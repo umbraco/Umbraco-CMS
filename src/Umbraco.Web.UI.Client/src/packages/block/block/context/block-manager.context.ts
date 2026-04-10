@@ -498,6 +498,20 @@ export abstract class UmbBlockManagerContext<
 		}
 	}
 
+	/**
+	 * Transfer a local block's content to the library.
+	 * Removes the inline content and updates the layout to reference the new element.
+	 */
+	transferToLibrary(oldContentKey: string, newElementKey: string) {
+		this.#contents.removeOne(oldContentKey);
+		this.removeExposesOf(oldContentKey);
+		this._layouts.updateOne(oldContentKey, {
+			contentKey: newElementKey,
+			isSharedContent: true,
+		} as Partial<BlockLayoutType>);
+		this.ensureContentResolved(newElementKey);
+	}
+
 	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {
 		this.#contents.updateOne(key, { [propertyAlias]: value });
 	}

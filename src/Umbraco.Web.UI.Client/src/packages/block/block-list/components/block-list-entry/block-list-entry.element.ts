@@ -8,7 +8,13 @@ import {
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import {
+	UmbDataPathBlockElementDataQuery,
+	UMB_BLOCK_MANAGER_CONTEXT,
+	UMB_BLOCK_TRANSFER_TO_LIBRARY_MODAL,
+} from '@umbraco-cms/backoffice/block';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
@@ -501,9 +507,47 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		`;
 	}
 
-	// TODO: Implement in "Transfer to Library"
-	#onTransferToLibrary = () => {
-		console.warn('Transfer to library — not yet implemented');
+	#onTransferToLibrary = async () => {
+		const contentKey = this._contentKey;
+		if (!contentKey) return;
+
+		const manager = await this.getContext(UMB_BLOCK_MANAGER_CONTEXT).catch(() => undefined);
+		if (!manager) return;
+		const content = manager.getContentOf(contentKey);
+		if (!content) return;
+
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT).catch(() => undefined);
+		if (!modalManager) return;
+		const result = await modalManager
+			.open(this, UMB_BLOCK_TRANSFER_TO_LIBRARY_MODAL, {
+				data: {},
+			})
+			.onSubmit()
+			.catch(() => undefined);
+		if (!result) return;
+
+		const elementRepository = new UmbElementDetailRepository(this);
+		const { data: scaffold } = await elementRepository.createScaffold({
+			documentType: { unique: content.contentTypeKey, collection: null },
+			values: content.values,
+			variants: [
+				{
+					culture: null,
+					segment: null,
+					state: null,
+					name: result.name,
+					publishDate: null,
+					createDate: null,
+					updateDate: null,
+				},
+			],
+		});
+		if (!scaffold) return;
+
+		const { data: created } = await elementRepository.create(scaffold, result.parentUnique);
+		if (!created) return;
+
+		manager.transferToLibrary(contentKey, created.unique);
 	};
 
 	// TODO: Implement in "Disconnect from Library"
