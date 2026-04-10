@@ -2018,6 +2018,11 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(UserOperationStatus.MediaNodeNotFound, Enumerable.Empty<NodePermissions>());
         }
 
+        if (idAttempt.Result.Count == 0)
+        {
+            return Attempt.SucceedWithStatus(UserOperationStatus.Success, Enumerable.Empty<NodePermissions>());
+        }
+
         Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions =
             await GetPermissionsAsync(userKey, idAttempt.Result, [UmbracoObjectTypes.Media]);
         scope.Complete();
@@ -2034,6 +2039,11 @@ internal partial class UserService : RepositoryService, IUserService
         if (idAttempt.Success is false || idAttempt.Result is null)
         {
             return Attempt.FailWithStatus(UserOperationStatus.ContentNodeNotFound, Enumerable.Empty<NodePermissions>());
+        }
+
+        if (idAttempt.Result.Count == 0)
+        {
+            return Attempt.SucceedWithStatus(UserOperationStatus.Success, Enumerable.Empty<NodePermissions>());
         }
 
         Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions =
