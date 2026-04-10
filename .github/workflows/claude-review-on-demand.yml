@@ -16,6 +16,9 @@ concurrency:
 jobs:
   review:
     runs-on: ubuntu-latest
+    if: |
+      github.event.issue.pull_request != null &&
+      contains(github.event.comment.body, '@umbraco review')
 
     steps:
       - name: Check commenter permission
@@ -61,7 +64,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          trigger_phrase: "@claude review"
+          trigger_phrase: "@umbraco review"
           claude_args: "--model claude-sonnet-4-6"
           prompt: |
             You are reviewing a pull request in the Umbraco CMS repository.
