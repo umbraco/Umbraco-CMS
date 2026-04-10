@@ -47,15 +47,6 @@ internal sealed class ElementPermissionService : IElementPermissionService
             return Task.FromResult(ElementAuthorizationStatus.NotFound);
         }
 
-        // Fetch both Elements and ElementContainers (folders)
-        IEntitySlim[] entities = _entityService.GetAll(
-            new[] { UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer },
-            keys).ToArray();
-        if (entities.Length == 0)
-        {
-            return Task.FromResult(ElementAuthorizationStatus.NotFound);
-        }
-
         // Check path access using the paths directly
         int[]? startNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
         foreach (TreeEntityPath entityPath in entityPaths)
