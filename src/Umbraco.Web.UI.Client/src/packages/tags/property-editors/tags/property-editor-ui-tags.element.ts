@@ -72,7 +72,7 @@ export class UmbPropertyEditorUITagsElement
 	}
 
 	#onChange(event: CustomEvent) {
-		this.value = ((event.target as UmbTagsInputElement).value as string).split(',');
+		this.value = (event.target as UmbTagsInputElement).items;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
