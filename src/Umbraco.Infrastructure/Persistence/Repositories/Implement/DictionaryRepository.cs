@@ -425,7 +425,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             var keysToInvalidate = new List<string>();
-            await MarkDescendantsForDeletion(entity.Key, db, keysToInvalidate);
+            await CollectDescendantsForDeletion(entity.Key, db, keysToInvalidate);
 
             DictionaryDto? dto = await db.DictionaryEntries
                 .Include(x => x.LanguageText)
@@ -515,9 +515,9 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
     }
 
     /// <summary>
-    /// Recursively loads and marks all descendants for deletion.
+    /// Recursively loads and collects all descendants for deletion.
     /// </summary>
-    private static async Task MarkDescendantsForDeletion(Guid parentId, UmbracoDbContext db, List<string> keysToInvalidate)
+    private static async Task CollectDescendantsForDeletion(Guid parentId, UmbracoDbContext db, List<string> keysToInvalidate)
     {
         List<DictionaryDto> children = await db.DictionaryEntries
             .Include(x => x.LanguageText)
@@ -526,7 +526,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 
         foreach (DictionaryDto child in children)
         {
-            await MarkDescendantsForDeletion(child.UniqueId, db, keysToInvalidate);
+            await CollectDescendantsForDeletion(child.UniqueId, db, keysToInvalidate);
             db.DictionaryEntries.Remove(child);
             keysToInvalidate.Add(child.Key);
         }
