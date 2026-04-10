@@ -60,6 +60,26 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<NodeDto> Nodes { get; set; }
 
+    public required DbSet<ContentDto> Content { get; set; }
+
+    public required DbSet<ContentVersionDto> ContentVersions { get; set; }
+
+    public required DbSet<ContentVersionCultureVariationDto> ContentVersionCultureVariations { get; set; }
+
+    public required DbSet<DocumentDto> Documents { get; set; }
+
+    public required DbSet<DocumentVersionDto> DocumentVersions { get; set; }
+
+    public required DbSet<DocumentCultureVariationDto> DocumentCultureVariations { get; set; }
+
+    public required DbSet<DocumentUrlDto> DocumentUrls { get; set; }
+
+    public required DbSet<DocumentUrlAliasDto> DocumentUrlAliases { get; set; }
+
+    public required DbSet<PropertyDataDto> PropertyData { get; set; }
+
+    public required DbSet<ContentScheduleDto> ContentSchedules { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var coreExtensions = options.FindExtension<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>();
