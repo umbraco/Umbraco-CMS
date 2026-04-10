@@ -1,6 +1,12 @@
 name: Claude Code Review
 
 on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned, labeled]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -15,105 +21,94 @@ permissions:
   id-token: write
 
 concurrency:
-  group: claude-review-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.run_id }}
+  group: claude-review-${{ github.event.pull_request.number || github.event.issue.number || github.event.inputs.pr_number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
   review:
     runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'issues' ||
+      github.event_name == 'pull_request_review_comment' ||
+      (github.event.issue.pull_request != null &&
+       contains(github.event.comment.body, '@claude'))
 
     steps:
-      - name: Resolve PR info
-        id: pr
+      - name: Resolve context
+        id: ctx
         uses: actions/github-script@v7
         with:
           script: |
+            // Determine if this is a PR context
+            const isPR = context.eventName === 'workflow_dispatch'
+              || context.eventName === 'pull_request_review_comment'
+              || context.payload.issue?.pull_request != null;
+
+            core.setOutput('is_pr', isPR ? 'true' : 'false');
+
+            if (!isPR) return;
+
             let pr;
             if (context.eventName === 'workflow_dispatch') {
-              const prNumber = context.payload.inputs?.pr_number;
-              if (!prNumber) throw new Error('pr_number input is required for workflow_dispatch');
               const { data } = await github.rest.pulls.get({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                pull_number: parseInt(prNumber, 10)
+                pull_number: parseInt(context.payload.inputs.pr_number, 10)
               });
               pr = data;
             } else {
-              pr = context.payload.pull_request;
-            }
-
-            // Skip drafts
-            if (pr.draft) {
-              core.info('PR is a draft — skipping.');
-              core.setOutput('skip', 'true');
-              return;
-            }
-
-            // Skip very large PRs
-            if (pr.changed_files > 150) {
-              await github.rest.issues.createComment({
+              const number = context.payload.pull_request?.number || context.issue.number;
+              const { data } = await github.rest.pulls.get({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: pr.number,
-                body: `This PR changes ${pr.changed_files} files — skipping automated review (limit: 150). Please request a manual review.`
+                pull_number: number
               });
-              core.setOutput('skip', 'true');
-              return;
+              pr = data;
             }
 
-            // SHA dedup — skip if this commit was already reviewed
-            const comments = await github.paginate(
-              github.rest.issues.listComments,
-              {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr.number,
-                per_page: 100
-              }
-            );
-            const alreadyReviewed = comments.some(c =>
-              c.body?.includes(`Based on commit \`${pr.head.sha}\``)
-            );
-            if (alreadyReviewed && context.eventName !== 'workflow_dispatch') {
-              core.info(`SHA ${pr.head.sha} already reviewed — skipping.`);
-              core.setOutput('skip', 'true');
-              return;
-            }
-
-            core.setOutput('skip', 'false');
             core.setOutput('number', pr.number.toString());
             core.setOutput('base_ref', pr.base.ref);
             core.setOutput('head_sha', pr.head.sha);
             core.setOutput('author', pr.user.login);
 
       - name: Checkout PR head
-        if: steps.pr.outputs.skip != 'true'
+        if: steps.ctx.outputs.is_pr == 'true'
         uses: actions/checkout@v4
         with:
-          ref: refs/pull/${{ steps.pr.outputs.number }}/head
+          ref: refs/pull/${{ steps.ctx.outputs.number }}/head
           fetch-depth: 0
 
-      - name: Run Claude Code Review
-        if: steps.pr.outputs.skip != 'true'
+      - name: Checkout repository
+        if: steps.ctx.outputs.is_pr != 'true'
+        uses: actions/checkout@v4
+
+      - name: Run Claude
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          trigger_phrase: "@claude"
+          assignee_trigger: "claude"
+          label_trigger: "claude"
           claude_args: "--model claude-sonnet-4-6"
           prompt: |
-            You are reviewing a pull request in the Umbraco CMS repository.
+            You are an AI assistant for the Umbraco CMS repository.
             This is an open-source project that welcomes community contributions.
 
-            PR: #${{ steps.pr.outputs.number }}
-            Base branch: ${{ steps.pr.outputs.base_ref }}
-            Head SHA: ${{ steps.pr.outputs.head_sha }}
-            Author: ${{ steps.pr.outputs.author }}
+            ## Context
 
-            ## Review Procedure
+            If this is a pull request review, use the following context:
+            - PR: #${{ steps.ctx.outputs.number }}
+            - Base branch: ${{ steps.ctx.outputs.base_ref }}
+            - Head SHA: ${{ steps.ctx.outputs.head_sha }}
+            - Author: ${{ steps.ctx.outputs.author }}
+
+            ## PR Review
+
+            When reviewing a pull request (triggered by `@claude review` on a PR, or via workflow_dispatch):
 
             Read and execute the review procedure defined in `.claude/skills/umb-review/SKILL.md`.
-            Use `${{ steps.pr.outputs.base_ref }}` as the target branch (skip auto-detection in step 1).
-
-            ## Output Instructions
+            Use `${{ steps.ctx.outputs.base_ref }}` as the target branch (skip auto-detection in step 1).
 
             For each finding that references a specific file and line:
             - Post an individual inline PR comment on that line.
@@ -121,11 +116,9 @@ jobs:
 
             For the overall summary (header, impact, verdict):
             - Post ONE top-level PR comment.
-            - Include "Based on commit `${{ steps.pr.outputs.head_sha }}`" at the bottom (used for dedup).
+            - Include "Based on commit `${{ steps.ctx.outputs.head_sha }}`" at the bottom (used for dedup).
 
             Do NOT use sticky/updating comments — post new individual comments.
-
-            ## Labeling
 
             After reviewing, apply labels to the PR based on changed files:
             - `area/frontend` — if files under `src/Umbraco.Web.UI.Client/` are changed
@@ -141,12 +134,23 @@ jobs:
             - `category/ui` — if changes to the UI layer are detected
 
             Only apply labels you are confident about. Never remove existing labels.
-            Use `gh pr edit ${{ steps.pr.outputs.number }} --add-label "<label>"` to apply labels.
+            Use `gh pr edit ${{ steps.ctx.outputs.number }} --add-label "<label>"` to apply labels.
+
+            ## Issues
+
+            When responding to an issue (triggered by assignment, label, or `@claude` comment on an issue):
+
+            Read the CLAUDE.md files in the repository to understand the project structure and conventions.
+            Analyze the issue and provide helpful guidance:
+            - Suggest which files or areas of the codebase are relevant
+            - Point to existing patterns that could help solve the issue
+            - If the issue is a bug report, suggest potential root causes
+            - If the issue is a feature request, suggest an implementation approach
 
             ## Tone
 
             Be friendly and constructive. This project values community contributions.
-            Thank the author. Frame feedback as suggestions where possible.
+            Frame feedback as suggestions where possible.
             Reserve firm language for genuine Critical issues only.
             Do not be condescending. Remember: "We welcome all contributions
             and will happily give feedback."
@@ -154,5 +158,5 @@ jobs:
             ## Constraints
 
             - Run fully autonomously. Do NOT ask questions.
-            - Only review changed files. Do not flag pre-existing issues.
+            - Only review changed files in PRs. Do not flag pre-existing issues.
             - Do not suggest changes that would themselves introduce breaking changes.
