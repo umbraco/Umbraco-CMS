@@ -296,9 +296,8 @@ internal sealed class PublishedProperty : PublishedPropertyBase
             // We need to convert null to empty
             culture ??= string.Empty;
             segment ??= string.Empty;
-            var fallbackKey = ToFallbackKey(fallback);
 
-            if (culture == string.Empty && segment == string.Empty && fallbackKey == string.Empty)
+            if (culture == string.Empty && segment == string.Empty && fallback.HasPolicies is false)
             {
                 return this;
             }
@@ -311,7 +310,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
                 }
             }
 
-            var k = new CompositeStringArrayKey(culture, segment, fallbackKey);
+            var k = new CompositeStringArrayKey(culture, segment, ToFallbackKey(fallback));
 
             CacheValue value = _values.GetOrAdd(k, _ => new CacheValue());
 

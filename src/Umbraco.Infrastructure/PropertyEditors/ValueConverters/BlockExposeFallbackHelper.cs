@@ -48,8 +48,8 @@ internal static class BlockExposeFallbackHelper
             return true;
         }
 
-        // Only apply language fallback for culture-variant blocks.
-        if (expectedCulture is null)
+        // Only apply language fallback for culture-variant blocks, and if any fallback policies are provided.
+        if (expectedCulture is null || fallback.HasPolicies is false)
         {
             resolvedCulture = null;
             return false;
