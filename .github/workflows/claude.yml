@@ -38,7 +38,7 @@ jobs:
           base_branch: "main"
           additional_permissions: "actions: read"
           show_full_output: true
-          claude_args: "--model claude-sonnet-4-6 --max-turns 25"
+          claude_args: "--model claude-sonnet-4-6 --max-turns 25 --allowedTools 'Bash(gh:*),Bash(git:*),Bash(npm:*),Bash(dotnet:*)'"
           prompt: |
             You are an AI assistant for the Umbraco CMS repository, an open-source
             .NET CMS that welcomes community contributions.
@@ -47,10 +47,11 @@ jobs:
             `@claude` is stripped before you see the message, so common requests
             will look like:
 
-            - `review` — Review the current PR. Use `gh pr diff` to read the
-              changes. Focus on bugs, breaking changes, and architectural
-              concerns. Post inline comments for specific issues and a brief
-              summary comment.
+            - `review` — Review the current PR. Use `gh pr diff` and
+              `gh pr view` to read the changes (NOT git diff, NOT the
+              umb-review skill — those won't work in this context).
+              Focus on bugs, breaking changes, and architectural concerns.
+              Post inline comments for specific issues and a brief summary.
             - `help` or a general question — Answer based on the codebase.
               Read CLAUDE.md files for project structure and conventions.
             - `fix ...` — Implement the requested fix on a new branch.
