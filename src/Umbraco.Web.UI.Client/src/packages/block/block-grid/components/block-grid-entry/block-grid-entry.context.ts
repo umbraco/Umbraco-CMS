@@ -61,8 +61,6 @@ export class UmbBlockGridEntryContext
 		return this.#relevantColumnSpanOptions.getValue();
 	}
 
-	#localize = new UmbLocalizationController(this);
-
 	#canScale = new UmbBooleanState(false);
 	readonly canScale = this.#canScale.asObservable();
 
@@ -310,8 +308,11 @@ export class UmbBlockGridEntryContext
 			throw new Error('No clipboard context found');
 		}
 
-		const workspaceName = this.#localize.string(propertyDatasetContext?.getName());
-		const propertyLabel = this.#localize.string(propertyContext?.getLabel());
+		const localizeCtrl = new UmbLocalizationController(this);
+		const workspaceName = localizeCtrl.string(propertyDatasetContext?.getName());
+		const propertyLabel = localizeCtrl.string(propertyContext?.getLabel());
+		localizeCtrl.destroy();
+
 		const blockLabel = this.getName();
 
 		const entryName = workspaceName
