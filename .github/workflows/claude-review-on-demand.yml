@@ -28,7 +28,7 @@ jobs:
               repo: context.repo.repo,
               username: context.payload.comment.user.login
             });
-            const allowed = ['admin', 'write'].includes(data.permission);
+            const allowed = ['admin', 'maintain', 'write'].includes(data.permission);
             if (!allowed) {
               core.info(`${context.payload.comment.user.login} has '${data.permission}' — skipping.`);
             }
@@ -49,11 +49,12 @@ jobs:
             core.setOutput('base_ref', pr.base.ref);
             core.setOutput('author', pr.user.login);
 
-      - name: Checkout
+      - name: Checkout PR head
         if: steps.permission.outputs.allowed == 'true'
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          ref: ${{ steps.pr_info.outputs.sha }}
+          fetch-depth: 0
 
       - name: Run Claude Code Review
         if: steps.permission.outputs.allowed == 'true'

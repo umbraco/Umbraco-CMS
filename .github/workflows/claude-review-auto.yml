@@ -61,17 +61,20 @@ jobs:
             }
 
             // SHA dedup — skip if this commit was already reviewed
-            const comments = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pr.number
-            });
-            const sha = pr.head.sha.substring(0, 7);
-            const alreadyReviewed = comments.data.some(c =>
-              c.body?.includes(`Based on commit \`${sha}\``)
+            const comments = await github.paginate(
+              github.rest.issues.listComments,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                per_page: 100
+              }
+            );
+            const alreadyReviewed = comments.some(c =>
+              c.body?.includes(`Based on commit \`${pr.head.sha}\``)
             );
             if (alreadyReviewed && context.eventName !== 'workflow_dispatch') {
-              core.info(`SHA ${sha} already reviewed — skipping.`);
+              core.info(`SHA ${pr.head.sha} already reviewed — skipping.`);
               core.setOutput('skip', 'true');
               return;
             }
@@ -82,11 +85,12 @@ jobs:
             core.setOutput('head_sha', pr.head.sha);
             core.setOutput('author', pr.user.login);
 
-      - name: Checkout
+      - name: Checkout PR head
         if: steps.pr.outputs.skip != 'true'
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          ref: refs/pull/${{ steps.pr.outputs.number }}/head
+          fetch-depth: 0
 
       - name: Run Claude Code Review
         if: steps.pr.outputs.skip != 'true'
