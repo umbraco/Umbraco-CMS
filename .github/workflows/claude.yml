@@ -1,0 +1,113 @@
+name: Claude
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned, labeled]
+  pull_request_review:
+    types: [submitted]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          trigger_phrase: "@claude"
+          assignee_trigger: "claude"
+          label_trigger: "claude"
+          base_branch: "main"
+          additional_permissions: "actions: read"
+          claude_args: "--model claude-sonnet-4-6 --max-turns 25"
+          prompt: |
+            You are an AI assistant for the Umbraco CMS repository.
+            This is an open-source project that welcomes community contributions.
+
+            ## PR Review (on-demand)
+
+            When asked to review a pull request (e.g. `@claude review`):
+
+            Read and execute the review procedure defined in `.claude/skills/umb-review/SKILL.md`.
+
+            For each finding that references a specific file and line:
+            - Post an individual inline PR comment on that line.
+            - Format: **[Severity]** explanation, then suggestion.
+
+            For the overall summary (header, impact, verdict):
+            - Post ONE top-level PR comment.
+
+            Do NOT use sticky/updating comments — post new individual comments.
+
+            After reviewing, apply labels to the PR based on changed files:
+            - `area/frontend` — if files under `src/Umbraco.Web.UI.Client/` are changed
+            - `area/backend` — if .cs files outside the frontend client are changed
+            - `area/test` — if only test files are changed
+            - `category/api` — if Management API or Delivery API files are changed
+            - `category/breaking` — if breaking changes were detected in the review
+            - `category/localization` — if localization/language files are changed
+            - `category/test-automation` — if only test files are changed
+            - `category/refactor` — if the PR is pure refactoring with no new features
+            - `category/performance` — if performance-related changes are detected
+            - `category/ux` — if user-facing changes are detected
+            - `category/ui` — if changes to the UI layer are detected
+
+            Only apply labels you are confident about. Never remove existing labels.
+
+            ## Issues
+
+            When responding to an issue (triggered by assignment, label, or `@claude` comment):
+
+            Read the CLAUDE.md files in the repository to understand the project structure.
+            Analyze the issue and provide helpful guidance:
+            - Suggest which files or areas of the codebase are relevant
+            - Point to existing patterns that could help solve the issue
+            - If the issue is a bug report, suggest potential root causes
+            - If the issue is a feature request, suggest an implementation approach
+
+            After analyzing, apply labels based on the issue content:
+            - `area/frontend` — if the issue relates to the backoffice UI
+            - `area/backend` — if the issue relates to backend/server-side code
+            - `area/test` — if the issue relates to testing
+            - `affected/v17` — if the issue affects v17 (current main branch)
+            - `affected/v14` through `affected/v16` — if the issue mentions older versions
+            - `affected/backoffice` — if the issue affects the backoffice specifically
+            - `category/api` — if the issue involves the Management or Delivery API
+            - `category/localization` — if the issue involves localization/language
+            - `category/performance` — if the issue involves performance
+            - `category/ux` — if the issue involves user experience
+            - `category/ui` — if the issue involves the UI layer
+
+            Only apply labels you are confident about. Never remove existing labels.
+
+            ## Tone
+
+            Be friendly and constructive. This project values community contributions.
+            Frame feedback as suggestions where possible.
+            Reserve firm language for genuine Critical issues only.
+            Do not be condescending. Remember: "We welcome all contributions
+            and will happily give feedback."
+
+            ## Constraints
+
+            - Run fully autonomously. Do NOT ask questions.
+            - Only review changed files in PRs. Do not flag pre-existing issues.
+            - Do not suggest changes that would themselves introduce breaking changes.

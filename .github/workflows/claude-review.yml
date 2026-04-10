@@ -1,14 +1,8 @@
-name: Claude Code Review
+name: Claude PR Review
 
 on:
-  issue_comment:
-    types: [created]
-  pull_request_review_comment:
-    types: [created]
-  issues:
-    types: [opened, assigned, labeled]
-  pull_request_review:
-    types: [submitted]
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
 
 permissions:
   contents: read
@@ -17,29 +11,23 @@ permissions:
   id-token: write
 
 jobs:
-  claude:
+  review:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
-    if: |
-      github.event_name != 'issue_comment' ||
-      contains(github.event.comment.body, '@claude')
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          trigger_phrase: "@claude"
-          assignee_trigger: "claude"
-          label_trigger: "claude"
           base_branch: "main"
           additional_permissions: "actions: read"
           claude_args: "--model claude-sonnet-4-6 --max-turns 25"
           prompt: |
-            You are an AI assistant for the Umbraco CMS repository.
-            This is an open-source project that welcomes community contributions.
-
-            ## PR Review
-
-            When reviewing a pull request (triggered by `@claude review` on a PR):
+            You are reviewing pull request #${{ github.event.pull_request.number }}
+            in the Umbraco CMS repository.
 
             Read and execute the review procedure defined in `.claude/skills/umb-review/SKILL.md`.
 
@@ -67,42 +55,10 @@ jobs:
 
             Only apply labels you are confident about. Never remove existing labels.
 
-            ## Issues
-
-            When responding to an issue (triggered by assignment, label, or `@claude` comment on an issue):
-
-            Read the CLAUDE.md files in the repository to understand the project structure and conventions.
-            Analyze the issue and provide helpful guidance:
-            - Suggest which files or areas of the codebase are relevant
-            - Point to existing patterns that could help solve the issue
-            - If the issue is a bug report, suggest potential root causes
-            - If the issue is a feature request, suggest an implementation approach
-
-            After analyzing the issue, apply labels based on its content:
-            - `area/frontend` — if the issue relates to the backoffice UI (`src/Umbraco.Web.UI.Client/`)
-            - `area/backend` — if the issue relates to backend/server-side code
-            - `area/test` — if the issue relates to testing
-            - `affected/v17` — if the issue affects v17 (current main branch)
-            - `affected/v14` through `affected/v16` — if the issue mentions or affects older versions
-            - `affected/backoffice` — if the issue affects the backoffice specifically
-            - `category/api` — if the issue involves the Management or Delivery API
-            - `category/localization` — if the issue involves localization/language
-            - `category/performance` — if the issue involves performance
-            - `category/ux` — if the issue involves user experience
-            - `category/ui` — if the issue involves the UI layer
-
-            Only apply labels you are confident about based on the issue description. Never remove existing labels.
-
-            ## Tone
-
             Be friendly and constructive. This project values community contributions.
             Frame feedback as suggestions where possible.
             Reserve firm language for genuine Critical issues only.
-            Do not be condescending. Remember: "We welcome all contributions
-            and will happily give feedback."
 
-            ## Constraints
-
-            - Run fully autonomously. Do NOT ask questions.
-            - Only review changed files in PRs. Do not flag pre-existing issues.
-            - Do not suggest changes that would themselves introduce breaking changes.
+            Run fully autonomously. Do NOT ask questions.
+            Only review changed files. Do not flag pre-existing issues.
+            Do not suggest changes that would themselves introduce breaking changes.
