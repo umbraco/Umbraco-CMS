@@ -10,6 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/clipboard';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbElementTypeStructureRepository } from '@umbraco-cms/backoffice/element';
 import type { UmbPropertyEditorRteValueType } from '@umbraco-cms/backoffice/rte';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -73,12 +74,20 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				const config = propertyContext.getConfig();
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
+				// Fetch element types allowed in the library, filtered to those matching block types
+				const blockTypeKeys = new Set(blockTypes.map((bt) => bt.contentElementTypeKey));
+				const elementTypeStructureRepo = new UmbElementTypeStructureRepository(this);
+				const { data: allowedTypes } = await elementTypeStructureRepo.requestAllowedChildrenOf(null, null);
+				const allowedLibraryElementTypeKeys =
+					allowedTypes?.items.filter((t) => t.unique && blockTypeKeys.has(t.unique)).map((t) => t.unique!) ?? [];
+
 				return {
 					modal: { size: modalSize },
 					data: {
 						blocks: blockTypes,
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
+						allowedLibraryElementTypeKeys,
 						clipboardFilter: async (clipboardEntryDetail) => {
 							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
 								pasteTranslatorManifests,
@@ -126,6 +135,11 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 					} else {
 						throw new Error('Failed to create block');
 					}
+				} else if (value?.library && data) {
+					await this._manager?.insertLibraryElementReference(
+						value.library.elementKey,
+						data.originData as UmbBlockRteWorkspaceOriginData,
+					);
 				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 					if (!clipboardContext) {

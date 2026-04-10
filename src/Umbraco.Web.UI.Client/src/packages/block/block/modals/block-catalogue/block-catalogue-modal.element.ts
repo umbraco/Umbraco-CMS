@@ -19,7 +19,7 @@ import { UMB_MODAL_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
-import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 type UmbBlockTypeItemWithGroupKey = UmbBlockTypeWithGroupKey & UmbDocumentTypeItemModel;
@@ -41,7 +41,10 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	private _groupedBlocks: Array<{ name?: string; blocks: Array<UmbBlockTypeItemWithGroupKey> }> = [];
 
 	@state()
-	private _openClipboard?: boolean;
+	private _activeView: 'create' | 'clipboard' | 'library' = 'create';
+
+	@state()
+	private _hasLibraryElements = false;
 
 	@state()
 	private _workspacePath?: string;
@@ -94,7 +97,8 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		super.connectedCallback();
 		if (!this.data) return;
 
-		this._openClipboard = this.data.openClipboard ?? false;
+		this._activeView = this.data.openClipboard ? 'clipboard' : 'create';
+		this._hasLibraryElements = (this.data.allowedLibraryElementTypeKeys?.length ?? 0) > 0;
 
 		this.#itemManager.setUniques(this.data.blocks.map((block) => block.contentElementTypeKey));
 	}
@@ -193,7 +197,15 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#renderMain() {
-		return this._manager ? (this._openClipboard ? this.#renderClipboard() : this.#renderCreateEmpty()) : nothing;
+		if (!this._manager) return nothing;
+		switch (this._activeView) {
+			case 'clipboard':
+				return this.#renderClipboard();
+			case 'library':
+				return this.#renderLibrary();
+			default:
+				return this.#renderCreateEmpty();
+		}
 	}
 
 	#renderClipboard() {
@@ -202,6 +214,44 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 				.config=${{ multiple: true, asyncFilter: this.data?.clipboardFilter }}
 				@selection-change=${this.#onClipboardPickerSelectionChange}></umb-clipboard-entry-picker>
 		`;
+	}
+
+	#renderLibrary() {
+		return html`
+			<uui-box>
+				<umb-tree
+					alias="Umb.Tree.Element"
+					.props=${{
+						hideTreeItemActions: true,
+						hideTreeRoot: true,
+						selectableFilter: this.#librarySelectableFilter,
+					}}
+					@selected=${this.#onLibraryElementSelected}
+					@deselected=${this.#onLibraryElementDeselected}></umb-tree>
+			</uui-box>
+		`;
+	}
+
+	#librarySelectableFilter = (item: any) => {
+		// Only elements (not folders) are selectable, filtered by allowed element type keys
+		if (item.isFolder) return false;
+		const allowedKeys = this.data?.allowedLibraryElementTypeKeys;
+		if (!allowedKeys?.length) return true;
+		return allowedKeys.includes(item.documentType?.unique);
+	};
+
+	#onLibraryElementSelected(event: UmbSelectedEvent) {
+		event.stopPropagation();
+		const elementKey = event.unique;
+		if (!elementKey) return;
+		this.value = {
+			library: { elementKey },
+		};
+	}
+
+	#onLibraryElementDeselected(event: UmbSelectedEvent) {
+		event.stopPropagation();
+		this.value = undefined;
 	}
 
 	#renderCreateEmpty() {
@@ -267,15 +317,27 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			<uui-tab-group slot="navigation">
 				<uui-tab
 					label=${this.localize.term('blockEditor_tabCreateEmpty')}
-					?active=${!this._openClipboard}
-					@click=${() => (this._openClipboard = false)}>
+					?active=${this._activeView === 'create'}
+					@click=${() => (this._activeView = 'create')}>
 					<umb-localize key=${this.localize.term('blockEditor_tabCreateEmpty')}>Create Empty</umb-localize>
 					<uui-icon slot="icon" name="icon-add"></uui-icon>
 				</uui-tab>
+				${when(
+					this._hasLibraryElements,
+					() => html`
+						<uui-tab
+							label=${this.localize.term('blockEditor_tabLibrary')}
+							?active=${this._activeView === 'library'}
+							@click=${() => (this._activeView = 'library')}>
+							<umb-localize key="blockEditor_tabLibrary">Library</umb-localize>
+							<uui-icon slot="icon" name="icon-link"></uui-icon>
+						</uui-tab>
+					`,
+				)}
 				<uui-tab
 					label=${this.localize.term('blockEditor_tabClipboard')}
-					?active=${this._openClipboard}
-					@click=${() => (this._openClipboard = true)}>
+					?active=${this._activeView === 'clipboard'}
+					@click=${() => (this._activeView = 'clipboard')}>
 					<umb-localize key=${this.localize.term('blockEditor_tabClipboard')}>Clipboard</umb-localize>
 					<uui-icon slot="icon" name="icon-clipboard"></uui-icon>
 				</uui-tab>

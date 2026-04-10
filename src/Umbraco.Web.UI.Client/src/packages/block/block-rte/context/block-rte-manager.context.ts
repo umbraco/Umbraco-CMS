@@ -82,6 +82,14 @@ export class UmbBlockRteManagerContext<
 		return true;
 	}
 
+	override async insertLibraryElementReference(elementKey: string, originData?: UmbBlockRteWorkspaceOriginData) {
+		await super.insertLibraryElementReference(elementKey, originData);
+		if (originData) {
+			const layout = { contentKey: elementKey, isSharedContent: true } as BlockLayoutType;
+			this.notifyBlockInserted(layout, originData);
+		}
+	}
+
 	/**
 	 * @param contentKey
 	 * @internal

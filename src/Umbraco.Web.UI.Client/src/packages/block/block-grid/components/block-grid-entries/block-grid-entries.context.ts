@@ -29,6 +29,7 @@ import {
 	UmbClipboardPastePropertyValueTranslatorValueResolver,
 } from '@umbraco-cms/backoffice/clipboard';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbElementTypeStructureRepository } from '@umbraco-cms/backoffice/element';
 import {
 	UMB_BLOCK_CATALOGUE_MODAL,
 	UmbBlockEntriesContext,
@@ -183,6 +184,14 @@ export class UmbBlockGridEntriesContext
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
 				const blockTypes = this.#allowedBlockTypes.getValue();
+
+				// Fetch element types allowed in the library, filtered to those matching block types
+				const blockTypeKeys = new Set(blockTypes.map((bt) => bt.contentElementTypeKey));
+				const elementTypeStructureRepo = new UmbElementTypeStructureRepository(this);
+				const { data: allowedTypes } = await elementTypeStructureRepo.requestAllowedChildrenOf(null, null);
+				const allowedLibraryElementTypeKeys =
+					allowedTypes?.items.filter((t) => t.unique && blockTypeKeys.has(t.unique)).map((t) => t.unique!) ?? [];
+
 				/*
 				modal size logic:
 				If more than 8 block types, medium modal, more than 12 large modal:
@@ -195,6 +204,7 @@ export class UmbBlockGridEntriesContext
 						blocks: blockTypes,
 						blockGroups: this._manager.getBlockGroups() ?? [],
 						openClipboard: routingInfo.view === 'clipboard',
+						allowedLibraryElementTypeKeys,
 						clipboardFilter: async (clipboardEntryDetail) => {
 							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
 								pasteTranslatorManifests,
@@ -249,6 +259,8 @@ export class UmbBlockGridEntriesContext
 					} else {
 						throw new Error('Failed to create block');
 					}
+				} else if (value?.library) {
+					this._manager?.insertLibraryElementReference(value.library.elementKey);
 				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 					if (!clipboardContext) {

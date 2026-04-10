@@ -59,6 +59,9 @@ export abstract class UmbBlockEntryContext<
 	#isLibraryElement = new UmbBooleanState(false);
 	readonly isLibraryElement = this.#isLibraryElement.asObservable();
 
+	#sharedContentVariantState = new UmbStringState(undefined);
+	readonly sharedContentVariantState = this.#sharedContentVariantState.asObservable();
+
 	readonly #localize = new UmbLocalizationController(this);
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
@@ -537,27 +540,31 @@ export abstract class UmbBlockEntryContext<
 		// was called before the manager was available)
 		this._manager.ensureContentResolved(this.#contentKey);
 
-		// observe library element state:
+		// Observe content and library state together to avoid race conditions.
+		// Both are evaluated in the same tick, preventing the unsupported flag
+		// from flashing true while library element content is being fetched.
 		this.observe(
-			this._manager.isSharedContentOf(this.#contentKey),
-			(isLibrary) => {
-				this.#isLibraryElement.setValue(isLibrary ?? false);
-			},
-			'observeIsLibraryElement',
-		);
-
-		// observe content:
-		this.observe(
-			this._manager.contentOf(this.#contentKey),
-			(content) => {
+			mergeObservables(
+				[this._manager.contentOf(this.#contentKey), this._manager.isSharedContentOf(this.#contentKey)],
+				([content, isLibrary]) => ({ content, isLibrary: isLibrary ?? false }),
+			),
+			({ content, isLibrary }) => {
+				this.#isLibraryElement.setValue(isLibrary);
 				if (this.#unsupported.getValue() !== true) {
-					// Don't mark as unsupported if this is a library element (content may still be loading)
-					const isLibrary = this.#isLibraryElement.getValue();
 					this.#unsupported.setValue(!content && !isLibrary);
 				}
 				this.#content.setValue(content);
 			},
 			'observeContent',
+		);
+
+		// Observe the variant state of shared content (published, draft, etc.)
+		this.observe(
+			this._manager.sharedContentVariantStateOf(this.#contentKey),
+			(state) => {
+				this.#sharedContentVariantState.setValue(state ?? undefined);
+			},
+			'observeSharedContentVariantState',
 		);
 	}
 	#observeSettingsData() {

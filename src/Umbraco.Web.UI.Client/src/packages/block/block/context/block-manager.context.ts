@@ -82,6 +82,10 @@ export abstract class UmbBlockManagerContext<
 	public readonly contents = this.#contents.asObservable();
 
 	readonly #resolvedLibraryElements = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
+	readonly #resolvedLibraryElementVariantStates = new UmbArrayState(
+		<Array<{ key: string; state: string | null }>>[],
+		(x) => x.key,
+	);
 	#elementRepository = new UmbElementDetailRepository(this);
 	#pendingElementFetches = new Set<string>();
 
@@ -323,6 +327,16 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
+	 * Returns an observable of the variant state for a shared/library element.
+	 * Emits the state string (e.g., 'Published', 'Draft') or null if not resolved yet.
+	 */
+	sharedContentVariantStateOf(key: string) {
+		return this.#resolvedLibraryElementVariantStates.asObservablePart(
+			(source) => source.find((x) => x.key === key)?.state ?? null,
+		);
+	}
+
+	/**
 	 * Imperatively triggers a fetch for a library element if the layout has isSharedContent set.
 	 * Called by block entry contexts when setContentKey() is invoked.
 	 */
@@ -353,6 +367,8 @@ export abstract class UmbBlockManagerContext<
 					),
 				};
 				this.#resolvedLibraryElements.appendOne(blockData);
+				const variantState = data.variants[0]?.state ?? null;
+				this.#resolvedLibraryElementVariantStates.appendOne({ key: data.unique, state: variantState });
 			}
 		} finally {
 			this.#pendingElementFetches.delete(key);
@@ -464,6 +480,22 @@ export abstract class UmbBlockManagerContext<
 		const variantId = this.getVariantId();
 		if (!variantId) return;
 		this.#exposes.filter((x) => !(x.contentKey === contentKey && variantId.compare(x)));
+	}
+
+	/**
+	 * Insert a block whose content is a library element reference.
+	 * Only creates a layout entry — no contentData entry is added.
+	 * Sets the initial block expose once the element content is resolved.
+	 */
+	async insertLibraryElementReference(elementKey: string, _originData?: BlockOriginDataType) {
+		const layout = { contentKey: elementKey, isSharedContent: true } as BlockLayoutType;
+		this._layouts.appendOne(layout);
+		await this.#fetchLibraryElement(elementKey);
+
+		const content = this.#resolvedLibraryElements.getValue().find((x) => x.key === elementKey);
+		if (content) {
+			this.#setInitialBlockExpose(content);
+		}
 	}
 
 	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {

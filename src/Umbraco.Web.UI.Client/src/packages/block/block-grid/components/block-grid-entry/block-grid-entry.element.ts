@@ -148,6 +148,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _isLibraryElement = false;
 
+	@state()
+	private _sharedContentVariantState: string | null | undefined;
+
 	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
 	private _isReferenceAttr = false;
 
@@ -206,8 +209,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.hasExpose,
 			(exposed) => {
-				this.#updateBlockViewProps({ unpublished: !exposed });
-				this._exposed = exposed;
+				// Shared content blocks use the element's variant state to determine published status
+				const isExposed = this._isLibraryElement ? this._sharedContentVariantState !== 'Draft' : exposed;
+				this.#updateBlockViewProps({ unpublished: !isExposed });
+				this._exposed = isExposed;
 			},
 			null,
 		);
@@ -229,6 +234,13 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			(isLibrary) => {
 				this._isLibraryElement = isLibrary;
 				this._isReferenceAttr = isLibrary;
+			},
+			null,
+		);
+		this.observe(
+			this.#context.sharedContentVariantState,
+			(state) => {
+				this._sharedContentVariantState = state;
 			},
 			null,
 		);
