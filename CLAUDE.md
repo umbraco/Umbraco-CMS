@@ -441,6 +441,48 @@ The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime depende
 
 ---
 
+## 7. CI/CD — Claude Automated PR Review
+
+Two GitHub Actions workflows provide automated code review using `anthropics/claude-code-action@v1` and the `umb-review` skill (`.claude/skills/umb-review/SKILL.md`). Reviews are advisory only — they do not block merging.
+
+### Workflows
+
+| File | Trigger | Purpose |
+|------|---------|---------|
+| `claude-review-auto.yml` | `pull_request_target` + `workflow_dispatch` | Auto-review on PR open/push; manual re-run by PR number |
+| `claude-review-on-demand.yml` | `issue_comment` (`@claude review`) | On-demand review triggered by collaborator comment |
+
+### Key Design Decisions
+
+- **`pull_request_target`** (not `pull_request`) — runs in base repo context so it has write access for fork PRs. Checkout must explicitly use `refs/pull/{n}/head` to get the PR code.
+- **`fetch-depth: 0`** — the umb-review skill uses `git diff {target}...HEAD` (triple-dot), which requires the merge base. Shallow clones break this.
+- **SHA dedup** — the auto workflow checks existing PR comments for `Based on commit \`{full-sha}\`` to skip re-reviews of the same commit. Uses `github.paginate()` to handle PRs with many comments.
+- **Permission gate** (on-demand) — `admin`, `maintain`, and `write` collaborators can trigger; others are silently ignored.
+- **Concurrency** — one review at a time per PR number; new pushes cancel in-progress reviews.
+- **Skip conditions** — draft PRs, PRs with >150 changed files.
+
+### Labels
+
+Both workflows instruct Claude to apply labels based on changed files:
+
+| Label | Condition |
+|-------|-----------|
+| `area/frontend` | Files under `src/Umbraco.Web.UI.Client/` |
+| `area/backend` | `.cs` files outside the frontend client |
+| `area/test` | Only test files changed |
+| `category/api` | Management or Delivery API files |
+| `category/breaking` | Breaking changes detected |
+| `category/localization` | Localization/language files |
+| `category/test-automation` | Only test files changed |
+| `category/refactor` | Pure refactoring, no new features |
+| `category/performance` | Performance-related changes |
+| `category/ux` | User-facing changes |
+| `category/ui` | UI layer changes |
+
+Labels are only added, never removed. Claude applies only labels it is confident about.
+
+---
+
 ## Quick Reference
 
 ### Essential Commands
