@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -51,6 +52,7 @@ internal partial class UserService : RepositoryService, IUserService
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IRuntimeState _runtimeState;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserService" /> class.
@@ -74,6 +76,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="isoCodeValidator">The validator for ISO codes.</param>
     /// <param name="forgotPasswordSender">The sender for forgot password emails.</param>
     /// <param name="userIdKeyResolver">The resolver for user ID to key mappings.</param>
+    /// <param name="runtimeState">The runtime state for checking upgrade status.</param>
     public UserService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -93,7 +96,8 @@ internal partial class UserService : RepositoryService, IUserService
         IOptions<ContentSettings> contentSettings,
         IIsoCodeValidator isoCodeValidator,
         IUserForgotPasswordSender forgotPasswordSender,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IRuntimeState runtimeState)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -109,6 +113,7 @@ internal partial class UserService : RepositoryService, IUserService
         _isoCodeValidator = isoCodeValidator;
         _forgotPasswordSender = forgotPasswordSender;
         _userIdKeyResolver = userIdKeyResolver;
+        _runtimeState = runtimeState;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
@@ -1739,7 +1744,22 @@ internal partial class UserService : RepositoryService, IUserService
     public IUser? GetUserById(int id)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return _userRepository.Get(id);
+
+        try
+        {
+            return _userRepository.Get(id);
+        }
+        catch (DbException)
+        {
+            // During upgrades the user table schema may be mid-migration, so fall back to
+            // a minimal query that only resolves the fields needed for authorization.
+            if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Upgrading)
+            {
+                return _userRepository.GetForUpgrade(id);
+            }
+
+            throw;
+        }
     }
 
     /// <inheritdoc/>

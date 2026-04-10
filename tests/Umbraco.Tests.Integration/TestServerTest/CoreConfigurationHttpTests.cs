@@ -274,7 +274,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
                 app.UseUmbraco()
                     .WithMiddleware(u =>
                     {
-                        // Delivery API doesn't need special middleware
+                        // Delivery API doesn't need special middleware.
                     })
                     .WithEndpoints(u =>
                     {
@@ -325,6 +325,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
                 app.UseUmbraco()
                     .WithMiddleware(u =>
                     {
+                        // Delivery API doesn't need special middleware.
                     })
                     .WithEndpoints(u =>
                     {
@@ -344,11 +345,13 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
         using var scope = factory.Services.CreateScope();
         var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-        Assert.DoesNotThrow(() => userService.GetUsersById([]));
+        // Use non-empty arguments so the repository-backed code paths are exercised,
+        // not just the early-return guards for null/empty input.
+        Assert.DoesNotThrow(() => userService.GetUsersById(-1));
         Assert.DoesNotThrow(() => userService.GetUserById(-1));
         Assert.DoesNotThrow(() => userService.GetAsync(Guid.Empty).GetAwaiter().GetResult());
-        Assert.DoesNotThrow(() => userService.GetAsync([]).GetAwaiter().GetResult());
-        Assert.DoesNotThrow(() => userService.GetAllInGroup(null));
+        Assert.DoesNotThrow(() => userService.GetAsync(new[] { Guid.Empty }).GetAwaiter().GetResult());
+        Assert.DoesNotThrow(() => userService.GetAllInGroup(-1));
     }
 
     /// <summary>
