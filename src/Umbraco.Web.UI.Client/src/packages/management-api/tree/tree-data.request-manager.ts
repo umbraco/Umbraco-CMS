@@ -122,8 +122,8 @@ export class UmbManagementApiTreeDataRequestManager<
 			? {
 					items: data.items,
 					total: data.total,
-					totalBefore: 0,
-					totalAfter: data.total - data.items.length,
+					totalBefore: skip,
+					totalAfter: Math.max(data.total - skip - data.items.length, 0),
 				}
 			: undefined;
 
@@ -190,8 +190,8 @@ export class UmbManagementApiTreeDataRequestManager<
 			? {
 					items: data.items,
 					total: data.total,
-					totalBefore: 0,
-					totalAfter: data.total - data.items.length,
+					totalBefore: skip,
+					totalAfter: Math.max(data.total - skip - data.items.length, 0),
 				}
 			: undefined;
 
@@ -214,8 +214,7 @@ export class UmbManagementApiTreeDataRequestManager<
 			return paging.skip !== undefined ? paging.skip : 0;
 		}
 
-		// Including args.skip for backwards compatibility
-		return args.skip !== undefined ? args.skip : 0;
+		return 0;
 	}
 
 	#getTakeFromArgs(args: UmbTreeRootItemsRequestArgs | UmbTreeChildrenOfRequestArgs): number {
@@ -225,8 +224,7 @@ export class UmbManagementApiTreeDataRequestManager<
 			return paging.take !== undefined ? paging.take : this.#defaultTakeSize;
 		}
 
-		// Including args.take for backwards compatibility
-		return args.take !== undefined ? args.take : this.#defaultTakeSize;
+		return this.#defaultTakeSize;
 	}
 
 	#getTargetResultHasValidParents(data: Array<TreeItemType> | undefined, parentUnique: string | null): boolean {

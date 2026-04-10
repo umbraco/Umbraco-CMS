@@ -194,6 +194,8 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly containerEditBtn: Locator;
   private readonly loginPageSelectedItem: Locator;
   private readonly errorPageSelectedItem: Locator;
+  private readonly publishModalBtn: Locator;
+  private readonly unpublishModalBtn: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -226,6 +228,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.plusIconBtn = page.locator("#icon-add svg");
     this.enterTagTxt = page.getByPlaceholder("Enter tag");
     this.menuItemTree = page.locator("umb-menu-item-tree-default");
+    this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
     this.confirmToUnpublishBtn = page
       .locator("umb-document-unpublish-modal")
       .getByLabel("Unpublish");
@@ -378,6 +381,8 @@ export class ContentUiHelper extends UiBaseLocators {
     this.rollbackBtn = this.documentWorkspace.getByRole("button", {
       name: /^Rollback(…)?$/,
     });
+    this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
+    this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     this.rollbackContainerBtn = this.container.getByLabel("Rollback");
     this.publicAccessBtn = page.getByRole("button", { name: "Public Access" });
     this.uuiCheckbox = page.locator("uui-checkbox");
@@ -1592,6 +1597,14 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickManualLinkRemoveButton() {
     await this.click(this.manualLinkRemoveBtn);
+  }
+
+  async clickPublishModalButton() {
+    await this.click(this.publishModalBtn);
+  }
+
+  async clickUnpublishModalButton() {
+    await this.click(this.unpublishModalBtn);
   }
 
   // Block Grid - Block List
@@ -2820,6 +2833,15 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(contentLocator.locator("#select-checkbox"), {
       force: true,
     });
+  }
+
+  async isContentCardWithNameSelected(contentName: string, isSelected: boolean = true) {
+    const contentLocator = this.cardContentNode.filter({hasText: contentName});
+    if (isSelected) {
+      await expect(contentLocator).toHaveAttribute('selected');
+    } else {
+      await expect(contentLocator).not.toHaveAttribute('selected');
+    }
   }
 
   async addGroupBasedPublicAccessWithPrefilledPages(memberGroupName: string) {
