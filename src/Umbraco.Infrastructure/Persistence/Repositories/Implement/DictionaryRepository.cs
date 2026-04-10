@@ -361,15 +361,26 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 
             // Update the dictionary entry itself
             DictionaryDto dto = DictionaryItemFactory.BuildDto(entity);
-            await db.UpsertAsync(dto, () =>
-                db.DictionaryEntries
-                    .Where(x => x.UniqueId == dto.UniqueId)
-                    .ExecuteUpdateAsync(setter => setter
-                        .SetProperty(x => x.Key, dto.Key)
-                        .SetProperty(x => x.Parent, dto.Parent)));
+            await db.DictionaryEntries
+                .Where(x => x.UniqueId == dto.UniqueId)
+                .ExecuteUpdateAsync(setter => setter
+                    .SetProperty(x => x.Key, dto.Key)
+                    .SetProperty(x => x.Parent, dto.Parent));
 
             IDictionary<string, ILanguage> languagesByIsoCode = await GetLanguagesByIsoCodeAsync();
 
+            // Remove translations that are no longer provided by the caller
+            var currentTranslationIds = entity.Translations
+                .Where(t => t.HasIdentity)
+                .Select(t => t.Id)
+                .ToHashSet();
+
+            await db.Set<LanguageTextDto>()
+                .Where(x => x.UniqueId == entity.Key && !currentTranslationIds.Contains(x.Id))
+                .ExecuteDeleteAsync();
+
+            // Update existing and insert new translations
+            var newTranslations = new List<(IDictionaryTranslation Translation, LanguageTextDto Dto)>();
             foreach (IDictionaryTranslation translation in entity.Translations)
             {
                 LanguageTextDto textDto = DictionaryTranslationFactory.BuildDto(translation, entity.Key, languagesByIsoCode);
@@ -377,19 +388,26 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
                 if (translation.HasIdentity)
                 {
                     // Update existing translation
-                    await db.UpsertAsync(textDto, () =>
-                        db.Set<LanguageTextDto>()
-                            .Where(x => x.Id == textDto.Id)
-                            .ExecuteUpdateAsync(setter => setter
-                                .SetProperty(x => x.LanguageId, textDto.LanguageId)
-                                .SetProperty(x => x.UniqueId, textDto.UniqueId)
-                                .SetProperty(x => x.Value, textDto.Value)));
+                    await db.Set<LanguageTextDto>()
+                        .Where(x => x.Id == textDto.Id)
+                        .ExecuteUpdateAsync(setter => setter
+                            .SetProperty(x => x.LanguageId, textDto.LanguageId)
+                            .SetProperty(x => x.UniqueId, textDto.UniqueId)
+                            .SetProperty(x => x.Value, textDto.Value));
                 }
                 else
                 {
                     // Insert new translation
                     await db.Set<LanguageTextDto>().AddAsync(textDto);
-                    await db.SaveChangesAsync();
+                    newTranslations.Add((translation, textDto));
+                }
+            }
+
+            if (newTranslations.Count > 0)
+            {
+                await db.SaveChangesAsync();
+                foreach ((IDictionaryTranslation translation, LanguageTextDto textDto) in newTranslations)
+                {
                     translation.Id = textDto.Id;
                     translation.Key = entity.Key;
                 }
