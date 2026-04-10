@@ -183,5 +183,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddLanguageKeyColumn>("{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}");
         To<V_18_0_0.AddLanguageDto>("{9880258E-834C-452D-A915-400D03BF9C41}");
         To<V_18_0_0.AddDomainKeyColumn>("{B7E4F2A1-3C5D-4E6F-8A9B-0C1D2E3F4A5B}");
+        To<V_18_0_0.AddDocumentRepositoryDtos>("{D7E8F9A0-B1C2-4D3E-A4F5-6B7C8D9E0F1A}");
     }
 }
