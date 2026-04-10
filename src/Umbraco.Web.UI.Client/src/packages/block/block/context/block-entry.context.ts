@@ -56,6 +56,9 @@ export abstract class UmbBlockEntryContext<
 	#unsupported = new UmbBooleanState(undefined);
 	readonly unsupported = this.#unsupported.asObservable();
 
+	#isLibraryElement = new UmbBooleanState(false);
+	readonly isLibraryElement = this.#isLibraryElement.asObservable();
+
 	readonly #localize = new UmbLocalizationController(this);
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
@@ -449,6 +452,7 @@ export abstract class UmbBlockEntryContext<
 	 */
 	setContentKey(contentKey: string) {
 		this.#contentKey = contentKey;
+		this._manager?.ensureContentResolved(contentKey);
 		this.#observeLayout();
 	}
 
@@ -529,13 +533,27 @@ export abstract class UmbBlockEntryContext<
 	#observeContentData() {
 		if (!this._manager || !this.#contentKey) return;
 
+		// Trigger library element fetch if needed (may have been missed when setContentKey
+		// was called before the manager was available)
+		this._manager.ensureContentResolved(this.#contentKey);
+
+		// observe library element state:
+		this.observe(
+			this._manager.isSharedContentOf(this.#contentKey),
+			(isLibrary) => {
+				this.#isLibraryElement.setValue(isLibrary ?? false);
+			},
+			'observeIsLibraryElement',
+		);
+
 		// observe content:
 		this.observe(
 			this._manager.contentOf(this.#contentKey),
 			(content) => {
 				if (this.#unsupported.getValue() !== true) {
-					// If we could not find content, then we do not know the contentTypeKey and then the content is broken. [NL]
-					this.#unsupported.setValue(!content);
+					// Don't mark as unsupported if this is a library element (content may still be loading)
+					const isLibrary = this.#isLibraryElement.getValue();
+					this.#unsupported.setValue(!content && !isLibrary);
 				}
 				this.#content.setValue(content);
 			},

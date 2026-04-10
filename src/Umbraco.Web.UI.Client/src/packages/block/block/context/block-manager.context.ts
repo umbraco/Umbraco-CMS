@@ -1,5 +1,10 @@
 import type { UmbBlockWorkspaceOriginData } from '../workspace/index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockExposeModel } from '../types.js';
+import type {
+	UmbBlockDataModel,
+	UmbBlockDataValueModel,
+	UmbBlockExposeModel,
+	UmbBlockLayoutBaseModel,
+} from '../types.js';
 import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -26,6 +31,7 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
+import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -74,6 +80,10 @@ export abstract class UmbBlockManagerContext<
 
 	readonly #contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly contents = this.#contents.asObservable();
+
+	readonly #resolvedLibraryElements = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
+	#elementRepository = new UmbElementDetailRepository(this);
+	#pendingElementFetches = new Set<string>();
 
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
@@ -293,8 +303,62 @@ export abstract class UmbBlockManagerContext<
 		return this._layouts.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}
 	contentOf(key: string) {
-		return this.#contents.asObservablePart((source) => source.find((x) => x.key === key));
+		return mergeObservables(
+			[
+				this.#contents.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.#resolvedLibraryElements.asObservablePart((source) => source.find((x) => x.key === key)),
+			],
+			([localContent, libraryContent]) => localContent ?? libraryContent ?? undefined,
+		);
 	}
+
+	/**
+	 * Returns an observable that emits true when the layout for the given contentKey
+	 * has `isSharedContent` set (i.e., the block references a library element).
+	 */
+	isSharedContentOf(key: string) {
+		return this._layouts.asObservablePart(
+			(source) => source.find((x) => x.contentKey === key)?.isSharedContent === true,
+		);
+	}
+
+	/**
+	 * Imperatively triggers a fetch for a library element if the layout has isSharedContent set.
+	 * Called by block entry contexts when setContentKey() is invoked.
+	 */
+	ensureContentResolved(key: string) {
+		const layout = this._layouts.getValue().find((x) => x.contentKey === key);
+		if (layout?.isSharedContent) {
+			this.#fetchLibraryElement(key);
+		}
+	}
+
+	async #fetchLibraryElement(key: string) {
+		if (this.#pendingElementFetches.has(key)) return;
+		this.#pendingElementFetches.add(key);
+		try {
+			const { data } = await this.#elementRepository.requestByUnique(key);
+			if (data) {
+				const blockData: UmbBlockDataModel = {
+					key: data.unique,
+					contentTypeKey: data.documentType.unique,
+					values: data.values.map(
+						(v): UmbBlockDataValueModel => ({
+							alias: v.alias,
+							editorAlias: v.editorAlias,
+							culture: v.culture,
+							segment: v.segment,
+							value: v.value,
+						}),
+					),
+				};
+				this.#resolvedLibraryElements.appendOne(blockData);
+			}
+		} finally {
+			this.#pendingElementFetches.delete(key);
+		}
+	}
+
 	settingsOf(key: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
 	}
@@ -355,7 +419,10 @@ export abstract class UmbBlockManagerContext<
 		return this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentTypeKey);
 	}
 	getContentOf(contentKey: string) {
-		return this.#contents.value.find((x) => x.key === contentKey);
+		return (
+			this.#contents.value.find((x) => x.key === contentKey) ??
+			this.#resolvedLibraryElements.value.find((x) => x.key === contentKey)
+		);
 	}
 	getSettingsOf(settingsKey: string) {
 		return this.#settings.value.find((x) => x.key === settingsKey);

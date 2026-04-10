@@ -146,6 +146,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	@state()
+	private _isLibraryElement = false;
+
+	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
+	private _isReferenceAttr = false;
+
+	@state()
 	private _isReadOnly = false;
 
 	constructor() {
@@ -218,6 +224,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
+		this.observe(
+			this.#context.isLibraryElement,
+			(isLibrary) => {
+				this._isLibraryElement = isLibrary;
+				this._isReferenceAttr = isLibrary;
+			},
+			null,
+		);
 
 		// Data:
 		this.observe(
@@ -575,11 +589,42 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		if (!this._showActions) return nothing;
 		return html`
 			<uui-action-bar>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderTransferToLibraryAction()}
+				${this.#renderDisconnectFromLibraryAction()} ${this.#renderCopyToClipboardAction()}
 				${this.#renderDeleteAction()}
 			</uui-action-bar>
 		`;
 	}
+
+	#renderTransferToLibraryAction() {
+		if (this._isReadOnly || this._isLibraryElement) return nothing;
+		const label = this.localize.term('blockEditor_transferToLibrary');
+		return html`
+			<uui-button look="secondary" label=${label} title=${label} @click=${this.#onTransferToLibrary}>
+				<uui-icon name="icon-link"></uui-icon>
+			</uui-button>
+		`;
+	}
+
+	#renderDisconnectFromLibraryAction() {
+		if (this._isReadOnly || !this._isLibraryElement) return nothing;
+		const label = this.localize.term('blockEditor_disconnectFromLibrary');
+		return html`
+			<uui-button look="secondary" label=${label} title=${label} @click=${this.#onDisconnectFromLibrary}>
+				<uui-icon name="icon-unlink"></uui-icon>
+			</uui-button>
+		`;
+	}
+
+	// TODO: Implement in "Transfer to Library"
+	#onTransferToLibrary = () => {
+		console.warn('Transfer to library — not yet implemented');
+	};
+
+	// TODO: Implement in "Disconnect from Library"
+	#onDisconnectFromLibrary = () => {
+		console.warn('Disconnect from library — not yet implemented');
+	};
 
 	#renderEditAction() {
 		if (this._isReadOnly) return nothing;
@@ -773,6 +818,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			uui-badge {
 				z-index: 2;
+			}
+
+			:host([is-reference]:hover)::after {
+				border-color: var(--uui-color-violet);
 			}
 		`,
 	];

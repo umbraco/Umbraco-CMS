@@ -1074,6 +1074,11 @@ export const data: Array<UmbMockDocumentModel> = [
 								contentKey: '1234-headline',
 								settingsKey: '1234-headline-settings',
 							},
+							{
+								contentKey: 'simple-element-id',
+								settingsKey: null,
+								isSharedContent: true,
+							},
 						],
 					},
 					contentData: [

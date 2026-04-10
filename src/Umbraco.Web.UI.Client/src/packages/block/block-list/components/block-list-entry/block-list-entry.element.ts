@@ -119,6 +119,12 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	@state()
+	private _isLibraryElement = false;
+
+	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
+	private _isReferenceAttr = false;
+
+	@state()
 	private _isReadOnly = false;
 
 	constructor() {
@@ -194,6 +200,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
+		this.observe(
+			this.#context.isLibraryElement,
+			(isLibrary) => {
+				this._isLibraryElement = isLibrary;
+				this._isReferenceAttr = isLibrary;
+			},
+			null,
+		);
 
 		// Data props:
 		this.observe(
@@ -448,11 +462,42 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		if (!this._showActions) return nothing;
 		return html`
 			<uui-action-bar>
-				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderTransferToLibraryAction()}
+				${this.#renderDisconnectFromLibraryAction()} ${this.#renderCopyToClipboardAction()}
 				${this.#renderDeleteAction()}
 			</uui-action-bar>
 		`;
 	}
+
+	#renderTransferToLibraryAction() {
+		if (this._isReadOnly || this._isLibraryElement) return nothing;
+		const label = this.localize.term('blockEditor_transferToLibrary');
+		return html`
+			<uui-button look="secondary" label=${label} title=${label} @click=${this.#onTransferToLibrary}>
+				<uui-icon name="icon-link"></uui-icon>
+			</uui-button>
+		`;
+	}
+
+	#renderDisconnectFromLibraryAction() {
+		if (this._isReadOnly || !this._isLibraryElement) return nothing;
+		const label = this.localize.term('blockEditor_disconnectFromLibrary');
+		return html`
+			<uui-button look="secondary" label=${label} title=${label} @click=${this.#onDisconnectFromLibrary}>
+				<uui-icon name="icon-unlink"></uui-icon>
+			</uui-button>
+		`;
+	}
+
+	// TODO: Implement in "Transfer to Library"
+	#onTransferToLibrary = () => {
+		console.warn('Transfer to library — not yet implemented');
+	};
+
+	// TODO: Implement in "Disconnect from Library"
+	#onDisconnectFromLibrary = () => {
+		console.warn('Disconnect from library — not yet implemented');
+	};
 
 	#renderEditContentAction() {
 		if (this._isReadOnly) return nothing;
@@ -499,9 +544,15 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#renderDeleteAction() {
 		if (this._isReadOnly) return nothing;
-		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()} title=${this.localize.term('general_delete')}>
-			<uui-icon name="icon-remove"></uui-icon>
-		</uui-button>`;
+		return html`
+			<uui-button
+				label="delete"
+				look="secondary"
+				@click=${() => this.#context.requestDelete()}
+				title=${this.localize.term('general_delete')}>
+				<uui-icon name="icon-remove"></uui-icon>
+			</uui-button>
+		`;
 	}
 
 	#renderCopyToClipboardAction() {
@@ -607,6 +658,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host([drag-placeholder]) .umb-block-list__block {
 				transition: opacity 50ms 16ms;
 				opacity: 0;
+			}
+
+			:host([is-reference]:hover)::after {
+				border-color: var(--uui-color-violet);
 			}
 		`,
 	];

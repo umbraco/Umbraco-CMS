@@ -6,6 +6,7 @@ export type * from './clipboard/types.js';
 export interface UmbBlockLayoutBaseModel {
 	contentKey: string;
 	settingsKey?: string | null;
+	isSharedContent?: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
