@@ -16,9 +16,7 @@ concurrency:
 jobs:
   review:
     runs-on: ubuntu-latest
-    if: |
-      github.event.issue.pull_request != null &&
-      contains(github.event.comment.body, '@claude review')
+    if: false # disabled — enable once auto workflow is validated
 
     steps:
       - name: Check commenter permission
