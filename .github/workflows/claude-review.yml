@@ -7,12 +7,8 @@ on:
     types: [created]
   issues:
     types: [opened, assigned, labeled]
-  workflow_dispatch:
-    inputs:
-      pr_number:
-        description: "PR number to review"
-        required: true
-        type: number
+  pull_request_review:
+    types: [submitted]
 
 permissions:
   contents: read
@@ -20,71 +16,11 @@ permissions:
   issues: write
   id-token: write
 
-concurrency:
-  group: claude-review-${{ github.event.pull_request.number || github.event.issue.number || github.event.inputs.pr_number || github.run_id }}
-  cancel-in-progress: true
-
 jobs:
-  review:
+  claude:
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'issues' ||
-      github.event_name == 'pull_request_review_comment' ||
-      (github.event.issue.pull_request != null &&
-       contains(github.event.comment.body, '@claude'))
-
     steps:
-      - name: Resolve context
-        id: ctx
-        uses: actions/github-script@v7
-        with:
-          script: |
-            // Determine if this is a PR context
-            const isPR = context.eventName === 'workflow_dispatch'
-              || context.eventName === 'pull_request_review_comment'
-              || context.payload.issue?.pull_request != null;
-
-            core.setOutput('is_pr', isPR ? 'true' : 'false');
-
-            if (!isPR) return;
-
-            let pr;
-            if (context.eventName === 'workflow_dispatch') {
-              const { data } = await github.rest.pulls.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: parseInt(context.payload.inputs.pr_number, 10)
-              });
-              pr = data;
-            } else {
-              const number = context.payload.pull_request?.number || context.issue.number;
-              const { data } = await github.rest.pulls.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: number
-              });
-              pr = data;
-            }
-
-            core.setOutput('number', pr.number.toString());
-            core.setOutput('base_ref', pr.base.ref);
-            core.setOutput('head_sha', pr.head.sha);
-            core.setOutput('author', pr.user.login);
-
-      - name: Checkout PR head
-        if: steps.ctx.outputs.is_pr == 'true'
-        uses: actions/checkout@v4
-        with:
-          ref: refs/pull/${{ steps.ctx.outputs.number }}/head
-          fetch-depth: 0
-
-      - name: Checkout repository
-        if: steps.ctx.outputs.is_pr != 'true'
-        uses: actions/checkout@v4
-
-      - name: Run Claude
-        uses: anthropics/claude-code-action@v1
+      - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: "@claude"
@@ -92,72 +28,3 @@ jobs:
           label_trigger: "claude"
           additional_permissions: "actions: read"
           claude_args: "--model claude-sonnet-4-6"
-          prompt: |
-            You are an AI assistant for the Umbraco CMS repository.
-            This is an open-source project that welcomes community contributions.
-
-            ## Context
-
-            If this is a pull request review, use the following context:
-            - PR: #${{ steps.ctx.outputs.number }}
-            - Base branch: ${{ steps.ctx.outputs.base_ref }}
-            - Head SHA: ${{ steps.ctx.outputs.head_sha }}
-            - Author: ${{ steps.ctx.outputs.author }}
-
-            ## PR Review
-
-            When reviewing a pull request (triggered by `@claude review` on a PR, or via workflow_dispatch):
-
-            Read and execute the review procedure defined in `.claude/skills/umb-review/SKILL.md`.
-            Use `${{ steps.ctx.outputs.base_ref }}` as the target branch (skip auto-detection in step 1).
-
-            For each finding that references a specific file and line:
-            - Post an individual inline PR comment on that line.
-            - Format: **[Severity]** explanation, then suggestion.
-
-            For the overall summary (header, impact, verdict):
-            - Post ONE top-level PR comment.
-            - Include "Based on commit `${{ steps.ctx.outputs.head_sha }}`" at the bottom (used for dedup).
-
-            Do NOT use sticky/updating comments — post new individual comments.
-
-            After reviewing, apply labels to the PR based on changed files:
-            - `area/frontend` — if files under `src/Umbraco.Web.UI.Client/` are changed
-            - `area/backend` — if .cs files outside the frontend client are changed
-            - `area/test` — if only test files are changed
-            - `category/api` — if Management API or Delivery API files are changed
-            - `category/breaking` — if breaking changes were detected in the review
-            - `category/localization` — if localization/language files are changed
-            - `category/test-automation` — if only test files are changed
-            - `category/refactor` — if the PR is pure refactoring with no new features
-            - `category/performance` — if performance-related changes are detected
-            - `category/ux` — if user-facing changes are detected
-            - `category/ui` — if changes to the UI layer are detected
-
-            Only apply labels you are confident about. Never remove existing labels.
-            Use `gh pr edit ${{ steps.ctx.outputs.number }} --add-label "<label>"` to apply labels.
-
-            ## Issues
-
-            When responding to an issue (triggered by assignment, label, or `@claude` comment on an issue):
-
-            Read the CLAUDE.md files in the repository to understand the project structure and conventions.
-            Analyze the issue and provide helpful guidance:
-            - Suggest which files or areas of the codebase are relevant
-            - Point to existing patterns that could help solve the issue
-            - If the issue is a bug report, suggest potential root causes
-            - If the issue is a feature request, suggest an implementation approach
-
-            ## Tone
-
-            Be friendly and constructive. This project values community contributions.
-            Frame feedback as suggestions where possible.
-            Reserve firm language for genuine Critical issues only.
-            Do not be condescending. Remember: "We welcome all contributions
-            and will happily give feedback."
-
-            ## Constraints
-
-            - Run fully autonomously. Do NOT ask questions.
-            - Only review changed files in PRs. Do not flag pre-existing issues.
-            - Do not suggest changes that would themselves introduce breaking changes.
