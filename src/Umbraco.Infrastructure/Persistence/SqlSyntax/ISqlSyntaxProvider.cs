@@ -321,7 +321,7 @@ public interface ISqlSyntaxProvider
     /// </summary>
     /// <param name="guid">The guid.</param>
     /// <returns>A string representation of the guid formatted for SQL.</returns>
-    string FormatGuid(Guid guid);
+    string FormatGuid(Guid guid) => guid.ToString();
 
     /// <summary>
     /// Formats a <see cref="TableDefinition"/> into its corresponding SQL statement.
