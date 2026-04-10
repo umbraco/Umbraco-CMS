@@ -32,7 +32,8 @@ public class PropertyDataDtoConfiguration : IEntityTypeConfiguration<PropertyDat
             .HasColumnName("intValue");
 
         builder.Property(x => x.DecimalValue)
-            .HasColumnName("decimalValue");
+            .HasColumnName("decimalValue")
+            .HasPrecision(20, 9);
 
         builder.Property(x => x.DateValue)
             .HasColumnName("dateValue");

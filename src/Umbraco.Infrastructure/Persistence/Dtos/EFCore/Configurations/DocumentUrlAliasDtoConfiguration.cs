@@ -32,6 +32,12 @@ public class DocumentUrlAliasDtoConfiguration : IEntityTypeConfiguration<Documen
             .HasPrincipalKey(x => x.UniqueId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // FK: LanguageId -> umbracoLanguage.id
+        builder.HasOne<LanguageDto>()
+            .WithMany()
+            .HasForeignKey(x => x.LanguageId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         // IX_umbracoDocumentUrlAlias_Unique (unique on UniqueId+LanguageId+Alias)
         builder.HasIndex(x => new { x.UniqueId, x.LanguageId, x.Alias })
             .IsUnique()

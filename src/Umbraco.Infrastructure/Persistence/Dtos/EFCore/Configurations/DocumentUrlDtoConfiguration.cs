@@ -39,6 +39,12 @@ public class DocumentUrlDtoConfiguration : IEntityTypeConfiguration<DocumentUrlD
             .HasPrincipalKey(x => x.UniqueId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // FK: LanguageId -> umbracoLanguage.id
+        builder.HasOne<LanguageDto>()
+            .WithMany()
+            .HasForeignKey(x => x.LanguageId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         // IX_umbracoDocumentUrl (unique on UniqueId+LanguageId+IsDraft+UrlSegment)
         // Note: SQL Server clustered behavior is added by SqlServerDocumentUrlDtoModelCustomizer.
         builder.HasIndex(x => new { x.UniqueId, x.LanguageId, x.IsDraft, x.UrlSegment })

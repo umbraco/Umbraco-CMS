@@ -525,6 +525,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LanguageId");
+
                     b.HasIndex("Alias", "LanguageId")
                         .HasDatabaseName("IX_umbracoDocumentUrlAlias_Lookup");
 
@@ -567,6 +569,8 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .UseCollation("NOCASE");
 
                     b.HasKey("NodeId");
+
+                    b.HasIndex("LanguageId");
 
                     b.HasIndex("UniqueId", "LanguageId", "IsDraft", "UrlSegment")
                         .IsUnique()
@@ -826,6 +830,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnName("dateValue");
 
                     b.Property<decimal?>("DecimalValue")
+                        .HasPrecision(20, 9)
                         .HasColumnType("TEXT")
                         .HasColumnName("decimalValue");
 
@@ -1070,6 +1075,11 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DocumentUrlAliasDto", b =>
                 {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", null)
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
                         .WithMany()
                         .HasForeignKey("UniqueId")
@@ -1080,6 +1090,11 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DocumentUrlDto", b =>
                 {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", null)
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
                         .WithMany()
                         .HasForeignKey("UniqueId")

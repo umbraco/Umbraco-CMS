@@ -2,91 +2,101 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
 #nullable disable
 
-namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
+namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260410094252_AddDocumentRepositoryDtos")]
+    [Migration("20260410100915_AddDocumentRepositoryDtos")]
     partial class AddDocumentRepositoryDtos
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.5");
 
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ApplicationType")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ClientId")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ClientSecret")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ClientType")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ConcurrencyToken")
                         .IsConcurrencyToken()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ConsentType")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("DisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("DisplayNames")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("JsonWebKeySet")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Permissions")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("PostLogoutRedirectUris")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("RedirectUris")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Requirements")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Settings")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId")
-                        .IsUnique()
-                        .HasFilter("[ClientId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("umbracoOpenIddictApplications", (string)null);
                 });
@@ -95,36 +105,44 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ApplicationId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ConcurrencyToken")
                         .IsConcurrencyToken()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Scopes")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Status")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Subject")
                         .HasMaxLength(400)
-                        .HasColumnType("nvarchar(400)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Type")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
 
@@ -137,40 +155,48 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ConcurrencyToken")
                         .IsConcurrencyToken()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Descriptions")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("DisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("DisplayNames")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Name")
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Resources")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique()
-                        .HasFilter("[Name] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("umbracoOpenIddictScopes", (string)null);
                 });
@@ -179,57 +205,66 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ApplicationId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("AuthorizationId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("ConcurrencyToken")
                         .IsConcurrencyToken()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime?>("CreationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("ExpirationDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Payload")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime?>("RedemptionDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ReferenceId")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Status")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Subject")
                         .HasMaxLength(400)
-                        .HasColumnType("nvarchar(400)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Type")
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorizationId");
 
                     b.HasIndex("ReferenceId")
-                        .IsUnique()
-                        .HasFilter("[ReferenceId] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("ApplicationId", "Status", "Subject", "Type");
 
@@ -240,30 +275,30 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("InstructionCount")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(1)
                         .HasColumnName("instructionCount");
 
                     b.Property<string>("Instructions")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("jsonInstruction");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("jsonInstruction")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("OriginIdentity")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("originated");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("originated")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime>("UtcStamp")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TEXT")
                         .HasColumnName("utcStamp");
 
                     b.HasKey("Id");
@@ -274,11 +309,11 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentDto", b =>
                 {
                     b.Property<int>("NodeId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("nodeId");
 
                     b.Property<int>("ContentTypeId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("contentTypeId");
 
                     b.HasKey("NodeId");
@@ -289,23 +324,24 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentScheduleDto", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("TEXT")
                         .HasColumnName("id");
 
                     b.Property<string>("Action")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("action");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("action")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TEXT")
                         .HasColumnName("date");
 
                     b.Property<int?>("LanguageId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("languageId");
 
                     b.Property<int>("NodeId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("nodeId");
 
                     b.HasKey("Id");
@@ -319,29 +355,28 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<int>("LanguageId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("languageId");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("name");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("name")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TEXT")
                         .HasColumnName("date");
 
                     b.Property<int?>("UpdateUserId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("availableUserId");
 
                     b.Property<int>("VersionId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("versionId");
 
                     b.HasKey("Id");
@@ -360,35 +395,34 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<bool>("Current")
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("current");
 
                     b.Property<int>("NodeId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("nodeId");
 
                     b.Property<bool>("PreventCleanup")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(false)
                         .HasColumnName("preventCleanup");
 
                     b.Property<string>("Text")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("text");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("text")
+                        .UseCollation("NOCASE");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("userId");
 
                     b.Property<DateTime>("VersionDate")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TEXT")
                         .HasColumnName("versionDate");
 
                     b.HasKey("Id");
@@ -409,33 +443,32 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<bool>("Available")
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("available");
 
                     b.Property<bool>("Edited")
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("edited");
 
                     b.Property<int>("LanguageId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("languageId");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("name");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("name")
+                        .UseCollation("NOCASE");
 
                     b.Property<int>("NodeId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("nodeId");
 
                     b.Property<bool>("Published")
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("published");
 
                     b.HasKey("Id");
@@ -453,15 +486,15 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DocumentDto", b =>
                 {
                     b.Property<int>("NodeId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("nodeId");
 
                     b.Property<bool>("Edited")
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("edited");
 
                     b.Property<bool>("Published")
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("published");
 
                     b.HasKey("NodeId");
@@ -476,33 +509,33 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Alias")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("alias");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("alias")
+                        .UseCollation("NOCASE");
 
                     b.Property<int?>("LanguageId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("languageId");
 
                     b.Property<Guid>("UniqueId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("TEXT")
                         .HasColumnName("uniqueId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LanguageId");
 
                     b.HasIndex("Alias", "LanguageId")
                         .HasDatabaseName("IX_umbracoDocumentUrlAlias_Lookup");
 
                     b.HasIndex("UniqueId", "LanguageId", "Alias")
                         .IsUnique()
-                        .HasDatabaseName("IX_umbracoDocumentUrlAlias_Unique")
-                        .HasFilter("[languageId] IS NOT NULL");
+                        .HasDatabaseName("IX_umbracoDocumentUrlAlias_Unique");
 
                     b.ToTable("umbracoDocumentUrlAlias", (string)null);
                 });
@@ -511,40 +544,40 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<int>("NodeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NodeId"));
-
                     b.Property<bool>("IsDraft")
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("isDraft");
 
                     b.Property<bool>("IsPrimary")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(true)
                         .HasColumnName("isPrimary");
 
                     b.Property<int?>("LanguageId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("languageId");
 
                     b.Property<Guid>("UniqueId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("TEXT")
                         .HasColumnName("uniqueId");
 
                     b.Property<string>("UrlSegment")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("urlSegment");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("urlSegment")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("NodeId");
 
+                    b.HasIndex("LanguageId");
+
                     b.HasIndex("UniqueId", "LanguageId", "IsDraft", "UrlSegment")
                         .IsUnique()
-                        .HasDatabaseName("IX_umbracoDocumentUrl")
-                        .HasFilter("[languageId] IS NOT NULL");
+                        .HasDatabaseName("IX_umbracoDocumentUrl");
 
                     b.ToTable("umbracoDocumentUrl", (string)null);
                 });
@@ -552,15 +585,15 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DocumentVersionDto", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
                     b.Property<bool>("Published")
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("published");
 
                     b.Property<int?>("TemplateId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("templateId");
 
                     b.HasKey("Id");
@@ -578,30 +611,29 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<int?>("DefaultLanguage")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("domainDefaultLanguage");
 
                     b.Property<string>("DomainName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("domainName");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("domainName")
+                        .UseCollation("NOCASE");
 
                     b.Property<Guid>("Key")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("TEXT")
                         .HasColumnName("key");
 
                     b.Property<int?>("RootStructureId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("domainRootStructureID");
 
                     b.Property<int>("SortOrder")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("sortOrder");
 
                     b.HasKey("Id");
@@ -616,16 +648,18 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<string>("Key")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
-                        .HasColumnName("key");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("key")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TEXT")
                         .HasColumnName("updated");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("value");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("value")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Key");
 
@@ -636,39 +670,39 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CultureName")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("languageCultureName");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("languageCultureName")
+                        .UseCollation("NOCASE");
 
                     b.Property<int?>("FallbackLanguageId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("fallbackLanguageId");
 
                     b.Property<bool>("IsDefault")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(false)
                         .HasColumnName("isDefaultVariantLang");
 
                     b.Property<bool>("IsMandatory")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(false)
                         .HasColumnName("mandatory");
 
                     b.Property<string>("IsoCode")
                         .HasMaxLength(14)
-                        .HasColumnType("nvarchar(14)")
-                        .HasColumnName("languageISOCode");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("languageISOCode")
+                        .UseCollation("NOCASE");
 
                     b.Property<Guid>("LanguageKey")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("TEXT")
                         .HasColumnName("languageKey");
 
                     b.HasKey("Id");
@@ -676,8 +710,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasIndex("FallbackLanguageId");
 
                     b.HasIndex("IsoCode")
-                        .IsUnique()
-                        .HasFilter("[languageISOCode] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("LanguageKey")
                         .IsUnique();
@@ -688,18 +721,19 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LastSyncedDto", b =>
                 {
                     b.Property<string>("MachineId")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("machineId");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("machineId")
+                        .UseCollation("NOCASE");
 
                     b.Property<DateTime>("LastSyncedDate")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TEXT")
                         .HasColumnName("lastSyncedDate");
 
                     b.Property<int?>("LastSyncedExternalId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("LastSyncedInternalId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("lastSyncedInternalId");
 
                     b.HasKey("MachineId");
@@ -711,53 +745,53 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<int>("NodeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NodeId"));
-
                     b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TEXT")
                         .HasColumnName("createDate");
 
                     b.Property<short>("Level")
-                        .HasColumnType("smallint")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("level");
 
                     b.Property<Guid?>("NodeObjectType")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("TEXT")
                         .HasColumnName("nodeObjectType");
 
                     b.Property<int>("ParentId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("parentId");
 
                     b.Property<string>("Path")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)")
-                        .HasColumnName("path");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("path")
+                        .UseCollation("NOCASE");
 
                     b.Property<int>("SortOrder")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("sortOrder");
 
                     b.Property<string>("Text")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("text");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("text")
+                        .UseCollation("NOCASE");
 
                     b.Property<bool>("Trashed")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasDefaultValue(false)
                         .HasColumnName("trashed");
 
                     b.Property<Guid>("UniqueId")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("TEXT")
                         .HasColumnName("uniqueId");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("nodeUser");
 
                     b.HasKey("NodeId");
@@ -791,52 +825,55 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<DateTime?>("DateValue")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("TEXT")
                         .HasColumnName("dateValue");
 
                     b.Property<decimal?>("DecimalValue")
-                        .HasColumnType("decimal(18,2)")
+                        .HasPrecision(20, 9)
+                        .HasColumnType("TEXT")
                         .HasColumnName("decimalValue");
 
                     b.Property<int?>("IntegerValue")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("intValue");
 
                     b.Property<int?>("LanguageId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("languageId");
 
                     b.Property<int>("PropertyTypeId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("propertyTypeId");
 
                     b.Property<string>("Segment")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)")
-                        .HasColumnName("segment");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("segment")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("SortableValue")
                         .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)")
-                        .HasColumnName("sortableValue");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("sortableValue")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("TextValue")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("textValue");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("textValue")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("VarcharValue")
                         .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)")
-                        .HasColumnName("varcharValue");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("varcharValue")
+                        .UseCollation("NOCASE");
 
                     b.Property<int>("VersionId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("versionId");
 
                     b.HasKey("Id");
@@ -852,8 +889,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
                     b.HasIndex("VersionId", "PropertyTypeId", "LanguageId", "Segment")
                         .IsUnique()
-                        .HasDatabaseName("IX_umbracoPropertyData_VersionId")
-                        .HasFilter("[languageId] IS NOT NULL AND [segment] IS NOT NULL");
+                        .HasDatabaseName("IX_umbracoPropertyData_VersionId");
 
                     b.ToTable("umbracoPropertyData", (string)null);
                 });
@@ -861,11 +897,11 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2ContentTypeKeysDto", b =>
                 {
                     b.Property<int>("WebhookId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("webhookId");
 
                     b.Property<Guid>("ContentTypeKey")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("TEXT")
                         .HasColumnName("entityKey");
 
                     b.HasKey("WebhookId", "ContentTypeKey")
@@ -877,13 +913,14 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2EventsDto", b =>
                 {
                     b.Property<int>("WebhookId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("webhookId");
 
                     b.Property<string>("Event")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("event");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("event")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("WebhookId", "Event")
                         .HasName("PK_webhookEvent2WebhookDto");
@@ -894,16 +931,18 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2HeadersDto", b =>
                 {
                     b.Property<int>("WebhookId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("webhookId");
 
                     b.Property<string>("Key")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("Key");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("Key")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("WebhookId", "Key")
                         .HasName("PK_headers2WebhookDto");
@@ -915,31 +954,32 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("description")
+                        .UseCollation("NOCASE");
 
                     b.Property<bool>("Enabled")
-                        .HasColumnType("bit")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("enabled");
 
                     b.Property<Guid>("Key")
-                        .HasColumnType("uniqueidentifier")
+                        .HasColumnType("TEXT")
                         .HasColumnName("key");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("name");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("name")
+                        .UseCollation("NOCASE");
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("url");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("url")
+                        .UseCollation("NOCASE");
 
                     b.HasKey("Id");
 
@@ -1038,6 +1078,11 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DocumentUrlAliasDto", b =>
                 {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", null)
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
                         .WithMany()
                         .HasForeignKey("UniqueId")
@@ -1048,6 +1093,11 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DocumentUrlDto", b =>
                 {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", null)
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
                         .WithMany()
                         .HasForeignKey("UniqueId")
