@@ -13,6 +13,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -297,6 +298,52 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
         // Verify backoffice marker is NOT registered
         var backofficeMarker = factory.Services.GetService<IBackOfficeEnabledMarker>();
         Assert.That(backofficeMarker, Is.Null, "IBackOfficeEnabledMarker should NOT be registered when using AddCore() without AddBackOffice()");
+    }
+
+    /// <summary>
+    /// Verifies that IUserService.GetUsersById works in a delivery-only scenario (no backoffice).
+    /// Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22404 where
+    /// GetUsersById used service location to resolve IBackOfficeUserStore, which isn't
+    /// registered without AddBackOffice(). This crashed Examine indexing via ContentValueSetBuilder.
+    /// </summary>
+    [Test]
+    public async Task CoreWithDeliveryApi_UserServiceGetUsersByIdDoesNotThrow()
+    {
+        // Arrange
+        using var factory = CreateFactory(
+            configureUmbraco: builder =>
+            {
+                builder
+                    .AddCore()
+                    .AddDeliveryApi()
+                    .AddUmbracoSqlServerSupport()
+                    .AddUmbracoSqliteSupport()
+                    .AddComposers();
+            },
+            configureApp: app =>
+            {
+                app.UseUmbraco()
+                    .WithMiddleware(u =>
+                    {
+                    })
+                    .WithEndpoints(u =>
+                    {
+                        u.UseDeliveryApiEndpoints();
+                    });
+            });
+
+        // Boot the application
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false,
+            BaseAddress = new Uri("https://localhost/", UriKind.Absolute),
+        });
+        await client.GetAsync("/");
+
+        // Act & Assert - resolve IUserService and call GetUsersById without throwing.
+        using var scope = factory.Services.CreateScope();
+        var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+        Assert.DoesNotThrow(() => userService.GetUsersById([]));
     }
 
     /// <summary>

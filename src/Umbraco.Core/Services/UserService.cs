@@ -1788,10 +1788,19 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
     {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        if (ids is null || ids.Length <= 0)
+        {
+            return Enumerable.Empty<IUser>();
+        }
 
-        return backOfficeUserStore.GetUsersAsync(ids).GetAwaiter().GetResult();
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+
+        // Use the repository directly to avoid a service-locator dependency on IBackOfficeUserStore,
+        // which is only registered when AddBackOffice() is called. This method is also invoked in
+        // delivery-only scenarios (e.g. Examine indexing via ContentValueSetBuilder).
+        List<int> idsAsList = [.. ids];
+        IQuery<IUser> query = Query<IUser>().Where(x => idsAsList.Contains(x.Id));
+        return _userRepository.Get(query);
     }
 
     /// <inheritdoc/>
