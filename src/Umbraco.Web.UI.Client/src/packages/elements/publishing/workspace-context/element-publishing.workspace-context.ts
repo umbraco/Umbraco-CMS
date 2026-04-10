@@ -305,6 +305,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 					headline: this.#localize.term('content_saveAndPublishModalTitle'),
 					options,
 					pickableFilter: this.#publishableVariantsFilter,
+					unique,
 				},
 				value: { selection: selected },
 			}).catch(() => undefined);
