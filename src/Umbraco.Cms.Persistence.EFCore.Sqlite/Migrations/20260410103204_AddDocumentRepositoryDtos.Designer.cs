@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260410100915_AddDocumentRepositoryDtos")]
+    [Migration("20260410103204_AddDocumentRepositoryDtos")]
     partial class AddDocumentRepositoryDtos
     {
         /// <inheritdoc />
@@ -422,8 +422,10 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnName("userId");
 
                     b.Property<DateTime>("VersionDate")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasColumnName("versionDate");
+                        .HasColumnName("versionDate")
+                        .HasDefaultValueSql("datetime('now')");
 
                     b.HasKey("Id");
 

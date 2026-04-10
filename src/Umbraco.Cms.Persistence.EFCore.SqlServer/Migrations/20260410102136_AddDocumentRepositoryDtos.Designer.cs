@@ -12,7 +12,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260410100808_AddDocumentRepositoryDtos")]
+    [Migration("20260410102136_AddDocumentRepositoryDtos")]
     partial class AddDocumentRepositoryDtos
     {
         /// <inheritdoc />
@@ -388,8 +388,10 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnName("userId");
 
                     b.Property<DateTime>("VersionDate")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasColumnName("versionDate");
+                        .HasColumnName("versionDate")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.HasKey("Id");
 

@@ -385,8 +385,10 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnName("userId");
 
                     b.Property<DateTime>("VersionDate")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasColumnName("versionDate");
+                        .HasColumnName("versionDate")
+                        .HasDefaultValueSql("GETUTCDATE()");
 
                     b.HasKey("Id");
 

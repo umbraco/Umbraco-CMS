@@ -419,8 +419,10 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnName("userId");
 
                     b.Property<DateTime>("VersionDate")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasColumnName("versionDate");
+                        .HasColumnName("versionDate")
+                        .HasDefaultValueSql("datetime('now')");
 
                     b.HasKey("Id");
 

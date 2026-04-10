@@ -19,7 +19,8 @@ public class ContentVersionDtoConfiguration : IEntityTypeConfiguration<ContentVe
             .HasColumnName(ContentVersionDto.NodeIdColumnName);
 
         builder.Property(x => x.VersionDate)
-            .HasColumnName(ContentVersionDto.VersionDateColumnName);
+            .HasColumnName(ContentVersionDto.VersionDateColumnName)
+            .HasDefaultValueSql("GETUTCDATE()");
 
         builder.Property(x => x.UserId)
             .HasColumnName(ContentVersionDto.UserIdColumnName);
