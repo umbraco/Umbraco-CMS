@@ -2117,6 +2117,7 @@ export default {
 		password: 'Password',
 		resetPassword: 'Reset password',
 		passwordChanged: 'Your password has been changed!',
+		passwordCopied: 'Password copied',
 		passwordChangedGeneric: 'Password changed',
 		passwordConfirm: 'Please confirm the new password',
 		passwordEnterNew: 'Enter your new password',
