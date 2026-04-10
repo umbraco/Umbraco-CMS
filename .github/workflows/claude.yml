@@ -37,6 +37,7 @@ jobs:
           label_trigger: "claude"
           base_branch: "main"
           additional_permissions: "actions: read"
+          show_full_output: true
           claude_args: "--model claude-sonnet-4-6 --max-turns 25"
           prompt: |
             You are an AI assistant for the Umbraco CMS repository.
