@@ -301,13 +301,13 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     }
 
     /// <summary>
-    /// Verifies that IUserService.GetUsersById works in a delivery-only scenario (no backoffice).
+    /// Verifies that IUserService read operations work in a delivery-only scenario (no backoffice).
     /// Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22404 where
-    /// GetUsersById used service location to resolve IBackOfficeUserStore, which isn't
+    /// these methods used service location to resolve IBackOfficeUserStore, which isn't
     /// registered without AddBackOffice(). This crashed Examine indexing via ContentValueSetBuilder.
     /// </summary>
     [Test]
-    public async Task CoreWithDeliveryApi_UserServiceGetUsersByIdDoesNotThrow()
+    public async Task CoreWithDeliveryApi_UserServiceReadMethodsDoNotThrow()
     {
         // Arrange
         using var factory = CreateFactory(
@@ -340,10 +340,15 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
         });
         await client.GetAsync("/");
 
-        // Act & Assert - resolve IUserService and call GetUsersById without throwing.
+        // Act & Assert - all read methods must work without IBackOfficeUserStore.
         using var scope = factory.Services.CreateScope();
         var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+
         Assert.DoesNotThrow(() => userService.GetUsersById([]));
+        Assert.DoesNotThrow(() => userService.GetUserById(-1));
+        Assert.DoesNotThrow(() => userService.GetAsync(Guid.Empty).GetAwaiter().GetResult());
+        Assert.DoesNotThrow(() => userService.GetAsync([]).GetAwaiter().GetResult());
+        Assert.DoesNotThrow(() => userService.GetAllInGroup(null));
     }
 
     /// <summary>

@@ -1695,10 +1695,8 @@ internal partial class UserService : RepositoryService, IUserService
             return Array.Empty<IUser>();
         }
 
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return _userRepository.GetAllInGroup(groupId.Value);
     }
 
     /// <inheritdoc/>
@@ -1740,28 +1738,29 @@ internal partial class UserService : RepositoryService, IUserService
     /// <inheritdoc/>
     public IUser? GetUserById(int id)
     {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAsync(id).GetAwaiter().GetResult();
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return _userRepository.Get(id);
     }
 
     /// <inheritdoc/>
     public Task<IUser?> GetAsync(Guid key)
     {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAsync(key);
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        return Task.FromResult(_userRepository.Get(key));
     }
 
     /// <inheritdoc/>
     public Task<IEnumerable<IUser>> GetAsync(IEnumerable<Guid> keys)
     {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+        Guid[] keysArray = keys.ToArray();
+        if (keysArray.Length == 0)
+        {
+            return Task.FromResult(Enumerable.Empty<IUser>());
+        }
 
-        return backOfficeUserStore.GetUsersAsync(keys.ToArray());
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        IEnumerable<IUser> users = _userRepository.GetMany(keysArray);
+        return Task.FromResult(users);
     }
 
     /// <inheritdoc/>
