@@ -1,8 +1,7 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../constants.js';
 import {
 	findBlockInValues,
-	updateBlockPropertyValues,
-	updateBlockSettingsValues,
+	updateBlockDataValues,
 	ensureBlockSettings,
 	addBlockToValue,
 	addBlockToArea,
@@ -13,6 +12,7 @@ import {
 } from './visual-editor-block-helper.js';
 import type { BlockValue } from './visual-editor-block-helper.js';
 import { VisualEditorBlockManager } from './visual-editor-block-manager.js';
+import { UmbVisualEditorPreviewContext } from './visual-editor-preview.context.js';
 import { UMB_VISUAL_EDITOR_PROPERTY_MODAL } from './visual-editor-property-modal.token.js';
 import type {
 	UmbVisualEditorPropertyGroup,
@@ -54,6 +54,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#previewRepository = new UmbPreviewRepository(this);
+	#previewContext?: UmbVisualEditorPreviewContext;
 	#connection?: HubConnection;
 	#serverUrl = '';
 	#suppressRefresh = false;
@@ -86,10 +87,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		const propStructure = this.#propertyStructures.find((p) => p.alias === propertyAlias);
 		const config = (propStructure?.config ?? []) as UmbPropertyEditorConfig;
 
-		const blocksConfig =
-			(config as Array<{ alias: string; value: unknown }>)?.find((c) => c.alias === 'blocks')?.value as
-				| Array<{ contentElementTypeKey: string; label?: string; settingsElementTypeKey?: string }>
-				| undefined;
+		const blocksConfig = this.#getBlocksConfig(propertyAlias);
 
 		const blockTypes = (blocksConfig ?? []).map((b) => ({
 			contentElementTypeKey: b.contentElementTypeKey,
@@ -182,8 +180,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		.onSetup(async (params) => {
 			const blockKey = params.blockKey as string;
 			this.#editingBlockKey = blockKey;
-			const allValues = this.#getAllValues();
-			const found = findBlockInValues(allValues, blockKey);
+			const found = this.#findBlock(blockKey);
 			if (!found) {
 				return false;
 			}
@@ -284,12 +281,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 			if (!propStructure?.config) return false;
 
-			const blocksConfig = (propStructure.config as Array<{ alias: string; value: unknown }>)?.find(
-				(c) => c.alias === 'blocks',
-			)?.value as
-				| Array<{ contentElementTypeKey: string; label?: string; forceHideContentEditorInOverlay?: boolean }>
-				| undefined;
-
+			const blocksConfig = this.#getBlocksConfig(this.#pendingAdd!.propertyAlias);
 			if (!blocksConfig || blocksConfig.length === 0) return false;
 
 			const blockTypes = blocksConfig.map((b) => ({
@@ -453,6 +445,16 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		// Build preview URL
 		this.#setPreviewUrl();
 
+		// Provide UMB_PREVIEW_CONTEXT so previewApp extensions work inside the visual editor
+		this.#previewContext = new UmbVisualEditorPreviewContext(this, {
+			serverUrl: this.#serverUrl,
+			getUnique: () => this.#workspaceContext?.getUnique(),
+			onUrlChange: (url) => {
+				this._previewUrl = url;
+				this._iframeReady = false;
+			},
+		});
+
 		// Resolve property structures from content type
 		await this.#fetchPropertyStructures();
 
@@ -610,6 +612,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 	#onIframeLoad() {
 		this._iframeReady = true;
+		this.#previewContext?.setIframeReady(true);
 		this.#injectGuestScript();
 		this.#restoreSelection();
 		this.#sendNonEditableTypes();
@@ -747,18 +750,31 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 	// --- Block config helpers ---
 
+	#findBlock(blockKey: string) {
+		return findBlockInValues(this.#getAllValues(), blockKey);
+	}
+
+	#getBlocksConfig(propertyAlias: string) {
+		const propStructure = this.#propertyStructures.find((p) => p.alias === propertyAlias);
+		if (!propStructure?.config) return undefined;
+		return (propStructure.config as Array<{ alias: string; value: unknown }>)?.find(
+			(c) => c.alias === 'blocks',
+		)?.value as
+			| Array<{
+					contentElementTypeKey: string;
+					label?: string;
+					settingsElementTypeKey?: string;
+					forceHideContentEditorInOverlay?: boolean;
+					areas?: Array<{ key: string; alias: string }>;
+				}>
+			| undefined;
+	}
+
 	#findBlockTypeConfig(
 		propertyAlias: string,
 		contentTypeKey: string,
 	): { contentElementTypeKey: string; settingsElementTypeKey?: string; areas?: Array<{ key: string }> } | undefined {
-		const propStructure = this.#propertyStructures.find((p) => p.alias === propertyAlias);
-		if (!propStructure?.config) return undefined;
-
-		const blocksConfig = (propStructure.config as Array<{ alias: string; value: unknown }>)?.find(
-			(c) => c.alias === 'blocks',
-		)?.value as Array<{ contentElementTypeKey: string; settingsElementTypeKey?: string }> | undefined;
-
-		return blocksConfig?.find((b) => b.contentElementTypeKey === contentTypeKey) as
+		return this.#getBlocksConfig(propertyAlias)?.find((b) => b.contentElementTypeKey === contentTypeKey) as
 			| { contentElementTypeKey: string; settingsElementTypeKey?: string; areas?: Array<{ key: string }> }
 			| undefined;
 	}
@@ -827,14 +843,13 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 			settingsValues?: Array<{ alias: string; value: unknown }>;
 		},
 	) {
-		const allValues = this.#getAllValues();
-		const found = findBlockInValues(allValues, blockKey);
+		const found = this.#findBlock(blockKey);
 		if (found) {
-			let updatedBlockValue = updateBlockPropertyValues(found.blockValue, blockKey, result.values);
+			let updatedBlockValue = updateBlockDataValues(found.blockValue, 'contentData', blockKey, result.values);
 
 			const settingsKey = found.layoutEntry?.settingsKey;
 			if (settingsKey && result.settingsValues?.length) {
-				updatedBlockValue = updateBlockSettingsValues(updatedBlockValue, settingsKey, result.settingsValues);
+				updatedBlockValue = updateBlockDataValues(updatedBlockValue, 'settingsData', settingsKey, result.settingsValues);
 			}
 
 			await this.#setPropertyValue(found.propertyAlias, updatedBlockValue);
@@ -845,23 +860,14 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	// --- Block add ---
 
 	async #onBlockAdd(siblingBlockKey: string, insertIndex: number) {
-		const allValues = this.#getAllValues();
-		const found = findBlockInValues(allValues, siblingBlockKey);
+		const found = this.#findBlock(siblingBlockKey);
 		if (!found) return;
 
 		const propertyAlias = found.propertyAlias;
 		const propertyValue = found.blockValue;
 		if (!propertyValue?.contentData) return;
 
-		const propStructure = this.#propertyStructures.find((p) => p.alias === propertyAlias);
-		if (!propStructure?.config) return;
-
-		const blocksConfig = (propStructure.config as Array<{ alias: string; value: unknown }>)?.find(
-			(c) => c.alias === 'blocks',
-		)?.value as
-			| Array<{ contentElementTypeKey: string; label?: string; forceHideContentEditorInOverlay?: boolean }>
-			| undefined;
-
+		const blocksConfig = this.#getBlocksConfig(propertyAlias);
 		if (!blocksConfig || blocksConfig.length === 0) return;
 
 		if (blocksConfig.length === 1) {
@@ -893,20 +899,14 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	// --- Block add to area ---
 
 	async #onBlockAddToArea(parentBlockKey: string, areaAlias: string, insertIndex: number) {
-		const allValues = this.#getAllValues();
-		const found = findBlockInValues(allValues, parentBlockKey);
+		const found = this.#findBlock(parentBlockKey);
 		if (!found) return;
 
 		const propertyAlias = found.propertyAlias;
 		const propertyValue = found.blockValue;
 		const parentBlock = found.block;
-		const propStructure = this.#propertyStructures.find((p) => p.alias === propertyAlias);
-		if (!propStructure?.config) return;
 
-		const blocksConfig = (propStructure.config as Array<{ alias: string; value: unknown }>)?.find(
-			(c) => c.alias === 'blocks',
-		)?.value as Array<{ contentElementTypeKey: string; areas?: Array<{ key: string; alias: string }> }> | undefined;
-
+		const blocksConfig = this.#getBlocksConfig(propertyAlias);
 		const parentBlockConfig = blocksConfig?.find((b) => b.contentElementTypeKey === parentBlock.contentTypeKey);
 		const areaConfigs = parentBlockConfig?.areas ?? [];
 
@@ -980,8 +980,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	// --- Block delete ---
 
 	async #onBlockDelete(blockKey: string) {
-		const allValues = this.#getAllValues();
-		const found = findBlockInValues(allValues, blockKey);
+		const found = this.#findBlock(blockKey);
 		if (!found) return;
 
 		const { name: blockName } = await this.#resolveBlockPropertyStructures(found.block.contentTypeKey);
@@ -1004,17 +1003,12 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	// --- Block reorder / move ---
 
 	async #onBlockMove(blockKey: string, targetIndex: number, targetParentBlockKey?: string, targetAreaAlias?: string) {
-		const allValues = this.#getAllValues();
-		const found = findBlockInValues(allValues, blockKey);
+		const found = this.#findBlock(blockKey);
 		if (!found) return;
 
 		let areaConfigs: Array<{ key: string; alias: string }> | undefined;
 		if (targetParentBlockKey && targetAreaAlias) {
-			const propStructure = this.#propertyStructures.find((p) => p.alias === found.propertyAlias);
-			const blocksConfig = (propStructure?.config as Array<{ alias: string; value: unknown }>)?.find(
-				(c) => c.alias === 'blocks',
-			)?.value as Array<{ contentElementTypeKey: string; areas?: Array<{ key: string; alias: string }> }> | undefined;
-
+			const blocksConfig = this.#getBlocksConfig(found.propertyAlias);
 			const parentBlock = found.blockValue.contentData.find((b) => b.key === targetParentBlockKey);
 			const parentConfig = blocksConfig?.find((b) => b.contentElementTypeKey === parentBlock?.contentTypeKey);
 			areaConfigs = parentConfig?.areas;
@@ -1033,8 +1027,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 	}
 
 	async #onBlockReorder(blockKey: string, toIndex: number) {
-		const allValues = this.#getAllValues();
-		const found = findBlockInValues(allValues, blockKey);
+		const found = this.#findBlock(blockKey);
 		if (!found) return;
 
 		const updatedValue = reorderBlockInValue(found.blockValue, blockKey, toIndex);
@@ -1055,6 +1048,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 
 	#refreshIframe() {
 		this._iframeReady = false;
+		this.#previewContext?.setIframeReady(false);
 		this.#setPreviewUrl();
 	}
 
@@ -1091,14 +1085,22 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 		return html`
 			<div id="visual-editor-view">
 				${!this._iframeReady ? html`<div id="loading"><uui-loader-circle></uui-loader-circle></div>` : nothing}
-				${this._previewUrl
-					? html`<iframe src=${this._previewUrl} title="Visual Editor" @load=${this.#onIframeLoad}></iframe>`
-					: nothing}
+				<div id="wrapper" class="fullsize">
+					${this._previewUrl
+						? html`<iframe src=${this._previewUrl} title="Visual Editor" @load=${this.#onIframeLoad}></iframe>`
+						: nothing}
+				</div>
 				${this._iframeReady && !this._hasRegions
 					? html`<div id="hint-bar">
 							<small>Click any highlighted property or block on the page to edit it.</small>
 						</div>`
 					: nothing}
+				<div id="menu">
+					<h4>${this.localize.term('visualEditor_title') ?? 'Visual Editor'}</h4>
+					<div id="apps">
+						<umb-extension-slot type="previewApp"></umb-extension-slot>
+					</div>
+				</div>
 			</div>
 		`;
 	}
@@ -1115,6 +1117,7 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				flex-direction: column;
 				height: 100%;
 				position: relative;
+				padding-bottom: 40px;
 			}
 
 			#loading {
@@ -1128,15 +1131,36 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				z-index: 10;
 			}
 
-			iframe {
+			#wrapper {
 				flex: 1;
+				transition: all 240ms cubic-bezier(0.165, 0.84, 0.44, 1);
+				flex-shrink: 0;
+				height: 100%;
 				width: 100%;
+			}
+
+			#wrapper.fullsize {
+				margin: 0 auto;
+				overflow: hidden;
+			}
+
+			#wrapper:not(.fullsize) {
+				margin: 10px auto;
+				background-color: white;
+				border-radius: 3px;
+				overflow: hidden;
+				box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.26);
+			}
+
+			iframe {
+				width: 100%;
+				height: 100%;
 				border: none;
 			}
 
 			#hint-bar {
 				position: absolute;
-				bottom: 12px;
+				bottom: 52px;
 				left: 50%;
 				transform: translateX(-50%);
 				background: var(--uui-color-surface);
@@ -1147,6 +1171,31 @@ export class UmbDocumentWorkspaceViewVisualEditorElement extends UmbLitElement i
 				z-index: 2;
 				max-width: 400px;
 				text-align: center;
+			}
+
+			#menu {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				z-index: 1;
+				background-color: var(--uui-color-header-surface);
+				height: 40px;
+			}
+
+			#menu > h4 {
+				color: var(--uui-color-header-contrast-emphasis);
+				margin: 0;
+				padding: 0 15px;
+			}
+
+			#apps {
+				display: inline-flex;
+				align-items: stretch;
+				height: 100%;
 			}
 		`,
 	];

@@ -1,4 +1,4 @@
-import { findLayoutEntryInAreas } from '@umbraco-cms/backoffice/block';
+import { findLayoutEntryInAreas, removeLayoutEntryFromAreas } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockLayoutWithAreasModel } from '@umbraco-cms/backoffice/block';
 import { UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/block-grid';
 import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS } from '@umbraco-cms/backoffice/block-list';
@@ -69,37 +69,20 @@ function mergeValues(
 }
 
 /**
- * Update a block's property values within the block value structure.
- * Returns a new BlockValue with the updated content data (immutable).
+ * Update values within a block's content or settings data (immutable).
+ * @param dataKey - Which data array to update: 'contentData' or 'settingsData'.
  */
-export function updateBlockPropertyValues(
+export function updateBlockDataValues(
 	blockValue: BlockValue,
-	blockKey: string,
+	dataKey: 'contentData' | 'settingsData',
+	key: string,
 	newValues: Array<{ alias: string; value: unknown }>,
 ): BlockValue {
 	return {
 		...blockValue,
-		contentData: blockValue.contentData.map((block) => {
-			if (block.key !== blockKey) return block;
-			return { ...block, values: mergeValues(block.values, newValues) };
-		}),
-	};
-}
-
-/**
- * Update a block's settings values within the block value structure.
- * Returns a new BlockValue with the updated settings data (immutable).
- */
-export function updateBlockSettingsValues(
-	blockValue: BlockValue,
-	settingsKey: string,
-	newValues: Array<{ alias: string; value: unknown }>,
-): BlockValue {
-	return {
-		...blockValue,
-		settingsData: blockValue.settingsData.map((settings) => {
-			if (settings.key !== settingsKey) return settings;
-			return { ...settings, values: mergeValues(settings.values, newValues) };
+		[dataKey]: blockValue[dataKey].map((entry) => {
+			if (entry.key !== key) return entry;
+			return { ...entry, values: mergeValues(entry.values, newValues) };
 		}),
 	};
 }
@@ -186,7 +169,7 @@ export function removeBlockFromValue(blockValue: BlockValue, blockKey: string): 
 	const layoutEntry = findLayoutEntryInAreas(existingLayout, blockKey);
 	const settingsKey = layoutEntry?.settingsKey;
 
-	const newLayout = removeLayoutEntryRecursive(existingLayout, blockKey);
+	const newLayout = removeLayoutEntryFromAreas(existingLayout, blockKey);
 
 	return {
 		...blockValue,
@@ -197,22 +180,6 @@ export function removeBlockFromValue(blockValue: BlockValue, blockKey: string): 
 			: blockValue.settingsData,
 		expose: blockValue.expose.filter((e) => e.contentKey !== blockKey),
 	};
-}
-
-/** Recursively remove a layout entry by contentKey, searching through block grid areas. */
-function removeLayoutEntryRecursive(entries: BlockValueLayout[], blockKey: string): BlockValueLayout[] {
-	return entries
-		.filter((entry) => entry.contentKey !== blockKey)
-		.map((entry) => {
-			if (!entry.areas) return entry;
-			return {
-				...entry,
-				areas: entry.areas.map((area) => ({
-					...area,
-					items: removeLayoutEntryRecursive(area.items, blockKey),
-				})),
-			};
-		});
 }
 
 /**

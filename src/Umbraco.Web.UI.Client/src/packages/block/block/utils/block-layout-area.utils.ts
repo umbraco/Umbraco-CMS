@@ -154,3 +154,28 @@ export function updateLayoutEntryInPlace<T extends UmbBlockLayoutWithAreasModel>
 	}
 	return undefined;
 }
+
+/**
+ * Recursively remove a layout entry by contentKey, searching through nested areas.
+ * Returns a new array with the entry removed.
+ * @param entries The layout entries to search.
+ * @param contentKey The contentKey of the entry to remove.
+ * @returns A new array with the matching entry removed.
+ */
+export function removeLayoutEntryFromAreas<T extends UmbBlockLayoutWithAreasModel>(
+	entries: Array<T>,
+	contentKey: string,
+): Array<T> {
+	return entries
+		.filter((entry) => entry.contentKey !== contentKey)
+		.map((entry) => {
+			if (!entry.areas) return entry;
+			return {
+				...entry,
+				areas: entry.areas.map((area) => ({
+					...area,
+					items: removeLayoutEntryFromAreas(area.items, contentKey),
+				})),
+			} as T;
+		});
+}
