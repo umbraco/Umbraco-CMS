@@ -16,7 +16,7 @@ public class DocumentUrlDto
     public const string IsPrimaryColumnName = "isPrimary";
 
     /// <summary>
-    /// Gets or sets the surrogate primary key identifier.
+    /// Gets or sets the unique identifier for the node.
     /// </summary>
     public int NodeId { get; set; }
 
