@@ -16,6 +16,8 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext;
 /// </summary>
 public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
 {
+    private static readonly Uri FallbackUrl = new("http://localhost");
+
     private readonly ICookieManager _cookieManager;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -116,7 +118,7 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
 
             // Don't cache fallback values — ApplicationMainUrl may become available after the
             // first HTTP request is processed (see EnsureApplicationMainUrl).
-            return _hostingEnvironment.ApplicationMainUrl ?? new Uri("http://localhost");
+            return _hostingEnvironment.ApplicationMainUrl ?? FallbackUrl;
         }
     }
 
@@ -136,7 +138,9 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
 
             Uri cleaned = _uriUtility.UriToUmbraco(OriginalRequestUrl);
 
-            // Only cache when OriginalRequestUrl was itself cached (i.e. from a real HTTP request).
+            // _originalRequestUrl is set as a side effect of the OriginalRequestUrl access above
+            // only when backed by a real HTTP request. When it's still null the value came from a
+            // fallback, so we don't cache — allowing a later-detected ApplicationMainUrl to take effect.
             if (_originalRequestUrl is not null)
             {
                 _cleanedUmbracoUrl = cleaned;

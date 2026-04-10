@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common.Testing;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.UmbracoContext;
 
@@ -71,6 +72,35 @@ public class UmbracoContextTests
         Assert.AreEqual("my-site.com", originalRequestUrl.Host);
     }
 
+    [Test]
+    public void OriginalRequestUrl_Fallback_Is_Not_Cached_And_Picks_Up_Later_ApplicationMainUrl()
+    {
+        // Arrange - simulate early startup: no HttpContext, no ApplicationMainUrl yet.
+        // Then ApplicationMainUrl becomes available (auto-detected from first HTTP request).
+        var hostingEnvironmentMock = new Mock<IHostingEnvironment>();
+        hostingEnvironmentMock.Setup(x => x.ApplicationVirtualPath).Returns("/");
+        hostingEnvironmentMock.Setup(x => x.ToAbsolute(It.IsAny<string>()))
+            .Returns((string path) => path.TrimStart('~'));
+        hostingEnvironmentMock.Setup(x => x.ApplicationMainUrl).Returns((Uri?)null);
+
+        var umbracoContext = CreateUmbracoContextWithHostingEnvironment(
+            hostingEnvironmentMock.Object,
+            httpContext: null);
+
+        // Act - first access falls back to http://localhost
+        var firstUrl = umbracoContext.OriginalRequestUrl;
+        Assert.AreEqual("http", firstUrl.Scheme);
+        Assert.AreEqual("localhost", firstUrl.Host);
+
+        // Simulate ApplicationMainUrl becoming available (e.g. after first HTTP request)
+        hostingEnvironmentMock.Setup(x => x.ApplicationMainUrl).Returns(new Uri("https://example.com"));
+
+        // Act - second access should pick up the newly available ApplicationMainUrl
+        var secondUrl = umbracoContext.OriginalRequestUrl;
+        Assert.AreEqual("https", secondUrl.Scheme);
+        Assert.AreEqual("example.com", secondUrl.Host);
+    }
+
     private static global::Umbraco.Cms.Web.Common.UmbracoContext.UmbracoContext CreateUmbracoContext(
         Uri? applicationMainUrl,
         HttpContext? httpContext)
@@ -88,6 +118,13 @@ public class UmbracoContextTests
                 x.WebRootPath == "/" &&
                 x.ContentRootPath == "/"));
 
+        return CreateUmbracoContextWithHostingEnvironment(hostingEnvironment, httpContext);
+    }
+
+    private static global::Umbraco.Cms.Web.Common.UmbracoContext.UmbracoContext CreateUmbracoContextWithHostingEnvironment(
+        IHostingEnvironment hostingEnvironment,
+        HttpContext? httpContext)
+    {
         var httpContextAccessor = Mock.Of<IHttpContextAccessor>(x => x.HttpContext == httpContext);
         var umbracoRequestPaths = new UmbracoRequestPaths(
             hostingEnvironment,
