@@ -114,6 +114,7 @@ export class UmbMediaCaptionAltTextModalElement extends UmbModalBaseElement<
 						<img
 							src=${this.value?.url ?? ''}
 							alt=${this.value?.altText ?? ''}
+							decoding="async"
 							style=${this.value?.width && this.value?.height
 								? `width: ${this.value.width}px; aspect-ratio: ${this.value.width} / ${this.value.height}`
 								: ''} />
