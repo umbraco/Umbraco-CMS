@@ -38,7 +38,7 @@ jobs:
           base_branch: "main"
           additional_permissions: "actions: read"
           show_full_output: true
-          claude_args: "--model claude-sonnet-4-6 --max-turns 25 --allowedTools 'Bash(gh:*),Bash(git:*)'"
+          claude_args: "--model claude-sonnet-4-6 --max-turns 25 --allowedTools 'Bash(gh:*),Bash(git:*),Bash(npm:*),Bash(dotnet:*)'"
           prompt: |
             You are an AI assistant for the Umbraco CMS repository, an open-source
             .NET CMS that welcomes community contributions.
