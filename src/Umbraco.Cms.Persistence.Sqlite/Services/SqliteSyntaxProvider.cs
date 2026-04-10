@@ -96,6 +96,15 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// SQLite does not have the concept of guids / uuid / uniqueidentifier
+    /// Columns are also case sensitive by default
+    /// Guids are serialized in uppercase by ORMs
+    /// We need to ensure Guids are stored consistently
+    /// </remarks>
+    public override string FormatGuid(Guid guid) => guid.ToString().ToUpper();
+
+    /// <inheritdoc />
     public override string Format(TableDefinition table)
     {
         var columns = Format(table.Columns);

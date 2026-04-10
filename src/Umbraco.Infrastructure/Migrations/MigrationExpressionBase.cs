@@ -180,6 +180,12 @@ public abstract class MigrationExpressionBase : IMigrationExpression
             return "NULL";
         }
 
+        // Guids need to be uppercase for SQLite
+        if (val is Guid guid)
+        {
+            return SqlSyntax.GetQuotedValue(SqlSyntax.FormatGuid(guid));
+        }
+
         Type type = val.GetType();
 
         switch (Type.GetTypeCode(type))
