@@ -2170,6 +2170,7 @@ export default {
 		updateDate: 'User last updated',
 		userCreated: 'has been created',
 		userCreatedSuccessHelp: 'The new user has successfully been created. To log in to Umbraco use the password below.',
+		userCreatedApiSuccessHelp: 'Set client credentials for the account via the user\'s profile.',
 		userHasPassword: 'The user already has a password set',
 		userHasGroup: "The user is already in group '%0%'",
 		userLockoutNotEnabled: 'Lockout is not enabled for this user',
