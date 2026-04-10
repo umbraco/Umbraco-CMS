@@ -2,6 +2,7 @@ import { UMB_ELEMENT_FOLDER_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE } from '..
 import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS } from '../repository/constants.js';
 import {
 	UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_FOLDER_CREATE,
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_DELETE,
 	UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE,
 } from '../user-permissions/constants.js';
@@ -15,7 +16,7 @@ import type { ManifestEntityCreateOptionActionFolderKind } from '@umbraco-cms/ba
 const folderCreateOption: ManifestEntityCreateOptionActionFolderKind = {
 	type: 'entityCreateOptionAction',
 	kind: 'folder',
-	alias: 'Umb.EntityCreateOptionAction.Element.Folder',
+	alias: 'Umb.EntityCreateOptionAction.ElementFolder',
 	name: 'Element Folder Entity Create Option Action',
 	forEntityTypes: [UMB_ELEMENT_ROOT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 	meta: {
@@ -24,6 +25,13 @@ const folderCreateOption: ManifestEntityCreateOptionActionFolderKind = {
 		additionalOptions: true,
 		folderRepositoryAlias: UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
 	},
+	conditions: [
+		{
+			alias: UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
+			allOf: [UMB_USER_PERMISSION_ELEMENT_FOLDER_CREATE],
+		},
+		{ alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS },
+	],
 };
 
 const folderDelete: UmbExtensionManifest = {
