@@ -1,9 +1,14 @@
 import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS } from '../repository/constants.js';
 import type { UmbElementFolderRepository } from '../repository/index.js';
 import { UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import {
+	UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE,
+} from '../user-permissions/constants.js';
 import type { UmbElementFolderModel } from '../types.js';
 import { UMB_ELEMENT_FOLDER_WORKSPACE_ALIAS } from './constants.js';
 import { UmbElementFolderWorkspaceEditorElement } from './element-folder-editor.element.js';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbEntityNamedDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/workspace';
 import { UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 import type { IRoutingInfo, PageComponent } from '@umbraco-cms/backoffice/router';
@@ -27,6 +32,8 @@ export class UmbElementFolderWorkspaceContext
 
 		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
 
+		this.#enforceUpdatePermission();
+
 		this.routes.setRoutes([
 			{
 				path: 'edit/:unique',
@@ -34,6 +41,36 @@ export class UmbElementFolderWorkspaceContext
 				setup: (component: PageComponent, info: IRoutingInfo) => {
 					const unique = info.match.params.unique;
 					this.load(unique);
+				},
+			},
+		]);
+	}
+
+	#enforceUpdatePermission() {
+		const guardUnique = 'UMB_PREVENT_FOLDER_RENAME_WITHOUT_PERMISSION';
+
+		// Block by default until the condition confirms permission.
+		this.nameWriteGuard.addRule({
+			unique: guardUnique,
+			permitted: false,
+			message: 'You do not have permission to rename this folder.',
+		});
+
+		createExtensionApiByAlias(this, UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [UMB_USER_PERMISSION_ELEMENT_FOLDER_UPDATE],
+				},
+				onChange: (permitted: boolean) => {
+					if (permitted) {
+						this.nameWriteGuard.removeRule(guardUnique);
+					} else {
+						this.nameWriteGuard.addRule({
+							unique: guardUnique,
+							permitted: false,
+							message: 'You do not have permission to rename this folder.',
+						});
+					}
 				},
 			},
 		]);
