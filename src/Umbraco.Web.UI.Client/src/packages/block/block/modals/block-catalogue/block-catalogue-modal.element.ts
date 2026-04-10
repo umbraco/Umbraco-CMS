@@ -319,7 +319,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 					label=${this.localize.term('blockEditor_tabCreateEmpty')}
 					?active=${this._activeView === 'create'}
 					@click=${() => (this._activeView = 'create')}>
-					<umb-localize key=${this.localize.term('blockEditor_tabCreateEmpty')}>Create Empty</umb-localize>
+					<umb-localize key="blockEditor_tabCreateEmpty">Create Empty</umb-localize>
 					<uui-icon slot="icon" name="icon-add"></uui-icon>
 				</uui-tab>
 				${when(
@@ -338,7 +338,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 					label=${this.localize.term('blockEditor_tabClipboard')}
 					?active=${this._activeView === 'clipboard'}
 					@click=${() => (this._activeView = 'clipboard')}>
-					<umb-localize key=${this.localize.term('blockEditor_tabClipboard')}>Clipboard</umb-localize>
+					<umb-localize key="blockEditor_tabClipboard">Clipboard</umb-localize>
 					<uui-icon slot="icon" name="icon-clipboard"></uui-icon>
 				</uui-tab>
 			</uui-tab-group>

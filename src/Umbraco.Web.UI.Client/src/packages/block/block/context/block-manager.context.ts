@@ -349,6 +349,7 @@ export abstract class UmbBlockManagerContext<
 
 	async #fetchLibraryElement(key: string) {
 		if (this.#pendingElementFetches.has(key)) return;
+		if (this.#resolvedLibraryElements.getValue().some((x) => x.key === key)) return;
 		this.#pendingElementFetches.add(key);
 		try {
 			const { data } = await this.#elementRepository.requestByUnique(key);
@@ -525,6 +526,8 @@ export abstract class UmbBlockManagerContext<
 		this.#contents.appendOne(newContent);
 		this._layouts.updateOne(elementKey, { contentKey: newKey, isSharedContent: undefined } as Partial<BlockLayoutType>);
 		this.#resolvedLibraryElements.removeOne(elementKey);
+		this.#resolvedLibraryElementVariantStates.removeOne(elementKey);
+		this.#setInitialBlockExpose(newContent);
 	}
 
 	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {

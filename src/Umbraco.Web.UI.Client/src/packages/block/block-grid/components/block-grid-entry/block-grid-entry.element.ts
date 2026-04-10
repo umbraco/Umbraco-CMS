@@ -58,6 +58,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	private _contentKey?: string | undefined;
 
 	#context = new UmbBlockGridEntryContext(this);
+	#elementRepository = new UmbElementDetailRepository(this);
 	#renderTimeout: number | undefined;
 
 	@state()
@@ -93,6 +94,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	private _exposed?: boolean;
+
+	private _hasExpose?: boolean;
 
 	// Unuspported is triggerede if the Block Type is not reconized, it can also be triggerede by the Content Element Type not existing any longer. [NL]
 	@state()
@@ -215,10 +218,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.hasExpose,
 			(exposed) => {
-				// Shared content blocks use the element's variant state to determine published status
-				const isExposed = this._isLibraryElement ? this._sharedContentVariantState !== 'Draft' : exposed;
-				this.#updateBlockViewProps({ unpublished: !isExposed });
-				this._exposed = isExposed;
+				this._hasExpose = exposed;
+				this.#updateExposedState();
 			},
 			null,
 		);
@@ -240,6 +241,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			(isLibrary) => {
 				this._isLibraryElement = isLibrary;
 				this._isReferenceAttr = isLibrary;
+				this.#updateExposedState();
 			},
 			null,
 		);
@@ -247,6 +249,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this.#context.sharedContentVariantState,
 			(state) => {
 				this._sharedContentVariantState = state;
+				this.#updateExposedState();
 			},
 			null,
 		);
@@ -398,6 +401,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#expose = () => {
 		this.#context.expose();
 	};
+
+	#updateExposedState() {
+		const isExposed = this._isLibraryElement
+			? this._sharedContentVariantState !== 'Draft'
+			: this._hasExpose;
+		this.#updateBlockViewProps({ unpublished: !isExposed });
+		this._exposed = isExposed;
+	}
 
 	#callUpdateInlineCreateButtons() {
 		clearTimeout(this.#renderTimeout);
@@ -653,7 +664,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			.catch(() => undefined);
 		if (!result) return;
 
-		const elementRepository = new UmbElementDetailRepository(this);
+		const elementRepository = this.#elementRepository;
 		const { data: scaffold } = await elementRepository.createScaffold({
 			documentType: { unique: content.contentTypeKey, collection: null },
 			values: content.values,
@@ -688,7 +699,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			color: 'warning',
 		});
 
-		const elementRepository = new UmbElementDetailRepository(this);
+		const elementRepository = this.#elementRepository;
 		const { data: element } = await elementRepository.requestByUnique(contentKey);
 		if (!element) return;
 

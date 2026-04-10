@@ -65,6 +65,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	private _contentKey?: string | undefined;
 
 	#context = new UmbBlockListEntryContext(this);
+	#elementRepository = new UmbElementDetailRepository(this);
 
 	@state()
 	private _contentTypeAlias?: string;
@@ -86,6 +87,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	private _exposed?: boolean;
+
+	private _hasExpose?: boolean;
 
 	@state()
 	private _unsupported?: boolean;
@@ -185,10 +188,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.hasExpose,
 			(exposed) => {
-				// Shared content blocks use the element's variant state to determine published status
-				const isExposed = this._isLibraryElement ? this._sharedContentVariantState !== 'Draft' : exposed;
-				this.#updateBlockViewProps({ unpublished: !isExposed });
-				this._exposed = isExposed;
+				this._hasExpose = exposed;
+				this.#updateExposedState();
 			},
 			null,
 		);
@@ -216,6 +217,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			(isLibrary) => {
 				this._isLibraryElement = isLibrary;
 				this._isReferenceAttr = isLibrary;
+				this.#updateExposedState();
 			},
 			null,
 		);
@@ -223,6 +225,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			this.#context.sharedContentVariantState,
 			(state) => {
 				this._sharedContentVariantState = state;
+				this.#updateExposedState();
 			},
 			null,
 		);
@@ -330,6 +333,15 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#expose = () => {
 		this.#context.expose();
 	};
+
+	#updateExposedState() {
+		// Shared content blocks use the element's variant state; local blocks use the expose entry
+		const isExposed = this._isLibraryElement
+			? this._sharedContentVariantState !== 'Draft'
+			: this._hasExpose;
+		this.#updateBlockViewProps({ unpublished: !isExposed });
+		this._exposed = isExposed;
+	}
 
 	async #copyToClipboard() {
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
@@ -526,7 +538,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.catch(() => undefined);
 		if (!result) return;
 
-		const elementRepository = new UmbElementDetailRepository(this);
+		const elementRepository = this.#elementRepository;
 		const { data: scaffold } = await elementRepository.createScaffold({
 			documentType: { unique: content.contentTypeKey, collection: null },
 			values: content.values,
@@ -561,7 +573,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			color: 'warning',
 		});
 
-		const elementRepository = new UmbElementDetailRepository(this);
+		const elementRepository = this.#elementRepository;
 		const { data: element } = await elementRepository.requestByUnique(contentKey);
 		if (!element) return;
 
