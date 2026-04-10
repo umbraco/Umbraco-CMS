@@ -832,6 +832,15 @@ public class EntityService : RepositoryService, IEntityService
     }
 
     /// <inheritdoc />
+    public virtual IEnumerable<TreeEntityPath> GetAllPaths(IEnumerable<UmbracoObjectTypes> objectTypes, params Guid[] keys)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _entityRepository.GetAllPaths(objectTypes.Select(objectType => objectType.GetGuid()).ToArray(), keys);
+        }
+    }
+
+    /// <inheritdoc />
     public int ReserveId(Guid key)
     {
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
