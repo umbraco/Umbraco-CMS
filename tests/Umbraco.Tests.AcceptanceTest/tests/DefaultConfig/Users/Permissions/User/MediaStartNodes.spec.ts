@@ -101,18 +101,14 @@ test("can see parent of start node but not access it", async ({
   await umbracoUi.user.goToSection(ConstantHelper.sections.media, false);
 
   // Assert
-
-  // Get initial URL (should be on media section)
-  await umbracoUi.waitForTimeout(100); // Wait for workspace to load
+  await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
+  await umbracoUi.media.waitForPageLoad();
   const initialUrl = umbracoUi.page.url();
 
-  await umbracoUi.media.isMediaTreeItemVisible(rootFolderName);
   await umbracoUi.media.goToMediaWithName(rootFolderName);
-  await umbracoUi.waitForTimeout(100); // Wait for workspace to load
 
   // Assert - URL should not have changed (no navigation occurred)
-  const currentUrl = umbracoUi.page.url();
-  expect(currentUrl).toBe(initialUrl);
+  await expect(umbracoUi.page).toHaveURL(initialUrl);
 
   await umbracoUi.media.openMediaCaretButtonForName(rootFolderName);
   await umbracoUi.media.isChildMediaVisible(rootFolderName, childFolderOneName);
