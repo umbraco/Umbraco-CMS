@@ -99,6 +99,9 @@ jobs:
             - `category/localization` — if localization/language files are changed
             - `category/test-automation` — if only test files are changed
             - `category/refactor` — if the PR is pure refactoring with no new features
+            - `category/performance` — if performance-related changes are detected
+            - `category/ux` — if user-facing changes are detected
+            - `category/ui` — if changes to the UI layer are detected
 
             Only apply labels you are confident about. Never remove existing labels.
             Use `gh pr edit ${{ github.event.issue.number }} --add-label "<label>"` to apply labels.
