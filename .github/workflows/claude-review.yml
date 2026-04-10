@@ -24,7 +24,7 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY_03 }}
           base_branch: "main"
           additional_permissions: "actions: read"
-          claude_args: "--model claude-sonnet-4-6 --max-turns 25"
+          claude_args: "--model claude-sonnet-4-6 --max-turns 50"
           prompt: |
             You are reviewing pull request #${{ github.event.pull_request.number }}
             in the Umbraco CMS repository.
