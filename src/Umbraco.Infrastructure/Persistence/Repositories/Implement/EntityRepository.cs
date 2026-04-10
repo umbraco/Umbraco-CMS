@@ -587,14 +587,23 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
             : PerformGetAllPaths(objectType);
 
+    /// <inheritdoc/>
+    public IEnumerable<TreeEntityPath> GetAllPaths(Guid[] objectTypes, params Guid[] keys) =>
+        keys.Any()
+            ? PerformGetAllPaths(objectTypes, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
+            : PerformGetAllPaths(objectTypes);
+
     private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>>? filter = null)
+        => PerformGetAllPaths([objectType], filter);
+
+    private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid[] objectTypes, Action<Sql<ISqlContext>>? filter = null)
     {
         // NodeId is named Id on TreeEntityPath = use an alias
         Sql<ISqlContext> sql = Sql().Select<NodeDto>(
                 x => Alias(x.NodeId, nameof(TreeEntityPath.Id)),
                 x => x.Path,
                 x => Alias(x.UniqueId, nameof(TreeEntityPath.Key)))
-            .From<NodeDto>().Where<NodeDto>(x => x.NodeObjectType == objectType);
+            .From<NodeDto>().WhereIn<NodeDto>(x => x.NodeObjectType, objectTypes);
         filter?.Invoke(sql);
         return Database.Fetch<TreeEntityPath>(sql);
     }
