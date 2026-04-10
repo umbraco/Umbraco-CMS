@@ -1,6 +1,7 @@
 import { UmbPropertyEditorUITagsElement } from './property-editor-ui-tags.element.js';
 import type { UmbTagsInputElement } from '../../components/tags-input/tags-input.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
 describe('UmbPropertyEditorUITagsElement', () => {
@@ -17,7 +18,7 @@ describe('UmbPropertyEditorUITagsElement', () => {
 	it('preserves tags containing commas', async () => {
 		const tagsInput = element.shadowRoot!.querySelector('umb-tags-input') as UmbTagsInputElement;
 		tagsInput.items = ['hello', 'world, with comma', 'foo'];
-		tagsInput.dispatchEvent(new CustomEvent('change'));
+		tagsInput.dispatchEvent(new UmbChangeEvent());
 		await element.updateComplete;
 		expect(element.value).to.deep.equal(['hello', 'world, with comma', 'foo']);
 	});

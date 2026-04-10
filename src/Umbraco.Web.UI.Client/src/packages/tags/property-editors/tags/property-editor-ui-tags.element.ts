@@ -71,8 +71,9 @@ export class UmbPropertyEditorUITagsElement
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-tags-input')!);
 	}
 
-	#onChange(event: CustomEvent) {
-		this.value = (event.target as UmbTagsInputElement).items;
+	#onChange(event: UmbChangeEvent) {
+		event.stopPropagation();
+		this.value = (event.currentTarget as UmbTagsInputElement).items;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
