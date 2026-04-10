@@ -241,10 +241,20 @@ export class UmbDocumentWorkspaceContext
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
 		if (blueprintUnique) {
+			// Reset state and set loading immediately, before the async blueprint data fetch.
+			// This ensures the workspace shows a loading indicator while the data is being fetched,
+			// preventing the previous workspace editor's inner router from firing history.replaceState
+			// (via the default-variant redirect route) which would cancel the outer navigation. (#21996)
+			this.resetState();
+			this.loading.addState({ unique: 'blueprint-fetch' });
+
 			const blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
 			const { data } = await blueprintRepository.scaffoldByUnique(blueprintUnique);
 
-			if (!data) throw new Error('Blueprint data is missing');
+			if (!data) {
+				this.loading.removeState('blueprint-fetch');
+				throw new Error('Blueprint data is missing');
+			}
 
 			return this.createScaffold({
 				parent,

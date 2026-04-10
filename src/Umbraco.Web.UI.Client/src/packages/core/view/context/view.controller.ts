@@ -66,6 +66,8 @@ export class UmbViewController extends UmbControllerBase {
 
 	public readonly viewAlias: string | null;
 
+	#destroyed = false;
+
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
 	protected readonly variantId = this.#variantId.asObservable();
 
@@ -127,7 +129,7 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	public provideAt(controllerHost: UmbClassInterface): void {
-		if (this.#currentProvideHost === controllerHost) return;
+		if (this.#destroyed || this.#currentProvideHost === controllerHost) return;
 
 		this.unprovide();
 
@@ -357,10 +359,10 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	override destroy(): void {
+		this.#destroyed = true;
 		this.#inherit = false;
 		this.#removeActive();
 		this.#autoActivate = false;
-		(this as any).provideAt = undefined;
 		this.unprovide();
 		super.destroy();
 		this.#consumeParentCtrl = undefined;
