@@ -184,7 +184,7 @@ public interface IEntityRepository : IRepository
     /// Gets all paths for entities of the specified object types, optionally filtered by the provided entity IDs.
     /// </summary>
     /// <param name="objectTypes">The unique identifiers of the object types.</param>
-    /// <param name="keys">Optional array of entity IDs to filter the paths. If not provided, paths for all entities of the specified type are returned.</param>
+    /// <param name="keys">Optional array of entity keys to filter the paths. If not provided, paths for all entities of the specified type are returned.</param>
     /// <returns>A collection of entity paths.</returns>
     IEnumerable<TreeEntityPath> GetAllPaths(Guid[] objectTypes, params Guid[] keys);
 
