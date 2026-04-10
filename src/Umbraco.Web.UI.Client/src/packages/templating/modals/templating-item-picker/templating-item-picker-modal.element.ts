@@ -31,16 +31,6 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 	private _close() {
 		this.modalContext?.reject();
 	}
-
-	#onSelected(type: CodeSnippetType) {
-		this._pickedItem = type;
-	}
-
-	#onDeselected(type: CodeSnippetType) {
-		if (this._pickedItem === type) {
-			this._pickedItem = undefined;
-		}
-	}
 	
 	async #submit() {
 		switch (this._pickedItem) {
@@ -131,8 +121,8 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				selectable
 				selectOnly
 				.selected=${this._pickedItem === CodeSnippetType.pageField}
-				@selected=${() => this.#onSelected(CodeSnippetType.pageField)}
-				@deselected=${() => this.#onDeselected(CodeSnippetType.pageField)}
+				@selected=${() => this._pickedItem = CodeSnippetType.pageField}
+				@deselected=${() => this._pickedItem = undefined}
 				label=${this.localize.term('template_insert')}>
 				<h3><umb-localize key="template_insertPageField">Value</umb-localize></h3>
 				<p>
@@ -147,8 +137,8 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 						selectable
 						selectOnly
 						.selected=${this._pickedItem === CodeSnippetType.partialView}
-						@selected=${() => this.#onSelected(CodeSnippetType.partialView)}
-						@deselected=${() => this.#onDeselected(CodeSnippetType.partialView)}
+						@selected=${() => this._pickedItem = CodeSnippetType.partialView}
+						@deselected=${() => this._pickedItem = undefined}
 						label=${this.localize.term('template_insert')}>
 						<h3><umb-localize key="template_insertPartialView">Partial view</umb-localize></h3>
 						<p>
@@ -163,8 +153,8 @@ export class UmbTemplatingItemPickerModalElement extends UmbModalBaseElement<
 				selectable
 				selectOnly
 				.selected=${this._pickedItem === CodeSnippetType.dictionaryItem}
-				@selected=${() => this.#onSelected(CodeSnippetType.dictionaryItem)}
-				@deselected=${() => this.#onDeselected(CodeSnippetType.dictionaryItem)}
+				@selected=${() => this._pickedItem = CodeSnippetType.dictionaryItem}
+				@deselected=${() => this._pickedItem = undefined}
 				label=${this.localize.term('template_insertDictionaryItem')}>
 				<h3><umb-localize key="template_insertDictionaryItem">Dictionary Item</umb-localize></h3>
 				<p>

@@ -31,15 +31,6 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 		this.modalContext?.reject();
 	}
 
-	#onSelected(type: TemplatingSectionType) {
-		this._pickedSection = type;
-	}
-
-	#onDeselected(type: TemplatingSectionType) {
-		if (this._pickedSection === type) {
-			this._pickedSection = undefined;
-		}
-	}
 
 	#submit() {
 		switch (this._pickedSection) {
@@ -90,8 +81,8 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 			selectOnly
 			.selected=${this._pickedSection === TemplatingSectionType.renderChildTemplate}
 			label=${this.localize.term('template_renderBody')}
-			@selected=${() => this.#onSelected(TemplatingSectionType.renderChildTemplate)}
-			@deselected=${() => this.#onDeselected(TemplatingSectionType.renderChildTemplate)}>
+			@selected=${() => this._pickedSection = TemplatingSectionType.renderChildTemplate}
+  			@deselected=${() => this._pickedSection = undefined}>
 			<h3><umb-localize key="template_renderBody">Render Child Template</umb-localize></h3>
 			<p>
 				<umb-localize key="template_renderBodyDesc">
@@ -107,8 +98,8 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 			selectOnly
 			.selected=${this._pickedSection === TemplatingSectionType.renderANamedSection}
 			label=${this.localize.term('template_renderSection')}
-			@selected=${() => this.#onSelected(TemplatingSectionType.renderANamedSection)}
-			@deselected=${() => this.#onDeselected(TemplatingSectionType.renderANamedSection)}>
+			@selected=${() => this._pickedSection = TemplatingSectionType.renderANamedSection}
+  			@deselected=${() => this._pickedSection = undefined}>
 			<h3><umb-localize key="template_renderSection">Render a named section</umb-localize></h3>
 			<p>
 				<umb-localize key="template_renderSectionDesc">
@@ -143,8 +134,8 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 			selectOnly
 			.selected=${this._pickedSection === TemplatingSectionType.defineANamedSection}
 			label=${this.localize.term('template_defineSection')}
-			@selected=${() => this.#onSelected(TemplatingSectionType.defineANamedSection)}
-			@deselected=${() => this.#onDeselected(TemplatingSectionType.defineANamedSection)}>
+			@selected=${() => this._pickedSection = TemplatingSectionType.defineANamedSection}
+  			@deselected=${() => this._pickedSection = undefined}>
 			<h3><umb-localize key="template_defineSection">Define a named section</umb-localize></h3>
 			<p>
 				<umb-localize key="template_defineSectionDesc">
