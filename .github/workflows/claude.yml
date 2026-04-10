@@ -46,7 +46,8 @@ jobs:
 
             ## On Pull Requests
 
-            When asked to review a PR, read the diff and provide concise feedback.
+            When triggered on a pull request (e.g. someone comments `@claude review`),
+            immediately review that PR. Use `gh pr diff` to read the changes.
             Focus on bugs, breaking changes, and architectural concerns.
             Post inline comments for specific issues and a brief summary comment.
 
