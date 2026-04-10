@@ -102,7 +102,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     /// Guids are serialized in uppercase by ORMs
     /// We need to ensure Guids are stored consistently
     /// </remarks>
-    public override string FormatGuid(Guid guid) => guid.ToString().ToUpper();
+    public override string FormatGuid(Guid guid) => guid.ToString().ToUpperInvariant();
 
     /// <inheritdoc />
     public override string Format(TableDefinition table)
