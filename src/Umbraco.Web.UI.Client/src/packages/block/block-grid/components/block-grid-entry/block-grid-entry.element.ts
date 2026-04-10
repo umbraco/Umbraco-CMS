@@ -677,9 +677,34 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		manager.transferToLibrary(contentKey, created.unique);
 	};
 
-	// TODO: Implement in "Disconnect from Library"
-	#onDisconnectFromLibrary = () => {
-		console.warn('Disconnect from library — not yet implemented');
+	#onDisconnectFromLibrary = async () => {
+		const contentKey = this.#context.getContentKey();
+		if (!contentKey) return;
+
+		await umbConfirmModal(this, {
+			headline: this.localize.term('blockEditor_disconnectFromLibrary'),
+			content: this.localize.term('blockEditor_disconnectFromLibraryConfirm'),
+			confirmLabel: this.localize.term('blockEditor_disconnectFromLibrary'),
+			color: 'warning',
+		});
+
+		const elementRepository = new UmbElementDetailRepository(this);
+		const { data: element } = await elementRepository.requestByUnique(contentKey);
+		if (!element) return;
+
+		const manager = await this.getContext(UMB_BLOCK_MANAGER_CONTEXT).catch(() => undefined);
+		if (!manager) return;
+		manager.disconnectFromLibrary(
+			contentKey,
+			element.values.map((v) => ({
+				alias: v.alias,
+				editorAlias: v.editorAlias,
+				culture: v.culture,
+				segment: v.segment,
+				value: v.value,
+			})),
+			element.documentType.unique,
+		);
 	};
 
 	#renderEditAction() {

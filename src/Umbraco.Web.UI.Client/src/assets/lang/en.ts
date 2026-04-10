@@ -2835,6 +2835,9 @@ export default {
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
 		tabLibrary: 'Library',
 		transferToLibrary: 'Transfer to Library',
+		disconnectFromLibrary: 'Disconnect from Library',
+		disconnectFromLibraryConfirm:
+			'This will create a local copy of the element content. The library element will not be affected.',
 		blockVariantConfigurationNotSupported:
 			'One or more Block Types of this Block Editor is using a Element-Type that is configured to Vary By Culture or Vary By Segment. This is not supported on a Content item that does not vary by Culture or Segment.',
 	},

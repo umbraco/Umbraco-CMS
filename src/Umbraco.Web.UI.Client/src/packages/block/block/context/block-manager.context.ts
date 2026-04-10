@@ -512,6 +512,21 @@ export abstract class UmbBlockManagerContext<
 		this.ensureContentResolved(newElementKey);
 	}
 
+	/**
+	 * Disconnect a block from the library, copying element content to local contentData.
+	 */
+	disconnectFromLibrary(elementKey: string, values: Array<UmbBlockDataValueModel>, contentTypeKey: string) {
+		const newKey = UmbId.new();
+		const newContent: UmbBlockDataModel = {
+			key: newKey,
+			contentTypeKey,
+			values,
+		};
+		this.#contents.appendOne(newContent);
+		this._layouts.updateOne(elementKey, { contentKey: newKey, isSharedContent: undefined } as Partial<BlockLayoutType>);
+		this.#resolvedLibraryElements.removeOne(elementKey);
+	}
+
 	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {
 		this.#contents.updateOne(key, { [propertyAlias]: value });
 	}
