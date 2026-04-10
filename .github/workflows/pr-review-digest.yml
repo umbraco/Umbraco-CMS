@@ -15,26 +15,9 @@ jobs:
         env:
           SLACK_WEBHOOK: ${{ secrets.PR_DIGEST_SLACK_WEBHOOK }}
         with:
-          github-token: ${{ secrets.ORG_READ_TOKEN }}
           script: |
             const org = 'umbraco';
             const repo = 'Umbraco-CMS';
-            const teamSlug = 'product-and-engineering';
-
-            // Get team members
-            let teamMembers = [];
-            try {
-              const { data: members } = await github.rest.teams.listMembersInOrg({
-                org,
-                team_slug: teamSlug,
-                per_page: 100
-              });
-              teamMembers = members.map(m => m.login.toLowerCase());
-              console.log(`Found ${teamMembers.length} team members`);
-            } catch (error) {
-              console.log(`Could not fetch team members: ${error.message}`);
-              console.log('Falling back to all non-bot PRs');
-            }
 
             // Get open PRs
             const { data: prs } = await github.rest.pulls.list({
@@ -54,8 +37,13 @@ jobs:
               const author = pr.user.login.toLowerCase();
               if (author.includes('bot') || author.includes('dependabot')) continue;
 
-              // If we have team members, filter by team
-              if (teamMembers.length > 0 && !teamMembers.includes(author)) continue;
+              // Only include PRs from write+ collaborators (team members)
+              const { data: perm } = await github.rest.repos.getCollaboratorPermissionLevel({
+                owner: org,
+                repo,
+                username: pr.user.login
+              });
+              if (!['admin', 'maintain', 'write'].includes(perm.permission)) continue;
 
               // Check for reviews
               const { data: reviews } = await github.rest.pulls.listReviews({
