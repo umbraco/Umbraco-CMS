@@ -71,7 +71,6 @@ export class UmbIconElement extends UmbLitElement {
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				--uui-icon-color: currentColor;
 			}
 		`,
 	];
