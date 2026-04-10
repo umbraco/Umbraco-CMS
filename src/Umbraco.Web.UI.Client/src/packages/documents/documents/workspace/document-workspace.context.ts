@@ -256,6 +256,7 @@ export class UmbDocumentWorkspaceContext
 				throw new Error('Blueprint data is missing');
 			}
 
+			this.loading.removeState('blueprint-fetch');
 			return this.createScaffold({
 				parent,
 				preset: {
