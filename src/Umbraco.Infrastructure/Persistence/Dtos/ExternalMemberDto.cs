@@ -36,6 +36,7 @@ internal sealed class ExternalMemberDto
     [Column("email")]
     [Length(1000)]
     [NullSetting(NullSetting = NullSettings.NotNull)]
+    [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Email")]
     public string Email { get; set; } = null!;
 
     /// <summary>

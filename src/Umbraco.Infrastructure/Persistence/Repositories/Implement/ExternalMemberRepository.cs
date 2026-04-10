@@ -151,16 +151,14 @@ internal sealed class ExternalMemberRepository : IExternalMemberRepository
     /// <inheritdoc />
     public async Task AssignRolesAsync(int externalMemberId, int[] memberGroupIds)
     {
-        foreach (var groupId in memberGroupIds)
-        {
-            var dto = new ExternalMember2MemberGroupDto
+        IEnumerable<ExternalMember2MemberGroupDto> dtos = memberGroupIds.Select(groupId =>
+            new ExternalMember2MemberGroupDto
             {
                 ExternalMemberId = externalMemberId,
                 MemberGroupId = groupId,
-            };
+            });
 
-            await Database.InsertAsync(dto);
-        }
+        await Database.InsertBulkAsync(dtos);
     }
 
     /// <inheritdoc />
