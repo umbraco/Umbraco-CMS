@@ -116,7 +116,11 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 						<uui-input ${umbFocus()} id="render-named-section-name" label=${this.localize.term('template_sectionName')}></uui-input>
 						<uui-checkbox
 							id="render-named-section-is-mandatory"
-							label=${this.localize.term('template_sectionMandatory')}></uui-checkbox>
+							label=${this.localize.term('template_sectionMandatory')}
+							@click=${(e: Event) => e.stopPropagation()}
+							@keydown=${(e: KeyboardEvent) => {
+        					if (e.key === 'Enter') {
+            				(e.target as HTMLElement).click();}}}></uui-checkbox>
 						<small>
 							<umb-localize key="template_sectionMandatoryDesc">
 								If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is
