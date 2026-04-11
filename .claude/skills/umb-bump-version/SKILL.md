@@ -34,7 +34,9 @@ Extract the version from `$ARGUMENTS`. It must be a valid semver-like string (e.
 
 ### 2. Read the Current Version
 
-Read `version.json` and extract the current `"version"` value. Display both the current and target versions to the user for confirmation context:
+Read `version.json` and extract the current `"version"` value. If the current version already equals the target version, report that the version is already set and stop — do not edit, stage, or commit anything.
+
+Otherwise, display both versions:
 
 ```
 Bumping version: {current} -> {target}
@@ -52,11 +54,13 @@ Use targeted edits — do NOT rewrite entire files. Be precise to avoid changing
 
 ### 4. Verify
 
-After all edits, grep for the new version string across the 5 files to confirm all updates landed correctly:
+After all edits, grep for the target version value across the 5 files to confirm all updates landed correctly:
 
 ```bash
-grep -n "\"version\"" version.json src/Umbraco.Web.UI.Client/package.json src/Umbraco.Web.UI.Client/package-lock.json tests/Umbraco.Tests.AcceptanceTest/package.json tests/Umbraco.Tests.AcceptanceTest/package-lock.json | head -20
+grep -n "\"version\": \"{version}\"" version.json src/Umbraco.Web.UI.Client/package.json src/Umbraco.Web.UI.Client/package-lock.json tests/Umbraco.Tests.AcceptanceTest/package.json tests/Umbraco.Tests.AcceptanceTest/package-lock.json
 ```
+
+Expect exactly 7 matches (one per `package.json` and `version.json`, two per `package-lock.json`).
 
 ### 5. Stage and Commit
 
