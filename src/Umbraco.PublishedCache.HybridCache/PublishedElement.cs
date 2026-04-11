@@ -21,9 +21,11 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         ContentNode contentNode,
         bool preview,
         IElementsCache elementsCache,
-        IVariationContextAccessor variationContextAccessor)
+        IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
     {
         VariationContextAccessor = variationContextAccessor;
+        PropertyRenderingContextAccessor = propertyRenderingContextAccessor;
         ContentNode = contentNode;
         ContentData? contentData = preview ? ContentNode.DraftModel : ContentNode.PublishedModel;
         if (contentData is null)
@@ -87,6 +89,8 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
 
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
+
+    internal IPropertyRenderingContextAccessor PropertyRenderingContextAccessor { get; }
 
     /// <inheritdoc />
     public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
