@@ -48,7 +48,8 @@ export default defineConfig({
 		sourcemap: true,
 		rollupOptions: {
 			input: {
-				main: new URL('index.html', import.meta.url).pathname, // Vite should only load the main index.html file
+				main: new URL('index.html', import.meta.url).pathname,
+				'icon-manager': new URL('devops/icon-manager/icon-manager.html', import.meta.url).pathname,
 			},
 		},
 	},
