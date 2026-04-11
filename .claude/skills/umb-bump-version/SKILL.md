@@ -26,6 +26,8 @@ The following 5 files must be updated with the new version:
 | 4 | `tests/Umbraco.Tests.AcceptanceTest/package.json` | `"version"` |
 | 5 | `tests/Umbraco.Tests.AcceptanceTest/package-lock.json` | top-level `"version"` AND `packages[""].version` |
 
+**Note**: For major version bumps (e.g., 17.x to 18.x), `src/Umbraco.Web.UI.Login/package.json` has a caret-ranged dependency on `@umbraco-cms/backoffice` (e.g., `^17.2.0`) that will need manual updating. This skill does not handle that — major bumps involve many other changes beyond version strings.
+
 ## Instructions
 
 ### 1. Parse and Validate the Version
