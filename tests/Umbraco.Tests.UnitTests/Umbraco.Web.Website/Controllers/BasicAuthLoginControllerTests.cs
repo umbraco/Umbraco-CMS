@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
@@ -42,7 +44,7 @@ public class BasicAuthLoginControllerTests
 
         var httpContext = new DefaultHttpContext { RequestServices = serviceProvider };
 
-        _controller = new BasicAuthLoginController
+        _controller = new BasicAuthLoginController(Options.Create(new BasicAuthSettings()))
         {
             ControllerContext = new ControllerContext
             {
@@ -246,7 +248,7 @@ public class BasicAuthLoginControllerTests
         ServiceProvider serviceProvider = services.BuildServiceProvider();
         var httpContext = new DefaultHttpContext { RequestServices = serviceProvider };
 
-        var controller = new BasicAuthLoginController
+        var controller = new BasicAuthLoginController(Options.Create(new BasicAuthSettings()))
         {
             ControllerContext = new ControllerContext { HttpContext = httpContext },
         };

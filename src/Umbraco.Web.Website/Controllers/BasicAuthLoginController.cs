@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
@@ -26,6 +28,14 @@ namespace Umbraco.Cms.Web.Website.Controllers;
 [AllowAnonymous]
 public class BasicAuthLoginController : Controller
 {
+    private readonly IOptions<BasicAuthSettings> _basicAuthSettings;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BasicAuthLoginController"/> class.
+    /// </summary>
+    /// <param name="basicAuthSettings">The basic authentication settings.</param>
+    public BasicAuthLoginController(IOptions<BasicAuthSettings> basicAuthSettings) => _basicAuthSettings = basicAuthSettings;
+
     /// <summary>
     /// Renders the login form.
     /// </summary>
@@ -280,7 +290,7 @@ public class BasicAuthLoginController : Controller
             ErrorMessage = errorMessage,
             ProviderNames = providerNames,
         };
-        return View("/umbraco/BasicAuthLogin/TwoFactor.cshtml", model);
+        return View(_basicAuthSettings.Value.TwoFactorViewPath, model);
     }
 
     /// <summary>
@@ -301,7 +311,7 @@ public class BasicAuthLoginController : Controller
             ErrorMessage = errorMessage,
             ExternalLoginProviders = externalProviders,
         };
-        return View("/umbraco/BasicAuthLogin/Login.cshtml", model);
+        return View(_basicAuthSettings.Value.LoginViewPath, model);
     }
 
     /// <summary>
