@@ -22,7 +22,20 @@
 		},
 		{
 			"name": "icon-alert",
-			"file": "triangle-alert.svg"
+			"file": "triangle-alert.svg",
+			"keywords": [
+				"warning",
+				"alert",
+				"exclamation"
+			],
+			"groups": [
+				"sign",
+				"security",
+				"symbol"
+			],
+			"related": [
+				"icon-info"
+			]
 		},
 		{
 			"name": "icon-alt",
@@ -313,10 +326,6 @@
 		{
 			"name": "icon-blockquote",
 			"file": "text-quote.svg"
-		},
-		{
-			"_name": "icon-blueprint",
-			"____file": "blueprint.svg"
 		},
 		{
 			"name": "icon-bluetooth",
@@ -698,11 +707,11 @@
 		{
 			"name": "icon-coins-alt",
 			"file": "coins.svg",
-			"legacy": true,
 			"keywords": [
 				"money",
 				"cash"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-coins",
@@ -842,7 +851,6 @@
 		{
 			"name": "icon-credit-card-alt",
 			"file": "credit-card.svg",
-			"legacy": true,
 			"keywords": [
 				"payments",
 				"debit cards",
@@ -862,7 +870,8 @@
 				"icon-credit-card",
 				"icon-credit-card-alt",
 				"icon-multiple-credit-cards"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-credit-card",
@@ -1108,8 +1117,6 @@
 		{
 			"name": "icon-document-dashed-line",
 			"file": "file.svg",
-			"missing": "TODO: Legacy until se have made a custom",
-			"legacy": true,
 			"keywords": [
 				"documents",
 				"new",
@@ -1120,7 +1127,8 @@
 			],
 			"groups": [
 				"document"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-document",
@@ -1212,7 +1220,6 @@
 		{
 			"name": "icon-employee",
 			"file": "user.svg",
-			"legacy": true,
 			"groups": [
 				"user",
 				"special"
@@ -1227,7 +1234,8 @@
 				"icon-piracy",
 				"icon-theif",
 				"icon-operator"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-energy-saving-bulb",
@@ -1502,7 +1510,6 @@
 		{
 			"name": "icon-globe-inverted-europe-africa",
 			"file": "globe.svg",
-			"legacy": true,
 			"keywords": [
 				"planets",
 				"earth",
@@ -1511,7 +1518,8 @@
 			"groups": [
 				"item",
 				"globe"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-globe",
@@ -1586,7 +1594,6 @@
 		{
 			"name": "icon-handtool-alt",
 			"file": "hand.svg",
-			"legacy": true,
 			"keywords": [
 				"hands",
 				"grabs",
@@ -1595,7 +1602,8 @@
 			"groups": [
 				"item",
 				"hand"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-handtool",
@@ -1766,7 +1774,6 @@
 		{
 			"name": "icon-invoice",
 			"file": "scroll-text.svg",
-			"legacy": true,
 			"keywords": [
 				"bills",
 				"invoices",
@@ -1778,20 +1785,20 @@
 				"item",
 				"money",
 				"invoice"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-ipad",
 			"file": "tablet.svg",
-			"legacy": true,
 			"keywords": [
 				"tablet"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-iphone",
 			"file": "smartphone.svg",
-			"legacy": true,
 			"keywords": [
 				"mobiles",
 				"telephones",
@@ -1807,7 +1814,8 @@
 				"icon-old-phone",
 				"icon-phone",
 				"icon-phone-ring"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-italic",
@@ -1816,7 +1824,6 @@
 		{
 			"name": "icon-item-arrangement",
 			"file": "table-properties.svg",
-			"legacy": true,
 			"keywords": [
 				"rows",
 				"grid",
@@ -1836,7 +1843,8 @@
 				"icon-stop",
 				"icon-thumbnail-list",
 				"icon-item-arrangement"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-junk",
@@ -1917,7 +1925,6 @@
 		{
 			"name": "icon-layers-alt",
 			"file": "layers.svg",
-			"legacy": true,
 			"keywords": [
 				"boxes",
 				"multiple",
@@ -1932,7 +1939,8 @@
 			],
 			"related": [
 				"icon-screensharing"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-layers",
@@ -1987,7 +1995,6 @@
 		{
 			"name": "icon-lense",
 			"file": "focus.svg",
-			"legacy": true,
 			"keywords": [
 				"circles",
 				"orbits",
@@ -1997,7 +2004,8 @@
 			],
 			"groups": [
 				"item"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-library",
@@ -2046,7 +2054,6 @@
 		{
 			"name": "icon-lightbulb",
 			"file": "lightbulb-off.svg",
-			"legacy": true,
 			"keywords": [
 				"off",
 				"lights",
@@ -2056,7 +2063,8 @@
 			"groups": [
 				"item",
 				"household"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-lightning",
@@ -2111,7 +2119,6 @@
 		{
 			"name": "icon-load",
 			"file": "arrow-down-to-line.svg",
-			"legacy": true,
 			"keywords": [
 				"downloads"
 			],
@@ -2121,12 +2128,12 @@
 			],
 			"related": [
 				"icon-navigation-bottom"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-loading",
 			"file": "watch.svg",
-			"legacy": true,
 			"keywords": [
 				"watches",
 				"clocks",
@@ -2135,7 +2142,8 @@
 			"groups": [
 				"item",
 				"clock"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-locate",
@@ -2152,7 +2160,6 @@
 		{
 			"name": "icon-location-near-me",
 			"file": "map-pinned.svg",
-			"legacy": true,
 			"keywords": [
 				"geolocation",
 				"maps",
@@ -2164,7 +2171,8 @@
 			"related": [
 				"icon-pin-location",
 				"icon-location-nearby"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-location-nearby",
@@ -2319,7 +2327,6 @@
 		{
 			"name": "icon-meeting",
 			"file": "presentation.svg",
-			"legacy": true,
 			"keywords": [
 				"boardroom",
 				"table",
@@ -2327,7 +2334,8 @@
 			],
 			"groups": [
 				"user"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-megaphone",
@@ -2369,7 +2377,6 @@
 		{
 			"name": "icon-message-unopened",
 			"file": "mail.svg",
-			"legacy": true,
 			"keywords": [
 				"emails",
 				"envelopes",
@@ -2383,7 +2390,8 @@
 			"related": [
 				"icon-message",
 				"icon-message-open"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-message",
@@ -2420,7 +2428,6 @@
 		{
 			"name": "icon-mindmap",
 			"file": "network.svg",
-			"legacy": true,
 			"keywords": [
 				"chart",
 				"flow chart",
@@ -2429,7 +2436,8 @@
 			],
 			"groups": [
 				"data"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-mobile",
@@ -2550,17 +2558,16 @@
 		{
 			"name": "icon-name-badge",
 			"file": "contact.svg",
-			"legacy": true,
 			"keywords": [
 				"brooch",
 				"sheriff",
 				"sticker"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-bottom",
 			"file": "arrow-down-to-line.svg",
-			"legacy": true,
 			"keywords": [
 				"last",
 				"end",
@@ -2575,12 +2582,12 @@
 				"icon-page-up",
 				"icon-page-down",
 				"icon-navigation-top"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-down",
 			"file": "chevron-down.svg",
-			"legacy": true,
 			"keywords": [
 				"arrows",
 				"triangles"
@@ -2588,12 +2595,12 @@
 			"groups": [
 				"action",
 				"arrow"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-first",
 			"file": "arrow-left-to-line.svg",
-			"legacy": true,
 			"keywords": [
 				"start",
 				"beginning"
@@ -2601,12 +2608,12 @@
 			"groups": [
 				"action",
 				"arrow"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-horizontal",
 			"file": "move-horizontal.svg",
-			"legacy": true,
 			"keywords": [
 				"arrows",
 				"lengths",
@@ -2616,12 +2623,12 @@
 			"groups": [
 				"action",
 				"arrow"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-last",
 			"file": "arrow-right-to-line.svg",
-			"legacy": true,
 			"keywords": [
 				"end",
 				"finish"
@@ -2629,12 +2636,12 @@
 			"groups": [
 				"action",
 				"arrow"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-left",
 			"file": "chevron-left.svg",
-			"legacy": true,
 			"keywords": [
 				"arrows",
 				"triangles"
@@ -2642,12 +2649,12 @@
 			"groups": [
 				"action",
 				"arrow"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-right",
 			"file": "chevron-right.svg",
-			"legacy": true,
 			"keywords": [
 				"arrows",
 				"triangles"
@@ -2658,21 +2665,21 @@
 			],
 			"related": [
 				"icon-navigation-up"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-road",
 			"file": "move-vertical.svg",
-			"legacy": true,
 			"groups": [
 				"action",
 				"arrow"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-top",
 			"file": "arrow-up-to-line.svg",
-			"legacy": true,
 			"keywords": [
 				"start",
 				"top",
@@ -2688,12 +2695,12 @@
 				"icon-page-up",
 				"icon-page-down",
 				"icon-navigation-bottom"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-up",
 			"file": "chevron-up.svg",
-			"legacy": true,
 			"keywords": [
 				"triangles",
 				"arrows"
@@ -2704,12 +2711,12 @@
 			],
 			"related": [
 				"icon-navigation-right"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation-vertical",
 			"file": "move-vertical.svg",
-			"legacy": true,
 			"keywords": [
 				"up",
 				"down",
@@ -2718,12 +2725,12 @@
 			"groups": [
 				"action",
 				"arrow"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigation",
 			"file": "move.svg",
-			"legacy": true,
 			"keywords": [
 				"move",
 				"drag and drop",
@@ -2733,7 +2740,8 @@
 			"groups": [
 				"action",
 				"arrow"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-navigational-arrow",
@@ -2774,7 +2782,6 @@
 		{
 			"name": "icon-newspaper-alt",
 			"file": "newspaper.svg",
-			"legacy": true,
 			"keywords": [
 				"blogs",
 				"articles",
@@ -2787,7 +2794,8 @@
 			"groups": [
 				"item",
 				"household"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-newspaper",
@@ -2809,7 +2817,6 @@
 		{
 			"name": "icon-next-media",
 			"file": "fast-forward.svg",
-			"legacy": true,
 			"keywords": [
 				"fast forward",
 				"skip"
@@ -2820,7 +2827,8 @@
 			],
 			"related": [
 				"icon-previous-media"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-next",
@@ -2841,7 +2849,6 @@
 		{
 			"name": "icon-nodes",
 			"file": "waypoints.svg",
-			"legacy": true,
 			"keywords": [
 				"git",
 				"line",
@@ -2849,16 +2856,17 @@
 			],
 			"groups": [
 				"data"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-notepad-alt",
 			"file": "file-text.svg",
-			"legacy": true,
 			"groups": [
 				"item",
 				"workplace"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-notepad",
@@ -2891,7 +2899,6 @@
 		{
 			"name": "icon-old-phone",
 			"file": "phone.svg",
-			"legacy": true,
 			"keywords": [
 				"telephones"
 			],
@@ -2904,7 +2911,8 @@
 				"icon-iphone",
 				"icon-phone",
 				"icon-phone-ring"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-omega",
@@ -2972,7 +2980,6 @@
 		{
 			"name": "icon-outbox",
 			"file": "archive-restore.svg",
-			"legacy": true,
 			"keywords": [
 				"out tray",
 				"trays"
@@ -2980,7 +2987,8 @@
 			"groups": [
 				"item",
 				"workplace"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-outdent",
@@ -3076,7 +3084,6 @@
 		{
 			"name": "icon-paint-roller",
 			"file": "paint-bucket.svg",
-			"legacy": true,
 			"keywords": [
 				"decorate",
 				"decoration",
@@ -3090,7 +3097,8 @@
 			"groups": [
 				"item",
 				"household"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-palette",
@@ -3150,12 +3158,12 @@
 		{
 			"name": "icon-paper-bag",
 			"file": "shopping-basket.svg",
-			"legacy": true,
 			"keywords": [
 				"carrier",
 				"container",
 				"sack"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-paper-plane-alt",
@@ -3213,13 +3221,13 @@
 		{
 			"name": "icon-paste-in",
 			"file": "clipboard-paste.svg",
-			"legacy": true,
 			"keywords": [
 				"clipboard"
 			],
 			"groups": [
 				"action"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-pause",
@@ -3232,7 +3240,6 @@
 		{
 			"name": "icon-pc",
 			"file": "monitor.svg",
-			"legacy": true,
 			"keywords": [
 				"computers",
 				"servers",
@@ -3243,12 +3250,12 @@
 				"item",
 				"tech",
 				"hardware"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-people-alt-2",
 			"file": "person-standing.svg",
-			"legacy": true,
 			"keywords": [
 				"person",
 				"man",
@@ -3257,12 +3264,12 @@
 			],
 			"groups": [
 				"user"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-people-alt",
 			"file": "person-standing.svg",
-			"legacy": true,
 			"keywords": [
 				"person",
 				"man",
@@ -3271,12 +3278,12 @@
 			],
 			"groups": [
 				"user"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-people-female",
 			"file": "person-standing.svg",
-			"legacy": true,
 			"keywords": [
 				"person",
 				"people",
@@ -3286,7 +3293,8 @@
 			],
 			"groups": [
 				"user"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-people",
@@ -3389,7 +3397,6 @@
 		{
 			"name": "icon-pictures-alt",
 			"file": "image.svg",
-			"legacy": true,
 			"keywords": [
 				"photograph",
 				"image",
@@ -3408,7 +3415,8 @@
 				"icon-pictures-alt-2",
 				"icon-photo-album",
 				"icon-mountain"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-pictures",
@@ -3494,7 +3502,6 @@
 		{
 			"name": "icon-planet",
 			"file": "orbit.svg",
-			"legacy": true,
 			"keywords": [
 				"space",
 				"saturn"
@@ -3502,7 +3509,8 @@
 			"groups": [
 				"item",
 				"globe"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-play",
@@ -3524,7 +3532,6 @@
 		{
 			"name": "icon-playing-cards",
 			"file": "gallery-horizontal-end.svg",
-			"legacy": true,
 			"keywords": [
 				"slideshows",
 				"carousels",
@@ -3535,7 +3542,8 @@
 			"groups": [
 				"misc",
 				"game"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-playlist",
@@ -3584,14 +3592,14 @@
 		{
 			"name": "icon-poll",
 			"file": "vote.svg",
-			"legacy": true,
 			"keywords": [
 				"bar graphs",
 				"bar charts"
 			],
 			"groups": [
 				"data"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-post-it",
@@ -3613,7 +3621,6 @@
 		{
 			"name": "icon-power-outlet",
 			"file": "square-power.svg",
-			"legacy": true,
 			"keywords": [
 				"power sockets",
 				"power outlets",
@@ -3623,7 +3630,8 @@
 			"groups": [
 				"item",
 				"household"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-power",
@@ -3685,34 +3693,33 @@
 		{
 			"name": "icon-price-dollar",
 			"file": "badge-dollar-sign.svg",
-			"legacy": true,
 			"groups": [
 				"item",
 				"money"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-price-euro",
 			"file": "badge-euro.svg",
-			"legacy": true,
 			"groups": [
 				"item",
 				"money"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-price-pound",
 			"file": "badge-pound-sterling.svg",
-			"legacy": true,
 			"groups": [
 				"item",
 				"money"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-price-yen",
 			"file": "badge-japanese-yen.svg",
-			"legacy": true,
 			"keywords": [
 				"buy",
 				"money"
@@ -3720,7 +3727,8 @@
 			"groups": [
 				"item",
 				"money"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-print",
@@ -3741,7 +3749,6 @@
 		{
 			"name": "icon-printer-alt",
 			"file": "printer.svg",
-			"legacy": true,
 			"keywords": [
 				"printers",
 				"peripherals"
@@ -3753,7 +3760,8 @@
 			],
 			"related": [
 				"icon-print"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-projector",
@@ -3907,13 +3915,13 @@
 		{
 			"name": "icon-rate",
 			"file": "star.svg",
-			"legacy": true,
 			"keywords": [
 				"stars"
 			],
 			"groups": [
 				"shape"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-re-post",
@@ -3975,13 +3983,13 @@
 		{
 			"name": "icon-record",
 			"file": "disc-3.svg",
-			"legacy": true,
 			"keywords": [
 				"circles"
 			],
 			"groups": [
 				"shape"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-rectangle-ellipsis",
@@ -4030,7 +4038,6 @@
 		{
 			"name": "icon-remote",
 			"file": "calculator.svg",
-			"legacy": true,
 			"keywords": [
 				"remote controls",
 				"buttons"
@@ -4038,7 +4045,8 @@
 			"groups": [
 				"item",
 				"household"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-remove",
@@ -4132,7 +4140,6 @@
 		{
 			"name": "icon-return-to-top",
 			"file": "arrow-up-to-line.svg",
-			"legacy": true,
 			"keywords": [
 				"loops",
 				"repeats",
@@ -4141,12 +4148,12 @@
 			"groups": [
 				"action",
 				"arrow"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-right-double-arrow",
 			"file": "chevrons-right.svg",
-			"legacy": true,
 			"keywords": [
 				"chevrons",
 				"two",
@@ -4155,18 +4162,19 @@
 			"groups": [
 				"action",
 				"arrow"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-roadsign",
 			"file": "milestone.svg",
-			"legacy": true,
 			"keywords": [
 				"warnings"
 			],
 			"groups": [
 				"transport"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-rocket",
@@ -4296,7 +4304,6 @@
 		{
 			"name": "icon-script-alt",
 			"file": "scroll.svg",
-			"legacy": true,
 			"keywords": [
 				"scroll",
 				"javascript",
@@ -4307,7 +4314,8 @@
 			],
 			"related": [
 				"icon-script"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-script",
@@ -4370,7 +4378,6 @@
 		{
 			"name": "icon-server-alt",
 			"file": "database.svg",
-			"legacy": true,
 			"keywords": [
 				"db",
 				"databases",
@@ -4380,7 +4387,8 @@
 				"item",
 				"tech",
 				"hardware"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-server",
@@ -4404,7 +4412,6 @@
 		{
 			"name": "icon-settings-alt",
 			"file": "settings.svg",
-			"legacy": true,
 			"keywords": [
 				"settings",
 				"cog",
@@ -4418,7 +4425,8 @@
 				"icon-settings",
 				"icon-umb-developer",
 				"icon-settings-alt-2"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-settings",
@@ -4534,7 +4542,6 @@
 		{
 			"name": "icon-shoe",
 			"file": "footprints.svg",
-			"legacy": true,
 			"keywords": [
 				"trainers",
 				"sneakers"
@@ -4542,12 +4549,12 @@
 			"groups": [
 				"item",
 				"clothing"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-shopping-basket-alt-2",
 			"file": "shopping-basket.svg",
-			"legacy": true,
 			"keywords": [
 				"carts",
 				"checkouts"
@@ -4558,7 +4565,8 @@
 			"related": [
 				"icon-shopping-basket",
 				"item-shopping-basket-alt"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-shopping-basket-alt",
@@ -4616,14 +4624,14 @@
 		{
 			"name": "icon-sience",
 			"file": "atom.svg",
-			"legacy": true,
 			"keywords": [
 				"nuclear",
 				"orbit"
 			],
 			"groups": [
 				"misc"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-science",
@@ -4645,7 +4653,6 @@
 		{
 			"name": "icon-sitemap",
 			"file": "network.svg",
-			"legacy": true,
 			"keywords": [
 				"trees",
 				"family trees",
@@ -4658,7 +4665,8 @@
 			],
 			"groups": [
 				"data"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-sleep",
@@ -4675,7 +4683,6 @@
 		{
 			"name": "icon-slideshow",
 			"file": "presentation.svg",
-			"legacy": true,
 			"keywords": [
 				"powerpoints",
 				"data",
@@ -4687,12 +4694,12 @@
 			"groups": [
 				"item",
 				"workplace"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-smiley-inverted",
 			"file": "smile.svg",
-			"legacy": true,
 			"keywords": [
 				"emojis",
 				"emoticons",
@@ -4708,7 +4715,8 @@
 			],
 			"related": [
 				"icon-smiley"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-smiley",
@@ -4776,7 +4784,6 @@
 		{
 			"name": "icon-sound-medium",
 			"file": "volume-2.svg",
-			"legacy": true,
 			"keywords": [
 				"sounds",
 				"audio",
@@ -4797,7 +4804,8 @@
 				"icon-sound-off",
 				"icon-sound-waves",
 				"icon-speaker"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-sound-off",
@@ -4959,7 +4967,6 @@
 		{
 			"name": "icon-squiggly-line",
 			"file": "route.svg",
-			"legacy": true,
 			"keywords": [
 				"wave",
 				"random",
@@ -4970,12 +4977,12 @@
 			],
 			"related": [
 				"icon-stream"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-ssd",
 			"file": "hard-drive.svg",
-			"legacy": true,
 			"keywords": [
 				"disk",
 				"hdd",
@@ -4991,12 +4998,12 @@
 				"icon-server",
 				"icon-disk-image",
 				"icon-ssd"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-stacked-disks",
 			"file": "server.svg",
-			"legacy": true,
 			"keywords": [
 				"hard drives",
 				"ssd",
@@ -5014,12 +5021,12 @@
 				"icon-server",
 				"icon-disk-image",
 				"icon-ssd"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-stamp",
 			"file": "square-asterisk.svg",
-			"legacy": true,
 			"keywords": [
 				"frame",
 				"photos",
@@ -5030,7 +5037,8 @@
 			],
 			"groups": [
 				"item"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-stop-alt",
@@ -5052,7 +5060,6 @@
 		{
 			"name": "icon-stop-hand",
 			"file": "hand.svg",
-			"legacy": true,
 			"keywords": [
 				"palm"
 			],
@@ -5063,7 +5070,8 @@
 			"related": [
 				"icon-stop-alt",
 				"icon-stop-hand"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-stop",
@@ -5099,7 +5107,6 @@
 		{
 			"name": "icon-stream",
 			"file": "square-activity.svg",
-			"legacy": true,
 			"keywords": [
 				"circle",
 				"wave",
@@ -5108,7 +5115,8 @@
 			],
 			"groups": [
 				"misc"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-strikethrough",
@@ -5141,7 +5149,6 @@
 		{
 			"name": "icon-sweatshirt",
 			"file": "shirt.svg",
-			"legacy": true,
 			"keywords": [
 				"jumper",
 				"pullover"
@@ -5153,7 +5160,8 @@
 			"related": [
 				"icon-top",
 				"icon-t-shirt"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-sync",
@@ -5251,7 +5259,6 @@
 		{
 			"name": "icon-takeaway-cup",
 			"file": "cup-soda.svg",
-			"legacy": true,
 			"keywords": [
 				"coffee",
 				"mug",
@@ -5267,7 +5274,8 @@
 				"icon-cocktail",
 				"icon-beer-glass",
 				"icon-wine-glass"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-target",
@@ -5507,7 +5515,6 @@
 		{
 			"name": "icon-tools",
 			"file": "wrench.svg",
-			"legacy": true,
 			"keywords": [
 				"spanner",
 				"settings",
@@ -5521,12 +5528,12 @@
 			"related": [
 				"icon-wrench",
 				"icon-tools"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-top",
 			"file": "shirt.svg",
-			"legacy": true,
 			"keywords": [
 				"vest"
 			],
@@ -5536,12 +5543,12 @@
 			],
 			"related": [
 				"icon-t-shirt"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-traffic-alt",
 			"file": "arrow-left-right.svg",
-			"legacy": true,
 			"keywords": [
 				"arrows",
 				"bi-directional",
@@ -5561,7 +5568,8 @@
 				"icon-repeat",
 				"icon-repeat-one",
 				"icon-navigation-road"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-trafic",
@@ -5601,7 +5609,6 @@
 		{
 			"name": "icon-trash-alt-2",
 			"file": "trash-2.svg",
-			"legacy": true,
 			"keywords": [
 				"bin",
 				"rubbish"
@@ -5613,12 +5620,12 @@
 			"related": [
 				"icon-trash",
 				"icon-trash-alt"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-trash-alt",
 			"file": "trash-2.svg",
-			"legacy": true,
 			"keywords": [
 				"bin",
 				"rubbish"
@@ -5630,7 +5637,8 @@
 			"related": [
 				"icon-trash",
 				"icon-trash-alt-2"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-trash",
@@ -5741,7 +5749,6 @@
 		{
 			"name": "icon-umb-content",
 			"file": "file.svg",
-			"legacy": true,
 			"keywords": [
 				"pages",
 				"papers",
@@ -5758,12 +5765,12 @@
 				"icon-diploma-alt",
 				"icon-script",
 				"icon-script-alt"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-umb-developer",
 			"file": "user-cog.svg",
-			"legacy": true,
 			"keywords": [
 				"settings",
 				"cog",
@@ -5777,12 +5784,12 @@
 				"icon-settings",
 				"icon-settings-alt",
 				"icon-settings-alt-2"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-umb-media",
 			"file": "image.svg",
-			"legacy": true,
 			"keywords": [
 				"photograph",
 				"image",
@@ -5801,12 +5808,12 @@
 				"icon-pictures-alt-2",
 				"icon-photo-album",
 				"icon-mountain"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-umb-settings",
 			"file": "wrench.svg",
-			"legacy": true,
 			"keywords": [
 				"spanner",
 				"wrench"
@@ -5818,12 +5825,12 @@
 			"related": [
 				"icon-wrench",
 				"icon-tools"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-umb-users",
 			"file": "user.svg",
-			"legacy": true,
 			"keywords": [
 				"person",
 				"people"
@@ -5840,7 +5847,8 @@
 				"icon-piracy",
 				"icon-theif",
 				"icon-operator"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-umbrella",
@@ -5914,7 +5922,6 @@
 		{
 			"name": "icon-usb-connector",
 			"file": "cable.svg",
-			"legacy": true,
 			"keywords": [
 				"plugs",
 				"peripherals",
@@ -5928,7 +5935,8 @@
 				"icon-usb",
 				"icon-wall-plug",
 				"icon-dock-connector"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-usb",
@@ -5944,7 +5952,6 @@
 		{
 			"name": "icon-user-female",
 			"file": "user.svg",
-			"legacy": true,
 			"keywords": [
 				"person",
 				"people",
@@ -5967,12 +5974,12 @@
 				"icon-piracy",
 				"icon-theif",
 				"icon-operator"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-user-females-alt",
 			"file": "users.svg",
-			"legacy": true,
 			"keywords": [
 				"person",
 				"people",
@@ -5992,12 +5999,12 @@
 				"icon-user",
 				"icon-user-female",
 				"icon-umb-users"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-user-females",
 			"file": "users.svg",
-			"legacy": true,
 			"keywords": [
 				"person",
 				"people",
@@ -6017,12 +6024,12 @@
 				"icon-user",
 				"icon-user-female",
 				"icon-umb-users"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-user-glasses",
 			"file": "user.svg",
-			"legacy": true,
 			"keywords": [
 				"person",
 				"people",
@@ -6045,7 +6052,8 @@
 				"icon-piracy",
 				"icon-theif",
 				"icon-operator"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-user",
@@ -6080,7 +6088,6 @@
 		{
 			"name": "icon-users-alt",
 			"file": "users.svg",
-			"legacy": true,
 			"keywords": [
 				"person",
 				"people",
@@ -6101,7 +6108,8 @@
 				"icon-user",
 				"icon-user-female",
 				"icon-umb-users"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-users",
@@ -6597,7 +6605,6 @@
 			"file": "land-plot.svg"
 		}
 	],
-	"custom": [],
 	"simpleIcons": [
 		{
 			"name": "icon-facebook",
@@ -6632,7 +6639,6 @@
 		{
 			"name": "icon-art-easel",
 			"file": "legacy/icon-art-easel.svg",
-			"legacy": true,
 			"keywords": [
 				"artworks",
 				"painting",
@@ -6642,7 +6648,8 @@
 			],
 			"groups": [
 				"picture"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-article",
@@ -6662,7 +6669,6 @@
 		{
 			"name": "icon-band-aid",
 			"file": "legacy/icon-band-aid.svg",
-			"legacy": true,
 			"keywords": [
 				"bandaids",
 				"plasters",
@@ -6674,28 +6680,29 @@
 			"groups": [
 				"item",
 				"household"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-baby-stroller",
 			"file": "legacy/icon-baby-stroller.svg",
-			"legacy": true,
 			"keywords": [
 				"pram",
 				"pushchair"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-bill-dollar",
 			"file": "legacy/icon-bill-dollar.svg",
-			"legacy": true,
 			"keywords": [
 				"money",
 				"us",
 				"usa",
 				"paper",
 				"cash"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-bill-euro",
@@ -6715,7 +6722,6 @@
 		{
 			"name": "icon-bill",
 			"file": "legacy/icon-bill.svg",
-			"legacy": true,
 			"keywords": [
 				"currency",
 				"money",
@@ -6728,7 +6734,8 @@
 				"item",
 				"money",
 				"note"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-billboard",
@@ -6738,14 +6745,14 @@
 		{
 			"name": "icon-bills-dollar",
 			"file": "legacy/icon-bills-dollar.svg",
-			"legacy": true,
 			"keywords": [
 				"money",
 				"us",
 				"usa",
 				"paper",
 				"cash"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-bills-euro",
@@ -6800,7 +6807,6 @@
 		{
 			"name": "icon-clothes-hanger",
 			"file": "legacy/icon-clothes-hanger.svg",
-			"legacy": true,
 			"keywords": [
 				"clothes",
 				"clothing",
@@ -6809,37 +6815,38 @@
 			"groups": [
 				"item",
 				"clothing"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-coin",
 			"file": "legacy/icon-coin.svg",
-			"legacy": true,
 			"keywords": [
 				"money",
 				"cash"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-coins-dollar-alt",
 			"file": "legacy/icon-coins-dollar-alt.svg",
-			"legacy": true,
 			"keywords": [
 				"money",
 				"us",
 				"usa"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-coins-dollar",
 			"file": "legacy/icon-coins-dollar.svg",
-			"legacy": true,
 			"keywords": [
 				"money",
 				"us",
 				"usa",
 				"cash"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-coins-euro-alt",
@@ -6879,7 +6886,6 @@
 		{
 			"name": "icon-desk",
 			"file": "legacy/icon-desk.svg",
-			"legacy": true,
 			"keywords": [
 				"benches",
 				"desks",
@@ -6890,24 +6896,24 @@
 			"groups": [
 				"item",
 				"household"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-dollar-bag",
 			"file": "legacy/icon-dollar-bag.svg",
-			"legacy": true,
 			"keywords": [
 				"money",
 				"us",
 				"usa",
 				"cash",
 				"sack"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-eject",
 			"file": "legacy/icon-eject.svg",
-			"legacy": true,
 			"keywords": [
 				"ejects",
 				"up",
@@ -6917,7 +6923,8 @@
 				"action",
 				"arrow",
 				"box"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-euro-bag",
@@ -6927,7 +6934,6 @@
 		{
 			"name": "icon-female-symbol",
 			"file": "legacy/icon-female-symbol.svg",
-			"legacy": true,
 			"keywords": [
 				"woman",
 				"women",
@@ -6937,7 +6943,8 @@
 			],
 			"groups": [
 				"misc"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-firewall",
@@ -6947,7 +6954,6 @@
 		{
 			"name": "icon-folder-open",
 			"file": "legacy/icon-folder-open.svg",
-			"legacy": true,
 			"keywords": [
 				"filing",
 				"documents"
@@ -6955,7 +6961,8 @@
 			"groups": [
 				"item",
 				"workplace"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-folder-outline",
@@ -6965,7 +6972,6 @@
 		{
 			"name": "icon-handprint",
 			"file": "legacy/icon-handprint.svg",
-			"legacy": true,
 			"keywords": [
 				"hands",
 				"personalisation",
@@ -6976,7 +6982,8 @@
 			"groups": [
 				"item",
 				"hand"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-hat",
@@ -6991,7 +6998,6 @@
 		{
 			"name": "icon-inactive-line",
 			"file": "legacy/icon-inactive-line.svg",
-			"legacy": true,
 			"keywords": [
 				"slashes",
 				"backslashes",
@@ -7001,12 +7007,12 @@
 			],
 			"groups": [
 				"shape"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-keychain",
 			"file": "legacy/icon-keychain.svg",
-			"legacy": true,
 			"groups": [
 				"item",
 				"security"
@@ -7017,12 +7023,12 @@
 				"icon-old-key",
 				"icon-keychain",
 				"icon-key"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-keyhole",
 			"file": "legacy/icon-keyhole.svg",
-			"legacy": true,
 			"groups": [
 				"item",
 				"security"
@@ -7033,7 +7039,8 @@
 				"icon-old-key",
 				"icon-keychain",
 				"icon-key"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-linkedin",
@@ -7043,7 +7050,6 @@
 		{
 			"name": "icon-linux-tux",
 			"file": "legacy/icon-linux-tux.svg",
-			"legacy": true,
 			"keywords": [
 				"penguins"
 			],
@@ -7052,7 +7058,8 @@
 			],
 			"related": [
 				"icon-os-x"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-male-and-female",
@@ -7067,7 +7074,6 @@
 		{
 			"name": "icon-molecular-network",
 			"file": "legacy/icon-molecular-network.svg",
-			"legacy": true,
 			"keywords": [
 				"molecule",
 				"atoms",
@@ -7079,12 +7085,12 @@
 			],
 			"related": [
 				"icon-molecular"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-molecular",
 			"file": "legacy/icon-molecular.svg",
-			"legacy": true,
 			"keywords": [
 				"molecule",
 				"atoms",
@@ -7097,7 +7103,8 @@
 			],
 			"related": [
 				"icon-molecular-network"
-			]
+			],
+			"legacy": true
 		},
 		{
 			"name": "icon-trash-empty",
@@ -7108,5 +7115,6 @@
 			"name": "icon-umbraco",
 			"file": "legacy/icon-umbraco.svg"
 		}
-	]
+	],
+	"custom": []
 }
