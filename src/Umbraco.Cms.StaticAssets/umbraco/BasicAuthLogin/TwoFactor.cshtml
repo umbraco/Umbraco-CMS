@@ -81,6 +81,10 @@
             outline: 2px solid #2152a3;
             outline-offset: 2px;
         }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         .error-message {
             background: #fef2f2;
             color: #991b1b;
@@ -130,8 +134,9 @@
                        @(hasError ? "aria-describedby=twofa-error aria-invalid=true" : "") />
             </div>
 
-            <button type="submit" class="btn">Verify</button>
+            <button type="submit" class="btn" data-submitting-text="Verifying&#x2026;">Verify</button>
         </form>
     </main>
+    <script src="@Url.Content("~/umbraco/basic-auth/login.js")"></script>
 </body>
 </html>

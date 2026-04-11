@@ -80,6 +80,10 @@
             outline: 2px solid #2152a3;
             outline-offset: 2px;
         }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         .btn-external {
             background: #fff;
             color: #1b264f;
@@ -142,7 +146,7 @@
                        @(hasError ? "aria-describedby=login-error aria-invalid=true" : "") />
             </div>
 
-            <button type="submit" class="btn">Sign in</button>
+            <button type="submit" class="btn" data-submitting-text="Signing in&#x2026;">Sign in</button>
         </form>
 
         @if (externalProviders.Count > 0)
@@ -155,10 +159,11 @@
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="provider" value="@provider.Name" />
                     <input type="hidden" name="returnPath" value="@Model?.ReturnPath" />
-                    <button type="submit" class="btn btn-external">Sign in with @(provider.DisplayName ?? provider.Name)</button>
+                    <button type="submit" class="btn btn-external" data-submitting-text="Redirecting&#x2026;">Sign in with @(provider.DisplayName ?? provider.Name)</button>
                 </form>
             }
         }
     </main>
+    <script src="@Url.Content("~/umbraco/basic-auth/login.js")"></script>
 </body>
 </html>
