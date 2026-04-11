@@ -5,6 +5,8 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.PropertyEditors;
 
@@ -442,4 +444,17 @@ public class BlockEditorVarianceHandlerTests
             ContentData = contentData.Select(cd => new BlockItemData { Key = cd.key, ContentTypeKey = contentTypeKey, Values = cd.values }).ToList(),
             Expose = expose,
         };
+
+    private static ILanguage CreateLanguage(string isoCode, string? fallbackIsoCode = null)
+    {
+        var builder = new LanguageBuilder()
+            .WithCultureInfo(isoCode);
+
+        if (fallbackIsoCode is not null)
+        {
+            builder.WithFallbackLanguageIsoCode(fallbackIsoCode);
+        }
+
+        return builder.Build();
+    }
 }

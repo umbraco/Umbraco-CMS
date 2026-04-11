@@ -15,6 +15,11 @@ public struct Fallback : IEnumerable<int>
     private readonly int[] _values;
 
     /// <summary>
+    /// Gets a value indicating whether any fallback policies are specified.
+    /// </summary>
+    public readonly bool HasPolicies => _values is { Length: > 0 };
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Fallback" /> struct with values.
     /// </summary>
     /// <param name="values">The values.</param>
@@ -55,7 +60,7 @@ public struct Fallback : IEnumerable<int>
     /// <value>
     /// The default language fallback policy.
     /// </value>
-    public static Fallback ToDefaultLanguage => new Fallback(new[] { DefaultLanguage });
+    public static Fallback ToDefaultLanguage => new Fallback([DefaultLanguage]);
 
     /// <summary>
     /// Gets the fallback to the default value policy.
@@ -63,7 +68,7 @@ public struct Fallback : IEnumerable<int>
     /// <value>
     /// The default value fallback policy.
     /// </value>
-    public static Fallback ToDefaultValue => new(new[] { DefaultValue });
+    public static Fallback ToDefaultValue => new([DefaultValue]);
 
     /// <summary>
     /// Gets the fallback to language policy.
@@ -71,7 +76,7 @@ public struct Fallback : IEnumerable<int>
     /// <value>
     /// The language fallback policy.
     /// </value>
-    public static Fallback ToLanguage => new(new[] { Language });
+    public static Fallback ToLanguage => new([Language]);
 
     /// <summary>
     /// Gets the fallback to tree ancestors policy.
@@ -79,7 +84,7 @@ public struct Fallback : IEnumerable<int>
     /// <value>
     /// The tree ancestors fallback policy.
     /// </value>
-    public static Fallback ToAncestors => new(new[] { Ancestors });
+    public static Fallback ToAncestors => new([Ancestors]);
 
     /// <inheritdoc />
     public IEnumerator<int> GetEnumerator() => ((IEnumerable<int>)_values ?? Array.Empty<int>()).GetEnumerator();

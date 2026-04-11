@@ -1149,6 +1149,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'stylesheets', value: ['/rte-styles.css'] },
 			{ alias: 'dimensions', value: { height: 500 } },
 			{ alias: 'maxImageSize', value: 500 },
+			{ alias: 'allowedMediaTypes', value: 'media-type-1-id,media-type-3-id' },
 			{ alias: 'ignoreUserStartNodes', value: false },
 			{ alias: 'overlaySize', value: 'medium' },
 		],
