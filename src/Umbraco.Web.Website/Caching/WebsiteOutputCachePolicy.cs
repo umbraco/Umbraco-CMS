@@ -75,7 +75,11 @@ internal sealed class WebsiteOutputCachePolicy : IOutputCachePolicy
         if (duration <= TimeSpan.Zero)
         {
             context.EnableOutputCaching = false;
-            logger.LogDebug("Resolved duration is zero or negative for content {ContentKey} — skipping output cache.", content.Key);
+            if (logger.IsEnabled(LogLevel.Debug))
+            {
+                logger.LogDebug("Resolved duration is zero or negative for content {ContentKey} — skipping output cache.", content.Key);
+            }
+
             return ValueTask.CompletedTask;
         }
 
@@ -119,12 +123,15 @@ internal sealed class WebsiteOutputCachePolicy : IOutputCachePolicy
             }
         }
 
-        logger.LogDebug(
-            "Caching content {ContentKey} ({ContentTypeAlias}) for {Duration}, {TagCount} tags",
-            content.Key,
-            content.ContentType.Alias,
-            duration,
-            context.Tags.Count);
+        if (logger.IsEnabled(LogLevel.Debug))
+        {
+            logger.LogDebug(
+                "Caching content {ContentKey} ({ContentTypeAlias}) for {Duration}, {TagCount} tags",
+                content.Key,
+                content.ContentType.Alias,
+                duration,
+                context.Tags.Count);
+        }
 
         return ValueTask.CompletedTask;
     }
@@ -140,7 +147,7 @@ internal sealed class WebsiteOutputCachePolicy : IOutputCachePolicy
             .GetRequiredService<ILogger<WebsiteOutputCachePolicy>>();
 
         // Don't cache responses that set cookies (e.g. antiforgery tokens on first request).
-        if (!StringValues.IsNullOrEmpty(context.HttpContext.Response.Headers.SetCookie))
+        if (StringValues.IsNullOrEmpty(context.HttpContext.Response.Headers.SetCookie) is false)
         {
             context.AllowCacheStorage = false;
             logger.LogDebug("Response has Set-Cookie header — preventing cache storage.");

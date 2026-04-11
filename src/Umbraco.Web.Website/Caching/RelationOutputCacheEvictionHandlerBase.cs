@@ -62,10 +62,14 @@ internal abstract class RelationOutputCacheEvictionHandlerBase
             Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(parentId, UmbracoObjectTypes.Document);
             if (parentKeyAttempt.Success)
             {
-                logger.LogDebug(
-                    "Entity referenced by document {ParentKey} via {RelationType} — evicting.",
-                    parentKeyAttempt.Result,
-                    relationTypeAlias);
+                if (logger.IsEnabled(LogLevel.Debug))
+                {
+                    logger.LogDebug(
+                        "Entity referenced by document {ParentKey} via {RelationType} — evicting.",
+                        parentKeyAttempt.Result,
+                        relationTypeAlias);
+                }
+
                 await OutputCacheStore.EvictByTagAsync(
                     Constants.Website.OutputCache.ContentTagPrefix + parentKeyAttempt.Result,
                     cancellationToken);

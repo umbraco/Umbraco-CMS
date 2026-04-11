@@ -75,36 +75,57 @@ internal sealed class DocumentOutputCacheEvictionHandler
             return;
         }
 
-        if (payload.Key.HasValue)
+        if (payload.Key.HasValue is false)
         {
-            Guid contentKey = payload.Key.Value;
+            return;
+        }
 
-            // Evict the specific content page.
+        Guid contentKey = payload.Key.Value;
+        await EvictContentFromCacheAsync(payload, contentKey, cancellationToken);
+        await InvokeCustomEvictionProvidersAsync(payload, contentKey, cancellationToken);
+    }
+
+    private async Task EvictContentFromCacheAsync(ContentCacheRefresher.JsonPayload payload, Guid contentKey, CancellationToken cancellationToken)
+    {
+        // Evict the specific content page.
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
             _logger.LogDebug("Evicting output cache for content {ContentKey}.", contentKey);
-            await OutputCacheStore.EvictByTagAsync(Constants.Website.OutputCache.ContentTagPrefix + contentKey, cancellationToken);
+        }
 
-            if (payload.ChangeTypes.HasFlag(TreeChangeTypes.RefreshBranch))
+        await OutputCacheStore.EvictByTagAsync(Constants.Website.OutputCache.ContentTagPrefix + contentKey, cancellationToken);
+
+        if (payload.ChangeTypes.HasFlag(TreeChangeTypes.RefreshBranch))
+        {
+            // Evict all descendants that tagged themselves with this ancestor.
+            if (_logger.IsEnabled(LogLevel.Debug))
             {
-                // Evict all descendants that tagged themselves with this ancestor.
                 _logger.LogDebug("Evicting output cache for descendants of {ContentKey}.", contentKey);
-                await OutputCacheStore.EvictByTagAsync(Constants.Website.OutputCache.AncestorTagPrefix + contentKey, cancellationToken);
             }
 
-            // Invoke custom eviction providers.
-            var context = new OutputCacheContentChangedContext(
-                payload.Id,
-                contentKey,
-                payload.PublishedCultures ?? Array.Empty<string>(),
-                payload.UnpublishedCultures ?? Array.Empty<string>());
+            await OutputCacheStore.EvictByTagAsync(Constants.Website.OutputCache.AncestorTagPrefix + contentKey, cancellationToken);
+        }
+    }
 
-            foreach (IWebsiteOutputCacheEvictionProvider provider in _evictionProviders)
+    private async Task InvokeCustomEvictionProvidersAsync(ContentCacheRefresher.JsonPayload payload, Guid contentKey, CancellationToken cancellationToken)
+    {
+        var context = new OutputCacheContentChangedContext(
+            payload.Id,
+            contentKey,
+            payload.PublishedCultures ?? [],
+            payload.UnpublishedCultures ?? []);
+
+        foreach (IWebsiteOutputCacheEvictionProvider provider in _evictionProviders)
+        {
+            IEnumerable<string> additionalTags = await provider.GetAdditionalEvictionTagsAsync(context, cancellationToken);
+            foreach (var tag in additionalTags)
             {
-                IEnumerable<string> additionalTags = await provider.GetAdditionalEvictionTagsAsync(context, cancellationToken);
-                foreach (var tag in additionalTags)
+                if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug("Evicting output cache tag {Tag} via custom provider.", tag);
-                    await OutputCacheStore.EvictByTagAsync(tag, cancellationToken);
                 }
+
+                await OutputCacheStore.EvictByTagAsync(tag, cancellationToken);
             }
         }
     }

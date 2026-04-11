@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Http;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Caching;
 
@@ -47,6 +49,17 @@ public class WebsiteOutputCachePolicyTests
     {
         var policy = CreatePolicy();
         OutputCacheContext context = CreateOutputCacheContext(withRouteValues: false);
+
+        await ((IOutputCachePolicy)policy).CacheRequestAsync(context, CancellationToken.None);
+
+        Assert.That(context.EnableOutputCaching, Is.False);
+    }
+
+    [Test]
+    public async Task CacheRequestAsync_WhenNoPublishedContent_DoesNotCache()
+    {
+        var policy = CreatePolicy();
+        OutputCacheContext context = CreateOutputCacheContext(withRouteValues: true, withPublishedContent: false);
 
         await ((IOutputCachePolicy)policy).CacheRequestAsync(context, CancellationToken.None);
 
@@ -249,6 +262,7 @@ public class WebsiteOutputCachePolicyTests
 
     private OutputCacheContext CreateOutputCacheContext(
         bool withRouteValues = false,
+        bool withPublishedContent = true,
         bool setNoCacheHeader = false,
         IEnumerable<IWebsiteOutputCacheTagProvider>? tagProviders = null,
         IEnumerable<IWebsiteOutputCacheVaryByProvider>? varyByProviders = null,
@@ -257,9 +271,11 @@ public class WebsiteOutputCachePolicyTests
         contentKey ??= Guid.NewGuid();
         var key = contentKey.Value;
         var contentType = Mock.Of<IPublishedContentType>(ct => ct.Alias == "testPage");
-        var content = Mock.Of<IPublishedContent>(c =>
-            c.Key == key &&
-            c.ContentType == contentType);
+        IPublishedContent? content = withPublishedContent
+            ? Mock.Of<IPublishedContent>(c =>
+                c.Key == key &&
+                c.ContentType == contentType)
+            : null;
 
         var services = new ServiceCollection();
         services.AddSingleton<ILogger<WebsiteOutputCachePolicy>>(NullLogger<WebsiteOutputCachePolicy>.Instance);
@@ -267,7 +283,7 @@ public class WebsiteOutputCachePolicyTests
         services.AddSingleton(_durationProviderMock.Object);
         services.AddSingleton(_navigationServiceMock.Object);
         services.AddSingleton<IEnumerable<IWebsiteOutputCacheTagProvider>>(
-            (tagProviders ?? new IWebsiteOutputCacheTagProvider[] { new ContentTypeOutputCacheTagProvider() }).ToList());
+            (tagProviders ?? [new ContentTypeOutputCacheTagProvider()]).ToList());
         services.AddSingleton<IEnumerable<IWebsiteOutputCacheVaryByProvider>>(
             (varyByProviders ?? Array.Empty<IWebsiteOutputCacheVaryByProvider>()).ToList());
 
@@ -279,11 +295,11 @@ public class WebsiteOutputCachePolicyTests
                 r.PublishedContent == content &&
                 r.SetNoCacheHeader == setNoCacheHeader);
 
-            var controllerDescriptor = new Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor
+            var controllerDescriptor = new ControllerActionDescriptor
             {
                 ControllerName = "RenderController",
                 ActionName = "Index",
-                ControllerTypeInfo = typeof(global::Umbraco.Cms.Web.Common.Controllers.RenderController).GetTypeInfo(),
+                ControllerTypeInfo = typeof(RenderController).GetTypeInfo(),
             };
 
             var routeValues = new UmbracoRouteValues(publishedRequest, controllerDescriptor);
