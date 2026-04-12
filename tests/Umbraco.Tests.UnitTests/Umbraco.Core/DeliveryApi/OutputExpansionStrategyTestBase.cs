@@ -48,8 +48,8 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var content = CreatePublishedContentMock();
         var propertyData = new PropertyData { Value = "n/a", Culture = string.Empty, Segment = string.Empty };
 
-        var prop1 = new PublishedProperty(DeliveryApiPropertyType, content.Object, VariationContextAccessorMock(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
-        var prop2 = new PublishedProperty(DefaultPropertyType, content.Object, VariationContextAccessorMock(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        var prop1 = new PublishedProperty(DeliveryApiPropertyType, content.Object, VariationContextAccessorMock(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        var prop2 = new PublishedProperty(DefaultPropertyType, content.Object, VariationContextAccessorMock(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
 
         var contentPickerContent = CreateSimplePickedContent(123, 456);
         var contentPickerProperty = CreateContentPickerProperty(content.Object, contentPickerContent.Key, "contentPicker", apiContentBuilder);
@@ -306,7 +306,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
         var propertyType = SetupPublishedPropertyType(valueConverterMock.Object, "theAlias", Constants.PropertyEditors.Aliases.Label);
         var propertyData = new PropertyData { Value = "doesn't matter, it's mocked", Culture = string.Empty, Segment = string.Empty };
-        var property = new PublishedProperty(propertyType, content.Object, VariationContextAccessorMock(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        var property = new PublishedProperty(propertyType, content.Object, VariationContextAccessorMock(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
 
         SetupContentMock(content, property);
 
@@ -383,7 +383,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
         var propertyData = new PropertyData { Value = new GuidUdi(Constants.UdiEntityType.Document, pickedContentKey).ToString(), Culture = string.Empty, Segment = string.Empty };
 
-        return new PublishedProperty(contentPickerPropertyType, parent, VariationContextAccessorMock(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        return new PublishedProperty(contentPickerPropertyType, parent, VariationContextAccessorMock(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
     }
 
     internal PublishedPropertyBase CreateMediaPickerProperty(IPublishedElement parent, Guid pickedMediaKey, string propertyTypeAlias, IApiMediaBuilder mediaBuilder)
@@ -396,7 +396,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
         var propertyData = new PropertyData { Value = new GuidUdi(Constants.UdiEntityType.Media, pickedMediaKey).ToString(), Culture = string.Empty, Segment = string.Empty };
 
-        return new PublishedProperty(mediaPickerPropertyType, parent, VariationContextAccessorMock(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        return new PublishedProperty(mediaPickerPropertyType, parent, VariationContextAccessorMock(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
     }
 
     internal PublishedPropertyBase CreateMediaPicker3Property(IPublishedElement parent, Guid pickedMediaKey, string propertyTypeAlias, IApiMediaBuilder mediaBuilder)
@@ -418,14 +418,14 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
 
         var propertyData = new PropertyData { Value = value, Culture = string.Empty, Segment = string.Empty };
 
-        return new PublishedProperty(mediaPickerPropertyType, parent, VariationContextAccessorMock(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        return new PublishedProperty(mediaPickerPropertyType, parent, VariationContextAccessorMock(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
     }
 
     internal PublishedPropertyBase CreateNumberProperty(IPublishedElement parent, int propertyValue, string propertyTypeAlias)
     {
         var numberPropertyType = SetupPublishedPropertyType(new IntegerValueConverter(), propertyTypeAlias, Constants.PropertyEditors.Aliases.Label);
         var propertyData = new PropertyData { Value = propertyValue, Culture = string.Empty, Segment = string.Empty };
-        return new PublishedProperty(numberPropertyType, parent, VariationContextAccessorMock(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        return new PublishedProperty(numberPropertyType, parent, VariationContextAccessorMock(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
     }
 
     internal PublishedPropertyBase CreateElementProperty(
@@ -464,7 +464,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
         var elementPropertyType = SetupPublishedPropertyType(elementValueConverter.Object, elementPropertyAlias, "My.Element.Property");
 
         var propertyData = new PropertyData { Value = "doesn't matter, it's mocked", Culture = string.Empty, Segment = string.Empty  };
-        return new PublishedProperty(elementPropertyType, parent, VariationContextAccessorMock(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        return new PublishedProperty(elementPropertyType, parent, VariationContextAccessorMock(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
     }
 
     protected IApiContentRouteBuilder ApiContentRouteBuilder() => CreateContentRouteBuilder(ApiContentPathProvider, CreateGlobalSettings());

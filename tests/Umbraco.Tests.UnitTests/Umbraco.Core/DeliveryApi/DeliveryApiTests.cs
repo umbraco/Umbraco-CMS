@@ -100,6 +100,8 @@ public class DeliveryApiTests
 
     protected IVariationContextAccessor CreateVariationContextAccessor() => new TestVariationContextAccessor();
 
+    protected IPropertyRenderingContextAccessor CreatePropertyRenderingContextAccessor() => new TestPropertyRenderingContextAccessor();
+
     protected IOptions<GlobalSettings> CreateGlobalSettings(bool hideTopLevelNodeFromPath = true)
     {
         var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hideTopLevelNodeFromPath };

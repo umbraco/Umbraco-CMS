@@ -46,7 +46,7 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
             // add one property per property type - this is required, for the indexing to work
             // if contentData supplies pdatas, use them, else use null
             contentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? propertyDatas); // else will be null
-            properties[i++] = new PublishedProperty(propertyType, this, variationContextAccessor, preview, propertyDatas, elementsCache, propertyType.CacheLevel);
+            properties[i++] = new PublishedProperty(propertyType, this, variationContextAccessor, PropertyRenderingContextAccessor, preview, propertyDatas, elementsCache, propertyType.CacheLevel);
         }
 
         _properties = properties;
