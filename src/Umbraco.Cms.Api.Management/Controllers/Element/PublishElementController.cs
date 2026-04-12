@@ -26,7 +26,7 @@ public class PublishElementController : ElementControllerBase
     private readonly IAuthorizationService _authorizationService;
     private readonly IElementPublishingService _elementPublishingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IDocumentPresentationFactory _documentPresentationFactory;
+    private readonly IElementPresentationFactory _elementPresentationFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishElementController"/> class.
@@ -34,17 +34,17 @@ public class PublishElementController : ElementControllerBase
     /// <param name="authorizationService">Service used to authorize element publish operations.</param>
     /// <param name="elementPublishingService">Service responsible for publishing elements.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
-    /// <param name="documentPresentationFactory">Factory used for creating culture publish schedule models.</param>
+    /// <param name="elementPresentationFactory">Factory used for creating culture publish schedule models.</param>
     public PublishElementController(
         IAuthorizationService authorizationService,
         IElementPublishingService elementPublishingService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IDocumentPresentationFactory documentPresentationFactory)
+        IElementPresentationFactory elementPresentationFactory)
     {
         _authorizationService = authorizationService;
         _elementPublishingService = elementPublishingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _documentPresentationFactory = documentPresentationFactory;
+        _elementPresentationFactory = elementPresentationFactory;
     }
 
     /// <summary>
@@ -78,9 +78,7 @@ public class PublishElementController : ElementControllerBase
             return Forbidden();
         }
 
-        // TODO ELEMENTS: IDocumentPresentationFactory carries the implementation of this mapping - it should probably be renamed
-        var tempModel = new PublishDocumentRequestModel { PublishSchedules = requestModel.PublishSchedules };
-        Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> modelResult = _documentPresentationFactory.CreateCulturePublishScheduleModels(tempModel);
+        Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> modelResult = _elementPresentationFactory.CreateCulturePublishScheduleModels(requestModel);
 
         if (modelResult.Success is false)
         {

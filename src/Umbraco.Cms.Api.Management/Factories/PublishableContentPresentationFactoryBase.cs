@@ -4,8 +4,11 @@ using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
@@ -20,6 +23,7 @@ internal abstract class PublishableContentPresentationFactoryBase<TEntity, TVari
     where TVariantItemResponseModel : PublishableVariantItemResponseModelBase
 {
     private readonly FlagProviderCollection _flagProviderCollection;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublishableContentPresentationFactoryBase{TEntity, TVariantItemResponseModel}"/> class.
@@ -28,10 +32,12 @@ internal abstract class PublishableContentPresentationFactoryBase<TEntity, TVari
     /// <param name="flagProviderCollection">The <see cref="FlagProviderCollection"/> instance used for determining flags to populate on response models.</param>
     protected PublishableContentPresentationFactoryBase(
         IUmbracoMapper umbracoMapper,
-        FlagProviderCollection flagProviderCollection)
+        FlagProviderCollection flagProviderCollection,
+        TimeProvider timeProvider)
     {
         UmbracoMapper = umbracoMapper;
         _flagProviderCollection = flagProviderCollection;
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -120,5 +126,52 @@ internal abstract class PublishableContentPresentationFactoryBase<TEntity, TVari
         {
             await flagProvider.PopulateFlagsAsync([model]);
         }
+    }
+
+    protected Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(IEnumerable<CultureAndScheduleRequestModel> cultureAndScheduleRequestModels)
+    {
+        var model = new List<CulturePublishScheduleModel>();
+
+        foreach (CultureAndScheduleRequestModel cultureAndScheduleRequestModel in cultureAndScheduleRequestModels)
+        {
+            if (cultureAndScheduleRequestModel.Schedule is null)
+            {
+                model.Add(new CulturePublishScheduleModel
+                {
+                    Culture = cultureAndScheduleRequestModel.Culture
+                              ?? Constants.System.InvariantCulture // API have `null` for invariant, but service layer has "*".
+                });
+                continue;
+            }
+
+            if (cultureAndScheduleRequestModel.Schedule.PublishTime is not null
+                && cultureAndScheduleRequestModel.Schedule.PublishTime <= _timeProvider.GetUtcNow())
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.PublishTimeNeedsToBeInFuture, model);
+            }
+
+            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime is not null
+                && cultureAndScheduleRequestModel.Schedule.UnpublishTime <= _timeProvider.GetUtcNow())
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.UpublishTimeNeedsToBeInFuture, model);
+            }
+
+            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= cultureAndScheduleRequestModel.Schedule.PublishTime)
+            {
+                return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, model);
+            }
+
+            model.Add(new CulturePublishScheduleModel
+            {
+                Culture = cultureAndScheduleRequestModel.Culture,
+                Schedule = new ContentScheduleModel
+                {
+                    PublishDate = cultureAndScheduleRequestModel.Schedule.PublishTime,
+                    UnpublishDate = cultureAndScheduleRequestModel.Schedule.UnpublishTime,
+                },
+            });
+        }
+
+        return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
     }
 }

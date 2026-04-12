@@ -21,7 +21,6 @@ internal sealed class DocumentPresentationFactory
 {
     private readonly ITemplateService _templateService;
     private readonly IPublicAccessService _publicAccessService;
-    private readonly TimeProvider _timeProvider;
     private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
@@ -40,11 +39,10 @@ internal sealed class DocumentPresentationFactory
         TimeProvider timeProvider,
         IIdKeyMap idKeyMap,
         FlagProviderCollection flagProviderCollection)
-        : base(umbracoMapper, flagProviderCollection)
+        : base(umbracoMapper, flagProviderCollection, timeProvider)
     {
         _templateService = templateService;
         _publicAccessService = publicAccessService;
-        _timeProvider = timeProvider;
         _idKeyMap = idKeyMap;
     }
 
@@ -121,52 +119,9 @@ internal sealed class DocumentPresentationFactory
     }
 
     /// <inheritdoc/>
-    public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
-    {
-        var model = new List<CulturePublishScheduleModel>();
-
-        foreach (CultureAndScheduleRequestModel cultureAndScheduleRequestModel in requestModel.PublishSchedules)
-        {
-            if (cultureAndScheduleRequestModel.Schedule is null)
-            {
-                model.Add(new CulturePublishScheduleModel
-                {
-                    Culture = cultureAndScheduleRequestModel.Culture
-                              ?? Constants.System.InvariantCulture // API have `null` for invariant, but service layer has "*".
-                });
-                continue;
-            }
-
-            if (cultureAndScheduleRequestModel.Schedule.PublishTime is not null
-                && cultureAndScheduleRequestModel.Schedule.PublishTime <= _timeProvider.GetUtcNow())
-            {
-                return Attempt.FailWithStatus(ContentPublishingOperationStatus.PublishTimeNeedsToBeInFuture, model);
-            }
-
-            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime is not null
-                && cultureAndScheduleRequestModel.Schedule.UnpublishTime <= _timeProvider.GetUtcNow())
-            {
-                return Attempt.FailWithStatus(ContentPublishingOperationStatus.UpublishTimeNeedsToBeInFuture, model);
-            }
-
-            if (cultureAndScheduleRequestModel.Schedule.UnpublishTime <= cultureAndScheduleRequestModel.Schedule.PublishTime)
-            {
-                return Attempt.FailWithStatus(ContentPublishingOperationStatus.UnpublishTimeNeedsToBeAfterPublishTime, model);
-            }
-
-            model.Add(new CulturePublishScheduleModel
-            {
-                Culture = cultureAndScheduleRequestModel.Culture,
-                Schedule = new ContentScheduleModel
-                {
-                    PublishDate = cultureAndScheduleRequestModel.Schedule.PublishTime,
-                    UnpublishDate = cultureAndScheduleRequestModel.Schedule.UnpublishTime,
-                },
-            });
-        }
-
-        return Attempt.SucceedWithStatus(ContentPublishingOperationStatus.Success, model);
-    }
+    public Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus>
+        CreateCulturePublishScheduleModels(PublishDocumentRequestModel requestModel)
+        => CreateCulturePublishScheduleModels(requestModel.PublishSchedules);
 
     /// <inheritdoc/>
     protected override DocumentVariantItemResponseModel CreateVariantItemResponseModel(

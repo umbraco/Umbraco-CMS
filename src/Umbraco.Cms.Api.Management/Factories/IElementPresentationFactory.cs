@@ -1,8 +1,11 @@
 using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Api.Management.ViewModels.Element.Item;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
@@ -39,4 +42,12 @@ public interface IElementPresentationFactory
     /// <param name="entity">The element entity to create the response model from.</param>
     /// <returns>A <see cref="DocumentTypeReferenceResponseModel"/> representing the document type reference.</returns>
     DocumentTypeReferenceResponseModel CreateDocumentTypeReferenceResponseModel(IElementEntitySlim entity);
+
+    /// <summary>
+    /// Creates a list of <see cref="CulturePublishScheduleModel"/> instances based on the provided <paramref name="requestModel"/>,
+    /// validating each culture's publish and unpublish schedule for correctness (e.g., ensuring times are in the future and unpublish is after publish).
+    /// </summary>
+    /// <param name="requestModel">The request model containing culture-specific scheduling information for publishing documents.</param>
+    /// <returns>An <see cref="Attempt{List{CulturePublishScheduleModel}, ContentPublishingOperationStatus}"/> containing the resulting list of culture publish schedules if validation succeeds, or a failure status with partial results if validation fails.</returns>
+    Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishElementRequestModel requestModel);
 }
