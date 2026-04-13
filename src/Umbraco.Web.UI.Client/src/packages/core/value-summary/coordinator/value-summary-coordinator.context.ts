@@ -59,16 +59,29 @@ export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
 				const resolver = await this.#getOrCreateResolver(valueType);
 				if (!resolver) continue;
 
-				const resolved = await resolver.resolveValues(uniqueValues);
-				const entries: ResolvedEntry[] = uniqueValues.map((v, i) => ({
-					key: `${valueType}:${toValueKey(v)}`,
-					value: resolved[i],
-				}));
-				this.#state.append(entries);
+				const { data, asObservable } = await resolver.resolveValues(uniqueValues);
+
+				this.#applyResolved(valueType, uniqueValues, data);
+
+				if (asObservable) {
+					this.observe(
+						asObservable(),
+						(resolved) => this.#applyResolved(valueType, uniqueValues, resolved),
+						`resolver-${valueType}`,
+					);
+				}
 			} catch (e) {
 				console.warn('[ValueSummary] Resolution failed for', valueType, e);
 			}
 		}
+	}
+
+	#applyResolved(valueType: string, uniqueValues: ReadonlyArray<unknown>, resolved: ReadonlyArray<unknown>) {
+		const entries: ResolvedEntry[] = uniqueValues.map((v, i) => ({
+			key: `${valueType}:${toValueKey(v)}`,
+			value: resolved[i],
+		}));
+		this.#state.append(entries);
 	}
 
 	async #getOrCreateResolver(valueType: string): Promise<UmbValueSummaryResolver | undefined> {

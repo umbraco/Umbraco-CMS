@@ -1,19 +1,33 @@
-import type { UmbValueSummaryResolver } from '@umbraco-cms/backoffice/value-summary';
+import { UmbSectionItemRepository } from '../repository/item/section-item.repository.js';
+import type { UmbSectionItemModel } from '../repository/item/types.js';
+import type { UmbValueSummaryResolveResult, UmbValueSummaryResolver } from '@umbraco-cms/backoffice/value-summary';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbSectionAliasesValueSummaryResolver
 	extends UmbControllerBase
 	implements UmbValueSummaryResolver<string[], ReadonlyArray<string>>
 {
-	#localize = new UmbLocalizationController(this);
+	#repo = new UmbSectionItemRepository(this);
 
-	async resolveValues(values: ReadonlyArray<string[]>): Promise<ReadonlyArray<ReadonlyArray<string>>> {
-		const sections = umbExtensionsRegistry.getByType('section');
-		const nameByAlias = new Map(
-			sections.map((s) => [s.alias, s.meta.label ? this.#localize.string(s.meta.label) : s.name]),
-		);
+	async resolveValues(values: ReadonlyArray<string[]>): Promise<UmbValueSummaryResolveResult<ReadonlyArray<string>>> {
+		const allAliases = [...new Set(values.flat())];
+		const { data, asObservable } = await this.#repo.requestItems(allAliases);
+		const items = Array.isArray(data) ? data : [];
+
+		return {
+			data: this.#map(values, items),
+			asObservable: asObservable
+				? () => createObservablePart(asObservable()!, (items) => this.#map(values, items))
+				: undefined,
+		};
+	}
+
+	#map(
+		values: ReadonlyArray<string[]>,
+		items: ReadonlyArray<UmbSectionItemModel>,
+	): ReadonlyArray<ReadonlyArray<string>> {
+		const nameByAlias = new Map(items.map((s) => [s.unique, s.name]));
 		return values.map((aliases) => aliases.map((alias) => nameByAlias.get(alias) ?? alias));
 	}
 }

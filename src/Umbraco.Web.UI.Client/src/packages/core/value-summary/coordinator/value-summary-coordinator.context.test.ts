@@ -11,7 +11,7 @@ class TestHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
 function makeManifest(
 	valueType: string,
-	resolverFn?: (values: ReadonlyArray<unknown>) => Promise<ReadonlyArray<unknown>>,
+	resolverFn?: (values: ReadonlyArray<unknown>) => Promise<{ data: ReadonlyArray<unknown> }>,
 ): ManifestValueSummary {
 	const manifest: ManifestValueSummary = {
 		type: 'valueSummary',
@@ -47,7 +47,6 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 	afterEach(() => {
 		coordinator.destroy();
 		document.body.innerHTML = '';
-		// Unregister test manifests
 		const registered = umbExtensionsRegistry.getByType('valueSummary');
 		for (const ext of registered) {
 			if (ext.alias.startsWith('Umb.Test.')) {
@@ -69,7 +68,6 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 		const obs = coordinator.observeResolvedValue(valueType, 'hello');
 		expect(obs).to.be.instanceOf(Observable);
 
-		// Wait for state update (synchronous for no-resolver path)
 		const value = await new Promise<unknown>((resolve) => {
 			obs.subscribe((v) => {
 				if (v !== undefined) resolve(v);
@@ -92,7 +90,7 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 
 	it('should resolve values using the resolver', async () => {
 		const valueType = 'Umb.Test.Resolver';
-		const manifest = makeManifest(valueType, async (values) => values.map((v) => `resolved:${v}`));
+		const manifest = makeManifest(valueType, async (values) => ({ data: values.map((v) => `resolved:${v}`) }));
 		umbExtensionsRegistry.register(manifest);
 
 		coordinator.preRegister(valueType, ['a']);
@@ -110,7 +108,7 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 		let callCount = 0;
 		const manifest = makeManifest(valueType, async (values) => {
 			callCount++;
-			return values.map((v) => `resolved:${v}`);
+			return { data: values.map((v) => `resolved:${v}`) };
 		});
 		umbExtensionsRegistry.register(manifest);
 
@@ -137,7 +135,9 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 
 	it('should maintain positional mapping for resolved values', async () => {
 		const valueType = 'Umb.Test.Positional';
-		const manifest = makeManifest(valueType, async (values) => values.map((v) => ({ original: v, doubled: `${v}${v}` })));
+		const manifest = makeManifest(valueType, async (values) => ({
+			data: values.map((v) => ({ original: v, doubled: `${v}${v}` })),
+		}));
 		umbExtensionsRegistry.register(manifest);
 
 		coordinator.preRegister(valueType, ['a', 'b']);
@@ -177,7 +177,7 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 				constructor() {
 					constructCount++;
 				}
-				resolveValues = async (values: ReadonlyArray<unknown>) => values.map((v) => `r:${v}`);
+				resolveValues = async (values: ReadonlyArray<unknown>) => ({ data: values.map((v) => `r:${v}`) });
 				destroy() {}
 			},
 		};

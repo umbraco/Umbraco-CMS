@@ -82,7 +82,7 @@ describe('UmbValueSummaryDefaultApi', () => {
 
 		(manifest as any).resolver = {
 			api: class {
-				resolveValues = async (values: ReadonlyArray<unknown>) => values.map((v) => `resolved:${v}`);
+				resolveValues = async (values: ReadonlyArray<unknown>) => ({ data: values.map((v) => `resolved:${v}`) });
 				destroy() {}
 			},
 		};
@@ -128,7 +128,7 @@ describe('UmbValueSummaryDefaultApi', () => {
 			api: class {
 				resolveValues = async (values: ReadonlyArray<unknown>) => {
 					connectCalls++;
-					return values.map((v) => `r:${v}`);
+					return { data: values.map((v) => `r:${v}`) };
 				};
 				destroy() {}
 			},
