@@ -16,8 +16,8 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
  * Extend this class to create custom value summary APIs.
  */
 export abstract class UmbValueSummaryApiBase extends UmbControllerBase implements UmbValueSummaryApi {
-	#value$ = new UmbObjectState<unknown>(undefined);
-	readonly value: Observable<unknown> = this.#value$.asObservable();
+	#value = new UmbObjectState<unknown>(undefined);
+	readonly value: Observable<unknown> = this.#value.asObservable();
 
 	#coordinator?: typeof UMB_VALUE_SUMMARY_COORDINATOR_CONTEXT.TYPE;
 	#valueType?: string;
@@ -62,12 +62,12 @@ export abstract class UmbValueSummaryApiBase extends UmbControllerBase implement
 			this.#coordinator.preRegister(this.#valueType, [this.#rawValue]);
 			this.observe(
 				this.#coordinator.observeResolvedValue(this.#valueType, this.#rawValue),
-				(v) => this.#value$.setValue(v),
+				(v) => this.#value.setValue(v),
 				'value',
 			);
 		} else {
 			// No coordinator — pass raw value through
-			this.#value$.setValue(this.#rawValue);
+			this.#value.setValue(this.#rawValue);
 		}
 	}
 }
