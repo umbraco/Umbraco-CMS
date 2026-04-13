@@ -1,11 +1,11 @@
 import { getDisplayStateFromUserStatus } from '../../utils.js';
-import type { UmbValueSummaryApi, UmbValueSummaryElementInterface } from '@umbraco-cms/backoffice/value-summary';
+import type { UmbValueSummaryApi, UmbValueSummaryElement } from '@umbraco-cms/backoffice/value-summary';
 import { customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-user-state-value-summary')
-export class UmbUserStateValueSummaryElement extends UmbLitElement implements UmbValueSummaryElementInterface {
+export class UmbUserStateValueSummaryElement extends UmbLitElement implements UmbValueSummaryElement {
 	@property({ attribute: false })
 	set api(api: UmbValueSummaryApi | undefined) {
 		this.#api = api;

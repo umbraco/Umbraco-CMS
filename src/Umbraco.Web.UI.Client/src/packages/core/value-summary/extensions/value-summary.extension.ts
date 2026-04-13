@@ -1,10 +1,10 @@
 import type { ManifestElementAndApi, ApiLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
-import type { UmbValueSummaryElementInterface } from './value-summary-element.interface.js';
+import type { UmbValueSummaryElement } from './value-summary-element.interface.js';
 import type { UmbValueSummaryApi } from './value-summary-api.interface.js';
 import type { UmbValueSummaryResolver } from './value-summary-resolver.interface.js';
 
 export interface ManifestValueSummary
-	extends ManifestElementAndApi<UmbValueSummaryElementInterface, UmbValueSummaryApi> {
+	extends ManifestElementAndApi<UmbValueSummaryElement, UmbValueSummaryApi> {
 	type: 'valueSummary';
 	/**
 	 * The value type this summary is registered for.

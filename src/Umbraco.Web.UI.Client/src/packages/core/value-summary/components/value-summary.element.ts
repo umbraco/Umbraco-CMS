@@ -3,7 +3,7 @@ import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-value-summary')
-export class UmbValueSummaryElement extends UmbLitElement {
+export class UmbValueSummaryExtensionElement extends UmbLitElement {
 	@property({ attribute: false })
 	set valueType(value: string | undefined) {
 		if (this.#valueType === value) return;
@@ -31,10 +31,10 @@ export class UmbValueSummaryElement extends UmbLitElement {
 	}
 }
 
-export { UmbValueSummaryElement as element };
+export { UmbValueSummaryExtensionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-value-summary': UmbValueSummaryElement;
+		'umb-value-summary': UmbValueSummaryExtensionElement;
 	}
 }

@@ -1,10 +1,10 @@
 import type { UmbMediaItemModel } from '../../repository/item/types.js';
-import type { UmbValueSummaryApi, UmbValueSummaryElementInterface } from '@umbraco-cms/backoffice/value-summary';
+import type { UmbValueSummaryApi, UmbValueSummaryElement } from '@umbraco-cms/backoffice/value-summary';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-media-start-node-value-summary')
-export class UmbMediaStartNodeValueSummaryElement extends UmbLitElement implements UmbValueSummaryElementInterface {
+export class UmbMediaStartNodeValueSummaryElement extends UmbLitElement implements UmbValueSummaryElement {
 	@property({ attribute: false })
 	set api(api: UmbValueSummaryApi | undefined) {
 		this.#api = api;

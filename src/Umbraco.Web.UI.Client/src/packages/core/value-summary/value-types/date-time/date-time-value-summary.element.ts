@@ -1,10 +1,10 @@
 import type { UmbValueSummaryApi } from '../../extensions/value-summary-api.interface.js';
-import type { UmbValueSummaryElementInterface } from '../../extensions/value-summary-element.interface.js';
+import type { UmbValueSummaryElement } from '../../extensions/value-summary-element.interface.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-date-time-value-summary')
-export class UmbDateTimeValueSummaryElement extends UmbLitElement implements UmbValueSummaryElementInterface {
+export class UmbDateTimeValueSummaryElement extends UmbLitElement implements UmbValueSummaryElement {
 	@property({ attribute: false })
 	set api(api: UmbValueSummaryApi | undefined) {
 		this.#api = api;

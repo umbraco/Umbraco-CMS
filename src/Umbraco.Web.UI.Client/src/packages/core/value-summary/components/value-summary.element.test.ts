@@ -1,9 +1,9 @@
 import './value-summary.element.js';
-import { UmbValueSummaryElement } from './value-summary.element.js';
+import { UmbValueSummaryExtensionElement } from './value-summary.element.js';
 import { expect, fixture, html } from '@open-wc/testing';
 
-describe('UmbValueSummaryElement', () => {
-	let element: UmbValueSummaryElement;
+describe('UmbValueSummaryExtensionElement', () => {
+	let element: UmbValueSummaryExtensionElement;
 
 	afterEach(() => {
 		// fixture handles its own cleanup
@@ -11,7 +11,7 @@ describe('UmbValueSummaryElement', () => {
 
 	it('should be defined', async () => {
 		element = await fixture(html`<umb-value-summary></umb-value-summary>`);
-		expect(element).to.be.instanceOf(UmbValueSummaryElement);
+		expect(element).to.be.instanceOf(UmbValueSummaryExtensionElement);
 	});
 
 	it('should accept valueType and value properties', async () => {

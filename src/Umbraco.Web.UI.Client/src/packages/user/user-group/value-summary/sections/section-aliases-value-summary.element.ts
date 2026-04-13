@@ -1,10 +1,10 @@
-import type { UmbValueSummaryApi, UmbValueSummaryElementInterface } from '@umbraco-cms/backoffice/value-summary';
+import type { UmbValueSummaryApi, UmbValueSummaryElement } from '@umbraco-cms/backoffice/value-summary';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-section-aliases-value-summary')
-export class UmbSectionAliasesValueSummaryElement extends UmbLitElement implements UmbValueSummaryElementInterface {
+export class UmbSectionAliasesValueSummaryElement extends UmbLitElement implements UmbValueSummaryElement {
 	@property({ attribute: false })
 	set api(api: UmbValueSummaryApi | undefined) {
 		this.#api = api;

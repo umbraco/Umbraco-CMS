@@ -1,11 +1,11 @@
 import type { UmbUserGroupItemModel } from '../repository/item/types.js';
 import type { UmbValueSummaryApi } from '@umbraco-cms/backoffice/value-summary';
-import type { UmbValueSummaryElementInterface } from '@umbraco-cms/backoffice/value-summary';
+import type { UmbValueSummaryElement } from '@umbraco-cms/backoffice/value-summary';
 import { customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-user-groups-value-summary')
-export class UmbUserGroupsValueSummaryElement extends UmbLitElement implements UmbValueSummaryElementInterface {
+export class UmbUserGroupsValueSummaryElement extends UmbLitElement implements UmbValueSummaryElement {
 	@property({ attribute: false })
 	set api(api: UmbValueSummaryApi | undefined) {
 		this.#api = api;

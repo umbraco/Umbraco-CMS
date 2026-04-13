@@ -1,11 +1,11 @@
 import { UmbDocumentItemDataResolver } from '../../item/document-item-data-resolver.js';
 import type { UmbDocumentItemModel } from '../../item/repository/types.js';
-import type { UmbValueSummaryApi, UmbValueSummaryElementInterface } from '@umbraco-cms/backoffice/value-summary';
+import type { UmbValueSummaryApi, UmbValueSummaryElement } from '@umbraco-cms/backoffice/value-summary';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-document-start-node-value-summary')
-export class UmbDocumentStartNodeValueSummaryElement extends UmbLitElement implements UmbValueSummaryElementInterface {
+export class UmbDocumentStartNodeValueSummaryElement extends UmbLitElement implements UmbValueSummaryElement {
 	@property({ attribute: false })
 	set api(api: UmbValueSummaryApi | undefined) {
 		this.#api = api;
