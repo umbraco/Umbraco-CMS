@@ -27,10 +27,12 @@ internal class PublishedContent : PublishedContentBase
         ContentNode contentNode,
         bool preview,
         IElementsCache elementsCache,
-        IVariationContextAccessor variationContextAccessor)
+        IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
         : base(variationContextAccessor)
     {
         VariationContextAccessor = variationContextAccessor;
+        PropertyRenderingContextAccessor = propertyRenderingContextAccessor;
         _contentNode = contentNode;
         ContentData? contentData = preview ? _contentNode.DraftModel : _contentNode.PublishedModel;
         if (contentData is null)
@@ -134,6 +136,8 @@ internal class PublishedContent : PublishedContentBase
 
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
+
+    internal IPropertyRenderingContextAccessor PropertyRenderingContextAccessor { get; }
 
     [Obsolete("Use the INavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
     public override int Level
