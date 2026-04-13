@@ -6,7 +6,7 @@ import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 type StartNode = { unique: string } | null;
 
-export class UmbMediaStartNodeValueSummaryResolver
+export class UmbMediaUserStartNodeValueSummaryResolver
 	extends UmbControllerBase
 	implements UmbValueSummaryResolver<StartNode, UmbMediaItemModel | null>
 {
@@ -40,4 +40,4 @@ export class UmbMediaStartNodeValueSummaryResolver
 }
 
 // Named 'api' for ApiLoaderProperty convention
-export { UmbMediaStartNodeValueSummaryResolver as api };
+export { UmbMediaUserStartNodeValueSummaryResolver as api };

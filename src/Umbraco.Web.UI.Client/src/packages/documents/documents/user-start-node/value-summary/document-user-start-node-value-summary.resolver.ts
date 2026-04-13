@@ -6,7 +6,7 @@ import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 type StartNode = { unique: string } | null;
 
-export class UmbDocumentStartNodeValueSummaryResolver
+export class UmbDocumentUserStartNodeValueSummaryResolver
 	extends UmbControllerBase
 	implements UmbValueSummaryResolver<StartNode, UmbDocumentItemModel | null>
 {
@@ -42,4 +42,4 @@ export class UmbDocumentStartNodeValueSummaryResolver
 }
 
 // Named 'api' for ApiLoaderProperty convention
-export { UmbDocumentStartNodeValueSummaryResolver as api };
+export { UmbDocumentUserStartNodeValueSummaryResolver as api };

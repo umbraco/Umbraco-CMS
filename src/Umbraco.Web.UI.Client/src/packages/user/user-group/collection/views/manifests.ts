@@ -38,14 +38,14 @@ export const manifests: Array<UmbExtensionManifest> = [
 				{
 					field: 'documentStartNode',
 					label: '#user_startnode',
-					// TODO: Use UMB_DOCUMENT_START_NODE_VALUE_TYPE when documents have been decoupled from users.
-					valueType: 'Umb.ValueType.Document.StartNode',
+					// TODO: Use UMB_DOCUMENT_USER_START_NODE_VALUE_TYPE when documents have been decoupled from users.
+					valueType: 'Umb.ValueType.Document.UserStartNode',
 				},
 				{
 					field: 'mediaStartNode',
 					label: '#user_mediastartnode',
-					// TODO: Use UMB_MEDIA_START_NODE_VALUE_TYPE when media have been decoupled from users.
-					valueType: 'Umb.ValueType.Media.StartNode',
+					// TODO: Use UMB_MEDIA_USER_START_NODE_VALUE_TYPE when media have been decoupled from users.
+					valueType: 'Umb.ValueType.Media.UserStartNode',
 				},
 			],
 		},

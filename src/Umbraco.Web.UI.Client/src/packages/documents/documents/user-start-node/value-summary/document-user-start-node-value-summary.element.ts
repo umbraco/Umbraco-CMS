@@ -4,8 +4,8 @@ import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
-@customElement('umb-document-start-node-value-summary')
-export class UmbDocumentStartNodeValueSummaryElement extends UmbValueSummaryElementBase<UmbDocumentItemModel | null> {
+@customElement('umb-document-user-start-node-value-summary')
+export class UmbDocumentUserStartNodeValueSummaryElement extends UmbValueSummaryElementBase<UmbDocumentItemModel | null> {
 	@state()
 	private _name?: string;
 
@@ -31,10 +31,10 @@ export class UmbDocumentStartNodeValueSummaryElement extends UmbValueSummaryElem
 	}
 }
 
-export { UmbDocumentStartNodeValueSummaryElement as element };
+export { UmbDocumentUserStartNodeValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-document-start-node-value-summary': UmbDocumentStartNodeValueSummaryElement;
+		'umb-document-user-start-node-value-summary': UmbDocumentUserStartNodeValueSummaryElement;
 	}
 }

@@ -1,4 +1,4 @@
-import { manifests as startNodeManifests } from './start-node/manifests.js';
+import { manifests as startNodeManifests } from './user-start-node/manifests.js';
 import { manifests as auditLogManifests } from './audit-log/manifests.js';
 import { manifests as collectionManifests } from './collection/manifests.js';
 import { manifests as entityActionsManifests } from './entity-actions/manifests.js';
