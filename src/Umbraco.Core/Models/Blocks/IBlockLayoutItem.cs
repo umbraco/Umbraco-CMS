@@ -25,6 +25,12 @@ public interface IBlockLayoutItem
     public Guid? SettingsKey { get; set; }
 
     /// <summary>
+    ///     Indicates if the content source is local or originates from the element service.
+    /// </summary>
+    // TODO KJA: We need a proper name for this.
+    public bool IsSharedContent { get; set; }
+
+    /// <summary>
     ///     Determines whether this layout item references the specified content key.
     /// </summary>
     /// <param name="key">The content key to check.</param>
@@ -41,4 +47,10 @@ public interface IBlockLayoutItem
     ///     <c>true</c> if this layout item references the specified settings key; otherwise, <c>false</c>.
     /// </returns>
     public bool ReferencesSetting(Guid key) => SettingsKey == key;
+
+    /// <summary>
+    ///     Returns any nested layouts for this layout (e.g. area layouts for the Block Grid).
+    /// </summary>
+    /// <returns>The nested layouts.</returns>
+    public IEnumerable<IBlockLayoutItem> GetContainedLayouts();
 }

@@ -11,6 +11,9 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
     /// <inheritdoc />
     public Guid? SettingsKey { get; set; }
 
+    /// <inheritdoc />
+    public bool IsSharedContent { get; set; }
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="BlockLayoutItemBase" /> class.
     /// </summary>
@@ -44,4 +47,7 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
     /// <inheritdoc />
     public virtual bool ReferencesSetting(Guid key)
         => SettingsKey == key;
+
+    /// <inheritdoc />
+    public virtual IEnumerable<IBlockLayoutItem> GetContainedLayouts() => [];
 }

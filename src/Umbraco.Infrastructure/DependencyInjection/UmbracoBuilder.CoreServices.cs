@@ -284,7 +284,9 @@ public static partial class UmbracoBuilderExtensions
     /// <returns>The same <see cref="Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder"/> instance so that multiple calls can be chained.</returns>
     public static IUmbracoBuilder AddPropertyIndexValueFactories(this IUmbracoBuilder builder)
     {
-        builder.Services.AddSingleton<IBlockValuePropertyIndexValueFactory, BlockValuePropertyIndexValueFactory>();
+        builder.Services.AddSingleton<IBlockListPropertyIndexValueFactory, BlockListPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<IBlockGridPropertyIndexValueFactory, BlockGridPropertyIndexValueFactory>();
+        builder.Services.AddSingleton<ISingleBlockPropertyIndexValueFactory, SingleBlockPropertyIndexValueFactory>();
         builder.Services.AddSingleton<ITagPropertyIndexValueFactory, TagPropertyIndexValueFactory>();
         builder.Services.AddSingleton<IRichTextPropertyIndexValueFactory, RichTextPropertyIndexValueFactory>();
         builder.Services.AddSingleton<IDateOnlyPropertyIndexValueFactory, DateOnlyPropertyIndexValueFactory>();

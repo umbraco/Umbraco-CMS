@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Extensions;
@@ -36,6 +37,7 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
     private readonly ILanguageService _languageService;
     private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
+    private readonly IElementCacheService _elementCacheService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SingleBlockPropertyValueConverter"/> class.
@@ -49,6 +51,7 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
     /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
     /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
     /// <param name="propertyRenderingContextAccessor">Accessor for the current property rendering context.</param>
+    /// <param name="elementCacheService">The cache for elements.</param>
     public SingleBlockPropertyValueConverter(
         IProfilingLogger proflog,
         BlockEditorConverter blockConverter,
@@ -58,7 +61,8 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
         IVariationContextAccessor variationContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
         ILanguageService languageService,
-        IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
+        IElementCacheService elementCacheService)
     {
         _proflog = proflog;
         _blockConverter = blockConverter;
@@ -69,6 +73,7 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
         _languageService = languageService;
         _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
+        _elementCacheService = elementCacheService;
     }
 
     /// <inheritdoc cref="SingleBlockPropertyValueConverter(IProfilingLogger, BlockEditorConverter, IApiElementBuilder, IJsonSerializer, BlockListPropertyValueConstructorCache, IVariationContextAccessor, BlockEditorVarianceHandler, ILanguageService, IPropertyRenderingContextAccessor)"/>
@@ -82,6 +87,21 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
         IVariationContextAccessor variationContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler)
         : this(proflog, blockConverter, apiElementBuilder, jsonSerializer, constructorCache, variationContextAccessor, blockEditorVarianceHandler, StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(), StaticServiceProvider.Instance.GetRequiredService<IPropertyRenderingContextAccessor>())
+    {
+    }
+
+    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V20.")]
+    public SingleBlockPropertyValueConverter(
+        IProfilingLogger proflog,
+        BlockEditorConverter blockConverter,
+        IApiElementBuilder apiElementBuilder,
+        IJsonSerializer jsonSerializer,
+        BlockListPropertyValueConstructorCache constructorCache,
+        IVariationContextAccessor variationContextAccessor,
+        BlockEditorVarianceHandler blockEditorVarianceHandler,
+        ILanguageService languageService,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
+        : this(proflog, blockConverter, apiElementBuilder, jsonSerializer, constructorCache, variationContextAccessor, blockEditorVarianceHandler, languageService, propertyRenderingContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IElementCacheService>())
     {
     }
 
@@ -149,7 +169,7 @@ public class SingleBlockPropertyValueConverter : PropertyValueConverterBase, IDe
             }
 
 
-            var creator = new SingleBlockPropertyValueCreator(_blockConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache, _languageService);
+            var creator = new SingleBlockPropertyValueCreator(_blockConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _elementCacheService, _jsonSerializer, _constructorCache, _languageService);
             return creator.CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks).GetAwaiter().GetResult();
         }
     }

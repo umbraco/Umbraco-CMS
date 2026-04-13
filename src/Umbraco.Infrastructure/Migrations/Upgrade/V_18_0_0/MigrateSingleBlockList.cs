@@ -68,12 +68,12 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         IDataTypeService dataTypeService,
         ILogger<MigrateSingleBlockList> logger,
         ICoreScopeProvider coreScopeProvider,
-        SingleBlockListProcessor  singleBlockListProcessor,
-        IJsonSerializer  jsonSerializer,
+        SingleBlockListProcessor singleBlockListProcessor,
+        IJsonSerializer jsonSerializer,
         SingleBlockListConfigurationCache blockListConfigurationCache,
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
-        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory,
+        ISingleBlockPropertyIndexValueFactory blockValuePropertyIndexValueFactory,
         IBlockEditorElementTypeCache elementTypeCache,
         AppCaches appCaches)
         : base(context)

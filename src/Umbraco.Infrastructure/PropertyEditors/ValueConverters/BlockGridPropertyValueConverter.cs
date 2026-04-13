@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -30,10 +31,21 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
         private readonly ILanguageService _languageService;
         private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
+        private readonly IElementCacheService _elementCacheService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlockGridPropertyValueConverter"/> class.
         /// </summary>
+        /// <param name="proflog">The logger used for profiling and diagnostics.</param>
+        /// <param name="blockConverter">The converter responsible for handling block editor values.</param>
+        /// <param name="jsonSerializer">The serializer used for JSON serialization and deserialization.</param>
+        /// <param name="apiElementBuilder">The builder for creating API elements from block data.</param>
+        /// <param name="constructorCache">The cache for block grid property value constructors.</param>
+        /// <param name="variationContextAccessor">Provides access to the current variation context.</param>
+        /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
+        /// <param name="languageService">Service for accessing all languages.</param>
+        /// <param name="propertyRenderingContextAccessor">Provides access to the current rendering context.</param>
+        /// <param name="elementCacheService">The cache for elements.</param>
         public BlockGridPropertyValueConverter(
             IProfilingLogger proflog,
             BlockEditorConverter blockConverter,
@@ -43,7 +55,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             IVariationContextAccessor variationContextAccessor,
             BlockEditorVarianceHandler blockEditorVarianceHandler,
             ILanguageService languageService,
-            IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
+            IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
+            IElementCacheService elementCacheService)
         {
             _proflog = proflog;
             _blockConverter = blockConverter;
@@ -54,6 +67,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             _blockEditorVarianceHandler = blockEditorVarianceHandler;
             _languageService = languageService;
             _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
+            _elementCacheService = elementCacheService;
         }
 
         /// <inheritdoc cref="BlockGridPropertyValueConverter(IProfilingLogger, BlockEditorConverter, IJsonSerializer, IApiElementBuilder, BlockGridPropertyValueConstructorCache, IVariationContextAccessor, BlockEditorVarianceHandler, ILanguageService, IPropertyRenderingContextAccessor)"/>
@@ -67,6 +81,31 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             IVariationContextAccessor variationContextAccessor,
             BlockEditorVarianceHandler blockEditorVarianceHandler)
             : this(proflog, blockConverter, jsonSerializer, apiElementBuilder, constructorCache, variationContextAccessor, blockEditorVarianceHandler, StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(), StaticServiceProvider.Instance.GetRequiredService<IPropertyRenderingContextAccessor>())
+        {
+        }
+
+        [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in V20.")]
+        public BlockGridPropertyValueConverter(
+            IProfilingLogger proflog,
+            BlockEditorConverter blockConverter,
+            IJsonSerializer jsonSerializer,
+            IApiElementBuilder apiElementBuilder,
+            BlockGridPropertyValueConstructorCache constructorCache,
+            IVariationContextAccessor variationContextAccessor,
+            BlockEditorVarianceHandler blockEditorVarianceHandler,
+            ILanguageService languageService,
+            IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
+            : this(
+                proflog,
+                blockConverter,
+                jsonSerializer,
+                apiElementBuilder,
+                constructorCache,
+                variationContextAccessor,
+                blockEditorVarianceHandler,
+                languageService,
+                propertyRenderingContextAccessor,
+                StaticServiceProvider.Instance.GetRequiredService<IElementCacheService>())
         {
         }
 
@@ -155,7 +194,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     return null;
                 }
 
-                var creator = new BlockGridPropertyValueCreator(_blockConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache, _languageService);
+                var creator = new BlockGridPropertyValueCreator(_blockConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _elementCacheService, _jsonSerializer, _constructorCache, _languageService);
                 return creator.CreateBlockModelAsync(owner, referenceCacheLevel, intermediateBlockModelValue, preview, configuration.Blocks, configuration.GridColumns).GetAwaiter().GetResult();
             }
         }

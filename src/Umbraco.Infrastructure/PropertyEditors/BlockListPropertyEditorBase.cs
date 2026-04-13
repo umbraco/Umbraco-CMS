@@ -21,13 +21,13 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 /// </summary>
 public abstract class BlockListPropertyEditorBase : DataEditor, IValueSchemaProvider
 {
-    private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
+    private readonly IBlockListPropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
     private readonly IJsonSerializer _jsonSerializer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlockListPropertyEditorBase"/> class.
     /// </summary>
-    protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory, IJsonSerializer jsonSerializer)
+    protected BlockListPropertyEditorBase(IDataValueEditorFactory dataValueEditorFactory, IBlockListPropertyIndexValueFactory blockValuePropertyIndexValueFactory, IJsonSerializer jsonSerializer)
         : base(dataValueEditorFactory)
     {
         _blockValuePropertyIndexValueFactory = blockValuePropertyIndexValueFactory;
