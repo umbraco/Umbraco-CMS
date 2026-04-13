@@ -63,6 +63,13 @@ internal sealed class MemberContentEditingService
     }
 
     /// <inheritdoc />
+    public override Task<IMember?> GetAsync(Guid key)
+    {
+        IMember? content = ContentService.GetById(key);
+        return Task.FromResult(content);
+    }
+
+    /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateAsync(MemberEditingModelBase editingModel, Guid memberTypeKey)
         => await ValidatePropertiesAsync(editingModel, memberTypeKey);
 

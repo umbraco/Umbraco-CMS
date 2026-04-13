@@ -55,7 +55,7 @@ internal sealed class ContentBlueprintEditingService
         => _containerService = containerService;
 
     /// <inheritdoc />
-    public Task<IContent?> GetAsync(Guid key)
+    public override Task<IContent?> GetAsync(Guid key)
     {
         IContent? blueprint = ContentService.GetBlueprintById(key);
         return Task.FromResult(blueprint);
