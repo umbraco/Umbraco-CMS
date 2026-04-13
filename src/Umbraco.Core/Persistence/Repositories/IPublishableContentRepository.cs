@@ -27,9 +27,6 @@ public interface IPublishableContentRepository<TContent> : IContentRepository<in
     void PersistContentSchedule(IPublishableContentBase content, ContentScheduleCollection schedule);
 
     /// <summary>
-    ///     Clears the publishing schedule for all entries having an a date before (lower than, or equal to) a specified date.
-    /// </summary>
-    /// <summary>
     ///     Clears the publishing schedule for all entries having a date before (lower than, or equal to) a specified date.
     /// </summary>
     /// <param name="date">The cutoff date.</param>
@@ -57,7 +54,7 @@ public interface IPublishableContentRepository<TContent> : IContentRepository<in
     bool HasContentForRelease(DateTime date);
 
     /// <summary>
-    ///     Gets <see cref="IContent" /> objects having an expiration date before (lower than, or equal to) a specified date.
+    ///     Gets <see cref="TContent" /> objects having an expiration date before (lower than, or equal to) a specified date.
     /// </summary>
     /// <remarks>
     ///     The content returned from this method may be culture variant, in which case you can use
