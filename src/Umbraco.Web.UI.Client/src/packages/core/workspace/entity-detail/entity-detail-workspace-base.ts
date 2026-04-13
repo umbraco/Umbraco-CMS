@@ -77,19 +77,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	);
 
 	/**
-	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead to get the parent both when creating and editing.
-	 */
-	public readonly parentUnique = this.#createUnderParent.asObservablePart((parent) =>
-		parent ? parent.unique : undefined,
-	);
-	/**
-	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead to get the parent both when creating and editing.
-	 */
-	public readonly parentEntityType = this.#createUnderParent.asObservablePart((parent) =>
-		parent ? parent.entityType : undefined,
-	);
-
-	/**
 	 * The base validation context for the workspace. This ensures that at least one validation context is always present.
 	 * @example You can manually validate all properties on the context:
 	 * ```ts
@@ -202,42 +189,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.#createUnderParent.setValue(parent);
 	}
 
-	/**
-	 * Get the parent
-	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead to get the parent both when creating and editing.
-	 * @returns { UmbEntityModel | undefined } The parent entity
-	 */
-	getParent(): UmbEntityModel | undefined {
-		return this.#createUnderParent.getValue();
-	}
-
-	/**
-	 * Set the parent
-	 * @deprecated Will be removed in v.18.
-	 * @param { UmbEntityModel } parent The parent entity
-	 */
-	setParent(parent: UmbEntityModel) {
-		this.#createUnderParent.setValue(parent);
-	}
-
-	/**
-	 * Get the parent unique
-	 * @deprecated Will be removed in v.18: Use UMB_PARENT_ENTITY_CONTEXT instead to get the parent both when creating and editing.
-	 * @returns { string | undefined } The parent unique identifier
-	 */
-	getParentUnique(): UmbEntityUnique | undefined {
-		return this.#createUnderParent.getValue()?.unique;
-	}
-
-	/**
-	 * Get the parent entity type
-	 * @deprecated Will be removed in v.18
-	 * @returns { string | undefined } The parent entity type
-	 */
-	getParentEntityType() {
-		return this.#createUnderParent.getValue()?.entityType;
-	}
-
 	async load(
 		unique: string,
 	): Promise<UmbRepositoryResponse<DetailModelType> | UmbRepositoryResponseWithAsObservable<DetailModelType>> {
@@ -310,8 +261,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		this.resetState();
 		this.loading.addState({ unique: LOADING_STATE_UNIQUE, message: `Creating ${this.getEntityType()} scaffold` });
 		await this.#init;
-		// keeping setParent for backwards compatibility. Remove in v18.
-		this.setParent(args.parent);
 		this._internal_setCreateUnderParent(args.parent);
 
 		const request = this._detailRepository!.createScaffold(args.preset);
@@ -319,7 +268,7 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		let { data } = await request;
 
 		if (data) {
-			data = await this._scaffoldProcessData(data);
+			data = await this._processIncomingData(data);
 
 			if (this.modalContext) {
 				// Notice if the preset comes with values, they will overwrite the scaffolded values... [NL]
@@ -337,14 +286,6 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 		return data;
 	}
 
-	/**
-	 * @deprecated Override `_processIncomingData` instead. `_scaffoldProcessData` will be removed in v.18.
-	 * @param {DetailModelType} data - The data to process.
-	 * @returns {Promise<DetailModelType>} The processed data.
-	 */
-	protected async _scaffoldProcessData(data: DetailModelType): Promise<DetailModelType> {
-		return await this._processIncomingData(data);
-	}
 	protected async _processIncomingData(data: DetailModelType): Promise<DetailModelType> {
 		return data;
 	}

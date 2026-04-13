@@ -72,7 +72,7 @@ internal sealed class MediaEditingService
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
 
     /// <inheritdoc />
-    public Task<IMedia?> GetAsync(Guid key)
+    public override Task<IMedia?> GetAsync(Guid key)
     {
         IMedia? media = ContentService.GetById(key);
         return Task.FromResult(media);

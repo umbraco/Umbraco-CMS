@@ -90,12 +90,13 @@ public class ConvertersTests
 
         var elementsCache = new ElementsDictionaryAppCache();
         var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new() };
+        var propertyRenderingContextAccessor = new TestPropertyRenderingContextAccessor { PropertyRenderingContext = new(default) };
 
         var contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "val1" } });
-        var element1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
+        var element1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
 
         contentNode = CreateContentNode("Element 2", 2345, elementType2, new Dictionary<string, object> { { "prop2", "1003" } });
-        var element2 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
+        var element2 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
 
         var cnt1 = new InternalPublishedContent(contentType1)
         {

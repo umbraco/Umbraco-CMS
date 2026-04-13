@@ -61,6 +61,8 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+
     public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
         ContentService,
         ContentTypeService,
@@ -263,11 +265,11 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
 
     [Test]
-    public void Export_Xml()
+    public async Task Export_Xml()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
 
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var def = new PackageDefinition { Name = "test", Templates = new[] { template.Id.ToString() } };
         var result = PackageBuilder.SavePackage(def);

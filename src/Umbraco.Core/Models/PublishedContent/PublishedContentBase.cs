@@ -1,6 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -10,8 +7,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     /// </summary>
     /// <remarks>This base class does which (a) consistently resolves and caches the URL, (b) provides an implementation
     /// for this[alias], and (c) provides basic content set management.</remarks>
-    // TODO ELEMENTS: correct version for the obsolete message here
-    [Obsolete("Please implement PublishableContentBase instead. Scheduled for removal in VXX")]
+    [Obsolete("Please implement PublishableContentBase instead. Scheduled for removal in V19")]
     public abstract class PublishedContentBase : PublishableContentBase, IPublishedContent
     {
         private readonly IVariationContextAccessor? _variationContextAccessor;

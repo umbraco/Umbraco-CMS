@@ -30,9 +30,9 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
 
     private IRedirectUrlService RedirectUrlService => GetRequiredService<IRedirectUrlService>();
 
-    public override void CreateTestData()
+    public override async Task CreateTestDataAsync()
     {
-        base.CreateTestData();
+        await base.CreateTestDataAsync();
 
         using (var scope = ScopeProvider.CreateScope())
         {
