@@ -8,7 +8,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'User Group References Value Summary',
 		forValueType: UMB_USER_GROUP_REFERENCES_VALUE_TYPE,
 		element: () => import('./user-group-value-summary.element.js'),
-		api: () => import('./user-group-value-summary.api.js'),
+		resolver: () => import('./user-group-value-summary.resolver.js'),
 	},
 	...sectionManifests,
 ];

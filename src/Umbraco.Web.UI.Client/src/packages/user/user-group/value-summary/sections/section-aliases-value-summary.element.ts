@@ -1,21 +1,32 @@
+import type { UmbValueSummaryApi, UmbValueSummaryElementInterface } from '@umbraco-cms/backoffice/value-summary';
 import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-section-aliases-value-summary')
-export class UmbSectionAliasesValueSummaryElement extends UmbLitElement {
+export class UmbSectionAliasesValueSummaryElement extends UmbLitElement implements UmbValueSummaryElementInterface {
 	@property({ attribute: false })
-	set value(val: string[] | undefined) {
-		this.#value = val;
-		this.#observeSectionNames();
+	set api(api: UmbValueSummaryApi | undefined) {
+		this.#api = api;
+		if (api) {
+			this.observe(
+				api.value,
+				(v) => {
+					this.#value = v as string[] | undefined;
+					this.#observeSectionNames();
+				},
+				'value',
+			);
+		}
 	}
-	get value() {
-		return this.#value;
+	get api() {
+		return this.#api;
 	}
 
 	@state()
 	private _sectionNames: Array<string> = [];
 
+	#api?: UmbValueSummaryApi;
 	#value?: string[];
 
 	#observeSectionNames() {

@@ -1,70 +1,39 @@
 import type { ManifestValueSummary } from '../extensions/value-summary.extension.js';
-import { UMB_VALUE_SUMMARY_COORDINATOR_CONTEXT } from '../coordinator/value-summary-coordinator.context-token.js';
-import { customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+
+const defaultApiLoader = () => import('../api/value-summary-api.base.js');
 
 @customElement('umb-value-summary')
 export class UmbValueSummaryElement extends UmbLitElement {
 	@property({ attribute: false })
 	set valueType(value: string | undefined) {
+		if (this.#valueType === value) return;
 		this.#valueType = value;
-		this.#register();
+		this.#filter = (m: ManifestValueSummary) => m.forValueType === this.#valueType;
 	}
 	get valueType() {
 		return this.#valueType;
 	}
 
 	@property({ attribute: false })
-	set value(value: unknown) {
-		this.#rawValue = value;
-		this.#register();
-	}
-	get value() {
-		return this.#rawValue;
-	}
-
-	@state()
-	private _resolvedValue?: unknown;
+	value?: unknown;
 
 	#valueType?: string;
-	#rawValue?: unknown;
+	#filter: (m: ManifestValueSummary) => boolean = () => false;
 
-	#coordinator?: typeof UMB_VALUE_SUMMARY_COORDINATOR_CONTEXT.TYPE;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_VALUE_SUMMARY_COORDINATOR_CONTEXT, (coordinator) => {
-			this.#coordinator = coordinator;
-			this.#register();
-		});
-	}
-
-	#register() {
-		if (!this.#valueType) return;
-		if (this.#coordinator) {
-			const valueType = this.#valueType;
-			const rawValue = this.#rawValue;
-			this.#coordinator.preRegister(valueType, [rawValue]);
-			this.observe(
-				this.#coordinator.observeResolvedValue(valueType, rawValue),
-				(resolved) => (this._resolvedValue = resolved),
-				'umbValueSummaryResolved',
-			);
-		} else {
-			// No coordinator — pass raw value through to the extension slot
-			this._resolvedValue = this.#rawValue;
-		}
-	}
+	#fallbackRender = () => html`<span>${String(this.value ?? '')}</span>`;
 
 	override render() {
 		if (!this.#valueType) return nothing;
-		return html`<umb-extension-slot
+		return html`<umb-extension-with-api-slot
 			type="valueSummary"
 			single
-			.filter=${(m: ManifestValueSummary) => m.forValueType === this.#valueType}
-			.props=${{ value: this._resolvedValue }}>
-			<span>${String(this._resolvedValue ?? '')}</span>
-		</umb-extension-slot>`;
+			.filter=${this.#filter}
+			.defaultApi=${defaultApiLoader}
+			.apiProps=${{ valueType: this.#valueType, rawValue: this.value }}
+			.fallbackRenderMethod=${this.#fallbackRender}>
+		</umb-extension-with-api-slot>`;
 	}
 }
 

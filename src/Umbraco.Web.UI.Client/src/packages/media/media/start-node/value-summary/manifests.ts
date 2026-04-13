@@ -7,6 +7,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Media Start Node Value Summary',
 		forValueType: UMB_MEDIA_START_NODE_VALUE_TYPE,
 		element: () => import('./media-start-node-value-summary.element.js'),
-		api: () => import('./media-start-node-value-summary.api.js'),
+		resolver: () => import('./media-start-node-value-summary.resolver.js'),
 	},
 ];

@@ -1,7 +1,9 @@
 export * from './constants.js';
 export type * from './extensions/value-summary.extension.js';
 export type { UmbValueSummaryElementInterface } from './extensions/value-summary-element.interface.js';
-export type * from './extensions/value-summary-api.interface.js';
+export type { UmbValueSummaryApi } from './extensions/value-summary-api.interface.js';
+export type { UmbValueSummaryResolver } from './extensions/value-summary-resolver.interface.js';
+export { UmbValueSummaryApiBase } from './api/value-summary-api.base.js';
 export * from './coordinator/value-summary-coordinator.context-token.js';
 export { UmbValueSummaryCoordinatorContext } from './coordinator/value-summary-coordinator.context.js';
 export { UmbValueSummaryElement } from './components/value-summary.element.js';

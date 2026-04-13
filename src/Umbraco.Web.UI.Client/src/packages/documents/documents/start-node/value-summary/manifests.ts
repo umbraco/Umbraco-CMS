@@ -7,6 +7,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Document Start Node Value Summary',
 		forValueType: UMB_DOCUMENT_START_NODE_VALUE_TYPE,
 		element: () => import('./document-start-node-value-summary.element.js'),
-		api: () => import('./document-start-node-value-summary.api.js'),
+		resolver: () => import('./document-start-node-value-summary.resolver.js'),
 	},
 ];

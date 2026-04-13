@@ -1,13 +1,13 @@
 import { UmbMediaItemRepository } from '../../repository/item/media-item.repository.js';
 import type { UmbMediaItemModel } from '../../repository/item/types.js';
-import type { UmbValueSummaryApi } from '@umbraco-cms/backoffice/value-summary';
+import type { UmbValueSummaryResolver } from '@umbraco-cms/backoffice/value-summary';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 type StartNode = { unique: string } | null;
 
-export class UmbMediaStartNodeValueSummaryApi
+export class UmbMediaStartNodeValueSummaryResolver
 	extends UmbControllerBase
-	implements UmbValueSummaryApi<StartNode, UmbMediaItemModel | null>
+	implements UmbValueSummaryResolver<StartNode, UmbMediaItemModel | null>
 {
 	#repo = new UmbMediaItemRepository(this);
 
@@ -26,4 +26,5 @@ export class UmbMediaStartNodeValueSummaryApi
 	}
 }
 
-export { UmbMediaStartNodeValueSummaryApi as api };
+// Named 'api' for ApiLoaderProperty convention
+export { UmbMediaStartNodeValueSummaryResolver as api };

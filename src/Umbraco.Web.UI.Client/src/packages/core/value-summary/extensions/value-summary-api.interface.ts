@@ -1,11 +1,11 @@
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
- * API interface for batch-resolving raw values to display values.
- *
- * Results must be returned in the same order as the input `values` array.
- * Each entry in the returned array corresponds positionally to the input.
+ * Per-element API for value summary extensions.
+ * Set on `element.api` by `umb-extension-with-api-slot`.
+ * Elements observe `value` to get the display value.
  */
-export interface UmbValueSummaryApi<TValue = unknown, TResolved = unknown> extends UmbApi {
-	resolveValues(values: ReadonlyArray<TValue>): Promise<ReadonlyArray<TResolved>>;
+export interface UmbValueSummaryApi extends UmbApi {
+	readonly value: Observable<unknown>;
 }

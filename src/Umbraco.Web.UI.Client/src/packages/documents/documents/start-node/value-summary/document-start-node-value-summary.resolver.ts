@@ -1,13 +1,13 @@
 import { UmbDocumentItemRepository } from '../../item/repository/document-item.repository.js';
 import type { UmbDocumentItemModel } from '../../item/repository/types.js';
-import type { UmbValueSummaryApi } from '@umbraco-cms/backoffice/value-summary';
+import type { UmbValueSummaryResolver } from '@umbraco-cms/backoffice/value-summary';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 type StartNode = { unique: string } | null;
 
-export class UmbDocumentStartNodeValueSummaryApi
+export class UmbDocumentStartNodeValueSummaryResolver
 	extends UmbControllerBase
-	implements UmbValueSummaryApi<StartNode, UmbDocumentItemModel | null>
+	implements UmbValueSummaryResolver<StartNode, UmbDocumentItemModel | null>
 {
 	#repo = new UmbDocumentItemRepository(this);
 
@@ -26,4 +26,5 @@ export class UmbDocumentStartNodeValueSummaryApi
 	}
 }
 
-export { UmbDocumentStartNodeValueSummaryApi as api };
+// Named 'api' for ApiLoaderProperty convention
+export { UmbDocumentStartNodeValueSummaryResolver as api };

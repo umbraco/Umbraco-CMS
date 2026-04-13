@@ -1,12 +1,12 @@
 import { UmbUserGroupItemRepository } from '../repository/item/user-group-item.repository.js';
 import type { UmbUserGroupItemModel } from '../repository/item/types.js';
-import type { UmbValueSummaryApi } from '@umbraco-cms/backoffice/value-summary';
+import type { UmbValueSummaryResolver } from '@umbraco-cms/backoffice/value-summary';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
-export class UmbUserGroupValueSummaryApi
+export class UmbUserGroupValueSummaryResolver
 	extends UmbControllerBase
-	implements UmbValueSummaryApi<UmbReferenceByUnique[], ReadonlyArray<UmbUserGroupItemModel>>
+	implements UmbValueSummaryResolver<UmbReferenceByUnique[], ReadonlyArray<UmbUserGroupItemModel>>
 {
 	#repo = new UmbUserGroupItemRepository(this);
 
@@ -21,4 +21,5 @@ export class UmbUserGroupValueSummaryApi
 	}
 }
 
-export { UmbUserGroupValueSummaryApi as api };
+// Named 'api' for ApiLoaderProperty convention
+export { UmbUserGroupValueSummaryResolver as api };
