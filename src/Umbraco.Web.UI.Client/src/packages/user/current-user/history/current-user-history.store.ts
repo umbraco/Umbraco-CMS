@@ -131,10 +131,27 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	/**
 	 * Extract a readable label from a path.
 	 * Tries to get the last meaningful segment (usually entity ID or section name).
+	 * For server-file-system uniques (e.g. `%2Ffolder%2Fitems%25dot%25cshtml`)
+	 * the segment is itself a URL-encoded path with `%dot%` standing in for `.` —
+	 * decode it and reduce to the filename so the user doesn't see raw
+	 * percent-encoding while waiting for the entity title to load.
 	 * @param path
 	 */
 	#extractLabelFromPath(path: string): string {
-		return this.#formatSegmentAsLabel(this.#getLastPathSegment(path));
+		const lastSegment = this.#getLastPathSegment(path);
+		const decoded = this.#decodeFileSystemUnique(lastSegment);
+		// Decoding may produce another path; take its last segment.
+		return this.#formatSegmentAsLabel(decoded.split('/').filter(Boolean).pop() ?? decoded);
+	}
+
+	#decodeFileSystemUnique(segment: string): string {
+		if (!segment.includes('%')) return segment;
+		try {
+			return decodeURIComponent(segment).replace(/%dot%/g, '.');
+		} catch {
+			// Malformed percent-encoding — leave as-is rather than throwing.
+			return segment;
+		}
 	}
 
 	/**

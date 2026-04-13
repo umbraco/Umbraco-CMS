@@ -3,6 +3,7 @@ import { UmbNameWriteGuardManager } from '../namable/index.js';
 import { UmbEntityDetailWorkspaceContextBase } from './entity-detail-workspace-base.js';
 import type { UmbEntityDetailWorkspaceContextArgs, UmbEntityDetailWorkspaceContextCreateArgs } from './types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbDetailRepository } from '@umbraco-cms/backoffice/repository';
 import type { UmbNamedEntityModel } from '@umbraco-cms/backoffice/entity';
 
@@ -27,10 +28,15 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 		super(host, args);
 		this.nameWriteGuard.fallbackToPermitted();
 		const typeLabel = args.typeLabel;
+		// Combine name with the forbidden state so the breadcrumb gets a
+		// meaningful label even when the entity can't be loaded — otherwise the
+		// section title is the only thing left in the chain (e.g. "Settings"
+		// instead of "Settings › Partial Views › Access denied").
 		this.observe(
-			this.name,
-			(name) => {
-				this.view.setTitle(name, { kind: 'workspace', typeLabel });
+			mergeObservables([this.name, this.forbidden.isOn], ([name, isForbidden]) => ({ name, isForbidden })),
+			({ name, isForbidden }) => {
+				const title = isForbidden ? '#routing_routeForbiddenTitle' : name;
+				this.view.setTitle(title, { kind: 'workspace', typeLabel });
 			},
 			null,
 		);
