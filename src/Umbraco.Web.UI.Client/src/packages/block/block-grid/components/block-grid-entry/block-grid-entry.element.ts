@@ -15,6 +15,8 @@ import type {
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 
+import '../../../block/action/block-action-list.element.js';
+
 /**
  * @element umb-block-grid-entry
  */
@@ -91,9 +93,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	// Unuspported is triggerede if the Block Type is not reconized, it can also be triggerede by the Content Element Type not existing any longer. [NL]
 	@state()
 	private _unsupported?: boolean;
-
-	@state()
-	private _showActions?: boolean;
 
 	@state()
 	private _workspaceEditContentPath?: string;
@@ -215,7 +214,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
-		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
 
@@ -572,12 +570,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#renderActionBar() {
 		if (this._isSortMode) return nothing;
-		if (!this._showActions) return nothing;
 		return html`
-			<uui-action-bar>
+			<umb-block-action-list block-editor=${UMB_BLOCK_GRID}>
 				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
-				${this.#renderDeleteAction()}
-			</uui-action-bar>
+			</umb-block-action-list>
 		`;
 	}
 
@@ -649,33 +645,20 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		`;
 	}
 
-	#renderDeleteAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			<uui-button
-				label="delete"
-				look="secondary"
-				@click=${() => this.#context.requestDelete()}
-				title=${this.localize.term('general_delete')}>
-				<uui-icon name="icon-remove"></uui-icon>
-			</uui-button>
-		`;
-	}
-
 	static override styles = [
 		UUIBlinkKeyframes,
 		css`
 			:host {
 				position: relative;
 				display: block;
-				--umb-block-grid-entry-actions-opacity: 0;
+				--umb-block-entry-actions-opacity: 0;
 			}
 
 			:host([settings-invalid]),
 			:host([content-invalid]),
 			:host(:hover),
 			:host(:focus-within) {
-				--umb-block-grid-entry-actions-opacity: 1;
+				--umb-block-entry-actions-opacity: 1;
 			}
 
 			:host::after {
@@ -706,14 +689,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				top: -1em;
 				left: var(--uui-size-space-2);
 				z-index: 2;
-			}
-
-			uui-action-bar {
-				position: absolute;
-				top: var(--uui-size-2);
-				right: var(--uui-size-2);
-				opacity: var(--umb-block-grid-entry-actions-opacity, 0);
-				transition: opacity 120ms;
 			}
 
 			uui-button-inline-create {

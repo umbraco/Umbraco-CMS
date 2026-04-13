@@ -17,6 +17,7 @@ import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboar
 import { UMB_PROPERTY_DATASET_CONTEXT, UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 import '../ref-rte-block/index.js';
+import '../../../block/action/block-action-list.element.js';
 
 /**
  * @class UmbBlockRteEntryElement
@@ -60,9 +61,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	@state()
 	private _exposed?: boolean;
-
-	@state()
-	private _showActions?: boolean;
 
 	@state()
 	private _workspaceEditContentPath?: string;
@@ -175,13 +173,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			null,
 		);
 
-		this.observe(
-			this.#context.actionsVisibility,
-			(showActions) => {
-				this._showActions = showActions;
-			},
-			null,
-		);
 		// Data props:
 		this.observe(
 			this.#context.layout,
@@ -344,12 +335,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderActionBar() {
-		if (!this._showActions) return nothing;
 		return html`
-			<uui-action-bar>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()}
-				${this.#renderCopyToClipboardAction()}${this.#renderDeleteAction()}
-			</uui-action-bar>
+			<umb-block-action-list block-editor=${UMB_BLOCK_RTE}>
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+			</umb-block-action-list>
 		`;
 	}
 
@@ -425,15 +414,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		`;
 	}
 
-	#renderDeleteAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
-				<uui-icon name="icon-remove"></uui-icon>
-			</uui-button>
-		`;
-	}
-
 	override render() {
 		return this.#renderBlock();
 	}
@@ -447,6 +427,13 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				user-select: all;
 				user-drag: auto;
 				white-space: nowrap;
+
+				--umb-block-entry-actions-opacity: 0;
+			}
+
+			:host(:hover),
+			:host(:focus-within) {
+				--umb-block-entry-actions-opacity: 1;
 			}
 
 			:host(.ProseMirror-selectednode) {
@@ -459,12 +446,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			umb-extension-slot::part(component) {
 				position: relative;
 				z-index: 0;
-			}
-
-			uui-action-bar {
-				position: absolute;
-				top: var(--uui-size-2);
-				right: var(--uui-size-2);
 			}
 
 			:host([drag-placeholder]) {

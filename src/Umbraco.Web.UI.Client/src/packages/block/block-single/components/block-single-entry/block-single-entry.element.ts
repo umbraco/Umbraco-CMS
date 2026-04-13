@@ -23,6 +23,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 import '../ref-single-block/index.js';
 import '../inline-single-block/index.js';
 import '../unsupported-single-block/index.js';
+import '../../../block/action/block-action-list.element.js';
 
 /**
  * @element umb-block-single-entry
@@ -84,9 +85,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 
 	@state()
 	private _unsupported?: boolean;
-
-	@state()
-	private _showActions?: boolean;
 
 	@state()
 	private _workspaceEditContentPath?: string;
@@ -179,13 +177,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 				this.#updateBlockViewProps({ unsupported: unsupported });
 				this._unsupported = unsupported;
 				this.toggleAttribute('unsupported', unsupported);
-			},
-			null,
-		);
-		this.observe(
-			this.#context.actionsVisibility,
-			(showActions) => {
-				this._showActions = showActions;
 			},
 			null,
 		);
@@ -432,12 +423,11 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderActionBar() {
-		return this._showActions
-			? html`<uui-action-bar>
-					${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
-					${this.#renderDeleteAction()}
-				</uui-action-bar>`
-			: nothing;
+		return html`
+			<umb-block-action-list block-editor=${UMB_BLOCK_SINGLE}>
+				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+			</umb-block-action-list>
+		`;
 	}
 
 	#renderEditContentAction() {
@@ -481,13 +471,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		`;
 	}
 
-	#renderDeleteAction() {
-		if (this._isReadOnly) return nothing;
-		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
-			<uui-icon name="icon-remove"></uui-icon>
-		</uui-button>`;
-	}
-
 	#renderCopyToClipboardAction() {
 		return html`
 			<uui-button
@@ -509,14 +492,14 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			:host {
 				position: relative;
 				display: block;
-				--umb-block-single-entry-actions-opacity: 0;
+				--umb-block-entry-actions-opacity: 0;
 			}
 
 			:host([settings-invalid]),
 			:host([content-invalid]),
 			:host(:hover),
 			:host(:focus-within) {
-				--umb-block-single-entry-actions-opacity: 1;
+				--umb-block-entry-actions-opacity: 1;
 			}
 
 			:host::after {
@@ -539,14 +522,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			umb-extension-slot::part(component) {
 				position: relative;
 				z-index: 0;
-			}
-
-			uui-action-bar {
-				position: absolute;
-				top: var(--uui-size-2);
-				right: var(--uui-size-2);
-				opacity: var(--umb-block-single-entry-actions-opacity, 0);
-				transition: opacity 120ms;
 			}
 
 			uui-badge {
