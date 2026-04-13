@@ -108,13 +108,23 @@ internal abstract class DeliveryApiOutputCachePolicyBase : IOutputCachePolicy
 
         IServiceProvider services = context.HttpContext.RequestServices;
         ILogger logger = services.GetRequiredService<ILoggerFactory>().CreateLogger(GetType());
+        IDeliveryApiOutputCacheRequestFilter requestFilter = services.GetRequiredService<IDeliveryApiOutputCacheRequestFilter>();
         IEnumerable<IDeliveryApiOutputCacheTagProvider> tagProviders = services.GetServices<IDeliveryApiOutputCacheTagProvider>();
-        IDeliveryApiOutputCacheDurationProvider durationProvider = services.GetRequiredService<IDeliveryApiOutputCacheDurationProvider>();
-
-        TimeSpan? minDuration = null;
 
         foreach (IPublishedContent item in items)
         {
+            // Check content-aware cacheability.
+            if (requestFilter.IsCacheable(context.HttpContext, item) is false)
+            {
+                context.AllowCacheStorage = false;
+                if (logger.IsEnabled(LogLevel.Debug))
+                {
+                    logger.LogDebug("Request filter returned not cacheable for item {ItemKey} — disabling cache storage.", item.Key);
+                }
+
+                return ValueTask.CompletedTask;
+            }
+
             // Tag with specific item key for targeted eviction.
             context.Tags.Add(ItemTagPrefix + item.Key);
 
@@ -129,31 +139,6 @@ internal abstract class DeliveryApiOutputCachePolicyBase : IOutputCachePolicy
                     context.Tags.Add(tag);
                 }
             }
-
-            // Check per-item duration override.
-            TimeSpan? itemDuration = durationProvider.GetDuration(item);
-            if (itemDuration == TimeSpan.Zero)
-            {
-                context.AllowCacheStorage = false;
-                if (logger.IsEnabled(LogLevel.Debug))
-                {
-                    logger.LogDebug("Duration provider returned zero for item {ItemKey} — disabling cache storage.", item.Key);
-                }
-
-                return ValueTask.CompletedTask;
-            }
-
-            if (itemDuration.HasValue)
-            {
-                minDuration = minDuration.HasValue
-                    ? TimeSpan.FromTicks(Math.Min(minDuration.Value.Ticks, itemDuration.Value.Ticks))
-                    : itemDuration;
-            }
-        }
-
-        if (minDuration.HasValue)
-        {
-            context.ResponseExpirationTimeSpan = minDuration;
         }
 
         if (logger.IsEnabled(LogLevel.Debug))

@@ -20,7 +20,6 @@ public class DeliveryApiOutputCacheContentPolicyTests
     private static readonly StringValues _defaultHeaders = new(["Accept-Language", "Accept-Segment", "Start-Item"]);
 
     private Mock<IDeliveryApiOutputCacheRequestFilter> _requestFilterMock = null!;
-    private Mock<IDeliveryApiOutputCacheDurationProvider> _durationProviderMock = null!;
     private Mock<IDocumentNavigationQueryService> _navigationServiceMock = null!;
 
     [SetUp]
@@ -30,9 +29,9 @@ public class DeliveryApiOutputCacheContentPolicyTests
         _requestFilterMock
             .Setup(f => f.IsCacheable(It.IsAny<HttpContext>()))
             .Returns(true);
-
-        _durationProviderMock = new Mock<IDeliveryApiOutputCacheDurationProvider>();
-        _durationProviderMock.Setup(p => p.GetDuration(It.IsAny<IPublishedContent>())).Returns((TimeSpan?)null);
+        _requestFilterMock
+            .Setup(f => f.IsCacheable(It.IsAny<HttpContext>(), It.IsAny<IPublishedContent>()))
+            .Returns(true);
 
         _navigationServiceMock = new Mock<IDocumentNavigationQueryService>();
         IEnumerable<Guid> emptyKeys = Enumerable.Empty<Guid>();
@@ -157,41 +156,11 @@ public class DeliveryApiOutputCacheContentPolicyTests
     }
 
     [Test]
-    public async Task ServeResponseAsync_UsesDurationProvider_WhenNonNull()
+    public async Task ServeResponseAsync_WhenContentFilterReturnsNotCacheable_DisablesCaching()
     {
-        var customDuration = TimeSpan.FromMinutes(5);
-        _durationProviderMock.Setup(p => p.GetDuration(It.IsAny<IPublishedContent>())).Returns(customDuration);
-
-        var policy = CreatePolicy();
-        OutputCacheContext context = CreateOutputCacheContext(
-            resolvedContentItems: [CreateContent()]);
-
-        await ((IOutputCachePolicy)policy).ServeResponseAsync(context, CancellationToken.None);
-
-        Assert.That(context.ResponseExpirationTimeSpan, Is.EqualTo(customDuration));
-    }
-
-    [Test]
-    public async Task ServeResponseAsync_FallsBackToConfigDuration_WhenProviderReturnsNull()
-    {
-        _durationProviderMock.Setup(p => p.GetDuration(It.IsAny<IPublishedContent>())).Returns((TimeSpan?)null);
-
-        var policy = CreatePolicy();
-        OutputCacheContext context = CreateOutputCacheContext(
-            resolvedContentItems: [CreateContent()]);
-
-        // Set a known initial duration to verify it's not overwritten.
-        context.ResponseExpirationTimeSpan = _defaultDuration;
-
-        await ((IOutputCachePolicy)policy).ServeResponseAsync(context, CancellationToken.None);
-
-        Assert.That(context.ResponseExpirationTimeSpan, Is.EqualTo(_defaultDuration));
-    }
-
-    [Test]
-    public async Task ServeResponseAsync_WhenDurationProviderReturnsZero_DisablesCaching()
-    {
-        _durationProviderMock.Setup(p => p.GetDuration(It.IsAny<IPublishedContent>())).Returns(TimeSpan.Zero);
+        _requestFilterMock
+            .Setup(f => f.IsCacheable(It.IsAny<HttpContext>(), It.IsAny<IPublishedContent>()))
+            .Returns(false);
 
         var policy = CreatePolicy();
         OutputCacheContext context = CreateOutputCacheContext(
@@ -200,27 +169,6 @@ public class DeliveryApiOutputCacheContentPolicyTests
         await ((IOutputCachePolicy)policy).ServeResponseAsync(context, CancellationToken.None);
 
         Assert.That(context.AllowCacheStorage, Is.False);
-    }
-
-    [Test]
-    public async Task ServeResponseAsync_MultipleItems_UsesMinimumDuration()
-    {
-        var shortDuration = TimeSpan.FromSeconds(10);
-        var longDuration = TimeSpan.FromSeconds(300);
-
-        var content1 = CreateContent();
-        var content2 = CreateContent();
-
-        _durationProviderMock.Setup(p => p.GetDuration(content1)).Returns(longDuration);
-        _durationProviderMock.Setup(p => p.GetDuration(content2)).Returns(shortDuration);
-
-        var policy = CreatePolicy();
-        OutputCacheContext context = CreateOutputCacheContext(
-            resolvedContentItems: [content1, content2]);
-
-        await ((IOutputCachePolicy)policy).ServeResponseAsync(context, CancellationToken.None);
-
-        Assert.That(context.ResponseExpirationTimeSpan, Is.EqualTo(shortDuration));
     }
 
     [Test]
@@ -289,7 +237,6 @@ public class DeliveryApiOutputCacheContentPolicyTests
         var services = new ServiceCollection();
         services.AddSingleton<ILoggerFactory>(NullLoggerFactory.Instance);
         services.AddSingleton(_requestFilterMock.Object);
-        services.AddSingleton(_durationProviderMock.Object);
         services.AddSingleton(_navigationServiceMock.Object);
         services.AddSingleton<IEnumerable<IDeliveryApiOutputCacheTagProvider>>(
             (tagProviders ?? [new ContentTypeDeliveryApiOutputCacheTagProvider()]).ToList());

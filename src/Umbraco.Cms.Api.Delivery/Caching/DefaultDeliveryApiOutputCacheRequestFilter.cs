@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Api.Delivery.Caching;
 
@@ -26,6 +27,9 @@ public class DefaultDeliveryApiOutputCacheRequestFilter : IDeliveryApiOutputCach
     /// <inheritdoc />
     public virtual bool IsCacheable(HttpContext context)
         => IsPreview() is false && HasPublicAccess();
+
+    /// <inheritdoc />
+    public virtual bool IsCacheable(HttpContext context, IPublishedContent content) => true;
 
     /// <summary>
     ///     Gets a value indicating whether the current request is a preview request.

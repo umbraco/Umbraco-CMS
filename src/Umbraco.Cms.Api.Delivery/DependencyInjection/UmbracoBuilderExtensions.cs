@@ -155,7 +155,6 @@ public static class UmbracoBuilderExtensions
 
         // Register extension point default implementations.
         builder.Services.AddSingleton<IDeliveryApiOutputCacheTagProvider, ContentTypeDeliveryApiOutputCacheTagProvider>();
-        builder.Services.AddSingleton<IDeliveryApiOutputCacheDurationProvider, DefaultDeliveryApiOutputCacheDurationProvider>();
         builder.Services.AddSingleton<IDeliveryApiOutputCacheRequestFilter, DefaultDeliveryApiOutputCacheRequestFilter>();
         builder.Services.AddSingleton<IDeliveryApiOutputCacheManager, DeliveryApiOutputCacheManager>();
 

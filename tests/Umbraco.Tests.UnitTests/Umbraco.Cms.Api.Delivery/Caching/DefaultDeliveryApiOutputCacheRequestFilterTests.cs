@@ -3,6 +3,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Delivery.Caching;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Delivery.Caching;
 
@@ -49,5 +50,14 @@ public class DefaultDeliveryApiOutputCacheRequestFilterTests
         var httpContext = new DefaultHttpContext();
 
         Assert.That(_filter.IsCacheable(httpContext), Is.False);
+    }
+
+    [Test]
+    public void IsCacheable_WithContent_ReturnsTrue()
+    {
+        var httpContext = new DefaultHttpContext();
+        var content = Mock.Of<IPublishedContent>();
+
+        Assert.That(_filter.IsCacheable(httpContext, content), Is.True);
     }
 }

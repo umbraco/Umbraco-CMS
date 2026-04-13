@@ -19,7 +19,6 @@ public class DeliveryApiOutputCacheMediaPolicyTests
     private static readonly StringValues _defaultHeaders = new("Start-Item");
 
     private Mock<IDeliveryApiOutputCacheRequestFilter> _requestFilterMock = null!;
-    private Mock<IDeliveryApiOutputCacheDurationProvider> _durationProviderMock = null!;
 
     [SetUp]
     public void SetUp()
@@ -28,9 +27,9 @@ public class DeliveryApiOutputCacheMediaPolicyTests
         _requestFilterMock
             .Setup(f => f.IsCacheable(It.IsAny<HttpContext>()))
             .Returns(true);
-
-        _durationProviderMock = new Mock<IDeliveryApiOutputCacheDurationProvider>();
-        _durationProviderMock.Setup(p => p.GetDuration(It.IsAny<IPublishedContent>())).Returns((TimeSpan?)null);
+        _requestFilterMock
+            .Setup(f => f.IsCacheable(It.IsAny<HttpContext>(), It.IsAny<IPublishedContent>()))
+            .Returns(true);
     }
 
     [Test]
@@ -127,7 +126,6 @@ public class DeliveryApiOutputCacheMediaPolicyTests
         var services = new ServiceCollection();
         services.AddSingleton<ILoggerFactory>(NullLoggerFactory.Instance);
         services.AddSingleton(_requestFilterMock.Object);
-        services.AddSingleton(_durationProviderMock.Object);
         services.AddSingleton<IEnumerable<IDeliveryApiOutputCacheTagProvider>>(
             (tagProviders ?? [new ContentTypeDeliveryApiOutputCacheTagProvider()]).ToList());
         services.AddSingleton<IEnumerable<IDeliveryApiOutputCacheVaryByProvider>>(
