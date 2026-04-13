@@ -1,36 +1,22 @@
-import type { UmbValueSummaryApi, UmbValueSummaryElement } from '@umbraco-cms/backoffice/value-summary';
-import { html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-section-aliases-value-summary')
-export class UmbSectionAliasesValueSummaryElement extends UmbLitElement implements UmbValueSummaryElement {
-	@property({ attribute: false })
-	set api(api: UmbValueSummaryApi | undefined) {
-		this.#api = api;
-		if (api) {
-			this.observe(
-				api.value,
-				(v) => {
-					this.#value = v as string[] | undefined;
-					this.#observeSectionNames();
-				},
-				'value',
-			);
-		}
-	}
-	get api() {
-		return this.#api;
-	}
-
+export class UmbSectionAliasesValueSummaryElement extends UmbValueSummaryElementBase<string[]> {
 	@state()
 	private _sectionNames: Array<string> = [];
 
-	#api?: UmbValueSummaryApi;
-	#value?: string[];
+	protected override willUpdate(changedProperties: PropertyValueMap<this>): void {
+		super.willUpdate(changedProperties);
+		if (changedProperties.has('_value' as keyof this)) {
+			this.#observeSectionNames();
+		}
+	}
 
 	#observeSectionNames() {
-		if (!this.#value?.length) {
+		if (!this._value?.length) {
 			this._sectionNames = [];
 			return;
 		}
@@ -38,7 +24,7 @@ export class UmbSectionAliasesValueSummaryElement extends UmbLitElement implemen
 			umbExtensionsRegistry.byType('section'),
 			(sections) => {
 				this._sectionNames = sections
-					.filter((x) => this.#value!.includes(x.alias))
+					.filter((x) => this._value!.includes(x.alias))
 					.map((x) => (x.meta.label ? this.localize.string(x.meta.label) : x.name));
 			},
 			'umbSectionAliasesObserver',

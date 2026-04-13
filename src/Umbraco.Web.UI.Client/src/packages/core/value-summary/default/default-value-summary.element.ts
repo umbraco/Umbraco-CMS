@@ -1,26 +1,8 @@
-import type { UmbValueSummaryApi } from '../extensions/value-summary-api.interface.js';
-import type { UmbValueSummaryElement } from '../extensions/value-summary-element.interface.js';
-import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbValueSummaryElementBase } from '../components/value-summary-element.base.js';
+import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-default-value-summary')
-export class UmbDefaultValueSummaryElement extends UmbLitElement implements UmbValueSummaryElement {
-	@property({ attribute: false })
-	set api(api: UmbValueSummaryApi | undefined) {
-		this.#api = api;
-		if (api) {
-			this.observe(api.value, (v) => (this._value = v), 'value');
-		}
-	}
-	get api() {
-		return this.#api;
-	}
-
-	#api?: UmbValueSummaryApi;
-
-	@state()
-	private _value?: unknown;
-
+export class UmbDefaultValueSummaryElement extends UmbValueSummaryElementBase {
 	override render() {
 		return html`<span>${String(this._value ?? '')}</span>`;
 	}
