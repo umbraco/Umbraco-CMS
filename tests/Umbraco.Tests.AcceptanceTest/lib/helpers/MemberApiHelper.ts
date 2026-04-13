@@ -21,6 +21,28 @@ export class MemberApiHelper {
     return response.headers().location.split("v1/member/").pop();
   }
 
+  // Read-modify-write update. Pass only the fields you want to change in `overrides`;
+  // everything else is preserved from the current server-side state.
+  async update(id: string, overrides: Partial<{isApproved: boolean; isLockedOut: boolean; isTwoFactorEnabled: boolean; email: string; username: string}> = {}) {
+    const data = await this.get(id);
+    const payload = {
+      variants: data.variants,
+      values: data.values,
+      email: data.email,
+      username: data.username,
+      isApproved: data.isApproved,
+      isLockedOut: data.isLockedOut,
+      isTwoFactorEnabled: data.isTwoFactorEnabled,
+      groups: (data.groups ?? []).map((g: any) => typeof g === 'string' ? g : g.id),
+      ...overrides,
+    };
+    return await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/member/' + id, payload);
+  }
+
+  async setLockedOut(id: string, isLockedOut: boolean) {
+    return await this.update(id, {isLockedOut});
+  }
+
   async delete(id: string) {
     if (id == null) {
       return;
@@ -72,7 +94,7 @@ export class MemberApiHelper {
 
   async createDefaultMember(memberName: string, memberTypeId: string, email: string, username: string, password: string) {
     await this.ensureNameNotExists(memberName);
-    
+
     const member = new MemberBuilder()
       .addVariant()
         .withName(memberName)
@@ -81,6 +103,24 @@ export class MemberApiHelper {
       .withUsername(username)
       .withPassword(password)
       .withMemberTypeId(memberTypeId)
+      .build();
+    return await this.create(member);
+  }
+
+  // createDefaultMember leaves isApproved at its builder default (false); this variant sets it
+  // to true so the member can sign in immediately.
+  async createApprovedMember(memberName: string, memberTypeId: string, email: string, username: string, password: string) {
+    await this.ensureNameNotExists(memberName);
+
+    const member = new MemberBuilder()
+      .addVariant()
+        .withName(memberName)
+        .done()
+      .withEmail(email)
+      .withUsername(username)
+      .withPassword(password)
+      .withMemberTypeId(memberTypeId)
+      .withIsApproved(true)
       .build();
     return await this.create(member);
   }
