@@ -10,8 +10,8 @@ namespace Umbraco.Cms.Api.Delivery.Caching;
 
 /// <summary>
 ///     Base output cache policy for Delivery API endpoints. Handles request filtering, vary-by rules,
-///     tagging, and duration provider logic. Subclasses specify the resolved-items key, tag prefix,
-///     and "all" tag that distinguish content from media.
+///     and tagging. Subclasses specify the resolved-items key, tag prefix, and "all" tag that
+///     distinguish content from media.
 /// </summary>
 internal abstract class DeliveryApiOutputCachePolicyBase : IOutputCachePolicy
 {

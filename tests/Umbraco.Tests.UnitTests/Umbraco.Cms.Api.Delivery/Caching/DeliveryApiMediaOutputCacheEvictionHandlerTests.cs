@@ -57,14 +57,15 @@ public class DeliveryApiMediaOutputCacheEvictionHandlerTests
     }
 
     [Test]
-    public async Task HandleAsync_RefreshAll_EvictsAllMediaTag()
+    public async Task HandleAsync_RefreshAll_EvictsAllTag()
     {
         var notification = CreateNotification(new MediaCacheRefresher.JsonPayload(1, Guid.NewGuid(), TreeChangeTypes.RefreshAll));
 
         await _handler.HandleAsync(notification, CancellationToken.None);
 
+        // RefreshAll evicts everything (not just media) because content responses may reference media.
         _storeMock.Verify(
-            s => s.EvictByTagAsync("umb-dapi-media-all", It.IsAny<CancellationToken>()),
+            s => s.EvictByTagAsync("umb-dapi-all", It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
