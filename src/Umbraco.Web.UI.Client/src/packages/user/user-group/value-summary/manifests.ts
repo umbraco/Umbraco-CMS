@@ -4,6 +4,7 @@ import { manifests as sectionManifests } from './sections/manifests.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'valueSummary',
+		kind: 'default',
 		alias: 'Umb.ValueSummary.UserGroup.References',
 		name: 'User Group References Value Summary',
 		forValueType: UMB_USER_GROUP_REFERENCES_VALUE_TYPE,

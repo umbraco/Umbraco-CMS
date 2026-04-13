@@ -3,13 +3,13 @@ import type { UmbValueSummaryElementInterface } from '../extensions/value-summar
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-boolean-value-summary')
-export class UmbBooleanValueSummaryElement extends UmbLitElement implements UmbValueSummaryElementInterface {
+@customElement('umb-default-value-summary')
+export class UmbDefaultValueSummaryElement extends UmbLitElement implements UmbValueSummaryElementInterface {
 	@property({ attribute: false })
 	set api(api: UmbValueSummaryApi | undefined) {
 		this.#api = api;
 		if (api) {
-			this.observe(api.value, (v) => (this._value = v as boolean), 'value');
+			this.observe(api.value, (v) => (this._value = v), 'value');
 		}
 	}
 	get api() {
@@ -19,19 +19,17 @@ export class UmbBooleanValueSummaryElement extends UmbLitElement implements UmbV
 	#api?: UmbValueSummaryApi;
 
 	@state()
-	private _value?: boolean | null;
+	private _value?: unknown;
 
 	override render() {
-		return html`${this._value === true
-			? html`<uui-icon name="icon-true"></uui-icon>`
-			: html`<uui-icon name="icon-false"></uui-icon>`}`;
+		return html`<span>${String(this._value ?? '')}</span>`;
 	}
 }
 
-export { UmbBooleanValueSummaryElement as element };
+export { UmbDefaultValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-boolean-value-summary': UmbBooleanValueSummaryElement;
+		'umb-default-value-summary': UmbDefaultValueSummaryElement;
 	}
 }

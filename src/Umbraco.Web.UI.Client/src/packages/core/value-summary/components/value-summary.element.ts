@@ -2,8 +2,6 @@ import type { ManifestValueSummary } from '../extensions/value-summary.extension
 import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-const defaultApiLoader = () => import('../api/value-summary-api.base.js');
-
 @customElement('umb-value-summary')
 export class UmbValueSummaryElement extends UmbLitElement {
 	@property({ attribute: false })
@@ -22,17 +20,13 @@ export class UmbValueSummaryElement extends UmbLitElement {
 	#valueType?: string;
 	#filter: (m: ManifestValueSummary) => boolean = () => false;
 
-	#fallbackRender = () => html`<span>${String(this.value ?? '')}</span>`;
-
 	override render() {
 		if (!this.#valueType) return nothing;
 		return html`<umb-extension-with-api-slot
 			type="valueSummary"
 			single
 			.filter=${this.#filter}
-			.defaultApi=${defaultApiLoader}
-			.apiProps=${{ valueType: this.#valueType, rawValue: this.value }}
-			.fallbackRenderMethod=${this.#fallbackRender}>
+			.apiProps=${{ valueType: this.#valueType, rawValue: this.value }}>
 		</umb-extension-with-api-slot>`;
 	}
 }

@@ -18,7 +18,7 @@ function makeManifest(
 		alias: `Umb.Test.ValueSummary.${valueType}`,
 		name: `Test Value Summary ${valueType}`,
 		forValueType: valueType,
-		element: () => import('../boolean/boolean-value-summary.element.js'),
+		element: () => import('../value-types/boolean/boolean-value-summary.element.js'),
 		meta: {},
 	} as unknown as ManifestValueSummary;
 
@@ -168,7 +168,7 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 			alias: `Umb.Test.ValueSummary.${valueType}`,
 			name: `Test Value Summary ${valueType}`,
 			forValueType: valueType,
-			element: () => import('../boolean/boolean-value-summary.element.js'),
+			element: () => import('../value-types/boolean/boolean-value-summary.element.js'),
 			meta: {},
 		} as unknown as ManifestValueSummary;
 

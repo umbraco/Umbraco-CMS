@@ -6,15 +6,16 @@ import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
- * Default per-element API that bridges the coordinator to the element.
- * Provided as `defaultApi` on the `umb-extension-with-api-slot` — manifests
- * don't need to specify an `api`.
+ * Abstract base class for value summary APIs.
+ * Bridges the coordinator to the element.
  *
- * Receives `valueType` and `value` via apiProps from the wrapper element.
+ * Receives `valueType` and `rawValue` via apiProps from the wrapper element.
  * Consumes the coordinator context to register for batch resolution and
  * exposes the result via the `value` observable.
+ *
+ * Extend this class to create custom value summary APIs.
  */
-export class UmbValueSummaryApiBase extends UmbControllerBase implements UmbValueSummaryApi {
+export abstract class UmbValueSummaryApiBase extends UmbControllerBase implements UmbValueSummaryApi {
 	#value$ = new UmbObjectState<unknown>(undefined);
 	readonly value: Observable<unknown> = this.#value$.asObservable();
 
@@ -70,5 +71,3 @@ export class UmbValueSummaryApiBase extends UmbControllerBase implements UmbValu
 		}
 	}
 }
-
-export { UmbValueSummaryApiBase as api };

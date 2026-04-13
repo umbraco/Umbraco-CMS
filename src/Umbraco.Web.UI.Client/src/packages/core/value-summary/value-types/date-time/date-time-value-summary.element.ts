@@ -1,5 +1,5 @@
-import type { UmbValueSummaryApi } from '../extensions/value-summary-api.interface.js';
-import type { UmbValueSummaryElementInterface } from '../extensions/value-summary-element.interface.js';
+import type { UmbValueSummaryApi } from '../../extensions/value-summary-api.interface.js';
+import type { UmbValueSummaryElementInterface } from '../../extensions/value-summary-element.interface.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 

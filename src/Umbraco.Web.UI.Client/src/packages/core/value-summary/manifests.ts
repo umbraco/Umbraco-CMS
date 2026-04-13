@@ -1,4 +1,9 @@
-import { manifests as booleanManifests } from './boolean/manifests.js';
-import { manifests as dateTimeManifests } from './date-time/manifests.js';
+import { manifests as defaultKindManifests } from './default/manifests.js';
+import { manifests as valueTypeManifests } from './value-types/manifests.js';
 
-export const manifests: Array<UmbExtensionManifest> = [...booleanManifests, ...dateTimeManifests];
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
+	...defaultKindManifests,
+	...valueTypeManifests,
+];

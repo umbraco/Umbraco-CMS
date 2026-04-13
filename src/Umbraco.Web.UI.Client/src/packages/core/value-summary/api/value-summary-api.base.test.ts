@@ -1,4 +1,4 @@
-import { UmbValueSummaryApiBase } from './value-summary-api.base.js';
+import { UmbValueSummaryDefaultApi } from '../default/default-value-summary.api.js';
 import { UmbValueSummaryCoordinatorContext } from '../coordinator/value-summary-coordinator.context.js';
 import type { ManifestValueSummary } from '../extensions/value-summary.extension.js';
 import { expect } from '@open-wc/testing';
@@ -10,7 +10,7 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 @customElement('test-api-base-host')
 class TestHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-describe('UmbValueSummaryApiBase', () => {
+describe('UmbValueSummaryDefaultApi', () => {
 	let host: TestHostElement;
 
 	beforeEach(() => {
@@ -29,13 +29,13 @@ describe('UmbValueSummaryApiBase', () => {
 	});
 
 	it('should expose a value observable', () => {
-		const api = new UmbValueSummaryApiBase(host);
+		const api = new UmbValueSummaryDefaultApi(host);
 		expect(api).to.have.property('value').that.is.instanceOf(Observable);
 		api.destroy();
 	});
 
 	it('should pass raw value through when no coordinator is available', async () => {
-		const api = new UmbValueSummaryApiBase(host);
+		const api = new UmbValueSummaryDefaultApi(host);
 		api.valueType = 'Umb.Test.NoCoordinator';
 		api.rawValue = 'hello';
 
@@ -52,7 +52,7 @@ describe('UmbValueSummaryApiBase', () => {
 	});
 
 	it('should not connect until valueType is set', async () => {
-		const api = new UmbValueSummaryApiBase(host);
+		const api = new UmbValueSummaryDefaultApi(host);
 		api.rawValue = 'test';
 
 		// Wait for microtask
@@ -76,7 +76,7 @@ describe('UmbValueSummaryApiBase', () => {
 			alias: `Umb.Test.ValueSummary.${valueType}`,
 			name: `Test Value Summary ${valueType}`,
 			forValueType: valueType,
-			element: () => import('../boolean/boolean-value-summary.element.js'),
+			element: () => import('../value-types/boolean/boolean-value-summary.element.js'),
 			meta: {},
 		} as unknown as ManifestValueSummary;
 
@@ -96,7 +96,7 @@ describe('UmbValueSummaryApiBase', () => {
 		const child = document.createElement('test-api-base-host') as TestHostElement;
 		host.appendChild(child);
 
-		const api = new UmbValueSummaryApiBase(child);
+		const api = new UmbValueSummaryDefaultApi(child);
 		api.valueType = valueType;
 		api.rawValue = 'test';
 
@@ -120,7 +120,7 @@ describe('UmbValueSummaryApiBase', () => {
 			alias: `Umb.Test.ValueSummary.${valueType}`,
 			name: `Test Value Summary ${valueType}`,
 			forValueType: valueType,
-			element: () => import('../boolean/boolean-value-summary.element.js'),
+			element: () => import('../value-types/boolean/boolean-value-summary.element.js'),
 			meta: {},
 		} as unknown as ManifestValueSummary;
 
@@ -141,7 +141,7 @@ describe('UmbValueSummaryApiBase', () => {
 		const child = document.createElement('test-api-base-host') as TestHostElement;
 		host.appendChild(child);
 
-		const api = new UmbValueSummaryApiBase(child);
+		const api = new UmbValueSummaryDefaultApi(child);
 
 		// Set both properties in same tick
 		api.valueType = valueType;
