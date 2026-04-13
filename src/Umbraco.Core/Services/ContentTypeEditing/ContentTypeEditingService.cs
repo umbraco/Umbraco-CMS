@@ -164,12 +164,21 @@ internal sealed class ContentTypeEditingService : ContentTypeEditingServiceBase<
 
         // this method should only contain blocking validation, warnings are handled by WarnDocumentTypeElementSwitchNotificationHandler
 
-        // => check whether the element was used in a block structure prior to updating
+        // => switching off the element flag: ensure the element type isn't referenced in block structures
+        //    and that no element instances exist in the library
         if (model.IsElement is false)
         {
-            return await _elementSwitchValidator.ElementToDocumentNotUsedInBlockStructuresAsync(contentType)
-                ? ContentTypeOperationStatus.Success
-                : ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration;
+            if (await _elementSwitchValidator.ElementToDocumentNotUsedInBlockStructuresAsync(contentType) is false)
+            {
+                return ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration;
+            }
+
+            if (await _elementSwitchValidator.ElementToDocumentHasNoContentAsync(contentType) is false)
+            {
+                return ContentTypeOperationStatus.InvalidElementFlagElementHasContent;
+            }
+
+            return ContentTypeOperationStatus.Success;
         }
 
         return await _elementSwitchValidator.DocumentToElementHasNoContentAsync(contentType)
