@@ -47,7 +47,7 @@ public interface IElementPresentationFactory
     /// Creates a list of <see cref="CulturePublishScheduleModel"/> instances based on the provided <paramref name="requestModel"/>,
     /// validating each culture's publish and unpublish schedule for correctness (e.g., ensuring times are in the future and unpublish is after publish).
     /// </summary>
-    /// <param name="requestModel">The request model containing culture-specific scheduling information for publishing documents.</param>
+    /// <param name="requestModel">The request model containing culture-specific scheduling information for publishing elements.</param>
     /// <returns>An <see cref="Attempt{List{CulturePublishScheduleModel}, ContentPublishingOperationStatus}"/> containing the resulting list of culture publish schedules if validation succeeds, or a failure status with partial results if validation fails.</returns>
     Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> CreateCulturePublishScheduleModels(PublishElementRequestModel requestModel);
 }
