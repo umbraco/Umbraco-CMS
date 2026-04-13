@@ -619,6 +619,31 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         Assert.IsNull(trashedPage, "Trashed content should not be in cache");
     }
 
+    [Test]
+    public async Task Restored_Content_Is_Available_In_Draft_Cache()
+    {
+        // Arrange - Verify published content is in cache, then trash it
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
+        Assert.IsNotNull(textPage, "Content should be in cache before trashing");
+
+        var trashResult = await ContentEditingService.MoveToRecycleBinAsync(PublishedTextPage.Key.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+
+        var trashedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
+        Assert.IsNull(trashedPage, "Trashed content should not be in cache");
+
+        // Act - Restore to root (original location)
+        var restoreResult = await ContentEditingService.RestoreAsync(PublishedTextPage.Key.Value, null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(restoreResult.Success);
+
+        // Assert - Restored content should be back in the draft cache, but not republished automatically
+        var restoredDraft = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, true);
+        Assert.IsNotNull(restoredDraft, "Restored content should be in the draft cache");
+
+        var restoredPublished = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, false);
+        Assert.IsNull(restoredPublished, "Restored content should not be in the published cache until it is republished");
+    }
+
     private void AssertTextPage(IPublishedContent textPage)
     {
         Assert.Multiple(() =>
