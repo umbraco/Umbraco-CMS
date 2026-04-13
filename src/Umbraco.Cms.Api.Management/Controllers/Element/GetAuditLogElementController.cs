@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// API controller responsible for retrieving audit log entries for elements in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetAuditLogElementController : ElementControllerBase
 {
@@ -22,6 +25,12 @@ public class GetAuditLogElementController : ElementControllerBase
     private readonly IAuditService _auditService;
     private readonly IAuditLogPresentationFactory _auditLogPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetAuditLogElementController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize access to audit log data.</param>
+    /// <param name="auditService">Service for retrieving audit log entries.</param>
+    /// <param name="auditLogPresentationFactory">Factory for creating audit log presentation models.</param>
     public GetAuditLogElementController(
         IAuthorizationService authorizationService,
         IAuditService auditService,
@@ -32,6 +41,16 @@ public class GetAuditLogElementController : ElementControllerBase
         _auditLogPresentationFactory = auditLogPresentationFactory;
     }
 
+    /// <summary>
+    /// Retrieves a paginated collection of audit log entries for the specified element.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element to retrieve audit logs for.</param>
+    /// <param name="orderDirection">The sort order direction for the results.</param>
+    /// <param name="sinceDate">Optional date filter to retrieve entries since a specific date.</param>
+    /// <param name="skip">The number of entries to skip for pagination.</param>
+    /// <param name="take">The number of entries to return for pagination.</param>
+    /// <returns>An <see cref="IActionResult"/> containing a paginated collection of audit log entries.</returns>
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}/audit-log")]
     [ProducesResponseType(typeof(PagedViewModel<AuditLogResponseModel>), StatusCodes.Status200OK)]

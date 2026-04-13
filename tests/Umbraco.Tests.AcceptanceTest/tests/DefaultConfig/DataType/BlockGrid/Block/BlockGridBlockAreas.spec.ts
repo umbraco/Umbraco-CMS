@@ -3,6 +3,7 @@ import {expect} from "@playwright/test";
 
 const blockGridEditorName = 'TestBlockGridEditor';
 const elementTypeName = 'BlockGridElement';
+const secondElementTypeName = 'SecondBlockElement';
 const dataTypeName = 'Textstring';
 const groupName = 'testGroup';
 let contentElementTypeId = '';
@@ -17,6 +18,7 @@ test.beforeEach(async ({umbracoUi, umbracoApi}) => {
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.dataType.ensureNameNotExists(blockGridEditorName);
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
+  await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
 });
 
 test('can update grid columns for areas for a block', async ({umbracoApi, umbracoUi}) => {
@@ -291,22 +293,119 @@ test('can add specified allowance for an area in a block', async ({umbracoApi, u
   expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithSpecifiedAllowance(blockGridEditorName, contentElementTypeId, areaAlias)).toBeTruthy();
 });
 
-test.fixme('can update specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
-  // TODO: Implement it later
+test('can update specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const areaAlias = 'TestArea';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const secondContentElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockGridWithAnAreaWithSpecifiedAllowanceInABlock(blockGridEditorName, contentElementTypeId, secondContentElementTypeId, areaAlias);
+  expect(await umbracoApi.dataType.doesBlockGridBlockContainAreaWithSpecifiedAllowanceForElementType(blockGridEditorName, contentElementTypeId, secondContentElementTypeId, areaAlias)).toBeTruthy();
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.goToBlockAreasTab();
+  await umbracoUi.dataType.goToAreaByAlias(areaAlias);
+  await umbracoUi.dataType.clickSpecifiedAllowanceComboboxByIndex(0);
+  await umbracoUi.dataType.selectSpecifiedAllowanceOptionByName(elementTypeName);
+  await umbracoUi.dataType.clickAreaSubmitButton();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesBlockGridBlockContainAreaWithSpecifiedAllowanceForElementType(blockGridEditorName, contentElementTypeId, contentElementTypeId, areaAlias)).toBeTruthy();
+  expect(await umbracoApi.dataType.doesBlockGridBlockContainAreaWithSpecifiedAllowanceForElementType(blockGridEditorName, contentElementTypeId, secondContentElementTypeId, areaAlias)).toBeFalsy();
 });
 
-test.fixme('can remove specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
-  // TODO: Implement it later
+test('can remove specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const areaAlias = 'TestArea';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const secondContentElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockGridWithAnAreaWithSpecifiedAllowanceInABlock(blockGridEditorName, contentElementTypeId, secondContentElementTypeId, areaAlias);
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithSpecifiedAllowance(blockGridEditorName, contentElementTypeId, areaAlias)).toBeTruthy();
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.goToBlockAreasTab();
+  await umbracoUi.dataType.goToAreaByAlias(areaAlias);
+  await umbracoUi.dataType.clickRemoveSpecifiedAllowanceByIndex(0);
+  await umbracoUi.dataType.clickAreaSubmitButton();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesBlockEditorBlockContainAreaWithSpecifiedAllowance(blockGridEditorName, contentElementTypeId, areaAlias)).toBeFalsy();
 });
 
-test.fixme('can add multiple specified allowances for an area in a block', async ({umbracoApi, umbracoUi}) => {
-  // TODO: Implement it later
+test('can add multiple specified allowances for an area in a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const areaAlias = 'TestArea';
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const secondContentElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockGridWithAnAreaWithSpecifiedAllowanceInABlock(blockGridEditorName, contentElementTypeId, secondContentElementTypeId, areaAlias);
+  expect(await umbracoApi.dataType.doesBlockGridBlockContainAreaWithSpecifiedAllowanceCount(blockGridEditorName, contentElementTypeId, 1, areaAlias)).toBeTruthy();
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.goToBlockAreasTab();
+  await umbracoUi.dataType.goToAreaByAlias(areaAlias);
+  await umbracoUi.dataType.clickAddSpecifiedAllowanceButton();
+  await umbracoUi.dataType.clickAreaSubmitButton();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesBlockGridBlockContainAreaWithSpecifiedAllowanceCount(blockGridEditorName, contentElementTypeId, 2, areaAlias)).toBeTruthy();
 });
 
-test.fixme('can add specified allowance with min and max for an area in a block', async ({umbracoApi, umbracoUi}) => {
-  // TODO: Implement it later
+test('can add specified allowance with min and max for an area in a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const areaAlias = 'TestArea';
+  const minAllowed = 2;
+  const maxAllowed = 5;
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const secondContentElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockGridWithAnAreaWithSpecifiedAllowanceInABlock(blockGridEditorName, contentElementTypeId, secondContentElementTypeId, areaAlias);
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.goToBlockAreasTab();
+  await umbracoUi.dataType.goToAreaByAlias(areaAlias);
+  await umbracoUi.dataType.enterSpecifiedAllowanceMinByIndex(minAllowed, 0);
+  await umbracoUi.dataType.enterSpecifiedAllowanceMaxByIndex(maxAllowed, 0);
+  await umbracoUi.dataType.clickAreaSubmitButton();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesBlockGridBlockContainAreaWithSpecifiedAllowanceMinMax(blockGridEditorName, contentElementTypeId, secondContentElementTypeId, minAllowed, maxAllowed, areaAlias)).toBeTruthy();
 });
 
-test.fixme('can remove min and max from specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
-  // TODO: Implement it later
+test('can remove min and max from specified allowance for an area in a block', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const areaAlias = 'TestArea';
+  const minAllowed = 3;
+  const maxAllowed = 8;
+  const textStringData = await umbracoApi.dataType.getByName(dataTypeName);
+  const secondContentElementTypeId = await umbracoApi.documentType.createDefaultElementType(secondElementTypeName, groupName, dataTypeName, textStringData.id);
+  await umbracoApi.dataType.createBlockGridWithAnAreaWithSpecifiedAllowanceWithMinMaxInABlock(blockGridEditorName, contentElementTypeId, secondContentElementTypeId, minAllowed, maxAllowed, areaAlias);
+  expect(await umbracoApi.dataType.doesBlockGridBlockContainAreaWithSpecifiedAllowanceMinMax(blockGridEditorName, contentElementTypeId, secondContentElementTypeId, minAllowed, maxAllowed, areaAlias)).toBeTruthy();
+
+  // Act
+  await umbracoUi.dataType.goToDataType(blockGridEditorName);
+  await umbracoUi.dataType.goToBlockWithName(elementTypeName);
+  await umbracoUi.dataType.goToBlockAreasTab();
+  await umbracoUi.dataType.goToAreaByAlias(areaAlias);
+  await umbracoUi.dataType.enterSpecifiedAllowanceMinByIndex(undefined, 0);
+  await umbracoUi.dataType.enterSpecifiedAllowanceMaxByIndex(undefined, 0);
+  await umbracoUi.dataType.clickAreaSubmitButton();
+  await umbracoUi.dataType.clickSubmitButton();
+  await umbracoUi.dataType.clickSaveButtonAndWaitForDataTypeToBeUpdated();
+
+  // Assert
+  expect(await umbracoApi.dataType.doesBlockGridBlockContainAreaWithSpecifiedAllowanceMinMax(blockGridEditorName, contentElementTypeId, secondContentElementTypeId, minAllowed, maxAllowed, areaAlias)).toBeFalsy();
 });

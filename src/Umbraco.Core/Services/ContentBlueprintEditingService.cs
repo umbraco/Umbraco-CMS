@@ -55,7 +55,7 @@ internal sealed class ContentBlueprintEditingService
         => _containerService = containerService;
 
     /// <inheritdoc />
-    public Task<IContent?> GetAsync(Guid key)
+    public override Task<IContent?> GetAsync(Guid key)
     {
         IContent? blueprint = ContentService.GetBlueprintById(key);
         return Task.FromResult(blueprint);
@@ -235,8 +235,8 @@ internal sealed class ContentBlueprintEditingService
         //       structural node data like path, level, sort orders etc.
         toMove.ParentId = parentId;
 
-        // Save blueprint
-        await SaveAsync(toMove, userKey);
+        var userId = await GetUserIdAsync(userKey);
+        ContentService.MoveBlueprint(toMove, userId);
 
         scope.Complete();
 

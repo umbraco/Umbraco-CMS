@@ -193,6 +193,28 @@ public class SecuritySettings
     public bool AllowConcurrentLogins { get; set; } = StaticAllowConcurrentLogins;
 
     /// <summary>
+    ///     Gets or sets a value indicating whether to allow concurrent logins for backoffice users.
+    ///     When <c>null</c> (default), the value of <see cref="AllowConcurrentLogins"/> is used.
+    /// </summary>
+    public bool? UserAllowConcurrentLogins { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether to allow concurrent logins for members.
+    ///     When <c>null</c> (default), the value of <see cref="AllowConcurrentLogins"/> is used.
+    /// </summary>
+    public bool? MemberAllowConcurrentLogins { get; set; }
+
+    /// <summary>
+    ///     Gets the effective concurrent login setting for backoffice users.
+    /// </summary>
+    public bool GetUserAllowConcurrentLogins() => UserAllowConcurrentLogins ?? AllowConcurrentLogins;
+
+    /// <summary>
+    ///     Gets the effective concurrent login setting for members.
+    /// </summary>
+    public bool GetMemberAllowConcurrentLogins() => MemberAllowConcurrentLogins ?? AllowConcurrentLogins;
+
+    /// <summary>
     /// Gets or sets the default duration (in milliseconds) of failed login attempts.
     /// </summary>
     /// <value>
@@ -257,15 +279,6 @@ public class SecuritySettings
     /// <remarks>
     ///     This property exists to enable IntelliSense/autocomplete in appsettings.json
     ///     for the <c>Umbraco:CMS:Security:UserPassword</c> configuration section.
-    ///     <para>
-    ///         Do not use this property to read password configuration at runtime.
-    ///         Inject <see cref="IOptions{UserPasswordConfigurationSettings}"/> directly instead,
-    ///         as that is the canonical registration used by all consumers.
-    ///     </para>
-    ///     <para>
-    ///         TODO (V18): Remove the standalone <see cref="UserPasswordConfigurationSettings"/>
-    ///         registration and consolidate all consumers to use this property.
-    ///     </para>
     /// </remarks>
     public UserPasswordConfigurationSettings UserPassword { get; set; } = new();
 
@@ -275,14 +288,6 @@ public class SecuritySettings
     /// <remarks>
     ///     This property exists to enable IntelliSense/autocomplete in appsettings.json
     ///     for the <c>Umbraco:CMS:Security:MemberPassword</c> configuration section.
-    ///     <para>
-    ///         Do not use this property to read password configuration at runtime.
-    ///         Inject <see cref="IOptions{MemberPasswordConfigurationSettings}"/> directly instead,
-    ///         as that is the canonical registration used by all consumers.
-    ///     </para>
-    ///     <para>
-    ///         TODO (V18): Remove the standalone <see cref="MemberPasswordConfigurationSettings"/>
-    ///         registration and consolidate all consumers to use this property.
-    ///     </para>
+    /// </remarks>
     public MemberPasswordConfigurationSettings MemberPassword { get; set; } = new();
 }

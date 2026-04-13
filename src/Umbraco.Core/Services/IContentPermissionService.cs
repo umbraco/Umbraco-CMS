@@ -96,7 +96,5 @@ public interface IContentPermissionService
     /// <param name="contentKeys">The identifiers of the content items to filter.</param>
     /// <param name="permissionsToCheck">The collection of permissions to authorize.</param>
     /// <returns>A task resolving into the set of authorized content keys.</returns>
-    // TODO (V18): Remove default implementation.
-    Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck)
-        => Task.FromResult<ISet<Guid>>(new HashSet<Guid>());
+    Task<ISet<Guid>> FilterAuthorizedAccessAsync(IUser user, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck);
 }

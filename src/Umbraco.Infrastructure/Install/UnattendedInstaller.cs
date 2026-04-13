@@ -11,6 +11,9 @@ using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Infrastructure.Install;
 
+/// <summary>
+/// Handles the unattended (automated) installation process for Umbraco CMS.
+/// </summary>
 public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedInstallNotification>
 {
     private readonly IUmbracoDatabaseFactory _databaseFactory;
@@ -22,6 +25,16 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
     private readonly IRuntimeState _runtimeState;
     private readonly IOptions<UnattendedSettings> _unattendedSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Install.UnattendedInstaller"/> class.
+    /// </summary>
+    /// <param name="databaseSchemaCreatorFactory">Factory for creating database schema creators.</param>
+    /// <param name="eventAggregator">Aggregates and dispatches events during installation.</param>
+    /// <param name="unattendedSettings">Configuration options for unattended installation.</param>
+    /// <param name="databaseFactory">Factory for creating Umbraco database instances.</param>
+    /// <param name="dbProviderFactoryCreator">Creates database provider factories.</param>
+    /// <param name="logger">Logger for logging installation events and errors.</param>
+    /// <param name="runtimeState">Provides information about the application's runtime state.</param>
     public UnattendedInstaller(
         DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
         IEventAggregator eventAggregator,
@@ -41,6 +54,16 @@ public class UnattendedInstaller : INotificationAsyncHandler<RuntimeUnattendedIn
         _runtimeState = runtimeState;
     }
 
+    /// <summary>
+    /// Handles the unattended installation process for Umbraco asynchronously.
+    /// This method checks if unattended installation is enabled and the database is configured,
+    /// attempts to create and connect to the database if necessary, and performs the installation
+    /// if Umbraco is not already installed. Upon completion, it publishes an <see cref="UnattendedInstallNotification"/>
+    /// event to signal that the unattended install has finished.
+    /// </summary>
+    /// <param name="notification">The notification instance for the unattended install event.</param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public Task HandleAsync(RuntimeUnattendedInstallNotification notification, CancellationToken cancellationToken)
     {
         // unattended install is not enabled

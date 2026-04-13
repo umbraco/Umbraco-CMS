@@ -11,12 +11,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.References;
 
+/// <summary>
+/// API controller responsible for retrieving referenced descendants of an element folder.
+/// </summary>
 [ApiVersion("1.0")]
 public class ReferencedDescendantsElementFolderController : ElementControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ReferencedDescendantsElementFolderController"/> class.
+    /// </summary>
+    /// <param name="trackedReferencesService">Service for tracking content references.</param>
+    /// <param name="umbracoMapper">Mapper for converting domain models to view models.</param>
     public ReferencedDescendantsElementFolderController(
         ITrackedReferencesService trackedReferencesService,
         IUmbracoMapper umbracoMapper)

@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ElementVersion;
 
+/// <summary>
+/// API controller responsible for rolling back an element to a specific version.
+/// </summary>
 [ApiVersion("1.0")]
 public class RollbackElementVersionController : ElementVersionControllerBase
 {
@@ -21,6 +24,12 @@ public class RollbackElementVersionController : ElementVersionControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IAuthorizationService _authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RollbackElementVersionController"/> class.
+    /// </summary>
+    /// <param name="elementVersionService">Service for managing element versions.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="authorizationService">Service used to authorize rollback operations.</param>
     public RollbackElementVersionController(
         IElementVersionService elementVersionService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -31,6 +40,13 @@ public class RollbackElementVersionController : ElementVersionControllerBase
         _authorizationService = authorizationService;
     }
 
+    /// <summary>
+    /// Rolls back an element to the version identified by the specified unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element version to roll back to.</param>
+    /// <param name="culture">Optional culture to target for variant elements.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the outcome of the rollback operation.</returns>
     [MapToApiVersion("1.0")]
     [HttpPost("{id:guid}/rollback")]
     [ProducesResponseType(StatusCodes.Status200OK)]

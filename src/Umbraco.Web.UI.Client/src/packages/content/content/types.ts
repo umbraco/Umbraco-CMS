@@ -3,6 +3,7 @@ import type { UmbPropertyValueData } from '@umbraco-cms/backoffice/property';
 import type { UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 
 export type * from './collection/types.js';
+export type * from './rollback/types.js';
 export type * from './tree/types.js';
 
 export interface UmbElementDetailModel {
@@ -12,11 +13,6 @@ export interface UmbElementDetailModel {
 export interface UmbElementValueModel<ValueType = unknown> extends UmbPropertyValueData<ValueType> {
 	culture: string | null;
 	editorAlias: string;
-	/**
-	 * @deprecated, we do not use entityType on values anymore. To be removed in Umbraco v.18.
-	 * Just remove the property.
-	 */
-	entityType?: string;
 	segment: string | null;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

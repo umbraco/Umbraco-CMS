@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
+/// <summary>
+/// Controller responsible for handling operations related to updating media items via the API.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateMediaController : UpdateMediaControllerBase
 {
@@ -19,6 +22,13 @@ public class UpdateMediaController : UpdateMediaControllerBase
     private readonly IMediaEditingPresentationFactory _mediaEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Media.UpdateMediaController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize access to media update operations.</param>
+    /// <param name="mediaEditingService">Service responsible for handling media editing logic.</param>
+    /// <param name="mediaEditingPresentationFactory">Factory for creating presentation models for media editing.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and user information.</param>
     public UpdateMediaController(
         IAuthorizationService authorizationService,
         IMediaEditingService mediaEditingService,

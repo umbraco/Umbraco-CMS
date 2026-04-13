@@ -8,6 +8,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentVersion;
 
+/// <summary>
+/// Serves as the base controller for handling operations related to document versions within the Umbraco CMS Management API.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.Document}-version")]
 [ApiExplorerSettings(GroupName = $"{nameof(Constants.UdiEntityType.Document)} Version")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]

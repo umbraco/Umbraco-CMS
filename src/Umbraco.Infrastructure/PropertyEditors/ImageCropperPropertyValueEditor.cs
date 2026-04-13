@@ -40,6 +40,20 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
     private ContentSettings _contentSettings;
     private readonly IDisposable? _contentSettingsChangeSubscription;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImageCropperPropertyValueEditor"/> class.
+    /// </summary>
+    /// <param name="attribute">The attribute that defines metadata for the data editor.</param>
+    /// <param name="logger">The logger used for logging events and errors related to the image cropper property editor.</param>
+    /// <param name="mediaFileSystem">The media file manager used to access and manage media files.</param>
+    /// <param name="shortStringHelper">The helper used for generating and manipulating short strings.</param>
+    /// <param name="contentSettings">The monitor providing access to content settings options.</param>
+    /// <param name="jsonSerializer">The serializer used for serializing and deserializing JSON data.</param>
+    /// <param name="ioHelper">The helper for IO operations, such as file and path handling.</param>
+    /// <param name="temporaryFileService">The service for managing temporary files.</param>
+    /// <param name="scopeProvider">The provider for managing database transaction scopes.</param>
+    /// <param name="fileStreamSecurityValidator">The validator for ensuring file stream security.</param>
+    /// <param name="dataTypeConfigurationCache">The cache for storing and retrieving data type configuration values.</param>
     public ImageCropperPropertyValueEditor(
         DataEditorAttribute attribute,
         ILogger<ImageCropperPropertyValueEditor> logger,
@@ -206,6 +220,14 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
         return _jsonSerializer.Serialize(editorImageCropperValue);
     }
 
+    /// <summary>
+    /// Converts the database value of an image cropper property to its string representation, handling both JSON and non-JSON formats.
+    /// </summary>
+    /// <param name="propertyType">The property type metadata, used to retrieve crop configuration if needed.</param>
+    /// <param name="value">The value to convert, which may be a JSON string or a simple source path.</param>
+    /// <returns>
+    /// A string representation of the database value. If the value is already a JSON structure, it is returned as-is; otherwise, it is serialized into a JSON object containing the source and crop information.
+    /// </returns>
     public override string ConvertDbToString(IPropertyType propertyType, object? value)
     {
         if (value == null || string.IsNullOrEmpty(value.ToString()))
@@ -276,5 +298,9 @@ internal sealed class ImageCropperPropertyValueEditor : DataValueEditor, IDispos
         return filepath;
     }
 
+    /// <summary>
+    /// Releases resources used by the <see cref="ImageCropperPropertyValueEditor"/>, including unsubscribing from content settings changes.
+    /// Call this method when the editor is no longer needed.
+    /// </summary>
     public void Dispose() => _contentSettingsChangeSubscription?.Dispose();
 }

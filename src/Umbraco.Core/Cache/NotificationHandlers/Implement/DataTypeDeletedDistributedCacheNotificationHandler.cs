@@ -18,11 +18,6 @@ public sealed class DataTypeDeletedDistributedCacheNotificationHandler : Deleted
         => _distributedCache = distributedCache;
 
     /// <inheritdoc />
-    [Obsolete("Scheduled for removal in Umbraco 18.")]
-    protected override void Handle(IEnumerable<IDataType> entities)
-        => Handle(entities, new Dictionary<string, object?>());
-
-    /// <inheritdoc />
     protected override void Handle(IEnumerable<IDataType> entities, IDictionary<string, object?> state)
     {
         _distributedCache.RemoveDataTypeCache(entities);

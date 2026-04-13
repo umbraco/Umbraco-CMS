@@ -63,7 +63,7 @@ public static partial class UmbracoBuilderExtensions
         services.AddScoped(x => (IMemberUserStore)x.GetRequiredService<IUserStore<MemberIdentityUser>>());
         services.AddScoped<IPasswordHasher<MemberIdentityUser>, MemberPasswordHasher>();
 
-        services.ConfigureOptions<ConfigureSecurityStampOptions>();
+        services.ConfigureOptions<ConfigureMemberSecurityStampValidatorOptions>();
         services.ConfigureOptions<ConfigureMemberCookieOptions>();
         services.AddScoped<MemberSecurityStampValidator>();
 

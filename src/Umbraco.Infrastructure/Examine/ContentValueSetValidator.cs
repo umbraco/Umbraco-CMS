@@ -23,6 +23,18 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentValueSetValidator"/> class.
+    /// </summary>
+    /// <param name="publishedValuesOnly">If <c>true</c>, only published values are validated.</param>
+    /// <param name="supportProtectedContent">If <c>true</c>, enables validation of protected content.</param>
+    /// <param name="publicAccessService">The service used to check public access permissions. May be <c>null</c>.</param>
+    /// <param name="scopeProvider">The provider for managing database scopes. May be <c>null</c>.</param>
+    /// <param name="parentId">Optional parent content ID to filter by. Defaults to <c>null</c>.</param>
+    /// <param name="includeItemTypes">Optional collection of item types to include in validation. Defaults to <c>null</c> (all types included).</param>
+    /// <param name="excludeItemTypes">Optional collection of item types to exclude from validation. Defaults to <c>null</c>.</param>
+    /// <param name="includeFields">Optional collection of field names to include in validation. Defaults to <c>null</c> (all fields included).</param>
+    /// <param name="excludeFields">Optional collection of field names to exclude from validation. Defaults to <c>null</c>.</param>
     public ContentValueSetValidator(
         bool publishedValuesOnly,
         bool supportProtectedContent,
@@ -44,10 +56,29 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
 
     protected override IEnumerable<string> ValidIndexCategories => ValidCategories;
 
+    /// <summary>
+    /// Gets a value indicating whether the validator includes only published content values.
+    /// </summary>
     public bool PublishedValuesOnly { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether this validator supports protected content.
+    /// </summary>
     public bool SupportProtectedContent { get; }
+
+    /// <summary>
+    /// Gets the identifier of the parent content item, if available.
+    /// </summary>
     public int? ParentId { get; }
 
+    /// <summary>
+    /// Determines whether the specified <paramref name="path"/> represents a descendant of the configured parent, based on the provided <paramref name="category"/>.
+    /// </summary>
+    /// <param name="path">The comma-delimited string representing the content path to validate.</param>
+    /// <param name="category">The category of the content, used for validation context.</param>
+    /// <returns>
+    /// <c>true</c> if the <paramref name="path"/> contains the parent ID and is considered valid; otherwise, <c>false</c>.
+    /// </returns>
     public bool ValidatePath(string path, string category)
     {
         //check if this document is a descendent of the parent
@@ -64,6 +95,14 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         return true;
     }
 
+    /// <summary>
+    /// Determines whether the specified path is outside of the recycle bin for the given category.
+    /// </summary>
+    /// <param name="path">The comma-delimited path string to validate.</param>
+    /// <param name="category">The category (e.g., content or media) used to determine the appropriate recycle bin.</param>
+    /// <returns>
+    /// <c>true</c> if <paramref name="path"/> does not include the recycle bin for the specified <paramref name="category"/> (when <c>PublishedValuesOnly</c> is <c>true</c>); otherwise, <c>false</c>.
+    /// </returns>
     public bool ValidateRecycleBin(string path, string category)
     {
         var recycleBinId = category == IndexTypes.Content
@@ -82,6 +121,14 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         return true;
     }
 
+    /// <summary>
+    /// Determines whether the content at the specified path is allowed to be indexed based on its protection status and the given category.
+    /// </summary>
+    /// <param name="path">The content path to check for protection.</param>
+    /// <param name="category">The category of the content, typically the index type (e.g., <c>IndexTypes.Content</c>).</param>
+    /// <returns>
+    /// <c>true</c> if the content is not protected, protection is not supported, or the category does not require protection checks; otherwise, <c>false</c>.
+    /// </returns>
     public bool ValidateProtectedContent(string path, string category)
     {
         if (category == IndexTypes.Content && !SupportProtectedContent)
@@ -105,6 +152,29 @@ public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValid
         return true;
     }
 
+    /// <summary>
+    /// Validates the specified <see cref="Umbraco.Cms.Core.Models.ValueSet"/> to determine if it meets the requirements for indexing in Examine.
+    /// <para>
+    /// Validation includes checks for published status (including culture variants), the presence and validity of the content path, and whether the content is in the recycle bin or protected.
+    /// If the value set fails any of these checks, it is either marked as failed (not indexable) or filtered (excluded from the index), depending on the nature of the issue.
+    /// </para>
+    /// </summary>
+    /// <param name="valueSet">The <see cref="Umbraco.Cms.Core.Models.ValueSet"/> to validate.</param>
+    /// <returns>
+    /// A <see cref="Umbraco.Cms.Infrastructure.Examine.ValueSetValidationResult"/> indicating the outcome of the validation:
+    /// <list type="bullet">
+    ///   <item>
+    ///     <description><c>Valid</c>: The value set passed all checks and is suitable for indexing.</description>
+    ///   </item>
+    ///   <item>
+    ///     <description><c>Filtered</c>: The value set should be excluded from the index due to path, recycle bin, or protected content rules.</description>
+    ///   </item>
+    ///   <item>
+    ///     <description><c>Failed</c>: The value set is invalid (for example, missing required fields) and cannot be indexed.</description>
+    ///   </item>
+    /// </list>
+    /// The result may also contain a filtered version of the original value set with unpublished culture variants removed.
+    /// </returns>
     public override ValueSetValidationResult Validate(ValueSet valueSet)
     {
         // Notes on status on the result:

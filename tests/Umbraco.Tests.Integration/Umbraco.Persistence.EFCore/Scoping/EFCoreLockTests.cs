@@ -13,7 +13,7 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.Scoping;
 
 [TestFixture]
-[Timeout(60000)]
+[CancelAfter(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 {
@@ -49,7 +49,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void SingleEagerReadLockTest()
+    public void SingleEagerReadLockTest(CancellationToken _ = default)
     {
         using var scope = EFScopeProvider.CreateScope();
         scope.Locks.EagerReadLock(scope.InstanceId, Constants.Locks.Servers);
@@ -57,7 +57,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void SingleReadLockTest()
+    public void SingleReadLockTest(CancellationToken _ = default)
     {
         using var scope = EFScopeProvider.CreateScope();
         scope.Locks.ReadLock(scope.InstanceId, Constants.Locks.Servers);
@@ -65,7 +65,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void SingleWriteLockTest()
+    public void SingleWriteLockTest(CancellationToken _ = default)
     {
         using var scope = EFScopeProvider.CreateScope();
         scope.Locks.WriteLock(scope.InstanceId, Constants.Locks.Servers);
@@ -73,7 +73,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void SingleEagerWriteLockTest()
+    public void SingleEagerWriteLockTest(CancellationToken _ = default)
     {
         using var scope = EFScopeProvider.CreateScope();
         scope.Locks.EagerWriteLock(scope.InstanceId, Constants.Locks.Servers);
@@ -81,7 +81,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Reacquire_Read_Lock()
+    public void Can_Reacquire_Read_Lock(CancellationToken _ = default)
     {
         using (var scope = EFScopeProvider.CreateScope())
         {
@@ -97,7 +97,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Reacquire_Write_Lock()
+    public void Can_Reacquire_Write_Lock(CancellationToken _ = default)
     {
         using (var scope = EFScopeProvider.CreateScope())
         {
@@ -113,7 +113,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void ConcurrentReadersTest()
+    public void ConcurrentReadersTest(CancellationToken _ = default)
     {
         if (BaseTestDatabase.IsSqlite())
         {
@@ -194,7 +194,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void ConcurrentWritersTest()
+    public void ConcurrentWritersTest(CancellationToken _ = default)
     {
         if (BaseTestDatabase.IsSqlite())
         {
@@ -313,7 +313,7 @@ internal sealed class EFCoreLockTests : UmbracoIntegrationTest
 
     [Retry(10)] // TODO make this test non-flaky.
     [Test]
-    public void DeadLockTest()
+    public void DeadLockTest(CancellationToken _ = default)
     {
         if (BaseTestDatabase.IsSqlite())
         {

@@ -90,6 +90,8 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         _localizationService = localizationService;
     }
 
+    public abstract Task<TContent?> GetAsync(Guid key);
+
     /// <summary>
     /// Creates a new content entity.
     /// </summary>
@@ -309,7 +311,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 userKey,
                 ContentTrashStatusRequirement.MustNotBeTrashed,
                 MoveToRecycleBin,
-                ContentSettings.DisableUnpublishWhenReferenced,
+                ContentSettings.DisableDeleteWhenReferenced,
                 ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);
 
     /// <summary>
@@ -563,15 +565,25 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return null;
         }
 
-        // verify that all properties match their respective property type culture and segment variance - i.e. no culture invariant properties that should have been culture variant
+        // verify that all properties match their respective property type culture variance
         if (propertyValuesAndVariance.Any(pv =>
             {
                 IPropertyType propertyType = propertyTypesByAlias[pv.PropertyValue.Alias];
-                return (propertyType.VariesByCulture() != pv.VariesByCulture)
-                       || (propertyType.VariesBySegment() is false && pv.VariesBySegment);
+                return propertyType.VariesByCulture() != pv.VariesByCulture;
             }))
         {
-            operationStatus = ContentEditingOperationStatus.PropertyTypeNotFound;
+            operationStatus = ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch;
+            return null;
+        }
+
+        // verify that all properties match their respective property type segment variance
+        if (propertyValuesAndVariance.Any(pv =>
+            {
+                IPropertyType propertyType = propertyTypesByAlias[pv.PropertyValue.Alias];
+                return propertyType.VariesBySegment() is false && pv.VariesBySegment;
+            }))
+        {
+            operationStatus = ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch;
             return null;
         }
 
@@ -771,6 +783,94 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         var allowedLanguageIds = user.CalculateAllowedLanguageIds(_localizationService)!;
 
         return (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
+    }
+
+    /// <summary>
+    /// A temporary method that ensures the data is sent in is overridden by the original data, in cases where the user do not have permissions to change the data.
+    /// </summary>
+    protected async Task<TPublishableContent> EnsureOnlyAllowedFieldsAreUpdated<TPublishableContent>(TPublishableContent contentWithPotentialUnallowedChanges, Guid userKey)
+        where TPublishableContent : IPublishableContentBase, TContent
+    {
+        if (contentWithPotentialUnallowedChanges.ContentType.VariesByCulture() is false)
+        {
+            return contentWithPotentialUnallowedChanges;
+        }
+
+        TContent? existingContent = await GetAsync(contentWithPotentialUnallowedChanges.Key);
+
+        HashSet<string>? allowedCultures = await GetAllowedCulturesForEditingUser(userKey);
+
+        ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
+
+        var disallowedCultures = (contentWithPotentialUnallowedChanges.EditedCultures ??
+                               contentWithPotentialUnallowedChanges.PublishedCultures)
+            .Where(culture => allowedCultures.Contains(culture) is false).ToList();
+
+        var allowedToEditDefaultLanguage = allowedCultures.Contains(defaultLanguage?.IsoCode ?? string.Empty);
+
+        var variantProperties = new List<IProperty>();
+        var invariantWithVariantSupportProperties = new List<(IProperty Property, IDataEditor DataEditor)>();
+        var invariantProperties = new List<IProperty>();
+
+        // group properties in processing groups
+        foreach (IProperty property in contentWithPotentialUnallowedChanges.Properties)
+        {
+            if (property.PropertyType.VariesByCulture())
+            {
+                variantProperties.Add(property);
+            }
+            else if (_propertyEditorCollection.TryGet(property.PropertyType.PropertyEditorAlias, out IDataEditor? dataEditor) && dataEditor.CanMergePartialPropertyValues(property.PropertyType))
+            {
+                invariantWithVariantSupportProperties.Add((property, dataEditor));
+            }
+            else
+            {
+                invariantProperties.Add(property);
+            }
+        }
+
+        // if the property varies by culture, simply overwrite the edited property value with the current property value for every culture
+        foreach (IProperty property in variantProperties)
+        {
+            foreach (var culture in disallowedCultures)
+            {
+                    var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
+                        .GetValue(culture, null, false);
+                    property.SetValue(currentValue, culture, null);
+            }
+        }
+
+        // If property does not support merging, we still need to overwrite if we are not allowed to edit invariant properties.
+        if (ContentSettings.AllowEditInvariantFromNonDefault is false && allowedToEditDefaultLanguage is false)
+        {
+            foreach (IProperty property in invariantProperties)
+            {
+                var currentValue = existingContent?.Properties.First(x => x.Alias == property.Alias)
+                    .GetValue(null, null, false);
+                property.SetValue(currentValue, null, null);
+            }
+        }
+
+        // if the property does not vary by culture and the data editor supports variance within invariant property values,
+        // we need perform a merge between the edited property value and the current property value
+        foreach ((IProperty Property, IDataEditor DataEditor) propertyWithEditor in invariantWithVariantSupportProperties)
+        {
+            var currentValue = existingContent?.Properties.First(x => x.Alias == propertyWithEditor.Property.Alias)
+                .GetValue(null, null, false);
+            var editedValue = contentWithPotentialUnallowedChanges.Properties
+                .First(x => x.Alias == propertyWithEditor.Property.Alias).GetValue(null, null, false);
+
+            // update the editedValue with a merged value of invariant data and allowed culture data using the currentValue as a fallback.
+            var mergedValue = propertyWithEditor.DataEditor.MergeVariantInvariantPropertyValue(
+                currentValue,
+                editedValue,
+                ContentSettings.AllowEditInvariantFromNonDefault || (defaultLanguage is not null && allowedCultures.Contains(defaultLanguage.IsoCode)),
+                allowedCultures);
+
+            propertyWithEditor.Property.SetValue(mergedValue, null, null);
+        }
+
+        return contentWithPotentialUnallowedChanges;
     }
 
     /// <summary>

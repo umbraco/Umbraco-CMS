@@ -1,12 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Examine;
+using Examine.Search;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -317,12 +321,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         string[] roleNames1 = { "TR1", "TR2" };
         MemberService.AssignRoles(new[] { member.Id }, roleNames1);
         var memberRoles = MemberService.GetAllRoles(member.Id);
-        CollectionAssert.AreEquivalent(roleNames1, memberRoles);
+        Assert.That(memberRoles, Is.EquivalentTo(roleNames1));
 
         string[] roleNames2 = { "TR3", "TR4" };
         MemberService.ReplaceRoles(new[] { member.Id }, roleNames2);
         memberRoles = MemberService.GetAllRoles(member.Id);
-        CollectionAssert.AreEquivalent(roleNames2, memberRoles);
+        Assert.That(memberRoles, Is.EquivalentTo(roleNames2));
     }
 
     [Test]
@@ -809,6 +813,28 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(1, found.Count());
         Assert.AreEqual(1, totalRecs);
         Assert.AreEqual("test5", found.First().Username);
+    }
+
+    [Test]
+    public async Task Can_Get_All_Members_Paged_With_Non_Zero_Skip()
+    {
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+        MemberService.Save(members);
+
+        var found = MemberService.GetAll(
+            skip: 2,
+            take: 2,
+            out var totalRecs,
+            "username",
+            Direction.Ascending,
+            memberType.Alias);
+
+        Assert.AreEqual(2, found.Count());
+        Assert.AreEqual(10, totalRecs);
+        Assert.AreEqual("test2", found.First().Username);
+        Assert.AreEqual("test3", found.Last().Username);
     }
 
     [Test]
@@ -1518,7 +1544,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(3, members.Length);
-            CollectionAssert.AreEquivalent(new [] { memberA.Key, memberB.Key, memberC.Key }, members.Select(m => m.Key).ToArray());
+            Assert.That(members.Select(m => m.Key).ToArray(), Is.EquivalentTo(new[] { memberA.Key, memberB.Key, memberC.Key }));
         });
     }
 

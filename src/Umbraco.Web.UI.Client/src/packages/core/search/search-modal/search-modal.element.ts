@@ -1,24 +1,25 @@
-import type { UmbSearchProvider, UmbSearchResultItemModel } from '../types.js';
+import { UMB_BACKOFFICE_CONTEXT } from '../../../../apps/backoffice/backoffice.context.js';
 import type { ManifestSearchResultItem } from '../extensions/types.js';
 import type { UmbGlobalSearchApi } from '../global-search/types.js';
+import type { UmbSearchProvider, UmbSearchResultItemModel } from '../types.js';
 import {
 	css,
+	customElement,
 	html,
 	nothing,
-	repeat,
-	customElement,
-	query,
-	state,
 	property,
+	query,
+	repeat,
+	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
-import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+
 import '../search-result/search-result-item.element.js';
-import { UMB_BACKOFFICE_CONTEXT } from '../../../../apps/backoffice/backoffice.context.js';
 
 type GlobalSearchers = {
 	name: string;
@@ -31,6 +32,7 @@ type GlobalSearchers = {
 export class UmbSearchModalElement extends UmbLitElement {
 	@query('#input-wrapper-fake-cursor')
 	private _inputFakeCursor!: HTMLElement;
+
 	@query('input')
 	private _input!: HTMLInputElement;
 
@@ -55,7 +57,9 @@ export class UmbSearchModalElement extends UmbLitElement {
 	#searchItemNavIndex = 0;
 
 	#searchRequestNumber = 0;
+
 	#inputTimer?: NodeJS.Timeout;
+
 	#inputTimerAmount = 300;
 
 	#currentSectionAlias?: string;
@@ -331,6 +335,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	override render() {
+		const inputLabel = this.localize.term('placeholders_search');
 		return html`
 			<div id="top">
 				<div id="search-icon">
@@ -343,9 +348,11 @@ export class UmbSearchModalElement extends UmbLitElement {
 				<div id="input-wrapper">
 					<div id="input-wrapper-fake-cursor" aria-hidden="true"></div>
 					<input
+						name="search-input"
 						type="text"
 						autocomplete="off"
-						placeholder=${this.localize.term('placeholders_search')}
+						placeholder=${inputLabel}
+						aria-label=${inputLabel}
 						value=${this._search}
 						@input=${this.#onSearchChange}
 						@blur=${() => this.#setShowFakeCursor(true)}
@@ -404,7 +411,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 			<a
 				class="search-item"
 				data-item-index=${index}
-				href=${item.href}
+				href=${item.href ?? '#'}
 				@click=${this.#closeModal}
 				@keydown=${this.#closeModal}>
 				<umb-extension-slot
@@ -422,17 +429,19 @@ export class UmbSearchModalElement extends UmbLitElement {
 	}
 
 	#renderNavigationTips() {
-		return html`<div id="navigation-tips">
-			<div class="navigation-tips-key" style="grid-column: span 2;">Tab</div>
-			<span>${this.localize.term('globalSearch_navigateSearchProviders')}</span>
-			<div class="navigation-tips-key">
-				<uui-icon name="icon-arrow-up"></uui-icon>
+		return html`
+			<div id="navigation-tips">
+				<div class="navigation-tips-key" style="grid-column: span 2;">Tab</div>
+				<span>${this.localize.term('globalSearch_navigateSearchProviders')}</span>
+				<div class="navigation-tips-key">
+					<uui-icon name="icon-arrow-up"></uui-icon>
+				</div>
+				<div class="navigation-tips-key">
+					<uui-icon name="icon-arrow-down"></uui-icon>
+				</div>
+				<span>${this.localize.term('globalSearch_navigateSearchResults')}</span>
 			</div>
-			<div class="navigation-tips-key">
-				<uui-icon name="icon-arrow-down"></uui-icon>
-			</div>
-			<span>${this.localize.term('globalSearch_navigateSearchResults')}</span>
-		</div>`;
+		`;
 	}
 
 	static override styles = [

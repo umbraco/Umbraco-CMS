@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -45,7 +45,7 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
             _contentByName["Root 2"].Key,
             _contentByName["Root 3"].Key
         };
-        CollectionAssert.AreEqual(expectedKeys, resultKeys);
+        Assert.That(resultKeys, Is.EqualTo(expectedKeys).AsCollection);
     }
 
     [Test]
@@ -67,7 +67,7 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
             _contentByName["Root 1/Child 4"].Key,
             _contentByName["Root 1/Child 5"].Key
         };
-        CollectionAssert.AreEqual(expectedKeys, resultKeys);
+        Assert.That(resultKeys, Is.EqualTo(expectedKeys).AsCollection);
     }
 
     [Test]
@@ -86,7 +86,7 @@ public class ContentSearchServiceTests : UmbracoIntegrationTest
             _contentByName["Root 2/Child 3"].Key,
             _contentByName["Root 2/Child 4"].Key
         };
-        CollectionAssert.AreEqual(expectedKeys, resultKeys);
+        Assert.That(resultKeys, Is.EqualTo(expectedKeys).AsCollection);
     }
 
     [Test]

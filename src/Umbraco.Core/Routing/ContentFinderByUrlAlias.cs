@@ -32,29 +32,6 @@ public class ContentFinderByUrlAlias : IContentFinder
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
     /// </summary>
-    // TODO (V18): Remove this constructor and the unused parameters from the remaining one. They are only retained to avoid
-    // an ambiguous constructor error. Also removed the internal "Simplified constructor for testing purposes".
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public ContentFinderByUrlAlias(
-        ILogger<ContentFinderByUrlAlias> logger,
-        IPublishedValueFallback publishedValueFallback,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IPublishedContentStatusFilteringService publishedContentStatusFilteringService)
-        : this(
-            logger,
-            publishedValueFallback,
-            umbracoContextAccessor,
-            documentNavigationQueryService,
-            publishedContentStatusFilteringService,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlAliasService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ContentFinderByUrlAlias" /> class.
-    /// </summary>
     public ContentFinderByUrlAlias(
         ILogger<ContentFinderByUrlAlias> logger,
 #pragma warning disable IDE0060 // Remove unused parameter

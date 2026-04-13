@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,7 +14,7 @@ using Umbraco.Cms.Tests.Integration.Testing;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence;
 
 [TestFixture]
-[Timeout(60000)]
+[CancelAfter(60000)]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 internal sealed class LocksTests : UmbracoIntegrationTest
 {
@@ -39,7 +37,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
         services.RemoveAll(x => !x.IsKeyedService && x.ImplementationType == typeof(SqliteAddRetryPolicyInterceptor));
 
     [Test]
-    public void SingleReadLockTest()
+    public void SingleReadLockTest(CancellationToken _ = default)
     {
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -49,7 +47,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void ConcurrentReadersTest()
+    public void ConcurrentReadersTest(CancellationToken _ = default)
     {
         const int threadCount = 8;
         var threads = new Thread[threadCount];
@@ -124,7 +122,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
     [NUnit.Framework.Ignore("We currently do not have a way to force lazy locks")]
     [Test]
-    public void GivenNonEagerLocking_WhenNoDbIsAccessed_ThenNoSqlIsExecuted()
+    public void GivenNonEagerLocking_WhenNoDbIsAccessed_ThenNoSqlIsExecuted(CancellationToken _ = default)
     {
         var sqlCount = 0;
 
@@ -154,7 +152,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
     [NUnit.Framework.Ignore("We currently do not have a way to force lazy locks")]
     [Test]
-    public void GivenNonEagerLocking_WhenDbIsAccessed_ThenSqlIsExecuted()
+    public void GivenNonEagerLocking_WhenDbIsAccessed_ThenSqlIsExecuted(CancellationToken _ = default)
     {
         var sqlCount = 0;
 
@@ -186,7 +184,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void ConcurrentWritersTest()
+    public void ConcurrentWritersTest(CancellationToken _ = default)
     {
         const int threadCount = 8;
         var threads = new Thread[threadCount];
@@ -286,7 +284,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
     [Retry(10)] // TODO make this test non-flaky.
     [Test]
-    public void DeadLockTest()
+    public void DeadLockTest(CancellationToken _ = default)
     {
         if (BaseTestDatabase.IsSqlite())
         {
@@ -379,7 +377,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void NoDeadLockTest()
+    public void NoDeadLockTest(CancellationToken _ = default)
     {
         if (BaseTestDatabase.IsSqlite())
         {
@@ -416,7 +414,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Throws_When_Lock_Timeout_Is_Exceeded_Read()
+    public void Throws_When_Lock_Timeout_Is_Exceeded_Read(CancellationToken cancellationToken = default)
     {
         if (BaseTestDatabase.IsSqlite())
         {
@@ -481,7 +479,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Throws_When_Lock_Timeout_Is_Exceeded_Write()
+    public void Throws_When_Lock_Timeout_Is_Exceeded_Write(CancellationToken cancellationToken = default)
     {
         var counter = 0;
         var gate = new ManualResetEventSlim(false);
@@ -549,7 +547,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
 
     [NUnit.Framework.Ignore("This test is very flaky, and is stopping our nightlys")]
     [Test]
-    public void Read_Lock_Waits_For_Write_Lock()
+    public void Read_Lock_Waits_For_Write_Lock(CancellationToken _ = default)
     {
         if (BaseTestDatabase.IsSqlite())
         {
@@ -621,7 +619,7 @@ internal sealed class LocksTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Lock_Exceeds_Command_Timeout()
+    public void Lock_Exceeds_Command_Timeout(CancellationToken _ = default)
     {
         using (var scope = ScopeProvider.CreateScope())
         {

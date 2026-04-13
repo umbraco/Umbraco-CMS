@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
+/// <summary>
+/// Provides API endpoints for retrieving the audit log entries related to media items.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetAuditLogMediaController : MediaControllerBase
 {
@@ -21,6 +24,12 @@ public class GetAuditLogMediaController : MediaControllerBase
     private readonly IAuditService _auditService;
     private readonly IAuditLogPresentationFactory _auditLogPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetAuditLogMediaController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service for performing permission checks.</param>
+    /// <param name="auditService">Service for retrieving audit logs.</param>
+    /// <param name="auditLogPresentationFactory">Factory for creating audit log presentation models.</param>
     public GetAuditLogMediaController(
         IAuthorizationService authorizationService,
         IAuditService auditService,
@@ -31,6 +40,16 @@ public class GetAuditLogMediaController : MediaControllerBase
         _auditLogPresentationFactory = auditLogPresentationFactory;
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of audit log entries for the specified media item.
+    /// </summary>
+    /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the media item whose audit log is requested.</param>
+    /// <param name="orderDirection">The direction in which to order the audit log entries. Defaults to descending.</param>
+    /// <param name="sinceDate">If specified, only audit log entries created on or after this date are returned.</param>
+    /// <param name="skip">The number of entries to skip (for pagination).</param>
+    /// <param name="take">The maximum number of entries to return (for pagination).</param>
+    /// <returns>A task representing the asynchronous operation. The result contains an <see cref="IActionResult"/> with a <see cref="PagedViewModel{AuditLogResponseModel}"/> of audit log entries.</returns>
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}/audit-log")]
     [ProducesResponseType(typeof(PagedViewModel<AuditLogResponseModel>), StatusCodes.Status200OK)]

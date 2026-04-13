@@ -12,6 +12,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// API controller responsible for validating element update requests without persisting changes.
+/// </summary>
 [ApiVersion("1.0")]
 public class ValidateUpdateElementController : UpdateElementControllerBase
 {
@@ -19,6 +22,13 @@ public class ValidateUpdateElementController : UpdateElementControllerBase
     private readonly IElementEditingService _elementEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidateUpdateElementController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize access to element update operations.</param>
+    /// <param name="elementEditingPresentationFactory">Factory for creating element editing presentation models.</param>
+    /// <param name="elementEditingService">Service responsible for element editing functionality.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public ValidateUpdateElementController(
         IAuthorizationService authorizationService,
         IElementEditingPresentationFactory elementEditingPresentationFactory,
@@ -31,6 +41,13 @@ public class ValidateUpdateElementController : UpdateElementControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Validates the request model for updating an element without actually updating it.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element to validate the update for.</param>
+    /// <param name="requestModel">The element update request model to validate.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the validation result.</returns>
     [HttpPut("{id:guid}/validate")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

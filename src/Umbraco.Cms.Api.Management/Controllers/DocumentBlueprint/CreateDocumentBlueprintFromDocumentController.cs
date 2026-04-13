@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentBlueprint;
 
+/// <summary>
+/// Provides API endpoints for creating document blueprints based on existing documents.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintControllerBase
@@ -23,6 +26,12 @@ public class CreateDocumentBlueprintFromDocumentController : DocumentBlueprintCo
     private readonly IContentBlueprintEditingService _contentBlueprintEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateDocumentBlueprintFromDocumentController"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="authorizationService">The service used to authorize access to controller actions.</param>
+    /// <param name="contentBlueprintEditingService">The service responsible for editing content blueprints.</param>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security information.</param>
     public CreateDocumentBlueprintFromDocumentController(
         IAuthorizationService authorizationService,
         IContentBlueprintEditingService contentBlueprintEditingService,

@@ -106,8 +106,7 @@ public interface IDocumentCacheService
     /// Use this when the published model factory is reset (e.g. InMemoryAuto mode), which
     /// invalidates all compiled model types and makes cached instances of any type stale.
     /// </remarks>
-    // TODO (V18): Remove default implementation.
-    void ClearConvertedContentCache() { }
+    void ClearConvertedContentCache();
 
     /// <summary>
     /// Clears converted IPublishedContent entries for the specified content types from the in-memory cache,
@@ -118,6 +117,5 @@ public interface IDocumentCacheService
     /// so only the affected content types need their converted cache cleared.
     /// </remarks>
     /// <param name="contentTypeIds">The IDs of the content types whose converted entries should be cleared.</param>
-    // TODO (V18): Remove default implementation.
-    void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds) { }
+    void ClearConvertedContentCache(IReadOnlyCollection<int> contentTypeIds);
 }

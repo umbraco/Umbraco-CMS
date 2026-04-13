@@ -6,6 +6,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class DocumentVersionRepository : ContentVersionRepositoryBase<DocumentDto, DocumentVersionDto>, IDocumentVersionRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentVersionRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">An <see cref="IScopeAccessor"/> used to manage the database scope for repository operations.</param>
     public DocumentVersionRepository(IScopeAccessor scopeAccessor)
         : base(scopeAccessor)
     {

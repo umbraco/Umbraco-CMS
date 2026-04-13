@@ -10,12 +10,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.ElementVersion;
 
+/// <summary>
+/// Controller for retrieving a specific element version by its unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyElementVersionController : ElementVersionControllerBase
 {
     private readonly IElementVersionService _elementVersionService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyElementVersionController"/> class.
+    /// </summary>
+    /// <param name="elementVersionService">Service for managing element versions.</param>
+    /// <param name="umbracoMapper">Mapper for converting domain models to view models.</param>
     public ByKeyElementVersionController(
         IElementVersionService elementVersionService,
         IUmbracoMapper umbracoMapper)
@@ -24,6 +32,12 @@ public class ByKeyElementVersionController : ElementVersionControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
+    /// <summary>
+    /// Retrieves a specific element version by its unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element version to retrieve.</param>
+    /// <returns>An <see cref="IActionResult"/> containing the element version if found.</returns>
     [MapToApiVersion("1.0")]
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(ElementVersionResponseModel), StatusCodes.Status200OK)]

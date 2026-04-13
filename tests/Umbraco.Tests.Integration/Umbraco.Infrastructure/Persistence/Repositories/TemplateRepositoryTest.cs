@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -64,7 +63,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         new TemplateRepository((IScopeAccessor)provider, appCaches ?? AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), LoggerFactory, FileSystems, ShortStringHelper, ViewHelper, RuntimeSettings, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     private ITemplateRepository CreateRepository(IScopeProvider provider, IOptionsMonitor<RuntimeSettings> runtimeSettings) =>
-        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, ShortStringHelper, ViewHelper, runtimeSettings, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), LoggerFactory, FileSystems, ShortStringHelper, ViewHelper, runtimeSettings, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     private static IOptionsMonitor<RuntimeSettings> CreateRuntimeSettingsMonitor(RuntimeMode mode)
     {
@@ -501,13 +500,13 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Delete_When_Assigned_To_Doc()
+    public async Task Can_Perform_Delete_When_Assigned_To_Doc()
     {
         // Arrange
         var provider = ScopeProvider;
         var scopeAccessor = (IScopeAccessor)provider;
         var dataTypeService = GetRequiredService<IDataTypeService>();
-        var fileService = GetRequiredService<IFileService>();
+        var templateService = GetRequiredService<ITemplateService>();
 
         using (provider.CreateScope())
         {
@@ -541,10 +540,12 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
                 dataValueReferences,
                 dataTypeService,
                 serializer,
-                Mock.Of<IEventAggregator>());
+                Mock.Of<IEventAggregator>(),
+                Mock.Of<IRepositoryCacheVersionService>(),
+                Mock.Of<ICacheSyncService>());
 
             var template = TemplateBuilder.CreateTextPageTemplate();
-            fileService.SaveTemplate(template); // else, FK violation on contentType!
+            await templateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);
@@ -879,6 +880,36 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var updatedContent = updatedReader.ReadToEnd();
             Assert.That(updatedContent, Does.Contain("original-content"));
             Assert.That(updatedContent, Does.Not.Contain("modified-content"));
+        }
+    }
+
+    [Test]
+    public void Delete_In_Production_Mode_Does_Not_Remove_File()
+    {
+        // Arrange - create template in development mode first.
+        var provider = ScopeProvider;
+
+        using (provider.CreateScope())
+        {
+            var developmentRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Development);
+            var developmentRepository = CreateRepository(provider, developmentRuntimeSettings);
+
+            var template = new Template(ShortStringHelper, "productionTestDelete", "productionTestDelete") { Content = "mock-content" };
+            developmentRepository.Save(template);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestDelete.cshtml"), Is.True);
+
+            // Act - try to delete in production mode.
+            var productionRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Production);
+            var productionRepository = CreateRepository(provider, productionRuntimeSettings);
+
+            var existingTemplate = productionRepository.Get("productionTestDelete");
+            Assert.IsNotNull(existingTemplate);
+
+            productionRepository.Delete(existingTemplate);
+
+            // Assert - database record should be removed but file should still exist.
+            Assert.That(productionRepository.Get("productionTestDelete"), Is.Null);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestDelete.cshtml"), Is.True);
         }
     }
 

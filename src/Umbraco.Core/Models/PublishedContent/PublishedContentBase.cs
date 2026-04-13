@@ -1,6 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
@@ -10,8 +7,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     /// </summary>
     /// <remarks>This base class does which (a) consistently resolves and caches the URL, (b) provides an implementation
     /// for this[alias], and (c) provides basic content set management.</remarks>
-    // TODO ELEMENTS: correct version for the obsolete message here
-    [Obsolete("Please implement PublishableContentBase instead. Scheduled for removal in VXX")]
+    [Obsolete("Please implement PublishableContentBase instead. Scheduled for removal in V19")]
     public abstract class PublishedContentBase : PublishableContentBase, IPublishedContent
     {
         private readonly IVariationContextAccessor? _variationContextAccessor;
@@ -40,39 +36,5 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
 
         /// <inheritdoc />
         public abstract int? TemplateId { get; }
-
-        /// <inheritdoc />
-        [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
-        public abstract IPublishedContent? Parent { get; }
-
-        /// <inheritdoc />
-        [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
-        public virtual IEnumerable<IPublishedContent> Children => GetChildren();
-
-        /// <summary>
-        ///     Gets the children of the current content item.
-        /// </summary>
-        /// <returns>The children of the current content item.</returns>
-        private IEnumerable<IPublishedContent> GetChildren()
-        {
-            INavigationQueryService? navigationQueryService;
-            IPublishedStatusFilteringService? publishedStatusFilteringService;
-
-            switch (ContentType.ItemType)
-            {
-                case PublishedItemType.Content:
-                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
-                    publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>();
-                    break;
-                case PublishedItemType.Media:
-                    navigationQueryService = StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
-                    publishedStatusFilteringService = StaticServiceProvider.Instance.GetRequiredService<IPublishedMediaStatusFilteringService>();
-                    break;
-                default:
-                    throw new NotImplementedException("Level is not implemented for " + ContentType.ItemType);
-            }
-
-            return this.Children(navigationQueryService, publishedStatusFilteringService);
-        }
     }
 }

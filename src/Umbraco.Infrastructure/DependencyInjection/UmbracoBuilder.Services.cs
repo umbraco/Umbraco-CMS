@@ -87,11 +87,9 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IContentSearchService, ContentSearchService>();
         builder.Services.AddUnique<IMediaSearchService, MediaSearchService>();
         builder.Services.AddUnique<IDistributedJobService, DistributedJobService>();
+        builder.Services.AddUnique<IPropertyEditorSchemaService, PropertyEditorSchemaService>();
 
-#pragma warning disable CS0618 // Type or member is obsolete
-        // TODO (V18): Replace this with MarkdigMarkdownToHtmlConverter as the default implementation.
-        builder.Services.AddUnique<IMarkdownToHtmlConverter, HeyRedMarkdownToHtmlConverter>();
-#pragma warning restore CS0618 // Type or member is obsolete
+        builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdigMarkdownToHtmlConverter>();
 
         return builder;
     }

@@ -11,14 +11,24 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
 
+/// <summary>
+/// Migration that adds the Element content type infrastructure to the database,
+/// including tables, recycle bin, user group permissions, and relation types.
+/// </summary>
 public class AddElements : AsyncMigrationBase
 {
     private readonly IRelationService _relationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AddElements"/> class.
+    /// </summary>
+    /// <param name="context">The migration context.</param>
+    /// <param name="relationService">The relation service used to create element relation types.</param>
     public AddElements(IMigrationContext context, IRelationService relationService)
         : base(context)
         => _relationService = relationService;
 
+    /// <inheritdoc />
     protected override Task MigrateAsync()
     {
         EnsureElementTreeLock();

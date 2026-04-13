@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Api.Management.ViewModels.Installer;
@@ -6,8 +6,16 @@ using Umbraco.Cms.Core.Models.Installer;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Installer;
 
+/// <summary>
+/// Provides mapping configuration for installer-related view models within the Umbraco CMS management API.
+/// </summary>
 public class InstallerViewModelsMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the object-object mappings between installer-related view models and their corresponding data or presentation models.
+    /// This method is used during the Umbraco installation process to ensure correct transformation of installer data between layers.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to register the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<InstallRequestModel, InstallData>((source, context) => new InstallData(), Map);

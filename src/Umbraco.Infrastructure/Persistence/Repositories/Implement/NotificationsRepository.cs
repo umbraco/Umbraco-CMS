@@ -11,14 +11,31 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <summary>
+/// Provides methods for managing notification entities in the persistence layer of Umbraco CMS.
+/// </summary>
 public class NotificationsRepository : INotificationsRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NotificationsRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">
+    /// The <see cref="IScopeAccessor"/> used to manage the database scope for repository operations.
+    /// </param>
     public NotificationsRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
     private IScope? AmbientScope => _scopeAccessor.AmbientScope;
 
+    /// <summary>
+    /// Gets notifications for the specified users filtered by action, node IDs, and object type.
+    /// </summary>
+    /// <param name="userIds">The collection of user IDs to retrieve notifications for.</param>
+    /// <param name="action">The action to filter notifications by; can be null.</param>
+    /// <param name="nodeIds">The collection of node IDs to filter notifications by.</param>
+    /// <param name="objectType">The object type GUID to filter notifications by.</param>
+    /// <returns>An enumerable of <see cref="Notification"/> objects matching the specified criteria.</returns>
     public IEnumerable<Notification> GetUsersNotifications(IEnumerable<int> userIds, string? action, IEnumerable<int> nodeIds, Guid objectType)
     {
         if (AmbientScope is null)
@@ -54,6 +71,13 @@ public class NotificationsRepository : INotificationsRepository
             .Select(x => new Notification(x.NodeId, x.UserId, x.Action, objectType));
     }
 
+    /// <summary>
+    /// Retrieves the notifications associated with content nodes for the specified user.
+    /// </summary>
+    /// <param name="user">The user whose content node notifications are to be retrieved.</param>
+    /// <returns>
+    /// An enumerable collection of <see cref="Notification"/> objects representing the user's notifications for content nodes.
+    /// </returns>
     public IEnumerable<Notification> GetUserNotifications(IUser user)
     {
         if (AmbientScope is null)
@@ -80,6 +104,13 @@ public class NotificationsRepository : INotificationsRepository
         return dtos.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
     }
 
+    /// <summary>
+    /// Sets notifications for the specified user and entity by replacing any existing notifications with new ones for the given actions.
+    /// </summary>
+    /// <param name="user">The user for whom to set notifications.</param>
+    /// <param name="entity">The entity associated with the notifications.</param>
+    /// <param name="actions">An array of action names for which to create notifications.</param>
+    /// <returns>An enumerable of the created <see cref="Notification"/> objects.</returns>
     public IEnumerable<Notification> SetNotifications(IUser user, IEntity entity, string[] actions)
     {
         DeleteNotifications(user, entity);
@@ -93,6 +124,13 @@ public class NotificationsRepository : INotificationsRepository
             .ToList();
     }
 
+    /// <summary>
+    /// Retrieves all user notifications associated with the specified entity.
+    /// </summary>
+    /// <param name="entity">The entity for which to retrieve user notifications.</param>
+    /// <returns>
+    /// An <see cref="IEnumerable{Notification}"/> containing all notifications related to the given entity, or an empty collection if none exist.
+    /// </returns>
     public IEnumerable<Notification> GetEntityNotifications(IEntity entity)
     {
         if (AmbientScope is null)
@@ -119,6 +157,11 @@ public class NotificationsRepository : INotificationsRepository
         return dtos.Select(d => new Notification(d.NodeId, d.UserId, d.Action, d.NodeObjectType)).ToList();
     }
 
+    /// <summary>
+    /// Deletes all notifications associated with the specified entity.
+    /// </summary>
+    /// <param name="entity">The entity for which to delete notifications.</param>
+    /// <returns>The number of notifications that were deleted.</returns>
     public int DeleteNotifications(IEntity entity)
     {
         if (AmbientScope == null)
@@ -132,6 +175,11 @@ public class NotificationsRepository : INotificationsRepository
         return AmbientScope.Database.Execute(sql);
     }
 
+    /// <summary>
+    /// Deletes all notifications associated with the specified user.
+    /// </summary>
+    /// <param name="user">The <see cref="IUser"/> for which to delete notifications.</param>
+    /// <returns>The number of notifications that were deleted.</returns>
     public int DeleteNotifications(IUser user)
     {
         if (AmbientScope == null)
@@ -159,6 +207,14 @@ public class NotificationsRepository : INotificationsRepository
         return AmbientScope.Database.Execute(sql);
     }
 
+    /// <summary>
+    /// Attempts to create a notification for a specified user and entity based on a given action.
+    /// </summary>
+    /// <param name="user">The user who will receive the notification.</param>
+    /// <param name="entity">The entity (such as a content item or node) associated with the notification.</param>
+    /// <param name="action">A string representing the action that triggers the notification (e.g., "save", "publish").</param>
+    /// <param name="notification">When this method returns, contains the created <see cref="Notification"/> if successful; otherwise, <c>null</c>.</param>
+    /// <returns><c>true</c> if the notification was successfully created and assigned to <paramref name="notification"/>; otherwise, <c>false</c>.</returns>
     public bool TryCreateNotification(IUser user, IEntity entity, string action, [NotNullWhen(true)] out Notification? notification)
     {
         if (AmbientScope is null)

@@ -58,6 +58,25 @@ export class UmbDataTypeServerDataSource
 	}
 
 	/**
+	 * Fetches multiple Data Types by their unique IDs from the server
+	 * @param {Array<string>} uniques - The unique IDs of the data types to fetch
+	 * @returns {*}
+	 * @memberof UmbDataTypeServerDataSource
+	 */
+	async readMany(uniques: Array<string>) {
+		if (!uniques || uniques.length === 0) {
+			return { data: [] };
+		}
+
+		const { data, error } = await this.#detailRequestManager.readMany(uniques);
+
+		return {
+			data: data?.items?.map((item) => this.#mapServerResponseModelToEntityDetailModel(item)),
+			error,
+		};
+	}
+
+	/**
 	 * Inserts a new Data Type on the server
 	 * @param {UmbDataTypeDetailModel} model
 	 * @param parentUnique

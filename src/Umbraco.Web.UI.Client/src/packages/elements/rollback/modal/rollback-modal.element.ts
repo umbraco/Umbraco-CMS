@@ -15,7 +15,7 @@ import { UMB_APP_LANGUAGE_CONTEXT, UmbLanguageItemRepository } from '@umbraco-cm
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbDiffChange } from '@umbraco-cms/backoffice/utils';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 
 import '../../modals/shared/element-variant-language-picker.element.js';
 
@@ -54,7 +54,7 @@ export class UmbElementRollbackModalElement extends UmbModalBaseElement<
 	private _isInvariant = true;
 
 	@state()
-	private _availableVariants: Option[] = [];
+	private _availableVariants: UUISelectOption[] = [];
 
 	@state()
 	private _diffs: Array<{ alias: string; diff: UmbDiffChange[] }> = [];

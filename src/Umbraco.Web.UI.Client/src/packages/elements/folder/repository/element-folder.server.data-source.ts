@@ -135,7 +135,7 @@ export class UmbElementFolderServerDataSource implements UmbDetailDataSource<Umb
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecute(
 			this.#host,
-			ElementService.deleteElementFolderById({
+			ElementService.deleteRecycleBinElementFolderById({
 				path: { id: unique },
 			}),
 		);

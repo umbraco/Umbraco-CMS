@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Serialization;
@@ -38,7 +39,7 @@ public class DataValueEditorReuseTests
         _propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>));
         _dataValueReferenceFactories = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>, new NullLogger<DataValueReferenceFactoryCollection>());
 
-        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>());
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>(), Mock.Of<IVariationContextAccessor>());
         _dataValueEditorFactoryMock
             .Setup(m =>
                 m.Create<BlockListPropertyEditorBase.BlockListEditorPropertyValueEditor>(It.IsAny<DataEditorAttribute>(), It.IsAny<BlockEditorDataConverter<BlockListValue, BlockListLayoutItem>>()))

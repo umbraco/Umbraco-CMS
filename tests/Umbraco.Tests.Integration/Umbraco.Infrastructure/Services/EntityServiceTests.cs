@@ -55,7 +55,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private IContentTypeContainerService ContentTypeContainerService => GetRequiredService<IContentTypeContainerService>();
 
@@ -692,11 +692,11 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
+    public async Task EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
     {
         var alias = "test" + Guid.NewGuid();
         var template = TemplateBuilder.CreateTextPageTemplate(alias);
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         var contentType = ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
         contentType.Variations = ContentVariation.Culture;
         ContentTypeService.Save(contentType);
@@ -716,10 +716,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
+    public async Task EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         var contentType = ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
         contentType.Variations = ContentVariation.Culture;
         ContentTypeService.Save(contentType);
@@ -1100,8 +1100,6 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     [TestCase(false)]
     public async Task EntityService_Siblings_FiltersByObjectTypes(bool foldersOnly)
     {
-        // For testing these scenarios we can use the data setup in CreateStructureForPagedDocumentTypeChildrenTest.
-
         var objectTypes = new List<UmbracoObjectTypes> { UmbracoObjectTypes.DocumentTypeContainer };
         if (foldersOnly is false)
         {
@@ -1122,7 +1120,47 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         }
     }
 
-    private List<Content> CreateDocumentSiblingsTestData()
+    [Test]
+    public void EntityService_Siblings_ReturnsEmpty_WhenTargetKeyDoesNotExist()
+    {
+        CreateDocumentSiblingsTestData();
+
+        var result = EntityService.GetSiblings(Guid.NewGuid(), [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(0, totalAfter);
+        Assert.IsEmpty(result);
+    }
+
+    [Test]
+    public void EntityService_Siblings_ReturnsOnlyTarget_WhenItIsTheSoleChild()
+    {
+        var children = CreateDocumentSiblingsTestData(count: 1);
+
+        var result = EntityService.GetSiblings(children[0].Key, [UmbracoObjectTypes.Document], 1, 1, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(0, totalBefore);
+        Assert.AreEqual(0, totalAfter);
+        Assert.AreEqual(1, result.Length);
+        Assert.IsTrue(result[0].Key == children[0].Key);
+    }
+
+    [Test]
+    public void EntityService_Siblings_ReportsCorrectTotalsOnBothSides_WhenTargetIsInTheMiddle()
+    {
+        var children = CreateDocumentSiblingsTestData();
+
+        // Target is at index 4 (position 5 of 10). With a window of 2 before and 2 after,
+        // the result should include indices 2-6, leaving 2 siblings before and 3 after the window.
+        var target = children[4];
+        var result = EntityService.GetSiblings(target.Key, [UmbracoObjectTypes.Document], 2, 2, out long totalBefore, out long totalAfter).ToArray();
+        Assert.AreEqual(2, totalBefore);
+        Assert.AreEqual(3, totalAfter);
+        Assert.AreEqual(5, result.Length);
+        Assert.IsTrue(result[0].Key == children[2].Key);
+        Assert.IsTrue(result[2].Key == children[4].Key);
+        Assert.IsTrue(result[4].Key == children[6].Key);
+    }
+
+    private List<Content> CreateDocumentSiblingsTestData(int count = 10)
     {
         var contentType = ContentTypeService.Get("umbTextpage");
 
@@ -1131,7 +1169,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
         var children = new List<Content>();
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < count; i++)
         {
             var child = ContentBuilder.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
             ContentService.Save(child);
@@ -1163,7 +1201,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             _isSetup = true;
 
             var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-            FileService.SaveTemplate(template); // else, FK violation on contentType!
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
             // Create and Save ContentType "umbTextpage" -> _contentType.Id
             _contentType =

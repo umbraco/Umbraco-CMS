@@ -13,6 +13,10 @@ public class DeleteForeignKeyBuilder : ExpressionBuilderBase<DeleteForeignKeyExp
     IDeleteForeignKeyPrimaryColumnBuilder,
     IDeleteForeignKeyOnTableBuilder
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.ForeignKey.DeleteForeignKeyBuilder"/> class.
+    /// </summary>
+    /// <param name="expression">The <see cref="DeleteForeignKeyExpression"/> that defines the foreign key to be deleted.</param>
     public DeleteForeignKeyBuilder(DeleteForeignKeyExpression expression)
         : base(expression)
     {

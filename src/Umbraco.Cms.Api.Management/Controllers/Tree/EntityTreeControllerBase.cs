@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -14,18 +14,14 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
+/// <summary>
+/// Serves as the base controller for managing entity trees, where each entity is of type <typeparamref name="TItem"/>.
+/// Provides common functionality for tree-based entity management in the API.
+/// </summary>
 public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerBase
     where TItem : EntityTreeItemResponseModel, new()
 {
     private readonly FlagProviderCollection _flagProviders;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected EntityTreeControllerBase(IEntityService entityService)
-        : this(
-            entityService,
-            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
-    }
 
     protected EntityTreeControllerBase(IEntityService entityService, FlagProviderCollection flagProviders)
     {
@@ -45,7 +41,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         (rootEntities, totalItems) = await FilterTreeEntities(rootEntities, totalItems);
 
-        TItem[] treeItemViewModels = MapTreeItemViewModels((Guid?)null, rootEntities);
+        TItem[] treeItemViewModels = await MapTreeItemViewModelsAsync((Guid?)null, rootEntities);
 
         await PopulateFlags(treeItemViewModels);
 
@@ -60,7 +56,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
 
         (children, totalItems) = await FilterTreeEntities(children, totalItems);
 
-        TItem[] treeItemViewModels = MapTreeItemViewModels(parentId, children);
+        TItem[] treeItemViewModels = await MapTreeItemViewModelsAsync(parentId, children);
 
         await PopulateFlags(treeItemViewModels);
 
@@ -82,7 +78,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         IEntitySlim? entity = siblings.FirstOrDefault();
         Guid? parentKey = GetParentKey(entity);
 
-        TItem[] treeItemViewModels = MapTreeItemViewModels(parentKey, siblings);
+        TItem[] treeItemViewModels = await MapTreeItemViewModelsAsync(parentKey, siblings);
 
         await PopulateFlags(treeItemViewModels);
 
@@ -138,16 +134,38 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
     {
         IEntitySlim[] ancestorEntities = await GetAncestorEntitiesAsync(descendantKey, includeSelf);
 
-        TItem[] treeItemViewModels = ancestorEntities
+        // All ancestors should be present in the collection, but we defensively use
+        // SingleOrDefault to handle potential data inconsistencies (e.g. after upgrades).
+        List<int>? missingParentIds = null;
+        IEnumerable<Task<TItem>> tasks = ancestorEntities
             .Select(ancestor =>
             {
                 IEntitySlim? parent = ancestor.ParentId > 0
-                    ? ancestorEntities.Single(a => a.Id == ancestor.ParentId)
+                    ? ancestorEntities.SingleOrDefault(a => a.Id == ancestor.ParentId)
                     : null;
 
-                return MapTreeItemViewModel(parent?.Key, ancestor);
-            })
-            .ToArray();
+                if (ancestor.ParentId > 0 && parent is null)
+                {
+                    missingParentIds ??= [];
+                    missingParentIds.Add(ancestor.ParentId);
+                }
+
+                return MapTreeItemViewModelAsync(parent?.Key, ancestor);
+            });
+        TItem[] treeItemViewModels = await Task.WhenAll(tasks);
+
+        if (missingParentIds is not null)
+        {
+            // Will use the static logger factory here, given this is an exception case and to avoid having to
+            // make widespread changes to support logging in the base controller.
+            ILogger logger = StaticApplicationLogging.CreateLogger<EntityTreeControllerBase<TItem>>();
+            logger.LogWarning(
+                "Ancestor(s) with ID(s) {MissingAncestorIds} not found in the ancestors collection for descendant {DescendantKey}. "
+                + "This indicates a data integrity issue in the entity path; consider running the database integrity health check "
+                + "and/or moving the entity to another location and back to rebuild its path.",
+                missingParentIds,
+                descendantKey);
+        }
 
         await PopulateFlags(treeItemViewModels);
 
@@ -212,8 +230,11 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 ordering: ItemOrdering)
             .ToArray();
 
-    protected virtual TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
-        => entities.Select(entity => MapTreeItemViewModel(parentKey, entity)).ToArray();
+    protected virtual async Task<TItem[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
+    {
+        IEnumerable<Task<TItem>> tasks = entities.Select(entity => MapTreeItemViewModelAsync(parentKey, entity));
+        return await Task.WhenAll(tasks);
+    }
 
     protected virtual async Task PopulateFlags(TItem[] treeItemViewModels)
     {
@@ -223,7 +244,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
         }
     }
 
-    protected virtual TItem MapTreeItemViewModel(Guid? parentKey, IEntitySlim entity)
+    protected virtual Task<TItem> MapTreeItemViewModelAsync(Guid? parentKey, IEntitySlim entity)
     {
         var viewModel = new TItem
         {
@@ -234,7 +255,7 @@ public abstract class EntityTreeControllerBase<TItem> : ManagementApiControllerB
                 : null,
         };
 
-        return viewModel;
+        return Task.FromResult(viewModel);
     }
 
     protected PagedViewModel<TItem> PagedViewModel(IEnumerable<TItem> treeItemViewModels, long totalItems)

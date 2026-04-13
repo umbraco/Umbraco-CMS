@@ -10,6 +10,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
+/// <summary>
+/// Serves as the base controller for content management operations in the Umbraco CMS API, providing shared functionality for content-related controllers.
+/// </summary>
 public abstract class ContentControllerBase : ManagementApiControllerBase
 {
     protected abstract string EntityName { get; }
@@ -56,6 +59,15 @@ public abstract class ContentControllerBase : ManagementApiControllerBase
                 .Build()),
             ContentEditingOperationStatus.PropertyTypeNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("One or more property types could not be found")
+                .Build()),
+            ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch => BadRequest(problemDetailsBuilder
+                .WithTitle("Property type culture variance mismatch")
+                .WithDetail("One or more property values specify a culture for an invariant property, or are missing a culture for a culture-variant property. "
+                    + "This can happen when a property is inherited from a variant composition on an invariant content type, which downgrades it to invariant.")
+                .Build()),
+            ContentEditingOperationStatus.PropertyTypeSegmentVarianceMismatch => BadRequest(problemDetailsBuilder
+                .WithTitle("Property type segment variance mismatch")
+                .WithDetail("One or more property values have a segment that does not match the property type's segment variance.")
                 .Build()),
             ContentEditingOperationStatus.InTrash => BadRequest(problemDetailsBuilder
                 .WithTitle("Content is in the recycle bin")

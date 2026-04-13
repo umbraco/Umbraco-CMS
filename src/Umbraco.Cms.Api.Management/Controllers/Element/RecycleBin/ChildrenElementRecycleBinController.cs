@@ -8,9 +8,17 @@ using Umbraco.Cms.Api.Management.ViewModels.Element.RecycleBin;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.RecycleBin;
 
+/// <summary>
+/// API controller responsible for retrieving child elements within the element recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class ChildrenElementRecycleBinController : ElementRecycleBinControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChildrenElementRecycleBinController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for retrieving entity data.</param>
+    /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
     public ChildrenElementRecycleBinController(
         IEntityService entityService,
         IElementPresentationFactory elementPresentationFactory)
@@ -18,6 +26,14 @@ public class ChildrenElementRecycleBinController : ElementRecycleBinControllerBa
     {
     }
 
+    /// <summary>
+    /// Gets a paginated collection of child elements in the recycle bin for the specified parent.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="parentId">The unique identifier of the parent element in the recycle bin.</param>
+    /// <param name="skip">The number of items to skip for pagination.</param>
+    /// <param name="take">The number of items to return for pagination.</param>
+    /// <returns>A paginated collection of element recycle bin items.</returns>
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<ElementRecycleBinItemResponseModel>), StatusCodes.Status200OK)]

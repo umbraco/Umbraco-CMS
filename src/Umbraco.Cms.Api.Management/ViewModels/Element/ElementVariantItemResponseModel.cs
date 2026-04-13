@@ -1,9 +1,10 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels.Content;
-using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.Element;
 
-public class ElementVariantItemResponseModel : VariantItemResponseModelBase
+/// <summary>
+/// Represents a variant item response model for an element, including its publish state.
+/// </summary>
+public class ElementVariantItemResponseModel : PublishableVariantItemResponseModelBase
 {
-    public required DocumentVariantState State { get; set; }
 }

@@ -27,6 +27,14 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultRepositoryCachePolicy{TEntity, TId}"/> class.
+    /// </summary>
+    /// <param name="cache">The application-level policy cache used for storing repository items.</param>
+    /// <param name="scopeAccessor">Provides access to the current scope.</param>
+    /// <param name="options">The options that configure repository cache policy behavior.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across instances.</param>
     public DefaultRepositoryCachePolicy(
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,
@@ -35,20 +43,6 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         ICacheSyncService cacheSyncService)
         : base(cache, scopeAccessor, repositoryCacheVersionService, cacheSyncService) =>
         _options = options ?? throw new ArgumentNullException(nameof(options));
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
-    public DefaultRepositoryCachePolicy(
-        IAppPolicyCache cache,
-        IScopeAccessor scopeAccessor,
-        RepositoryCachePolicyOptions options)
-        : this(
-            cache,
-            scopeAccessor,
-            options,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
-    {
-    }
 
     protected string EntityTypeCacheKey { get; } = RepositoryCacheKeys.GetKey<TEntity>();
 

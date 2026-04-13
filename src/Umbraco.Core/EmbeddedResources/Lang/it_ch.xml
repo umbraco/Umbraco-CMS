@@ -1292,7 +1292,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
       è stata eseguita sulla pagina '%2%'
       dall'utente '%3%'
 
-      Vai al link http://%4%/#/content/content/edit/%5% per modificare.
+      Vai al link http://%4%/section/content/workspace/document/edit/%5% per modificare.
 
       %6%
 
@@ -1343,7 +1343,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 															Ciao %0%,
 														</h1>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															Questa è un'email automatica per informare che l'azione <strong>'%1%'</strong> è stata eseguita sulla pagina <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> dall'utente <strong>'%3%'</strong>
+															Questa è un'email automatica per informare che l'azione <strong>'%1%'</strong> è stata eseguita sulla pagina <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/section/content/workspace/document/edit/%5%"><strong>'%2%'</strong></a> dall'utente <strong>'%3%'</strong>
 														</p>
 														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
 															<tbody>
@@ -1351,7 +1351,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
 																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
 																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>MODIFICA</a> </td> </tr></tbody></table>
+																				<a href='http://%4%/section/content/workspace/document/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>MODIFICA</a> </td> </tr></tbody></table>
 																	</td>
 																</tr>
 															</tbody>
@@ -2771,18 +2771,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="characters_left"><![CDATA[<strong>%0%</strong> caratteri rimasti.]]></key>
 		<key alias="characters_exceed"><![CDATA[Massimo %0% caratteri, <strong>%1%</strong> di troppo.]]></key>
 	</area>
-	<area alias="recycleBin">
-		<key alias="contentTrashed">
-			Contenuto cestinato con Id: {0} relativo al contenuto principale originale con Id: {1}
-		</key>
-		<key alias="mediaTrashed">Media cestinato con Id: {0} relativo al media principale originale con Id: {1}</key>
-		<key alias="itemCannotBeRestored">Impossibile ripristinare automaticamente questo elemento</key>
-		<key alias="itemCannotBeRestoredHelpText">
-			Non esiste una posizione in cui questo elemento possa essere ripristinato
-			automaticamente. Puoi spostare l'elemento manualmente utilizzando l'albero sottostante.
-		</key>
-		<key alias="wasRestored"><![CDATA[è stato ripristinato sotto]]></key>
-	</area>
+
 	<area alias="relationType">
 		<key alias="direction">Direzione</key>
 		<key alias="parentToChild">Da genitore a figlio</key>

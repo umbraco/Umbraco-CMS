@@ -12,6 +12,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 export interface UmbConfirmBulkActionModalEntityReferencesConfig {
 	uniques: Array<string>;
@@ -38,6 +39,10 @@ export class UmbConfirmBulkActionModalEntityReferencesElement extends UmbLitElem
 	#referenceRepository?: UmbEntityReferenceRepository;
 
 	#limitItems = 5;
+
+	getTotalItems() {
+		return this._totalItems;
+	}
 
 	protected override firstUpdated(_changedProperties: PropertyValues): void {
 		super.firstUpdated(_changedProperties);
@@ -93,6 +98,8 @@ export class UmbConfirmBulkActionModalEntityReferencesElement extends UmbLitElem
 			const { data: items } = await this.#itemRepository.requestItems(uniques);
 			this._items = items ?? [];
 		}
+
+		this.dispatchEvent(new UmbChangeEvent());
 	}
 
 	override render() {

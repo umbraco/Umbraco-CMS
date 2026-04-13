@@ -46,37 +46,7 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
     }
 
     /// <inheritdoc />
-    public IMemberGroup? GetById(Guid id) => GetAsync(id).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
     public IMemberGroup? GetByName(string? name) => name is null ? null : GetByNameAsync(name).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public void Save(IMemberGroup memberGroup)
-    {
-        if (string.IsNullOrWhiteSpace(memberGroup.Name))
-        {
-            throw new InvalidOperationException("The name of a MemberGroup can not be empty");
-        }
-
-        EventMessages evtMsgs = EventMessagesFactory.Get();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var savingNotification = new MemberGroupSavingNotification(memberGroup, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            _memberGroupRepository.Save(memberGroup);
-            scope.Complete();
-
-            scope.Notifications.Publish(
-                new MemberGroupSavedNotification(memberGroup, evtMsgs).WithStateFrom(savingNotification));
-        }
-    }
 
     /// <inheritdoc />
     public void Delete(IMemberGroup memberGroup) => DeleteAsync(memberGroup.Key).GetAwaiter().GetResult();

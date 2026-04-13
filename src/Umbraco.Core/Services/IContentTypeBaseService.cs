@@ -306,28 +306,6 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId);
 
     /// <summary>
-    ///     Copies a content type with a new alias and name.
-    /// </summary>
-    /// <param name="original">The content type to copy.</param>
-    /// <param name="alias">The alias for the copy.</param>
-    /// <param name="name">The name for the copy.</param>
-    /// <param name="parentId">The identifier of the parent container.</param>
-    /// <returns>The copied content type.</returns>
-    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
-    TItem Copy(TItem original, string alias, string name, int parentId = -1);
-
-    /// <summary>
-    ///     Copies a content type with a new alias and name under a parent.
-    /// </summary>
-    /// <param name="original">The content type to copy.</param>
-    /// <param name="alias">The alias for the copy.</param>
-    /// <param name="name">The name for the copy.</param>
-    /// <param name="parent">The parent content type.</param>
-    /// <returns>The copied content type.</returns>
-    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
-    TItem Copy(TItem original, string alias, string name, TItem parent);
-
-    /// <summary>
     ///     Copies a content type to a container asynchronously.
     /// </summary>
     /// <param name="key">The unique identifier of the content type to copy.</param>
@@ -376,7 +354,5 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// </summary>
     /// <param name="key">The key of the child content type.</param>
     /// <returns>A collection of the keys of all potential parents.</returns>
-    /// <exception cref="NotImplementedException">Default implementation due to breaking changes.</exception>
-    /// TODO (V18): Remove the default implementation.
-    Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentKeysAsync(Guid key) => Task.FromResult(Attempt.FailWithStatus<IEnumerable<Guid>, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotImplemented, []));
+    Task<Attempt<IEnumerable<Guid>, ContentTypeOperationStatus>> GetAllowedParentKeysAsync(Guid key);
 }

@@ -152,7 +152,7 @@ public class ContentNavigationServiceBaseTests
         {
             Assert.IsTrue(result);
             Assert.AreEqual(2, rootsList.Count);
-            CollectionAssert.AreEqual(new[] { Root, anotherRoot }, rootsList); // Root and Another root in order
+            Assert.That(rootsList, Is.EqualTo(new[] { Root, anotherRoot }).AsCollection); // Root and Another root in order
         });
     }
 
@@ -1514,7 +1514,7 @@ public class ContentNavigationServiceBaseTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(nodeExistsInBin);
-            CollectionAssert.AreEqual(initialDescendantsList, descendantsKeysInBin);
+            Assert.That(descendantsKeysInBin, Is.EqualTo(initialDescendantsList).AsCollection);
 
             foreach (Guid descendant in initialDescendantsList)
             {
@@ -1751,7 +1751,7 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.DoesNotContain(childrenList, nodeToMove);
+            Assert.That(childrenList, Has.No.Member(nodeToMove));
             Assert.AreEqual(oldParentChildrenCount - 1, childrenList.Count);
         });
     }
@@ -1777,7 +1777,7 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.Contains(childrenList, nodeToMove);
+            Assert.That(childrenList, Has.Member(nodeToMove));
             Assert.AreEqual(targetParentChildrenCount + 1, childrenList.Count);
         });
     }
@@ -1938,7 +1938,7 @@ public class ContentNavigationServiceBaseTests
 
         Assert.Multiple(() =>
         {
-            CollectionAssert.Contains(childrenList, nodeToRestore);
+            Assert.That(childrenList, Has.Member(nodeToRestore));
             Assert.AreEqual(targetParentChildrenCount + 1, childrenList.Count);
         });
     }

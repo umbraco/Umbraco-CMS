@@ -10,138 +10,39 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 internal sealed class ContentBaseFactory
 {
     /// <summary>
-    ///     Builds an IContent item from a dto and content type.
+    ///     Creates a <see cref="Content"/> entity from the specified <see cref="DocumentDto"/> and <see cref="IContentType"/>.
     /// </summary>
+    /// <param name="dto">The <see cref="DocumentDto"/> containing the data used to construct the content entity.</param>
+    /// <param name="contentType">The <see cref="IContentType"/> that defines the structure and properties of the content.</param>
+    /// <returns>A <see cref="Content"/> instance populated with data from the provided <paramref name="dto"/> and <paramref name="contentType"/>.</returns>
     public static Content BuildEntity(DocumentDto dto, IContentType? contentType)
     {
-        ContentDto contentDto = dto.ContentDto;
-        NodeDto nodeDto = contentDto.NodeDto;
-        DocumentVersionDto documentVersionDto = dto.ContentVersionDto;
-        ContentVersionDto contentVersionDto = documentVersionDto.ContentVersionDto;
-        DocumentVersionDto? publishedVersionDto = dto.PublishedVersionDto;
-
-        var content = new Content(nodeDto.Text, nodeDto.ParentId, contentType);
-
-        try
-        {
-            content.DisableChangeTracking();
-
-            content.Id = dto.NodeId;
-            content.Key = nodeDto.UniqueId;
-            content.VersionId = contentVersionDto.Id;
-
-            content.Name = contentVersionDto.Text;
-
-            content.Path = nodeDto.Path;
-            content.Level = nodeDto.Level;
-            content.ParentId = nodeDto.ParentId;
-            content.SortOrder = nodeDto.SortOrder;
-            content.Trashed = nodeDto.Trashed;
-
-            content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
-            content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-
-            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
-            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
-
-            content.Published = dto.Published;
-            content.Edited = dto.Edited;
-
-            if (publishedVersionDto != null)
-            {
-                // We need this to get the proper versionId to match to unpublished values.
-                // This is only needed if the content has been published before.
-                content.PublishedVersionId = publishedVersionDto.Id;
-                if (dto.Published)
-                {
-                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate.EnsureUtc();
-                    content.PublishName = publishedVersionDto.ContentVersionDto.Text;
-                    content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
-                }
-            }
-
-            // templates = ignored, managed by the repository
-
-            // reset dirty initial properties (U4-1946)
-            content.ResetDirtyProperties(false);
-            return content;
-        }
-        finally
-        {
-            content.EnableChangeTracking();
-        }
+        NodeDto nodeDto = dto.ContentDto.NodeDto;
+        return BuildPublishableEntity(new Content(nodeDto.Text, nodeDto.ParentId, contentType), dto);
     }
 
     /// <summary>
-    ///     Builds an IElement item from a dto and content type.
+    ///     Constructs an Element item entity from the provided data transfer object (DTO) and content type.
     /// </summary>
-    // TODO ELEMENTS: refactor and reuse code from BuildEntity(DocumentDto dto, IContentType? contentType)
+    /// <param name="dto">The <see cref="ElementDto"/> containing the data for the element.</param>
+    /// <param name="contentType">The <see cref="IContentType"/> representing the type of the element, or <c>null</c> if not specified.</param>
+    /// <returns>A <see cref="IElement"/> entity built from the specified DTO and content type.</returns>
     public static IElement BuildEntity(ElementDto dto, IContentType? contentType)
     {
         ArgumentNullException.ThrowIfNull(contentType);
 
-        ContentDto contentDto = dto.ContentDto;
-        NodeDto nodeDto = contentDto.NodeDto;
-        ElementVersionDto elementVersionDto = dto.ContentVersionDto;
-        ContentVersionDto contentVersionDto = elementVersionDto.ContentVersionDto;
-        ElementVersionDto? publishedVersionDto = dto.PublishedVersionDto;
-
-        var content = new Element(
-            nodeDto.Text ?? throw new ArgumentException("The element did not have a name", nameof(dto)),
-            contentType);
-
-        try
-        {
-            content.DisableChangeTracking();
-
-            content.Id = dto.NodeId;
-            content.Key = nodeDto.UniqueId;
-            content.VersionId = contentVersionDto.Id;
-
-            content.Name = contentVersionDto.Text;
-
-            content.Path = nodeDto.Path;
-            content.Level = nodeDto.Level;
-            content.ParentId = nodeDto.ParentId;
-            content.SortOrder = nodeDto.SortOrder;
-            content.Trashed = nodeDto.Trashed;
-
-            content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
-            content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = nodeDto.CreateDate;
-            content.UpdateDate = contentVersionDto.VersionDate;
-
-            content.Published = dto.Published;
-            content.Edited = dto.Edited;
-
-            if (publishedVersionDto != null)
-            {
-                // We need this to get the proper versionId to match to unpublished values.
-                // This is only needed if the content has been published before.
-                content.PublishedVersionId = publishedVersionDto.Id;
-                if (dto.Published)
-                {
-                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
-                    content.PublishName = publishedVersionDto.ContentVersionDto.Text;
-                    content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
-                }
-            }
-
-            // templates = ignored, managed by the repository
-
-            // reset dirty initial properties (U4-1946)
-            content.ResetDirtyProperties(false);
-            return content;
-        }
-        finally
-        {
-            content.EnableChangeTracking();
-        }
+        NodeDto nodeDto = dto.ContentDto.NodeDto;
+        return BuildPublishableEntity(
+            new Element(nodeDto.Text ?? throw new ArgumentException("The element did not have a name", nameof(dto)), contentType),
+            dto);
     }
 
     /// <summary>
-    ///     Builds a Media item from a dto and content type.
+    ///     Constructs a Media item entity from the provided data transfer object (DTO) and media type.
     /// </summary>
+    /// <param name="dto">The <see cref="ContentDto"/> containing the data for the media item.</param>
+    /// <param name="contentType">The <see cref="IMediaType"/> representing the type of the media item, or <c>null</c> if not specified.</param>
+    /// <returns>A <see cref="Media"/> entity built from the specified DTO and media type.</returns>
     public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType? contentType)
     {
         NodeDto nodeDto = dto.NodeDto;
@@ -180,8 +81,11 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds a Member item from a dto and member type.
+    /// Builds a <see cref="Member"/> instance from the specified data transfer object and member type.
     /// </summary>
+    /// <param name="dto">The <see cref="MemberDto"/> containing the member data.</param>
+    /// <param name="contentType">The <see cref="IMemberType"/> describing the member type, or <c>null</c> if not specified.</param>
+    /// <returns>The constructed <see cref="Member"/> instance.</returns>
     public static Member BuildEntity(MemberDto dto, IMemberType? contentType)
     {
         NodeDto nodeDto = dto.ContentDto.NodeDto;
@@ -237,8 +141,11 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds a dto from an IContent item.
+    /// Creates a <see cref="DocumentDto"/> instance from the specified <see cref="IContent"/> entity and object type identifier.
     /// </summary>
+    /// <param name="entity">The content entity to convert into a DTO.</param>
+    /// <param name="objectType">The unique identifier representing the object type.</param>
+    /// <returns>A <see cref="DocumentDto"/> representing the specified content entity.</returns>
     public static DocumentDto BuildDto(IContent entity, Guid objectType)
     {
         ContentDto contentDto = BuildContentDto(entity, objectType);
@@ -255,8 +162,11 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds a dto from an IElement item.
+    /// Creates an <see cref="ElementDto"/> instance from the specified <see cref="IElement"/> entity and object type identifier.
     /// </summary>
+    /// <param name="entity">The content entity to convert into a DTO.</param>
+    /// <param name="objectType">The unique identifier representing the object type.</param>
+    /// <returns>An <see cref="ElementDto"/> representing the specified content entity.</returns>
     public static ElementDto BuildDto(IElement entity, Guid objectType)
     {
         ContentDto contentDto = BuildContentDto(entity, objectType);
@@ -272,6 +182,13 @@ internal sealed class ContentBaseFactory
         return dto;
     }
 
+    /// <summary>
+    /// Creates a collection of tuples pairing each <see cref="ContentSchedule"/> in the provided schedule with its corresponding <see cref="ContentScheduleDto"/>.
+    /// </summary>
+    /// <param name="entity">The content entity associated with the schedules.</param>
+    /// <param name="contentSchedule">The collection of content schedules to convert.</param>
+    /// <param name="languageRepository">The repository used to resolve language identifiers for each schedule.</param>
+    /// <returns>An enumerable of tuples, each containing a <see cref="ContentSchedule"/> and its corresponding <see cref="ContentScheduleDto"/>.</returns>
     public static IEnumerable<(ContentSchedule Model, ContentScheduleDto Dto)> BuildScheduleDto(
         IPublishableContentBase entity,
         ContentScheduleCollection contentSchedule,
@@ -288,8 +205,11 @@ internal sealed class ContentBaseFactory
                 }));
 
     /// <summary>
-    ///     Builds a dto from an IMedia item.
+    ///     Creates a <see cref="MediaDto"/> instance from the specified <see cref="IMedia"/> entity.
     /// </summary>
+    /// <param name="mediaUrlGenerators">A collection of media URL generators used to resolve media URLs.</param>
+    /// <param name="entity">The <see cref="IMedia"/> entity to convert to a DTO.</param>
+    /// <returns>A <see cref="MediaDto"/> representing the provided media entity.</returns>
     public static MediaDto BuildDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity)
     {
         ContentDto contentDto = BuildContentDto(entity, Constants.ObjectTypes.Media);
@@ -305,8 +225,10 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds a dto from an IMember item.
+    ///     Builds a <see cref="MemberDto"/> from the specified <see cref="IMember"/> entity.
     /// </summary>
+    /// <param name="entity">The <see cref="IMember"/> entity to build the DTO from.</param>
+    /// <returns>A <see cref="MemberDto"/> representing the given <paramref name="entity"/>.</returns>
     public static MemberDto BuildDto(IMember entity)
     {
         ContentDto contentDto = BuildContentDto(entity, Constants.ObjectTypes.Member);
@@ -429,5 +351,63 @@ internal sealed class ContentBaseFactory
         };
 
         return dto;
+    }
+
+    private static TEntity BuildPublishableEntity<TEntity, TVersionDto>(TEntity content, IPublishableContentDto<TVersionDto> dto)
+        where TEntity : PublishableContentBase
+        where TVersionDto : class, IContentVersionDto
+    {
+        NodeDto nodeDto = dto.ContentDto.NodeDto;
+        ContentVersionDto contentVersionDto = dto.ContentVersionDto.ContentVersionDto;
+        TVersionDto? publishedVersionDto = dto.PublishedVersionDto;
+
+        try
+        {
+            content.DisableChangeTracking();
+
+            content.Id = dto.NodeId;
+            content.Key = nodeDto.UniqueId;
+            content.VersionId = contentVersionDto.Id;
+
+            content.Name = contentVersionDto.Text;
+
+            content.Path = nodeDto.Path;
+            content.Level = nodeDto.Level;
+            content.ParentId = nodeDto.ParentId;
+            content.SortOrder = nodeDto.SortOrder;
+            content.Trashed = nodeDto.Trashed;
+
+            content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
+            content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
+
+            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
+
+            content.Published = dto.Published;
+            content.Edited = dto.Edited;
+
+            if (publishedVersionDto != null)
+            {
+                // We need this to get the proper versionId to match to unpublished values.
+                // This is only needed if the content has been published before.
+                content.PublishedVersionId = publishedVersionDto.Id;
+                if (dto.Published)
+                {
+                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate.EnsureUtc();
+                    content.PublishName = publishedVersionDto.ContentVersionDto.Text;
+                    content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
+                }
+            }
+
+            // templates = ignored, managed by the repository
+
+            // reset dirty initial properties (U4-1946)
+            content.ResetDirtyProperties(false);
+            return content;
+        }
+        finally
+        {
+            content.EnableChangeTracking();
+        }
     }
 }

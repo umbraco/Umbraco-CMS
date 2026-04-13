@@ -357,12 +357,6 @@ internal partial class BlockListElementLevelVariationTests
 
         RefreshContentTypeCache(elementType, contentType);
 
-        // to re-publish the content we need to set the invariant name
-        content = ContentService.GetById(content.Key)!;
-        content.Name = "Home";
-        ContentService.Save(content);
-        PublishContent(content, contentType);
-
         var publishedContent = GetPublishedContent(content.Key);
 
         SetVariationContext(requestCulture, null);
@@ -484,6 +478,8 @@ internal partial class BlockListElementLevelVariationTests
         });
     }
 
+    [TestCase(ContentVariation.Culture, "en-US", null)]
+    [TestCase(ContentVariation.Culture, "da-DK", null)]
     [TestCase(ContentVariation.Culture, "en-US", "Segment1")]
     [TestCase(ContentVariation.Culture, "en-US", "Segment2")]
     [TestCase(ContentVariation.Culture, "da-DK", "Segment1")]
@@ -496,7 +492,7 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase(ContentVariation.Segment, "en-US", "Segment2")]
     [TestCase(ContentVariation.Segment, "da-DK", "Segment1")]
     [TestCase(ContentVariation.Segment, "da-DK", "Segment2")]
-    public async Task Can_Handle_Variant_Element_For_Invariant_Content(ContentVariation elementVariation, string culture, string segment)
+    public async Task Can_Handle_Variant_Element_For_Invariant_Content(ContentVariation elementVariation, string culture, string? segment)
     {
         var elementType = CreateElementType(elementVariation);
         var blockListDataType = await CreateBlockListDataType(elementType);
@@ -507,16 +503,38 @@ internal partial class BlockListElementLevelVariationTests
             elementType,
             new []
             {
+                // NOTE: the content is fully invariant, so the variant element properties can only ever vary by the
+                //       default language (if they even vary) - appearing to be invariant, but being variant at data level.
                 new BlockProperty(
                     new List<BlockPropertyValue>
                     {
-                        new() { Alias = "invariantText", Value = "This is invariant content text" },
-                        new() { Alias = "variantText", Value = "This is also invariant content text" }
+                        new()
+                        {
+                            Alias = "invariantText",
+                            Value = "This is invariant content text"
+                        },
+                        new()
+                        {
+                            Alias = "variantText",
+                            Value = "This is variant content text",
+                            Culture = elementVariation.VariesByCulture() ? "en-US" : null,
+                            Segment = null
+                        }
                     },
                     new List<BlockPropertyValue>
                     {
-                        new() { Alias = "invariantText", Value = "This is invariant settings text" },
-                        new() { Alias = "variantText", Value = "This is also invariant settings text" }
+                        new()
+                        {
+                            Alias = "invariantText",
+                            Value = "This is invariant settings text"
+                        },
+                        new()
+                        {
+                            Alias = "variantText",
+                            Value = "This is variant settings text",
+                            Culture = elementVariation.VariesByCulture() ? "en-US" : null,
+                            Segment = null
+                        }
                     },
                     null,
                     null)
@@ -541,7 +559,7 @@ internal partial class BlockListElementLevelVariationTests
 
             var variantProperty = blockListItem.Content.Properties.Last();
             Assert.AreEqual("variantText", variantProperty.Alias);
-            Assert.AreEqual("This is also invariant content text", variantProperty.GetValue());
+            Assert.AreEqual("This is variant content text", variantProperty.GetValue());
         });
 
         Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
@@ -553,7 +571,7 @@ internal partial class BlockListElementLevelVariationTests
 
             var variantProperty = blockListItem.Settings.Properties.Last();
             Assert.AreEqual("variantText", variantProperty.Alias);
-            Assert.AreEqual("This is also invariant settings text", variantProperty.GetValue());
+            Assert.AreEqual("This is variant settings text", variantProperty.GetValue());
         });
     }
 

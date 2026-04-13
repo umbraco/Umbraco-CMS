@@ -15,13 +15,24 @@ internal sealed class HttpScopeReference : IHttpScopeReference
     private bool _disposedValue;
     private bool _registered;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.Scoping.HttpScopeReference"/> class,
+    /// associating it with the specified <paramref name="scopeProvider"/>.
+    /// </summary>
+    /// <param name="scopeProvider">The <see cref="ScopeProvider"/> used to manage the scope for this reference.</param>
     public HttpScopeReference(ScopeProvider scopeProvider) => _scopeProvider = scopeProvider;
 
+    /// <summary>
+    /// Disposes the current <see cref="HttpScopeReference"/>, releasing any resources associated with the scope.
+    /// </summary>
     public void Dispose() =>
 
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
 
+    /// <summary>
+    /// Marks this HTTP scope reference as registered, indicating it is now active within the current HTTP context.
+    /// </summary>
     public void Register() => _registered = true;
 
     private void Dispose(bool disposing)

@@ -8,10 +8,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// Serves as the base controller for element creation endpoints in the Umbraco CMS Management API.
+/// Provides shared functionality for creating elements.
+/// </summary>
 public abstract class CreateElementControllerBase : ElementControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateElementControllerBase"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize access to element creation operations.</param>
     protected CreateElementControllerBase(IAuthorizationService authorizationService)
         => _authorizationService = authorizationService;
 

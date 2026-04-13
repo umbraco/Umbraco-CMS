@@ -19,6 +19,15 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
 {
     private readonly IEventMessagesFactory _eventMessagesFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.MemberGroupRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for storing and retrieving cached data.</param>
+    /// <param name="logger">The logger used for logging repository operations and errors.</param>
+    /// <param name="eventMessagesFactory">Factory for creating event messages to be used during repository operations.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning for repository data.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
     public MemberGroupRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -36,6 +45,11 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
 
     private Guid NodeObjectTypeId => Constants.ObjectTypes.MemberGroup;
 
+    /// <summary>
+    /// Gets the member group with the specified unique identifier.
+    /// </summary>
+    /// <param name="uniqueId">The unique identifier of the member group.</param>
+    /// <returns>The member group if found; otherwise, null.</returns>
     public IMemberGroup? Get(Guid uniqueId)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false);
@@ -46,6 +60,11 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
         return dto == null ? null : MemberGroupFactory.BuildEntity(dto);
     }
 
+    /// <summary>
+    /// Gets a member group by its name.
+    /// </summary>
+    /// <param name="name">The name of the member group to retrieve.</param>
+    /// <returns>The member group matching the specified name, or null if not found.</returns>
     public IMemberGroup? GetByName(string? name) =>
         IsolatedCache.GetCacheItem(
             typeof(IMemberGroup).FullName + "." + name,
@@ -62,6 +81,14 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
             // sliding is true
             true);
 
+    /// <summary>
+    /// Attempts to create a new member group with the specified role name if one does not already exist.
+    /// If a group with the given role name exists, or if the creation is cancelled by a notification, no new group is created.
+    /// </summary>
+    /// <param name="roleName">The name of the role to use for the new member group.</param>
+    /// <returns>
+    /// The newly created <see cref="Umbraco.Cms.Core.Models.IMemberGroup"/> if successful; otherwise, <c>null</c> if a group with the specified role name already exists or creation was cancelled.
+    /// </returns>
     public IMemberGroup? CreateIfNotExists(string roleName)
     {
         IQuery<IMemberGroup> qry = Query<IMemberGroup>().Where(group => group.Name!.Equals(roleName));
@@ -86,6 +113,11 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
         return grp;
     }
 
+    /// <summary>
+    /// Gets the member groups associated with the specified member.
+    /// </summary>
+    /// <param name="memberId">The identifier of the member.</param>
+    /// <returns>An enumerable collection of member groups that the member belongs to.</returns>
     public IEnumerable<IMemberGroup> GetMemberGroupsForMember(int memberId)
     {
         Sql<ISqlContext> sql = Sql()
@@ -101,6 +133,11 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
             .Select(x => MemberGroupFactory.BuildEntity(x));
     }
 
+    /// <summary>
+    /// Gets the member groups associated with the specified member.
+    /// </summary>
+    /// <param name="username">The username of the member.</param>
+    /// <returns>An enumerable collection of member groups that the member belongs to.</returns>
     public IEnumerable<IMemberGroup> GetMemberGroupsForMember(string? username)
     {
         Sql<ISqlContext>? sql = Sql()
@@ -118,10 +155,25 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
             .Select(x => MemberGroupFactory.BuildEntity(x));
     }
 
+    /// <summary>
+    /// Replaces all existing roles for the specified members with the provided role names.
+    /// </summary>
+    /// <param name="memberIds">The IDs of the members whose roles will be replaced.</param>
+    /// <param name="roleNames">The new set of role names to assign to each member, replacing any existing roles.</param>
     public void ReplaceRoles(int[] memberIds, string[] roleNames) => AssignRolesInternal(memberIds, roleNames, true);
 
+    /// <summary>
+    /// Assigns the specified roles to the members identified by the given member IDs.
+    /// </summary>
+    /// <param name="memberIds">An array of member IDs to assign roles to.</param>
+    /// <param name="roleNames">An array of role names to assign to the members.</param>
     public void AssignRoles(int[] memberIds, string[] roleNames) => AssignRolesInternal(memberIds, roleNames);
 
+    /// <summary>
+    /// Dissociates the specified roles from the given member IDs.
+    /// </summary>
+    /// <param name="memberIds">The IDs of the members to dissociate roles from.</param>
+    /// <param name="roleNames">The names of the roles to dissociate.</param>
     public void DissociateRoles(int[] memberIds, string[] roleNames) => DissociateRolesInternal(memberIds, roleNames);
 
     protected override IMemberGroup? PerformGet(int id)
@@ -315,12 +367,21 @@ internal sealed class MemberGroupRepository : EntityRepositoryBase<int, IMemberG
 
     private sealed class AssignedRolesDto
     {
+        /// <summary>
+        /// Gets or sets the name of the role.
+        /// </summary>
         [Column("text")]
         public string? RoleName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the identifier of the member.
+        /// </summary>
         [Column("Member")]
         public int MemberId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the identifier of the member group.
+        /// </summary>
         [Column("MemberGroup")]
         public int MemberGroupId { get; set; }
     }

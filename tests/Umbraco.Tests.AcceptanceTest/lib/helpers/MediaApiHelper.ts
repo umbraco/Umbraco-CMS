@@ -1,6 +1,6 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
-import {MediaBuilder} from "../builders";
 import {AliasHelper} from "./AliasHelper";
+import {MediaBuilder} from "../builders";
 
 export class MediaApiHelper {
   api: ApiHelpers

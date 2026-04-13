@@ -18,12 +18,18 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     private const string CmsObjectPath = "Umbraco:CMS";
     private const string GlobalIdPath = $"{CmsObjectPath}:Global:Id";
     private const string DisableRedirectUrlTrackingPath = $"{CmsObjectPath}:WebRouting:DisableRedirectUrlTracking";
+    private const string ImagingHmacSecretKeyPath = $"{CmsObjectPath}:Imaging:HMACSecretKey";
 
     private readonly JsonDocumentOptions _jsonDocumentOptions = new() { CommentHandling = JsonCommentHandling.Skip };
     private readonly IConfiguration _configuration;
     private readonly ILogger<JsonConfigManipulator> _logger;
     private readonly SemaphoreSlim _lock = new(1, 1);
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="JsonConfigManipulator"/> class.
+    /// </summary>
+    /// <param name="configuration">The <see cref="IConfiguration"/> instance containing configuration settings.</param>
+    /// <param name="logger">The <see cref="ILogger{JsonConfigManipulator}"/> instance used for logging operations.</param>
     public JsonConfigManipulator(IConfiguration configuration, ILogger<JsonConfigManipulator> logger)
     {
         _configuration = configuration;
@@ -104,6 +110,10 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     /// <inheritdoc />
     public async Task SetGlobalIdAsync(string id)
         => await CreateOrUpdateConfigValueAsync(GlobalIdPath, id);
+
+    /// <inheritdoc />
+    public async Task SetImagingHmacSecretKeyAsync(string base64Key)
+        => await CreateOrUpdateConfigValueAsync(ImagingHmacSecretKeyPath, base64Key);
 
     /// <summary>
     /// Creates or updates a config value at the specified path.

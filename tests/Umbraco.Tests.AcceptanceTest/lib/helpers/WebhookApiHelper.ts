@@ -24,7 +24,7 @@ export class WebhookApiHelper {
   }
 
   async doesExist(id: string) {
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/webhook/' + id);
+    const response = await this.get(this.api.baseUrl + '/umbraco/management/api/v1/webhook/' + id);
     return response.status() === 200;
   }
 

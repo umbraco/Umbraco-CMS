@@ -74,7 +74,7 @@ internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegration
     {
         var publishResult = ContentService.Publish(content, culturesToPublish);
         Assert.IsTrue(publishResult.Success);
-        DocumentCacheService.RefreshContentAsync(content);
+        DocumentCacheService.RefreshContentAsync(content).GetAwaiter().GetResult();
     }
 
     protected IContentType CreateElementType(ContentVariation variation, string alias = "myElementType")

@@ -15,6 +15,10 @@ internal sealed class CacheInstructionRepository : ICacheInstructionRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.CacheInstructionRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
     public CacheInstructionRepository(IScopeAccessor scopeAccessor) => _scopeAccessor = scopeAccessor;
 
     private IScope? AmbientScope => _scopeAccessor.AmbientScope;

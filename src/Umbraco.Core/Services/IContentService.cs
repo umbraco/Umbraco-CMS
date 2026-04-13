@@ -37,20 +37,17 @@ public interface IContentService : IPublishableContentService<IContent>
     ///     Saves a blueprint.
     /// </summary>
     /// <param name="content">The blueprint to save.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 18.")]
-    void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Saves a blueprint.
-    /// </summary>
-    /// <param name="content">The blueprint to save.</param>
     /// <param name="createdFromContent">The content from which the blueprint was created.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
-    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => SaveBlueprint(content, userId);
-#pragma warning restore CS0618 // Type or member is obsolete
+    void SaveBlueprint(IContent content, IContent? createdFromContent, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Moves a blueprint.
+    /// </summary>
+    /// <param name="content">The blueprint to move.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    // TODO (V19): Remove the default implementation from this
+    void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
 
     /// <summary>
     ///     Deletes a blueprint.
@@ -69,18 +66,6 @@ public interface IContentService : IPublishableContentService<IContent>
     // TODO: Remove the default implementation when CreateContentFromBlueprint is removed.
     IContent CreateBlueprintFromContent(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
         => throw new NotImplementedException();
-
-    /// <summary>
-    ///     (Deprecated) Creates a new content item from a blueprint.
-    /// </summary>
-    /// <param name="blueprint">The blueprint to create content from.</param>
-    /// <param name="name">The name for the new content.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    /// <returns>The created content.</returns>
-    /// <remarks>If creating content from a blueprint, use <see cref="IContentBlueprintEditingService.GetScaffoldedAsync"/>
-    /// instead. If creating a blueprint from content use <see cref="CreateBlueprintFromContent"/> instead.</remarks>
-    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in Umbraco 18.")]
-    IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Deletes blueprints for a content type.
@@ -108,35 +93,11 @@ public interface IContentService : IPublishableContentService<IContent>
     IContent? GetById(int id);
 
     /// <summary>
-    ///     Gets a document.
-    /// </summary>
-    /// <param name="key">The unique identifier of the document.</param>
-    /// <returns>The document, or null if not found.</returns>
-    // TODO (V18): This is already declared on the base type, so for the next major, when we can allow a binary breaking change, we should remove it from here.
-#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
-    IContent? GetById(Guid key);
-#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
-
-    /// <summary>
-    ///     Gets publish/unpublish schedule for a content node.
-    /// </summary>
-    /// <param name="contentId">The identifier of the content to load schedule for.</param>
-    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
-    ContentScheduleCollection GetContentScheduleByContentId(int contentId);
-
-    /// <summary>
     ///     Gets documents.
     /// </summary>
     /// <param name="ids">The identifiers of the documents.</param>
     /// <returns>The documents.</returns>
     IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
-
-    /// <summary>
-    ///     Gets documents.
-    /// </summary>
-    /// <param name="ids">The unique identifiers of the documents.</param>
-    /// <returns>The documents.</returns>
-    IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
 
     /// <summary>
     ///     Gets documents at a given level.
@@ -317,13 +278,6 @@ public interface IContentService : IPublishableContentService<IContent>
     /// <returns>A dictionary with a node Id and an IEnumerable of matching ContentSchedules.</returns>
     [Obsolete("Use GetContentSchedulesByKeys instead. Scheduled for removal in Umbraco 19.")]
     IDictionary<int, IEnumerable<ContentSchedule>> GetContentSchedulesByIds(Guid[] keys) => ImmutableDictionary<int, IEnumerable<ContentSchedule>>.Empty;
-
-    /// <summary>
-    ///     Gets a dictionary of content keys and their matching content schedules.
-    /// </summary>
-    /// <param name="keys">The content keys.</param>
-    /// <returns>A dictionary with a content key and an IEnumerable of matching ContentSchedules.</returns>
-    IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys) => ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
 
     #endregion
 

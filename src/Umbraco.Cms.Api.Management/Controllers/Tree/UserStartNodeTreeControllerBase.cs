@@ -4,13 +4,16 @@ using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
+/// <summary>
+/// Provides a base controller for managing tree structures representing user start nodes in the Umbraco management API.
+/// </summary>
+/// <typeparam name="TItem">The type of the tree item managed by the controller.</typeparam>
 public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControllerBase<TItem>
     where TItem : ContentTreeItemResponseModel, new()
 {
@@ -21,19 +24,6 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
     private string[]? _userStartNodePaths;
     private Dictionary<Guid, bool> _accessMap = new();
     private Guid? _dataTypeKey;
-
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected UserStartNodeTreeControllerBase(
-        IEntityService entityService,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              userStartNodeEntitiesService,
-              dataTypeService)
-    {
-    }
 
     protected UserStartNodeTreeControllerBase(
         IEntityService entityService,
@@ -96,17 +86,17 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
         return CalculateAccessMap(() => userAccessEntities, out _);
     }
 
-    protected override TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+    protected override async Task<TItem[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
     {
         if (UserHasRootAccess() || IgnoreUserStartNodes())
         {
-            return base.MapTreeItemViewModels(parentKey, entities);
+            return await base.MapTreeItemViewModelsAsync(parentKey, entities);
         }
 
         // for users with no root access, only add items for the entities contained within the calculated access map.
         // the access map may contain entities that the user does not have direct access to, but need still to see,
         // because it has descendants that the user *does* have access to. these entities are added as "no access" items.
-        TItem[] contentTreeItemViewModels = entities.Select(entity =>
+        IEnumerable<Task<TItem?>> tasks = entities.Select(async entity =>
             {
                 if (_accessMap.TryGetValue(entity.Key, out var hasAccess) == false)
                 {
@@ -117,9 +107,10 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
                 // direct access => return a regular item
                 // no direct access => return a "no access" item
                 return hasAccess
-                    ? MapTreeItemViewModel(parentKey, entity)
-                    : MapTreeItemViewModelAsNoAccess(parentKey, entity);
-            })
+                    ? await MapTreeItemViewModelAsync(parentKey, entity)
+                    : await MapTreeItemViewModelAsNoAccessAsync(parentKey, entity);
+            });
+        TItem[] contentTreeItemViewModels = (await Task.WhenAll(tasks))
             .WhereNotNull()
             .ToArray();
 
@@ -148,9 +139,9 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
         return entities;
     }
 
-    private TItem MapTreeItemViewModelAsNoAccess(Guid? parentKey, IEntitySlim entity)
+    private async Task<TItem> MapTreeItemViewModelAsNoAccessAsync(Guid? parentKey, IEntitySlim entity)
     {
-        TItem viewModel = MapTreeItemViewModel(parentKey, entity);
+        TItem viewModel = await MapTreeItemViewModelAsync(parentKey, entity);
         viewModel.NoAccess = true;
         return viewModel;
     }

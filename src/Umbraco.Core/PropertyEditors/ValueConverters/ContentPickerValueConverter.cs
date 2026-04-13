@@ -86,8 +86,14 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
     /// <inheritdoc />
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
     {
-        IPublishedContent? content = GetContent(propertyType, inter);
-        return content ?? inter;
+        // Built-in routing properties (umbracoInternalRedirectId, umbracoRedirect) are excluded
+        // from content resolution; return the raw intermediate value so PublishedRouter can use it.
+        if (IsExcludedProperty(propertyType))
+        {
+            return inter;
+        }
+
+        return GetContent(propertyType, inter, preview);
     }
 
     /// <inheritdoc />
@@ -102,7 +108,7 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
     /// <inheritdoc />
     public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
     {
-        IPublishedContent? content = GetContent(propertyType, inter);
+        IPublishedContent? content = GetContent(propertyType, inter, preview);
         if (content == null)
         {
             return null;
@@ -111,40 +117,28 @@ public class ContentPickerValueConverter : PropertyValueConverterBase, IDelivery
         return _apiContentBuilder.Build(content);
     }
 
-    private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter)
+    private static bool IsExcludedProperty(IPublishedPropertyType propertyType)
+        => propertyType.Alias is not null
+           && PropertiesToExclude.Contains(propertyType.Alias.ToLower(CultureInfo.InvariantCulture));
+
+    private IPublishedContent? GetContent(IPublishedPropertyType propertyType, object? inter, bool preview)
     {
-        if (inter == null)
+        if (inter is null || IsExcludedProperty(propertyType))
         {
             return null;
         }
 
-        if ((propertyType.Alias != null &&
-             PropertiesToExclude.Contains(propertyType.Alias.ToLower(CultureInfo.InvariantCulture))) == false)
+        if (inter is int id)
         {
-            IPublishedContent? content;
-            if (inter is int id)
-            {
-                content = _publishedContentCache.GetById(id);
-                if (content != null)
-                {
-                    return content;
-                }
-            }
-            else
-            {
-                if (inter is not GuidUdi udi)
-                {
-                    return null;
-                }
-
-                content = _publishedContentCache.GetById(udi.Guid);
-                if (content != null && content.ContentType.ItemType == PublishedItemType.Content)
-                {
-                    return content;
-                }
-            }
+            return _publishedContentCache.GetById(preview, id);
         }
 
-        return null;
+        if (inter is not GuidUdi udi)
+        {
+            return null;
+        }
+
+        IPublishedContent? content = _publishedContentCache.GetById(preview, udi.Guid);
+        return content?.ContentType.ItemType == PublishedItemType.Content ? content : null;
     }
 }

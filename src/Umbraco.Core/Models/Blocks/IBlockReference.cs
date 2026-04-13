@@ -13,15 +13,6 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 public interface IBlockReference
 {
     /// <summary>
-    ///     Gets the content UDI.
-    /// </summary>
-    /// <value>
-    ///     The content UDI.
-    /// </value>
-    [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
-    Udi ContentUdi { get; }
-
-    /// <summary>
     /// Gets the content key.
     /// </summary>
     public Guid ContentKey { get; set; }

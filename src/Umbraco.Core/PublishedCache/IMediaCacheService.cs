@@ -103,8 +103,7 @@ public interface IMediaCacheService
     /// Use this when the published model factory is reset (e.g. InMemoryAuto mode), which
     /// invalidates all compiled model types and makes cached instances of any type stale.
     /// </remarks>
-    // TODO (V18): Remove default implementation.
-    void ClearConvertedContentCache() { }
+    void ClearConvertedContentCache();
 
     /// <summary>
     /// Clears converted IPublishedContent entries for the specified media types from the in-memory cache,
@@ -115,6 +114,5 @@ public interface IMediaCacheService
     /// so only the affected media types need their converted cache cleared.
     /// </remarks>
     /// <param name="mediaTypeIds">The IDs of the media types whose converted entries should be cleared.</param>
-    // TODO (V18): Remove default implementation.
-    void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds) { }
+    void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds);
 }

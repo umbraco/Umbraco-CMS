@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -516,17 +515,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     #region Get, Has, Is
 
     /// <summary>
-    /// <summary>
-    /// Gets the content schedule collection for the specified content key.
-    /// </summary>
-    /// <param name="contentId">The unique key of the content to retrieve the schedule for.</param>
-    /// <returns>The <see cref="ContentScheduleCollection"/> for the specified content, or an empty collection if not found.</returns>
-
-    /// <inheritdoc />
-    Attempt<OperationResult?> IContentServiceBase<IContent>.Save(IEnumerable<IContent> contents, int userId) =>
-        Attempt.Succeed(Save(contents, userId));
-
-    /// <summary>
     ///     Gets a collection of <see cref="IContent" /> objects by Level
     /// </summary>
     /// <param name="level">The level to retrieve Content from</param>
@@ -767,44 +755,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         return intKeyedResults;
     }
 
-    /// <inheritdoc/>
-    public IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys)
-    {
-        if (keys.Length == 0)
-        {
-            return ImmutableDictionary<Guid, IEnumerable<ContentSchedule>>.Empty;
-        }
-
-        Dictionary<int, Guid> intToKeyMap = new(keys.Length);
-        foreach (Guid key in keys)
-        {
-            Attempt<int> contentId = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document);
-            if (contentId.Success is false)
-            {
-                continue;
-            }
-
-            intToKeyMap[contentId.Result] = key;
-        }
-
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        scope.ReadLock(Constants.Locks.ContentTree);
-
-        IDictionary<int, IEnumerable<ContentSchedule>> intKeyedResults =
-            _documentRepository.GetContentSchedulesByIds(intToKeyMap.Keys.ToArray());
-
-        var guidKeyedResults = new Dictionary<Guid, IEnumerable<ContentSchedule>>(intKeyedResults.Count);
-        foreach (KeyValuePair<int, IEnumerable<ContentSchedule>> entry in intKeyedResults)
-        {
-            if (intToKeyMap.TryGetValue(entry.Key, out Guid guidKey))
-            {
-                guidKeyedResults[guidKey] = entry.Value;
-            }
-        }
-
-        return guidKeyedResults;
-    }
-
     /// <summary>
     ///     Checks if the passed in <see cref="IContent" /> can be published based on the ancestors publish state.
     /// </summary>
@@ -878,7 +828,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
             var allLangs = _languageRepository.GetMany().ToList();
 
-            PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+            PublishResult result = CommitContentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
             scope.Complete();
             return result;
         }
@@ -1173,7 +1123,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
         }
 
-        PublishResult result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, true, isRoot);
+        PublishResult result = CommitContentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, true, isRoot);
         if (result.Success)
         {
             publishedDocuments.Add(document);
@@ -1419,9 +1369,22 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
             if (contents is not null)
             {
+                // When checking if an item is related, we need to exclude the "relate parent on delete" relation type,
+                // as this is automatically created when items are trashed and would prevent emptying the recycle bin.
+                int[]? relateParentOnDeleteRelationTypeIds = null;
+                if (_contentSettings.DisableDeleteWhenReferenced)
+                {
+                    IRelationType? relateParentOnDeleteRelationType = _relationService.GetRelationTypeByAlias(
+                        Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
+                    if (relateParentOnDeleteRelationType is not null)
+                    {
+                        relateParentOnDeleteRelationTypeIds = [relateParentOnDeleteRelationType.Id];
+                    }
+                }
+
                 foreach (IContent content in contents)
                 {
-                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child))
+                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child, excludeRelationTypeIds: relateParentOnDeleteRelationTypeIds))
                     {
                         continue;
                     }
@@ -1499,7 +1462,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             scope.WriteLock(Constants.Locks.ContentTree);
 
             TryGetParentKey(parentId, out Guid? parentKey);
-            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentId, parentKey, eventMessages)))
+            if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(content, copy, parentKey, eventMessages)))
             {
                 scope.Complete();
                 return null;
@@ -1569,7 +1532,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                         IContent descendantCopy = descendant.DeepCloneWithResetIdentities();
                         descendantCopy.ParentId = parentId;
 
-                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentId, parentKey, eventMessages)))
+                        if (scope.Notifications.PublishCancelable(new ContentCopyingNotification(descendant, descendantCopy, parentKey, eventMessages)))
                         {
                             continue;
                         }
@@ -1606,7 +1569,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 new ContentTreeChangeNotification(copy, TreeChangeTypes.RefreshBranch, eventMessages));
             foreach (Tuple<IContent, IContent> x in CollectionsMarshal.AsSpan(copies))
             {
-                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentId, parentKey, relateToOriginal, eventMessages));
+                scope.Notifications.Publish(new ContentCopiedNotification(x.Item1, x.Item2, parentKey, relateToOriginal, eventMessages));
             }
 
             Audit(AuditType.Copy, userId, content.Id);
@@ -1814,31 +1777,16 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         return OperationResult.Succeed(eventMessages);
     }
 
-    /// <summary>
-    /// Checks the data integrity of the content tree and optionally fixes issues.
-    /// </summary>
-    /// <param name="options">The options for the data integrity check.</param>
-    /// <returns>A <see cref="ContentDataIntegrityReport"/> containing the results of the integrity check.</returns>
-    public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            ContentDataIntegrityReport report = _documentRepository.CheckDataIntegrity(options);
-
-            if (report.FixedIssues.Count > 0)
+    /// <inheritdoc />
+    public override ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
+        => CheckDataIntegrity(
+            options,
+            scope =>
             {
                 // The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
                 var root = new Content("root", -1, new ContentType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
                 scope.Notifications.Publish(new ContentTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
-            }
-
-            scope.Complete();
-
-            return report;
-        }
-    }
+            });
 
     #endregion
 
@@ -1870,14 +1818,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// </remarks>
     #endregion
 
-    #region Private Methods
-
-    // TODO ELEMENTS: not used? clean up!
-    private bool IsMandatoryCulture(IReadOnlyCollection<ILanguage> langs, string culture) =>
-        langs.Any(x => x.IsMandatory && x.IsoCode.InvariantEquals(culture));
-
-    #endregion
-
     #region Content Types
 
     /// <summary>
@@ -1892,7 +1832,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// </remarks>
     /// <param name="contentTypeIds">Id of the <see cref="IContentType" /></param>
     /// <param name="userId">Optional Id of the user issuing the delete operation</param>
-    public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
+    public override void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
     {
         // TODO: This currently this is called from the ContentTypeService but that needs to change,
         // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
@@ -2029,6 +1969,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     /// </summary>
     /// <param name="content">The blueprint content to save.</param>
     /// <param name="userId">The optional ID of the user saving the blueprint.</param>
+    [Obsolete("Please use the method taking all parameters. Scheduled for removal in Umbraco 20.")]
     public void SaveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
         => SaveBlueprint(content, null, userId);
 
@@ -2060,6 +2001,33 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
             scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, createdFromContent, evtMsgs));
+            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
+
+            scope.Complete();
+        }
+    }
+
+    /// <summary>
+    /// Moves a content blueprint to a different container.
+    /// </summary>
+    /// <param name="content">The blueprint content to move.</param>
+    /// <param name="userId">The optional ID of the user moving the blueprint.</param>
+    public void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        content.Blueprint = true;
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
+            content.WriterId = userId;
+
+            _documentBlueprintRepository.Save(content);
+
+            Audit(AuditType.Move, userId, content.Id);
+
             scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
 
             scope.Complete();
@@ -2138,11 +2106,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
         return content;
     }
-
-    /// <inheritdoc />
-    [Obsolete("Use IContentBlueprintEditingService.GetScaffoldedAsync() instead. Scheduled for removal in Umbraco 18.")]
-    public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = Constants.Security.SuperUserId)
-        => CreateBlueprintFromContent(blueprint, name, userId);
 
     /// <summary>
     /// Gets all content blueprints for the specified content type IDs.
@@ -2234,12 +2197,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
     protected override bool SupportsBranchPublishing => true;
 
     protected override ILogger<ContentService> Logger => _logger;
-
-    protected override IContent CreateContentInstance(string name, int parentId, IContentType contentType, int userId)
-        => new Content(name, parentId, contentType, userId);
-
-    protected override IContent CreateContentInstance(string name, IContent parent, IContentType contentType, int userId)
-        => new Content(name, parent, contentType, userId);
 
     protected override void DeleteLocked(ICoreScope scope, IContent content, EventMessages evtMsgs)
     {

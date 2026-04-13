@@ -11,6 +11,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// Serves as the base controller for implementing element management operations within the Umbraco CMS Management API.
+/// Provides shared functionality for derived element controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Element)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Element))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessElements)]

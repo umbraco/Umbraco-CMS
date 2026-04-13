@@ -7,8 +7,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
+/// <summary>
+/// Factory for creating database model definitions used in Umbraco CMS persistence.
+/// </summary>
 public static class DefinitionFactory
 {
+    /// <summary>
+    /// Generates a <see cref="TableDefinition"/> for the specified model type, using the provided SQL syntax provider.
+    /// The method inspects the model type's properties and associated attributes (such as <see cref="TableNameAttribute"/>,
+    /// <see cref="ColumnAttribute"/>, <see cref="ForeignKeyAttribute"/>, <see cref="IndexAttribute"/>, <see cref="IgnoreAttribute"/>,
+    /// and <see cref="ResultColumnAttribute"/>) to determine the table name, columns, foreign keys, and indexes.
+    /// </summary>
+    /// <param name="modelType">The model <see cref="Type"/> to generate the table definition for.</param>
+    /// <param name="sqlSyntax">The SQL syntax provider used to generate database-specific SQL.</param>
+    /// <returns>A <see cref="TableDefinition"/> representing the database table structure, including columns, foreign keys, and indexes, for the specified model type.</returns>
     public static TableDefinition GetTableDefinition(Type modelType, ISqlSyntaxProvider sqlSyntax)
     {
         // Looks for NPoco's TableNameAtribute for the name of the table
@@ -73,6 +85,19 @@ public static class DefinitionFactory
         return tableDefinition;
     }
 
+    /// <summary>
+    /// Creates a <see cref="ColumnDefinition"/> for the specified property of a model type by inspecting its attributes and metadata.
+    /// </summary>
+    /// <param name="modelType">The type of the model containing the property.</param>
+    /// <param name="propertyInfo">The <see cref="PropertyInfo"/> representing the property to map as a database column.</param>
+    /// <param name="columnName">The name of the column in the database.</param>
+    /// <param name="tableName">The name of the table the column belongs to.</param>
+    /// <param name="sqlSyntax">The SQL syntax provider used for database-specific SQL generation.</param>
+    /// <returns>
+    /// A <see cref="ColumnDefinition"/> describing the column's database mapping, including type, nullability, primary key, size, constraints, and other settings
+    /// as determined by attributes (such as <see cref="NullSettingAttribute"/>, <see cref="SpecialDbTypeAttribute"/>, <see cref="PrimaryKeyColumnAttribute"/>,
+    /// <see cref="LengthAttribute"/>, and <see cref="ConstraintAttribute"/>) applied to the property.
+    /// </returns>
     public static ColumnDefinition GetColumnDefinition(Type modelType, PropertyInfo propertyInfo, string columnName, string tableName, ISqlSyntaxProvider sqlSyntax)
     {
         var definition = new ColumnDefinition
@@ -134,6 +159,17 @@ public static class DefinitionFactory
         return definition;
     }
 
+    /// <summary>
+    /// Creates a <see cref="ForeignKeyDefinition"/> that describes a foreign key relationship for the specified model property.
+    /// </summary>
+    /// <param name="modelType">The <see cref="Type"/> of the model declaring the foreign key property.</param>
+    /// <param name="propertyInfo">The <see cref="PropertyInfo"/> for the property representing the foreign key in the model.</param>
+    /// <param name="attribute">The <see cref="ForeignKeyAttribute"/> providing metadata about the referenced table and column.</param>
+    /// <param name="columnName">The name of the column in the current (foreign) table that holds the foreign key value.</param>
+    /// <param name="tableName">The name of the current (foreign) table containing the foreign key column.</param>
+    /// <returns>
+    /// A <see cref="ForeignKeyDefinition"/> that specifies the foreign key constraint, including the foreign and primary tables, columns, and referential actions.
+    /// </returns>
     public static ForeignKeyDefinition GetForeignKeyDefinition(Type modelType, PropertyInfo propertyInfo, ForeignKeyAttribute attribute, string columnName, string tableName)
     {
         TableNameAttribute? referencedTable = attribute.Type.FirstAttribute<TableNameAttribute>();
@@ -161,6 +197,15 @@ public static class DefinitionFactory
         return definition;
     }
 
+    /// <summary>
+    /// Creates an <see cref="IndexDefinition"/> based on the provided model type, property, and index attribute.
+    /// </summary>
+    /// <param name="modelType">The model <see cref="Type"/> that contains the property.</param>
+    /// <param name="propertyInfo">The <see cref="PropertyInfo"/> representing the property to index.</param>
+    /// <param name="attribute">The <see cref="IndexAttribute"/> containing index configuration.</param>
+    /// <param name="columnName">The name of the column to be indexed.</param>
+    /// <param name="tableName">The name of the table containing the column.</param>
+    /// <returns>An <see cref="IndexDefinition"/> describing the index.</returns>
     public static IndexDefinition GetIndexDefinition(Type modelType, PropertyInfo propertyInfo, IndexAttribute attribute, string columnName, string tableName)
     {
         var indexName = string.IsNullOrEmpty(attribute.Name)

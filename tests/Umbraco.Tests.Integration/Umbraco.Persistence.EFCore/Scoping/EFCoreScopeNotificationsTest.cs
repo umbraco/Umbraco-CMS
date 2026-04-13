@@ -20,7 +20,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
         builder.AddNotificationHandler<TestDoNotSendNotification, TestDoNotSendNotificationHandler>();
     }
 
-    private IEFCoreScopeProvider<TestUmbracoDbContext> EfCoreScopeProvider => GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
+    private IEFCoreScopeProvider<TestUmbracoDbContext> EFCoreScopeProvider => GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
 
     [Test]
     public void Scope_Can_Send_Notification()
@@ -30,7 +30,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
         // has only gone up by 1
         var initialAssertCount = TestContext.CurrentContext.AssertCount;
 
-        using (var scope = EfCoreScopeProvider.CreateScope())
+        using (var scope = EFCoreScopeProvider.CreateScope())
         {
             var savingNotification = new TestSendNotification();
             scope.Notifications.Publish(savingNotification);
@@ -44,9 +44,9 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
     public void Child_Scope_Can_Send_Notification()
     {
         var initialAssertCount = TestContext.CurrentContext.AssertCount;
-        using (var scope = EfCoreScopeProvider.CreateScope())
+        using (var scope = EFCoreScopeProvider.CreateScope())
         {
-            using (var childScope = EfCoreScopeProvider.CreateScope())
+            using (var childScope = EFCoreScopeProvider.CreateScope())
             {
                 var savingNotification = new TestSendNotification();
                 childScope.Notifications.Publish(savingNotification);
@@ -62,7 +62,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
     [Test]
     public void Scope_Does_Not_Send_Notification_When_Not_Completed()
     {
-        using var scope = EfCoreScopeProvider.CreateScope();
+        using var scope = EFCoreScopeProvider.CreateScope();
 
         var savingNotification = new TestDoNotSendNotification();
         scope.Notifications.Publish(savingNotification);
@@ -71,7 +71,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
     [Test]
     public void Scope_Does_Not_Send_Notification_When_Suppressing()
     {
-        using var scope = EfCoreScopeProvider.CreateScope();
+        using var scope = EFCoreScopeProvider.CreateScope();
         scope.Notifications.Suppress();
         var savingNotification = new TestDoNotSendNotification();
         scope.Notifications.Publish(savingNotification);
@@ -81,9 +81,9 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
     [Test]
     public void Child_Scope_Cannot_Send_Suppressed_Notification()
     {
-        using var scope = EfCoreScopeProvider.CreateScope();
+        using var scope = EFCoreScopeProvider.CreateScope();
 
-        using (var childScope = EfCoreScopeProvider.CreateScope())
+        using (var childScope = EFCoreScopeProvider.CreateScope())
         {
             childScope.Notifications.Suppress();
             var savingNotification = new TestDoNotSendNotification();
@@ -98,11 +98,11 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
     {
         var initialAssertCount = TestContext.CurrentContext.AssertCount;
 
-        using (var scope = EfCoreScopeProvider.CreateScope())
+        using (var scope = EFCoreScopeProvider.CreateScope())
         {
             var savingParentNotification = new TestSendNotification();
             scope.Notifications.Publish(savingParentNotification);
-            using (var childScope = EfCoreScopeProvider.CreateScope())
+            using (var childScope = EFCoreScopeProvider.CreateScope())
             {
                 childScope.Notifications.Suppress();
                 var savingNotification = new TestDoNotSendNotification();
@@ -122,9 +122,9 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
         var initialAssertCount = TestContext.CurrentContext.AssertCount;
 
 
-        using (var scope = EfCoreScopeProvider.CreateScope())
+        using (var scope = EFCoreScopeProvider.CreateScope())
         {
-            using (var childScope = EfCoreScopeProvider.CreateScope())
+            using (var childScope = EFCoreScopeProvider.CreateScope())
             {
                 using (childScope.Notifications.Suppress())
                 {
@@ -148,7 +148,7 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
     {
         var initialAssertCount = TestContext.CurrentContext.AssertCount;
 
-        using (var scope = EfCoreScopeProvider.CreateScope())
+        using (var scope = EFCoreScopeProvider.CreateScope())
         {
             using (scope.Notifications.Suppress())
             {
@@ -168,10 +168,10 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
     [Test]
     public void Child_Scope_Does_Not_Send_Notification_When_Parent_Suppressing()
     {
-        using var scope = EfCoreScopeProvider.CreateScope();
+        using var scope = EFCoreScopeProvider.CreateScope();
         scope.Notifications.Suppress();
 
-        using (var childScope = EfCoreScopeProvider.CreateScope())
+        using (var childScope = EFCoreScopeProvider.CreateScope())
         {
             var savingNotification = new TestDoNotSendNotification();
             childScope.Notifications.Publish(savingNotification);
@@ -182,11 +182,11 @@ internal sealed class EFCoreScopeNotificationsTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Cant_Suppress_Notifactions_On_Child_When_Parent_Suppressing()
+    public void Cant_Suppress_Notifications_On_Child_When_Parent_Suppressing()
     {
-        using var parentScope = EfCoreScopeProvider.CreateScope();
+        using var parentScope = EFCoreScopeProvider.CreateScope();
         using var parentSuppressed = parentScope.Notifications.Suppress();
-        using var childScope = EfCoreScopeProvider.CreateScope();
+        using var childScope = EFCoreScopeProvider.CreateScope();
         Assert.Throws<InvalidOperationException>(() => childScope.Notifications.Suppress());
     }
 

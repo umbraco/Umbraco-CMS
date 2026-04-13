@@ -1,10 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -24,14 +21,6 @@ public class TemplateService : RepositoryService, ITemplateService
     private readonly ITemplateRepository _templateRepository;
     private readonly IAuditService _auditService;
     private readonly ITemplateContentParserService _templateContentParserService;
-    private readonly IOptions<RuntimeSettings> _runtimeSettings;
-
-    // TODO (V18): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
-    // Also update UmbracoBuilder where this service is registered using:
-    //   Services.AddUnique<ITemplateService>(sp => ActivatorUtilities.CreateInstance<TemplateService>(sp));
-    // We do this to allow the ActivatorUtilitiesConstructor to be used (it's otherwise ignored by AddUnique).
-    // Revert it to:
-    //   Services.AddUnique<ITemplateService, TemplateService>();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TemplateService" /> class.
@@ -43,27 +32,6 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <param name="templateRepository">The repository for template data access.</param>
     /// <param name="auditService">The audit service for recording audit entries.</param>
     /// <param name="templateContentParserService">The service for parsing template content.</param>
-    /// <param name="runtimeSettings">The runtime configuration settings.</param>
-    [ActivatorUtilitiesConstructor]
-    public TemplateService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IShortStringHelper shortStringHelper,
-        ITemplateRepository templateRepository,
-        IAuditService auditService,
-        ITemplateContentParserService templateContentParserService,
-        IOptions<RuntimeSettings> runtimeSettings)
-        : base(provider, loggerFactory, eventMessagesFactory)
-    {
-        _shortStringHelper = shortStringHelper;
-        _templateRepository = templateRepository;
-        _auditService = auditService;
-        _templateContentParserService = templateContentParserService;
-        _runtimeSettings = runtimeSettings;
-    }
-
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
     public TemplateService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -72,64 +40,13 @@ public class TemplateService : RepositoryService, ITemplateService
         ITemplateRepository templateRepository,
         IAuditService auditService,
         ITemplateContentParserService templateContentParserService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            shortStringHelper,
-            templateRepository,
-            auditService,
-            templateContentParserService,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<RuntimeSettings>>())
+        : base(provider, loggerFactory, eventMessagesFactory)
     {
+        _shortStringHelper = shortStringHelper;
+        _templateRepository = templateRepository;
+        _auditService = auditService;
+        _templateContentParserService = templateContentParserService;
     }
-
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public TemplateService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IShortStringHelper shortStringHelper,
-        ITemplateRepository templateRepository,
-        IAuditRepository auditRepository,
-        ITemplateContentParserService templateContentParserService,
-        IUserIdKeyResolver userIdKeyResolver,
-        IDefaultViewContentProvider defaultViewContentProvider)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            shortStringHelper,
-            templateRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            templateContentParserService)
-    {
-    }
-
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public TemplateService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IShortStringHelper shortStringHelper,
-        ITemplateRepository templateRepository,
-        IAuditService auditService,
-        IAuditRepository auditRepository,
-        ITemplateContentParserService templateContentParserService,
-        IUserIdKeyResolver userIdKeyResolver,
-        IDefaultViewContentProvider defaultViewContentProvider)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            shortStringHelper,
-            templateRepository,
-            auditService,
-            templateContentParserService)
-    {
-    }
-
-    private bool IsProductionMode => _runtimeSettings.Value.Mode == RuntimeMode.Production;
 
     /// <inheritdoc />
     [Obsolete("Use the overload that includes name and alias parameters instead. Scheduled for removal in Umbraco 19.")]
@@ -218,11 +135,6 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <returns>The operation status indicating the result of the validation.</returns>
     private async Task<TemplateOperationStatus> ValidateCreateAsync(ITemplate templateToCreate)
     {
-        if (IsProductionMode)
-        {
-            return TemplateOperationStatus.NotAllowedInProductionMode;
-        }
-
         ITemplate? existingTemplate = await GetAsync(templateToCreate.Alias);
         if (existingTemplate is not null)
         {
@@ -317,19 +229,6 @@ public class TemplateService : RepositoryService, ITemplateService
         if (_templateRepository.Exists(templateToUpdate.Id) is false)
         {
             return TemplateOperationStatus.TemplateNotFound;
-        }
-
-        // In production mode, block updates if the content is being changed.
-        if (IsProductionMode)
-        {
-            // Reuse existingTemplate if keys match (same template), otherwise fetch by key.
-            ITemplate? existingByKey = existingTemplate?.Key == templateToUpdate.Key
-                ? existingTemplate
-                : await GetAsync(templateToUpdate.Key);
-            if (existingByKey is not null && existingByKey.Content != templateToUpdate.Content)
-            {
-                return TemplateOperationStatus.ContentChangeNotAllowedInProductionMode;
-            }
         }
 
         return TemplateOperationStatus.Success;
@@ -580,11 +479,6 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <returns>An attempt result containing the deleted template and operation status.</returns>
     private async Task<Attempt<ITemplate?, TemplateOperationStatus>> DeleteAsync(Func<Task<ITemplate?>> getTemplate, Guid userKey)
     {
-        if (IsProductionMode)
-        {
-            return Attempt.FailWithStatus<ITemplate?, TemplateOperationStatus>(TemplateOperationStatus.NotAllowedInProductionMode, null);
-        }
-
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             ITemplate? template = await getTemplate();

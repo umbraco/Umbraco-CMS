@@ -31,33 +31,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     /// <param name="eventMessagesFactory">The event messages factory.</param>
     /// <param name="dictionaryRepository">The dictionary repository.</param>
     /// <param name="languageRepository">The language repository.</param>
-    [Obsolete("Please use constructor with language, dictionary and user services. Scheduled for removal in Umbraco 18.")]
-    public LocalizationService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IDictionaryRepository dictionaryRepository,
-        ILanguageRepository languageRepository)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            dictionaryRepository,
-            languageRepository,
-            StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDictionaryItemService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="LocalizationService" /> class.
-    /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="dictionaryRepository">The dictionary repository.</param>
-    /// <param name="languageRepository">The language repository.</param>
     /// <param name="languageService">The language service.</param>
     /// <param name="dictionaryItemService">The dictionary item service.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
@@ -78,58 +51,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         _languageService = languageService;
         _dictionaryItemService = dictionaryItemService;
         _userIdKeyResolver = userIdKeyResolver;
-    }
-
-    /// <summary>
-    ///     Adds or updates a translation for a dictionary item and language
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="language"></param>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     This does not save the item, that needs to be done explicitly
-    /// </remarks>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public void AddOrUpdateDictionaryValue(IDictionaryItem item, ILanguage? language, string value)
-    {
-        if (item == null)
-        {
-            throw new ArgumentNullException(nameof(item));
-        }
-
-        if (language == null)
-        {
-            throw new ArgumentNullException(nameof(language));
-        }
-
-        item.AddOrUpdateDictionaryValue(language, value);
-    }
-
-    /// <summary>
-    ///     Creates and saves a new dictionary item and assigns a value to all languages if defaultValue is specified.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <param name="parentId"></param>
-    /// <param name="defaultValue"></param>
-    /// <returns></returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public IDictionaryItem CreateDictionaryItemWithIdentity(string key, Guid? parentId, string? defaultValue = null)
-    {
-        IEnumerable<IDictionaryTranslation> translations = defaultValue.IsNullOrWhiteSpace()
-            ? Array.Empty<IDictionaryTranslation>()
-            : GetAllLanguages()
-                .Select(language => new DictionaryTranslation(language, defaultValue!))
-                .ToArray();
-
-        Attempt<IDictionaryItem, DictionaryItemOperationStatus> result = _dictionaryItemService
-            .CreateAsync(new DictionaryItem(parentId, key) { Translations = translations }, Constants.Security.SuperUserKey)
-            .GetAwaiter()
-            .GetResult();
-        // mimic old service behavior
-        return result.Success || result.Status == DictionaryItemOperationStatus.CancelledByNotification
-            ? result.Result
-            : throw new ArgumentException($"Could not create a dictionary item with key: {key} under parent: {parentId}");
     }
 
     /// <summary>
@@ -160,17 +81,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         => _dictionaryItemService.GetAsync(id).GetAwaiter().GetResult();
 
     /// <summary>
-    ///     Gets a collection <see cref="IDictionaryItem" /> by their <see cref="Guid" /> ids
-    /// </summary>
-    /// <param name="ids">Ids of the <see cref="IDictionaryItem" /></param>
-    /// <returns>
-    ///     A collection of <see cref="IDictionaryItem" />
-    /// </returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDictionaryItem> GetDictionaryItemsByIds(params Guid[] ids)
-        => _dictionaryItemService.GetManyAsync(ids).GetAwaiter().GetResult();
-
-    /// <summary>
     ///     Gets a <see cref="IDictionaryItem" /> by its key
     /// </summary>
     /// <param name="key">Key of the <see cref="IDictionaryItem" /></param>
@@ -182,17 +92,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         => _dictionaryItemService.GetAsync(key).GetAwaiter().GetResult();
 
     /// <summary>
-    ///     Gets a collection of <see cref="IDictionaryItem" /> by their keys
-    /// </summary>
-    /// <param name="keys">Keys of the <see cref="IDictionaryItem" /></param>
-    /// <returns>
-    ///     A collection of <see cref="IDictionaryItem" />
-    /// </returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDictionaryItem> GetDictionaryItemsByKeys(params string[] keys)
-        => _dictionaryItemService.GetManyAsync(keys).GetAwaiter().GetResult();
-
-    /// <summary>
     /// Gets a list of children for a <see cref="IDictionaryItem"/>
     /// </summary>
     /// <param name="parentId">Id of the parent</param>
@@ -200,32 +99,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
     [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
     public IEnumerable<IDictionaryItem> GetDictionaryItemChildren(Guid parentId)
         => _dictionaryItemService.GetChildrenAsync(parentId).GetAwaiter().GetResult();
-
-    /// <summary>
-    ///     Gets a list of descendants for a <see cref="IDictionaryItem" />
-    /// </summary>
-    /// <param name="parentId">Id of the parent, null will return all dictionary items</param>
-    /// <returns>An enumerable list of <see cref="IDictionaryItem" /> objects</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDictionaryItem> GetDictionaryItemDescendants(Guid? parentId)
-        => _dictionaryItemService.GetDescendantsAsync(parentId).GetAwaiter().GetResult();
-
-    /// <summary>
-    /// Gets the root/top <see cref="IDictionaryItem"/> objects
-    /// </summary>
-    /// <returns>An enumerable list of <see cref="IDictionaryItem"/> objects</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDictionaryItem> GetRootDictionaryItems()
-        => _dictionaryItemService.GetAtRootAsync().GetAwaiter().GetResult();
-
-    /// <summary>
-    ///     Checks if a <see cref="IDictionaryItem" /> with given key exists
-    /// </summary>
-    /// <param name="key">Key of the <see cref="IDictionaryItem" /></param>
-    /// <returns>True if a <see cref="IDictionaryItem" /> exists, otherwise false</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public bool DictionaryItemExists(string key)
-        => _dictionaryItemService.ExistsAsync(key).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Saves a <see cref="IDictionaryItem" /> object
@@ -244,19 +117,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         {
             _dictionaryItemService.CreateAsync(dictionaryItem, currentUserKey).GetAwaiter().GetResult();
         }
-    }
-
-    /// <summary>
-    ///     Deletes a <see cref="IDictionaryItem" /> object and its related translations
-    ///     as well as its children.
-    /// </summary>
-    /// <param name="dictionaryItem"><see cref="IDictionaryItem" /> to delete</param>
-    /// <param name="userId">Optional id of the user deleting the dictionary item</param>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public void Delete(IDictionaryItem dictionaryItem, int userId = Constants.Security.SuperUserId)
-    {
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-        _dictionaryItemService.DeleteAsync(dictionaryItem.Key, currentUserKey).GetAwaiter().GetResult();
     }
 
     /// <summary>
@@ -291,33 +151,8 @@ internal class LocalizationService : RepositoryService, ILocalizationService
 
     /// <inheritdoc />
     [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    public int? GetLanguageIdByIsoCode(string isoCode)
-        => _languageService.GetAsync(isoCode).GetAwaiter().GetResult()?.Id;
-
-    /// <inheritdoc />
-    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    public string? GetLanguageIsoCodeById(int id)
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _languageRepository.GetIsoCodeById(id);
-        }
-    }
-
-    /// <inheritdoc />
-    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
     public string GetDefaultLanguageIsoCode()
         => _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    public int? GetDefaultLanguageId()
-    {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _languageRepository.GetDefaultId();
-        }
-    }
 
     /// <summary>
     ///     Gets all available languages
@@ -344,31 +179,6 @@ internal class LocalizationService : RepositoryService, ILocalizationService
         if (result.Status == LanguageOperationStatus.InvalidFallback)
         {
             throw new InvalidOperationException($"Cannot save language {language.IsoCode} with fallback {language.FallbackIsoCode}.");
-        }
-    }
-
-    /// <summary>
-    ///     Deletes a <see cref="ILanguage" /> by removing it (but not its usages) from the db
-    /// </summary>
-    /// <param name="language"><see cref="ILanguage" /> to delete</param>
-    /// <param name="userId">Optional id of the user deleting the language</param>
-    [Obsolete("Please use ILanguageService for language operations. Scheduled for removal in Umbraco 18.")]
-    public void Delete(ILanguage language, int userId = Constants.Security.SuperUserId)
-    {
-        Guid currentUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-        _languageService.DeleteAsync(language.IsoCode, currentUserKey).GetAwaiter().GetResult();
-    }
-
-    /// <summary>
-    /// Gets the dictionary item key map containing all dictionary item keys and their corresponding GUIDs.
-    /// </summary>
-    /// <returns>A dictionary mapping dictionary item keys to their GUIDs.</returns>
-    [Obsolete("Please use IDictionaryItemService for dictionary item operations. Scheduled for removal in Umbraco 18.")]
-    public Dictionary<string, Guid> GetDictionaryItemKeyMap()
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _dictionaryRepository.GetDictionaryItemKeyMap();
         }
     }
 }

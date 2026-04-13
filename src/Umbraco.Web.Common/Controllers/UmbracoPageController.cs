@@ -92,13 +92,6 @@ public abstract class UmbracoPageController : UmbracoController
     ///     Ensures that a physical view file exists on disk.
     /// </summary>
     /// <param name="template">The view name.</param>
-    [Obsolete("Please use the correctly spelt EnsurePhysicalViewExists method. Scheduled for removal in Umbraco 18.")]
-    protected bool EnsurePhsyicalViewExists(string? template) => EnsurePhysicalViewExists(template);
-
-    /// <summary>
-    ///     Ensures that a physical view file exists on disk.
-    /// </summary>
-    /// <param name="template">The view name.</param>
     protected bool EnsurePhysicalViewExists(string? template)
     {
         if (string.IsNullOrWhiteSpace(template))

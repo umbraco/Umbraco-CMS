@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -21,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetUp() => CreateTestData();
+    public async Task SetUp() => await CreateTestDataAsync();
 
     [Test]
     public void Can_Save_And_Get()
@@ -355,11 +356,11 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     private IContent _otherpage;
     private IContent _trashed;
 
-    public void CreateTestData()
+    public async Task CreateTestDataAsync()
     {
-        var fileService = GetRequiredService<IFileService>();
+        var templateService = GetRequiredService<ITemplateService>();
         var template = TemplateBuilder.CreateTextPageTemplate();
-        fileService.SaveTemplate(template); // else, FK violation on contentType!
+        await templateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
         var contentService = GetRequiredService<IContentService>();
         var contentTypeService = GetRequiredService<IContentTypeService>();

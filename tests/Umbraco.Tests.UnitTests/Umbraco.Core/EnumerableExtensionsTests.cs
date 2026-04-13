@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Umbraco.Extensions;
 
@@ -127,13 +125,13 @@ public class EnumerableExtensionsTests
 
         Assert.That(groupsOfTwo.Length, Is.EqualTo(5));
         Assert.That(flattened.Length, Is.EqualTo(integers.Length));
-        CollectionAssert.AreEquivalent(integers, flattened);
+        Assert.That(flattened, Is.EquivalentTo(integers));
 
         var groupsOfMassive = integers.InGroupsOf(100).ToArray();
         Assert.That(groupsOfMassive.Length, Is.EqualTo(1));
         flattened = groupsOfMassive.SelectMany(x => x).ToArray();
         Assert.That(flattened.Length, Is.EqualTo(integers.Length));
-        CollectionAssert.AreEquivalent(integers, flattened);
+        Assert.That(flattened, Is.EquivalentTo(integers));
     }
 
     [Test]

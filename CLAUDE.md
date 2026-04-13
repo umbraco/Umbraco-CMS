@@ -394,12 +394,17 @@ The repository contains BOTH (actively supported):
 All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
 - Reference tokens (not JWT) for better security
 - **Secure cookie-based token storage** (v17+) - tokens stored in HTTP-only cookies with `__Host-` prefix
-- Tokens are redacted from client-side responses and passed via secure cookies only
+- Tokens are redacted from client-side responses and passed via secure cookies only (`[redacted]` placeholder)
 - ASP.NET Core Data Protection for token encryption
 - Configured in `Umbraco.Cms.Api.Common`
 - API requests must include credentials (`credentials: include` for fetch)
 
 **Load Balancing Requirement**: All servers must share the same Data Protection key ring.
+
+**Frontend auth pitfalls** — see `src/Umbraco.Web.UI.Client/docs/edge-cases.md` (Auth & Cross-tab section) and `docs/security.md`. Key points:
+- Never call `validateToken()` per API request — it revokes the previous reference token (ID2019 errors)
+- `window.opener` is set for ANY `window.open()` target, not only OAuth popups — scope guards to the pathname too
+- BroadcastChannel does not deliver messages to the sender's own tab
 
 ### Content Caching Strategy
 
@@ -416,70 +421,87 @@ APIs use `Asp.Versioning.Mvc`:
 - OpenAPI docs: `/umbraco/openapi/management.json`, `/umbraco/openapi/delivery.json`
 - Swagger UI: `/umbraco/openapi/`
 
-### Backoffice npm Package Structure
+### Updating `OpenApi.json` (Management API)
 
-The backoffice (`Umbraco.Web.UI.Client`) is published to npm as **`@umbraco-cms/backoffice`** with a plugin architecture:
+When a PR changes Management API controllers or models, the `OpenApi.json` file in the Management API project must be updated:
 
-#### Architecture Overview
+1. Run the Umbraco instance locally
+2. Open Swagger UI and navigate to the swagger.json link (e.g. `https://localhost:44339/umbraco/swagger/management/swagger.json`)
+3. Copy the full JSON content and paste it into `src/Umbraco.Cms.Api.Management/OpenApi.json`
 
-- **Multi-workspace structure**: Subprojects in `src/libs/*`, `src/packages/*`, `src/external/*`
-- **Export model**: All exports defined in root `package.json` → `./exports` field
-- **Importmap-driven runtime**: Dependencies provided at runtime via importmap (single source of truth)
-- **Build-time types**: TypeScript types come from npm peerDependencies
-- **Plugin model**: Developers create plugins that import from `@umbraco-cms/backoffice/*` exports
+**Important**: Commit only the substantive changes — not IDE-applied formatting (whitespace, reordering, etc.). Extraneous formatting diffs make PRs harder to review and merge-ups more error-prone.
 
-#### Dependency Hoisting Strategy
+### Backoffice npm Package
 
-When building for npm (`npm pack`), the `cleanse-pkg.js` script hoists subproject dependencies to root `peerDependencies` with intelligent version range conversion:
-
-**Version Range Logic** (uses `semver` package):
-
-1. **Pre-release (0.x.y)**: Convert to explicit range
-   - Input: `^0.85.0` or `0.85.0`
-   - Output: `>=0.85.0 <1.0.0`
-   - Rationale: Pre-release caret only allows patch updates, explicit range allows minor upgrades within 0.x.x
-   - Example: Plugin can use `@hey-api/openapi-ts@0.91.1` while backoffice uses `0.85.0`
-
-2. **Stable with caret (^X.Y.Z where X ≥ 1)**: Keep as-is
-   - Input: `^3.3.1`
-   - Output: `^3.3.1` (unchanged)
-   - Rationale: Caret already implements correct semantics for stable versions
-
-3. **Stable exact versions (X.Y.Z where X ≥ 1)**: Add caret
-   - Input: `3.16.0`
-   - Output: `^3.16.0`
-   - Rationale: Normalizes to conventional semver format
-
-#### Key Dependencies
-
-**Runtime via importmap** (types available from peerDependencies):
-- `lit`, `rxjs`, `@umbraco-ui/uui` - Core framework
-- `monaco-editor`, `@tiptap/*` - Feature-specific editors
-- `@hey-api/openapi-ts` - HTTP client type generation
-
-**Build-time only** (not hoisted):
-- `vite`, `typescript`, `eslint` - Dev tooling
-
-#### Plugin Development Implications
-
-Plugin developers should:
-- **Declare explicit dependencies** in their own `package.json` (avoid relying on transitive deps)
-- **Understand the version ranges**: `>=0.85.0 <1.0.0` means they can use newer pre-release versions
-- **Know that types match npm ranges**, but runtime comes from importmap (managed by backoffice)
-- **When `@hey-api` hits 1.0.0**: Published constraint will automatically become `^1.0.0`
-
-#### Implementation Details
-
-- Script location: `src/Umbraco.Web.UI.Client/devops/publish/cleanse-pkg.js`
-- Runs as `prepack` hook before npm pack
-- Uses `semver.minVersion()` for robust version range parsing
-- Generates single source of truth for importmap versions
+The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime dependencies are provided via importmap; npm peerDependencies provide types only. For full details on dependency hoisting, version range logic, and plugin development, see `/src/Umbraco.Web.UI.Client/CLAUDE.md` → "npm Package Publishing".
 
 ### Known Limitations
 
 1. **Circular Dependencies**: Avoided via `Lazy<T>` or event notifications
 2. **Multi-Server**: Requires shared Data Protection key ring and synchronized clocks (NTP)
 3. **Database Support**: SQL Server, SQLite
+
+---
+
+## 7. CI/CD — Claude AI Assistant
+
+Two GitHub Actions workflows powered by `anthropics/claude-code-action@v1`. Advisory only — does not block merging.
+
+### Workflows
+
+| File | Trigger | Purpose |
+|------|---------|---------|
+| `claude-review.yml` | `pull_request: [opened, ready_for_review]` | Auto-review every non-draft PR using the `umb-review` skill |
+| `claude.yml` | `@claude` comments, issue assign/label | Interactive assistant for PRs and issues |
+
+### Auto-Review (`claude-review.yml`)
+
+Runs the full `.claude/skills/umb-review/SKILL.md` procedure on every newly opened or un-drafted PR. Produces inline comments per finding and one summary comment with a verdict. Skips draft PRs. No turn limit.
+
+### Interactive (`claude.yml`)
+
+Responds to `@claude` mentions on PRs and issues. The trigger phrase is stripped before Claude sees the message, so:
+
+- `@claude review` → light review using `gh pr diff` (not the umb-review skill)
+- `@claude fix ...` → implements a fix on a new branch
+- `@claude help` → answers questions about the codebase
+- `@claude label` → applies labels
+- `@claude` (empty) → defaults to `review` on PRs, `help` on issues
+
+Also triggers on issue assignment to `claude` or adding the `claude` label. Gated: only runs when `@claude` appears in the comment/issue body. Max 25 turns.
+
+**Allowed Bash tools**: `gh`, `git`, `npm`, `dotnet` (interactive only; auto-review allows `gh` and `git`).
+
+### Labels
+
+Both workflows apply labels based on content:
+
+**On PRs** (based on changed files):
+
+| Label | Condition |
+|-------|-----------|
+| `area/frontend` | Files under `src/Umbraco.Web.UI.Client/` |
+| `area/backend` | `.cs` files outside the frontend client |
+| `area/test` | Only test files changed |
+| `category/api` | Management or Delivery API files |
+| `category/breaking` | Breaking changes detected |
+| `category/localization` | Localization/language files |
+| `category/test-automation` | Only test files changed |
+| `category/refactor` | Pure refactoring, no new features |
+| `category/performance` | Performance-related changes |
+| `category/ux` | User-facing changes |
+| `category/ui` | UI layer changes |
+
+**On Issues** (based on content): same `area/*` and `category/*` labels, plus `affected/v14` through `affected/v17` and `affected/backoffice`.
+
+Labels are only added, never removed. Claude applies only labels it is confident about.
+
+### Key Implementation Notes
+
+- **Checkout required** — the action internally runs `git fetch origin main` for trusted file restoration. Without `actions/checkout`, it fails with `fatal: not a git repository`.
+- **`id-token: write` permission** — required for OIDC token exchange with the Claude GitHub App.
+- **Trigger phrase stripping** — the action strips `@claude` from comments before passing to Claude. Prompts must reference commands without the prefix (e.g., `review` not `@claude review`).
+- **PR number injection** — the interactive workflow injects the PR/issue number into the prompt via `${{ github.event.issue.number }}` since Claude can't discover it from `gh pr view` when checked out on `main`.
 
 ---
 
@@ -503,6 +525,16 @@ dotnet format
 # Pack all projects
 dotnet pack -c Release
 ```
+
+### Integration Test Database Configuration
+
+Integration tests are configured in `tests/Umbraco.Tests.Integration/appsettings.Tests.json`.
+
+The `Tests:Database:DatabaseType` setting controls which database is used:
+- `"SQLite"` (default) - No external dependencies
+- `"LocalDb"` - Uses SQL Server LocalDB, required for SQL Server-specific tests (e.g., page-level locking, `sys.dm_tran_locks`)
+
+SQL Server-specific tests use `BaseTestDatabase.IsSqlite()` to skip when running on SQLite.
 
 ### Key Projects
 
@@ -529,6 +561,7 @@ dotnet pack -c Release
 For detailed information about individual projects, see their CLAUDE.md files:
 - **Core Architecture**: `/src/Umbraco.Core/CLAUDE.md` - Service contracts, notification patterns
 - **API Infrastructure**: `/src/Umbraco.Cms.Api.Common/CLAUDE.md` - OpenAPI, authentication, serialization
+- **Backoffice Frontend**: `/src/Umbraco.Web.UI.Client/CLAUDE.md` - Lit web components, extension system, auth client
 
 ### Getting Help
 

@@ -10,21 +10,25 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
+/// <summary>
+/// API controller responsible for managing and retrieving the child nodes of dictionary items in the Umbraco dictionary tree.
+/// </summary>
 [ApiVersion("1.0")]
 public class ChildrenDictionaryTreeController : DictionaryTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public ChildrenDictionaryTreeController(IEntityService entityService, IDictionaryItemService dictionaryItemService)
-        : base(entityService, dictionaryItemService)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public ChildrenDictionaryTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
         : base(entityService, flagProviders, dictionaryItemService)
     {
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of dictionary tree items that are direct children of the specified parent dictionary item.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="parentId">The unique identifier of the parent dictionary item whose children are to be retrieved.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set (used for pagination).</param>
+    /// <param name="take">The maximum number of items to return (used for pagination).</param>
+    /// <returns>A paged view model containing the child dictionary tree items.</returns>
     [HttpGet("children")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]

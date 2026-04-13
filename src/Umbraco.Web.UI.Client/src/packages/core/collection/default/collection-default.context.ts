@@ -218,15 +218,7 @@ export class UmbDefaultCollectionContext<
 
 		this.#userDefinedProperties.setValue(this.#config?.userDefinedProperties ?? []);
 
-		const viewManagerConfig: UmbCollectionViewManagerConfig = { defaultViewAlias: this.#defaultViewAlias };
-
-		if (this.#config.layouts && this.#config.layouts.length > 0) {
-			this.#viewLayouts.setValue(this.#config.layouts);
-			const aliases = this.#config.layouts.map((layout) => layout.collectionView);
-			viewManagerConfig.manifestFilter = (manifest) => aliases.includes(manifest.alias);
-		}
-
-		this.view.setConfig(viewManagerConfig);
+		this.#configureViews();
 
 		this._configured = true;
 	}
@@ -395,35 +387,6 @@ export class UmbDefaultCollectionContext<
 	}
 
 	/**
-	 * Sets the manifest for the collection.
-	 * @param {ManifestCollection} manifest - The manifest for the collection.
-	 * @memberof UmbCollectionContext
-	 * @deprecated Use set the `.manifest` property instead.
-	 */
-	public setManifest(manifest: ManifestCollection | undefined) {
-		if (this._manifest === manifest) return;
-		this._manifest = manifest;
-
-		if (!this._manifest) return;
-		this.#observeRepository(this._manifest.meta.repositoryAlias);
-	}
-
-	/**
-	 * Returns the manifest for the collection.
-	 * @returns {ManifestCollection} - The manifest for the collection.
-	 * @memberof UmbCollectionContext
-	 * @deprecated Use the `.manifest` property instead.
-	 */
-	public getManifest(): ManifestCollection | undefined {
-		new UmbDeprecation({
-			removeInVersion: '18.0.0',
-			deprecated: 'getManifest',
-			solution: 'Use .manifest property instead',
-		}).warn();
-		return this._manifest;
-	}
-
-	/**
 	 * Returns the items in the collection.
 	 * @returns {Array<CollectionItemType>} - The items in the collection.
 	 */
@@ -454,5 +417,15 @@ export class UmbDefaultCollectionContext<
 				this._selectOnly.setValue(selection.length > 0);
 			}
 		});
+	}
+
+	#configureViews() {
+		const viewManagerConfig: UmbCollectionViewManagerConfig = { defaultViewAlias: this.#defaultViewAlias };
+		const layouts = this.#config?.layouts;
+		if (layouts && layouts.length > 0) {
+			this.#viewLayouts.setValue(layouts);
+			viewManagerConfig.viewsOverride = layouts;
+		}
+		this.view.setConfig(viewManagerConfig);
 	}
 }

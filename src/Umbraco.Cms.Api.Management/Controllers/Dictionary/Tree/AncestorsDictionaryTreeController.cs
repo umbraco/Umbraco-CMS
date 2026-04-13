@@ -8,21 +8,23 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 
+/// <summary>
+/// Controller responsible for managing and exposing operations related to the ancestors of dictionary items in the dictionary tree.
+/// </summary>
 [ApiVersion("1.0")]
 public class AncestorsDictionaryTreeController : DictionaryTreeControllerBase
 {
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public AncestorsDictionaryTreeController(IEntityService entityService, IDictionaryItemService dictionaryItemService)
-        : base(entityService, dictionaryItemService)
-    {
-    }
-
-    [ActivatorUtilitiesConstructor]
     public AncestorsDictionaryTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IDictionaryItemService dictionaryItemService)
         : base(entityService, flagProviders, dictionaryItemService)
     {
     }
 
+    /// <summary>
+    /// Retrieves all ancestor dictionary items for the specified descendant item.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="descendantId">The unique identifier of the descendant dictionary item whose ancestors are to be retrieved.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains an <see cref="ActionResult{T}"/> with a collection of ancestor <see cref="NamedEntityTreeItemResponseModel"/> items.</returns>
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(IEnumerable<NamedEntityTreeItemResponseModel>), StatusCodes.Status200OK)]

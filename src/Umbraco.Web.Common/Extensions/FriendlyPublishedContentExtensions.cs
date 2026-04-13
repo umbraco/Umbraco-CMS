@@ -16,56 +16,197 @@ namespace Umbraco.Extensions;
 
 public static class FriendlyPublishedContentExtensions
 {
-    private static IVariationContextAccessor VariationContextAccessor { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>();
+    private static IVariationContextAccessor? _variationContextAccessor;
+    private static IDomainCache? _domainCache;
+    private static IPublishedContentCache? _publishedContentCache;
+    private static IDocumentNavigationQueryService? _documentNavigationQueryService;
+    private static IMediaNavigationQueryService? _mediaNavigationQueryService;
+    private static IPublishedModelFactory? _publishedModelFactory;
+    private static IPublishedUrlProvider? _publishedUrlProvider;
+    private static IUserService? _userService;
+    private static IUmbracoContextAccessor? _umbracoContextAccessor;
+    private static ISiteDomainMapper? _siteDomainHelper;
+    private static IExamineManager? _examineManager;
+    private static IFileService? _fileService;
+    private static IOptions<WebRoutingSettings>? _webRoutingSettings;
+    private static IContentTypeService? _contentTypeService;
+    private static IPublishedValueFallback? _publishedValueFallback;
+    private static IMediaTypeService? _mediaTypeService;
+    private static IMemberTypeService? _memberTypeService;
 
-    private static IDomainCache DomainCache { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IDomainCache>();
+    private static IVariationContextAccessor VariationContextAccessor
+    {
+        get
+        {
+            _variationContextAccessor ??= StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>();
+            return _variationContextAccessor;
+        }
+    }
 
-    private static IPublishedContentCache PublishedContentCache { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
+    private static IDomainCache DomainCache
+    {
+        get
+        {
+            _domainCache ??= StaticServiceProvider.Instance.GetRequiredService<IDomainCache>();
+            return _domainCache;
+        }
+    }
 
-    private static IDocumentNavigationQueryService DocumentNavigationQueryService { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+    private static IPublishedContentCache PublishedContentCache
+    {
+        get
+        {
+            _publishedContentCache ??= StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
+            return _publishedContentCache;
+        }
+    }
 
-    private static IMediaNavigationQueryService MediaNavigationQueryService { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+    private static IDocumentNavigationQueryService DocumentNavigationQueryService
+    {
+        get
+        {
+            _documentNavigationQueryService ??= StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
+            return _documentNavigationQueryService;
+        }
+    }
 
-    private static IPublishedModelFactory PublishedModelFactory { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedModelFactory>();
+    private static IMediaNavigationQueryService MediaNavigationQueryService
+    {
+        get
+        {
+            _mediaNavigationQueryService ??= StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
+            return _mediaNavigationQueryService;
+        }
+    }
 
-    private static IPublishedUrlProvider PublishedUrlProvider { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>();
+    private static IPublishedModelFactory PublishedModelFactory
+    {
+        get
+        {
+            _publishedModelFactory ??= StaticServiceProvider.Instance.GetRequiredService<IPublishedModelFactory>();
+            return _publishedModelFactory;
+        }
+    }
 
-    private static IUserService UserService { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IUserService>();
+    private static IPublishedUrlProvider PublishedUrlProvider
+    {
+        get
+        {
+            _publishedUrlProvider ??= StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>();
+            return _publishedUrlProvider;
+        }
+    }
 
-    private static IUmbracoContextAccessor UmbracoContextAccessor { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IUmbracoContextAccessor>();
+    private static IUserService UserService
+    {
+        get
+        {
+            _userService ??= StaticServiceProvider.Instance.GetRequiredService<IUserService>();
+            return _userService;
+        }
+    }
 
-    private static ISiteDomainMapper SiteDomainHelper { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<ISiteDomainMapper>();
+    private static IUmbracoContextAccessor UmbracoContextAccessor
+    {
+        get
+        {
+            _umbracoContextAccessor ??= StaticServiceProvider.Instance.GetRequiredService<IUmbracoContextAccessor>();
+            return _umbracoContextAccessor;
+        }
+    }
 
-    private static IExamineManager ExamineManager { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IExamineManager>();
+    private static ISiteDomainMapper SiteDomainHelper
+    {
+        get
+        {
+            _siteDomainHelper ??= StaticServiceProvider.Instance.GetRequiredService<ISiteDomainMapper>();
+            return _siteDomainHelper;
+        }
+    }
 
-    private static IFileService FileService { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IFileService>();
+    private static IExamineManager ExamineManager
+    {
+        get
+        {
+            _examineManager ??= StaticServiceProvider.Instance.GetRequiredService<IExamineManager>();
+            return _examineManager;
+        }
+    }
 
-    private static IOptions<WebRoutingSettings> WebRoutingSettings { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>();
+    private static IFileService FileService
+    {
+        get
+        {
+            _fileService ??= StaticServiceProvider.Instance.GetRequiredService<IFileService>();
+            return _fileService;
+        }
+    }
 
-    private static IContentTypeService ContentTypeService { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>();
+    private static IOptions<WebRoutingSettings> WebRoutingSettings
+    {
+        get
+        {
+            _webRoutingSettings ??= StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>();
+            return _webRoutingSettings;
+        }
+    }
 
-    private static IPublishedValueFallback PublishedValueFallback { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>();
+    private static IContentTypeService ContentTypeService
+    {
+        get
+        {
+            _contentTypeService ??= StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>();
+            return _contentTypeService;
+        }
+    }
 
-    private static IMediaTypeService MediaTypeService { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>();
+    private static IPublishedValueFallback PublishedValueFallback
+    {
+        get
+        {
+            _publishedValueFallback ??= StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>();
+            return _publishedValueFallback;
+        }
+    }
 
-    private static IMemberTypeService MemberTypeService { get; } =
-        StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>();
+    private static IMediaTypeService MediaTypeService
+    {
+        get
+        {
+            _mediaTypeService ??= StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>();
+            return _mediaTypeService;
+        }
+    }
+
+    private static IMemberTypeService MemberTypeService
+    {
+        get
+        {
+            _memberTypeService ??= StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>();
+            return _memberTypeService;
+        }
+    }
+
+    internal static void Reset()
+    {
+        _variationContextAccessor = null;
+        _domainCache = null;
+        _publishedContentCache = null;
+        _documentNavigationQueryService = null;
+        _mediaNavigationQueryService = null;
+        _publishedModelFactory = null;
+        _publishedUrlProvider = null;
+        _userService = null;
+        _umbracoContextAccessor = null;
+        _siteDomainHelper = null;
+        _examineManager = null;
+        _fileService = null;
+        _webRoutingSettings = null;
+        _contentTypeService = null;
+        _publishedValueFallback = null;
+        _mediaTypeService = null;
+        _memberTypeService = null;
+    }
 
     private static INavigationQueryService GetNavigationQueryService(IPublishedContent content)
     {

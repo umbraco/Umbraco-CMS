@@ -10,3 +10,4 @@ export * from './member';
 export * from './memberTypes';
 export * from './documentBlueprints';
 export * from './webhook';
+export * from './element';

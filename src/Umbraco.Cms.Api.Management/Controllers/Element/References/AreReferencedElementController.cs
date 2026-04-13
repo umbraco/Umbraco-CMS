@@ -10,12 +10,20 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.References;
 
+/// <summary>
+/// API controller responsible for checking whether elements are referenced by other content.
+/// </summary>
 [ApiVersion("1.0")]
 public class AreReferencedElementController : ElementControllerBase
 {
     private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AreReferencedElementController"/> class.
+    /// </summary>
+    /// <param name="trackedReferencesService">Service for tracking content references.</param>
+    /// <param name="umbracoMapper">Mapper for converting domain models to view models.</param>
     public AreReferencedElementController(ITrackedReferencesService trackedReferencesService, IUmbracoMapper umbracoMapper)
     {
         _trackedReferencesService = trackedReferencesService;
