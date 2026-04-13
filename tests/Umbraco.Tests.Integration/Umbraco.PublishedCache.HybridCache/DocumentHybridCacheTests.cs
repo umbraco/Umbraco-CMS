@@ -583,6 +583,42 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         Assert.IsTrue(hasContentForTextPageCached);
     }
 
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Not_Get_Trashed_Content_By_Key(bool preview)
+    {
+        // Arrange - Verify published content is in cache
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, preview);
+        Assert.IsNotNull(textPage, "Content should be in cache before trashing");
+
+        // Act - Trash the document (move to recycle bin)
+        var trashResult = await ContentEditingService.MoveToRecycleBinAsync(PublishedTextPage.Key.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+
+        // Assert - Content should no longer be in the cache
+        var trashedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, preview);
+        Assert.IsNull(trashedPage, "Trashed content should not be in cache");
+    }
+
+    [Test]
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Not_Get_Trashed_Content_By_Id(bool preview)
+    {
+        // Arrange - Verify published content is in cache
+        var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
+        Assert.IsNotNull(textPage, "Content should be in cache before trashing");
+
+        // Act - Trash the document (move to recycle bin)
+        var trashResult = await ContentEditingService.MoveToRecycleBinAsync(PublishedTextPage.Key.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+
+        // Assert - Content should no longer be in the cache
+        var trashedPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
+        Assert.IsNull(trashedPage, "Trashed content should not be in cache");
+    }
+
     private void AssertTextPage(IPublishedContent textPage)
     {
         Assert.Multiple(() =>

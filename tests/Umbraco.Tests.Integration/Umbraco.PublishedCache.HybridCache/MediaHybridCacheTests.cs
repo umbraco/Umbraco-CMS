@@ -165,6 +165,38 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
     }
 
     [Test]
+    public async Task Cannot_Get_Trashed_Media_By_Key()
+    {
+        // Arrange
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
+        Assert.IsNotNull(media, "Media should be in cache before trashing");
+
+        // Act
+        var trashResult = await MediaEditingService.MoveToRecycleBinAsync(SubImage.Key.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+
+        // Assert
+        var trashedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
+        Assert.IsNull(trashedMedia, "Trashed media should not be in cache");
+    }
+
+    [Test]
+    public async Task Cannot_Get_Trashed_Media_By_Id()
+    {
+        // Arrange
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
+        Assert.IsNotNull(media, "Media should be in cache before trashing");
+
+        // Act
+        var trashResult = await MediaEditingService.MoveToRecycleBinAsync(SubImage.Key.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+
+        // Assert
+        var trashedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
+        Assert.IsNull(trashedMedia, "Trashed media should not be in cache");
+    }
+
+    [Test]
     public async Task Cannot_Get_Deleted_Media_By_Id()
     {
         // Arrange
