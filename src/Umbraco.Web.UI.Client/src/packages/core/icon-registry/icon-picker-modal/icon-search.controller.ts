@@ -144,7 +144,7 @@ export class UmbIconSearchController extends UmbControllerBase {
 			searchableTokens.push(...tokenize(keyword));
 		}
 
-		const allSearchable = [...searchableTokens, ...groupsLower];
+		const allSearchable = [...searchableTokens, ...groupsLower.flatMap((g) => tokenize(g))];
 
 		cached = { nameWithoutPrefix, keywordsLower, groupsLower, searchableTokens, allSearchable };
 		this.#searchable.set(icon, cached);

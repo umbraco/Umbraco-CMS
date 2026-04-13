@@ -39,6 +39,12 @@ const mockIcons: Array<UmbIconDefinition> = [
 		name: 'icon-no-metadata',
 		path: () => Promise.resolve({ default: '' }),
 	},
+	{
+		name: 'icon-plane',
+		path: () => Promise.resolve({ default: '' }),
+		keywords: ['airplane', 'flight'],
+		groups: ['transport vehicle'],
+	},
 ];
 
 describe('UmbIconSearchController', () => {
@@ -80,6 +86,22 @@ describe('UmbIconSearchController', () => {
 	it('should include fuzzy matches for typos', async () => {
 		const results = await controller.search('truk');
 		expect(results.some((r) => r.name === 'icon-truck')).to.be.true;
+	});
+
+	it('should fuzzy-match typos against tokens within a multi-word group', async () => {
+		// Group string on icon-plane is "transport vehicle". A typo'd query
+		// "transprtt" must fuzzy-match the "transport" token within the group,
+		// not the full "transport vehicle" string (where the extra word
+		// dominates the edit distance and pushes similarity below threshold).
+		const results = await controller.search('transprtt');
+		expect(results.some((r) => r.name === 'icon-plane')).to.be.true;
+	});
+
+	it('should match a partial word against a token within a multi-word group', async () => {
+		// "vehicl" should match icon-plane whose group is "transport vehicle",
+		// regardless of whether substring or fuzzy tier catches it.
+		const results = await controller.search('vehicl');
+		expect(results.some((r) => r.name === 'icon-plane')).to.be.true;
 	});
 
 	it('should append related icons after primary results', async () => {
