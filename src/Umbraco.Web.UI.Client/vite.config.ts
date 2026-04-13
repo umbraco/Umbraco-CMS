@@ -1,4 +1,4 @@
-import { defineConfig, PluginOption } from 'vite';
+import { defineConfig, loadEnv, PluginOption } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import viteTSConfigPaths from 'vite-tsconfig-paths';
 
@@ -43,15 +43,26 @@ export const plugins: PluginOption[] = [
 ];
 
 // https://vitejs.dev/config/
-export default defineConfig({
-	build: {
-		sourcemap: true,
-		rollupOptions: {
-			input: {
-				main: new URL('index.html', import.meta.url).pathname,
-				'icon-manager': new URL('devops/icon-manager/icon-manager.html', import.meta.url).pathname,
+export default defineConfig(({ mode }) => {
+	const env = loadEnv(mode, process.cwd(), '');
+	const input: Record<string, string> = {
+		main: new URL('index.html', import.meta.url).pathname,
+	};
+
+	if (mode === 'development' || env.UMBRACO_INCLUDE_ICON_MANAGER === 'true') {
+		input['icon-manager'] = new URL(
+			'devops/icon-manager/icon-manager.html',
+			import.meta.url,
+		).pathname;
+	}
+
+	return {
+		build: {
+			sourcemap: true,
+			rollupOptions: {
+				input,
 			},
 		},
-	},
-	plugins,
+		plugins,
+	};
 });
