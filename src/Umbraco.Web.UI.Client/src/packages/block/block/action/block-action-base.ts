@@ -1,0 +1,16 @@
+import type { UmbBlockActionArgs } from './types.js';
+import type { UmbBlockAction } from './block-action.interface.js';
+import { UmbActionBase } from '@umbraco-cms/backoffice/action';
+
+export abstract class UmbBlockActionBase<ArgsMetaType>
+	extends UmbActionBase<UmbBlockActionArgs<ArgsMetaType>>
+	implements UmbBlockAction<ArgsMetaType>
+{
+	public getHref(): Promise<string | undefined> {
+		return Promise.resolve(undefined);
+	}
+
+	public execute(): Promise<void> {
+		return Promise.resolve();
+	}
+}

@@ -23,6 +23,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
 import '../unsupported-list-block/index.js';
+import '../../../block/action/block-action-list.element.js';
 
 /**
  * @element umb-block-list-entry
@@ -83,9 +84,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	private _unsupported?: boolean;
-
-	@state()
-	private _showActions?: boolean;
 
 	@state()
 	private _workspaceEditContentPath?: string;
@@ -182,13 +180,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				this.#updateBlockViewProps({ unsupported: unsupported });
 				this._unsupported = unsupported;
 				this.toggleAttribute('unsupported', unsupported);
-			},
-			null,
-		);
-		this.observe(
-			this.#context.actionsVisibility,
-			(showActions) => {
-				this._showActions = showActions;
 			},
 			null,
 		);
@@ -445,12 +436,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#renderActionBar() {
 		if (this._isSortMode) return nothing;
-		if (!this._showActions) return nothing;
 		return html`
-			<uui-action-bar>
+			<umb-block-action-list block-editor=${UMB_BLOCK_LIST}>
 				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
-				${this.#renderDeleteAction()}
-			</uui-action-bar>
+			</umb-block-action-list>
 		`;
 	}
 
@@ -497,13 +486,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		`;
 	}
 
-	#renderDeleteAction() {
-		if (this._isReadOnly) return nothing;
-		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()} title=${this.localize.term('general_delete')}>
-			<uui-icon name="icon-remove"></uui-icon>
-		</uui-button>`;
-	}
-
 	#renderCopyToClipboardAction() {
 		return html`
 			<uui-button
@@ -526,14 +508,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host {
 				position: relative;
 				display: block;
-				--umb-block-list-entry-actions-opacity: 0;
+				--umb-block-entry-actions-opacity: 0;
 			}
 
 			:host([settings-invalid]),
 			:host([content-invalid]),
 			:host(:hover),
 			:host(:focus-within) {
-				--umb-block-list-entry-actions-opacity: 1;
+				--umb-block-entry-actions-opacity: 1;
 			}
 
 			:host::after {
@@ -556,14 +538,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			umb-extension-slot::part(component) {
 				position: relative;
 				z-index: 0;
-			}
-
-			uui-action-bar {
-				position: absolute;
-				top: var(--uui-size-2);
-				right: var(--uui-size-2);
-				opacity: var(--umb-block-list-entry-actions-opacity, 0);
-				transition: opacity 120ms;
 			}
 
 			uui-badge {
