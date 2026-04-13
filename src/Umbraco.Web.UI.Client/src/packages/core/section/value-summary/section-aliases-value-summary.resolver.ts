@@ -1,16 +1,18 @@
-import { UmbSectionItemRepository } from '../repository/item/section-item.repository.js';
-import type { UmbSectionItemModel } from '../repository/item/types.js';
+import { UmbExtensionItemRepository } from '@umbraco-cms/backoffice/extension';
+import type { UmbExtensionItemModel } from '@umbraco-cms/backoffice/extension';
 import type { UmbValueSummaryResolveResult, UmbValueSummaryResolver } from '@umbraco-cms/backoffice/value-summary';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 
 export class UmbSectionAliasesValueSummaryResolver
 	extends UmbControllerBase
-	implements UmbValueSummaryResolver<string[], ReadonlyArray<string>>
+	implements UmbValueSummaryResolver<string[], ReadonlyArray<UmbExtensionItemModel>>
 {
-	#repo = new UmbSectionItemRepository(this);
+	#repo = new UmbExtensionItemRepository(this);
 
-	async resolveValues(values: ReadonlyArray<string[]>): Promise<UmbValueSummaryResolveResult<ReadonlyArray<string>>> {
+	async resolveValues(
+		values: ReadonlyArray<string[]>,
+	): Promise<UmbValueSummaryResolveResult<ReadonlyArray<UmbExtensionItemModel>>> {
 		const allAliases = [...new Set(values.flat())];
 		const { data, asObservable } = await this.#repo.requestItems(allAliases);
 		const items = Array.isArray(data) ? data : [];
@@ -25,10 +27,12 @@ export class UmbSectionAliasesValueSummaryResolver
 
 	#map(
 		values: ReadonlyArray<string[]>,
-		items: ReadonlyArray<UmbSectionItemModel>,
-	): ReadonlyArray<ReadonlyArray<string>> {
-		const nameByAlias = new Map(items.map((s) => [s.unique, s.name]));
-		return values.map((aliases) => aliases.map((alias) => nameByAlias.get(alias) ?? alias));
+		items: ReadonlyArray<UmbExtensionItemModel>,
+	): ReadonlyArray<ReadonlyArray<UmbExtensionItemModel>> {
+		const itemByAlias = new Map(items.map((s) => [s.unique, s]));
+		return values.map(
+			(aliases) => aliases.map((alias) => itemByAlias.get(alias)).filter(Boolean) as UmbExtensionItemModel[],
+		);
 	}
 }
 
