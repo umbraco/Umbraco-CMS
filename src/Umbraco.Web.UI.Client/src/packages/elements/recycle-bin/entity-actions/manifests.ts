@@ -16,7 +16,10 @@ import {
 	UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 	UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 } from '../constants.js';
-import { UMB_USER_PERMISSION_ELEMENT_FOLDER_DELETE } from '../../folder/user-permissions/constants.js';
+import {
+	UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_FOLDER_DELETE,
+} from '../../folder/user-permissions/constants.js';
 import { UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/entity-action';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
@@ -103,7 +106,7 @@ const folderActions: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+				alias: UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
 				allOf: [UMB_USER_PERMISSION_ELEMENT_FOLDER_DELETE],
 			},
 			{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS },

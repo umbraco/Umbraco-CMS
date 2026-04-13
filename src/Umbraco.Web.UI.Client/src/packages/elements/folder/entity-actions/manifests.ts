@@ -30,7 +30,6 @@ const folderCreateOption: ManifestEntityCreateOptionActionFolderKind = {
 			alias: UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS,
 			allOf: [UMB_USER_PERMISSION_ELEMENT_FOLDER_CREATE],
 		},
-		{ alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS },
 	],
 };
 
