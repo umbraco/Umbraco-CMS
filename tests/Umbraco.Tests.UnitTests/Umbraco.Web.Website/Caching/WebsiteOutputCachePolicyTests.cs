@@ -283,7 +283,7 @@ public class WebsiteOutputCachePolicyTests
         services.AddSingleton(_durationProviderMock.Object);
         services.AddSingleton(_navigationServiceMock.Object);
         services.AddSingleton<IEnumerable<IWebsiteOutputCacheTagProvider>>(
-            (tagProviders ?? [new ContentTypeOutputCacheTagProvider()]).ToList());
+            (tagProviders ?? [new ContentTypeWebsiteOutputCacheTagProvider()]).ToList());
         services.AddSingleton<IEnumerable<IWebsiteOutputCacheVaryByProvider>>(
             (varyByProviders ?? Array.Empty<IWebsiteOutputCacheVaryByProvider>()).ToList());
 

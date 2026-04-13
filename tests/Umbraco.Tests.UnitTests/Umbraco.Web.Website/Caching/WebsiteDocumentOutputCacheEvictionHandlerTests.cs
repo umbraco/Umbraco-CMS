@@ -14,12 +14,12 @@ using Umbraco.Cms.Web.Website.Caching;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Caching;
 
 [TestFixture]
-public class DocumentOutputCacheEvictionHandlerTests
+public class WebsiteDocumentOutputCacheEvictionHandlerTests
 {
     private Mock<IOutputCacheStore> _storeMock = null!;
     private Mock<IRelationService> _relationServiceMock = null!;
     private Mock<IIdKeyMap> _idKeyMapMock = null!;
-    private DocumentOutputCacheEvictionHandler _handler = null!;
+    private WebsiteDocumentOutputCacheEvictionHandler _handler = null!;
     private List<Mock<IWebsiteOutputCacheEvictionProvider>> _evictionProviderMocks = null!;
 
     [SetUp]
@@ -264,12 +264,12 @@ public class DocumentOutputCacheEvictionHandlerTests
 
     private void RebuildHandler()
     {
-        _handler = new DocumentOutputCacheEvictionHandler(
+        _handler = new WebsiteDocumentOutputCacheEvictionHandler(
             _storeMock.Object,
             _relationServiceMock.Object,
             _idKeyMapMock.Object,
             _evictionProviderMocks.Select(m => m.Object),
-            NullLogger<DocumentOutputCacheEvictionHandler>.Instance);
+            NullLogger<WebsiteDocumentOutputCacheEvictionHandler>.Instance);
     }
 
     private static ContentCacheRefresherNotification CreateNotification(params ContentCacheRefresher.JsonPayload[] payloads)

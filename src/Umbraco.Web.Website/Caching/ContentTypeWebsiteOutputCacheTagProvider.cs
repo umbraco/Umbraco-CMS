@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Web.Website.Caching;
 /// <summary>
 ///     Tags cached pages with their content type alias, enabling eviction by content type.
 /// </summary>
-internal sealed class ContentTypeOutputCacheTagProvider : IWebsiteOutputCacheTagProvider
+internal sealed class ContentTypeWebsiteOutputCacheTagProvider : IWebsiteOutputCacheTagProvider
 {
     /// <inheritdoc />
     public IEnumerable<string> GetTags(IPublishedContent content)
