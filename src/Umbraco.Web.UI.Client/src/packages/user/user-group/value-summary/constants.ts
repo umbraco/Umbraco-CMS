@@ -7,5 +7,3 @@ declare global {
 		[UMB_USER_GROUP_REFERENCES_VALUE_TYPE]: UmbReferenceByUnique[];
 	}
 }
-
-export * from './sections/constants.js';

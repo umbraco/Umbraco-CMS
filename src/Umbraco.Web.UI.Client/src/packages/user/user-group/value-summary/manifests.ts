@@ -1,5 +1,4 @@
 import { UMB_USER_GROUP_REFERENCES_VALUE_TYPE } from './constants.js';
-import { manifests as sectionManifests } from './sections/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -11,5 +10,4 @@ export const manifests: Array<UmbExtensionManifest> = [
 		element: () => import('./user-group-value-summary.element.js'),
 		resolver: () => import('./user-group-value-summary.resolver.js'),
 	},
-	...sectionManifests,
 ];

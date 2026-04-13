@@ -1,4 +1,4 @@
-export const UMB_SECTION_ALIASES_VALUE_TYPE = 'Umb.ValueType.UserGroup.SectionAliases' as const;
+export const UMB_SECTION_ALIASES_VALUE_TYPE = 'Umb.ValueType.Section.Aliases' as const;
 
 declare global {
 	interface UmbValueTypeMap {
