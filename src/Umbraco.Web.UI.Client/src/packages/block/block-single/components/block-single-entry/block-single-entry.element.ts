@@ -308,8 +308,8 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			throw new Error('Could not get required contexts to copy.');
 		}
 
-		const workspaceName = propertyDatasetContext?.getName();
-		const propertyLabel = propertyContext?.getLabel();
+		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
+		const propertyLabel = this.localize.string(propertyContext?.getLabel());
 		const blockLabel = this.#context.getName();
 
 		const entryName = workspaceName
