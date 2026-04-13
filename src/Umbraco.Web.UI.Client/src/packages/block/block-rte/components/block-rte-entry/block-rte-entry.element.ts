@@ -17,7 +17,6 @@ import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboar
 import { UMB_PROPERTY_DATASET_CONTEXT, UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 import '../ref-rte-block/index.js';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 /**
  * @class UmbBlockRteEntryElement
@@ -271,10 +270,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			throw new Error('Could not get required contexts to copy.');
 		}
 
-		const localizeCtrl = new UmbLocalizationController(this);
-		const workspaceName = localizeCtrl.string(propertyDatasetContext?.getName());
-		const propertyLabel = localizeCtrl.string(propertyContext?.getLabel());
-		localizeCtrl.destroy();
+		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
+		const propertyLabel = this.localize.string(propertyContext?.getLabel());
 
 		const blockLabel = this.#context.getName();
 		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
