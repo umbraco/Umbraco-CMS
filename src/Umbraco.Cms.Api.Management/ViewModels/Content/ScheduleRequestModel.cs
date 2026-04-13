@@ -5,7 +5,9 @@
 /// </summary>
 public class ScheduleRequestModel
 {
-    /// <summary>Gets or sets the scheduled publish time for the content.</summary>
+    /// <summary>
+    /// Gets or sets the scheduled publish time for the content.
+    /// </summary>
     public DateTimeOffset? PublishTime { get; set; }
 
     /// <summary>
