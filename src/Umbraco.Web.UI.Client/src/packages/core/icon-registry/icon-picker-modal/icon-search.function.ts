@@ -115,8 +115,8 @@ export function searchIcons(icons: Array<UmbIconDefinition>, query: string): Arr
 		}
 	}
 
-	// Sort by score descending
-	scored.sort((a, b) => b.score - a.score);
+	// Sort by score descending, then by name ascending for stable ordering of equal scores
+	scored.sort((a, b) => b.score - a.score || a.icon.name.localeCompare(b.icon.name));
 
 	const results = scored.map((s) => s.icon);
 	const resultNames = new Set(results.map((r) => r.name));
