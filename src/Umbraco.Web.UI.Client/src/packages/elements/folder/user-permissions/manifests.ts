@@ -80,7 +80,7 @@ const entityUserPermissions: Array<ManifestEntityUserPermission> = [
 // 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 // 		element: () => import('./input-element-folder-granular-user-permission.element.js'),
 // 		meta: {
-// 			schemaType: 'ElementFolderPermissionPresentationModel',
+// 			schemaType: 'ElementContainerPermissionPresentationModel',
 // 			label: '#user_permissionsGranular',
 // 			description: '{#userPermissions_granular_elementFolder}',
 // 		},

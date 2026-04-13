@@ -4,7 +4,7 @@ import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_ENTITY_CONTEXT, type UmbEntityUnique 
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ElementFolderPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { ElementContainerPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
 export class UmbElementFolderUserPermissionCondition
@@ -13,7 +13,7 @@ export class UmbElementFolderUserPermissionCondition
 {
 	#entityType: string | undefined;
 	#unique: string | null | undefined;
-	#elementFolderPermissions: Array<ElementFolderPermissionPresentationModel> = [];
+	#elementFolderPermissions: Array<ElementContainerPermissionPresentationModel> = [];
 	#fallbackPermissions: string[] = [];
 	#ancestors: Array<UmbEntityUnique> = [];
 
@@ -83,7 +83,9 @@ export class UmbElementFolderUserPermissionCondition
 			const path = [...this.#ancestors, this.#unique].filter((unique) => unique !== null);
 			// Reverse the path to find the closest element folder permission quickly
 			const reversedPath = [...path].reverse();
-			const elementFolderPermissionsMap = new Map(this.#elementFolderPermissions.map((p) => [p.elementFolder.id, p]));
+			const elementFolderPermissionsMap = new Map(
+				this.#elementFolderPermissions.map((p) => [p.elementContainer.id, p]),
+			);
 
 			// Find the closest element folder permission in the path
 			const closestElementFolderPermission = reversedPath.find((id) => elementFolderPermissionsMap.has(id));
@@ -129,9 +131,10 @@ export class UmbElementFolderUserPermissionCondition
 		this.permitted = allOfPermitted && oneOfPermitted;
 	}
 
-	#isElementFolderUserPermission(permission: unknown): permission is ElementFolderPermissionPresentationModel {
+	#isElementFolderUserPermission(permission: unknown): permission is ElementContainerPermissionPresentationModel {
 		return (
-			(permission as ElementFolderPermissionPresentationModel).$type === 'ElementFolderPermissionPresentationModel'
+			(permission as ElementContainerPermissionPresentationModel).$type ===
+			'ElementContainerPermissionPresentationModel'
 		);
 	}
 }

@@ -21,7 +21,7 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 	}
 	public set permissions(value: Array<UmbElementFolderUserPermissionModel>) {
 		this.#permissions = value;
-		const uniques = value.map((item) => item.elementFolder.id);
+		const uniques = value.map((item) => item.elementContainer.id);
 		this.#observePickedFolders(uniques);
 	}
 
@@ -65,7 +65,7 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 
 		// update permission with new verbs
 		this.permissions = this.#permissions.map((permission) => {
-			if (permission.elementFolder.id === item.unique) {
+			if (permission.elementContainer.id === item.unique) {
 				return {
 					...permission,
 					verbs: result,
@@ -99,8 +99,8 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 					this.#folderPickerModalContext?.reject();
 
 					const permissionItem: UmbElementFolderUserPermissionModel = {
-						$type: 'ElementFolderPermissionPresentationModel',
-						elementFolder: { id: unique },
+						$type: 'ElementContainerPermissionPresentationModel',
+						elementContainer: { id: unique },
 						verbs: result,
 					};
 
@@ -216,7 +216,7 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 	}
 
 	#getPermissionForFolder(unique: string) {
-		return this.#permissions?.find((permission) => permission.elementFolder.id === unique);
+		return this.#permissions?.find((permission) => permission.elementContainer.id === unique);
 	}
 
 	#getPermissionNamesForFolder(item: UmbElementFolderItemModel) {
