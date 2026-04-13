@@ -154,67 +154,72 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 				</umb-property-layout>
 			</uui-box>
 
-			${when(
-				!this._isElement || this._allowedInLibrary,
-				() => html`
-					<uui-box headline=${this.localize.term('contentTypeEditor_historyCleanupHeading')}>
-						<umb-property-layout
-							alias="HistoryCleanup"
-							label=${this.localize.term('contentTypeEditor_historyCleanupHeading')}>
-							<div slot="description">
-								<umb-localize key="contentTypeEditor_historyCleanupDescription"
-									>Allow overriding the global history cleanup settings.</umb-localize
-								>
-							</div>
-							<div slot="editor">
-								<uui-form-layout-item>
-									<uui-toggle
-										id="prevent-cleanup"
-										label=${this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}
-										.checked=${this._preventCleanup ?? false}
-										@change=${this.#onChangePreventCleanup}></uui-toggle>
-								</uui-form-layout-item>
+			<uui-box headline=${this.localize.term('contentTypeEditor_historyCleanupHeading')}>
+				<umb-property-layout
+					alias="HistoryCleanup"
+					label=${this.localize.term('contentTypeEditor_historyCleanupHeading')}>
+					<div slot="description">
+						<umb-localize key="contentTypeEditor_historyCleanupDescription"
+							>Allow overriding the global history cleanup settings.</umb-localize
+						>
+					</div>
+					<div slot="editor">
+						${this._isElement && !this._allowedInLibrary
+							? html`
+									<div class="not-applicable-message">
+										<umb-localize key="contentTypeEditor_elementDoesNotSupport">
+											This is not applicable for an Element type.
+										</umb-localize>
+									</div>
+								`
+							: html`
+									<uui-form-layout-item>
+										<uui-toggle
+											id="prevent-cleanup"
+											label=${this.localize.term('contentTypeEditor_historyCleanupPreventCleanup')}
+											.checked=${this._preventCleanup ?? false}
+											@change=${this.#onChangePreventCleanup}></uui-toggle>
+									</uui-form-layout-item>
 
-								${when(
-									!this._preventCleanup,
-									() => html`
-										<uui-form-layout-item>
-											<uui-label slot="label" for="versions-newer-than-days">
-												<umb-localize key="contentTypeEditor_historyCleanupKeepAllVersionsNewerThanDays"
-													>Keep all versions newer than days</umb-localize
-												>
-											</uui-label>
+									${when(
+										!this._preventCleanup,
+										() => html`
+											<uui-form-layout-item>
+												<uui-label slot="label" for="versions-newer-than-days">
+													<umb-localize key="contentTypeEditor_historyCleanupKeepAllVersionsNewerThanDays"
+														>Keep all versions newer than days</umb-localize
+													>
+												</uui-label>
 
-											<uui-input
-												type="number"
-												id="versions-newer-than-days"
-												min="0"
-												placeholder="7"
-												.value=${this._keepAllVersionsNewerThanDays?.toString() ?? ''}
-												@change=${this.#onChangeKeepAllVersionsNewerThanDays}></uui-input>
-										</uui-form-layout-item>
+												<uui-input
+													type="number"
+													id="versions-newer-than-days"
+													min="0"
+													placeholder="7"
+													.value=${this._keepAllVersionsNewerThanDays?.toString() ?? ''}
+													@change=${this.#onChangeKeepAllVersionsNewerThanDays}></uui-input>
+											</uui-form-layout-item>
 
-										<uui-form-layout-item>
-											<uui-label slot="label" for="latest-version-per-day-days">
-												<umb-localize key="contentTypeEditor_historyCleanupKeepLatestVersionPerDayForDays"
-													>Keep latest version per day for days</umb-localize
-												>
-											</uui-label>
-											<uui-input
-												type="number"
-												id="latest-version-per-day-days"
-												min="0"
-												placeholder="90"
-												.value=${this._keepLatestVersionPerDayForDays?.toString() ?? ''}
-												@change=${this.#onChangeKeepLatestVersionPerDayForDays}></uui-input>
-										</uui-form-layout-item>
-									`,
-								)}
-							</div>
-						</umb-property-layout>
-					</uui-box>
-				`,
-			)}
+											<uui-form-layout-item>
+												<uui-label slot="label" for="latest-version-per-day-days">
+													<umb-localize key="contentTypeEditor_historyCleanupKeepLatestVersionPerDayForDays"
+														>Keep latest version per day for days</umb-localize
+													>
+												</uui-label>
+												<uui-input
+													type="number"
+													id="latest-version-per-day-days"
+													min="0"
+													placeholder="90"
+													.value=${this._keepLatestVersionPerDayForDays?.toString() ?? ''}
+													@change=${this.#onChangeKeepLatestVersionPerDayForDays}></uui-input>
+											</uui-form-layout-item>
+										`,
+									)}
+								`}
+					</div>
+				</umb-property-layout>
+			</uui-box>
 		`;
 	}
 
@@ -263,6 +268,11 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 			// TODO: is this necessary?
 			uui-toggle {
 				display: flex;
+			}
+
+			.not-applicable-message {
+				color: var(--uui-color-text-alt);
+				font-style: italic;
 			}
 		`,
 	];
