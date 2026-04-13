@@ -45,6 +45,12 @@ class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel
 		const mappedItems = mockItems.map((item) => allowedDocumentTypeMapper(item));
 		return { items: mappedItems, total: mappedItems.length };
 	}
+
+	getAllowedInLibrary(): PagedAllowedDocumentTypeModel {
+		const mockItems = this.data.filter((item) => item.allowedInLibrary);
+		const mappedItems = mockItems.map((item) => allowedDocumentTypeMapper(item));
+		return { items: mappedItems, total: mappedItems.length };
+	}
 }
 
 const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): UmbMockDocumentTypeModel => {

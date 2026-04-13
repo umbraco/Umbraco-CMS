@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Runtime.Serialization;
 using Umbraco.Extensions;
 
-// TODO ELEMENTS: ensure property annotations ect. are up to date from Content
 public abstract class PublishableContentBase : ContentBase, IPublishableContentBase
 {
     private HashSet<string>? _editedCultures;

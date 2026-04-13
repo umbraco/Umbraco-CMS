@@ -44,20 +44,21 @@ public class ConvertersTests
 
         var elementsCache = new ElementsDictionaryAppCache();
         var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new() };
+        var propertyRenderingContextAccessor = new TestPropertyRenderingContextAccessor { PropertyRenderingContext = new(default) };
 
         var contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "1234" } });
-        var element1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
+        var element1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
 
         Assert.AreEqual(1234, element1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
 
         // 'null' would be considered a 'missing' value by the default, magic logic
         contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", null } });
-        var e = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
+        var e = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
         Assert.IsFalse(e.HasValue("prop1"));
 
         // '0' would not - it's a valid integer - but the converter knows better
         contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "0" } });
-        e = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
+        e = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
         Assert.IsFalse(e.HasValue("prop1"));
     }
 
@@ -129,8 +130,10 @@ public class ConvertersTests
         var elementsCache = new ElementsDictionaryAppCache();
         var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new() };
 
+
         var contentNode = CreateContentNode("Element 1", 1234, elementType1, new Dictionary<string, object> { { "prop1", "1234" } });
-        var element1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
+        var propertyRenderingContextAccessor = new TestPropertyRenderingContextAccessor { PropertyRenderingContext = new(default) };
+        var element1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
 
         var cntType1 = contentTypeFactory.CreateContentType(Guid.NewGuid(), 1001, "cnt1", t => Enumerable.Empty<PublishedPropertyType>());
         var cnt1 = new InternalPublishedContent(cntType1) { Id = 1234 };

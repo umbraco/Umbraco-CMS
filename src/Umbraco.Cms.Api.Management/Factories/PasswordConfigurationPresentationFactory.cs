@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.ViewModels.Security;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -12,19 +12,11 @@ namespace Umbraco.Cms.Api.Management.Factories;
 public class PasswordConfigurationPresentationFactory : IPasswordConfigurationPresentationFactory
 {
     private readonly SecuritySettings _securitySettings;
-    
-    // TODO (V19): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
-    // Also update UmbracoBuilder where this service is registered using:
-    //   builder.Services.AddTransient<IPasswordConfigurationPresentationFactory>(sp => ActivatorUtilities.CreateInstance<PasswordConfigurationPresentationFactory>(sp));
-    // We do this to allow the ActivatorUtilitiesConstructor to be used (it's otherwise ignored by AddTransient).
-    // Revert it to:
-    //   builder.Services.AddTransient<IPasswordConfigurationPresentationFactory, PasswordConfigurationPresentationFactory>()    
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PasswordConfigurationPresentationFactory"/> class.
     /// </summary>
     /// <param name="securitySettings">An <see cref="IOptionsSnapshot{T}"/> containing the current <see cref="SecuritySettings"/> for user password configuration.</param>
-    [ActivatorUtilitiesConstructor]
     public PasswordConfigurationPresentationFactory(IOptionsSnapshot<SecuritySettings> securitySettings)
         => _securitySettings = securitySettings.Value;
 
@@ -35,6 +27,13 @@ public class PasswordConfigurationPresentationFactory : IPasswordConfigurationPr
     [Obsolete("Use the constructor that accepts IOptionsSnapshot<SecuritySettings> instead. Scheduled for removal in Umbraco 19.")]
     public PasswordConfigurationPresentationFactory(IOptionsSnapshot<UserPasswordConfigurationSettings> userPasswordConfigurationSettings)
         : this(StaticServiceProvider.Instance.GetRequiredService<IOptionsSnapshot<SecuritySettings>>())
+    {
+    }
+
+    // This is just here to resolve an ambiguous constructor.
+    [Obsolete("Use the constructor that accepts IOptionsSnapshot<SecuritySettings> instead. Scheduled for removal in Umbraco 19.")]
+    public PasswordConfigurationPresentationFactory(IOptionsSnapshot<SecuritySettings> securitySettings, IOptionsSnapshot<UserPasswordConfigurationSettings> _)
+        : this(securitySettings)
     {
     }
 

@@ -100,6 +100,8 @@ public class DeliveryApiTests
 
     protected IVariationContextAccessor CreateVariationContextAccessor() => new TestVariationContextAccessor();
 
+    protected IPropertyRenderingContextAccessor CreatePropertyRenderingContextAccessor() => new TestPropertyRenderingContextAccessor();
+
     protected IOptions<GlobalSettings> CreateGlobalSettings(bool hideTopLevelNodeFromPath = true)
     {
         var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hideTopLevelNodeFromPath };
@@ -127,6 +129,25 @@ public class DeliveryApiTests
         content.SetupGet(c => c.ItemType).Returns(contentType.ItemType);
         content.SetupGet(c => c.Level).Returns(1);
         content.Setup(c => c.IsPublished(It.IsAny<string?>())).Returns(true);
+    }
+
+    protected void ConfigurePublishedElementMock(Mock<IPublishedElement> element, Guid key, string name, IPublishedContentType contentType, IEnumerable<IPublishedProperty> properties)
+    {
+        element.SetupGet(c => c.Key).Returns(key);
+        element.SetupGet(c => c.Name).Returns(name);
+        element
+            .SetupGet(m => m.Cultures)
+            .Returns(new Dictionary<string, PublishedCultureInfo>()
+            {
+                {
+                    string.Empty,
+                    new PublishedCultureInfo(string.Empty, name,null, DateTime.UtcNow)
+                }
+            });
+        element.SetupGet(c => c.ContentType).Returns(contentType);
+        element.SetupGet(c => c.Properties).Returns(properties);
+        element.SetupGet(c => c.ItemType).Returns(contentType.ItemType);
+        element.Setup(c => c.IsPublished(It.IsAny<string?>())).Returns(true);
     }
 
     protected string DefaultUrlSegment(string name, string? culture = null)
