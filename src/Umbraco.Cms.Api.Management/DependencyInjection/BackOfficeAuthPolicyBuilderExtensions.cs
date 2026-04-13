@@ -154,7 +154,7 @@ internal static class BackOfficeAuthPolicyBuilderExtensions
         options.AddPolicy(AuthorizationPolicies.ElementFolderPermissionByResource, policy =>
         {
             policy.AuthenticationSchemes.Add(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-            policy.Requirements.Add(new ElementcontainerPermissionRequirement());
+            policy.Requirements.Add(new ElementContainerPermissionRequirement());
         });
 
         options.AddPolicy(AuthorizationPolicies.MediaPermissionByResource, policy =>

@@ -5,6 +5,6 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.Element;
 /// <summary>
 ///     Authorization requirement for the <see cref="ElementContainerPermissionHandler" />.
 /// </summary>
-public class ElementcontainerPermissionRequirement : IAuthorizationRequirement
+public class ElementContainerPermissionRequirement : IAuthorizationRequirement
 {
 }

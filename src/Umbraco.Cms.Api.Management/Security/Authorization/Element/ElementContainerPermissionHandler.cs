@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Api.Management.Security.Authorization.Element;
 /// <summary>
 ///     Authorizes that the current user has the correct permission access to the element container item(s) specified in the request.
 /// </summary>
-public class ElementContainerPermissionHandler : MustSatisfyRequirementAuthorizationHandler<ElementcontainerPermissionRequirement, ElementContainerPermissionResource>
+public class ElementContainerPermissionHandler : MustSatisfyRequirementAuthorizationHandler<ElementContainerPermissionRequirement, ElementContainerPermissionResource>
 {
     private readonly IElementContainerPermissionAuthorizer _elementContainerPermissionAuthorizer;
     private readonly IAuthorizationHelper _authorizationHelper;
@@ -26,7 +26,7 @@ public class ElementContainerPermissionHandler : MustSatisfyRequirementAuthoriza
     /// <inheritdoc />
     protected override async Task<bool> IsAuthorized(
         AuthorizationHandlerContext context,
-        ElementcontainerPermissionRequirement requirement,
+        ElementContainerPermissionRequirement requirement,
         ElementContainerPermissionResource resource)
     {
         var result = true;
