@@ -1,7 +1,7 @@
 import type { UmbIconDefinition } from '../types.js';
 import { UMB_ICON_REGISTRY_CONTEXT } from '../icon-registry.context-token.js';
 import type { UmbIconPickerModalData, UmbIconPickerModalValue } from './icon-picker-modal.token.js';
-import { searchIcons } from './icon-search.function.js';
+import { UmbIconSearchController } from './icon-search.controller.js';
 import {
 	css,
 	customElement,
@@ -23,6 +23,8 @@ import { debounce, toCamelCase } from '@umbraco-cms/backoffice/utils';
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {
 	#icons?: Array<UmbIconDefinition>;
 
+	#searchController = new UmbIconSearchController(this);
+
 	#debouncedFilterIcons = debounce(() => this.#filterIcons(), 250);
 
 	@query('#search')
@@ -42,6 +44,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		this.consumeContext(UMB_ICON_REGISTRY_CONTEXT, (context) => {
 			this.observe(context?.approvedIcons, (icons) => {
 				this.#icons = icons;
+				this.#searchController.setIcons(icons ?? []);
 				this.#filterIcons();
 			});
 		});
@@ -56,12 +59,17 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		this.#debouncedFilterIcons();
 	}
 
-	#filterIcons() {
+	async #filterIcons() {
 		if (!this.#icons) return;
 		const value = this._searchInput?.value?.trim();
 		if (value && value.length > 0) {
 			this._isSearching = true;
-			this._iconsFiltered = searchIcons(this.#icons, value);
+			try {
+				this._iconsFiltered = await this.#searchController.search(value);
+			} catch (error) {
+				// Ignore aborted searches — a newer search (or teardown) superseded this one.
+				if ((error as DOMException)?.name !== 'AbortError') throw error;
+			}
 		} else {
 			this._isSearching = false;
 			this._iconsFiltered = this.#icons;
