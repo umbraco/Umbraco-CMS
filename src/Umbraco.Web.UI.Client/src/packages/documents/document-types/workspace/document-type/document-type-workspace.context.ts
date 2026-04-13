@@ -44,6 +44,7 @@ export class UmbDocumentTypeWorkspaceContext
 			workspaceAlias: UMB_DOCUMENT_TYPE_WORKSPACE_ALIAS,
 			entityType: UMB_DOCUMENT_TYPE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_DOCUMENT_TYPE_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_documentTypes',
 		});
 
 		// Document type specific:

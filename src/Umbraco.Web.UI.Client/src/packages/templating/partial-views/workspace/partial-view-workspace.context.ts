@@ -39,6 +39,7 @@ export class UmbPartialViewWorkspaceContext
 			workspaceAlias: UMB_PARTIAL_VIEW_WORKSPACE_ALIAS,
 			entityType: UMB_PARTIAL_VIEW_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_PARTIAL_VIEW_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_partialViews',
 		});
 
 		this.routes.setRoutes([

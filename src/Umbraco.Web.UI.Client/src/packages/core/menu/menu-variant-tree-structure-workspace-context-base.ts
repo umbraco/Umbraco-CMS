@@ -17,6 +17,9 @@ import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_VIEW_CONTEXT } from '@umbraco-cms/backoffice/view';
+import type { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import { umbPublishAncestorsToView } from './publish-ancestors-to-view.function.js';
 
 interface UmbMenuVariantTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -43,6 +46,7 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 	#parentContext = new UmbParentEntityContext(this);
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
+	#viewContext?: UmbViewContext;
 	#isModalContext: boolean = false;
 	#isNew: boolean | undefined = undefined;
 	#variantWorkspaceContext?: typeof UMB_VARIANT_WORKSPACE_CONTEXT.TYPE;
@@ -73,6 +77,17 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
 			this.#sectionSidebarMenuContext = instance;
 		});
+
+		this.consumeContext(UMB_VIEW_CONTEXT, (instance) => {
+			this.#viewContext = instance;
+			this.#publishAncestorsToView();
+		});
+
+		this.observe(
+			this.structure,
+			() => this.#publishAncestorsToView(),
+			'observeStructureForAncestorPublish',
+		);
 
 		this.consumeContext(UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -195,6 +210,15 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 			}
 		}
+	}
+
+	#publishAncestorsToView(): void {
+		umbPublishAncestorsToView(
+			this.#viewContext,
+			this.#structure.getValue(),
+			this.#workspaceContext?.getUnique(),
+			(item) => item.variants[0]?.name,
+		);
 	}
 
 	#setParentData(structureItems: Array<UmbVariantStructureItemModel>) {

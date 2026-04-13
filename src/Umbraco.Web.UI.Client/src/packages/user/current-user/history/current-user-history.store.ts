@@ -1,4 +1,5 @@
 import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.store.token.js';
+import { umbCurrentViewTitle } from '@umbraco-cms/backoffice/view';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
@@ -17,6 +18,8 @@ export type UmbCurrentUserHistoryItem = {
 	displayPath?: string;
 };
 
+const BREADCRUMB_SEPARATOR = ' › ';
+
 export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHistoryItem> {
 	public readonly history = this._data.asObservable();
 
@@ -27,34 +30,30 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 
 	#lastAddedUnique: string | null = null;
 	#lastAddedPath: string | null = null;
-	#titleObserver: MutationObserver | null = null;
-	#headObserver: MutationObserver | null = null;
-	#titleUpdateTimer: ReturnType<typeof setTimeout> | null = null;
-
-	#handleNavigateSuccess = () => {
-		// Update label for the most recent history item after navigation completes.
-		this.#scheduleTitleUpdate();
-	};
 
 	#handleNavigate = (event: any) => {
 		const url = new URL(event.destination.url);
-		const path = this.#normalizePath(url.pathname);
+		// `path` stores the full (unnormalized) URL so that clicking the entry
+		// in the history takes the user back to exactly where they were — e.g.
+		// the specific workspace tab or culture variant.
+		const fullPath = url.pathname;
+		const normalizedPath = this.#normalizePath(fullPath);
 
-		// Before adding a new item, finalize the label of the previous item
-		// using the current document title (before it changes).
-		this.#finalizeCurrentLabel();
+		// Before adding a new item, finalize the state of the previous item.
+		// If it ended in a GUID and never received a title, drop it.
+		this.#removeUnresolvedGuidEntry();
 
 		const unique = UmbId.new();
-		const historyItem = {
+		const historyItem: UmbCurrentUserHistoryItem = {
 			unique,
-			path,
-			displayPath: this.#formatDisplayPath(path),
-			label: this.#extractLabelFromPath(path),
+			path: fullPath,
+			label: this.#extractLabelFromPath(normalizedPath),
+			displayPath: undefined,
 		};
 		const wasAdded = this.#pushIfNew(historyItem);
 		if (wasAdded) {
 			this.#lastAddedUnique = unique;
-			this.#lastAddedPath = path;
+			this.#lastAddedPath = normalizedPath;
 		}
 	};
 
@@ -65,45 +64,48 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 			new UmbArrayState<UmbCurrentUserHistoryItem>([], (x) => x.unique),
 		);
 		if (!('navigation' in window)) return;
-		(window as any).navigation.addEventListener('navigatesuccess', this.#handleNavigateSuccess);
 		(window as any).navigation.addEventListener('navigate', this.#handleNavigate);
 
-		this.#setupTitleObserver();
+		// Mirror the active view's structured title onto the latest history entry.
+		// Skip modal-kind segments (modals don't change the URL — without this, an
+		// opened modal would rewrite the underlying page's entry) and tab-kind
+		// segments (which sub-view the user was on is noise in a breadcrumb; the
+		// full URL is still preserved on `path` for click-through).
+		this.observe(umbCurrentViewTitle, (view) => {
+			if (!view || !this.#lastAddedUnique || !this.#lastAddedPath) return;
+			// Guard against stale emissions during fast navigation.
+			if (this.#normalizePath(view.path) !== this.#lastAddedPath) return;
+			if (view.segments.some((s) => s.kind === 'modal')) return;
+
+			const breadcrumb = view.segments.filter((s) => s.kind !== 'tab');
+			if (!breadcrumb.length) return;
+
+			const leaf = breadcrumb[breadcrumb.length - 1];
+			const parents = breadcrumb.slice(0, -1);
+			this.updateItem(this.#lastAddedUnique, {
+				label: leaf.label,
+				displayPath: parents.length ? parents.map((s) => s.label).join(BREADCRUMB_SEPARATOR) : undefined,
+			});
+		});
 	}
 
 	/**
-	 * Normalize a path by stripping sub-route suffixes (variants, views, tabs)
-	 * and trailing /collection segments. This ensures that internal workspace
-	 * navigation (e.g., switching tabs or variants) does not create separate
-	 * history entries, while still creating an entry for the base entity path.
+	 * Normalize a path by stripping sub-route suffixes so that internal workspace
+	 * navigation (switching tabs, variants, sub-views) doesn't create separate
+	 * history entries. The first regex handles `/invariant`, `/root`, `/<locale>`,
+	 * `/view`, and `/tab` segments (each possibly followed by more path), the
+	 * second collapses a trailing `/collection` into the parent path.
+	 * @param path
 	 */
 	#normalizePath(path: string): string {
-		// Strip sub-route suffixes: variant paths (/invariant, /en-us), /root
-		path = path.replace(/\/(?:invariant|root)(?:\/.*)?$/, '');
-		path = path.replace(/\/[a-z]{2}-[a-z]{2}(?:\/.*)?$/i, '');
-		// Strip view and tab sub-routes
-		path = path.replace(/\/(?:view|tab)(?:\/.*)?$/, '');
-		// Strip trailing /collection to de-duplicate with parent
-		path = path.replace(/\/collection$/, '');
-		return path;
+		return path
+			.replace(/\/(?:invariant|root|[a-z]{2}-[a-z]{2}|view|tab)(?:\/.*)?$/i, '')
+			.replace(/\/collection$/, '');
 	}
 
 	/**
-	 * Finalize the current item's label before navigating away.
-	 * If the path ends in a GUID and the title wasn't resolved in time, remove the entry.
-	 */
-	#finalizeCurrentLabel(): void {
-		if (this.#titleUpdateTimer) {
-			clearTimeout(this.#titleUpdateTimer);
-			this.#titleUpdateTimer = null;
-		}
-
-		this.#removeUnresolvedGuidEntry();
-	}
-
-	/**
-	 * Remove the last added entry if it ends in a GUID and the label wasn't resolved from the title.
-	 * This cleans up entries where the user navigated away too quickly.
+	 * Remove the last added entry if it ends in a GUID and the label wasn't resolved from the active view's title.
+	 * This cleans up entries where the user navigated away before a workspace had time to publish its title.
 	 */
 	#removeUnresolvedGuidEntry(): void {
 		if (!this.#lastAddedUnique || !this.#lastAddedPath) return;
@@ -120,6 +122,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 
 	/**
 	 * Get the last segment of a path.
+	 * @param path
 	 */
 	#getLastPathSegment(path: string): string {
 		return path.split('/').filter(Boolean).pop() ?? '';
@@ -128,136 +131,55 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	/**
 	 * Extract a readable label from a path.
 	 * Tries to get the last meaningful segment (usually entity ID or section name).
+	 * @param path
 	 */
 	#extractLabelFromPath(path: string): string {
 		return this.#formatSegmentAsLabel(this.#getLastPathSegment(path));
 	}
 
 	/**
-	 * Format a URL segment as a readable label.
-	 * Handles special suffixes and converts kebab-case to Title Case.
+	 * Format a URL segment as a readable label: converts kebab-case to Title Case,
+	 * pluralises the `-root` / `-management` tree-root conventions (e.g.
+	 * `user-root` → `Users`), and handles a handful of known identifiers.
+	 * @param segment
 	 */
 	#formatSegmentAsLabel(segment: string): string {
 		if (!segment) return '';
-
-		// Special cases: Handle specific common and known segments to provide something more user-friendly.
-		if (segment === 'dashboardTabsContentIntro') {
-			return 'Welcome to Umbraco';
-		}
-
-		// Special cases: Handle known and common suffixes: "user-root" -> "Users", "member-management" -> "Members"
-		if (segment.endsWith('-root') || segment.endsWith('-management')) {
-			const base = segment.replace(/-(root|management)$/, '');
-			const titleCased = this.#toTitleCase(base);
-			return titleCased + 's';
-		}
-
-		// Convert kebab-case to Title Case for better display
-		// e.g., "models-builder" -> "Models Builder"
-		return this.#toTitleCase(segment);
-	}
-
-	/**
-	 * Convert a kebab-case string to Title Case.
-	 * e.g., "models-builder" -> "Models Builder"
-	 */
-	#toTitleCase(str: string): string {
-		if (!str) return '';
-		return str
+		if (segment === 'dashboardTabsContentIntro') return 'Welcome to Umbraco';
+		const rootMatch = segment.match(/^(.+)-(?:root|management)$/);
+		const base = rootMatch ? rootMatch[1] : segment;
+		const titleCased = base
 			.split('-')
 			.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
 			.join(' ');
+		return rootMatch ? titleCased + 's' : titleCased;
 	}
 
 	/**
-	 * Format a path for display by stripping common prefixes.
-	 * e.g., "/umbraco/section/content/..." -> "content/..."
-	 */
-	#formatDisplayPath(path: string): string {
-		return path.replace(/^\/(umbraco\/)?(section\/)?/, '');
-	}
-
-	#setupTitleObserver(): void {
-		const titleElement = document.querySelector('title');
-		if (titleElement) {
-			this.#titleObserver = new MutationObserver(() => this.#onTitleChange());
-			this.#titleObserver.observe(titleElement, { childList: true, characterData: true, subtree: true });
-		} else {
-			// If title element doesn't exist yet, observe head for its creation.
-			this.#headObserver = new MutationObserver(() => {
-				const title = document.querySelector('title');
-				if (title) {
-					this.#headObserver?.disconnect();
-					this.#headObserver = null;
-					this.#titleObserver = new MutationObserver(() => this.#onTitleChange());
-					this.#titleObserver.observe(title, { childList: true, characterData: true, subtree: true });
-				}
-			});
-			this.#headObserver.observe(document.head, { childList: true });
-		}
-	}
-
-	#onTitleChange(): void {
-		this.#scheduleTitleUpdate();
-	}
-
-	#scheduleTitleUpdate(): void {
-		if (this.#titleUpdateTimer) {
-			clearTimeout(this.#titleUpdateTimer);
-		}
-		// Capture the target path at schedule time so the update only fires
-		// if we're still on the same page when the timer completes.
-		// This prevents updating the wrong entry during fast navigation.
-		const targetPath = this.#lastAddedPath;
-		this.#titleUpdateTimer = setTimeout(() => {
-			if (targetPath && this.#normalizePath(window.location.pathname) === targetPath) {
-				this.#updateLatestLabel();
-			}
-		}, 150);
-	}
-
-	#updateLatestLabel(): void {
-		if (!this.#lastAddedUnique || !this.#lastAddedPath) return;
-
-		const title = document.title;
-		if (!title) return;
-
-		// Extract friendly title by removing " | Umbraco" suffix.
-		let friendlyTitle = title.replace(/ \| Umbraco$/, '');
-		if (!friendlyTitle) return;
-
-		// Take only the first part if there are multiple pipe-separated segments
-		// e.g., "My Blog Post | Content" -> "My Blog Post".
-		const pipeIndex = friendlyTitle.indexOf(' | ');
-		if (pipeIndex > 0) {
-			friendlyTitle = friendlyTitle.substring(0, pipeIndex);
-		}
-
-		// Skip generic/technical labels that aren't useful as entity names.
-		const skipLabels = ['invariant', 'content', 'media', 'settings', 'users', 'packages', 'members', 'user'];
-		if (skipLabels.includes(friendlyTitle.toLowerCase())) {
-			return;
-		}
-
-		// Update the item in the store for immediate display
-		this.updateItem(this.#lastAddedUnique, { label: friendlyTitle });
-	}
-
-	/**
-	 * Pushes a new history item, removing any existing item with the same path.
-	 * @returns true if the item was added, false if it was a duplicate of the last item
+	 * Pushes a new history item, removing any existing item with the same normalized path.
+	 * Paths are compared after normalization so that tab / variant switches within the
+	 * same entity are treated as the same entry — but the full path (including the
+	 * current tab) is preserved on the item so clicking it returns the user to the
+	 * exact place they left.
+	 * @param historyItem
+	 * @returns true if the item was added, false if it was an immediate duplicate of the last item
 	 */
 	#pushIfNew(historyItem: UmbCurrentUserHistoryItem): boolean {
 		const history = this._data.getValue();
 		const lastItem = history[history.length - 1];
+		const incomingNormalized = this.#normalizePath(historyItem.path);
 
-		// Skip if this is the same as the last item (immediate duplicate).
-		if (lastItem && lastItem.path === historyItem.path) {
+		// Skip if this is the same (normalized) as the last item — but still bump the
+		// stored path so the entry reflects the most recently visited tab / variant.
+		if (lastItem && this.#normalizePath(lastItem.path) === incomingNormalized) {
+			if (lastItem.path !== historyItem.path) {
+				this.updateItem(lastItem.unique, { path: historyItem.path });
+			}
 			return false;
 		}
 
-		// Remove any earlier entry with the same path (de-duplicate).
-		const filteredHistory = history.filter((item) => item.path !== historyItem.path);
+		// Remove any earlier entry with the same normalized path (de-duplicate).
+		const filteredHistory = history.filter((item) => this.#normalizePath(item.path) !== incomingNormalized);
 
 		this._data.setValue([...filteredHistory, historyItem]);
 		return true;
@@ -286,20 +208,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 
 	override destroy(): void {
 		if ('navigation' in window) {
-			(window as any).navigation.removeEventListener('navigatesuccess', this.#handleNavigateSuccess);
 			(window as any).navigation.removeEventListener('navigate', this.#handleNavigate);
-		}
-		if (this.#headObserver) {
-			this.#headObserver.disconnect();
-			this.#headObserver = null;
-		}
-		if (this.#titleObserver) {
-			this.#titleObserver.disconnect();
-			this.#titleObserver = null;
-		}
-		if (this.#titleUpdateTimer) {
-			clearTimeout(this.#titleUpdateTimer);
-			this.#titleUpdateTimer = null;
 		}
 		super.destroy();
 	}

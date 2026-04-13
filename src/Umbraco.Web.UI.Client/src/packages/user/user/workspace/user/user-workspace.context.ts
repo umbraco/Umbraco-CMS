@@ -43,6 +43,7 @@ export class UmbUserWorkspaceContext
 			workspaceAlias: UMB_USER_WORKSPACE_ALIAS,
 			entityType: UMB_USER_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_USER_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#general_user',
 		});
 
 		this.routes.setRoutes([

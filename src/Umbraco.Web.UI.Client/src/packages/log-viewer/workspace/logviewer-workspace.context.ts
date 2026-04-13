@@ -108,6 +108,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 		this.provideContext(UMB_WORKSPACE_CONTEXT, this);
 		this.#repository = new UmbLogViewerRepository(host);
 
+		this.view.inherit();
 		this.view.setTitle('#treeHeaders_logViewer');
 	}
 

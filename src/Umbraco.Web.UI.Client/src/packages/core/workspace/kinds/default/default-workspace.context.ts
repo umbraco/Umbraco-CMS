@@ -15,6 +15,10 @@ export class UmbDefaultWorkspaceContext extends UmbContextBase implements UmbWor
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_WORKSPACE_CONTEXT.toString());
+		// Inherit the view from the hosting section so the section title propagates
+		// into this workspace's title chain (and thereby document.title and the user
+		// history breadcrumb).
+		this.view.inherit();
 	}
 
 	set manifest(manifest: ManifestWorkspaceDefaultKind) {

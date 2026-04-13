@@ -23,6 +23,7 @@ export class UmbMemberTypeWorkspaceContext
 			workspaceAlias: UMB_MEMBER_TYPE_WORKSPACE_ALIAS,
 			entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_memberTypes',
 		});
 
 		this.routes.setRoutes([

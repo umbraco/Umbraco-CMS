@@ -29,6 +29,7 @@ export class UmbWebhookWorkspaceContext
 			workspaceAlias: UMB_WEBHOOK_WORKSPACE_ALIAS,
 			entityType: UMB_WEBHOOK_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_WEBHOOK_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_webhooks',
 		});
 
 		this.routes.setRoutes([

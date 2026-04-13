@@ -26,10 +26,11 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 	constructor(host: UmbControllerHost, args: UmbEntityDetailWorkspaceContextArgs) {
 		super(host, args);
 		this.nameWriteGuard.fallbackToPermitted();
+		const typeLabel = args.typeLabel;
 		this.observe(
 			this.name,
 			(name) => {
-				this.view.setTitle(name);
+				this.view.setTitle(name, { kind: 'workspace', typeLabel });
 			},
 			null,
 		);

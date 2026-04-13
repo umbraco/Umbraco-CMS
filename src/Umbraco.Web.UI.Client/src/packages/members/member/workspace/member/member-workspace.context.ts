@@ -115,6 +115,27 @@ export class UmbMemberWorkspaceContext
 			},
 			null,
 		);
+
+		// Publish a stable, member-specific title to the view chain. The content base
+		// sets the title from the active variant's name, but members aren't true
+		// variant content — the variant name may be empty. We fall back to the
+		// member's username or email so the user history always gets a usable label,
+		// and tag it with a typeLabel so the history breadcrumb can show "Member"
+		// rather than just the section name.
+		this.observe(
+			this._data.createObservablePartOfCurrent((data) => ({
+				variantName: data?.variants?.[0]?.name,
+				username: data?.username,
+				email: data?.email,
+			})),
+			({ variantName, username, email }) => {
+				const name = variantName || username || email;
+				if (name) {
+					this.view.setTitle(name, { kind: 'workspace', typeLabel: '#member_memberKindDefault' });
+				}
+			},
+			null,
+		);
 	}
 
 	#hintedMsgs: Set<string> = new Set();

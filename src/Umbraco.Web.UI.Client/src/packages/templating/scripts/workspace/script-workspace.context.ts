@@ -25,6 +25,7 @@ export class UmbScriptWorkspaceContext
 			workspaceAlias: UMB_SCRIPT_WORKSPACE_ALIAS,
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_scripts',
 		});
 
 		this.routes.setRoutes([

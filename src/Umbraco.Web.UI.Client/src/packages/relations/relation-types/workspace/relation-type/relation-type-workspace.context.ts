@@ -6,6 +6,7 @@ import { UmbWorkspaceRouteManager } from '@umbraco-cms/backoffice/workspace';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 export class UmbRelationTypeWorkspaceContext extends UmbContextBase {
 	public readonly workspaceAlias = 'Umb.Workspace.RelationType';
@@ -23,9 +24,16 @@ export class UmbRelationTypeWorkspaceContext extends UmbContextBase {
 	readonly isDependency = this.#data.asObservablePart((data) => data?.isDependency);
 
 	readonly routes = new UmbWorkspaceRouteManager(this);
+	public readonly view = new UmbViewContext(this, null);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_RELATION_TYPE_WORKSPACE_CONTEXT);
+		this.view.inherit();
+		this.observe(
+			this.name,
+			(name) => this.view.setTitle(name, { kind: 'workspace', typeLabel: '#treeHeaders_relationTypes' }),
+			null,
+		);
 
 		this.routes.setRoutes([
 			{

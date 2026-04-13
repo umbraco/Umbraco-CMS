@@ -1,6 +1,8 @@
 import { UmbShortcutController } from '../../shortcut/context/shortcut.controller.js';
 import { UMB_VIEW_CONTEXT } from './view.context-token.js';
-import { UmbClassState, UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { _setUmbCurrentViewTitle } from './current-view-title.js';
+import type { UmbCurrentViewTitleSegment, UmbViewTitleKind } from './current-view-title.js';
+import { UmbClassState, UmbObjectState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbHintController } from '@umbraco-cms/backoffice/hint';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
@@ -61,8 +63,14 @@ export class UmbViewController extends UmbControllerBase {
 	#explicitInheritance?: boolean;
 	#parentView?: UmbViewController;
 	#title?: string;
-	#computedTitle = new UmbStringState(undefined);
-	readonly computedTitle = this.#computedTitle.asObservable();
+	#titleKind: UmbViewTitleKind = 'workspace';
+	#titleTypeLabel?: string;
+	#titleAncestors?: ReadonlyArray<string>;
+	#computedTitleSegments = new UmbObjectState<ReadonlyArray<UmbCurrentViewTitleSegment> | undefined>(undefined);
+	readonly computedTitleSegments = this.#computedTitleSegments.asObservable();
+	readonly computedTitle = this.#computedTitleSegments.asObservablePart((segs) =>
+		segs?.length ? segs.map((s) => s.label).join(' | ') : undefined,
+	);
 
 	public readonly viewAlias: string | null;
 
@@ -119,9 +127,44 @@ export class UmbViewController extends UmbControllerBase {
 		this.hints.updateScaffold({ variantId: variantId });
 	}
 
-	public setTitle(title: string | undefined): void {
-		if (this.#title === title) return;
+	/**
+	 * Set this view's title. When the view is active (and has no active children),
+	 * the title contributes to `document.title` and to the published breadcrumb.
+	 * @param title The view's own title. Localization keys like `#foo_bar` are resolved automatically.
+	 * @param options Optional metadata. `kind` classifies the segment (default: `'workspace'`). `typeLabel`
+	 *   optionally inserts an additional segment with kind `'workspace-type'` immediately before this one — useful
+	 *   for entity workspaces that want to disambiguate e.g. "User Group" from "User" in the breadcrumb.
+	 */
+	public setTitle(
+		title: string | undefined,
+		options?: { kind?: UmbViewTitleKind; typeLabel?: string },
+	): void {
+		const { kind = 'workspace', typeLabel } = options ?? {};
+		if (this.#title === title && this.#titleKind === kind && this.#titleTypeLabel === typeLabel) return;
 		this.#title = title;
+		this.#titleKind = kind;
+		this.#titleTypeLabel = typeLabel;
+		this.#computeTitle();
+		this.#updateTitle();
+	}
+
+	/**
+	 * Set additional breadcrumb segments representing ancestors of this view in a
+	 * hierarchical entity tree (e.g. the parent folders of a media item). Ancestors
+	 * are inserted into the title chain between the parent view's contribution and
+	 * this view's own title, with `kind: 'workspace-ancestor'`.
+	 *
+	 * Ordered root → leaf (closest ancestor last). Pass `undefined` or an empty
+	 * array to clear.
+	 * @param ancestors Ancestor labels, root-most first.
+	 */
+	public setAncestors(ancestors: ReadonlyArray<string> | undefined): void {
+		const normalized = ancestors?.length ? ancestors : undefined;
+		const current = this.#titleAncestors;
+		if (current === normalized) return;
+		if (current && normalized && current.length === normalized.length && current.every((v, i) => v === normalized[i]))
+			return;
+		this.#titleAncestors = normalized;
 		this.#computeTitle();
 		this.#updateTitle();
 	}
@@ -216,7 +259,13 @@ export class UmbViewController extends UmbControllerBase {
 			},
 			'observeParentTitle',
 		);
-		this.hints.inheritFrom(this.#parentView?.hints);
+		// Hint inheritance requires a viewAlias or pathFilter on this view to target.
+		// Views without an alias (e.g. workspace-level views inheriting from a section
+		// purely to receive the section's title chain) have no hint target to resolve
+		// and must skip hint inheritance — title inheritance alone is supported.
+		if (this.viewAlias) {
+			this.hints.inheritFrom(this.#parentView?.hints);
+		}
 	}
 
 	#requestActivateParent() {
@@ -305,26 +354,68 @@ export class UmbViewController extends UmbControllerBase {
 		if (!this.#active || this.#hasActiveChildren()) {
 			return;
 		}
-		const localTitle = this.getComputedTitle();
-		if (!localTitle) {
+		const segments = this.#computedTitleSegments.getValue();
+		if (!segments || segments.length === 0) {
 			return;
 		}
+		const localTitle = segments.map((s) => s.label).join(' | ');
 		document.title = localTitle + ' | Umbraco';
+
+		_setUmbCurrentViewTitle({
+			path: window.location.pathname,
+			segments,
+		});
 	}
 
 	#computeTitle() {
-		const titles = [];
+		const segments: UmbCurrentViewTitleSegment[] = [];
 		if (this.#inherit && this.#parentView) {
-			titles.push(this.#parentView.getComputedTitle());
+			const parentSegments = this.#parentView.getComputedTitleSegments();
+			if (parentSegments) {
+				segments.push(...parentSegments);
+			}
 		}
 		if (this.#title) {
-			titles.push(this.#localize.string(this.#title));
+			if (this.#titleTypeLabel) {
+				segments.push({
+					label: this.#localize.string(this.#titleTypeLabel),
+					kind: 'workspace-type',
+				});
+			}
+			if (this.#titleAncestors) {
+				for (const ancestor of this.#titleAncestors) {
+					// Ancestor names can arrive as localization keys (e.g. a tree root's
+					// `#treeHeaders_dataTypes`), so resolve them the same way the leaf and
+					// type-label titles do.
+					segments.push({ label: this.#localize.string(ancestor), kind: 'workspace-ancestor' });
+				}
+			}
+			segments.push({
+				label: this.#localize.string(this.#title),
+				kind: this.#titleKind,
+			});
 		}
-		this.#computedTitle.setValue(titles.length > 0 ? titles.join(' | ') : undefined);
+		// Collapse consecutive segments with the same label. Primary case: a tree
+		// root sharing its hosting section's name (e.g. "Content" root under the
+		// Content section) — dedup avoids "Content | Content". Side effect: if a
+		// child entity has the exact same name as its parent (e.g. folder "Images"
+		// inside folder "Images"), the breadcrumb loses one level; the full URL
+		// is preserved on the history `path` so navigation still works.
+		const deduped: UmbCurrentViewTitleSegment[] = [];
+		for (const seg of segments) {
+			if (deduped[deduped.length - 1]?.label === seg.label) continue;
+			deduped.push(seg);
+		}
+		this.#computedTitleSegments.setValue(deduped.length ? deduped : undefined);
 	}
 
 	public getComputedTitle(): string | undefined {
-		return this.#computedTitle.getValue();
+		const segs = this.#computedTitleSegments.getValue();
+		return segs?.length ? segs.map((s) => s.label).join(' | ') : undefined;
+	}
+
+	public getComputedTitleSegments(): ReadonlyArray<UmbCurrentViewTitleSegment> | undefined {
+		return this.#computedTitleSegments.getValue();
 	}
 
 	#children: UmbViewController[] = [];

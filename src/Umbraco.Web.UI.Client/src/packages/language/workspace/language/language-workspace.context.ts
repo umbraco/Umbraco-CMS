@@ -24,6 +24,7 @@ export class UmbLanguageWorkspaceContext
 			workspaceAlias: UMB_LANGUAGE_WORKSPACE_ALIAS,
 			entityType: UMB_LANGUAGE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_languages',
 		});
 
 		this.routes.setRoutes([

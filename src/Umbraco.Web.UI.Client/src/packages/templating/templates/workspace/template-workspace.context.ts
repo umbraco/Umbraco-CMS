@@ -35,6 +35,7 @@ export class UmbTemplateWorkspaceContext
 			workspaceAlias: UMB_TEMPLATE_WORKSPACE_ALIAS,
 			entityType: UMB_TEMPLATE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_TEMPLATE_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_templates',
 		});
 
 		this.routes.setRoutes([

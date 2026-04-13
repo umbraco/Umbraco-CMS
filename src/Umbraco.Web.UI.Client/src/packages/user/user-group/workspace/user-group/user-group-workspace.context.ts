@@ -36,6 +36,7 @@ export class UmbUserGroupWorkspaceContext
 			workspaceAlias: UMB_USER_GROUP_WORKSPACE_ALIAS,
 			entityType: UMB_USER_GROUP_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_USER_GROUP_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#user_usergroup',
 		});
 
 		this.routes.setRoutes([

@@ -40,7 +40,11 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 			this.observe(
 				this.#currentUserHistoryStore.latestHistory,
 				(history) => {
-					this._history = history.reverse();
+					// Do NOT use `history.reverse()` — it mutates the array in place,
+					// and the source observable caches its last emission via shareReplay(1),
+					// so mutating here corrupts subsequent subscriptions (the order would
+					// flip on every re-subscribe). Copy first.
+					this._history = history.slice().reverse();
 					this.#pagination.setTotalItems(this._history.length);
 				},
 				'umbCurrentUserHistoryObserver',

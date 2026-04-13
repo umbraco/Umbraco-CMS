@@ -5,6 +5,13 @@ export interface UmbEntityDetailWorkspaceContextArgs {
 	entityType: string;
 	workspaceAlias: string;
 	detailRepositoryAlias: string;
+	/**
+	 * Optional user-friendly label for this entity type (e.g. "User Group", "Member").
+	 * When set, the workspace's title chain includes an additional breadcrumb segment
+	 * above the entity name, used by the user history list to disambiguate entities
+	 * of different types that share the same section. Localization keys are supported.
+	 */
+	typeLabel?: string;
 }
 
 /**

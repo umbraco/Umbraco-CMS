@@ -21,6 +21,7 @@ export class UmbMemberGroupWorkspaceContext
 			workspaceAlias: UMB_MEMBER_GROUP_WORKSPACE_ALIAS,
 			entityType: UMB_MEMBER_GROUP_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_MEMBER_GROUP_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#content_membergroup',
 		});
 
 		this.routes.setRoutes([

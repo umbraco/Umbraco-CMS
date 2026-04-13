@@ -7,6 +7,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 @customElement('umb-section-main-views')
 export class UmbSectionMainViewElement extends UmbLitElement {
@@ -31,8 +32,15 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	@state()
 	private _routes: Array<UmbRoute> = [];
 
+	// A view context that publishes the currently active dashboard / section-view's
+	// title, inheriting the section's title so the history breadcrumb and the
+	// browser's `document.title` both carry the section as the parent.
+	#viewContext = new UmbViewContext(this, null);
+
 	constructor() {
 		super();
+
+		this.#viewContext.inherit();
 
 		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'dashboard', null, (dashboards) => {
 			this._dashboards = dashboards.map((dashboard) => dashboard.manifest);
@@ -43,6 +51,29 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			this._views = views.map((view) => view.manifest);
 			this.#createRoutes();
 		});
+	}
+
+	#updateActiveViewTitle(): void {
+		if (!this._activePath && !this._defaultView) {
+			this.#viewContext.setTitle(undefined);
+			return;
+		}
+		const activePath = this._activePath || this._defaultView;
+		const matchingDashboard = this._dashboards.find(
+			(manifest) => this.#constructDashboardPath(manifest) === activePath,
+		);
+		if (matchingDashboard) {
+			this.#viewContext.setTitle(this.#getDashboardName(matchingDashboard));
+			return;
+		}
+		const matchingView = this._views.find((manifest) => this.#constructViewPath(manifest) === activePath);
+		if (matchingView) {
+			this.#viewContext.setTitle(
+				matchingView.meta.label ? this.localize.string(matchingView.meta.label) : (matchingView.name ?? matchingView.alias),
+			);
+			return;
+		}
+		this.#viewContext.setTitle(undefined);
 	}
 
 	#constructDashboardPath(manifest: ManifestDashboard) {
@@ -104,6 +135,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							}}
 							@change=${(event: UmbRouterSlotChangeEvent) => {
 								this._activePath = event.target.localActiveViewPath;
+								this.#updateActiveViewTitle();
 							}}>
 						</umb-router-slot>
 					</umb-body-layout>
