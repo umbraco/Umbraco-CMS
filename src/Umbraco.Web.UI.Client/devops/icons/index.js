@@ -14,8 +14,30 @@ const umbracoSvgDirectory = `${moduleDirectory}/svgs`;
 const iconMapJson = `${moduleDirectory}/icon-dictionary.json`;
 
 const lucideSvgDirectory = 'node_modules/lucide-static/icons';
+const lucideTagsJson = 'node_modules/lucide-static/tags.json';
+// Snapshot of Lucide's per-icon categories metadata (icon-name -> categories[]),
+// extracted from https://github.com/lucide-icons/lucide/tree/main/icons.
+// Refresh periodically by re-running the snapshot extraction — see PR history.
+const lucideCategoriesJson = 'devops/icons/lucide-categories.json';
 const simpleIconsSvgDirectory = 'node_modules/simple-icons/icons';
 const customSvgDirectory = `${moduleDirectory}/svgs/custom`;
+
+// Case-insensitive dedupe while preserving the order of first occurrence.
+const mergeUnique = (...lists) => {
+	const seen = new Set();
+	const out = [];
+	for (const list of lists) {
+		if (!Array.isArray(list)) continue;
+		for (const value of list) {
+			if (typeof value !== 'string') continue;
+			const key = value.toLowerCase();
+			if (seen.has(key)) continue;
+			seen.add(key);
+			out.push(value);
+		}
+	}
+	return out;
+};
 
 const IS_GITHUB_ACTIONS = process.env.GITHUB_ACTIONS === 'true';
 
@@ -36,6 +58,12 @@ const collectDictionaryIcons = async () => {
 	const fileRaw = rawData.toString();
 	const fileJSON = JSON.parse(fileRaw);
 
+	// Lucide's own metadata — merged into curated entries so every Lucide-backed
+	// icon benefits from upstream tags/categories without us having to hand-curate
+	// each one.
+	const lucideTags = JSON.parse(readFileSync(lucideTagsJson).toString());
+	const lucideCategories = JSON.parse(readFileSync(lucideCategoriesJson).toString());
+
 	let icons = [];
 
 	// Lucide:
@@ -51,14 +79,19 @@ const collectDictionaryIcons = async () => {
 				svg = svg.replace('stroke-width="2"', 'stroke-width="1.75"');
 				const iconFileName = iconDef.name;
 
+				// Merge curated data first (wins on ordering) with Lucide's upstream metadata.
+				const lucideKey = iconDef.file.replace(/\.svg$/, '');
+				const keywords = mergeUnique(iconDef.keywords, lucideTags[lucideKey]);
+				const groups = mergeUnique(iconDef.groups, lucideCategories[lucideKey]);
+
 				const icon = {
 					name: iconDef.name,
 					hidden: iconDef.legacy ?? iconDef.internal,
 					fileName: iconFileName,
 					svg,
 					output: `${iconsOutputDirectory}/${iconFileName}.ts`,
-					keywords: iconDef.keywords,
-					groups: iconDef.groups,
+					keywords,
+					groups,
 					related: iconDef.related,
 				};
 
