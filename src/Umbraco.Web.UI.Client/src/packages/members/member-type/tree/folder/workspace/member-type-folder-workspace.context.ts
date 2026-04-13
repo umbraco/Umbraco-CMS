@@ -21,6 +21,7 @@ export class UmbMemberTypeFolderWorkspaceContext
 			workspaceAlias: UMB_MEMBER_TYPE_FOLDER_WORKSPACE_ALIAS,
 			entityType: UMB_MEMBER_TYPE_FOLDER_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_MEMBER_TYPE_FOLDER_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_memberTypes',
 		});
 
 		this.routes.setRoutes([

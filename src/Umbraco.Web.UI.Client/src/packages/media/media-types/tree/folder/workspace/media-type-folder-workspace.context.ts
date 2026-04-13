@@ -21,6 +21,7 @@ export class UmbMediaTypeFolderWorkspaceContext
 			workspaceAlias: UMB_MEDIA_TYPE_FOLDER_WORKSPACE_ALIAS,
 			entityType: UMB_MEDIA_TYPE_FOLDER_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_MEDIA_TYPE_FOLDER_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_mediaTypes',
 		});
 
 		this.routes.setRoutes([

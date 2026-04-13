@@ -23,6 +23,7 @@ export class UmbDocumentTypeFolderWorkspaceContext
 			workspaceAlias: UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS,
 			entityType: UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_DOCUMENT_TYPE_FOLDER_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_documentTypes',
 		});
 
 		this.routes.setRoutes([
