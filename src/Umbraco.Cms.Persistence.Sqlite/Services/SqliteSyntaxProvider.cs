@@ -97,10 +97,10 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
     /// <inheritdoc />
     /// <remarks>
-    /// SQLite does not have the concept of guids / uuid / uniqueidentifier
-    /// Columns are also case sensitive by default
-    /// Guids are serialized in uppercase by ORMs
-    /// We need to ensure Guids are stored consistently
+    /// SQLite does not have the concept of guids / uuid / uniqueidentifier and columns are also
+    /// case sensitive by default.
+    /// Guids are serialized in uppercase by ORMs so we need to ensure they are stored in uppercase to
+    /// avoid case sensitivity issues when comparing values.
     /// </remarks>
     public override string FormatGuid(Guid guid) => guid.ToString().ToUpperInvariant();
 
