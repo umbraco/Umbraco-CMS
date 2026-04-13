@@ -66,6 +66,7 @@ export class UmbViewController extends UmbControllerBase {
 	#titleKind: UmbViewTitleKind = 'workspace';
 	#titleTypeLabel?: string;
 	#titleAncestors?: ReadonlyArray<string>;
+	#titleIcon?: string;
 	#computedTitleSegments = new UmbObjectState<ReadonlyArray<UmbCurrentViewTitleSegment> | undefined>(undefined);
 	readonly computedTitleSegments = this.#computedTitleSegments.asObservable();
 	readonly computedTitle = this.#computedTitleSegments.asObservablePart((segs) =>
@@ -133,17 +134,27 @@ export class UmbViewController extends UmbControllerBase {
 	 * @param title The view's own title. Localization keys like `#foo_bar` are resolved automatically.
 	 * @param options Optional metadata. `kind` classifies the segment (default: `'workspace'`). `typeLabel`
 	 *   optionally inserts an additional segment with kind `'workspace-type'` immediately before this one — useful
-	 *   for entity workspaces that want to disambiguate e.g. "User Group" from "User" in the breadcrumb.
+	 *   for entity workspaces that want to disambiguate e.g. "User Group" from "User" in the breadcrumb. `icon`
+	 *   attaches an icon to the leaf segment (e.g. `icon-document-js`) so consumers like the user history list
+	 *   can render an entity-specific icon alongside the label.
 	 */
 	public setTitle(
 		title: string | undefined,
-		options?: { kind?: UmbViewTitleKind; typeLabel?: string },
+		options?: { kind?: UmbViewTitleKind; typeLabel?: string; icon?: string },
 	): void {
-		const { kind = 'workspace', typeLabel } = options ?? {};
-		if (this.#title === title && this.#titleKind === kind && this.#titleTypeLabel === typeLabel) return;
+		const { kind = 'workspace', typeLabel, icon } = options ?? {};
+		if (
+			this.#title === title &&
+			this.#titleKind === kind &&
+			this.#titleTypeLabel === typeLabel &&
+			this.#titleIcon === icon
+		) {
+			return;
+		}
 		this.#title = title;
 		this.#titleKind = kind;
 		this.#titleTypeLabel = typeLabel;
+		this.#titleIcon = icon;
 		this.#computeTitle();
 		this.#updateTitle();
 	}
@@ -393,6 +404,7 @@ export class UmbViewController extends UmbControllerBase {
 			segments.push({
 				label: this.#localize.string(this.#title),
 				kind: this.#titleKind,
+				...(this.#titleIcon ? { icon: this.#titleIcon } : {}),
 			});
 		}
 		// Collapse consecutive segments with the same label. Primary case: a tree

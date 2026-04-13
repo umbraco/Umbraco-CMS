@@ -12,6 +12,12 @@ export interface UmbEntityDetailWorkspaceContextArgs {
 	 * of different types that share the same section. Localization keys are supported.
 	 */
 	typeLabel?: string;
+	/**
+	 * Optional icon to attach to this entity's leaf title segment (e.g. `icon-document-js`).
+	 * Surfaced by consumers like the user history list. For workspaces whose icon varies
+	 * per-entity (e.g. document type), set the icon directly via `view.setTitle(...)` instead.
+	 */
+	icon?: string;
 }
 
 /**

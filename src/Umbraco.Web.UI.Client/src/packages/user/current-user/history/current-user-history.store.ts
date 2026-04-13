@@ -13,7 +13,11 @@ export type UmbCurrentUserHistoryItem = {
 	path: string;
 	/** @deprecated `label` type will be changed to `string` only in Umbraco 19. [LK] */
 	label: string | Array<string>;
-	/** @deprecated No longer used internally. This will be removed in Umbraco 19. [LK] */
+	/**
+	 * Optional icon name (e.g. `icon-document-js`) attached to the entry by the
+	 * active workspace via its title chain. When absent the consumer should fall
+	 * back to a generic icon (e.g. `icon-link`).
+	 */
 	icon?: string;
 	displayPath?: string;
 };
@@ -84,6 +88,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 			const parents = breadcrumb.slice(0, -1);
 			this.updateItem(this.#lastAddedUnique, {
 				label: leaf.label,
+				icon: leaf.icon,
 				displayPath: parents.length ? parents.map((s) => s.label).join(BREADCRUMB_SEPARATOR) : undefined,
 			});
 		});

@@ -26,6 +26,7 @@ export class UmbScriptWorkspaceContext
 			entityType: UMB_SCRIPT_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_SCRIPT_DETAIL_REPOSITORY_ALIAS,
 			typeLabel: '#treeHeaders_scripts',
+			icon: 'icon-document-js',
 		});
 
 		this.routes.setRoutes([

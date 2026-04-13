@@ -21,6 +21,7 @@ export class UmbStylesheetFolderWorkspaceContext
 			entityType: UMB_STYLESHEET_FOLDER_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_STYLESHEET_FOLDER_REPOSITORY_ALIAS,
 			typeLabel: '#treeHeaders_stylesheets',
+			icon: 'icon-folder',
 		});
 
 		this.routes.setRoutes([

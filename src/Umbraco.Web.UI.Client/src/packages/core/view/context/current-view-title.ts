@@ -21,6 +21,11 @@ export type UmbViewTitleKind =
 export type UmbCurrentViewTitleSegment = {
 	label: string;
 	kind: UmbViewTitleKind;
+	/**
+	 * Optional icon name (e.g. `icon-document-js`) associated with this segment.
+	 * Consumers like the user history list may render this alongside the label.
+	 */
+	icon?: string;
 };
 
 /**

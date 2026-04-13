@@ -27,7 +27,7 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 	constructor(host: UmbControllerHost, args: UmbEntityDetailWorkspaceContextArgs) {
 		super(host, args);
 		this.nameWriteGuard.fallbackToPermitted();
-		const typeLabel = args.typeLabel;
+		const { typeLabel, icon } = args;
 		// Combine name with the forbidden state so the breadcrumb gets a
 		// meaningful label even when the entity can't be loaded — otherwise the
 		// section title is the only thing left in the chain (e.g. "Settings"
@@ -36,7 +36,7 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 			mergeObservables([this.name, this.forbidden.isOn], ([name, isForbidden]) => ({ name, isForbidden })),
 			({ name, isForbidden }) => {
 				const title = isForbidden ? '#routing_routeForbiddenTitle' : name;
-				this.view.setTitle(title, { kind: 'workspace', typeLabel });
+				this.view.setTitle(title, { kind: 'workspace', typeLabel, icon });
 			},
 			null,
 		);
