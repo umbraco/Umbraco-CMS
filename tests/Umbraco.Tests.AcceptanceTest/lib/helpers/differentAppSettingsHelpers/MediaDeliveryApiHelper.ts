@@ -73,13 +73,13 @@ export class MediaDeliveryApiHelper {
     if (mediaTypeName === 'Image') {
       const mediaWidth = mediaData.values.find(x => x.alias === 'umbracoWidth')?.value;
       const mediaHeight = mediaData.values.find(x => x.alias === 'umbracoHeight')?.value;
-      expect(mediaItemJson.width).toBe(mediaWidth ? Number(mediaWidth) : null);
-      expect(mediaItemJson.height).toBe(mediaHeight ? Number(mediaHeight) : null);
+      expect(mediaItemJson.width).toBe(mediaWidth ? Number(mediaWidth) : 0);
+      expect(mediaItemJson.height).toBe(mediaHeight ? Number(mediaHeight) : 0);
       expect(mediaItemJson.focalPoint).toBe(mediaData.values[0].value.focalPoint);
       expect(mediaItemJson.crops).toEqual(mediaData.values[0].value.crops);
     } else {
-      expect(mediaItemJson.width).toBeNull();
-      expect(mediaItemJson.height).toBeNull();
+      expect(mediaItemJson.width).toBe(0);
+      expect(mediaItemJson.height).toBe(0);
       expect(mediaItemJson.focalPoint).toBeNull();
       expect(mediaItemJson.crops).toBeNull();  
     }
