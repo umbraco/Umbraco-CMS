@@ -522,7 +522,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			]
 		},
 		{
@@ -683,7 +683,6 @@
 				"money",
 				"us",
 				"usa",
-				"paper",
 				"cash"
 			]
 		},
@@ -1047,7 +1046,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			]
 		},
 		{
@@ -1062,7 +1061,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			]
 		},
@@ -1080,7 +1079,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			]
 		},
@@ -1111,7 +1110,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			]
 		},
 		{
@@ -1258,7 +1257,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			]
 		},
@@ -1538,7 +1537,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			]
 		},
@@ -1891,7 +1890,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			]
 		},
@@ -1918,7 +1917,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			]
 		},
@@ -2088,7 +2087,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			]
 		},
 		{
@@ -3248,7 +3247,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			],
 			"legacy": true
@@ -3643,7 +3642,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			]
 		},
 		{
@@ -3739,7 +3738,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			],
 			"related": [
@@ -3755,7 +3754,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			],
 			"related": [
@@ -3812,7 +3811,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			]
 		},
 		{
@@ -3847,7 +3846,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			],
 			"related": [
@@ -3869,7 +3868,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			],
 			"related": [
@@ -3892,7 +3891,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			],
 			"related": [
@@ -4199,7 +4198,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			]
 		},
 		{
@@ -4238,7 +4237,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			]
 		},
@@ -4385,7 +4384,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			],
 			"legacy": true
@@ -4400,7 +4399,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			],
 			"related": [
@@ -4991,7 +4990,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			],
 			"related": [
@@ -5014,7 +5013,7 @@
 			],
 			"groups": [
 				"item",
-				"tech",
+				"technology",
 				"hardware"
 			],
 			"related": [
@@ -5723,7 +5722,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			],
 			"related": [
 				"icon-tv"
@@ -5740,7 +5739,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			],
 			"related": [
 				"icon-tv-old"
@@ -5929,7 +5928,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			],
 			"related": [
 				"icon-usb",
@@ -5943,7 +5942,7 @@
 			"file": "usb.svg",
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			],
 			"related": [
 				"icon-usb-connector"
@@ -6208,7 +6207,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			],
 			"related": [
 				"icon-power-outlet",
@@ -6288,7 +6287,7 @@
 			],
 			"groups": [
 				"item",
-				"tech"
+				"technology"
 			]
 		},
 		{
