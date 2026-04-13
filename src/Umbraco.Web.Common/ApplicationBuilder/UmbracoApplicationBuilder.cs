@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -103,6 +104,14 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
         // Must be called after UseRouting and before UseEndpoints
         AppBuilder.UseSession();
+
+        // Register output cache middleware if any feature (website, delivery API) has configured output caching.
+        // This must be called at most once per application — individual features register policies via
+        // AddOutputCache() (which is additive) but the middleware itself must only be added here.
+        if (ApplicationServices.GetService<IOutputCacheStore>() is not null)
+        {
+            AppBuilder.UseOutputCache();
+        }
 
         // DO NOT PUT ANY UseEndpoints declarations here!! Those must all come very last in the pipeline,
         // endpoints are terminating middleware. All of our endpoints are declared in ext of IUmbracoApplicationBuilder

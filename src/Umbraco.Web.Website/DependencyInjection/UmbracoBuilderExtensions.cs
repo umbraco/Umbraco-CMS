@@ -124,9 +124,6 @@ public static partial class UmbracoBuilderExtensions
                 new WebsiteOutputCachePolicy(settings.ContentDuration));
         });
 
-        builder.Services.Configure<UmbracoPipelineOptions>(options =>
-            options.AddFilter(new WebsiteOutputCachePipelineFilter("UmbracoWebsiteOutputCache")));
-
         // Register eviction handlers and providers.
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, DocumentOutputCacheEvictionHandler>();
         builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, MediaOutputCacheEvictionHandler>();
