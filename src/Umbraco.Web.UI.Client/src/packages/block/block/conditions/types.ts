@@ -20,12 +20,19 @@ export interface BlockWorkspaceIsReadOnlyConditionConfig
 	match?: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export interface BlockEntryIsReadOnlyConditionConfig
+	extends UmbConditionConfigBase<'Umb.Condition.BlockEntryIsReadOnly'> {
+	match?: boolean;
+}
+
 declare global {
 	interface UmbExtensionConditionConfigMap {
 		umbBlock:
 			| BlockEntryShowContentEditConditionConfig
 			| BlockWorkspaceHasSettingsConditionConfig
 			| BlockEntryIsExposedConditionConfig
-			| BlockWorkspaceIsReadOnlyConditionConfig;
+			| BlockWorkspaceIsReadOnlyConditionConfig
+			| BlockEntryIsReadOnlyConditionConfig;
 	}
 }

@@ -1,7 +1,6 @@
 import type { ManifestBlockAction } from '../block-action.extension.js';
 import type { UmbBlockAction } from '../block-action.interface.js';
 import type { UmbBlockActionElement } from '../block-action-element.interface.js';
-import { UMB_BLOCK_ENTRY_CONTEXT } from '../../context/block-entry.context-token.js';
 import type { MetaBlockActionDefaultKind } from './types.js';
 import { customElement, html, ifDefined, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
@@ -30,22 +29,6 @@ export class UmbBlockActionDefaultElement<
 	@state()
 	private _href?: string;
 
-	@state()
-	private _isReadOnly = false;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
-			if (!context) return;
-			this.observe(
-				context.readOnlyGuard.permitted,
-				(isReadOnly) => (this._isReadOnly = isReadOnly),
-				'observeIsReadOnly',
-			);
-		});
-	}
-
 	async #onClick(event: PointerEvent) {
 		event.stopPropagation();
 
@@ -61,7 +44,6 @@ export class UmbBlockActionDefaultElement<
 
 	override render() {
 		if (!this.manifest) return nothing;
-		if (this._isReadOnly) return nothing;
 		const label = this.manifest.meta.label ? this.localize.string(this.manifest.meta.label) : this.manifest.name;
 		return html`
 			<uui-button
