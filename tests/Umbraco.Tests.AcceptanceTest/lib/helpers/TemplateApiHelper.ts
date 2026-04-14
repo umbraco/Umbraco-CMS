@@ -319,7 +319,7 @@ export class TemplateApiHelper {
     '@using Umbraco.Cms.Web.Website.Controllers\n' +
     '@using Umbraco.Cms.Web.Website.Models\n' +
     '@using Umbraco.Extensions\n' +
-    '@inject MemberModelBuilderFactory memberModelBuilderFactory;\n' +
+    '@inject MemberModelBuilderFactory memberModelBuilderFactory\n' +
     '@{\n' +
     '    Layout = null;\n' +
     '    var memberIdentity = Context.User.GetMemberIdentity();\n' +
