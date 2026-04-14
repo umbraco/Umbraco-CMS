@@ -59,7 +59,7 @@ export abstract class UmbValueSummaryApiBase extends UmbControllerBase implement
 		if (this.#valueType === undefined) return;
 
 		if (this.#coordinator) {
-			this.#coordinator.preRegister(this.#valueType, [this.#rawValue]);
+			this.#coordinator.preRegister(this.#valueType, this.#rawValue);
 			this.observe(
 				this.#coordinator.observeResolvedValue(this.#valueType, this.#rawValue),
 				(v) => this.#value.setValue(v),

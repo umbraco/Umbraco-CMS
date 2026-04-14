@@ -32,16 +32,15 @@ export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
 		super(host, UMB_VALUE_SUMMARY_COORDINATOR_CONTEXT);
 	}
 
-	preRegister(valueType: string, values: ReadonlyArray<unknown>): void {
+	preRegister(valueType: string, value: unknown): void {
 		const manifest = this.#getManifest(valueType);
 
 		if (!manifest?.valueResolver) {
-			// No resolver — pass through raw values
-			this.#state.append(values.map((v) => ({ key: `${valueType}:${toValueKey(v)}`, value: v })));
+			// No resolver — pass through raw value
+			this.#state.append([{ key: `${valueType}:${toValueKey(value)}`, value }]);
 		} else {
 			if (!this.#pending.has(valueType)) this.#pending.set(valueType, new Set());
-			const pendingSet = this.#pending.get(valueType)!;
-			for (const v of values) pendingSet.add(v);
+			this.#pending.get(valueType)!.add(value);
 			this.#scheduleFlush();
 		}
 	}

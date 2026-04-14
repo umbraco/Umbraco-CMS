@@ -64,7 +64,7 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 		const manifest = makeManifest(valueType);
 		umbExtensionsRegistry.register(manifest);
 
-		coordinator.preRegister(valueType, ['hello']);
+		coordinator.preRegister(valueType, 'hello');
 		const obs = coordinator.observeResolvedValue(valueType, 'hello');
 		expect(obs).to.be.instanceOf(Observable);
 
@@ -78,7 +78,7 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 
 	it('should pass raw values through when no manifest is registered', async () => {
 		const valueType = 'Umb.Test.NoManifest';
-		coordinator.preRegister(valueType, [42]);
+		coordinator.preRegister(valueType, 42);
 
 		const value = await new Promise<unknown>((resolve) => {
 			coordinator.observeResolvedValue(valueType, 42).subscribe((v) => {
@@ -93,7 +93,7 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 		const manifest = makeManifest(valueType, async (values) => ({ data: values.map((v) => `resolved:${v}`) }));
 		umbExtensionsRegistry.register(manifest);
 
-		coordinator.preRegister(valueType, ['a']);
+		coordinator.preRegister(valueType, 'a');
 
 		const value = await new Promise<unknown>((resolve) => {
 			coordinator.observeResolvedValue(valueType, 'a').subscribe((v) => {
@@ -112,8 +112,8 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 		});
 		umbExtensionsRegistry.register(manifest);
 
-		coordinator.preRegister(valueType, ['x']);
-		coordinator.preRegister(valueType, ['y']);
+		coordinator.preRegister(valueType, 'x');
+		coordinator.preRegister(valueType, 'y');
 
 		const [vx, vy] = await Promise.all([
 			new Promise<unknown>((resolve) => {
@@ -140,7 +140,8 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 		}));
 		umbExtensionsRegistry.register(manifest);
 
-		coordinator.preRegister(valueType, ['a', 'b']);
+		coordinator.preRegister(valueType, 'a');
+		coordinator.preRegister(valueType, 'b');
 
 		const [va, vb] = await Promise.all([
 			new Promise<unknown>((resolve) => {
@@ -185,7 +186,7 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 		umbExtensionsRegistry.register(manifest);
 
 		// First flush
-		coordinator.preRegister(valueType, ['a']);
+		coordinator.preRegister(valueType, 'a');
 		await new Promise<void>((resolve) => {
 			coordinator.observeResolvedValue(valueType, 'a').subscribe((v) => {
 				if (v !== undefined) resolve();
@@ -193,7 +194,7 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 		});
 
 		// Second flush (new tick)
-		coordinator.preRegister(valueType, ['b']);
+		coordinator.preRegister(valueType, 'b');
 		await new Promise<void>((resolve) => {
 			coordinator.observeResolvedValue(valueType, 'b').subscribe((v) => {
 				if (v !== undefined) resolve();
