@@ -132,7 +132,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		}
 
 		if (this._tabs.length > 0) {
-			this._tabs?.forEach((tab) => {
+			this._tabs.forEach((tab) => {
 				const tabName = tab.name ?? '';
 				const path = `tab/${encodeFolderName(tabName)}`;
 				routes.push({
@@ -206,7 +206,7 @@ export class UmbContentWorkspaceViewEditElement extends UmbLitElement implements
 		// ViewAlias null is only for the root tab, therefor we can implement this hack.
 		if (viewAlias === null) {
 			// Specific hack for the Generic tab to only show its name if there are other tabs.
-			if (this._tabs && this._tabs?.length > 0) {
+			if (this._tabs && this._tabs.length > 0) {
 				view.setSegments('tab', { label: '#general_generic', kind: 'tab' });
 			} else {
 				view.clearSegments('tab');
