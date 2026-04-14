@@ -23,4 +23,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Current User MFA Disable Provider Modal',
 		element: () => import('./current-user-mfa-disable/current-user-mfa-disable-modal.element.js'),
 	},
+	{
+		type: 'modal',
+		alias: 'Umb.Modal.CurrentUser.Workspace',
+		name: 'Current User Workspace Modal',
+		element: () => import('./current-user-workspace/current-user-workspace-modal.element.js'),
+	},
 ];

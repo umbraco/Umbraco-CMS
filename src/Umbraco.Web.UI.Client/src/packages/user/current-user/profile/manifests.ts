@@ -1,4 +1,7 @@
-import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import {
+	UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_SECTION_USER_NO_PERMISSION_CONDITION_ALIAS,
+} from '@umbraco-cms/backoffice/section';
 import { UMB_CURRENT_USER_ALLOW_CHANGE_PASSWORD_CONDITION_ALIAS } from '@umbraco-cms/backoffice/user';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -45,6 +48,24 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_CURRENT_USER_ALLOW_CHANGE_PASSWORD_CONDITION_ALIAS,
+			},
+		],
+	},
+	{
+		type: 'currentUserAction',
+		kind: 'default',
+		alias: 'Umb.CurrentUserWorkspace.Button.Edit',
+		name: 'Current User Workspace Edit Button',
+		weight: 1000,
+		api: () => import('./edit-current-user-workspace.action.js'),
+		meta: {
+			label: '#general_edit',
+			icon: 'edit',
+		},
+		conditions: [
+			{
+				alias: UMB_SECTION_USER_NO_PERMISSION_CONDITION_ALIAS,
+				match: 'Umb.Section.Users',
 			},
 		],
 	},

@@ -2229,6 +2229,9 @@ export default {
 		'2faCodeInput': 'Verification code',
 		'2faCodeInputHelp': 'Please enter the verification code',
 		'2faInvalidCode': 'Invalid code entered',
+		avatarUploadSuccess: 'Avatar uploaded',
+		avatarDeleteSuccess: 'Avatar deleted',
+		unknownFailure: 'Unknown failure',
 	},
 	validation: {
 		validation: 'Validation',
