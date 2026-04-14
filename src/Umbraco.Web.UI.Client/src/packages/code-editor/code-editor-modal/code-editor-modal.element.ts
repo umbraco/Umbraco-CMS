@@ -55,13 +55,18 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 	static override styles = [
 		css`
 			#editor-box {
+				box-sizing: border-box;
 				padding: var(--uui-box-default-padding, var(--uui-size-space-5, 18px));
 				height: 100%;
+				min-width: 0;
 				display: flex;
+				overflow: hidden;
 			}
 
 			umb-code-editor {
 				width: 100%;
+				min-width: 0;
+				overflow: hidden;
 			}
 		`,
 	];
