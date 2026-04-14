@@ -57,29 +57,26 @@ public interface IRedirectUrlRepository : IAsyncReadWriteRepository<Guid, IRedir
     /// <summary>
     ///     Gets all redirect URLs.
     /// </summary>
-    /// <param name="pageIndex">The page index.</param>
+    /// <param name="pageIndex">The zero-based page index.</param>
     /// <param name="pageSize">The page size.</param>
-    /// <param name="total">The total count of redirect URLs.</param>
-    /// <returns>The redirect URLs.</returns>
-    Task<IEnumerable<IRedirectUrl>> GetAllUrlsAsync(long pageIndex, int pageSize, out long total);
+    /// <returns>A paged model containing the redirect URLs and the total count.</returns>
+    Task<PagedModel<IRedirectUrl>> GetAllUrlsAsync(long pageIndex, int pageSize);
 
     /// <summary>
     ///     Gets all redirect URLs below a given content item.
     /// </summary>
     /// <param name="rootContentId">The content unique identifier.</param>
-    /// <param name="pageIndex">The page index.</param>
+    /// <param name="pageIndex">The zero-based page index.</param>
     /// <param name="pageSize">The page size.</param>
-    /// <param name="total">The total count of redirect URLs.</param>
-    /// <returns>The redirect URLs.</returns>
-    Task<IEnumerable<IRedirectUrl>> GetAllUrlsAsync(int rootContentId, long pageIndex, int pageSize, out long total);
+    /// <returns>A paged model containing the redirect URLs and the total count.</returns>
+    Task<PagedModel<IRedirectUrl>> GetAllUrlsAsync(int rootContentId, long pageIndex, int pageSize);
 
     /// <summary>
     ///     Searches for all redirect URLs that contain a given search term in their URL property.
     /// </summary>
     /// <param name="searchTerm">The term to search for.</param>
-    /// <param name="pageIndex">The page index.</param>
+    /// <param name="pageIndex">The zero-based page index.</param>
     /// <param name="pageSize">The page size.</param>
-    /// <param name="total">The total count of redirect URLs.</param>
-    /// <returns>The redirect URLs.</returns>
-    Task<IEnumerable<IRedirectUrl>> SearchUrlsAsync(string searchTerm, long pageIndex, int pageSize, out long total);
+    /// <returns>A paged model containing the matching redirect URLs and the total count.</returns>
+    Task<PagedModel<IRedirectUrl>> SearchUrlsAsync(string searchTerm, long pageIndex, int pageSize);
 }
