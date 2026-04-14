@@ -80,28 +80,30 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     /// <inheritdoc />
     public async Task<Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus>> CreateAsync(ExternalMemberIdentity member, IExternalLogin? externalLogin = null)
     {
+        // Cross-store uniqueness checks run in a separate read-only scope so they don't hold
+        // SHARED table locks that would deadlock with concurrent write transactions on SQLite.
+        // The unique indexes on the table are the ultimate guard against duplicates.
+        using (ICoreScope readScope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            ExternalMemberOperationStatus? uniquenessResult = await ValidateUsernameUniqueAsync(member.UserName, null);
+            if (uniquenessResult is not null)
+            {
+                return Attempt.FailWithStatus(uniquenessResult.Value, member);
+            }
+
+            if (_securitySettings.MemberRequireUniqueEmail)
+            {
+                uniquenessResult = await ValidateEmailUniqueAsync(member.Email, null);
+                if (uniquenessResult is not null)
+                {
+                    return Attempt.FailWithStatus(uniquenessResult.Value, member);
+                }
+            }
+        }
+
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        // Cross-store uniqueness: check username across both external and content member stores.
-        ExternalMemberOperationStatus? uniquenessResult = await ValidateUsernameUniqueAsync(member.UserName, null);
-        if (uniquenessResult is not null)
-        {
-            scope.Complete();
-            return Attempt.FailWithStatus(uniquenessResult.Value, member);
-        }
-
-        // Cross-store uniqueness: check email if required.
-        if (_securitySettings.MemberRequireUniqueEmail)
-        {
-            uniquenessResult = await ValidateEmailUniqueAsync(member.Email, null);
-            if (uniquenessResult is not null)
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus(uniquenessResult.Value, member);
-            }
-        }
 
         // Publish cancelable saving notification.
         var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);
@@ -132,28 +134,29 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     /// <inheritdoc />
     public async Task<Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus>> UpdateAsync(ExternalMemberIdentity member)
     {
+        // Cross-store uniqueness checks run in a separate read-only scope so they don't hold
+        // SHARED table locks that would deadlock with concurrent write transactions on SQLite.
+        using (ICoreScope readScope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            ExternalMemberOperationStatus? uniquenessResult = await ValidateUsernameUniqueAsync(member.UserName, member.Key);
+            if (uniquenessResult is not null)
+            {
+                return Attempt.FailWithStatus(uniquenessResult.Value, member);
+            }
+
+            if (_securitySettings.MemberRequireUniqueEmail)
+            {
+                uniquenessResult = await ValidateEmailUniqueAsync(member.Email, member.Key);
+                if (uniquenessResult is not null)
+                {
+                    return Attempt.FailWithStatus(uniquenessResult.Value, member);
+                }
+            }
+        }
+
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        // Cross-store uniqueness: check username across both stores (exclude self).
-        ExternalMemberOperationStatus? uniquenessResult = await ValidateUsernameUniqueAsync(member.UserName, member.Key);
-        if (uniquenessResult is not null)
-        {
-            scope.Complete();
-            return Attempt.FailWithStatus(uniquenessResult.Value, member);
-        }
-
-        // Cross-store uniqueness: check email if required (exclude self).
-        if (_securitySettings.MemberRequireUniqueEmail)
-        {
-            uniquenessResult = await ValidateEmailUniqueAsync(member.Email, member.Key);
-            if (uniquenessResult is not null)
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus(uniquenessResult.Value, member);
-            }
-        }
 
         // Publish cancelable saving notification.
         var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);

@@ -861,8 +861,14 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             CreateDate = DateTime.UtcNow,
         };
 
+        // Build the external login upfront so it can be saved in the same transaction
+        // as the member creation, reducing database write-lock contention.
+        IExternalLogin? externalLogin = user.Logins
+            .Select(x => new ExternalLogin(x.LoginProvider, x.ProviderKey, x.UserData))
+            .FirstOrDefault();
+
         Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus> result =
-            await _externalMemberService.CreateAsync(externalIdentity);
+            await _externalMemberService.CreateAsync(externalIdentity, externalLogin);
 
         if (result.Success is false)
         {
@@ -888,8 +894,8 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             await _externalMemberService.AssignRolesAsync(result.Result.Key, roles);
         }
 
-        // Handle external logins.
-        if (user.IsPropertyDirty(nameof(MemberIdentityUser.Logins)))
+        // Save any additional logins beyond the first (which was batched with create above).
+        if (user.IsPropertyDirty(nameof(MemberIdentityUser.Logins)) && user.Logins.Count > 1)
         {
             _externalLoginService.Save(
                 result.Result.Key,
@@ -939,7 +945,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
         // Resolve the int Id and CreateDate from the stored record — MemberIdentityUser
         // doesn't carry the int Id (it uses Guid key as Id) and CreateDate may not be set.
-        var existing = _externalMemberService.GetByKeyAsync(user.Key).GetAwaiter().GetResult();
+        var existing = await _externalMemberService.GetByKeyAsync(user.Key);
         if (existing is not null)
         {
             externalIdentity.Id = existing.Id;
