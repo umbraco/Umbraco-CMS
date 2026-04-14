@@ -1,11 +1,13 @@
 import { UMB_BLOCK_ENTRY_CONTEXT } from '../context/block-entry.context-token.js';
 import type { UmbBlockActionArgs } from './types.js';
 import type { ManifestBlockAction, MetaBlockAction } from './block-action.extension.js';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-block-action-list')
 export class UmbBlockActionListElement extends UmbLitElement {
@@ -16,13 +18,10 @@ export class UmbBlockActionListElement extends UmbLitElement {
 	private _showActions?: boolean;
 
 	@state()
-	private _filter?: (manifest: ManifestBlockAction<MetaBlockAction>) => boolean;
+	private _actions: Array<UmbExtensionElementAndApiInitializer<ManifestBlockAction>> = [];
 
-	@state()
-	private _apiArgs?: UmbApiConstructorArgumentsMethodType<
-		ManifestBlockAction<MetaBlockAction>,
-		[UmbBlockActionArgs<MetaBlockAction>]
-	>;
+	#unique?: string;
+	#contentTypeAlias?: string;
 
 	constructor() {
 		super();
@@ -33,50 +32,56 @@ export class UmbBlockActionListElement extends UmbLitElement {
 				observeMultiple([context.unique, context.contentElementTypeAlias, context.actionsVisibility]),
 				([unique, contentTypeAlias, showActions]) => {
 					this._showActions = showActions;
-
-					if (!unique) {
-						this._filter = undefined;
-						this._apiArgs = undefined;
-						return;
-					}
-
-					this._filter = (manifest: ManifestBlockAction<MetaBlockAction>) => {
-						if (
-							manifest.forContentTypeAlias &&
-							!stringOrStringArrayContains(manifest.forContentTypeAlias, contentTypeAlias ?? '')
-						) {
-							return false;
-						}
-						if (
-							manifest.forBlockEditor &&
-							!stringOrStringArrayContains(manifest.forBlockEditor, this.blockEditor ?? '')
-						) {
-							return false;
-						}
-						return true;
-					};
-
-					this._apiArgs = (manifest: ManifestBlockAction<MetaBlockAction>) => {
-						return [{ unique, meta: manifest.meta }];
-					};
+					this.#unique = unique ?? undefined;
+					this.#contentTypeAlias = contentTypeAlias ?? undefined;
+					this.#initExtensions();
 				},
 			);
 		});
 	}
 
+	#extensionsInitialized = false;
+
+	#initExtensions() {
+		if (this.#extensionsInitialized || !this.#unique) return;
+		this.#extensionsInitialized = true;
+
+		new UmbExtensionsElementAndApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			'blockAction',
+			(manifest: ManifestBlockAction<MetaBlockAction>) =>
+				[{ unique: this.#unique!, meta: manifest.meta }] as [UmbBlockActionArgs<MetaBlockAction>],
+			(manifest: ManifestBlockAction<MetaBlockAction>) => this.#filterExtension(manifest),
+			(actions) => (this._actions = actions),
+			'blockActionsInitializer',
+		);
+	}
+
+	#filterExtension(manifest: ManifestBlockAction): boolean {
+		if (
+			manifest.forContentTypeAlias &&
+			!stringOrStringArrayContains(manifest.forContentTypeAlias, this.#contentTypeAlias ?? '')
+		) {
+			return false;
+		}
+		if (manifest.forBlockEditor && !stringOrStringArrayContains(manifest.forBlockEditor, this.blockEditor ?? '')) {
+			return false;
+		}
+		return true;
+	}
+
 	override render() {
 		if (!this._showActions) return nothing;
-		if (!this._filter) return nothing;
 
 		return html`
 			<uui-action-bar>
 				<slot></slot>
-				<umb-extension-with-api-slot
-					type="blockAction"
-					.filter=${this._filter}
-					.apiArgs=${this._apiArgs}
-					.renderMethod=${(ext: { component: HTMLElement }) => ext.component}>
-				</umb-extension-with-api-slot>
+				${repeat(
+					this._actions,
+					(action) => action.alias,
+					(action) => action.component,
+				)}
 			</uui-action-bar>
 		`;
 	}
