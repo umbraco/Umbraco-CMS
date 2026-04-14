@@ -12,17 +12,19 @@ export class CurrentUserProfileUiHelper extends UiBaseLocators {
     this.historyEntries = page.locator('umb-current-user-history-user-profile-app uui-ref-node');
   }
 
-  async getHistoryEntryByName(name: string): Promise<Locator> {
-    return this.historyEntries.filter({has: this.page.locator(`[name="${name}"]`)});
+  getHistoryEntryByName(name: string): Locator {
+    // uui-ref-node renders name and detail as child text nodes. Match entries
+    // whose accessible link name starts with the exact entity name.
+    return this.historyEntries.getByRole('link', {name: new RegExp('^' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b')});
   }
 
-  async getHistoryEntryDetail(name: string): Promise<string | null> {
-    const entry = await this.getHistoryEntryByName(name);
-    return entry.getAttribute('detail');
+  async getHistoryEntryText(name: string): Promise<string | null> {
+    const entry = this.getHistoryEntryByName(name);
+    return entry.first().textContent();
   }
 
   async isHistoryEntryVisible(name: string, isVisible: boolean = true): Promise<void> {
-    const entry = await this.getHistoryEntryByName(name);
+    const entry = this.getHistoryEntryByName(name);
     if (isVisible) {
       await expect(entry).toBeVisible();
     } else {
@@ -31,7 +33,7 @@ export class CurrentUserProfileUiHelper extends UiBaseLocators {
   }
 
   async countHistoryEntriesWithName(name: string): Promise<number> {
-    const entry = await this.getHistoryEntryByName(name);
+    const entry = this.getHistoryEntryByName(name);
     return entry.count();
   }
 

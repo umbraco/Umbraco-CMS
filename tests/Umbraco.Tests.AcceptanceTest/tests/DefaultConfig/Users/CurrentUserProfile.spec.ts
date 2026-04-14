@@ -42,17 +42,16 @@ test.describe('Recent History', () => {
   const childName = 'Child Page';
 
   test.beforeEach(async ({umbracoApi}) => {
-    await umbracoApi.documentType.ensureNameNotExists(docTypeName);
     await umbracoApi.document.ensureNameNotExists(childName);
     await umbracoApi.document.ensureNameNotExists(parentName);
     await umbracoApi.document.ensureNameNotExists(rootName);
+    await umbracoApi.documentType.ensureNameNotExists(docTypeName);
 
-    // Create a self-referencing doc type (allows itself as child + root)
+    // Create a doc type that allows as root and allows itself as child (self-referencing)
     const docTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(docTypeName);
-    // Update to allow itself as a child document type
     const docType = await umbracoApi.documentType.get(docTypeId);
-    docType.allowedDocumentTypes = [{id: docTypeId, sortOrder: 0}];
-    await umbracoApi.documentType.update(docTypeId, docType);
+    docType.allowedDocumentTypes = [{documentType: {id: docTypeId}, sortOrder: 0}];
+    await umbracoApi.put(umbracoApi.baseUrl + '/umbraco/management/api/v1/document-type/' + docTypeId, docType);
 
     // Create 3-level document tree
     const rootId = await umbracoApi.document.createDefaultDocument(rootName, docTypeId);
@@ -81,11 +80,11 @@ test.describe('Recent History', () => {
     // Open profile modal
     await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
 
-    // Assert
+    // Assert — the entry's accessible text contains the name and parent breadcrumbs
     await umbracoUi.currentUserProfile.isHistoryEntryVisible(childName);
-    const detail = await umbracoUi.currentUserProfile.getHistoryEntryDetail(childName);
-    expect(detail).toContain(rootName);
-    expect(detail).toContain(parentName);
+    const text = await umbracoUi.currentUserProfile.getHistoryEntryText(childName);
+    expect(text).toContain(rootName);
+    expect(text).toContain(parentName);
   });
 
   test('shows breadcrumb path at each nesting level', async ({umbracoUi}) => {
@@ -108,35 +107,38 @@ test.describe('Recent History', () => {
     // Open profile modal
     await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
 
-    // Assert — each entry has the correct breadcrumb depth
-    const rootDetail = await umbracoUi.currentUserProfile.getHistoryEntryDetail(rootName);
-    expect(rootDetail).toContain('Content');
+    // Assert — each entry's text contains the correct breadcrumb depth
+    const rootText = await umbracoUi.currentUserProfile.getHistoryEntryText(rootName);
+    expect(rootText).toContain('Content');
 
-    const parentDetail = await umbracoUi.currentUserProfile.getHistoryEntryDetail(parentName);
-    expect(parentDetail).toContain(rootName);
+    const parentText = await umbracoUi.currentUserProfile.getHistoryEntryText(parentName);
+    expect(parentText).toContain(rootName);
 
-    const childDetail = await umbracoUi.currentUserProfile.getHistoryEntryDetail(childName);
-    expect(childDetail).toContain(rootName);
-    expect(childDetail).toContain(parentName);
+    const childText = await umbracoUi.currentUserProfile.getHistoryEntryText(childName);
+    expect(childText).toContain(rootName);
+    expect(childText).toContain(parentName);
   });
 
-  test('tab switching does not create duplicate history entries', async ({umbracoUi}) => {
+  test('revisiting a document does not create duplicate history entries', async ({umbracoUi}) => {
     // Arrange
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
     await umbracoUi.content.clickCaretButtonForContentName(rootName);
     await umbracoUi.content.clickCaretButtonForContentName(parentName);
+
+    // Act — visit child, then parent, then child again
+    await umbracoUi.content.goToContentWithName(childName);
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
+    await umbracoUi.content.goToContentWithName(parentName);
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
     await umbracoUi.content.goToContentWithName(childName);
     await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
-
-    // Act — switch to the Info tab
-    await umbracoUi.content.clickInfoTab();
-    await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
 
     // Open profile modal
     await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
 
-    // Assert — only one entry for the child document
+    // Assert — entry exists and is not duplicated
+    await umbracoUi.currentUserProfile.isHistoryEntryVisible(childName);
     const count = await umbracoUi.currentUserProfile.countHistoryEntriesWithName(childName);
     expect(count).toBe(1);
   });
