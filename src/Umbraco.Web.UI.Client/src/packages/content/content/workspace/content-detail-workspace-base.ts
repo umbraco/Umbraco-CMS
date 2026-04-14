@@ -400,7 +400,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	protected _setViewTitle(variantName: string | undefined): void {
 		const icon: string | undefined = (this._data.getCurrent() as any)?.[this.#contentTypePropertyName]?.icon;
-		this.view.setTitle(variantName, icon ? { icon } : undefined);
+		if (variantName) {
+			this.view.setSegments('leaf', { label: variantName, kind: 'workspace', ...(icon ? { icon } : {}) });
+		} else {
+			this.view.clearSegments('leaf');
+		}
 	}
 
 	public async loadLanguages() {

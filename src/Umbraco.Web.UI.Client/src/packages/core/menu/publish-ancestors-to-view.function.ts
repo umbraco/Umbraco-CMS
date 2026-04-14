@@ -25,5 +25,12 @@ export function umbPublishAncestorsToView<T extends { unique: UmbEntityUnique }>
 		.filter((item) => item.unique !== currentUnique)
 		.map((item) => getName(item) ?? '')
 		.filter((name) => name.length > 0);
-	viewContext.setAncestors(ancestors);
+	if (ancestors.length) {
+		viewContext.setSegments(
+			'ancestors',
+			...ancestors.map((label) => ({ label, kind: 'workspace-ancestor' as const })),
+		);
+	} else {
+		viewContext.clearSegments('ancestors');
+	}
 }

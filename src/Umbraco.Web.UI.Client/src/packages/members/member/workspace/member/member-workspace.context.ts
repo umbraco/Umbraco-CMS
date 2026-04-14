@@ -122,6 +122,8 @@ export class UmbMemberWorkspaceContext
 		// member's username or email so the user history always gets a usable label,
 		// and tag it with a typeLabel so the history breadcrumb can show "Member"
 		// rather than just the section name.
+		this.view.setSegments('workspace-type', { label: '#member_memberKindDefault', kind: 'workspace-type' });
+
 		this.observe(
 			this._data.createObservablePartOfCurrent((data) => ({
 				variantName: data?.variants?.[0]?.name,
@@ -132,11 +134,13 @@ export class UmbMemberWorkspaceContext
 			({ variantName, username, email, memberTypeIcon }) => {
 				const name = variantName || username || email;
 				if (name) {
-					this.view.setTitle(name, {
+					this.view.setSegments('leaf', {
+						label: name,
 						kind: 'workspace',
-						typeLabel: '#member_memberKindDefault',
 						icon: memberTypeIcon || 'icon-user',
 					});
+				} else {
+					this.view.clearSegments('leaf');
 				}
 			},
 			null,

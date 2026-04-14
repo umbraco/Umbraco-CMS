@@ -29,9 +29,16 @@ export class UmbRelationTypeWorkspaceContext extends UmbContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_RELATION_TYPE_WORKSPACE_CONTEXT);
 		this.view.inherit();
+		this.view.setSegments('workspace-type', { label: '#treeHeaders_relationTypes', kind: 'workspace-type' });
 		this.observe(
 			this.name,
-			(name) => this.view.setTitle(name, { kind: 'workspace', typeLabel: '#treeHeaders_relationTypes', icon: 'icon-trafic' }),
+			(name) => {
+				if (name) {
+					this.view.setSegments('leaf', { label: name, kind: 'workspace', icon: 'icon-trafic' });
+				} else {
+					this.view.clearSegments('leaf');
+				}
+			},
 			null,
 		);
 

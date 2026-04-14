@@ -62,11 +62,7 @@ export class UmbViewController extends UmbControllerBase {
 	#inherit = false;
 	#explicitInheritance?: boolean;
 	#parentView?: UmbViewController;
-	#title?: string;
-	#titleKind: UmbViewTitleKind = 'workspace';
-	#titleTypeLabel?: string;
-	#titleAncestors?: ReadonlyArray<string>;
-	#titleIcon?: string;
+	#segmentSlots = new Map<string, ReadonlyArray<UmbCurrentViewTitleSegment>>();
 	#computedTitleSegments = new UmbObjectState<ReadonlyArray<UmbCurrentViewTitleSegment> | undefined>(undefined);
 	readonly computedTitleSegments = this.#computedTitleSegments.asObservable();
 	readonly computedTitle = this.#computedTitleSegments.asObservablePart((segs) =>
@@ -128,56 +124,72 @@ export class UmbViewController extends UmbControllerBase {
 		this.hints.updateScaffold({ variantId: variantId });
 	}
 
+	// ── Segment-slot API ──────────────────────────────────────────────
+	// Each caller owns a named slot. The controller flattens all slots,
+	// sorts by kind priority, localizes labels, and deduplicates.
+
 	/**
-	 * Set this view's title. When the view is active (and has no active children),
-	 * the title contributes to `document.title` and to the published breadcrumb.
-	 * @param title The view's own title. Localization keys like `#foo_bar` are resolved automatically.
-	 * @param options Optional metadata. `kind` classifies the segment (default: `'workspace'`). `typeLabel`
-	 *   optionally inserts an additional segment with kind `'workspace-type'` immediately before this one — useful
-	 *   for entity workspaces that want to disambiguate e.g. "User Group" from "User" in the breadcrumb. `icon`
-	 *   attaches an icon to the leaf segment (e.g. `icon-document-js`) so consumers like the user history list
-	 *   can render an entity-specific icon alongside the label.
+	 * Add or replace segments under a named slot. Each slot key is owned by a
+	 * single caller (e.g. `'leaf'`, `'workspace-type'`, `'ancestors'`).
+	 * Labels may be raw localization keys (`#foo_bar`) — they are resolved
+	 * automatically when the title is computed.
+	 * @param slotKey Unique key identifying this caller's contribution.
+	 * @param segments One or more segments to store under the slot. Pass none to clear.
+	 */
+	public setSegments(slotKey: string, ...segments: UmbCurrentViewTitleSegment[]): void {
+		if (segments.length === 0) {
+			this.clearSegments(slotKey);
+			return;
+		}
+		this.#segmentSlots.set(slotKey, segments);
+		this.#computeTitle();
+		this.#updateTitle();
+	}
+
+	/**
+	 * Remove all segments for a named slot.
+	 * @param slotKey The slot to clear.
+	 */
+	public clearSegments(slotKey: string): void {
+		if (!this.#segmentSlots.has(slotKey)) return;
+		this.#segmentSlots.delete(slotKey);
+		this.#computeTitle();
+		this.#updateTitle();
+	}
+
+	/**
+	 * @deprecated Use {@link setSegments} instead. Will be removed in Umbraco 19.
+	 * Convenience wrapper that maps the legacy positional API to named segment slots.
 	 */
 	public setTitle(
 		title: string | undefined,
 		options?: { kind?: UmbViewTitleKind; typeLabel?: string; icon?: string },
 	): void {
 		const { kind = 'workspace', typeLabel, icon } = options ?? {};
-		if (
-			this.#title === title &&
-			this.#titleKind === kind &&
-			this.#titleTypeLabel === typeLabel &&
-			this.#titleIcon === icon
-		) {
-			return;
+		if (title) {
+			if (typeLabel) {
+				this.setSegments('workspace-type', { label: typeLabel, kind: 'workspace-type' });
+			}
+			this.setSegments('leaf', { label: title, kind, ...(icon ? { icon } : {}) });
+		} else {
+			this.clearSegments('workspace-type');
+			this.clearSegments('leaf');
 		}
-		this.#title = title;
-		this.#titleKind = kind;
-		this.#titleTypeLabel = typeLabel;
-		this.#titleIcon = icon;
-		this.#computeTitle();
-		this.#updateTitle();
 	}
 
 	/**
-	 * Set additional breadcrumb segments representing ancestors of this view in a
-	 * hierarchical entity tree (e.g. the parent folders of a media item). Ancestors
-	 * are inserted into the title chain between the parent view's contribution and
-	 * this view's own title, with `kind: 'workspace-ancestor'`.
-	 *
-	 * Ordered root → leaf (closest ancestor last). Pass `undefined` or an empty
-	 * array to clear.
-	 * @param ancestors Ancestor labels, root-most first.
+	 * @deprecated Use {@link setSegments} with kind `'workspace-ancestor'` instead. Will be removed in Umbraco 19.
+	 * Convenience wrapper that maps ancestor labels to the `'ancestors'` segment slot.
 	 */
 	public setAncestors(ancestors: ReadonlyArray<string> | undefined): void {
-		const normalized = ancestors?.length ? ancestors : undefined;
-		const current = this.#titleAncestors;
-		if (current === normalized) return;
-		if (current && normalized && current.length === normalized.length && current.every((v, i) => v === normalized[i]))
+		if (!ancestors?.length) {
+			this.clearSegments('ancestors');
 			return;
-		this.#titleAncestors = normalized;
-		this.#computeTitle();
-		this.#updateTitle();
+		}
+		this.setSegments(
+			'ancestors',
+			...ancestors.map((label): UmbCurrentViewTitleSegment => ({ label, kind: 'workspace-ancestor' })),
+		);
 	}
 
 	public provideAt(controllerHost: UmbClassInterface): void {
@@ -381,41 +393,45 @@ export class UmbViewController extends UmbControllerBase {
 		});
 	}
 
+	static #KIND_PRIORITY: Record<UmbViewTitleKind, number> = {
+		section: 0,
+		'workspace-type': 1,
+		'workspace-ancestor': 2,
+		workspace: 3,
+		tab: 4,
+		modal: 5,
+	};
+
 	#computeTitle() {
 		const segments: UmbCurrentViewTitleSegment[] = [];
+
+		// 1. Inherited parent segments (already localized by the parent's own computation).
 		if (this.#inherit && this.#parentView) {
 			const parentSegments = this.#parentView.getComputedTitleSegments();
 			if (parentSegments) {
 				segments.push(...parentSegments);
 			}
 		}
-		if (this.#title) {
-			if (this.#titleTypeLabel) {
-				segments.push({
-					label: this.#localize.string(this.#titleTypeLabel),
-					kind: 'workspace-type',
+
+		// 2. This view's own segments: flatten all slots, sort by kind priority,
+		//    and localize labels (which may be raw localization keys like `#foo_bar`).
+		const local: UmbCurrentViewTitleSegment[] = [];
+		for (const slot of this.#segmentSlots.values()) {
+			for (const seg of slot) {
+				local.push({
+					...seg,
+					label: this.#localize.string(seg.label),
 				});
 			}
-			if (this.#titleAncestors) {
-				for (const ancestor of this.#titleAncestors) {
-					// Ancestor names can arrive as localization keys (e.g. a tree root's
-					// `#treeHeaders_dataTypes`), so resolve them the same way the leaf and
-					// type-label titles do.
-					segments.push({ label: this.#localize.string(ancestor), kind: 'workspace-ancestor' });
-				}
-			}
-			segments.push({
-				label: this.#localize.string(this.#title),
-				kind: this.#titleKind,
-				...(this.#titleIcon ? { icon: this.#titleIcon } : {}),
-			});
 		}
-		// Collapse consecutive segments with the same label. Primary case: a tree
-		// root sharing its hosting section's name (e.g. "Content" root under the
-		// Content section) — dedup avoids "Content | Content". Side effect: if a
-		// child entity has the exact same name as its parent (e.g. folder "Images"
-		// inside folder "Images"), the breadcrumb loses one level; the full URL
-		// is preserved on the history `path` so navigation still works.
+		local.sort(
+			(a, b) => (UmbViewController.#KIND_PRIORITY[a.kind] ?? 99) - (UmbViewController.#KIND_PRIORITY[b.kind] ?? 99),
+		);
+		segments.push(...local);
+
+		// 3. Collapse consecutive segments with the same label. Primary case: a tree
+		//    root sharing its hosting section's name (e.g. "Content" root under the
+		//    Content section) — dedup avoids "Content | Content".
 		const deduped: UmbCurrentViewTitleSegment[] = [];
 		for (const seg of segments) {
 			if (deduped[deduped.length - 1]?.label === seg.label) continue;

@@ -28,6 +28,11 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 		super(host, args);
 		this.nameWriteGuard.fallbackToPermitted();
 		const { typeLabel, icon } = args;
+
+		if (typeLabel) {
+			this.view.setSegments('workspace-type', { label: typeLabel, kind: 'workspace-type' });
+		}
+
 		// Combine name with the forbidden state so the breadcrumb gets a
 		// meaningful label even when the entity can't be loaded — otherwise the
 		// section title is the only thing left in the chain (e.g. "Settings"
@@ -35,8 +40,12 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 		this.observe(
 			mergeObservables([this.name, this.forbidden.isOn], ([name, isForbidden]) => ({ name, isForbidden })),
 			({ name, isForbidden }) => {
-				const title = isForbidden ? '#routing_routeForbiddenTitle' : name;
-				this.view.setTitle(title, { kind: 'workspace', typeLabel, icon });
+				const label = isForbidden ? '#routing_routeForbiddenTitle' : name;
+				if (label) {
+					this.view.setSegments('leaf', { label, kind: 'workspace', ...(icon ? { icon } : {}) });
+				} else {
+					this.view.clearSegments('leaf');
+				}
 			},
 			null,
 		);
