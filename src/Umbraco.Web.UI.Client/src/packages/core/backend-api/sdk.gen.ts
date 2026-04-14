@@ -776,6 +776,23 @@ export class DocumentBlueprintService {
     }
     
     /**
+     * Gets the audit log for a document blueprint.
+     * Gets a paginated collection of audit log entries for the document blueprint identified by the provided Id.
+     */
+    public static getDocumentBlueprintByIdAuditLog<ThrowOnError extends boolean = true>(options: Options<GetDocumentBlueprintByIdAuditLogData, ThrowOnError>) {
+        return (options.client ?? client).get<GetDocumentBlueprintByIdAuditLogResponses, GetDocumentBlueprintByIdAuditLogErrors, ThrowOnError>({
+            security: [
+                {
+                    scheme: 'bearer',
+                    type: 'http'
+                }
+            ],
+            url: '/umbraco/management/api/v1/document-blueprint/{id}/audit-log',
+            ...options
+        });
+    }
+    
+    /**
      * Moves a document blueprint.
      * Moves a document blueprint identified by the provided Id to a different location.
      */

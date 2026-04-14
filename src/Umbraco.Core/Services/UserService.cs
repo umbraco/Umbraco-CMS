@@ -2095,6 +2095,11 @@ internal partial class UserService : RepositoryService, IUserService
         Dictionary<Guid, int> nodes,
         IEnumerable<UmbracoObjectTypes> objectTypes)
     {
+        if (nodes.Count == 0)
+        {
+            return Attempt.SucceedWithStatus(UserOperationStatus.Success, Enumerable.Empty<NodePermissions>());
+        }
+
         IUser? user = await GetAsync(userKey);
         if (user is null)
         {
