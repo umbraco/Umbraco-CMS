@@ -388,6 +388,12 @@ export class UmbViewController extends UmbControllerBase {
 		});
 		this.shortcuts.deactivate();
 		this.#removeActive();
+
+		// Clear the global title when the top-level (non-inheriting) active view
+		// deactivates, so subscribers don't see stale data between navigations.
+		if (!this.#inherit) {
+			_setUmbCurrentViewTitle(undefined);
+		}
 	}
 
 	#updateTitle() {

@@ -1,6 +1,6 @@
 import type { UmbCurrentUserHistoryItem, UmbCurrentUserHistoryStore } from './current-user-history.store.js';
 import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.store.token.js';
-import { html, customElement, state, nothing, css, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing, css, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
@@ -90,8 +90,9 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 
 	#renderItem(item: UmbCurrentUserHistoryItem) {
 		const label = Array.isArray(item.label) ? item.label[0] : item.label;
+		const detail = item.displayPath ? this.#truncate(item.displayPath, 50) : undefined;
 		return html`
-			<uui-ref-node name=${label} detail=${this.#truncate(item.displayPath, 50)} href=${item.path}>
+			<uui-ref-node name=${label} detail=${ifDefined(detail)} href=${item.path}>
 				<umb-icon slot="icon" name=${item.icon ?? 'icon-link'}></umb-icon>
 			</uui-ref-node>
 		`;
