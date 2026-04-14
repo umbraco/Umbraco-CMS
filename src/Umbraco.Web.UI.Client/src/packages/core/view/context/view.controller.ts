@@ -124,10 +124,6 @@ export class UmbViewController extends UmbControllerBase {
 		this.hints.updateScaffold({ variantId: variantId });
 	}
 
-	// ── Segment-slot API ──────────────────────────────────────────────
-	// Each caller owns a named slot. The controller flattens all slots,
-	// sorts by kind priority, localizes labels, and deduplicates.
-
 	/**
 	 * Add or replace segments under a named slot. Each slot key is owned by a
 	 * single caller (e.g. `'leaf'`, `'workspace-type'`, `'ancestors'`).
@@ -141,12 +137,7 @@ export class UmbViewController extends UmbControllerBase {
 			this.clearSegments(slotKey);
 			return;
 		}
-		const current = this.#segmentSlots.get(slotKey);
-		if (current && current.length === segments.length && current.every((s, i) =>
-			s.label === segments[i].label && s.kind === segments[i].kind && s.icon === segments[i].icon,
-		)) {
-			return;
-		}
+		if (UmbViewController.#segmentsEqual(this.#segmentSlots.get(slotKey), segments)) return;
 		this.#segmentSlots.set(slotKey, segments);
 		this.#computeTitle();
 		this.#updateTitle();
@@ -428,6 +419,15 @@ export class UmbViewController extends UmbControllerBase {
 		modal: 5,
 	};
 
+	static #segmentsEqual(
+		a: ReadonlyArray<UmbCurrentViewTitleSegment> | undefined,
+		b: ReadonlyArray<UmbCurrentViewTitleSegment> | undefined,
+	): boolean {
+		if (a === b) return true;
+		if (!a || !b || a.length !== b.length) return false;
+		return a.every((s, i) => s.label === b[i].label && s.kind === b[i].kind && s.icon === b[i].icon);
+	}
+
 	#computeTitle() {
 		const segments: UmbCurrentViewTitleSegment[] = [];
 
@@ -463,15 +463,8 @@ export class UmbViewController extends UmbControllerBase {
 			if (deduped[deduped.length - 1]?.label === seg.label) continue;
 			deduped.push(seg);
 		}
-		// Skip the observable emission when the result hasn't changed — prevents
-		// cascading recomputations in inheriting child views for no-op updates.
 		const result = deduped.length ? deduped : undefined;
-		const prev = this.#computedTitleSegments.getValue();
-		if (prev && result && prev.length === result.length && prev.every((s, i) =>
-			s.label === result[i].label && s.kind === result[i].kind && s.icon === result[i].icon,
-		)) {
-			return;
-		}
+		if (UmbViewController.#segmentsEqual(this.#computedTitleSegments.getValue(), result)) return;
 		this.#computedTitleSegments.setValue(result);
 	}
 
