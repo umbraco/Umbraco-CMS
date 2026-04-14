@@ -9,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_MEMBER_TYPE_ROOT_ENTITY_TYPE,
 			headline: '#treeHeaders_memberTypes',
-			icon: 'icon-member-dashed-line',
+			icon: 'icon-user',
 		},
 	},
 ];

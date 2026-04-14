@@ -24,7 +24,7 @@ export class UmbMemberTypeWorkspaceContext
 			entityType: UMB_MEMBER_TYPE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_MEMBER_TYPE_DETAIL_REPOSITORY_ALIAS,
 			typeLabel: '#treeHeaders_memberTypes',
-			icon: 'icon-member-dashed-line',
+			icon: 'icon-user',
 		});
 
 		this.routes.setRoutes([
