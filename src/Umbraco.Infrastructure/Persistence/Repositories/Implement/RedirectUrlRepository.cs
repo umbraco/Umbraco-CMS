@@ -1,17 +1,13 @@
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NPoco;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -81,8 +77,7 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
     public async Task DeleteAllAsync() =>
         await AmbientScope.ExecuteWithContextAsync<RedirectUrlDto>(async db =>
         {
-            db.RedirectUrls.RemoveRange(db.RedirectUrls);
-            await db.SaveChangesAsync();
+            await db.RedirectUrls.ExecuteDeleteAsync();
         });
 
     /// <summary>
@@ -92,11 +87,9 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
     public async Task DeleteContentUrlsAsync(Guid contentKey) =>
         await AmbientScope.ExecuteWithContextAsync<RedirectUrlDto>(async db =>
         {
-            db.RedirectUrls
+            await db.RedirectUrls
                 .Where(x => x.ContentKey == contentKey)
-                .ExecuteDelete();
-
-            await db.SaveChangesAsync();
+                .ExecuteDeleteAsync();
         });
 
     /// <summary>
@@ -107,11 +100,9 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
     public async Task DeleteAsync(Guid id) =>
         await AmbientScope.ExecuteWithContextAsync<RedirectUrlDto>(async db =>
         {
-            db.RedirectUrls
+            await db.RedirectUrls
                 .Where(x => x.Id == id)
-                .ExecuteDelete();
-
-            await db.SaveChangesAsync();
+                .ExecuteDeleteAsync();
         });
 
     /// <summary>
@@ -119,11 +110,14 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
     /// </summary>
     /// <param name="url">The URL to find the most recent redirect for.</param>
     /// <returns>The most recent <see cref="Umbraco.Cms.Core.Models.IRedirectUrl"/> if found; otherwise, null.</returns>
-    public async Task<IRedirectUrl?> GetMostRecentUrlAsync(string url) =>
-        await AmbientScope.ExecuteWithContextAsync(async db =>
+    public async Task<IRedirectUrl?> GetMostRecentUrlAsync(string url)
+    {
+        var urlHash = url.GenerateHash<SHA1>();
+
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             var result = await db.RedirectUrls
-                .Where(x => x.Url == url && x.UrlHash == url.GenerateHash<SHA1>())
+                .Where(x => x.Url == url && x.UrlHash == urlHash)
                 .OrderByDescending(x => x.CreateDateUtc)
                 .Join(
                     db.Nodes,
@@ -134,6 +128,7 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
 
             return result == null ? null : Map(result.Redirect, result.ContentId);
         });
+    }
 
     /// <inheritdoc/>
     public async Task<IRedirectUrl?> GetMostRecentUrlAsync(string url, string culture)
@@ -143,11 +138,13 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
             return await GetMostRecentUrlAsync(url);
         }
 
+        var urlHash = url.GenerateHash<SHA1>();
+
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             var results = await db.RedirectUrls
                 .Where(x => x.Url == url
-                            && x.UrlHash == url.GenerateHash<SHA1>()
+                            && x.UrlHash == urlHash
                             && (x.Culture == culture.ToLower()
                                 || x.Culture == null
                                 || x.Culture == string.Empty))
@@ -174,12 +171,17 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
     public async Task<IEnumerable<IRedirectUrl>> GetContentUrlsAsync(Guid contentKey) =>
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
+            var contentId = await db.Nodes
+                .Where(n => n.UniqueId == contentKey)
+                .Select(n => n.NodeId)
+                .FirstOrDefaultAsync();
+
             List<RedirectUrlDto> dtos = await db.RedirectUrls
                 .Where(x => x.ContentKey == contentKey)
                 .OrderByDescending(x => x.CreateDateUtc)
                 .ToListAsync();
 
-            return dtos.Select(Map).WhereNotNull();
+            return dtos.Select(dto => Map(dto, contentId));
         });
 
     /// <inheritdoc/>
@@ -263,7 +265,7 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             var result = await db.RedirectUrls
-                .Where(x => x.ContentKey == id)
+                .Where(x => x.Id == id)
                 .Join(
                     db.Nodes,
                     redirect => redirect.ContentKey,
