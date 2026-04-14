@@ -1,112 +1,129 @@
-# Revised Plan: Migrate Edit Settings to blockAction (using default kind)
+# Plan: Stage 2 — Migrate Edit Content to blockAction Extension
 
 ## Context
 
-Edit Settings uses the `default` kind with an API class that returns the workspace path via `getHref()` and a validation data path via `getValidationDataPath()`. Visibility is controlled by manifest conditions. The default kind element is extended to support a validation badge driven by the API.
+Stage 1 (Edit Settings) is complete. The pattern is proven: use the `default` kind with an API class that provides `getHref()` and `getValidationDataPath()`, controlled by manifest conditions.
 
-## Decisions
+Edit Content is more complex because it has two mutually exclusive visual states:
+1. **Edit button** — navigates to content workspace (when `showContentEdit && workspaceEditContentPath`)
+2. **Expose button** — calls `context.expose()` with "Create this for..." label (when `showContentEdit === false && exposed === false`)
 
-- **Kind**: Use `default` kind, not a custom `editSettings` kind
-- **Validation badge**: API class provides `getValidationDataPath()`, default kind element creates the validation controller and renders the badge
-- **Visibility**: Manifest conditions control when the action is shown (has settings, not read-only)
+## Approach: Two Separate blockAction Extensions
+
+Rather than a custom kind that handles both states, register two `blockAction` extensions with mutually exclusive conditions:
+
+**`Umb.BlockAction.EditContent`** — uses `default` kind:
+- Condition: `Umb.Condition.BlockEntryShowContentEdit` + `Umb.Condition.BlockEntryIsReadOnly` match: false
+- API: `getHref()` returns `workspaceEditContentPath`, `getValidationDataPath()` returns content validation path
+- Icon: `icon-edit` (or `icon-add` when not exposed — needs the API or element to handle this)
+
+**`Umb.BlockAction.ExposeContent`** — uses `default` kind:
+- Condition: `Umb.Condition.BlockEntryShowContentEdit` match: false + `Umb.Condition.BlockEntryIsExposed` match: false + `Umb.Condition.BlockEntryIsReadOnly` match: false
+- API: `execute()` calls `context.expose()`
+- Meta: `icon: 'icon-add'`, label: dynamic "Create this for {contentTypeName}"
+
+### Decisions
+
+- **Edit Content icon**: Always `icon-edit`. The Expose action handles the `icon-add` case.
+- **Expose label**: Use a static localization key (`#blockEditor_createThisFor`). Loses the dynamic content type name suffix but keeps things simple.
+- **`BlockEntryShowContentEdit` condition**: Needs `match?: boolean` added so the Expose action can use `match: false`.
+
+### Existing Conditions
+
+- `Umb.Condition.BlockEntryShowContentEdit` — already exists, uses `UMB_BLOCK_ENTRY_CONTEXT.showContentEdit`. **Needs `match` support** for the expose action to use `match: false`.
+- `Umb.Condition.BlockEntryIsReadOnly` — already exists (we created it)
+- `Umb.Condition.BlockWorkspaceIsExposed` — uses `UMB_BLOCK_WORKSPACE_CONTEXT` (wrong level). We need an **entry-level** version: `Umb.Condition.BlockEntryIsExposed`
 
 ## Steps
 
-### 1. Remove the `editSettings` kind
+### 1. Add `match` support to BlockEntryShowContentEdit condition
 
-Delete `src/packages/block/block/action/edit-settings/` directory. Remove references from `action/manifests.ts` and `action/index.ts`.
+**Modify:** `src/packages/block/block/conditions/block-entry-show-content-edit.condition.ts`
+- Add `match` comparison: `this.permitted = showContentEdit === (this.config.match !== undefined ? this.config.match : true)`
 
-### 2. Extend UmbBlockAction interface with getValidationDataPath()
+**Modify:** `src/packages/block/block/conditions/types.ts`
+- Change `BlockEntryShowContentEditConditionConfig` from `type` to `interface` with `match?: boolean`
 
-**Modify:** `src/packages/block/block/action/block-action.interface.ts`
-- Add `getValidationDataPath(): Promise<string | undefined>` to the `UmbBlockAction` interface
+### 2. Create Block Entry Is Exposed condition
 
-**Modify:** `src/packages/block/block/action/block-action-base.ts`
-- Add default implementation returning `Promise.resolve(undefined)`
+**New file:** `src/packages/block/block/conditions/block-entry-is-exposed.condition.ts`
+- Consumes `UMB_BLOCK_ENTRY_CONTEXT`, observes `hasExpose` (the exposed state)
+- Supports `match?: boolean` (default true)
 
-### 3. Add validation badge support to default kind element
+**Modify:** `conditions/types.ts`, `conditions/manifests.ts`, `conditions/constants.ts`
 
-**Modify:** `src/packages/block/block/action/default/block-action.element.ts`
+### 3. Create Edit Content blockAction API class
 
-After the API is set (in the `api` setter), call `api.getValidationDataPath()`. If it returns a path:
-- Create a `UmbObserveValidationStateController` with that path
-- Track `_invalid` state
-- Render the button `color` as `'invalid'` when invalid
-- Render `<uui-badge attention color="invalid" label="...">!</uui-badge>` inside the button when invalid
-
-This requires importing `UmbObserveValidationStateController` and `UmbDataPathBlockElementDataQuery` (if needed — but the API returns the full path, so no query construction in the element).
-
-### 4. Create Block Entry Has Settings condition
-
-**New file:** `src/packages/block/block/conditions/block-entry-has-settings.condition.ts`
-- Consumes `UMB_BLOCK_ENTRY_CONTEXT`, observes `settingsElementTypeKey`
-- `this.permitted = !!settingsElementTypeKey`
-
-**Modify:** `src/packages/block/block/conditions/types.ts` — add config type
-**Modify:** `src/packages/block/block/conditions/manifests.ts` — register condition
-**Modify:** `src/packages/block/block/conditions/constants.ts` — add alias constant
-
-### 5. Create Edit Settings blockAction API class
-
-**New files** in `src/packages/block/block/action/common/edit-settings/`:
-
-- `edit-settings-block.action.ts` — extends `UmbBlockActionBase<MetaBlockActionDefaultKind>`:
+**New files** in `src/packages/block/block/action/common/edit-content/`:
+- `edit-content-block.action.ts` — extends `UmbBlockActionBase`:
   - Consumes `UMB_BLOCK_ENTRY_CONTEXT`
-  - `getHref()`: returns `context.workspaceEditSettingsPath` value (observed reactively or fetched)
-  - `getValidationDataPath()`: returns `$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]` using `context.settingsKey`
+  - `getHref()`: awaits context, returns `workspaceEditContentPath` via `observe().asPromise()`
+  - `getValidationDataPath()`: returns `$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]`
 - `manifests.ts`:
   ```
-  type: 'blockAction',
-  kind: 'default',
-  alias: 'Umb.BlockAction.EditSettings',
-  weight: 300,
-  api: () => import('./edit-settings-block.action.js'),
-  meta: { icon: 'icon-settings', label: '#general_settings' },
+  type: 'blockAction', kind: 'default',
+  alias: 'Umb.BlockAction.EditContent', weight: 400,
+  meta: { icon: 'icon-edit', label: '#general_edit' },
   conditions: [
+    { alias: 'Umb.Condition.BlockEntryShowContentEdit' },
     { alias: 'Umb.Condition.BlockEntryIsReadOnly', match: false },
-    { alias: 'Umb.Condition.BlockEntryHasSettings' },
   ],
   ```
-- `constants.ts` — `UMB_BLOCK_ACTION_EDIT_SETTINGS_ALIAS`
+- `constants.ts`
 
-### 6. Wire up manifests and exports
+### 4. Create Expose Content blockAction API class
 
-**Modify:** `src/packages/block/block/action/manifests.ts` — add edit-settings action manifests
-**Modify:** `src/packages/block/block/action/index.ts` — add edit-settings constants export
+**New files** in `src/packages/block/block/action/common/expose-content/`:
+- `expose-content-block.action.ts` — extends `UmbBlockActionBase`:
+  - Consumes `UMB_BLOCK_ENTRY_CONTEXT`
+  - `execute()`: calls `context.expose()`
+- `manifests.ts`:
+  ```
+  type: 'blockAction', kind: 'default',
+  alias: 'Umb.BlockAction.ExposeContent', weight: 400,
+  meta: { icon: 'icon-add', label: '#blockEditor_createThisFor' },
+  conditions: [
+    { alias: 'Umb.Condition.BlockEntryShowContentEdit', match: false },
+    { alias: 'Umb.Condition.BlockEntryIsExposed', match: false },
+    { alias: 'Umb.Condition.BlockEntryIsReadOnly', match: false },
+  ],
+  ```
+- `constants.ts`
 
-### 7. Remove slotted Edit Settings from all four entry elements
+Note: `#blockEditor_createThisFor` will render without the content type name parameter. This is a minor UX simplification.
 
-Remove `#renderEditSettingsAction()` and its call from each entry element's `#renderActionBar()`. Keep `_settingsInvalid`, `_hasSettings`, and settings path observers where they're used for blockViewProps or reflected attributes.
+### 5. Wire up manifests and exports
 
-## Note on getHref() reactivity
+**Modify:** `action/manifests.ts` — add edit-content + expose-content manifests
+**Modify:** `action/index.ts` — add new constants exports
 
-The current default kind element calls `api.getHref()` once in the `api` setter. For Edit Settings, the workspace path is resolved asynchronously from the context. The API class needs to either:
-- Return the path once it's available (the element calls getHref() after API construction, which may be before the context resolves)
-- Or the element needs to re-call getHref() when the API signals a change
+### 6. Remove slotted Edit Content from all four entry elements
 
-Looking at how the entity action default element handles this — it also calls `getHref()` once. If the path isn't available yet, it returns undefined and the button renders without href. This may need the API to notify when the href changes, or the element to poll/observe. For the initial implementation, the context should resolve quickly enough that the path is available by the time the user sees the button.
+Remove `#renderEditContentAction()` / `#renderEditAction()` and `#expose()` from all four elements. Remove their calls from `<umb-block-action-list>` slot.
 
-If this proves unreliable, we can add an observable `href` property to the API later.
+After this step the slot is empty — remove `<slot></slot>` from `<umb-block-action-list>`.
+
+### 7. Clean up
+
+Remove unused state/observers from entry elements. Verify which are still needed for blockViewProps and reflected attributes before removing.
 
 ## Verification
 
 1. `npm run build` — no errors
 2. `npm run check:circular` — clean
 3. Const export test passes
-4. Visual: Edit Settings button in same position with settings icon
-5. Functional: Clicking navigates to workspace settings view
-6. Validation: Invalid badge appears when settings fail validation
-7. Read-only: Button hidden when read-only (via condition)
-8. No settings: Button hidden when block has no settings type (via condition)
+4. Edit Content button: navigates to content workspace, shows validation badge
+5. Expose button: "Create this for..." appears when not exposed, clicking exposes block
+6. Read-only: Both buttons hidden
+7. Inline editing mode: Edit Content hidden when `showContentEdit` is false
+8. `<slot>` removed from `<umb-block-action-list>`
 
 ## Critical Files
 
 | File | Role |
 |------|------|
-| `src/packages/block/block/action/edit-settings/` | DELETE (replacing with default kind approach) |
-| `src/packages/block/block/action/block-action.interface.ts` | Add getValidationDataPath() |
-| `src/packages/block/block/action/block-action-base.ts` | Add default getValidationDataPath() |
-| `src/packages/block/block/action/default/block-action.element.ts` | Add validation badge support |
-| `src/packages/block/block/conditions/` | New BlockEntryHasSettings condition |
-| `src/packages/block/block/action/common/edit-settings/` | New API class + manifests |
-| All four entry elements | Remove #renderEditSettingsAction() |
+| `src/packages/block/block/conditions/` | New BlockEntryIsExposed condition |
+| `src/packages/block/block/action/common/edit-content/` (new) | Edit Content API + manifest |
+| `src/packages/block/block/action/common/expose-content/` (new) | Expose Content API + manifest |
+| `src/packages/block/block/action/block-action-list.element.ts` | Remove `<slot>` |
+| All four entry elements | Remove edit content render + expose method |

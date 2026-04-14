@@ -570,45 +570,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#renderActionBar() {
 		if (this._isSortMode) return nothing;
-		return html`
-			<umb-block-action-list block-editor=${UMB_BLOCK_GRID}>
-				${this.#renderEditAction()}
-			</umb-block-action-list>
-		`;
-	}
-
-	#renderEditAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			${when(
-				this._showContentEdit && this._workspaceEditContentPath,
-				() => html`
-					<uui-button
-						label="edit"
-						look="secondary"
-						color=${this._contentInvalid ? 'danger' : ''}
-						href=${this._workspaceEditContentPath!}
-						title=${this.localize.term('general_edit')}>
-						<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
-						${when(
-							this._contentInvalid,
-							() => html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`,
-						)}
-					</uui-button>
-				`,
-			)}
-			${when(
-				this._showContentEdit === false && this._exposed === false,
-				() => html`
-					<uui-button
-						@click=${this.#expose}
-						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
-						look="secondary">
-						<uui-icon name="icon-add"></uui-icon>
-					</uui-button>
-				`,
-			)}
-		`;
+		return html`<umb-block-action-list block-editor=${UMB_BLOCK_GRID}></umb-block-action-list>`;
 	}
 
 	static override styles = [

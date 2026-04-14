@@ -388,35 +388,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#renderActionBar() {
 		if (this._isSortMode) return nothing;
-		return html`
-			<umb-block-action-list block-editor=${UMB_BLOCK_LIST}>
-				${this.#renderEditContentAction()}
-			</umb-block-action-list>
-		`;
-	}
-
-	#renderEditContentAction() {
-		if (this._isReadOnly) return nothing;
-		return this._showContentEdit && this._workspaceEditContentPath
-			? html`<uui-button
-					label="edit"
-					look="secondary"
-					color=${this._contentInvalid ? 'invalid' : ''}
-					href=${this._workspaceEditContentPath}
-					title=${this.localize.term('general_edit')}>
-					<uui-icon name=${this._exposed === false && this._isReadOnly === false ? 'icon-add' : 'icon-edit'}></uui-icon>
-					${this._contentInvalid
-						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-						: nothing}
-				</uui-button>`
-			: this._showContentEdit === false && this._exposed === false
-				? html`<uui-button
-						@click=${this.#expose}
-						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
-						look="secondary"
-						><uui-icon name="icon-add"></uui-icon
-					></uui-button>`
-				: nothing;
+		return html`<umb-block-action-list block-editor=${UMB_BLOCK_LIST}></umb-block-action-list>`;
 	}
 
 	override render() {
