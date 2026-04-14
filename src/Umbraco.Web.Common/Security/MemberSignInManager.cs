@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
@@ -19,8 +22,10 @@ namespace Umbraco.Cms.Web.Common.Security;
 public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMemberSignInManager
 {
     private readonly IEventAggregator _eventAggregator;
+    private readonly IIpResolver _ipResolver;
     private readonly IMemberExternalLoginProviders _memberExternalLoginProviders;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public MemberSignInManager(
         UserManager<MemberIdentityUser> memberManager,
         IHttpContextAccessor contextAccessor,
@@ -33,10 +38,28 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         IEventAggregator eventAggregator,
         IOptions<SecuritySettings> securitySettings,
         IRequestCache requestCache)
+        : this(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, memberExternalLoginProviders, eventAggregator, securitySettings, requestCache, StaticServiceProvider.Instance.GetRequiredService<IIpResolver>())
+    {
+    }
+
+    public MemberSignInManager(
+        UserManager<MemberIdentityUser> memberManager,
+        IHttpContextAccessor contextAccessor,
+        IUserClaimsPrincipalFactory<MemberIdentityUser> claimsFactory,
+        IOptions<IdentityOptions> optionsAccessor,
+        ILogger<SignInManager<MemberIdentityUser>> logger,
+        IAuthenticationSchemeProvider schemes,
+        IUserConfirmation<MemberIdentityUser> confirmation,
+        IMemberExternalLoginProviders memberExternalLoginProviders,
+        IEventAggregator eventAggregator,
+        IOptions<SecuritySettings> securitySettings,
+        IRequestCache requestCache,
+        IIpResolver ipResolver)
         : base(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, securitySettings, requestCache)
     {
         _memberExternalLoginProviders = memberExternalLoginProviders;
         _eventAggregator = eventAggregator;
+        _ipResolver = ipResolver;
     }
 
     protected override bool AllowConcurrentLoginsEnabled => SecuritySettings.GetMemberAllowConcurrentLogins();
@@ -311,7 +334,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     {
         result = await base.HandleSignIn(user, username, result);
 
-        var ipAddress = Context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+        var ipAddress = _ipResolver.GetCurrentRequestIpAddress();
 
         if (result.Succeeded)
         {
@@ -332,7 +355,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     public override async Task SignOutAsync()
     {
         MemberIdentityUser? user = await UserManager.GetUserAsync(Context.User);
-        var ipAddress = Context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+        var ipAddress = _ipResolver.GetCurrentRequestIpAddress();
 
         await base.SignOutAsync();
 
