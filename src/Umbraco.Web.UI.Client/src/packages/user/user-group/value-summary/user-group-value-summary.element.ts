@@ -10,8 +10,6 @@ export class UmbUserGroupsValueSummaryElement extends UmbValueSummaryElementBase
 	}
 }
 
-export { UmbUserGroupsValueSummaryElement as element };
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-user-groups-value-summary': UmbUserGroupsValueSummaryElement;

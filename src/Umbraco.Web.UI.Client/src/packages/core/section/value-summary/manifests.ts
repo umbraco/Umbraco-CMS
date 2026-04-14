@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.ValueSummary.Section.Aliases',
 		name: 'Section Aliases Value Summary',
 		forValueType: UMB_SECTION_ALIASES_VALUE_TYPE,
-		element: () => import('./section-aliases-value-summary.element.js'),
-		valueResolver: () => import('./section-aliases-value-summary.resolver.js'),
+		element: () => import('./section-aliases-value-summary.js'),
+		valueResolver: () => import('./section-aliases-value-summary.js'),
 	},
 ];

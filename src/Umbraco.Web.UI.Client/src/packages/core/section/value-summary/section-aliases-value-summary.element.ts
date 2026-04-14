@@ -11,8 +11,6 @@ export class UmbSectionAliasesValueSummaryElement extends UmbValueSummaryElement
 	}
 }
 
-export { UmbSectionAliasesValueSummaryElement as element };
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-section-aliases-value-summary': UmbSectionAliasesValueSummaryElement;

@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.ValueSummary.Document.UserStartNode',
 		name: 'Document User Start Node Value Summary',
 		forValueType: UMB_DOCUMENT_USER_START_NODE_VALUE_TYPE,
-		element: () => import('./document-user-start-node-value-summary.element.js'),
-		valueResolver: () => import('./document-user-start-node-value-summary.resolver.js'),
+		element: () => import('./document-user-start-node-value-summary.js'),
+		valueResolver: () => import('./document-user-start-node-value-summary.js'),
 	},
 ];

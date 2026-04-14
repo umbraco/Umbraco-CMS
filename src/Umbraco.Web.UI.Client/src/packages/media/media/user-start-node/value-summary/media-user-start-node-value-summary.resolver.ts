@@ -39,5 +39,3 @@ export class UmbMediaUserStartNodeValueSummaryResolver
 	}
 }
 
-// Named 'api' for ApiLoaderProperty convention
-export { UmbMediaUserStartNodeValueSummaryResolver as api };

@@ -41,5 +41,3 @@ export class UmbDocumentUserStartNodeValueSummaryResolver
 	}
 }
 
-// Named 'api' for ApiLoaderProperty convention
-export { UmbDocumentUserStartNodeValueSummaryResolver as api };

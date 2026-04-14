@@ -9,8 +9,6 @@ export class UmbMediaUserStartNodeValueSummaryElement extends UmbValueSummaryEle
 	}
 }
 
-export { UmbMediaUserStartNodeValueSummaryElement as element };
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-media-user-start-node-value-summary': UmbMediaUserStartNodeValueSummaryElement;

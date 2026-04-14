@@ -40,5 +40,3 @@ export class UmbUserGroupValueSummaryResolver
 	}
 }
 
-// Named 'api' for ApiLoaderProperty convention
-export { UmbUserGroupValueSummaryResolver as api };

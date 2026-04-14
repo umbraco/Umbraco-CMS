@@ -36,5 +36,3 @@ export class UmbSectionAliasesValueSummaryResolver
 	}
 }
 
-// Named 'api' for ApiLoaderProperty convention
-export { UmbSectionAliasesValueSummaryResolver as api };

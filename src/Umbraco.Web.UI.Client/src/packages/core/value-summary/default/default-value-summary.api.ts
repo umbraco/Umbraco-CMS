@@ -6,4 +6,3 @@ import { UmbValueSummaryApiBase } from '../base/value-summary-api.base.js';
  */
 export class UmbValueSummaryDefaultApi extends UmbValueSummaryApiBase {}
 
-export { UmbValueSummaryDefaultApi as api };

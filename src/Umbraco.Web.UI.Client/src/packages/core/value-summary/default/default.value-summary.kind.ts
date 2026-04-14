@@ -8,8 +8,8 @@ export const UMB_VALUE_SUMMARY_DEFAULT_KIND_MANIFEST: UmbExtensionManifestKind =
 	manifest: {
 		type: 'valueSummary',
 		kind: 'default',
-		element: () => import('./default-value-summary.element.js'),
-		api: () => import('./default-value-summary.api.js'),
+		element: () => import('./default-value-summary.js'),
+		api: () => import('./default-value-summary.js'),
 		meta: {},
 	},
 };

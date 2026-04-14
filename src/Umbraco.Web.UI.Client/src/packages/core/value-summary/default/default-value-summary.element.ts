@@ -8,8 +8,6 @@ export class UmbDefaultValueSummaryElement extends UmbValueSummaryElementBase {
 	}
 }
 
-export { UmbDefaultValueSummaryElement as element };
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-default-value-summary': UmbDefaultValueSummaryElement;

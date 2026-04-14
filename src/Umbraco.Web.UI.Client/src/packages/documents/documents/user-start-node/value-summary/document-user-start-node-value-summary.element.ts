@@ -31,8 +31,6 @@ export class UmbDocumentUserStartNodeValueSummaryElement extends UmbValueSummary
 	}
 }
 
-export { UmbDocumentUserStartNodeValueSummaryElement as element };
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-document-user-start-node-value-summary': UmbDocumentUserStartNodeValueSummaryElement;
