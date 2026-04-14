@@ -56,8 +56,8 @@ public class ElementPickerValueConverterTests : PropertyValueConverterTests
 
         var propertyData = new PropertyData { Value = "n/a", Culture = "abc", Segment = string.Empty };
 
-        var prop1 = new PublishedProperty(DeliveryApiPropertyType, publishedElement.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
-        var prop2 = new PublishedProperty(DefaultPropertyType, publishedElement.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        var prop1 = new PublishedProperty(DeliveryApiPropertyType, publishedElement.Object, CreateVariationContextAccessor(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        var prop2 = new PublishedProperty(DefaultPropertyType, publishedElement.Object, CreateVariationContextAccessor(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
 
         var publishedPropertyType = new Mock<IPublishedPropertyType>();
         publishedPropertyType.SetupGet(p => p.Alias).Returns("test");
