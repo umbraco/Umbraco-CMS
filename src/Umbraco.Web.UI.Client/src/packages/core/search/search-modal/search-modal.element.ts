@@ -387,6 +387,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 					(searcher) => html`
 						<button
 							class="search-provider ${this._currentGlobalSearcher?.alias === searcher.alias ? 'active' : ''}"
+							aria-pressed="${this._currentGlobalSearcher?.alias === searcher.alias ? 'active' : 'false'}"
 							data-provider-alias=${searcher.alias}
 							@click=${() => this.#setCurrentSearcher(searcher)}
 							@keydown=${() => ''}>
