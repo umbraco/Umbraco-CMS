@@ -1,9 +1,8 @@
 import type { ManifestPropertyEditorUi } from '../extensions/types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { levenshteinSimilarity } from '@umbraco-cms/backoffice/utils';
+import { fuzzyMatchScore, fuzzyTokenize } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-const FUZZY_THRESHOLD = 0.6;
 const YIELD_EVERY = 50;
 
 interface ScoredUI {
@@ -13,22 +12,11 @@ interface ScoredUI {
 
 interface SearchableUI {
 	labelLower: string;
+	labelTokens: Array<string>;
 	nameLower: string;
 	aliasLower: string;
 	groupLower: string;
 	allTokens: Array<string>;
-}
-
-/**
- * Splits text into lowercase tokens on whitespace, hyphens and dots.
- * @param {string} text - The text to tokenize.
- * @returns {Array<string>} The tokens.
- */
-function tokenize(text: string): Array<string> {
-	return text
-		.toLowerCase()
-		.split(/[\s\-.]+/)
-		.filter(Boolean);
 }
 
 /**
@@ -75,7 +63,7 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 		const normalizedQuery = query.toLowerCase().trim();
 		if (!normalizedQuery) return [];
 
-		const queryTokens = tokenize(normalizedQuery);
+		const queryTokens = fuzzyTokenize(normalizedQuery);
 		if (queryTokens.length === 0) return [];
 
 		const scored: Array<ScoredUI> = [];
@@ -109,19 +97,20 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 		if (cached) return cached;
 
 		const labelLower = (ui.meta.label || '').toLowerCase();
+		const labelTokens = fuzzyTokenize(labelLower);
 		const nameLower = ui.name.toLowerCase();
 		const aliasLower = ui.alias.toLowerCase();
 		const groupLower = (ui.meta.group || '').toLowerCase();
 
-		const allTokens = [...tokenize(labelLower), ...tokenize(nameLower), ...tokenize(aliasLower)];
+		const allTokens = [...labelTokens, ...fuzzyTokenize(nameLower), ...fuzzyTokenize(aliasLower)];
 
-		cached = { labelLower, nameLower, aliasLower, groupLower, allTokens };
+		cached = { labelLower, labelTokens, nameLower, aliasLower, groupLower, allTokens };
 		this.#searchable.set(ui, cached);
 		return cached;
 	}
 
 	#scoreUI(ui: ManifestPropertyEditorUi, query: string, queryTokens: Array<string>): number {
-		const { labelLower, nameLower, aliasLower, groupLower, allTokens } = this.#getSearchable(ui);
+		const { labelLower, labelTokens, nameLower, aliasLower, groupLower, allTokens } = this.#getSearchable(ui);
 
 		// Label substring match
 		if (labelLower.includes(query)) {
@@ -149,25 +138,20 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 			return 150;
 		}
 
-		// Fuzzy matching via Levenshtein against all tokens + group tokens
-		const allSearchable = [...allTokens, ...tokenize(groupLower)];
-		let totalSimilarity = 0;
-		for (const qt of queryTokens) {
-			let bestSimilarity = 0;
-			for (const st of allSearchable) {
-				const sim = levenshteinSimilarity(qt, st);
-				if (sim > bestSimilarity) {
-					bestSimilarity = sim;
-				}
-			}
-			if (bestSimilarity < FUZZY_THRESHOLD) {
-				return 0;
-			}
-			totalSimilarity += bestSimilarity;
+		// Fuzzy match on label tokens (primary) — higher score range
+		const labelFuzzy = fuzzyMatchScore(queryTokens, labelTokens);
+		if (labelFuzzy > 0) {
+			return 50 + Math.floor(labelFuzzy * 49);
 		}
 
-		const avgSimilarity = totalSimilarity / queryTokens.length;
-		return Math.max(1, Math.floor(avgSimilarity * 99));
+		// Fuzzy match on all tokens (secondary) — lower score range
+		const allSearchable = [...allTokens, ...fuzzyTokenize(groupLower)];
+		const allFuzzy = fuzzyMatchScore(queryTokens, allSearchable);
+		if (allFuzzy > 0) {
+			return 1 + Math.floor(allFuzzy * 48);
+		}
+
+		return 0;
 	}
 
 	override destroy(): void {
