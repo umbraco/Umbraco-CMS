@@ -198,7 +198,7 @@ Use the format: `Area: Description (closes #IssueID)`
 - Describe the change and its impact
 - Be specific, not vague (describe "a golden retriever" not just "a dog")
 
-**Issue Linking**: Add `(closes #IssueID)` to auto-close linked issues on merge.
+**Issue Linking**: Add `(closes #IssueID)` to the title for readability, AND include a closing keyword on its own line in the PR body (e.g., `Fixes #IssueID`) so GitHub actually auto-links and auto-closes the issue on merge. GitHub only parses closing keywords (`closes`, `fixes`, `resolves`) from the PR body or commit messages — the title suffix is cosmetic and does **not** trigger auto-close on its own.
 
 ### Commit Messages
 
@@ -438,6 +438,68 @@ The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime depende
 1. **Circular Dependencies**: Avoided via `Lazy<T>` or event notifications
 2. **Multi-Server**: Requires shared Data Protection key ring and synchronized clocks (NTP)
 3. **Database Support**: SQL Server, SQLite
+
+---
+
+## 7. CI/CD — Claude AI Assistant
+
+Two GitHub Actions workflows powered by `anthropics/claude-code-action@v1`. Advisory only — does not block merging.
+
+### Workflows
+
+| File | Trigger | Purpose |
+|------|---------|---------|
+| `claude-review.yml` | `pull_request: [opened, ready_for_review]` | Auto-review every non-draft PR using the `umb-review` skill |
+| `claude.yml` | `@claude` comments, issue assign/label | Interactive assistant for PRs and issues |
+
+### Auto-Review (`claude-review.yml`)
+
+Runs the full `.claude/skills/umb-review/SKILL.md` procedure on every newly opened or un-drafted PR. Produces inline comments per finding and one summary comment with a verdict. Skips draft PRs. No turn limit.
+
+### Interactive (`claude.yml`)
+
+Responds to `@claude` mentions on PRs and issues. The trigger phrase is stripped before Claude sees the message, so:
+
+- `@claude review` → light review using `gh pr diff` (not the umb-review skill)
+- `@claude fix ...` → implements a fix on a new branch
+- `@claude help` → answers questions about the codebase
+- `@claude label` → applies labels
+- `@claude` (empty) → defaults to `review` on PRs, `help` on issues
+
+Also triggers on issue assignment to `claude` or adding the `claude` label. Gated: only runs when `@claude` appears in the comment/issue body. Max 25 turns.
+
+**Allowed Bash tools**: `gh`, `git`, `npm`, `dotnet` (interactive only; auto-review allows `gh` and `git`).
+
+### Labels
+
+Both workflows apply labels based on content:
+
+**On PRs** (based on changed files):
+
+| Label | Condition |
+|-------|-----------|
+| `area/frontend` | Files under `src/Umbraco.Web.UI.Client/` |
+| `area/backend` | `.cs` files outside the frontend client |
+| `area/test` | Only test files changed |
+| `category/api` | Management or Delivery API files |
+| `category/breaking` | Breaking changes detected |
+| `category/localization` | Localization/language files |
+| `category/test-automation` | Only test files changed |
+| `category/refactor` | Pure refactoring, no new features |
+| `category/performance` | Performance-related changes |
+| `category/ux` | User-facing changes |
+| `category/ui` | UI layer changes |
+
+**On Issues** (based on content): same `area/*` and `category/*` labels, plus `affected/v14` through `affected/v17` and `affected/backoffice`.
+
+Labels are only added, never removed. Claude applies only labels it is confident about.
+
+### Key Implementation Notes
+
+- **Checkout required** — the action internally runs `git fetch origin main` for trusted file restoration. Without `actions/checkout`, it fails with `fatal: not a git repository`.
+- **`id-token: write` permission** — required for OIDC token exchange with the Claude GitHub App.
+- **Trigger phrase stripping** — the action strips `@claude` from comments before passing to Claude. Prompts must reference commands without the prefix (e.g., `review` not `@claude review`).
+- **PR number injection** — the interactive workflow injects the PR/issue number into the prompt via `${{ github.event.issue.number }}` since Claude can't discover it from `gh pr view` when checked out on `main`.
 
 ---
 

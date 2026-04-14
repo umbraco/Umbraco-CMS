@@ -217,6 +217,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 								<uui-toggle
 									slot="editor"
 									data-mark="toggle:approved"
+									label=${this.localize.term('user_stateApproved')}
 									.checked=${this._workspaceContext!.isApproved}
 									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isApproved', e.target.checked)}>
 								</uui-toggle>
@@ -226,6 +227,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 								<uui-toggle
 									slot="editor"
 									data-mark="toggle:locked-out"
+									label=${this.localize.term('user_stateLockedOut')}
 									?disabled=${this._isNew || !this._workspaceContext!.isLockedOut}
 									.checked=${this._workspaceContext!.isLockedOut}
 									@change=${(e: UUIBooleanInputEvent) => this.#onChange('isLockedOut', e.target.checked)}>
@@ -237,6 +239,7 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 						<uui-toggle
 							slot="editor"
 							data-mark="toggle:two-factor"
+							label=${this.localize.term('member_2fa')}
 							?disabled=${this._isNew || !this._workspaceContext.isTwoFactorEnabled}
 							.checked=${this._workspaceContext.isTwoFactorEnabled}
 							@change=${(e: UUIBooleanInputEvent) => this.#onChange('isTwoFactorEnabled', e.target.checked)}>

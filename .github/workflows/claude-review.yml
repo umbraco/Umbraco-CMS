@@ -1,0 +1,64 @@
+name: Claude PR Review
+
+on:
+  pull_request_target:
+    types: [opened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY_03 }}
+          base_branch: "main"
+          additional_permissions: "actions: read"
+          claude_args: "--model claude-sonnet-4-6 --allowedTools 'Bash(gh:*),Bash(git:*)'"
+          prompt: |
+            You are reviewing pull request #${{ github.event.pull_request.number }}
+            in the Umbraco CMS repository.
+
+            Read and execute the review procedure defined in `.claude/skills/umb-review/SKILL.md`.
+
+            For each finding that references a specific file and line:
+            - Post an individual inline PR comment on that line.
+            - Format: **[Severity]** explanation, then suggestion.
+
+            For the overall summary (header, impact, verdict):
+            - Post ONE top-level PR comment.
+
+            Do NOT use sticky/updating comments — post new individual comments.
+
+            After reviewing, apply labels to the PR based on changed files:
+            - `area/frontend` — if files under `src/Umbraco.Web.UI.Client/` are changed
+            - `area/backend` — if .cs files outside the frontend client are changed
+            - `area/test` — if only test files are changed
+            - `category/api` — if Management API or Delivery API files are changed
+            - `category/breaking` — if breaking changes were detected in the review
+            - `category/localization` — if localization/language files are changed
+            - `category/test-automation` — if only test files are changed
+            - `category/refactor` — if the PR is pure refactoring with no new features
+            - `category/performance` — if performance-related changes are detected
+            - `category/ux` — if user-facing changes are detected
+            - `category/ui` — if changes to the UI layer are detected
+
+            Only apply labels you are confident about. Never remove existing labels.
+
+            Be friendly and constructive. This project values community contributions.
+            Frame feedback as suggestions where possible.
+            Reserve firm language for genuine Critical issues only.
+
+            Run fully autonomously. Do NOT ask questions.
+            Only review changed files. Do not flag pre-existing issues.
+            Do not suggest changes that would themselves introduce breaking changes.
