@@ -274,10 +274,10 @@ export class UmbViewController extends UmbControllerBase {
 			'observeParentTitle',
 		);
 		// Hint inheritance requires a viewAlias or pathFilter on this view to target.
-		// Views without an alias (e.g. workspace-level views inheriting from a section
+		// Views without either (e.g. workspace-level views inheriting from a section
 		// purely to receive the section's title chain) have no hint target to resolve
 		// and must skip hint inheritance — title inheritance alone is supported.
-		if (this.viewAlias) {
+		if (this.viewAlias || this.hints.hasPathFilter) {
 			this.hints.inheritFrom(this.#parentView?.hints);
 		}
 	}
