@@ -68,8 +68,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 		}
 		const matchingView = this._views.find((manifest) => this.#constructViewPath(manifest) === activePath);
 		if (matchingView) {
-			const name = matchingView.meta.label ? this.localize.string(matchingView.meta.label) : (matchingView.name ?? matchingView.alias);
-			this.#viewContext.setSegments('dashboard', { label: name, kind: 'workspace' });
+			this.#viewContext.setSegments('dashboard', { label: this.#getViewName(matchingView), kind: 'workspace' });
 			return;
 		}
 		this.#viewContext.clearSegments('dashboard');
@@ -146,6 +145,10 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 		return dashboard.meta?.label ? this.localize.string(dashboard.meta.label) : (dashboard.name ?? dashboard.alias);
 	}
 
+	#getViewName(view: ManifestSectionView) {
+		return view.meta?.label ? this.localize.string(view.meta.label) : (view.name ?? view.alias);
+	}
+
 	#renderDashboards() {
 		// Only show dashboards if there are more than one dashboard or if there are both dashboards and views
 		return (this._dashboards.length > 0 && this._views.length > 0) || this._dashboards.length > 1
@@ -176,7 +179,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			? html`
 					<uui-tab-group slot="navigation" id="views">
 						${this._views.map((view) => {
-							const viewName = view.meta.label ? this.localize.string(view.meta.label) : (view.name ?? view.alias);
+							const viewName = this.#getViewName(view);
 							const viewPath = this.#constructViewPath(view);
 							// If this path matches, or if this is the default view and the active path is empty.
 							const isActive =

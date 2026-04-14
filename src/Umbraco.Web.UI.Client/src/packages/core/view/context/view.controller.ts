@@ -141,6 +141,12 @@ export class UmbViewController extends UmbControllerBase {
 			this.clearSegments(slotKey);
 			return;
 		}
+		const current = this.#segmentSlots.get(slotKey);
+		if (current && current.length === segments.length && current.every((s, i) =>
+			s.label === segments[i].label && s.kind === segments[i].kind && s.icon === segments[i].icon,
+		)) {
+			return;
+		}
 		this.#segmentSlots.set(slotKey, segments);
 		this.#computeTitle();
 		this.#updateTitle();
@@ -457,7 +463,16 @@ export class UmbViewController extends UmbControllerBase {
 			if (deduped[deduped.length - 1]?.label === seg.label) continue;
 			deduped.push(seg);
 		}
-		this.#computedTitleSegments.setValue(deduped.length ? deduped : undefined);
+		// Skip the observable emission when the result hasn't changed — prevents
+		// cascading recomputations in inheriting child views for no-op updates.
+		const result = deduped.length ? deduped : undefined;
+		const prev = this.#computedTitleSegments.getValue();
+		if (prev && result && prev.length === result.length && prev.every((s, i) =>
+			s.label === result[i].label && s.kind === result[i].kind && s.icon === result[i].icon,
+		)) {
+			return;
+		}
+		this.#computedTitleSegments.setValue(result);
 	}
 
 	public getComputedTitle(): string | undefined {
