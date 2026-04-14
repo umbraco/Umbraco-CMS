@@ -1,9 +1,8 @@
 import type { UmbIconDefinition } from '../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { levenshteinSimilarity } from '@umbraco-cms/backoffice/utils';
+import { fuzzyMatchScore, fuzzyTokenize } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-const FUZZY_THRESHOLD = 0.6;
 const YIELD_EVERY = 50; // Yield to the event loop after scoring this many icons.
 
 interface ScoredIcon {
@@ -13,17 +12,11 @@ interface ScoredIcon {
 
 interface SearchableIcon {
 	nameWithoutPrefix: string;
+	nameTokens: Array<string>;
 	keywordsLower: Array<string>;
 	groupsLower: Array<string>;
 	searchableTokens: Array<string>;
 	allSearchable: Array<string>;
-}
-
-function tokenize(text: string): Array<string> {
-	return text
-		.toLowerCase()
-		.split(/[\s-]+/)
-		.filter(Boolean);
 }
 
 /**
@@ -72,7 +65,7 @@ export class UmbIconSearchController extends UmbControllerBase {
 		const normalizedQuery = query.toLowerCase().trim();
 		if (!normalizedQuery) return [];
 
-		const queryTokens = tokenize(normalizedQuery);
+		const queryTokens = fuzzyTokenize(normalizedQuery);
 		if (queryTokens.length === 0) return [];
 
 		// Score all icons, yielding to the event loop periodically so that a
@@ -136,23 +129,24 @@ export class UmbIconSearchController extends UmbControllerBase {
 		if (cached) return cached;
 
 		const nameWithoutPrefix = icon.name.toLowerCase().replace(/^icon-/, '');
+		const nameTokens = fuzzyTokenize(nameWithoutPrefix);
 		const keywordsLower = icon.keywords?.map((k) => k.toLowerCase()) ?? [];
 		const groupsLower = icon.groups?.map((g) => g.toLowerCase()) ?? [];
 
-		const searchableTokens = tokenize(nameWithoutPrefix);
+		const searchableTokens = [...nameTokens];
 		for (const keyword of keywordsLower) {
-			searchableTokens.push(...tokenize(keyword));
+			searchableTokens.push(...fuzzyTokenize(keyword));
 		}
 
-		const allSearchable = [...searchableTokens, ...groupsLower.flatMap((g) => tokenize(g))];
+		const allSearchable = [...searchableTokens, ...groupsLower.flatMap((g) => fuzzyTokenize(g))];
 
-		cached = { nameWithoutPrefix, keywordsLower, groupsLower, searchableTokens, allSearchable };
+		cached = { nameWithoutPrefix, nameTokens, keywordsLower, groupsLower, searchableTokens, allSearchable };
 		this.#searchable.set(icon, cached);
 		return cached;
 	}
 
 	#scoreIcon(icon: UmbIconDefinition, query: string, queryTokens: Array<string>): number {
-		const { nameWithoutPrefix, keywordsLower, groupsLower, searchableTokens, allSearchable } =
+		const { nameWithoutPrefix, nameTokens, keywordsLower, groupsLower, searchableTokens, allSearchable } =
 			this.#getSearchable(icon);
 
 		// Full query substring match on name
@@ -189,25 +183,19 @@ export class UmbIconSearchController extends UmbControllerBase {
 			}
 		}
 
-		// Fuzzy matching via Levenshtein
-		let totalSimilarity = 0;
-		for (const qt of queryTokens) {
-			let bestSimilarity = 0;
-			for (const st of allSearchable) {
-				const sim = levenshteinSimilarity(qt, st);
-				if (sim > bestSimilarity) {
-					bestSimilarity = sim;
-				}
-			}
-			if (bestSimilarity < FUZZY_THRESHOLD) {
-				return 0; // Token doesn't meet threshold — no match.
-			}
-			totalSimilarity += bestSimilarity;
+		// Fuzzy match on name tokens (primary) — higher score range
+		const nameFuzzy = fuzzyMatchScore(queryTokens, nameTokens);
+		if (nameFuzzy > 0) {
+			return 50 + Math.floor(nameFuzzy * 49);
 		}
 
-		// Scale average similarity to 1–99 range.
-		const avgSimilarity = totalSimilarity / queryTokens.length;
-		return Math.max(1, Math.floor(avgSimilarity * 99));
+		// Fuzzy match on all tokens (secondary) — lower score range
+		const allFuzzy = fuzzyMatchScore(queryTokens, allSearchable);
+		if (allFuzzy > 0) {
+			return 1 + Math.floor(allFuzzy * 48);
+		}
+
+		return 0;
 	}
 
 	override destroy(): void {
