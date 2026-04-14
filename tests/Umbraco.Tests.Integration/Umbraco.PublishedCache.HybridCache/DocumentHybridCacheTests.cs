@@ -583,7 +583,6 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         Assert.IsTrue(hasContentForTextPageCached);
     }
 
-    [Test]
     [TestCase(true)]
     [TestCase(false)]
     public async Task Can_Not_Get_Trashed_Content_By_Key(bool preview)
@@ -601,7 +600,6 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
         Assert.IsNull(trashedPage, "Trashed content should not be in cache");
     }
 
-    [Test]
     [TestCase(true)]
     [TestCase(false)]
     public async Task Can_Not_Get_Trashed_Content_By_Id(bool preview)
