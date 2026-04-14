@@ -26,6 +26,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForMediaTree)]
 public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTreeItemResponseModel>
 {
+    private readonly IMediaStartNodeTreeFilterService _treeFilterService;
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
     /// <summary>
@@ -43,10 +44,11 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
         IMediaPresentationFactory mediaPresentationFactory)
         : base(entityService, flagProviders, treeFilterService)
     {
+        _treeFilterService = treeFilterService;
         _mediaPresentationFactory = mediaPresentationFactory;
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor accepting IMediaStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     public MediaTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -55,12 +57,14 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
         AppCaches appCaches,
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IMediaPresentationFactory mediaPresentationFactory)
-        : this(
+        : base(
               entityService,
               flagProviders,
-              StaticServiceProvider.Instance.GetRequiredService<IMediaStartNodeTreeFilterService>(),
-              mediaPresentationFactory)
+              userStartNodeEntitiesService,
+              dataTypeService)
     {
+        _mediaPresentationFactory = mediaPresentationFactory;
+        _treeFilterService = StaticServiceProvider.Instance.GetRequiredService<IMediaStartNodeTreeFilterService>();
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Media;
@@ -83,4 +87,18 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 
         return responseModel;
     }
+
+    /// <summary>
+    /// Gets the calculated start node IDs for the current user.
+    /// </summary>
+    /// <returns>An array of start node IDs.</returns>
+    [Obsolete("No longer used. Register a custom IMediaStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
+    protected override int[] GetUserStartNodeIds() => (_treeFilterService as ILegacyUserStartNodeTreeFilterService)?.GetUserStartNodeIds() ?? [];
+
+    /// <summary>
+    /// Gets the calculated start node paths for the current user.
+    /// </summary>
+    /// <returns>An array of start node paths.</returns>
+    [Obsolete("No longer used. Register a custom IMediaStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
+    protected override string[] GetUserStartNodePaths() => (_treeFilterService as ILegacyUserStartNodeTreeFilterService)?.GetUserStartNodePaths() ?? [];
 }

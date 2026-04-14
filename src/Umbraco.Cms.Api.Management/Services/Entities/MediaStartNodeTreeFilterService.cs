@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Api.Management.Services.Entities;
 /// User start node tree filter service for media trees.
 /// Resolves the current user's media start nodes.
 /// </summary>
-internal sealed class MediaStartNodeTreeFilterService : UserStartNodeTreeFilterService, IMediaStartNodeTreeFilterService
+internal sealed class MediaStartNodeTreeFilterService : UserStartNodeTreeFilterService, IMediaStartNodeTreeFilterService, ILegacyUserStartNodeTreeFilterService
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
@@ -31,13 +31,19 @@ internal sealed class MediaStartNodeTreeFilterService : UserStartNodeTreeFilterS
     /// <inheritdoc />
     protected override UmbracoObjectTypes[] TreeObjectTypes => [UmbracoObjectTypes.Media];
 
+    /// <inheritdoc/>
+    public int[] GetUserStartNodeIds() => CalculateUserStartNodeIds();
+
+    /// <inheritdoc/>
+    public string[] GetUserStartNodePaths() => CalculateUserStartNodePaths();
+
     /// <inheritdoc />
     protected override int[] CalculateUserStartNodeIds()
         => _backOfficeSecurityAccessor
                .BackOfficeSecurity?
                .CurrentUser?
                .CalculateMediaStartNodeIds(_entityService, _appCaches)
-           ?? Array.Empty<int>();
+           ?? [];
 
     /// <inheritdoc />
     protected override string[] CalculateUserStartNodePaths()
@@ -45,5 +51,5 @@ internal sealed class MediaStartNodeTreeFilterService : UserStartNodeTreeFilterS
                .BackOfficeSecurity?
                .CurrentUser?
                .GetMediaStartNodePaths(_entityService, _appCaches)
-           ?? Array.Empty<string>();
+           ?? [];
 }

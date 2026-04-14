@@ -2,6 +2,7 @@ using Umbraco.Cms.Api.Management.Models.Entities;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
@@ -29,10 +30,38 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
         IEntityService entityService,
         FlagProviderCollection flagProviders,
         IUserStartNodeTreeFilterService treeFilterService)
-        : base(entityService, flagProviders)
-    {
+        : base(entityService, flagProviders) =>
         _treeFilterService = treeFilterService;
-    }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    [Obsolete("Please use the constructor accepting IUserStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
+    protected UserStartNodeTreeControllerBase(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService)
+        : base(entityService, flagProviders) =>
+        _treeFilterService = new CallbackStartNodeTreeFilterService(
+            userStartNodeEntitiesService,
+            dataTypeService,
+            GetUserStartNodeIds,
+            GetUserStartNodePaths,
+            () => [ItemObjectType]);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <summary>
+    /// Gets the calculated start node IDs for the current user.
+    /// </summary>
+    /// <returns>An array of start node IDs.</returns>
+    [Obsolete("No longer used. Register a custom IUserStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
+    protected abstract int[] GetUserStartNodeIds();
+
+    /// <summary>
+    /// Gets the calculated start node paths for the current user.
+    /// </summary>
+    /// <returns>An array of start node paths.</returns>
+    [Obsolete("No longer used. Register a custom IUserStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
+    protected abstract string[] GetUserStartNodePaths();
 
     /// <summary>
     /// Configures the controller to ignore user start nodes for a specific data type.
@@ -83,4 +112,42 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
 
     private bool ShouldBypassStartNodeFiltering()
         => _treeFilterService.ShouldBypassStartNodeFiltering(_dataTypeKey);
+
+    /// <summary>
+    /// A backward-compatible adapter that implements <see cref="UserStartNodeTreeFilterService"/>
+    /// by delegating start node resolution to callback functions.
+    /// </summary>
+    /// <remarks>
+    /// Used by the obsolete constructor to bridge the old abstract-method-based
+    /// start node resolution to the new service-based approach.
+    /// </remarks>
+    [Obsolete("Only used by the obsolete constructor. Scheduled for removal in Umbraco 19.")]
+    private sealed class CallbackStartNodeTreeFilterService : UserStartNodeTreeFilterService
+    {
+        private readonly Func<int[]> _getStartNodeIds;
+        private readonly Func<string[]> _getStartNodePaths;
+        private readonly Func<UmbracoObjectTypes[]> _getTreeObjectTypes;
+
+        public CallbackStartNodeTreeFilterService(
+            IUserStartNodeEntitiesService userStartNodeEntitiesService,
+            IDataTypeService dataTypeService,
+            Func<int[]> getStartNodeIds,
+            Func<string[]> getStartNodePaths,
+            Func<UmbracoObjectTypes[]> getTreeObjectTypes)
+            : base(userStartNodeEntitiesService, dataTypeService)
+        {
+            _getStartNodeIds = getStartNodeIds;
+            _getStartNodePaths = getStartNodePaths;
+            _getTreeObjectTypes = getTreeObjectTypes;
+        }
+
+        /// <inheritdoc />
+        protected override UmbracoObjectTypes[] TreeObjectTypes => _getTreeObjectTypes();
+
+        /// <inheritdoc />
+        protected override int[] CalculateUserStartNodeIds() => _getStartNodeIds();
+
+        /// <inheritdoc />
+        protected override string[] CalculateUserStartNodePaths() => _getStartNodePaths();
+    }
 }

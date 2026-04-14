@@ -28,6 +28,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForContentTree)]
 public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBase<DocumentTreeItemResponseModel>
 {
+    private readonly IDocumentStartNodeTreeFilterService _treeFilterService;
     private readonly IPublicAccessService _publicAccessService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IDocumentPermissionFilterService _documentPermissionFilterService;
@@ -51,12 +52,13 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         IDocumentPermissionFilterService documentPermissionFilterService)
         : base(entityService, flagProviders, treeFilterService)
     {
+        _treeFilterService = treeFilterService;
         _publicAccessService = publicAccessService;
         _documentPresentationFactory = documentPresentationFactory;
         _documentPermissionFilterService = documentPermissionFilterService;
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor accepting IDocumentStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     protected DocumentTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -69,14 +71,17 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         : this(
               entityService,
               flagProviders,
-              StaticServiceProvider.Instance.GetRequiredService<IDocumentStartNodeTreeFilterService>(),
+              userStartNodeEntitiesService,
+              dataTypeService,
               publicAccessService,
+              appCaches,
+              backofficeSecurityAccessor,
               documentPresentationFactory,
               StaticServiceProvider.Instance.GetRequiredService<IDocumentPermissionFilterService>())
     {
     }
 
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor accepting IDocumentStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     protected DocumentTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -87,14 +92,12 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         IBackOfficeSecurityAccessor backofficeSecurityAccessor,
         IDocumentPresentationFactory documentPresentationFactory,
         IDocumentPermissionFilterService documentPermissionFilterService)
-        : this(
-              entityService,
-              flagProviders,
-              StaticServiceProvider.Instance.GetRequiredService<IDocumentStartNodeTreeFilterService>(),
-              publicAccessService,
-              documentPresentationFactory,
-              documentPermissionFilterService)
+        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
     {
+        _treeFilterService = StaticServiceProvider.Instance.GetRequiredService<IDocumentStartNodeTreeFilterService>();
+        _publicAccessService = publicAccessService;
+        _documentPresentationFactory = documentPresentationFactory;
+        _documentPermissionFilterService = documentPermissionFilterService;
     }
 
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Document;
@@ -128,4 +131,18 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     /// <inheritdoc/>
     protected override Task<(IEntitySlim[] Entities, long TotalBefore, long TotalAfter)> FilterTreeEntities(Guid targetKey, IEntitySlim[] entities, long totalBefore, long totalAfter)
         => _documentPermissionFilterService.FilterAsync(targetKey, entities, totalBefore, totalAfter);
+
+    /// <summary>
+    /// Gets the calculated start node IDs for the current user.
+    /// </summary>
+    /// <returns>An array of start node IDs.</returns>
+    [Obsolete("No longer used. Register a custom IDocumentStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
+    protected override int[] GetUserStartNodeIds() => (_treeFilterService as ILegacyUserStartNodeTreeFilterService)?.GetUserStartNodeIds() ?? [];
+
+    /// <summary>
+    /// Gets the calculated start node paths for the current user.
+    /// </summary>
+    /// <returns>An array of start node paths.</returns>
+    [Obsolete("No longer used. Register a custom IDocumentStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
+    protected override string[] GetUserStartNodePaths() => (_treeFilterService as ILegacyUserStartNodeTreeFilterService)?.GetUserStartNodePaths() ?? [];
 }
