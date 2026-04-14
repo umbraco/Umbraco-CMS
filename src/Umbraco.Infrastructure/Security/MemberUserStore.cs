@@ -114,9 +114,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 return await CreateExternalMemberAsync(user);
             }
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope();
-
-            // create member
+            // Create the in-memory member entity before opening the write scope.
+            // CreateMember only does a member type lookup (in its own read-only scope) and
+            // builds the entity in memory — keeping it outside the write scope avoids holding
+            // table locks that conflict with concurrent write transactions on SQLite.
             IMember memberEntity = _memberService.CreateMember(
                 user.UserName!,
                 user.Email!,
@@ -144,7 +145,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
             UpdateMemberProperties(memberEntity, user, out bool _);
 
-            // create the member
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+            // save the member
             Attempt<OperationResult?> saveAttempt = _memberService.Save(memberEntity, PublishNotificationSaveOptions.Saving);
             if (saveAttempt.Success is false)
             {
