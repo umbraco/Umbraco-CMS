@@ -131,7 +131,7 @@ export class UmbMemberWorkspaceContext
 			({ variantName, username, email }) => {
 				const name = variantName || username || email;
 				if (name) {
-					this.view.setTitle(name, { kind: 'workspace', typeLabel: '#member_memberKindDefault' });
+					this.view.setTitle(name, { kind: 'workspace', typeLabel: '#member_memberKindDefault', icon: 'icon-user' });
 				}
 			},
 			null,

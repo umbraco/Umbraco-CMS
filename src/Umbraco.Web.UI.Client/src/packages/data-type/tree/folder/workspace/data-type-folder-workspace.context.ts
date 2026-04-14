@@ -21,6 +21,7 @@ export class UmbDataTypeFolderWorkspaceContext
 			entityType: UMB_DATA_TYPE_FOLDER_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_DATA_TYPE_FOLDER_REPOSITORY_ALIAS,
 			typeLabel: '#treeHeaders_dataTypes',
+			icon: 'icon-folder',
 		});
 
 		this.routes.setRoutes([

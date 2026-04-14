@@ -85,6 +85,7 @@ export class UmbDataTypeWorkspaceContext
 			entityType: UMB_DATA_TYPE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_DATA_TYPE_DETAIL_REPOSITORY_ALIAS,
 			typeLabel: '#treeHeaders_dataTypes',
+			icon: 'icon-autofill',
 		});
 
 		this.#observePropertyEditorSchemaAlias();

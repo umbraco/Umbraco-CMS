@@ -31,7 +31,7 @@ export class UmbRelationTypeWorkspaceContext extends UmbContextBase {
 		this.view.inherit();
 		this.observe(
 			this.name,
-			(name) => this.view.setTitle(name, { kind: 'workspace', typeLabel: '#treeHeaders_relationTypes' }),
+			(name) => this.view.setTitle(name, { kind: 'workspace', typeLabel: '#treeHeaders_relationTypes', icon: 'icon-trafic' }),
 			null,
 		);
 

@@ -22,6 +22,7 @@ export class UmbDocumentBlueprintFolderWorkspaceContext
 			entityType: UMB_DOCUMENT_BLUEPRINT_FOLDER_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_DOCUMENT_BLUEPRINT_FOLDER_REPOSITORY_ALIAS,
 			typeLabel: '#treeHeaders_contentBlueprints',
+			icon: 'icon-folder',
 		});
 
 		this.routes.setRoutes([

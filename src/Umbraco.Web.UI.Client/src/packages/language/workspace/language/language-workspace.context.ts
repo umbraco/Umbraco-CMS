@@ -25,6 +25,7 @@ export class UmbLanguageWorkspaceContext
 			entityType: UMB_LANGUAGE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_LANGUAGE_DETAIL_REPOSITORY_ALIAS,
 			typeLabel: '#treeHeaders_languages',
+			icon: 'icon-globe',
 		});
 
 		this.routes.setRoutes([
