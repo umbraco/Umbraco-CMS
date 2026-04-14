@@ -830,32 +830,6 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    public async Task<Attempt<IUser?, UserOperationStatus>> UpdateProfileAsync(Guid userKey, CurrentUserUpdateModel model)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        IUser? existingUser = await userStore.GetAsync(userKey);
-
-        if (existingUser is null)
-        {
-            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, existingUser);
-        }
-
-        IUser updated = MapCurrentUserUpdate(model, existingUser);
-        UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
-
-        if (saveStatus is not UserOperationStatus.Success)
-        {
-            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(saveStatus, existingUser);
-        }
-
-        scope.Complete();
-        return Attempt.SucceedWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Success, updated);
-    }
-
-    /// <inheritdoc/>
     public async Task<Attempt<IUser?, UserOperationStatus>> UpdateAsync(Guid performingUserKey, UserUpdateModel model)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
@@ -975,7 +949,39 @@ internal partial class UserService : RepositoryService, IUserService
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Success, updated);
+    }
 
+    /// <inheritdoc/>
+    public async Task<Attempt<IUser?, UserOperationStatus>> UpdateProfileAsync(Guid userKey, UserUpdateProfileModel model)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        IUser? existingUser = await userStore.GetAsync(userKey);
+
+        if (existingUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, existingUser);
+        }
+
+        UserOperationStatus validationStatus = ValidateUserProfileUpdateModel(model);
+        if (validationStatus is not UserOperationStatus.Success)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(validationStatus, existingUser);
+        }
+
+        IUser updated = MapUserProfileUpdate(model, existingUser);
+        UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
+
+        if (saveStatus is not UserOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(saveStatus, existingUser);
+        }
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Success, updated);
     }
 
     /// <inheritdoc/>
@@ -1056,20 +1062,6 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     /// <summary>
-    ///     Maps user update model properties to an existing user.
-    /// </summary>
-    /// <param name="source">The source update model.</param>
-    /// <param name="target">The target user to update.</param>
-    /// <returns>The updated <see cref="IUser" />.</returns>
-    private IUser MapCurrentUserUpdate(
-        CurrentUserUpdateModel source,
-        IUser target)
-    {
-        target.Language = source.LanguageIsoCode;
-        return target;
-    }
-
-    /// <summary>
     ///     Validates a user update model against an existing user.
     /// </summary>
     /// <param name="existingUser">The existing user being updated.</param>
@@ -1119,6 +1111,35 @@ internal partial class UserService : RepositoryService, IUserService
         }
 
         return UserOperationStatus.Success;
+    }
+
+    /// <summary>
+    ///     Validates a user profile update model.
+    /// </summary>
+    /// <param name="model">The profile update model to validate.</param>
+    /// <returns>The <see cref="UserOperationStatus" /> indicating validation result.</returns>
+    private UserOperationStatus ValidateUserProfileUpdateModel(UserUpdateProfileModel model)
+    {
+        if (_isoCodeValidator.IsValid(model.LanguageIsoCode) is false)
+        {
+            return UserOperationStatus.InvalidIsoCode;
+        }
+
+        return UserOperationStatus.Success;
+    }
+
+    /// <summary>
+    ///     Maps user profile update model properties to an existing user.
+    /// </summary>
+    /// <param name="source">The source update profile model.</param>
+    /// <param name="target">The target user to update.</param>
+    /// <returns>The updated <see cref="IUser" />.</returns>
+    private IUser MapUserProfileUpdate(
+        UserUpdateProfileModel source,
+        IUser target)
+    {
+        target.Language = source.LanguageIsoCode;
+        return target;
     }
 
     /// <summary>
