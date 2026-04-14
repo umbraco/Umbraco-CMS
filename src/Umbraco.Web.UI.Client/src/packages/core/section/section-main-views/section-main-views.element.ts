@@ -55,7 +55,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 
 	#updateActiveViewTitle(): void {
 		if (!this._activePath && !this._defaultView) {
-			this.#viewContext.setTitle(undefined);
+			this.#viewContext.clearSegments('dashboard');
 			return;
 		}
 		const activePath = this._activePath || this._defaultView;
@@ -63,17 +63,16 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			(manifest) => this.#constructDashboardPath(manifest) === activePath,
 		);
 		if (matchingDashboard) {
-			this.#viewContext.setTitle(this.#getDashboardName(matchingDashboard));
+			this.#viewContext.setSegments('dashboard', { label: this.#getDashboardName(matchingDashboard), kind: 'workspace' });
 			return;
 		}
 		const matchingView = this._views.find((manifest) => this.#constructViewPath(manifest) === activePath);
 		if (matchingView) {
-			this.#viewContext.setTitle(
-				matchingView.meta.label ? this.localize.string(matchingView.meta.label) : (matchingView.name ?? matchingView.alias),
-			);
+			const name = matchingView.meta.label ? this.localize.string(matchingView.meta.label) : (matchingView.name ?? matchingView.alias);
+			this.#viewContext.setSegments('dashboard', { label: name, kind: 'workspace' });
 			return;
 		}
-		this.#viewContext.setTitle(undefined);
+		this.#viewContext.clearSegments('dashboard');
 	}
 
 	#constructDashboardPath(manifest: ManifestDashboard) {

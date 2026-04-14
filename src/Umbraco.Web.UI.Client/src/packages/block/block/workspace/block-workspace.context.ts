@@ -282,7 +282,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#name.setValue(title);
 
 		if (this.#modalContext) {
-			this.view.setTitle(title);
+			if (title) {
+				this.view.setSegments('leaf', { label: title, kind: 'workspace' });
+			} else {
+				this.view.clearSegments('leaf');
+			}
 		}
 	}
 

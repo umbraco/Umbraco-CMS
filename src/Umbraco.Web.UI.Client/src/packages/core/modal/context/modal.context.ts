@@ -88,7 +88,11 @@ export class UmbModalContext<
 			title = this.alias.getDefaultModal()?.title ?? undefined;
 		}
 
-		this.view.setTitle(title, { kind: 'modal' });
+		if (title) {
+			this.view.setSegments('modal', { label: title, kind: 'modal' });
+		} else {
+			this.view.clearSegments('modal');
+		}
 
 		this.type = args.modal?.type || this.type;
 		size = args.modal?.size ?? size;

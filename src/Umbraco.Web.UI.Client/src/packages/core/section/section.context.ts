@@ -33,7 +33,11 @@ export class UmbSectionContext extends UmbContextBase implements UmbApi {
 
 		const sectionLabel = manifest ? manifest.meta?.label || manifest.name : undefined;
 		this.#manifestLabel.setValue(sectionLabel);
-		this.#viewContext.setTitle(sectionLabel, { kind: 'section' });
+		if (sectionLabel) {
+			this.#viewContext.setSegments('section', { label: sectionLabel, kind: 'section' });
+		} else {
+			this.#viewContext.clearSegments('section');
+		}
 	}
 	public get manifest(): ManifestSection | undefined {
 		return this._manifest;

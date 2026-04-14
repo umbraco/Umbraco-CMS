@@ -75,7 +75,11 @@ export class UmbPropertyTypeWorkspaceContext
 		this.observe(
 			this.name,
 			(name) => {
-				this.view.setTitle(name);
+				if (name) {
+					this.view.setSegments('leaf', { label: name, kind: 'workspace' });
+				} else {
+					this.view.clearSegments('leaf');
+				}
 			},
 			null,
 		);
