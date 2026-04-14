@@ -35,7 +35,7 @@ export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
 	preRegister(valueType: string, values: ReadonlyArray<unknown>): void {
 		const manifest = this.#getManifest(valueType);
 
-		if (!manifest?.resolver) {
+		if (!manifest?.valueResolver) {
 			// No resolver — pass through raw values
 			this.#state.append(values.map((v) => ({ key: `${valueType}:${toValueKey(v)}`, value: v })));
 		} else {
@@ -89,9 +89,9 @@ export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
 		if (resolver) return resolver;
 
 		const manifest = this.#getManifest(valueType);
-		if (!manifest?.resolver) return undefined;
+		if (!manifest?.valueResolver) return undefined;
 
-		const ResolverConstructor = await loadManifestApi(manifest.resolver);
+		const ResolverConstructor = await loadManifestApi(manifest.valueResolver);
 		if (!ResolverConstructor) return undefined;
 
 		resolver = new ResolverConstructor(this) as UmbValueSummaryResolver;

@@ -1,10 +1,9 @@
-import type { ManifestElementAndApi, ApiLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbValueSummaryElement } from './value-summary-element.interface.js';
 import type { UmbValueSummaryApi } from './value-summary-api.interface.js';
 import type { UmbValueSummaryResolver } from './value-summary-resolver.interface.js';
+import type { ManifestElementAndApi, ApiLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestValueSummary
-	extends ManifestElementAndApi<UmbValueSummaryElement, UmbValueSummaryApi> {
+export interface ManifestValueSummary extends ManifestElementAndApi<UmbValueSummaryElement, UmbValueSummaryApi> {
 	type: 'valueSummary';
 	/**
 	 * The value type this summary is registered for.
@@ -14,7 +13,7 @@ export interface ManifestValueSummary
 	 * Optional resolver for batch-resolving raw values before rendering.
 	 * Used by the coordinator for efficient batching across multiple elements.
 	 */
-	resolver?: ApiLoaderProperty<UmbValueSummaryResolver>;
+	valueResolver?: ApiLoaderProperty<UmbValueSummaryResolver>;
 	meta: MetaValueSummary;
 }
 

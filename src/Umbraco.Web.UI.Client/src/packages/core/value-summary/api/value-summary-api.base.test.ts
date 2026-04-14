@@ -80,7 +80,7 @@ describe('UmbValueSummaryDefaultApi', () => {
 			meta: {},
 		} as unknown as ManifestValueSummary;
 
-		(manifest as any).resolver = {
+		(manifest as any).valueResolver = {
 			api: class {
 				resolveValues = async (values: ReadonlyArray<unknown>) => ({ data: values.map((v) => `resolved:${v}`) });
 				destroy() {}
@@ -124,7 +124,7 @@ describe('UmbValueSummaryDefaultApi', () => {
 			meta: {},
 		} as unknown as ManifestValueSummary;
 
-		(manifest as any).resolver = {
+		(manifest as any).valueResolver = {
 			api: class {
 				resolveValues = async (values: ReadonlyArray<unknown>) => {
 					connectCalls++;

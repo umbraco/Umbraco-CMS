@@ -23,7 +23,7 @@ function makeManifest(
 	} as unknown as ManifestValueSummary;
 
 	if (resolverFn) {
-		(manifest as any).resolver = {
+		(manifest as any).valueResolver = {
 			api: class {
 				resolveValues = resolverFn;
 				destroy() {}
@@ -172,7 +172,7 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 			meta: {},
 		} as unknown as ManifestValueSummary;
 
-		(manifest as any).resolver = {
+		(manifest as any).valueResolver = {
 			api: class {
 				constructor() {
 					constructCount++;
