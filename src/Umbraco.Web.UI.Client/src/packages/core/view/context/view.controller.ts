@@ -158,7 +158,7 @@ export class UmbViewController extends UmbControllerBase {
 	}
 
 	/**
-	 * @deprecated Use {@link setSegments} instead. Will be removed in Umbraco 19.
+	 * @deprecated Use {@link setSegments} instead. Scheduled for removal in Umbraco 19.
 	 * Convenience wrapper that maps the legacy positional API to named segment slots.
 	 */
 	public setTitle(
@@ -166,30 +166,38 @@ export class UmbViewController extends UmbControllerBase {
 		options?: { kind?: UmbViewTitleKind; typeLabel?: string; icon?: string },
 	): void {
 		const { kind = 'workspace', typeLabel, icon } = options ?? {};
+		// Batch slot mutations to avoid intermediate publishes.
 		if (title) {
 			if (typeLabel) {
-				this.setSegments('workspace-type', { label: typeLabel, kind: 'workspace-type' });
+				this.#segmentSlots.set('workspace-type', [{ label: typeLabel, kind: 'workspace-type' }]);
+			} else {
+				this.#segmentSlots.delete('workspace-type');
 			}
-			this.setSegments('leaf', { label: title, kind, ...(icon ? { icon } : {}) });
+			this.#segmentSlots.set('leaf', [{ label: title, kind, ...(icon ? { icon } : {}) }]);
 		} else {
-			this.clearSegments('workspace-type');
-			this.clearSegments('leaf');
+			this.#segmentSlots.delete('workspace-type');
+			this.#segmentSlots.delete('leaf');
 		}
+		this.#computeTitle();
+		this.#updateTitle();
 	}
 
 	/**
-	 * @deprecated Use {@link setSegments} with kind `'workspace-ancestor'` instead. Will be removed in Umbraco 19.
+	 * @deprecated Use {@link setSegments} with kind `'workspace-ancestor'` instead. Scheduled for removal in Umbraco 19.
 	 * Convenience wrapper that maps ancestor labels to the `'ancestors'` segment slot.
 	 */
 	public setAncestors(ancestors: ReadonlyArray<string> | undefined): void {
 		if (!ancestors?.length) {
-			this.clearSegments('ancestors');
-			return;
+			if (!this.#segmentSlots.has('ancestors')) return;
+			this.#segmentSlots.delete('ancestors');
+		} else {
+			this.#segmentSlots.set(
+				'ancestors',
+				ancestors.map((label): UmbCurrentViewTitleSegment => ({ label, kind: 'workspace-ancestor' })),
+			);
 		}
-		this.setSegments(
-			'ancestors',
-			...ancestors.map((label): UmbCurrentViewTitleSegment => ({ label, kind: 'workspace-ancestor' })),
-		);
+		this.#computeTitle();
+		this.#updateTitle();
 	}
 
 	public provideAt(controllerHost: UmbClassInterface): void {
@@ -253,6 +261,12 @@ export class UmbViewController extends UmbControllerBase {
 
 	public inherit() {
 		this.#inherit = true;
+		// If the parent was already resolved (synchronous context lookup) before
+		// inherit() was called, #setParentView saw #inherit=false and skipped
+		// #inheritFromParent. Re-evaluate now that inheritance is enabled.
+		if (this.#parentView) {
+			this.#inheritFromParent();
+		}
 	}
 
 	public inheritFrom(context?: UmbViewController): void {

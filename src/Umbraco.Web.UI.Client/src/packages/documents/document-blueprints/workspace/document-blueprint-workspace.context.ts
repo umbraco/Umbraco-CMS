@@ -48,6 +48,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 			ignoreValidationResultOnSubmit: true,
 		});
 
+		this.view.setSegments('workspace-type', { label: '#treeHeaders_contentBlueprints', kind: 'workspace-type' });
+
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {

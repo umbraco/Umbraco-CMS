@@ -8,7 +8,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import { type Observable, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type {
@@ -76,10 +76,10 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 			this.view.setSegments('workspace-type', { label: typeLabel, kind: 'workspace-type' });
 		}
 		this.observe(
-			this.name,
-			(name) => {
+			observeMultiple([this.name, this.icon]),
+			([name, icon]) => {
 				if (name) {
-					this.view.setSegments('leaf', { label: name, kind: 'workspace' });
+					this.view.setSegments('leaf', { label: name, kind: 'workspace', ...(icon ? { icon } : {}) });
 				} else {
 					this.view.clearSegments('leaf');
 				}
