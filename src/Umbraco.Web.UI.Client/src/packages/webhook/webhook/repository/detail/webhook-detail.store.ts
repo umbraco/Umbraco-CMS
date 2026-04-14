@@ -15,7 +15,7 @@ export class UmbWebhookDetailStore extends UmbDetailStoreBase<UmbWebhookDetailMo
 	 * @memberof UmbWebhookDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_WEBHOOK_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_WEBHOOK_DETAIL_STORE_CONTEXT);
 	}
 }
 
