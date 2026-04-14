@@ -6,6 +6,9 @@ namespace Umbraco.Cms.Core.Notifications;
 /// <summary>
 ///     Notification that is published after a member has successfully logged out.
 /// </summary>
+/// <remarks>
+///     This notification is useful for audit logging and implementing custom post-sign-out behavior.
+/// </remarks>
 public class MemberLogoutSuccessNotification : MemberNotification
 {
     /// <summary>

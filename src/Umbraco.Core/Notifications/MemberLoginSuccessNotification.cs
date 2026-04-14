@@ -6,6 +6,10 @@ namespace Umbraco.Cms.Core.Notifications;
 /// <summary>
 ///     Notification that is published after a member has successfully logged in.
 /// </summary>
+/// <remarks>
+///     This notification is useful for audit logging, security monitoring, and post-authentication
+///     concerns such as associating session data with a member.
+/// </remarks>
 public class MemberLoginSuccessNotification : MemberNotification
 {
     /// <summary>

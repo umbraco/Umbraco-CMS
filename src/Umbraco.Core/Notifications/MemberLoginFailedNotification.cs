@@ -6,6 +6,11 @@ namespace Umbraco.Cms.Core.Notifications;
 /// <summary>
 ///     Notification that is published when a member login attempt fails.
 /// </summary>
+/// <remarks>
+///     This notification is useful for audit logging, security monitoring, and detecting potential
+///     brute-force attacks. The <see cref="MemberNotification.MemberKey"/> may be <c>null</c> if the
+///     member could not be found for the given credentials.
+/// </remarks>
 public class MemberLoginFailedNotification : MemberNotification
 {
     /// <summary>
