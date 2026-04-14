@@ -1,4 +1,4 @@
-import type { UmbColorPickerPropertyEditorValue } from '../value-type/types.js';
+import type { UmbColorPickerPropertyEditorValue } from '../types.js';
 import { customElement, html, nothing, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 

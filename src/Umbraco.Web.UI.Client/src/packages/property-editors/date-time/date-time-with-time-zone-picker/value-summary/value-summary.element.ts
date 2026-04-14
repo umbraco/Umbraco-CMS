@@ -1,4 +1,4 @@
-import type { UmbDateTimeWithTimeZonePropertyEditorValue } from '../value-type/types.js';
+import type { UmbDateTimeWithTimeZonePropertyEditorValue } from '../types.js';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 
