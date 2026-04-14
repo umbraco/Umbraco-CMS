@@ -127,11 +127,16 @@ export class UmbMemberWorkspaceContext
 				variantName: data?.variants?.[0]?.name,
 				username: data?.username,
 				email: data?.email,
+				memberTypeIcon: data?.memberType?.icon,
 			})),
-			({ variantName, username, email }) => {
+			({ variantName, username, email, memberTypeIcon }) => {
 				const name = variantName || username || email;
 				if (name) {
-					this.view.setTitle(name, { kind: 'workspace', typeLabel: '#member_memberKindDefault', icon: 'icon-user' });
+					this.view.setTitle(name, {
+						kind: 'workspace',
+						typeLabel: '#member_memberKindDefault',
+						icon: memberTypeIcon || 'icon-user',
+					});
 				}
 			},
 			null,

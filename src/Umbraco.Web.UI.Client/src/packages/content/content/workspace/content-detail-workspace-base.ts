@@ -352,7 +352,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				const variantName = variants.find(
 					(v) => v.culture === activeVariant?.culture && v.segment === activeVariant?.segment,
 				)?.name;
-				this.view.setTitle(variantName);
+				this._setViewTitle(variantName);
 			},
 			null,
 		);
@@ -390,6 +390,16 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.loadLanguages();
+	}
+
+	/**
+	 * Publishes the active variant name to the view title. Subclasses can override
+	 * this to include additional options such as a per-entity icon resolved from
+	 * the content type.
+	 * @param variantName The active variant's display name.
+	 */
+	protected _setViewTitle(variantName: string | undefined): void {
+		this.view.setTitle(variantName);
 	}
 
 	public async loadLanguages() {

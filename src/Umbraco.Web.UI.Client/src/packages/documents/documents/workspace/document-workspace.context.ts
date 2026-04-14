@@ -222,6 +222,11 @@ export class UmbDocumentWorkspaceContext
 		]);
 	}
 
+	protected override _setViewTitle(variantName: string | undefined): void {
+		const icon = this._data.getCurrent()?.documentType?.icon;
+		this.view.setTitle(variantName, { icon: icon || undefined });
+	}
+
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
