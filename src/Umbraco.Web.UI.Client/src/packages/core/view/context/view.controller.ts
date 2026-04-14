@@ -457,10 +457,16 @@ export class UmbViewController extends UmbControllerBase {
 
 		// 3. Collapse consecutive segments with the same label. Primary case: a tree
 		//    root sharing its hosting section's name (e.g. "Content" root under the
-		//    Content section) — dedup avoids "Content | Content".
+		//    Content section) — dedup avoids "Content | Content". When collapsing,
+		//    prefer the later segment's metadata (icon, kind) since deeper views
+		//    carry richer information than their parents.
 		const deduped: UmbCurrentViewTitleSegment[] = [];
 		for (const seg of segments) {
-			if (deduped[deduped.length - 1]?.label === seg.label) continue;
+			const prev = deduped[deduped.length - 1];
+			if (prev?.label === seg.label) {
+				deduped[deduped.length - 1] = seg;
+				continue;
+			}
 			deduped.push(seg);
 		}
 		const result = deduped.length ? deduped : undefined;
