@@ -306,6 +306,42 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             loginInfo.LoginProvider,
             user.Id);
 
+    /// <inheritdoc />
+    protected override async Task<SignInResult> HandleSignIn(MemberIdentityUser? user, string? username, SignInResult result)
+    {
+        result = await base.HandleSignIn(user, username, result);
+
+        var ipAddress = Context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+
+        if (result.Succeeded)
+        {
+            if (user is not null)
+            {
+                _eventAggregator.Publish(new MemberLoginSuccessNotification(ipAddress, user.Key));
+            }
+        }
+        else if (!result.RequiresTwoFactor && !result.IsLockedOut)
+        {
+            _eventAggregator.Publish(new MemberLoginFailedNotification(ipAddress, user?.Key));
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public override async Task SignOutAsync()
+    {
+        MemberIdentityUser? user = await UserManager.GetUserAsync(Context.User);
+        var ipAddress = Context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+
+        await base.SignOutAsync();
+
+        if (user is not null)
+        {
+            _eventAggregator.Publish(new MemberLogoutSuccessNotification(ipAddress, user.Key));
+        }
+    }
+
     protected void NotifyRequiresTwoFactor(MemberIdentityUser user) => Notify(
         user,
         currentUser => new MemberTwoFactorRequestedNotification(currentUser.Key));
