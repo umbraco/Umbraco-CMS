@@ -26,6 +26,14 @@ export type UmbCurrentViewTitleSegment = {
 	 * Consumers like the user history list may render this alongside the label.
 	 */
 	icon?: string;
+	/**
+	 * When true, this segment replaces the immediately preceding segment if it
+	 * has the same label. Use this when a workspace root shares its hosting
+	 * section's name (e.g. "Content" root under the Content section) to avoid
+	 * "Content › Content" in the breadcrumb while keeping the richer segment's
+	 * metadata (icon, kind).
+	 */
+	replaces?: boolean;
 };
 
 /**

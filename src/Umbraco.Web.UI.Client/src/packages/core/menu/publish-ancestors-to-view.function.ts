@@ -28,7 +28,14 @@ export function umbPublishAncestorsToView<T extends { unique: UmbEntityUnique }>
 	if (ancestors.length) {
 		viewContext.setSegments(
 			'ancestors',
-			...ancestors.map((label) => ({ label, kind: 'workspace-ancestor' as const })),
+			// The first ancestor is the tree root, whose label often matches the
+			// workspace-type segment (e.g. both are "Scripts"). Mark it as `replaces`
+			// so only the ancestor (with its richer position in the chain) survives.
+			...ancestors.map((label, i) => ({
+				label,
+				kind: 'workspace-ancestor' as const,
+				...(i === 0 ? { replaces: true } : {}),
+			})),
 		);
 	} else {
 		viewContext.clearSegments('ancestors');

@@ -29,6 +29,19 @@ export abstract class UmbEntityNamedDetailWorkspaceContextBase<
 		this.nameWriteGuard.fallbackToPermitted();
 		const { typeLabel, icon } = args;
 
+		if (!typeLabel) {
+			console.warn(
+				`[UmbEntityNamedDetailWorkspaceContextBase] Workspace "${args.workspaceAlias}" is missing a typeLabel. ` +
+				`Set typeLabel in the workspace args to improve the user history breadcrumb.`,
+			);
+		}
+		if (!icon) {
+			console.warn(
+				`[UmbEntityNamedDetailWorkspaceContextBase] Workspace "${args.workspaceAlias}" is missing an icon. ` +
+				`Set icon in the workspace args to show an entity-specific icon in the user history.`,
+			);
+		}
+
 		if (typeLabel) {
 			this.view.setSegments('workspace-type', { label: typeLabel, kind: 'workspace-type' });
 		}

@@ -6,6 +6,7 @@ import { UmbClassState, UmbObjectState, mergeObservables } from '@umbraco-cms/ba
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbHintController } from '@umbraco-cms/backoffice/hint';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import type { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -162,6 +163,11 @@ export class UmbViewController extends UmbControllerBase {
 		title: string | undefined,
 		options?: { kind?: UmbViewTitleKind; typeLabel?: string; icon?: string },
 	): void {
+		new UmbDeprecation({
+			deprecated: 'UmbViewController.setTitle()',
+			removeInVersion: '19.0.0',
+			solution: 'Use view.setSegments() and view.clearSegments() instead.',
+		}).warn();
 		const { kind = 'workspace', typeLabel, icon } = options ?? {};
 		// Batch slot mutations to avoid intermediate publishes.
 		if (title) {
@@ -184,6 +190,11 @@ export class UmbViewController extends UmbControllerBase {
 	 * Convenience wrapper that maps ancestor labels to the `'ancestors'` segment slot.
 	 */
 	public setAncestors(ancestors: ReadonlyArray<string> | undefined): void {
+		new UmbDeprecation({
+			deprecated: 'UmbViewController.setAncestors()',
+			removeInVersion: '19.0.0',
+			solution: 'Use view.setSegments() with kind "workspace-ancestor" instead.',
+		}).warn();
 		if (!ancestors?.length) {
 			if (!this.#segmentSlots.has('ancestors')) return;
 			this.#segmentSlots.delete('ancestors');
@@ -425,7 +436,9 @@ export class UmbViewController extends UmbControllerBase {
 	): boolean {
 		if (a === b) return true;
 		if (!a || !b || a.length !== b.length) return false;
-		return a.every((s, i) => s.label === b[i].label && s.kind === b[i].kind && s.icon === b[i].icon);
+		return a.every((s, i) =>
+			s.label === b[i].label && s.kind === b[i].kind && s.icon === b[i].icon && s.replaces === b[i].replaces,
+		);
 	}
 
 	#computeTitle() {
@@ -455,21 +468,19 @@ export class UmbViewController extends UmbControllerBase {
 		);
 		segments.push(...local);
 
-		// 3. Collapse consecutive segments with the same label. Primary case: a tree
-		//    root sharing its hosting section's name (e.g. "Content" root under the
-		//    Content section) — dedup avoids "Content | Content". When collapsing,
-		//    prefer the later segment's metadata (icon, kind) since deeper views
-		//    carry richer information than their parents.
-		const deduped: UmbCurrentViewTitleSegment[] = [];
+		// 3. Apply explicit replacements: when a segment has `replaces: true` and
+		//    the preceding segment has the same label, replace it. This is opt-in
+		//    so callers control exactly when dedup happens (no hidden metadata loss).
+		const resolved: UmbCurrentViewTitleSegment[] = [];
 		for (const seg of segments) {
-			const prev = deduped[deduped.length - 1];
-			if (prev?.label === seg.label) {
-				deduped[deduped.length - 1] = seg;
+			const prev = resolved[resolved.length - 1];
+			if (seg.replaces && prev?.label === seg.label) {
+				resolved[resolved.length - 1] = seg;
 				continue;
 			}
-			deduped.push(seg);
+			resolved.push(seg);
 		}
-		const result = deduped.length ? deduped : undefined;
+		const result = resolved.length ? resolved : undefined;
 		if (UmbViewController.#segmentsEqual(this.#computedTitleSegments.getValue(), result)) return;
 		this.#computedTitleSegments.setValue(result);
 	}

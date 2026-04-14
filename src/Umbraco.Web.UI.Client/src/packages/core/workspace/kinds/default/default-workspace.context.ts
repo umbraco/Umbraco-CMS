@@ -25,7 +25,10 @@ export class UmbDefaultWorkspaceContext extends UmbContextBase implements UmbWor
 		this.workspaceAlias = manifest.alias;
 		this.setEntityType(manifest.meta.entityType);
 		const icon = manifest.meta.icon;
-		this.view.setSegments('leaf', { label: manifest.meta.headline, kind: 'workspace', ...(icon ? { icon } : {}) });
+		// Root workspaces often share their section's label (e.g. "Content" root
+		// in the Content section). Mark as `replaces` so the breadcrumb shows
+		// only the workspace segment (with its richer icon/kind metadata).
+		this.view.setSegments('leaf', { label: manifest.meta.headline, kind: 'workspace', replaces: true, ...(icon ? { icon } : {}) });
 	}
 
 	setUnique(unique: UmbEntityUnique): void {
