@@ -301,7 +301,9 @@
     recycleBinMedia: '/umbraco/management/api/v1/recycle-bin/media',
     domains: '/domains',
     notifications: '/notifications',
-    currentUser: '/umbraco/management/api/v1/user/current'
+    currentUser: '/umbraco/management/api/v1/user/current',
+    currentUserProfile: '/umbraco/management/api/v1/user/current/profile',
+    currentUserAvatar: '/umbraco/management/api/v1/user/current/avatar',
   }
 
   public static readonly userGroupDescriptionValues = {
