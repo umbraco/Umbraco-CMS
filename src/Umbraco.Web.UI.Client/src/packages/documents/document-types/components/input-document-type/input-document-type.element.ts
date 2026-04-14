@@ -12,6 +12,7 @@ import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 import type { UmbRepositoryItemsStatus } from '@umbraco-cms/backoffice/repository';
 
 import '@umbraco-cms/backoffice/entity-item';
+import { UUIBlinkAnimationValue } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-input-document-type')
 export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
@@ -280,6 +281,55 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 		css`
 			#btn-add {
 				width: 100%;
+			}
+
+			#loader {
+				margin-top: 10px;
+				opacity: 0;
+				animation: show-loader 0s 120ms forwards;
+			}
+
+			@keyframes show-loader {
+				to {
+					opacity: 1;
+				}
+			}
+
+			uui-ref-node-document-type::after {
+				content: '';
+				position: absolute;
+				z-index: 1;
+				pointer-events: none;
+				inset: 0;
+				border: 1px solid transparent;
+				border-radius: var(--uui-border-radius);
+
+				transition: border-color 240ms ease-in;
+			}
+
+			uui-ref-node-document-type[drag-placeholder] {
+				--uui-color-focus: transparent;
+				color: transparent;
+			}
+
+			uui-ref-node-document-type[drag-placeholder]::after {
+				display: block;
+				border-width: 2px;
+				border-color: var(--uui-color-interactive-emphasis);
+				animation: ${UUIBlinkAnimationValue};
+			}
+			uui-ref-node-document-type[drag-placeholder]::before {
+				content: '';
+				position: absolute;
+				pointer-events: none;
+				inset: 0;
+				border-radius: var(--uui-border-radius);
+				background-color: var(--uui-color-interactive-emphasis);
+				opacity: 0.12;
+			}
+			uui-ref-node-document-type[drag-placeholder] > * {
+				transition: opacity 50ms 16ms;
+				opacity: 0;
 			}
 		`,
 	];
