@@ -77,14 +77,12 @@ public class ElementSwitchValidator : IElementSwitchValidator
 
     /// <inheritdoc />
     public Task<bool> DocumentToElementHasNoContentAsync(IContentTypeBase contentType) =>
-
-        // if any content for the content type exists, the validation fails.
-        Task.FromResult(_contentTypeService.HasContentNodes(contentType.Id) is false);
+        HasNoContentNodesAsync(contentType);
 
     /// <inheritdoc />
     public Task<bool> ElementToDocumentHasNoContentAsync(IContentTypeBase contentType) =>
+        HasNoContentNodesAsync(contentType);
 
-        // element instances are also persisted as nodes in the content table (via the FK from umbracoElement),
-        // so HasContentNodes detects element instances when the content type is currently an element.
+    private Task<bool> HasNoContentNodesAsync(IContentTypeBase contentType) =>
         Task.FromResult(_contentTypeService.HasContentNodes(contentType.Id) is false);
 }

@@ -299,7 +299,7 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
     {
         var typeBuilder = new ContentTypeBuilder()
             .WithIsElement(isElement)
-            .WithAllowedInLibrary(true);
+            .WithAllowedInLibrary(isElement);
         var contentType = typeBuilder.Build();
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         return contentType;
