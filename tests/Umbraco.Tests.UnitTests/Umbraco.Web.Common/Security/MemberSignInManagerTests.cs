@@ -72,7 +72,8 @@ public class MemberSignInManagerTests
             Mock.Of<IMemberExternalLoginProviders>(),
             Mock.Of<IEventAggregator>(),
             Mock.Of<IOptions<SecuritySettings>>(x => x.Value == new SecuritySettings()),
-            new DictionaryAppCache());
+            new DictionaryAppCache(),
+            Mock.Of<IIpResolver>());
     }
 
     private static Mock<MemberManager> MockMemberManager()
