@@ -2075,10 +2075,6 @@ export class UiBaseLocators extends BasePage {
     await this.click(this.changePhotoBtn);
   }
 
-  async clickRemoveButtonForUserGroupWithName(userGroupName: string) {
-    await this.click(this.page.locator('umb-user-group-ref', {hasText: userGroupName}).locator('[label="Remove"]'));
-  }
-
   async clickRemovePhotoButton() {
     await this.click(this.removePhotoBtn);
   }
