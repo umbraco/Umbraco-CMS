@@ -76,7 +76,7 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 			this.column.labelTemplate,
 			() => html`<umb-ufm-render inline .markdown=${this.column.labelTemplate} .value=${{ value }}></umb-ufm-render>`,
 			() =>
-				editorAlias ? html`<umb-value-summary .valueType=${editorAlias} .value=${value}></umb-value-summary>` : value,
+				editorAlias ? html`<umb-value-summary-extension .valueType=${editorAlias} .value=${value}></umb-value-summary-extension>` : value,
 		);
 	}
 }

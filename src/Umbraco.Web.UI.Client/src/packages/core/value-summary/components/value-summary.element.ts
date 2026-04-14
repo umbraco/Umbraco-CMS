@@ -2,7 +2,7 @@ import type { ManifestValueSummary } from '../extensions/value-summary.extension
 import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-@customElement('umb-value-summary')
+@customElement('umb-value-summary-extension')
 export class UmbValueSummaryExtensionElement extends UmbLitElement {
 	@property({ attribute: false })
 	set valueType(value: string | undefined) {
@@ -36,6 +36,6 @@ export { UmbValueSummaryExtensionElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-value-summary': UmbValueSummaryExtensionElement;
+		'umb-value-summary-extension': UmbValueSummaryExtensionElement;
 	}
 }

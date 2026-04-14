@@ -109,9 +109,9 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 				if (col.valueType) {
 					return {
 						columnAlias: col.field,
-						value: html`<umb-value-summary
+						value: html`<umb-value-summary-extension
 							.valueType=${col.valueType}
-							.value=${rawValue}></umb-value-summary>`,
+							.value=${rawValue}></umb-value-summary-extension>`,
 					};
 				}
 				return {
