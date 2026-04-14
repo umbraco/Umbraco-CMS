@@ -107,7 +107,9 @@ test.describe('Recent History', () => {
     // Open profile modal
     await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
 
-    // Assert — each entry's text contains the correct breadcrumb depth
+    // Assert — wait for entries to render, then check breadcrumb depth
+    await umbracoUi.currentUserProfile.isHistoryEntryVisible(childName);
+
     const rootText = await umbracoUi.currentUserProfile.getHistoryEntryText(rootName);
     expect(rootText).toContain('Content');
 
