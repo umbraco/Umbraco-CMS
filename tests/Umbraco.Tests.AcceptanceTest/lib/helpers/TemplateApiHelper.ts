@@ -440,8 +440,6 @@ export class TemplateApiHelper {
     '\n    </div>' +
     '\n}\n';
 
-  // Covers login AND logout flows — the login-status partial renders the logout button once
-  // the member is authenticated.
   async createMemberLoginTemplate(name: string) {
     return await this.createTemplateWithContent(
       name,
@@ -456,7 +454,6 @@ export class TemplateApiHelper {
     );
   }
 
-  // Bundles the login form so the test can authenticate before exercising the profile form
   async createMemberProfileTemplate(name: string) {
     return await this.createTemplateWithContent(
       name,

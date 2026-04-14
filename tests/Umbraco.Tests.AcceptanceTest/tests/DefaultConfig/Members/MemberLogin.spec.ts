@@ -53,7 +53,6 @@ test('member cannot log in with invalid password', async ({umbracoApi, umbracoUi
   const url = await umbracoApi.document.getDocumentUrl(documentId);
   await umbracoUi.contentRender.navigateToRenderedContentPage(url);
 
-
   // Act
   await umbracoUi.memberAuthentication.fillLoginForm(username, 'wrongPassword!1');
   await umbracoUi.memberAuthentication.submitLoginForm();
