@@ -238,7 +238,7 @@ export class DocumentApiHelper {
     const documentTypeId = await this.api.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId, true);
     const documentId = await this.createDocumentWithTemplate(documentName, documentTypeId, templateId);
     await this.publish(documentId);
-    return await this.getDocumentUrl(documentId);
+    return documentId;
   }
 
   async createDocumentWithContentPicker(documentName: string, documentTypeId: string, contentPickerId: string) {

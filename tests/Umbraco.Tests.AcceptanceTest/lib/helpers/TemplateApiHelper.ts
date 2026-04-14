@@ -313,13 +313,6 @@ export class TemplateApiHelper {
     return await this.create(name, alias, templateContent);
   }
 
-  // Member authentication templates. Mirror the field names and controller routing of the
-  // embedded snippets at src/Umbraco.Core/EmbeddedResources/Snippets/{Login,RegisterMember,
-  // EditProfile,LoginStatus}.cshtml so submissions hit the real surface controllers.
-  // The 2FA / external-provider blocks are intentionally omitted.
-
-  // Shared header + auth-state markers. data-mark is the project-wide test-id attribute
-  // (see playwright.config.ts testIdAttribute), read by MemberAuthenticationUiHelper.
   private readonly memberAuthTemplateHeader =
     '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n' +
     '@using Umbraco.Cms.Web.Common.Models\n' +
@@ -337,151 +330,142 @@ export class TemplateApiHelper {
     '<span data-mark="member-auth-state">@(isMemberAuthenticated ? "authenticated" : "anonymous")</span>\n' +
     '<span data-mark="member-auth-name">@memberIdentity?.Name</span>\n';
 
-  private readonly memberAuthTemplateFooter = '</body></html>\n';
+  private readonly memberLoginFormBody =
+    '\n@{ var loginModel = new LoginModel(); loginModel.RedirectUrl = null; }' +
+    '\n<div class="login-form">' +
+    '\n@using (Html.BeginUmbracoForm<UmbLoginController>("HandleLogin", new { RedirectUrl = loginModel.RedirectUrl }))' +
+    '\n{' +
+    '\n    <h4>Log in with a local account.</h4>' +
+    '\n    <div asp-validation-summary="All" class="text-danger"></div>' +
+    '\n    <div class="mb-3">' +
+    '\n        <label asp-for="@loginModel.Username" class="form-label"></label>' +
+    '\n        <input asp-for="@loginModel.Username" class="form-control" />' +
+    '\n    </div>' +
+    '\n    <div class="mb-3">' +
+    '\n        <label asp-for="@loginModel.Password" class="form-label"></label>' +
+    '\n        <input asp-for="@loginModel.Password" class="form-control" />' +
+    '\n    </div>' +
+    '\n    <div class="mb-3 form-check">' +
+    '\n        <input asp-for="@loginModel.RememberMe" class="form-check-input" />' +
+    '\n        <label asp-for="@loginModel.RememberMe" class="form-check-label">Remember me</label>' +
+    '\n    </div>' +
+    '\n    <button type="submit" class="btn btn-primary">Log in</button>' +
+    '\n}' +
+    '\n</div>\n';
 
-  private readonly memberLoginFormBody = `
-@{ var loginModel = new LoginModel(); loginModel.RedirectUrl = null; }
-<div class="login-form">
-@using (Html.BeginUmbracoForm<UmbLoginController>("HandleLogin", new { RedirectUrl = loginModel.RedirectUrl }))
-{
-    <h4>Log in with a local account.</h4>
-    <div asp-validation-summary="All" class="text-danger"></div>
-    <div class="mb-3">
-        <label asp-for="@loginModel.Username" class="form-label"></label>
-        <input asp-for="@loginModel.Username" class="form-control" />
-    </div>
-    <div class="mb-3">
-        <label asp-for="@loginModel.Password" class="form-label"></label>
-        <input asp-for="@loginModel.Password" class="form-control" />
-    </div>
-    <div class="mb-3 form-check">
-        <input asp-for="@loginModel.RememberMe" class="form-check-input" />
-        <label asp-for="@loginModel.RememberMe" class="form-check-label">Remember me</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Log in</button>
-}
-</div>
-`;
+  private readonly memberRegisterFormBody =
+    '\n@{' +
+    '\n    var registerModel = memberModelBuilderFactory' +
+    '\n        .CreateRegisterModel()' +
+    '\n        .WithMemberTypeAlias("Member")' +
+    '\n        .WithRedirectUrl(null)' +
+    '\n        .WithCustomProperties(false)' +
+    '\n        .WithAutomaticLogIn(true)' +
+    '\n        .Build();' +
+    '\n    var success = TempData["FormSuccess"] != null;' +
+    '\n}' +
+    '\n@if (success)' +
+    '\n{' +
+    '\n    <p class="text-success">Registration succeeded.</p>' +
+    '\n}' +
+    '\nelse' +
+    '\n{' +
+    '\n    using (Html.BeginUmbracoForm<UmbRegisterController>("HandleRegisterMember",' +
+    '\n        new { MemberTypeAlias = registerModel.MemberTypeAlias, UsernameIsEmail = registerModel.UsernameIsEmail, RedirectUrl = registerModel.RedirectUrl, AutomaticLogIn = registerModel.AutomaticLogIn }))' +
+    '\n    {' +
+    '\n        <h2>Create a new account.</h2>' +
+    '\n        <div asp-validation-summary="All" class="text-danger"></div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@registerModel.Name" class="form-label"></label>' +
+    '\n            <input asp-for="@registerModel.Name" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@registerModel.Email" class="form-label"></label>' +
+    '\n            <input asp-for="@registerModel.Email" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@registerModel.Password" class="form-label"></label>' +
+    '\n            <input asp-for="@registerModel.Password" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@registerModel.ConfirmPassword" class="form-label"></label>' +
+    '\n            <input asp-for="@registerModel.ConfirmPassword" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <button type="submit" class="btn btn-primary">Register</button>' +
+    '\n    }' +
+    '\n}\n';
 
-  private readonly memberRegisterFormBody = `
-@{
-    var registerModel = memberModelBuilderFactory
-        .CreateRegisterModel()
-        .WithMemberTypeAlias("Member")
-        .WithRedirectUrl(null)
-        .WithCustomProperties(false)
-        .WithAutomaticLogIn(true)
-        .Build();
-    var success = TempData["FormSuccess"] != null;
-}
-@if (success)
-{
-    <p class="text-success">Registration succeeded.</p>
-}
-else
-{
-    using (Html.BeginUmbracoForm<UmbRegisterController>("HandleRegisterMember",
-        new { MemberTypeAlias = registerModel.MemberTypeAlias, UsernameIsEmail = registerModel.UsernameIsEmail, RedirectUrl = registerModel.RedirectUrl, AutomaticLogIn = registerModel.AutomaticLogIn }))
-    {
-        <h2>Create a new account.</h2>
-        <div asp-validation-summary="All" class="text-danger"></div>
-        <div class="mb-3">
-            <label asp-for="@registerModel.Name" class="form-label"></label>
-            <input asp-for="@registerModel.Name" class="form-control" />
-        </div>
-        <div class="mb-3">
-            <label asp-for="@registerModel.Email" class="form-label"></label>
-            <input asp-for="@registerModel.Email" class="form-control" />
-        </div>
-        <div class="mb-3">
-            <label asp-for="@registerModel.Password" class="form-label"></label>
-            <input asp-for="@registerModel.Password" class="form-control" />
-        </div>
-        <div class="mb-3">
-            <label asp-for="@registerModel.ConfirmPassword" class="form-label"></label>
-            <input asp-for="@registerModel.ConfirmPassword" class="form-control" />
-        </div>
-        <button type="submit" class="btn btn-primary">Register</button>
-    }
-}
-`;
+  private readonly memberProfileFormBody =
+    '\n@{' +
+    '\n    var profileModel = await memberModelBuilderFactory' +
+    '\n        .CreateProfileModel()' +
+    '\n        .WithRedirectUrl(null)' +
+    '\n        .WithCustomProperties(false)' +
+    '\n        .BuildForCurrentMemberAsync();' +
+    '\n    var success = TempData["FormSuccess"] != null;' +
+    '\n}' +
+    '\n@if (profileModel != null)' +
+    '\n{' +
+    '\n    if (success)' +
+    '\n    {' +
+    '\n        <p class="text-success">Profile updated</p>' +
+    '\n    }' +
+    '\n    using (Html.BeginUmbracoForm<UmbProfileController>("HandleUpdateProfile", new { RedirectUrl = profileModel.RedirectUrl }))' +
+    '\n    {' +
+    '\n        <h2>Update your account.</h2>' +
+    '\n        <div asp-validation-summary="All" class="text-danger"></div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@profileModel.Name" class="form-label"></label>' +
+    '\n            <input asp-for="@profileModel.Name" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <div class="mb-3">' +
+    '\n            <label asp-for="@profileModel.Email" class="form-label"></label>' +
+    '\n            <input asp-for="@profileModel.Email" class="form-control" />' +
+    '\n        </div>' +
+    '\n        <input asp-for="@profileModel.UserName" type="hidden" />' +
+    '\n        <button type="submit" class="btn btn-primary">Update</button>' +
+    '\n    }' +
+    '\n}\n';
 
-  private readonly memberProfileFormBody = `
-@{
-    var profileModel = await memberModelBuilderFactory
-        .CreateProfileModel()
-        .WithRedirectUrl(null)
-        .WithCustomProperties(false)
-        .BuildForCurrentMemberAsync();
-    var success = TempData["FormSuccess"] != null;
-}
-@if (profileModel != null)
-{
-    if (success)
-    {
-        <p class="text-success">Profile updated</p>
-    }
-    using (Html.BeginUmbracoForm<UmbProfileController>("HandleUpdateProfile", new { RedirectUrl = profileModel.RedirectUrl }))
-    {
-        <h2>Update your account.</h2>
-        <div asp-validation-summary="All" class="text-danger"></div>
-        <div class="mb-3">
-            <label asp-for="@profileModel.Name" class="form-label"></label>
-            <input asp-for="@profileModel.Name" class="form-control" />
-        </div>
-        <div class="mb-3">
-            <label asp-for="@profileModel.Email" class="form-label"></label>
-            <input asp-for="@profileModel.Email" class="form-control" />
-        </div>
-        @* UserName is [ReadOnly] but the non-nullable reference type triggers auto-Required
-           validation. Round-trip it as hidden so the form posts a non-empty value. *@
-        <input asp-for="@profileModel.UserName" type="hidden" />
-        <button type="submit" class="btn btn-primary">Update</button>
-    }
-}
-`;
-
-  private readonly memberLoginStatusBody = `
-@{ var logoutModel = new PostRedirectModel(); logoutModel.RedirectUrl = null; }
-@if (isMemberAuthenticated)
-{
-    <div class="login-status">
-        <p>Welcome back <strong>@memberIdentity?.Name</strong>!</p>
-        @using (Html.BeginUmbracoForm<UmbLoginStatusController>("HandleLogout", new { RedirectUrl = logoutModel.RedirectUrl }))
-        {
-            <button type="submit" class="btn btn-primary">Log out</button>
-        }
-    </div>
-}
-`;
+  private readonly memberLoginStatusBody =
+    '\n@{ var logoutModel = new PostRedirectModel(); logoutModel.RedirectUrl = null; }' +
+    '\n@if (isMemberAuthenticated)' +
+    '\n{' +
+    '\n    <div class="login-status">' +
+    '\n        <p>Welcome back <strong>@memberIdentity?.Name</strong>!</p>' +
+    '\n        @using (Html.BeginUmbracoForm<UmbLoginStatusController>("HandleLogout", new { RedirectUrl = logoutModel.RedirectUrl }))' +
+    '\n        {' +
+    '\n            <button type="submit" class="btn btn-primary">Log out</button>' +
+    '\n        }' +
+    '\n    </div>' +
+    '\n}\n';
 
   // Covers login AND logout flows — the login-status partial renders the logout button once
   // the member is authenticated.
   async createMemberLoginTemplate(name: string) {
     return await this.createTemplateWithContent(
       name,
-      this.memberAuthTemplateHeader + this.memberLoginFormBody + this.memberLoginStatusBody + this.memberAuthTemplateFooter,
+      this.memberAuthTemplateHeader + this.memberLoginFormBody + this.memberLoginStatusBody + '</body></html>\n',
     );
   }
 
   async createMemberRegistrationTemplate(name: string) {
     return await this.createTemplateWithContent(
       name,
-      this.memberAuthTemplateHeader + this.memberRegisterFormBody + this.memberLoginStatusBody + this.memberAuthTemplateFooter,
+      this.memberAuthTemplateHeader + this.memberRegisterFormBody + this.memberLoginStatusBody + '</body></html>\n',
     );
   }
 
   // Bundles the login form so the test can authenticate before exercising the profile form
-  // (which renders only for an authenticated member).
   async createMemberProfileTemplate(name: string) {
     return await this.createTemplateWithContent(
       name,
-      this.memberAuthTemplateHeader + this.memberLoginFormBody + this.memberProfileFormBody + this.memberLoginStatusBody + this.memberAuthTemplateFooter,
+      this.memberAuthTemplateHeader + this.memberLoginFormBody + this.memberProfileFormBody + this.memberLoginStatusBody + '</body></html>\n',
     );
   }
 
   async createTemplateWithEntityDataPickerValue(templateName: string, propertyName: string) {
-    const templateContent = 
+    const templateContent =
       '@using Umbraco.Cms.Core.Models;\n' +
       '@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage;\n' +
       '@{\n' +
