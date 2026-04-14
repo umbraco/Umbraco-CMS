@@ -124,6 +124,17 @@ export class UmbDocumentBlueprintWorkspaceContext
 		return this.getData()?.documentType.unique;
 	}
 
+	// The blueprint detail response doesn't include documentType.icon, so the
+	// base class's generic _setViewTitle finds no icon. Use icon-blueprint as a
+	// static fallback matching the tree item representation.
+	protected override _setViewTitle(variantName: string | undefined): void {
+		if (variantName) {
+			this.view.setSegments('leaf', { label: variantName, kind: 'workspace', icon: 'icon-blueprint' });
+		} else {
+			this.view.clearSegments('leaf');
+		}
+	}
+
 	/**
 	 * Override mandatory validation to filter out variants without a name before validating.
 	 * Blueprints allow partial variant data and users may only provide a name for some cultures.
