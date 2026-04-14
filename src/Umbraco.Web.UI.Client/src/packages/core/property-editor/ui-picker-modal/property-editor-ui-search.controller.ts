@@ -15,6 +15,7 @@ interface SearchableUI {
 	labelTokens: Array<string>;
 	nameLower: string;
 	aliasLower: string;
+	keywordsLower: Array<string>;
 	groupLower: string;
 	allTokens: Array<string>;
 }
@@ -100,17 +101,22 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 		const labelTokens = fuzzyTokenize(labelLower);
 		const nameLower = ui.name.toLowerCase();
 		const aliasLower = ui.alias.toLowerCase();
+		const keywordsLower = ui.meta.keywords?.map((k) => k.toLowerCase()) ?? [];
 		const groupLower = (ui.meta.group || '').toLowerCase();
 
 		const allTokens = [...labelTokens, ...fuzzyTokenize(nameLower), ...fuzzyTokenize(aliasLower)];
+		for (const keyword of keywordsLower) {
+			allTokens.push(...fuzzyTokenize(keyword));
+		}
 
-		cached = { labelLower, labelTokens, nameLower, aliasLower, groupLower, allTokens };
+		cached = { labelLower, labelTokens, nameLower, aliasLower, keywordsLower, groupLower, allTokens };
 		this.#searchable.set(ui, cached);
 		return cached;
 	}
 
 	#scoreUI(ui: ManifestPropertyEditorUi, query: string, queryTokens: Array<string>): number {
-		const { labelLower, labelTokens, nameLower, aliasLower, groupLower, allTokens } = this.#getSearchable(ui);
+		const { labelLower, labelTokens, nameLower, aliasLower, keywordsLower, groupLower, allTokens } =
+			this.#getSearchable(ui);
 
 		// Label substring match
 		if (labelLower.includes(query)) {
@@ -127,7 +133,17 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 			return 250;
 		}
 
-		// All query tokens match against label/name/alias tokens
+		// Keyword exact match
+		if (keywordsLower.some((k) => k === query)) {
+			return 240;
+		}
+
+		// Keyword substring match
+		if (keywordsLower.some((k) => k.includes(query))) {
+			return 220;
+		}
+
+		// All query tokens match against label/name/alias/keyword tokens
 		const allTokensMatch = queryTokens.every((qt) => allTokens.some((st) => st.includes(qt)));
 		if (allTokensMatch) {
 			return 200;

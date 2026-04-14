@@ -20,6 +20,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.TextBox',
 			icon: 'icon-autofill',
 			group: 'common',
+			keywords: ['string'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [inputTypeConfig],

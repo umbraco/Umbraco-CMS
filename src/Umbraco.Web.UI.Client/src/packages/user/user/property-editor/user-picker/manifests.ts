@@ -11,6 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.UserPicker',
 			icon: 'icon-user',
 			group: 'people',
+			keywords: ['select'],
 		},
 	},
 	userPickerSchemaManifest,
