@@ -163,6 +163,27 @@ test.describe('Recent History', () => {
     expect(page.url()).toContain('/workspace/document/edit/');
   });
 
+  test('document entry retains its label after navigating to another section', async ({umbracoUi}) => {
+    // Arrange — visit a document
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.clickCaretButtonForContentName(rootName);
+    await umbracoUi.content.goToContentWithName(rootName);
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+
+    // Act — navigate to a different section
+    await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+
+    // Open profile modal
+    await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
+
+    // Assert — the document entry still has its name, not just "Content"
+    await umbracoUi.currentUserProfile.isHistoryEntryVisible(rootName);
+    const text = await umbracoUi.currentUserProfile.getHistoryEntryText(rootName);
+    expect(text).toContain('Content');
+  });
+
   test('revisiting a document does not create duplicate history entries', async ({umbracoUi}) => {
     // Arrange
     await umbracoUi.goToBackOffice();
