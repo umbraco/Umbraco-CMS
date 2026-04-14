@@ -1,7 +1,15 @@
 import type { UmbValueSummaryElement } from './value-summary-element.interface.js';
 import type { UmbValueSummaryApi } from './value-summary-api.interface.js';
 import type { UmbValueSummaryResolver } from './value-summary-resolver.interface.js';
-import type { ManifestElementAndApi, ApiLoaderProperty } from '@umbraco-cms/backoffice/extension-api';
+import type { ClassConstructor, ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
+
+type UmbValueSummaryResolverModule =
+	| { valueResolver: ClassConstructor<UmbValueSummaryResolver> }
+	| { default: ClassConstructor<UmbValueSummaryResolver> };
+
+export type UmbValueSummaryResolverLoaderProperty =
+	| (() => Promise<UmbValueSummaryResolverModule>)
+	| ClassConstructor<UmbValueSummaryResolver>;
 
 export interface ManifestValueSummary extends ManifestElementAndApi<UmbValueSummaryElement, UmbValueSummaryApi> {
 	type: 'valueSummary';
@@ -13,7 +21,7 @@ export interface ManifestValueSummary extends ManifestElementAndApi<UmbValueSumm
 	 * Optional resolver for batch-resolving raw values before rendering.
 	 * Used by the coordinator for efficient batching across multiple elements.
 	 */
-	valueResolver?: ApiLoaderProperty<UmbValueSummaryResolver>;
+	valueResolver?: UmbValueSummaryResolverLoaderProperty;
 	meta: MetaValueSummary;
 }
 

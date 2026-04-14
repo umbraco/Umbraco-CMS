@@ -5,7 +5,7 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
+import { loadValueSummaryResolver } from '../extensions/load-value-summary-resolver.function.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -91,7 +91,7 @@ export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
 		const manifest = this.#getManifest(valueType);
 		if (!manifest?.valueResolver) return undefined;
 
-		const ResolverConstructor = await loadManifestApi(manifest.valueResolver);
+		const ResolverConstructor = await loadValueSummaryResolver(manifest.valueResolver);
 		if (!ResolverConstructor) return undefined;
 
 		resolver = new ResolverConstructor(this) as UmbValueSummaryResolver;
