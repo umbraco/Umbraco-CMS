@@ -15,7 +15,9 @@ export interface UmbEntityDetailWorkspaceContextArgs {
 	/**
 	 * Optional icon to attach to this entity's leaf title segment (e.g. `icon-document-js`).
 	 * Surfaced by consumers like the user history list. For workspaces whose icon varies
-	 * per-entity (e.g. document type), set the icon directly via `view.setTitle(...)` instead.
+	 * per-entity (e.g. document type), update the `leaf` segment directly via
+	 * `view.setSegments(...)` / `view.clearSegments(...)` instead. `view.setTitle(...)`
+	 * remains legacy compatibility, but is not the recommended API for this.
 	 */
 	icon?: string;
 }
