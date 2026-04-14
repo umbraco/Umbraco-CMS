@@ -47,35 +47,36 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 		const item = this.value.item;
 		switch (alias) {
 			case 'contentTypeAlias':
-				return item.documentType.alias;
+				return { value: item.documentType.alias };
 			case 'createDate':
-				return this._createDate?.toLocaleString();
+				return { value: this._createDate?.toLocaleString() };
 			case 'creator':
 			case 'owner':
-				return item.creator;
+				return { value: item.creator };
 			case 'published':
-				return this._state !== DocumentVariantStateModel.DRAFT ? 'True' : 'False';
+				return { value: this._state !== DocumentVariantStateModel.DRAFT ? 'True' : 'False' };
 			case 'sortOrder':
-				return item.sortOrder;
+				return { value: item.sortOrder };
 			case 'updateDate':
-				return this._updateDate?.toLocaleString();
+				return { value: this._updateDate?.toLocaleString() };
 			case 'updater':
-				return item.updater;
+				return { value: item.updater };
 			default: {
 				const culture = this.#resolver.getCulture();
 				const prop = item.values.find((x) => x.alias === alias && (!x.culture || x.culture === culture));
-				return prop?.value ?? '';
+				return { value: prop?.value ?? '', editorAlias: prop?.editorAlias };
 			}
 		}
 	}
 
 	override render() {
 		if (!this.value) return nothing;
-		const value = this.#getPropertyValueByAlias();
+		const { value, editorAlias } = this.#getPropertyValueByAlias();
 		return when(
 			this.column.labelTemplate,
 			() => html`<umb-ufm-render inline .markdown=${this.column.labelTemplate} .value=${{ value }}></umb-ufm-render>`,
-			() => html`${value}`,
+			() =>
+				editorAlias ? html`<umb-value-summary .valueType=${editorAlias} .value=${value}></umb-value-summary>` : value,
 		);
 	}
 }
