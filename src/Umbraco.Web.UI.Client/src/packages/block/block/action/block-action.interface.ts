@@ -14,4 +14,12 @@ export interface UmbBlockAction<ArgsMetaType> extends UmbAction<UmbBlockActionAr
 	 * @returns {Promise<void>}
 	 */
 	execute(): Promise<void>;
+
+	/**
+	 * Optional validation data path for displaying an invalid badge on the action button.
+	 * When provided, the default kind element creates a validation state controller
+	 * and renders a badge when validation messages exist at the given path.
+	 * @returns {Promise<string | undefined>}
+	 */
+	getValidationDataPath(): Promise<string | undefined>;
 }

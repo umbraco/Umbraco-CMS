@@ -381,7 +381,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	#renderActionBar() {
 		return html`
 			<umb-block-action-list block-editor=${UMB_BLOCK_SINGLE}>
-				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()}
+				${this.#renderEditContentAction()}
 			</umb-block-action-list>
 		`;
 	}
@@ -407,24 +407,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 						><uui-icon name="icon-add"></uui-icon
 					></uui-button>`
 				: nothing;
-	}
-
-	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			${this._hasSettings && this._workspaceEditSettingsPath
-				? html`<uui-button
-						label="Edit settings"
-						look="secondary"
-						color=${this._settingsInvalid ? 'invalid' : ''}
-						href=${this._workspaceEditSettingsPath}>
-						<uui-icon name="icon-settings"></uui-icon>
-						${this._settingsInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
-							: nothing}
-					</uui-button>`
-				: nothing}
-		`;
 	}
 
 	override render() {

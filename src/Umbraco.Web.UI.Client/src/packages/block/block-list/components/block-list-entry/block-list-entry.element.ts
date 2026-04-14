@@ -83,9 +83,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	private _workspaceEditContentPath?: string;
 
 	@state()
-	private _workspaceEditSettingsPath?: string;
-
-	@state()
 	private _inlineEditingMode?: boolean;
 
 	@state()
@@ -220,7 +217,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.workspaceEditSettingsPath,
 			(path) => {
-				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editSettingsPath: path } });
 			},
 			null,
@@ -394,7 +390,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		if (this._isSortMode) return nothing;
 		return html`
 			<umb-block-action-list block-editor=${UMB_BLOCK_LIST}>
-				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()}
+				${this.#renderEditContentAction()}
 			</umb-block-action-list>
 		`;
 	}
@@ -421,25 +417,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 						><uui-icon name="icon-add"></uui-icon
 					></uui-button>`
 				: nothing;
-	}
-
-	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			${this._hasSettings && this._workspaceEditSettingsPath
-				? html`<uui-button
-						label="Edit settings"
-						look="secondary"
-						color=${this._settingsInvalid ? 'invalid' : ''}
-						href=${this._workspaceEditSettingsPath}
-						title=${this.localize.term('general_settings')}>
-						<uui-icon name="icon-settings"></uui-icon>
-						${this._settingsInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
-							: nothing}
-					</uui-button>`
-				: nothing}
-		`;
 	}
 
 	override render() {

@@ -572,7 +572,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		if (this._isSortMode) return nothing;
 		return html`
 			<umb-block-action-list block-editor=${UMB_BLOCK_GRID}>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()}
+				${this.#renderEditAction()}
 			</umb-block-action-list>
 		`;
 	}
@@ -608,28 +608,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 					</uui-button>
 				`,
 			)}
-		`;
-	}
-
-	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			${this._hasSettings && this._workspaceEditSettingsPath
-				? html`
-						<uui-button
-							label="Edit settings"
-							look="secondary"
-							color=${this._settingsInvalid ? 'invalid' : ''}
-							href=${this._workspaceEditSettingsPath}
-							title=${this.localize.term('general_settings')}>
-							<uui-icon name="icon-settings"></uui-icon>
-							${when(
-								this._settingsInvalid,
-								() => html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`,
-							)}
-						</uui-button>
-					`
-				: nothing}
 		`;
 	}
 

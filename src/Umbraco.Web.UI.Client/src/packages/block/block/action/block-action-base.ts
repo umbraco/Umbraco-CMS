@@ -13,4 +13,8 @@ export abstract class UmbBlockActionBase<ArgsMetaType>
 	public execute(): Promise<void> {
 		return Promise.resolve();
 	}
+
+	public getValidationDataPath(): Promise<string | undefined> {
+		return Promise.resolve(undefined);
+	}
 }

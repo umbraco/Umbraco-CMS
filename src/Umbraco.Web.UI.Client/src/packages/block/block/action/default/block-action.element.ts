@@ -5,6 +5,7 @@ import type { MetaBlockActionDefaultKind } from './types.js';
 import { customElement, html, ifDefined, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 
 @customElement('umb-block-action')
 export class UmbBlockActionDefaultElement<
@@ -21,18 +22,34 @@ export class UmbBlockActionDefaultElement<
 
 	public set api(api: ApiType | undefined) {
 		this.#api = api;
+
 		this.#api?.getHref?.().then((href) => {
 			this._href = href;
+		});
+
+		this.#api?.getValidationDataPath?.().then((path) => {
+			this.removeUmbControllerByAlias('observeValidation');
+			if (path) {
+				new UmbObserveValidationStateController(
+					this,
+					path,
+					(hasMessages) => (this._invalid = hasMessages),
+					'observeValidation',
+				);
+			}
 		});
 	}
 
 	@state()
 	private _href?: string;
 
-	async #onClick(event: PointerEvent) {
-		event.stopPropagation();
+	@state()
+	private _invalid = false;
 
+	async #onClick(event: PointerEvent) {
 		if (this._href) return;
+
+		event.stopPropagation();
 
 		try {
 			await this.#api?.execute();
@@ -51,10 +68,12 @@ export class UmbBlockActionDefaultElement<
 				data-mark="block-action:${this.manifest.alias}"
 				href=${ifDefined(this._href)}
 				look="secondary"
+				color=${this._invalid ? 'invalid' : ''}
 				label=${label}
 				title=${label}
 				@click=${this.#onClick}>
 				${when(this.manifest.meta.icon, (icon) => html`<uui-icon name=${icon}></uui-icon>`)}
+				${when(this._invalid, () => html`<uui-badge attention color="invalid" label="Invalid">!</uui-badge>`)}
 			</uui-button>
 		`;
 	}

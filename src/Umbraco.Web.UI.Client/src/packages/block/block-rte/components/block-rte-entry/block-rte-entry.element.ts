@@ -292,7 +292,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	#renderActionBar() {
 		return html`
 			<umb-block-action-list block-editor=${UMB_BLOCK_RTE}>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()}
+				${this.#renderEditAction()}
 			</umb-block-action-list>
 		`;
 	}
@@ -337,24 +337,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 						<uui-icon name="icon-add"></uui-icon>
 					</uui-button>`
 				: nothing;
-	}
-
-	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			${this._hasSettings && this._workspaceEditSettingsPath
-				? html`<uui-button
-						label="Edit settings"
-						look="secondary"
-						color=${this._settingsInvalid ? 'invalid' : ''}
-						href=${this._workspaceEditSettingsPath}>
-						<uui-icon name="icon-settings"></uui-icon>
-						${this._settingsInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
-							: nothing}
-					</uui-button>`
-				: nothing}
-		`;
 	}
 
 	override render() {
