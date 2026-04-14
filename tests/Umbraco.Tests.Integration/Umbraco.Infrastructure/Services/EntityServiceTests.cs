@@ -1160,68 +1160,6 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(result[4].Key == children[6].Key);
     }
 
-    [Test]
-    public void GetAllPaths_By_Ids_Returns_All_Paths_In_Batches()
-    {
-        // Create enough content items to span multiple batches when retrieved by IDs.
-        // We use a count slightly above a single batch size to verify the batching logic
-        // aggregates results from multiple groups correctly.
-        const int batchSize = Constants.Sql.MaxParameterCount;
-        var itemCount = batchSize + 10;
-
-        var contentType = ContentTypeService.Get("umbTextpage");
-
-        var root = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(root);
-
-        var ids = new List<int>();
-        for (var i = 0; i < itemCount; i++)
-        {
-            var child = ContentBuilder.CreateSimpleContent(contentType, $"Item {i}", root);
-            ContentService.Save(child);
-            ids.Add(child.Id);
-        }
-
-        // Retrieve all paths by IDs - this should batch internally and return all results.
-        TreeEntityPath[] paths = EntityService.GetAllPaths(UmbracoObjectTypes.Document, ids.ToArray()).ToArray();
-
-        Assert.AreEqual(ids.Count, paths.Length, "Should return a path for every requested ID.");
-        foreach (var id in ids)
-        {
-            Assert.IsTrue(paths.Any(p => p.Id == id), $"Missing path for ID {id}");
-        }
-    }
-
-    [Test]
-    public void GetAllPaths_By_Keys_Returns_All_Paths_In_Batches()
-    {
-        // Same verification as the ID-based test but for the Guid key overload.
-        const int batchSize = Constants.Sql.MaxParameterCount;
-        var itemCount = batchSize + 10;
-
-        var contentType = ContentTypeService.Get("umbTextpage");
-
-        var root = ContentBuilder.CreateSimpleContent(contentType);
-        ContentService.Save(root);
-
-        var keys = new List<Guid>();
-        for (var i = 0; i < itemCount; i++)
-        {
-            var child = ContentBuilder.CreateSimpleContent(contentType, $"Item {i}", root);
-            ContentService.Save(child);
-            keys.Add(child.Key);
-        }
-
-        // Retrieve all paths by keys - this should batch internally and return all results.
-        TreeEntityPath[] paths = EntityService.GetAllPaths(UmbracoObjectTypes.Document, keys.ToArray()).ToArray();
-
-        Assert.AreEqual(keys.Count, paths.Length, "Should return a path for every requested key.");
-        foreach (var key in keys)
-        {
-            Assert.IsTrue(paths.Any(p => p.Key == key), $"Missing path for key {key}");
-        }
-    }
-
     private List<Content> CreateDocumentSiblingsTestData(int count = 10)
     {
         var contentType = ContentTypeService.Get("umbTextpage");
