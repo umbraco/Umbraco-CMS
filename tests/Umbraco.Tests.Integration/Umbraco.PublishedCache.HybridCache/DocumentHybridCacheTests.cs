@@ -585,7 +585,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
 
     [TestCase(true)]
     [TestCase(false)]
-    public async Task Can_Not_Get_Trashed_Content_By_Key(bool preview)
+    public async Task Cannot_Get_Trashed_Content_By_Key(bool preview)
     {
         // Arrange - Verify published content is in cache
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPage.Key.Value, preview);
@@ -602,7 +602,7 @@ internal sealed class DocumentHybridCacheTests : UmbracoIntegrationTestWithConte
 
     [TestCase(true)]
     [TestCase(false)]
-    public async Task Can_Not_Get_Trashed_Content_By_Id(bool preview)
+    public async Task Cannot_Get_Trashed_Content_By_Id(bool preview)
     {
         // Arrange - Verify published content is in cache
         var textPage = await PublishedContentHybridCache.GetByIdAsync(PublishedTextPageId, preview);
