@@ -131,6 +131,49 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         });
     }
 
+    [Test]
+    public async Task Can_Create_Relation_Type_Without_Object_Types()
+    {
+        IRelationTypeWithIsDependency relationType = new RelationType("Test Relation", "testRelation", false, parentObjectType: null, childObjectType: null, false);
+
+        Attempt<IRelationType, RelationTypeOperationStatus> result = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(RelationTypeOperationStatus.Success, result.Status);
+            Assert.IsNull(result.Result.ParentObjectType);
+            Assert.IsNull(result.Result.ChildObjectType);
+        });
+        AssertRelationTypesAreSame(relationType, result.Result);
+    }
+
+    [Test]
+    public async Task Can_Update_Relation_Type_Without_Object_Types()
+    {
+        IRelationTypeWithIsDependency relationType = new RelationType("Test Relation", "testRelation", false, parentObjectType: null, childObjectType: null, false);
+        Attempt<IRelationType, RelationTypeOperationStatus> createResult = await RelationService.CreateAsync(relationType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+
+        createResult.Result.Name = "Updated Name";
+        Attempt<IRelationType, RelationTypeOperationStatus> updateResult = await RelationService.UpdateAsync(createResult.Result, Constants.Security.SuperUserKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(updateResult.Success);
+            Assert.AreEqual(RelationTypeOperationStatus.Success, updateResult.Status);
+        });
+
+        IRelationType? persisted = RelationService.GetRelationTypeById(updateResult.Result.Key);
+        Assert.IsNotNull(persisted);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("Updated Name", persisted!.Name);
+            Assert.IsNull(persisted.ParentObjectType);
+            Assert.IsNull(persisted.ChildObjectType);
+        });
+    }
+
     private void AssertRelationTypesAreSame(IRelationTypeWithIsDependency relationType, IRelationType result)
     {
         Assert.Multiple(() =>

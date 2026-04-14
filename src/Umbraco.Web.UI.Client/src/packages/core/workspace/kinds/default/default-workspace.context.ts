@@ -14,7 +14,7 @@ export class UmbDefaultWorkspaceContext extends UmbContextBase implements UmbWor
 	public readonly view = new UmbViewContext(this, null);
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_WORKSPACE_CONTEXT.toString());
+		super(host, UMB_WORKSPACE_CONTEXT);
 	}
 
 	set manifest(manifest: ManifestWorkspaceDefaultKind) {
