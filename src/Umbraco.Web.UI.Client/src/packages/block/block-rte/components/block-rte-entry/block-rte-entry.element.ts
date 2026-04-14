@@ -1,5 +1,5 @@
-import type { UmbBlockRteLayoutModel, UmbBlockRteValueModel } from '../../types.js';
-import { UMB_BLOCK_RTE, UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
+import type { UmbBlockRteLayoutModel } from '../../types.js';
+import { UMB_BLOCK_RTE } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
@@ -13,8 +13,6 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
-import { UMB_PROPERTY_DATASET_CONTEXT, UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 import '../ref-rte-block/index.js';
 import '../../../block/action/block-action-list.element.js';
@@ -98,17 +96,11 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.requestUpdate('_blockViewProps');
 	}
 
-	#clipboardContext?: typeof UMB_CLIPBOARD_PROPERTY_CONTEXT.TYPE;
-
 	constructor() {
 		super();
 
 		// We do not have index for RTE Blocks at the moment.
 		this.#context.setIndex(0);
-
-		this.consumeContext(UMB_CLIPBOARD_PROPERTY_CONTEXT, (clipboardContext) => {
-			this.#clipboardContext = clipboardContext;
-		});
 
 		this.observe(
 			this.#context.showContentEdit,
@@ -249,43 +241,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.setAttribute('contenteditable', 'false');
 	}
 
-	async #copyToClipboard() {
-		if (!this.#clipboardContext) {
-			console.warn('Clipboard context is not available.');
-			return;
-		}
-
-		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
-		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		if (!propertyDatasetContext || !propertyContext) {
-			throw new Error('Could not get required contexts to copy.');
-		}
-
-		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
-		const propertyLabel = this.localize.string(propertyContext?.getLabel());
-
-		const blockLabel = this.#context.getName();
-		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
-		const content = this.#context.getContent();
-		const layout = this.#context.getLayout();
-		const settings = this.#context.getSettings();
-		const expose = this.#context.getExpose();
-		const propertyValue: UmbBlockRteValueModel = {
-			contentData: content ? [structuredClone(content)] : [],
-			layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined },
-			settingsData: settings ? [structuredClone(settings)] : [],
-			expose: expose ? [structuredClone(expose)] : [],
-		};
-		const editorUiManifest = propertyContext.getEditorManifest();
-
-		this.#clipboardContext.write({
-			icon: this._icon,
-			name: entryName,
-			propertyValue,
-			propertyEditorUiAlias: editorUiManifest?.alias ?? '',
-		});
-	}
-
 	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
 		const elementTypeAlias = this._contentTypeAlias ?? '';
 		const isForBlockEditor =
@@ -337,7 +292,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	#renderActionBar() {
 		return html`
 			<umb-block-action-list block-editor=${UMB_BLOCK_RTE}>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()}
 			</umb-block-action-list>
 		`;
 	}
@@ -399,18 +354,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 							: nothing}
 					</uui-button>`
 				: nothing}
-		`;
-	}
-
-	#renderCopyToClipboardAction() {
-		if (!this.#clipboardContext) return nothing;
-		return html`
-			<uui-button
-				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
-				look="secondary"
-				@click=${() => this.#copyToClipboard()}>
-				<uui-icon name="icon-clipboard-copy"></uui-icon>
-			</uui-button>
 		`;
 	}
 

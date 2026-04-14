@@ -572,7 +572,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		if (this._isSortMode) return nothing;
 		return html`
 			<umb-block-action-list block-editor=${UMB_BLOCK_GRID}>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()}
 			</umb-block-action-list>
 		`;
 	}
@@ -630,18 +630,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						</uui-button>
 					`
 				: nothing}
-		`;
-	}
-
-	#renderCopyToClipboardAction() {
-		return html`
-			<uui-button
-				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
-				look="secondary"
-				@click=${() => this.#context.copyToClipboard()}
-				title=${this.localize.term('general_copy')}>
-				<uui-icon name="icon-clipboard-copy"></uui-icon>
-			</uui-button>
 		`;
 	}
 
