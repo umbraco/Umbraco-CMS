@@ -87,25 +87,10 @@ describe('UmbPropertyEditorUISearchController', () => {
 		expect(results[0].alias).to.equal('Umb.PropertyEditorUi.TextBox');
 	});
 
-	it('should match by alias substring', async () => {
-		const results = await controller.search('RichText');
-		expect(results.some((r) => r.alias === 'Umb.PropertyEditorUi.RichText')).to.be.true;
-	});
-
-	it('should match by alias dot-segmented token', async () => {
-		const results = await controller.search('mediapicker');
-		expect(results.some((r) => r.alias === 'Umb.PropertyEditorUi.MediaPicker')).to.be.true;
-	});
-
 	it('should match by group', async () => {
 		const results = await controller.search('pickers');
 		expect(results.some((r) => r.alias === 'Umb.PropertyEditorUi.MediaPicker')).to.be.true;
 		expect(results.some((r) => r.alias === 'Umb.PropertyEditorUi.ColorPicker')).to.be.true;
-	});
-
-	it('should rank label match higher than alias match', async () => {
-		const results = await controller.search('rich text');
-		expect(results[0].alias).to.equal('Umb.PropertyEditorUi.RichText');
 	});
 
 	it('should include fuzzy matches for typos', async () => {

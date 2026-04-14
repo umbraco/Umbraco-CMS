@@ -14,14 +14,13 @@ interface SearchableUI {
 	labelLower: string;
 	labelTokens: Array<string>;
 	nameLower: string;
-	aliasLower: string;
 	keywordsLower: Array<string>;
 	groupLower: string;
 	allTokens: Array<string>;
 }
 
 /**
- * Controller that searches property editor UIs by label, name, alias and group
+ * Controller that searches property editor UIs by label, name, keywords and group
  * using substring and fuzzy matching. Precomputes per-UI lowercased strings and
  * tokens once per loaded set, and supports cancellation: a newer call to
  * {@link UmbPropertyEditorUISearchController.search} aborts any in-flight
@@ -100,23 +99,21 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 		const labelLower = (ui.meta.label || '').toLowerCase();
 		const labelTokens = fuzzyTokenize(labelLower);
 		const nameLower = ui.name.toLowerCase();
-		const aliasLower = ui.alias.toLowerCase();
 		const keywordsLower = ui.meta.keywords?.map((k) => k.toLowerCase()) ?? [];
 		const groupLower = (ui.meta.group || '').toLowerCase();
 
-		const allTokens = [...labelTokens, ...fuzzyTokenize(nameLower), ...fuzzyTokenize(aliasLower)];
+		const allTokens = [...labelTokens, ...fuzzyTokenize(nameLower)];
 		for (const keyword of keywordsLower) {
 			allTokens.push(...fuzzyTokenize(keyword));
 		}
 
-		cached = { labelLower, labelTokens, nameLower, aliasLower, keywordsLower, groupLower, allTokens };
+		cached = { labelLower, labelTokens, nameLower, keywordsLower, groupLower, allTokens };
 		this.#searchable.set(ui, cached);
 		return cached;
 	}
 
 	#scoreUI(ui: ManifestPropertyEditorUi, query: string, queryTokens: Array<string>): number {
-		const { labelLower, labelTokens, nameLower, aliasLower, keywordsLower, groupLower, allTokens } =
-			this.#getSearchable(ui);
+		const { labelLower, labelTokens, nameLower, keywordsLower, groupLower, allTokens } = this.#getSearchable(ui);
 
 		// Label substring match
 		if (labelLower.includes(query)) {
@@ -126,11 +123,6 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 		// Manifest name substring match
 		if (nameLower.includes(query)) {
 			return 280;
-		}
-
-		// Alias substring match
-		if (aliasLower.includes(query)) {
-			return 250;
 		}
 
 		// Keyword exact match
