@@ -110,33 +110,33 @@ public class ReferencedByMemberController : MemberControllerBase
     {
         Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> relationItemsAttempt = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, UmbracoObjectTypes.Member, skip, take, true);
 
-        if (relationItemsAttempt.Success is false)
+        if (relationItemsAttempt.Success is true)
         {
-            // The entity-based lookup fails for external-only members (no umbracoNode entry).
-            // Fall back to a key-based relation query if this is an external member.
-            if (relationItemsAttempt.Status == GetReferencesOperationStatus.ContentNotFound
-                && await _memberEditingService.IsExternalMemberAsync(id))
+            var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
             {
-#pragma warning disable CS0618 // Type or member is obsolete — using the key-based overload that doesn't require an entity
-                PagedModel<RelationItemModel> externalRelations = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
-#pragma warning restore CS0618
+                Total = relationItemsAttempt.Result.Total,
+                Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItemsAttempt.Result.Items),
+            };
 
-                return Ok(new PagedViewModel<IReferenceResponseModel>
-                {
-                    Total = externalRelations.Total,
-                    Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(externalRelations.Items),
-                });
-            }
-
-            return GetReferencesOperationStatusResult(relationItemsAttempt.Status);
+            return Ok(pagedViewModel);
         }
 
-        var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
+        // The entity-based lookup fails for external-only members (no umbracoNode entry).
+        // Fall back to a key-based relation query if this is an external member.
+        if (relationItemsAttempt.Status == GetReferencesOperationStatus.ContentNotFound
+            && await _memberEditingService.IsExternalMemberAsync(id))
         {
-            Total = relationItemsAttempt.Result.Total,
-            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItemsAttempt.Result.Items),
-        };
+#pragma warning disable CS0618 // Type or member is obsolete — using the key-based overload that doesn't require an entity.
+            PagedModel<RelationItemModel> externalRelations = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
+#pragma warning restore CS0618
 
-        return Ok(pagedViewModel);
+            return Ok(new PagedViewModel<IReferenceResponseModel>
+            {
+                Total = externalRelations.Total,
+                Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(externalRelations.Items),
+            });
+        }
+
+        return GetReferencesOperationStatusResult(relationItemsAttempt.Status);
     }
 }
