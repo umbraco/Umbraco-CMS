@@ -117,11 +117,6 @@ export class UmbMediaWorkspaceContext
 		]);
 	}
 
-	protected override _setViewTitle(variantName: string | undefined): void {
-		const icon = this._data.getCurrent()?.mediaType?.icon;
-		this.view.setTitle(variantName, { icon: icon || undefined });
-	}
-
 	public override resetState() {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);

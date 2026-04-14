@@ -393,13 +393,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	}
 
 	/**
-	 * Publishes the active variant name to the view title. Subclasses can override
-	 * this to include additional options such as a per-entity icon resolved from
-	 * the content type.
+	 * Publishes the active variant name and content-type icon to the view title.
+	 * The icon is resolved generically from the content-type property identified
+	 * by {@link UmbContentDetailWorkspaceContextArgs.contentTypePropertyName}.
 	 * @param variantName The active variant's display name.
 	 */
 	protected _setViewTitle(variantName: string | undefined): void {
-		this.view.setTitle(variantName);
+		const icon: string | undefined = (this._data.getCurrent() as any)?.[this.#contentTypePropertyName]?.icon;
+		this.view.setTitle(variantName, icon ? { icon } : undefined);
 	}
 
 	public async loadLanguages() {
