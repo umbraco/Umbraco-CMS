@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
@@ -13,6 +14,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common;
@@ -23,14 +25,23 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security;
 [TestFixture]
 public class MemberSignInManagerTests
 {
-    private Mock<ILogger<SignInManager<MemberIdentityUser>>> _mockLogger;
-    private readonly Mock<MemberManager> _memberManager = MockMemberManager();
+    private const string TestIpAddress = "192.168.1.100";
+
+    private Mock<ILogger<SignInManager<MemberIdentityUser>>> _mockLogger = null!;
+    private Mock<MemberManager> _memberManager = null!;
+    private Mock<IEventAggregator> _mockEventAggregator = null!;
+    private Mock<IIpResolver> _mockIpResolver = null!;
 
     public UserClaimsPrincipalFactory<MemberIdentityUser> CreateClaimsFactory(MemberManager userMgr)
         => new(userMgr, Options.Create(new IdentityOptions()));
 
     public MemberSignInManager CreateSut()
     {
+        _memberManager = MockMemberManager();
+        _mockEventAggregator = new Mock<IEventAggregator>();
+        _mockIpResolver = new Mock<IIpResolver>();
+        _mockIpResolver.Setup(x => x.GetCurrentRequestIpAddress()).Returns(TestIpAddress);
+
         // This all needs to be setup because internally aspnet resolves a bunch
         // of services from the HttpContext.RequestServices.
         var serviceProviderFactory = new DefaultServiceProviderFactory();
@@ -70,10 +81,10 @@ public class MemberSignInManagerTests
             Mock.Of<IAuthenticationSchemeProvider>(),
             Mock.Of<IUserConfirmation<MemberIdentityUser>>(),
             Mock.Of<IMemberExternalLoginProviders>(),
-            Mock.Of<IEventAggregator>(),
+            _mockEventAggregator.Object,
             Mock.Of<IOptions<SecuritySettings>>(x => x.Value == new SecuritySettings()),
             new DictionaryAppCache(),
-            Mock.Of<IIpResolver>());
+            _mockIpResolver.Object);
     }
 
     private static Mock<MemberManager> MockMemberManager()
@@ -133,5 +144,86 @@ public class MemberSignInManagerTests
 
         // assert
         Assert.IsFalse(actual.Succeeded);
+    }
+
+    [Test]
+    public async Task Can_Publish_Login_Success_Notification()
+    {
+        // arrange
+        var memberKey = Guid.NewGuid();
+        var sut = CreateSut();
+        var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser", Key = memberKey };
+
+        _memberManager.Setup(x => x.GetUserIdAsync(It.IsAny<MemberIdentityUser>())).ReturnsAsync("test-user-id");
+        _memberManager.Setup(x => x.GetUserNameAsync(It.IsAny<MemberIdentityUser>())).ReturnsAsync(fakeUser.UserName);
+        _memberManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(fakeUser);
+        _memberManager.Setup(x => x.CheckPasswordAsync(fakeUser, "password")).ReturnsAsync(true);
+        _memberManager.Setup(x => x.IsEmailConfirmedAsync(fakeUser)).ReturnsAsync(true);
+        _memberManager.Setup(x => x.IsLockedOutAsync(fakeUser)).ReturnsAsync(false);
+
+        // act
+        await sut.PasswordSignInAsync(fakeUser, "password", false, false);
+
+        // assert
+        _mockEventAggregator.Verify(
+            x => x.Publish(It.Is<MemberLoginSuccessNotification>(n =>
+                n.IpAddress == TestIpAddress && n.MemberKey == memberKey)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task Can_Publish_Login_Failed_Notification_When_User_Not_Found()
+    {
+        // arrange
+        var sut = CreateSut();
+
+        // FindByNameAsync returns null by default on the fresh mock, so the
+        // string overload of PasswordSignInAsync will call HandleSignIn with a null user.
+
+        // act
+        await sut.PasswordSignInAsync("nonexistent_user", "password", false, false);
+
+        // assert
+        _mockEventAggregator.Verify(
+            x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
+                n.IpAddress == TestIpAddress && n.MemberKey == null)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task Can_Publish_Logout_Success_Notification()
+    {
+        // arrange
+        var memberKey = Guid.NewGuid();
+        var sut = CreateSut();
+        var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser", Key = memberKey };
+
+        _memberManager.Setup(x => x.GetUserAsync(It.IsAny<ClaimsPrincipal>())).ReturnsAsync(fakeUser);
+
+        // act
+        await sut.SignOutAsync();
+
+        // assert
+        _mockEventAggregator.Verify(
+            x => x.Publish(It.Is<MemberLogoutSuccessNotification>(n =>
+                n.IpAddress == TestIpAddress && n.MemberKey == memberKey)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task Cannot_Publish_Logout_Notification_When_User_Not_Found()
+    {
+        // arrange
+        var sut = CreateSut();
+
+        // GetUserAsync returns null by default on the fresh mock.
+
+        // act
+        await sut.SignOutAsync();
+
+        // assert
+        _mockEventAggregator.Verify(
+            x => x.Publish(It.IsAny<MemberLogoutSuccessNotification>()),
+            Times.Never);
     }
 }
