@@ -399,6 +399,60 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
         });
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Handle_Missing_Layout_Keys(bool useLayoutKey)
+    {
+        var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
+        elementType.IsElement = true;
+        ContentTypeService.Save(elementType);
+
+        var blockListContentType = await CreateBlockListContentType(elementType);
+
+        var contentElementKey = Guid.NewGuid();
+        var layoutKey = Guid.NewGuid();
+        var layoutItem = useLayoutKey
+            ? new BlockListLayoutItem { Key = layoutKey, ContentKey = contentElementKey }
+            : new BlockListLayoutItem { ContentKey = contentElementKey };
+        var blockListValue = new BlockListValue
+        {
+            Layout = new Dictionary<string, IEnumerable<IBlockLayoutItem>>
+            {
+                {
+                    Constants.PropertyEditors.Aliases.BlockList, [layoutItem]
+                },
+            },
+            ContentData =
+            [
+                new()
+                {
+                    Key = contentElementKey,
+                    ContentTypeAlias = elementType.Alias,
+                    ContentTypeKey = elementType.Key,
+                    Values = [],
+                }
+            ],
+            Expose = [new(contentElementKey, null, null)],
+        };
+        var blocksPropertyValue = JsonSerializer.Serialize(blockListValue);
+
+        var content = new ContentBuilder()
+            .WithContentType(blockListContentType)
+            .WithName("My Blocks")
+            .WithPropertyValues(new { blocks = blocksPropertyValue })
+            .Build();
+        ContentService.Save(content);
+
+        var valueEditor = await GetValueEditor(blockListContentType);
+        var toEditorValue = valueEditor.ToEditor(content.Properties["blocks"]!) as BlockListValue;
+        Assert.IsNotNull(toEditorValue);
+
+        var blockListLayoutItems = toEditorValue!.GetLayouts().ToArray();
+        Assert.IsNotNull(blockListLayoutItems);
+        Assert.AreEqual(1, blockListLayoutItems.Length);
+        Assert.AreEqual(useLayoutKey ? layoutKey : contentElementKey, blockListLayoutItems.First().Key);
+    }
+
     private async Task<IContentType> CreateBlockListContentType(IContentType elementType)
     {
         var blockListDataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)

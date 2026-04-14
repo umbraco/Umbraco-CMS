@@ -9,6 +9,18 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 public interface IBlockLayoutItem
 {
     /// <summary>
+    ///     Gets or sets the layout item key.
+    /// </summary>
+    /// <value>
+    ///     The layout item key.
+    /// </value>
+    /// <remarks>
+    ///     Uniquely identifies a layout item. Previously the <see cref="ContentKey"/> could be used for this, but
+    ///     with reusable elements, the same <see cref="ContentKey"/> can appear multiple times in one layout.
+    /// </remarks>
+    public Guid Key { get; set; }
+
+    /// <summary>
     ///     Gets or sets the content key.
     /// </summary>
     /// <value>

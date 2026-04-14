@@ -129,6 +129,7 @@ public partial class ElementEditingServiceTests
         const string placeholder = "00000000-0000-0000-0000-000000000000";
         var blockKeys = blockValue.ContentData.Select(d => d.Key)
             .Concat(blockValue.SettingsData.Select(d => d.Key))
+            .Concat(blockValue.Layout.Values.SelectMany(layout => layout.Select(item => item.Key)))
             .Distinct();
 
         return blockKeys.Aggregate(json, (current, key) => current.Replace(key.ToString(), placeholder));
@@ -269,7 +270,7 @@ public partial class ElementEditingServiceTests
     {
         const int numberOfBlocks = 2;
         var blockKeys = Enumerable.Range(0, numberOfBlocks)
-            .Select(_ => Enumerable.Range(0, 2).Select(_ => Guid.NewGuid()).ToList())
+            .Select(_ => Enumerable.Range(0, 3).Select(_ => Guid.NewGuid()).ToList())
             .ToList();
         return (new T
         {
@@ -278,13 +279,14 @@ public partial class ElementEditingServiceTests
                 [editorAlias] = blockKeys.Select(blockKeyGroup =>
                     new TLayout
                     {
-                        ContentKey = blockKeyGroup[0],
-                        SettingsKey = blockKeyGroup[1],
+                        Key = blockKeyGroup[0],
+                        ContentKey = blockKeyGroup[1],
+                        SettingsKey = blockKeyGroup[2],
                     }).OfType<IBlockLayoutItem>(),
             },
             ContentData = blockKeys.Select(blockKeyGroup => new BlockItemData
                 {
-                    Key = blockKeyGroup[0],
+                    Key = blockKeyGroup[1],
                     ContentTypeAlias = elementContentType.Alias,
                     ContentTypeKey = elementContentType.Key,
                     Values = [],
@@ -292,7 +294,7 @@ public partial class ElementEditingServiceTests
                 .ToList(),
             SettingsData = blockKeys.Select(blockKeyGroup => new BlockItemData
                 {
-                    Key = blockKeyGroup[1],
+                    Key = blockKeyGroup[2],
                     ContentTypeAlias = settingsContentType.Alias,
                     ContentTypeKey = settingsContentType.Key,
                     Values = [],
