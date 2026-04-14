@@ -5,7 +5,7 @@ import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summar
 @customElement('umb-date-time-with-time-zone-property-editor-value-summary')
 export class UmbDateTimeWithTimeZonePropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<UmbDateTimeWithTimeZonePropertyEditorValue> {
 	override render() {
-		return html`<span>${this._value?.date}</span>`;
+		return html`<span>${this._value?.date} ${this._value?.timeZone}</span>`;
 	}
 }
 
