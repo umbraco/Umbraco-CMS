@@ -345,25 +345,7 @@ public interface IMyService
 - Default impl should be functionally correct even if not optimal
 - If using `StaticServiceProvider` in a default impl, note this is temporary
 
-### 5.4 TypeScript / Backoffice Deprecation
-
-The backoffice client (`src/Umbraco.Web.UI.Client`) uses a **dual-mechanism** deprecation pattern. Both are required for every deprecation — see `/src/Umbraco.Web.UI.Client/docs/deprecation.md` for full details:
-
-1. **JSDoc `@deprecated` tag** — for IDE warnings
-2. **Runtime `UmbDeprecation` warning** — console output so consumers are notified at runtime:
-   ```ts
-   import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
-
-   new UmbDeprecation({
-       deprecated: 'ClassName.methodName()',
-       removeInVersion: '19.0.0',
-       solution: 'Use newMethod() instead.',
-   }).warn();
-   ```
-
-Both must be present. A `@deprecated` JSDoc without a runtime `UmbDeprecation` warning is incomplete.
-
-### 5.5 General Rules
+### 5.4 General Rules
 
 - **Removal policy**: Obsoleted members must remain for at least one full major version before removal. If obsoleted in version N, the earliest removal is version N+2. For example, something obsoleted in v17 is scheduled for removal in v19 (giving the whole of v18 as a deprecation period).
 - All `[Obsolete]` attributes must include **"Scheduled for removal in Umbraco {current+2}"**
