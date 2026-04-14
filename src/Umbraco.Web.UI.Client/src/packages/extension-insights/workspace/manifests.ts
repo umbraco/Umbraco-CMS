@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_EXTENSION_ROOT_ENTITY_TYPE,
 			headline: 'Extension Insights',
+			icon: 'icon-wand',
 		},
 	},
 	{

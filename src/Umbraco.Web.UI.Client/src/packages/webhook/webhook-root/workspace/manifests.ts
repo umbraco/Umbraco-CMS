@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_WEBHOOK_ROOT_ENTITY_TYPE,
 			headline: '#treeHeaders_webhooks',
+			icon: 'icon-webhook',
 		},
 	},
 	{

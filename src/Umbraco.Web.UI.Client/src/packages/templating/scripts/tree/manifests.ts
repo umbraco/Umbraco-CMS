@@ -52,6 +52,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_SCRIPT_ROOT_ENTITY_TYPE,
 			headline: '#treeHeaders_scripts',
+			icon: 'icon-document-js',
 		},
 	},
 	{

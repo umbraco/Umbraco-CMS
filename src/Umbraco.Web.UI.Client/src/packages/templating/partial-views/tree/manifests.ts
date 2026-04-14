@@ -60,6 +60,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_PARTIAL_VIEW_ROOT_ENTITY_TYPE,
 			headline: '#treeHeaders_partialViews',
+			icon: 'icon-document-html',
 		},
 	},
 	{

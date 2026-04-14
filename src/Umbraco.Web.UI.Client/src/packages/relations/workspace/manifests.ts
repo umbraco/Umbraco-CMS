@@ -10,6 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: 'relations-root',
 			headline: 'Relations',
+			icon: 'icon-trafic',
 		},
 	},
 	{

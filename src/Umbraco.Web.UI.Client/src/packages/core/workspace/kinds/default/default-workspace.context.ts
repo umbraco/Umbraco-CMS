@@ -24,7 +24,7 @@ export class UmbDefaultWorkspaceContext extends UmbContextBase implements UmbWor
 	set manifest(manifest: ManifestWorkspaceDefaultKind) {
 		this.workspaceAlias = manifest.alias;
 		this.setEntityType(manifest.meta.entityType);
-		this.view.setTitle(manifest.meta.headline);
+		this.view.setTitle(manifest.meta.headline, { icon: manifest.meta.icon });
 	}
 
 	setUnique(unique: UmbEntityUnique): void {

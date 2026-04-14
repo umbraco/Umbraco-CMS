@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_MEDIA_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 			headline: '#general_recycleBin',
+			icon: 'icon-trash',
 		},
 	},
 	{
