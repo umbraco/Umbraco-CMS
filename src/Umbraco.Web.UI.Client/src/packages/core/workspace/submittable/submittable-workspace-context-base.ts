@@ -51,7 +51,7 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	//isDirty = this.#isNew.asObservable();
 
 	constructor(host: UmbControllerHost, workspaceAlias: string) {
-		super(host, UMB_WORKSPACE_CONTEXT.toString());
+		super(host, UMB_WORKSPACE_CONTEXT);
 		this.workspaceAlias = workspaceAlias;
 		// Inherit the view from the hosting section so the section title propagates
 		// into this workspace's title chain (and thereby document.title and the user

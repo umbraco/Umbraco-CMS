@@ -14,7 +14,7 @@ export class UmbDefaultWorkspaceContext extends UmbContextBase implements UmbWor
 	public readonly view = new UmbViewContext(this, null);
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_WORKSPACE_CONTEXT.toString());
+		super(host, UMB_WORKSPACE_CONTEXT);
 		// Inherit the view from the hosting section so the section title propagates
 		// into this workspace's title chain (and thereby document.title and the user
 		// history breadcrumb).
