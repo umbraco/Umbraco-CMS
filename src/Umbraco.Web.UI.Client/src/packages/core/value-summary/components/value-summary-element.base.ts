@@ -3,10 +3,7 @@ import type { UmbValueSummaryElement } from '../extensions/value-summary-element
 import { property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
-export abstract class UmbValueSummaryElementBase<T = unknown>
-	extends UmbLitElement
-	implements UmbValueSummaryElement
-{
+export abstract class UmbValueSummaryElementBase<T = unknown> extends UmbLitElement implements UmbValueSummaryElement {
 	@property({ attribute: false })
 	set api(api: UmbValueSummaryApi | undefined) {
 		this.#api = api;

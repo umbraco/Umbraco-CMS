@@ -26,7 +26,8 @@ export class UmbValueSummaryExtensionElement extends UmbLitElement {
 			type="valueSummary"
 			single
 			.filter=${this.#filter}
-			.apiProps=${{ valueType: this.#valueType, rawValue: this.value }}>
+			.apiProps=${{ valueType: this.#valueType, rawValue: this.value }}
+			.fallbackRenderMethod=${() => html`${this.value}`}>
 		</umb-extension-with-api-slot>`;
 	}
 }
