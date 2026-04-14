@@ -17,6 +17,7 @@ import { UmbPaginationManager, debounce, fromCamelCase } from '@umbraco-cms/back
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/property-type';
+import { UmbPropertyEditorUISearchController } from '@umbraco-cms/backoffice/property-editor';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
@@ -64,6 +65,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 
+	#searchController = new UmbPropertyEditorUISearchController(this);
+
 	constructor() {
 		super();
 
@@ -94,6 +97,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 					.sort((a, b) => a.meta.label.localeCompare(b.meta.label));
 
 				this.#groupLookup = Object.fromEntries(propertyEditorUIs.map((ui) => [ui.alias, ui.meta.group]));
+				this.#searchController.setPropertyEditorUIs(this.#propertyEditorUIs);
 
 				this.#performFiltering();
 			}).asPromise(),
@@ -218,42 +222,48 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this.#performFiltering();
 	}
 
-	#performFiltering() {
+	async #performFiltering() {
 		if (this.#currentFilterQuery) {
 			const filteredDataTypes = this.#dataTypes
 				.filter((dataType) => dataType.name?.toLowerCase().includes(this.#currentFilterQuery))
 				.sort((a, b) => a.name.localeCompare(b.name));
 
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
-			const grouped = Object.groupBy(filteredDataTypes, (dataType: UmbDataTypeItemModel) =>
-				fromCamelCase(this.#groupLookup[dataType.propertyEditorUiAlias] ?? 'Uncategorized'),
-			);
+			this._groupedDataTypes = this.#groupDataTypes(filteredDataTypes);
 
-			this._groupedDataTypes = Object.keys(grouped)
-				.sort((a, b) => a.localeCompare(b))
-				.map((key) => ({ key, items: grouped[key] }));
+			try {
+				const filteredUIs = await this.#searchController.search(this.#currentFilterQuery);
+				this._groupedPropertyEditorUIs = this.#groupUIs(filteredUIs);
+			} catch (error) {
+				if ((error as DOMException)?.name !== 'AbortError') throw error;
+			}
 		} else {
 			this._groupedDataTypes = [];
+			this._groupedPropertyEditorUIs = this.#groupUIs(this.#propertyEditorUIs);
 		}
+	}
 
-		const filteredUIs = !this.#currentFilterQuery
-			? this.#propertyEditorUIs
-			: this.#propertyEditorUIs.filter(
-					(propertyEditorUI) =>
-						propertyEditorUI.name.toLowerCase().includes(this.#currentFilterQuery) ||
-						propertyEditorUI.alias.toLowerCase().includes(this.#currentFilterQuery),
-				);
-
+	#groupDataTypes(dataTypes: Array<UmbDataTypeItemModel>) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
-		const grouped = Object.groupBy(filteredUIs, (propertyEditorUi: ManifestPropertyEditorUi) =>
+		const grouped = Object.groupBy(dataTypes, (dataType: UmbDataTypeItemModel) =>
+			fromCamelCase(this.#groupLookup[dataType.propertyEditorUiAlias] ?? 'Uncategorized'),
+		);
+
+		return Object.keys(grouped)
+			.sort((a, b) => a.localeCompare(b))
+			.map((key) => ({ key, items: grouped[key] as Array<UmbDataTypeItemModel> }));
+	}
+
+	#groupUIs(uis: Array<ManifestPropertyEditorUi>) {
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-expect-error
+		const grouped = Object.groupBy(uis, (propertyEditorUi: ManifestPropertyEditorUi) =>
 			fromCamelCase(propertyEditorUi.meta.group ?? 'Uncategorized'),
 		);
 
-		this._groupedPropertyEditorUIs = Object.keys(grouped)
+		return Object.keys(grouped)
 			.sort((a, b) => a.localeCompare(b))
-			.map((key) => ({ key, items: grouped[key] }));
+			.map((key) => ({ key, items: grouped[key] as Array<ManifestPropertyEditorUi> }));
 	}
 
 	override render() {
