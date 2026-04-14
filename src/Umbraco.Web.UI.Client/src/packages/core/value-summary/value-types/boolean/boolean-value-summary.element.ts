@@ -1,4 +1,4 @@
-import { UmbValueSummaryElementBase } from '../../components/value-summary-element.base.js';
+import { UmbValueSummaryElementBase } from '../../base/value-summary-element.base.js';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-boolean-value-summary')

@@ -1,4 +1,4 @@
-import { UmbValueSummaryApiBase } from '../api/value-summary-api.base.js';
+import { UmbValueSummaryApiBase } from '../base/value-summary-api.base.js';
 
 /**
  * Default value summary API implementation.
