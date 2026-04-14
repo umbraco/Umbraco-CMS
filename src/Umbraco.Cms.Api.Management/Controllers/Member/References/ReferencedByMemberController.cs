@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.TrackedReferences;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -19,25 +20,25 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member.References;
 [ApiVersion("1.0")]
 public class ReferencedByMemberController : MemberControllerBase
 {
-    private readonly ITrackedReferencesService _trackedReferencesService;
     private readonly IRelationTypePresentationFactory _relationTypePresentationFactory;
-    private readonly IMemberEditingService _memberEditingService;
+    private readonly IMemberReferenceService _memberReferenceService;
+
+    // TODO (V19): Remove the unnecessary parameters provided to the constructor.
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ReferencedByMemberController"/> class.
     /// </summary>
     /// <param name="trackedReferencesService">An implementation of <see cref="ITrackedReferencesService"/> used to manage tracked references.</param>
     /// <param name="relationTypePresentationFactory">An implementation of <see cref="IRelationTypePresentationFactory"/> used to create relation type presentations.</param>
-    /// <param name="memberEditingService">Service used for member editing operations.</param>
+    /// <param name="memberReferenceService">Service for retrieving paged references to a member.</param>
     [ActivatorUtilitiesConstructor]
     public ReferencedByMemberController(
         ITrackedReferencesService trackedReferencesService,
         IRelationTypePresentationFactory relationTypePresentationFactory,
-        IMemberEditingService memberEditingService)
+        IMemberReferenceService memberReferenceService)
     {
-        _trackedReferencesService = trackedReferencesService;
         _relationTypePresentationFactory = relationTypePresentationFactory;
-        _memberEditingService = memberEditingService;
+        _memberReferenceService = memberReferenceService;
     }
 
     /// <summary>
@@ -50,7 +51,7 @@ public class ReferencedByMemberController : MemberControllerBase
         : this(
             trackedReferencesService,
             relationTypePresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberEditingService>())
+            StaticServiceProvider.Instance.GetRequiredService<IMemberReferenceService>())
     {
     }
 
@@ -73,12 +74,12 @@ public class ReferencedByMemberController : MemberControllerBase
         int skip = 0,
         int take = 20)
     {
-        PagedModel<RelationItemModel> relationItems = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
+        Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> result = await _memberReferenceService.GetPagedReferencesAsync(id, skip, take);
 
         var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
         {
-            Total = relationItems.Total,
-            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItems.Items),
+            Total = result.Result.Total,
+            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(result.Result.Items),
         };
 
         return pagedViewModel;
@@ -108,35 +109,19 @@ public class ReferencedByMemberController : MemberControllerBase
         int skip = 0,
         int take = 20)
     {
-        Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> relationItemsAttempt = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, UmbracoObjectTypes.Member, skip, take, true);
+        Attempt<PagedModel<RelationItemModel>, GetReferencesOperationStatus> result = await _memberReferenceService.GetPagedReferencesAsync(id, skip, take);
 
-        if (relationItemsAttempt.Success is true)
+        if (result.Success is false)
         {
-            var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
-            {
-                Total = relationItemsAttempt.Result.Total,
-                Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(relationItemsAttempt.Result.Items),
-            };
-
-            return Ok(pagedViewModel);
+            return GetReferencesOperationStatusResult(result.Status);
         }
 
-        // The entity-based lookup fails for external-only members (no umbracoNode entry).
-        // Fall back to a key-based relation query if this is an external member.
-        if (relationItemsAttempt.Status == GetReferencesOperationStatus.ContentNotFound
-            && await _memberEditingService.IsExternalMemberAsync(id))
+        var pagedViewModel = new PagedViewModel<IReferenceResponseModel>
         {
-#pragma warning disable CS0618 // Type or member is obsolete — using the key-based overload that doesn't require an entity.
-            PagedModel<RelationItemModel> externalRelations = await _trackedReferencesService.GetPagedRelationsForItemAsync(id, skip, take, true);
-#pragma warning restore CS0618
+            Total = result.Result.Total,
+            Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(result.Result.Items),
+        };
 
-            return Ok(new PagedViewModel<IReferenceResponseModel>
-            {
-                Total = externalRelations.Total,
-                Items = await _relationTypePresentationFactory.CreateReferenceResponseModelsAsync(externalRelations.Items),
-            });
-        }
-
-        return GetReferencesOperationStatusResult(relationItemsAttempt.Status);
+        return Ok(pagedViewModel);
     }
 }

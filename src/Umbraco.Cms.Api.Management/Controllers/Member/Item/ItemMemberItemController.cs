@@ -3,12 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.Services;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member.Item;
@@ -20,25 +17,23 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member.Item;
 [ApiVersion("1.0")]
 public class ItemMemberItemController : MemberItemControllerBase
 {
-    private readonly IEntityService _entityService;
-    private readonly IMemberPresentationFactory _memberPresentationFactory;
-    private readonly IMemberEditingService _memberEditingService;
+    private readonly IMemberPresentationService _memberPresentationService;
+
+    // TODO (V19): Remove the unnecessary parameters provided to the constructor.
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ItemMemberItemController"/> class.
     /// </summary>
     /// <param name="entityService">Service used for entity operations and retrieval.</param>
     /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models.</param>
-    /// <param name="memberEditingService">Service used for member editing operations.</param>
+    /// <param name="memberPresentationService">Service for resolving members across both content and external stores.</param>
     [ActivatorUtilitiesConstructor]
     public ItemMemberItemController(
         IEntityService entityService,
         IMemberPresentationFactory memberPresentationFactory,
-        IMemberEditingService memberEditingService)
+        IMemberPresentationService memberPresentationService)
     {
-        _entityService = entityService;
-        _memberPresentationFactory = memberPresentationFactory;
-        _memberEditingService = memberEditingService;
+        _memberPresentationService = memberPresentationService;
     }
 
     /// <summary>
@@ -51,7 +46,7 @@ public class ItemMemberItemController : MemberItemControllerBase
         : this(
             entityService,
             memberPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberEditingService>())
+            StaticServiceProvider.Instance.GetRequiredService<IMemberPresentationService>())
     {
     }
 
@@ -69,28 +64,7 @@ public class ItemMemberItemController : MemberItemControllerBase
             return Ok(Enumerable.Empty<MemberItemResponseModel>());
         }
 
-        // Resolve content members from the entity service.
-        IMemberEntitySlim[] contentMembers = _entityService
-            .GetAll(UmbracoObjectTypes.Member, ids.ToArray())
-            .OfType<IMemberEntitySlim>()
-            .ToArray();
-
-        var responseModels = new List<MemberItemResponseModel>(
-            contentMembers.Select(_memberPresentationFactory.CreateItemResponseModel));
-
-        // Find any IDs not resolved from the content store and check external members.
-        HashSet<Guid> resolvedIds = contentMembers.Select(m => m.Key).ToHashSet();
-        IEnumerable<Guid> unresolvedIds = ids.Where(id => !resolvedIds.Contains(id));
-
-        foreach (Guid unresolvedId in unresolvedIds)
-        {
-            ExternalMemberIdentity? externalMember = await _memberEditingService.GetExternalMemberAsync(unresolvedId);
-            if (externalMember is not null)
-            {
-                responseModels.Add(_memberPresentationFactory.CreateExternalMemberItemResponseModel(externalMember));
-            }
-        }
-
+        IEnumerable<MemberItemResponseModel> responseModels = await _memberPresentationService.CreateItemResponseModelsAsync(ids);
         return Ok(responseModels);
     }
 }
