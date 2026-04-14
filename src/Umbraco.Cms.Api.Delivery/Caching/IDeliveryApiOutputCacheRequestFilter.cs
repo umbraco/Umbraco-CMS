@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Api.Delivery.Caching;
 public interface IDeliveryApiOutputCacheRequestFilter
 {
     /// <summary>
-    ///     Returns <c>true</c> if the request is eligible for output caching; otherwise <c>false</c>.
+    ///     Gets a value indicating whether the request is eligible for output caching.
     ///     Called before the controller runs.
     /// </summary>
     /// <param name="context">The HTTP context for the current request.</param>
@@ -28,12 +28,11 @@ public interface IDeliveryApiOutputCacheRequestFilter
     bool IsCacheable(HttpContext context);
 
     /// <summary>
-    ///     Returns <c>true</c> if the response for the given content or media item is eligible for
-    ///     output caching; otherwise <c>false</c>. Called after the controller resolves content.
-    ///     The default implementation returns <c>true</c>.
+    ///     Gets a value indicating whether the response for the given content or media item is eligible
+    ///     for output caching. Called after the controller resolves content.
     /// </summary>
     /// <param name="context">The HTTP context for the current request.</param>
     /// <param name="content">The resolved published content or media item.</param>
     /// <returns><c>true</c> if the response may be cached; <c>false</c> to skip caching.</returns>
-    bool IsCacheable(HttpContext context, IPublishedContent content) => true;
+    bool IsCacheable(HttpContext context, IPublishedContent content);
 }

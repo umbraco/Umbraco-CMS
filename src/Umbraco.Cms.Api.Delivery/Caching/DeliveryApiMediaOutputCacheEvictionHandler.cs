@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Api.Delivery.Caching;
 /// <summary>
 ///     Handles <see cref="MediaCacheRefresherNotification"/> to evict Delivery API output cache entries
 ///     when media is created, updated, or deleted. Also evicts content responses that reference
-///     the changed media via picker properties.
+///     the changed media via picker properties (umbMedia relations).
 /// </summary>
 internal sealed class DeliveryApiMediaOutputCacheEvictionHandler
     : RelationOutputCacheEvictionHandlerBase, INotificationAsyncHandler<MediaCacheRefresherNotification>

@@ -32,15 +32,15 @@ public class DefaultDeliveryApiOutputCacheRequestFilter : IDeliveryApiOutputCach
     public virtual bool IsCacheable(HttpContext context, IPublishedContent content) => true;
 
     /// <summary>
-    ///     Gets a value indicating whether the current request is a preview request.
-    ///     By default returns <c>true</c> when the Delivery API preview mode is active.
+    ///     Returns <c>true</c> if the current request is a preview request; <c>false</c> if the request
+    ///     is not a preview and may be cached.
     /// </summary>
     protected virtual bool IsPreview()
         => _requestPreviewService.IsPreview();
 
     /// <summary>
-    ///     Gets a value indicating whether the current request has public access.
-    ///     By default returns <c>true</c> when the Delivery API is configured for public access or a valid API key is present.
+    ///     Returns <c>true</c> if the current request has public access; <c>false</c> if the request
+    ///     is not publicly accessible and should not be cached.
     /// </summary>
     protected virtual bool HasPublicAccess()
         => _apiAccessService.HasPublicAccess();

@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Api.Delivery.Caching;
 
 /// <summary>
 ///     Handles <see cref="MemberCacheRefresherNotification"/> to evict Delivery API output cache entries
-///     for content that references the changed member via picker properties.
+///     for content that references the changed member via picker properties (umbMember relations).
 /// </summary>
 internal sealed class DeliveryApiMemberOutputCacheEvictionHandler
     : RelationOutputCacheEvictionHandlerBase, INotificationAsyncHandler<MemberCacheRefresherNotification>

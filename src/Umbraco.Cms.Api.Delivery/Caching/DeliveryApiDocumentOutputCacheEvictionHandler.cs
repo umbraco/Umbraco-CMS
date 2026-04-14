@@ -77,8 +77,9 @@ internal sealed class DeliveryApiDocumentOutputCacheEvictionHandler
     {
         if (payload.ChangeTypes.HasFlag(TreeChangeTypes.RefreshAll))
         {
-            _logger.LogDebug("Evicting all Delivery API content output cache entries.");
-            await OutputCacheStore.EvictByTagAsync(Constants.DeliveryApi.OutputCache.AllContentTag, cancellationToken);
+            // Evict all Delivery API responses — media responses may reference content via picker properties.
+            _logger.LogDebug("Content refresh all — evicting all Delivery API output cache entries.");
+            await OutputCacheStore.EvictByTagAsync(Constants.DeliveryApi.OutputCache.AllTag, cancellationToken);
             return;
         }
 

@@ -7,8 +7,8 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Web.Common.Caching;
 
 /// <summary>
-///     Base class for output cache eviction handlers that evict cached responses for documents
-///     referencing changed entities via Umbraco's automatic relation types.
+///     Base class for output cache eviction handlers that evict cached responses for content
+///     or media items referencing changed entities via Umbraco's automatic relation types.
 /// </summary>
 public abstract class RelationOutputCacheEvictionHandlerBase
 {
@@ -37,8 +37,8 @@ public abstract class RelationOutputCacheEvictionHandlerBase
     protected IOutputCacheStore OutputCacheStore { get; }
 
     /// <summary>
-    ///     Evicts cached responses for all documents that reference any of the given entity IDs
-    ///     via the specified relation type. Deduplicates parent IDs across all entities.
+    ///     Evicts cached responses for all content or media items that reference any of the given
+    ///     entity IDs via the specified relation type. Deduplicates parent IDs across all entities.
     /// </summary>
     /// <param name="changedEntityIds">The IDs of the entities that changed.</param>
     /// <param name="relationTypeAlias">The relation type alias to query.</param>

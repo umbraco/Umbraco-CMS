@@ -102,6 +102,9 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
         // AddOutputCache() (which is additive) but the middleware itself must only be added here.
         // Placed after auth (policies may check preview/access state) but before antiforgery, localization,
         // and session so that cache hits bypass those middlewares for better throughput.
+        // NOTE: If the application has already registered UseOutputCache() elsewhere (e.g. in Program.cs),
+        // this will cause an InvalidOperationException at request time. Remove the external UseOutputCache()
+        // call when using Umbraco's managed output caching.
         if (ApplicationServices.GetService<IOutputCacheStore>() is not null)
         {
             AppBuilder.UseOutputCache();

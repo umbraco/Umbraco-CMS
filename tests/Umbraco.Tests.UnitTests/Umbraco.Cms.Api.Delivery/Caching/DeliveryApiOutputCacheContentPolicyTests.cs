@@ -239,7 +239,7 @@ public class DeliveryApiOutputCacheContentPolicyTests
         services.AddSingleton(_requestFilterMock.Object);
         services.AddSingleton(_navigationServiceMock.Object);
         services.AddSingleton<IEnumerable<IDeliveryApiOutputCacheTagProvider>>(
-            (tagProviders ?? [new ContentTypeDeliveryApiOutputCacheTagProvider()]).ToList());
+            (tagProviders ?? [new DeliveryApiContentTypeOutputCacheTagProvider()]).ToList());
         services.AddSingleton<IEnumerable<IDeliveryApiOutputCacheVaryByProvider>>(
             (varyByProviders ?? Array.Empty<IDeliveryApiOutputCacheVaryByProvider>()).ToList());
 

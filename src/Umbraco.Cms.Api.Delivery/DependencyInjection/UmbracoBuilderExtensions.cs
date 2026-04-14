@@ -154,9 +154,9 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, DeliveryApiMemberOutputCacheEvictionHandler>();
 
         // Register extension point default implementations.
-        builder.Services.AddSingleton<IDeliveryApiOutputCacheTagProvider, ContentTypeDeliveryApiOutputCacheTagProvider>();
-        builder.Services.AddSingleton<IDeliveryApiOutputCacheRequestFilter, DefaultDeliveryApiOutputCacheRequestFilter>();
-        builder.Services.AddSingleton<IDeliveryApiOutputCacheManager, DeliveryApiOutputCacheManager>();
+        builder.Services.AddSingleton<IDeliveryApiOutputCacheTagProvider, DeliveryApiContentTypeOutputCacheTagProvider>();
+        builder.Services.AddUnique<IDeliveryApiOutputCacheRequestFilter, DefaultDeliveryApiOutputCacheRequestFilter>();
+        builder.Services.AddUnique<IDeliveryApiOutputCacheManager, DeliveryApiOutputCacheManager>();
 
         return builder;
     }

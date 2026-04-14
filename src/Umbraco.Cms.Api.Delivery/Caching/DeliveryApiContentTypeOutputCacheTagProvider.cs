@@ -5,9 +5,9 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 namespace Umbraco.Cms.Api.Delivery.Caching;
 
 /// <summary>
-///     Default tag provider that tags cached Delivery API responses with the content type alias.
+///     Tags cached pages for delivery API output caching with their content type alias, enabling eviction by content type.
 /// </summary>
-internal sealed class ContentTypeDeliveryApiOutputCacheTagProvider : IDeliveryApiOutputCacheTagProvider
+internal sealed class DeliveryApiContentTypeOutputCacheTagProvider : IDeliveryApiOutputCacheTagProvider
 {
     /// <inheritdoc />
     public IEnumerable<string> GetTags(IPublishedContent content)

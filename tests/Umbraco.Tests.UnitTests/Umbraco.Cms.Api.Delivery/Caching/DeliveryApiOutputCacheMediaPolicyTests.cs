@@ -127,7 +127,7 @@ public class DeliveryApiOutputCacheMediaPolicyTests
         services.AddSingleton<ILoggerFactory>(NullLoggerFactory.Instance);
         services.AddSingleton(_requestFilterMock.Object);
         services.AddSingleton<IEnumerable<IDeliveryApiOutputCacheTagProvider>>(
-            (tagProviders ?? [new ContentTypeDeliveryApiOutputCacheTagProvider()]).ToList());
+            (tagProviders ?? [new DeliveryApiContentTypeOutputCacheTagProvider()]).ToList());
         services.AddSingleton<IEnumerable<IDeliveryApiOutputCacheVaryByProvider>>(
             Array.Empty<IDeliveryApiOutputCacheVaryByProvider>().ToList());
 
