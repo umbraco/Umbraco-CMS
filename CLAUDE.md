@@ -199,7 +199,7 @@ Use the format: `Area: Description (closes #IssueID)`
 - Describe the change and its impact
 - Be specific, not vague (describe "a golden retriever" not just "a dog")
 
-**Issue Linking**: Add `(closes #IssueID)` to auto-close linked issues on merge.
+**Issue Linking**: Add `(closes #IssueID)` to the title for readability, AND include a closing keyword on its own line in the PR body (e.g., `Fixes #IssueID`) so GitHub actually auto-links and auto-closes the issue on merge. GitHub only parses closing keywords (`closes`, `fixes`, `resolves`) from the PR body or commit messages — the title suffix is cosmetic and does **not** trigger auto-close on its own.
 
 ### Commit Messages
 
