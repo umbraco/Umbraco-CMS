@@ -1560,4 +1560,61 @@ internal sealed partial class ContentTypeEditingServiceTests
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentTypeOperationStatus.InvalidSegmentVariationForElementType, result.Status);
     }
+
+    [Test]
+    public async Task Cannot_Switch_Document_To_Element_When_Content_Exists()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test");
+        createModel.AllowedAsRoot = true;
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var content = ContentService.Create("Test Content", Constants.System.Root, contentType.Alias);
+        var saveResult = ContentService.Save(content);
+        Assert.IsTrue(saveResult.Success);
+
+        var updateModel = ContentTypeUpdateModel("Test", "test", isElement: true);
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidElementFlagDocumentHasContent, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Switch_Element_To_Document_When_Element_Instances_Exist()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test", isElement: true);
+        createModel.AllowedInLibrary = true;
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var element = ElementService.Create("Test Element", contentType.Alias);
+        var saveResult = ElementService.Save(element);
+        Assert.IsTrue(saveResult.Success);
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidElementFlagElementHasContent, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Switch_Element_To_Document_When_Used_In_Block_Structure()
+    {
+        var createModel = ContentTypeCreateModel("Test", "test", isElement: true);
+        var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
+
+        var dataType = DataTypeBuilder.CreateSimpleElementDataType(
+            IOHelper,
+            Constants.PropertyEditors.Aliases.BlockList,
+            contentType.Key,
+            elementSettingKey: null);
+        var dataTypeResult = await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(dataTypeResult.Success);
+
+        var updateModel = ContentTypeUpdateModel("Test", "test");
+        var result = await ContentTypeEditingService.UpdateAsync(contentType, updateModel, Constants.Security.SuperUserKey);
+
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration, result.Status);
+    }
 }
