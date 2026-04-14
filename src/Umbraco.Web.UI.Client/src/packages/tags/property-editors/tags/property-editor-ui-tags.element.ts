@@ -73,7 +73,9 @@ export class UmbPropertyEditorUITagsElement
 
 	#onChange(event: UmbChangeEvent) {
 		event.stopPropagation();
-		this.value = (event.currentTarget as UmbTagsInputElement).items;
+		const items = (event.currentTarget as UmbTagsInputElement).items;
+		this.value =
+			this._storageType === 'Csv' ? ((event.currentTarget as UmbTagsInputElement).value as string).split(',') : items;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
