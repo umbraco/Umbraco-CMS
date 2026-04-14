@@ -861,7 +861,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
             .WhereIn<NodeDto>(x => x.NodeId, ids)
             .OrderBy<LanguageDto>(x => x.Id);
 
-    // TODO ELEMENTS: this is a copy/paste of GetDocumentVariantInfos, adjusted for elements - can we refactor in any way?
+    // This is a copy/paste of GetDocumentVariantInfos, adjusted for elements. While we have interfaces in place to
+    // reduce this duplication at code level, NPoco unfortunately does not allow it at execution time, so we'll have
+    // to live with the duplication.
     private Sql<ISqlContext> GetElementVariantInfos(IEnumerable<int> ids) =>
         Sql()
             .Select<NodeDto>(x => x.NodeId)

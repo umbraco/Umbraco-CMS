@@ -14,6 +14,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     private readonly IPublishedElement _element;
     private readonly bool _isPreviewing;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
     private readonly IElementsCache _elementsCache;
     private readonly bool _isMember;
     private string? _valuesCacheKey;
@@ -39,6 +40,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         IPublishedPropertyType propertyType,
         IPublishedElement element,
         IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         bool preview,
         PropertyData[]? sourceValues,
         IElementsCache elementsElementsCache,
@@ -70,6 +72,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
         _element = element;
         _variationContextAccessor = variationContextAccessor;
+        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
         _isPreviewing = preview;
         _isMember = element.ContentType.ItemType == PublishedItemType.Member;
         _elementsCache = elementsElementsCache;
@@ -169,11 +172,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
         // Include the fallback policy in the cache key so that different fallback strategies
         // produce separate cached values (e.g., block editors filter differently with Fallback.ToLanguage).
-        Fallback fallback = default;
-        if (_element is PublishedElement publishedElement)
-        {
-            fallback = publishedElement.PropertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
-        }
+        Fallback fallback = _propertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
 
         CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment, fallback);
 

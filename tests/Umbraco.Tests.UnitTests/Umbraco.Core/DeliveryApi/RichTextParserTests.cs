@@ -741,7 +741,7 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var numberPropertyType = SetupPublishedPropertyType(new IntegerValueConverter(), "number", Constants.PropertyEditors.Aliases.Label);
         var propertyData = new PropertyData { Value = propertyValue, Culture = string.Empty, Segment = string.Empty };
-        var property = new PublishedProperty(numberPropertyType, element.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        var property = new PublishedProperty(numberPropertyType, element.Object, CreateVariationContextAccessor(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
 
         element.SetupGet(c => c.Properties).Returns(new[] { property });
         return element.Object;

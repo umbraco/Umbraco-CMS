@@ -1,7 +1,7 @@
 name: Claude PR Review
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, ready_for_review]
 
 permissions:

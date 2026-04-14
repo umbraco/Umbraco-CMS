@@ -2,10 +2,16 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
-// TODO ELEMENTS: fully define this interface
 public interface IPublishableContentService<TContent> : IContentServiceBase<TContent>
     where TContent : class, IPublishableContentBase
 {
+    /// <summary>
+    ///     Gets content.
+    /// </summary>
+    /// <param name="ids">The unique identifiers of the content.</param>
+    /// <returns>The content.</returns>
+    IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids);
+
     /// <summary>
     ///     Saves content.
     /// </summary>
@@ -37,6 +43,13 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     ///     <para>This operation is potentially dangerous and expensive.</para>
     /// </remarks>
     void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Gets publish/unpublish schedule for a content node.
+    /// </summary>
+    /// <param name="contentId">The identifier of the content to load schedule for.</param>
+    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
+    ContentScheduleCollection GetContentScheduleByContentId(int contentId);
 
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
