@@ -213,6 +213,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 				-webkit-line-clamp: 2;
 				-webkit-box-orient: vertical;
 				overflow: hidden;
+				padding-bottom: 0.1em;
 			}
 		`,
 	];
