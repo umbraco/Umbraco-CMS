@@ -1,7 +1,7 @@
 name: Claude PR Review
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, ready_for_review]
 
 permissions:
@@ -24,7 +24,7 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY_03 }}
           base_branch: "main"
           additional_permissions: "actions: read"
-          claude_args: "--model claude-sonnet-4-6"
+          claude_args: "--model claude-sonnet-4-6 --allowedTools 'Bash(gh:*),Bash(git:*)'"
           prompt: |
             You are reviewing pull request #${{ github.event.pull_request.number }}
             in the Umbraco CMS repository.
