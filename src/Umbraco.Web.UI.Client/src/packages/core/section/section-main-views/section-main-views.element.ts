@@ -119,6 +119,9 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			});
 		}
 		this._routes = routes;
+		// Re-evaluate the active view title: the manifests may have loaded after
+		// the router's initial @change event, so the title wasn't set then.
+		this.#updateActiveViewTitle();
 	}
 
 	override render() {

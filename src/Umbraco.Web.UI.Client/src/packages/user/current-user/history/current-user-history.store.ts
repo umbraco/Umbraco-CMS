@@ -84,6 +84,17 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 			if (!breadcrumb.length) return;
 
 			const leaf = breadcrumb[breadcrumb.length - 1];
+
+			// Guard against stale section-only re-publications. When a workspace
+			// disconnects during navigation, the parent section view re-publishes
+			// its own title (just the section name). Because the URL has already
+			// changed, the path guard above passes. Reject emissions that have no
+			// workspace-kind segment if the entry already has a resolved label.
+			if (!breadcrumb.some((s) => s.kind === 'workspace')) {
+				const item = this._data.getValue().find((i) => i.unique === this.#lastAddedUnique);
+				if (item && item.label !== this.#extractLabelFromPath(this.#lastAddedPath)) return;
+			}
+
 			const parents = breadcrumb.slice(0, -1);
 			this.updateItem(this.#lastAddedUnique, {
 				label: leaf.label,
