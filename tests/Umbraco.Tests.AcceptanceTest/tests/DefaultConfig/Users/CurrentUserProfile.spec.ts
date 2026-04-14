@@ -66,7 +66,7 @@ test.describe('Recent History', () => {
     await umbracoApi.documentType.ensureNameNotExists(docTypeName);
   });
 
-  test('shows readable label and breadcrumb after visiting a nested document', async ({umbracoUi}) => {
+  test('shows readable label and breadcrumb after visiting a nested document', {tag: '@smoke'}, async ({umbracoUi}) => {
     // Arrange
     await umbracoUi.goToBackOffice();
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
@@ -117,6 +117,48 @@ test.describe('Recent History', () => {
     const childText = await umbracoUi.currentUserProfile.getHistoryEntryText(childName);
     expect(childText).toContain(rootName);
     expect(childText).toContain(parentName);
+  });
+
+  test('shows document type in history when visited', async ({umbracoUi}) => {
+    // Arrange
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+
+    // Act — navigate to the document type
+    await umbracoUi.content.clickCaretButtonForContentName('Document Types');
+    await umbracoUi.content.goToContentWithName(docTypeName);
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+
+    // Open profile modal
+    await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
+
+    // Assert
+    await umbracoUi.currentUserProfile.isHistoryEntryVisible(docTypeName);
+    const text = await umbracoUi.currentUserProfile.getHistoryEntryText(docTypeName);
+    expect(text).toContain('Document Types');
+  });
+
+  test('clicking a history entry navigates back to the document', async ({umbracoUi, page}) => {
+    // Arrange — visit a document to create a history entry
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.clickCaretButtonForContentName(rootName);
+    await umbracoUi.content.goToContentWithName(rootName);
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+
+    // Navigate away to a different section
+    await umbracoUi.content.goToSection(ConstantHelper.sections.settings);
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
+
+    // Act — open profile modal and click the history entry
+    await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
+    await umbracoUi.currentUserProfile.isHistoryEntryVisible(rootName);
+    const entry = umbracoUi.currentUserProfile.getHistoryEntryByName(rootName);
+    await entry.click();
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+
+    // Assert — we're back on the document workspace
+    expect(page.url()).toContain('/workspace/document/edit/');
   });
 
   test('revisiting a document does not create duplicate history entries', async ({umbracoUi}) => {
