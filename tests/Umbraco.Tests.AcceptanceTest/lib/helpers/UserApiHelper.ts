@@ -299,4 +299,13 @@ export class UserApiHelper {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/filter/user?skip=0&take=100&userGroupIds=' + userGroupIds);
     return await response.json();
   }
+
+  // Current User Profile
+  async updateCurrentUserProfile(languageIsoCode: string) {
+    return await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/user/current/profile', {languageIsoCode});
+  }
+
+  async clearCurrentUserAvatar() {
+    return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/user/current/avatar');
+  }
 }
