@@ -37,9 +37,8 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 
 	#handleNavigate = (event: any) => {
 		const url = new URL(event.destination.url);
-		// `path` stores the full (unnormalized) URL so that clicking the entry
-		// in the history takes the user back to exactly where they were — e.g.
-		// the specific workspace tab or culture variant.
+		// `path` stores the full (unnormalized) pathname so that clicking the
+		// entry navigates back to the specific tab or culture variant.
 		const fullPath = url.pathname;
 		const normalizedPath = this.#normalizePath(fullPath);
 
@@ -104,7 +103,7 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 	 */
 	#normalizePath(path: string): string {
 		return path
-			.replace(/\/(?:invariant|root|[a-z]{2}-[a-z]{2}|view|tab)(?:\/.*)?$/i, '')
+			.replace(/\/(?:invariant|root|[a-z]{2}-[a-z]{2}|view|tab)\b.*$/i, '')
 			.replace(/\/collection$/, '');
 	}
 

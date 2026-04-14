@@ -259,8 +259,11 @@ export class UmbViewController extends UmbControllerBase {
 			},
 			'observeParentVariantId',
 		);
+		// Observe the full segment list rather than the joined string so that
+		// metadata-only changes (icon, kind) on parent segments propagate to
+		// inheriting children even when the labels haven't changed.
 		this.observe(
-			this.#parentView?.computedTitle,
+			this.#parentView?.computedTitleSegments,
 			() => {
 				this.#computeTitle();
 				// Check for parent view as it is undefined in a disassembling state and we do not want to update the title in that situation. [NL]
