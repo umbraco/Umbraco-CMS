@@ -18,8 +18,15 @@ public class MemberLoginFailedNotification : MemberNotification
     /// </summary>
     /// <param name="ipAddress">The source IP address of the failed login attempt.</param>
     /// <param name="memberKey">The key of the member whose login failed, or <c>null</c> if the member could not be found.</param>
-    public MemberLoginFailedNotification(string ipAddress, Guid? memberKey)
+    /// <param name="reason">The reason the login attempt failed (e.g. "InvalidCredentials", "LockedOut", "NotAllowed", "MemberNotFound").</param>
+    public MemberLoginFailedNotification(string ipAddress, Guid? memberKey, string reason)
         : base(ipAddress, memberKey)
     {
+        Reason = reason;
     }
+
+    /// <summary>
+    ///     Gets the reason the login attempt failed.
+    /// </summary>
+    public string Reason { get; }
 }

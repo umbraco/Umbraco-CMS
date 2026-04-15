@@ -87,7 +87,7 @@ public class MemberSignInManagerTests
             _mockIpResolver.Object);
     }
 
-    private static Mock<MemberManager> MockMemberManager()
+    private static Mock<MemberManager> MockMemberManager(IEventAggregator? eventAggregator = null)
         => new(
             Mock.Of<IIpResolver>(),
             Mock.Of<IMemberUserStore>(),
@@ -101,7 +101,8 @@ public class MemberSignInManagerTests
             new TestOptionsSnapshot<MemberPasswordConfigurationSettings>(new MemberPasswordConfigurationSettings()),
             Mock.Of<IPublicAccessService>(),
             Mock.Of<IHttpContextAccessor>(),
-            Mock.Of<IPublishedModelFactory>());
+            Mock.Of<IPublishedModelFactory>(),
+            eventAggregator ?? Mock.Of<IEventAggregator>());
 
     [Test]
     public async Task
@@ -172,13 +173,33 @@ public class MemberSignInManagerTests
     }
 
     [Test]
+    public async Task Can_Publish_Login_Failed_Notification_When_Password_Wrong()
+    {
+        // arrange
+        var memberKey = Guid.NewGuid();
+        var sut = CreateSut();
+        var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser", Key = memberKey };
+
+        // act
+        await sut.PasswordSignInAsync(fakeUser, "wrong_password", false, false);
+
+        // assert
+        _mockEventAggregator.Verify(
+            x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
+                n.IpAddress == TestIpAddress
+                && n.MemberKey == memberKey
+                && n.Reason == MemberLoginFailedReason.InvalidCredentials)),
+            Times.Once);
+    }
+
+    [Test]
     public async Task Can_Publish_Login_Failed_Notification_When_User_Not_Found()
     {
         // arrange
         var sut = CreateSut();
 
         // FindByNameAsync returns null by default on the fresh mock, so the
-        // string overload of PasswordSignInAsync will call HandleSignIn with a null user.
+        // string overload of PasswordSignInAsync calls HandleSignIn with a null user.
 
         // act
         await sut.PasswordSignInAsync("nonexistent_user", "password", false, false);
@@ -186,7 +207,9 @@ public class MemberSignInManagerTests
         // assert
         _mockEventAggregator.Verify(
             x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
-                n.IpAddress == TestIpAddress && n.MemberKey == null)),
+                n.IpAddress == TestIpAddress
+                && n.MemberKey == null
+                && n.Reason == MemberLoginFailedReason.MemberNotFound)),
             Times.Once);
     }
 

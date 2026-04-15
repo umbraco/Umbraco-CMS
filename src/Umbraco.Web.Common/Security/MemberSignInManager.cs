@@ -64,6 +64,21 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
 
     protected override bool AllowConcurrentLoginsEnabled => SecuritySettings.GetMemberAllowConcurrentLogins();
 
+    /// <inheritdoc />
+    public override async Task<SignInResult> PasswordSignInAsync(MemberIdentityUser user, string password, bool isPersistent, bool lockoutOnFailure)
+    {
+        SignInResult result = await base.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
+
+        if (!result.Succeeded && !result.RequiresTwoFactor)
+        {
+            var ipAddress = _ipResolver.GetCurrentRequestIpAddress();
+            var reason = GetFailedLoginReason(result);
+            _eventAggregator.Publish(new MemberLoginFailedNotification(ipAddress, user.Key, reason));
+        }
+
+        return result;
+    }
+
     // use default scheme for members
     protected override string AuthenticationType => IdentityConstants.ApplicationScheme;
 
@@ -343,9 +358,11 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
                 _eventAggregator.Publish(new MemberLoginSuccessNotification(ipAddress, user.Key));
             }
         }
-        else if (!result.RequiresTwoFactor && !result.IsLockedOut)
+        else if (!result.RequiresTwoFactor && user is null)
         {
-            _eventAggregator.Publish(new MemberLoginFailedNotification(ipAddress, user?.Key));
+            // User not found — PasswordSignInAsync(TUser) override handles the case
+            // where the user exists but the password is wrong.
+            _eventAggregator.Publish(new MemberLoginFailedNotification(ipAddress, memberKey: null, MemberLoginFailedReason.MemberNotFound));
         }
 
         return result;
@@ -364,6 +381,13 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             _eventAggregator.Publish(new MemberLogoutSuccessNotification(ipAddress, user.Key));
         }
     }
+
+    private static string GetFailedLoginReason(SignInResult result) => result switch
+    {
+        { IsLockedOut: true } => MemberLoginFailedReason.LockedOut,
+        { IsNotAllowed: true } => MemberLoginFailedReason.NotAllowed,
+        _ => MemberLoginFailedReason.InvalidCredentials,
+    };
 
     protected void NotifyRequiresTwoFactor(MemberIdentityUser user) => Notify(
         user,
