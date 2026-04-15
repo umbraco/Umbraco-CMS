@@ -24,7 +24,14 @@ permissions:
 
 jobs:
   review:
-    if: github.event.pull_request.draft == false
+    # Skip fork PRs: secrets are not exposed on `pull_request` events from
+    # forks, so the action would fail with a red check. Remove this clause
+    # once upstream fork support lands (tracked in
+    # https://github.com/anthropics/claude-code-action/issues/939) and we
+    # can re-enable the `pull_request_target` trigger above.
+    if: >-
+      github.event.pull_request.draft == false
+      && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
