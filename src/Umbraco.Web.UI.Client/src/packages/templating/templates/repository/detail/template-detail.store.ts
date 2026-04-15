@@ -15,7 +15,7 @@ export class UmbTemplateDetailStore extends UmbDetailStoreBase<UmbTemplateDetail
 	 * @memberof UmbTemplateDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_TEMPLATE_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_TEMPLATE_DETAIL_STORE_CONTEXT);
 	}
 }
 
