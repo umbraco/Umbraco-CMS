@@ -296,7 +296,17 @@ public interface IUserService : IMembershipUserService
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
+    [Obsolete($"{nameof(GetUsersById)} is deprecated and will be removed in Umbraco 19. Use {nameof(GetUsersByKey)} instead.")]
     IEnumerable<IUser> GetUsersById(params int[]? ids);
+
+    /// <summary>
+    ///     Gets a users by Key
+    /// </summary>
+    /// <param name="keys">Keys of the users to retrieve</param>
+    /// <returns>
+    ///     <see cref="IUser" />
+    /// </returns>
+    IEnumerable<IUser> GetUsersByKey(params Guid[]? keys);
 
     /// <summary>
     ///     Removes a specific section from all user groups
