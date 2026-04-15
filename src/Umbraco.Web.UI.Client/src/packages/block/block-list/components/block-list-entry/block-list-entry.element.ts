@@ -17,6 +17,7 @@ import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoff
 import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type {
@@ -337,7 +338,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#updateExposedState() {
 		// Shared content blocks use the element's variant state; local blocks use the expose entry
 		const isExposed = this._isLibraryElement
-			? this._sharedContentVariantState !== 'Draft'
+			? this._sharedContentVariantState !== DocumentVariantStateModel.DRAFT
 			: this._hasExpose;
 		this.#updateBlockViewProps({ unpublished: !isExposed });
 		this._exposed = isExposed;
@@ -364,10 +365,16 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		const settings = this.#context.getSettings();
 		const expose = this.#context.getExpose();
 
+		// Strip isSharedContent from clipboard — pasted blocks should always be local copies
+		const clonedLayout = layout ? structuredClone(layout) : undefined;
+		if (clonedLayout) {
+			delete clonedLayout.isSharedContent;
+		}
+
 		const propertyValue: UmbBlockListValueModel = {
 			contentData: content ? [structuredClone(content)] : [],
 			layout: {
-				[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
+				[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: clonedLayout ? [clonedLayout] : undefined,
 			},
 			settingsData: settings ? [structuredClone(settings)] : [],
 			expose: expose ? [structuredClone(expose)] : [],

@@ -61,9 +61,11 @@ export abstract class UmbBlockEntryContext<
 	protected readonly localize = new UmbLocalizationController(this);
 
 	#isLibraryElement = new UmbBooleanState(false);
+	/** Observable that emits true when this block references shared content from the Element Library. */
 	readonly isLibraryElement = this.#isLibraryElement.asObservable();
 
 	#sharedContentVariantState = new UmbStringState(undefined);
+	/** Observable of the shared element's variant state (e.g. 'Published', 'Draft'), resolved for the active culture/segment. */
 	readonly sharedContentVariantState = this.#sharedContentVariantState.asObservable();
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);

@@ -1067,14 +1067,17 @@ export const data: Array<UmbMockDocumentModel> = [
 					layout: {
 						'Umbraco.BlockList': [
 							{
+								key: '1234',
 								contentKey: '1234',
 								settingsKey: '5678',
 							},
 							{
+								key: '1234-headline',
 								contentKey: '1234-headline',
 								settingsKey: '1234-headline-settings',
 							},
 							{
+								key: '45110b54-764e-4198-858d-6bf8f51589b6',
 								contentKey: 'simple-element-id',
 								settingsKey: null,
 								isSharedContent: true,

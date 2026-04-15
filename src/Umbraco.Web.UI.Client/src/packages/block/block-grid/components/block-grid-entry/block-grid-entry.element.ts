@@ -13,6 +13,7 @@ import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type {
 	ManifestBlockEditorCustomView,
@@ -404,7 +405,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#updateExposedState() {
 		const isExposed = this._isLibraryElement
-			? this._sharedContentVariantState !== 'Draft'
+			? this._sharedContentVariantState !== DocumentVariantStateModel.DRAFT
 			: this._hasExpose;
 		this.#updateBlockViewProps({ unpublished: !isExposed });
 		this._exposed = isExposed;

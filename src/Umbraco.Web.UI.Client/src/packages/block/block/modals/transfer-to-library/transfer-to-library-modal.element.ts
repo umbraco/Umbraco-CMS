@@ -74,7 +74,7 @@ export class UmbBlockTransferToLibraryModalElement extends UmbModalBaseElement<
 						label=${this.localize.term('blockEditor_transferToLibrary')}
 						look="primary"
 						color="positive"
-						?disabled=${!this._name || !this._hasSelectedLocation}
+						?disabled=${!this._name.trim() || !this._hasSelectedLocation}
 						@click=${this.#onTransfer}></uui-button>
 				</div>
 			</umb-body-layout>

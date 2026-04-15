@@ -82,8 +82,10 @@ export abstract class UmbBlockManagerContext<
 	public readonly contents = this.#contents.asObservable();
 
 	readonly #resolvedLibraryElements = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
-	readonly #resolvedLibraryElementVariantStates = new UmbArrayState(
-		<Array<{ key: string; state: string | null }>>[],
+	readonly #resolvedLibraryElementVariants = new UmbArrayState(
+		<
+			Array<{ key: string; variants: Array<{ culture: string | null; segment: string | null; state: string | null }> }>
+		>[],
 		(x) => x.key,
 	);
 	#elementRepository = new UmbElementDetailRepository(this);
@@ -327,12 +329,22 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
-	 * Returns an observable of the variant state for a shared/library element.
+	 * Returns an observable of the variant state for a shared/library element,
+	 * resolved against the manager's active variantId (culture/segment).
 	 * Emits the state string (e.g., 'Published', 'Draft') or null if not resolved yet.
 	 */
 	sharedContentVariantStateOf(key: string) {
-		return this.#resolvedLibraryElementVariantStates.asObservablePart(
-			(source) => source.find((x) => x.key === key)?.state ?? null,
+		return mergeObservables(
+			[
+				this.#resolvedLibraryElementVariants.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.variantId,
+			],
+			([entry, variantId]) => {
+				if (!entry?.variants.length) return null;
+				if (!variantId) return entry.variants[0]?.state ?? null;
+				const match = entry.variants.find((v) => v.culture === variantId.culture && v.segment === variantId.segment);
+				return match?.state ?? entry.variants[0]?.state ?? null;
+			},
 		);
 	}
 
@@ -368,8 +380,14 @@ export abstract class UmbBlockManagerContext<
 					),
 				};
 				this.#resolvedLibraryElements.appendOne(blockData);
-				const variantState = data.variants[0]?.state ?? null;
-				this.#resolvedLibraryElementVariantStates.appendOne({ key: data.unique, state: variantState });
+				this.#resolvedLibraryElementVariants.appendOne({
+					key: data.unique,
+					variants: data.variants.map((v) => ({
+						culture: v.culture ?? null,
+						segment: v.segment ?? null,
+						state: v.state ?? null,
+					})),
+				});
 			}
 		} finally {
 			this.#pendingElementFetches.delete(key);
@@ -526,8 +544,12 @@ export abstract class UmbBlockManagerContext<
 		this.#contents.appendOne(newContent);
 		this._layouts.updateOne(elementKey, { contentKey: newKey, isSharedContent: undefined } as Partial<BlockLayoutType>);
 		this.#resolvedLibraryElements.removeOne(elementKey);
-		this.#resolvedLibraryElementVariantStates.removeOne(elementKey);
-		this.#setInitialBlockExpose(newContent);
+		this.#resolvedLibraryElementVariants.removeOne(elementKey);
+		// Only set expose if the content type structure is loaded (it may not be for library elements
+		// whose type was not in the block type list)
+		if (this.getStructure(contentTypeKey)) {
+			this.#setInitialBlockExpose(newContent);
+		}
 	}
 
 	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {
