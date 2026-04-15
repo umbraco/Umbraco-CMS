@@ -52,8 +52,7 @@ export class UmbIconSearchController extends UmbControllerBase {
 	 * returned promise is superseded by another search or by {@link destroy}.
 	 * @param {string} query - The search query string.
 	 * @returns {Promise<Array<UmbIconDefinition>>} Filtered and sorted icons,
-	 * ordered: exact/substring matches first, then fuzzy matches, then related
-	 * icons.
+	 * ordered: exact/substring matches first, then fuzzy matches.
 	 */
 	async search(query: string): Promise<Array<UmbIconDefinition>> {
 		// Abort any previous in-flight search.
@@ -87,37 +86,11 @@ export class UmbIconSearchController extends UmbControllerBase {
 		// Sort by score descending, then by name ascending for stable ordering of equal scores.
 		scored.sort((a, b) => b.score - a.score || a.icon.name.localeCompare(b.icon.name));
 
-		const results = scored.map((s) => s.icon);
-		const resultNames = new Set(results.map((r) => r.name));
-
-		// Collect related icons from matched results.
-		const relatedNames = new Set<string>();
-		for (const { icon } of scored) {
-			if (icon.related) {
-				for (const name of icon.related) {
-					if (!resultNames.has(name)) {
-						relatedNames.add(name);
-					}
-				}
-			}
-		}
-
-		// Look up related icon definitions and append.
-		if (relatedNames.size > 0) {
-			const iconsByName = new Map(this.#icons.map((i) => [i.name, i]));
-			for (const name of relatedNames) {
-				const relatedIcon = iconsByName.get(name);
-				if (relatedIcon) {
-					results.push(relatedIcon);
-				}
-			}
-		}
-
 		if (signal.aborted) throw this.#abortError();
 		if (this.#inFlight === controller) {
 			this.#inFlight = undefined;
 		}
-		return results;
+		return scored.map((s) => s.icon);
 	}
 
 	#abortError(): DOMException {
