@@ -1,3 +1,4 @@
+import { UMB_LANGUAGE_COLLECTION_ALIAS } from '../constants.js';
 import { UMB_LANGUAGE_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 import { UMB_BOOLEAN_VALUE_TYPE } from '@umbraco-cms/backoffice/value-type';
@@ -5,30 +6,13 @@ import { UMB_BOOLEAN_VALUE_TYPE } from '@umbraco-cms/backoffice/value-type';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionView',
+		kind: 'table',
 		alias: UMB_LANGUAGE_TABLE_COLLECTION_VIEW_ALIAS,
 		name: 'Language Table Collection View',
-		js: () => import('./table/language-table-collection-view.element.js'),
 		meta: {
 			label: 'Table',
 			icon: 'icon-table',
 			pathName: 'table',
-		},
-		conditions: [
-			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: 'Umb.Collection.Language',
-			},
-		],
-	},
-	{
-		type: 'collectionView',
-		kind: 'table',
-		alias: 'TEST',
-		name: 'Language Table Collection View',
-		meta: {
-			label: 'Table KIND',
-			icon: 'icon-table',
-			pathName: 'table2',
 			columns: [
 				{
 					field: 'unique',
@@ -53,7 +37,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: 'Umb.Collection.Language',
+				match: UMB_LANGUAGE_COLLECTION_ALIAS,
 			},
 		],
 	},
