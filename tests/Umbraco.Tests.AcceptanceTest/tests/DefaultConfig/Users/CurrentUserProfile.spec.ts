@@ -207,4 +207,36 @@ test.describe('Recent History', () => {
     const count = await umbracoUi.currentUserProfile.countHistoryEntriesWithName(childName);
     expect(count).toBe(1);
   });
+
+  test('opening the user profile modal does not overwrite the underlying entry', async ({umbracoUi}) => {
+    // Arrange — visit a document so we have a resolved entry
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.clickCaretButtonForContentName(rootName);
+    await umbracoUi.content.goToContentWithName(rootName);
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+
+    // Act — open the profile modal (which publishes its own title with kind 'modal')
+    await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
+
+    // Assert — the workspace entry is still the document, not the modal title.
+    // Guards against regression of the `kind === 'modal'` filter in the history store.
+    await umbracoUi.currentUserProfile.isHistoryEntryVisible(rootName);
+  });
+
+  test('Recycle Bin entry shows static icon and Content breadcrumb', async ({umbracoUi}) => {
+    // Arrange — visit the content recycle bin (a static-icon root workspace, no entity name)
+    await umbracoUi.goToBackOffice();
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+    await umbracoUi.content.goToContentWithName('Recycle Bin');
+    await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+
+    // Open profile modal
+    await umbracoUi.currentUserProfile.clickCurrentUserAvatarButton();
+
+    // Assert — entry exists with the Content section as its breadcrumb
+    await umbracoUi.currentUserProfile.isHistoryEntryVisible('Recycle Bin');
+    const text = await umbracoUi.currentUserProfile.getHistoryEntryText('Recycle Bin');
+    expect(text).toContain('Content');
+  });
 });
