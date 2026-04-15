@@ -56,11 +56,18 @@ export class UmbDocumentTreeItemElement extends UmbTreeItemElementBase<
 		return this.#icon;
 	}
 
+	/**
+	 * Whether this item is an accessible collection displayed in a menu.
+	 * noAccess items show a normal expand arrow so the user can browse to their start node.
+	 */
+	get #isAccessibleCollectionInMenu(): boolean {
+		// `this._forceShowExpand` is equivalent to hasCollection for this element.
+		return this._isMenu && this._forceShowExpand && !this._noAccess;
+	}
+
 	// eslint-disable-next-line @typescript-eslint/naming-convention
 	override _renderExpandSymbol = () => {
-		// If this in the menu and it is a collection, then we will enforce the user to the Collection view instead of expanding.
-		// `this._forceShowExpand` is equivalent to hasCollection for this element.
-		if (this._isMenu && this._forceShowExpand) {
+		if (this.#isAccessibleCollectionInMenu) {
 			return html`<umb-icon data-mark="open-collection" name="icon-list" style="font-size: 8px;"></umb-icon>`;
 		} else {
 			return undefined;

@@ -41,9 +41,12 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		super.setIsMenu(isMenu);
 		if (isMenu) {
 			this.observe(
-				this.hasCollection,
-				(hasCollection) => {
-					if (hasCollection) {
+				mergeObservables(
+					[this.hasCollection, this.noAccess],
+					([hasCollection, noAccess]) => hasCollection && !noAccess,
+				),
+				(isAccessibleCollection) => {
+					if (isAccessibleCollection) {
 						this._treeItemChildrenManager.setTargetTakeSize(1, 1);
 
 						this.observe(
@@ -88,9 +91,21 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 		return this.#item.getHasCollection();
 	}
 
+	public getNoAccess(): boolean {
+		return this._treeItem.getValue()?.noAccess ?? false;
+	}
+
+	/**
+	 * Whether this item is an accessible collection displayed in a menu.
+	 * noAccess items (ancestors needed for navigating to a user start node) must remain
+	 * expandable so the user can browse to their start node within the collection.
+	 */
+	#isAccessibleCollectionInMenu(): boolean {
+		return this.getIsMenu() && this.#item.getHasCollection() && !this.getNoAccess();
+	}
+
 	public override showChildren() {
-		if (this.getIsMenu() && this.#item.getHasCollection()) {
-			// Collections cannot be expanded via a menu, instead we open the Collection for the user.
+		if (this.#isAccessibleCollectionInMenu()) {
 			this.#openCollection();
 			return;
 		}
@@ -98,8 +113,7 @@ export class UmbDocumentTreeItemContext extends UmbDefaultTreeItemContext<
 	}
 
 	public override hideChildren() {
-		if (this.getIsMenu() && this.#item.getHasCollection()) {
-			// Collections in a menu will collapse when already showing children, and instead we open the Collection for the user.
+		if (this.#isAccessibleCollectionInMenu()) {
 			this.#openCollection();
 		}
 		super.hideChildren();
