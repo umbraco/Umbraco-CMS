@@ -47,18 +47,22 @@ public class GetAllRedirectUrlManagementController : RedirectUrlManagementContro
     [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a paginated collection of redirect URLs.")]
     [EndpointDescription("Gets a paginated collection of redirect URLs with support for filtering and sorting.")]
-    public Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> GetAll(
+    public async Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> GetAll(
         CancellationToken cancellationToken,
         string? filter,
         int skip = 0,
         int take = 100)
     {
-        long total;
-        IEnumerable<IRedirectUrl> redirects = filter is null
-            ? _redirectUrlService.GetAllRedirectUrls(skip, take, out total)
-            : _redirectUrlService.SearchRedirectUrls(filter, skip, take, out total);
+        PagedModel<IRedirectUrl> result = filter is null
+            ? await _redirectUrlService.GetAllRedirectUrlsAsync(skip, take)
+            : await _redirectUrlService.SearchRedirectUrlsAsync(filter, skip, take);
 
-        IEnumerable<RedirectUrlResponseModel> redirectViewModels = _redirectUrlPresentationFactory.CreateMany(redirects);
-        return Task.FromResult<ActionResult<PagedViewModel<RedirectUrlResponseModel>>>(new PagedViewModel<RedirectUrlResponseModel> { Items = redirectViewModels, Total = total });
+        var viewModel = new PagedViewModel<RedirectUrlResponseModel>
+        {
+            Total = result.Total,
+            Items = _redirectUrlPresentationFactory.CreateMany(result.Items),
+        };
+
+        return Ok(viewModel);
     }
 }

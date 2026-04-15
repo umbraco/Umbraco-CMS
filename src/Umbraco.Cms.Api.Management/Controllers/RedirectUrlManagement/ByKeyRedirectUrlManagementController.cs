@@ -46,20 +46,22 @@ public class ByKeyRedirectUrlManagementController : RedirectUrlManagementControl
     [ProducesResponseType(typeof(PagedViewModel<RedirectUrlResponseModel>), StatusCodes.Status200OK)]
     [EndpointSummary("Gets a redirect URL.")]
     [EndpointDescription("Gets a redirect URL identified by the provided Id.")]
-    public Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> ByKey(
+    public async Task<ActionResult<PagedViewModel<RedirectUrlResponseModel>>> ByKey(
         CancellationToken cancellationToken,
         Guid id,
         int skip = 0,
         int take = 100)
     {
-        IRedirectUrl[] redirects = _redirectUrlService.GetContentRedirectUrls(id).ToArray();
+        IEnumerable<IRedirectUrl> redirects = await _redirectUrlService.GetContentRedirectUrlsAsync(id);
 
-        IEnumerable<RedirectUrlResponseModel> viewModels = _redirectUrlPresentationFactory.CreateMany(redirects);
+        IRedirectUrl[] redirectArray = redirects.ToArray();
 
-        return Task.FromResult<ActionResult<PagedViewModel<RedirectUrlResponseModel>>>(new PagedViewModel<RedirectUrlResponseModel>
+        var viewModel = new PagedViewModel<RedirectUrlResponseModel>
         {
-            Items = viewModels.Skip(skip).Take(take),
-            Total = redirects.Length,
-        });
+            Total = redirectArray.Length,
+            Items = _redirectUrlPresentationFactory.CreateMany(redirectArray.Skip(skip).Take(take)),
+        };
+
+        return Ok(viewModel);
     }
 }
