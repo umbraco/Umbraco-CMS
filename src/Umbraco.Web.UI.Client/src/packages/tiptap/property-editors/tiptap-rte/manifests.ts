@@ -12,6 +12,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 			propertyEditorSchemaAlias: 'Umbraco.RichText',
 			icon: 'icon-browser-window',
 			group: 'richContent',
+			keywords: ['content', 'article', 'body', 'html', 'wysiwyg', 'richtext'],
 			settings: {
 				properties: [
 					{

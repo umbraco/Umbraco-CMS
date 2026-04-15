@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.CheckBoxList',
 			icon: 'icon-bulleted-list',
 			group: 'lists',
-			keywords: ['select'],
+			keywords: ['select', 'multi', 'options', 'features', 'categories'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [

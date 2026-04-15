@@ -20,7 +20,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.TextBox',
 			icon: 'icon-autofill',
 			group: 'common',
-			keywords: ['string'],
+			keywords: ['string', 'headline', 'title', 'name', 'subtitle', 'sku', 'label', 'caption'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [inputTypeConfig],
@@ -43,6 +43,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.EmailAddress',
 			icon: 'icon-message',
 			group: 'common',
+			keywords: ['email', 'contact', 'address'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [inputTypeConfig],

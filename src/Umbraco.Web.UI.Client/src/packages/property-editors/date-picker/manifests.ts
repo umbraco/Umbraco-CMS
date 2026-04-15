@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.DateTime',
 			icon: 'icon-time',
 			group: 'pickers',
-			keywords: ['select'],
+			keywords: ['select', 'date', 'calendar', 'schedule', 'event'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [

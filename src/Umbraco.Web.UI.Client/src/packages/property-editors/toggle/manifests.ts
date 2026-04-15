@@ -18,6 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.TrueFalse',
 			icon: 'icon-checkbox',
 			group: 'common',
+			keywords: ['boolean', 'switch', 'flag', 'enabled', 'active', 'visible', 'featured'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [

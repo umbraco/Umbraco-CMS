@@ -9,7 +9,7 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Select',
 		icon: 'icon-list',
 		group: 'pickers',
-		keywords: ['dropdown'],
+		keywords: ['dropdown', 'select', 'choice', 'option'],
 		settings: {
 			properties: [
 				{

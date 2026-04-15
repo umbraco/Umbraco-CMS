@@ -11,6 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.TimeOnly',
 			icon: 'icon-time',
 			group: 'date',
+			keywords: ['time', 'clock', 'hour', 'schedule', 'duration'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [

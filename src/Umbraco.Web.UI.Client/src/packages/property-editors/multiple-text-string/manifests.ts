@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.MultipleTextstring',
 			icon: 'icon-ordered-list',
 			group: 'lists',
-			keywords: ['string'],
+			keywords: ['string', 'list', 'items', 'values', 'features'],
 			supportsReadOnly: true,
 		},
 	},

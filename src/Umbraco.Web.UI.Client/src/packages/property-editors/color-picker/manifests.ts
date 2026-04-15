@@ -12,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.ColorPicker',
 			icon: 'icon-colorpicker',
 			group: 'pickers',
-			keywords: ['select'],
+			keywords: ['select', 'color', 'colour', 'theme', 'brand', 'background'],
 			supportsReadOnly: true,
 		},
 	},

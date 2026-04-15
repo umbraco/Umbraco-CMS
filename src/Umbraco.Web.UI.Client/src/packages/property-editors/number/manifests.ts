@@ -19,6 +19,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.Decimal',
 			icon: 'icon-autofill',
 			group: 'common',
+			keywords: ['number', 'decimal', 'price', 'cost', 'amount', 'rate', 'weight'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -54,6 +55,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Numeric',
 			icon: 'icon-autofill',
 			group: 'common',
+			keywords: ['number', 'integer', 'count', 'quantity', 'sort', 'order', 'limit'],
 			propertyEditorSchemaAlias: 'Umbraco.Integer',
 			supportsReadOnly: true,
 		},

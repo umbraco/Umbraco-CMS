@@ -11,6 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.DateOnly',
 			icon: 'icon-calendar-alt',
 			group: 'date',
+			keywords: ['date', 'calendar', 'birthday', 'deadline'],
 			supportsReadOnly: true,
 		},
 	},

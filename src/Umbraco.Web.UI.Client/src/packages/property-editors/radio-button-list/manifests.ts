@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.RadioButtonList',
 			icon: 'icon-target',
 			group: 'lists',
-			keywords: ['select'],
+			keywords: ['select', 'choice', 'option', 'type', 'category'],
 			supportsReadOnly: true,
 		},
 	},
