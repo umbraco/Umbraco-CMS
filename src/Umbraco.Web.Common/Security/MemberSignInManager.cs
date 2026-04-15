@@ -360,7 +360,8 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         }
         else if (result.RequiresTwoFactor is false)
         {
-            // RequiresTwoFactor means "2FA is now required" (not a failure) — skip that.
+            // RequiresTwoFactor means "2FA is now required" (not a failure) — so we don't publish a failed notification.
+
             // All other failures reach here:
             // - User not found (user is null) via PasswordSignInAsync(string)
             // - Failed 2FA verification (user is not null) via TwoFactorSignInAsync
