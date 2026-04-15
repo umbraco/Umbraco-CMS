@@ -79,6 +79,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 				label: this.#getViewName(matchingView),
 				kind: 'workspace',
 				replaces: true,
+				...(matchingView.meta.icon ? { icon: matchingView.meta.icon } : {}),
 			});
 			return;
 		}
