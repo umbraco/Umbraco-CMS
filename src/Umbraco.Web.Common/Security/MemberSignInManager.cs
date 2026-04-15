@@ -69,7 +69,7 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
     {
         SignInResult result = await base.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
 
-        if (!result.Succeeded && !result.RequiresTwoFactor)
+        if (result.Succeeded is false && result.RequiresTwoFactor is false)
         {
             var ipAddress = _ipResolver.GetCurrentRequestIpAddress();
             var reason = GetFailedLoginReason(result);
@@ -358,11 +358,15 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
                 _eventAggregator.Publish(new MemberLoginSuccessNotification(ipAddress, user.Key));
             }
         }
-        else if (!result.RequiresTwoFactor && user is null)
+        else if (result.RequiresTwoFactor is false)
         {
-            // User not found — PasswordSignInAsync(TUser) override handles the case
-            // where the user exists but the password is wrong.
-            _eventAggregator.Publish(new MemberLoginFailedNotification(ipAddress, memberKey: null, MemberLoginFailedReason.MemberNotFound));
+            // RequiresTwoFactor means "2FA is now required" (not a failure) — skip that.
+            // All other failures reach here:
+            // - User not found (user is null) via PasswordSignInAsync(string)
+            // - Failed 2FA verification (user is not null) via TwoFactorSignInAsync
+            // Note: password failures for existing users are handled by PasswordSignInAsync(TUser) override.
+            var reason = user is null ? MemberLoginFailedReason.MemberNotFound : GetFailedLoginReason(result);
+            _eventAggregator.Publish(new MemberLoginFailedNotification(ipAddress, user?.Key, reason));
         }
 
         return result;

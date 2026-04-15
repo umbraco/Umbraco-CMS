@@ -35,7 +35,7 @@ public class MemberSignInManagerTests
     public UserClaimsPrincipalFactory<MemberIdentityUser> CreateClaimsFactory(MemberManager userMgr)
         => new(userMgr, Options.Create(new IdentityOptions()));
 
-    public MemberSignInManager CreateSut()
+    public MemberSignInManager CreateSut(IdentityOptions? identityOptions = null)
     {
         _memberManager = MockMemberManager();
         _mockEventAggregator = new Mock<IEventAggregator>();
@@ -76,7 +76,9 @@ public class MemberSignInManagerTests
             _memberManager.Object,
             Mock.Of<IHttpContextAccessor>(x => x.HttpContext == httpContext),
             CreateClaimsFactory(_memberManager.Object),
-            Mock.Of<IOptions<IdentityOptions>>(),
+            identityOptions is not null
+                ? Options.Create(identityOptions)
+                : Mock.Of<IOptions<IdentityOptions>>(),
             _mockLogger.Object,
             Mock.Of<IAuthenticationSchemeProvider>(),
             Mock.Of<IUserConfirmation<MemberIdentityUser>>(),
@@ -87,7 +89,7 @@ public class MemberSignInManagerTests
             _mockIpResolver.Object);
     }
 
-    private static Mock<MemberManager> MockMemberManager(IEventAggregator? eventAggregator = null)
+    private static Mock<MemberManager> MockMemberManager()
         => new(
             Mock.Of<IIpResolver>(),
             Mock.Of<IMemberUserStore>(),
@@ -101,8 +103,7 @@ public class MemberSignInManagerTests
             new TestOptionsSnapshot<MemberPasswordConfigurationSettings>(new MemberPasswordConfigurationSettings()),
             Mock.Of<IPublicAccessService>(),
             Mock.Of<IHttpContextAccessor>(),
-            Mock.Of<IPublishedModelFactory>(),
-            eventAggregator ?? Mock.Of<IEventAggregator>());
+            Mock.Of<IPublishedModelFactory>());
 
     [Test]
     public async Task
@@ -210,6 +211,53 @@ public class MemberSignInManagerTests
                 n.IpAddress == TestIpAddress
                 && n.MemberKey == null
                 && n.Reason == MemberLoginFailedReason.MemberNotFound)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task Can_Publish_Login_Failed_Notification_When_Locked_Out()
+    {
+        // arrange
+        var memberKey = Guid.NewGuid();
+        var sut = CreateSut();
+        var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser", Key = memberKey };
+
+        _memberManager.Setup(x => x.SupportsUserLockout).Returns(true);
+        _memberManager.Setup(x => x.IsLockedOutAsync(fakeUser)).ReturnsAsync(true);
+
+        // act
+        await sut.PasswordSignInAsync(fakeUser, "password", false, false);
+
+        // assert
+        _mockEventAggregator.Verify(
+            x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
+                n.IpAddress == TestIpAddress
+                && n.MemberKey == memberKey
+                && n.Reason == MemberLoginFailedReason.LockedOut)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task Can_Publish_Login_Failed_Notification_When_Not_Allowed()
+    {
+        // arrange
+        var memberKey = Guid.NewGuid();
+        var identityOptions = new IdentityOptions { SignIn = { RequireConfirmedEmail = true } };
+        var sut = CreateSut(identityOptions);
+        var fakeUser = new MemberIdentityUser(777) { UserName = "TestUser", Key = memberKey };
+
+        // IsEmailConfirmedAsync returns false by default on the mock,
+        // so CanSignInAsync returns false → PreSignInCheck returns NotAllowed.
+
+        // act
+        await sut.PasswordSignInAsync(fakeUser, "password", false, false);
+
+        // assert
+        _mockEventAggregator.Verify(
+            x => x.Publish(It.Is<MemberLoginFailedNotification>(n =>
+                n.IpAddress == TestIpAddress
+                && n.MemberKey == memberKey
+                && n.Reason == MemberLoginFailedReason.NotAllowed)),
             Times.Once);
     }
 
