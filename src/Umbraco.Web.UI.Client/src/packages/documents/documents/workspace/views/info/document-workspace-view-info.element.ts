@@ -254,10 +254,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 								?readonly=${!this._hasSettingsAccess || this._isTrashed}
 								style=${ifDefined(!this.#isTemplateAllowed ? 'color: var(--uui-color-danger)' : undefined)}
 								title=${ifDefined(!this.#isTemplateAllowed ? this.localize.term('template_notAllowed') : undefined)}>
-								<uui-icon
-									slot="icon"
-									name=${!this.#isTemplateAllowed ? 'icon-alert' : 'icon-document-html'}
-									style=${ifDefined(!this.#isTemplateAllowed ? 'color: var(--uui-color-danger)' : undefined)}></uui-icon>
+								<uui-icon slot="icon" name=${!this.#isTemplateAllowed ? 'icon-alert' : 'icon-document-html'}></uui-icon>
 								${!this._isTrashed
 									? html` <uui-action-bar slot="actions">
 											${this._allowedTemplates?.length
