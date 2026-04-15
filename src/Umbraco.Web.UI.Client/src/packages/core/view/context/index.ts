@@ -5,5 +5,6 @@ export { umbCurrentViewTitle } from './current-view-title.js';
 export type {
 	UmbCurrentViewTitle,
 	UmbCurrentViewTitleSegment,
+	UmbViewSegmentSlotKey,
 	UmbViewTitleKind,
 } from './current-view-title.js';

@@ -15,6 +15,35 @@ export type UmbViewTitleKind =
 	| 'modal';
 
 /**
+ * Canonical slot keys recognised by {@link UmbViewController.setSegments}.
+ *
+ * Each slot is owned by a single kind of caller, so the canonical names give
+ * autocomplete and discoverability for the common cases. Plugin authors may
+ * still pass any other string (the type widens via `string & {}`) to define
+ * their own slot — but stick to the canonical names where one fits.
+ *
+ * | Key | Owner |
+ * |------|-------|
+ * | `'section'` | `UmbSectionContext` — top-level section name |
+ * | `'dashboard'` | Section main views — active dashboard / section-view |
+ * | `'workspace-type'` | Workspace contexts — entity-type label (e.g. "Member") |
+ * | `'ancestors'` | Tree structure helpers — tree path leading to the leaf |
+ * | `'leaf'` | Workspace contexts — the active entity (variant name, etc.) |
+ * | `'tab'` | Workspace editors — the active tab |
+ * | `'modal'` | `UmbModalContext` — active modal title |
+ */
+export type UmbViewSegmentSlotKey =
+	| 'section'
+	| 'dashboard'
+	| 'workspace-type'
+	| 'ancestors'
+	| 'leaf'
+	| 'tab'
+	| 'modal'
+	// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+	| (string & {});
+
+/**
  * A single segment in the active view's title chain, annotated with the kind
  * of view that produced it.
  */

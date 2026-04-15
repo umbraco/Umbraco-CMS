@@ -1,7 +1,7 @@
 import { UmbShortcutController } from '../../shortcut/context/shortcut.controller.js';
 import { UMB_VIEW_CONTEXT } from './view.context-token.js';
 import { _setUmbCurrentViewTitle } from './current-view-title.js';
-import type { UmbCurrentViewTitleSegment, UmbViewTitleKind } from './current-view-title.js';
+import type { UmbCurrentViewTitleSegment, UmbViewSegmentSlotKey, UmbViewTitleKind } from './current-view-title.js';
 import { UmbClassState, UmbObjectState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbHintController } from '@umbraco-cms/backoffice/hint';
@@ -63,7 +63,7 @@ export class UmbViewController extends UmbControllerBase {
 	#inherit = false;
 	#explicitInheritance?: boolean;
 	#parentView?: UmbViewController;
-	#segmentSlots = new Map<string, ReadonlyArray<UmbCurrentViewTitleSegment>>();
+	#segmentSlots = new Map<UmbViewSegmentSlotKey, ReadonlyArray<UmbCurrentViewTitleSegment>>();
 	#computedTitleSegments = new UmbObjectState<ReadonlyArray<UmbCurrentViewTitleSegment> | undefined>(undefined);
 	readonly computedTitleSegments = this.#computedTitleSegments.asObservable();
 	readonly computedTitle = this.#computedTitleSegments.asObservablePart((segs) =>
@@ -133,7 +133,7 @@ export class UmbViewController extends UmbControllerBase {
 	 * @param slotKey Unique key identifying this caller's contribution.
 	 * @param segments One or more segments to store under the slot. Pass none to clear.
 	 */
-	public setSegments(slotKey: string, ...segments: UmbCurrentViewTitleSegment[]): void {
+	public setSegments(slotKey: UmbViewSegmentSlotKey, ...segments: UmbCurrentViewTitleSegment[]): void {
 		if (segments.length === 0) {
 			this.clearSegments(slotKey);
 			return;
@@ -148,7 +148,7 @@ export class UmbViewController extends UmbControllerBase {
 	 * Remove all segments for a named slot.
 	 * @param slotKey The slot to clear.
 	 */
-	public clearSegments(slotKey: string): void {
+	public clearSegments(slotKey: UmbViewSegmentSlotKey): void {
 		if (!this.#segmentSlots.has(slotKey)) return;
 		this.#segmentSlots.delete(slotKey);
 		this.#computeTitle();
