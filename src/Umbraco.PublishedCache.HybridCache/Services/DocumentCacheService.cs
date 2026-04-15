@@ -194,12 +194,23 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         {
             await _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode));
         }
+        else
+        {
+            // No draft in the database cache — remove any stale draft entry from the local memory cache.
+            await _hybridCache.RemoveAsync(GetCacheKey(key, true));
+        }
 
         if (publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key))
         {
             var cacheKey = GetCacheKey(publishedNode.Key, false);
             await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode));
             _publishedContentCache.Remove(cacheKey, out _);
+        }
+        else
+        {
+            // Either no published node in the database cache, or the ancestor path is no longer published —
+            // remove any stale published entry from the local memory cache.
+            await ClearPublishedCacheAsync(key);
         }
 
         scope.Complete();
@@ -310,6 +321,14 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
+        if (content.Trashed)
+        {
+            await _databaseCacheRepository.DeleteContentItemAsync(content.Id);
+            await RemoveFromMemoryCacheAsync(content.Key);
+            scope.Complete();
+            return;
+        }
+
         // Always set draft node
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
@@ -317,7 +336,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
         await _databaseCacheRepository.RefreshContentAsync(draftCacheNode, content.PublishedState);
 
-        if (content.PublishedState == PublishedState.Publishing || content.PublishedState == PublishedState.Unpublishing)
+        if (content.PublishedState is PublishedState.Publishing or PublishedState.Unpublishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
 

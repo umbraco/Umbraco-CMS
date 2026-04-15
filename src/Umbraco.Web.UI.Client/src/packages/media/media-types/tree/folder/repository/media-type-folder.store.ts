@@ -15,7 +15,7 @@ export class UmbMediaTypeFolderStore extends UmbDetailStoreBase<UmbFolderModel> 
 	 * @memberof UmbMediaTypeStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MEDIA_TYPE_FOLDER_STORE_CONTEXT.toString());
+		super(host, UMB_MEDIA_TYPE_FOLDER_STORE_CONTEXT);
 	}
 }
 

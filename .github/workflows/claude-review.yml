@@ -1,18 +1,37 @@
 name: Claude PR Review
 
 on:
-  pull_request_target:
+  pull_request:
     types: [opened, ready_for_review]
+  # NOTE: `pull_request_target` would let this workflow review fork PRs
+  # (with access to secrets), but the action currently fails during OIDC
+  # token exchange with "401 Unauthorized - Invalid OIDC token" on that
+  # event. PR #579 added `pull_request_target` routing to the action, but
+  # Anthropic's `/github-app-token-exchange` endpoint appears not to
+  # accept the token claims produced by that event. Re-enable once the
+  # upstream issue is resolved.
+  # See: https://github.com/anthropics/claude-code-action/issues/347
+  #      https://github.com/anthropics/claude-code-action/issues/621
+  # pull_request_target:
+  #   types: [opened, ready_for_review]
 
 permissions:
   contents: read
   pull-requests: write
   issues: write
   id-token: write
+  actions: read
 
 jobs:
   review:
-    if: github.event.pull_request.draft == false
+    # Skip fork PRs: secrets are not exposed on `pull_request` events from
+    # forks, so the action would fail with a red check. Remove this clause
+    # once upstream fork support lands (tracked in
+    # https://github.com/anthropics/claude-code-action/issues/939) and we
+    # can re-enable the `pull_request_target` trigger above.
+    if: >-
+      github.event.pull_request.draft == false
+      && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
