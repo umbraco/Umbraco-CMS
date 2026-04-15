@@ -1786,12 +1786,22 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
+    [Obsolete($"{nameof(GetUsersById)} is deprecated and will be removed in Umbraco 19. Use {nameof(GetUsersByKey)} instead.")]
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
         IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
 
         return backOfficeUserStore.GetUsersAsync(ids).GetAwaiter().GetResult();
+    }
+
+    /// <inheritdoc/>
+    public IEnumerable<IUser> GetUsersByKey(params Guid[]? keys)
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        return backOfficeUserStore.GetUsersAsync(keys).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc/>
