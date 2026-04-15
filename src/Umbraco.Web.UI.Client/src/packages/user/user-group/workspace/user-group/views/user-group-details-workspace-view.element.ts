@@ -164,9 +164,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 
 					${this.#renderPermissionGroups()}
 				</umb-stack>
-				<div>
-					<umb-user-group-workspace-users></umb-user-group-workspace-users>
-				</div>
+				<umb-user-group-workspace-users></umb-user-group-workspace-users>
 			</div>
 		`;
 	}

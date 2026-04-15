@@ -127,9 +127,6 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 	@state()
 	private _statuses?: Array<UmbRepositoryItemsStatus>;
 
-	@property({ type: Number, attribute: 'remaining-count' })
-	remainingCount = 0;
-
 	@state()
 	private _modalRoute?: string;
 
@@ -203,15 +200,7 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 					(status) => this.#renderItem(status),
 				)}
 			</uui-ref-list>
-			${this.#renderRemainingCount()}
 		`;
-	}
-
-	#renderRemainingCount() {
-		if (!this.remainingCount) return nothing;
-		return html`<div class="remaining-count">
-			${this.localize.term('user_andMore', this.remainingCount)} - <i>${this.localize.term('user_usersNotManagedFromGroup')}</i>
-		</div>`;
 	}
 
 	#renderItem(status: UmbRepositoryItemsStatus) {
@@ -240,9 +229,6 @@ export class UmbUserInputElement extends UmbFormControlMixin<string, typeof UmbL
 		css`
 			#btn-add {
 				width: 100%;
-			}
-			.remaining-count {
-				padding: 0px 0px 8px 12px;
 			}
 		`,
 	];

@@ -2,7 +2,7 @@ import { UMB_USER_GROUP_WORKSPACE_CONTEXT } from '../user-group-workspace.contex
 import { UmbUserGroupUsersRepository } from '../../../repository/users/user-group-users.repository.js';
 import type { UmbUserInputElement } from '../../../../user/components/user-input/user-input.element.js';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
@@ -20,17 +20,11 @@ export class UmbUserGroupWorkspaceUsersElement extends UmbLitElement {
 	#unique?: string;
 	#isNew = false;
 	#persistedUserUniques: string[] = [];
-	#notificationContext?: typeof UMB_NOTIFICATION_CONTEXT.TYPE;
 	#usersRepository = new UmbUserGroupUsersRepository(this);
 	#workspaceContext?: typeof UMB_USER_GROUP_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
 		super();
-
-		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (context) => {
-			this.#notificationContext = context;
-		});
-
 		this.consumeContext(UMB_USER_GROUP_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
 			this.#observe();
@@ -40,10 +34,10 @@ export class UmbUserGroupWorkspaceUsersElement extends UmbLitElement {
 	#observe() {
 		this.observe(
 			this.#workspaceContext?.unique,
-			(value) => {
-				this.#unique = value ?? undefined;
-				if (value && !this.#isNew) {
-					this.#loadUsers(value);
+			(unique) => {
+				this.#unique = unique ?? undefined;
+				if (unique && !this.#isNew) {
+					this.#loadUsers(unique);
 				}
 			},
 			'_observeUnique',
@@ -87,8 +81,10 @@ export class UmbUserGroupWorkspaceUsersElement extends UmbLitElement {
 			this.#usersRepository.removeUsersFromGroup(unique, toRemove),
 		]);
 
+		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
+
 		if (addError) {
-			this.#notificationContext?.peek('danger', {
+			notificationContext?.peek('danger', {
 				data: {
 					headline: this.localize.term('speechBubbles_operationFailedHeader'),
 					message: this.localize.term('user_addUsersToGroupError'),
@@ -97,7 +93,7 @@ export class UmbUserGroupWorkspaceUsersElement extends UmbLitElement {
 		}
 
 		if (removeError) {
-			this.#notificationContext?.peek('danger', {
+			notificationContext?.peek('danger', {
 				data: {
 					headline: this.localize.term('speechBubbles_operationFailedHeader'),
 					message: this.localize.term('user_removeUsersFromGroupError'),
@@ -140,12 +136,18 @@ export class UmbUserGroupWorkspaceUsersElement extends UmbLitElement {
 		return html`
 			<uui-box>
 				<div slot="headline"><umb-localize key="general_users"></umb-localize></div>
-				<umb-user-input
-					.selection=${this._userUniques}
-					.remainingCount=${this._usersRemainingCount}
-					@change=${this.#onUsersChange}></umb-user-input>
+				<umb-user-input .selection=${this._userUniques} @change=${this.#onUsersChange}></umb-user-input>
+				${this.#renderRemainingCount()}
 			</uui-box>
 		`;
+	}
+
+	#renderRemainingCount() {
+		if (!this._usersRemainingCount) return nothing;
+		return html`<div class="remaining-count">
+			${this.localize.term('user_andMore', this._usersRemainingCount)} -
+			<i>${this.localize.term('user_usersNotManagedFromGroup')}</i>
+		</div>`;
 	}
 
 	static override styles = [
@@ -153,6 +155,9 @@ export class UmbUserGroupWorkspaceUsersElement extends UmbLitElement {
 		css`
 			:host {
 				display: block;
+			}
+			.remaining-count {
+				padding: 8px 0px 8px 0px;
 			}
 		`,
 	];
