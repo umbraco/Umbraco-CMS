@@ -85,12 +85,17 @@ export class UmbCurrentUserHistoryStore extends UmbStoreBase<UmbCurrentUserHisto
 
 			const leaf = breadcrumb[breadcrumb.length - 1];
 
-			// Guard against stale section-only re-publications. When a workspace
-			// disconnects during navigation, the parent section view re-publishes
-			// its own title (just the section name). Because the URL has already
-			// changed, the path guard above passes. Reject emissions that have no
-			// workspace-kind segment if the entry already has a resolved label.
+			// Guard against section-only emissions polluting a workspace entry.
+			// Two cases need rejecting, both missing a `kind: 'workspace'` segment:
+			//   1. A workspace disconnects during navigation and the parent section
+			//      re-publishes just the section name — the entry already has the
+			//      richer label from the previous view, don't clobber it.
+			//   2. The user opens the avatar modal *before* the workspace has
+			//      mounted and published its leaf; the section's title would
+			//      otherwise overwrite the URL fallback on a workspace URL. We
+			//      prefer to wait: the workspace will publish shortly.
 			if (!breadcrumb.some((s) => s.kind === 'workspace')) {
+				if (this.#lastAddedPath.includes('/workspace/')) return;
 				const item = this._data.getValue().find((i) => i.unique === this.#lastAddedUnique);
 				if (item && item.label !== this.#extractLabelFromPath(this.#lastAddedPath)) return;
 			}

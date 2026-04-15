@@ -909,6 +909,7 @@ export default {
 		insert: 'Insert',
 		install: 'Install',
 		invalid: 'Invalid',
+		items: 'Items',
 		justify: 'Justify',
 		label: 'Label',
 		language: 'Language',
