@@ -64,13 +64,10 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 	#truncate(input: string | undefined, length: number, separator = '...'): string {
 		if (!input) return '';
 		if (input.length <= length) return input;
-
-		const separatorLength = separator.length;
-		const charsToShow = length - separatorLength;
-		const frontChars = Math.ceil(charsToShow / 2);
-		const backChars = Math.floor(charsToShow / 2);
-
-		return input.substring(0, frontChars) + separator + input.substring(input.length - backChars);
+		// Truncate from the LEFT so the rightmost segments (the leaf's immediate
+		// parents) survive — they carry more contextual relevance than the section
+		// at the start of the breadcrumb.
+		return separator + input.substring(input.length - (length - separator.length));
 	}
 
 	override render() {
@@ -91,9 +88,11 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 	#renderItem(item: UmbCurrentUserHistoryItem) {
 		const label = Array.isArray(item.label) ? item.label[0] : item.label;
 		const detail = item.displayPath ? this.#truncate(item.displayPath, 50) : undefined;
+		// Omit the icon entirely when none is provided — better than a misleading
+		// fallback (e.g. `icon-link` implies a hyperlink/relation, not a history entry).
 		return html`
 			<uui-ref-node name=${label} detail=${ifDefined(detail)} href=${item.path}>
-				<umb-icon slot="icon" name=${item.icon ?? 'icon-link'}></umb-icon>
+				${item.icon ? html`<umb-icon slot="icon" name=${item.icon}></umb-icon>` : nothing}
 			</uui-ref-node>
 		`;
 	}
