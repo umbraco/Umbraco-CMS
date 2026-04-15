@@ -76,7 +76,6 @@ export class UmbBlockActionListElement extends UmbLitElement {
 
 		return html`
 			<uui-action-bar>
-				<slot></slot>
 				${repeat(
 					this._actions,
 					(action) => action.alias,

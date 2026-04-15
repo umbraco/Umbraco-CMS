@@ -1,4 +1,10 @@
-import { UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS } from './constants.js';
+import {
+	UMB_BLOCK_ENTRY_HAS_SETTINGS_CONDITION_ALIAS,
+	UMB_BLOCK_ENTRY_IS_EXPOSED_CONDITION_ALIAS,
+	UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS,
+} from './constants.js';
+import UmbBlockEntryHasSettingsCondition from './block-entry-has-settings.condition.js';
+import { UmbBlockEntryIsExposedCondition as UmbBlockEntryIsExposedConditionEntry } from './block-entry-is-exposed.condition.js';
 import UmbBlockEntryIsReadOnlyCondition from './block-entry-is-read-only.condition.js';
 import UmbBlockEntryShowContentEditCondition from './block-entry-show-content-edit.condition.js';
 import UmbBlockWorkspaceHasSettingsCondition from './block-workspace-has-settings.condition.js';
@@ -30,6 +36,18 @@ export const manifests: Array<ManifestCondition> = [
 		name: 'Block Workspace Is ReadOnly Condition',
 		alias: 'Umb.Condition.BlockWorkspaceIsReadOnly',
 		api: UmbBlockWorkspaceIsReadOnlyCondition,
+	},
+	{
+		type: 'condition',
+		name: 'Block Entry Has Settings Condition',
+		alias: UMB_BLOCK_ENTRY_HAS_SETTINGS_CONDITION_ALIAS,
+		api: UmbBlockEntryHasSettingsCondition,
+	},
+	{
+		type: 'condition',
+		name: 'Block Entry Is Exposed Condition',
+		alias: UMB_BLOCK_ENTRY_IS_EXPOSED_CONDITION_ALIAS,
+		api: UmbBlockEntryIsExposedConditionEntry,
 	},
 	{
 		type: 'condition',

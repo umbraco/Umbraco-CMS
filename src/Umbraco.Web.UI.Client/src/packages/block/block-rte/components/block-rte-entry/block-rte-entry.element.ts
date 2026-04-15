@@ -290,11 +290,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderActionBar() {
-		return html`
-			<umb-block-action-list block-editor=${UMB_BLOCK_RTE}>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()}
-			</umb-block-action-list>
-		`;
+		return html`<umb-block-action-list block-editor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
 	}
 
 	#renderBuiltinBlockView = () => {
@@ -314,47 +310,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}
 			.config=${this._blockViewProps.config}></umb-ref-rte-block>`;
-	}
-
-	#renderEditAction() {
-		if (this._isReadOnly) return nothing;
-		return this._showContentEdit && this._workspaceEditContentPath
-			? html`<uui-button
-					label="edit"
-					look="secondary"
-					color=${this._contentInvalid ? 'invalid' : ''}
-					href=${this._workspaceEditContentPath}>
-					<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
-					${this._contentInvalid
-						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-						: nothing}
-				</uui-button>`
-			: this._showContentEdit === false && this._exposed === false
-				? html`<uui-button
-						@click=${this.#expose}
-						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
-						look="secondary">
-						<uui-icon name="icon-add"></uui-icon>
-					</uui-button>`
-				: nothing;
-	}
-
-	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			${this._hasSettings && this._workspaceEditSettingsPath
-				? html`<uui-button
-						label="Edit settings"
-						look="secondary"
-						color=${this._settingsInvalid ? 'invalid' : ''}
-						href=${this._workspaceEditSettingsPath}>
-						<uui-icon name="icon-settings"></uui-icon>
-						${this._settingsInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
-							: nothing}
-					</uui-button>`
-				: nothing}
-		`;
 	}
 
 	override render() {
