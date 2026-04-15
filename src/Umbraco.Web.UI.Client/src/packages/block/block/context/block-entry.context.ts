@@ -54,6 +54,7 @@ export abstract class UmbBlockEntryContext<
 	protected _manager?: BlockManagerContextType;
 	protected _entries?: BlockEntriesContextType;
 
+	#layoutKey?: string;
 	#contentKey?: string;
 	#unsupported = new UmbBooleanState(undefined);
 	readonly unsupported = this.#unsupported.asObservable();
@@ -150,7 +151,7 @@ export abstract class UmbBlockEntryContext<
 	public readonly layout = this._layout.asObservable();
 	public readonly contentKey = this._layout.asObservablePart((x) => x?.contentKey);
 	public readonly settingsKey = this._layout.asObservablePart((x) => (x ? (x.settingsKey ?? null) : undefined));
-	public readonly unique = this._layout.asObservablePart((x) => x?.contentKey);
+	public readonly unique = this._layout.asObservablePart((x) => x?.key);
 
 	/**
 	 * Get the layout of the block.
@@ -461,15 +462,33 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	/**
+	 * Set the layout key of this entry — the unique identity of the layout item.
+	 * @param {string} layoutKey the layout key.
+	 */
+	setLayoutKey(layoutKey: string) {
+		this.#layoutKey = layoutKey;
+		this.#observeLayout();
+	}
+
+	getLayoutKey() {
+		return this.#layoutKey;
+	}
+
+	/**
 	 * Set the contentKey of this entry.
 	 * @function setContentKey
 	 * @param {string} contentKey the entry content key.
 	 * @returns {void}
+	 * @deprecated Use `setLayoutKey` instead. Will be removed in Umbraco 20.
 	 */
 	setContentKey(contentKey: string) {
 		this.#contentKey = contentKey;
 		this._manager?.ensureContentResolved(contentKey);
-		this.#observeLayout();
+		// Backwards compat: if no layoutKey set yet, use contentKey
+		if (!this.#layoutKey) {
+			this.#layoutKey = contentKey;
+			this.#observeLayout();
+		}
 	}
 
 	/**
@@ -501,10 +520,10 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	#observeLayout() {
-		if (!this._entries || !this.#contentKey) return;
+		if (!this._entries || !this.#layoutKey) return;
 
 		this.observe(
-			this._entries.layoutOf(this.#contentKey),
+			this._entries.layoutByKey(this.#layoutKey),
 			(layout) => {
 				this._layout.setValue(layout);
 			},
@@ -560,18 +579,19 @@ export abstract class UmbBlockEntryContext<
 	protected abstract _gotEntries(): void;
 
 	#observeContentData() {
-		if (!this._manager || !this.#contentKey) return;
+		const contentKey = this.#contentKey ?? this._layout.value?.contentKey;
+		if (!this._manager || !contentKey) return;
 
 		// Trigger library element fetch if needed (may have been missed when setContentKey
 		// was called before the manager was available)
-		this._manager.ensureContentResolved(this.#contentKey);
+		this._manager.ensureContentResolved(contentKey);
 
 		// Observe content and library state together to avoid race conditions.
 		// Both are evaluated in the same tick, preventing the unsupported flag
 		// from flashing true while library element content is being fetched.
 		this.observe(
 			mergeObservables(
-				[this._manager.contentOf(this.#contentKey), this._manager.isSharedContentOf(this.#contentKey)],
+				[this._manager.contentOf(contentKey), this._manager.isSharedContentOf(contentKey)],
 				([content, isLibrary]) => ({ content, isLibrary: isLibrary ?? false }),
 			),
 			({ content, isLibrary }) => {
@@ -586,7 +606,7 @@ export abstract class UmbBlockEntryContext<
 
 		// Observe the variant state of shared content (published, draft, etc.)
 		this.observe(
-			this._manager.sharedContentVariantStateOf(this.#contentKey),
+			this._manager.sharedContentVariantStateOf(contentKey),
 			(state) => {
 				this.#sharedContentVariantState.setValue(state ?? undefined);
 			},

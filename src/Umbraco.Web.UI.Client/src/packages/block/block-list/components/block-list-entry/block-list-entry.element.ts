@@ -44,10 +44,51 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		return this.#context.getIndex();
 	}
 
+	/**
+	 * Set the layout entry for this block.
+	 */
+	@property({ attribute: false })
+	public set layout(value: UmbBlockListLayoutModel | undefined) {
+		if (!value) return;
+		const layoutKey = value.key;
+		const contentKey = value.contentKey;
+
+		if (layoutKey && layoutKey !== this._layoutKey) {
+			this._layoutKey = layoutKey;
+			this.#context.setLayoutKey(layoutKey);
+		}
+
+		if (contentKey && contentKey !== this._contentKey) {
+			this._contentKey = contentKey;
+			this.#context.setContentKey(contentKey);
+
+			new UmbObserveValidationStateController(
+				this,
+				`$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]`,
+				(hasMessages) => {
+					this._contentInvalid = hasMessages;
+					this._blockViewProps.contentInvalid = hasMessages;
+				},
+				'observeMessagesForContent',
+			);
+		}
+	}
+
+	public get layoutKey(): string | undefined {
+		return this._layoutKey;
+	}
+	private _layoutKey?: string | undefined;
+
+	/**
+	 * @deprecated Use the `layout` property instead. Will be removed in Umbraco 20.
+	 */
 	@property({ attribute: false })
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
 		this._contentKey = value;
+		if (!this._layoutKey) {
+			this.#context.setLayoutKey(value);
+		}
 		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(
@@ -566,7 +607,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		const { data: created } = await elementRepository.create(scaffold, result.parentUnique);
 		if (!created) return;
 
-		manager.transferToLibrary(contentKey, created.unique);
+		const layoutKey = this.#context.getLayout()?.key;
+		if (!layoutKey) return;
+		manager.transferToLibrary(layoutKey, contentKey, created.unique);
 	};
 
 	#onDisconnectFromLibrary = async () => {
@@ -586,7 +629,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 		const manager = await this.getContext(UMB_BLOCK_MANAGER_CONTEXT).catch(() => undefined);
 		if (!manager) return;
+		const layoutKey = this.#context.getLayout()?.key;
+		if (!layoutKey) return;
 		manager.disconnectFromLibrary(
+			layoutKey,
 			contentKey,
 			element.values.map((v) => ({
 				alias: v.alias,

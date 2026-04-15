@@ -23,10 +23,31 @@ import '../ref-rte-block/index.js';
  */
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	/**
+	 * The unique layout key for this block entry.
+	 */
+	// TODO: [LK] Review the `layoutKey` property, whether it should just be `key` or even `id`?
+	@property({ type: String, attribute: 'data-layout-key', reflect: true })
+	public set layoutKey(value: string | undefined) {
+		if (!value) return;
+		this._layoutKey = value;
+		this.#context.setLayoutKey(value);
+	}
+	public get layoutKey(): string | undefined {
+		return this._layoutKey;
+	}
+	private _layoutKey?: string | undefined;
+
+	/**
+	 * @deprecated Use `layoutKey` instead. Will be removed in Umbraco 20.
+	 */
 	@property({ type: String, attribute: 'data-content-key', reflect: true })
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
 		this._contentKey = value;
+		if (!this._layoutKey) {
+			this.#context.setLayoutKey(value);
+		}
 		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(

@@ -35,6 +35,46 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.#context.setIndex(value);
 	}
 
+	/**
+	 * Set the layout entry for this block.
+	 */
+	@property({ attribute: false })
+	public set layout(value: UmbBlockGridLayoutModel | undefined) {
+		if (!value) return;
+		const layoutKey = value.key;
+		const contentKey = value.contentKey;
+
+		if (layoutKey && layoutKey !== this._layoutKey) {
+			this._layoutKey = layoutKey;
+			this.#context.setLayoutKey(layoutKey);
+		}
+
+		if (contentKey && contentKey !== this._contentKey) {
+			this._contentKey = contentKey;
+			this._blockViewProps.contentKey = contentKey;
+			this.setAttribute('data-element-key', contentKey);
+			this.#context.setContentKey(contentKey);
+
+			new UmbObserveValidationStateController(
+				this,
+				`$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]`,
+				(hasMessages) => {
+					this._contentInvalid = hasMessages;
+					this._blockViewProps.contentInvalid = hasMessages;
+				},
+				'observeMessagesForContent',
+			);
+		}
+	}
+
+	public get layoutKey(): string | undefined {
+		return this._layoutKey;
+	}
+	private _layoutKey?: string | undefined;
+
+	/**
+	 * @deprecated Use the `layout` property instead. Will be removed in Umbraco 20.
+	 */
 	@property({ attribute: false })
 	public get contentKey(): string | undefined {
 		return this._contentKey;
@@ -44,6 +84,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this._contentKey = key;
 		this._blockViewProps.contentKey = key;
 		this.setAttribute('data-element-key', key);
+		if (!this._layoutKey) {
+			this.#context.setLayoutKey(key);
+		}
 		this.#context.setContentKey(key);
 
 		new UmbObserveValidationStateController(
@@ -686,7 +729,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		const { data: created } = await elementRepository.create(scaffold, result.parentUnique);
 		if (!created) return;
 
-		manager.transferToLibrary(contentKey, created.unique);
+		const layoutKey = this.#context.getLayout()?.key;
+		if (!layoutKey) return;
+		manager.transferToLibrary(layoutKey, contentKey, created.unique);
 	};
 
 	#onDisconnectFromLibrary = async () => {
@@ -706,7 +751,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 		const manager = await this.getContext(UMB_BLOCK_MANAGER_CONTEXT).catch(() => undefined);
 		if (!manager) return;
+		const layoutKey = this.#context.getLayout()?.key;
+		if (!layoutKey) return;
 		manager.disconnectFromLibrary(
+			layoutKey,
 			contentKey,
 			element.values.map((v) => ({
 				alias: v.alias,

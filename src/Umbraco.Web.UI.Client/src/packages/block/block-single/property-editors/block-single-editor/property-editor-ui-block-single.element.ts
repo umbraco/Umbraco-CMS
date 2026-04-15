@@ -41,10 +41,10 @@ import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockSingleLayoutModel, UmbBlockSingleEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentKey!;
+		return element.layoutKey!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentKey;
+		return modelEntry.key;
 	},
 	//identifier: 'block-single-editor',
 	itemSelector: 'umb-block-single-entry',
@@ -395,13 +395,9 @@ export class UmbPropertyEditorUIBlockSingleElement
 		return html`
 			${repeat(
 				this._layouts,
-				(x) => x.contentKey,
+				(x) => x.key,
 				(layoutEntry) => html`
-					<umb-block-single-entry
-						.contentKey=${layoutEntry.contentKey}
-						.layout=${layoutEntry}
-						${umbDestroyOnDisconnect()}>
-					</umb-block-single-entry>
+					<umb-block-single-entry .layout=${layoutEntry} ${umbDestroyOnDisconnect()}></umb-block-single-entry>
 				`,
 			)}
 			${this.#renderCreateButtonGroup()}

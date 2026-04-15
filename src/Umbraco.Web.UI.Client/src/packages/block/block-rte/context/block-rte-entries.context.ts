@@ -203,7 +203,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 
 	async create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentKey'>,
+		partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentKey' | 'key'>,
 		originData?: UmbBlockRteWorkspaceOriginData,
 	) {
 		await this._retrieveManager;

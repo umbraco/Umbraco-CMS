@@ -24,6 +24,8 @@ import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 type UmbBlockTypeItemWithGroupKey = UmbBlockTypeWithGroupKey & UmbDocumentTypeItemModel;
 
+// TODO: [LK] Consider making as a workspace, then the "library" workspace-view could live in the "library" or "element" workspace instead.
+
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	UmbBlockCatalogueModalData,

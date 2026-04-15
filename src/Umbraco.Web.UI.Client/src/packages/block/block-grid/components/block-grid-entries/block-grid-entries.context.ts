@@ -505,23 +505,23 @@ export class UmbBlockGridEntriesContext
 	}
 
 	// create Block?
-	override async delete(contentKey: string) {
+	override async delete(layoutKey: string) {
 		// TODO: Loop through children and delete them as well?
 		// Find layout entry:
-		const layout = this._layoutEntries.getValue().find((x) => x.contentKey === contentKey);
+		const layout = this._layoutEntries.getValue().find((x) => x.key === layoutKey);
 		if (!layout) {
-			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
+			throw new Error(`Cannot delete block, missing layout for ${layoutKey}`);
 		}
 		// The following loop will only delete the referenced data of sub Layout Entries, as the Layout entry is part of the main Layout Entry they will go away when that is removed. [NL]
 		forEachBlockLayoutEntryOf(layout, async (entry) => {
 			if (entry.settingsKey) {
 				this._manager!.removeOneSettings(entry.settingsKey);
 			}
-			this._manager!.removeOneContent(contentKey);
-			this._manager!.removeExposesOf(contentKey);
+			this._manager!.removeOneContent(entry.contentKey);
+			this._manager!.removeExposesOf(entry.contentKey);
 		});
 
-		await super.delete(contentKey);
+		await super.delete(layoutKey);
 	}
 
 	protected async _insertFromPropertyValue(value: UmbBlockGridValueModel, originData: UmbBlockGridWorkspaceOriginData) {

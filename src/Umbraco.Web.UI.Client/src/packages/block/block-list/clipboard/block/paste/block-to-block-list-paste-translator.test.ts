@@ -32,6 +32,7 @@ describe('UmbBlockToBlockListClipboardPastePropertyValueTranslator', () => {
 		layout: {
 			[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: [
 				{
+					key: 'contentKey',
 					contentKey: 'contentKey',
 					settingsKey: null,
 				},
@@ -45,6 +46,7 @@ describe('UmbBlockToBlockListClipboardPastePropertyValueTranslator', () => {
 		contentData: blockListPropertyValue.contentData,
 		layout: [
 			{
+				key: 'contentKey',
 				contentKey: 'contentKey',
 				settingsKey: null,
 			},

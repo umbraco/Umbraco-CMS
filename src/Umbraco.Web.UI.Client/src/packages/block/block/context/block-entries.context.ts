@@ -30,7 +30,7 @@ export abstract class UmbBlockEntriesContext<
 
 	public abstract readonly canCreate: Observable<boolean>;
 
-	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.contentKey);
+	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.key);
 	readonly layoutEntries = this._layoutEntries.asObservable();
 	readonly layoutEntriesLength = this._layoutEntries.asObservablePart((x) => x.length);
 
@@ -64,8 +64,14 @@ export abstract class UmbBlockEntriesContext<
 	layoutOf(contentKey: string) {
 		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}
+	layoutByKey(layoutKey: string) {
+		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.key === layoutKey));
+	}
 	getLayoutOf(contentKey: string) {
 		return this._layoutEntries.getValue().find((x) => x.contentKey === contentKey);
+	}
+	getLayoutByKey(layoutKey: string) {
+		return this._layoutEntries.getValue().find((x) => x.key === layoutKey);
 	}
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		return this._layoutEntries.setValue(layouts);
@@ -79,7 +85,7 @@ export abstract class UmbBlockEntriesContext<
 
 	public abstract create(
 		contentElementTypeKey: string,
-		layoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		layoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 		originData?: BlockOriginData,
 	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
@@ -90,19 +96,25 @@ export abstract class UmbBlockEntriesContext<
 		originData: BlockOriginData,
 	): Promise<boolean>;
 
-	public async delete(contentKey: string) {
+	public async delete(layoutKey: string) {
 		await this._retrieveManager;
-		const layout = this._layoutEntries.value.find((x) => x.contentKey === contentKey);
+		const layout = this._layoutEntries.value.find((x) => x.key === layoutKey);
 		if (!layout) {
-			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
+			throw new Error(`Cannot delete block, missing layout for ${layoutKey}`);
 		}
-		this._layoutEntries.removeOne(contentKey);
+		this._layoutEntries.removeOne(layoutKey);
 
-		this._manager!.removeOneContent(contentKey);
-		if (layout.settingsKey) {
-			this._manager!.removeOneSettings(layout.settingsKey);
+		// Only remove content/settings/exposes if no other layout references the same contentKey
+		const hasOtherReference = this._layoutEntries.value.some(
+			(x) => x.key !== layoutKey && x.contentKey === layout.contentKey,
+		);
+		if (!hasOtherReference) {
+			this._manager!.removeOneContent(layout.contentKey);
+			if (layout.settingsKey) {
+				this._manager!.removeOneSettings(layout.settingsKey);
+			}
+			this._manager!.removeExposesOf(layout.contentKey);
 		}
-		this._manager!.removeExposesOf(contentKey);
 	}
 
 	// insert/paste from property value methods:

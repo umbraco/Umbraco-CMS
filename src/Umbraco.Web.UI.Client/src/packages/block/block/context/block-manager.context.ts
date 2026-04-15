@@ -75,7 +75,7 @@ export abstract class UmbBlockManagerContext<
 	protected _liveEditingMode = new UmbBooleanState(undefined);
 	public readonly liveEditingMode = this._liveEditingMode.asObservable();
 
-	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentKey);
+	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.key);
 	public readonly layouts = this._layouts.asObservable();
 
 	readonly #contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
@@ -128,6 +128,10 @@ export abstract class UmbBlockManagerContext<
 	 * @param {Array<BlockLayoutType>} layouts - All layouts.
 	 */
 	setLayouts(layouts: Array<BlockLayoutType>) {
+		// Backwards compatibility: ensure all layouts have a key (persisted data may not have one)
+		layouts.forEach((l) => {
+			l.key ??= l.contentKey;
+		});
 		this._layouts.setValue(layouts);
 	}
 
@@ -507,7 +511,7 @@ export abstract class UmbBlockManagerContext<
 	 * Sets the initial block expose once the element content is resolved.
 	 */
 	async insertLibraryElementReference(elementKey: string, _originData?: BlockOriginDataType) {
-		const layout = { contentKey: elementKey, isSharedContent: true } as BlockLayoutType;
+		const layout = { key: UmbId.new(), contentKey: elementKey, isSharedContent: true } as BlockLayoutType;
 		this._layouts.appendOne(layout);
 		await this.#fetchLibraryElement(elementKey);
 
@@ -521,10 +525,10 @@ export abstract class UmbBlockManagerContext<
 	 * Transfer a local block's content to the library.
 	 * Removes the inline content and updates the layout to reference the new element.
 	 */
-	transferToLibrary(oldContentKey: string, newElementKey: string) {
+	transferToLibrary(layoutKey: string, oldContentKey: string, newElementKey: string) {
 		this.#contents.removeOne(oldContentKey);
 		this.removeExposesOf(oldContentKey);
-		this._layouts.updateOne(oldContentKey, {
+		this._layouts.updateOne(layoutKey, {
 			contentKey: newElementKey,
 			isSharedContent: true,
 		} as Partial<BlockLayoutType>);
@@ -534,7 +538,7 @@ export abstract class UmbBlockManagerContext<
 	/**
 	 * Disconnect a block from the library, copying element content to local contentData.
 	 */
-	disconnectFromLibrary(elementKey: string, values: Array<UmbBlockDataValueModel>, contentTypeKey: string) {
+	disconnectFromLibrary(layoutKey: string, elementKey: string, values: Array<UmbBlockDataValueModel>, contentTypeKey: string) {
 		const newKey = UmbId.new();
 		const newContent: UmbBlockDataModel = {
 			key: newKey,
@@ -542,7 +546,7 @@ export abstract class UmbBlockManagerContext<
 			values,
 		};
 		this.#contents.appendOne(newContent);
-		this._layouts.updateOne(elementKey, { contentKey: newKey, isSharedContent: undefined } as Partial<BlockLayoutType>);
+		this._layouts.updateOne(layoutKey, { contentKey: newKey, isSharedContent: undefined } as Partial<BlockLayoutType>);
 		this.#resolvedLibraryElements.removeOne(elementKey);
 		this.#resolvedLibraryElementVariants.removeOne(elementKey);
 		// Only set expose if the content type structure is loaded (it may not be for library elements
@@ -572,7 +576,7 @@ export abstract class UmbBlockManagerContext<
 
 	abstract createWithPresets(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 		originData?: BlockOriginDataType,
 	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
@@ -673,7 +677,7 @@ export abstract class UmbBlockManagerContext<
 
 	protected async _createBlockData(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 	) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
@@ -681,9 +685,12 @@ export abstract class UmbBlockManagerContext<
 			throw new Error(`Cannot create block, missing block type for ${contentElementTypeKey}`);
 		}
 
+		const contentKey = UmbId.new();
+
 		// Create layout entry:
 		const layout: BlockLayoutType = {
-			contentKey: UmbId.new(),
+			key: contentKey,
+			contentKey,
 			...(partialLayoutEntry as Partial<BlockLayoutType>),
 		} as BlockLayoutType;
 

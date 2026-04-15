@@ -4,6 +4,7 @@ export type * from './conditions/types.js';
 export type * from './clipboard/types.js';
 
 export interface UmbBlockLayoutBaseModel {
+	key: string;
 	contentKey: string;
 	settingsKey?: string | null;
 	isSharedContent?: boolean;
