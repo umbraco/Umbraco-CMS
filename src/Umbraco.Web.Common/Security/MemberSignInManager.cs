@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
@@ -19,8 +22,10 @@ namespace Umbraco.Cms.Web.Common.Security;
 public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMemberSignInManager
 {
     private readonly IEventAggregator _eventAggregator;
+    private readonly IIpResolver _ipResolver;
     private readonly IMemberExternalLoginProviders _memberExternalLoginProviders;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public MemberSignInManager(
         UserManager<MemberIdentityUser> memberManager,
         IHttpContextAccessor contextAccessor,
@@ -33,13 +38,46 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
         IEventAggregator eventAggregator,
         IOptions<SecuritySettings> securitySettings,
         IRequestCache requestCache)
+        : this(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, memberExternalLoginProviders, eventAggregator, securitySettings, requestCache, StaticServiceProvider.Instance.GetRequiredService<IIpResolver>())
+    {
+    }
+
+    public MemberSignInManager(
+        UserManager<MemberIdentityUser> memberManager,
+        IHttpContextAccessor contextAccessor,
+        IUserClaimsPrincipalFactory<MemberIdentityUser> claimsFactory,
+        IOptions<IdentityOptions> optionsAccessor,
+        ILogger<SignInManager<MemberIdentityUser>> logger,
+        IAuthenticationSchemeProvider schemes,
+        IUserConfirmation<MemberIdentityUser> confirmation,
+        IMemberExternalLoginProviders memberExternalLoginProviders,
+        IEventAggregator eventAggregator,
+        IOptions<SecuritySettings> securitySettings,
+        IRequestCache requestCache,
+        IIpResolver ipResolver)
         : base(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation, securitySettings, requestCache)
     {
         _memberExternalLoginProviders = memberExternalLoginProviders;
         _eventAggregator = eventAggregator;
+        _ipResolver = ipResolver;
     }
 
     protected override bool AllowConcurrentLoginsEnabled => SecuritySettings.GetMemberAllowConcurrentLogins();
+
+    /// <inheritdoc />
+    public override async Task<SignInResult> PasswordSignInAsync(MemberIdentityUser user, string password, bool isPersistent, bool lockoutOnFailure)
+    {
+        SignInResult result = await base.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
+
+        if (result.Succeeded is false && result.RequiresTwoFactor is false)
+        {
+            var ipAddress = _ipResolver.GetCurrentRequestIpAddress();
+            var reason = GetFailedLoginReason(result);
+            _eventAggregator.Publish(new MemberLoginFailedNotification(ipAddress, user.Key, reason));
+        }
+
+        return result;
+    }
 
     // use default scheme for members
     protected override string AuthenticationType => IdentityConstants.ApplicationScheme;
@@ -305,6 +343,56 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             "The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'",
             loginInfo.LoginProvider,
             user.Id);
+
+    /// <inheritdoc />
+    protected override async Task<SignInResult> HandleSignIn(MemberIdentityUser? user, string? username, SignInResult result)
+    {
+        result = await base.HandleSignIn(user, username, result);
+
+        var ipAddress = _ipResolver.GetCurrentRequestIpAddress();
+
+        if (result.Succeeded)
+        {
+            if (user is not null)
+            {
+                _eventAggregator.Publish(new MemberLoginSuccessNotification(ipAddress, user.Key));
+            }
+        }
+        else if (result.RequiresTwoFactor is false)
+        {
+            // RequiresTwoFactor means "2FA is now required" (not a failure) — so we don't publish a failed notification.
+
+            // All other failures reach here:
+            // - User not found (user is null) via PasswordSignInAsync(string)
+            // - Failed 2FA verification (user is not null) via TwoFactorSignInAsync
+            // Note: password failures for existing users are handled by PasswordSignInAsync(TUser) override.
+            var reason = user is null ? MemberLoginFailedReason.MemberNotFound : GetFailedLoginReason(result);
+            _eventAggregator.Publish(new MemberLoginFailedNotification(ipAddress, user?.Key, reason));
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public override async Task SignOutAsync()
+    {
+        MemberIdentityUser? user = await UserManager.GetUserAsync(Context.User);
+        var ipAddress = _ipResolver.GetCurrentRequestIpAddress();
+
+        await base.SignOutAsync();
+
+        if (user is not null)
+        {
+            _eventAggregator.Publish(new MemberLogoutSuccessNotification(ipAddress, user.Key));
+        }
+    }
+
+    private static string GetFailedLoginReason(SignInResult result) => result switch
+    {
+        { IsLockedOut: true } => MemberLoginFailedReason.LockedOut,
+        { IsNotAllowed: true } => MemberLoginFailedReason.NotAllowed,
+        _ => MemberLoginFailedReason.InvalidCredentials,
+    };
 
     protected void NotifyRequiresTwoFactor(MemberIdentityUser user) => Notify(
         user,
