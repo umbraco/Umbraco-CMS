@@ -22,6 +22,8 @@ import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
+const MAX_SUGGESTIONS = 5;
+
 @customElement('umb-data-type-picker-flow-modal')
 export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	UmbDataTypePickerFlowModalData,
@@ -31,6 +33,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	public override set data(value: UmbDataTypePickerFlowModalData) {
 		super.data = value;
+		if (value?.propertyLabel) {
+			this.#loadSuggestions(value.propertyLabel);
+		}
 	}
 
 	@state()
@@ -38,6 +43,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _groupedPropertyEditorUIs: Array<{ key: string; items: Array<ManifestPropertyEditorUi> }> = [];
+
+	@state()
+	private _suggestedPropertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 
 	@state()
 	private _currentPage = 1;
@@ -66,6 +74,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 
 	#searchController = new UmbPropertyEditorUISearchController(this);
+	#suggestionSearchController = new UmbPropertyEditorUISearchController(this);
 
 	constructor() {
 		super();
@@ -98,6 +107,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 				this.#groupLookup = Object.fromEntries(propertyEditorUIs.map((ui) => [ui.alias, ui.meta.group]));
 				this.#searchController.setPropertyEditorUIs(this.#propertyEditorUIs);
+				this.#suggestionSearchController.setPropertyEditorUIs(this.#propertyEditorUIs);
 
 				this.#performFiltering();
 			}).asPromise(),
@@ -166,6 +176,16 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				this.#select(value?.unique);
 				this._submitModal();
 			});
+	}
+
+	async #loadSuggestions(propertyLabel: string) {
+		try {
+			await this.#initPromise;
+			const results = await this.#suggestionSearchController.search(propertyLabel);
+			this._suggestedPropertyEditorUIs = results.slice(0, MAX_SUGGESTIONS);
+		} catch (error) {
+			if ((error as DOMException)?.name !== 'AbortError') throw error;
+		}
 	}
 
 	async #getDataTypes() {
@@ -278,7 +298,20 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	}
 
 	#renderGrid() {
-		return this.#currentFilterQuery ? this.#renderFilteredList() : this.#renderUIs();
+		return this.#currentFilterQuery
+			? this.#renderFilteredList()
+			: html`${this.#renderSuggestions()}${this.#renderUIs()}`;
+	}
+
+	#renderSuggestions() {
+		if (this._suggestedPropertyEditorUIs.length === 0) return nothing;
+		return html`
+			<h5 class="category-name">
+				<umb-localize key="contentTypeEditor_suggestedEditors">Suggestions</umb-localize>
+			</h5>
+			${this.#renderGroupUIs(this._suggestedPropertyEditorUIs)}
+			<hr />
+		`;
 	}
 
 	#renderFilter() {

@@ -23,6 +23,13 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 	private _ids?: Array<string>;
 
 	/**
+	 * Optional label of the property being edited. Used to provide AI-powered
+	 * suggestions in the property editor UI picker.
+	 */
+	@property({ type: String })
+	propertyLabel?: string;
+
+	/**
 	 * @param {string} dataTypeId
 	 * @default
 	 */
@@ -51,7 +58,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
 			.onSetup(() => {
 				return {
-					data: {},
+					data: { propertyLabel: this.propertyLabel },
 					value: { selection: this._ids ?? [] },
 				};
 			})

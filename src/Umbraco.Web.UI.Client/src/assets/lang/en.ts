@@ -1791,6 +1791,7 @@ export default {
 		editorSettings: 'Editor settings',
 		searchResultSettings: 'Available configurations',
 		searchResultEditors: 'Create a new configuration',
+		suggestedEditors: 'Suggestions',
 		configuration: 'Configuration',
 		yesDelete: 'Yes, delete',
 		movedUnderneath: 'was moved underneath',

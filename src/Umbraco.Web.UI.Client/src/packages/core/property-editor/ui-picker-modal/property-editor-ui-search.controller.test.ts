@@ -53,6 +53,7 @@ const mockUIs: Array<ManifestPropertyEditorUi> = [
 			icon: 'icon-picture',
 			group: 'Pickers',
 			propertyEditorSchemaAlias: 'Umbraco.MediaPicker3',
+			keywords: ['image', 'photo', 'picture'],
 		},
 	}),
 	mockUI({
@@ -112,6 +113,13 @@ describe('UmbPropertyEditorUISearchController', () => {
 	it('should match multiple tokens', async () => {
 		const results = await controller.search('color picker');
 		expect(results[0].alias).to.equal('Umb.PropertyEditorUi.ColorPicker');
+	});
+
+	it('should surface partial matches for multi-word queries where only one token matches a keyword', async () => {
+		// "hero" matches nothing, but "image" is an exact keyword on Media Picker.
+		// Without partial-token scoring this would return zero matches.
+		const results = await controller.search('hero image');
+		expect(results.some((r) => r.alias === 'Umb.PropertyEditorUi.MediaPicker')).to.be.true;
 	});
 
 	it('should abort a prior in-flight search when a new one starts', async () => {

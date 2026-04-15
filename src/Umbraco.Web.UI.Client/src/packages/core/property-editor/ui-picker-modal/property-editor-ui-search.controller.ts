@@ -141,6 +141,31 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 			return 200;
 		}
 
+		// Partial token match — some (but not all) query tokens match keywords or label tokens.
+		// Helps multi-word queries like "Hero Image" surface editors where at least one token
+		// matches strongly (e.g., Media Picker via the "image" keyword).
+		if (queryTokens.length > 1) {
+			let partialScore = 0;
+			let matchedTokens = 0;
+			for (const qt of queryTokens) {
+				if (keywordsLower.some((k) => k === qt)) {
+					matchedTokens++;
+					partialScore += 60;
+				} else if (keywordsLower.some((k) => k.includes(qt) || qt.includes(k))) {
+					matchedTokens++;
+					partialScore += 30;
+				} else if (labelTokens.some((lt) => lt === qt || lt.includes(qt))) {
+					matchedTokens++;
+					partialScore += 30;
+				}
+			}
+			if (matchedTokens > 0) {
+				// Normalise by query length so long queries don't accumulate unfairly.
+				// Cap at 149 to stay below the group-substring tier (150).
+				return Math.min(149, Math.floor(partialScore / queryTokens.length));
+			}
+		}
+
 		// Group substring match
 		if (groupLower.includes(query)) {
 			return 150;
