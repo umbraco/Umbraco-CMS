@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services.ContentTypeEditing;
@@ -85,8 +83,5 @@ public interface IElementSwitchValidator
     ///     Element types with existing element instances in the library cannot be converted
     ///     to document types because document types use a different storage and editing model.
     /// </remarks>
-    // TODO (V19): Remove the default implementation.
-    Task<bool> ElementToDocumentHasNoContentAsync(IContentTypeBase contentType)
-        => Task.FromResult(StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>()
-            .HasContentNodes(contentType.Id) is false);
+    Task<bool> ElementToDocumentHasNoContentAsync(IContentTypeBase contentType);
 }
