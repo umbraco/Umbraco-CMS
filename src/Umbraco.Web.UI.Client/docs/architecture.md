@@ -91,48 +91,13 @@ Packages expose subpath exports (e.g., `@umbraco-cms/backoffice/dashboard`, `@um
 
 ### Extension Registry
 
-All UI is registered as **Extension Manifests**. The registry is mutable at runtime — extensions can be added, removed, or replaced.
+All UI and a few other customizations are registered as **Extension Manifests** — plain objects declaring type, alias, behavior, and activation conditions. The registry is mutable at runtime — extensions can be added, removed, or replaced.
 
-```typescript
-const manifest: UmbExtensionManifest = {
-  type: 'dashboard',
-  alias: 'My.Dashboard',
-  name: 'My Dashboard',
-  element: () => import('./my-dashboard.element.js'),
-  weight: 100,
-  meta: { label: 'My Dashboard', pathname: 'my-dashboard' },
-  conditions: [
-    { alias: 'Umb.Condition.SectionAlias', match: 'Umb.Section.Content' },
-  ],
-};
-```
-
-Key extension types: `section`, `sectionView`, `dashboard`, `workspace`, `workspaceView`, `workspaceAction`, `workspaceContext`, `propertyEditorUi`, `propertyEditorSchema`, `tree`, `treeItem`, `menuItem`, `entityAction`, `entityBulkAction`, `headerApp`, `globalContext`, `modal`, `bundle`, `backofficeEntryPoint`, `localization`, `condition`, `kind`.
-
-**Registration methods:**
-
-- **Internal packages**: `umbraco-package.ts` exports a `bundle` manifest with `js: () => import('./manifests.js')`. The `manifests.ts` aggregates sub-feature manifests. Bundle type ensures lazy-loading.
-
-```typescript
-// umbraco-package.ts
-export const name = 'Umbraco.Core.MyPackage';
-export const extensions = [
-  { name: 'My Package Bundle', alias: 'Umb.Bundle.MyPackage', type: 'bundle', js: () => import('./manifests.js') },
-];
-
-// manifests.ts
-import { manifests as featureAManifests } from './feature-a/manifests.js';
-export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [...featureAManifests];
-```
-
-- **External packages**: `umbraco-package.json` (static).
-- **Runtime**: `umbExtensionsRegistry.register(manifest)` or `registerMany(manifests)`.
-
-**Conditions**: Declarative rules for when an extension is active (e.g., section alias match, user permission).
+For the full manifest shape, alias conventions, registration methods, and how aliases connect extensions, see **[Manifests & Aliases](./manifests.md)**.
 
 ### Kinds
 
-Kinds are **generic, reusable implementations of an extension type**. A kind provides a pre-built `element`, `api`, or both for a specific purpose. Extensions reference a kind to inherit its implementation, then customize behavior through `meta`.
+Kinds are **generic, reusable manifests of an extension type**. A kind can provide a pre-built `element`, `api`, or both for a specific purpose. Extensions reference a kind to inherit its implementation, then customize behavior through `meta`.
 
 **How it works**: The registry merges kind defaults with the extension manifest. Extension properties override kind properties; `meta` is shallow-merged (extension meta extends/overrides kind meta).
 

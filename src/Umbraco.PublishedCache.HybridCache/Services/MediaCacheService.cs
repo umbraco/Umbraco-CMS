@@ -163,6 +163,15 @@ internal sealed class MediaCacheService : IMediaCacheService
     public async Task RefreshMediaAsync(IMedia media)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        if (media.Trashed)
+        {
+            await _databaseCacheRepository.DeleteContentItemAsync(media.Id);
+            await RemoveFromMemoryCacheAsync(media.Key);
+            scope.Complete();
+            return;
+        }
+
         var cacheNode = _cacheNodeFactory.ToContentCacheNode(media);
         await _databaseCacheRepository.RefreshMediaAsync(cacheNode);
         _publishedContentCache.Remove(GetCacheKey(media.Key, false), out _);
@@ -247,6 +256,10 @@ internal sealed class MediaCacheService : IMediaCacheService
             var cacheKey = GetCacheKey(publishedNode.Key, false);
             await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key));
             _publishedContentCache.Remove(cacheKey, out _);
+        }
+        else
+        {
+            await RemoveFromMemoryCacheAsync(key);
         }
 
         scope.Complete();
