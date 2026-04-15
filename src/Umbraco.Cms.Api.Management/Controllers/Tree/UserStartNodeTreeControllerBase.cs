@@ -54,14 +54,14 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
     /// </summary>
     /// <returns>An array of start node IDs.</returns>
     [Obsolete("No longer used. Register a custom IUserStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
-    protected abstract int[] GetUserStartNodeIds();
+    protected virtual int[] GetUserStartNodeIds() => [];
 
     /// <summary>
     /// Gets the calculated start node paths for the current user.
     /// </summary>
     /// <returns>An array of start node paths.</returns>
     [Obsolete("No longer used. Register a custom IUserStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
-    protected abstract string[] GetUserStartNodePaths();
+    protected virtual string[] GetUserStartNodePaths() => [];
 
     /// <summary>
     /// Configures the controller to ignore user start nodes for a specific data type.
