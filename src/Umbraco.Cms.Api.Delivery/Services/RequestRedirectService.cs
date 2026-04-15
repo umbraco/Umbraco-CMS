@@ -38,7 +38,7 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
         _globalSettings = globalSettings.Value;
     }
 
-    public IApiContentRoute? GetRedirectRoute(string requestedPath)
+    public async Task<IApiContentRoute?> GetRedirectRouteAsync(string requestedPath)
     {
         requestedPath = requestedPath.EnsureStartsWith("/");
 
@@ -55,13 +55,13 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
 
         // important: redirect URLs are always tracked without trailing slashes
         requestedPath = requestedPath.TrimEnd("/");
-        IRedirectUrl? redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath, culture);
+        IRedirectUrl? redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(requestedPath, culture);
 
         // if a redirect URL was not found, try by appending the start item ID because URL tracking might have tracked
         // a redirect with "{root content ID}/{content path}"
         if (redirectUrl is null && startItem is not null)
         {
-            redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl($"{startItem.Id}{requestedPath}", culture);
+            redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync($"{startItem.Id}{requestedPath}", culture);
         }
 
         // still no redirect URL found - try looking for a configured domain if we have a domain bound request,
@@ -74,7 +74,7 @@ internal sealed class RequestRedirectService : RoutingServiceBase, IRequestRedir
             {
                 requestedPath = GetContentRoute(domainAndUri, contentRoute);
                 culture ??= domainAndUri.Culture;
-                redirectUrl = _redirectUrlService.GetMostRecentRedirectUrl(requestedPath, culture);
+                redirectUrl = await _redirectUrlService.GetMostRecentRedirectUrlAsync(requestedPath, culture);
             }
         }
 

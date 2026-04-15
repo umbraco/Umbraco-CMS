@@ -34,6 +34,6 @@ namespace Umbraco.Cms.Core.Routing
         /// Creates appropriate redirects for the content item following an update.
         /// </summary>
         /// <param name="oldRoutes">The populated dictionary of old routes;</param>
-        void CreateRedirects(IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes);
+        Task CreateRedirectsAsync(IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> oldRoutes);
     }
 }
