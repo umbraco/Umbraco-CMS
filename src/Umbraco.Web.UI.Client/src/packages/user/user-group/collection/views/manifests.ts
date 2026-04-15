@@ -1,34 +1,15 @@
-import { UMB_SECTION_ALIASES_VALUE_TYPE } from '@umbraco-cms/backoffice/section';
+import { UMB_USER_GROUP_COLLECTION_ALIAS } from '../constants.js';
 import { UMB_USER_GROUP_TABLE_COLLECTION_VIEW_ALIAS } from './constants.js';
+import { UMB_SECTION_ALIASES_VALUE_TYPE } from '@umbraco-cms/backoffice/section';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionView',
+		kind: 'table',
 		alias: UMB_USER_GROUP_TABLE_COLLECTION_VIEW_ALIAS,
 		name: 'User Group Table Collection View',
-		js: () => import('./user-group-table-collection-view.element.js'),
 		meta: {
-			label: 'Table',
-			icon: 'icon-table',
-			pathName: 'table',
-		},
-		conditions: [
-			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: 'Umb.Collection.UserGroup',
-			},
-		],
-	},
-	{
-		type: 'collectionView',
-		kind: 'table',
-		alias: 'Umb.CollectionView.UserGroup.Table.Kind',
-		name: 'User Group Table Kind Collection View',
-		meta: {
-			label: 'Table',
-			icon: 'icon-table',
-			pathName: 'table2',
 			columns: [
 				{
 					field: 'sections',
@@ -52,7 +33,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		conditions: [
 			{
 				alias: UMB_COLLECTION_ALIAS_CONDITION,
-				match: 'Umb.Collection.UserGroup',
+				match: UMB_USER_GROUP_COLLECTION_ALIAS,
 			},
 		],
 	},
