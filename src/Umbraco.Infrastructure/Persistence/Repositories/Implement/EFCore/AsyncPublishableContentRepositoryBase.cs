@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
@@ -6,6 +7,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
@@ -27,7 +29,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     where TEntity : class, IPublishableContentBase
     where TRepository : class, IRepository
     where TEntityDto : class
-    where TContentVersionDto : class
+    where TContentVersionDto : class, IContentVersionDto
     where TContentCultureVariationDto : class, new()
 {
     /// <summary>
@@ -98,6 +100,31 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// <param name="entity">The domain entity to convert.</param>
     /// <returns>The DTO ready to be saved to the database.</returns>
     protected abstract TEntityDto BuildEntityDto(TEntity entity);
+
+    // --- AsyncContentRepositoryBase overrides ---
+
+    /// <inheritdoc />
+    protected override async Task PerformDeleteVersionAsync(int versionId, CancellationToken cancellationToken) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            await db.PropertyData
+                .Where(x => x.VersionId == versionId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            await db.ContentVersionCultureVariations
+                .Where(x => x.VersionId == versionId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            await db.Set<TContentVersionDto>()
+                .Where(x => x.Id == versionId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            await db.ContentVersions
+                .Where(x => x.Id == versionId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            return true;
+        });
 
     // --- IAsyncPublishableContentRepository ---
 

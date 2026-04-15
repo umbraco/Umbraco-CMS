@@ -130,10 +130,6 @@ internal sealed class AsyncDocumentRepository
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    protected override Task PerformDeleteVersionAsync(Guid versionKey, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
-
-    /// <inheritdoc />
     protected override Task OnUowRefreshedEntityAsync(IContent entity, CancellationToken cancellationToken) =>
         throw new NotImplementedException();
 
