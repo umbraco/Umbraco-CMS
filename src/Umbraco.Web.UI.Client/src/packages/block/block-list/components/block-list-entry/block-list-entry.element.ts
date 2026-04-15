@@ -77,6 +77,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	private _unsupported?: boolean;
 
 	@state()
+	private _showActions?: boolean;
+
+	@state()
 	private _inlineEditingMode?: boolean;
 
 	@state()
@@ -167,6 +170,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
+		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
 
@@ -380,7 +384,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#renderActionBar() {
 		if (this._isSortMode) return nothing;
-		return html`<umb-block-action-list block-editor=${UMB_BLOCK_LIST}></umb-block-action-list>`;
+		if (!this._showActions) return nothing;
+		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_LIST}></umb-block-action-list>`;
 	}
 
 	override render() {
@@ -393,14 +398,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host {
 				position: relative;
 				display: block;
-				--umb-block-entry-actions-opacity: 0;
+				--umb-block-list-entry-actions-opacity: 0;
 			}
 
 			:host([settings-invalid]),
 			:host([content-invalid]),
 			:host(:hover),
 			:host(:focus-within) {
-				--umb-block-entry-actions-opacity: 1;
+				--umb-block-list-entry-actions-opacity: 1;
 			}
 
 			:host::after {
@@ -423,6 +428,15 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			umb-extension-slot::part(component) {
 				position: relative;
 				z-index: 0;
+			}
+
+			#actions {
+				position: absolute;
+				top: var(--uui-size-2);
+				right: var(--uui-size-2);
+				opacity: var(--umb-block-list-entry-actions-opacity, 0);
+				transition: opacity 120ms;
+				z-index: 1;
 			}
 
 			uui-badge {

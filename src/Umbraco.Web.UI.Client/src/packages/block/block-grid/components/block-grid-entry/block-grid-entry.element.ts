@@ -87,9 +87,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _exposed?: boolean;
 
-	// Unuspported is triggerede if the Block Type is not reconized, it can also be triggerede by the Content Element Type not existing any longer. [NL]
+	// Unsupported is triggered if the Block Type is not recognized, it can also be triggered by the Content Element Type not existing any longer. [NL]
 	@state()
 	private _unsupported?: boolean;
+
+	@state()
+	private _showActions?: boolean;
 
 	@state()
 	private _inlineEditingMode?: boolean;
@@ -204,6 +207,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
+		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
 
@@ -558,7 +562,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#renderActionBar() {
 		if (this._isSortMode) return nothing;
-		return html`<umb-block-action-list block-editor=${UMB_BLOCK_GRID}></umb-block-action-list>`;
+		if (!this._showActions) return nothing;
+		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_GRID}></umb-block-action-list>`;
 	}
 
 	static override styles = [
@@ -567,14 +572,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			:host {
 				position: relative;
 				display: block;
-				--umb-block-entry-actions-opacity: 0;
+				--umb-block-grid-entry-actions-opacity: 0;
 			}
 
 			:host([settings-invalid]),
 			:host([content-invalid]),
 			:host(:hover),
 			:host(:focus-within) {
-				--umb-block-entry-actions-opacity: 1;
+				--umb-block-grid-entry-actions-opacity: 1;
 			}
 
 			:host::after {
@@ -622,6 +627,15 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 			:host(:not([index='0'])) uui-button-inline-create:not([vertical]) {
 				top: calc(var(--umb-block-grid--row-gap, 0px) * -0.5);
+			}
+
+			#actions {
+				position: absolute;
+				top: var(--uui-size-2);
+				right: var(--uui-size-2);
+				opacity: var(--umb-block-grid-entry-actions-opacity, 0);
+				transition: opacity 120ms;
+				z-index: 1;
 			}
 
 			uui-button-inline-create[vertical] {

@@ -58,6 +58,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	private _exposed?: boolean;
 
 	@state()
+	private _showActions?: boolean;
+
+	@state()
 	private _contentTypeAlias?: string;
 
 	@state()
@@ -154,6 +157,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			},
 			null,
 		);
+
+		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 
 		// Data props:
 		this.observe(
@@ -278,7 +283,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderActionBar() {
-		return html`<umb-block-action-list block-editor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
+		if (!this._showActions) return nothing;
+		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
 	}
 
 	#renderBuiltinBlockView = () => {
@@ -332,6 +338,15 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			umb-extension-slot::part(component) {
 				position: relative;
 				z-index: 0;
+			}
+
+			#actions {
+				position: absolute;
+				top: var(--uui-size-2);
+				right: var(--uui-size-2);
+				opacity: var(--umb-block-entry-actions-opacity, 0);
+				transition: opacity 120ms;
+				z-index: 1;
 			}
 
 			:host([drag-placeholder]) {

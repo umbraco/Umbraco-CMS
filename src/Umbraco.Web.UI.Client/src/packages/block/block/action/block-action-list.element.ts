@@ -1,7 +1,7 @@
 import { UMB_BLOCK_ENTRY_CONTEXT } from '../context/block-entry.context-token.js';
 import type { UmbBlockActionArgs } from './types.js';
 import type { ManifestBlockAction, MetaBlockAction } from './block-action.extension.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -89,22 +89,6 @@ export class UmbBlockActionListElement extends UmbLitElement {
 			</uui-action-bar>
 		`;
 	}
-
-	static override styles = [
-		css`
-			:host {
-				position: absolute;
-				top: var(--uui-size-2);
-				right: var(--uui-size-2);
-				z-index: 1;
-			}
-
-			uui-action-bar {
-				opacity: var(--umb-block-entry-actions-opacity, 0);
-				transition: opacity 120ms;
-			}
-		`,
-	];
 }
 
 declare global {
