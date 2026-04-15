@@ -58,5 +58,4 @@ Property editor value types use the schema alias as the key because document col
 - The `declare global` block lives in the **same file** as the constant.
 - **One value type per file.** File is named `constants.ts` inside a `value-type/` sub-folder.
 - Export the constant from the package `index.ts` so other packages can import it.
-- Do not group multiple value types in one file.
 - Property editor value types always use the schema alias — do not invent a different key.

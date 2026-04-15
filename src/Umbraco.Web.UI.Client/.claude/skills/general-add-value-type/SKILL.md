@@ -82,10 +82,6 @@ Add to the package `index.ts`:
 export * from './value-type/constants.js';
 ```
 
-For **property editors**: the document collection connects to the value summary automatically via `editorAlias` from the server — no collection manifest step needed. The export is still required so the `valueSummary` manifest within the same package can import the constant.
-
-For **generic table collection kind** (non-property-editor columns): other packages import the constant to set `valueType` in their collection view manifests.
-
 ---
 
 ## Checklist

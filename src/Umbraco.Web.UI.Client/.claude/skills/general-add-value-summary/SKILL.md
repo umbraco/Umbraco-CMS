@@ -208,31 +208,12 @@ Same as Option A, Step 3.
 
 ---
 
-## Using the value type in a collection column
+## Collection wiring
 
-How you connect the value summary to a collection depends on the context.
+**Property editors**: no extra step needed. The document collection reads `editorAlias` from the server and matches it to your `forValueType`.
 
-### Property editors — no manifest step needed
-
-Document collection views receive `editorAlias` from the server for each property value and pass it directly as `valueType` to `<umb-value-summary-extension>`. Registering the `valueSummary` manifest with `forValueType` equal to the schema alias is sufficient — the document collection picks it up automatically.
-
-### Generic table collection kind — set `valueType` in the manifest
-
-For non-property-editor columns (e.g., user state, dates, reference lists), set `valueType` statically in the table collection view manifest:
+**Generic table collection kind**: set `valueType` in the collection manifest column:
 
 ```typescript
-import { UMB_{FEATURE}_VALUE_TYPE } from '@umbraco-cms/backoffice/{package}';
-
-{
-  type: 'collectionView',
-  kind: 'table',
-  alias: 'Umb.CollectionView.MyEntity.Table',
-  meta: {
-    columns: [
-      { field: 'myField', label: 'My Field', valueType: UMB_{FEATURE}_VALUE_TYPE },
-    ],
-  },
-}
+{ field: 'myField', label: 'My Field', valueType: UMB_{FEATURE}_VALUE_TYPE }
 ```
-
-`valueType` is `keyof UmbValueTypeMap` — TypeScript validates the key at compile time. This field is specific to the table collection view kind.

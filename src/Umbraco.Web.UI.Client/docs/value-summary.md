@@ -118,7 +118,7 @@ Provide `asObservable` only when the resolved data can change after initial load
 
 `UmbValueSummaryCoordinatorContext` is instantiated on the collection default context automatically. It batches all `preRegister()` calls within the same microtask queue into a single `resolveValues()` call per value type, deduplicating values before the resolver is called.
 
-**Agents do not create or configure the coordinator.** It is transparent to value summary implementations — the base API class handles discovery and fallback.
+Value summary implementations do not interact with it directly — the base API class handles coordinator discovery and fallback.
 
 ## Collection integration
 
