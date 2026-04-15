@@ -11,20 +11,23 @@ interface ScoredIcon {
 }
 
 interface SearchableIcon {
-	nameWithoutPrefix: string;
 	nameTokens: Array<string>;
 	keywordsLower: Array<string>;
-	groupsLower: Array<string>;
+	keywordTokens: Array<string>;
+	groupTokens: Array<string>;
 	searchableTokens: Array<string>;
 	allSearchable: Array<string>;
 }
 
 /**
  * Controller that searches a set of icons by name, keywords and groups using
- * substring and fuzzy matching. Precomputes per-icon lowercased strings and
- * tokens once per loaded icon set, and supports cancellation: a newer call to
- * {@link UmbIconSearchController.search} aborts any in-flight search, and
- * {@link UmbIconSearchController.destroy} aborts any in-flight search.
+ * word-boundary and fuzzy matching. Substring matches only count when they
+ * begin at a token boundary (start of string or after whitespace/hyphen/dot),
+ * so e.g. a query of "paper" does not match "newspaper". Pre-computes per-icon
+ * lowercased tokens once per loaded icon set, and supports cancellation: a
+ * newer call to {@link UmbIconSearchController.search} aborts any in-flight
+ * search, and {@link UmbIconSearchController.destroy} aborts any in-flight
+ * search.
  */
 export class UmbIconSearchController extends UmbControllerBase {
 	#icons: Array<UmbIconDefinition> = [];
@@ -106,24 +109,23 @@ export class UmbIconSearchController extends UmbControllerBase {
 		const keywordsLower = icon.keywords?.map((k) => k.toLowerCase()) ?? [];
 		const groupsLower = icon.groups?.map((g) => g.toLowerCase()) ?? [];
 
-		const searchableTokens = [...nameTokens];
-		for (const keyword of keywordsLower) {
-			searchableTokens.push(...fuzzyTokenize(keyword));
-		}
+		const keywordTokens = keywordsLower.flatMap((k) => fuzzyTokenize(k));
+		const groupTokens = groupsLower.flatMap((g) => fuzzyTokenize(g));
+		const searchableTokens = [...nameTokens, ...keywordTokens];
+		const allSearchable = [...searchableTokens, ...groupTokens];
 
-		const allSearchable = [...searchableTokens, ...groupsLower.flatMap((g) => fuzzyTokenize(g))];
-
-		cached = { nameWithoutPrefix, nameTokens, keywordsLower, groupsLower, searchableTokens, allSearchable };
+		cached = { nameTokens, keywordsLower, keywordTokens, groupTokens, searchableTokens, allSearchable };
 		this.#searchable.set(icon, cached);
 		return cached;
 	}
 
 	#scoreIcon(icon: UmbIconDefinition, query: string, queryTokens: Array<string>): number {
-		const { nameWithoutPrefix, nameTokens, keywordsLower, groupsLower, searchableTokens, allSearchable } =
+		const { nameTokens, keywordsLower, keywordTokens, groupTokens, searchableTokens, allSearchable } =
 			this.#getSearchable(icon);
 
-		// Full query substring match on name
-		if (nameWithoutPrefix.includes(query)) {
+		// Full query matches the start of a name token (word-boundary match).
+		// e.g. "paper" matches "paper-icon" or "wrapping-paper", NOT "newspaper".
+		if (nameTokens.some((t) => t.startsWith(query))) {
 			return 300;
 		}
 
@@ -132,38 +134,38 @@ export class UmbIconSearchController extends UmbControllerBase {
 			return 250;
 		}
 
-		// Full query substring match on a keyword
-		if (keywordsLower.some((k) => k.includes(query))) {
+		// Full query matches the start of a keyword token (word-boundary match)
+		if (keywordTokens.some((t) => t.startsWith(query))) {
 			return 200;
 		}
 
-		// All query tokens substring-match against name/keyword tokens
-		const allTokensMatch = queryTokens.every((qt) => searchableTokens.some((st) => st.includes(qt)));
+		// All query tokens are prefixes of name/keyword tokens (multi-word boundary match)
+		const allTokensMatch = queryTokens.every((qt) => searchableTokens.some((st) => st.startsWith(qt)));
 		if (allTokensMatch) {
 			return 150;
 		}
 
-		// Full query substring match on a group
-		if (groupsLower.some((g) => g.includes(query))) {
+		// Full query matches the start of a group token (word-boundary match)
+		if (groupTokens.some((t) => t.startsWith(query))) {
 			return 100;
 		}
 
-		// All query tokens match against group tokens
-		if (groupsLower.length > 0) {
-			const allGroupTokensMatch = queryTokens.every((qt) => groupsLower.some((gt) => gt.includes(qt)));
+		// All query tokens are prefixes of group tokens
+		if (groupTokens.length > 0) {
+			const allGroupTokensMatch = queryTokens.every((qt) => groupTokens.some((gt) => gt.startsWith(qt)));
 			if (allGroupTokensMatch) {
 				return 100;
 			}
 		}
 
 		// Fuzzy match on name tokens (primary) — higher score range
-		const nameFuzzy = fuzzyMatchScore(queryTokens, nameTokens);
+		const nameFuzzy = fuzzyMatchScore(queryTokens, nameTokens, 0.7);
 		if (nameFuzzy > 0) {
 			return 50 + Math.floor(nameFuzzy * 49);
 		}
 
 		// Fuzzy match on all tokens (secondary) — lower score range
-		const allFuzzy = fuzzyMatchScore(queryTokens, allSearchable);
+		const allFuzzy = fuzzyMatchScore(queryTokens, allSearchable, 0.8);
 		if (allFuzzy > 0) {
 			return 1 + Math.floor(allFuzzy * 48);
 		}
