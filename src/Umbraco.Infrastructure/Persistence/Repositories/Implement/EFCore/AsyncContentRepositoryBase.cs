@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
@@ -121,8 +122,18 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     }
 
     /// <inheritdoc />
-    public virtual Task<IEnumerable<Guid>> GetVersionKeysAsync(Guid nodeKey, int topRows, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public virtual async Task<IEnumerable<Guid>> GetVersionKeysAsync(Guid nodeKey, int maxRows, CancellationToken cancellationToken) =>
+        await AmbientScope.ExecuteWithContextAsync<IEnumerable<Guid>>(async db =>
+        {
+            return await db.ContentVersions
+                .Join(db.Nodes, version => version.NodeId, node => node.NodeId, (version, node) => new { version, node })
+                .Where(x => x.node.UniqueId == nodeKey)
+                .OrderByDescending(x => x.version.Current)
+                .ThenByDescending(x => x.version.VersionDate)
+                .Take(maxRows)
+                .Select(x => x.version.Key)
+                .ToListAsync(cancellationToken);
+        });
 
     /// <inheritdoc />
     public abstract Task<TEntity?> GetVersionAsync(Guid versionKey, CancellationToken cancellationToken);
