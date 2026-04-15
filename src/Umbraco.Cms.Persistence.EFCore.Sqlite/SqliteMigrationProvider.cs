@@ -56,6 +56,7 @@ public class SqliteMigrationProvider : IMigrationProvider
             EFCoreMigration.AddKeyValueDto => typeof(Migrations.AddKeyValueDto),
             EFCoreMigration.SqliteCollation => typeof(Migrations.SqliteCollation),
             EFCoreMigration.AddLanguageDto => typeof(Migrations.AddLanguageDto),
+            EFCoreMigration.AddRedirectUrlDto => typeof(Migrations.AddRedirectUrlDto),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }
