@@ -1,18 +1,12 @@
 import { UmbBlockListEntryContext } from '../../context/block-list-entry.context.js';
-import type { UmbBlockListLayoutModel, UmbBlockListValueModel } from '../../types.js';
-import {
-	UMB_BLOCK_LIST,
-	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
-	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
-} from '../../constants.js';
+import type { UmbBlockListLayoutModel } from '../../types.js';
+import { UMB_BLOCK_LIST } from '../../constants.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type {
 	ManifestBlockEditorCustomView,
 	UmbBlockEditorCustomViewProperties,
@@ -290,44 +284,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.#context.expose();
 	};
 
-	async #copyToClipboard() {
-		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
-		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
-		if (!propertyDatasetContext || !propertyContext || !clipboardContext) {
-			throw new Error('Could not get required contexts to copy.');
-		}
-
-		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
-		const propertyLabel = this.localize.string(propertyContext?.getLabel());
-		const blockLabel = this.#context.getName();
-
-		const entryName = workspaceName
-			? `${workspaceName} - ${propertyLabel} - ${blockLabel}`
-			: `${propertyLabel} - ${blockLabel}`;
-
-		const content = this.#context.getContent();
-		const layout = this.#context.getLayout();
-		const settings = this.#context.getSettings();
-		const expose = this.#context.getExpose();
-
-		const propertyValue: UmbBlockListValueModel = {
-			contentData: content ? [structuredClone(content)] : [],
-			layout: {
-				[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
-			},
-			settingsData: settings ? [structuredClone(settings)] : [],
-			expose: expose ? [structuredClone(expose)] : [],
-		};
-
-		clipboardContext.write({
-			icon: this._icon,
-			name: entryName,
-			propertyValue,
-			propertyEditorUiAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
-		});
-	}
-
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
 		if (this._unsupported) {
 			// If the block is unsupported, we should not allow any custom views to render.
@@ -438,7 +394,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		if (this._isSortMode) return nothing;
 		return html`
 			<umb-block-action-list block-editor=${UMB_BLOCK_LIST}>
-				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()}
 			</umb-block-action-list>
 		`;
 	}
@@ -483,18 +439,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 							: nothing}
 					</uui-button>`
 				: nothing}
-		`;
-	}
-
-	#renderCopyToClipboardAction() {
-		return html`
-			<uui-button
-				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
-				look="secondary"
-				@click=${() => this.#copyToClipboard()}
-				title=${this.localize.term('general_copy')}>
-				<uui-icon name="icon-clipboard-copy"></uui-icon>
-			</uui-button>
 		`;
 	}
 

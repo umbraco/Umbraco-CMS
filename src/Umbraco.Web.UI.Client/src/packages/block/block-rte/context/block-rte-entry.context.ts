@@ -1,9 +1,12 @@
-import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel } from '../types.js';
+import type { UmbBlockRteLayoutModel, UmbBlockRteTypeModel, UmbBlockRteValueModel } from '../types.js';
+import { UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../constants.js';
 import { UMB_BLOCK_RTE_MANAGER_CONTEXT } from './block-rte-manager.context-token.js';
 import { UMB_BLOCK_RTE_ENTRIES_CONTEXT } from './block-rte-entries.context-token.js';
-import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
+import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
@@ -37,4 +40,47 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 	protected override _gotEntries() {}
 
 	protected override _gotContentType() {}
+
+	override async copyToClipboard() {
+		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+		if (!clipboardContext) {
+			console.warn('Clipboard context is not available.');
+			return;
+		}
+
+		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+		if (!propertyDatasetContext || !propertyContext) {
+			throw new Error('Could not get required contexts to copy.');
+		}
+
+		const workspaceName = this.localize.string(propertyDatasetContext.getName());
+		const propertyLabel = this.localize.string(propertyContext.getLabel());
+		const blockLabel = this.getName();
+
+		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
+
+		const content = this.getContent();
+		const layout = this.getLayout();
+		const settings = this.getSettings();
+		const expose = this.getExpose();
+
+		const propertyValue: UmbBlockRteValueModel = {
+			contentData: content ? [structuredClone(content)] : [],
+			layout: {
+				[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
+			},
+			settingsData: settings ? [structuredClone(settings)] : [],
+			expose: expose ? [structuredClone(expose)] : [],
+		};
+
+		const editorUiManifest = propertyContext.getEditorManifest();
+
+		clipboardContext.write({
+			icon: this.getContentElementTypeIcon(),
+			name: entryName,
+			propertyValue,
+			propertyEditorUiAlias: editorUiManifest?.alias ?? '',
+		});
+	}
 }
