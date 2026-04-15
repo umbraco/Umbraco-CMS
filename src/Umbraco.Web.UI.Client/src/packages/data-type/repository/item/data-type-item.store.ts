@@ -16,7 +16,7 @@ export class UmbDataTypeItemStore extends UmbItemStoreBase<UmbDataTypeItemModel>
 	 * @memberof UmbDataTypeItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DATA_TYPE_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_DATA_TYPE_ITEM_STORE_CONTEXT);
 	}
 }
 
