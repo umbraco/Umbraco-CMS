@@ -62,13 +62,24 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 		const matchingDashboard = this._dashboards.find(
 			(manifest) => this.#constructDashboardPath(manifest) === activePath,
 		);
+		// Dashboards/section-views are a more specific refinement of the section,
+		// so when their label matches the section's, replace it (e.g. "Media"
+		// dashboard inside the "Media" section → just "Media" in the chain).
 		if (matchingDashboard) {
-			this.#viewContext.setSegments('dashboard', { label: this.#getDashboardName(matchingDashboard), kind: 'workspace' });
+			this.#viewContext.setSegments('dashboard', {
+				label: this.#getDashboardName(matchingDashboard),
+				kind: 'workspace',
+				replaces: true,
+			});
 			return;
 		}
 		const matchingView = this._views.find((manifest) => this.#constructViewPath(manifest) === activePath);
 		if (matchingView) {
-			this.#viewContext.setSegments('dashboard', { label: this.#getViewName(matchingView), kind: 'workspace' });
+			this.#viewContext.setSegments('dashboard', {
+				label: this.#getViewName(matchingView),
+				kind: 'workspace',
+				replaces: true,
+			});
 			return;
 		}
 		this.#viewContext.clearSegments('dashboard');
