@@ -58,7 +58,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
 			.onSetup(() => {
 				return {
-					data: { propertyLabel: this.propertyLabel },
+					data: { suggestionQuery: this.propertyLabel },
 					value: { selection: this._ids ?? [] },
 				};
 			})

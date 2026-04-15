@@ -33,8 +33,8 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	public override set data(value: UmbDataTypePickerFlowModalData) {
 		super.data = value;
-		if (value?.propertyLabel) {
-			this.#loadSuggestions(value.propertyLabel);
+		if (value?.suggestionQuery) {
+			this.#loadSuggestions(value.suggestionQuery);
 		}
 	}
 
