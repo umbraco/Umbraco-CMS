@@ -77,6 +77,7 @@ test('can create content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value).toBe(contentText);
   // Verify audit trail
+  await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryHaveCount(1);
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
