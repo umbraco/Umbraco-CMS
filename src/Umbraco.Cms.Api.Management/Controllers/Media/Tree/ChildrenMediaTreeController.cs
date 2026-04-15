@@ -20,6 +20,23 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 public class ChildrenMediaTreeController : MediaTreeControllerBase
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="ChildrenMediaTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities within the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
+    /// <param name="treeFilterService">Service for filtering media tree entities based on user start nodes.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
+    [ActivatorUtilitiesConstructor]
+    public ChildrenMediaTreeController(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IMediaStartNodeTreeFilterService treeFilterService,
+        IMediaPresentationFactory mediaPresentationFactory)
+        : base(entityService, flagProviders, treeFilterService, mediaPresentationFactory)
+    {
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="ChildrenMediaTreeController"/> class, responsible for handling API requests related to child media items in the media tree.
     /// </summary>
     /// <param name="entityService">Service for accessing and managing entities within the Umbraco CMS.</param>
@@ -50,7 +67,7 @@ public class ChildrenMediaTreeController : MediaTreeControllerBase
     /// <param name="appCaches">Provides access to application-level caches for performance optimization.</param>
     /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context, used for authorization and user information.</param>
     /// <param name="mediaPresentationFactory">Factory for creating presentation models for media entities.</param>
-    [ActivatorUtilitiesConstructor]
+    [Obsolete("Please use the constructor accepting IMediaStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     public ChildrenMediaTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

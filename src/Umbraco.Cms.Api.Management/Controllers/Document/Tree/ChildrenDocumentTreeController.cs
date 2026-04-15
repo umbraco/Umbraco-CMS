@@ -24,6 +24,33 @@ public class ChildrenDocumentTreeController : DocumentTreeControllerBase
     /// Initializes a new instance of the <see cref="ChildrenDocumentTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for document tree nodes.</param>
+    /// <param name="treeFilterService">Service for filtering document tree entities based on user start nodes.</param>
+    /// <param name="publicAccessService">Service for handling public access permissions on documents.</param>
+    /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
+    /// <param name="documentPermissionFilterService">Service for filtering documents based on user permissions.</param>
+    [ActivatorUtilitiesConstructor]
+    public ChildrenDocumentTreeController(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IDocumentStartNodeTreeFilterService treeFilterService,
+        IPublicAccessService publicAccessService,
+        IDocumentPresentationFactory documentPresentationFactory,
+        IDocumentPermissionFilterService documentPermissionFilterService)
+        : base(
+            entityService,
+            flagProviders,
+            treeFilterService,
+            publicAccessService,
+            documentPresentationFactory,
+            documentPermissionFilterService)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChildrenDocumentTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
     /// <param name="userStartNodeEntitiesService">Service for resolving user start nodes for entities.</param>
     /// <param name="dataTypeService">Service for accessing and managing data types.</param>
     /// <param name="publicAccessService">Service for handling public access permissions and restrictions.</param>
@@ -61,7 +88,7 @@ public class ChildrenDocumentTreeController : DocumentTreeControllerBase
     /// <param name="appCaches">Provides application-level caching functionality.</param>
     /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and authentication.</param>
     /// <param name="documentPresentationFactory">Factory for creating document presentation models for the API.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor accepting IDocumentStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     public ChildrenDocumentTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -95,7 +122,7 @@ public class ChildrenDocumentTreeController : DocumentTreeControllerBase
     /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context.</param>
     /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
     /// <param name="documentPermissionFilterService">Service for filtering documents based on permissions.</param>
-    [ActivatorUtilitiesConstructor]
+    [Obsolete("Please use the constructor accepting IDocumentStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     public ChildrenDocumentTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

@@ -20,6 +20,33 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 public class AncestorsDocumentTreeController : DocumentTreeControllerBase
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="AncestorsDocumentTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for document tree nodes.</param>
+    /// <param name="treeFilterService">Service for filtering document tree entities based on user start nodes.</param>
+    /// <param name="publicAccessService">Service for handling public access permissions on documents.</param>
+    /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
+    /// <param name="documentPermissionFilterService">Service for filtering documents based on user permissions.</param>
+    [ActivatorUtilitiesConstructor]
+    public AncestorsDocumentTreeController(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IDocumentStartNodeTreeFilterService treeFilterService,
+        IPublicAccessService publicAccessService,
+        IDocumentPresentationFactory documentPresentationFactory,
+        IDocumentPermissionFilterService documentPermissionFilterService)
+        : base(
+            entityService,
+            flagProviders,
+            treeFilterService,
+            publicAccessService,
+            documentPresentationFactory,
+            documentPermissionFilterService)
+    {
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Document.Tree.AncestorsDocumentTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service used for entity operations within the Umbraco CMS.</param>
@@ -60,7 +87,7 @@ public class AncestorsDocumentTreeController : DocumentTreeControllerBase
     /// <param name="appCaches">Provides access to application-level caches.</param>
     /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and operations.</param>
     /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor accepting IDocumentStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     public AncestorsDocumentTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -94,7 +121,7 @@ public class AncestorsDocumentTreeController : DocumentTreeControllerBase
     /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and authentication.</param>
     /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
     /// <param name="documentPermissionFilterService">Service for filtering documents based on user permissions.</param>
-    [ActivatorUtilitiesConstructor]
+    [Obsolete("Please use the constructor accepting IDocumentStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     public AncestorsDocumentTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

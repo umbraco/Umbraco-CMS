@@ -20,6 +20,23 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 public class RootMediaTreeController : MediaTreeControllerBase
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="RootMediaTreeController"/> class.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
+    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
+    /// <param name="treeFilterService">Service for filtering media tree entities based on user start nodes.</param>
+    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
+    [ActivatorUtilitiesConstructor]
+    public RootMediaTreeController(
+        IEntityService entityService,
+        FlagProviderCollection flagProviders,
+        IMediaStartNodeTreeFilterService treeFilterService,
+        IMediaPresentationFactory mediaPresentationFactory)
+        : base(entityService, flagProviders, treeFilterService, mediaPresentationFactory)
+    {
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="RootMediaTreeController"/> class, which manages the root of the media tree in the Umbraco backoffice API.
     /// </summary>
     /// <param name="entityService">Service for managing and retrieving entities in the system.</param>
@@ -50,7 +67,7 @@ public class RootMediaTreeController : MediaTreeControllerBase
     /// <param name="appCaches">Provides access to application-level caches.</param>
     /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and operations.</param>
     /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
-    [ActivatorUtilitiesConstructor]
+    [Obsolete("Please use the constructor accepting IMediaStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     public RootMediaTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
