@@ -16,4 +16,5 @@ public enum EFCoreMigration
     AddLanguageDto = 8,
     AddDomainDto = 9,
     AddDocumentRepositoryDtos = 10,
+    AddContentVersionKeyColumn = 11,
 }

@@ -38,35 +38,30 @@ public interface IAsyncContentRepository<TEntity> : IAsyncReadWriteRepository<Gu
     Task<IEnumerable<TEntity>> GetAllVersionsSlimAsync(Guid nodeKey, int skip, int take, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets the internal integer identifiers of the versions for a content node.
+    ///     Gets the Guid keys of the versions for a content node.
     /// </summary>
     /// <param name="nodeKey">The Guid key of the content node.</param>
-    /// <param name="topRows">The maximum number of version identifiers to return.</param>
+    /// <param name="topRows">The maximum number of version keys to return.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
-    ///     Up to <paramref name="topRows" /> version identifiers, with the current version first and subsequent versions ordered most recent first.
+    ///     Up to <paramref name="topRows" /> version keys, with the current version first and subsequent versions ordered most recent first.
     /// </returns>
-    /// <remarks>Version rows do not yet have Guid keys.</remarks>
-    // TODO: Migrate to Guid version keys when content version Guids are added to the schema.
-    Task<IEnumerable<int>> GetVersionIdsAsync(Guid nodeKey, int topRows, CancellationToken cancellationToken);
+    Task<IEnumerable<Guid>> GetVersionKeysAsync(Guid nodeKey, int topRows, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Gets a specific version of a content node by its internal integer identifier.
+    ///     Gets a specific version of a content node by its Guid key.
     /// </summary>
-    /// <param name="versionId">The internal integer identifier of the version.</param>
+    /// <param name="versionKey">The Guid key of the version.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The content entity at the specified version, or <c>null</c> if not found.</returns>
-    /// <remarks>Version rows do not yet have Guid keys.</remarks>
-    // TODO: Migrate to Guid version key when content version Guids are added to the schema.
-    Task<TEntity?> GetVersionAsync(int versionId, CancellationToken cancellationToken);
+    Task<TEntity?> GetVersionAsync(Guid versionKey, CancellationToken cancellationToken);
 
     /// <summary>
-    ///     Deletes a specific version by its internal integer identifier.
+    ///     Deletes a specific version by its Guid key.
     /// </summary>
-    /// <param name="versionId">The internal integer identifier of the version to delete.</param>
+    /// <param name="versionKey">The Guid key of the version to delete.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    // TODO: Migrate to Guid version key when content version Guids are added to the schema.
-    Task DeleteVersionAsync(int versionId, CancellationToken cancellationToken);
+    Task DeleteVersionAsync(Guid versionKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Deletes all versions of a content node that are older than the specified date.

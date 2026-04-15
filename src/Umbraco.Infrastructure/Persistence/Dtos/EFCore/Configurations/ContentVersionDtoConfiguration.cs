@@ -35,6 +35,13 @@ public class ContentVersionDtoConfiguration : IEntityTypeConfiguration<ContentVe
             .HasColumnName(ContentVersionDto.PreventCleanupColumnName)
             .HasDefaultValue(false);
 
+        builder.Property(x => x.Key)
+            .HasColumnName(ContentVersionDto.KeyColumnName);
+
+        builder.HasIndex(x => x.Key)
+            .IsUnique()
+            .HasDatabaseName($"IX_{ContentVersionDto.TableName}_key");
+
         // FK: NodeId -> umbracoContent.nodeId
         builder.HasOne<ContentDto>()
             .WithMany()

@@ -114,19 +114,22 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     public abstract Task<IEnumerable<TEntity>> GetAllVersionsAsync(Guid nodeKey, CancellationToken cancellationToken);
 
     /// <inheritdoc />
-    public virtual Task<IEnumerable<TEntity>> GetAllVersionsSlimAsync(Guid nodeKey, int skip, int take, CancellationToken cancellationToken) =>
+    public virtual async Task<IEnumerable<TEntity>> GetAllVersionsSlimAsync(Guid nodeKey, int skip, int take, CancellationToken cancellationToken)
+    {
+        IEnumerable<TEntity> allVersions = await GetAllVersionsAsync(nodeKey, cancellationToken);
+        return allVersions.Skip(skip).Take(take);
+    }
+
+    /// <inheritdoc />
+    public virtual Task<IEnumerable<Guid>> GetVersionKeysAsync(Guid nodeKey, int topRows, CancellationToken cancellationToken) =>
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public virtual Task<IEnumerable<int>> GetVersionIdsAsync(Guid nodeKey, int topRows, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public abstract Task<TEntity?> GetVersionAsync(Guid versionKey, CancellationToken cancellationToken);
 
     /// <inheritdoc />
-    public abstract Task<TEntity?> GetVersionAsync(int versionId, CancellationToken cancellationToken);
-
-    /// <inheritdoc />
-    public virtual Task DeleteVersionAsync(int versionId, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public virtual async Task DeleteVersionAsync(Guid versionKey, CancellationToken cancellationToken)
+        => await PerformDeleteVersionAsync(versionKey, cancellationToken);
 
     /// <inheritdoc />
     public virtual Task DeleteVersionsAsync(Guid nodeKey, DateTime versionDate, CancellationToken cancellationToken) =>
@@ -170,10 +173,9 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     /// <summary>
     ///     Performs the low-level deletion of a specific version row from the data store.
     /// </summary>
-    /// <param name="nodeId">The integer node identifier owning the version.</param>
-    /// <param name="versionId">The integer identifier of the version to delete.</param>
+    /// <param name="versionKey">The Guid key of the version to delete.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    protected abstract Task PerformDeleteVersionAsync(int nodeId, int versionId, CancellationToken cancellationToken);
+    protected abstract Task PerformDeleteVersionAsync(Guid versionKey, CancellationToken cancellationToken);
 
     /// <summary>
     ///     Called after a scope is refreshed for an entity, allowing the repository to publish

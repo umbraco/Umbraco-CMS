@@ -15,6 +15,7 @@ public class ContentVersionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersion;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string KeyColumnName = "key";
 
     private const string UserIdColumnName = "userId";
     private const string VersionDateColumnName = "versionDate";
@@ -31,6 +32,15 @@ public class ContentVersionDto
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the globally unique key for the content version.
+    /// </summary>
+    [Column(KeyColumnName)]
+    [NullSetting(NullSetting = NullSettings.NotNull)]
+    [Constraint(Default = SystemMethods.NewGuid)]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_key")]
+    public Guid Key { get; set; }
 
     /// <summary>
     /// Gets or sets the unique identifier of the node for this content version.

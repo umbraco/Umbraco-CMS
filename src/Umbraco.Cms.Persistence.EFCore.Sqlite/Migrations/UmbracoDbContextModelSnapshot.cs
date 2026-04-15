@@ -399,6 +399,10 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("current");
 
+                    b.Property<Guid>("Key")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("key");
+
                     b.Property<int>("NodeId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("nodeId");
@@ -428,6 +432,10 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 
                     b.HasIndex("Current")
                         .HasDatabaseName("IX_umbracoContentVersion_Current");
+
+                    b.HasIndex("Key")
+                        .IsUnique()
+                        .HasDatabaseName("IX_umbracoContentVersion_key");
 
                     b.HasIndex("VersionDate")
                         .HasDatabaseName("IX_umbracoContentVersion_VersionDate");
