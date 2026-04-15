@@ -33,6 +33,24 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 
 ---
 
+## Required Reading Before Acting
+
+**Before performing any of these actions, you MUST read the linked doc first:**
+
+| Before you... | Read |
+|----------------|------|
+| Deprecate or remove a public API | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning |
+| Create a new element or component | [docs/style-guide.md](./docs/style-guide.md) |
+| Create a repository or data source | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md) |
+| Add error handling or debugging | [docs/error-handling.md](./docs/error-handling.md) |
+| Write or modify tests | [docs/testing.md](./docs/testing.md) |
+| Work with auth or security | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md) |
+| Scaffold a new package or module | [docs/package-development.md](./docs/package-development.md) |
+
+This is not optional. Skipping these leads to convention violations that are caught in review.
+
+---
+
 ## Skills & Documentation — Mandatory Usage
 
 **When a skill or documentation file exists for the task you are performing, you MUST use it. Do NOT improvise, skip steps, or manually create files that a skill is designed to scaffold.**
