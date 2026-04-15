@@ -9,6 +9,11 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
+/**
+ * Renders registered blockAction extensions inside a uui-action-bar.
+ * Filters actions by block editor type and content type alias.
+ * @element umb-block-action-list
+ */
 @customElement('umb-block-action-list')
 export class UmbBlockActionListElement extends UmbLitElement {
 	@property({ type: String, attribute: 'block-editor' })

@@ -49,9 +49,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	private _showContentEdit = false;
 
 	@state()
-	private _hasSettings = false;
-
-	@state()
 	private _label = '';
 
 	@state()
@@ -59,12 +56,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	@state()
 	private _exposed?: boolean;
-
-	@state()
-	private _workspaceEditContentPath?: string;
-
-	@state()
-	private _workspaceEditSettingsPath?: string;
 
 	@state()
 	private _contentTypeAlias?: string;
@@ -113,7 +104,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.observe(
 			this.#context.settingsElementTypeKey,
 			(key) => {
-				this._hasSettings = !!key;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
 			},
 			null,
@@ -199,7 +189,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.observe(
 			this.#context.workspaceEditContentPath,
 			(path) => {
-				this._workspaceEditContentPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editContentPath: path } });
 			},
 			null,
@@ -207,7 +196,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.observe(
 			this.#context.workspaceEditSettingsPath,
 			(path) => {
-				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editSettingsPath: path } });
 			},
 			null,

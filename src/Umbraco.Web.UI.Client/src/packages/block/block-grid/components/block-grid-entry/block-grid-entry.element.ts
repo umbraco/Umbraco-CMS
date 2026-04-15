@@ -71,9 +71,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _showContentEdit = false;
 
-	@state()
-	private _hasSettings = false;
-
 	// If _createPath is undefined, its because no blocks are allowed to be created here[NL]
 	@state()
 	private _createBeforePath?: string;
@@ -93,12 +90,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	// Unuspported is triggerede if the Block Type is not reconized, it can also be triggerede by the Content Element Type not existing any longer. [NL]
 	@state()
 	private _unsupported?: boolean;
-
-	@state()
-	private _workspaceEditContentPath?: string;
-
-	@state()
-	private _workspaceEditSettingsPath?: string;
 
 	@state()
 	private _inlineEditingMode?: boolean;
@@ -165,7 +156,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.settingsElementTypeKey,
 			(key) => {
-				this._hasSettings = !!key;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
 			},
 			null,
@@ -265,7 +255,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.workspaceEditContentPath,
 			(path) => {
-				this._workspaceEditContentPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editContentPath: path } });
 			},
 			null,
@@ -273,7 +262,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.workspaceEditSettingsPath,
 			(path) => {
-				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editSettingsPath: path } });
 			},
 			null,

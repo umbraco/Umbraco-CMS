@@ -65,9 +65,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	private _showContentEdit = false;
 
 	@state()
-	private _hasSettings = false;
-
-	@state()
 	private _label = '';
 
 	@state()
@@ -78,9 +75,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	@state()
 	private _unsupported?: boolean;
-
-	@state()
-	private _workspaceEditContentPath?: string;
 
 	@state()
 	private _inlineEditingMode?: boolean;
@@ -127,7 +121,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.settingsElementTypeKey,
 			(key) => {
-				this._hasSettings = !!key;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
 			},
 			null,
@@ -209,7 +202,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.workspaceEditContentPath,
 			(path) => {
-				this._workspaceEditContentPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editContentPath: path } });
 			},
 			null,
