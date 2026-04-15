@@ -48,6 +48,7 @@ export class UmbCodeEditorModalElement extends UmbModalBaseElement<UmbCodeEditor
 			<umb-code-editor
 				language=${ifDefined(this.data?.language)}
 				.code=${this.data?.content ?? ''}
+				?word-wrap=${this.data?.language === 'html'}
 				@loaded=${this.#onLoaded}></umb-code-editor>
 		`;
 	}
