@@ -52,7 +52,9 @@ tools/docfx/
 /build/csharp-docs/_site/
 
 # Local config
-.claude/settings.local.json
+.claude/*
+!.claude/skills/
+!.claude/settings.json
 .env.local
 
 # Build
