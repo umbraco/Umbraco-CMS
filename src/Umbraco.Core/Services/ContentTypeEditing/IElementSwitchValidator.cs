@@ -69,4 +69,19 @@ public interface IElementSwitchValidator
     ///     because element types cannot have directly created content nodes.
     /// </remarks>
     Task<bool> DocumentToElementHasNoContentAsync(IContentTypeBase contentType);
+
+    /// <summary>
+    ///     Validates whether an element type can be converted to a document type by checking
+    ///     if any element instances exist for the content type.
+    /// </summary>
+    /// <param name="contentType">The content type to validate.</param>
+    /// <returns>
+    ///     <c>true</c> if no element instances exist for the content type and it can safely
+    ///     be converted to a document type; otherwise, <c>false</c>.
+    /// </returns>
+    /// <remarks>
+    ///     Element types with existing element instances in the library cannot be converted
+    ///     to document types because document types use a different storage and editing model.
+    /// </remarks>
+    Task<bool> ElementToDocumentHasNoContentAsync(IContentTypeBase contentType);
 }

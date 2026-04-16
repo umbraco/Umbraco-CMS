@@ -3,8 +3,6 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-// TODO ELEMENTS: split this into two interfaces - like "IEntityDto" and "IPublishedDto"?
-
 /// <summary>
 /// Defines the contract for a content version DTO with an identifier and published state.
 /// </summary>

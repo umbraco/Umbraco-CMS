@@ -67,38 +67,23 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
 
     #region Others
 
-    // TODO ELEMENTS: create abstractions of the implementations in this region, and share them with ContentService
-
-    Attempt<OperationResult?> IContentServiceBase<IElement>.Save(IEnumerable<IElement> contents, int userId) =>
-        Attempt.Succeed(Save(contents, userId));
-
-    public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            scope.WriteLock(Constants.Locks.ContentTree);
-
-            ContentDataIntegrityReport report = _elementRepository.CheckDataIntegrity(options);
-
-            if (report.FixedIssues.Count > 0)
+    /// <inheritdoc />
+    public override ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
+        => CheckDataIntegrity(
+            options,
+            scope =>
             {
                 // The event args needs a content item so we'll make a fake one with enough properties to not cause a null ref
                 var root = new Element("root", -1, new ContentType(_shortStringHelper, -1)) { Id = -1, Key = Guid.Empty };
                 scope.Notifications.Publish(new ElementTreeChangeNotification(root, TreeChangeTypes.RefreshAll, EventMessagesFactory.Get()));
-            }
-
-            scope.Complete();
-
-            return report;
-        }
-    }
+            });
 
     #endregion
 
     #region Content Types
 
     /// <inheritdoc/>
-    public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
+    public override void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = Constants.Security.SuperUserId)
     {
         var changes = new List<TreeChange<IElement>>();
         var contentTypeIdsA = contentTypeIds.ToArray();
@@ -150,13 +135,6 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
     protected override bool SupportsBranchPublishing => false;
 
     protected override ILogger<ElementService> Logger => _logger;
-
-    protected override IElement CreateContentInstance(string name, int parentId, IContentType contentType, int userId)
-        => new Element(name, contentType, userId);
-
-    // TODO ELEMENTS: this should only be on the content service
-    protected override IElement CreateContentInstance(string name, IElement parent, IContentType contentType, int userId)
-        => throw new InvalidOperationException("Elements cannot be nested underneath one another");
 
     protected override void DeleteLocked(ICoreScope scope, IElement content, EventMessages evtMsgs)
     {

@@ -355,25 +355,26 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
-            if (_documentNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys))
+            var inMainTree = _documentNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys);
+            var inBin = inMainTree is false && _documentNavigationQueryService.TryGetDescendantsKeysInBin(key, out descendantsKeys);
+
+            if (inMainTree || inBin)
             {
                 var branchKeys = descendantsKeys.ToList();
                 branchKeys.Add(key);
 
-                // If the branch is unpublished, we need to remove it from cache instead of refreshing it
-                if (IsBranchUnpublished(payload))
+                // Remove from cache if the branch is in the bin or being unpublished; otherwise refresh.
+                var removeFromCache = inBin || IsBranchUnpublished(payload);
+
+                foreach (Guid branchKey in branchKeys)
                 {
-                    foreach (Guid branchKey in branchKeys)
+                    if (removeFromCache)
                     {
                         _documentCacheService.RemoveFromMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                        continue;
                     }
-                }
-                else
-                {
-                    foreach (Guid branchKey in branchKeys)
-                    {
-                        _documentCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
-                    }
+
+                    _documentCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
                 }
             }
         }

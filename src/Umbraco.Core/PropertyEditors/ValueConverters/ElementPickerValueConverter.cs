@@ -1,4 +1,6 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+﻿using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.DeliveryApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
@@ -9,14 +11,21 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public class ElementPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IJsonSerializer _jsonSerializer;
+    // TODO ELEMENTS: this needs replacing with IPublishedElementCache when #22369 is merged
     private readonly IElementCacheService _elementCacheService;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IApiElementBuilder _apiElementBuilder;
 
-    public ElementPickerValueConverter(IJsonSerializer jsonSerializer, IElementCacheService elementCacheService, IVariationContextAccessor variationContextAccessor)
+    public ElementPickerValueConverter(
+        IJsonSerializer jsonSerializer,
+        IElementCacheService elementCacheService,
+        IVariationContextAccessor variationContextAccessor,
+        IApiElementBuilder apiElementBuilder)
     {
         _jsonSerializer = jsonSerializer;
         _elementCacheService = elementCacheService;
         _variationContextAccessor = variationContextAccessor;
+        _apiElementBuilder = apiElementBuilder;
     }
 
     public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -35,6 +44,23 @@ public class ElementPickerValueConverter : PropertyValueConverterBase, IDelivery
         => source?.ToString()!;
 
     public override object? ConvertIntermediateToObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview)
+        => GetElements(inter, preview);
+
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType)
+        => GetPropertyCacheLevel(propertyType);
+
+    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevelForExpansion(IPublishedPropertyType propertyType)
+        => PropertyCacheLevel.Snapshot;
+
+    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType) => typeof(IEnumerable<IApiElement>);
+
+    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
+    {
+        IPublishedElement[]? elements = GetElements(inter, preview);
+        return elements?.Select(_apiElementBuilder.Build);
+    }
+
+    private IPublishedElement[]? GetElements(object? inter, bool preview)
     {
         var value = inter as string;
         if (value.IsNullOrWhiteSpace())
@@ -60,16 +86,4 @@ public class ElementPickerValueConverter : PropertyValueConverterBase, IDelivery
 
         return elements.ToArray();
     }
-
-    // TODO ELEMENTS: implement Delivery API
-    public PropertyCacheLevel GetDeliveryApiPropertyCacheLevel(IPublishedPropertyType propertyType)
-        => GetPropertyCacheLevel(propertyType);
-
-    // TODO ELEMENTS: implement Delivery API
-    public Type GetDeliveryApiPropertyValueType(IPublishedPropertyType propertyType)
-        => GetPropertyValueType(propertyType);
-
-    // TODO ELEMENTS: implement Delivery API
-    public object? ConvertIntermediateToDeliveryApiObject(IPublishedElement owner, IPublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object? inter, bool preview, bool expanding)
-        => null;
 }

@@ -59,7 +59,7 @@ public class CacheSettings
     /// Gets or sets a value for the media breadth first seed count.
     /// </summary>
     [DefaultValue(StaticMediaBreadthFirstSeedCount)]
-    public int MediaBreadthFirstSeedCount { get; set; } = StaticDocumentBreadthFirstSeedCount;
+    public int MediaBreadthFirstSeedCount { get; set; } = StaticMediaBreadthFirstSeedCount;
 
     /// <summary>
     /// Gets or sets a value for the element breadth first seed count.
