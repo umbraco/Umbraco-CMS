@@ -1,4 +1,5 @@
 export * from './conditions/index.js';
+export * from './decorators/index.js';
 export * from './initializers/index.js';
 export * from './registry.js';
 export * from './utils/index.js';
