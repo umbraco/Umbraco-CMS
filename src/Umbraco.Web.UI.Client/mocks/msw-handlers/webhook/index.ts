@@ -1,5 +1,4 @@
 import { detailHandlers } from './detail.handlers.js';
-import { collectionHandlers } from './collection.handlers.js';
 import { itemHandlers } from './item.handlers.js';
 import { eventsHandlers } from './events.handlers.js';
 import { deliveryHandlers } from './delivery.handlers.js';
@@ -8,7 +7,6 @@ import { deliveryHandlers } from './delivery.handlers.js';
 // GET /webhook/events would otherwise be matched by GET /webhook/:id.
 export const handlers = [
 	...eventsHandlers,
-	...collectionHandlers,
 	...itemHandlers,
 	...detailHandlers,
 	...deliveryHandlers,
