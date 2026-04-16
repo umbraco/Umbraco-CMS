@@ -22,6 +22,9 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	@state()
 	private _headline: string = this.localize.term('general_create');
 
+	@state()
+	private _loading = true;
+
 	override async firstUpdated() {
 		const mediaUnique = this.data?.parent.unique;
 		const mediaTypeUnique = this.data?.mediaType?.unique || null;
@@ -40,6 +43,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 			// TODO: implement pagination, or get 1000?
 			this._allowedMediaTypes = data.items;
 		}
+		this._loading = false;
 	}
 
 	async #retrieveHeadline(unique: string) {
@@ -64,11 +68,13 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<uui-dialog-layout headline=${this._headline ?? ''}>
-				${when(
-					this._allowedMediaTypes.length === 0,
-					() => this.#renderNotAllowed(),
-					() => this.#renderAllowedMediaTypes(),
-				)}
+				${this._loading
+					? html`<div id="loader"><uui-loader></uui-loader></div>`
+					: when(
+							this._allowedMediaTypes.length === 0,
+							() => this.#renderNotAllowed(),
+							() => this.#renderAllowedMediaTypes(),
+						)}
 				<uui-button
 					slot="actions"
 					id="cancel"
@@ -116,6 +122,12 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 		css`
 			#edit-permissions {
 				margin-top: var(--uui-size-6);
+			}
+
+			#loader {
+				display: flex;
+				justify-content: center;
+				align-items: center;
 			}
 		`,
 	];
