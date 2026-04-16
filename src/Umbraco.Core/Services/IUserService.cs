@@ -305,7 +305,7 @@ public interface IUserService : IMembershipUserService
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
-    IEnumerable<IUser> GetUsersByKey(params Guid[]? keys);
+    IEnumerable<IUser> GetUsersByKey(params Guid[]? keys) => throw new NotImplementedException();
 
     /// <summary>
     ///     Removes a specific section from all user groups
