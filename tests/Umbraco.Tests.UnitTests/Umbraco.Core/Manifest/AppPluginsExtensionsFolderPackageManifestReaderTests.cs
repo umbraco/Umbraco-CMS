@@ -54,7 +54,7 @@ public class AppPluginsExtensionsFolderPackageManifestReaderTests
 
         var extension = manifest.Extensions.First();
         Assert.AreEqual("bundle", GetProperty(extension, "type"));
-        Assert.AreEqual("MyPackage.Extensions.Bundle.0", GetProperty(extension, "alias"));
+        Assert.AreEqual("MyPackage.Extensions.Bundle.my-dashboard", GetProperty(extension, "alias"));
         Assert.That(GetProperty(extension, "js")!.ToString(), Does.Contain("/App_Plugins/MyPackage/extensions/my-dashboard.js"));
         Assert.That(GetProperty(extension, "js")!.ToString(), Does.Contain("?v=%CACHE_BUSTER%"));
     }
@@ -76,9 +76,9 @@ public class AppPluginsExtensionsFolderPackageManifestReaderTests
             .Select(e => GetProperty(e, "alias")!.ToString())
             .ToList();
 
-        Assert.That(aliases, Does.Contain("MyPackage.Extensions.Bundle.0"));
-        Assert.That(aliases, Does.Contain("MyPackage.Extensions.Bundle.1"));
-        Assert.That(aliases, Does.Contain("MyPackage.Extensions.Bundle.2"));
+        Assert.That(aliases, Does.Contain("MyPackage.Extensions.Bundle.action"));
+        Assert.That(aliases, Does.Contain("MyPackage.Extensions.Bundle.dashboard"));
+        Assert.That(aliases, Does.Contain("MyPackage.Extensions.Bundle.editor"));
     }
 
     [Test]

@@ -70,21 +70,22 @@ internal sealed class AppPluginsExtensionsFolderPackageManifestReader : IPackage
 
             var bundleExtensions = new List<object>();
 
-            foreach (IFileInfo file in extensionsContents)
+            foreach (IFileInfo file in extensionsContents.OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase))
             {
                 if (file.IsDirectory || !file.Name.EndsWith(".js", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
+                var fileNameWithoutExtension = file.Name[..file.Name.LastIndexOf('.')];
                 var jsPath = WebPath.Combine(Constants.SystemDirectories.AppPlugins, packageFolder.Name, ExtensionsFolderName, file.Name)
                     + "?v=%CACHE_BUSTER%";
 
                 bundleExtensions.Add(new
                 {
                     type = "bundle",
-                    alias = $"{packageFolder.Name}.Extensions.Bundle.{bundleExtensions.Count}",
-                    name = $"{packageFolder.Name} Extensions Bundle {bundleExtensions.Count}",
+                    alias = $"{packageFolder.Name}.Extensions.Bundle.{fileNameWithoutExtension}",
+                    name = $"{packageFolder.Name} Extensions Bundle ({fileNameWithoutExtension})",
                     js = jsPath,
                 });
             }

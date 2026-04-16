@@ -14,8 +14,8 @@ import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
  *    These are detected automatically and registered via {@link registerExtensionModule}.
  */
 export class UmbBundleExtensionInitializer extends UmbExtensionInitializerBase<'bundle', ManifestBundle> {
-	// Caches the loaded module per manifest alias so unloadExtension doesn't need to re-import.
-	#loadedModules = new Map<string, Record<string, unknown>>();
+	// Stores the import promise so unloadExtension can await it even if instantiate is still in flight.
+	#loadingModules = new Map<string, Promise<Record<string, unknown> | undefined>>();
 
 	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<ManifestBundle>) {
 		super(host, extensionRegistry, 'bundle');
@@ -23,11 +23,12 @@ export class UmbBundleExtensionInitializer extends UmbExtensionInitializerBase<'
 
 	async instantiateExtension(manifest: ManifestBundle): Promise<void> {
 		if (manifest.js) {
-			const js = await loadManifestPlainJs(manifest.js);
+			const jsPromise = loadManifestPlainJs(manifest.js);
+			this.#loadingModules.set(manifest.alias, jsPromise);
+
+			const js = await jsPromise;
 
 			if (js) {
-				this.#loadedModules.set(manifest.alias, js);
-
 				if (registerExtensionModule(js, this.extensionRegistry)) {
 					return;
 				}
@@ -46,8 +47,10 @@ export class UmbBundleExtensionInitializer extends UmbExtensionInitializerBase<'
 	}
 
 	async unloadExtension(manifest: ManifestBundle): Promise<void> {
-		const js = this.#loadedModules.get(manifest.alias);
-		this.#loadedModules.delete(manifest.alias);
+		const jsPromise = this.#loadingModules.get(manifest.alias);
+		this.#loadingModules.delete(manifest.alias);
+
+		const js = await jsPromise;
 
 		if (js) {
 			if (unregisterExtensionModule(js, this.extensionRegistry)) {
