@@ -1786,7 +1786,6 @@ internal partial class UserService : RepositoryService, IUserService
     }
 
     /// <inheritdoc/>
-    [Obsolete($"Use {nameof(GetUsersByKey)} instead. Scheduled for removal in Umbraco 19.")]
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
     {
         using IServiceScope scope = _serviceScopeFactory.CreateScope();
