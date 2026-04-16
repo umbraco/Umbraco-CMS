@@ -122,6 +122,12 @@ export class UmbIconSearchController extends UmbControllerBase {
 		const { nameTokens, keywordsLower, keywordTokens, groupTokens, searchableTokens, allSearchable } =
 			this.#getSearchable(icon);
 
+		// 80% match on the full icon name.
+		// e.g. "icon-bug" matches "icon-bug", NOT "icon-buggy".
+		if (query.length > icon.name.length * 0.8 && icon.name.startsWith(query)) {
+			return 400;
+		}
+
 		// Full query matches the start of a name token (word-boundary match).
 		// e.g. "paper" matches "paper-icon" or "wrapping-paper", NOT "newspaper".
 		if (nameTokens.some((t) => t.startsWith(query))) {
