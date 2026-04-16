@@ -17,7 +17,7 @@ export const itemHandlers = [
 
 	http.get(umbracoPath(`/item${UMB_SLUG}`), ({ request }) => {
 		const ids = new URL(request.url).searchParams.getAll('id');
-		if (!ids) return;
+		if (!ids.length) return;
 		const items = umbTemplateMockDb.item.getItems(ids);
 		return HttpResponse.json(items);
 	}),

@@ -36,6 +36,7 @@ export class UmbEntityRecycleBin<MockType extends { id: string; isTrashed: boole
 
 	update(id: string, updatedItem: MockType) {
 		const itemIndex = this.data.findIndex((item) => item.id === id);
+		if (itemIndex === -1) return;
 		this.data[itemIndex] = updatedItem;
 	}
 

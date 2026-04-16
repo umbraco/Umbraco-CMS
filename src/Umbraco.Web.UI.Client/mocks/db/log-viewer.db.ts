@@ -36,7 +36,7 @@ class UmbLogViewerMessagesData extends UmbMockDBBase<LogMessageResponseModel> {
 	}
 
 	getLogs(skip = 0, take = this.data.length): Array<LogMessageResponseModel> {
-		return this.data.slice(skip, take);
+		return this.data.slice(skip, skip + take);
 	}
 
 	getLevelCount(): Record<string, number> {
