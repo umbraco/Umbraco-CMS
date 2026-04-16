@@ -1,4 +1,4 @@
-import { umbExtension } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtension } from '../../src/libs/extension-api/decorators/umb-extension.decorator.js';
 
 class MyDecoratorDashboardElement extends HTMLElement {
 	connectedCallback() {
