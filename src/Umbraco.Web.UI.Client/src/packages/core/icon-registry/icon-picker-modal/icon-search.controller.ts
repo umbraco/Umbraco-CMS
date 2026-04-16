@@ -124,7 +124,7 @@ export class UmbIconSearchController extends UmbControllerBase {
 
 		// 5+ letters match on the full icon name.
 		// e.g. "icon-bu" matches "icon-bug"
-		if (query.length > 5 && icon.name.startsWith(query)) {
+		if (query.includes('-') && query.length > query.indexOf('-') + 1 && icon.name.startsWith(query)) {
 			return 400;
 		}
 
