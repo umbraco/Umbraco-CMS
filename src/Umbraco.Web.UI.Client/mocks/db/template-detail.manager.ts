@@ -13,7 +13,7 @@ export class UmbMockTemplateDetailManager extends UmbMockEntityDetailManager<Umb
 		return `@using Umbraco.Cms.Web.Common.PublishedModels;
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
-		Layout = ${masterTemplateAlias};
+		Layout = ${JSON.stringify(masterTemplateAlias)};
 }`;
 	}
 }
