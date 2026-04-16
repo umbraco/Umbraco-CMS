@@ -13,19 +13,19 @@ namespace Umbraco.Cms.Web.Website.Caching;
 ///     Handles <see cref="MemberCacheRefresherNotification"/> to evict output cache entries
 ///     for pages that reference the changed member via picker properties.
 /// </summary>
-internal sealed class MemberOutputCacheEvictionHandler
+internal sealed class WebsiteMemberOutputCacheEvictionHandler
     : RelationOutputCacheEvictionHandlerBase, INotificationAsyncHandler<MemberCacheRefresherNotification>
 {
-    private readonly ILogger<MemberOutputCacheEvictionHandler> _logger;
+    private readonly ILogger<WebsiteMemberOutputCacheEvictionHandler> _logger;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MemberOutputCacheEvictionHandler"/> class.
+    ///     Initializes a new instance of the <see cref="WebsiteMemberOutputCacheEvictionHandler"/> class.
     /// </summary>
-    public MemberOutputCacheEvictionHandler(
+    public WebsiteMemberOutputCacheEvictionHandler(
         IOutputCacheStore outputCacheStore,
         IRelationService relationService,
         IIdKeyMap idKeyMap,
-        ILogger<MemberOutputCacheEvictionHandler> logger)
+        ILogger<WebsiteMemberOutputCacheEvictionHandler> logger)
         : base(outputCacheStore, relationService, idKeyMap)
         => _logger = logger;
 
