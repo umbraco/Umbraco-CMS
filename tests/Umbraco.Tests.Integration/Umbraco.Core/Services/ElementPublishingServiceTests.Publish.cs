@@ -140,7 +140,6 @@ public partial class ElementPublishingServiceTests
     }
 
     [Test]
-    [Ignore("Trashing does not clear the published cache - this is a pre-existing issue that also affects documents.")]
     public async Task Cannot_Get_Published_Again_After_Trashing()
     {
         var elementType = await SetupInvariantElementTypeAsync();

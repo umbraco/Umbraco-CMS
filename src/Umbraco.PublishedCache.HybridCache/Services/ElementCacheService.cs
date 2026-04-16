@@ -218,12 +218,22 @@ internal sealed class ElementCacheService : IElementCacheService
         {
             await _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode));
         }
+        else
+        {
+            // No draft in the database cache — remove any stale draft entry from the local memory cache.
+            await _hybridCache.RemoveAsync(GetCacheKey(key, true));
+        }
 
         if (publishedNode is not null)
         {
             var cacheKey = GetCacheKey(publishedNode.Key, false);
             await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode));
             _publishedElementCache.Remove(cacheKey, out _);
+        }
+        else
+        {
+            // No published node in the database cache — remove any stale published entry from the local memory cache.
+            await ClearPublishedCacheAsync(key);
         }
 
         scope.Complete();
@@ -238,6 +248,14 @@ internal sealed class ElementCacheService : IElementCacheService
     public async Task RefreshElementAsync(IElement element)
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+        if (element.Trashed)
+        {
+            await _databaseCacheRepository.DeleteContentItemAsync(element.Id);
+            await RemoveFromMemoryCacheAsync(element.Key);
+            scope.Complete();
+            return;
+        }
 
         // Always set draft node
         // We have nodes separate in the cache, cause 99% of the time, you are only using one
