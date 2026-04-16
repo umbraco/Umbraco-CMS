@@ -292,11 +292,11 @@ export class UmbDocumentWorkspaceContext
 
 	/**
 	 * Set the template
-	 * @param {string} templateUnique The unique identifier of the template.
+	 * @param {string | null} templateUnique The unique identifier of the template, or null to clear the template.
 	 * @memberof UmbDocumentWorkspaceContext
 	 */
-	setTemplate(templateUnique: string) {
-		this._data.updateCurrent({ template: { unique: templateUnique } });
+	setTemplate(templateUnique: string | null) {
+		this._data.updateCurrent({ template: templateUnique ? { unique: templateUnique } : null });
 	}
 
 	protected override async _handleSave() {
