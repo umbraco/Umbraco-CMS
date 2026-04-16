@@ -304,7 +304,7 @@ export function getEditorUiAlias(propertyEditorAlias: string): string {
 
 		// Other
 		'Umbraco.Tags': 'Umb.PropertyEditorUi.Tags',
-		'Umbraco.EmailAddress': 'Umb.PropertyEditorUi.Email',
+		'Umbraco.EmailAddress': 'Umb.PropertyEditorUi.EmailAddress',
 		'Umbraco.ListView': 'Umb.PropertyEditorUi.Collection',
 		'Umbraco.Label': 'Umb.PropertyEditorUi.Label',
 		'Umbraco.IconPicker': 'Umb.PropertyEditorUi.IconPicker',

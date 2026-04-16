@@ -1104,7 +1104,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 			id: '671efc93-83f3-47a8-bd08-b2b7179a8b5a',
 		},
 		editorAlias: 'Umbraco.EmailAddress',
-		editorUiAlias: 'Umb.PropertyEditorUi.Email',
+		editorUiAlias: 'Umb.PropertyEditorUi.EmailAddress',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: true,
