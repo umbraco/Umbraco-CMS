@@ -297,34 +297,34 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Use_Obsolete_Save()
+    public async Task Can_Use_Obsolete_Save()
     {
         foreach (var culture in Cultures)
         {
-            SetDomainOnContent(Root, culture, GetDomainUrlFromCultureCode(culture));
+            await SetDomainOnContent(Root, culture, GetDomainUrlFromCultureCode(culture));
         }
 
-        var domains = GetRequiredService<IDomainService>().GetAssignedDomains(Root.Id, true);
+        var domains = await GetRequiredService<IDomainService>().GetAssignedDomainsAsync(Root.Key, true);
         Assert.AreEqual(3, domains.Count());
     }
 
     [Test]
-    public void Can_Use_Obsolete_Delete()
+    public async Task Can_Use_Obsolete_Delete()
     {
         foreach (var culture in Cultures)
         {
-            SetDomainOnContent(Root, culture, GetDomainUrlFromCultureCode(culture));
+            await SetDomainOnContent(Root, culture, GetDomainUrlFromCultureCode(culture));
         }
 
         var domainService = GetRequiredService<IDomainService>();
 
-        var domains = domainService.GetAssignedDomains(Root.Id, true);
+        var domains = await domainService.GetAssignedDomainsAsync(Root.Key, true);
         Assert.AreEqual(3, domains.Count());
 
         var result = domainService.Delete(domains.First());
         Assert.IsTrue(result.Success);
 
-        domains = domainService.GetAssignedDomains(Root.Id, true);
+        domains = await domainService.GetAssignedDomainsAsync(Root.Key, true);
         Assert.AreEqual(2, domains.Count());
     }
 
@@ -394,12 +394,17 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
     private static string GetDomainUrlFromCultureCode(string culture) =>
         "/" + culture.Replace("-", string.Empty).ToLower() + "/";
 
-    private void SetDomainOnContent(IContent content, string cultureIsoCode, string domain)
+    private async Task SetDomainOnContent(IContent content, string cultureIsoCode, string domain)
     {
         var domainService = GetRequiredService<IDomainService>();
-        var langId = GetRequiredService<ILocalizationService>().GetLanguageIdByIsoCode(cultureIsoCode);
+        var langId = await GetRequiredService<ILanguageService>().GetAsync(cultureIsoCode);
+        var domainsUpdateModel = new DomainsUpdateModel
+        {
+            Domains = new DomainModel { DomainName = domain, IsoCode = cultureIsoCode }.Yield(),
+        };
         domainService.Save(
-            new UmbracoDomain(domain) { RootContentId = content.Id, LanguageId = langId });
+            new UmbracoDomain(domain) { RootContentId = content.Id, LanguageId = langId.Id });
+        //await domainService.UpdateDomainsAsync(content.Key, domainsUpdateModel);
     }
 
     private IEnumerable<UrlInfo> GetContentUrlsAsync(IContent root) =>

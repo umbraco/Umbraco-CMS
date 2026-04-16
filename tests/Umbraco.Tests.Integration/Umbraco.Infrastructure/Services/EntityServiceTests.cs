@@ -55,7 +55,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private IContentTypeContainerService ContentTypeContainerService => GetRequiredService<IContentTypeContainerService>();
 
@@ -692,11 +692,11 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
+    public async Task EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
     {
         var alias = "test" + Guid.NewGuid();
         var template = TemplateBuilder.CreateTextPageTemplate(alias);
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         var contentType = ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
         contentType.Variations = ContentVariation.Culture;
         ContentTypeService.Save(contentType);
@@ -716,10 +716,10 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
+    public async Task EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         var contentType = ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
         contentType.Variations = ContentVariation.Culture;
         ContentTypeService.Save(contentType);
@@ -1201,7 +1201,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             _isSetup = true;
 
             var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-            FileService.SaveTemplate(template); // else, FK violation on contentType!
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
             // Create and Save ContentType "umbTextpage" -> _contentType.Id
             _contentType =

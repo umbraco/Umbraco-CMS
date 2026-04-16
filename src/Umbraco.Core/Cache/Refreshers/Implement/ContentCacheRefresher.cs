@@ -202,11 +202,23 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
                 idsRemoved.Add(payload.Id);
             }
 
-            HandleMemoryCache(payload);
-            HandleRouting(payload);
+            // For Remove payloads, clean up routing caches before navigation removes the node from the tree (HandleRouting needs
+            // the navigation structure to find descendants).
+            if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+            {
+                HandleRouting(payload);
+            }
 
             HandleNavigation(payload);
             HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
+
+            HandleMemoryCache(payload);
+
+            // For non-Remove payloads, run routing after publish status and memory cache are populated.
+            if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove) is false)
+            {
+                HandleRouting(payload);
+            }
 
             HandleIdKeyMap(payload);
         }
@@ -223,27 +235,30 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         base.Refresh(payloads);
     }
 
-    private static bool ShouldClearPartialViewCache(JsonPayload[] payloads)
-    {
-        return payloads.Any(x =>
+    internal static bool ShouldClearPartialViewCache(IEnumerable<(TreeChangeTypes ChangeTypes, string[]? PublishedCultures, string[]? UnpublishedCultures)> changes)
+        => changes.Any(change =>
         {
-            // Check for relelvant change type
-            var isRelevantChangeType = x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll) ||
-                x.ChangeTypes.HasType(TreeChangeTypes.Remove) ||
-                x.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) ||
-                x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch);
+            // Check for relevant change type
+            var isRelevantChangeType = change.ChangeTypes.HasType(TreeChangeTypes.RefreshAll) ||
+                                       change.ChangeTypes.HasType(TreeChangeTypes.Remove) ||
+                                       change.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) ||
+                                       change.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch);
 
             // Check for published/unpublished changes
-            var hasChanges = x.PublishedCultures?.Length > 0 ||
-                   x.UnpublishedCultures?.Length > 0;
+            var hasChanges = change.PublishedCultures?.Length > 0 ||
+                             change.UnpublishedCultures?.Length > 0;
 
-            // There's no other way to detect trashed content as the change type is only Remove when deleted permanently
-            var isTrashed = x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && x.PublishedCultures is null && x.UnpublishedCultures is null;
+            // There's no other way to detect trashed state as the change type is only Remove when deleted permanently
+            var isTrashed = change.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && change.PublishedCultures is null && change.UnpublishedCultures is null;
 
-            // Skip blueprints and only clear the partial cache for removals or refreshes with changes
-            return x.Blueprint == false && (isTrashed || (isRelevantChangeType && hasChanges));
+            // Only clear the partial cache for removals or refreshes with changes
+            return isTrashed || (isRelevantChangeType && hasChanges);
         });
-    }
+
+    private static bool ShouldClearPartialViewCache(JsonPayload[] payloads)
+        => ShouldClearPartialViewCache(payloads
+            .Where(payload => payload.Blueprint is false)
+            .Select(payload => (payload.ChangeTypes, payload.PublishedCultures, payload.UnpublishedCultures)));
 
     private void HandleMemoryCache(JsonPayload payload)
     {
@@ -261,25 +276,26 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
-            if (_documentNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys))
+            var inMainTree = _documentNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys);
+            var inBin = inMainTree is false && _documentNavigationQueryService.TryGetDescendantsKeysInBin(key, out descendantsKeys);
+
+            if (inMainTree || inBin)
             {
                 var branchKeys = descendantsKeys.ToList();
                 branchKeys.Add(key);
 
-                // If the branch is unpublished, we need to remove it from cache instead of refreshing it
-                if (IsBranchUnpublished(payload))
+                // Remove from cache if the branch is in the bin or being unpublished; otherwise refresh.
+                var removeFromCache = inBin || IsBranchUnpublished(payload);
+
+                foreach (Guid branchKey in branchKeys)
                 {
-                    foreach (Guid branchKey in branchKeys)
+                    if (removeFromCache)
                     {
                         _documentCacheService.RemoveFromMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                        continue;
                     }
-                }
-                else
-                {
-                    foreach (Guid branchKey in branchKeys)
-                    {
-                        _documentCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
-                    }
+
+                    _documentCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
                 }
             }
         }
@@ -309,7 +325,8 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         {
             Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
 
-            // Note that we need to clear the navigation service as the last thing.
+            // Remove routing must run before HandleNavigation removes the node from the navigation tree,
+            // since we need the tree structure to resolve descendant keys.
             if (_documentNavigationQueryService.TryGetDescendantsKeysOrSelfKeys(key, out IEnumerable<Guid>? descendantsOrSelfKeys))
             {
                 _documentUrlService.DeleteUrlsFromCacheAsync(descendantsOrSelfKeys).GetAwaiter().GetResult();

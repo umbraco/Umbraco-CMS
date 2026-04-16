@@ -398,20 +398,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#languages.setValue(data?.items ?? []);
 	}
 
-	/**
-	 * @deprecated Call `_loadSegmentsFor` instead. `loadSegments` will be removed in v.18.
-	 * (note this was introduced in v.17, and deprecated in v.17.0.1)
-	 */
-	protected async loadSegments() {
-		console.warn('Stop using loadSegments, call _loadSegmentsFor instead. loadSegments will be removed in v.18.');
-		const unique = await firstValueFrom(this.unique);
-		if (!unique) {
-			this._segments.setValue([]);
-			return;
-		}
-		this._loadSegmentsFor(unique);
-	}
-
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected async _loadSegmentsFor(unique: string): Promise<void> {
 		console.warn(
@@ -1114,7 +1100,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
 
 		// Only update the variants that was chosen to be saved:
-		const persistedData = this._data.getCurrent();
+		// Use getPersisted() as the base so non-saved variants retain the actual
+		// server state, not unsaved local edits from current data.
+		const persistedData = this._data.getPersisted();
 		const newPersistedData = await new UmbMergeContentVariantDataController(this).process(
 			persistedData,
 			data,

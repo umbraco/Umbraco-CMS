@@ -94,6 +94,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Operation not permitted")
                     .WithDetail("The attempted operation was not permitted, likely due to a permission/configuration mismatch with the operation.")
                     .Build()),
+                ContentTypeOperationStatus.SystemAliasChangeNotAllowed => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Alias change not permitted")
+                    .WithDetail($"The alias of a system {type} type cannot be changed. To create a {type} type with a different alias, use the duplicate operation instead.")
+                    .Build()),
                 ContentTypeOperationStatus.CancelledByNotification => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Cancelled by notification")
                     .WithDetail("The attempted operation was cancelled by a notification.")
@@ -113,6 +117,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")
                     .WithDetail("Cannot change to document type because this element type is used in the configuration of a data type.")
+                    .Build()),
+                ContentTypeOperationStatus.InvalidElementFlagElementHasContent => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid IsElement flag")
+                    .WithDetail("Cannot change to document type because content has already been created with this element type.")
                     .Build()),
                 ContentTypeOperationStatus.InvalidElementFlagComparedToParent => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")

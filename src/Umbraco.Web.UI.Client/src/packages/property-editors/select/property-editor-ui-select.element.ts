@@ -5,7 +5,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 	UmbPropertyEditorUiElement,
 } from '@umbraco-cms/backoffice/property-editor';
-import type { UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
@@ -39,7 +39,7 @@ export class UmbPropertyEditorUISelectElement extends UmbLitElement implements U
 	}
 
 	@state()
-	private _options: Array<Option> = [];
+	private _options: Array<UUISelectOption> = [];
 
 	#onChange(event: UUISelectEvent) {
 		this.value = event.target.value as string;

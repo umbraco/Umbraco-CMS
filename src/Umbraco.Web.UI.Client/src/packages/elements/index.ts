@@ -3,6 +3,7 @@ export * from './entity.js';
 export * from './paths.js';
 export * from './audit-log/index.js';
 export * from './collection/index.js';
+export * from './entity-actions/index.js';
 export * from './folder/index.js';
 export * from './global-components/index.js';
 export * from './item/index.js';

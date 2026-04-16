@@ -16,8 +16,10 @@ internal class PublishedContent : PublishedElement, IPublishedContent
         ContentNode contentNode,
         bool preview,
         IElementsCache elementsCache,
-        IVariationContextAccessor variationContextAccessor)
-        : base(contentNode, preview, elementsCache, variationContextAccessor)
+        IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
+        : base(contentNode, preview, elementsCache, variationContextAccessor, propertyRenderingContextAccessor)
+
     {
     }
 

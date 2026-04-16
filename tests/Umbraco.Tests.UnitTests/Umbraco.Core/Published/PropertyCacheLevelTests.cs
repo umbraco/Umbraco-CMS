@@ -1,10 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -48,9 +46,10 @@ public class PropertyCacheLevelTests
 
         var elementsCache = new ElementsDictionaryAppCache();
         var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new() };
+        var propertyRenderingContextAccessor = new TestPropertyRenderingContextAccessor { PropertyRenderingContext = new(default) };
         var contentNode = CreateContentNode("Set 1", 1234, setType1, new Dictionary<string, object> { { "prop1", "1234" } });
 
-        var set1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
+        var set1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
@@ -97,9 +96,10 @@ public class PropertyCacheLevelTests
         cacheManager.Setup(x => x.ElementsCache).Returns(elementsCache);
 
         var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new() };
+        var propertyRenderingContextAccessor = new TestPropertyRenderingContextAccessor { PropertyRenderingContext = new(default) };
         var contentNode = CreateContentNode("Set 1", 1234, setType1, new Dictionary<string, object> { { "prop1", "1234" } });
 
-        var set1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
+        var set1 = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
 
         Assert.AreEqual(1234, set1.Value(Mock.Of<IPublishedValueFallback>(), "prop1"));
         Assert.AreEqual(1, converter.SourceConverts);
@@ -155,7 +155,8 @@ public class PropertyCacheLevelTests
             var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new() };
 
             var contentNode = CreateContentNode("Set 1", 1234, setType1, new Dictionary<string, object> { { "prop1", "1234" } });
-            var unused = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor);
+            var propertyRenderingContextAccessor = new TestPropertyRenderingContextAccessor { PropertyRenderingContext = new(default) };
+            var unused = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
         });
     }
 

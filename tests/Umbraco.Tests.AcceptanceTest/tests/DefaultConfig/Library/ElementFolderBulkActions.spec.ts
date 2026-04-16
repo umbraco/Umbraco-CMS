@@ -29,7 +29,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-test('can bulk publish elements in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can bulk publish elements in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.library.selectElementWithNameInElementCollectionView(firstElementName);
   await umbracoUi.library.selectElementWithNameInElementCollectionView(secondElementName);
@@ -41,7 +41,7 @@ test('can bulk publish elements in a folder', {tag: '@smoke'}, async ({umbracoAp
   expect(await umbracoApi.element.isElementPublished(secondElementId)).toBeTruthy();
 });
 
-test('can bulk unpublish elements in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can bulk unpublish elements in a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.element.publish(firstElementId);
   await umbracoApi.element.publish(secondElementId);
@@ -81,7 +81,7 @@ test('can bulk move elements to another folder', async ({umbracoApi, umbracoUi})
   await umbracoApi.element.ensureNameNotExists(targetFolderName);
 });
 
-test('can bulk trash elements in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can bulk trash elements in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.library.selectElementWithNameInElementCollectionView(firstElementName);
   await umbracoUi.library.selectElementWithNameInElementCollectionView(secondElementName);

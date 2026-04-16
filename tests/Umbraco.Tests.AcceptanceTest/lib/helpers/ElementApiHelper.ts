@@ -162,11 +162,12 @@ export class ElementApiHelper {
     return response.status();
   }
 
-  async moveToRecycleBin(id: string) {
+  async moveToRecycleBin(id: string, isFolder: boolean = false) {
     if (id == null) {
       return;
     }
-    const response = await this.api.put(`${this.api.baseUrl}${ConstantHelper.apiEndpoints.element}/${id}/move-to-recycle-bin`);
+    const endpoint = isFolder ? ConstantHelper.apiEndpoints.elementFolder : ConstantHelper.apiEndpoints.element;
+    const response = await this.api.put(`${this.api.baseUrl}${endpoint}/${id}/move-to-recycle-bin`);
     return response.status();
   }
 

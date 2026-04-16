@@ -1,17 +1,21 @@
-import { UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/constants.js';
-import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
-import { UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS } from '../../folder/repository/constants.js';
-import { UMB_ELEMENT_ITEM_REPOSITORY_ALIAS } from '../../item/constants.js';
+import { UmbElementFolderItemDataResolver } from '../../folder/data-resolver/element-folder-item-data-resolver.js';
+import { UmbElementItemDataResolver } from '../../item/data-resolver/element-item-data-resolver.js';
+import {
+	UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
+	UMB_ELEMENT_FOLDER_ITEM_REPOSITORY_ALIAS,
+	UMB_ELEMENT_FOLDER_PICKER_MODAL,
+	UMB_ELEMENT_FOLDER_REPOSITORY_ALIAS,
+	UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
+	UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
+	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_DELETE,
+} from '../../constants.js';
+import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import {
 	UMB_ELEMENT_FOLDER_RECYCLE_BIN_REPOSITORY_ALIAS,
 	UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 	UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE,
 } from '../constants.js';
-import { UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS } from '../../reference/constants.js';
-import {
-	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
-	UMB_USER_PERMISSION_ELEMENT_DELETE,
-} from '../../user-permissions/constants.js';
 import { UMB_ENTITY_HAS_CHILDREN_CONDITION_ALIAS } from '@umbraco-cms/backoffice/entity-action';
 import {
 	UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS,
@@ -26,6 +30,7 @@ const elementActions: Array<UmbExtensionManifest> = [
 		name: 'Trash Element Entity Action',
 		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
 		meta: {
+			itemDataResolver: UmbElementItemDataResolver,
 			itemRepositoryAlias: UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
 			recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
 			referenceRepositoryAlias: UMB_ELEMENT_REFERENCE_REPOSITORY_ALIAS,
@@ -61,31 +66,34 @@ const elementActions: Array<UmbExtensionManifest> = [
 			{ alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS },
 		],
 	},
-	// {
-	// 	type: 'entityAction',
-	// 	kind: 'restoreFromRecycleBin',
-	// 	alias: 'Umb.EntityAction.Element.RecycleBin.Restore',
-	// 	name: 'Restore Element From Recycle Bin Entity Action',
-	// 	forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
-	// 	meta: {
-	// 		itemRepositoryAlias: UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
-	// 		itemDataResolver: UmbElementItemDataResolver,
-	// 		recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
-	// 		pickerModal: UMB_ELEMENT_PICKER_MODAL,
-	// 	},
-	// 	conditions: [
-	// 		{
-	// 			alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
-	// 		},
-	// 	],
-	// },
+	{
+		type: 'entityAction',
+		kind: 'restoreFromRecycleBin',
+		alias: 'Umb.EntityAction.Element.RecycleBin.Restore',
+		name: 'Restore Element From Recycle Bin Entity Action',
+		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
+		meta: {
+			destinationItemRepositoryAlias: UMB_ELEMENT_FOLDER_ITEM_REPOSITORY_ALIAS,
+			destinationRootEntityType: UMB_ELEMENT_ROOT_ENTITY_TYPE,
+			destinationItemDataResolver: UmbElementFolderItemDataResolver,
+			itemRepositoryAlias: UMB_ELEMENT_ITEM_REPOSITORY_ALIAS,
+			itemDataResolver: UmbElementItemDataResolver,
+			pickerModal: UMB_ELEMENT_FOLDER_PICKER_MODAL,
+			recycleBinRepositoryAlias: UMB_ELEMENT_RECYCLE_BIN_REPOSITORY_ALIAS,
+		},
+		conditions: [
+			{
+				alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS,
+			},
+		],
+	},
 ];
 
 const folderActions: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
 		kind: 'trashFolder',
-		alias: 'Umb.EntityAction.Element.Folder.Trash',
+		alias: 'Umb.EntityAction.ElementFolder.Trash',
 		name: 'Trash Element Folder Entity Action',
 		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
 		meta: {
@@ -99,6 +107,22 @@ const folderActions: Array<UmbExtensionManifest> = [
 			},
 			{ alias: UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS },
 		],
+	},
+	{
+		type: 'entityAction',
+		kind: 'restoreFromRecycleBin',
+		alias: 'Umb.EntityAction.ElementFolder.RecycleBin.Restore',
+		name: 'Restore Element Folder From Recycle Bin Entity Action',
+		forEntityTypes: [UMB_ELEMENT_FOLDER_ENTITY_TYPE],
+		meta: {
+			destinationRootEntityType: UMB_ELEMENT_ROOT_ENTITY_TYPE,
+			destinationItemDataResolver: UmbElementFolderItemDataResolver,
+			itemRepositoryAlias: UMB_ELEMENT_FOLDER_ITEM_REPOSITORY_ALIAS,
+			itemDataResolver: UmbElementFolderItemDataResolver,
+			pickerModal: UMB_ELEMENT_FOLDER_PICKER_MODAL,
+			recycleBinRepositoryAlias: UMB_ELEMENT_FOLDER_RECYCLE_BIN_REPOSITORY_ALIAS,
+		},
+		conditions: [{ alias: UMB_ENTITY_IS_TRASHED_CONDITION_ALIAS }],
 	},
 ];
 

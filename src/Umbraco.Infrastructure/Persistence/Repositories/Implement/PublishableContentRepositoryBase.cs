@@ -1494,6 +1494,11 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
     #region Content Repository
 
+    /// <summary>
+    /// Counts the number of published documents, optionally filtered by content type alias.
+    /// </summary>
+    /// <param name="contentTypeAlias">The alias of the content type to filter by. If null or empty, counts all published documents.</param>
+    /// <returns>The count of published documents matching the criteria.</returns>
     public int CountPublished(string? contentTypeAlias = null)
     {
         Sql<ISqlContext> sql = SqlContext.Sql();

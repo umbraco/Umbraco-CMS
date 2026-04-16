@@ -25,7 +25,6 @@ describe('UmbBlockToBlockSingleClipboardPastePropertyValueTranslator', () => {
 						alias: 'headline',
 						editorAlias: 'Umbraco.TextBox',
 						value: 'Headline value',
-						entityType: '',
 					},
 				],
 			},

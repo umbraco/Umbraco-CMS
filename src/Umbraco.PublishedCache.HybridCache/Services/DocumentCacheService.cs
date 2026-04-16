@@ -148,8 +148,9 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             // If we can resolve the content cache node, we still need to check if the ancestor path is published.
             // This does cost some performance, but it's necessary to ensure that the content is actually published.
             // When unpublishing a node, a payload with RefreshBranch is published, so we don't have to worry about this.
-            // Similarly, when a branch is published, next time the content is requested, the parent will be published,
-            // this works because we don't cache null values.
+            // Similarly, when a branch is published, next time the content is requested, the parent will be published.
+            // Null values are cached here are tagged and cleared by ClearMemoryCacheAsync, so the next request after a
+            // cache clear will re-query the database.
             if (preview is false && contentCacheNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(contentCacheNode.Key) is false)
             {
                 // Careful not to early return here. We need to complete the scope even if returning null.
@@ -193,12 +194,23 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         {
             await _hybridCache.SetAsync(GetCacheKey(draftNode.Key, true), draftNode, GetEntryOptions(draftNode.Key, true), GenerateTags(draftNode));
         }
+        else
+        {
+            // No draft in the database cache — remove any stale draft entry from the local memory cache.
+            await _hybridCache.RemoveAsync(GetCacheKey(key, true));
+        }
 
         if (publishedNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(publishedNode.Key))
         {
             var cacheKey = GetCacheKey(publishedNode.Key, false);
             await _hybridCache.SetAsync(cacheKey, publishedNode, GetEntryOptions(publishedNode.Key, false), GenerateTags(publishedNode));
             _publishedContentCache.Remove(cacheKey, out _);
+        }
+        else
+        {
+            // Either no published node in the database cache, or the ancestor path is no longer published —
+            // remove any stale published entry from the local memory cache.
+            await ClearPublishedCacheAsync(key);
         }
 
         scope.Complete();
@@ -309,6 +321,14 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
+        if (content.Trashed)
+        {
+            await _databaseCacheRepository.DeleteContentItemAsync(content.Id);
+            await RemoveFromMemoryCacheAsync(content.Key);
+            scope.Complete();
+            return;
+        }
+
         // Always set draft node
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
@@ -316,7 +336,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
         await _databaseCacheRepository.RefreshContentAsync(draftCacheNode, content.PublishedState);
 
-        if (content.PublishedState == PublishedState.Publishing || content.PublishedState == PublishedState.Unpublishing)
+        if (content.PublishedState is PublishedState.Publishing or PublishedState.Unpublishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
 
@@ -333,10 +353,25 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     private static string GetCacheKey(Guid key, bool preview) => preview ? $"{key}+draft" : $"{key}";
 
-    // Generates the cache tags for a given CacheNode
-    // We use the tags to be able to clear all cache entries that are related to a given content item.
-    // Tags for now are only content/media, but can be expanded with draft/published later.
-    private static HashSet<string> GenerateTags(ContentCacheNode? cacheNode) => cacheNode is null ? [] : [Constants.Cache.Tags.Content, ContentTypeIdTag(cacheNode.ContentTypeId)];
+    /// <summary>
+    /// Generates the cache tags for a given <see cref="ContentCacheNode"/>.
+    /// </summary>
+    /// <param name="cacheNode">The cache node to generate tags for, or <c>null</c> for a negative-cache entry.</param>
+    /// <returns>
+    /// A set of tags that always includes <see cref="Constants.Cache.Tags.Content"/>.
+    /// When <paramref name="cacheNode"/> is non-null, the content type ID tag is also included.
+    /// </returns>
+    /// <remarks>
+    /// Tags are used to clear all cache entries related to a given content item or type.
+    /// The <see cref="Constants.Cache.Tags.Content"/> tag is always included — even for null entries — so
+    /// that <see cref="ClearMemoryCacheAsync"/> (which clears by this tag) can evict negative-cache entries.
+    /// Without this, null entries survive tag-based cache clears and become permanently stale.
+    /// Tags currently cover content/media distinctions but can be expanded with draft/published later.
+    /// </remarks>
+    private static HashSet<string> GenerateTags(ContentCacheNode? cacheNode) =>
+        cacheNode is null
+            ? [Constants.Cache.Tags.Content]
+            : [Constants.Cache.Tags.Content, ContentTypeIdTag(cacheNode.ContentTypeId)];
 
     public async Task DeleteItemAsync(IContentBase content)
     {
