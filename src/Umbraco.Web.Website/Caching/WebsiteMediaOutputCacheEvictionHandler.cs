@@ -14,19 +14,19 @@ namespace Umbraco.Cms.Web.Website.Caching;
 ///     Handles <see cref="MediaCacheRefresherNotification"/> to evict output cache entries
 ///     for pages that reference the changed media via picker properties.
 /// </summary>
-internal sealed class MediaOutputCacheEvictionHandler
+internal sealed class WebsiteMediaOutputCacheEvictionHandler
     : RelationOutputCacheEvictionHandlerBase, INotificationAsyncHandler<MediaCacheRefresherNotification>
 {
-    private readonly ILogger<MediaOutputCacheEvictionHandler> _logger;
+    private readonly ILogger<WebsiteMediaOutputCacheEvictionHandler> _logger;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MediaOutputCacheEvictionHandler"/> class.
+    ///     Initializes a new instance of the <see cref="WebsiteMediaOutputCacheEvictionHandler"/> class.
     /// </summary>
-    public MediaOutputCacheEvictionHandler(
+    public WebsiteMediaOutputCacheEvictionHandler(
         IOutputCacheStore outputCacheStore,
         IRelationService relationService,
         IIdKeyMap idKeyMap,
-        ILogger<MediaOutputCacheEvictionHandler> logger)
+        ILogger<WebsiteMediaOutputCacheEvictionHandler> logger)
         : base(outputCacheStore, relationService, idKeyMap)
         => _logger = logger;
 
