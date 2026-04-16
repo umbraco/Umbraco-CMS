@@ -1,8 +1,8 @@
 import type { UmbMockWebhookModel } from '../../mock-data-set.types.js';
 
-// Content type IDs referenced from the default mock data set
-const SIMPLE_DOC_TYPE_ID = 'the-simplest-document-type-id';
-const SIMPLE_DOC_TYPE_2_ID = 'simple-document-type-id';
+// Document type IDs from the kitchen-sink data set
+const HOME_DOC_TYPE_ID = '7184285e-9709-4e13-8c72-1fe52f024b28'; // Home
+const COLOR_PICKER_DOC_TYPE_ID = '015bc281-7410-40e2-81b5-b8f7c963bd61'; // Color Picker
 
 // ─── Reusable event definitions ──────────────────────────────────────────────
 
@@ -67,7 +67,7 @@ export const data: Array<UmbMockWebhookModel> = [
 		url: 'https://blog.example.com/on-publish',
 		enabled: true,
 		events: [EVENT_CONTENT_PUBLISHED],
-		contentTypeKeys: [SIMPLE_DOC_TYPE_ID],
+		contentTypeKeys: [HOME_DOC_TYPE_ID],
 		headers: {},
 	},
 
@@ -79,7 +79,7 @@ export const data: Array<UmbMockWebhookModel> = [
 		url: 'https://example.com/multi-type',
 		enabled: true,
 		events: [EVENT_CONTENT_PUBLISHED, EVENT_CONTENT_UNPUBLISHED],
-		contentTypeKeys: [SIMPLE_DOC_TYPE_ID, SIMPLE_DOC_TYPE_2_ID],
+		contentTypeKeys: [HOME_DOC_TYPE_ID, COLOR_PICKER_DOC_TYPE_ID],
 		headers: {},
 	},
 
@@ -179,7 +179,7 @@ export const data: Array<UmbMockWebhookModel> = [
 		url: 'https://secure.example.com/webhook',
 		enabled: true,
 		events: [EVENT_CONTENT_PUBLISHED, EVENT_CONTENT_UNPUBLISHED],
-		contentTypeKeys: [SIMPLE_DOC_TYPE_ID],
+		contentTypeKeys: [HOME_DOC_TYPE_ID],
 		headers: { Authorization: 'Bearer prod-token-xyz', 'X-Environment': 'production' },
 	},
 
@@ -191,7 +191,7 @@ export const data: Array<UmbMockWebhookModel> = [
 		url: 'https://old-system.example.com/webhook/v1',
 		enabled: false,
 		events: [EVENT_CONTENT_PUBLISHED, EVENT_CONTENT_DELETED],
-		contentTypeKeys: [SIMPLE_DOC_TYPE_2_ID],
+		contentTypeKeys: [COLOR_PICKER_DOC_TYPE_ID],
 		headers: { 'X-API-Key': 'old-key-abc', Authorization: 'Bearer deprecated-token' },
 	},
 
