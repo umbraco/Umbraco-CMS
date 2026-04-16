@@ -1,7 +1,3 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -38,6 +34,8 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
     private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
 
     private IElementPublishingService ElementPublishingService => GetRequiredService<IElementPublishingService>();
+
+    private IElementContainerService ElementContainerService => GetRequiredService<IElementContainerService>();
 
     private IPublishedElementCache PublishedElementCache => GetRequiredService<IPublishedElementCache>();
 
@@ -162,6 +160,93 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         // Assert
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.Name, Is.EqualTo("My Element Name"));
+    }
+
+    [Test]
+    public async Task Cannot_Get_Trashed_As_Published()
+    {
+        // Arrange
+        var elementKey = await CreateAndPublishElement("Published Element");
+
+        // Act — trash the element
+        await ElementEditingService.MoveToRecycleBinAsync(elementKey, Constants.Security.SuperUserKey);
+
+        // Assert
+        var result = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
+        Assert.That(result, Is.Null);
+    }
+
+    [Test]
+    public async Task Cannot_Get_Published_Again_After_Trashing()
+    {
+        // Arrange
+        var elementKey = await CreateAndPublishElement("Published Element");
+
+        // Verify it's in the published cache
+        var before = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
+        Assert.That(before, Is.Not.Null);
+
+        // Act — trash the element
+        await ElementEditingService.MoveToRecycleBinAsync(elementKey, Constants.Security.SuperUserKey);
+
+        // Assert
+        var after = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
+        Assert.That(after, Is.Null);
+    }
+
+    [Test]
+    public async Task Cannot_Get_Published_Elements_After_Folder_Trashed()
+    {
+        // Arrange — create a folder with published elements inside
+        var folderKey = Guid.NewGuid();
+        var folderResult = await ElementContainerService.CreateAsync(folderKey, "Test Folder", null, Constants.Security.SuperUserKey);
+        Assert.That(folderResult.Success, Is.True);
+
+        var element1Key = await CreateElementInFolder("Element One", folderKey);
+        var element2Key = await CreateElementInFolder("Element Two", folderKey);
+
+        await PublishElement(element1Key);
+        await PublishElement(element2Key);
+
+        // Verify both elements are in the published cache
+        var before1 = await PublishedElementCache.GetByIdAsync(element1Key, preview: false);
+        var before2 = await PublishedElementCache.GetByIdAsync(element2Key, preview: false);
+        Assert.That(before1, Is.Not.Null);
+        Assert.That(before2, Is.Not.Null);
+
+        // Act — trash the folder
+        var trashResult = await ElementContainerService.MoveToRecycleBinAsync(folderKey, Constants.Security.SuperUserKey);
+        Assert.That(trashResult.Success, Is.True);
+
+        // Assert — elements should no longer be in the published cache
+        var after1 = await PublishedElementCache.GetByIdAsync(element1Key, preview: false);
+        var after2 = await PublishedElementCache.GetByIdAsync(element2Key, preview: false);
+        Assert.That(after1, Is.Null);
+        Assert.That(after2, Is.Null);
+    }
+
+    private async Task<Guid> CreateElementInFolder(string name, Guid parentKey)
+    {
+        var createResult = await ElementEditingService.CreateAsync(
+            new ElementCreateModel
+            {
+                ContentTypeKey = _elementTypeKey,
+                ParentKey = parentKey,
+                Variants = [new() { Name = name }],
+            },
+            Constants.Security.SuperUserKey);
+
+        Assert.That(createResult.Success, Is.True);
+        return createResult.Result.Content!.Key;
+    }
+
+    private async Task PublishElement(Guid elementKey)
+    {
+        var publishResult = await ElementPublishingService.PublishAsync(
+            elementKey,
+            [new CulturePublishScheduleModel { Culture = "*", Schedule = null }],
+            Constants.Security.SuperUserKey);
+        Assert.That(publishResult.Success, Is.True);
     }
 
     private async Task<Guid> CreateElement(string name)
