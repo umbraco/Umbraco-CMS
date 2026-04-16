@@ -51,19 +51,19 @@ internal sealed class AppPluginsExtensionsFolderPackageManifestReader : IPackage
                 continue;
             }
 
+            var extensionsPath = WebPath.Combine(Constants.SystemDirectories.AppPlugins, packageFolder.Name, ExtensionsFolderName);
+            IDirectoryContents extensionsContents = fileProvider.GetDirectoryContents(extensionsPath);
+
+            if (!extensionsContents.Exists)
+            {
+                continue;
+            }
+
             // Skip packages that already have an umbraco-package.json — those are handled
             // by the AppPluginsPackageManifestReader and would cause duplicate manifest entries.
             var packagePath = WebPath.Combine(Constants.SystemDirectories.AppPlugins, packageFolder.Name);
             IDirectoryContents packageContents = fileProvider.GetDirectoryContents(packagePath);
             if (packageContents.Any(f => !f.IsDirectory && f.Name.InvariantEquals(PackageManifestFileName)))
-            {
-                continue;
-            }
-
-            var extensionsPath = WebPath.Combine(Constants.SystemDirectories.AppPlugins, packageFolder.Name, ExtensionsFolderName);
-            IDirectoryContents extensionsContents = fileProvider.GetDirectoryContents(extensionsPath);
-
-            if (!extensionsContents.Exists)
             {
                 continue;
             }
