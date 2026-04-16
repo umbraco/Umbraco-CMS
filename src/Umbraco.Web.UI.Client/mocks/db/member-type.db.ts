@@ -45,6 +45,7 @@ const createDetailMockMapper = (request: CreateMemberTypeRequestModel): UmbMockM
 		hasChildren: false,
 		parent: null,
 		hasListView: false,
+		isFolder: false,
 		flags: [],
 	};
 };

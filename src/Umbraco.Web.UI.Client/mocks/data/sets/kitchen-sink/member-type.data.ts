@@ -17,7 +17,11 @@ function mapCompositionType(type: string): CompositionTypeModel {
 	}
 }
 
-const rawData = [
+const rawData: Array<
+	Omit<UmbMockMemberTypeModel, 'compositions'> & {
+		compositions: Array<{ memberType: { id: string }; compositionType: string }>;
+	}
+> = [
 	{
 		name: 'Member',
 		id: 'd59be02f-1df9-4228-aa1e-01917d806cda',

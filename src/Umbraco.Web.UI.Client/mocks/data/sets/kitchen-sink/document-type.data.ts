@@ -17,7 +17,11 @@ function mapCompositionType(type: string): CompositionTypeModel {
 	}
 }
 
-const rawData = [
+const rawData: Array<
+	Omit<UmbMockDocumentTypeModel, 'compositions'> & {
+		compositions: Array<{ documentType: { id: string }; compositionType: string }>;
+	}
+> = [
 	{
 		allowedTemplates: [],
 		defaultTemplate: null,

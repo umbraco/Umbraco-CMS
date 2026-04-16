@@ -40,6 +40,7 @@ import type {
 	// Member Type
 	MemberTypeItemResponseModel,
 	MemberTypeResponseModel,
+	MemberTypeTreeItemResponseModel,
 	// Partial View
 	FileSystemTreeItemPresentationModel,
 	PartialViewItemResponseModel,
@@ -129,9 +130,8 @@ export type UmbMockMemberModel = MemberResponseModel & MemberItemResponseModel;
 export type UmbMockMemberGroupModel = MemberGroupItemResponseModel;
 
 export type UmbMockMemberTypeModel = MemberTypeResponseModel &
+	MemberTypeTreeItemResponseModel &
 	MemberTypeItemResponseModel & {
-		hasChildren: boolean;
-		parent: { id: string } | null;
 		hasListView: boolean;
 	};
 

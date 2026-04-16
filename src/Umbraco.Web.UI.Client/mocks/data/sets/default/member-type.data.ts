@@ -48,6 +48,7 @@ export const data: Array<UmbMockMemberTypeModel> = [
 		parent: null,
 		hasChildren: false,
 		hasListView: false,
+		isFolder: false,
 		flags: [],
 	},
 	{
@@ -98,5 +99,6 @@ export const data: Array<UmbMockMemberTypeModel> = [
 		parent: null,
 		hasChildren: false,
 		hasListView: false,
+		isFolder: false,
 	},
 ];

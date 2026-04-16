@@ -288,7 +288,7 @@ function mapCompositionType(type: string): CompositionTypeModel {
 	}
 }
 
-const rawData = ${JSON.stringify(allMemberTypes, null, '\t')};
+const rawData: Array<Omit<UmbMockMemberTypeModel, 'compositions'> & { compositions: Array<{ memberType: { id: string }; compositionType: string }> }> = ${JSON.stringify(allMemberTypes, null, '\t')};
 
 export const data: Array<UmbMockMemberTypeModel> = rawData.map(mt => ({
 	...mt,
