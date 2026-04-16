@@ -5,9 +5,4 @@ import { deliveryHandlers } from './delivery.handlers.js';
 
 // NOTE: eventsHandlers must be registered before detailHandlers because
 // GET /webhook/events would otherwise be matched by GET /webhook/:id.
-export const handlers = [
-	...eventsHandlers,
-	...itemHandlers,
-	...detailHandlers,
-	...deliveryHandlers,
-];
+export const handlers = [...eventsHandlers, ...itemHandlers, ...detailHandlers, ...deliveryHandlers];
