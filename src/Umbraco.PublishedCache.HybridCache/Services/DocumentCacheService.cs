@@ -257,11 +257,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-            IEnumerable<ContentCacheNode> cacheNodes = await _databaseCacheRepository.GetDocumentSourcesAsync(uncachedKeys);
+            List<ContentCacheNode> cacheNodes = (await _databaseCacheRepository.GetDocumentSourcesAsync(uncachedKeys)).ToList();
 
             scope.Complete();
 
-            _logger.LogDebug("Document nodes to cache {NodeCount}", cacheNodes.Count());
+            _logger.LogDebug("Document nodes to cache {NodeCount}", cacheNodes.Count);
 
             foreach (ContentCacheNode cacheNode in cacheNodes)
             {

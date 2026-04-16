@@ -132,7 +132,7 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
             isolatedCache.Clear(RepositoryCacheKeys.GetKey<IElement, Guid?>(payload.Key));
 
             HandleMemoryCache(payload);
-            HandlePublishStatus(payload);
+            HandlePublishStatusAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
 
             if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
             {
@@ -171,20 +171,20 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
         }
     }
 
-    private void HandlePublishStatus(JsonPayload payload)
+    private async Task HandlePublishStatusAsync(JsonPayload payload, CancellationToken cancellationToken)
     {
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
-            _publishStatusManagementService.InitializeAsync(CancellationToken.None).GetAwaiter().GetResult();
+            await _publishStatusManagementService.InitializeAsync(cancellationToken);
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
-            _publishStatusManagementService.RemoveAsync(payload.Key, CancellationToken.None).GetAwaiter().GetResult();
+            await _publishStatusManagementService.RemoveAsync(payload.Key, cancellationToken);
         }
         else if ((payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) || payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch)) && HasPublishStatusUpdates(payload))
         {
-            _publishStatusManagementService.AddOrUpdateStatusAsync(payload.Key, CancellationToken.None).GetAwaiter().GetResult();
+            await _publishStatusManagementService.AddOrUpdateStatusAsync(payload.Key, cancellationToken);
         }
     }
 

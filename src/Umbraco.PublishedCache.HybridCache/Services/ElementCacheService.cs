@@ -177,11 +177,11 @@ internal sealed class ElementCacheService : IElementCacheService
 
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-            IEnumerable<ContentCacheNode> cacheNodes = await _databaseCacheRepository.GetElementSourcesAsync(uncachedKeys);
+            List<ContentCacheNode> cacheNodes = (await _databaseCacheRepository.GetElementSourcesAsync(uncachedKeys)).ToList();
 
             scope.Complete();
 
-            _logger.LogDebug("Element nodes to cache {NodeCount}", cacheNodes.Count());
+            _logger.LogDebug("Element nodes to cache {NodeCount}", cacheNodes.Count);
 
             foreach (ContentCacheNode cacheNode in cacheNodes)
             {

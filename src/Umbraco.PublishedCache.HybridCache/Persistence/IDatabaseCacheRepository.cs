@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 /// </summary>
 internal interface IDatabaseCacheRepository
 {
-    // --- Document methods ---
+    #region Document methods
 
     /// <summary>
     /// Gets a single cache node for a document key.
@@ -51,7 +51,9 @@ internal interface IDatabaseCacheRepository
     /// <returns>Tuples of content key and whether the cache entry is a draft.</returns>
     IEnumerable<(Guid Key, bool IsDraft)> GetDocumentKeysWithPublishedStatus(IEnumerable<Guid> contentTypeKeys);
 
-    // --- Media methods ---
+    #endregion
+
+    #region Media methods
 
     /// <summary>
     /// Gets a single cache node for a media key.
@@ -76,7 +78,9 @@ internal interface IDatabaseCacheRepository
     /// <returns>The keys of all media items using the specified media types.</returns>
     IEnumerable<Guid> GetMediaKeysByContentTypeKeys(IEnumerable<Guid> mediaTypeKeys);
 
-    // --- Element methods ---
+    #endregion
+
+    #region Element methods
 
     /// <summary>
     /// Gets a single cache node for an element key.
@@ -112,7 +116,9 @@ internal interface IDatabaseCacheRepository
     /// </summary>
     Task RefreshElementAsync(ContentCacheNode contentCacheNode, PublishedState publishedState);
 
-    // --- Shared methods ---
+    #endregion
+
+    #region Shared methods
 
     /// <summary>
     /// Deletes the specified content item from the cache database.
@@ -148,4 +154,6 @@ internal interface IDatabaseCacheRepository
         IReadOnlyCollection<int>? mediaTypeIds = null,
         IReadOnlyCollection<int>? memberTypeIds = null,
         IReadOnlyCollection<int>? elementTypeIds = null);
+
+    #endregion
 }

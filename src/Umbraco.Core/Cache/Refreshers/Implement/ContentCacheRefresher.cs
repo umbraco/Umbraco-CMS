@@ -289,7 +289,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             }
 
             HandleNavigation(payload);
-            HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
+            HandlePublishStatusAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
 
             HandleMemoryCache(payload);
 
@@ -541,7 +541,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private bool ExistsInNavigationBin(Guid contentKey) => _documentNavigationQueryService.TryGetParentKeyInBin(contentKey, out _);
 
-    private async Task HandlePublishedAsync(JsonPayload payload, CancellationToken cancellationToken)
+    private async Task HandlePublishStatusAsync(JsonPayload payload, CancellationToken cancellationToken)
     {
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
