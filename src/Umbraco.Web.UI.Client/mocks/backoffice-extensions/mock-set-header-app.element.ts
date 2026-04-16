@@ -1,5 +1,5 @@
 import { umbMockManager } from '../mock-manager.js';
-import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 const MOCK_SET_STORAGE_KEY = 'umb:mockSet';
@@ -20,6 +20,8 @@ export class MockSetHeaderAppElement extends UmbLitElement {
 	}
 
 	override render() {
+		if (umbMockManager.availableSets.length <= 1) return nothing;
+
 		return html`
 			<uui-button compact label="Mock data set" look="primary" popovertarget="mock-set-popover">
 				Mock: ${this._currentSetLabel}
