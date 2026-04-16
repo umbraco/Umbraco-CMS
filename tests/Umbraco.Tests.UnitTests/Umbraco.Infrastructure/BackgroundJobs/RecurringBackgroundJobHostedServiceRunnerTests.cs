@@ -19,7 +19,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
         var sut = CreateRunner(new TestJobA());
         await sut.StartAsync(CancellationToken.None);
 
-        bool result = sut.TriggerExecution<TestJobA>();
+        bool result = sut.TriggerExecution<TestJobA>(NextExecutionStrategy.None);
 
         Assert.IsTrue(result);
 
@@ -32,7 +32,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
         var sut = CreateRunner(new TestJobA());
         await sut.StartAsync(CancellationToken.None);
 
-        bool result = sut.TriggerExecution<TestJobB>();
+        bool result = sut.TriggerExecution<TestJobB>(NextExecutionStrategy.None);
 
         Assert.IsFalse(result);
 
@@ -44,7 +44,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
     {
         var sut = CreateRunner(new TestJobA());
 
-        bool result = sut.TriggerExecution<TestJobA>();
+        bool result = sut.TriggerExecution<TestJobA>(NextExecutionStrategy.None);
 
         Assert.IsFalse(result);
     }
@@ -90,7 +90,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
         Assert.AreEqual(1, executionCount, "Should have executed once initially");
 
         // Trigger — period is 30s, so without trigger we wouldn't get another
-        sut.TriggerExecution<TestJobA>();
+        sut.TriggerExecution<TestJobA>(NextExecutionStrategy.None);
         Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
         Assert.AreEqual(2, executionCount, "Should have executed again after trigger");
 

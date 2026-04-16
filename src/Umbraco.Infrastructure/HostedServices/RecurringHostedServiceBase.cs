@@ -277,14 +277,14 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// If the scheduled time has already passed during the triggered execution, it is skipped and the next period tick is awaited.
     /// </summary>
     /// <seealso cref="NextExecutionStrategy.None" />
-    public void TriggerExecution()
+    protected internal void TriggerExecution()
         => TriggerExecution(NextExecutionStrategy.None);
 
     /// <summary>
     /// Signals the background loop to execute immediately, with the specified strategy for determining the next execution after the triggered one completes.
     /// </summary>
     /// <param name="strategy">Controls the delay after the triggered execution.</param>
-    public void TriggerExecution(NextExecutionStrategy strategy)
+    protected internal void TriggerExecution(NextExecutionStrategy strategy)
     {
         Interlocked.Exchange(ref _triggerState, new TriggerState(Strategy: strategy));
         ReleaseSignal();
@@ -295,7 +295,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// After the triggered execution, the next execution is scheduled after the specified delay (measured from execution start; execution time is subtracted to prevent drift).
     /// </summary>
     /// <param name="nextDelay">The target interval from execution start to the next execution. Execution time is subtracted to prevent drift.</param>
-    public void TriggerExecution(TimeSpan nextDelay)
+    protected internal void TriggerExecution(TimeSpan nextDelay)
     {
         Interlocked.Exchange(ref _triggerState, new TriggerState(Delay: nextDelay));
         ReleaseSignal();
