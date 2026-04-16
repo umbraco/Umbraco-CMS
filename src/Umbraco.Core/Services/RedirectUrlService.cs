@@ -96,40 +96,52 @@ internal sealed class RedirectUrlService : AsyncRepositoryService, IRedirectUrlS
     }
 
     /// <inheritdoc/>
-    public async Task<PagedModel<IRedirectUrl>> GetContentRedirectUrlsAsync(Guid contentKey, long pageIndex, int pageSize)
+    public async Task<PagedModel<IRedirectUrl>> GetContentRedirectUrlsAsync(Guid contentKey, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.GetContentUrlsAsync(contentKey, pageIndex, pageSize);
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.GetContentUrlsAsync(contentKey, pageNumber, pageSize);
 
         scope.Complete();
         return redirectUrls;
     }
 
     /// <inheritdoc/>
-    public async Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(long pageIndex, int pageSize)
+    public async Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.GetAllUrlsAsync(pageIndex, pageSize);
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.GetAllUrlsAsync(pageNumber, pageSize);
 
         scope.Complete();
         return redirectUrls;
     }
 
     /// <inheritdoc/>
-    public async Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(int rootContentId, long pageIndex, int pageSize)
+    public async Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(int rootContentId, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.GetAllUrlsAsync(rootContentId, pageIndex, pageSize);
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.GetAllUrlsAsync(rootContentId, pageNumber, pageSize);
 
         scope.Complete();
         return redirectUrls;
     }
 
     /// <inheritdoc/>
-    public async Task<PagedModel<IRedirectUrl>> SearchRedirectUrlsAsync(string searchTerm, long pageIndex, int pageSize)
+    public async Task<PagedModel<IRedirectUrl>> SearchRedirectUrlsAsync(string searchTerm, int skip, int take)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.SearchUrlsAsync(searchTerm, pageIndex, pageSize);
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.SearchUrlsAsync(searchTerm, pageNumber, pageSize);
 
         scope.Complete();
         return redirectUrls;

@@ -65,31 +65,10 @@ public interface IRedirectUrlService : IService
     ///     Gets paginated redirect URLs for a content item.
     /// </summary>
     /// <param name="contentKey">The content unique key.</param>
-    /// <param name="pageIndex">The zero-based page index.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <returns>All redirect URLs for the content item.</returns>
-    Task<PagedModel<IRedirectUrl>> GetContentRedirectUrlsAsync(Guid contentKey, long pageIndex, int pageSize);
-
-    /// <summary>
-    ///     Gets paginated redirect URLs for a content item.
-    /// </summary>
-    /// <param name="contentKey">The content unique key.</param>
     /// <param name="skip">Amount to skip.</param>
     /// <param name="take">Amount to take.</param>
     /// <returns>All redirect URLs for the content item.</returns>
-    async Task<PagedModel<IRedirectUrl>> GetContentRedirectUrlsAsync(Guid contentKey, int skip, int take)
-    {
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-        return await GetContentRedirectUrlsAsync(contentKey, pageNumber, pageSize);
-    }
-
-    /// <summary>
-    ///     Gets all redirect URLs.
-    /// </summary>
-    /// <param name="pageIndex">The zero-based page index.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <returns>A paged model containing the redirect URLs and the total count.</returns>
-    Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(long pageIndex, int pageSize);
+    Task<PagedModel<IRedirectUrl>> GetContentRedirectUrlsAsync(Guid contentKey, int skip, int take);
 
     /// <summary>
     ///     Gets all redirect URLs.
@@ -97,30 +76,16 @@ public interface IRedirectUrlService : IService
     /// <param name="skip">Amount to skip.</param>
     /// <param name="take">Amount to take.</param>
     /// <returns>A paged model containing the redirect URLs and the total count.</returns>
-    async Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(int skip, int take)
-    {
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-
-        return await GetAllRedirectUrlsAsync(pageNumber, pageSize);
-    }
+    Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(int skip, int take);
 
     /// <summary>
     ///     Gets all redirect URLs below a given content item.
     /// </summary>
     /// <param name="rootContentId">The content unique identifier.</param>
-    /// <param name="pageIndex">The zero-based page index.</param>
-    /// <param name="pageSize">The page size.</param>
+    /// <param name="skip">Amount to skip.</param>
+    /// <param name="take">Amount to take.</param>
     /// <returns>A paged model containing the redirect URLs and the total count.</returns>
-    Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(int rootContentId, long pageIndex, int pageSize);
-
-    /// <summary>
-    ///     Searches for all redirect URLs that contain a given search term in their URL property.
-    /// </summary>
-    /// <param name="searchTerm">The term to search for.</param>
-    /// <param name="pageIndex">The zero-based page index.</param>
-    /// <param name="pageSize">The page size.</param>
-    /// <returns>A paged model containing the matching redirect URLs and the total count.</returns>
-    Task<PagedModel<IRedirectUrl>> SearchRedirectUrlsAsync(string searchTerm, long pageIndex, int pageSize);
+    Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(int rootContentId, int skip, int take);
 
     /// <summary>
     ///     Searches for all redirect URLs that contain a given search term in their URL property.
@@ -129,10 +94,5 @@ public interface IRedirectUrlService : IService
     /// <param name="skip">Amount to skip.</param>
     /// <param name="take">Amount to take.</param>
     /// <returns>A paged model containing the matching redirect URLs and the total count.</returns>
-    async Task<PagedModel<IRedirectUrl>> SearchRedirectUrlsAsync(string searchTerm, int skip, int take)
-    {
-        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
-
-        return await SearchRedirectUrlsAsync(searchTerm, pageNumber, pageSize);
-    }
+    Task<PagedModel<IRedirectUrl>> SearchRedirectUrlsAsync(string searchTerm, int skip, int take);
 }
