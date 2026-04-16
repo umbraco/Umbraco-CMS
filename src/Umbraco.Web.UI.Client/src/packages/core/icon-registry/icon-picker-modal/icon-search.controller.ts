@@ -104,8 +104,7 @@ export class UmbIconSearchController extends UmbControllerBase {
 		let cached = this.#searchable.get(icon);
 		if (cached) return cached;
 
-		const nameWithoutPrefix = icon.name.toLowerCase().replace(/^icon-/, '');
-		const nameTokens = fuzzyTokenize(nameWithoutPrefix);
+		const nameTokens = fuzzyTokenize(icon.name).filter((t) => t !== 'icon');
 		const keywordsLower = icon.keywords?.map((k) => k.toLowerCase()) ?? [];
 		const groupsLower = icon.groups?.map((g) => g.toLowerCase()) ?? [];
 
