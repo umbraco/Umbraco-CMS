@@ -173,18 +173,40 @@ export function registerExtensionModule(
 			if (apiExport) {
 				fullManifest.api = apiExport;
 			}
+
+			// If no exports resolved, infer from the class type
+			if (!fullManifest.element && !fullManifest.api) {
+				if (isHTMLElement(targetClass)) {
+					fullManifest.element = targetClass;
+				} else {
+					fullManifest.api = targetClass;
+				}
+			}
 		} else {
 			// Multiple extensions: each decorated class maps to its own manifest.
-			// If explicitly exported as 'api', set as api; otherwise default to element.
-			if (exportNames.has('api')) {
-				fullManifest.api = targetClass;
-			} else {
+			// If the manifest already has element/api set (e.g. via class references in the decorator),
+			// respect those. Otherwise, infer from the class type:
+			// - HTMLElement subclass → element
+			// - Anything else → api (common for actions with kind:'default' providing the UI)
+			if (!fullManifest.element && !fullManifest.api) {
+				if (isHTMLElement(targetClass)) {
+					fullManifest.element = targetClass;
+				} else {
+					fullManifest.api = targetClass;
+				}
+			} else if (!fullManifest.element && isHTMLElement(targetClass)) {
 				fullManifest.element = targetClass;
+			} else if (!fullManifest.api && !isHTMLElement(targetClass)) {
+				fullManifest.api = targetClass;
 			}
 		}
 
 		registry.register(fullManifest);
 	}
+}
+
+function isHTMLElement(target: any): boolean {
+	return typeof HTMLElement !== 'undefined' && target.prototype instanceof HTMLElement;
 }
 
 /**
