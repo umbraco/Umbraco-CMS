@@ -93,6 +93,9 @@ import type {
 	MemberReferenceResponseModel,
 	// News
 	NewsDashboardItemResponseModel,
+	// Webhook
+	WebhookResponseModel,
+	WebhookLogResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 // ============================================================================
@@ -159,22 +162,9 @@ export type UmbMockUserModel = UserResponseModel & UserItemResponseModel;
 
 export type UmbMockUserGroupModel = UserGroupResponseModel & UserGroupItemResponseModel;
 
-export interface UmbMockWebhookEventModel {
-	eventName: string;
-	eventType: string;
-	alias: string;
-}
+export type UmbMockWebhookModel = WebhookResponseModel;
 
-export interface UmbMockWebhookModel {
-	id: string;
-	name: string | null;
-	description: string | null;
-	url: string;
-	enabled: boolean;
-	events: Array<UmbMockWebhookEventModel>;
-	contentTypeKeys: Array<string>;
-	headers: Record<string, string>;
-}
+export type UmbMockWebhookDeliveryModel = WebhookLogResponseModel;
 
 export type UmbMockTrackedReferenceItemModel =
 	| DefaultReferenceResponseModel
@@ -229,6 +219,7 @@ export interface UmbMockDataSet {
 	userGroup?: Array<UmbMockUserGroupModel>;
 	objectType?: Array<ObjectTypeResponseModel>;
 	webhook?: Array<UmbMockWebhookModel>;
+	webhookDelivery?: Array<UmbMockWebhookDeliveryModel>;
 
 	// Log viewer data (optional, defaults to empty arrays/default values)
 	logViewerSavedSearches?: Array<SavedLogSearchResponseModel>;
