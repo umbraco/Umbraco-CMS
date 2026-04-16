@@ -1,5 +1,5 @@
 /**
- * Transform cmsContentType records (document types) into mock data format.
+ * Transform cmsContentType records (member types) into mock data format.
  */
 import {
 	prepare,
@@ -12,7 +12,6 @@ import {
 	type PropertyType,
 } from './db.js';
 
-// Local interface matching actual DB schema
 interface PropertyTypeGroup {
 	id: number;
 	uniqueId: string;
@@ -25,34 +24,20 @@ interface PropertyTypeGroup {
 
 interface ContentTypeRow extends UmbracoNode, ContentType {}
 
-interface AllowedContentType {
-	childContentTypeId: number;
-	sortOrder: number;
-}
-
 interface Composition {
 	parentContentTypeId: number;
 	childContentTypeId: number;
 }
 
-interface DocumentType {
-	contentTypeNodeId: number;
-	templateNodeId: number;
-	IsDefault: number;
+interface MemberTypePropertyMeta {
+	propertytypeId: number;
+	memberCanEdit: number;
+	viewOnProfile: number;
+	isSensitive: number;
 }
 
-interface AllowedTemplate {
-	contentTypeNodeId: number;
-	templateNodeId: number;
-}
-
-interface TemplateNode {
-	id: number;
-	uniqueId: string;
-}
-
-export function transformDocumentTypes(): void {
-	// Query document types with their node and content type information
+export function transformMemberTypes(): void {
+	// Query member types with their node and content type information
 	const query = prepare(`
 		SELECT
 			n.id, n.uniqueId, n.parentId, n.level, n.path, n.sortOrder,
@@ -66,7 +51,7 @@ export function transformDocumentTypes(): void {
 		ORDER BY n.sortOrder
 	`);
 
-	const rows = query.all(ObjectTypes.DocumentType) as ContentTypeRow[];
+	const rows = query.all(ObjectTypes.MemberType) as ContentTypeRow[];
 
 	// Get folders
 	const folderQuery = prepare(`
@@ -77,10 +62,9 @@ export function transformDocumentTypes(): void {
 		ORDER BY sortOrder
 	`);
 
-	const folders = folderQuery.all(ObjectTypes.DocumentTypeContainer) as UmbracoNode[];
+	const folders = folderQuery.all(ObjectTypes.MemberTypeContainer) as UmbracoNode[];
 
 	// Get property types
-	// Note: Use column aliases to normalize PascalCase column names to camelCase
 	const propertyQuery = prepare(`
 		SELECT
 			pt.id, pt.dataTypeId, pt.contentTypeId, pt.propertyTypeGroupId,
@@ -103,14 +87,17 @@ export function transformDocumentTypes(): void {
 
 	const groups = groupQuery.all() as PropertyTypeGroup[];
 
-	// Get allowed content types
-	// Note: Use column aliases to normalize PascalCase column names to camelCase
-	const allowedQuery = prepare(`
-		SELECT Id as parentContentTypeId, AllowedId as childContentTypeId, SortOrder as sortOrder
-		FROM cmsContentTypeAllowedContentType
+	// Get member-specific property metadata (isSensitive, visibility)
+	const memberTypeQuery = prepare(`
+		SELECT propertytypeId, memberCanEdit, viewOnProfile, isSensitive
+		FROM cmsMemberType
 	`);
 
-	const allowed = allowedQuery.all() as (AllowedContentType & { parentContentTypeId: number })[];
+	const memberTypeMeta = memberTypeQuery.all() as MemberTypePropertyMeta[];
+	const memberPropertyMap = new Map<number, MemberTypePropertyMeta>();
+	for (const m of memberTypeMeta) {
+		memberPropertyMap.set(m.propertytypeId, m);
+	}
 
 	// Get compositions (inheritance relationships)
 	const compositionQuery = prepare(`
@@ -119,35 +106,6 @@ export function transformDocumentTypes(): void {
 	`);
 
 	const compositions = compositionQuery.all() as Composition[];
-
-	// Get document type specific data (templates)
-	const docTypeQuery = prepare(`
-		SELECT contentTypeNodeId, templateNodeId, IsDefault
-		FROM cmsDocumentType
-	`);
-
-	const docTypes = docTypeQuery.all() as DocumentType[];
-
-	// Get allowed templates
-	const allowedTemplateQuery = prepare(`
-		SELECT contentTypeNodeId, templateNodeId
-		FROM cmsDocumentType
-	`);
-
-	const allowedTemplates = allowedTemplateQuery.all() as AllowedTemplate[];
-
-	// Get template nodes for ID lookup
-	const templateNodeQuery = prepare(`
-		SELECT id, uniqueId
-		FROM umbracoNode
-		WHERE nodeObjectType = ?
-	`);
-
-	const templateNodes = templateNodeQuery.all(ObjectTypes.Template) as TemplateNode[];
-	const templateIdMap = new Map<number, string>();
-	for (const t of templateNodes) {
-		templateIdMap.set(t.id, formatGuid(t.uniqueId));
-	}
 
 	// Get data type nodes for ID lookup
 	const dataTypeNodeQuery = prepare(`
@@ -183,13 +141,6 @@ export function transformDocumentTypes(): void {
 		groupsByContentType.set(g.contentTypeNodeId, list);
 	}
 
-	const allowedByContentType = new Map<number, AllowedContentType[]>();
-	for (const a of allowed) {
-		const list = allowedByContentType.get(a.parentContentTypeId) || [];
-		list.push(a);
-		allowedByContentType.set(a.parentContentTypeId, list);
-	}
-
 	const compositionsByContentType = new Map<number, Composition[]>();
 	for (const c of compositions) {
 		const list = compositionsByContentType.get(c.childContentTypeId) || [];
@@ -197,21 +148,7 @@ export function transformDocumentTypes(): void {
 		compositionsByContentType.set(c.childContentTypeId, list);
 	}
 
-	const defaultTemplateByContentType = new Map<number, number | null>();
-	for (const dt of docTypes) {
-		if (dt.IsDefault === 1) {
-			defaultTemplateByContentType.set(dt.contentTypeNodeId, dt.templateNodeId);
-		}
-	}
-
-	const allowedTemplatesByContentType = new Map<number, number[]>();
-	for (const at of allowedTemplates) {
-		const list = allowedTemplatesByContentType.get(at.contentTypeNodeId) || [];
-		list.push(at.templateNodeId);
-		allowedTemplatesByContentType.set(at.contentTypeNodeId, list);
-	}
-
-	// Check if a document type has children (other doc types or folders have it as parent)
+	// Check if a member type has children
 	const hasChildrenMap = new Map<number, boolean>();
 	for (const row of rows) {
 		if (row.parentId > 0) {
@@ -230,21 +167,19 @@ export function transformDocumentTypes(): void {
 		groupIdMap.set(g.id, formatGuid(g.uniqueId));
 	}
 
-	// Transform document types
-	const documentTypes = rows.map((row) => {
+	// Transform member types
+	const memberTypes = rows.map((row) => {
 		const variations = getVariationFlags(row.variations);
 		const parentId = row.parentId > 0 ? parentMap.get(row.parentId) : null;
 		const ctGroups = groupsByContentType.get(row.id) || [];
 		const ctProperties = propertyTypesByContentType.get(row.id) || [];
-		const ctAllowed = allowedByContentType.get(row.id) || [];
 		const ctCompositions = compositionsByContentType.get(row.id) || [];
-		const defaultTemplateId = defaultTemplateByContentType.get(row.id);
-		const ctAllowedTemplates = allowedTemplatesByContentType.get(row.id) || [];
 
 		// Transform properties
 		const properties = ctProperties.map((pt) => {
 			const ptVariations = getVariationFlags(pt.variations);
 			const containerId = pt.propertyTypeGroupId ? groupIdMap.get(pt.propertyTypeGroupId) : null;
+			const memberProp = memberPropertyMap.get(pt.id);
 
 			return {
 				id: `pt-${pt.id}`,
@@ -265,6 +200,11 @@ export function transformDocumentTypes(): void {
 				appearance: {
 					labelOnTop: pt.labelOnTop === 1,
 				},
+				isSensitive: memberProp?.isSensitive === 1,
+				visibility: {
+					memberCanView: memberProp?.viewOnProfile === 1,
+					memberCanEdit: memberProp?.memberCanEdit === 1,
+				},
 			};
 		});
 
@@ -280,57 +220,31 @@ export function transformDocumentTypes(): void {
 			};
 		});
 
-		// Transform allowed document types
-		const allowedDocumentTypes = ctAllowed.map((a) => ({
-			documentType: { id: parentMap.get(a.childContentTypeId) || `unknown-${a.childContentTypeId}` },
-			sortOrder: a.sortOrder,
-		}));
-
 		// Transform compositions
-		// In cmsContentType2ContentType: parentContentTypeId = the composed type, childContentTypeId = the type using it
-		// Inheritance: when the child's umbracoNode.parentId matches the parentContentTypeId
 		const compositionsList = ctCompositions.map((c) => ({
-			documentType: { id: parentMap.get(c.parentContentTypeId) || `unknown-${c.parentContentTypeId}` },
+			memberType: { id: parentMap.get(c.parentContentTypeId) || `unknown-${c.parentContentTypeId}` },
 			compositionType: row.parentId === c.parentContentTypeId ? 'Inheritance' : 'Composition',
 		}));
 
-		// Transform allowed templates
-		const allowedTemplatesList = ctAllowedTemplates
-			.map((templateNodeId) => {
-				const id = templateIdMap.get(templateNodeId);
-				return id ? { id } : null;
-			})
-			.filter((t): t is { id: string } => t !== null);
-
-		// Get default template
-		const defaultTemplate = defaultTemplateId ? { id: templateIdMap.get(defaultTemplateId) || null } : null;
-
 		return {
-			allowedTemplates: allowedTemplatesList,
-			defaultTemplate: defaultTemplate?.id ? defaultTemplate : null,
-			id: formatGuid(row.uniqueId),
-			alias: row.alias,
 			name: row.text || 'Unnamed',
+			id: formatGuid(row.uniqueId),
 			description: row.description,
-			icon: row.icon || 'icon-document',
+			alias: row.alias,
+			icon: row.icon || 'icon-user',
 			allowedAsRoot: row.allowAtRoot === 1,
 			variesByCulture: variations.variesByCulture,
 			variesBySegment: variations.variesBySegment,
 			isElement: row.isElement === 1,
-			hasChildren: hasChildrenMap.get(row.id) || false,
-			parent: parentId ? { id: parentId } : null,
-			isFolder: false,
 			properties,
 			containers,
-			allowedDocumentTypes,
 			compositions: compositionsList,
-			cleanup: {
-				preventCleanup: false,
-				keepAllVersionsNewerThanDays: null,
-				keepLatestVersionPerDayForDays: null,
-			},
-			flags: [] as string[],
+			parent: parentId ? { id: parentId } : null,
+			hasChildren: hasChildrenMap.get(row.id) || false,
+			hasListView: !!row.listView,
+			isFolder: false,
 			collection: row.listView ? { id: row.listView.toLowerCase() } : undefined,
+			flags: [] as string[],
 		};
 	});
 
@@ -339,39 +253,30 @@ export function transformDocumentTypes(): void {
 		const parentId = folder.parentId > 0 ? parentMap.get(folder.parentId) : null;
 
 		return {
-			allowedTemplates: [],
-			defaultTemplate: null,
-			id: formatGuid(folder.uniqueId),
-			alias: (folder.text || 'folder').toLowerCase().replace(/\s+/g, ''),
 			name: folder.text || 'Unnamed Folder',
+			id: formatGuid(folder.uniqueId),
 			description: null,
+			alias: (folder.text || 'folder').toLowerCase().replace(/\s+/g, ''),
 			icon: 'icon-folder',
 			allowedAsRoot: false,
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
-			hasChildren: hasChildrenMap.get(folder.id) || false,
-			parent: parentId ? { id: parentId } : null,
-			isFolder: true,
 			properties: [],
 			containers: [],
-			allowedDocumentTypes: [],
 			compositions: [],
-			cleanup: {
-				preventCleanup: false,
-				keepAllVersionsNewerThanDays: null,
-				keepLatestVersionPerDayForDays: null,
-			},
+			parent: parentId ? { id: parentId } : null,
+			hasChildren: hasChildrenMap.get(folder.id) || false,
+			hasListView: false,
+			isFolder: true,
 			flags: [] as string[],
 		};
 	});
 
-	// Combine folders and document types
-	const allDocumentTypes = [...folderData, ...documentTypes];
+	const allMemberTypes = [...folderData, ...memberTypes];
 
 	// Generate TypeScript content
-	// Note: compositions.compositionType needs to be converted to enum values
-	const content = `import type { UmbMockDocumentTypeModel } from '../../mock-data-set.types.js';
+	const content = `import type { UmbMockMemberTypeModel } from '../../mock-data-set.types.js';
 import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 // Map string composition type to enum
@@ -383,17 +288,17 @@ function mapCompositionType(type: string): CompositionTypeModel {
 	}
 }
 
-const rawData: Array<Omit<UmbMockDocumentTypeModel, 'compositions'> & { compositions: Array<{ documentType: { id: string }; compositionType: string }> }> = ${JSON.stringify(allDocumentTypes, null, '\t')};
+const rawData: Array<Omit<UmbMockMemberTypeModel, 'compositions'> & { compositions: Array<{ memberType: { id: string }; compositionType: string }> }> = ${JSON.stringify(allMemberTypes, null, '\t')};
 
-export const data: Array<UmbMockDocumentTypeModel> = rawData.map(dt => ({
-	...dt,
-	compositions: dt.compositions.map(c => ({
+export const data: Array<UmbMockMemberTypeModel> = rawData.map(mt => ({
+	...mt,
+	compositions: mt.compositions.map(c => ({
 		...c,
 		compositionType: mapCompositionType(c.compositionType),
 	})),
 }));
 `;
 
-	writeDataFile('document-type.data.ts', content);
-	console.log(`Transformed ${documentTypes.length} document types and ${folders.length} folders`);
+	writeDataFile('member-type.data.ts', content);
+	console.log(`Transformed ${memberTypes.length} member types and ${folders.length} folders`);
 }

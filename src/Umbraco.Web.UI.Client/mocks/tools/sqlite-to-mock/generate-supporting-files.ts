@@ -175,36 +175,6 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [];
 `,
 	);
 
-	// Members
-	writeDataFile(
-		'member.data.ts',
-		`import type { UmbMockMemberModel } from '../../mock-data-set.types.js';
-
-// Empty members - no members in the database
-export const data: Array<UmbMockMemberModel> = [];
-`,
-	);
-
-	// Member groups
-	writeDataFile(
-		'member-group.data.ts',
-		`import type { UmbMockMemberGroupModel } from '../../mock-data-set.types.js';
-
-// Empty member groups - no member groups in the database
-export const data: Array<UmbMockMemberGroupModel> = [];
-`,
-	);
-
-	// Member types
-	writeDataFile(
-		'member-type.data.ts',
-		`import type { UmbMockMemberTypeModel } from '../../mock-data-set.types.js';
-
-// Empty member types - no member types in the database
-export const data: Array<UmbMockMemberTypeModel> = [];
-`,
-	);
-
 	// Relations
 	writeDataFile(
 		'relation.data.ts',
