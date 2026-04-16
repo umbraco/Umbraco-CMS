@@ -1,6 +1,11 @@
 import type { UmbMockDataSet } from './data/mock-data-set.types.js';
 import { umbMockDbRegistry } from './db/mock-db-registry.js';
 
+interface UmbMockSetEntry {
+	label: string;
+	loader: () => Promise<UmbMockDataSet>;
+}
+
 /**
  * Central manager for mock data sets.
  * Handles loading mock sets and coordinating DB initialization.
@@ -10,10 +15,13 @@ class UmbMockManager {
 	#currentDataSet: UmbMockDataSet | null = null;
 
 	// Lazy loaders for mock sets
-	#mockSetLoaders: Record<string, () => Promise<UmbMockDataSet>> = {
-		default: () => import('./data/sets/default/index.js') as Promise<UmbMockDataSet>,
-		kenn: () => import('./data/sets/kenn/index.js') as Promise<UmbMockDataSet>,
-		userPermissions: () => import('./data/sets/user-permissions/index.js') as Promise<UmbMockDataSet>,
+	#mockSetLoaders: Record<string, UmbMockSetEntry> = {
+		default: { label: 'Default', loader: () => import('./data/sets/default/index.js') as Promise<UmbMockDataSet> },
+		kenn: { label: 'Kenn', loader: () => import('./data/sets/kenn/index.js') as Promise<UmbMockDataSet> },
+		userPermissions: {
+			label: 'User Permissions',
+			loader: () => import('./data/sets/user-permissions/index.js') as Promise<UmbMockDataSet>,
+		},
 	};
 
 	/**
@@ -21,6 +29,20 @@ class UmbMockManager {
 	 */
 	get currentSetName(): string {
 		return this.#currentSetName;
+	}
+
+	/**
+	 * Get the label of the current mock set.
+	 */
+	get currentSetLabel(): string {
+		return this.#mockSetLoaders[this.#currentSetName]?.label ?? this.#currentSetName;
+	}
+
+	/**
+	 * Get all available mock sets as alias/label pairs.
+	 */
+	get availableSets(): Array<{ alias: string; label: string }> {
+		return Object.entries(this.#mockSetLoaders).map(([alias, { label }]) => ({ alias, label }));
 	}
 
 	/**
@@ -80,13 +102,13 @@ class UmbMockManager {
 	 * @param setName
 	 */
 	async #loadSet(setName: string): Promise<void> {
-		const loader = this.#mockSetLoaders[setName];
-		if (!loader) {
+		const entry = this.#mockSetLoaders[setName];
+		if (!entry) {
 			console.warn(`Mock set "${setName}" not found, falling back to "default"`);
-			this.#currentDataSet = await this.#mockSetLoaders['default']();
+			this.#currentDataSet = await this.#mockSetLoaders['default'].loader();
 			this.#currentSetName = 'default';
 		} else {
-			this.#currentDataSet = await loader();
+			this.#currentDataSet = await entry.loader();
 			this.#currentSetName = setName;
 		}
 	}

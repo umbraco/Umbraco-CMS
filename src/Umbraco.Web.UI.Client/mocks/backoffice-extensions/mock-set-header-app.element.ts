@@ -9,27 +9,30 @@ export class MockSetHeaderAppElement extends UmbLitElement {
 	@state()
 	private _currentSet: string = umbMockManager.currentSetName;
 
-	#onSetSelected(setName: string) {
-		if (setName === this._currentSet) return;
+	@state()
+	private _currentSetLabel: string = umbMockManager.currentSetLabel;
 
-		localStorage.setItem(MOCK_SET_STORAGE_KEY, setName);
+	#onSetSelected(alias: string) {
+		if (alias === this._currentSet) return;
+
+		localStorage.setItem(MOCK_SET_STORAGE_KEY, alias);
 		window.location.reload();
 	}
 
 	override render() {
 		return html`
 			<uui-button compact label="Mock data set" look="primary" popovertarget="mock-set-popover">
-				Mock: ${this._currentSet}
+				Mock: ${this._currentSetLabel}
 			</uui-button>
 			<uui-popover-container id="mock-set-popover" placement="bottom-start">
 				<umb-popover-layout>
 					<div class="mock-set-list">
-						${umbMockManager.availableSetNames.map(
-							(setName) => html`
+						${umbMockManager.availableSets.map(
+							({ alias, label }) => html`
 								<uui-menu-item
-									label=${setName}
-									?active=${setName === this._currentSet}
-									@click=${() => this.#onSetSelected(setName)}>
+									label=${label}
+									?active=${alias === this._currentSet}
+									@click=${() => this.#onSetSelected(alias)}>
 								</uui-menu-item>
 							`,
 						)}
