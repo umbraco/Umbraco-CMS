@@ -4,6 +4,8 @@ import { umbMockDbRegistry } from './db/mock-db-registry.js';
 interface UmbMockSetEntry {
 	label: string;
 	loader: () => Promise<UmbMockDataSet>;
+	/** Whether the set appears in the header app dropdown. Defaults to false. */
+	visible?: boolean;
 }
 
 /**
@@ -16,8 +18,16 @@ class UmbMockManager {
 
 	// Lazy loaders for mock sets
 	#mockSetLoaders: Record<string, UmbMockSetEntry> = {
-		default: { label: 'Default', loader: () => import('./data/sets/default/index.js') as Promise<UmbMockDataSet> },
-		kenn: { label: 'Kenn', loader: () => import('./data/sets/kenn/index.js') as Promise<UmbMockDataSet> },
+		default: {
+			label: 'Default',
+			loader: () => import('./data/sets/default/index.js') as Promise<UmbMockDataSet>,
+			visible: true,
+		},
+		kenn: {
+			label: 'Kenn',
+			loader: () => import('./data/sets/kenn/index.js') as Promise<UmbMockDataSet>,
+			visible: true,
+		},
 		userPermissions: {
 			label: 'User Permissions',
 			loader: () => import('./data/sets/user-permissions/index.js') as Promise<UmbMockDataSet>,
@@ -39,10 +49,13 @@ class UmbMockManager {
 	}
 
 	/**
-	 * Get all available mock sets as alias/label pairs.
+	 * Get all visible mock sets as alias/label pairs.
+	 * Only sets with `visible: true` are included.
 	 */
 	get availableSets(): Array<{ alias: string; label: string }> {
-		return Object.entries(this.#mockSetLoaders).map(([alias, { label }]) => ({ alias, label }));
+		return Object.entries(this.#mockSetLoaders)
+			.filter(([, { visible }]) => visible === true)
+			.map(([alias, { label }]) => ({ alias, label }));
 	}
 
 	/**
