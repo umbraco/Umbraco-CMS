@@ -263,7 +263,7 @@ public class AppPluginsExtensionsFolderPackageManifestReaderTests
             .Setup(m => m.GetDirectoryContents(extensionsPath))
             .Returns(extensionsContentsMock.Object);
 
-        return CreateDirectoryFileInfo(packageName);
+        return CreateFileInfoMock(packageName, isDirectory: true);
     }
 
     private IFileInfo CreatePackageFolder(string packageName)
@@ -290,15 +290,7 @@ public class AppPluginsExtensionsFolderPackageManifestReaderTests
             .Setup(m => m.GetDirectoryContents(extensionsPath))
             .Returns(emptyContentsMock.Object);
 
-        return CreateDirectoryFileInfo(packageName);
-    }
-
-    private static IFileInfo CreateDirectoryFileInfo(string name)
-    {
-        var fileInfo = new Mock<IFileInfo>();
-        fileInfo.SetupGet(f => f.IsDirectory).Returns(true);
-        fileInfo.SetupGet(f => f.Name).Returns(name);
-        return fileInfo.Object;
+        return CreateFileInfoMock(packageName, isDirectory: true);
     }
 
     private static IFileInfo CreateFileInfoMock(string name, bool isDirectory = false)

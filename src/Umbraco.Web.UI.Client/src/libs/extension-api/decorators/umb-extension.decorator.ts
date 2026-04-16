@@ -72,14 +72,10 @@ export type UmbExtensionDecoratorManifest<T extends UmbExtensionManifest = UmbEx
 export function umbExtension<T extends UmbExtensionManifest = UmbExtensionManifest>(
 	manifest: UmbExtensionDecoratorManifest<T>,
 ) {
-	return ((targetOrValue: any, contextOrUndefined?: ClassDecoratorContext) => {
-		// Standard decorator (Stage 3 TC39)
-		if (contextOrUndefined && typeof contextOrUndefined === 'object' && contextOrUndefined.kind === 'class') {
-			targetOrValue[UMB_EXTENSION_MANIFEST] = manifest;
-			return targetOrValue;
-		}
-
-		// Legacy TypeScript experimental decorator
+	// Both standard (TC39 Stage 3) and legacy (TS experimental) decorators receive the
+	// class as the first argument. The runtime behavior is identical — only the type
+	// signatures differ, which is handled by UmbExtensionClassDecorator.
+	return ((targetOrValue: any) => {
 		targetOrValue[UMB_EXTENSION_MANIFEST] = manifest;
 		return targetOrValue;
 	}) as UmbExtensionClassDecorator;

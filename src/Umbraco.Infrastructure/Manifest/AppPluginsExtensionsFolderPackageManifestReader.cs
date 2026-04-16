@@ -69,7 +69,6 @@ internal sealed class AppPluginsExtensionsFolderPackageManifestReader : IPackage
             }
 
             var bundleExtensions = new List<object>();
-            var bundleIndex = 0;
 
             foreach (IFileInfo file in extensionsContents)
             {
@@ -84,12 +83,10 @@ internal sealed class AppPluginsExtensionsFolderPackageManifestReader : IPackage
                 bundleExtensions.Add(new
                 {
                     type = "bundle",
-                    alias = $"{packageFolder.Name}.Extensions.Bundle.{bundleIndex}",
-                    name = $"{packageFolder.Name} Extensions Bundle {bundleIndex}",
+                    alias = $"{packageFolder.Name}.Extensions.Bundle.{bundleExtensions.Count}",
+                    name = $"{packageFolder.Name} Extensions Bundle {bundleExtensions.Count}",
                     js = jsPath,
                 });
-
-                bundleIndex++;
             }
 
             if (bundleExtensions.Count > 0)

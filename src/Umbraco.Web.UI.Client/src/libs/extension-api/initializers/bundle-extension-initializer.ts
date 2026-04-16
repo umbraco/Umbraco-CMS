@@ -14,6 +14,9 @@ import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
  *    These are detected automatically and registered via {@link registerExtensionModule}.
  */
 export class UmbBundleExtensionInitializer extends UmbExtensionInitializerBase<'bundle', ManifestBundle> {
+	// Caches the loaded module per manifest alias so unloadExtension doesn't need to re-import.
+	#loadedModules = new Map<string, Record<string, unknown>>();
+
 	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<ManifestBundle>) {
 		super(host, extensionRegistry, 'bundle');
 	}
@@ -23,6 +26,8 @@ export class UmbBundleExtensionInitializer extends UmbExtensionInitializerBase<'
 			const js = await loadManifestPlainJs(manifest.js);
 
 			if (js) {
+				this.#loadedModules.set(manifest.alias, js);
+
 				if (registerExtensionModule(js, this.extensionRegistry)) {
 					return;
 				}
@@ -41,24 +46,23 @@ export class UmbBundleExtensionInitializer extends UmbExtensionInitializerBase<'
 	}
 
 	async unloadExtension(manifest: ManifestBundle): Promise<void> {
-		if (manifest.js) {
-			const js = await loadManifestPlainJs(manifest.js);
+		const js = this.#loadedModules.get(manifest.alias);
+		this.#loadedModules.delete(manifest.alias);
 
-			if (js) {
-				if (unregisterExtensionModule(js, this.extensionRegistry)) {
-					return;
-				}
-
-				Object.keys(js).forEach((key) => {
-					const value = js[key];
-
-					if (Array.isArray(value)) {
-						this.extensionRegistry.unregisterMany(value.map((v) => v.alias));
-					} else if (typeof value === 'object') {
-						this.extensionRegistry.unregister((value as ManifestBase).alias);
-					}
-				});
+		if (js) {
+			if (unregisterExtensionModule(js, this.extensionRegistry)) {
+				return;
 			}
+
+			Object.keys(js).forEach((key) => {
+				const value = js[key];
+
+				if (Array.isArray(value)) {
+					this.extensionRegistry.unregisterMany(value.map((v) => v.alias));
+				} else if (typeof value === 'object') {
+					this.extensionRegistry.unregister((value as ManifestBase).alias);
+				}
+			});
 		}
 	}
 }
