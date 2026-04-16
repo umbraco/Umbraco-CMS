@@ -3,18 +3,14 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'kind',
-		alias: 'Umb.Kind.CollectionAction.Create',
-		matchKind: 'create',
+		alias: 'Umb.Kind.CollectionAction.Button',
+		matchKind: 'button',
 		matchType: 'collectionAction',
 		manifest: {
 			type: 'collectionAction',
-			kind: 'create',
-			element: () => import('./collection-create-action.element.js'),
-			api: () => import('./collection-create-action.api.js'),
-			weight: 1200,
-			meta: {
-				label: '#actions_createFor',
-			},
+			kind: 'button',
+			element: () => import('./collection-action-button.element.js'),
+			api: () => import('./collection-action-button.api.js'),
 		},
 	},
 ];
