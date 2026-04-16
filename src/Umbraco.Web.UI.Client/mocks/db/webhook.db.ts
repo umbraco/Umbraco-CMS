@@ -42,6 +42,7 @@ const detailResponseMapper = (item: UmbMockWebhookModel) => {
 const itemResponseMapper = (item: UmbMockWebhookModel) => {
 	return {
 		id: item.id,
+		flags: [],
 		name: item.name ?? '',
 		enabled: item.enabled,
 		events: item.events.map((e) => e.eventName).join(', '),

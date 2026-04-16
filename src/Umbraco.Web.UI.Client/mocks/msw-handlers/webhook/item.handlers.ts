@@ -11,6 +11,6 @@ export const itemHandlers = [
 
 		const items = umbWebhookMockDb.item.getItems(ids);
 
-		return HttpResponse.json({ items, total: items.length });
+		return HttpResponse.json(items);
 	}),
 ];
