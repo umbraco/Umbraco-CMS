@@ -15,7 +15,7 @@ export class UmbScriptDetailStore extends UmbDetailStoreBase<UmbScriptDetailMode
 	 * @memberof UmbScriptDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_SCRIPT_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_SCRIPT_DETAIL_STORE_CONTEXT);
 	}
 }
 
