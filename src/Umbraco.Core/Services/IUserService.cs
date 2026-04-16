@@ -296,7 +296,6 @@ public interface IUserService : IMembershipUserService
     /// <returns>
     ///     <see cref="IUser" />
     /// </returns>
-    [Obsolete($"Use {nameof(GetUsersByKey)} instead. Scheduled for removal in Umbraco 19.")]
     IEnumerable<IUser> GetUsersById(params int[]? ids);
 
     /// <summary>
