@@ -988,14 +988,14 @@ const rawData = [
 				alias: 'dropdownMultiValue',
 				culture: null,
 				segment: null,
-				value: '["One","Three"]',
+				value: ['One', 'Three'],
 			},
 			{
 				editorAlias: 'Umbraco.DropDown.Flexible',
 				alias: 'dropdownSingleValue',
 				culture: null,
 				segment: null,
-				value: '["Two"]',
+				value: ['Two'],
 			},
 		],
 		flags: [],
@@ -1209,7 +1209,7 @@ const rawData = [
 				culture: null,
 				segment: null,
 				value: {
-					src: '/umbraco/backoffice/assets/umb-pattern-pink.png',
+					src: '/umbraco/backoffice/assets/umb-pattern-blue.png',
 					focalPoint: {
 						left: 0.7736573381473065,
 						top: 0.6536672841836085,
@@ -2204,7 +2204,7 @@ const rawData = [
 				segment: null,
 				value: {
 					markup:
-						'<p>Yikes so many buttons!</p><ul><li><p>Button</p></li><li><p>Button</p></li><li><p>More button!</p></li></ul><p><img data-udi="umb://media/f06adb918cdd408d83ddf7b833fc393c" src="" alt="" width="426" height="284" style="display: block; margin-left: auto; margin-right: auto;"></p><p>&nbsp;</p>',
+						'<p>Yikes so many buttons!</p><ul><li><p>Button</p></li><li><p>Button</p></li><li><p>More button!</p></li></ul><p><img data-udi="umb://media/f06adb918cdd408d83ddf7b833fc393c" src="/umbraco/backoffice/assets/umb-pattern-blue.png" alt="" width="284" height="284"></p><p>&nbsp;</p>',
 					blocks: {
 						contentData: [],
 						settingsData: [],
