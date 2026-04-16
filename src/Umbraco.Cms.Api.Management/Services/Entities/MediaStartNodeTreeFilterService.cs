@@ -15,7 +15,7 @@ internal sealed class MediaStartNodeTreeFilterService : UserStartNodeTreeFilterS
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
 
-    internal MediaStartNodeTreeFilterService(
+    public MediaStartNodeTreeFilterService(
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
