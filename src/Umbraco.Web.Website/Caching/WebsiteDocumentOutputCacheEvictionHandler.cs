@@ -15,21 +15,21 @@ namespace Umbraco.Cms.Web.Website.Caching;
 ///     when content is published, unpublished, moved, or deleted. Also evicts pages that
 ///     reference the changed content via picker properties (umbDocument relations).
 /// </summary>
-internal sealed class DocumentOutputCacheEvictionHandler
+internal sealed class WebsiteDocumentOutputCacheEvictionHandler
     : RelationOutputCacheEvictionHandlerBase, INotificationAsyncHandler<ContentCacheRefresherNotification>
 {
     private readonly IEnumerable<IWebsiteOutputCacheEvictionProvider> _evictionProviders;
-    private readonly ILogger<DocumentOutputCacheEvictionHandler> _logger;
+    private readonly ILogger<WebsiteDocumentOutputCacheEvictionHandler> _logger;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="DocumentOutputCacheEvictionHandler"/> class.
+    ///     Initializes a new instance of the <see cref="WebsiteDocumentOutputCacheEvictionHandler"/> class.
     /// </summary>
-    public DocumentOutputCacheEvictionHandler(
+    public WebsiteDocumentOutputCacheEvictionHandler(
         IOutputCacheStore outputCacheStore,
         IRelationService relationService,
         IIdKeyMap idKeyMap,
         IEnumerable<IWebsiteOutputCacheEvictionProvider> evictionProviders,
-        ILogger<DocumentOutputCacheEvictionHandler> logger)
+        ILogger<WebsiteDocumentOutputCacheEvictionHandler> logger)
         : base(outputCacheStore, relationService, idKeyMap)
     {
         _evictionProviders = evictionProviders;

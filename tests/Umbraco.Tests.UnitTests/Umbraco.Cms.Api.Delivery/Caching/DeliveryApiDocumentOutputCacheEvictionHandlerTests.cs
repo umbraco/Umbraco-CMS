@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Delivery.Caching;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -9,18 +10,17 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Web.Website.Caching;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Caching;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Delivery.Caching;
 
 [TestFixture]
-public class DocumentOutputCacheEvictionHandlerTests
+public class DeliveryApiDocumentOutputCacheEvictionHandlerTests
 {
     private Mock<IOutputCacheStore> _storeMock = null!;
     private Mock<IRelationService> _relationServiceMock = null!;
     private Mock<IIdKeyMap> _idKeyMapMock = null!;
-    private DocumentOutputCacheEvictionHandler _handler = null!;
-    private List<Mock<IWebsiteOutputCacheEvictionProvider>> _evictionProviderMocks = null!;
+    private List<Mock<IDeliveryApiOutputCacheEvictionProvider>> _evictionProviderMocks = null!;
+    private DeliveryApiDocumentOutputCacheEvictionHandler _handler = null!;
 
     [SetUp]
     public void SetUp()
@@ -37,7 +37,7 @@ public class DocumentOutputCacheEvictionHandlerTests
 
         _idKeyMapMock = new Mock<IIdKeyMap>();
 
-        _evictionProviderMocks = new List<Mock<IWebsiteOutputCacheEvictionProvider>>();
+        _evictionProviderMocks = new List<Mock<IDeliveryApiOutputCacheEvictionProvider>>();
 
         RebuildHandler();
     }
@@ -55,7 +55,7 @@ public class DocumentOutputCacheEvictionHandlerTests
         await _handler.HandleAsync(notification, CancellationToken.None);
 
         _storeMock.Verify(
-            s => s.EvictByTagAsync($"umb-content-{key}", It.IsAny<CancellationToken>()),
+            s => s.EvictByTagAsync($"umb-dapi-content-{key}", It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -72,7 +72,7 @@ public class DocumentOutputCacheEvictionHandlerTests
         await _handler.HandleAsync(notification, CancellationToken.None);
 
         _storeMock.Verify(
-            s => s.EvictByTagAsync($"umb-content-{key}", It.IsAny<CancellationToken>()),
+            s => s.EvictByTagAsync($"umb-dapi-content-{key}", It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -89,10 +89,10 @@ public class DocumentOutputCacheEvictionHandlerTests
         await _handler.HandleAsync(notification, CancellationToken.None);
 
         _storeMock.Verify(
-            s => s.EvictByTagAsync($"umb-content-{key}", It.IsAny<CancellationToken>()),
+            s => s.EvictByTagAsync($"umb-dapi-content-{key}", It.IsAny<CancellationToken>()),
             Times.Once);
         _storeMock.Verify(
-            s => s.EvictByTagAsync($"umb-content-ancestor-{key}", It.IsAny<CancellationToken>()),
+            s => s.EvictByTagAsync($"umb-dapi-content-ancestor-{key}", It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -107,8 +107,9 @@ public class DocumentOutputCacheEvictionHandlerTests
 
         await _handler.HandleAsync(notification, CancellationToken.None);
 
+        // RefreshAll evicts everything (not just content) because media responses may reference content.
         _storeMock.Verify(
-            s => s.EvictByTagAsync("umb-content-all", It.IsAny<CancellationToken>()),
+            s => s.EvictByTagAsync("umb-dapi-all", It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -124,17 +125,17 @@ public class DocumentOutputCacheEvictionHandlerTests
         await _handler.HandleAsync(notification, CancellationToken.None);
 
         _storeMock.Verify(
-            s => s.EvictByTagAsync($"umb-content-{key1}", It.IsAny<CancellationToken>()),
+            s => s.EvictByTagAsync($"umb-dapi-content-{key1}", It.IsAny<CancellationToken>()),
             Times.Once);
         _storeMock.Verify(
-            s => s.EvictByTagAsync($"umb-content-{key2}", It.IsAny<CancellationToken>()),
+            s => s.EvictByTagAsync($"umb-dapi-content-{key2}", It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
     [Test]
     public async Task HandleAsync_InvokesEvictionProviders()
     {
-        var providerMock = new Mock<IWebsiteOutputCacheEvictionProvider>();
+        var providerMock = new Mock<IDeliveryApiOutputCacheEvictionProvider>();
         providerMock
             .Setup(p => p.GetAdditionalEvictionTagsAsync(It.IsAny<OutputCacheContentChangedContext>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new[] { "blog-category-123" });
@@ -158,12 +159,12 @@ public class DocumentOutputCacheEvictionHandlerTests
     [Test]
     public async Task HandleAsync_MultipleProviders_EvictsAllReturnedTags()
     {
-        var provider1Mock = new Mock<IWebsiteOutputCacheEvictionProvider>();
+        var provider1Mock = new Mock<IDeliveryApiOutputCacheEvictionProvider>();
         provider1Mock
             .Setup(p => p.GetAdditionalEvictionTagsAsync(It.IsAny<OutputCacheContentChangedContext>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new[] { "tag-a" });
 
-        var provider2Mock = new Mock<IWebsiteOutputCacheEvictionProvider>();
+        var provider2Mock = new Mock<IDeliveryApiOutputCacheEvictionProvider>();
         provider2Mock
             .Setup(p => p.GetAdditionalEvictionTagsAsync(It.IsAny<OutputCacheContentChangedContext>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new[] { "tag-b" });
@@ -201,6 +202,23 @@ public class DocumentOutputCacheEvictionHandlerTests
     }
 
     [Test]
+    public async Task HandleAsync_SkipsBlueprints()
+    {
+        var notification = CreateNotification(new ContentCacheRefresher.JsonPayload
+        {
+            Key = Guid.NewGuid(),
+            ChangeTypes = TreeChangeTypes.RefreshNode,
+            Blueprint = true,
+        });
+
+        await _handler.HandleAsync(notification, CancellationToken.None);
+
+        _storeMock.Verify(
+            s => s.EvictByTagAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Test]
     public async Task HandleAsync_EvictsRelatedDocuments()
     {
         const int changedId = 10;
@@ -211,7 +229,7 @@ public class DocumentOutputCacheEvictionHandlerTests
         relation.Setup(r => r.ParentId).Returns(parentId);
 
         _relationServiceMock
-            .Setup(r => r.GetByChildId(changedId, global::Umbraco.Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentAlias))
+            .Setup(r => r.GetByChildId(changedId, Constants.Conventions.RelationTypes.RelatedDocumentAlias))
             .Returns(new[] { relation.Object });
 
         _idKeyMapMock
@@ -228,7 +246,7 @@ public class DocumentOutputCacheEvictionHandlerTests
         await _handler.HandleAsync(notification, CancellationToken.None);
 
         _storeMock.Verify(
-            s => s.EvictByTagAsync($"umb-content-{parentKey}", It.IsAny<CancellationToken>()),
+            s => s.EvictByTagAsync($"umb-dapi-content-{parentKey}", It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -243,7 +261,7 @@ public class DocumentOutputCacheEvictionHandlerTests
 
         // Both changed items reference the same parent.
         _relationServiceMock
-            .Setup(r => r.GetByChildId(It.IsAny<int>(), global::Umbraco.Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentAlias))
+            .Setup(r => r.GetByChildId(It.IsAny<int>(), Constants.Conventions.RelationTypes.RelatedDocumentAlias))
             .Returns(new[] { relation.Object });
 
         _idKeyMapMock
@@ -258,18 +276,18 @@ public class DocumentOutputCacheEvictionHandlerTests
 
         // Parent should only be evicted once despite being referenced by both payloads.
         _storeMock.Verify(
-            s => s.EvictByTagAsync($"umb-content-{parentKey}", It.IsAny<CancellationToken>()),
+            s => s.EvictByTagAsync($"umb-dapi-content-{parentKey}", It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
     private void RebuildHandler()
     {
-        _handler = new DocumentOutputCacheEvictionHandler(
+        _handler = new DeliveryApiDocumentOutputCacheEvictionHandler(
             _storeMock.Object,
             _relationServiceMock.Object,
             _idKeyMapMock.Object,
             _evictionProviderMocks.Select(m => m.Object),
-            NullLogger<DocumentOutputCacheEvictionHandler>.Instance);
+            NullLogger<DeliveryApiDocumentOutputCacheEvictionHandler>.Instance);
     }
 
     private static ContentCacheRefresherNotification CreateNotification(params ContentCacheRefresher.JsonPayload[] payloads)
