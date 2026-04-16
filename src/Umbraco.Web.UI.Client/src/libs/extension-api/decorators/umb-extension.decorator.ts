@@ -100,17 +100,13 @@ export function getExtensionManifest(target: any): UmbExtensionDecoratorManifest
 /**
  * Registers extensions from a module's exports with the provided extension registry.
  *
- * Scans the module for classes decorated with `@umbExtension` and resolves named exports
- * to manifest fields. Supports two modes:
+ * Scans the module for classes decorated with `@umbExtension` and registers each one.
+ * The decorated class is automatically assigned to the manifest based on its type:
+ * - `HTMLElement` subclass → `element`
+ * - Anything else → `api`
  *
- * **Single extension per module** (conventional exports):
- * - `default` export → `element`
- * - `element` named export → `element` (overrides default)
- * - `api` named export → `api`
- *
- * **Multiple extensions per module** (bundled):
- * - Each decorated class is registered as its own `element` by default
- * - A class explicitly exported as `api` is registered as `api` instead
+ * Explicit `element` or `api` references in the decorator manifest are preserved.
+ * This allows pairing classes: `@umbExtension({ ..., api: MyApiClass })`
  *
  * The manifest metadata is read from the decorated class via {@link getExtensionManifest}.
  * Only classes with `@umbExtension` metadata are registered.
@@ -144,67 +140,29 @@ export function registerExtensionModule(
 		return;
 	}
 
-	// Build a reverse map from class → export name(s) for element/api resolution
-	const classToExportNames = new Map<any, Set<string>>();
-	for (const [name, value] of Object.entries(moduleExports)) {
-		if (!classToExportNames.has(value)) {
-			classToExportNames.set(value, new Set());
-		}
-		classToExportNames.get(value)!.add(name);
-	}
-
-	// Register each decorated class with resolved element/api fields.
-	// For single-extension modules, `default`/`as element`/`as api` exports are used.
-	// For multi-extension modules, each decorated class is its own element by default.
-	const isSingleExtension = decoratedClasses.size === 1;
-
+	// Register each decorated class. The decorated class is inferred by type:
+	// - HTMLElement subclass → element
+	// - Anything else → api
+	// Explicit element/api references in the manifest (e.g. { api: MyApiClass }) are preserved.
 	for (const [targetClass, manifest] of decoratedClasses) {
 		const fullManifest: any = { ...manifest };
-		const exportNames = classToExportNames.get(targetClass) ?? new Set<string>();
 
-		if (isSingleExtension) {
-			// Single extension: use the conventional export mapping
-			const elementExport = moduleExports.element ?? moduleExports.default;
-			const apiExport = moduleExports.api;
-
-			if (elementExport) {
-				fullManifest.element = elementExport;
-			}
-			if (apiExport) {
-				fullManifest.api = apiExport;
-			}
-
-			// If no exports resolved, infer from the class type
-			if (!fullManifest.element && !fullManifest.api) {
-				if (isHTMLElement(targetClass)) {
-					fullManifest.element = targetClass;
-				} else {
-					fullManifest.api = targetClass;
-				}
-			}
-		} else {
-			// Multiple extensions: each decorated class maps to its own manifest.
-			// If the manifest already has element/api set (e.g. via class references in the decorator),
-			// respect those. Otherwise, infer from the class type:
-			// - HTMLElement subclass → element
-			// - Anything else → api (common for actions with kind:'default' providing the UI)
-			if (!fullManifest.element && !fullManifest.api) {
-				if (isHTMLElement(targetClass)) {
-					fullManifest.element = targetClass;
-				} else {
-					fullManifest.api = targetClass;
-				}
-			} else if (!fullManifest.element && isHTMLElement(targetClass)) {
-				fullManifest.element = targetClass;
-			} else if (!fullManifest.api && !isHTMLElement(targetClass)) {
-				fullManifest.api = targetClass;
-			}
+		if (!fullManifest.element && isHTMLElement(targetClass)) {
+			fullManifest.element = targetClass;
+		}
+		if (!fullManifest.api && !isHTMLElement(targetClass)) {
+			fullManifest.api = targetClass;
 		}
 
 		registry.register(fullManifest);
 	}
 }
 
+/**
+ * Checks whether a class constructor extends HTMLElement.
+ * @param {object} target - The class constructor to check.
+ * @returns {boolean} True if the class extends HTMLElement.
+ */
 function isHTMLElement(target: any): boolean {
 	return typeof HTMLElement !== 'undefined' && target.prototype instanceof HTMLElement;
 }
