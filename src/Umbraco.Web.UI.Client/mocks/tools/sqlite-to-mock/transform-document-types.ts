@@ -31,6 +31,7 @@ interface AllowedContentType {
 }
 
 interface Composition {
+	parentContentTypeId: number;
 	childContentTypeId: number;
 }
 
@@ -117,7 +118,7 @@ export function transformDocumentTypes(): void {
 		FROM cmsContentType2ContentType
 	`);
 
-	const compositions = compositionQuery.all() as (Composition & { parentContentTypeId: number })[];
+	const compositions = compositionQuery.all() as Composition[];
 
 	// Get document type specific data (templates)
 	const docTypeQuery = prepare(`
@@ -191,9 +192,9 @@ export function transformDocumentTypes(): void {
 
 	const compositionsByContentType = new Map<number, Composition[]>();
 	for (const c of compositions) {
-		const list = compositionsByContentType.get(c.parentContentTypeId) || [];
+		const list = compositionsByContentType.get(c.childContentTypeId) || [];
 		list.push(c);
-		compositionsByContentType.set(c.parentContentTypeId, list);
+		compositionsByContentType.set(c.childContentTypeId, list);
 	}
 
 	const defaultTemplateByContentType = new Map<number, number | null>();
@@ -285,10 +286,12 @@ export function transformDocumentTypes(): void {
 			sortOrder: a.sortOrder,
 		}));
 
-		// Transform compositions (all entries in this table are compositions)
+		// Transform compositions
+		// In cmsContentType2ContentType: parentContentTypeId = the composed type, childContentTypeId = the type using it
+		// Inheritance: when the child's umbracoNode.parentId matches the parentContentTypeId
 		const compositionsList = ctCompositions.map((c) => ({
-			documentType: { id: parentMap.get(c.childContentTypeId) || `unknown-${c.childContentTypeId}` },
-			compositionType: 'Composition',
+			documentType: { id: parentMap.get(c.parentContentTypeId) || `unknown-${c.parentContentTypeId}` },
+			compositionType: row.parentId === c.parentContentTypeId ? 'Inheritance' : 'Composition',
 		}));
 
 		// Transform allowed templates
