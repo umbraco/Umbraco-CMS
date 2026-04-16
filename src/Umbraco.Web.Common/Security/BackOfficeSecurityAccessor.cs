@@ -36,16 +36,23 @@ public class BackOfficeSecurityAccessor : IBackOfficeSecurityAccessor
     /// <inheritdoc />
     public IDisposable Override(IBackOfficeSecurity backOfficeSecurity)
     {
+        ArgumentNullException.ThrowIfNull(backOfficeSecurity);
+
+        IBackOfficeSecurity? previous = _ambientOverride.Value;
         _ambientOverride.Value = backOfficeSecurity;
-        return new OverrideScope();
+        return new OverrideScope(previous);
     }
 
     /// <summary>
-    ///     Disposable scope that clears the <see cref="AsyncLocal{T}" />-based ambient override
-    ///     for the current async flow when disposed.
+    ///     Disposable scope that restores the previous <see cref="AsyncLocal{T}" />-based ambient
+    ///     override for the current async flow when disposed, supporting nested overrides.
     /// </summary>
     private sealed class OverrideScope : IDisposable
     {
-        public void Dispose() => _ambientOverride.Value = null;
+        private readonly IBackOfficeSecurity? _previous;
+
+        public OverrideScope(IBackOfficeSecurity? previous) => _previous = previous;
+
+        public void Dispose() => _ambientOverride.Value = _previous;
     }
 }

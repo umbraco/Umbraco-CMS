@@ -17,7 +17,7 @@ public interface IBackOfficeSecurityAccessor
     ///     of the returned scope. Disposing the scope clears the override.
     /// </summary>
     /// <remarks>
-    ///     This is intended for background processing scenarios  where no HTTP context is available
+    ///     This is intended for background processing scenarios where no HTTP context is available
     ///     but CMS code still needs a backoffice identity.
     /// </remarks>
     /// <param name="backOfficeSecurity">The identity to use for the duration of the scope.</param>

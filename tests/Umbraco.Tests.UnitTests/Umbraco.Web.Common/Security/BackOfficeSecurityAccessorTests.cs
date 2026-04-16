@@ -73,10 +73,11 @@ public class BackOfficeSecurityAccessorTests
         var accessor = new BackOfficeSecurityAccessor(httpContextAccessor);
         var overrideSecurity = Mock.Of<IBackOfficeSecurity>();
 
-        var scope = accessor.Override(overrideSecurity);
-        Assert.That(accessor.BackOfficeSecurity, Is.SameAs(overrideSecurity));
+        using (var scope = accessor.Override(overrideSecurity))
+        {
+            Assert.That(accessor.BackOfficeSecurity, Is.SameAs(overrideSecurity));
+        }
 
-        scope.Dispose();
         Assert.That(accessor.BackOfficeSecurity, Is.Null);
     }
 
@@ -93,12 +94,33 @@ public class BackOfficeSecurityAccessorTests
         var accessor = new BackOfficeSecurityAccessor(httpContextAccessor);
 
         var overrideSecurity = Mock.Of<IBackOfficeSecurity>();
-        var scope = accessor.Override(overrideSecurity);
-
-        Assert.That(accessor.BackOfficeSecurity, Is.SameAs(overrideSecurity));
-
-        scope.Dispose();
+        using (var scope = accessor.Override(overrideSecurity))
+        {
+            Assert.That(accessor.BackOfficeSecurity, Is.SameAs(overrideSecurity));
+        }
 
         Assert.That(accessor.BackOfficeSecurity, Is.SameAs(httpContextSecurity));
+    }
+
+    [Test]
+    public void Override_Nested_InnerDispose_RestoresOuter()
+    {
+        var httpContextAccessor = Mock.Of<IHttpContextAccessor>(x => x.HttpContext == null);
+        var accessor = new BackOfficeSecurityAccessor(httpContextAccessor);
+
+        var outerSecurity = Mock.Of<IBackOfficeSecurity>();
+        var innerSecurity = Mock.Of<IBackOfficeSecurity>();
+
+        using (var outerScope = accessor.Override(outerSecurity))
+        {
+            Assert.That(accessor.BackOfficeSecurity, Is.SameAs(outerSecurity));
+
+            using (var innerScope = accessor.Override(innerSecurity))
+            {
+                Assert.That(accessor.BackOfficeSecurity, Is.SameAs(innerSecurity));
+            }
+
+            Assert.That(accessor.BackOfficeSecurity, Is.SameAs(outerSecurity));
+        }
     }
 }
