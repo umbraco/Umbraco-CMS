@@ -21,6 +21,9 @@ import { transformUsers } from './transform-users.js';
 import { transformTemplates } from './transform-templates.js';
 import { transformLanguages } from './transform-languages.js';
 import { transformDictionary } from './transform-dictionary.js';
+import { transformMemberTypes } from './transform-member-types.js';
+import { transformMemberGroups } from './transform-member-groups.js';
+import { transformMembers } from './transform-members.js';
 import { generateSupportingFiles } from './generate-supporting-files.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -90,6 +93,18 @@ console.log('');
 
 console.log('Transforming users and user groups...');
 transformUsers();
+console.log('');
+
+console.log('Transforming member types...');
+transformMemberTypes();
+console.log('');
+
+console.log('Transforming member groups...');
+transformMemberGroups();
+console.log('');
+
+console.log('Transforming members...');
+transformMembers();
 console.log('');
 
 console.log('Transforming templates...');
