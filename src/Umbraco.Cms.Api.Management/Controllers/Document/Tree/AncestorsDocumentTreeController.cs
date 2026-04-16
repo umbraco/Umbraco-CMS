@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -65,6 +66,7 @@ public class AncestorsDocumentTreeController : DocumentTreeControllerBase
     /// <param name="documentPresentationFactory">Factory for creating document presentation models.</param>
     /// <param name="documentPermissionFilterService">Service for filtering documents based on user permissions.</param>
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public AncestorsDocumentTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

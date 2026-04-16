@@ -15,7 +15,7 @@ internal sealed class DocumentStartNodeTreeFilterService : UserStartNodeTreeFilt
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
 
-    public DocumentStartNodeTreeFilterService(
+    internal DocumentStartNodeTreeFilterService(
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,

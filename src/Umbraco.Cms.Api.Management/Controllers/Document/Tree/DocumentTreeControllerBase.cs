@@ -145,6 +145,10 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         return responseModel;
     }
 
+    // Falls back to empty when _treeFilterService is a custom IDocumentStartNodeTreeFilterService
+    // that does not implement the internal ILegacyUserStartNodeTreeFilterService interface.
+    // This is safe because these methods are obsolete and no longer called by the base class.
+
     /// <inheritdoc/>
     [Obsolete("No longer used. Register a custom IDocumentStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
     protected override int[] GetUserStartNodeIds() => (_treeFilterService as ILegacyUserStartNodeTreeFilterService)?.GetUserStartNodeIds() ?? [];

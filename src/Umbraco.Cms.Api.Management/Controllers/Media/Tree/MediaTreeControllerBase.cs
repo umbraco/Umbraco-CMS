@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -122,6 +123,7 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
     /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and operations.</param>
     /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public MediaTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
@@ -155,6 +157,10 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
 
         return responseModel;
     }
+
+    // Falls back to empty when _treeFilterService is a custom IMediaStartNodeTreeFilterService
+    // that does not implement the internal ILegacyUserStartNodeTreeFilterService interface.
+    // This is safe because these methods are obsolete and no longer called by the base class.
 
     [Obsolete("No longer used. Register a custom IMediaStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
     protected override int[] GetUserStartNodeIds() => (_treeFilterService as ILegacyUserStartNodeTreeFilterService)?.GetUserStartNodeIds() ?? [];

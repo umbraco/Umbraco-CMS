@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -52,6 +53,7 @@ public class AncestorsMediaTreeController : MediaTreeControllerBase
     /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and operations.</param>
     /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
     [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public AncestorsMediaTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
