@@ -159,6 +159,23 @@ export type UmbMockUserModel = UserResponseModel & UserItemResponseModel;
 
 export type UmbMockUserGroupModel = UserGroupResponseModel & UserGroupItemResponseModel;
 
+export interface UmbMockWebhookEventModel {
+	eventName: string;
+	eventType: string;
+	alias: string;
+}
+
+export interface UmbMockWebhookModel {
+	id: string;
+	name: string | null;
+	description: string | null;
+	url: string;
+	enabled: boolean;
+	events: Array<UmbMockWebhookEventModel>;
+	contentTypeKeys: Array<string>;
+	headers: Record<string, string>;
+}
+
 export type UmbMockTrackedReferenceItemModel =
 	| DefaultReferenceResponseModel
 	| DocumentReferenceResponseModel
@@ -211,6 +228,7 @@ export interface UmbMockDataSet {
 	user?: Array<UmbMockUserModel>;
 	userGroup?: Array<UmbMockUserGroupModel>;
 	objectType?: Array<ObjectTypeResponseModel>;
+	webhook?: Array<UmbMockWebhookModel>;
 
 	// Log viewer data (optional, defaults to empty arrays/default values)
 	logViewerSavedSearches?: Array<SavedLogSearchResponseModel>;
