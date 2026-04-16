@@ -1,21 +1,71 @@
 const { http, HttpResponse } = window.MockServiceWorker;
 import { umbMediaMockDb } from '../../db/media.db.js';
-import type { GetImagingResizeUrlsResponse } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbMockMediaModel } from '../../data/mock-data-set.types.js';
+import type { GetImagingResizeUrlsResponse, MediaUrlInfoModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+
+/**
+ * Extracts the file URL from a media item's `umbracoFile` property value.
+ * Handles both ImageCropper (`{ src, focalPoint, crops }`) and UploadField (string path) formats.
+ * @param {UmbMockMediaModel} item The media mock model to extract the file URL from.
+ * @returns {string | null} The file URL string, or null if no file value is found.
+ */
+function getMediaFileUrl(item: UmbMockMediaModel): string | null {
+	const fileValue = item.values.find((v) => v.alias === 'umbracoFile');
+	if (!fileValue?.value) return null;
+
+	// ImageCropper stores { src, focalPoint, crops }, UploadField stores the path directly
+	if (typeof fileValue.value === 'object' && 'src' in (fileValue.value as Record<string, unknown>)) {
+		return (fileValue.value as { src: string }).src;
+	}
+	if (typeof fileValue.value === 'string') {
+		return fileValue.value;
+	}
+	return null;
+}
+
+/**
+ * Builds a resize URL by appending width, height, mode, and format query parameters to the source path.
+ * @param {string} src The original media file URL.
+ * @param {URLSearchParams} params The request query parameters containing resize options.
+ * @returns {string} The source URL with resize query parameters appended.
+ */
+function buildResizeUrl(src: string, params: URLSearchParams): string {
+	const height = params.get('height') || '200';
+	const width = params.get('width') || '200';
+	const mode = params.get('mode');
+	const format = params.get('format');
+
+	const resizeParams = new URLSearchParams();
+	resizeParams.set('width', width);
+	resizeParams.set('height', height);
+	if (mode) resizeParams.set('mode', mode);
+	if (format) resizeParams.set('format', format);
+
+	return `${src}?${resizeParams.toString()}`;
+}
 
 export const imagingHandlers = [
 	http.get(umbracoPath('/imaging/resize/urls'), ({ request }) => {
 		const url = new URL(request.url);
 		const ids = url.searchParams.getAll('id');
-		if (!ids) return new HttpResponse(null, { status: 404 });
+		if (!ids.length) return new HttpResponse(null, { status: 400 });
 
 		const media = umbMediaMockDb.getAll().filter((item) => ids.includes(item.id));
 
-		const response: GetImagingResizeUrlsResponse = media.map((item) => ({
-			id: item.id,
-			// TODO: Figure out where to populate the `urlInfos` array, as the server's `MediaResponseModel` removed the deprecated `urls` property. [LK]
-			urlInfos: [], // item.urls,
-		}));
+		const response: GetImagingResizeUrlsResponse = media.map((item) => {
+			const src = getMediaFileUrl(item);
+			const urlInfos: Array<MediaUrlInfoModel> = [];
+
+			if (src) {
+				urlInfos.push({
+					culture: null,
+					url: buildResizeUrl(src, url.searchParams),
+				});
+			}
+
+			return { id: item.id, urlInfos };
+		});
 
 		return HttpResponse.json(response);
 	}),
