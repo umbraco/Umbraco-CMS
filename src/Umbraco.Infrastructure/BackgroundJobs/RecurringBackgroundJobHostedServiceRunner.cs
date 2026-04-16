@@ -39,31 +39,39 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
         foreach (IRecurringBackgroundJob job in _jobs)
         {
             Type jobType = job.GetType();
+            var added = false;
+
             try
             {
-                var added = false;
                 IHostedService hostedService = _hostedServices.GetOrAdd(jobType, _ =>
                 {
-                    _logger.LogDebug("Creating background hosted service for {job}", jobType.Name);
+                    _logger.LogDebug("Creating background hosted service for {JobTypeName}", jobType.Name);
 
+                    IHostedService hostedService = _jobFactory(job);
                     added = true;
-                    return _jobFactory(job);
+
+                    return hostedService;
                 });
 
                 if (!added)
                 {
-                    _logger.LogWarning("A background hosted service for {job} is already registered, skipping duplicate.", jobType.Name);
+                    _logger.LogWarning("A background hosted service for {JobTypeName} is already registered, skipping duplicate", jobType.Name);
                     continue;
                 }
 
-                _logger.LogInformation("Starting a background hosted service for {job} with a delay of {delay}, running every {period}", jobType.Name, job.Delay, job.Period);
+                _logger.LogInformation("Starting a background hosted service for {JobTypeName} with a delay of {Delay}, running every {Period}", jobType.Name, job.Delay, job.Period);
 
                 await hostedService.StartAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                _hostedServices.TryRemove(jobType, out _);
-                _logger.LogError(ex, "Failed to start background hosted service for {job}", jobType.Name);
+                if (added)
+                {
+                    // Ensure we don't stop hosted services that were not successfully started
+                    _hostedServices.TryRemove(jobType, out _);
+                }
+
+                _logger.LogError(ex, "Failed to start background hosted service for {JobTypeName}", jobType.Name);
             }
         }
 
@@ -75,18 +83,19 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
     {
         _logger.LogInformation("Stopping recurring background jobs hosted services");
 
-        foreach ((Type jobType, IHostedService hostedService) in _hostedServices)
+        foreach (Type jobType in _hostedServices.Keys)
         {
-            if (_hostedServices.TryRemove(jobType, out _))
+            if (_hostedServices.TryRemove(jobType, out IHostedService? hostedService))
             {
                 try
                 {
-                    _logger.LogInformation("Stopping background hosted service for {job}", jobType.Name);
+                    _logger.LogInformation("Stopping background hosted service for {JobTypeName}", jobType.Name);
+
                     await hostedService.StopAsync(stoppingToken).ConfigureAwait(false);
                 }
-                catch (Exception exception)
+                catch (Exception ex)
                 {
-                    _logger.LogError(exception, "Failed to stop background hosted service for {job}", jobType.Name);
+                    _logger.LogError(ex, "Failed to stop background hosted service for {JobTypeName}", jobType.Name);
                 }
             }
         }
