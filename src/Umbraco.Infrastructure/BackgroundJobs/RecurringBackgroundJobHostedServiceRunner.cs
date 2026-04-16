@@ -104,18 +104,6 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
     }
 
     /// <summary>
-    /// Signals the background loop for the specified job type to execute immediately.
-    /// After the triggered execution, the original schedule is kept.
-    /// </summary>
-    /// <typeparam name="TJob">The type of the recurring background job to trigger.</typeparam>
-    /// <returns>
-    ///   <c>true</c> if the job was found and triggered; <c>false</c> if no hosted service is running for this job type.
-    /// </returns>
-    public bool TriggerExecution<TJob>()
-        where TJob : IRecurringBackgroundJob
-        => TriggerExecution<TJob>(NextExecutionStrategy.None);
-
-    /// <summary>
     /// Signals the background loop for the specified job type to execute immediately, with the specified strategy for determining the next execution after the triggered one completes.
     /// </summary>
     /// <typeparam name="TJob">The type of the recurring background job to trigger.</typeparam>
@@ -123,7 +111,7 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
     /// <returns>
     ///   <c>true</c> if the job was found and triggered; <c>false</c> if no hosted service is running for this job type.
     /// </returns>
-    public bool TriggerExecution<TJob>(NextExecutionStrategy strategy)
+    internal bool TriggerExecution<TJob>(NextExecutionStrategy strategy)
         where TJob : IRecurringBackgroundJob
     {
         if (FindHostedService<TJob>() is not { } hostedService)
@@ -145,7 +133,7 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
     /// <returns>
     ///   <c>true</c> if the job was found and triggered; <c>false</c> if no hosted service is running for this job type.
     /// </returns>
-    public bool TriggerExecution<TJob>(TimeSpan nextDelay)
+    internal bool TriggerExecution<TJob>(TimeSpan nextDelay)
         where TJob : IRecurringBackgroundJob
     {
         if (FindHostedService<TJob>() is not { } hostedService)
