@@ -430,9 +430,9 @@ public static partial class UmbracoBuilderExtensions
         // add notification handlers for redirect tracking
         builder
             .AddNotificationHandler<ContentPublishingNotification, RedirectTrackingHandler>()
-            .AddNotificationHandler<ContentPublishedNotification, RedirectTrackingHandler>()
+            .AddNotificationAsyncHandler<ContentPublishedNotification, RedirectTrackingHandler>()
             .AddNotificationHandler<ContentMovingNotification, RedirectTrackingHandler>()
-            .AddNotificationHandler<ContentMovedNotification, RedirectTrackingHandler>();
+            .AddNotificationAsyncHandler<ContentMovedNotification, RedirectTrackingHandler>();
 
         // Add notification handlers for DistributedCache
         builder

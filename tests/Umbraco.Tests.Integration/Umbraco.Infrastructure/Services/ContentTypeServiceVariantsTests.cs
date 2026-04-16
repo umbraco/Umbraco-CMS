@@ -86,7 +86,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment, true)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment, false)]
     [LongRunning]
-    public void Change_Content_Type_Variation_Clears_Redirects(
+    public async Task Change_Content_Type_Variation_Clears_Redirects(
         ContentVariation startingContentTypeVariation,
         ContentVariation changedContentTypeVariation,
         bool shouldUrlRedirectsBeCleared)
@@ -110,19 +110,19 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         IContent doc2 = ContentBuilder.CreateBasicContent(contentType2);
         ContentService.Save(doc2);
 
-        RedirectUrlService.Register("hello/world", doc.Key);
-        RedirectUrlService.Register("hello2/world2", doc2.Key);
+        await RedirectUrlService.RegisterAsync("hello/world", doc.Key);
+        await RedirectUrlService.RegisterAsync("hello2/world2", doc2.Key);
 
         // These 2 assertions should probably be moved to a test for the Register() method?
-        Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
-        Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
+        Assert.AreEqual(1, (await RedirectUrlService.GetContentRedirectUrlsAsync(doc.Key)).Count());
+        Assert.AreEqual(1, (await RedirectUrlService.GetContentRedirectUrlsAsync(doc2.Key)).Count());
 
         // change variation
         contentType.Variations = changedContentTypeVariation;
         ContentTypeService.Save(contentType);
         var expectedRedirectUrlCount = shouldUrlRedirectsBeCleared ? 0 : 1;
-        Assert.AreEqual(expectedRedirectUrlCount, RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
-        Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
+        Assert.AreEqual(expectedRedirectUrlCount, (await RedirectUrlService.GetContentRedirectUrlsAsync(doc.Key)).Count());
+        Assert.AreEqual(1, (await RedirectUrlService.GetContentRedirectUrlsAsync(doc2.Key)).Count());
     }
 
     [TestCase(ContentVariation.Nothing, ContentVariation.Culture)]

@@ -34,9 +34,9 @@ public class DeleteByKeyRedirectUrlManagementController : RedirectUrlManagementC
     [ProducesResponseType(StatusCodes.Status200OK)]
     [EndpointSummary("Deletes a redirect URL.")]
     [EndpointDescription("Deletes a redirect URL identified by the provided Id.")]
-    public Task<IActionResult> DeleteByKey(CancellationToken cancellationToken, Guid id)
+    public async Task<IActionResult> DeleteByKey(CancellationToken cancellationToken, Guid id)
     {
-        _redirectUrlService.Delete(id);
-        return Task.FromResult<IActionResult>(Ok());
+        await _redirectUrlService.DeleteAsync(id);
+        return Ok();
     }
 }

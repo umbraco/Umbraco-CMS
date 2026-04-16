@@ -67,7 +67,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
             return Ok(ApiContentResponseBuilder.Build(contentItem));
         }
 
-        IApiContentRoute? redirectRoute = _requestRedirectService.GetRedirectRoute(path);
+        IApiContentRoute? redirectRoute = await _requestRedirectService.GetRedirectRouteAsync(path);
         return redirectRoute != null
             ? RedirectTo(redirectRoute)
             : NotFound();

@@ -9,8 +9,9 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -25,15 +26,15 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     public async Task SetUp() => await CreateTestDataAsync();
 
     [Test]
-    public void Can_Save_And_Get()
+    public async Task Can_Save_And_Get()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
             var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
-            repo.Save(rurl);
+            await repo.SaveAsync(rurl, CancellationToken.None);
             scope.Complete();
 
             Assert.AreNotEqual(0, rurl.Id);
@@ -41,8 +42,8 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
-            var rurl = repo.GetMostRecentUrl("blah");
+            var repo = CreateRepository();
+            var rurl = await repo.GetMostRecentUrlAsync("blah");
             scope.Complete();
 
             Assert.IsNotNull(rurl);
@@ -51,23 +52,23 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Save_And_Get_With_Culture()
+    public async Task Can_Save_And_Get_With_Culture()
     {
         var culture = "en";
-        using (var scope = ScopeProvider.CreateScope())
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var repo = CreateRepository(ScopeProvider);
+            var repo = CreateRepository();
             var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah", Culture = culture };
-            repo.Save(rurl);
+            await repo.SaveAsync(rurl, CancellationToken.None);
             scope.Complete();
 
             Assert.AreNotEqual(0, rurl.Id);
         }
 
-        using (var scope = ScopeProvider.CreateScope())
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var repo = CreateRepository(ScopeProvider);
-            var rurl = repo.GetMostRecentUrl("blah");
+            var repo = CreateRepository();
+            var rurl = await repo.GetMostRecentUrlAsync("blah");
             scope.Complete();
 
             Assert.IsNotNull(rurl);
@@ -77,17 +78,17 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Save_And_Get_Most_Recent()
+    public async Task Can_Save_And_Get_Most_Recent()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
 
         Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
             var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
-            repo.Save(rurl);
+            await repo.SaveAsync(rurl, CancellationToken.None);
             scope.Complete();
 
             Assert.AreNotEqual(0, rurl.Id);
@@ -102,7 +103,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
                 Url = "blah",
                 CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
             };
-            repo.Save(rurl);
+            await repo.SaveAsync(rurl, CancellationToken.None);
             scope.Complete();
 
             Assert.AreNotEqual(0, rurl.Id);
@@ -110,8 +111,8 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
-            var rurl = repo.GetMostRecentUrl("blah");
+            var repo = CreateRepository();
+            var rurl = await repo.GetMostRecentUrlAsync("blah");
             scope.Complete();
 
             Assert.IsNotNull(rurl);
@@ -120,17 +121,17 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Save_And_Get_Most_Recent_For_Culture()
+    public async Task Can_Save_And_Get_Most_Recent_For_Culture()
     {
         var cultureA = "en";
         var cultureB = "de";
         Assert.AreNotEqual(_textpage.Id, _otherpage.Id);
 
-        using (var scope = ScopeProvider.CreateScope())
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var repo = CreateRepository(ScopeProvider);
+            var repo = CreateRepository();
             var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah", Culture = cultureA };
-            repo.Save(rurl);
+            await repo.SaveAsync(rurl, CancellationToken.None);
             scope.Complete();
 
             Assert.AreNotEqual(0, rurl.Id);
@@ -146,16 +147,16 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
                 CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1), // ensure time difference
                 Culture = cultureB
             };
-            repo.Save(rurl);
+            await repo.SaveAsync(rurl, CancellationToken.None);
             scope.Complete();
 
             Assert.AreNotEqual(0, rurl.Id);
         }
 
-        using (var scope = ScopeProvider.CreateScope())
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var repo = CreateRepository(ScopeProvider);
-            var rurl = repo.GetMostRecentUrl("blah", cultureA);
+            var repo = CreateRepository();
+            var rurl = await repo.GetMostRecentUrlAsync("blah", cultureA);
             scope.Complete();
 
             Assert.IsNotNull(rurl);
@@ -165,15 +166,15 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Save_And_Get_By_Content()
+    public async Task Can_Save_And_Get_By_Content()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
             var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
-            repo.Save(rurl);
+            await repo.SaveAsync(rurl, CancellationToken.None);
             scope.Complete();
 
             Assert.AreNotEqual(0, rurl.Id);
@@ -185,7 +186,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
                 Url = "durg",
                 CreateDateUtc = rurl.CreateDateUtc.AddSeconds(1) // ensure time difference
             };
-            repo.Save(rurl);
+            await repo.SaveAsync(rurl, CancellationToken.None);
             scope.Complete();
 
             Assert.AreNotEqual(0, rurl.Id);
@@ -193,8 +194,8 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
-            var rurls = repo.GetContentUrls(_textpage.Key).ToArray();
+            var repo = CreateRepository();
+            var rurls = (await repo.GetContentUrlsAsync(_textpage.Key)).ToArray();
             scope.Complete();
 
             Assert.AreEqual(2, rurls.Length);
@@ -204,21 +205,21 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Save_And_Delete()
+    public async Task Can_Save_And_Delete()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
             var rurl = new RedirectUrl { ContentKey = _textpage.Key, Url = "blah" };
-            repo.Save(rurl);
+            await repo.SaveAsync(rurl, CancellationToken.None);
             scope.Complete();
 
             Assert.AreNotEqual(0, rurl.Id);
 
             rurl = new RedirectUrl { ContentKey = _otherpage.Key, Url = "durg" };
-            repo.Save(rurl);
+            await repo.SaveAsync(rurl, CancellationToken.None);
             scope.Complete();
 
             Assert.AreNotEqual(0, rurl.Id);
@@ -226,30 +227,30 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
-            repo.DeleteContentUrls(_textpage.Key);
+            var repo = CreateRepository();
+            await repo.DeleteContentUrlsAsync(_textpage.Key);
             scope.Complete();
 
-            var rurls = repo.GetContentUrls(_textpage.Key);
+            var rurls = await repo.GetContentUrlsAsync(_textpage.Key);
 
             Assert.AreEqual(0, rurls.Count());
         }
     }
 
     [Test]
-    public void Can_Get_All_Urls_Filtered_By_Root_Content_Id()
+    public async Task Can_Get_All_Urls_Filtered_By_Root_Content_Id()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
 
         // Create redirects for content at different levels of the hierarchy (_textpage is root,
         // _subpage and _otherpage are children of _textpage).
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
 
             // Redirect for root page.
             var rurlRoot = new RedirectUrl { ContentKey = _textpage.Key, Url = "root-redirect" };
-            repo.Save(rurlRoot);
+            await repo.SaveAsync(rurlRoot, CancellationToken.None);
 
             // Redirect for subpage (child of textpage).
             var rurlSub = new RedirectUrl
@@ -258,7 +259,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
                 Url = "subpage-redirect",
                 CreateDateUtc = rurlRoot.CreateDateUtc.AddSeconds(1)
             };
-            repo.Save(rurlSub);
+            await repo.SaveAsync(rurlSub, CancellationToken.None);
 
             // Redirect for otherpage (child of textpage).
             var rurlOther = new RedirectUrl
@@ -267,17 +268,18 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
                 Url = "otherpage-redirect",
                 CreateDateUtc = rurlRoot.CreateDateUtc.AddSeconds(2)
             };
-            repo.Save(rurlOther);
+            await repo.SaveAsync(rurlOther, CancellationToken.None);
 
             scope.Complete();
         }
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
 
             // Get all URLs under _textpage (should include _subpage and _otherpage redirects).
-            var rurls = repo.GetAllUrls(_textpage.Id, 0, 100, out var total).ToArray();
+            PagedModel<IRedirectUrl> result = await repo.GetAllUrlsAsync(_textpage.Id, 0, 100);
+            var rurls = result.Items.ToArray();
             scope.Complete();
 
             // Should find redirects for descendants of _textpage.
@@ -289,16 +291,16 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Search_Urls()
+    public async Task Can_Search_Urls()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
 
             var rurl1 = new RedirectUrl { ContentKey = _textpage.Key, Url = "/old-products/widget-123" };
-            repo.Save(rurl1);
+            await repo.SaveAsync(rurl1, CancellationToken.None);
 
             var rurl2 = new RedirectUrl
             {
@@ -306,7 +308,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
                 Url = "/old-services/consulting",
                 CreateDateUtc = rurl1.CreateDateUtc.AddSeconds(1)
             };
-            repo.Save(rurl2);
+            await repo.SaveAsync(rurl2, CancellationToken.None);
 
             var rurl3 = new RedirectUrl
             {
@@ -314,20 +316,21 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
                 Url = "/old-products/gadget-456",
                 CreateDateUtc = rurl1.CreateDateUtc.AddSeconds(2)
             };
-            repo.Save(rurl3);
+            await repo.SaveAsync(rurl3, CancellationToken.None);
 
             scope.Complete();
         }
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
 
             // Search for URLs containing "products".
-            var rurls = repo.SearchUrls("products", 0, 100, out var total).ToArray();
+            PagedModel<IRedirectUrl> result = await repo.SearchUrlsAsync("products", 0, 100);
+            var rurls = result.Items.ToArray();
             scope.Complete();
 
-            Assert.AreEqual(2, total);
+            Assert.AreEqual(2, result.Total);
             Assert.AreEqual(2, rurls.Length);
             Assert.That(rurls.All(r => r.Url.Contains("products")), Is.True);
             Assert.That(rurls.Any(r => r.Url == "/old-products/widget-123"), Is.True);
@@ -336,20 +339,21 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
 
         using (var scope = provider.CreateScope())
         {
-            var repo = CreateRepository(provider);
+            var repo = CreateRepository();
 
             // Search for URLs containing "consulting" - should only find 1.
-            var rurls = repo.SearchUrls("consulting", 0, 100, out var total).ToArray();
+            PagedModel<IRedirectUrl> result = await repo.SearchUrlsAsync("consulting", 0, 100);
+            var rurls = result.Items.ToArray();
             scope.Complete();
 
-            Assert.AreEqual(1, total);
+            Assert.AreEqual(1, result.Total);
             Assert.AreEqual(1, rurls.Length);
             Assert.AreEqual("/old-services/consulting", rurls[0].Url);
         }
     }
 
-    private IRedirectUrlRepository CreateRepository(IScopeProvider provider) =>
-        new RedirectUrlRepository((IScopeAccessor)provider, AppCaches, LoggerFactory.CreateLogger<RedirectUrlRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+    private IRedirectUrlRepository CreateRepository() =>
+        new RedirectUrlRepository(GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(), AppCaches, LoggerFactory.CreateLogger<RedirectUrlRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
     private IContent _textpage;
     private IContent _subpage;

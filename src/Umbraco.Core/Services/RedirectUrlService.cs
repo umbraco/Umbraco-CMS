@@ -3,13 +3,14 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Scoping.EFCore;
 
 namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
 /// Provides services for managing redirect URLs.
 /// </summary>
-internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlService
+internal sealed class RedirectUrlService : AsyncRepositoryService, IRedirectUrlService
 {
     private readonly IRedirectUrlRepository _redirectUrlRepository;
 
@@ -17,7 +18,7 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
     /// Initializes a new instance of the <see cref="RedirectUrlService"/> class.
     /// </summary>
     public RedirectUrlService(
-        ICoreScopeProvider provider,
+        IScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IRedirectUrlRepository redirectUrlRepository)
@@ -25,10 +26,10 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
         _redirectUrlRepository = redirectUrlRepository;
 
     /// <inheritdoc/>
-    public void Register(string url, Guid contentKey, string? culture = null)
+    public async Task RegisterAsync(string url, Guid contentKey, string? culture = null)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        IRedirectUrl? redir = _redirectUrlRepository.Get(url, contentKey, culture);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IRedirectUrl? redir = await _redirectUrlRepository.GetAsync(url, contentKey, culture);
         if (redir != null)
         {
             redir.CreateDateUtc = DateTime.UtcNow;
@@ -38,94 +39,112 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
             redir = new RedirectUrl { Key = Guid.NewGuid(), Url = url, ContentKey = contentKey, Culture = culture };
         }
 
-        _redirectUrlRepository.Save(redir);
+        await _redirectUrlRepository.SaveAsync(redir, CancellationToken.None);
         scope.Complete();
     }
 
     /// <inheritdoc/>
-    public void Delete(IRedirectUrl redirectUrl)
+    public async Task DeleteAsync(IRedirectUrl redirectUrl)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        _redirectUrlRepository.Delete(redirectUrl);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        await _redirectUrlRepository.DeleteAsync(redirectUrl, CancellationToken.None);
         scope.Complete();
     }
 
     /// <inheritdoc/>
-    public void Delete(Guid id)
+    public async Task DeleteAsync(Guid id)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        _redirectUrlRepository.Delete(id);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        await _redirectUrlRepository.DeleteAsync(id);
         scope.Complete();
     }
 
     /// <inheritdoc/>
-    public void DeleteContentRedirectUrls(Guid contentKey)
+    public async Task DeleteContentRedirectUrlsAsync(Guid contentKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        _redirectUrlRepository.DeleteContentUrls(contentKey);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        await _redirectUrlRepository.DeleteContentUrlsAsync(contentKey);
         scope.Complete();
     }
 
     /// <inheritdoc/>
-    public void DeleteAll()
+    public async Task DeleteAllAsync()
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        _redirectUrlRepository.DeleteAll();
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        await _redirectUrlRepository.DeleteAllAsync();
         scope.Complete();
-    }
-
-    /// <inheritdoc/>
-    public IRedirectUrl? GetMostRecentRedirectUrl(string url)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return _redirectUrlRepository.GetMostRecentUrl(url);
     }
 
     /// <inheritdoc/>
     public async Task<IRedirectUrl?> GetMostRecentRedirectUrlAsync(string url)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return await _redirectUrlRepository.GetMostRecentUrlAsync(url);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        var recentUrl = await _redirectUrlRepository.GetMostRecentUrlAsync(url);
+        scope.Complete();
+
+        return recentUrl;
     }
 
     /// <inheritdoc/>
-    public IEnumerable<IRedirectUrl> GetContentRedirectUrls(Guid contentKey)
+    public async Task<IEnumerable<IRedirectUrl>> GetContentRedirectUrlsAsync(Guid contentKey)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return _redirectUrlRepository.GetContentUrls(contentKey);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        var redirectUrl = await _redirectUrlRepository.GetContentUrlsAsync(contentKey);
+        scope.Complete();
+
+        return redirectUrl;
     }
 
     /// <inheritdoc/>
-    public IEnumerable<IRedirectUrl> GetAllRedirectUrls(long pageIndex, int pageSize, out long total)
+    public async Task<PagedModel<IRedirectUrl>> GetContentRedirectUrlsAsync(Guid contentKey, int skip, int take)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return _redirectUrlRepository.GetAllUrls(pageIndex, pageSize, out total);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.GetContentUrlsAsync(contentKey, pageNumber, pageSize);
+
+        scope.Complete();
+        return redirectUrls;
     }
 
     /// <inheritdoc/>
-    public IEnumerable<IRedirectUrl> GetAllRedirectUrls(int rootContentId, long pageIndex, int pageSize, out long total)
+    public async Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(int skip, int take)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return _redirectUrlRepository.GetAllUrls(rootContentId, pageIndex, pageSize, out total);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.GetAllUrlsAsync(pageNumber, pageSize);
+
+        scope.Complete();
+        return redirectUrls;
     }
 
     /// <inheritdoc/>
-    public IEnumerable<IRedirectUrl> SearchRedirectUrls(string searchTerm, long pageIndex, int pageSize, out long total)
+    public async Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(int rootContentId, int skip, int take)
     {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return _redirectUrlRepository.SearchUrls(searchTerm, pageIndex, pageSize, out total);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.GetAllUrlsAsync(rootContentId, pageNumber, pageSize);
+
+        scope.Complete();
+        return redirectUrls;
     }
 
     /// <inheritdoc/>
-    public IRedirectUrl? GetMostRecentRedirectUrl(string url, string? culture)
+    public async Task<PagedModel<IRedirectUrl>> SearchRedirectUrlsAsync(string searchTerm, int skip, int take)
     {
-        if (string.IsNullOrWhiteSpace(culture))
-        {
-            return GetMostRecentRedirectUrl(url);
-        }
+        using ICoreScope scope = ScopeProvider.CreateScope();
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return _redirectUrlRepository.GetMostRecentUrl(url, culture);
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+
+        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.SearchUrlsAsync(searchTerm, pageNumber, pageSize);
+
+        scope.Complete();
+        return redirectUrls;
     }
 
     /// <inheritdoc/>
@@ -136,7 +155,10 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
             return await GetMostRecentRedirectUrlAsync(url);
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return await _redirectUrlRepository.GetMostRecentUrlAsync(url, culture);
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IRedirectUrl? redirectUrl = await _redirectUrlRepository.GetMostRecentUrlAsync(url, culture);
+
+        scope.Complete();
+        return redirectUrl;
     }
 }
