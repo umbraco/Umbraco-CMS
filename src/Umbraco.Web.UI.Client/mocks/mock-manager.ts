@@ -23,14 +23,10 @@ class UmbMockManager {
 			loader: () => import('./data/sets/default/index.js') as Promise<UmbMockDataSet>,
 			visible: true,
 		},
-		kenn: {
-			label: 'Kenn',
-			loader: () => import('./data/sets/kenn/index.js') as Promise<UmbMockDataSet>,
-			visible: true,
-		},
 		userPermissions: {
 			label: 'User Permissions',
 			loader: () => import('./data/sets/user-permissions/index.js') as Promise<UmbMockDataSet>,
+			visible: false,
 		},
 	};
 
