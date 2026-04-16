@@ -101,10 +101,16 @@ export function getExtensionManifest(target: any): UmbExtensionDecoratorManifest
  * Registers extensions from a module's exports with the provided extension registry.
  *
  * Scans the module for classes decorated with `@umbExtension` and resolves named exports
- * to manifest fields:
+ * to manifest fields. Supports two modes:
+ *
+ * **Single extension per module** (conventional exports):
  * - `default` export → `element`
  * - `element` named export → `element` (overrides default)
  * - `api` named export → `api`
+ *
+ * **Multiple extensions per module** (bundled):
+ * - Each decorated class is registered as its own `element` by default
+ * - A class explicitly exported as `api` is registered as `api` instead
  *
  * The manifest metadata is read from the decorated class via {@link getExtensionManifest}.
  * Only classes with `@umbExtension` metadata are registered.
@@ -138,27 +144,43 @@ export function registerExtensionModule(
 		return;
 	}
 
-	// Resolve exports to manifest fields
-	const elementExport = moduleExports.element ?? moduleExports.default;
-	const apiExport = moduleExports.api;
+	// Build a reverse map from class → export name(s) for element/api resolution
+	const classToExportNames = new Map<any, Set<string>>();
+	for (const [name, value] of Object.entries(moduleExports)) {
+		if (!classToExportNames.has(value)) {
+			classToExportNames.set(value, new Set());
+		}
+		classToExportNames.get(value)!.add(name);
+	}
 
-	// Register each decorated class with the resolved exports
+	// Register each decorated class with resolved element/api fields.
+	// For single-extension modules, `default`/`as element`/`as api` exports are used.
+	// For multi-extension modules, each decorated class is its own element by default.
+	const isSingleExtension = decoratedClasses.size === 1;
+
 	for (const [targetClass, manifest] of decoratedClasses) {
 		const fullManifest: any = { ...manifest };
+		const exportNames = classToExportNames.get(targetClass) ?? new Set<string>();
 
-		if (elementExport === targetClass || (!apiExport && elementExport)) {
-			fullManifest.element = targetClass;
-		}
+		if (isSingleExtension) {
+			// Single extension: use the conventional export mapping
+			const elementExport = moduleExports.element ?? moduleExports.default;
+			const apiExport = moduleExports.api;
 
-		if (apiExport === targetClass) {
-			fullManifest.api = targetClass;
-		} else if (apiExport) {
-			// The api export exists but is a different class — attach it to this manifest
-			fullManifest.api = apiExport;
-		}
-
-		if (elementExport && elementExport !== targetClass) {
-			fullManifest.element = elementExport;
+			if (elementExport) {
+				fullManifest.element = elementExport;
+			}
+			if (apiExport) {
+				fullManifest.api = apiExport;
+			}
+		} else {
+			// Multiple extensions: each decorated class maps to its own manifest.
+			// If explicitly exported as 'api', set as api; otherwise default to element.
+			if (exportNames.has('api')) {
+				fullManifest.api = targetClass;
+			} else {
+				fullManifest.element = targetClass;
+			}
 		}
 
 		registry.register(fullManifest);
