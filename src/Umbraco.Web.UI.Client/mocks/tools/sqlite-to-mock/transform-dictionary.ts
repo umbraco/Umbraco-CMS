@@ -94,7 +94,7 @@ export function transformDictionary(): void {
 	});
 
 	// Generate TypeScript content
-	const content = `import type { UmbMockDictionaryModel } from '../../types/mock-data-set.types.js';
+	const content = `import type { UmbMockDictionaryModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockDictionaryModel> = ${JSON.stringify(dictionary, null, '\t')};
 `;

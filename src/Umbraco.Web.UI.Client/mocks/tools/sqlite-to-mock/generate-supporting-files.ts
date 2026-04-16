@@ -33,7 +33,7 @@ function generateIndexFile(setAlias: string): void {
 
 	const content = `// ${capitalizedAlias} mock data set - implements UmbMockDataSet interface
 // Generated from Umbraco SQLite database export
-import type { UmbMockDataSet } from '../../types/mock-data-set.types.js';
+import type { UmbMockDataSet } from '../../mock-data-set.types.js';
 
 // Import all data
 import { data as dataType } from './data-type.data.js';
@@ -168,7 +168,7 @@ function generatePlaceholderFiles(): void {
 	// Document blueprints
 	writeDataFile(
 		'document-blueprint.data.ts',
-		`import type { UmbMockDocumentBlueprintModel } from '../../types/mock-data-set.types.js';
+		`import type { UmbMockDocumentBlueprintModel } from '../../mock-data-set.types.js';
 
 // Empty document blueprints - no blueprints in the database
 export const data: Array<UmbMockDocumentBlueprintModel> = [];
@@ -178,7 +178,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [];
 	// Members
 	writeDataFile(
 		'member.data.ts',
-		`import type { UmbMockMemberModel } from '../../types/mock-data-set.types.js';
+		`import type { UmbMockMemberModel } from '../../mock-data-set.types.js';
 
 // Empty members - no members in the database
 export const data: Array<UmbMockMemberModel> = [];
@@ -188,7 +188,7 @@ export const data: Array<UmbMockMemberModel> = [];
 	// Member groups
 	writeDataFile(
 		'member-group.data.ts',
-		`import type { UmbMockMemberGroupModel } from '../../types/mock-data-set.types.js';
+		`import type { UmbMockMemberGroupModel } from '../../mock-data-set.types.js';
 
 // Empty member groups - no member groups in the database
 export const data: Array<UmbMockMemberGroupModel> = [];
@@ -198,7 +198,7 @@ export const data: Array<UmbMockMemberGroupModel> = [];
 	// Member types
 	writeDataFile(
 		'member-type.data.ts',
-		`import type { UmbMockMemberTypeModel } from '../../types/mock-data-set.types.js';
+		`import type { UmbMockMemberTypeModel } from '../../mock-data-set.types.js';
 
 // Empty member types - no member types in the database
 export const data: Array<UmbMockMemberTypeModel> = [];
@@ -208,7 +208,7 @@ export const data: Array<UmbMockMemberTypeModel> = [];
 	// Relations
 	writeDataFile(
 		'relation.data.ts',
-		`import type { UmbMockRelationModel } from '../../types/mock-data-set.types.js';
+		`import type { UmbMockRelationModel } from '../../mock-data-set.types.js';
 
 // Empty relations
 export const data: Array<UmbMockRelationModel> = [];
@@ -218,7 +218,7 @@ export const data: Array<UmbMockRelationModel> = [];
 	// Relation types
 	writeDataFile(
 		'relationType.data.ts',
-		`import type { UmbMockRelationTypeModel } from '../../types/mock-data-set.types.js';
+		`import type { UmbMockRelationTypeModel } from '../../mock-data-set.types.js';
 
 // Empty relation types
 export const data: Array<UmbMockRelationTypeModel> = [];
@@ -228,7 +228,7 @@ export const data: Array<UmbMockRelationTypeModel> = [];
 	// Scripts
 	writeDataFile(
 		'script.data.ts',
-		`import type { UmbMockScriptModel } from '../../types/mock-data-set.types.js';
+		`import type { UmbMockScriptModel } from '../../mock-data-set.types.js';
 
 // Empty scripts
 export const data: Array<UmbMockScriptModel> = [];
@@ -238,7 +238,7 @@ export const data: Array<UmbMockScriptModel> = [];
 	// Static files
 	writeDataFile(
 		'static-file.data.ts',
-		`import type { UmbMockStaticFileModel } from '../../types/mock-data-set.types.js';
+		`import type { UmbMockStaticFileModel } from '../../mock-data-set.types.js';
 
 // Empty static files
 export const data: Array<UmbMockStaticFileModel> = [];
@@ -248,7 +248,7 @@ export const data: Array<UmbMockStaticFileModel> = [];
 	// Stylesheets
 	writeDataFile(
 		'stylesheet.data.ts',
-		`import type { UmbMockStylesheetModel } from '../../types/mock-data-set.types.js';
+		`import type { UmbMockStylesheetModel } from '../../mock-data-set.types.js';
 
 // Empty stylesheets
 export const data: Array<UmbMockStylesheetModel> = [];
@@ -258,7 +258,7 @@ export const data: Array<UmbMockStylesheetModel> = [];
 	// Tracked references
 	writeDataFile(
 		'tracked-reference.data.ts',
-		`import type { UmbMockTrackedReferenceItemModel } from '../../types/mock-data-set.types.js';
+		`import type { UmbMockTrackedReferenceItemModel } from '../../mock-data-set.types.js';
 
 // Empty tracked references
 export const items: Array<UmbMockTrackedReferenceItemModel> = [];
@@ -315,7 +315,7 @@ export const data: Array<UserTwoFactorProviderModel> = [
 	// Partial views
 	writeDataFile(
 		'partial-view.data.ts',
-		`import type { UmbMockPartialViewModel } from '../../types/mock-data-set.types.js';
+		`import type { UmbMockPartialViewModel } from '../../mock-data-set.types.js';
 import type { PartialViewSnippetResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<UmbMockPartialViewModel> = [

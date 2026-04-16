@@ -94,7 +94,7 @@ export function transformDataTypes(): void {
 	const allDataTypes = [...folderData, ...dataTypes];
 
 	// Generate TypeScript content
-	const content = `import type { UmbMockDataTypeModel } from '../../types/mock-data-set.types.js';
+	const content = `import type { UmbMockDataTypeModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockDataTypeModel> = ${JSON.stringify(allDataTypes, null, '\t')};
 `;

@@ -369,7 +369,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		id: 'dt-email',
 		parent: null,
 		editorAlias: 'Umbraco.EmailAddress',
-		editorUiAlias: 'Umb.PropertyEditorUi.Email',
+		editorUiAlias: 'Umb.PropertyEditorUi.EmailAddress',
 		hasChildren: false,
 		isFolder: false,
 		isDeletable: true,

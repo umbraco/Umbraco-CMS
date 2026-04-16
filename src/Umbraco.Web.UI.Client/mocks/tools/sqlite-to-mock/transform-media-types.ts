@@ -228,7 +228,7 @@ export function transformMediaTypes(): void {
 	});
 
 	// Generate TypeScript content
-	const content = `import type { UmbMockMediaTypeModel } from '../../types/mock-data-set.types.js';
+	const content = `import type { UmbMockMediaTypeModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockMediaTypeModel> = ${JSON.stringify(mediaTypes, null, '\t')};
 `;

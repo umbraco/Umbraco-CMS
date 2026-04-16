@@ -31,7 +31,7 @@ export function transformLanguages(): void {
 	}));
 
 	// Generate TypeScript content
-	const content = `import type { UmbMockLanguageModel } from '../../types/mock-data-set.types.js';
+	const content = `import type { UmbMockLanguageModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockLanguageModel> = ${JSON.stringify(languages, null, '\t')};
 `;

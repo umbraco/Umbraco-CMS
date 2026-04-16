@@ -371,7 +371,7 @@ export function transformDocumentTypes(): void {
 
 	// Generate TypeScript content
 	// Note: compositions.compositionType needs to be converted to enum values
-	const content = `import type { UmbMockDocumentTypeModel } from '../../types/mock-data-set.types.js';
+	const content = `import type { UmbMockDocumentTypeModel } from '../../mock-data-set.types.js';
 import { CompositionTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 // Map string composition type to enum

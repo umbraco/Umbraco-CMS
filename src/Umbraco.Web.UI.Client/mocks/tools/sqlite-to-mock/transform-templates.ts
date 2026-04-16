@@ -62,7 +62,7 @@ export function transformTemplates(): void {
 	});
 
 	// Generate TypeScript content
-	const content = `import type { UmbMockTemplateModel } from '../../types/mock-data-set.types.js';
+	const content = `import type { UmbMockTemplateModel } from '../../mock-data-set.types.js';
 import type {
 	TemplateQuerySettingsResponseModel,
 	TemplateQueryResultResponseModel,

@@ -300,10 +300,11 @@ export function getEditorUiAlias(propertyEditorAlias: string): string {
 		// Block editors
 		'Umbraco.BlockList': 'Umb.PropertyEditorUi.BlockList',
 		'Umbraco.BlockGrid': 'Umb.PropertyEditorUi.BlockGrid',
+		'Umbraco.SingleBlock': 'Umb.PropertyEditorUi.BlockSingle',
 
 		// Other
 		'Umbraco.Tags': 'Umb.PropertyEditorUi.Tags',
-		'Umbraco.EmailAddress': 'Umb.PropertyEditorUi.Email',
+		'Umbraco.EmailAddress': 'Umb.PropertyEditorUi.EmailAddress',
 		'Umbraco.ListView': 'Umb.PropertyEditorUi.Collection',
 		'Umbraco.Label': 'Umb.PropertyEditorUi.Label',
 		'Umbraco.IconPicker': 'Umb.PropertyEditorUi.IconPicker',
