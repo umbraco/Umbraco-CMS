@@ -20,6 +20,8 @@ export class UmbScriptFolderWorkspaceContext
 			workspaceAlias: UMB_SCRIPT_FOLDER_WORKSPACE_ALIAS,
 			entityType: UMB_SCRIPT_FOLDER_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_SCRIPT_FOLDER_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_scripts',
+			icon: 'icon-folder',
 		});
 
 		this.routes.setRoutes([

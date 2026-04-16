@@ -22,6 +22,8 @@ export class UmbDictionaryWorkspaceContext
 			workspaceAlias: UMB_DICTIONARY_WORKSPACE_ALIAS,
 			entityType: UMB_DICTIONARY_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_DICTIONARY_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_dictionary',
+			icon: 'icon-book-alt',
 		});
 
 		this.routes.setRoutes([

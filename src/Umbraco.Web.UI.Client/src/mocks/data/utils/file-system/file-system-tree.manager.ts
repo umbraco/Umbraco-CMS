@@ -25,6 +25,19 @@ export class UmbMockFileSystemTreeManager<T extends FileSystemTreeItemPresentati
 		return this.#pagedTreeResult({ items, skip, take });
 	}
 
+	getAncestorsOf({ descendantPath }: { descendantPath: string }): Array<FileSystemTreeItemPresentationModel> {
+		const items: Array<T> = [];
+		let currentPath: string | undefined = descendantPath;
+		while (currentPath) {
+			const item = this.#db.getAll().find((i) => i.path === currentPath);
+			if (!item) break;
+			items.push(item);
+			currentPath = item.parent?.path;
+		}
+		// Returned root-first, including the descendant itself (matches Management API contract).
+		return items.reverse().map((item) => createFileSystemTreeItem(item));
+	}
+
 	#pagedTreeResult({ items, skip, take }: { items: Array<T>; skip: number; take: number }) {
 		const paged = pagedResult(items, skip, take);
 		const treeItems = paged.items.map((item) => createFileSystemTreeItem(item));

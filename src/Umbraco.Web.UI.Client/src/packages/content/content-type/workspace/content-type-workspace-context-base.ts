@@ -8,7 +8,7 @@ import {
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import type { Observable } from '@umbraco-cms/backoffice/observable-api';
+import { type Observable, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import type {
@@ -71,7 +71,21 @@ export abstract class UmbContentTypeWorkspaceContextBase<
 
 		// Keep current data in sync with the owner content type - This is used for the discard changes feature
 		this.observe(this.structure.ownerContentType, (data) => this._data.setCurrent(data), null);
-		this.observe(this.name, (name) => this.view.setTitle(name), null);
+		const typeLabel = args.typeLabel;
+		if (typeLabel) {
+			this.view.setSegments('workspace-type', { label: typeLabel, kind: 'workspace-type' });
+		}
+		this.observe(
+			observeMultiple([this.name, this.icon]),
+			([name, icon]) => {
+				if (name) {
+					this.view.setSegments('leaf', { label: name, kind: 'workspace', ...(icon ? { icon } : {}) });
+				} else {
+					this.view.clearSegments('leaf');
+				}
+			},
+			null,
+		);
 		// TODO: sometimes the browserTitle for a parent view is set later than the child is updating. We need to fix this as well enable a parent browser title to be updating on the go. [NL]
 	}
 

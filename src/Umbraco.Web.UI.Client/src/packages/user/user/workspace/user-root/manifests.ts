@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_USER_ROOT_ENTITY_TYPE,
 			headline: '#treeHeaders_users',
+			icon: 'icon-user',
 		},
 	},
 	{

@@ -24,6 +24,8 @@ export class UmbMediaTypeWorkspaceContext
 			workspaceAlias: UMB_MEDIA_TYPE_WORKSPACE_ALIAS,
 			entityType: UMB_MEDIA_TYPE_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_MEDIA_TYPE_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_mediaTypes',
+			icon: 'icon-document-dashed-line',
 		});
 
 		this.routes.setRoutes([

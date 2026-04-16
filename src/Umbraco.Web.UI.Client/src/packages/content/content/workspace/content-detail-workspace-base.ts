@@ -352,7 +352,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				const variantName = variants.find(
 					(v) => v.culture === activeVariant?.culture && v.segment === activeVariant?.segment,
 				)?.name;
-				this.view.setTitle(variantName);
+				this._setViewTitle(variantName);
 			},
 			null,
 		);
@@ -390,6 +390,21 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		);
 
 		this.loadLanguages();
+	}
+
+	/**
+	 * Publishes the active variant name and content-type icon to the view title.
+	 * The icon is resolved generically from the content-type property identified
+	 * by {@link UmbContentDetailWorkspaceContextArgs.contentTypePropertyName}.
+	 * @param variantName The active variant's display name.
+	 */
+	protected _setViewTitle(variantName: string | undefined): void {
+		const icon: string | undefined = (this._data.getCurrent() as any)?.[this.#contentTypePropertyName]?.icon;
+		if (variantName) {
+			this.view.setSegments('leaf', { label: variantName, kind: 'workspace', ...(icon ? { icon } : {}) });
+		} else {
+			this.view.clearSegments('leaf');
+		}
 	}
 
 	public async loadLanguages() {

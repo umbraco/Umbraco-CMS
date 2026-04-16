@@ -49,6 +49,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_MEDIA_TYPE_ROOT_ENTITY_TYPE,
 			headline: '#treeHeaders_mediaTypes',
+			icon: 'icon-document-dashed-line',
 		},
 	},
 	...folderManifests,

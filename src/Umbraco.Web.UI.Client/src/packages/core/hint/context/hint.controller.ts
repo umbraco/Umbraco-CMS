@@ -24,6 +24,9 @@ export class UmbHintController<
 	setPathFilter(filter: (path: Array<string>) => boolean) {
 		this.#pathFilter = filter;
 	}
+	get hasPathFilter(): boolean {
+		return this.#pathFilter !== undefined;
+	}
 
 	#scaffold = new UmbObjectState<Partial<HintType>>({});
 	readonly scaffold = this.#scaffold.asObservable();

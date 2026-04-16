@@ -53,6 +53,10 @@ export abstract class UmbSubmittableWorkspaceContextBase<WorkspaceDataModelType>
 	constructor(host: UmbControllerHost, workspaceAlias: string) {
 		super(host, UMB_WORKSPACE_CONTEXT);
 		this.workspaceAlias = workspaceAlias;
+		// Inherit the view from the hosting section so the section title propagates
+		// into this workspace's title chain (and thereby document.title and the user
+		// history breadcrumb).
+		this.view.inherit();
 		// TODO: Consider if we can move this consumption to #resolveSubmit, just as a getContext, but it depends if others use the modalContext prop.. [NL]
 		this.consumeContext(UMB_MODAL_CONTEXT, (context) => {
 			(this.modalContext as UmbModalContext | undefined) = context;

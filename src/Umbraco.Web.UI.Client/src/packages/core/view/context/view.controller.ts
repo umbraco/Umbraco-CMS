@@ -1,9 +1,12 @@
 import { UmbShortcutController } from '../../shortcut/context/shortcut.controller.js';
 import { UMB_VIEW_CONTEXT } from './view.context-token.js';
-import { UmbClassState, UmbStringState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
+import { _setUmbCurrentViewTitle } from './current-view-title.js';
+import type { UmbCurrentViewTitleSegment, UmbViewSegmentSlotKey, UmbViewTitleKind } from './current-view-title.js';
+import { UmbClassState, UmbObjectState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbHintController } from '@umbraco-cms/backoffice/hint';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
 import type { UmbContextConsumerController, UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -60,9 +63,12 @@ export class UmbViewController extends UmbControllerBase {
 	#inherit = false;
 	#explicitInheritance?: boolean;
 	#parentView?: UmbViewController;
-	#title?: string;
-	#computedTitle = new UmbStringState(undefined);
-	readonly computedTitle = this.#computedTitle.asObservable();
+	#segmentSlots = new Map<UmbViewSegmentSlotKey, ReadonlyArray<UmbCurrentViewTitleSegment>>();
+	#computedTitleSegments = new UmbObjectState<ReadonlyArray<UmbCurrentViewTitleSegment> | undefined>(undefined);
+	readonly computedTitleSegments = this.#computedTitleSegments.asObservable();
+	readonly computedTitle = this.#computedTitleSegments.asObservablePart((segs) =>
+		segs?.length ? segs.map((s) => s.label).join(' | ') : undefined,
+	);
 
 	public readonly viewAlias: string | null;
 
@@ -119,9 +125,85 @@ export class UmbViewController extends UmbControllerBase {
 		this.hints.updateScaffold({ variantId: variantId });
 	}
 
-	public setTitle(title: string | undefined): void {
-		if (this.#title === title) return;
-		this.#title = title;
+	/**
+	 * Add or replace segments under a named slot. Each slot key is owned by a
+	 * single caller (e.g. `'leaf'`, `'workspace-type'`, `'ancestors'`).
+	 * Labels may be raw localization keys (`#foo_bar`) — they are resolved
+	 * automatically when the title is computed.
+	 * @param slotKey Unique key identifying this caller's contribution.
+	 * @param segments One or more segments to store under the slot. Pass none to clear.
+	 */
+	public setSegments(slotKey: UmbViewSegmentSlotKey, ...segments: UmbCurrentViewTitleSegment[]): void {
+		if (segments.length === 0) {
+			this.clearSegments(slotKey);
+			return;
+		}
+		if (UmbViewController.#segmentsEqual(this.#segmentSlots.get(slotKey), segments)) return;
+		this.#segmentSlots.set(slotKey, segments);
+		this.#computeTitle();
+		this.#updateTitle();
+	}
+
+	/**
+	 * Remove all segments for a named slot.
+	 * @param slotKey The slot to clear.
+	 */
+	public clearSegments(slotKey: UmbViewSegmentSlotKey): void {
+		if (!this.#segmentSlots.has(slotKey)) return;
+		this.#segmentSlots.delete(slotKey);
+		this.#computeTitle();
+		this.#updateTitle();
+	}
+
+	/**
+	 * @deprecated Use {@link setSegments} instead. Scheduled for removal in Umbraco 19.
+	 * Convenience wrapper that maps the legacy positional API to named segment slots.
+	 */
+	public setTitle(
+		title: string | undefined,
+		options?: { kind?: UmbViewTitleKind; typeLabel?: string; icon?: string },
+	): void {
+		new UmbDeprecation({
+			deprecated: 'UmbViewController.setTitle()',
+			removeInVersion: '19.0.0',
+			solution: 'Use view.setSegments() and view.clearSegments() instead.',
+		}).warn();
+		const { kind = 'workspace', typeLabel, icon } = options ?? {};
+		// Batch slot mutations to avoid intermediate publishes.
+		if (title) {
+			if (typeLabel) {
+				this.#segmentSlots.set('workspace-type', [{ label: typeLabel, kind: 'workspace-type' }]);
+			} else {
+				this.#segmentSlots.delete('workspace-type');
+			}
+			this.#segmentSlots.set('leaf', [{ label: title, kind, ...(icon ? { icon } : {}) }]);
+		} else {
+			this.#segmentSlots.delete('workspace-type');
+			this.#segmentSlots.delete('leaf');
+		}
+		this.#computeTitle();
+		this.#updateTitle();
+	}
+
+	/**
+	 * @deprecated Use {@link setSegments} with kind `'workspace-ancestor'` instead. Scheduled for removal in Umbraco 19.
+	 * Convenience wrapper that maps ancestor labels to the `'ancestors'` segment slot.
+	 */
+	public setAncestors(ancestors: ReadonlyArray<string> | undefined): void {
+		new UmbDeprecation({
+			deprecated: 'UmbViewController.setAncestors()',
+			removeInVersion: '19.0.0',
+			solution: 'Use view.setSegments() with kind "workspace-ancestor" instead.',
+		}).warn();
+		if (!ancestors?.length) {
+			if (!this.#segmentSlots.has('ancestors')) return;
+			this.#segmentSlots.delete('ancestors');
+		} else {
+			this.#segmentSlots.set(
+				'ancestors',
+				ancestors.map((label): UmbCurrentViewTitleSegment => ({ label, kind: 'workspace-ancestor' })),
+			);
+		}
 		this.#computeTitle();
 		this.#updateTitle();
 	}
@@ -187,6 +269,12 @@ export class UmbViewController extends UmbControllerBase {
 
 	public inherit() {
 		this.#inherit = true;
+		// If the parent was already resolved (synchronous context lookup) before
+		// inherit() was called, #setParentView saw #inherit=false and skipped
+		// #inheritFromParent. Re-evaluate now that inheritance is enabled.
+		if (this.#parentView) {
+			this.#inheritFromParent();
+		}
 	}
 
 	public inheritFrom(context?: UmbViewController): void {
@@ -205,8 +293,11 @@ export class UmbViewController extends UmbControllerBase {
 			},
 			'observeParentVariantId',
 		);
+		// Observe the full segment list rather than the joined string so that
+		// metadata-only changes (icon, kind) on parent segments propagate to
+		// inheriting children even when the labels haven't changed.
 		this.observe(
-			this.#parentView?.computedTitle,
+			this.#parentView?.computedTitleSegments,
 			() => {
 				this.#computeTitle();
 				// Check for parent view as it is undefined in a disassembling state and we do not want to update the title in that situation. [NL]
@@ -216,7 +307,13 @@ export class UmbViewController extends UmbControllerBase {
 			},
 			'observeParentTitle',
 		);
-		this.hints.inheritFrom(this.#parentView?.hints);
+		// Hint inheritance requires a viewAlias or pathFilter on this view to target.
+		// Views without either (e.g. workspace-level views inheriting from a section
+		// purely to receive the section's title chain) have no hint target to resolve
+		// and must skip hint inheritance — title inheritance alone is supported.
+		if (this.viewAlias || this.hints.hasPathFilter) {
+			this.hints.inheritFrom(this.#parentView?.hints);
+		}
 	}
 
 	#requestActivateParent() {
@@ -299,32 +396,111 @@ export class UmbViewController extends UmbControllerBase {
 		});
 		this.shortcuts.deactivate();
 		this.#removeActive();
+
+		// Clear the global title when the top-level (non-inheriting) active view
+		// deactivates, so subscribers don't see stale data between navigations.
+		if (!this.#inherit) {
+			_setUmbCurrentViewTitle(undefined);
+		}
 	}
 
 	#updateTitle() {
 		if (!this.#active || this.#hasActiveChildren()) {
 			return;
 		}
-		const localTitle = this.getComputedTitle();
-		if (!localTitle) {
+		const segments = this.#computedTitleSegments.getValue();
+		if (!segments || segments.length === 0) {
 			return;
 		}
-		document.title = localTitle + ' | Umbraco';
+		// Reverse the segment order for the browser title so the most specific
+		// item (workspace name) appears first — Chrome truncates tabs after ~20
+		// characters, so the item the user is editing must be leftmost.
+		// The segments array itself retains hierarchy order (section → leaf) for
+		// consumers like the user history breadcrumb.
+		const browserTitle = segments
+			.slice()
+			.reverse()
+			.map((s) => s.label)
+			.join(' | ');
+		document.title = browserTitle + ' | Umbraco';
+
+		_setUmbCurrentViewTitle({
+			path: window.location.pathname,
+			segments,
+		});
+	}
+
+	static #KIND_PRIORITY: Record<UmbViewTitleKind, number> = {
+		section: 0,
+		'workspace-type': 1,
+		'workspace-ancestor': 2,
+		workspace: 3,
+		tab: 4,
+		modal: 5,
+	};
+
+	static #segmentsEqual(
+		a: ReadonlyArray<UmbCurrentViewTitleSegment> | undefined,
+		b: ReadonlyArray<UmbCurrentViewTitleSegment> | undefined,
+	): boolean {
+		if (a === b) return true;
+		if (!a || !b || a.length !== b.length) return false;
+		return a.every((s, i) =>
+			s.label === b[i].label && s.kind === b[i].kind && s.icon === b[i].icon && s.replaces === b[i].replaces,
+		);
 	}
 
 	#computeTitle() {
-		const titles = [];
+		const segments: UmbCurrentViewTitleSegment[] = [];
+
+		// 1. Inherited parent segments (already localized by the parent's own computation).
 		if (this.#inherit && this.#parentView) {
-			titles.push(this.#parentView.getComputedTitle());
+			const parentSegments = this.#parentView.getComputedTitleSegments();
+			if (parentSegments) {
+				segments.push(...parentSegments);
+			}
 		}
-		if (this.#title) {
-			titles.push(this.#localize.string(this.#title));
+
+		// 2. This view's own segments: flatten all slots, sort by kind priority,
+		//    and localize labels (which may be raw localization keys like `#foo_bar`).
+		const local: UmbCurrentViewTitleSegment[] = [];
+		for (const slot of this.#segmentSlots.values()) {
+			for (const seg of slot) {
+				local.push({
+					...seg,
+					label: this.#localize.string(seg.label),
+				});
+			}
 		}
-		this.#computedTitle.setValue(titles.length > 0 ? titles.join(' | ') : undefined);
+		local.sort(
+			(a, b) => (UmbViewController.#KIND_PRIORITY[a.kind] ?? 99) - (UmbViewController.#KIND_PRIORITY[b.kind] ?? 99),
+		);
+		segments.push(...local);
+
+		// 3. Apply explicit replacements: when a segment has `replaces: true` and
+		//    the preceding segment has the same label, replace it. This is opt-in
+		//    so callers control exactly when dedup happens (no hidden metadata loss).
+		const resolved: UmbCurrentViewTitleSegment[] = [];
+		for (const seg of segments) {
+			const prev = resolved[resolved.length - 1];
+			if (seg.replaces && prev?.label === seg.label) {
+				resolved[resolved.length - 1] = seg;
+				continue;
+			}
+			resolved.push(seg);
+		}
+		const result = resolved.length ? resolved : undefined;
+		if (UmbViewController.#segmentsEqual(this.#computedTitleSegments.getValue(), result)) return;
+		this.#computedTitleSegments.setValue(result);
 	}
 
 	public getComputedTitle(): string | undefined {
-		return this.#computedTitle.getValue();
+		const segs = this.#computedTitleSegments.getValue();
+		return segs?.length ? segs.map((s) => s.label).join(' | ') : undefined;
+	}
+
+	public getComputedTitleSegments(): ReadonlyArray<UmbCurrentViewTitleSegment> | undefined {
+		return this.#computedTitleSegments.getValue();
 	}
 
 	#children: UmbViewController[] = [];

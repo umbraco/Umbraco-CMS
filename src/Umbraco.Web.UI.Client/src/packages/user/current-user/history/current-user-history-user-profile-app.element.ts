@@ -1,6 +1,6 @@
 import type { UmbCurrentUserHistoryItem, UmbCurrentUserHistoryStore } from './current-user-history.store.js';
 import { UMB_CURRENT_USER_HISTORY_STORE_CONTEXT } from './current-user-history.store.token.js';
-import { html, customElement, state, nothing, css, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, state, nothing, css, repeat, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
@@ -40,7 +40,11 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 			this.observe(
 				this.#currentUserHistoryStore.latestHistory,
 				(history) => {
-					this._history = history.reverse();
+					// Do NOT use `history.reverse()` — it mutates the array in place,
+					// and the source observable caches its last emission via shareReplay(1),
+					// so mutating here corrupts subsequent subscriptions (the order would
+					// flip on every re-subscribe). Copy first.
+					this._history = history.slice().reverse();
 					this.#pagination.setTotalItems(this._history.length);
 				},
 				'umbCurrentUserHistoryObserver',
@@ -60,13 +64,10 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 	#truncate(input: string | undefined, length: number, separator = '...'): string {
 		if (!input) return '';
 		if (input.length <= length) return input;
-
-		const separatorLength = separator.length;
-		const charsToShow = length - separatorLength;
-		const frontChars = Math.ceil(charsToShow / 2);
-		const backChars = Math.floor(charsToShow / 2);
-
-		return input.substring(0, frontChars) + separator + input.substring(input.length - backChars);
+		// Truncate from the LEFT so the rightmost segments (the leaf's immediate
+		// parents) survive — they carry more contextual relevance than the section
+		// at the start of the breadcrumb.
+		return separator + input.substring(input.length - (length - separator.length));
 	}
 
 	override render() {
@@ -86,9 +87,12 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 
 	#renderItem(item: UmbCurrentUserHistoryItem) {
 		const label = Array.isArray(item.label) ? item.label[0] : item.label;
+		const detail = item.displayPath ? this.#truncate(item.displayPath, 50) : undefined;
+		// Omit the icon entirely when none is provided — better than a misleading
+		// fallback (e.g. `icon-link` implies a hyperlink/relation, not a history entry).
 		return html`
-			<uui-ref-node name=${label} detail=${this.#truncate(item.displayPath, 50)} href=${item.path}>
-				<uui-icon slot="icon" name="icon-link"></uui-icon>
+			<uui-ref-node name=${label} detail=${ifDefined(detail)} href=${item.path}>
+				${item.icon ? html`<umb-icon slot="icon" name=${item.icon}></umb-icon>` : nothing}
 			</uui-ref-node>
 		`;
 	}

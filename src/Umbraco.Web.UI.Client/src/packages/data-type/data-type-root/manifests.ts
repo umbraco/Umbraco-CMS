@@ -9,6 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_DATA_TYPE_ROOT_ENTITY_TYPE,
 			headline: '#treeHeaders_dataTypes',
+			icon: 'icon-autofill',
 		},
 	},
 ];

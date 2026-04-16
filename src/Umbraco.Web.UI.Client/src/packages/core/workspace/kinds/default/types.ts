@@ -10,6 +10,11 @@ export interface ManifestWorkspaceDefaultKind
 
 export interface MetaWorkspaceDefaultKind extends MetaWorkspace {
 	headline: string;
+	/**
+	 * Optional icon for this workspace (e.g. `icon-globe`).
+	 * Surfaced by consumers like the user history list.
+	 */
+	icon?: string;
 }
 
 declare global {

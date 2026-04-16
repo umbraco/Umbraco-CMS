@@ -25,6 +25,8 @@ export class UmbStylesheetWorkspaceContext
 			workspaceAlias: UMB_STYLESHEET_WORKSPACE_ALIAS,
 			entityType: UMB_STYLESHEET_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_STYLESHEET_DETAIL_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_stylesheets',
+			icon: 'icon-palette',
 		});
 
 		this.routes.setRoutes([

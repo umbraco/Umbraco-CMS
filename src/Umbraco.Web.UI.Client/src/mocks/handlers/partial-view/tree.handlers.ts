@@ -19,4 +19,11 @@ export const treeHandlers = [
 		const response = umbPartialViewMockDB.tree.getChildrenOf({ parentPath, skip, take });
 		return HttpResponse.json(response);
 	}),
+
+	http.get(umbracoPath(`/tree${UMB_SLUG}/ancestors`), ({ request }) => {
+		const descendantPath = new URL(request.url).searchParams.get('descendantPath');
+		if (!descendantPath) return new HttpResponse(null, { status: 400 });
+		const response = umbPartialViewMockDB.tree.getAncestorsOf({ descendantPath });
+		return HttpResponse.json(response);
+	}),
 ];

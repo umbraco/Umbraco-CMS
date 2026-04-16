@@ -10,6 +10,9 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbAncestorsEntityContext, UmbParentEntityContext, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
+import { UMB_VIEW_CONTEXT } from '@umbraco-cms/backoffice/view';
+import type { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import { umbPublishAncestorsToView } from './publish-ancestors-to-view.function.js';
 
 interface UmbMenuTreeStructureWorkspaceContextBaseArgs {
 	treeRepositoryAlias: string;
@@ -34,6 +37,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 	#parentContext = new UmbParentEntityContext(this);
 	#ancestorContext = new UmbAncestorsEntityContext(this);
 	#sectionSidebarMenuContext?: typeof UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT.TYPE;
+	#viewContext?: UmbViewContext;
 	#isModalContext: boolean = false;
 	#isNew: boolean | undefined = undefined;
 
@@ -50,6 +54,19 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		this.consumeContext(UMB_SECTION_SIDEBAR_MENU_SECTION_CONTEXT, (instance) => {
 			this.#sectionSidebarMenuContext = instance;
 		});
+
+		this.consumeContext(UMB_VIEW_CONTEXT, (instance) => {
+			this.#viewContext = instance;
+			// Publish the current structure (if any) as ancestor segments so the user
+			// history breadcrumb reflects the entity's tree path.
+			this.#publishAncestorsToView();
+		});
+
+		this.observe(
+			this.structure,
+			() => this.#publishAncestorsToView(),
+			'observeStructureForAncestorPublish',
+		);
 
 		this.consumeContext(UMB_SUBMITTABLE_TREE_ENTITY_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
@@ -141,6 +158,15 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		if (menuItemAlias && !this.#isModalContext) {
 			this.#expandSectionSidebarMenu(structureItems, menuItemAlias);
 		}
+	}
+
+	#publishAncestorsToView(): void {
+		umbPublishAncestorsToView(
+			this.#viewContext,
+			this.#structure.getValue(),
+			this.#workspaceContext?.getUnique(),
+			(item) => item.name,
+		);
 	}
 
 	#setParentData(structureItems: Array<UmbStructureItemModel>) {

@@ -12,6 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			entityType: UMB_LANGUAGE_ROOT_ENTITY_TYPE,
 			headline: '#treeHeaders_languages',
+			icon: 'icon-globe',
 		},
 	},
 	{

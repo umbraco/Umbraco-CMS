@@ -21,4 +21,11 @@ export const treeHandlers = [
 		const response = umbMemberTypeMockDb.tree.getChildrenOf({ parentId, skip, take });
 		return HttpResponse.json(response);
 	}),
+
+	http.get(umbracoPath(`/tree${UMB_SLUG}/ancestors`), ({ request }) => {
+		const descendantId = new URL(request.url).searchParams.get('descendantId');
+		if (!descendantId) return;
+		const response = umbMemberTypeMockDb.tree.getAncestorsOf({ descendantId });
+		return HttpResponse.json(response);
+	}),
 ];

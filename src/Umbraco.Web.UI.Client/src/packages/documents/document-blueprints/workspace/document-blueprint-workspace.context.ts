@@ -48,6 +48,8 @@ export class UmbDocumentBlueprintWorkspaceContext
 			ignoreValidationResultOnSubmit: true,
 		});
 
+		this.view.setSegments('workspace-type', { label: '#treeHeaders_contentBlueprints', kind: 'workspace-type' });
+
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {
@@ -120,6 +122,17 @@ export class UmbDocumentBlueprintWorkspaceContext
 	 */
 	getContentTypeUnique(): string | undefined {
 		return this.getData()?.documentType.unique;
+	}
+
+	// The blueprint detail response doesn't include documentType.icon, so the
+	// base class's generic _setViewTitle finds no icon. Use icon-blueprint as a
+	// static fallback matching the tree item representation.
+	protected override _setViewTitle(variantName: string | undefined): void {
+		if (variantName) {
+			this.view.setSegments('leaf', { label: variantName, kind: 'workspace', icon: 'icon-blueprint' });
+		} else {
+			this.view.clearSegments('leaf');
+		}
 	}
 
 	/**

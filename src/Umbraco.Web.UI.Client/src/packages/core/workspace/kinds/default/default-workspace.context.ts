@@ -15,12 +15,20 @@ export class UmbDefaultWorkspaceContext extends UmbContextBase implements UmbWor
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_WORKSPACE_CONTEXT);
+		// Inherit the view from the hosting section so the section title propagates
+		// into this workspace's title chain (and thereby document.title and the user
+		// history breadcrumb).
+		this.view.inherit();
 	}
 
 	set manifest(manifest: ManifestWorkspaceDefaultKind) {
 		this.workspaceAlias = manifest.alias;
 		this.setEntityType(manifest.meta.entityType);
-		this.view.setTitle(manifest.meta.headline);
+		const icon = manifest.meta.icon;
+		// Root workspaces often share their section's label (e.g. "Content" root
+		// in the Content section). Mark as `replaces` so the breadcrumb shows
+		// only the workspace segment (with its richer icon/kind metadata).
+		this.view.setSegments('leaf', { label: manifest.meta.headline, kind: 'workspace', replaces: true, ...(icon ? { icon } : {}) });
 	}
 
 	setUnique(unique: UmbEntityUnique): void {

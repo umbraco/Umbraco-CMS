@@ -7,6 +7,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
+import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 @customElement('umb-section-main-views')
 export class UmbSectionMainViewElement extends UmbLitElement {
@@ -31,8 +32,15 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	@state()
 	private _routes: Array<UmbRoute> = [];
 
+	// A view context that publishes the currently active dashboard / section-view's
+	// title, inheriting the section's title so the history breadcrumb and the
+	// browser's `document.title` both carry the section as the parent.
+	#viewContext = new UmbViewContext(this, null);
+
 	constructor() {
 		super();
+
+		this.#viewContext.inherit();
 
 		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'dashboard', null, (dashboards) => {
 			this._dashboards = dashboards.map((dashboard) => dashboard.manifest);
@@ -43,6 +51,39 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			this._views = views.map((view) => view.manifest);
 			this.#createRoutes();
 		});
+	}
+
+	#updateActiveViewTitle(): void {
+		if (!this._activePath && !this._defaultView) {
+			this.#viewContext.clearSegments('dashboard');
+			return;
+		}
+		const activePath = this._activePath || this._defaultView;
+		const matchingDashboard = this._dashboards.find(
+			(manifest) => this.#constructDashboardPath(manifest) === activePath,
+		);
+		// Dashboards/section-views are a more specific refinement of the section,
+		// so when their label matches the section's, replace it (e.g. "Media"
+		// dashboard inside the "Media" section → just "Media" in the chain).
+		if (matchingDashboard) {
+			this.#viewContext.setSegments('dashboard', {
+				label: this.#getDashboardName(matchingDashboard),
+				kind: 'workspace',
+				replaces: true,
+			});
+			return;
+		}
+		const matchingView = this._views.find((manifest) => this.#constructViewPath(manifest) === activePath);
+		if (matchingView) {
+			this.#viewContext.setSegments('dashboard', {
+				label: this.#getViewName(matchingView),
+				kind: 'workspace',
+				replaces: true,
+				...(matchingView.meta.icon ? { icon: matchingView.meta.icon } : {}),
+			});
+			return;
+		}
+		this.#viewContext.clearSegments('dashboard');
 	}
 
 	#constructDashboardPath(manifest: ManifestDashboard) {
@@ -90,6 +131,9 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			});
 		}
 		this._routes = routes;
+		// Re-evaluate the active view title: the manifests may have loaded after
+		// the router's initial @change event, so the title wasn't set then.
+		this.#updateActiveViewTitle();
 	}
 
 	override render() {
@@ -104,6 +148,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							}}
 							@change=${(event: UmbRouterSlotChangeEvent) => {
 								this._activePath = event.target.localActiveViewPath;
+								this.#updateActiveViewTitle();
 							}}>
 						</umb-router-slot>
 					</umb-body-layout>
@@ -113,6 +158,10 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 
 	#getDashboardName(dashboard: ManifestDashboard) {
 		return dashboard.meta?.label ? this.localize.string(dashboard.meta.label) : (dashboard.name ?? dashboard.alias);
+	}
+
+	#getViewName(view: ManifestSectionView) {
+		return view.meta?.label ? this.localize.string(view.meta.label) : (view.name ?? view.alias);
 	}
 
 	#renderDashboards() {
@@ -145,7 +194,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			? html`
 					<uui-tab-group slot="navigation" id="views">
 						${this._views.map((view) => {
-							const viewName = view.meta.label ? this.localize.string(view.meta.label) : (view.name ?? view.alias);
+							const viewName = this.#getViewName(view);
 							const viewPath = this.#constructViewPath(view);
 							// If this path matches, or if this is the default view and the active path is empty.
 							const isActive =

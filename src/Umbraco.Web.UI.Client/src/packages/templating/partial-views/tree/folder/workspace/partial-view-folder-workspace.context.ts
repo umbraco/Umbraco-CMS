@@ -21,6 +21,8 @@ export class UmbPartialViewFolderWorkspaceContext
 			workspaceAlias: UMB_PARTIAL_VIEW_FOLDER_WORKSPACE_ALIAS,
 			entityType: UMB_PARTIAL_VIEW_FOLDER_ENTITY_TYPE,
 			detailRepositoryAlias: UMB_PARTIAL_VIEW_FOLDER_REPOSITORY_ALIAS,
+			typeLabel: '#treeHeaders_partialViews',
+			icon: 'icon-folder',
 		});
 
 		this.routes.setRoutes([
