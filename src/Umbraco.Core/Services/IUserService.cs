@@ -299,7 +299,7 @@ public interface IUserService : IMembershipUserService
     IEnumerable<IUser> GetUsersById(params int[]? ids);
 
     /// <summary>
-    ///     Gets a users by Key
+    ///     Gets users by keys
     /// </summary>
     /// <param name="keys">Keys of the users to retrieve</param>
     /// <returns>
