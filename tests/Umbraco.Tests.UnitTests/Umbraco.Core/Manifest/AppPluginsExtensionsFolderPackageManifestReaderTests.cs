@@ -184,6 +184,21 @@ public class AppPluginsExtensionsFolderPackageManifestReaderTests
     }
 
     [Test]
+    public async Task Can_Skip_Packages_With_Existing_UmbracoPackageJson()
+    {
+        var packageWithJson = CreatePackageFolderWithExtensionsAndManifest("HasJson", "dashboard.js");
+        var packageWithoutJson = CreatePackageFolderWithExtensions("NoJson", "editor.js");
+
+        _rootDirectoryContentsMock
+            .Setup(f => f.GetEnumerator())
+            .Returns(new List<IFileInfo> { packageWithJson, packageWithoutJson }.GetEnumerator());
+
+        var result = (await _reader.ReadPackageManifestsAsync()).ToList();
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual("NoJson", result.First().Name);
+    }
+
+    [Test]
     public async Task Generates_Correct_Js_Paths()
     {
         var packageFolder = CreatePackageFolderWithExtensions("My.Package", "my-extension.js");
@@ -207,8 +222,36 @@ public class AppPluginsExtensionsFolderPackageManifestReaderTests
         return CreatePackageFolderWithExtensionFiles(packageName, extensionFiles);
     }
 
+    private IFileInfo CreatePackageFolderWithExtensionsAndManifest(string packageName, params string[] jsFileNames)
+    {
+        var result = CreatePackageFolderWithExtensionFiles(packageName, jsFileNames.Select(name => CreateFileInfoMock(name)).ToArray());
+
+        // Override the package folder contents to include an umbraco-package.json
+        var packagePath = WebPath.Combine(Constants.SystemDirectories.AppPlugins, packageName);
+        var packageContentsMock = new Mock<IDirectoryContents>();
+        packageContentsMock
+            .Setup(f => f.GetEnumerator())
+            .Returns(new List<IFileInfo> { CreateFileInfoMock("umbraco-package.json") }.GetEnumerator());
+        _fileProviderMock
+            .Setup(m => m.GetDirectoryContents(packagePath))
+            .Returns(packageContentsMock.Object);
+
+        return result;
+    }
+
     private IFileInfo CreatePackageFolderWithExtensionFiles(string packageName, params IFileInfo[] extensionFiles)
     {
+        // Set up the package folder contents (no umbraco-package.json by default)
+        var packagePath = WebPath.Combine(Constants.SystemDirectories.AppPlugins, packageName);
+        var packageContentsMock = new Mock<IDirectoryContents>();
+        packageContentsMock
+            .Setup(f => f.GetEnumerator())
+            .Returns(new List<IFileInfo>().GetEnumerator());
+        _fileProviderMock
+            .Setup(m => m.GetDirectoryContents(packagePath))
+            .Returns(packageContentsMock.Object);
+
+        // Set up the extensions subfolder contents
         var extensionsContentsMock = new Mock<IDirectoryContents>();
         extensionsContentsMock.SetupGet(d => d.Exists).Returns(true);
         extensionsContentsMock
@@ -225,6 +268,17 @@ public class AppPluginsExtensionsFolderPackageManifestReaderTests
 
     private IFileInfo CreatePackageFolder(string packageName)
     {
+        // Set up the package folder contents (no umbraco-package.json)
+        var packagePath = WebPath.Combine(Constants.SystemDirectories.AppPlugins, packageName);
+        var packageContentsMock = new Mock<IDirectoryContents>();
+        packageContentsMock
+            .Setup(f => f.GetEnumerator())
+            .Returns(new List<IFileInfo>().GetEnumerator());
+        _fileProviderMock
+            .Setup(m => m.GetDirectoryContents(packagePath))
+            .Returns(packageContentsMock.Object);
+
+        // Set up non-existent extensions subfolder
         var emptyContentsMock = new Mock<IDirectoryContents>();
         emptyContentsMock.SetupGet(d => d.Exists).Returns(false);
         emptyContentsMock

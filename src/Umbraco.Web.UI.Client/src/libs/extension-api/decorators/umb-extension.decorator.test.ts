@@ -1,5 +1,10 @@
 import { expect } from '@open-wc/testing';
-import { umbExtension, getExtensionManifest, registerExtensionModule } from './umb-extension.decorator.js';
+import {
+	umbExtension,
+	getExtensionManifest,
+	registerExtensionModule,
+	unregisterExtensionModule,
+} from './umb-extension.decorator.js';
 import type { ManifestBase } from '../types/index.js';
 
 describe('umbExtension decorator', () => {
@@ -59,9 +64,7 @@ describe('registerExtensionModule', () => {
 	});
 
 	it('registers an HTMLElement subclass as element', () => {
-		const manifest = { type: 'dashboard', alias: 'Test.Dashboard', name: 'Test' };
-
-		@umbExtension(manifest)
+		@umbExtension({ type: 'dashboard', alias: 'Test.Dashboard', name: 'Test' })
 		class TestDashboard extends HTMLElement {}
 
 		registerExtensionModule({ TestDashboard }, registry);
@@ -72,9 +75,7 @@ describe('registerExtensionModule', () => {
 	});
 
 	it('registers a non-HTMLElement class as api', () => {
-		const manifest = { type: 'entityAction', alias: 'Test.Action', name: 'Test' };
-
-		@umbExtension(manifest)
+		@umbExtension({ type: 'entityAction', alias: 'Test.Action', name: 'Test' })
 		class TestAction {
 			execute() {}
 		}
@@ -91,6 +92,7 @@ describe('registerExtensionModule', () => {
 			execute() {}
 		}
 
+		// Using 'as any' because ManifestBase doesn't have 'api' — specific types like ManifestElementAndApi do
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		@umbExtension({ type: 'entityAction', alias: 'Test.Action', name: 'Test', api: MyApi } as any)
 		class TestElement extends HTMLElement {}
@@ -148,17 +150,91 @@ describe('registerExtensionModule', () => {
 		expect(registry.registered[0]).to.have.property('alias', 'Test.Dashboard');
 	});
 
-	it('does nothing if no exports are decorated', () => {
-		class PlainA {}
-		class PlainB {}
+	it('returns true when decorated classes are found', () => {
+		@umbExtension({ type: 'dashboard', alias: 'Test.Dashboard', name: 'Test' })
+		class TestDashboard extends HTMLElement {}
 
-		registerExtensionModule({ PlainA, PlainB }, registry);
-
-		expect(registry.registered).to.have.length(0);
+		const result = registerExtensionModule({ TestDashboard }, registry);
+		expect(result).to.be.true;
 	});
 
-	it('does nothing for empty module exports', () => {
-		registerExtensionModule({}, registry);
-		expect(registry.registered).to.have.length(0);
+	it('returns false when no decorated classes are found', () => {
+		class PlainClass {}
+		const result = registerExtensionModule({ PlainClass }, registry);
+		expect(result).to.be.false;
+	});
+
+	it('returns false for empty module exports', () => {
+		const result = registerExtensionModule({}, registry);
+		expect(result).to.be.false;
+	});
+});
+
+describe('unregisterExtensionModule', () => {
+	let unregistered: string[];
+	let unregistry: { unregister: (alias: string) => void };
+
+	beforeEach(() => {
+		unregistered = [];
+		unregistry = {
+			unregister(alias: string) {
+				unregistered.push(alias);
+			},
+		};
+	});
+
+	it('unregisters decorated classes by alias', () => {
+		@umbExtension({ type: 'dashboard', alias: 'Test.Dashboard', name: 'Test' })
+		class TestDashboard extends HTMLElement {}
+
+		unregisterExtensionModule({ TestDashboard }, unregistry);
+
+		expect(unregistered).to.have.length(1);
+		expect(unregistered[0]).to.equal('Test.Dashboard');
+	});
+
+	it('unregisters multiple decorated classes', () => {
+		@umbExtension({ type: 'dashboard', alias: 'Test.DashA', name: 'A' })
+		class DashA extends HTMLElement {}
+
+		@umbExtension({ type: 'dashboard', alias: 'Test.DashB', name: 'B' })
+		class DashB extends HTMLElement {}
+
+		unregisterExtensionModule({ DashA, DashB }, unregistry);
+
+		expect(unregistered).to.have.length(2);
+		expect(unregistered).to.include('Test.DashA');
+		expect(unregistered).to.include('Test.DashB');
+	});
+
+	it('skips undecorated exports', () => {
+		@umbExtension({ type: 'dashboard', alias: 'Test.Dashboard', name: 'Test' })
+		class Decorated extends HTMLElement {}
+
+		class NotDecorated extends HTMLElement {}
+
+		unregisterExtensionModule({ Decorated, NotDecorated }, unregistry);
+
+		expect(unregistered).to.have.length(1);
+		expect(unregistered[0]).to.equal('Test.Dashboard');
+	});
+
+	it('returns true when decorated classes are found', () => {
+		@umbExtension({ type: 'dashboard', alias: 'Test.Dashboard', name: 'Test' })
+		class TestDashboard extends HTMLElement {}
+
+		const result = unregisterExtensionModule({ TestDashboard }, unregistry);
+		expect(result).to.be.true;
+	});
+
+	it('returns false when no decorated classes are found', () => {
+		class PlainClass {}
+		const result = unregisterExtensionModule({ PlainClass }, unregistry);
+		expect(result).to.be.false;
+	});
+
+	it('returns false for empty module exports', () => {
+		const result = unregisterExtensionModule({}, unregistry);
+		expect(result).to.be.false;
 	});
 });

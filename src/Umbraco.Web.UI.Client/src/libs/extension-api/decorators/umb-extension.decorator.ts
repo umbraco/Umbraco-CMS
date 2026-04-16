@@ -4,47 +4,44 @@ import type { ManifestBase } from '../types/index.js';
 /**
  * Static property name used to store manifest metadata on decorated classes.
  */
-const UMB_EXTENSION_MANIFEST = Symbol.for('umbExtensionManifest');
+const UMB_EXTENSION_MANIFEST = Symbol.for('umbraco:extension:manifest');
 
 /**
  * The manifest metadata accepted by the `@umbExtension` decorator.
  *
- * Omits loader properties (element, api, js, elementName) and phantom types (ELEMENT_TYPE, API_TYPE)
- * since these are resolved from the module's exports:
- * - `default export` → `element`
- * - `export { X as api }` → `api`
- * - `export { X as element }` → `element` (explicit, overrides default)
+ * Omits loader properties (element, js, elementName) and phantom types (ELEMENT_TYPE, API_TYPE)
+ * since these are resolved automatically. The `api` field is preserved — it can be set to a
+ * class reference to pair an API class with the decorated element class.
  *
  * The generic parameter allows using specific manifest types (e.g. `ManifestDashboard`,
- * `ManifestEntityAction`) for full type-safety, or `ManifestBase` for a loose contract.
+ * `ManifestEntityAction`) for full type-safety.
  */
-export type UmbExtensionDecoratorManifest<T extends ManifestBase = ManifestBase> = Omit<
+export type UmbExtensionDecoratorManifest<T extends UmbExtensionManifest = UmbExtensionManifest> = Omit<
 	T,
-	'element' | 'elementName' | 'js' | 'api' | 'ELEMENT_TYPE' | 'API_TYPE'
+	'element' | 'elementName' | 'js' | 'ELEMENT_TYPE' | 'API_TYPE'
 >;
 
 /**
  * A class decorator that stores extension manifest metadata on the class.
  *
  * The decorator itself has no runtime side-effects — it only tags the class
- * with manifest data. Registration happens separately:
- * - **Vite plugin (build time):** Extracts the metadata statically and generates
- * `umbraco-package.json`. The existing pipeline handles loading and registration.
- * - **Runtime (entry point / manual):** Call {@link registerExtensionModule} with
- * the module's exports and the extension registry to register dynamically.
+ * with manifest data. Registration happens separately via the bundle initializer
+ * (automatic) or by calling {@link registerExtensionModule} manually.
  *
- * The module's named exports determine how classes map to manifest fields:
- * - `default export` → `element` field
- * - `export { X as api }` → `api` field
- * - `export { X as element }` → `element` field (explicit override)
+ * When registered, the decorated class is assigned to the manifest based on its type:
+ * - `HTMLElement` subclass → `element`
+ * - Anything else → `api`
  *
- * This decorator supports both modern "standard" decorators (Stage 3 TC39 proposal) and
+ * To pair an element with a separate API class, pass `api` in the manifest:
+ * `@umbExtension({ ..., api: MyApiClass })`
+ *
+ * Supports both modern "standard" decorators (Stage 3 TC39 proposal) and
  * legacy TypeScript experimental decorators for backward compatibility.
  * @param {UmbExtensionDecoratorManifest} manifest - The extension manifest metadata.
  * @returns {UmbExtensionClassDecorator} A class decorator function.
  * @example
  * ```ts
- * // Simple dashboard (default export = element)
+ * // Dashboard — HTMLElement subclass, auto-assigned as element
  * @umbExtension({
  *   type: 'dashboard',
  *   alias: 'My.Dashboard',
@@ -58,23 +55,23 @@ export type UmbExtensionDecoratorManifest<T extends ManifestBase = ManifestBase>
  * ```
  * @example
  * ```ts
- * // Action with both element and API (exported as named exports)
+ * // Entity action with kind — non-HTMLElement, auto-assigned as api
  * @umbExtension({
  *   type: 'entityAction',
+ *   kind: 'default',
  *   alias: 'My.Action',
  *   name: 'My Action',
+ *   forEntityTypes: ['document'],
+ *   meta: { label: 'Do it', icon: 'icon-wand' },
  * })
- * class MyActionApi implements UmbApi {
+ * export class MyActionApi implements UmbApi {
  *   async execute() { ... }
  * }
- *
- * @customElement('my-action-button')
- * class MyActionElement extends UmbLitElement { ... }
- *
- * export { MyActionApi as api, MyActionElement as element };
  * ```
  */
-export function umbExtension<T extends ManifestBase = ManifestBase>(manifest: UmbExtensionDecoratorManifest<T>) {
+export function umbExtension<T extends UmbExtensionManifest = UmbExtensionManifest>(
+	manifest: UmbExtensionDecoratorManifest<T>,
+) {
 	return ((targetOrValue: any, contextOrUndefined?: ClassDecoratorContext) => {
 		// Standard decorator (Stage 3 TC39)
 		if (contextOrUndefined && typeof contextOrUndefined === 'object' && contextOrUndefined.kind === 'class') {
@@ -113,6 +110,7 @@ export function getExtensionManifest(target: any): UmbExtensionDecoratorManifest
  * @param {object} moduleExports - The module's exports (e.g. from `import * as mod from './my-ext.js'`).
  * @param {object} registry - The UmbExtensionRegistry instance.
  * @param {(manifest: ManifestBase) => void} registry.register - The register method on the extension registry.
+ * @returns {boolean} True if any decorated classes were found and registered.
  * @example
  * ```ts
  * // In a backofficeEntryPoint onInit:
@@ -177,7 +175,7 @@ export function unregisterExtensionModule(
 /**
  * Collects all decorated classes and their manifest metadata from module exports.
  * @param {object} moduleExports - The module's exports.
- * @returns {Map<any, UmbExtensionDecoratorManifest>} Map of class → manifest metadata.
+ * @returns {Map<object, UmbExtensionDecoratorManifest>} Map of class → manifest metadata.
  */
 function collectDecoratedClasses(moduleExports: Record<string, any>): Map<any, UmbExtensionDecoratorManifest> {
 	const decoratedClasses = new Map<any, UmbExtensionDecoratorManifest>();
