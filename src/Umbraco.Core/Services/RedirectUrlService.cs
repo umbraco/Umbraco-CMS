@@ -96,6 +96,16 @@ internal sealed class RedirectUrlService : AsyncRepositoryService, IRedirectUrlS
     }
 
     /// <inheritdoc/>
+    public async Task<PagedModel<IRedirectUrl>> GetContentRedirectUrlsAsync(Guid contentKey, long pageIndex, int pageSize)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        PagedModel<IRedirectUrl> redirectUrls = await _redirectUrlRepository.GetContentUrlsAsync(contentKey, pageIndex, pageSize);
+
+        scope.Complete();
+        return redirectUrls;
+    }
+
+    /// <inheritdoc/>
     public async Task<PagedModel<IRedirectUrl>> GetAllRedirectUrlsAsync(long pageIndex, int pageSize)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();

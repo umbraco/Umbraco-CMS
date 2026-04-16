@@ -54,12 +54,34 @@ public interface IRedirectUrlService : IService
     /// <returns>The most recent redirect URLs corresponding to the route.</returns>
     Task<IRedirectUrl?> GetMostRecentRedirectUrlAsync(string url, string? culture);
 
-        /// <summary>
+    /// <summary>
     ///     Gets all redirect URLs for a content item.
     /// </summary>
     /// <param name="contentKey">The content unique key.</param>
     /// <returns>All redirect URLs for the content item.</returns>
     Task<IEnumerable<IRedirectUrl>> GetContentRedirectUrlsAsync(Guid contentKey);
+
+    /// <summary>
+    ///     Gets paginated redirect URLs for a content item.
+    /// </summary>
+    /// <param name="contentKey">The content unique key.</param>
+    /// <param name="pageIndex">The zero-based page index.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <returns>All redirect URLs for the content item.</returns>
+    Task<PagedModel<IRedirectUrl>> GetContentRedirectUrlsAsync(Guid contentKey, long pageIndex, int pageSize);
+
+    /// <summary>
+    ///     Gets paginated redirect URLs for a content item.
+    /// </summary>
+    /// <param name="contentKey">The content unique key.</param>
+    /// <param name="skip">Amount to skip.</param>
+    /// <param name="take">Amount to take.</param>
+    /// <returns>All redirect URLs for the content item.</returns>
+    async Task<PagedModel<IRedirectUrl>> GetContentRedirectUrlsAsync(Guid contentKey, int skip, int take)
+    {
+        PaginationHelper.ConvertSkipTakeToPaging(skip, take, out var pageNumber, out var pageSize);
+        return await GetContentRedirectUrlsAsync(contentKey, pageNumber, pageSize);
+    }
 
     /// <summary>
     ///     Gets all redirect URLs.

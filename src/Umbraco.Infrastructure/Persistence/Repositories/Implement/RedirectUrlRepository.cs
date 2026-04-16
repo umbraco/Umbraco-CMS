@@ -145,7 +145,7 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
             var results = await db.RedirectUrls
                 .Where(x => x.Url == url
                             && x.UrlHash == urlHash
-                            && (x.Culture == culture.ToLower()
+                            && (x.Culture == culture.ToLowerInvariant()
                                 || x.Culture == null
                                 || x.Culture == string.Empty))
                 .OrderByDescending(x => x.CreateDateUtc)
@@ -182,6 +182,26 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
                 .ToListAsync();
 
             return dtos.Select(dto => Map(dto, contentId));
+        });
+
+    /// <inheritdoc/>
+    public async Task<PagedModel<IRedirectUrl>> GetContentUrlsAsync(Guid contentKey, long pageIndex, int pageSize) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            var contentId = await db.Nodes
+                .Where(n => n.UniqueId == contentKey)
+                .Select(n => n.NodeId)
+                .FirstOrDefaultAsync();
+
+            List<RedirectUrlDto> dtos = await db.RedirectUrls
+                .Where(x => x.ContentKey == contentKey)
+                .Skip((int)(pageIndex * pageSize))
+                .Take(pageSize)
+                .OrderByDescending(x => x.CreateDateUtc)
+                .ToListAsync();
+
+            IRedirectUrl[] items = dtos.Select(dto => Map(dto, contentId)).ToArray();
+            return new PagedModel<IRedirectUrl>(items.Length, items);
         });
 
     /// <inheritdoc/>
@@ -237,12 +257,11 @@ internal sealed class RedirectUrlRepository : AsyncEntityRepositoryBase<Guid, IR
         {
             var term = searchTerm.Trim().ToLowerInvariant();
 
-            var total = await db.RedirectUrls
-                .Where(x => x.Url.Contains(term))
-                .LongCountAsync();
+            IQueryable<RedirectUrlDto> query = db.RedirectUrls.Where(x => x.Url.Contains(term));
 
-            var results = await db.RedirectUrls
-                .Where(x => x.Url.Contains(term))
+            var total = await query.LongCountAsync();
+
+            var results = await query
                 .OrderByDescending(x => x.CreateDateUtc)
                 .Skip((int)(pageIndex * pageSize))
                 .Take(pageSize)

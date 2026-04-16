@@ -52,14 +52,12 @@ public class ByKeyRedirectUrlManagementController : RedirectUrlManagementControl
         int skip = 0,
         int take = 100)
     {
-        IEnumerable<IRedirectUrl> redirects = await _redirectUrlService.GetContentRedirectUrlsAsync(id);
-
-        IRedirectUrl[] redirectArray = redirects.ToArray();
+        PagedModel<IRedirectUrl> redirects = await _redirectUrlService.GetContentRedirectUrlsAsync(id, skip, take);
 
         var viewModel = new PagedViewModel<RedirectUrlResponseModel>
         {
-            Total = redirectArray.Length,
-            Items = _redirectUrlPresentationFactory.CreateMany(redirectArray.Skip(skip).Take(take)),
+            Total = redirects.Total,
+            Items = _redirectUrlPresentationFactory.CreateMany(redirects.Items),
         };
 
         return Ok(viewModel);

@@ -55,6 +55,15 @@ public interface IRedirectUrlRepository : IAsyncReadWriteRepository<Guid, IRedir
     Task<IEnumerable<IRedirectUrl>> GetContentUrlsAsync(Guid contentKey);
 
     /// <summary>
+    ///     Gets paginated redirect URLs for a content item.
+    /// </summary>
+    /// <param name="contentKey">The content unique key.</param>
+    /// <param name="pageIndex">The zero-based page index.</param>
+    /// <param name="pageSize">The page size.</param>
+    /// <returns>All redirect URLs for the content item.</returns>
+    Task<PagedModel<IRedirectUrl>> GetContentUrlsAsync(Guid contentKey, long pageIndex, int pageSize);
+
+    /// <summary>
     ///     Gets all redirect URLs.
     /// </summary>
     /// <param name="pageIndex">The zero-based page index.</param>
