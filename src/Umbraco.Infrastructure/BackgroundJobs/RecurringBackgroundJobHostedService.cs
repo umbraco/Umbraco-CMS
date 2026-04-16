@@ -1,16 +1,15 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Serilog.Core;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.Notifications;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 
@@ -23,32 +22,68 @@ public static class RecurringBackgroundJobHostedService
     /// Creates a factory function that produces hosted services for recurring background jobs.
     /// </summary>
     /// <param name="serviceProvider">The service provider used to create hosted service instances.</param>
-    /// <returns>A function that takes an <see cref="IRecurringBackgroundJob"/> and returns an <see cref="IHostedService"/>.</returns>
-    public static Func<IRecurringBackgroundJob, IHostedService> CreateHostedServiceFactory(IServiceProvider serviceProvider) =>
-        (IRecurringBackgroundJob job) =>
+    /// <returns>
+    /// A function that takes an <see cref="IRecurringBackgroundJob" /> and returns an <see cref="IHostedService" />.
+    /// </returns>
+    public static Func<IRecurringBackgroundJob, IHostedService> CreateHostedServiceFactory(IServiceProvider serviceProvider)
+        => (IRecurringBackgroundJob job) =>
         {
             Type hostedServiceType = typeof(RecurringBackgroundJobHostedService<>).MakeGenericType(job.GetType());
+
             return (IHostedService)ActivatorUtilities.CreateInstance(serviceProvider, hostedServiceType, job);
         };
 }
 
 /// <summary>
 /// Runs a recurring background job inside a hosted service.
-/// Generic version for DependencyInjection
 /// </summary>
-/// <typeparam name="TJob">Type of the Job</typeparam>
-public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceBase where TJob : IRecurringBackgroundJob
+/// <typeparam name="TJob">The type of the job.</typeparam>
+public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceBase
+    where TJob : IRecurringBackgroundJob
 {
-
+    private readonly IRuntimeState _runtimeState;
     private readonly ILogger<RecurringBackgroundJobHostedService<TJob>> _logger;
     private readonly IMainDom _mainDom;
-    private readonly IRuntimeState _runtimeState;
     private readonly IServerRoleAccessor _serverRoleAccessor;
     private readonly IEventAggregator _eventAggregator;
+    private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IRecurringBackgroundJob _job;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RecurringBackgroundJobHostedService{TJob}"/> class, which manages the execution of a recurring background job.
+    /// Initializes a new instance of the <see cref="RecurringBackgroundJobHostedService{TJob}" /> class, which manages the execution of a recurring background job.
+    /// </summary>
+    /// <param name="runtimeState">Provides information about the current runtime state of the Umbraco application.</param>
+    /// <param name="logger">The logger used to record diagnostic and operational information for this hosted service.</param>
+    /// <param name="mainDom">The main domain instance responsible for coordinating single-instance operations across multiple application domains.</param>
+    /// <param name="serverRoleAccessor">Determines the current server's role in a multi-server environment.</param>
+    /// <param name="eventAggregator">Handles the publishing and subscribing of application events.</param>
+    /// <param name="eventMessagesFactory">The event messages factory.</param>
+    /// <param name="job">The recurring background job instance to be managed and executed by this service.</param>
+    /// <param name="timeProvider">The time provider used for scheduling and elapsed time measurement.</param>
+    public RecurringBackgroundJobHostedService(
+        IRuntimeState runtimeState,
+        ILogger<RecurringBackgroundJobHostedService<TJob>> logger,
+        IMainDom mainDom,
+        IServerRoleAccessor serverRoleAccessor,
+        IEventAggregator eventAggregator,
+        IEventMessagesFactory eventMessagesFactory,
+        TJob job,
+        TimeProvider timeProvider)
+        : base(logger, job.Period, job.Delay, timeProvider)
+    {
+        _runtimeState = runtimeState;
+        _logger = logger;
+        _mainDom = mainDom;
+        _serverRoleAccessor = serverRoleAccessor;
+        _eventAggregator = eventAggregator;
+        _eventMessagesFactory = eventMessagesFactory;
+        _job = job;
+
+        _job.PeriodChanged += OnPeriodChanged;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecurringBackgroundJobHostedService{TJob}" /> class, which manages the execution of a recurring background job.
     /// </summary>
     /// <param name="runtimeState">Provides information about the current runtime state of the Umbraco application.</param>
     /// <param name="logger">The logger used to record diagnostic and operational information for this hosted service.</param>
@@ -56,6 +91,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     /// <param name="serverRoleAccessor">Determines the current server's role in a multi-server environment.</param>
     /// <param name="eventAggregator">Handles the publishing and subscribing of application events.</param>
     /// <param name="job">The recurring background job instance to be managed and executed by this service.</param>
+    [Obsolete("Use the constructor accepting IEventMessagesFactory and TimeProvider instead. Scheduled for removal in Umbraco 19.")]
     public RecurringBackgroundJobHostedService(
         IRuntimeState runtimeState,
         ILogger<RecurringBackgroundJobHostedService<TJob>> logger,
@@ -63,31 +99,22 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         IServerRoleAccessor serverRoleAccessor,
         IEventAggregator eventAggregator,
         TJob job)
-        : base(logger, job.Period, job.Delay)
-    {
-        _runtimeState = runtimeState;
-        _logger = logger;
-        _mainDom = mainDom;
-        _serverRoleAccessor = serverRoleAccessor;
-        _eventAggregator = eventAggregator;
-        _job = job;
-
-        _job.PeriodChanged += (sender, e) => ChangePeriod(_job.Period);
-    }
+        : this(runtimeState, logger, mainDom, serverRoleAccessor, eventAggregator, StaticServiceProvider.Instance.GetRequiredService<IEventMessagesFactory>(), job, TimeProvider.System)
+    { }
 
     /// <inheritdoc />
-    public override async Task PerformExecuteAsync(object? state)
+    public override async Task PerformExecuteAsync(CancellationToken stoppingToken)
     {
-        var executingNotification = new Notifications.RecurringBackgroundJobExecutingNotification(_job, new EventMessages());
-        await _eventAggregator.PublishAsync(executingNotification);
+        EventMessages eventMessages = _eventMessagesFactory.Get();
+        var executingNotification = new RecurringBackgroundJobExecutingNotification(_job, eventMessages);
+        await _eventAggregator.PublishAsync(executingNotification, stoppingToken);
 
         try
         {
-
             if (_runtimeState.Level != RuntimeLevel.Run)
             {
                 _logger.LogDebug("Job not running as runlevel not yet ready");
-                await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
+                await _eventAggregator.PublishAsync(new RecurringBackgroundJobIgnoredNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
                 return;
             }
 
@@ -95,7 +122,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
             if (!_job.ServerRoles.Contains(_serverRoleAccessor.CurrentServerRole))
             {
                 _logger.LogDebug("Job not running on this server role");
-                await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
+                await _eventAggregator.PublishAsync(new RecurringBackgroundJobIgnoredNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
                 return;
             }
 
@@ -103,54 +130,69 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
             if (!_mainDom.IsMainDom)
             {
                 _logger.LogDebug("Job not running as not MainDom");
-                await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
+                await _eventAggregator.PublishAsync(new RecurringBackgroundJobIgnoredNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
                 return;
             }
 
-
-            await _job.RunJobAsync();
-            await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobExecutedNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
-
-
+            await _job.RunJobAsync(stoppingToken);
+            await _eventAggregator.PublishAsync(new RecurringBackgroundJobExecutedNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            _logger.LogDebug("Job canceled during shutdown.");
+            await _eventAggregator.PublishAsync(new RecurringBackgroundJobCanceledNotification(_job, eventMessages).WithStateFrom(executingNotification), CancellationToken.None);
         }
         catch (Exception ex)
         {
-            await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobFailedNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
             _logger.LogError(ex, "Unhandled exception in recurring background job.");
+            await _eventAggregator.PublishAsync(new RecurringBackgroundJobFailedNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
         }
-
     }
 
-    /// <summary>
-    /// Asynchronously starts the recurring background job and publishes notifications before and after the job is started.
-    /// This method first publishes a <see cref="Notifications.RecurringBackgroundJobStartingNotification"/> prior to starting the job,
-    /// then calls the base implementation to start the job, and finally publishes a <see cref="Notifications.RecurringBackgroundJobStartedNotification"/>.
-    /// </summary>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A task that represents the asynchronous start operation.</returns>
+    /// <inheritdoc />
+    [Obsolete("Override PerformExecuteAsync(CancellationToken) instead. Scheduled for removal in Umbraco 19.")]
+    public override Task PerformExecuteAsync(object? state) => PerformExecuteAsync(CancellationToken.None);
+
+    /// <inheritdoc />
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        var startingNotification = new Notifications.RecurringBackgroundJobStartingNotification(_job, new EventMessages());
-        await _eventAggregator.PublishAsync(startingNotification);
+        EventMessages eventMessages = _eventMessagesFactory.Get();
+        var startingNotification = new RecurringBackgroundJobStartingNotification(_job, eventMessages);
+        await _eventAggregator.PublishAsync(startingNotification, cancellationToken);
 
         await base.StartAsync(cancellationToken);
 
-        await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobStartedNotification(_job, new EventMessages()).WithStateFrom(startingNotification));
-
+        await _eventAggregator.PublishAsync(new RecurringBackgroundJobStartedNotification(_job, eventMessages).WithStateFrom(startingNotification), cancellationToken);
     }
 
-    /// <summary>
-    /// Asynchronously stops the recurring background job service, publishing notifications before and after stopping.
-    /// </summary>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A task that represents the asynchronous stop operation.</returns>
+    /// <inheritdoc />
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        var stoppingNotification = new Notifications.RecurringBackgroundJobStoppingNotification(_job, new EventMessages());
-        await _eventAggregator.PublishAsync(stoppingNotification);
+        EventMessages eventMessages = _eventMessagesFactory.Get();
+        var stoppingNotification = new RecurringBackgroundJobStoppingNotification(_job, eventMessages);
+        await _eventAggregator.PublishAsync(stoppingNotification, cancellationToken);
 
         await base.StopAsync(cancellationToken);
 
-        await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobStoppedNotification(_job, new EventMessages()).WithStateFrom(stoppingNotification));
+        await _eventAggregator.PublishAsync(new RecurringBackgroundJobStoppedNotification(_job, eventMessages).WithStateFrom(stoppingNotification), cancellationToken);
     }
+
+    /// <inheritdoc />
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _job.PeriodChanged -= OnPeriodChanged;
+        }
+
+        base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// Handles the <see cref="IRecurringBackgroundJob.PeriodChanged" /> event by updating the base class period.
+    /// </summary>
+    /// <param name="sender">The sender.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    private void OnPeriodChanged(object? sender, EventArgs e)
+        => ChangePeriod(_job.Period);
 }

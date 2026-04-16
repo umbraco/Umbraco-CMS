@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Diagnostics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -10,168 +9,236 @@ using Umbraco.Cms.Core.Configuration;
 namespace Umbraco.Cms.Infrastructure.HostedServices;
 
 /// <summary>
-///     Provides a base class for recurring background tasks implemented as hosted services.
+/// Provides a base class for recurring background tasks implemented as hosted services.
 /// </summary>
-/// <remarks>
-///     See: <see href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-3.1&amp;tabs=visual-studio#timed-background-tasks"/>.
-/// </remarks>
-public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
+public abstract class RecurringHostedServiceBase : BackgroundService
 {
     /// <summary>
-    ///     The default delay to use for recurring tasks for the first run after application start-up if no alternative is
-    ///     configured.
+    /// The default delay to use for recurring tasks for the first run after application start-up if no alternative is configured.
     /// </summary>
     protected static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
 
     private readonly TimeSpan _delay;
-
     private readonly ILogger? _logger;
-    private bool _disposedValue;
-    private TimeSpan _period;
-    private Timer? _timer;
+    private readonly TimeProvider _timeProvider;
+    private readonly SemaphoreSlim _signal = new(0, 1);
+    private CancellationTokenSource _periodChangeCts = new();
+    private long _periodTicks;
+    private TriggerState _triggerState = TriggerState.Default;
+    private volatile bool _nextExecutionSkipOnOvershoot;
+    private int _isDisposed;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="RecurringHostedServiceBase" /> class.
+    /// Initializes a new instance of the <see cref="RecurringHostedServiceBase" /> class.
     /// </summary>
     /// <param name="logger">Logger.</param>
     /// <param name="period">Timespan representing how often the task should recur.</param>
-    /// <param name="delay">
-    ///     Timespan representing the initial delay after application start-up before the first run of the task
-    ///     occurs.
-    /// </param>
-    protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay)
+    /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
+    /// <param name="timeProvider">The time provider used for scheduling and elapsed time measurement.</param>
+    protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay, TimeProvider timeProvider)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(period, TimeSpan.Zero);
+
         _logger = logger;
-        _period = period;
+        Interlocked.Exchange(ref _periodTicks, period.Ticks);
         _delay = delay;
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
-    /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optonal
-    /// configuration for the first run time is available.
+    /// Initializes a new instance of the <see cref="RecurringHostedServiceBase" /> class.
+    /// </summary>
+    /// <param name="logger">Logger.</param>
+    /// <param name="period">Timespan representing how often the task should recur.</param>
+    /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
+    [Obsolete("Use the constructor accepting TimeProvider. Scheduled for removal in Umbraco 19.")]
+    protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay)
+        : this(logger, period, delay, TimeProvider.System)
+    { }
+
+    /// <summary>
+    /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optional configuration for the first run time is available.
     /// </summary>
     /// <param name="firstRunTime">The configured time to first run the task in crontab format.</param>
-    /// <param name="cronTabParser">An instance of <see cref="ICronTabParser"/></param>
+    /// <param name="cronTabParser">An instance of <see cref="ICronTabParser" />.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="defaultDelay">The default delay to use when a first run time is not configured.</param>
-    /// <returns>The delay before first running the recurring task.</returns>
-    protected static TimeSpan GetDelay(
-        string firstRunTime,
-        ICronTabParser cronTabParser,
-        ILogger logger,
-        TimeSpan defaultDelay) => GetDelay(firstRunTime, cronTabParser, logger, DateTime.Now, defaultDelay);
+    /// <returns>
+    /// The delay before first running the recurring task.
+    /// </returns>
+    [Obsolete("Use DelayCalculator.GetDelay instead. Scheduled for removal in Umbraco 19.")]
+    protected static TimeSpan GetDelay(string firstRunTime, ICronTabParser cronTabParser, ILogger logger, TimeSpan defaultDelay)
+        => BackgroundJobs.DelayCalculator.GetDelay(firstRunTime, cronTabParser, logger, defaultDelay);
+
+    /// <inheritdoc />
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        // Initial delay (also interruptible via signal)
+        if (_delay > TimeSpan.Zero)
+        {
+            try
+            {
+                bool signaled = await WaitForSignalAsync(_delay, CancellationToken.None, stoppingToken);
+                if (signaled)
+                {
+                    // Trigger interrupted the initial delay — consume the trigger state, so it doesn't leak into WaitForNextExecutionAsync after the first execution
+                    Interlocked.Exchange(ref _triggerState, TriggerState.Default);
+                    _nextExecutionSkipOnOvershoot = false;
+                }
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                return;
+            }
+        }
+
+        TimeSpan nextDelayBasis = ReadPeriod();
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            long startTimestamp = _timeProvider.GetTimestamp();
+            try
+            {
+                await PerformExecuteAsync(stoppingToken);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                break;
+            }
+            catch (Exception ex)
+            {
+                ILogger logger = _logger ?? StaticApplicationLogging.CreateLogger(GetType());
+                logger.LogError(ex, "Unhandled exception in recurring hosted service.");
+            }
+
+            TimeSpan executionElapsed = _timeProvider.GetElapsedTime(startTimestamp);
+            nextDelayBasis = await WaitForNextExecutionAsync(nextDelayBasis, executionElapsed, stoppingToken);
+        }
+    }
 
     /// <summary>
-    /// Determines the delay before the first run of a recurring task implemented as a hosted service when an optonal
-    /// configuration for the first run time is available.
+    /// Waits for the remaining period (minus execution time) before the next execution.
+    /// If <see cref="TriggerExecution()" /> is called, the wait exits immediately and returns the delay basis for the execution after the triggered one.
     /// </summary>
-    /// <param name="firstRunTime">The configured time to first run the task in crontab format.</param>
-    /// <param name="cronTabParser">An instance of <see cref="ICronTabParser"/></param>
-    /// <param name="logger">The logger.</param>
-    /// <param name="now">The current datetime.</param>
-    /// <param name="defaultDelay">The default delay to use when a first run time is not configured.</param>
-    /// <returns>The delay before first running the recurring task.</returns>
-    /// <remarks>Internal to expose for unit tests.</remarks>
-    internal static TimeSpan GetDelay(
-        string firstRunTime,
-        ICronTabParser cronTabParser,
-        ILogger logger,
-        DateTime now,
-        TimeSpan defaultDelay)
+    /// <param name="delayBasis">The delay basis.</param>
+    /// <param name="executionElapsed">The execution elapsed.</param>
+    /// <param name="stoppingToken">The stopping token.</param>
+    /// <returns>
+    /// The delay basis to use for the next wait cycle.
+    /// </returns>
+    private async Task<TimeSpan> WaitForNextExecutionAsync(TimeSpan delayBasis, TimeSpan executionElapsed, CancellationToken stoppingToken)
     {
-        // If first run time not set, start with just small delay after application start.
-        if (string.IsNullOrEmpty(firstRunTime))
+        TimeSpan period = ReadPeriod();
+        TimeSpan delay = ComputeNextDelay(delayBasis, executionElapsed);
+
+        // If the delay basis was from a NextExecutionStrategy.None trigger and the execution overshot the scheduled time,
+        // advance to the next period tick instead of executing immediately.
+        // The flag is consumed unconditionally so it never leaks into later cycles.
+        bool skipOnOvershoot = _nextExecutionSkipOnOvershoot;
+        _nextExecutionSkipOnOvershoot = false;
+
+        if (delay <= TimeSpan.Zero && skipOnOvershoot)
         {
-            return defaultDelay;
+            delay = ComputeNextDelay(delayBasis + period, executionElapsed);
         }
 
-        // If first run time not a valid cron tab, log, and revert to small delay after application start.
-        if (!cronTabParser.IsValidCronTab(firstRunTime))
+        if (delay <= TimeSpan.Zero)
         {
-            logger.LogWarning("Could not parse {FirstRunTime} as a crontab expression. Defaulting to default delay for hosted service start.", firstRunTime);
-            return defaultDelay;
+            return period;
         }
 
-        // Otherwise start at scheduled time according to cron expression, unless within the default delay period.
-        DateTime firstRunOccurance = cronTabParser.GetNextOccurrence(firstRunTime, now);
-        TimeSpan delay = firstRunOccurance - now;
-        return delay < defaultDelay
-            ? defaultDelay
-            : delay;
-    }
+        long waitStart = _timeProvider.GetTimestamp();
 
-    /// <inheritdoc />
-    public virtual Task StartAsync(CancellationToken cancellationToken)
-    {
-        using (!ExecutionContext.IsFlowSuppressed() ? (IDisposable)ExecutionContext.SuppressFlow() : null)
+        while (true)
         {
-            _timer = new Timer(ExecuteAsync, null, _delay, _period);
+            CancellationToken periodChangeToken = _periodChangeCts.Token;
+            bool signaled;
+            try
+            {
+                signaled = await WaitForSignalAsync(delay, periodChangeToken, stoppingToken);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                return ReadPeriod();
+            }
+
+            if (!signaled && periodChangeToken.IsCancellationRequested)
+            {
+                // Period changed — re-read and recalculate remaining delay with the new period.
+                period = ReadPeriod();
+                TimeSpan totalElapsed = executionElapsed + _timeProvider.GetElapsedTime(waitStart);
+                delay = ComputeNextDelay(period, totalElapsed);
+                if (delay <= TimeSpan.Zero)
+                {
+                    return period;
+                }
+
+                continue;
+            }
+
+            if (!signaled)
+            {
+                return period; // Normal timeout — next wait uses normal period
+            }
+
+            TriggerState triggerState = Interlocked.Exchange(ref _triggerState, TriggerState.Default);
+            if (triggerState.Delay.HasValue)
+            {
+                return triggerState.Delay.Value;
+            }
+
+            TimeSpan waitElapsed = _timeProvider.GetElapsedTime(waitStart);
+            TimeSpan remaining = ComputeNextDelay(delay, waitElapsed);
+
+            switch (triggerState.Strategy)
+            {
+                case NextExecutionStrategy.None:
+                    _nextExecutionSkipOnOvershoot = true;
+                    return remaining;
+                case NextExecutionStrategy.Replace:
+                    return remaining + period;
+                case NextExecutionStrategy.Reset:
+                default:
+                    return period;
+            }
         }
-
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc />
-    public virtual Task StopAsync(CancellationToken cancellationToken)
-    {
-        _period = Timeout.InfiniteTimeSpan;
-        _timer?.Change(Timeout.Infinite, 0);
-        return Task.CompletedTask;
     }
 
     /// <summary>
-    ///     Executes the task.
+    /// Implements the work of the recurring task.
+    /// </summary>
+    /// <param name="stoppingToken">A cancellation token that is signaled when the host is shutting down.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
+    public virtual Task PerformExecuteAsync(CancellationToken stoppingToken)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => PerformExecuteAsync(null);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <summary>
+    /// Implements the work of the recurring task.
     /// </summary>
     /// <param name="state">The task state.</param>
-    public virtual async void ExecuteAsync(object? state)
-    {
-        var sw = Stopwatch.StartNew();
-        try
-        {
-            // First, stop the timer, we do not want tasks to execute in parallel
-            _timer?.Change(Timeout.Infinite, 0);
-
-            // Delegate work to method returning a task, that can be called and asserted in a unit test.
-            // Without this there can be behaviour where tests pass, but an error within them causes the test
-            // running process to crash.
-            // Hat-tip: https://stackoverflow.com/a/14207615/489433
-            await PerformExecuteAsync(state);
-        }
-        catch (Exception ex)
-        {
-            ILogger logger = _logger ?? StaticApplicationLogging.CreateLogger(GetType());
-            logger.LogError(ex, "Unhandled exception in recurring hosted service.");
-        }
-        finally
-        {
-            sw.Stop();
-
-            // If the service has been stopped, _period is set to InfiniteTimeSpan in StopAsync.
-            // Preserve it to keep the timer disabled.
-            TimeSpan remaining = _period == Timeout.InfiniteTimeSpan
-                ? Timeout.InfiniteTimeSpan
-                : ComputeNextDelay(_period, sw.Elapsed);
-            _timer?.Change(remaining, _period);
-        }
-    }
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
+    /// <remarks>
+    /// This overload does not receive a <see cref="CancellationToken" />, so shutdown cancellation is not propagated to the implementation.
+    /// </remarks>
+    [Obsolete("Override PerformExecuteAsync(CancellationToken) instead. Scheduled for removal in Umbraco 19.")]
+    public virtual Task PerformExecuteAsync(object? state)
+        => Task.CompletedTask;
 
     /// <summary>
-    /// Executes the core logic of the recurring hosted service asynchronously.
+    /// Executes the task.
     /// </summary>
-    /// <param name="state">An optional object containing state information for the execution.</param>
-    /// <returns>A <see cref="Task"/> that represents the asynchronous execution of the recurring task.</returns>
-    public abstract Task PerformExecuteAsync(object? state);
+    /// <param name="state">The task state.</param>
+    [Obsolete("No longer used. The base class now uses BackgroundService.ExecuteAsync(CancellationToken). Scheduled for removal in Umbraco 19.")]
+    public virtual void ExecuteAsync(object? state)
+    { }
 
     /// <summary>
     /// Computes the delay before the next execution, subtracting the elapsed execution time from the period to prevent drift.
-    /// Clamps to <see cref="TimeSpan.Zero" /> if execution exceeded the period.
     /// </summary>
     /// <param name="period">The configured period between executions.</param>
     /// <param name="elapsed">The elapsed time of the current execution.</param>
@@ -185,28 +252,143 @@ public abstract class RecurringHostedServiceBase : IHostedService, IDisposable
     {
         TimeSpan remaining = period - elapsed;
 
-        // A negative period (e.g. Timeout.InfiniteTimeSpan = -1ms, set by StopAsync) will always produce a
-        // negative remaining value. The caller in ExecuteAsync guards against this by checking for InfiniteTimeSpan
-        // before calling this method, to avoid scheduling an extra execution after stop.
         return remaining < TimeSpan.Zero ? TimeSpan.Zero : remaining;
     }
 
     /// <summary>
-    /// Change the period between operations.
+    /// Change the period between operations. The new period takes effect immediately, interrupting the current wait if necessary.
     /// </summary>
-    /// <param name="newPeriod">The new period between tasks</param>
-    protected void ChangePeriod(TimeSpan newPeriod) => _period = newPeriod;
+    /// <param name="newPeriod">The new period between tasks.</param>
+    protected void ChangePeriod(TimeSpan newPeriod)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(newPeriod, TimeSpan.Zero);
 
+        Interlocked.Exchange(ref _periodTicks, newPeriod.Ticks);
+
+        // Cancel but don't dispose — the wait loop may still be registering against the token.
+        // The old CTS is small once cancelled and will be collected by the GC.
+        CancellationTokenSource oldCts = Interlocked.Exchange(ref _periodChangeCts, new CancellationTokenSource());
+        oldCts.Cancel();
+    }
+
+    /// <summary>
+    /// Signals the background loop to execute immediately.
+    /// After the triggered execution, the original schedule is kept.
+    /// If the scheduled time has already passed during the triggered execution, it is skipped and the next period tick is awaited.
+    /// </summary>
+    /// <seealso cref="NextExecutionStrategy.None" />
+    public void TriggerExecution()
+        => TriggerExecution(NextExecutionStrategy.None);
+
+    /// <summary>
+    /// Signals the background loop to execute immediately, with the specified strategy for determining the next execution after the triggered one completes.
+    /// </summary>
+    /// <param name="strategy">Controls the delay after the triggered execution.</param>
+    public void TriggerExecution(NextExecutionStrategy strategy)
+    {
+        Interlocked.Exchange(ref _triggerState, new TriggerState(Strategy: strategy));
+        ReleaseSignal();
+    }
+
+    /// <summary>
+    /// Signals the background loop to execute immediately.
+    /// After the triggered execution, the next execution is scheduled after the specified delay (measured from execution start; execution time is subtracted to prevent drift).
+    /// </summary>
+    /// <param name="nextDelay">The target interval from execution start to the next execution. Execution time is subtracted to prevent drift.</param>
+    public void TriggerExecution(TimeSpan nextDelay)
+    {
+        Interlocked.Exchange(ref _triggerState, new TriggerState(Delay: nextDelay));
+        ReleaseSignal();
+    }
+
+    /// <summary>
+    /// Reads the current period in a thread-safe manner.
+    /// </summary>
+    /// <returns>
+    /// The current period between executions.
+    /// </returns>
+    private TimeSpan ReadPeriod()
+        => TimeSpan.FromTicks(Interlocked.Read(ref _periodTicks));
+
+    /// <summary>
+    /// Waits for the semaphore to be signaled or for the timeout to expire, using the injected <see cref="TimeProvider" />.
+    /// </summary>
+    /// <param name="timeout">The maximum time to wait.</param>
+    /// <param name="periodChangeToken">A cancellation token that is signaled when the period changes.</param>
+    /// <param name="stoppingToken">A cancellation token for shutdown.</param>
+    /// <returns>
+    ///   <c>true</c> if the semaphore was signaled; <c>false</c> if the timeout expired or the period changed.
+    /// </returns>
+    /// <exception cref="OperationCanceledException">Thrown when <paramref name="stoppingToken" /> is cancelled.</exception>
+    private async Task<bool> WaitForSignalAsync(TimeSpan timeout, CancellationToken periodChangeToken, CancellationToken stoppingToken)
+    {
+        using var timeoutCts = new CancellationTokenSource(timeout, _timeProvider);
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, periodChangeToken, stoppingToken);
+
+        try
+        {
+            await _signal.WaitAsync(linkedCts.Token);
+            return true;
+        }
+        catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
+        {
+            return false; // Timeout expired or period changed
+        }
+    }
+
+    /// <summary>
+    /// Releases the semaphore to wake the background loop. If the semaphore is already signaled, the call is a no-op.
+    /// </summary>
+    private void ReleaseSignal()
+    {
+        try
+        {
+            _signal.Release();
+        }
+        catch (SemaphoreFullException)
+        {
+            // Already signaled
+        }
+    }
+
+    /// <inheritdoc />
+    public sealed override void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Releases unmanaged and optionally managed resources.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (Interlocked.CompareExchange(ref _isDisposed, 1, 0) != 0)
         {
-            if (disposing)
-            {
-                _timer?.Dispose();
-            }
-
-            _disposedValue = true;
+            return;
         }
+
+        if (disposing)
+        {
+            _signal.Dispose();
+            _periodChangeCts.Dispose();
+        }
+
+        base.Dispose();
+    }
+
+    /// <summary>
+    /// Immutable snapshot of the trigger state.
+    /// </summary>
+    private sealed record TriggerState(NextExecutionStrategy Strategy = default, TimeSpan? Delay = null)
+    {
+        /// <summary>
+        /// Gets the default trigger state with no strategy and no custom delay.
+        /// </summary>
+        /// <value>
+        /// The default trigger state.
+        /// </value>
+        public static TriggerState Default { get; } = new();
     }
 }
