@@ -37,7 +37,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="timeProvider">The time provider used for scheduling and elapsed time measurement.</param>
     protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay, TimeProvider timeProvider)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(period, TimeSpan.Zero);
+        ArgumentOutOfRangeException.ThrowIfLessThan(period, TimeSpan.Zero);
 
         _logger = logger;
         Interlocked.Exchange(ref _periodTicks, period.Ticks);
