@@ -238,7 +238,7 @@ export function transformUsers(): void {
 	});
 
 	// Generate user TypeScript content
-	const userContent = `import type { UmbMockUserModel } from '../../types/mock-data-set.types.js';
+	const userContent = `import type { UmbMockUserModel } from '../../mock-data-set.types.js';
 import { UserKindModel, UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 // Map string state to enum
@@ -266,7 +266,7 @@ export const data: Array<UmbMockUserModel> = rawData.map(user => ({
 	console.log(`Transformed ${transformedUsers.length} users`);
 
 	// Generate user group TypeScript content
-	const groupContent = `import type { UmbMockUserGroupModel } from '../../types/mock-data-set.types.js';
+	const groupContent = `import type { UmbMockUserGroupModel } from '../../mock-data-set.types.js';
 
 export const data: Array<UmbMockUserGroupModel> = ${JSON.stringify(transformedGroups, null, '\t')};
 `;

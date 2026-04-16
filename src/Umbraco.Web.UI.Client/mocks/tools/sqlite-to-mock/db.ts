@@ -300,6 +300,7 @@ export function getEditorUiAlias(propertyEditorAlias: string): string {
 		// Block editors
 		'Umbraco.BlockList': 'Umb.PropertyEditorUi.BlockList',
 		'Umbraco.BlockGrid': 'Umb.PropertyEditorUi.BlockGrid',
+		'Umbraco.SingleBlock': 'Umb.PropertyEditorUi.BlockSingle',
 
 		// Other
 		'Umbraco.Tags': 'Umb.PropertyEditorUi.Tags',

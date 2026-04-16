@@ -303,7 +303,7 @@ export function transformDocuments(): void {
 
 	// Generate TypeScript content
 	// Note: variants.state needs to be converted to enum values
-	const content = `import type { UmbMockDocumentModel } from '../../types/mock-data-set.types.js';
+	const content = `import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 // Map string state to enum
