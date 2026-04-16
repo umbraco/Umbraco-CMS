@@ -123,7 +123,7 @@ export class UmbIconSearchController extends UmbControllerBase {
 			this.#getSearchable(icon);
 
 		// 80% match on the full icon name.
-		// e.g. "icon-bug" matches "icon-bug", NOT "icon-buggy".
+		// e.g. "icon-bu" matches "icon-bug"
 		if (query.length > icon.name.length * 0.8 && icon.name.startsWith(query)) {
 			return 400;
 		}
