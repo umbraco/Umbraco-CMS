@@ -2,7 +2,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -88,7 +87,7 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddUmbracoApi<ConfigureUmbracoDeliveryApiOpenApiOptions>(DeliveryApiConfiguration.ApiName, DeliveryApiConfiguration.ApiTitle);
 
         // Replaces the internal Microsoft OpenApiSchemaService in order to ensure the correct JSON options are used
-        builder.Services.ReplaceOpenApiSchemaService();
+        builder.Services.ReplaceOpenApiSchemaService(DeliveryApiConfiguration.ApiName, Constants.JsonOptionsNames.DeliveryApi);
         builder.AddUmbracoApiOpenApiUI();
 
         builder
@@ -160,29 +159,4 @@ public static class UmbracoBuilderExtensions
         return builder;
     }
 
-    /// <summary>
-    /// Replaces the OpenApiSchemaService to use the Delivery API JSON serializer options, instead of the default http JSON options.
-    /// </summary>
-    /// <param name="serviceCollection">The <see cref="IServiceCollection"/>.</param>
-    /// <remarks>This is needed because the OpenAPI schema generation relies on the JSON options to determine how to generate the schemas.
-    /// There is a proposal to add support for this currently open: https://github.com/dotnet/aspnetcore/issues/60738.</remarks>
-    private static void ReplaceOpenApiSchemaService(this IServiceCollection serviceCollection)
-    {
-        ServiceDescriptor serviceDescriptor = serviceCollection
-            .FirstOrDefault(x => x.ServiceType.Name == "OpenApiSchemaService" && Equals(x.ServiceKey, DeliveryApiConfiguration.ApiName))
-            ?? throw new InvalidOperationException("Could not find the OpenApiSchemaService when replacing the registered implementation with one created with the delivery API JSON options.");
-
-        serviceCollection.Remove(serviceDescriptor);
-        serviceCollection.Add(
-            new ServiceDescriptor(
-                serviceDescriptor.ServiceType,
-                serviceDescriptor.ServiceKey,
-                (sp, serviceKey) => sp.CreateInstance(
-                    serviceDescriptor.KeyedImplementationType!,
-                    serviceKey!,
-                    Options.Create(
-                        sp.GetRequiredService<IOptionsMonitor<JsonOptions>>()
-                            .Get(Constants.JsonOptionsNames.DeliveryApi))),
-                ServiceLifetime.Singleton));
-    }
 }

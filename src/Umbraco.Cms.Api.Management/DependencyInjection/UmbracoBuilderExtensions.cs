@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.Configuration;
@@ -104,7 +102,7 @@ public static partial class UmbracoBuilderExtensions
             builder.Services.ConfigureOptions<ConfigureUmbracoBackofficeHttpJsonOptions>();
 
             // Replaces the internal Microsoft OpenApiSchemaService in order to ensure the correct JSON options are used
-            builder.Services.ReplaceOpenApiSchemaService();
+            builder.Services.ReplaceOpenApiSchemaService(ManagementApiConfiguration.ApiName, Constants.JsonOptionsNames.BackOffice);
 
             services.Configure<UmbracoPipelineOptions>(options =>
             {
@@ -121,29 +119,4 @@ public static partial class UmbracoBuilderExtensions
         return builder;
     }
 
-    /// <summary>
-    /// Replaces the OpenApiSchemaService to use the Management API JSON serializer options, instead of the default http JSON options.
-    /// </summary>
-    /// <param name="serviceCollection">The <see cref="IServiceCollection"/>.</param>
-    /// <remarks>This is needed because the OpenAPI schema generation relies on the JSON options to determine how to generate the schemas.
-    /// There is a proposal to add support for this currently open: https://github.com/dotnet/aspnetcore/issues/60738.</remarks>
-    private static void ReplaceOpenApiSchemaService(this IServiceCollection serviceCollection)
-    {
-        ServiceDescriptor serviceDescriptor = serviceCollection
-            .FirstOrDefault(x => x.ServiceType.Name == "OpenApiSchemaService" && Equals(x.ServiceKey, ManagementApiConfiguration.ApiName))
-            ?? throw new InvalidOperationException("Could not find the OpenApiSchemaService when replacing the registered implementation with one created with the management API JSON options.");
-
-        serviceCollection.Remove(serviceDescriptor);
-        serviceCollection.Add(
-            new ServiceDescriptor(
-                serviceDescriptor.ServiceType,
-                serviceDescriptor.ServiceKey,
-                (sp, serviceKey) => sp.CreateInstance(
-                    serviceDescriptor.KeyedImplementationType!,
-                    serviceKey!,
-                    Options.Create(
-                        sp.GetRequiredService<IOptionsMonitor<JsonOptions>>()
-                            .Get(Constants.JsonOptionsNames.BackOffice))),
-                ServiceLifetime.Singleton));
-    }
 }
