@@ -52,8 +52,15 @@ VITE_MOCK_SET=my-site npm run dev
 You must also register the new set in `mocks/mock-manager.ts` by adding an entry to the `#mockSetLoaders` map:
 
 ```ts
-#mockSetLoaders: Record<string, () => Promise<UmbMockDataSet>> = {
-  default: () => import('./data/sets/default/index.js') as Promise<UmbMockDataSet>,
-  'my-site': () => import('./data/sets/my-site/index.js') as Promise<UmbMockDataSet>,
+#mockSetLoaders: Record<string, UmbMockSetEntry> = {
+  default: {
+    label: 'Default',
+    loader: () => import('./data/sets/default/index.js') as Promise<UmbMockDataSet>,
+  },
+  'my-site': {
+    label: 'My Site',
+    loader: () => import('./data/sets/my-site/index.js') as Promise<UmbMockDataSet>,
+    visible: true,
+  },
 };
 ```
