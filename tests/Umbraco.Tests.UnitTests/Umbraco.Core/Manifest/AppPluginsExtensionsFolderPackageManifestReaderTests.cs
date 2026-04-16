@@ -3,9 +3,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Infrastructure.Manifest;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest;
@@ -29,14 +28,10 @@ public class AppPluginsExtensionsFolderPackageManifestReaderTests
         var fileProviderFactoryMock = new Mock<IPackageManifestFileProviderFactory>();
         fileProviderFactoryMock.Setup(m => m.Create()).Returns(_fileProviderMock.Object);
 
-        var umbracoVersionMock = new Mock<IUmbracoVersion>();
-        umbracoVersionMock.SetupGet(m => m.SemanticVersion).Returns(new SemVersion(17, 4, 0));
-
         var loggerMock = new Mock<ILogger<AppPluginsExtensionsFolderPackageManifestReader>>();
 
         _reader = new AppPluginsExtensionsFolderPackageManifestReader(
             fileProviderFactoryMock.Object,
-            umbracoVersionMock.Object,
             loggerMock.Object);
     }
 
@@ -54,7 +49,7 @@ public class AppPluginsExtensionsFolderPackageManifestReaderTests
 
         var manifest = result.First();
         Assert.AreEqual("MyPackage", manifest.Name);
-        Assert.AreEqual("17.4.0", manifest.Version);
+        Assert.IsNull(manifest.Version);
         Assert.AreEqual(1, manifest.Extensions.Length);
 
         var extension = manifest.Extensions.First();
@@ -220,7 +215,7 @@ public class AppPluginsExtensionsFolderPackageManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(extensionFiles.ToList().GetEnumerator());
 
-        var extensionsPath = $"{Constants.SystemDirectories.AppPlugins}/{packageName}/extensions";
+        var extensionsPath = WebPath.Combine(Constants.SystemDirectories.AppPlugins, packageName, "extensions");
         _fileProviderMock
             .Setup(m => m.GetDirectoryContents(extensionsPath))
             .Returns(extensionsContentsMock.Object);
@@ -236,7 +231,7 @@ public class AppPluginsExtensionsFolderPackageManifestReaderTests
             .Setup(f => f.GetEnumerator())
             .Returns(new List<IFileInfo>().GetEnumerator());
 
-        var extensionsPath = $"{Constants.SystemDirectories.AppPlugins}/{packageName}/extensions";
+        var extensionsPath = WebPath.Combine(Constants.SystemDirectories.AppPlugins, packageName, "extensions");
         _fileProviderMock
             .Setup(m => m.GetDirectoryContents(extensionsPath))
             .Returns(emptyContentsMock.Object);

@@ -1,2 +1,2 @@
-export { umbExtension, getExtensionManifest, registerExtensionModule } from './umb-extension.decorator.js';
+export { umbExtension, getExtensionManifest, registerExtensionModule, unregisterExtensionModule } from './umb-extension.decorator.js';
 export type { UmbExtensionDecoratorManifest } from './umb-extension.decorator.js';

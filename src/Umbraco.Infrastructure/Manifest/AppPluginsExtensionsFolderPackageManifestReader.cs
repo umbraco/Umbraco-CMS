@@ -1,7 +1,6 @@
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Routing;
@@ -19,16 +18,13 @@ internal sealed class AppPluginsExtensionsFolderPackageManifestReader : IPackage
     private const string ExtensionsFolderName = "extensions";
 
     private readonly IPackageManifestFileProviderFactory _packageManifestFileProviderFactory;
-    private readonly IUmbracoVersion _umbracoVersion;
     private readonly ILogger<AppPluginsExtensionsFolderPackageManifestReader> _logger;
 
     public AppPluginsExtensionsFolderPackageManifestReader(
         IPackageManifestFileProviderFactory packageManifestFileProviderFactory,
-        IUmbracoVersion umbracoVersion,
         ILogger<AppPluginsExtensionsFolderPackageManifestReader> logger)
     {
         _packageManifestFileProviderFactory = packageManifestFileProviderFactory;
-        _umbracoVersion = umbracoVersion;
         _logger = logger;
     }
 
@@ -92,7 +88,6 @@ internal sealed class AppPluginsExtensionsFolderPackageManifestReader : IPackage
                 manifests.Add(new PackageManifest
                 {
                     Name = packageFolder.Name,
-                    Version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild(),
                     Extensions = bundleExtensions.ToArray(),
                 });
             }

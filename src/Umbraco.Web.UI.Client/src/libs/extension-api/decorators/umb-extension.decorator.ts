@@ -126,24 +126,13 @@ export function getExtensionManifest(target: any): UmbExtensionDecoratorManifest
 export function registerExtensionModule(
 	moduleExports: Record<string, any>,
 	registry: { register(manifest: ManifestBase): void },
-): void {
-	// Collect all decorated classes and their manifest metadata
-	const decoratedClasses = new Map<any, UmbExtensionDecoratorManifest>();
-	for (const value of Object.values(moduleExports)) {
-		const manifest = getExtensionManifest(value);
-		if (manifest) {
-			decoratedClasses.set(value, manifest);
-		}
-	}
+): boolean {
+	const decoratedClasses = collectDecoratedClasses(moduleExports);
 
 	if (decoratedClasses.size === 0) {
-		return;
+		return false;
 	}
 
-	// Register each decorated class. The decorated class is inferred by type:
-	// - HTMLElement subclass → element
-	// - Anything else → api
-	// Explicit element/api references in the manifest (e.g. { api: MyApiClass }) are preserved.
 	for (const [targetClass, manifest] of decoratedClasses) {
 		const fullManifest: any = { ...manifest };
 
@@ -156,6 +145,49 @@ export function registerExtensionModule(
 
 		registry.register(fullManifest);
 	}
+
+	return true;
+}
+
+/**
+ * Unregisters extensions from a module's exports that were previously registered
+ * via {@link registerExtensionModule}.
+ * @param {object} moduleExports - The module's exports.
+ * @param {object} registry - The UmbExtensionRegistry instance.
+ * @param {(alias: string) => void} registry.unregister - The unregister method on the extension registry.
+ * @returns {boolean} True if any decorated classes were found and unregistered.
+ */
+export function unregisterExtensionModule(
+	moduleExports: Record<string, any>,
+	registry: { unregister(alias: string): void },
+): boolean {
+	const decoratedClasses = collectDecoratedClasses(moduleExports);
+
+	if (decoratedClasses.size === 0) {
+		return false;
+	}
+
+	for (const [, manifest] of decoratedClasses) {
+		registry.unregister(manifest.alias);
+	}
+
+	return true;
+}
+
+/**
+ * Collects all decorated classes and their manifest metadata from module exports.
+ * @param {object} moduleExports - The module's exports.
+ * @returns {Map<any, UmbExtensionDecoratorManifest>} Map of class → manifest metadata.
+ */
+function collectDecoratedClasses(moduleExports: Record<string, any>): Map<any, UmbExtensionDecoratorManifest> {
+	const decoratedClasses = new Map<any, UmbExtensionDecoratorManifest>();
+	for (const value of Object.values(moduleExports)) {
+		const manifest = getExtensionManifest(value);
+		if (manifest) {
+			decoratedClasses.set(value, manifest);
+		}
+	}
+	return decoratedClasses;
 }
 
 /**
