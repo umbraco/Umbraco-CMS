@@ -412,8 +412,17 @@ export class UmbViewController extends UmbControllerBase {
 		if (!segments || segments.length === 0) {
 			return;
 		}
-		const localTitle = segments.map((s) => s.label).join(' | ');
-		document.title = localTitle + ' | Umbraco';
+		// Reverse the segment order for the browser title so the most specific
+		// item (workspace name) appears first — Chrome truncates tabs after ~20
+		// characters, so the item the user is editing must be leftmost.
+		// The segments array itself retains hierarchy order (section → leaf) for
+		// consumers like the user history breadcrumb.
+		const browserTitle = segments
+			.slice()
+			.reverse()
+			.map((s) => s.label)
+			.join(' | ');
+		document.title = browserTitle + ' | Umbraco';
 
 		_setUmbCurrentViewTitle({
 			path: window.location.pathname,
