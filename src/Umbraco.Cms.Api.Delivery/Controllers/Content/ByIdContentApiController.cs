@@ -41,17 +41,20 @@ public class ByIdContentApiController : ContentApiItemControllerBase
         {
             return NotFound();
         }
+
         IActionResult? deniedAccessResult = await HandleMemberAccessAsync(contentItem, _requestMemberAccessService).ConfigureAwait(false);
         if (deniedAccessResult is not null)
         {
             return deniedAccessResult;
         }
+
         IApiContentResponse? apiContentResponse = ApiContentResponseBuilder.Build(contentItem);
         if (apiContentResponse is null)
         {
             return NotFound();
         }
 
+        SetOutputCacheContent(contentItem);
         return Ok(apiContentResponse);
     }
 }
