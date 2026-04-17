@@ -5,7 +5,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Tiptap.Toolbar.ClearFormatting',
 		name: 'Clear Formatting Tiptap Toolbar Extension',
 		api: () => import('./clear-formatting.tiptap-toolbar-api.js'),
-		forExtensions: ['Umb.Tiptap.HtmlAttributeClass', 'Umb.Tiptap.HtmlAttributeStyle'],
 		meta: {
 			alias: 'clear-formatting',
 			icon: 'icon-clear-formatting',
