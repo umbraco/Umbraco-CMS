@@ -62,6 +62,17 @@ public sealed class AuditService : RepositoryService, IAuditService
     }
 
     /// <inheritdoc />
+    [Obsolete("Use the overload accepting typeAlias. Scheduled for removal in Umbraco 19.")]
+    public Task<Attempt<AuditLogOperationStatus>> AddAsync(
+        AuditType type,
+        Guid userKey,
+        int objectId,
+        string? entityType,
+        string? comment,
+        string? parameters)
+        => AddAsync(type, userKey, objectId, entityType, comment, parameters, typeAlias: null);
+
+    /// <inheritdoc />
     public async Task<Attempt<AuditLogOperationStatus>> AddAsync(
         AuditType type,
         Guid userKey,

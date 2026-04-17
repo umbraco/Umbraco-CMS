@@ -1,6 +1,6 @@
 import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
-export interface AuditLogTriggerMapping {
+export interface UmbAuditLogTriggerMapping {
 	operation: string;
 	label: string;
 }
@@ -12,7 +12,7 @@ export interface ManifestAuditLogTriggerStyle extends ManifestBase {
 }
 
 export interface MetaAuditLogTriggerStyle {
-	mappings: AuditLogTriggerMapping[];
+	mappings: UmbAuditLogTriggerMapping[];
 	fallbackLabel?: string;
 }
 
