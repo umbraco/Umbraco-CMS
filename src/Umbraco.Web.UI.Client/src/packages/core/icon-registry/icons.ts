@@ -37,7 +37,7 @@ path: () => import("./icons/icon-alt.js"),
 },{
 name: "icon-anchor",
 keywords: ["ship"],
-groups: ["transportation","text"],
+groups: ["transport","text"],
 path: () => import("./icons/icon-anchor.js"),
 },{
 name: "icon-app",
@@ -65,7 +65,7 @@ path: () => import("./icons/icon-application-window.js"),
 },{
 name: "icon-arrivals",
 keywords: ["arrival","plane","trip","airplane","landing"],
-groups: ["transportation","travel"],
+groups: ["transport","travel"],
 path: () => import("./icons/icon-arrivals.js"),
 },{
 name: "icon-arrow-down",
@@ -234,7 +234,7 @@ path: () => import("./icons/icon-bluetooth.js"),
 },{
 name: "icon-boat-shipping",
 keywords: ["boat","knots","nautical mile","maritime","sailing","yacht","cruise","ocean liner","tanker","vessel","navy","trip","releases"],
-groups: ["transportation","navigation","travel"],
+groups: ["transport","navigation","travel"],
 path: () => import("./icons/icon-boat-shipping.js"),
 },{
 name: "icon-bold",
@@ -299,7 +299,7 @@ path: () => import("./icons/icon-brick.js"),
 },{
 name: "icon-briefcase",
 keywords: ["work","bag","baggage","folder"],
-groups: ["transportation"],
+groups: ["transport"],
 path: () => import("./icons/icon-briefcase.js"),
 },{
 name: "icon-browser-window",
@@ -339,7 +339,7 @@ path: () => import("./icons/icon-burn.js"),
 },{
 name: "icon-bus",
 keywords: ["bus","vehicle","transport","trip"],
-groups: ["transportation"],
+groups: ["transport"],
 path: () => import("./icons/icon-bus.js"),
 },{
 name: "icon-calculator",
@@ -380,7 +380,7 @@ path: () => import("./icons/icon-caps-lock.js"),
 },{
 name: "icon-car",
 keywords: ["vehicle","drive","trip","journey"],
-groups: ["transportation"],
+groups: ["transport"],
 path: () => import("./icons/icon-car.js"),
 },{
 name: "icon-categories",
@@ -737,7 +737,7 @@ path: () => import("./icons/icon-cut.js"),
 },{
 name: "icon-dashboard",
 keywords: ["dashboard","dial","meter","speed","pressure","measure","level"],
-groups: ["transportation","sports","science"],
+groups: ["transport","sports","science"],
 path: () => import("./icons/icon-dashboard.js"),
 },{
 name: "icon-defrag",
@@ -757,7 +757,7 @@ path: () => import("./icons/icon-delete.js"),
 },{
 name: "icon-departure",
 keywords: ["departure","plane","trip","airplane","takeoff"],
-groups: ["transportation","travel"],
+groups: ["transport","travel"],
 path: () => import("./icons/icon-departure.js"),
 },{
 name: "icon-desktop",
@@ -2029,7 +2029,7 @@ path: () => import("./icons/icon-pin-location.js"),
 },{
 name: "icon-plane",
 keywords: ["airplanes","aeroplanes","aircraft","flying","flight","plane","trip","airplane"],
-groups: ["transport","vehicle","transportation","travel","navigation"],
+groups: ["transport","vehicle","travel","navigation"],
 path: () => import("./icons/icon-plane.js"),
 },{
 name: "icon-planet",
@@ -2418,12 +2418,12 @@ path: () => import("./icons/icon-shift.js"),
 },{
 name: "icon-shipping-box",
 keywords: ["grid","grill","lines","storage","shipping","freight","supply chain","docker","environment","devops","code","coding"],
-groups: ["shape","box","development","transportation","mail"],
+groups: ["shape","box","development","transport","mail"],
 path: () => import("./icons/icon-shipping-box.js"),
 },{
 name: "icon-shipping",
 keywords: ["trailer","sack truck","boxes","lift","carry","baggage","luggage","travel","cart","trolley","suitcase"],
-groups: ["commerce","transportation","travel"],
+groups: ["commerce","transport","travel"],
 related: ["icon-truck"],
 path: () => import("./icons/icon-shipping.js"),
 },{
@@ -2557,7 +2557,7 @@ path: () => import("./icons/icon-speaker.js"),
 },{
 name: "icon-speed-gauge",
 keywords: ["guage","speed","scale","fuel","dashboard","dial","meter","pressure","measure","level"],
-groups: ["measure","transportation","sports","science"],
+groups: ["measure","transport","sports","science"],
 related: ["icon-temperatrure-alt"],
 path: () => import("./icons/icon-speed-gauge.js"),
 },{
@@ -2786,7 +2786,7 @@ path: () => import("./icons/icon-thumbnails.js"),
 },{
 name: "icon-ticket",
 keywords: ["one","1","entry","pass","voucher","event","concert","show","perforated","dashed"],
-groups: ["item","money","note","ticket","account","transportation"],
+groups: ["item","money","note","ticket","account","transport"],
 related: ["icon-coins","icon-bills"],
 path: () => import("./icons/icon-ticket.js"),
 },{
@@ -2829,7 +2829,7 @@ path: () => import("./icons/icon-trafic.js"),
 },{
 name: "icon-train",
 keywords: ["trams","railways","trains","public transport","railway","metro","subway","underground","high-speed","bullet","fast","track","line"],
-groups: ["transport","vehicle","transportation"],
+groups: ["transport","vehicle"],
 path: () => import("./icons/icon-train.js"),
 },{
 name: "icon-trash-alt-2",
@@ -2870,7 +2870,7 @@ path: () => import("./icons/icon-trophy.js"),
 },{
 name: "icon-truck",
 keywords: ["lorry","vehicle","van","shipping","delivery","haulage"],
-groups: ["transport","vehicle","transportation"],
+groups: ["transport","vehicle"],
 related: ["icon-shipping"],
 path: () => import("./icons/icon-truck.js"),
 },{

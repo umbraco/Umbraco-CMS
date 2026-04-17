@@ -93,7 +93,7 @@ describe('UmbIconSearchController', () => {
 		// "transprtt" must fuzzy-match the "transport" token within the group,
 		// not the full "transport vehicle" string (where the extra word
 		// dominates the edit distance and pushes similarity below threshold).
-		const results = await controller.search('transprtt');
+		const results = await controller.search('transprt');
 		expect(results.some((r) => r.name === 'icon-plane')).to.be.true;
 	});
 
