@@ -31,10 +31,12 @@ export const detailHandlers = [
 		const id = params.id as string;
 		if (!id) return new HttpResponse(null, { status: 400 });
 
-		const response = umbWebhookMockDb.detail.read(id);
-		if (!response) return new HttpResponse(null, { status: 404 });
-
-		return HttpResponse.json(response);
+		try {
+			const response = umbWebhookMockDb.detail.read(id);
+			return HttpResponse.json(response);
+		} catch {
+			return new HttpResponse(null, { status: 404 });
+		}
 	}),
 
 	http.put(umbracoPath(`${UMB_SLUG}/:id`), async ({ request, params }) => {
