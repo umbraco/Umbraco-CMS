@@ -22,6 +22,11 @@ const lucideCategoriesJson = 'devops/icons/lucide-categories.json';
 const simpleIconsSvgDirectory = 'node_modules/simple-icons/icons';
 const customSvgDirectory = `${moduleDirectory}/svgs/custom`;
 
+// Lucide group names that should be normalised to our preferred terms.
+const groupRenames = {
+	'transportation': 'transport',
+};
+
 // Case-insensitive dedupe while preserving the order of first occurrence.
 const mergeUnique = (...lists) => {
 	const seen = new Set();
@@ -82,7 +87,9 @@ const collectDictionaryIcons = async () => {
 				// Merge curated data first (wins on ordering) with Lucide's upstream metadata.
 				const lucideKey = iconDef.file.replace(/\.svg$/, '');
 				const keywords = mergeUnique(iconDef.keywords, lucideTags[lucideKey]);
-				const groups = mergeUnique(iconDef.groups, lucideCategories[lucideKey]);
+				const groups = mergeUnique(iconDef.groups, lucideCategories[lucideKey])
+					.map((g) => groupRenames[g] ?? g)
+					.filter((g, i, a) => a.indexOf(g) === i);
 
 				const icon = {
 					name: iconDef.name,

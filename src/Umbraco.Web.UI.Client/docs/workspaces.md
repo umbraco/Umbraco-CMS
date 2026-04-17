@@ -196,7 +196,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase
   implements UmbPublishableWorkspaceContext {
 
   constructor(host: UmbControllerHost) {
-    super(host, UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT.toString());
+    super(host, UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
 
     this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (workspaceContext) => {
       // Access workspace data and add publishing capabilities

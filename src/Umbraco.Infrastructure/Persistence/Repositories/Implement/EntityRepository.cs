@@ -510,7 +510,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     /// <returns>An <see cref="IEnumerable{TreeEntityPath}"/> containing the paths of the matching entities.</returns>
     public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[]? ids) =>
         ids?.Any() ?? false
-            ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, ids.Distinct()))
+            ? ids.Distinct().SelectByGroups(
+                group => PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.NodeId, group)),
+                Constants.Sql.MaxParameterCount)
+                .ToList()
             : PerformGetAllPaths(objectType);
 
     /// <summary>
@@ -521,7 +524,10 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
     /// <returns>An enumerable of <see cref="Umbraco.Cms.Core.Models.TreeEntityPath"/> representing the entity paths.</returns>
     public IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys) =>
         keys.Any()
-            ? PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, keys.Distinct()))
+            ? keys.Distinct().SelectByGroups(
+                group => PerformGetAllPaths(objectType, sql => sql.WhereIn<NodeDto>(x => x.UniqueId, group)),
+                Constants.Sql.MaxParameterCount)
+                .ToList()
             : PerformGetAllPaths(objectType);
 
     private IEnumerable<TreeEntityPath> PerformGetAllPaths(Guid objectType, Action<Sql<ISqlContext>>? filter = null)
