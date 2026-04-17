@@ -110,9 +110,16 @@ function setupStandardDecorator<
 			return protoOrTarget.set.call(this, value);
 		},
 		init(this: any, value: InstanceType) {
-			// Defer controller creation to avoid timing issues with private fields
-			queueMicrotask(() => {
-				new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, context, value);
+			// Defer controller creation to hostConnected so:
+			// 1. All class field initializers have run
+			// 2. The element is in the DOM and ready to dispatch provide events to descendants
+			let initialized = false;
+			this.addController({
+				hostConnected: () => {
+					if (initialized) return;
+					initialized = true;
+					new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, context, value);
+				},
 			});
 			return value;
 		},
@@ -148,12 +155,19 @@ function setupLegacyDecorator<
 	const constructor = protoOrTarget.constructor as any;
 
 	// Strategy 1: Use addInitializer if available (LitElement classes)
+	// Defer controller creation to hostConnected so:
+	// 1. All class field initializers have run (element[propertyKey] is set)
+	// 2. The element is in the DOM and ready to dispatch provide events to descendants
 	if (constructor.addInitializer) {
 		constructor.addInitializer((element: any): void => {
-			// Defer controller creation to avoid timing issues with private fields
-			queueMicrotask(() => {
-				const initialValue = element[propertyKey];
-				new UmbContextProviderController<BaseType, ResultType, InstanceType>(element, context, initialValue);
+			let initialized = false;
+			element.addController({
+				hostConnected: () => {
+					if (initialized) return;
+					initialized = true;
+					const initialValue = element[propertyKey];
+					new UmbContextProviderController<BaseType, ResultType, InstanceType>(element, context, initialValue);
+				},
 			});
 		});
 		return;

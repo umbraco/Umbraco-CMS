@@ -114,20 +114,29 @@ function setupStandardDecorator<BaseType extends UmbContextMinimal, ResultType e
 	}
 
 	decoratorContext.addInitializer(function () {
-		queueMicrotask(() => {
-			if (subscribe) {
-				// Continuous subscription - stays active and updates property on context changes
-				new UmbContextConsumerController(this, context, (value) => {
-					protoOrTarget.set.call(this, value);
-					callback?.(value);
-				});
-			} else {
-				// One-time consumption - uses asPromise() to get the value once and then cleans up
-				const controller = new UmbContextConsumerController(this, context, callback);
-				controller.asPromise().then((value) => {
-					protoOrTarget.set.call(this, value);
-				});
-			}
+		// Defer controller creation to hostConnected so:
+		// 1. All class field initializers have run (the instance is fully constructed)
+		// 2. The element is in the DOM, so the context-request event can dispatch
+		// 3. Resolution happens before the first render if a provider is in the ancestor tree
+		let initialized = false;
+		(this as any).addController({
+			hostConnected: () => {
+				if (initialized) return;
+				initialized = true;
+				if (subscribe) {
+					// Continuous subscription - stays active and updates property on context changes
+					new UmbContextConsumerController(this, context, (value) => {
+						protoOrTarget.set.call(this, value);
+						callback?.(value);
+					});
+				} else {
+					// One-time consumption - uses asPromise() to get the value once and then cleans up
+					const controller = new UmbContextConsumerController(this, context, callback);
+					controller.asPromise().then((value) => {
+						protoOrTarget.set.call(this, value);
+					});
+				}
+			},
 		});
 	});
 }
@@ -165,22 +174,31 @@ function setupLegacyDecorator<BaseType extends UmbContextMinimal, ResultType ext
 	const constructor = protoOrTarget.constructor as any;
 
 	// Strategy 1: Use addInitializer if available (LitElement classes)
+	// Defer controller creation to hostConnected so:
+	// 1. All class field initializers have run (the instance is fully constructed)
+	// 2. The element is in the DOM, so the context-request event can dispatch
+	// 3. Resolution happens before the first render if a provider is in the ancestor tree
 	if (constructor.addInitializer) {
 		constructor.addInitializer((element: any): void => {
-			queueMicrotask(() => {
-				if (subscribe) {
-					// Continuous subscription
-					new UmbContextConsumerController(element, context, (value) => {
-						element[propertyKey] = value;
-						callback?.(value);
-					});
-				} else {
-					// One-time consumption using asPromise()
-					const controller = new UmbContextConsumerController(element, context, callback);
-					controller.asPromise().then((value) => {
-						element[propertyKey] = value;
-					});
-				}
+			let initialized = false;
+			element.addController({
+				hostConnected: () => {
+					if (initialized) return;
+					initialized = true;
+					if (subscribe) {
+						// Continuous subscription
+						new UmbContextConsumerController(element, context, (value) => {
+							element[propertyKey] = value;
+							callback?.(value);
+						});
+					} else {
+						// One-time consumption using asPromise()
+						const controller = new UmbContextConsumerController(element, context, callback);
+						controller.asPromise().then((value) => {
+							element[propertyKey] = value;
+						});
+					}
+				},
 			});
 		});
 		return;
