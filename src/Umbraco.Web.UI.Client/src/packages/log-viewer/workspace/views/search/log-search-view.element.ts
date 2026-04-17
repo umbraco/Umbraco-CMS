@@ -2,34 +2,13 @@ import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../logviewer-workspace.context-to
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
-import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { observedFrom } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-search-view')
 export class UmbLogViewerSearchViewElement extends UmbLitElement {
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.canShowLogs, { default: true })
 	@state()
 	private _canShowLogs = true;
-
-	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
-
-	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
-	private set _logViewerContext(value) {
-		this.#logViewerContext = value;
-		this.#observeCanShowLogs();
-	}
-	private get _logViewerContext() {
-		return this.#logViewerContext;
-	}
-
-	#canShowLogsObserver?: UmbObserverController<boolean | null>;
-
-	#observeCanShowLogs() {
-		if (this.#canShowLogsObserver) this.#canShowLogsObserver.destroy();
-
-		this.#canShowLogsObserver = this.observe(this._logViewerContext?.canShowLogs, (canShowLogs) => {
-			this._canShowLogs = canShowLogs ?? this._canShowLogs;
-		});
-	}
 
 	override render() {
 		return html`
