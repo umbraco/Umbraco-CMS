@@ -8,7 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import type { UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
-import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { consumeContext, observedFrom } from '@umbraco-cms/backoffice/context-api';
 import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { debounceTime, skip } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -19,29 +19,30 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 	@query('#search-dropdown')
 	private _searchDropdownElement!: UmbDropdownElement;
 
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.savedSearches, { default: undefined })
 	@state()
-	private _savedSearches: SavedLogSearchResponseModel[] = [];
+	private _savedSearchesPage?: { items?: SavedLogSearchResponseModel[] };
 
+	private get _savedSearches(): SavedLogSearchResponseModel[] {
+		return this._savedSearchesPage?.items ?? [];
+	}
+
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.filterExpression, { default: '' })
 	@state()
 	private _inputQuery = '';
 
-	@state()
-	private _isQuerySaved = false;
+	private get _isQuerySaved(): boolean {
+		return this._savedSearches.some((search) => search.query === this._inputQuery);
+	}
 
 	// Local state for debouncing user input before updating context
 	#localQueryState = new UmbStringState('');
 
-	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
-
-	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
-	private set _logViewerContext(value) {
-		this.#logViewerContext = value;
-		this.#observeStuff();
-		this.#logViewerContext?.getSavedSearches();
-	}
-	private get _logViewerContext() {
-		return this.#logViewerContext;
-	}
+	@consumeContext({
+		context: UMB_APP_LOG_VIEWER_CONTEXT,
+		callback: (ctx) => ctx?.getSavedSearches(),
+	})
+	private _logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
 	constructor() {
 		super();
@@ -57,18 +58,6 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 				this.#persist(query);
 			},
 		);
-	}
-
-	#observeStuff() {
-		this.observe(this._logViewerContext?.savedSearches, (savedSearches) => {
-			this._savedSearches = savedSearches?.items ?? [];
-			this._isQuerySaved = this._savedSearches.some((search) => search.query === this._inputQuery);
-		});
-
-		this.observe(this._logViewerContext?.filterExpression, (query) => {
-			this._inputQuery = query ?? '';
-			this._isQuerySaved = this._savedSearches.some((search) => search.query === this._inputQuery);
-		});
 	}
 
 	#setQuery(event: Event) {
@@ -129,7 +118,8 @@ export class UmbLogViewerSearchInputElement extends UmbLitElement {
 			.then((savedSearch) => {
 				if (savedSearch) {
 					this.#saveSearch(savedSearch);
-					this._isQuerySaved = true;
+					// _isQuerySaved is derived from _savedSearches; it will recompute when
+					// the context emits the updated savedSearches list.
 				}
 			})
 			.catch(() => {});
