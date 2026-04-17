@@ -40,6 +40,10 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY_03 }}
+
+          # Enable progress tracking
+          track_progress: true
+
           additional_permissions: "actions: read"
           claude_args: "--model claude-sonnet-4-6 --allowedTools 'Bash(gh:*),Bash(git:*)'"
           prompt: |
