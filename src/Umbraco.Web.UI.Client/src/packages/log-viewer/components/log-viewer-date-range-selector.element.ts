@@ -17,25 +17,18 @@ export class UmbLogViewerDateRangeSelectorElement extends UmbLitElement {
 	@property({ type: Boolean, reflect: true })
 	horizontal = false;
 
-	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
-
 	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
-	private set _logViewerContext(value) {
-		this.#logViewerContext = value;
-		this.#observeStuff();
-	}
-	private get _logViewerContext() {
-		return this.#logViewerContext;
-	}
+	private _logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	#observeStuff() {
-		this.observe(
-			this._logViewerContext?.dateRange,
+	constructor() {
+		super();
+		this.observeContext(
+			UMB_APP_LOG_VIEWER_CONTEXT,
+			(ctx) => ctx.dateRange,
 			(dateRange) => {
 				this._startDate = dateRange?.startDate ?? '';
 				this._endDate = dateRange?.endDate ?? '';
 			},
-			'_observeDateRange',
 		);
 	}
 

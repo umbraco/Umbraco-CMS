@@ -1,43 +1,28 @@
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../logviewer-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { consumeContext, observedFrom } from '@umbraco-cms/backoffice/context-api';
 
 //TODO: add a disabled attribute to the show more button when the total number of items is correctly returned from the endpoint
 @customElement('umb-log-viewer-overview-view')
 export class UmbLogViewerOverviewViewElement extends UmbLitElement {
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.logCount)
 	@state()
-	private _errorCount?: number;
+	private _logCount?: { Error?: number } | null;
 
+	private get _errorCount(): number | undefined {
+		return this._logCount?.Error;
+	}
+
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.canShowLogs, { default: false })
 	@state()
 	private _canShowLogs = false;
 
-	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
-
 	@consumeContext({
 		context: UMB_APP_LOG_VIEWER_CONTEXT,
+		callback: (ctx) => ctx?.getLogLevels(0, 100),
 	})
-	private set _logViewerContext(value) {
-		this.#logViewerContext = value;
-		this.#observeErrorCount();
-		this.#observeCanShowLogs();
-		value?.getLogLevels(0, 100);
-	}
-	private get _logViewerContext() {
-		return this.#logViewerContext;
-	}
-
-	#observeErrorCount() {
-		this.observe(this._logViewerContext?.logCount, (logLevelCount) => {
-			this._errorCount = logLevelCount?.Error;
-		});
-	}
-
-	#observeCanShowLogs() {
-		this.observe(this._logViewerContext?.canShowLogs, (canShowLogs) => {
-			this._canShowLogs = canShowLogs ?? false;
-		});
-	}
+	private _logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
 	override render() {
 		return html`
