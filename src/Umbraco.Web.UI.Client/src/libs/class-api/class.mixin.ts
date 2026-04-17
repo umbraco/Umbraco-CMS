@@ -98,6 +98,33 @@ export const UmbClassMixin = <T extends ClassConstructor<EventTarget>>(superClas
 			return new UmbContextConsumerController(this, contextAlias, callback);
 		}
 
+		observeContext<
+			BaseType extends UmbContextMinimal = UmbContextMinimal,
+			ResultType extends BaseType = BaseType,
+			ObservedT = unknown,
+		>(
+			contextAlias: string | UmbContextToken<BaseType, ResultType>,
+			selector: (ctx: ResultType) => Observable<ObservedT> | undefined,
+			callback: ObserverCallback<ObservedT>,
+			controllerAlias?: UmbControllerAlias | null,
+		): UmbContextConsumerController<BaseType, ResultType> {
+			// A stable controller alias ensures observe() re-uses the same observer controller
+			// across context instance changes (new provider mounts, unprovide/reprovide).
+			const observerAlias =
+				controllerAlias === null
+					? undefined
+					: controllerAlias ?? Symbol(`observeContext:${contextAlias.toString()}`);
+
+			return new UmbContextConsumerController(this, contextAlias, (ctx) => {
+				if (ctx === undefined) {
+					this.observe(undefined, undefined, observerAlias ?? null);
+					return;
+				}
+				const source = selector(ctx);
+				this.observe(source, callback, observerAlias ?? null);
+			});
+		}
+
 		async getContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
 			options?: UmbClassGetContextOptions,

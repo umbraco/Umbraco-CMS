@@ -73,6 +73,29 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 			return new UmbContextConsumerController(this, alias, callback);
 		}
 
+		observeContext<
+			BaseType extends UmbContextMinimal = UmbContextMinimal,
+			ResultType extends BaseType = BaseType,
+			ObservedT = unknown,
+		>(
+			alias: string | UmbContextToken<BaseType, ResultType>,
+			selector: (ctx: ResultType) => Observable<ObservedT> | undefined,
+			callback: ObserverCallback<ObservedT>,
+			controllerAlias?: UmbControllerAlias | null,
+		): UmbContextConsumerController<BaseType, ResultType> {
+			const observerAlias =
+				controllerAlias === null ? undefined : controllerAlias ?? Symbol(`observeContext:${alias.toString()}`);
+
+			return new UmbContextConsumerController(this, alias, (ctx) => {
+				if (ctx === undefined) {
+					this.observe(undefined, undefined, observerAlias ?? null);
+					return;
+				}
+				const source = selector(ctx);
+				this.observe(source, callback, observerAlias ?? null);
+			});
+		}
+
 		async getContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
 			contextAlias: string | UmbContextToken<BaseType, ResultType>,
 			options?: UmbClassGetContextOptions,

@@ -67,6 +67,27 @@ export interface UmbClassInterface extends UmbControllerHost {
 	): UmbContextConsumerController<BaseType, ResultType>;
 
 	/**
+	 * @description Consume a context AND observe an observable slice of it in one call. Callback fires on each emission.
+	 * Handles context resolution, observable subscription, and cleanup automatically.
+	 * @param {string | UmbContextToken} alias The context to consume.
+	 * @param {(ctx: ResultType) => Observable<T> | undefined} selector Returns the observable slice to observe.
+	 * @param {ObserverCallback<T>} callback Called with each emission from the observable.
+	 * @param {UmbControllerAlias | null | undefined} controllerAlias Optional alias for the internal observer controller.
+	 * @returns {UmbContextConsumerController} Reference to the created Context Consumer Controller instance.
+	 * @memberof UmbClassInterface
+	 */
+	observeContext<
+		BaseType extends UmbContextMinimal = UmbContextMinimal,
+		ResultType extends BaseType = BaseType,
+		ObservedT = unknown,
+	>(
+		alias: string | UmbContextToken<BaseType, ResultType>,
+		selector: (ctx: ResultType) => Observable<ObservedT> | undefined,
+		callback: ObserverCallback<ObservedT>,
+		controllerAlias?: UmbControllerAlias | null,
+	): UmbContextConsumerController<BaseType, ResultType>;
+
+	/**
 	 * @description Retrieve a context. Notice this is a one time retrieving of a context, meaning if you expect this to be up to date with reality you should instead use the consumeContext method.
 	 * @param {string} alias
 	 * @returns {Promise<unknown>} A Promise with the reference to the Context Api Instance
