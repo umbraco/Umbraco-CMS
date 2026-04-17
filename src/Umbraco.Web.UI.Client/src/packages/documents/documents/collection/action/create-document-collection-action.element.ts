@@ -1,15 +1,16 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import { UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbCollectionCreatePopoverScrollMixin } from '@umbraco-cms/backoffice/collection';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-create-document-collection-action')
-export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
+export class UmbCreateDocumentCollectionActionElement extends UmbCollectionCreatePopoverScrollMixin(UmbLitElement) {
 	@state()
 	private _allowedDocumentTypes: Array<UmbAllowedDocumentTypeModel> = [];
 
@@ -18,9 +19,6 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 
 	@state()
 	private _documentTypeUnique?: string;
-
-	@state()
-	private _popoverOpen = false;
 
 	@property({ attribute: false })
 	manifest?: ManifestCollectionAction;
@@ -52,13 +50,6 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		if (data && data.items) {
 			this._allowedDocumentTypes = data.items;
 		}
-	}
-
-	#onPopoverToggle(event: ToggleEvent) {
-		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this._popoverOpen = event.newState === 'open';
 	}
 
 	#getCreateUrl(item: UmbAllowedDocumentTypeModel) {
@@ -108,7 +99,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 			<uui-popover-container
 				id="collection-action-menu-popover"
 				placement="bottom-start"
-				@toggle=${this.#onPopoverToggle}>
+				@toggle=${this._onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
 						${repeat(
@@ -125,14 +116,6 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 			</uui-popover-container>
 		`;
 	}
-
-	static override styles = [
-		css`
-			uui-scroll-container {
-				max-height: 500px;
-			}
-		`,
-	];
 }
 
 export default UmbCreateDocumentCollectionActionElement;

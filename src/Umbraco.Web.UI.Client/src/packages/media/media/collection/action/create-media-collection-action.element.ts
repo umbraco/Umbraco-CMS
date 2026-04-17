@@ -4,12 +4,13 @@ import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.
 import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbCollectionCreatePopoverScrollMixin } from '@umbraco-cms/backoffice/collection';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-create-media-collection-action')
-export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
+export class UmbCreateMediaCollectionActionElement extends UmbCollectionCreatePopoverScrollMixin(UmbLitElement) {
 	@state()
 	private _allowedMediaTypes: Array<UmbAllowedMediaTypeModel> = [];
 
@@ -18,9 +19,6 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 
 	@state()
 	private _mediaTypeUnique?: string;
-
-	@state()
-	private _popoverOpen = false;
 
 	@property({ attribute: false })
 	manifest?: ManifestCollectionAction;
@@ -50,13 +48,6 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		if (data && data.items) {
 			this._allowedMediaTypes = data.items;
 		}
-	}
-
-	#onPopoverToggle(event: ToggleEvent) {
-		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this._popoverOpen = event.newState === 'open';
 	}
 
 	#getCreateUrl(item: UmbAllowedMediaTypeModel) {
@@ -107,7 +98,7 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 			<uui-popover-container
 				id="collection-action-menu-popover"
 				placement="bottom-start"
-				@toggle=${this.#onPopoverToggle}>
+				@toggle=${this._onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
 						${repeat(

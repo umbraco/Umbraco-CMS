@@ -1,17 +1,15 @@
 import { UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
-import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMemberTypeStructureRepository } from '@umbraco-cms/backoffice/member-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbCollectionCreatePopoverScrollMixin } from '@umbraco-cms/backoffice/collection';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMemberTypeModel } from '@umbraco-cms/backoffice/member-type';
 
 @customElement('umb-create-member-collection-action')
-export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
+export class UmbCreateMemberCollectionActionElement extends UmbCollectionCreatePopoverScrollMixin(UmbLitElement) {
 	@state()
 	private _allowedMemberTypes: Array<UmbAllowedMemberTypeModel> = [];
-
-	@state()
-	private _popoverOpen = false;
 
 	@property({ attribute: false })
 	manifest?: ManifestCollectionAction;
@@ -27,13 +25,6 @@ export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
 		if (data && data.items) {
 			this._allowedMemberTypes = data.items;
 		}
-	}
-
-	#onPopoverToggle(event: ToggleEvent) {
-		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this._popoverOpen = event.newState === 'open';
 	}
 
 	#getCreateUrl(item: UmbAllowedMemberTypeModel) {
@@ -80,7 +71,7 @@ export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
 			<uui-popover-container
 				id="collection-action-menu-popover"
 				placement="bottom-start"
-				@toggle=${this.#onPopoverToggle}>
+				@toggle=${this._onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
 						${repeat(
@@ -97,14 +88,6 @@ export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
 			</uui-popover-container>
 		`;
 	}
-
-	static override styles = [
-		css`
-			uui-scroll-container {
-				max-height: 500px;
-			}
-		`,
-	];
 }
 
 export default UmbCreateMemberCollectionActionElement;

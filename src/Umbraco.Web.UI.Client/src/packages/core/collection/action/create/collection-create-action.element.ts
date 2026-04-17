@@ -3,16 +3,14 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import { UmbCollectionCreatePopoverScrollMixin } from './collection-create-popover-scroll.mixin.js';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 type ManifestType = ManifestEntityCreateOptionAction;
 
 @customElement('umb-collection-create-action-button')
-export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
-	@state()
-	private _popoverOpen = false;
-
+export class UmbCollectionCreateActionButtonElement extends UmbCollectionCreatePopoverScrollMixin(UmbLitElement) {
 	@state()
 	private _multipleOptions = false;
 
@@ -29,7 +27,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		this._popoverOpen = event.newState === 'open';
+		this._onPopoverToggle(event as unknown as ToggleEvent);
 	}
 
 	async #onClick(event: Event, controller: UmbExtensionApiInitializer<ManifestType>, href?: string) {
