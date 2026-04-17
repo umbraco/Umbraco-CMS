@@ -40,6 +40,9 @@ import {
 } from './examine.data.js';
 import { items as trackedReferenceItems } from './tracked-reference.data.js';
 import { data as news } from './umbraco-news.data.js';
+import { data as webhook } from './webhook.data.js';
+import { data as webhookEvent } from './webhook-event.data.js';
+import { data as webhookDelivery } from './webhook-delivery.data.js';
 
 // Named exports for all data
 export {
@@ -80,6 +83,9 @@ export {
 	examineSearchResults,
 	trackedReferenceItems,
 	news,
+	webhook,
+	webhookEvent,
+	webhookDelivery,
 };
 
 // Type assertion to ensure this module satisfies UmbMockDataSet
@@ -121,5 +127,8 @@ const _typeCheck: UmbMockDataSet = {
 	examineSearchResults,
 	trackedReferenceItems,
 	news,
+	webhook,
+	webhookEvent,
+	webhookDelivery,
 };
 void _typeCheck;
