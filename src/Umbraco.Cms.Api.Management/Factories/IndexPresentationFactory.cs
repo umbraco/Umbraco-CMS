@@ -124,7 +124,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "An error occured trying to get the searcher name of index {IndexName}", index.Name);
+            _logger.LogError(e, "An error occurred trying to get the searcher name of index {IndexName}", index.Name);
             name = "Could not determine searcher name because of error.";
             return false;
         }
@@ -139,7 +139,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "An error occured trying to get the document count of index {IndexName}", index.Name);
+            _logger.LogError(e, "An error occurred trying to get the document count of index {IndexName}", index.Name);
             documentCount = 0;
             return false;
         }
@@ -154,7 +154,7 @@ public class IndexPresentationFactory : IIndexPresentationFactory
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "An error occured trying to get the field name count of index {IndexName}", index.Name);
+            _logger.LogError(e, "An error occurred trying to get the field name count of index {IndexName}", index.Name);
             fieldNameCount = 0;
             return false;
         }
