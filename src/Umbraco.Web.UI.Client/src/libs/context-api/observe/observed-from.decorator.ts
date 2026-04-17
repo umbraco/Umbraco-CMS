@@ -17,10 +17,14 @@ export interface UmbObservedFromOptions<T> {
  * slice of a context. Combines context consumption and observable observation in one declaration.
  *
  * When the element connects to the DOM:
- * 1. A context consumer requests the context (synchronously if the provider is an ancestor).
- * 2. When the context resolves, the selector runs to get the observable slice.
- * 3. The observable is subscribed to via `element.observe()`, re-assigning the property on each emission.
- * 4. If the context is unprovided, the observable is cleaned up. A new provider triggers re-subscription.
+ * 1. Setup is deferred one microtask so inherited private fields (e.g. the controller host's
+ *    `#controllers` array) are initialized before the consumer registers.
+ * 2. A context consumer then requests the context; if the provider is an ancestor, the request
+ *    resolves synchronously (first render may still occur with the default before the microtask runs).
+ * 3. When the context resolves, the selector runs to get the observable slice.
+ * 4. The observable is subscribed to via `element.observe()`, re-assigning the property on each emission.
+ * 5. If the observable emits `undefined` and a default is provided, the default is re-applied.
+ * 6. If the context is unprovided, the observable is cleaned up. A new provider triggers re-subscription.
  *
  * Supports both modern "standard" decorators (Stage 3 TC39 proposal) and legacy TypeScript experimental decorators.
  * @param {string | UmbContextToken} contextAlias - The context token or alias to consume.
