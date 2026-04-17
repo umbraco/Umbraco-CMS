@@ -4,6 +4,7 @@ import { provideContext } from './context-provide.decorator.js';
 import { aTimeout, elementUpdated, expect, fixture } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { html } from '@umbraco-cms/backoffice/external/lit';
 
 class UmbTestContextConsumerClass implements UmbContextMinimal {
 	public prop: string;
@@ -111,7 +112,7 @@ describe('@provide decorator', () => {
 
 	it('should provide context to descendants on first render', async () => {
 		// The provider decorator's controller must be set up before the descendant's consume
-		// runs its request, otherwise the descendant would see undefined on first render
+		// runs its request — otherwise the descendant would see undefined during its first render.
 		const providerInstance = new UmbTestContextConsumerClass('early value');
 
 		class TimingProviderElement extends UmbLitElement {
@@ -120,16 +121,22 @@ describe('@provide decorator', () => {
 		}
 		customElements.define('timing-provider-element', TimingProviderElement);
 
+		// Capture the context value seen by the descendant DURING its first render(), not after.
+		// If the provider isn't set up in time, render() would see undefined.
 		class TimingConsumerElement extends UmbLitElement {
-			contextValueAtFirstRender?: UmbTestContextConsumerClass;
+			public renderedValues: (UmbTestContextConsumerClass | undefined)[] = [];
+			contextValue?: UmbTestContextConsumerClass;
 
 			constructor() {
 				super();
 				this.consumeContext(testToken, (value) => {
-					if (this.contextValueAtFirstRender === undefined) {
-						this.contextValueAtFirstRender = value;
-					}
+					this.contextValue = value;
 				});
+			}
+
+			override render() {
+				this.renderedValues.push(this.contextValue);
+				return html`<div>${this.contextValue?.prop ?? 'no value'}</div>`;
 			}
 		}
 		customElements.define('timing-consumer-element', TimingConsumerElement);
@@ -141,6 +148,9 @@ describe('@provide decorator', () => {
 
 		await elementUpdated(consumerEl);
 
-		expect(consumerEl.contextValueAtFirstRender).to.equal(providerInstance);
+		// The first render must already have seen the context value.
+		expect(consumerEl.renderedValues[0], 'context value seen during first render').to.equal(providerInstance);
+		// The descendant must never have rendered with undefined.
+		expect(consumerEl.renderedValues, 'consumer rendered with undefined at some point').to.not.include(undefined);
 	});
 });

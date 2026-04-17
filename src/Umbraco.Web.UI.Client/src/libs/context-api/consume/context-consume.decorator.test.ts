@@ -2,6 +2,7 @@ import { UmbContextToken } from '../token/context-token.js';
 import type { UmbContextMinimal } from '../types.js';
 import { UmbContextProvider } from '../provide/context-provider.js';
 import { consumeContext } from './context-consume.decorator.js';
+import { UmbContextConsumerController } from './context-consumer.controller.js';
 import { aTimeout, elementUpdated, expect, fixture } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -197,15 +198,38 @@ describe('@consume decorator', () => {
 		provider.hostConnected();
 	});
 
-	it('should not set up the consumer multiple times across disconnect/reconnect cycles', async () => {
-		let callbackCount = 0;
+	it('swallows asPromise rejection when subscribe:false and no provider is available', async () => {
+		// Use a different token with no provider registered.
+		const unprovidedToken = new UmbContextToken<UmbTestContextConsumerClass>('unprovided-context');
 
+		class NoProviderController extends UmbControllerBase {
+			@consumeContext({ context: unprovidedToken, subscribe: false })
+			contextValue?: UmbTestContextConsumerClass;
+		}
+
+		let unhandledRejection: PromiseRejectionEvent | undefined;
+		const rejectionHandler = (e: PromiseRejectionEvent) => {
+			unhandledRejection = e;
+		};
+		window.addEventListener('unhandledrejection', rejectionHandler);
+
+		try {
+			const controller = new NoProviderController(element);
+			// Wait long enough for the RAF-based request timeout to reject the promise.
+			await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+			await aTimeout(0);
+
+			expect(unhandledRejection, 'no unhandled promise rejection should surface').to.be.undefined;
+			expect(controller.contextValue).to.be.undefined;
+		} finally {
+			window.removeEventListener('unhandledrejection', rejectionHandler);
+		}
+	});
+
+	it('should not set up the consumer multiple times across disconnect/reconnect cycles', async () => {
 		class ReconnectElement extends UmbLitElement {
 			@consumeContext({
 				context: testToken,
-				callback: () => {
-					callbackCount++;
-				},
 			})
 			contextValue?: UmbTestContextConsumerClass;
 		}
@@ -215,8 +239,11 @@ describe('@consume decorator', () => {
 		const reconnectElement = await fixture<ReconnectElement>(`<reconnect-element></reconnect-element>`);
 		await elementUpdated(reconnectElement);
 
-		const initialCallbackCount = callbackCount;
-		expect(initialCallbackCount).to.be.greaterThan(0);
+		const countConsumers = () =>
+			reconnectElement.getUmbControllers((c) => c instanceof UmbContextConsumerController).length;
+
+		const initialConsumerCount = countConsumers();
+		expect(initialConsumerCount, 'a consumer controller is registered after initial connect').to.equal(1);
 
 		// Disconnect and reconnect
 		const parent = reconnectElement.parentElement!;
@@ -225,10 +252,8 @@ describe('@consume decorator', () => {
 		parent.appendChild(reconnectElement);
 		await elementUpdated(reconnectElement);
 
-		// The consumer should not have been set up a second time —
-		// the same controller handles reconnect via hostConnected lifecycle
-		// If it WAS set up again, we'd see a second initial-resolution callback
-		// (callback may fire on reconnect for re-resolution, but the controller itself is not recreated)
+		// The decorator must not register a duplicate consumer on reconnect.
+		expect(countConsumers(), 'consumer controller count is unchanged after reconnect').to.equal(initialConsumerCount);
 		expect(reconnectElement.contextValue).to.equal(provider.providerInstance());
 	});
 });

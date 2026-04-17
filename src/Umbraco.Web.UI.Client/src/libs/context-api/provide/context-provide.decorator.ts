@@ -82,18 +82,12 @@ export function provideContext<
 }
 
 /**
- * Sets up a standard decorator (Stage 3 TC39 proposal) for auto-accessors.
- * This branch is used when decorating with the 'accessor' keyword.
- * Example: @provideContext({context: TOKEN}) accessor myProp = new MyContext();
+ * Standard decorator (Stage 3 TC39) path for `accessor` fields.
  *
- * The decorator receives a ClassAccessorDecoratorContext object and returns
- * an accessor descriptor that intercepts the property initialization.
- *
- * This is the modern, standardized decorator API that will be the standard
- * when Lit 4.x is released.
- *
- * Note: Standard decorators currently don't work with @state()/@property()
- * decorators, which is why we still need the legacy branch.
+ * Registers the UmbContextProviderController directly via `addUmbController`
+ * during `init` — the host's controller list is lazy-inited in
+ * `UmbControllerHostMixin`, so this is safe even though inherited class fields
+ * are not yet set.
  * @param protoOrTarget
  * @param context
  */
@@ -110,39 +104,18 @@ function setupStandardDecorator<
 			return protoOrTarget.set.call(this, value);
 		},
 		init(this: any, value: InstanceType) {
-			// Defer controller creation to hostConnected so:
-			// 1. All class field initializers have run
-			// 2. The element is in the DOM and ready to dispatch provide events to descendants
-			let initialized = false;
-			this.addController({
-				hostConnected: () => {
-					if (initialized) return;
-					initialized = true;
-					new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, context, value);
-				},
-			});
+			new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, context, value);
 			return value;
 		},
 	};
 }
 
 /**
- * Sets up a legacy decorator (TypeScript experimental) for regular properties.
- * This branch is used when decorating without the 'accessor' keyword.
- * Example: @provideContext({context: TOKEN}) myProp = new MyContext();
+ * Legacy decorator (TypeScript experimental) path for regular properties.
  *
- * The decorator receives:
- * - protoOrTarget: The class prototype
- * - propertyKey: The property name (string)
- *
- * This is the older TypeScript experimental decorator API, still widely used
- * in Umbraco because it works with @state() and @property() decorators.
- * The 'accessor' keyword is not compatible with these decorators yet.
- *
- * We support three initialization strategies:
- * 1. addInitializer (if available, e.g., on LitElement classes)
- * 2. hostConnected wrapper (for UmbController classes)
- * 3. Warning (if neither is available)
+ * Registers a lightweight init-only UmbController that defers the provider's
+ * creation to `hostConnected` — by then the decorated class field's initializer
+ * has run and the instance value is readable.
  * @param protoOrTarget
  * @param propertyKey
  * @param context
@@ -154,49 +127,43 @@ function setupLegacyDecorator<
 >(protoOrTarget: any, propertyKey: string, context: string | UmbContextToken<BaseType, ResultType>): void {
 	const constructor = protoOrTarget.constructor as any;
 
-	// Strategy 1: Use addInitializer if available (LitElement classes)
-	// Defer controller creation to hostConnected so:
-	// 1. All class field initializers have run (element[propertyKey] is set)
-	// 2. The element is in the DOM and ready to dispatch provide events to descendants
+	// LitElement classes: register an init UmbController at construction time.
+	// The init controller reads the field at hostConnected time — which runs after
+	// class-field initializers and before first render.
 	if (constructor.addInitializer) {
 		constructor.addInitializer((element: any): void => {
 			let initialized = false;
-			element.addController({
-				hostConnected: () => {
+			element.addUmbController({
+				controllerAlias: Symbol(`provideContext:init:${propertyKey}`),
+				hostConnected() {
 					if (initialized) return;
 					initialized = true;
 					const initialValue = element[propertyKey];
 					new UmbContextProviderController<BaseType, ResultType, InstanceType>(element, context, initialValue);
 				},
+				hostDisconnected() {},
+				destroy() {},
 			});
 		});
 		return;
 	}
 
-	// Strategy 2: Wrap hostConnected for UmbController classes without addInitializer
+	// UmbControllerBase (non-Lit) classes: wrap hostConnected to register on attach.
 	if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
 		const originalHostConnected = protoOrTarget.hostConnected;
+		const setupMarker = Symbol(`provideContext:${propertyKey}`);
 
 		protoOrTarget.hostConnected = function (this: any) {
-			// Set up provider once, using a flag to prevent multiple setups
-			if (!this.__provideControllers) {
-				this.__provideControllers = new Map();
-			}
-
-			if (!this.__provideControllers.has(propertyKey)) {
+			if (!this[setupMarker]) {
+				this[setupMarker] = true;
 				const initialValue = this[propertyKey];
 				new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, context, initialValue);
-				// Mark as set up to prevent duplicate providers
-				this.__provideControllers.set(propertyKey, true);
 			}
-
-			// Call original hostConnected if it exists
 			originalHostConnected?.call(this);
 		};
 		return;
 	}
 
-	// Strategy 3: No supported initialization method available
 	console.warn(
 		`@provideContext applied to ${constructor.name}.${propertyKey} but neither addInitializer nor hostConnected is available. ` +
 			`Make sure the class extends UmbLitElement, UmbControllerBase, or implements UmbController with hostConnected.`,
