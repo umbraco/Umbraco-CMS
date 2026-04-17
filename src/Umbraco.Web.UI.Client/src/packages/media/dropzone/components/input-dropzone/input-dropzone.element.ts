@@ -205,7 +205,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 					)}
 					${when(
 						item.status === UmbFileDropzoneItemStatus.ERROR,
-						() => html`<div class="error">An error occured</div>`,
+						() => html`<div class="error">An error occurred</div>`,
 					)}
 					${when(item.status === UmbFileDropzoneItemStatus.CANCELLED, () => html`<div class="error">Cancelled</div>`)}
 					${when(
