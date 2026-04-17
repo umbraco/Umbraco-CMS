@@ -2,6 +2,7 @@ import type { UmbMockWebhookModel } from '../data/mock-data-set.types.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
+import { umbWebhookEventMockDb } from './webhook-event.db.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 
 class UmbWebhookMockDB extends UmbEntityMockDbBase<UmbMockWebhookModel> {
@@ -20,7 +21,9 @@ const createDetailMockMapper = (request: any): UmbMockWebhookModel => {
 		description: request.description ?? null,
 		url: request.url,
 		enabled: request.enabled ?? true,
-		events: request.events ?? [],
+		events: ((request.events as Array<string>) ?? [])
+			.map((alias) => umbWebhookEventMockDb.getAll().find((e) => e.alias === alias))
+			.filter((e) => e !== undefined),
 		contentTypeKeys: request.contentTypeKeys ?? [],
 		headers: request.headers ?? {},
 	};
