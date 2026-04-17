@@ -2,25 +2,15 @@ import type { UmbLogLevelCounts } from '../../../../../log-viewer/types.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context-token.js';
 import { css, html, customElement, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { observedFrom } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-log-types-chart')
 export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
-	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
-
-	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
-	private set _logViewerContext(value) {
-		this.#logViewerContext = value;
-		this.#logViewerContext?.getLogCount();
-		this.#observeStuff();
-	}
-	private get _logViewerContext() {
-		return this.#logViewerContext;
-	}
-
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.dateRange, { default: { startDate: '', endDate: '' } })
 	@state()
 	private _dateRange = { startDate: '', endDate: '' };
 
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.logCount, { default: null })
 	@state()
 	private _logLevelCounts: UmbLogLevelCounts | null = null;
 
@@ -32,6 +22,16 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 
 	@state()
 	private _logLevelKeys: [string, number][] = [];
+
+	private _logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => {
+			this._logViewerContext = ctx;
+			ctx?.getLogCount();
+		});
+	}
 
 	protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
 		if (_changedProperties.has('_logLevelCountFilter') || _changedProperties.has('_logLevelCounts')) {
@@ -57,19 +57,6 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 			this._logLevelKeys = [];
 			this._logLevelCount = [];
 		}
-	}
-
-	#observeStuff() {
-		this.observe(this._logViewerContext?.logCount, (logLevel) => {
-			this._logLevelCounts = logLevel ?? null;
-			this.setLogLevelCount();
-		});
-
-		this.observe(this._logViewerContext?.dateRange, (dateRange) => {
-			if (dateRange) {
-				this._dateRange = dateRange;
-			}
-		});
 	}
 
 	#buildSearchUrl(level: string): string {
