@@ -1661,6 +1661,7 @@ export default {
 		tabRules: 'Editor',
 	},
 	template: {
+		notAllowed: 'The selected template is no longer allowed on this document type.',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
