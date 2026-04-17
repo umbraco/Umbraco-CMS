@@ -37,19 +37,22 @@ export class UmbBlockActionListElement extends UmbLitElement {
 				observeMultiple([context.unique, context.contentElementTypeAlias, context.actionsVisibility]),
 				([unique, contentTypeAlias, showActions]) => {
 					this._showActions = showActions;
+					const hasChanged = this.#unique !== unique || this.#contentTypeAlias !== contentTypeAlias;
 					this.#unique = unique ?? undefined;
 					this.#contentTypeAlias = contentTypeAlias ?? undefined;
-					this.#initExtensions();
+					if (hasChanged) {
+						this.#initExtensions();
+					}
 				},
 			);
 		});
 	}
 
-	#extensionsInitialized = false;
-
 	#initExtensions() {
-		if (this.#extensionsInitialized || !this.#unique) return;
-		this.#extensionsInitialized = true;
+		if (!this.#unique) return;
+
+		// Re-create the initializer so the filter closure captures the latest #contentTypeAlias and #unique.
+		this.removeUmbControllerByAlias('blockActionsInitializer');
 
 		new UmbExtensionsElementAndApiInitializer(
 			this,

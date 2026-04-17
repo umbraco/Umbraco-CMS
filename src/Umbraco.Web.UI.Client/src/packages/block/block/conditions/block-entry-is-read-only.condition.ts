@@ -1,4 +1,4 @@
-import { UMB_BLOCK_ENTRY_CONTEXT } from '../index.js';
+import { UMB_BLOCK_ENTRY_CONTEXT } from '../context/block-entry.context-token.js';
 import type { BlockEntryIsReadOnlyConditionConfig } from './types.js';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';

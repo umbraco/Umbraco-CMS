@@ -25,7 +25,8 @@ export class UmbEditContentBlockAction extends UmbBlockActionBase<MetaBlockActio
 
 	override async getHref() {
 		await this.#contextReady;
-		return this.observe(this.#context?.workspaceEditContentPath)?.asPromise();
+		const path = await this.observe(this.#context?.workspaceEditContentPath)?.asPromise();
+		return path || undefined;
 	}
 
 	override async getValidationDataPath() {

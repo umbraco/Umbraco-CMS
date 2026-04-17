@@ -15,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		api: () => import('./expose-content-block.action.js'),
 		meta: {
 			icon: 'icon-add',
-			label: '#blockEditor_createThisFor',
+			label: '#actions_create',
 		},
 		conditions: [
 			{ alias: UMB_BLOCK_ENTRY_SHOW_CONTENT_EDIT_CONDITION_ALIAS, match: false },

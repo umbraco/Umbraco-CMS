@@ -776,6 +776,6 @@ export abstract class UmbBlockEntryContext<
 	 * Subclasses must override this method with editor-specific clipboard logic.
 	 */
 	public async copyToClipboard(): Promise<void> {
-		console.warn('copyToClipboard() is not implemented for this block entry context.');
+		throw new Error('copyToClipboard() is not implemented for this block entry context.');
 	}
 }

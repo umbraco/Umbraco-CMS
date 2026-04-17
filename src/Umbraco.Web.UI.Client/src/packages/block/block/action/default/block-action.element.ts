@@ -22,6 +22,7 @@ export class UmbBlockActionDefaultElement<
 
 	public set api(api: ApiType | undefined) {
 		this.#api = api;
+		this._href = undefined;
 
 		// TODO: getHref() and getValidationDataPath() resolve once. If the underlying observable values
 		// change, the button won't update. Consider making these reactive in a future iteration. [LK]
