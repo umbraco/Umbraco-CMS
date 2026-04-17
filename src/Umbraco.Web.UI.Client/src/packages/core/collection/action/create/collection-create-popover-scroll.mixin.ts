@@ -36,11 +36,12 @@ export const UmbCollectionCreatePopoverScrollMixin = <T extends HTMLElementConst
 			// @ts-ignore
 			this._popoverOpen = event.newState === 'open';
 
-			if (this._popoverOpen && this._triggerButton && this._scrollContainer) {
-				const rect = this._triggerButton.getBoundingClientRect();
-				const availableHeight = window.innerHeight - rect.bottom - 8;
-				this._scrollContainer.style.maxHeight = `${Math.max(availableHeight, 120)}px`;
-			}
+			if (!this._popoverOpen) return;
+			if (!this._triggerButton || !this._scrollContainer) return;
+
+			const rect = this._triggerButton.getBoundingClientRect();
+			const availableHeight = window.innerHeight - rect.bottom - 8;
+			this._scrollContainer.style.maxHeight = `${Math.max(availableHeight, 120)}px`;
 		}
 
 		static styles = [
