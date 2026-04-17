@@ -89,8 +89,11 @@ function setupStandardDecorator<BaseType extends UmbContextMinimal, ResultType e
 				const source = selector(ctx);
 				(this as any).observe?.(
 					source,
-					(value: T) => {
-						protoOrTarget.set.call(this, value);
+					(value: T | undefined) => {
+						// If the observable emits undefined and we have a default, fall back to it.
+						// This matches the common defensive pattern `this._field = value ?? default`.
+						const resolved = value === undefined && options?.default !== undefined ? options.default : value;
+						protoOrTarget.set.call(this, resolved);
 					},
 					observerAlias,
 				);
@@ -128,8 +131,10 @@ function setupLegacyDecorator<BaseType extends UmbContextMinimal, ResultType ext
 					const source = selector(ctx);
 					element.observe?.(
 						source,
-						(value: T) => {
-							element[propertyKey] = value;
+						(value: T | undefined) => {
+							const resolved =
+								value === undefined && options?.default !== undefined ? options.default : value;
+							element[propertyKey] = resolved;
 						},
 						observerAlias,
 					);
@@ -166,8 +171,10 @@ function setupLegacyDecorator<BaseType extends UmbContextMinimal, ResultType ext
 					const source = selector(ctx);
 					this.observe?.(
 						source,
-						(value: T) => {
-							this[propertyKey] = value;
+						(value: T | undefined) => {
+							const resolved =
+								value === undefined && options?.default !== undefined ? options.default : value;
+							this[propertyKey] = resolved;
 						},
 						observerAlias,
 					);
