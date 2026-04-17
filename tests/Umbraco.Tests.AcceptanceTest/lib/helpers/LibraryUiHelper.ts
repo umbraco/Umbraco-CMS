@@ -374,7 +374,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.collectionMenu = page.locator('umb-collection-menu');
     this.entityPickerTree = page.locator('umb-tree[alias="Umb.Tree.EntityDataPicker"]');
     this.languageToggle = page.getByTestId('input:entity-name').locator('#toggle');
-    this.elementVariantDropdown = page.locator('umb-workspace-split-view-variant-selector uui-popover-container #dropdown');
+    this.elementVariantDropdown = page.locator('umb-element-workspace-split-view-variant-selector uui-popover-container #dropdown');
     this.blockProperty = page.locator('umb-block-workspace-view-edit-property');
     // Multi URL Picker
     this.linkPickerAddBtn = this.linkPickerModal.getByRole('button', {name: 'Add', exact: true});
