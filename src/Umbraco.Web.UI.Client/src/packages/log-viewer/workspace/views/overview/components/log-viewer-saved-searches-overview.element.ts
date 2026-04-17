@@ -4,35 +4,31 @@ import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { SavedLogSearchResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { observedFrom } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-saved-searches-overview')
 export class UmbLogViewerSavedSearchesOverviewElement extends UmbLitElement {
 	#itemsPerPage = 999;
 	#currentPage = 1;
 
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.savedSearches, { default: undefined })
 	@state()
-	private _savedSearches: SavedLogSearchResponseModel[] = [];
+	private _savedSearchesPage?: { items?: SavedLogSearchResponseModel[]; total?: number };
 
-	@state()
-	private _total = 0;
-
-	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
-
-	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
-	private set _logViewerContext(value) {
-		this.#logViewerContext = value;
-		this.#getSavedSearches();
-		this.#observeStuff();
+	private get _savedSearches(): SavedLogSearchResponseModel[] {
+		return this._savedSearchesPage?.items ?? [];
 	}
-	private get _logViewerContext() {
-		return this.#logViewerContext;
+	private get _total(): number {
+		return this._savedSearchesPage?.total ?? 0;
 	}
 
-	#observeStuff() {
-		this.observe(this._logViewerContext?.savedSearches, (savedSearches) => {
-			this._savedSearches = savedSearches?.items ?? [];
-			this._total = savedSearches?.total ?? 0;
+	private _logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => {
+			this._logViewerContext = ctx;
+			this.#getSavedSearches();
 		});
 	}
 

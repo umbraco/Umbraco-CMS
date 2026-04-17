@@ -4,35 +4,31 @@ import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LogTemplateResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { observedFrom } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-message-templates-overview')
 export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	#itemsPerPage = 10;
 	#currentPage = 1;
 
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.messageTemplates, { default: undefined })
 	@state()
-	private _total = 0;
+	private _messageTemplatesPage?: { items?: LogTemplateResponseModel[]; total?: number } | null;
 
-	@state()
-	private _messageTemplates: Array<LogTemplateResponseModel> = [];
-
-	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
-
-	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
-	private set _logViewerContext(value) {
-		this.#logViewerContext = value;
-		this.#getMessageTemplates();
-		this.#observeStuff();
+	private get _messageTemplates(): LogTemplateResponseModel[] {
+		return this._messageTemplatesPage?.items ?? [];
 	}
-	private get _logViewerContext() {
-		return this.#logViewerContext;
+	private get _total(): number {
+		return this._messageTemplatesPage?.total ?? 0;
 	}
 
-	#observeStuff() {
-		this.observe(this._logViewerContext?.messageTemplates, (templates) => {
-			this._messageTemplates = templates?.items ?? [];
-			this._total = templates?.total ?? 0;
+	private _logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => {
+			this._logViewerContext = ctx;
+			this.#getMessageTemplates();
 		});
 	}
 
