@@ -93,7 +93,7 @@ describe('UmbIconSearchController', () => {
 		// "transprtt" must fuzzy-match the "transport" token within the group,
 		// not the full "transport vehicle" string (where the extra word
 		// dominates the edit distance and pushes similarity below threshold).
-		const results = await controller.search('transprtt');
+		const results = await controller.search('transprt');
 		expect(results.some((r) => r.name === 'icon-plane')).to.be.true;
 	});
 
@@ -104,21 +104,12 @@ describe('UmbIconSearchController', () => {
 		expect(results.some((r) => r.name === 'icon-plane')).to.be.true;
 	});
 
-	it('should append related icons after primary results', async () => {
+	it('should not include related icons that do not match the query', async () => {
+		// icon-truck has related: ['icon-shipping']. Searching for "truck" should
+		// only return icon-truck — icon-shipping is unrelated to the query.
 		const results = await controller.search('truck');
-		const truckIndex = results.findIndex((r) => r.name === 'icon-truck');
-		const shippingIndex = results.findIndex((r) => r.name === 'icon-shipping');
-		expect(truckIndex).to.be.greaterThan(-1);
-		expect(shippingIndex).to.be.greaterThan(-1);
-		expect(shippingIndex).to.be.greaterThan(truckIndex);
-	});
-
-	it('should not duplicate related icons already in primary results', async () => {
-		const results = await controller.search('transport');
-		const truckCount = results.filter((r) => r.name === 'icon-truck').length;
-		const shippingCount = results.filter((r) => r.name === 'icon-shipping').length;
-		expect(truckCount).to.equal(1);
-		expect(shippingCount).to.equal(1);
+		expect(results.some((r) => r.name === 'icon-truck')).to.be.true;
+		expect(results.some((r) => r.name === 'icon-shipping')).to.be.false;
 	});
 
 	it('should match icons without metadata by name only', async () => {

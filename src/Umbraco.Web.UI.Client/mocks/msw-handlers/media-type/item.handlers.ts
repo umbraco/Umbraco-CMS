@@ -1,0 +1,33 @@
+const { http, HttpResponse } = window.MockServiceWorker;
+import { umbMediaTypeMockDb } from '../../db/media-type.db.js';
+import { UMB_SLUG } from './slug.js';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+
+export const itemHandlers = [
+	http.get(umbracoPath(`/item${UMB_SLUG}/search`), ({ request }) => {
+		const url = new URL(request.url);
+		const query = url.searchParams.get('query') ?? '';
+		const skip = Number(url.searchParams.get('skip')) || 0;
+		const take = Number(url.searchParams.get('take')) || 100;
+
+		const response = umbMediaTypeMockDb.item.search(query, skip, take);
+
+		return HttpResponse.json(response);
+	}),
+
+	http.get(umbracoPath(`/item${UMB_SLUG}`), ({ request }) => {
+		const ids = new URL(request.url).searchParams.getAll('id');
+		if (!ids) return;
+		const items = umbMediaTypeMockDb.item.getItems(ids);
+		return HttpResponse.json(items);
+	}),
+
+	http.get(umbracoPath(`/item${UMB_SLUG}/allowed`), ({ request }) => {
+		const fileExtension = new URL(request.url).searchParams.get('fileExtension');
+		if (!fileExtension) return;
+
+		const response = umbMediaTypeMockDb.getAllowedByFileExtension(fileExtension);
+
+		return HttpResponse.json(response);
+	}),
+];

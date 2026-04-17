@@ -16,6 +16,8 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext;
 /// </summary>
 public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
 {
+    private static readonly Uri FallbackUrl = new("http://localhost");
+
     private readonly ICookieManager _cookieManager;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -84,19 +86,69 @@ public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
         : new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl());
 
     /// <inheritdoc />
-    // set the urls lazily, no need to allocate until they are needed...
-    // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
-    // is a work around to being able to access the UmbracoContext during application startup and this will also ensure that people
-    // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
-    // the current domain during application startup.
-    // see: http://issues.umbraco.org/issue/U4-1890
-    public Uri OriginalRequestUrl =>
-_originalRequestUrl ??= RequestUrl ?? new Uri("http://localhost");
+    /// <remarks>
+    /// <para>The URL is resolved lazily in the following order of precedence:</para>
+    /// <list type="number">
+    ///   <item>The current HTTP request URL, when an <see cref="HttpContext"/> is available.
+    ///   This value is cached for the lifetime of this context instance.</item>
+    ///   <item>The configured <see cref="IHostingEnvironment.ApplicationMainUrl"/>, which is set from
+    ///   <c>Umbraco:CMS:WebRouting:UmbracoApplicationUrl</c> or auto-detected from the first request.
+    ///   This allows background services (e.g. <c>RecurringHostedServiceBase</c>) to generate absolute
+    ///   URLs with the correct scheme and host.</item>
+    ///   <item>A fallback of <c>http://localhost</c> when neither of the above is available (e.g. during
+    ///   application startup before any request has been processed).</item>
+    /// </list>
+    /// <para>Fallback values (2 and 3) are not cached, so that a later-detected
+    /// <see cref="IHostingEnvironment.ApplicationMainUrl"/> is picked up on the next access.</para>
+    /// </remarks>
+    public Uri OriginalRequestUrl
+    {
+        get
+        {
+            if (_originalRequestUrl is not null)
+            {
+                return _originalRequestUrl;
+            }
+
+            // Cache only when we have a real request URL — it is stable for this context's lifetime.
+            if (RequestUrl is not null)
+            {
+                return _originalRequestUrl = RequestUrl;
+            }
+
+            // Don't cache fallback values — ApplicationMainUrl may become available after the
+            // first HTTP request is processed (see EnsureApplicationMainUrl).
+            return _hostingEnvironment.ApplicationMainUrl ?? FallbackUrl;
+        }
+    }
 
     /// <inheritdoc />
-    // set the urls lazily, no need to allocate until they are needed...
-    public Uri CleanedUmbracoUrl =>
-_cleanedUmbracoUrl ??= _uriUtility.UriToUmbraco(OriginalRequestUrl);
+    /// <remarks>
+    /// Like <see cref="OriginalRequestUrl"/>, this value is only cached when a real HTTP request URL
+    /// is available. Fallback-derived values are re-evaluated on each access.
+    /// </remarks>
+    public Uri CleanedUmbracoUrl
+    {
+        get
+        {
+            if (_cleanedUmbracoUrl is not null)
+            {
+                return _cleanedUmbracoUrl;
+            }
+
+            Uri cleaned = _uriUtility.UriToUmbraco(OriginalRequestUrl);
+
+            // _originalRequestUrl is set as a side effect of the OriginalRequestUrl access above
+            // only when backed by a real HTTP request. When it's still null the value came from a
+            // fallback, so we don't cache — allowing a later-detected ApplicationMainUrl to take effect.
+            if (_originalRequestUrl is not null)
+            {
+                _cleanedUmbracoUrl = cleaned;
+            }
+
+            return cleaned;
+        }
+    }
 
     /// <inheritdoc />
     public IPublishedContentCache Content => _cacheManager.Content;
