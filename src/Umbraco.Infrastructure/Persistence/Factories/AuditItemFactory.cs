@@ -28,7 +28,10 @@ internal static class AuditItemFactory
             dto.EntityType,
             dto.Comment,
             dto.Parameters,
-            dto.Datestamp.EnsureUtc());
+            dto.Datestamp.EnsureUtc(),
+            dto.TriggerSource,
+            dto.TriggerOperation,
+            dto.LogTypeAlias);
 
     /// <summary>
     /// Builds a <see cref="Umbraco.Cms.Core.Models.Membership.LogDto"/> from the given <see cref="Umbraco.Cms.Core.Models.IAuditItem"/> entity.
@@ -45,5 +48,8 @@ internal static class AuditItemFactory
             UserId = entity.UserId,
             EntityType = entity.EntityType,
             Parameters = entity.Parameters,
+            TriggerSource = entity.TriggerSource,
+            TriggerOperation = entity.TriggerOperation,
+            LogTypeAlias = entity.TypeAlias,
         };
 }

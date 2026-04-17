@@ -29,4 +29,19 @@ public class AuditLogResponseModel
     /// Gets or sets the parameters associated with the audit log entry.
     /// </summary>
     public string? Parameters { get; set; }
+
+    /// <summary>
+    /// Gets or sets the source of the trigger that initiated the audited action (e.g. "Core", "Umbraco.Workflow").
+    /// </summary>
+    public string? TriggerSource { get; set; }
+
+    /// <summary>
+    /// Gets or sets the operation of the trigger that initiated the audited action (e.g. "ScheduledPublish", "Rollback", "Final Approval").
+    /// </summary>
+    public string? TriggerOperation { get; set; }
+
+    /// <summary>
+    /// Gets or sets the type alias for custom audit entries (e.g. "Umb.Workflow.Approved").
+    /// </summary>
+    public string? TypeAlias { get; set; }
 }

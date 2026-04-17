@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -24,13 +25,13 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
     /// <inheritdoc />
     public TimeSpan Period => TimeSpan.FromMinutes(1);
 
-
     private readonly IContentService _contentService;
     private readonly ILogger<ScheduledPublishingJob> _logger;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly TimeProvider _timeProvider;
     private readonly IServerMessenger _serverMessenger;
     private readonly IUmbracoContextFactory _umbracoContextFactory;
+    private readonly IAuditTriggerAccessor _auditTriggerAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ScheduledPublishingJob" /> class.
@@ -41,7 +42,8 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
         ILogger<ScheduledPublishingJob> logger,
         IServerMessenger serverMessenger,
         ICoreScopeProvider scopeProvider,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        IAuditTriggerAccessor auditTriggerAccessor)
     {
         _contentService = contentService;
         _umbracoContextFactory = umbracoContextFactory;
@@ -49,6 +51,7 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
         _serverMessenger = serverMessenger;
         _scopeProvider = scopeProvider;
         _timeProvider = timeProvider;
+        _auditTriggerAccessor = auditTriggerAccessor;
     }
 
     /// <inheritdoc />
@@ -78,6 +81,7 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
              * It's possible that during the swapping process we may run this job more frequently than intended but this is not of great concern and it's
              * only until the old SchedulingPublisher shuts down. */
             scope.EagerWriteLock(Constants.Locks.ScheduledPublishing);
+            _auditTriggerAccessor.Set(new AuditTrigger(Constants.Audit.TriggerSources.Core, Constants.Audit.TriggerOperations.ScheduledPublish));
             try
             {
                 // Run

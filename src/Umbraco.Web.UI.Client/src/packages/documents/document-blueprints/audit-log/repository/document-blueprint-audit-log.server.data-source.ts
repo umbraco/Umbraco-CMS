@@ -36,6 +36,9 @@ export class UmbDocumentBlueprintAuditLogServerDataSource
 					logType: item.logType as UmbDocumentBlueprintAuditLogType,
 					comment: item.comment,
 					parameters: item.parameters,
+					triggerSource: item.triggerSource,
+					triggerOperation: item.triggerOperation,
+					typeAlias: item.typeAlias,
 				};
 			});
 

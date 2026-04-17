@@ -271,6 +271,10 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
+            ScopeProvider.Context?.Enlist(
+                Constants.Audit.TriggerEnlistmentKey,
+                () => new AuditTrigger(Constants.Audit.TriggerSources.Core, Constants.Audit.TriggerOperations.Rollback));
+
             var rollingBackNotification = new ContentRollingBackNotification(content, evtMsgs);
             if (scope.Notifications.PublishCancelable(rollingBackNotification))
             {

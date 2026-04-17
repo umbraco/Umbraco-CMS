@@ -38,7 +38,7 @@ public class DefaultCachePolicyTests
         var defaultPolicy =
             new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions(), new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>());
 
-        var unused = defaultPolicy.Get(1, id => new AuditItem(1, AuditType.Copy, 123, "test", "blah"), o => null);
+        var unused = defaultPolicy.Get(1, id => new AuditItem(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null), o => null);
         Assert.IsTrue(isCached);
     }
 
@@ -46,7 +46,7 @@ public class DefaultCachePolicyTests
     public void Get_Single_From_Cache()
     {
         var cache = new Mock<IAppPolicyCache>();
-        cache.Setup(x => x.Get(It.IsAny<string>())).Returns(new AuditItem(1, AuditType.Copy, 123, "test", "blah"));
+        cache.Setup(x => x.Get(It.IsAny<string>())).Returns(new AuditItem(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null));
 
         var defaultPolicy =
             new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions(), new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>());
@@ -71,8 +71,8 @@ public class DefaultCachePolicyTests
             new object[] { },
             ids => new[]
             {
-                new AuditItem(1, AuditType.Copy, 123, "test", "blah"),
-                new AuditItem(2, AuditType.Copy, 123, "test", "blah2"),
+                new AuditItem(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null),
+                new AuditItem(2, AuditType.Copy, 123, "test", "blah2", null, null, null, null, null),
             });
 
         Assert.AreEqual(2, cached.Count);
@@ -84,8 +84,8 @@ public class DefaultCachePolicyTests
         var cache = new Mock<IAppPolicyCache>();
         cache.Setup(x => x.SearchByKey(It.IsAny<string>())).Returns(new[]
         {
-            new AuditItem(1, AuditType.Copy, 123, "test", "blah"),
-            new AuditItem(2, AuditType.Copy, 123, "test", "blah2"),
+            new AuditItem(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null),
+            new AuditItem(2, AuditType.Copy, 123, "test", "blah2", null, null, null, null, null),
         });
 
         var defaultPolicy =
@@ -107,7 +107,7 @@ public class DefaultCachePolicyTests
             new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions(), new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>());
         try
         {
-            defaultPolicy.Update(new AuditItem(1, AuditType.Copy, 123, "test", "blah"), item => throw new Exception("blah!"));
+            defaultPolicy.Update(new AuditItem(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null), item => throw new Exception("blah!"));
         }
         catch
         {
@@ -131,7 +131,7 @@ public class DefaultCachePolicyTests
             new DefaultRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new RepositoryCachePolicyOptions(), new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>());
         try
         {
-            defaultPolicy.Delete(new AuditItem(1, AuditType.Copy, 123, "test", "blah"), item => throw new Exception("blah!"));
+            defaultPolicy.Delete(new AuditItem(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null), item => throw new Exception("blah!"));
         }
         catch
         {

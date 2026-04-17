@@ -1,15 +1,15 @@
 import type { ManifestAuditLogAction } from '../audit-log-action/audit-log-action.extension.js';
 import type { ManifestWorkspaceInfoAppAuditLogKind } from './types.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { createExtensionApiByAlias, umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPaginationManager, UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
+import { fromPascalCase, UmbPaginationManager, UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbAuditLogModel, UmbAuditLogRepository } from '@umbraco-cms/backoffice/audit-log';
+import type { UmbAuditLogModel, UmbAuditLogRepository, ManifestAuditLogTypeStyle, MetaAuditLogTypeStyle, ManifestAuditLogTriggerStyle } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -45,6 +45,11 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 
 	#userMap = new Map<string, UmbUserItemModel>();
 
+	#typeStyleMap = new Map<string, MetaAuditLogTypeStyle>();
+
+	// Keyed by "source:operation" for exact matches, or "source" for fallback
+	#triggerLabelMap = new Map<string, string>();
+
 	#workspaceContext?: typeof UMB_ENTITY_WORKSPACE_CONTEXT.TYPE;
 
 	constructor() {
@@ -53,6 +58,36 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 		this.#pagination.setPageSize(10);
 		this.observe(this.#pagination.currentPage, (number) => (this._currentPageNumber = number));
 		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
+
+		this.observe(
+			umbExtensionsRegistry.byType('auditLogTypeStyle'),
+			(manifests) => {
+				this.#typeStyleMap.clear();
+				for (const manifest of manifests as ManifestAuditLogTypeStyle[]) {
+					for (const alias of manifest.forTypeAliases) {
+						this.#typeStyleMap.set(alias, manifest.meta);
+					}
+				}
+				this.requestUpdate('_items');
+			},
+		);
+
+		this.observe(
+			umbExtensionsRegistry.byType('auditLogTriggerStyle'),
+			(manifests) => {
+				this.#triggerLabelMap.clear();
+				for (const manifest of manifests as ManifestAuditLogTriggerStyle[]) {
+					const source = manifest.forTriggerSource;
+					for (const mapping of manifest.meta.mappings) {
+						this.#triggerLabelMap.set(`${source}:${mapping.operation}`, mapping.label);
+					}
+					if (manifest.meta.fallbackLabel) {
+						this.#triggerLabelMap.set(source, manifest.meta.fallbackLabel);
+					}
+				}
+				this.requestUpdate('_items');
+			},
+		);
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
 			context?.addEventListener(UmbRequestReloadStructureForEntityEvent.TYPE, () => {
@@ -156,34 +191,67 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 	#renderHistory() {
 		if (!this._items?.length) return html`${this.localize.term('content_noItemsToShow')}`;
 		return html`
-			<umb-history-list>
-				${repeat(
-					this._items,
-					(item) => item.timestamp,
-					(item) => this.#renderHistoryItem(item),
-				)}
-			</umb-history-list>
+			<table class="log-table">
+				<thead>
+					<tr>
+						<th colspan="2">${this.localize.term('general_user')}</th>
+						<th>${this.localize.term('general_action')}</th>
+						<th>${this.localize.term('auditTrails_trigger')}</th>
+						<th>${this.localize.term('general_comment')}</th>
+					</tr>
+				</thead>
+				<tbody>
+					${repeat(
+						this._items,
+						(item) => item.timestamp,
+						(item) => this.#renderHistoryItem(item),
+					)}
+				</tbody>
+			</table>
 		`;
 	}
 
 	#renderHistoryItem(item: UmbAuditLogModel) {
 		const tagData = this.#auditLogRepository?.getTagStyleAndText?.(item.logType);
+		const typeStyle = item.typeAlias ? this.#typeStyleMap.get(item.typeAlias) : undefined;
 		const user = this.#userMap.get(item.user.unique);
 
+		const badgeLook = typeStyle?.look ?? tagData?.style.look ?? 'placeholder';
+		const badgeColor = typeStyle?.color ?? tagData?.style.color ?? 'default';
+		const badgeLabel = typeStyle?.label ?? this.localize.term(tagData?.text.label ?? item.logType, item.parameters);
+
 		return html`
-			<umb-history-item
-				.name=${user?.name ?? 'Unknown'}
-				.detail=${this.localize.date(item.timestamp, UMB_DATE_TIME_FORMAT_OPTIONS)}>
-				<umb-user-avatar slot="avatar" .name=${user?.name} .kind=${user?.kind} .imgUrls=${user?.avatarUrls ?? []}>
-				</umb-user-avatar>
-				<div class="log-type">
-					<uui-tag look=${tagData?.style.look ?? 'placeholder'} color=${tagData?.style.color ?? 'default'}>
-						${this.localize.term(tagData?.text.label ?? item.logType, item.parameters)}
-					</uui-tag>
-					<span>${this.localize.term(tagData?.text.desc ?? '', item.parameters)}</span>
-				</div>
-			</umb-history-item>
+			<tr>
+				<td class="cell-avatar">
+					<umb-user-avatar .name=${user?.name} .kind=${user?.kind} .imgUrls=${user?.avatarUrls ?? []}>
+					</umb-user-avatar>
+				</td>
+				<td class="cell-user">
+					<span class="user-name">${user?.name ?? 'Unknown'}</span>
+					<span class="user-detail">${this.localize.date(item.timestamp, UMB_DATE_TIME_FORMAT_OPTIONS)}</span>
+				</td>
+				<td class="cell-action">
+					<uui-tag look=${badgeLook} color=${badgeColor}>${badgeLabel}</uui-tag>
+				</td>
+				<td class="cell-trigger">${this.#renderTrigger(item)}</td>
+				<td class="cell-comment">${this.#renderComment(item, tagData?.text.desc)}</td>
+			</tr>
 		`;
+	}
+
+	#renderTrigger(item: UmbAuditLogModel) {
+		if (!item.triggerSource || !item.triggerOperation) return nothing;
+		// Try exact match (source:operation), then source fallback, then raw display
+		const label =
+			this.#triggerLabelMap.get(`${item.triggerSource}:${item.triggerOperation}`)
+			?? this.#triggerLabelMap.get(item.triggerSource)
+			?? `${item.triggerSource}: ${fromPascalCase(item.triggerOperation)}`;
+		return label;
+	}
+
+	#renderComment(item: UmbAuditLogModel, descKey?: string) {
+		const localized = descKey ? this.localize.term(descKey, item.parameters ?? '') : '';
+		return localized || item.comment || '';
 	}
 
 	#renderPagination() {
@@ -213,17 +281,59 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 				justify-content: center;
 			}
 
-			.log-type {
-				display: grid;
-				grid-template-columns: var(--uui-size-40) auto;
-				gap: var(--uui-size-layout-1);
+			.log-table {
+				width: 100%;
+				border-collapse: collapse;
+				table-layout: auto;
 			}
 
-			.log-type uui-tag {
-				justify-self: center;
-				height: fit-content;
-				margin-top: auto;
-				margin-bottom: auto;
+			.log-table thead th {
+				text-align: left;
+				font-size: var(--uui-type-small-size);
+				font-weight: 600;
+				color: var(--uui-color-text-alt);
+				padding: 0 var(--uui-size-space-3) var(--uui-size-space-3);
+				border-bottom: 1px solid var(--uui-color-border);
+			}
+
+			.log-table tbody td {
+				padding: var(--uui-size-space-3);
+				vertical-align: middle;
+			}
+
+			.cell-avatar {
+				width: 2.5em;
+			}
+
+			.cell-user {
+				white-space: nowrap;
+			}
+
+			.user-name {
+				display: block;
+				font-weight: 600;
+			}
+
+			.user-detail {
+				display: block;
+				font-size: var(--uui-size-4);
+				color: var(--uui-color-text-alt);
+				line-height: 1;
+			}
+
+			.cell-action uui-tag {
+				white-space: nowrap;
+			}
+
+			.cell-trigger {
+				font-size: var(--uui-type-small-size);
+				color: var(--uui-color-text-alt);
+				white-space: nowrap;
+			}
+
+			.cell-comment {
+				font-size: var(--uui-type-small-size);
+				color: var(--uui-color-text-alt);
 			}
 
 			uui-pagination {

@@ -50,6 +50,9 @@ export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<U
 					logType: item.logType as UmbMediaAuditLogType, // TODO: fix this type cast
 					comment: item.comment,
 					parameters: item.parameters,
+					triggerSource: item.triggerSource,
+					triggerOperation: item.triggerOperation,
+					typeAlias: item.typeAlias,
 				};
 			});
 

@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -19,13 +21,44 @@ public interface IAuditService : IService
     /// <param name="comment">The comment associated with the audit entry.</param>
     /// <param name="parameters">The parameters associated with the audit entry.</param>
     /// <returns>Result of the add audit log operation.</returns>
-    public Task<Attempt<AuditLogOperationStatus>> AddAsync(
+    [Obsolete("Use the overload accepting typeAlias. Scheduled for removal in Umbraco 19.")]
+    Task<Attempt<AuditLogOperationStatus>> AddAsync(
+        AuditType type,
+        Guid userKey,
+        int objectId,
+        string? entityType,
+        string? comment,
+        string? parameters)
+        => AddAsync(type, userKey, objectId, entityType, comment, parameters, typeAlias: null);
+
+    /// <summary>
+    ///    Adds an audit entry.
+    /// </summary>
+    /// <param name="type">The type of the audit.</param>
+    /// <param name="userKey">The key of the user triggering the event.</param>
+    /// <param name="objectId">The identifier of the affected object.</param>
+    /// <param name="entityType">The entity type of the affected object.</param>
+    /// <param name="comment">The comment associated with the audit entry.</param>
+    /// <param name="parameters">The parameters associated with the audit entry.</param>
+    /// <param name="typeAlias">An optional type alias for custom audit entries (e.g. "Umb.Workflow.Approved").</param>
+    /// <returns>Result of the add audit log operation.</returns>
+    // TODO (V19): Remove the default implementation when the obsolete Add method is removed.
+    Task<Attempt<AuditLogOperationStatus>> AddAsync(
         AuditType type,
         Guid userKey,
         int objectId,
         string? entityType,
         string? comment = null,
-        string? parameters = null) => throw new NotImplementedException();
+        string? parameters = null,
+        string? typeAlias = null)
+    {
+        var userId = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>()
+            .GetAsync(userKey).GetAwaiter().GetResult();
+#pragma warning disable CS0618 // Type or member is obsolete
+        Add(type, userId, objectId, entityType, comment ?? string.Empty, parameters);
+#pragma warning restore CS0618 // Type or member is obsolete
+        return Task.FromResult(Attempt.Succeed(AuditLogOperationStatus.Success));
+    }
 
     /// <summary>
     /// Adds an audit log entry.

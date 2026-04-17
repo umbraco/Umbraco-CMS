@@ -10,7 +10,26 @@ public sealed class AuditItem : EntityBase, IAuditItem
     /// <summary>
     ///     Initializes a new instance of the <see cref="AuditItem" /> class.
     /// </summary>
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public AuditItem(int objectId, AuditType type, int userId, string? entityType, string? comment = null, string? parameters = null, DateTime? createDate = null)
+        : this(objectId, type, userId, entityType, comment, parameters, createDate, triggerSource: null, triggerOperation: null, typeAlias: null)
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AuditItem" /> class.
+    /// </summary>
+    public AuditItem(
+        int objectId,
+        AuditType type,
+        int userId,
+        string? entityType,
+        string? comment,
+        string? parameters,
+        DateTime? createDate,
+        string? triggerSource,
+        string? triggerOperation,
+        string? typeAlias)
     {
         DisableChangeTracking();
 
@@ -21,6 +40,9 @@ public sealed class AuditItem : EntityBase, IAuditItem
         EntityType = entityType;
         Parameters = parameters;
         CreateDate = createDate ?? default;
+        TriggerSource = triggerSource;
+        TriggerOperation = triggerOperation;
+        TypeAlias = typeAlias;
 
         EnableChangeTracking();
     }
@@ -39,4 +61,13 @@ public sealed class AuditItem : EntityBase, IAuditItem
 
     /// <inheritdoc />
     public string? Parameters { get; }
+
+    /// <inheritdoc />
+    public string? TriggerSource { get; }
+
+    /// <inheritdoc />
+    public string? TriggerOperation { get; }
+
+    /// <inheritdoc />
+    public string? TypeAlias { get; }
 }

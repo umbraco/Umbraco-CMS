@@ -28,7 +28,7 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 
     private IAuditRepository AuditRepository => GetRequiredService<IAuditRepository>();
 
-    private IAuditItem GetAuditItem(int id) => new AuditItem(id, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail");
+    private IAuditItem GetAuditItem(int id) => new AuditItem(id, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail", null, null, null, null, null);
 
     [Test]
     public void Can_Add_Audit_Entry()
@@ -37,7 +37,7 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
         using (var scope = ScopeProvider.CreateScope())
         {
             var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
-            repo.Save(new AuditItem(-1, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail"));
+            repo.Save(new AuditItem(-1, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail", null, null, null, null, null));
 
             var dtos = ScopeAccessor.AmbientScope.Database.Fetch<LogDto>("WHERE id > -1");
 
@@ -88,8 +88,8 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 
             for (var i = 0; i < 100; i++)
             {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
+                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created", null, null, null, null, null));
+                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published", null, null, null, null, null));
             }
 
             scope.Complete();
@@ -116,8 +116,8 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 
             for (var i = 0; i < 100; i++)
             {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
+                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created", null, null, null, null, null));
+                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published", null, null, null, null, null));
             }
 
             scope.Complete();
@@ -165,8 +165,8 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 
             for (var i = 0; i < 100; i++)
             {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
+                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created", null, null, null, null, null));
+                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published", null, null, null, null, null));
             }
 
             scope.Complete();
@@ -202,8 +202,8 @@ internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 
             for (var i = 0; i < 100; i++)
             {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), "Content created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), "Content published"));
+                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), "Content created", null, null, null, null, null));
+                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), "Content published", null, null, null, null, null));
             }
 
             scope.Complete();

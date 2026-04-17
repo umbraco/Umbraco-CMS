@@ -39,6 +39,9 @@ export type AuditLogResponseModel = {
     logType: AuditTypeModel;
     comment?: string | null;
     parameters?: string | null;
+    triggerSource?: string | null;
+    triggerOperation?: string | null;
+    typeAlias?: string | null;
 };
 
 export enum AuditTypeModel {
@@ -2197,6 +2200,16 @@ export type PasswordConfigurationResponseModel = {
     requireDigit: boolean;
     requireLowercase: boolean;
     requireUppercase: boolean;
+};
+
+export type PatchDocumentRequestModel = {
+    operations: Array<PatchOperationRequestModel>;
+};
+
+export type PatchOperationRequestModel = {
+    op: string;
+    path: string;
+    value?: unknown;
 };
 
 export type ProblemDetails = {
@@ -6809,6 +6822,47 @@ export type PutDocumentByIdNotificationsErrors = {
 export type PutDocumentByIdNotificationsError = PutDocumentByIdNotificationsErrors[keyof PutDocumentByIdNotificationsErrors];
 
 export type PutDocumentByIdNotificationsResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PatchDocumentByIdPatchData = {
+    body?: PatchDocumentRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document/{id}/patch';
+};
+
+export type PatchDocumentByIdPatchErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+    /**
+     * Unprocessable Content
+     */
+    422: ProblemDetails;
+};
+
+export type PatchDocumentByIdPatchError = PatchDocumentByIdPatchErrors[keyof PatchDocumentByIdPatchErrors];
+
+export type PatchDocumentByIdPatchResponses = {
     /**
      * OK
      */
