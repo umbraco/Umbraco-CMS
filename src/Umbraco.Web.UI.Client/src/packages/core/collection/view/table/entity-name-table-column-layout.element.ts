@@ -14,10 +14,7 @@ interface UmbEntityNameTableColumnValue {
  */
 @customElement('umb-entity-name-table-column-layout')
 export class UmbEntityNameTableColumnLayoutElement extends UmbLitElement implements UmbTableColumnLayoutElement {
-	@property({ attribute: false })
 	column!: UmbTableColumn;
-
-	@property({ attribute: false })
 	item!: UmbTableItem;
 
 	@property({ attribute: false })
