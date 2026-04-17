@@ -119,7 +119,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			headline: '#redirectUrls_disableUrlTracker',
 			content: '#redirectUrls_confirmDisable',
 			color: 'danger',
-			confirmLabel: 'Disable',
+			confirmLabel: '#actions_disable',
 		});
 
 		this.#trackerToggle();
