@@ -14,10 +14,7 @@ const deprecation = new UmbDeprecation({
 
 @customElement('umb-entity-actions-table-column-view')
 export class UmbEntityActionsTableColumnViewElement extends UmbLitElement implements UmbTableColumnLayoutElement {
-	@property({ attribute: false })
 	column!: UmbTableColumn;
-
-	@property({ attribute: false })
 	item!: UmbTableItem;
 
 	@property({ attribute: false })
