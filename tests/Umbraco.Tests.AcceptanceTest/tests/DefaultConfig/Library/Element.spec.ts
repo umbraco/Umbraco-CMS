@@ -39,7 +39,7 @@ test('can create empty element', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.library.isElementInTreeVisible(elementName);
 });
 
-test('can save and publish empty element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can save and publish empty element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   await umbracoUi.goToBackOffice();
