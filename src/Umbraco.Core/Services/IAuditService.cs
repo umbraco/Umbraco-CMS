@@ -43,7 +43,7 @@ public interface IAuditService : IService
     /// <param name="typeAlias">An optional type alias for custom audit entries (e.g. "Umb.Workflow.Approved").</param>
     /// <returns>Result of the add audit log operation.</returns>
     // TODO (V19): Remove the default implementation when the obsolete Add method is removed.
-    Task<Attempt<AuditLogOperationStatus>> AddAsync(
+    async Task<Attempt<AuditLogOperationStatus>> AddAsync(
         AuditType type,
         Guid userKey,
         int objectId,
@@ -52,12 +52,17 @@ public interface IAuditService : IService
         string? parameters = null,
         string? typeAlias = null)
     {
-        var userId = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>()
-            .GetAsync(userKey).GetAwaiter().GetResult();
+        IUserIdKeyResolver resolver = StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>();
+        Attempt<int> userIdAttempt = await resolver.TryGetAsync(userKey);
+        if (userIdAttempt.Success is false)
+        {
+            return Attempt.Fail(AuditLogOperationStatus.UserNotFound);
+        }
+
 #pragma warning disable CS0618 // Type or member is obsolete
-        Add(type, userId, objectId, entityType, comment ?? string.Empty, parameters);
+        Add(type, userIdAttempt.Result, objectId, entityType, comment ?? string.Empty, parameters);
 #pragma warning restore CS0618 // Type or member is obsolete
-        return Task.FromResult(Attempt.Succeed(AuditLogOperationStatus.Success));
+        return Attempt.Succeed(AuditLogOperationStatus.Success);
     }
 
     /// <summary>
