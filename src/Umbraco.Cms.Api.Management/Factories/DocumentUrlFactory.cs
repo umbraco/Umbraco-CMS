@@ -102,7 +102,7 @@ public class DocumentUrlFactory : IDocumentUrlFactory
 
             if (await _previewService.TryEnterPreviewAsync(currentUser) is false)
             {
-                _logger.LogError("A server error occured, could not initiate an authenticated preview state for the current user.");
+                _logger.LogError("A server error occurred, could not initiate an authenticated preview state for the current user.");
                 return null;
             }
         }
