@@ -283,18 +283,6 @@ export class UmbInputDocumentTypeElement extends UmbFormControlMixin<string | un
 				width: 100%;
 			}
 
-			#loader {
-				margin-top: 10px;
-				opacity: 0;
-				animation: show-loader 0s 120ms forwards;
-			}
-
-			@keyframes show-loader {
-				to {
-					opacity: 1;
-				}
-			}
-
 			uui-ref-node-document-type::after {
 				content: '';
 				position: absolute;
