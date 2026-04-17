@@ -108,4 +108,39 @@ describe('@provide decorator', () => {
 		expect(element.contextValue).to.equal(newProviderInstance);
 		expect(element.contextValue?.prop).to.equal(newProviderInstance.prop);
 	});
+
+	it('should provide context to descendants on first render', async () => {
+		// The provider decorator's controller must be set up before the descendant's consume
+		// runs its request, otherwise the descendant would see undefined on first render
+		const providerInstance = new UmbTestContextConsumerClass('early value');
+
+		class TimingProviderElement extends UmbLitElement {
+			@provideContext({ context: testToken })
+			providerInstance = providerInstance;
+		}
+		customElements.define('timing-provider-element', TimingProviderElement);
+
+		class TimingConsumerElement extends UmbLitElement {
+			contextValueAtFirstRender?: UmbTestContextConsumerClass;
+
+			constructor() {
+				super();
+				this.consumeContext(testToken, (value) => {
+					if (this.contextValueAtFirstRender === undefined) {
+						this.contextValueAtFirstRender = value;
+					}
+				});
+			}
+		}
+		customElements.define('timing-consumer-element', TimingConsumerElement);
+
+		const providerEl = await fixture<TimingProviderElement>(
+			`<timing-provider-element><timing-consumer-element></timing-consumer-element></timing-provider-element>`,
+		);
+		const consumerEl = providerEl.querySelector('timing-consumer-element') as TimingConsumerElement;
+
+		await elementUpdated(consumerEl);
+
+		expect(consumerEl.contextValueAtFirstRender).to.equal(providerInstance);
+	});
 });
