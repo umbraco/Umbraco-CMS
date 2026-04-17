@@ -1,6 +1,7 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
 import {UserBuilder} from "../builders";
 import {Page} from "@playwright/test";
+import { ConstantHelper } from "./ConstantHelper";
 
 export class UserApiHelper {
   api: ApiHelpers;
@@ -302,10 +303,10 @@ export class UserApiHelper {
 
   // Current User Profile
   async updateCurrentUserProfile(languageIsoCode: string) {
-    return await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/user/current/profile', {languageIsoCode});
+    return await this.api.put(this.api.baseUrl + ConstantHelper.apiEndpoints.currentUserProfile, {languageIsoCode});
   }
 
   async clearCurrentUserAvatar() {
-    return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/user/current/avatar');
+    return await this.api.delete(this.api.baseUrl + ConstantHelper.apiEndpoints.currentUserAvatar);
   }
 }
