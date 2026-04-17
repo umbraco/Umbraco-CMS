@@ -305,7 +305,7 @@ internal class ExamineIndexRebuilder : IIndexRebuilder
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "An error occured trying to get determine index shouldRebuild status for index {IndexName}. The index will NOT be considered for rebuilding", index.Name);
+            _logger.LogError(e, "An error occurred trying to get determine index shouldRebuild status for index {IndexName}. The index will NOT be considered for rebuilding", index.Name);
             return false;
         }
     }
