@@ -33,7 +33,7 @@ public class ContentTypeCachePolicyBenchmarks
     public void Setup()
     {
         _entities = Enumerable.Range(1, EntityCount)
-            .Select(i => new AuditItem(i, AuditType.Copy, 123, "test", $"item{i}", null, null, null, null, null))
+            .Select(i => new AuditItem(i, AuditType.Copy, 123, "test", $"item{i}"))
             .ToArray();
 
         var accessor = new Mock<IScopeAccessor>();

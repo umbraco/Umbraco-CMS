@@ -35,8 +35,8 @@ public class FullDataSetCachePolicyTests
     {
         AuditItem[] getAll =
         {
-            new(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null),
-            new(2, AuditType.Copy, 123, "test", "blah2", null, null, null, null, null),
+            new(1, AuditType.Copy, 123, "test", "blah"),
+            new(2, AuditType.Copy, 123, "test", "blah2"),
         };
 
         var isCached = false;
@@ -47,7 +47,7 @@ public class FullDataSetCachePolicyTests
         var policy =
             new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
 
-        var unused = policy.Get(1, id => new AuditItem(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null), ids => getAll);
+        var unused = policy.Get(1, id => new AuditItem(1, AuditType.Copy, 123, "test", "blah"), ids => getAll);
         Assert.IsTrue(isCached);
     }
 
@@ -56,11 +56,11 @@ public class FullDataSetCachePolicyTests
     {
         AuditItem[] getAll =
         {
-            new(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null), new(2, AuditType.Copy, 123, "test", "blah2", null, null, null, null, null),
+            new(1, AuditType.Copy, 123, "test", "blah"), new(2, AuditType.Copy, 123, "test", "blah2"),
         };
 
         var cache = new Mock<IAppPolicyCache>();
-        cache.Setup(x => x.Get(It.IsAny<string>())).Returns(new AuditItem(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null));
+        cache.Setup(x => x.Get(It.IsAny<string>())).Returns(new AuditItem(1, AuditType.Copy, 123, "test", "blah"));
 
         var defaultPolicy =
             new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
@@ -113,8 +113,8 @@ public class FullDataSetCachePolicyTests
     {
         AuditItem[] getAll =
         {
-            new(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null),
-            new(2, AuditType.Copy, 123, "test", "blah2", null, null, null, null, null),
+            new(1, AuditType.Copy, 123, "test", "blah"),
+            new(2, AuditType.Copy, 123, "test", "blah2"),
         };
 
         var cached = new List<string>();
@@ -149,8 +149,8 @@ public class FullDataSetCachePolicyTests
         cache.Setup(x => x.Get(It.IsAny<string>())).Returns(() =>
             new DeepCloneableList<AuditItem>(ListCloneBehavior.CloneOnce)
             {
-                new(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null),
-                new(2, AuditType.Copy, 123, "test", "blah2", null, null, null, null, null),
+                new(1, AuditType.Copy, 123, "test", "blah"),
+                new(2, AuditType.Copy, 123, "test", "blah2"),
             });
 
         var defaultPolicy =
@@ -165,8 +165,8 @@ public class FullDataSetCachePolicyTests
     {
         AuditItem[] getAll =
         {
-            new(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null),
-            new(2, AuditType.Copy, 123, "test", "blah2", null, null, null, null, null),
+            new(1, AuditType.Copy, 123, "test", "blah"),
+            new(2, AuditType.Copy, 123, "test", "blah2"),
         };
 
         var cacheCleared = false;
@@ -178,7 +178,7 @@ public class FullDataSetCachePolicyTests
             new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
         try
         {
-            defaultPolicy.Update(new AuditItem(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null), item => throw new Exception("blah!"));
+            defaultPolicy.Update(new AuditItem(1, AuditType.Copy, 123, "test", "blah"), item => throw new Exception("blah!"));
         }
         catch
         {
@@ -195,8 +195,8 @@ public class FullDataSetCachePolicyTests
     {
         AuditItem[] getAll =
         {
-            new(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null),
-            new(2, AuditType.Copy, 123, "test", "blah2", null, null, null, null, null),
+            new(1, AuditType.Copy, 123, "test", "blah"),
+            new(2, AuditType.Copy, 123, "test", "blah2"),
         };
 
         var cacheCleared = false;
@@ -208,7 +208,7 @@ public class FullDataSetCachePolicyTests
             new FullDataSetRepositoryCachePolicy<AuditItem, object>(cache.Object, DefaultAccessor, new SingleServerCacheVersionService(), Mock.Of<ICacheSyncService>(), item => item.Id, false);
         try
         {
-            defaultPolicy.Delete(new AuditItem(1, AuditType.Copy, 123, "test", "blah", null, null, null, null, null), item => throw new Exception("blah!"));
+            defaultPolicy.Delete(new AuditItem(1, AuditType.Copy, 123, "test", "blah"), item => throw new Exception("blah!"));
         }
         catch
         {
@@ -240,7 +240,7 @@ public class FullDataSetCachePolicyTests
         var databaseCallCount = 0;
 
         AuditItem[] getAll = Enumerable.Range(1, 100)
-            .Select(i => new AuditItem(i, AuditType.Copy, 123, "test", $"item{i}", null, null, null, null, null))
+            .Select(i => new AuditItem(i, AuditType.Copy, 123, "test", $"item{i}"))
             .ToArray();
 
         // Use a non-locking cache to expose race conditions.
@@ -342,7 +342,7 @@ public class FullDataSetCachePolicyTests
 
         // Pre-populate cache.
         var initialData = Enumerable.Range(1, 50)
-            .Select(i => new AuditItem(i, AuditType.Copy, 123, "test", $"item{i}", null, null, null, null, null))
+            .Select(i => new AuditItem(i, AuditType.Copy, 123, "test", $"item{i}"))
             .ToArray();
         policy.GetAll(null, _ => initialData);
 
@@ -370,7 +370,7 @@ public class FullDataSetCachePolicyTests
                             // Writer thread - clears and repopulates cache.
                             policy.ClearAll();
                             var newData = Enumerable.Range(1, 50)
-                                .Select(k => new AuditItem(k, AuditType.Copy, 123, "test", $"new{k}", null, null, null, null, null))
+                                .Select(k => new AuditItem(k, AuditType.Copy, 123, "test", $"new{k}"))
                                 .ToArray();
                             policy.GetAll(null, _ => newData);
                         }

@@ -24,12 +24,12 @@ public sealed class AuditItem : EntityBase, IAuditItem
         AuditType type,
         int userId,
         string? entityType,
-        string? comment,
-        string? parameters,
-        DateTime? createDate,
-        string? triggerSource,
-        string? triggerOperation,
-        string? typeAlias)
+        string? comment = null,
+        string? parameters = null,
+        DateTime? createDate = null,
+        string? triggerSource = null,
+        string? triggerOperation = null,
+        string? typeAlias = null)
     {
         DisableChangeTracking();
 
