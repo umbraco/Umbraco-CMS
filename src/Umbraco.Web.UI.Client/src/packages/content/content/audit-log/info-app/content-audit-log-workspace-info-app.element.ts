@@ -250,6 +250,17 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 	}
 
 	#renderComment(item: UmbAuditLogModel, descKey?: string) {
+		// For non-custom types without parameters, the comment is redundant
+		// (it just repeats the action badge label, e.g. "Content saved").
+		// Only show comments for custom types or when parameters add detail
+		// (e.g. "Content saved for languages: en-US, da-DK").
+		const isCustom = item.logType === 'Custom';
+		const hasParameters = !!item.parameters;
+
+		if (!isCustom && !hasParameters) {
+			return nothing;
+		}
+
 		const localized = descKey ? this.localize.term(descKey, item.parameters ?? '') : '';
 		return localized || item.comment || '';
 	}
