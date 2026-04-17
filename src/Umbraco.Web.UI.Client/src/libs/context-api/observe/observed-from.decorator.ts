@@ -17,14 +17,12 @@ export interface UmbObservedFromOptions<T> {
  * slice of a context. Combines context consumption and observable observation in one declaration.
  *
  * When the element connects to the DOM:
- * 1. Setup is deferred one microtask so inherited private fields (e.g. the controller host's
- *    `#controllers` array) are initialized before the consumer registers.
- * 2. A context consumer then requests the context; if the provider is an ancestor, the request
- *    resolves synchronously (first render may still occur with the default before the microtask runs).
- * 3. When the context resolves, the selector runs to get the observable slice.
- * 4. The observable is subscribed to via `element.observe()`, re-assigning the property on each emission.
- * 5. If the observable emits `undefined` and a default is provided, the default is re-applied.
- * 6. If the context is unprovided, the observable is cleaned up. A new provider triggers re-subscription.
+ * 1. A context consumer is registered immediately via `addUmbController` — the controller
+ *    host's list is lazy-inited, so registration is safe during `addInitializer`.
+ * 2. When the context resolves, the selector runs to get the observable slice.
+ * 3. The observable is subscribed to via `element.observe()`, re-assigning the property on each emission.
+ * 4. If the observable emits `undefined` and a default is provided, the default is re-applied.
+ * 5. If the context is unprovided, the observable is cleaned up. A new provider triggers re-subscription.
  *
  * Supports both modern "standard" decorators (Stage 3 TC39 proposal) and legacy TypeScript experimental decorators.
  * @param {string | UmbContextToken} contextAlias - The context token or alias to consume.
@@ -66,6 +64,42 @@ export function observedFrom<
 	}) as ObservedFromDecorator<T>;
 }
 
+/**
+ * Registers a context consumer that binds the decorated field to an observable slice of the context.
+ * @param host The UmbControllerHost to attach the consumer to.
+ * @param contextAlias Context token or alias to request.
+ * @param selector Returns the observable slice of the resolved context.
+ * @param assign Writes the resolved value (or default) into the decorated field.
+ * @param options Decorator options (default value).
+ * @param observerAlias Stable alias for the observer controller so re-provisioning re-uses the same slot.
+ */
+function bindObservedFrom<BaseType extends UmbContextMinimal, ResultType extends BaseType, T>(
+	host: any,
+	contextAlias: string | UmbContextToken<BaseType, ResultType>,
+	selector: (ctx: ResultType) => Observable<T> | undefined,
+	assign: (value: T | undefined) => void,
+	options: UmbObservedFromOptions<T> | undefined,
+	observerAlias: symbol,
+): void {
+	new UmbContextConsumerController(host, contextAlias, (ctx: ResultType | undefined) => {
+		if (ctx === undefined) {
+			host.observe?.(undefined, undefined, observerAlias);
+			return;
+		}
+		const source = selector(ctx);
+		host.observe?.(
+			source,
+			(value: T | undefined) => {
+				// When the observable emits undefined and a default is configured, fall back to it —
+				// mirrors the defensive `this._field = value ?? default` pattern consumers write manually.
+				const resolved = value === undefined && options?.default !== undefined ? options.default : value;
+				assign(resolved);
+			},
+			observerAlias,
+		);
+	});
+}
+
 function setupStandardDecorator<BaseType extends UmbContextMinimal, ResultType extends BaseType, T>(
 	protoOrTarget: any,
 	decoratorContext: ClassAccessorDecoratorContext<any, T>,
@@ -82,27 +116,14 @@ function setupStandardDecorator<BaseType extends UmbContextMinimal, ResultType e
 		// the context is unprovided and re-provided by a closer ancestor.
 		const observerAlias = Symbol('observedFrom');
 
-		// Defer so inherited class fields (e.g. UmbControllerHostMixin's private
-		// #controllers array) are initialized before the controller registers.
-		queueMicrotask(() => {
-			new UmbContextConsumerController(this, contextAlias, (ctx) => {
-				if (ctx === undefined) {
-					(this as any).observe?.(undefined, undefined, observerAlias);
-					return;
-				}
-				const source = selector(ctx);
-				(this as any).observe?.(
-					source,
-					(value: T | undefined) => {
-						// If the observable emits undefined and we have a default, fall back to it.
-						// This matches the common defensive pattern `this._field = value ?? default`.
-						const resolved = value === undefined && options?.default !== undefined ? options.default : value;
-						protoOrTarget.set.call(this, resolved);
-					},
-					observerAlias,
-				);
-			});
-		});
+		bindObservedFrom(
+			this,
+			contextAlias,
+			selector,
+			(resolved) => protoOrTarget.set.call(this, resolved),
+			options,
+			observerAlias,
+		);
 	});
 }
 
@@ -115,51 +136,37 @@ function setupLegacyDecorator<BaseType extends UmbContextMinimal, ResultType ext
 ): void {
 	const constructor = protoOrTarget.constructor as any;
 
-	// Strategy 1: addInitializer (LitElement-based classes)
-	// Defer to microtask so class fields and inherited private fields are initialized before
-	// the controller registers and we potentially overwrite the field-initialized value with a default.
+	// LitElement classes: register the consumer at construction time via addInitializer.
 	if (constructor.addInitializer) {
 		constructor.addInitializer((element: any): void => {
-			queueMicrotask(() => {
-				if (options?.default !== undefined && element[propertyKey] === undefined) {
-					element[propertyKey] = options.default;
-				}
+			if (options?.default !== undefined && element[propertyKey] === undefined) {
+				element[propertyKey] = options.default;
+			}
 
-				const observerAlias = Symbol(`observedFrom:${propertyKey}`);
+			const observerAlias = Symbol(`observedFrom:${propertyKey}`);
 
-				new UmbContextConsumerController(element, contextAlias, (ctx: ResultType | undefined) => {
-					if (ctx === undefined) {
-						element.observe?.(undefined, undefined, observerAlias);
-						return;
-					}
-					const source = selector(ctx);
-					element.observe?.(
-						source,
-						(value: T | undefined) => {
-							const resolved =
-								value === undefined && options?.default !== undefined ? options.default : value;
-							element[propertyKey] = resolved;
-						},
-						observerAlias,
-					);
-				});
-			});
+			bindObservedFrom(
+				element,
+				contextAlias,
+				selector,
+				(resolved) => {
+					element[propertyKey] = resolved;
+				},
+				options,
+				observerAlias,
+			);
 		});
 		return;
 	}
 
-	// Strategy 2: hostConnected wrapper for classes without addInitializer (e.g. UmbControllerBase).
-	// We still need this for pre-init setup since we can't rely on addInitializer.
+	// UmbControllerBase (non-Lit) classes: wrap hostConnected to register on attach.
 	if ('hostConnected' in protoOrTarget && typeof protoOrTarget.hostConnected === 'function') {
 		const originalHostConnected = protoOrTarget.hostConnected;
+		const setupMarker = Symbol(`observedFrom:${propertyKey}:setup`);
 
 		protoOrTarget.hostConnected = function (this: any) {
-			if (!this.__observedFromSetup) {
-				this.__observedFromSetup = new Set<string>();
-			}
-
-			if (!this.__observedFromSetup.has(propertyKey)) {
-				this.__observedFromSetup.add(propertyKey);
+			if (!this[setupMarker]) {
+				this[setupMarker] = true;
 
 				if (options?.default !== undefined && this[propertyKey] === undefined) {
 					this[propertyKey] = options.default;
@@ -167,22 +174,16 @@ function setupLegacyDecorator<BaseType extends UmbContextMinimal, ResultType ext
 
 				const observerAlias = Symbol(`observedFrom:${propertyKey}`);
 
-				new UmbContextConsumerController(this, contextAlias, (ctx: ResultType | undefined) => {
-					if (ctx === undefined) {
-						this.observe?.(undefined, undefined, observerAlias);
-						return;
-					}
-					const source = selector(ctx);
-					this.observe?.(
-						source,
-						(value: T | undefined) => {
-							const resolved =
-								value === undefined && options?.default !== undefined ? options.default : value;
-							this[propertyKey] = resolved;
-						},
-						observerAlias,
-					);
-				});
+				bindObservedFrom(
+					this,
+					contextAlias,
+					selector,
+					(resolved) => {
+						this[propertyKey] = resolved;
+					},
+					options,
+					observerAlias,
+				);
 			}
 
 			originalHostConnected?.call(this);
