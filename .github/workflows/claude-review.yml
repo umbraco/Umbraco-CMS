@@ -2,7 +2,7 @@ name: Claude PR Review
 
 on:
   pull_request:
-    types: [opened, ready_for_review]
+    types: [opened, ready_for_review, reopened]
   # NOTE: `pull_request_target` would let this workflow review fork PRs
   # (with access to secrets), but the action currently fails during OIDC
   # token exchange with "401 Unauthorized - Invalid OIDC token" on that
@@ -18,7 +18,6 @@ on:
 permissions:
   contents: read
   pull-requests: write
-  issues: write
   id-token: write
   actions: read
 
@@ -34,14 +33,20 @@ jobs:
       && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY_03 }}
-          base_branch: "main"
+
+          # Enable progress tracking
+          track_progress: true
+
+          # Debug (set to true to show full output in logs, false to hide it and only post comments on the PR)
+          show_full_output: false
+
           additional_permissions: "actions: read"
           claude_args: "--model claude-sonnet-4-6 --allowedTools 'Bash(gh:*),Bash(git:*)'"
           prompt: |
