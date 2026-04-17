@@ -23,14 +23,9 @@ export class UmbLogViewerLogTypesChartElement extends UmbLitElement {
 	@state()
 	private _logLevelKeys: [string, number][] = [];
 
-	private _logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
-
 	constructor() {
 		super();
-		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => {
-			this._logViewerContext = ctx;
-			ctx?.getLogCount();
-		});
+		this.consumeContext(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx?.getLogCount());
 	}
 
 	protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {

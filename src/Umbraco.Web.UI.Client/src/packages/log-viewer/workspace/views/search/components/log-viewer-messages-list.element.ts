@@ -33,7 +33,6 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 	constructor() {
 		super();
-		// Side-effect: re-fetch logs when the filter expression changes (after initial value).
 		this.observeContext(
 			UMB_APP_LOG_VIEWER_CONTEXT,
 			(ctx) => ctx.filterExpression.pipe(skip(1)),

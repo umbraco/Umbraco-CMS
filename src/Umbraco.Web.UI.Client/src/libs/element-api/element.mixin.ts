@@ -83,16 +83,16 @@ export const UmbElementMixin = <T extends HTMLElementConstructor>(superClass: T)
 			callback: ObserverCallback<ObservedT>,
 			controllerAlias?: UmbControllerAlias | null,
 		): UmbContextConsumerController<BaseType, ResultType> {
-			const observerAlias =
-				controllerAlias === null ? undefined : controllerAlias ?? Symbol(`observeContext:${alias.toString()}`);
+			// Pass null to opt out of aliasing; otherwise generate a per-call Symbol.
+			const observerAlias: UmbControllerAlias | null =
+				controllerAlias === null ? null : controllerAlias ?? Symbol(`observeContext:${alias.toString()}`);
 
 			return new UmbContextConsumerController(this, alias, (ctx) => {
 				if (ctx === undefined) {
-					this.observe(undefined, undefined, observerAlias ?? null);
+					this.observe(undefined, undefined, observerAlias);
 					return;
 				}
-				const source = selector(ctx);
-				this.observe(source, callback, observerAlias ?? null);
+				this.observe(selector(ctx), callback, observerAlias);
 			});
 		}
 

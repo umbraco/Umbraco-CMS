@@ -70,16 +70,16 @@ function setupStandardDecorator<BaseType extends UmbContextMinimal, ResultType e
 	options?: UmbObservedFromOptions<T>,
 ): void {
 	decoratorContext.addInitializer(function () {
-		// Apply default value to the accessor before context resolves
 		if (options?.default !== undefined) {
 			protoOrTarget.set.call(this, options.default);
 		}
 
-		// Stable alias ensures `observe()` re-uses the same observer controller across
-		// context instance changes (new provider mounts, unprovide/reprovide).
+		// Stable alias so `observe()` re-uses the same observer controller when
+		// the context is unprovided and re-provided by a closer ancestor.
 		const observerAlias = Symbol('observedFrom');
 
-		// Defer to microtask so inherited class fields are initialized before the controller registers.
+		// Defer so inherited class fields (e.g. UmbControllerHostMixin's private
+		// #controllers array) are initialized before the controller registers.
 		queueMicrotask(() => {
 			new UmbContextConsumerController(this, contextAlias, (ctx) => {
 				if (ctx === undefined) {
