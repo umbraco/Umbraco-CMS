@@ -4,6 +4,7 @@
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -105,6 +106,29 @@ internal sealed class ExternalMemberRepository : IExternalMemberRepository
     }
 
     /// <inheritdoc />
+    public async Task UpdateLoginPropertiesAsync(ExternalMemberIdentity member, bool bumpUpdateDate)
+    {
+        NPocoSqlExtensions.SqlUpd<ExternalMemberDto> GetSetExpression(NPocoSqlExtensions.SqlUpd<ExternalMemberDto> _)
+        {
+            var setExpression = new NPocoSqlExtensions.SqlUpd<ExternalMemberDto>(SqlContext);
+            setExpression.Set(x => x.LastLoginDate, member.LastLoginDate);
+            setExpression.Set(x => x.SecurityStamp, member.SecurityStamp);
+            if (bumpUpdateDate)
+            {
+                setExpression.Set(x => x.UpdateDate, member.UpdateDate);
+            }
+
+            return setExpression;
+        }
+
+        Sql<ISqlContext> sql = SqlContext.Sql()
+            .Update<ExternalMemberDto>(GetSetExpression)
+            .Where<ExternalMemberDto>(x => x.Key == member.Key);
+
+        await Database.ExecuteAsync(sql);
+    }
+
+    /// <inheritdoc />
     public async Task DeleteAsync(Guid key)
     {
         // Delete group memberships first (FK constraint).
@@ -182,6 +206,7 @@ internal sealed class ExternalMemberRepository : IExternalMemberRepository
             LastLoginDate = dto.LastLoginDate,
             LastLockoutDate = dto.LastLockoutDate,
             CreateDate = dto.CreateDate,
+            UpdateDate = dto.UpdateDate,
             SecurityStamp = dto.SecurityStamp,
             ProfileData = dto.ProfileData,
         };
@@ -199,6 +224,7 @@ internal sealed class ExternalMemberRepository : IExternalMemberRepository
             LastLoginDate = identity.LastLoginDate,
             LastLockoutDate = identity.LastLockoutDate,
             CreateDate = identity.CreateDate,
+            UpdateDate = identity.UpdateDate,
             SecurityStamp = identity.SecurityStamp,
             ProfileData = identity.ProfileData,
         };

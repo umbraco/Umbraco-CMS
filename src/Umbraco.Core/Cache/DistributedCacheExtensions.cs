@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -309,12 +310,28 @@ public static class DistributedCacheExtensions
     /// <returns>An enumerable of JSON payloads for the member cache refresher.</returns>
     /// <remarks>Internal for unit test.</remarks>
     internal static IEnumerable<MemberCacheRefresher.JsonPayload> GetPayloads(IEnumerable<IMember> members, IDictionary<string, object?> state, bool removed)
-        => members
+    {
+        bool indexableFieldsChanged = GetMemberIndexableFieldsChanged(state);
+        return members
             .DistinctBy(x => (x.Id, x.Username))
-            .Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, removed)
+            .Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, removed, indexableFieldsChanged)
             {
                 PreviousUsername = GetPreviousUsername(x, state)
             });
+    }
+
+    private static bool GetMemberIndexableFieldsChanged(IDictionary<string, object?> state)
+    {
+        // Default to true for backward compatibility — any save that doesn't explicitly signal
+        // "nothing indexable changed" is treated as potentially indexable.
+        if (state.TryGetValue(Constants.Conventions.Member.IndexableFieldsChangedStateKey, out object? value)
+            && value is bool flag)
+        {
+            return flag;
+        }
+
+        return true;
+    }
 
     private static string? GetPreviousUsername(IMember x, IDictionary<string, object?> state)
     {
@@ -342,12 +359,20 @@ public static class DistributedCacheExtensions
     /// </summary>
     /// <param name="dc">The distributed cache.</param>
     /// <param name="externalMembers">The external members to refresh in cache.</param>
+    [Obsolete("Use the overload taking notification state instead. Scheduled for removal in Umbraco 19.")]
     public static void RefreshExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers)
+        => dc.RefreshExternalMemberCache(externalMembers, new Dictionary<string, object?>());
+
+    /// <summary>
+    ///     Refreshes the specified external members in the distributed cache.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="externalMembers">The external members to refresh in cache.</param>
+    /// <param name="state">The notification state dictionary.</param>
+    public static void RefreshExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers, IDictionary<string, object?> state)
         => dc.RefreshByPayload(
             ExternalMemberCacheRefresher.UniqueId,
-            externalMembers
-                .DistinctBy(x => x.Key)
-                .Select(x => new ExternalMemberCacheRefresher.JsonPayload(x.Id, x.Key, false)));
+            GetPayloads(externalMembers, state, removed: false));
 
     /// <summary>
     ///     Removes the specified external members from the distributed cache.
@@ -357,9 +382,26 @@ public static class DistributedCacheExtensions
     public static void RemoveExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers)
         => dc.RefreshByPayload(
             ExternalMemberCacheRefresher.UniqueId,
-            externalMembers
-                .DistinctBy(x => x.Key)
-                .Select(x => new ExternalMemberCacheRefresher.JsonPayload(x.Id, x.Key, true)));
+            GetPayloads(externalMembers, new Dictionary<string, object?>(), removed: true));
+
+    /// <summary>
+    ///     Gets the JSON payloads for external member cache refresh operations.
+    /// </summary>
+    /// <param name="externalMembers">The external members to create payloads for.</param>
+    /// <param name="state">The notification state dictionary.</param>
+    /// <param name="removed">Whether the external members were removed.</param>
+    /// <returns>An enumerable of JSON payloads for the external member cache refresher.</returns>
+    /// <remarks>Internal for unit test.</remarks>
+    internal static IEnumerable<ExternalMemberCacheRefresher.JsonPayload> GetPayloads(
+        IEnumerable<ExternalMemberIdentity> externalMembers,
+        IDictionary<string, object?> state,
+        bool removed)
+    {
+        bool indexableFieldsChanged = GetMemberIndexableFieldsChanged(state);
+        return externalMembers
+            .DistinctBy(x => x.Key)
+            .Select(x => new ExternalMemberCacheRefresher.JsonPayload(x.Id, x.Key, removed, indexableFieldsChanged));
+    }
 
     #endregion
 

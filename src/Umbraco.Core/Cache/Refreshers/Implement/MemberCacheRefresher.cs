@@ -87,10 +87,26 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
         /// <param name="username">The username of the member.</param>
         /// <param name="removed">Whether the member was removed.</param>
         public JsonPayload(int id, string? username, bool removed)
+            : this(id, username, removed, indexableFieldsChanged: true)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JsonPayload" /> class.
+        /// </summary>
+        /// <param name="id">The identifier of the member.</param>
+        /// <param name="username">The username of the member.</param>
+        /// <param name="removed">Whether the member was removed.</param>
+        /// <param name="indexableFieldsChanged">
+        ///     Whether any field that is part of the Examine value set has changed as part of this operation.
+        ///     When <c>false</c>, Examine indexing handlers will skip the re-index for this payload.
+        /// </param>
+        public JsonPayload(int id, string? username, bool removed, bool indexableFieldsChanged)
         {
             Id = id;
             Username = username;
             Removed = removed;
+            IndexableFieldsChanged = indexableFieldsChanged;
         }
 
         /// <summary>
@@ -112,6 +128,16 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
         ///     Gets a value indicating whether the member was removed.
         /// </summary>
         public bool Removed { get; }
+
+        /// <summary>
+        ///     Gets a value indicating whether any indexable field changed as part of the originating save.
+        /// </summary>
+        /// <remarks>
+        ///     Defaults to <c>true</c> for backward compatibility. When explicitly set to <c>false</c>
+        ///     (e.g. by a login-only update when <c>SecuritySettings.TreatLoginAsMemberUpdate</c> is
+        ///     <c>false</c>), Examine indexing handlers will skip re-indexing this payload.
+        /// </remarks>
+        public bool IndexableFieldsChanged { get; } = true;
     }
 
     /// <inheritdoc />

@@ -99,6 +99,25 @@ public class MemberIndexingNotificationHandlerTests
     }
 
     [Test]
+    public void GivenRefreshByPayload_WhenIndexableFieldsUnchanged_ThenReIndexNotCalled()
+    {
+        // Arrange
+        var payload = new[]
+        {
+            new MemberCacheRefresher.JsonPayload(42, "test", removed: false, indexableFieldsChanged: false),
+        };
+        var notification = new MemberCacheRefresherNotification(payload, MessageType.RefreshByPayload);
+
+        // Act
+        _sut.Handle(notification);
+
+        // Assert
+        _mockMemberService.Verify(x => x.GetById(It.IsAny<int>()), Times.Never);
+        _mockIndexingHandler.Verify(x => x.ReIndexForMember(It.IsAny<IMember>()), Times.Never);
+        _mockIndexingHandler.Verify(x => x.DeleteIndexForEntity(It.IsAny<int>(), It.IsAny<bool>()), Times.Never);
+    }
+
+    [Test]
     public void GivenRefreshByPayload_WithMultiplePayloads_ThenEachIsProcessed()
     {
         // Arrange

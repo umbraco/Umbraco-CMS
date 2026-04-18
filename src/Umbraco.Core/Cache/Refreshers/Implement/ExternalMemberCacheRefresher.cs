@@ -45,10 +45,26 @@ public sealed class ExternalMemberCacheRefresher : PayloadCacheRefresherBase<Ext
         /// <param name="key">The unique key of the external member.</param>
         /// <param name="removed">Whether the external member was removed.</param>
         public JsonPayload(int id, Guid key, bool removed)
+            : this(id, key, removed, indexableFieldsChanged: true)
+        {
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="JsonPayload" /> class.
+        /// </summary>
+        /// <param name="id">The integer identifier of the external member.</param>
+        /// <param name="key">The unique key of the external member.</param>
+        /// <param name="removed">Whether the external member was removed.</param>
+        /// <param name="indexableFieldsChanged">
+        ///     Whether any field that is part of the Examine value set has changed as part of this operation.
+        ///     When <c>false</c>, Examine indexing handlers will skip the re-index for this payload.
+        /// </param>
+        public JsonPayload(int id, Guid key, bool removed, bool indexableFieldsChanged)
         {
             Id = id;
             Key = key;
             Removed = removed;
+            IndexableFieldsChanged = indexableFieldsChanged;
         }
 
         /// <summary>
@@ -65,6 +81,16 @@ public sealed class ExternalMemberCacheRefresher : PayloadCacheRefresherBase<Ext
         ///     Gets a value indicating whether the external member was removed.
         /// </summary>
         public bool Removed { get; }
+
+        /// <summary>
+        ///     Gets a value indicating whether any indexable field changed as part of the originating save.
+        /// </summary>
+        /// <remarks>
+        ///     Defaults to <c>true</c> for backward compatibility. When explicitly set to <c>false</c>
+        ///     (e.g. by a login-only update when <c>SecuritySettings.TreatLoginAsMemberUpdate</c> is
+        ///     <c>false</c>), Examine indexing handlers will skip re-indexing this payload.
+        /// </remarks>
+        public bool IndexableFieldsChanged { get; } = true;
     }
 
     /// <inheritdoc />

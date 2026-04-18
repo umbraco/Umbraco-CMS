@@ -54,6 +54,21 @@ public interface IExternalMemberRepository
     Task UpdateAsync(ExternalMemberIdentity member);
 
     /// <summary>
+    ///     Updates only the login-related properties of an external member.
+    /// </summary>
+    /// <param name="member">The external member identity carrying the new values.</param>
+    /// <param name="bumpUpdateDate">
+    ///     When <c>true</c>, the <c>updateDate</c> column is updated to <see cref="ExternalMemberIdentity.UpdateDate"/>.
+    ///     When <c>false</c>, the <c>updateDate</c> column is left untouched, enabling downstream indexing
+    ///     to be skipped when no indexable field has changed.
+    /// </param>
+    /// <remarks>
+    ///     Sets <c>lastLoginDate</c>, <c>securityStamp</c>, and (optionally) <c>updateDate</c> only.
+    ///     Does not perform uniqueness checks or full DTO mapping.
+    /// </remarks>
+    Task UpdateLoginPropertiesAsync(ExternalMemberIdentity member, bool bumpUpdateDate);
+
+    /// <summary>
     ///     Deletes an external member by its unique key.
     /// </summary>
     /// <param name="key">The unique key of the external member to delete.</param>

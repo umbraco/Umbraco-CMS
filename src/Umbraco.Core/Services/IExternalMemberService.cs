@@ -58,6 +58,22 @@ public interface IExternalMemberService
     Task<Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus>> UpdateAsync(ExternalMemberIdentity member);
 
     /// <summary>
+    ///     Updates only the login-related properties of an external member via a lightweight direct SQL update.
+    /// </summary>
+    /// <param name="member">The external member identity carrying the new values for <c>LastLoginDate</c> and <c>SecurityStamp</c>.</param>
+    /// <returns>An <see cref="Attempt{TResult,TStatus}"/> with the updated member on success.</returns>
+    /// <remarks>
+    ///     Use this instead of <see cref="UpdateAsync"/> on the login path when only <c>LastLoginDate</c>
+    ///     and/or <c>SecurityStamp</c> have changed. Skips the uniqueness checks and full-DTO mapping
+    ///     performed by the full update.
+    ///     <para>
+    ///         Whether <c>UpdateDate</c> is bumped — and consequently whether the Examine index is
+    ///         refreshed — is governed by <c>SecuritySettings.TreatLoginAsMemberUpdate</c>.
+    ///     </para>
+    /// </remarks>
+    Task<Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus>> UpdateLoginPropertiesAsync(ExternalMemberIdentity member);
+
+    /// <summary>
     ///     Deletes an external member by its unique key.
     /// </summary>
     /// <param name="key">The unique key of the external member to delete.</param>

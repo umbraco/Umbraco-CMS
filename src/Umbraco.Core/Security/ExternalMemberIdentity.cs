@@ -69,7 +69,7 @@ public class ExternalMemberIdentity
     /// </summary>
     /// <remarks>
     ///     Whether a login operation updates this value is governed by
-    ///     <c>SecuritySettings.TreatLoginAsContentUpdate</c>.
+    ///     <c>SecuritySettings.TreatLoginAsMemberUpdate</c>.
     /// </remarks>
     public DateTime UpdateDate { get; set; }
 

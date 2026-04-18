@@ -926,39 +926,60 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
         var isTokensPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.LoginTokens));
 
-        // For external members, always do a full update. Unlike content members where a full
-        // save is expensive (content versioning, node tree, notifications), the external member
-        // update is a single-row UPDATE — there's no meaningful performance difference vs a
-        // targeted two-column fast path, and it ensures ProfileData changes from OnExternalLogin
-        // callbacks are persisted (ProfileData has no change tracking).
-        var externalIdentity = new ExternalMemberIdentity
+        // Detect login-only updates — on the OIDC callback we typically only set LastLoginDate
+        // (and SecurityStamp when concurrent logins are disabled). In that case we route to the
+        // lightweight UpdateLoginPropertiesAsync which issues a targeted SQL UPDATE and lets the
+        // downstream indexing handler skip re-indexing when nothing indexable changed.
+        if (IsUpdatingOnlyLoginProperties(user))
         {
-            Key = user.Key,
-            Email = user.Email!,
-            UserName = user.UserName!,
-            Name = user.Name,
-            IsApproved = user.IsApproved,
-            IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd.Value >= DateTimeOffset.UtcNow,
-            LastLoginDate = user.LastLoginDate,
-            LastLockoutDate = user.LastLockoutDate,
-            CreateDate = user.CreatedDate,
-            SecurityStamp = user.SecurityStamp,
-            ProfileData = user.ProfileData,
-        };
-
-        // Resolve the int Id and CreateDate from the stored record — MemberIdentityUser
-        // doesn't carry the int Id (it uses Guid key as Id) and CreateDate may not be set.
-        var existing = await _externalMemberService.GetByKeyAsync(user.Key);
-        if (existing is not null)
-        {
-            externalIdentity.Id = existing.Id;
-            if (externalIdentity.CreateDate == default)
+            var loginIdentity = new ExternalMemberIdentity
             {
-                externalIdentity.CreateDate = existing.CreateDate;
-            }
-        }
+                Key = user.Key,
+                LastLoginDate = user.LastLoginDate,
+                SecurityStamp = user.SecurityStamp,
+            };
 
-        await _externalMemberService.UpdateAsync(externalIdentity);
+            var existingForLogin = await _externalMemberService.GetByKeyAsync(user.Key);
+            if (existingForLogin is not null)
+            {
+                loginIdentity.Id = existingForLogin.Id;
+            }
+
+            await _externalMemberService.UpdateLoginPropertiesAsync(loginIdentity);
+        }
+        else
+        {
+            // Full update — covers ProfileData changes from OnExternalLogin callbacks, role updates,
+            // email/username changes etc. ProfileData has no change tracking so we can't safely skip.
+            var externalIdentity = new ExternalMemberIdentity
+            {
+                Key = user.Key,
+                Email = user.Email!,
+                UserName = user.UserName!,
+                Name = user.Name,
+                IsApproved = user.IsApproved,
+                IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd.Value >= DateTimeOffset.UtcNow,
+                LastLoginDate = user.LastLoginDate,
+                LastLockoutDate = user.LastLockoutDate,
+                CreateDate = user.CreatedDate,
+                SecurityStamp = user.SecurityStamp,
+                ProfileData = user.ProfileData,
+            };
+
+            // Resolve the int Id and CreateDate from the stored record — MemberIdentityUser
+            // doesn't carry the int Id (it uses Guid key as Id) and CreateDate may not be set.
+            var existing = await _externalMemberService.GetByKeyAsync(user.Key);
+            if (existing is not null)
+            {
+                externalIdentity.Id = existing.Id;
+                if (externalIdentity.CreateDate == default)
+                {
+                    externalIdentity.CreateDate = existing.CreateDate;
+                }
+            }
+
+            await _externalMemberService.UpdateAsync(externalIdentity);
+        }
 
         if (isLoginsPropertyDirty)
         {
@@ -981,6 +1002,31 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         }
 
         return IdentityResult.Success;
+    }
+
+    private static bool IsUpdatingOnlyLoginProperties(MemberIdentityUser user)
+    {
+        // Only consider a login-only update if at least LastLoginDate or SecurityStamp is dirty,
+        // and none of the other tracked fields that would require a full update are dirty.
+        bool hasLoginChange = user.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDate))
+            || user.IsPropertyDirty(nameof(MemberIdentityUser.SecurityStamp));
+        if (hasLoginChange is false)
+        {
+            return false;
+        }
+
+        string[] disqualifyingProperties =
+        [
+            nameof(MemberIdentityUser.Email),
+            nameof(MemberIdentityUser.UserName),
+            nameof(MemberIdentityUser.Name),
+            nameof(MemberIdentityUser.IsApproved),
+            nameof(MemberIdentityUser.LockoutEnd),
+            nameof(MemberIdentityUser.LastLockoutDate),
+            nameof(MemberIdentityUser.ProfileData),
+        ];
+
+        return disqualifyingProperties.All(p => user.IsPropertyDirty(p) is false);
     }
 
     private async Task<IdentityResult> DeleteExternalMemberAsync(MemberIdentityUser user)

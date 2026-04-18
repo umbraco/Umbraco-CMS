@@ -26,7 +26,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     private readonly IMemberService _memberService;
     private readonly IMemberGroupService _memberGroupService;
     private readonly IExternalLoginWithKeyRepository _externalLoginRepository;
-    private readonly SecuritySettings _securitySettings;
+    private readonly IOptionsMonitor<SecuritySettings> _securitySettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ExternalMemberService"/> class.
@@ -46,7 +46,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         _memberService = memberService;
         _memberGroupService = memberGroupService;
         _externalLoginRepository = externalLoginRepository;
-        _securitySettings = securitySettings.CurrentValue;
+        _securitySettings = securitySettings;
     }
 
     /// <inheritdoc />
@@ -91,7 +91,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
                 return Attempt.FailWithStatus(uniquenessResult.Value, member);
             }
 
-            if (_securitySettings.MemberRequireUniqueEmail)
+            if (_securitySettings.CurrentValue.MemberRequireUniqueEmail)
             {
                 uniquenessResult = await ValidateEmailUniqueAsync(member.Email, null);
                 if (uniquenessResult is not null)
@@ -112,6 +112,14 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
             scope.Complete();
             return Attempt.FailWithStatus(ExternalMemberOperationStatus.CancelledByNotification, member);
         }
+
+        DateTime now = DateTime.UtcNow;
+        if (member.CreateDate == default)
+        {
+            member.CreateDate = now;
+        }
+
+        member.UpdateDate = now;
 
         // Persist.
         var id = await _repository.CreateAsync(member);
@@ -144,7 +152,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
                 return Attempt.FailWithStatus(uniquenessResult.Value, member);
             }
 
-            if (_securitySettings.MemberRequireUniqueEmail)
+            if (_securitySettings.CurrentValue.MemberRequireUniqueEmail)
             {
                 uniquenessResult = await ValidateEmailUniqueAsync(member.Email, member.Key);
                 if (uniquenessResult is not null)
@@ -166,7 +174,50 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
             return Attempt.FailWithStatus(ExternalMemberOperationStatus.CancelledByNotification, member);
         }
 
+        member.UpdateDate = DateTime.UtcNow;
+
         await _repository.UpdateAsync(member);
+
+        scope.Notifications.Publish(
+            new ExternalMemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus(ExternalMemberOperationStatus.Success, member);
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus>> UpdateLoginPropertiesAsync(ExternalMemberIdentity member)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        // When true (default), a login is treated as a member update: UpdateDate is bumped and the member index refreshes.
+        // When false, none of that happens — the repository leaves updateDate untouched, and the IndexableFieldsChanged state
+        // flag tells the Examine indexing handler to skip re-indexing since no indexed field actually changed.
+        // This is configurable so implementors can decide whether a login constitutes an "update" to the member or not.
+        // They can avoid unnecessary index refreshes if not, but if they need it to be treated as an update, e.g. for an active members
+        // dashboard driven by the search index, then they can have that too.
+        bool bumpUpdateDate = _securitySettings.CurrentValue.TreatLoginAsMemberUpdate;
+
+        // Mirror the content-member pattern (MemberService.UpdateLoginPropertiesAsync): we set
+        // well-known state flags that downstream handlers can read to short-circuit expensive work.
+        var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);
+        savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
+        savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, bumpUpdateDate);
+
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus(ExternalMemberOperationStatus.CancelledByNotification, member);
+        }
+
+        if (bumpUpdateDate)
+        {
+            member.UpdateDate = DateTime.UtcNow;
+        }
+
+        await _repository.UpdateLoginPropertiesAsync(member, bumpUpdateDate);
 
         scope.Notifications.Publish(
             new ExternalMemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));

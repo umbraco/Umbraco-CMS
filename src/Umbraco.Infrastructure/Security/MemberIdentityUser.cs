@@ -1,6 +1,4 @@
 using System.Globalization;
-using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
 
@@ -9,13 +7,13 @@ namespace Umbraco.Cms.Core.Security;
 /// </summary>
 public class MemberIdentityUser : UmbracoIdentityUser
 {
-    // Custom comparer for enumerables
-    private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> _groupsComparer = new(
-        (groups, enumerable) =>
-            groups?.Select(x => x.Alias).UnsortedSequenceEqual(enumerable?.Select(x => x.Alias)) ?? false,
-        groups => groups.GetHashCode());
-
+    // IDE0032: explicit backing fields are required because the Comments and ProfileData setters pass them by ref
+    // to BeingDirty.SetPropertyValueAndDetectChanges for change detection.
+    // Converting to auto-properties would silently remove the dirty tracking.
+#pragma warning disable IDE0032 // Use auto property
     private string? _comments;
+    private string? _profileData;
+#pragma warning restore IDE0032 // Use auto property
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberIdentityUser" /> class.
@@ -77,8 +75,16 @@ public class MemberIdentityUser : UmbracoIdentityUser
     ///     Only used for external-only members. For content-based members, profile data
     ///     lives in content properties and this value is null.
     /// </summary>
-    /// <remarks>No change tracking because this is managed by IExternalMemberService.</remarks>
-    public string? ProfileData { get; set; }
+    /// <remarks>
+    ///     Dirty-tracked so that login-path routing (see <c>MemberUserStore.UpdateExternalMemberAsync</c>)
+    ///     can detect when an <c>OnExternalLogin</c> callback refreshes profile data and route to the
+    ///     full update path — ensuring the change is persisted and the member index is refreshed.
+    /// </remarks>
+    public string? ProfileData
+    {
+        get => _profileData;
+        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _profileData, nameof(ProfileData));
+    }
 
     /// <summary>
     ///     Deserialises the <see cref="ProfileData"/> JSON string into a typed object.

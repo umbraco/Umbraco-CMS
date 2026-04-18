@@ -63,7 +63,7 @@ public sealed class ExternalMemberIndexingNotificationHandler :
             {
                 _umbracoIndexingHandler.DeleteExternalMemberFromIndex(payload.Id);
             }
-            else
+            else if (payload.IndexableFieldsChanged)
             {
                 ExternalMemberIdentity? member = _externalMemberService.GetByKeyAsync(payload.Key)
                     .GetAwaiter().GetResult();

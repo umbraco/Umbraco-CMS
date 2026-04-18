@@ -69,5 +69,22 @@ public interface IMemberRepository : IContentRepository<int, IMember>
     /// </summary>
     /// <param name="member">The member to update.</param>
     /// <returns>Used to avoid the full save of the member object after a login operation.</returns>
-    Task UpdateLoginPropertiesAsync(IMember member) => Task.CompletedTask;
+    [Obsolete("Use the overload taking bumpUpdateDate instead. Scheduled for removal in Umbraco 19.")]
+    Task UpdateLoginPropertiesAsync(IMember member)
+#pragma warning disable CS0618 // Type or member is obsolete
+        => UpdateLoginPropertiesAsync(member, bumpUpdateDate: true);
+#pragma warning restore CS0618
+
+    /// <summary>
+    /// Saves only the properties related to login for the member, using an optimized, non-locking update.
+    /// </summary>
+    /// <param name="member">The member to update.</param>
+    /// <param name="bumpUpdateDate">
+    ///     When <c>true</c>, also bumps the member's <c>UpdateDate</c> and the corresponding <c>ContentVersionDto.VersionDate</c>.
+    ///     When <c>false</c>, only the login-related columns are touched — enabling downstream indexing
+    ///     to be skipped when no indexable field has changed.
+    /// </param>
+    /// <returns>Used to avoid the full save of the member object after a login operation.</returns>
+    // TODO (V19): Remove the default implementation once the obsolete overload is removed.
+    Task UpdateLoginPropertiesAsync(IMember member, bool bumpUpdateDate) => Task.CompletedTask;
 }

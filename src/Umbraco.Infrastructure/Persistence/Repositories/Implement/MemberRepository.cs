@@ -1160,7 +1160,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     }
 
     /// <inheritdoc/>
-    public async Task UpdateLoginPropertiesAsync(IMember member)
+    public async Task UpdateLoginPropertiesAsync(IMember member, bool bumpUpdateDate)
     {
         var updatedLastLoginDate = member.IsPropertyDirty(nameof(member.LastLoginDate));
         var updatedSecurityStamp = member.IsPropertyDirty(nameof(member.SecurityStamp));
@@ -1185,17 +1185,23 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             return setExpression;
         }
 
-        member.UpdatingEntity();
+        if (bumpUpdateDate)
+        {
+            member.UpdatingEntity();
+        }
 
         Sql<ISqlContext> updateMemberQuery = Sql()
             .Update<MemberDto>(m => GetMemberSetExpression(member, m))
             .Where<MemberDto>(m => m.NodeId == member.Id);
         await Database.ExecuteAsync(updateMemberQuery);
 
-        Sql<ISqlContext> updateContentVersionQuery = Sql()
-            .Update<ContentVersionDto>(m => m.Set(x => x.VersionDate, member.UpdateDate))
-            .Where<ContentVersionDto>(m => m.NodeId == member.Id && m.Current == true);
-        await Database.ExecuteAsync(updateContentVersionQuery);
+        if (bumpUpdateDate)
+        {
+            Sql<ISqlContext> updateContentVersionQuery = Sql()
+                .Update<ContentVersionDto>(m => m.Set(x => x.VersionDate, member.UpdateDate))
+                .Where<ContentVersionDto>(m => m.NodeId == member.Id && m.Current == true);
+            await Database.ExecuteAsync(updateContentVersionQuery);
+        }
 
         OnUowRefreshedEntity(new MemberRefreshNotification(member, new EventMessages()));
 

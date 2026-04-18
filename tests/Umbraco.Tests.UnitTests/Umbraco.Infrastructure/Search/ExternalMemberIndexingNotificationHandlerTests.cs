@@ -102,6 +102,25 @@ public class ExternalMemberIndexingNotificationHandlerTests
     }
 
     [Test]
+    public void GivenRefreshByPayload_WhenIndexableFieldsUnchanged_ThenReIndexNotCalled()
+    {
+        // Arrange
+        var payload = new[]
+        {
+            new ExternalMemberCacheRefresher.JsonPayload(42, Guid.NewGuid(), removed: false, indexableFieldsChanged: false),
+        };
+        var notification = new ExternalMemberCacheRefresherNotification(payload, MessageType.RefreshByPayload);
+
+        // Act
+        _sut.Handle(notification);
+
+        // Assert
+        _mockExternalMemberService.Verify(x => x.GetByKeyAsync(It.IsAny<Guid>()), Times.Never);
+        _mockIndexingHandler.Verify(x => x.ReIndexForExternalMember(It.IsAny<ExternalMemberIdentity>()), Times.Never);
+        _mockIndexingHandler.Verify(x => x.DeleteExternalMemberFromIndex(It.IsAny<int>()), Times.Never);
+    }
+
+    [Test]
     public void GivenRefreshByPayload_WithMultiplePayloads_ThenEachIsProcessed()
     {
         // Arrange

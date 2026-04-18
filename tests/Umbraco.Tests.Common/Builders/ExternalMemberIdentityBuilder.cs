@@ -57,8 +57,10 @@ public class ExternalMemberIdentityBuilder
         return this;
     }
 
-    public ExternalMemberIdentity Build() =>
-        new()
+    public ExternalMemberIdentity Build()
+    {
+        DateTime now = DateTime.UtcNow;
+        return new()
         {
             Key = _key ?? Guid.NewGuid(),
             Email = _email,
@@ -66,10 +68,12 @@ public class ExternalMemberIdentityBuilder
             Name = _name,
             IsApproved = _isApproved,
             IsLockedOut = _isLockedOut,
-            CreateDate = DateTime.UtcNow,
+            CreateDate = now,
+            UpdateDate = now,
             SecurityStamp = Guid.NewGuid().ToString(),
             ProfileData = _profileData,
         };
+    }
 
     public static ExternalMemberIdentity CreateSimple(string email = "test@example.com", string? name = null) =>
         new ExternalMemberIdentityBuilder()

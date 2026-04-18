@@ -26,5 +26,5 @@ public sealed class ExternalMemberSavedDistributedCacheNotificationHandler : Sav
 
     /// <inheritdoc />
     protected override void Handle(IEnumerable<ExternalMemberIdentity> entities, IDictionary<string, object?> state)
-        => _distributedCache.RefreshExternalMemberCache(entities);
+        => _distributedCache.RefreshExternalMemberCache(entities, state);
 }

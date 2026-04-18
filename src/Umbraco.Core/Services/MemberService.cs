@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -25,6 +27,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly IMemberGroupService _memberGroupService;
         private readonly Lazy<IIdKeyMap> _idKeyMap;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
+        private readonly IOptionsMonitor<SecuritySettings> _securitySettings;
 
         #region Constructor
 
@@ -41,6 +44,45 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="auditService">The service for audit logging.</param>
         /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
         /// <param name="userIdKeyResolver">The resolver for user ID to key mapping.</param>
+        /// <param name="securitySettings">Security settings used to govern login-related behaviour.</param>
+        public MemberService(
+            ICoreScopeProvider provider,
+            ILoggerFactory loggerFactory,
+            IEventMessagesFactory eventMessagesFactory,
+            IMemberGroupService memberGroupService,
+            IMemberRepository memberRepository,
+            IMemberTypeRepository memberTypeRepository,
+            IMemberGroupRepository memberGroupRepository,
+            IAuditService auditService,
+            Lazy<IIdKeyMap> idKeyMap,
+            IUserIdKeyResolver userIdKeyResolver,
+            IOptionsMonitor<SecuritySettings> securitySettings)
+            : base(provider, loggerFactory, eventMessagesFactory)
+        {
+            _memberRepository = memberRepository;
+            _memberTypeRepository = memberTypeRepository;
+            _memberGroupRepository = memberGroupRepository;
+            _auditService = auditService;
+            _idKeyMap = idKeyMap;
+            _userIdKeyResolver = userIdKeyResolver;
+            _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
+            _securitySettings = securitySettings;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MemberService"/> class.
+        /// </summary>
+        /// <param name="provider">The core scope provider for managing database operations.</param>
+        /// <param name="loggerFactory">The factory for creating loggers.</param>
+        /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
+        /// <param name="memberGroupService">The service for managing member groups.</param>
+        /// <param name="memberRepository">The repository for member data access.</param>
+        /// <param name="memberTypeRepository">The repository for member type data access.</param>
+        /// <param name="memberGroupRepository">The repository for member group data access.</param>
+        /// <param name="auditService">The service for audit logging.</param>
+        /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
+        /// <param name="userIdKeyResolver">The resolver for user ID to key mapping.</param>
+        [Obsolete("Use the constructor taking IOptionsMonitor<SecuritySettings> instead. Scheduled for removal in Umbraco 19.")]
         public MemberService(
             ICoreScopeProvider provider,
             ILoggerFactory loggerFactory,
@@ -52,15 +94,19 @@ namespace Umbraco.Cms.Core.Services
             IAuditService auditService,
             Lazy<IIdKeyMap> idKeyMap,
             IUserIdKeyResolver userIdKeyResolver)
-            : base(provider, loggerFactory, eventMessagesFactory)
+            : this(
+                provider,
+                loggerFactory,
+                eventMessagesFactory,
+                memberGroupService,
+                memberRepository,
+                memberTypeRepository,
+                memberGroupRepository,
+                auditService,
+                idKeyMap,
+                userIdKeyResolver,
+                StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<SecuritySettings>>())
         {
-            _memberRepository = memberRepository;
-            _memberTypeRepository = memberTypeRepository;
-            _memberGroupRepository = memberGroupRepository;
-            _auditService = auditService;
-            _idKeyMap = idKeyMap;
-            _userIdKeyResolver = userIdKeyResolver;
-            _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
         }
 
         /// <summary>
@@ -96,7 +142,8 @@ namespace Umbraco.Cms.Core.Services
                 memberGroupRepository,
                 StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
                 idKeyMap,
-                StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
+                StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
+                StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<SecuritySettings>>())
         {
         }
 
@@ -137,7 +184,8 @@ namespace Umbraco.Cms.Core.Services
                 memberGroupRepository,
                 auditService,
                 idKeyMap,
-                userIdKeyResolver)
+                userIdKeyResolver,
+                StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<SecuritySettings>>())
         {
         }
 
@@ -992,15 +1040,26 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+            // When true (default), a login is treated as a member update: UpdateDate is bumped, the ContentVersionDto.VersionDate moves,
+            // and the member index refreshes. When false, none of that happens — the repository skips UpdatingEntity() and the version-date
+            // update, and the IndexableFieldsChanged state flag tells the Examine indexing handler to skip re-indexing since no indexed
+            // field actually changed.
+            // This is configurable so implementors can decide whether a login constitutes an "update" to the member or not.
+            // They can avoid unnecessary index refreshes if not, but if they need it to be treated as an update, e.g. for an active members
+            // dashboard driven by the search index, then they can have that too.
+            bool bumpUpdateDate = _securitySettings.CurrentValue.TreatLoginAsMemberUpdate;
+
             var savingNotification = new MemberSavingNotification(member, evtMsgs);
-            savingNotification.State.Add("LoginPropertiesOnly", true);
+            savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
+            savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, bumpUpdateDate);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();
                 return;
             }
 
-            await _memberRepository.UpdateLoginPropertiesAsync(member);
+            await _memberRepository.UpdateLoginPropertiesAsync(member, bumpUpdateDate);
 
             scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
 

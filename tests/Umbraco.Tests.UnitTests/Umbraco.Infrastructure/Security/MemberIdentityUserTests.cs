@@ -110,6 +110,53 @@ public class MemberIdentityUserTests
         Assert.AreEqual("London", result["homeCity"]);
     }
 
+    [Test]
+    public void ProfileData_Setting_New_Value_Marks_Property_Dirty()
+    {
+        // Arrange
+        var user = new MemberIdentityUser();
+
+        // Act
+        user.ProfileData = """{"name":"Test"}""";
+
+        // Assert — dirty tracking is load-bearing for MemberUserStore.UpdateExternalMemberAsync
+        // to detect OnExternalLogin callback refreshes and route to the full update path rather
+        // than the lightweight login path (which would otherwise lose the ProfileData change).
+        Assert.IsTrue(user.IsPropertyDirty(nameof(MemberIdentityUser.ProfileData)));
+    }
+
+    [Test]
+    public void ProfileData_Setting_Same_Value_Does_Not_Mark_Property_Dirty()
+    {
+        // Arrange
+        var user = new MemberIdentityUser();
+        user.DisableChangeTracking();
+        user.ProfileData = """{"name":"Test"}""";
+        user.EnableChangeTracking();
+
+        // Act — reassigning the exact same value should not flip the dirty flag.
+        user.ProfileData = """{"name":"Test"}""";
+
+        // Assert
+        Assert.IsFalse(user.IsPropertyDirty(nameof(MemberIdentityUser.ProfileData)));
+    }
+
+    [Test]
+    public void ProfileData_Setting_With_Change_Tracking_Disabled_Does_Not_Mark_Property_Dirty()
+    {
+        // Arrange — MemberUserStore.MapExternalMemberToIdentityUser hydrates ProfileData from
+        // the store inside a DisableChangeTracking/EnableChangeTracking pair so initial load
+        // does not appear as a pending change.
+        var user = new MemberIdentityUser();
+        user.DisableChangeTracking();
+
+        // Act
+        user.ProfileData = """{"name":"Test"}""";
+
+        // Assert
+        Assert.IsFalse(user.IsPropertyDirty(nameof(MemberIdentityUser.ProfileData)));
+    }
+
     private class TestProfile
     {
         public string? Name { get; set; }
