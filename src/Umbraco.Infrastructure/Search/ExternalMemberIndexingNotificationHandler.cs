@@ -1,15 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Examine;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
@@ -24,23 +21,17 @@ namespace Umbraco.Cms.Infrastructure.Search;
 public sealed class ExternalMemberIndexingNotificationHandler :
     INotificationHandler<ExternalMemberCacheRefresherNotification>
 {
-    private readonly IExamineManager _examineManager;
     private readonly IExternalMemberService _externalMemberService;
-    private readonly IValueSetBuilder<ExternalMemberIdentity> _valueSetBuilder;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ExternalMemberIndexingNotificationHandler"/> class.
     /// </summary>
     public ExternalMemberIndexingNotificationHandler(
-        IExamineManager examineManager,
         IExternalMemberService externalMemberService,
-        IValueSetBuilder<ExternalMemberIdentity> valueSetBuilder,
         IUmbracoIndexingHandler umbracoIndexingHandler)
     {
-        _examineManager = examineManager;
         _externalMemberService = externalMemberService;
-        _valueSetBuilder = valueSetBuilder;
         _umbracoIndexingHandler = umbracoIndexingHandler;
     }
 
@@ -70,10 +61,7 @@ public sealed class ExternalMemberIndexingNotificationHandler :
         {
             if (payload.Removed)
             {
-                foreach (IUmbracoMemberIndex index in _examineManager.Indexes.OfType<IUmbracoMemberIndex>())
-                {
-                    index.DeleteFromIndex(payload.Id.ToInvariantString());
-                }
+                _umbracoIndexingHandler.DeleteExternalMemberFromIndex(payload.Id);
             }
             else
             {
@@ -81,11 +69,7 @@ public sealed class ExternalMemberIndexingNotificationHandler :
                     .GetAwaiter().GetResult();
                 if (member is not null)
                 {
-                    IEnumerable<ValueSet> valueSets = _valueSetBuilder.GetValueSets(member);
-                    foreach (IUmbracoMemberIndex index in _examineManager.Indexes.OfType<IUmbracoMemberIndex>())
-                    {
-                        index.IndexItems(valueSets);
-                    }
+                    _umbracoIndexingHandler.ReIndexForExternalMember(member);
                 }
             }
         }
