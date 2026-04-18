@@ -65,6 +65,15 @@ public class ExternalMemberIdentity
     public DateTime CreateDate { get; set; }
 
     /// <summary>
+    ///     Gets or sets the date and time when the external member was last updated.
+    /// </summary>
+    /// <remarks>
+    ///     Whether a login operation updates this value is governed by
+    ///     <c>SecuritySettings.TreatLoginAsContentUpdate</c>.
+    /// </remarks>
+    public DateTime UpdateDate { get; set; }
+
+    /// <summary>
     ///     Gets or sets the security stamp used for concurrency validation.
     /// </summary>
     public string? SecurityStamp { get; set; }

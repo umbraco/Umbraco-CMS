@@ -36,6 +36,7 @@ public class ExternalMemberValueSetBuilder : IValueSetBuilder<ExternalMemberIden
                 { "loginName", member.UserName.Yield() },
                 { "email", member.Email.Yield() },
                 { "createDate", new object[] { member.CreateDate } },
+                { "updateDate", new object[] { member.UpdateDate } },
                 { "id", new object[] { member.Id } },
                 { "isExternalOnly", "1".Yield() },
             };

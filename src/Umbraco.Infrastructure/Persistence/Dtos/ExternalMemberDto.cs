@@ -92,6 +92,13 @@ internal sealed class ExternalMemberDto
     public DateTime CreateDate { get; set; }
 
     /// <summary>
+    /// Gets or sets the date and time when the external member was last updated.
+    /// </summary>
+    [Column("updateDate")]
+    [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
+    public DateTime UpdateDate { get; set; }
+
+    /// <summary>
     /// Gets or sets the security stamp for the external member.
     /// </summary>
     [Column("securityStamp")]
