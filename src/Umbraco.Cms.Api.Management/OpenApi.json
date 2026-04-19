@@ -46210,6 +46210,10 @@
           },
           "kind": {
             "$ref": "#/components/schemas/MemberKindModel"
+          },
+          "profileData": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

@@ -1585,6 +1585,7 @@ export type MemberResponseModel = {
     lastPasswordChangeDate?: string | null;
     groups: Array<string>;
     kind: MemberKindModel;
+    profileData?: string | null;
 };
 
 export type MemberTypeCompositionModel = {

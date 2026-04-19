@@ -107,12 +107,10 @@ export class UmbMemberWorkspaceViewMemberInfoElement extends UmbLitElement imple
 					<h4><umb-localize key="content_createDate">Created</umb-localize></h4>
 					<span> ${this._createDate} </span>
 				</div>
-				${this.#isExternalOnly()
-					? nothing
-					: html`<div>
-							<h4><umb-localize key="content_updateDate">Last edited</umb-localize></h4>
-							<span> ${this._updateDate} </span>
-						</div>`}
+				<div>
+					<h4><umb-localize key="content_updateDate">Last edited</umb-localize></h4>
+					<span> ${this._updateDate} </span>
+				</div>
 				${this.#isExternalOnly()
 					? nothing
 					: html`<div>

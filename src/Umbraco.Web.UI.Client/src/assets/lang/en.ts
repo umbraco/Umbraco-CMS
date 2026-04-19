@@ -437,6 +437,7 @@ export default {
 		memberKindDefault: 'Member',
 		memberKindApi: 'API Member',
 		memberKindExternalOnly: 'External',
+		profileData: 'Profile data',
 		externalMemberTitle: 'External member',
 		externalMemberDescription:
 			'This member is managed by an external authentication provider. Identity data such as email and username is maintained by the provider, not Umbraco.',

@@ -118,10 +118,12 @@ internal sealed class MemberPresentationFactory : IMemberPresentationFactory
             {
                 Name = member.Name ?? string.Empty,
                 CreateDate = new DateTimeOffset(member.CreateDate, TimeSpan.Zero),
+                UpdateDate = new DateTimeOffset(member.UpdateDate, TimeSpan.Zero),
             }],
             Values = Enumerable.Empty<MemberValueResponseModel>(),
             MemberType = new MemberTypeReferenceResponseModel(),
             Groups = groupKeys,
+            ProfileData = member.ProfileData,
         };
     }
 

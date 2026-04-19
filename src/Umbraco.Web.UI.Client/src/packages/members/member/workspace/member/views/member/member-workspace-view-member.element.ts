@@ -369,6 +369,13 @@ export class UmbMemberWorkspaceViewMemberElement extends UmbLitElement implement
 				flex-direction: column;
 				gap: var(--uui-size-space-4);
 			}
+			/* Space sibling workspace info apps (e.g. "Profile data", "Referenced by")
+				in the same way the surrounding left-column boxes are spaced. */
+			div.container {
+				display: flex;
+				flex-direction: column;
+				gap: var(--uui-size-space-4);
+			}
 			uui-box {
 				height: fit-content;
 			}

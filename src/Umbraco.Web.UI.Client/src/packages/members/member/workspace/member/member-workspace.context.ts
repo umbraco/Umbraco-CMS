@@ -46,6 +46,7 @@ export class UmbMemberWorkspaceContext
 	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	readonly createDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].createDate);
 	readonly updateDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].updateDate);
+	readonly profileData = this._data.createObservablePartOfCurrent((data) => data?.profileData);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
