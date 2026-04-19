@@ -763,14 +763,14 @@ const rawData = [
 				alias: 'colorPickerNoLabels',
 				culture: null,
 				segment: null,
-				value: '{\r\n  "value": "cc0000",\r\n  "label": "cc0000",\r\n  "sortOrder": 1,\r\n  "id": "2"\r\n}',
+				value: { value: 'cc0000', label: 'cc0000' },
 			},
 			{
 				editorAlias: 'Umbraco.ColorPicker',
 				alias: 'colorPickerLabels',
 				culture: null,
 				segment: null,
-				value: '{\r\n  "value": "cc0000",\r\n  "label": "Red",\r\n  "sortOrder": 1,\r\n  "id": "2"\r\n}',
+				value: { value: 'cc0000', label: 'Red' },
 			},
 		],
 		flags: [],
@@ -988,14 +988,14 @@ const rawData = [
 				alias: 'dropdownMultiValue',
 				culture: null,
 				segment: null,
-				value: '["One","Three"]',
+				value: ['One', 'Three'],
 			},
 			{
 				editorAlias: 'Umbraco.DropDown.Flexible',
 				alias: 'dropdownSingleValue',
 				culture: null,
 				segment: null,
-				value: '["Two"]',
+				value: ['Two'],
 			},
 		],
 		flags: [],
@@ -1209,7 +1209,7 @@ const rawData = [
 				culture: null,
 				segment: null,
 				value: {
-					src: '/umbraco/backoffice/assets/umb-pattern-pink.png',
+					src: '/umbraco/backoffice/assets/umb-pattern-blue.png',
 					focalPoint: {
 						left: 0.7736573381473065,
 						top: 0.6536672841836085,
@@ -1731,7 +1731,7 @@ const rawData = [
 						unique: '2329915b-fb6b-4c2f-9179-8c16ba125cea',
 					},
 					{
-						name: 'Pexels Mark Stebnicki 2255924',
+						name: 'Placeholder 2255924',
 						type: 'media',
 						unique: 'a0651d98-14a9-4d92-8133-6f59b248d31',
 					},
@@ -1767,7 +1767,7 @@ const rawData = [
 						unique: '0865b2ab-ad7c-48d4-a8c6-608986a0e942',
 					},
 					{
-						name: 'Pexels Dxt 73640',
+						name: 'Placeholder 73640',
 						type: 'media',
 						unique: '76c02ec8-6a82-4c47-95da-56f6628b58fb',
 					},
@@ -1804,7 +1804,7 @@ const rawData = [
 						unique: '9394af8f-d306-4778-9f03-2431eb8f5b6b',
 					},
 					{
-						name: 'Pexels Engin Akyurt 1435904',
+						name: 'Placeholder 1435904',
 						type: 'media',
 						unique: 'b44956af-620a-4e17-bbce-3987446fb2f1',
 					},
@@ -2204,7 +2204,7 @@ const rawData = [
 				segment: null,
 				value: {
 					markup:
-						'<p>Yikes so many buttons!</p><ul><li><p>Button</p></li><li><p>Button</p></li><li><p>More button!</p></li></ul><p><img data-udi="umb://media/f06adb918cdd408d83ddf7b833fc393c" src="" alt="" width="426" height="284" style="display: block; margin-left: auto; margin-right: auto;"></p><p>&nbsp;</p>',
+						'<p>Yikes so many buttons!</p><ul><li><p>Button</p></li><li><p>Button</p></li><li><p>More button!</p></li></ul><p><img data-udi="umb://media/f06adb918cdd408d83ddf7b833fc393c" src="/umbraco/backoffice/assets/umb-pattern-blue.png" alt="" width="284" height="284"></p><p>&nbsp;</p>',
 					blocks: {
 						contentData: [],
 						settingsData: [],

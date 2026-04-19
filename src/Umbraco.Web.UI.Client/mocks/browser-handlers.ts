@@ -41,6 +41,7 @@ import * as serverHandlers from './msw-handlers/server.handlers.js';
 import { handlers as documentBlueprintHandlers } from './msw-handlers/document-blueprint/index.js';
 import { handlers as temporaryFileHandlers } from './msw-handlers/temporary-file/index.js';
 import { handlers as segmentHandlers } from './msw-handlers/segment.handlers.js';
+import { handlers as webhookHandlers } from './msw-handlers/webhook/index.js';
 
 const handlers = [
 	...backofficeHandlers,
@@ -84,6 +85,7 @@ const handlers = [
 	...documentBlueprintHandlers,
 	...temporaryFileHandlers,
 	...segmentHandlers,
+	...webhookHandlers,
 	...serverHandlers.serverInformationHandlers,
 	serverHandlers.serverRunningHandler,
 	...manifestsHandlers.manifestEmptyHandlers,
