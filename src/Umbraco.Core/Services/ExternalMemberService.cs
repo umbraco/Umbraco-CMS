@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -11,10 +10,9 @@ using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
-namespace Umbraco.Cms.Infrastructure.Services.Implement;
+namespace Umbraco.Cms.Core.Services;
 
 /// <summary>
 ///     Implements <see cref="IExternalMemberService"/> for managing external-only members
@@ -216,11 +214,14 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         // dashboard driven by the search index, then they can have that too.
         bool bumpUpdateDate = _securitySettings.CurrentValue.TreatLoginAsMemberUpdate;
 
-        _logger.LogDebug(
-            "External member {MemberKey} login — lightweight update path (bumpUpdateDate={BumpUpdateDate}, re-index={ReIndex}).",
-            member.Key,
-            bumpUpdateDate,
-            bumpUpdateDate);
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug(
+                "External member {MemberKey} login — lightweight update path (bumpUpdateDate={BumpUpdateDate}, re-index={ReIndex}).",
+                member.Key,
+                bumpUpdateDate,
+                bumpUpdateDate);
+        }
 
         // Mirror the content-member pattern (MemberService.UpdateLoginPropertiesAsync): we set
         // well-known state flags that downstream handlers can read to short-circuit expensive work.
