@@ -1160,6 +1160,10 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
     }
 
     /// <inheritdoc/>
+    [Obsolete("Use the overload taking bumpUpdateDate instead. Scheduled for removal in Umbraco 19.")]
+    public Task UpdateLoginPropertiesAsync(IMember member)
+        => UpdateLoginPropertiesAsync(member, bumpUpdateDate: true);
+
     public async Task UpdateLoginPropertiesAsync(IMember member, bool bumpUpdateDate)
     {
         var updatedLastLoginDate = member.IsPropertyDirty(nameof(member.LastLoginDate));
