@@ -101,6 +101,7 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
         ///     Whether any field that is part of the Examine value set has changed as part of this operation.
         ///     When <c>false</c>, Examine indexing handlers will skip the re-index for this payload.
         /// </param>
+        [System.Text.Json.Serialization.JsonConstructor]
         public JsonPayload(int id, string? username, bool removed, bool indexableFieldsChanged)
         {
             Id = id;

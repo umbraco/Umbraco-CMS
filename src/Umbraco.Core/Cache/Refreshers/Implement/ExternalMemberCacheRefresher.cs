@@ -59,6 +59,7 @@ public sealed class ExternalMemberCacheRefresher : PayloadCacheRefresherBase<Ext
         ///     Whether any field that is part of the Examine value set has changed as part of this operation.
         ///     When <c>false</c>, Examine indexing handlers will skip the re-index for this payload.
         /// </param>
+        [System.Text.Json.Serialization.JsonConstructor]
         public JsonPayload(int id, Guid key, bool removed, bool indexableFieldsChanged)
         {
             Id = id;
