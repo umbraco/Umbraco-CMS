@@ -28,8 +28,11 @@ namespace Umbraco.Cms.Core.Services
         private readonly Lazy<IIdKeyMap> _idKeyMap;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly IOptionsMonitor<SecuritySettings> _securitySettings;
+        private readonly ILogger<MemberService> _logger;
 
         #region Constructor
+
+        // TODO (V19): Remove the unused parameter in the remaining constructor after removing the obsolete ones.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberService"/> class.
@@ -42,6 +45,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="memberTypeRepository">The repository for member type data access.</param>
         /// <param name="memberGroupRepository">The repository for member group data access.</param>
         /// <param name="auditService">The service for audit logging.</param>
+        /// <param name="auditRepository">Unused. Retained to disambiguate this constructor from the now-obsolete 11-parameter constructor so <c>ActivatorUtilities</c> picks this one by parameter count.</param>
         /// <param name="idKeyMap">The lazy-loaded service for mapping between IDs and keys.</param>
         /// <param name="userIdKeyResolver">The resolver for user ID to key mapping.</param>
         /// <param name="securitySettings">Security settings used to govern login-related behaviour.</param>
@@ -54,6 +58,9 @@ namespace Umbraco.Cms.Core.Services
             IMemberTypeRepository memberTypeRepository,
             IMemberGroupRepository memberGroupRepository,
             IAuditService auditService,
+#pragma warning disable IDE0060 // Remove unused parameter
+            IAuditRepository auditRepository,
+#pragma warning restore IDE0060 // Remove unused parameter
             Lazy<IIdKeyMap> idKeyMap,
             IUserIdKeyResolver userIdKeyResolver,
             IOptionsMonitor<SecuritySettings> securitySettings)
@@ -67,6 +74,7 @@ namespace Umbraco.Cms.Core.Services
             _userIdKeyResolver = userIdKeyResolver;
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
             _securitySettings = securitySettings;
+            _logger = loggerFactory.CreateLogger<MemberService>();
         }
 
         /// <summary>
@@ -103,6 +111,7 @@ namespace Umbraco.Cms.Core.Services
                 memberTypeRepository,
                 memberGroupRepository,
                 auditService,
+                StaticServiceProvider.Instance.GetRequiredService<IAuditRepository>(),
                 idKeyMap,
                 userIdKeyResolver,
                 StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<SecuritySettings>>())
@@ -141,6 +150,7 @@ namespace Umbraco.Cms.Core.Services
                 memberTypeRepository,
                 memberGroupRepository,
                 StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
+                auditRepository,
                 idKeyMap,
                 StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>(),
                 StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<SecuritySettings>>())
@@ -183,6 +193,7 @@ namespace Umbraco.Cms.Core.Services
                 memberTypeRepository,
                 memberGroupRepository,
                 auditService,
+                auditRepository,
                 idKeyMap,
                 userIdKeyResolver,
                 StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<SecuritySettings>>())
@@ -1049,6 +1060,15 @@ namespace Umbraco.Cms.Core.Services
             // They can avoid unnecessary index refreshes if not, but if they need it to be treated as an update, e.g. for an active members
             // dashboard driven by the search index, then they can have that too.
             bool bumpUpdateDate = _securitySettings.CurrentValue.TreatLoginAsMemberUpdate;
+
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug(
+                    "Content member {MemberKey} login — lightweight update path (bumpUpdateDate={BumpUpdateDate}, re-index={ReIndex}).",
+                    member.Key,
+                    bumpUpdateDate,
+                    bumpUpdateDate);
+            }
 
             var savingNotification = new MemberSavingNotification(member, evtMsgs);
             savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);

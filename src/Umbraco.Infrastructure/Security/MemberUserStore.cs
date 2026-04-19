@@ -939,7 +939,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 SecurityStamp = user.SecurityStamp,
             };
 
-            var existingForLogin = await _externalMemberService.GetByKeyAsync(user.Key);
+            ExternalMemberIdentity? existingForLogin = await _externalMemberService.GetByKeyAsync(user.Key);
             if (existingForLogin is not null)
             {
                 loginIdentity.Id = existingForLogin.Id;
@@ -950,7 +950,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         else
         {
             // Full update — covers ProfileData changes from OnExternalLogin callbacks, role updates,
-            // email/username changes etc. ProfileData has no change tracking so we can't safely skip.
+            // email/username changes etc.
             var externalIdentity = new ExternalMemberIdentity
             {
                 Key = user.Key,
@@ -968,7 +968,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
             // Resolve the int Id and CreateDate from the stored record — MemberIdentityUser
             // doesn't carry the int Id (it uses Guid key as Id) and CreateDate may not be set.
-            var existing = await _externalMemberService.GetByKeyAsync(user.Key);
+            ExternalMemberIdentity? existing = await _externalMemberService.GetByKeyAsync(user.Key);
             if (existing is not null)
             {
                 externalIdentity.Id = existing.Id;

@@ -27,6 +27,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
     private readonly IMemberGroupService _memberGroupService;
     private readonly IExternalLoginWithKeyRepository _externalLoginRepository;
     private readonly IOptionsMonitor<SecuritySettings> _securitySettings;
+    private readonly ILogger<ExternalMemberService> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ExternalMemberService"/> class.
@@ -47,6 +48,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         _memberGroupService = memberGroupService;
         _externalLoginRepository = externalLoginRepository;
         _securitySettings = securitySettings;
+        _logger = loggerFactory.CreateLogger<ExternalMemberService>();
     }
 
     /// <inheritdoc />
@@ -121,6 +123,13 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
 
         member.UpdateDate = now;
 
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug(
+                "External member {MemberKey} created via full path (indexing will occur).",
+                member.Key);
+        }
+
         // Persist.
         var id = await _repository.CreateAsync(member);
         member.Id = id;
@@ -176,6 +185,13 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
 
         member.UpdateDate = DateTime.UtcNow;
 
+        if (_logger.IsEnabled(LogLevel.Debug))
+        {
+            _logger.LogDebug(
+                "External member {MemberKey} updated via full path (indexing will occur).",
+                member.Key);
+        }
+
         await _repository.UpdateAsync(member);
 
         scope.Notifications.Publish(
@@ -199,6 +215,12 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
         // They can avoid unnecessary index refreshes if not, but if they need it to be treated as an update, e.g. for an active members
         // dashboard driven by the search index, then they can have that too.
         bool bumpUpdateDate = _securitySettings.CurrentValue.TreatLoginAsMemberUpdate;
+
+        _logger.LogDebug(
+            "External member {MemberKey} login — lightweight update path (bumpUpdateDate={BumpUpdateDate}, re-index={ReIndex}).",
+            member.Key,
+            bumpUpdateDate,
+            bumpUpdateDate);
 
         // Mirror the content-member pattern (MemberService.UpdateLoginPropertiesAsync): we set
         // well-known state flags that downstream handlers can read to short-circuit expensive work.
