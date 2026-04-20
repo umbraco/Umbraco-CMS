@@ -141,9 +141,9 @@ export class UmbUserMfaModalElement extends UmbLitElement {
 	 */
 	async #onProviderDisable(item: UmbMfaLoginProviderOption) {
 		await umbConfirmModal(this, {
-			headline: this.localize.term('actions_disable'),
+			headline: '#actions_disable',
 			content: this.localize.term('user_2faDisableForUser', item.displayName),
-			confirmLabel: this.localize.term('actions_disable'),
+			confirmLabel: '#actions_disable',
 			color: 'danger',
 		});
 
