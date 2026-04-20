@@ -42,22 +42,21 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 	protected override _gotContentType() {}
 
 	override async copyToClipboard() {
-		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
+		const [clipboardContext, propertyDatasetContext, propertyContext] = await Promise.all([
+			this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT),
+			this.getContext(UMB_PROPERTY_DATASET_CONTEXT),
+			this.getContext(UMB_PROPERTY_CONTEXT),
+		]);
+
 		if (!clipboardContext) {
 			console.warn('Clipboard context is not available.');
 			return;
 		}
-
-		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
 		if (!propertyDatasetContext) throw new Error('Could not get property dataset context to copy.');
-
-		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
 		if (!propertyContext) throw new Error('Could not get property context to copy.');
 
-		const editorUiManifest = propertyContext.getEditorManifest();
-		if (!editorUiManifest?.alias) {
-			throw new Error('Could not determine property editor UI alias for clipboard entry.');
-		}
+		const editorUiAlias = propertyContext.getEditorManifest()?.alias;
+		if (!editorUiAlias) throw new Error('Could not determine property editor UI alias for clipboard entry.');
 
 		const workspaceName = this.localize.string(propertyDatasetContext.getName());
 		const propertyLabel = this.localize.string(propertyContext.getLabel());
@@ -68,7 +67,7 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 			icon: this.getContentElementTypeIcon(),
 			name: entryName,
 			propertyValue: this.#buildPropertyValue(),
-			propertyEditorUiAlias: editorUiManifest.alias,
+			propertyEditorUiAlias: editorUiAlias,
 		});
 	}
 
