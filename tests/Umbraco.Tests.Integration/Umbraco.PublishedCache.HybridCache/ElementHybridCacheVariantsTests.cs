@@ -60,7 +60,7 @@ internal sealed class ElementHybridCacheVariantsTests : UmbracoIntegrationTest
         await PublishAllCultures(_variantElementKey);
 
         // Act
-        IPublishedElement? element = await PublishedElementCache.GetByIdAsync(_variantElementKey, preview: false);
+        IPublishedElement? element = await PublishedElementCache.GetByKeyAsync(_variantElementKey, preview: false);
 
         // Assert
         Assert.That(element, Is.Not.Null);
@@ -79,7 +79,7 @@ internal sealed class ElementHybridCacheVariantsTests : UmbracoIntegrationTest
         await PublishAllCultures(_variantElementKey);
 
         // Act
-        IPublishedElement? element = await PublishedElementCache.GetByIdAsync(_variantElementKey, preview: false);
+        IPublishedElement? element = await PublishedElementCache.GetByKeyAsync(_variantElementKey, preview: false);
 
         // Assert
         Assert.That(element, Is.Not.Null);
@@ -120,7 +120,7 @@ internal sealed class ElementHybridCacheVariantsTests : UmbracoIntegrationTest
         await PublishCulture(_variantElementKey, EnglishIsoCode);
 
         // Act
-        IPublishedElement? element = await PublishedElementCache.GetByIdAsync(_variantElementKey, preview: false);
+        IPublishedElement? element = await PublishedElementCache.GetByKeyAsync(_variantElementKey, preview: false);
 
         // Assert
         Assert.That(element, Is.Not.Null);
@@ -141,7 +141,7 @@ internal sealed class ElementHybridCacheVariantsTests : UmbracoIntegrationTest
         await PublishCulture(_variantElementKey, EnglishIsoCode);
 
         // Act
-        IPublishedElement? element = await PublishedElementCache.GetByIdAsync(_variantElementKey, preview: false);
+        IPublishedElement? element = await PublishedElementCache.GetByKeyAsync(_variantElementKey, preview: false);
 
         // Assert — element should be published with English culture only
         Assert.That(element, Is.Not.Null);
@@ -153,7 +153,7 @@ internal sealed class ElementHybridCacheVariantsTests : UmbracoIntegrationTest
     public async Task Draft_Has_Both_Culture_Values()
     {
         // Act — request draft (no publish needed)
-        IPublishedElement? element = await PublishedElementCache.GetByIdAsync(_variantElementKey, preview: true);
+        IPublishedElement? element = await PublishedElementCache.GetByKeyAsync(_variantElementKey, preview: true);
 
         // Assert
         Assert.That(element, Is.Not.Null);
