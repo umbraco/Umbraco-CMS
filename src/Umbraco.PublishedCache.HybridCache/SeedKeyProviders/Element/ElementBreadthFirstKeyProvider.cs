@@ -16,7 +16,6 @@ namespace Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Element;
 internal sealed class ElementBreadthFirstKeyProvider : BreadthFirstKeyProvider, IElementSeedKeyProvider
 {
     private readonly IElementPublishStatusQueryService _publishStatusService;
-    private readonly int _seedCount;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementBreadthFirstKeyProvider"/> class.
@@ -31,70 +30,16 @@ internal sealed class ElementBreadthFirstKeyProvider : BreadthFirstKeyProvider, 
         : base(elementNavigationQueryService, cacheSettings.Value.ElementBreadthFirstSeedCount)
     {
         _publishStatusService = publishStatusService;
-        _seedCount = cacheSettings.Value.ElementBreadthFirstSeedCount;
     }
 
     /// <inheritdoc/>
-    public new ISet<Guid> GetSeedKeys()
-    {
-        if (_seedCount == 0)
-        {
-            return new HashSet<Guid>();
-        }
+    protected override bool ShouldSeed(Guid key)
+        => _publishStatusService.IsPublishedInAnyCulture(key);
 
-        Queue<Guid> keyQueue = new();
-        HashSet<Guid> keys = [];
-        int keyCount = 0;
-
-        if (NavigationQueryService.TryGetRootKeys(out IEnumerable<Guid> rootKeys) is false)
-        {
-            return new HashSet<Guid>();
-        }
-
-        foreach (Guid key in rootKeys)
-        {
-            // Always enqueue for child traversal (might be a container with element children)
-            keyQueue.Enqueue(key);
-
-            // Only count published elements toward the seed limit
-            if (_publishStatusService.IsPublishedInAnyCulture(key))
-            {
-                keys.Add(key);
-                keyCount++;
-                if (keyCount == _seedCount)
-                {
-                    return keys;
-                }
-            }
-        }
-
-        while (keyQueue.Count > 0 && keyCount < _seedCount)
-        {
-            Guid key = keyQueue.Dequeue();
-
-            if (NavigationQueryService.TryGetChildrenKeys(key, out IEnumerable<Guid> childKeys) is false)
-            {
-                continue;
-            }
-
-            foreach (Guid childKey in childKeys)
-            {
-                // Always enqueue for child traversal (might be a nested container)
-                keyQueue.Enqueue(childKey);
-
-                // Only count published elements toward the seed limit
-                if (_publishStatusService.IsPublishedInAnyCulture(childKey))
-                {
-                    keys.Add(childKey);
-                    keyCount++;
-                    if (keyCount == _seedCount)
-                    {
-                        return keys;
-                    }
-                }
-            }
-        }
-
-        return keys;
-    }
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Always traverse children because containers (which are not published and not seeded)
+    /// may have published element children.
+    /// </remarks>
+    protected override bool ShouldTraverseChildren(Guid key) => true;
 }
