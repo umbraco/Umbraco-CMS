@@ -560,6 +560,22 @@ public interface IContentService : IContentServiceBase<IContent>
     PublishResult Publish(IContent content, string[] cultures, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
+    ///     Saves and publishes a document.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         By default, publishes all variations of the document, but it is possible to specify a culture to be
+    ///         published.
+    ///     </para>
+    ///     <para>When a culture is being published, it includes all varying values along with all invariant values.</para>
+    ///     <para>The document is *always* saved, even when publishing fails.</para>
+    /// </remarks>
+    /// <param name="content">The document to publish.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userId">The identifier of the user performing the action.</param>
+    PublishResult SaveAndPublish(IContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
     ///     Publishes a document branch.
     /// </summary>
     /// <param name="content">The root document.</param>

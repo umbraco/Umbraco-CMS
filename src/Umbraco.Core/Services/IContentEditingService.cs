@@ -42,6 +42,17 @@ public interface IContentEditingService
     Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAsync(ContentCreateModel createModel, Guid userKey);
 
     /// <summary>
+    ///     Creates and publishes a new content item.
+    /// </summary>
+    /// <param name="createModel">The model containing the content data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the creation result or an error status.</returns>
+    // TODO (V18): Remove default implementation.
+    Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ContentCreateModel createModel, string[] culturesToPublish, Guid userKey)
+        => Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.Unknown, new ContentCreateResult()));
+
+    /// <summary>
     ///     Updates an existing content item.
     /// </summary>
     /// <param name="key">The unique identifier of the content item to update.</param>
@@ -49,6 +60,18 @@ public interface IContentEditingService
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the update result or an error status.</returns>
     Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAsync(Guid key, ContentUpdateModel updateModel, Guid userKey);
+
+    /// <summary>
+    ///     Updates and publishes an existing content item.
+    /// </summary>
+    /// <param name="key">The unique identifier of the content item to update.</param>
+    /// <param name="updateModel">The model containing the updated content data.</param>
+    /// <param name="culturesToPublish">The cultures to publish.</param>
+    /// <param name="userKey">The unique identifier of the user performing the action.</param>
+    /// <returns>An attempt containing the update result or an error status.</returns>
+    // TODO (V18): Remove default implementation.
+    Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
+        => Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.Unknown, new ContentUpdateResult()));
 
     /// <summary>
     ///     Moves a content item to the recycle bin.

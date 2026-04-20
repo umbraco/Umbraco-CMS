@@ -1438,6 +1438,128 @@ public class ContentService : RepositoryService, IContentService
     }
 
     /// <inheritdoc />
+    public PublishResult SaveAndPublish(IContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
+    {
+        if (content == null)
+        {
+            throw new ArgumentNullException(nameof(content));
+        }
+
+        if (culturesToPublish == null)
+        {
+            throw new ArgumentNullException(nameof(culturesToPublish));
+        }
+
+        if (content.Name != null && content.Name.Length > 255)
+        {
+            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+        }
+
+        var varies = content.ContentType.VariesByCulture();
+
+        if (culturesToPublish.Length == 0 && !varies)
+        {
+            // No cultures specified and doesn't vary, so publish it, else nothing to publish
+            return SaveAndPublish(content, userId: userId);
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        var allLangs = _languageRepository.GetMany().ToList();
+
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        var savingNotification = new ContentSavingNotification(content, evtMsgs);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+        }
+
+        if (culturesToPublish.Any(x => x == null || x == "*"))
+        {
+            throw new InvalidOperationException(
+                "Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
+        }
+
+        IEnumerable<CultureImpact> impacts =
+            culturesToPublish.Select(x => _cultureImpactFactory.ImpactExplicit(x, IsDefaultCulture(allLangs, x)));
+
+        // publish the culture(s)
+        // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+        foreach (CultureImpact impact in impacts)
+        {
+            content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
+        }
+
+        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        scope.Complete();
+        return result;
+    }
+
+    private PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        PublishedState publishedState = content.PublishedState;
+        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
+        {
+            throw new InvalidOperationException(
+                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
+        }
+
+        // cannot accept invariant (null or empty) culture for variant content type
+        // cannot accept a specific culture for invariant content type (but '*' is ok)
+        if (content.ContentType.VariesByCulture())
+        {
+            if (culture.IsNullOrWhiteSpace())
+            {
+                throw new NotSupportedException("Invariant culture is not supported by variant content types.");
+            }
+        }
+        else
+        {
+            if (!culture.IsNullOrWhiteSpace() && culture != "*")
+            {
+                throw new NotSupportedException(
+                    $"Culture \"{culture}\" is not supported by invariant content types.");
+            }
+        }
+
+        if (content.Name != null && content.Name.Length > 255)
+        {
+            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
+        }
+
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.ContentTree);
+
+        var allLangs = _languageRepository.GetMany().ToList();
+
+        // Change state to publishing
+        content.PublishedState = PublishedState.Publishing;
+        var savingNotification = new ContentSavingNotification(content, evtMsgs);
+        if (scope.Notifications.PublishCancelable(savingNotification))
+        {
+            return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+        }
+
+        // if culture is specific, first publish the invariant values, then publish the culture itself.
+        // if culture is '*', then publish them all (including variants)
+
+        // this will create the correct culture impact even if culture is * or null
+        var impact = _cultureImpactFactory.Create(culture, IsDefaultCulture(allLangs, culture), content);
+
+        // publish the culture(s)
+        // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
+        content.PublishCulture(impact, DateTime.UtcNow, _propertyEditorCollection);
+
+        PublishResult result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
+        scope.Complete();
+        return result;
+    }
+
+    /// <inheritdoc />
     public PublishResult Unpublish(IContent content, string? culture = "*", int userId = Constants.Security.SuperUserId)
     {
         if (content == null)
