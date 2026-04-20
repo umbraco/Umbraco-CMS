@@ -12,9 +12,9 @@
     It also highlights the current active page/section in the navigation with the CSS class "current".
 *@
 
-@{ var selection = Model?.Root(DocumentNavigationQueryService, PublishedStatusFilteringService).Children(DocumentNavigationQueryService, PublishedStatusFilteringService).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
+@{ var selection = Model.Root(DocumentNavigationQueryService, PublishedStatusFilteringService).Children(DocumentNavigationQueryService, PublishedStatusFilteringService).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
 
-@if (selection?.Length > 0)
+@if (selection.Length > 0)
 {
     <ul>
         @foreach (var item in selection)
