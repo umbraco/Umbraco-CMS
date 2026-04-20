@@ -336,7 +336,8 @@ Each phase requires review and sign-off before the next begins.
 
 - [x] **Phase 0** — Pre-flight (read-only checks)
 - [x] **Phase 1** — New extension types (`ManifestTreeView`, `ManifestTreeItemCard`)
-- [ ] **Phase 2** — `expansion.expandTo()` convenience method + tests
+- [x] **Phase 2** — `expansion.expandTo()` convenience method + tests
+  - ⚠️ **Needs revisit** — current implementation is not satisfactory. Revisit before Phase 5 and figure out an alternative approach before the card view depends on it.
 - [ ] **Phase 3** — Extract Classic view + shell refactor (invasive)
   - [ ] 3.1 — Optional `hideTreeItemActions` / `isMenu` on `UmbTreeContext`
   - [ ] 3.2 — `<umb-classic-tree-view>` element + manifest
