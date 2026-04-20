@@ -75,12 +75,15 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 		};
 
 		const editorUiManifest = propertyContext.getEditorManifest();
+		if (!editorUiManifest?.alias) {
+			throw new Error('Could not determine property editor UI alias for clipboard entry.');
+		}
 
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
 			name: entryName,
 			propertyValue,
-			propertyEditorUiAlias: editorUiManifest?.alias ?? '',
+			propertyEditorUiAlias: editorUiManifest.alias,
 		});
 	}
 }

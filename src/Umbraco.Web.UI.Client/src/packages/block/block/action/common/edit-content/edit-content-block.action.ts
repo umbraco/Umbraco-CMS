@@ -5,6 +5,10 @@ import { UmbDataPathBlockElementDataQuery } from '../../../validation/data-path-
 import { UMB_BLOCK_ENTRY_CONTEXT } from '../../../context/block-entry.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+/**
+ * Block action that navigates to the block's content editor workspace.
+ * Exposes the workspace edit path via `getHref()` and the content validation data path via `getValidationDataPath()`.
+ */
 export class UmbEditContentBlockAction extends UmbBlockActionBase<MetaBlockActionDefaultKind> {
 	#context?: typeof UMB_BLOCK_ENTRY_CONTEXT.TYPE;
 	#contextReady: Promise<void>;
