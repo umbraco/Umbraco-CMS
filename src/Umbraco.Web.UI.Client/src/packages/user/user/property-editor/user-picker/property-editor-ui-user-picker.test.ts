@@ -2,6 +2,9 @@ import { UmbPropertyEditorUIUserPickerElement } from './property-editor-ui-user-
 import { expect, fixture, html } from '@open-wc/testing';
 import { type UmbTestRunnerWindow, defaultA11yConfig } from '@umbraco-cms/internal/test-utils';
 
+// ensure module is loaded and all global components are registered before running the tests
+import '@umbraco-cms/backoffice/user';
+
 describe('UmbPropertyEditorUIUserPickerElement', () => {
 	let element: UmbPropertyEditorUIUserPickerElement;
 
