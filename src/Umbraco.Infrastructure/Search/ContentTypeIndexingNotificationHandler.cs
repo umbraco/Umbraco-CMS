@@ -22,7 +22,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
     private readonly IMediaService _mediaService;
     private readonly IMemberService _memberService;
     private readonly IMemberTypeService _memberTypeService;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
     private readonly IOptionsMonitor<IndexingSettings> _indexingSettings;
 
@@ -41,7 +41,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
         IMemberService memberService,
         IMediaService mediaService,
         IMemberTypeService memberTypeService,
-        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         IOptionsMonitor<IndexingSettings> indexingSettings)
     {
         _umbracoIndexingHandler =

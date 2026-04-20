@@ -18,6 +18,7 @@ public class CacheRefreshingNotificationHandlerTests
 {
     private Mock<IDocumentCacheService> _documentCacheService = null!;
     private Mock<IMediaCacheService> _mediaCacheService = null!;
+    private Mock<IElementCacheService> _elementCacheService = null!;
     private Mock<IPublishedContentTypeCache> _publishedContentTypeCache = null!;
     private CacheRefreshingNotificationHandler _handler = null!;
 
@@ -26,11 +27,13 @@ public class CacheRefreshingNotificationHandlerTests
     {
         _documentCacheService = new Mock<IDocumentCacheService>(MockBehavior.Strict);
         _mediaCacheService = new Mock<IMediaCacheService>(MockBehavior.Strict);
+        _elementCacheService = new Mock<IElementCacheService>(MockBehavior.Strict);
         _publishedContentTypeCache = new Mock<IPublishedContentTypeCache>();
 
         _handler = new CacheRefreshingNotificationHandler(
             _documentCacheService.Object,
             _mediaCacheService.Object,
+            _elementCacheService.Object,
             _publishedContentTypeCache.Object);
     }
 
@@ -168,10 +171,131 @@ public class CacheRefreshingNotificationHandlerTests
             Times.Never);
     }
 
+    [Test]
+    public async Task Structural_Element_Type_Change_Triggers_Rebuild()
+    {
+        // Arrange
+        var elementType = CreateElementType(300);
+        var notification = new ContentTypeRefreshedNotification(
+            new ContentTypeChange<IContentType>(elementType, ContentTypeChangeTypes.RefreshMain),
+            new EventMessages());
+
+        _elementCacheService
+            .Setup(x => x.Rebuild(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(300))));
+
+        // Act
+        await _handler.HandleAsync(notification, CancellationToken.None);
+
+        // Assert — structural changes trigger Rebuild on element cache service.
+        _elementCacheService.Verify(
+            x => x.Rebuild(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(300))),
+            Times.Once);
+
+        // Assert — no converted cache clear for structural-only changes.
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(),
+            Times.Never);
+
+        // Assert — document cache service is not touched for element type changes.
+        _documentCacheService.Verify(
+            x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+        _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task Non_Structural_Element_Type_Change_Selectively_Clears_Converted_Cache()
+    {
+        // Arrange
+        var elementType = CreateElementType(300);
+        var notification = new ContentTypeRefreshedNotification(
+            new ContentTypeChange<IContentType>(elementType, ContentTypeChangeTypes.RefreshOther),
+            new EventMessages());
+
+        _elementCacheService
+            .Setup(x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(300))));
+
+        // Act
+        await _handler.HandleAsync(notification, CancellationToken.None);
+
+        // Assert — selective clear by element type ID (not full clear).
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(300))),
+            Times.Once);
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(),
+            Times.Never);
+
+        // Assert — no rebuild for non-structural changes.
+        _elementCacheService.Verify(
+            x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+
+        // Assert — document cache service is not touched for element type changes.
+        _documentCacheService.Verify(
+            x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+        _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+    }
+
+    [Test]
+    public async Task Mixed_Document_And_Element_Type_Changes_Route_To_Correct_Services()
+    {
+        // Arrange
+        var documentType = CreateContentType(100);
+        var elementType = CreateElementType(300);
+        var notification = new ContentTypeRefreshedNotification(
+            [
+                new ContentTypeChange<IContentType>(documentType, ContentTypeChangeTypes.RefreshMain),
+                new ContentTypeChange<IContentType>(elementType, ContentTypeChangeTypes.RefreshOther),
+            ],
+            new EventMessages());
+
+        _documentCacheService
+            .Setup(x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()));
+        _elementCacheService
+            .Setup(x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()));
+
+        // Act
+        await _handler.HandleAsync(notification, CancellationToken.None);
+
+        // Assert — document structural change triggers document rebuild.
+        _documentCacheService.Verify(
+            x => x.Rebuild(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(100))),
+            Times.Once);
+        _documentCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+
+        // Assert — element non-structural change triggers element converted cache clear.
+        _elementCacheService.Verify(
+            x => x.ClearConvertedContentCache(It.Is<IReadOnlyCollection<int>>(ids => ids.Count == 1 && ids.Contains(300))),
+            Times.Once);
+        _elementCacheService.Verify(
+            x => x.Rebuild(It.IsAny<IReadOnlyCollection<int>>()),
+            Times.Never);
+    }
+
     private static IContentType CreateContentType(int id)
     {
         var mock = new Mock<IContentType>();
         mock.Setup(x => x.Id).Returns(id);
+        mock.Setup(x => x.IsElement).Returns(false);
+        return mock.Object;
+    }
+
+    private static IContentType CreateElementType(int id)
+    {
+        var mock = new Mock<IContentType>();
+        mock.Setup(x => x.Id).Returns(id);
+        mock.Setup(x => x.IsElement).Returns(true);
         return mock.Object;
     }
 
