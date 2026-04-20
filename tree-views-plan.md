@@ -334,8 +334,8 @@ Phases 1 and 2 can run in parallel. Phases 3 through 7 are sequential.
 
 Each phase requires review and sign-off before the next begins.
 
-- [ ] **Phase 0** — Pre-flight (read-only checks)
-- [ ] **Phase 1** — New extension types (`ManifestTreeView`, `ManifestTreeItemCard`)
+- [x] **Phase 0** — Pre-flight (read-only checks)
+- [x] **Phase 1** — New extension types (`ManifestTreeView`, `ManifestTreeItemCard`)
 - [ ] **Phase 2** — `expansion.expandTo()` convenience method + tests
 - [ ] **Phase 3** — Extract Classic view + shell refactor (invasive)
   - [ ] 3.1 — Optional `hideTreeItemActions` / `isMenu` on `UmbTreeContext`

@@ -15,3 +15,5 @@ export * from './entity-actions/move/index.js';
 export type * from './types.js';
 
 export type { UmbTreePickerModalData, UmbTreePickerModalValue } from './tree-picker-modal/index.js';
+export * from './tree-item-card/index.js';
+export * from './view/index.js';
