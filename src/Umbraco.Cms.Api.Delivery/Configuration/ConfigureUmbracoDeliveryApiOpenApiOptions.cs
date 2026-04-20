@@ -34,6 +34,5 @@ public class ConfigureUmbracoDeliveryApiOpenApiOptions : ConfigureUmbracoOpenApi
 
         options.AddOperationTransformer<ContentApiTransformer>();
         options.AddOperationTransformer<MediaApiTransformer>();
-        options.AddDocumentTransformer<MimeTypesTransformer>();
     }
 }

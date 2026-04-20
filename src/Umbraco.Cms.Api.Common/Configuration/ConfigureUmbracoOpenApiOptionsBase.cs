@@ -81,6 +81,7 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
 
         options.AddSchemaTransformer<RequireNonNullablePropertiesSchemaTransformer>();
         options.AddSchemaTransformer<FixFileReturnTypesTransformer>();
+        options.AddOperationTransformer<MimeTypesTransformer>();
     }
 
     /// <summary>
