@@ -273,7 +273,10 @@ public class ContentService : RepositoryService, IContentService
         {
             ScopeProvider.Context?.Enlist(
                 Constants.Audit.TriggerEnlistmentKey,
-                () => new AuditTrigger(Constants.Audit.TriggerSources.Core, Constants.Audit.TriggerOperations.Rollback));
+                () => new AuditTrigger(
+                    Constants.Audit.TriggerSources.Core,
+                    Constants.Audit.TriggerOperations.Rollback,
+                    SuppressForAuditTypes: [AuditType.RollBack]));
 
             var rollingBackNotification = new ContentRollingBackNotification(content, evtMsgs);
             if (scope.Notifications.PublishCancelable(rollingBackNotification))

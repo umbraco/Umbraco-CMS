@@ -379,6 +379,14 @@ public sealed class AuditService : RepositoryService, IAuditService
     {
         AuditTrigger? trigger = _auditTriggerAccessor.Current;
 
+        // Suppress the trigger when the caller has declared it redundant for this audit type.
+        // e.g. a Rollback trigger on a RollBack audit entry (the type already conveys the action),
+        // while the nested Save entry still carries the trigger which provides useful context.
+        if (trigger?.SuppressForAuditTypes?.Contains(type) is true)
+        {
+            trigger = null;
+        }
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
         _auditRepository.Save(new AuditItem(
