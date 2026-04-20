@@ -29,6 +29,14 @@ public partial class UmbracoPlan : MigrationPlan
     public override string InitialState => "{DED98755-4059-41BB-ADBD-3FEAB12D1D7B}";
 
     /// <summary>
+    /// Gets the semantic version corresponding to <see cref="InitialState"/>.
+    /// </summary>
+    /// <remarks>
+    /// Keep in sync with <see cref="InitialState"/> whenever the lowest supported upgrade version changes.
+    /// </remarks>
+    private static SemVersion InitialStateVersion { get; } = new(9, 4, 0);
+
+    /// <summary>
     /// Defines the plan.
     /// </summary>
     /// <remarks>
@@ -197,15 +205,12 @@ public partial class UmbracoPlan : MigrationPlan
             return null;
         }
 
-        // InitialState is the final migration state of 9.4 (lowest supported upgrade).
-        // TODO (V18): Update to the final migration state version of 17.4 when InitialState changes.
-        var initialVersion = new SemVersion(9, 4, 0);
-        SemVersion? trackedVersion = initialVersion;
+        SemVersion? trackedVersion = InitialStateVersion;
         var current = InitialState;
 
         if (string.Equals(current, state, StringComparison.OrdinalIgnoreCase))
         {
-            return initialVersion;
+            return InitialStateVersion;
         }
 
         while (Transitions.TryGetValue(current, out Transition? transition) && transition is not null)
