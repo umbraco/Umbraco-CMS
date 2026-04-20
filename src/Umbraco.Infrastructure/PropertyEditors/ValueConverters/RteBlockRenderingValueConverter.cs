@@ -3,17 +3,20 @@
 
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Blocks;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Infrastructure.Extensions;
@@ -41,6 +44,8 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
     private readonly RichTextBlockPropertyValueConstructorCache _constructorCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
+    private readonly ILanguageService _languageService;
+    private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
 
     private DeliveryApiSettings _deliveryApiSettings;
     private readonly IDisposable? _deliveryApiSettingsChangeSubscription;
@@ -62,6 +67,48 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
     /// <param name="variationContextAccessor">Provides access to the current variation context.</param>
     /// <param name="blockEditorVarianceHandler">Handles variance for block editors.</param>
     /// <param name="deliveryApiSettingsMonitor">Monitors settings for the Delivery API.</param>
+    /// <param name="languageService">Service used to retrieve language information for fallback resolution.</param>
+    /// <param name="propertyRenderingContextAccessor">Accessor for the current property rendering context.</param>
+    public RteBlockRenderingValueConverter(
+        HtmlLocalLinkParser linkParser,
+        HtmlUrlParser urlParser,
+        HtmlImageSourceParser imageSourceParser,
+        IApiRichTextElementParser apiRichTextElementParser,
+        IApiRichTextMarkupParser apiRichTextMarkupParser,
+        IPartialViewBlockEngine partialViewBlockEngine,
+        BlockEditorConverter blockEditorConverter,
+        IJsonSerializer jsonSerializer,
+        IApiElementBuilder apiElementBuilder,
+        RichTextBlockPropertyValueConstructorCache constructorCache,
+        ILogger<RteBlockRenderingValueConverter> logger,
+        IVariationContextAccessor variationContextAccessor,
+        BlockEditorVarianceHandler blockEditorVarianceHandler,
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor,
+        ILanguageService languageService,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
+    {
+        _linkParser = linkParser;
+        _urlParser = urlParser;
+        _imageSourceParser = imageSourceParser;
+        _apiRichTextElementParser = apiRichTextElementParser;
+        _apiRichTextMarkupParser = apiRichTextMarkupParser;
+        _partialViewBlockEngine = partialViewBlockEngine;
+        _blockEditorConverter = blockEditorConverter;
+        _jsonSerializer = jsonSerializer;
+        _apiElementBuilder = apiElementBuilder;
+        _constructorCache = constructorCache;
+        _logger = logger;
+        _variationContextAccessor = variationContextAccessor;
+        _blockEditorVarianceHandler = blockEditorVarianceHandler;
+        _languageService = languageService;
+        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
+
+        _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
+        _deliveryApiSettingsChangeSubscription = deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
+    }
+
+    /// <inheritdoc cref="RteBlockRenderingValueConverter(HtmlLocalLinkParser, HtmlUrlParser, HtmlImageSourceParser, IApiRichTextElementParser, IApiRichTextMarkupParser, IPartialViewBlockEngine, BlockEditorConverter, IJsonSerializer, IApiElementBuilder, RichTextBlockPropertyValueConstructorCache, ILogger{RteBlockRenderingValueConverter}, IVariationContextAccessor, BlockEditorVarianceHandler, IOptionsMonitor{DeliveryApiSettings}, ILanguageService, IPropertyRenderingContextAccessor)"/>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public RteBlockRenderingValueConverter(
         HtmlLocalLinkParser linkParser,
         HtmlUrlParser urlParser,
@@ -77,23 +124,8 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
         IVariationContextAccessor variationContextAccessor,
         BlockEditorVarianceHandler blockEditorVarianceHandler,
         IOptionsMonitor<DeliveryApiSettings> deliveryApiSettingsMonitor)
+        : this(linkParser, urlParser, imageSourceParser, apiRichTextElementParser, apiRichTextMarkupParser, partialViewBlockEngine, blockEditorConverter, jsonSerializer, apiElementBuilder, constructorCache, logger, variationContextAccessor, blockEditorVarianceHandler, deliveryApiSettingsMonitor, StaticServiceProvider.Instance.GetRequiredService<ILanguageService>(), StaticServiceProvider.Instance.GetRequiredService<IPropertyRenderingContextAccessor>())
     {
-        _linkParser = linkParser;
-        _urlParser = urlParser;
-        _imageSourceParser = imageSourceParser;
-        _apiRichTextElementParser = apiRichTextElementParser;
-        _apiRichTextMarkupParser = apiRichTextMarkupParser;
-        _partialViewBlockEngine = partialViewBlockEngine;
-        _blockEditorConverter = blockEditorConverter;
-        _jsonSerializer = jsonSerializer;
-        _apiElementBuilder = apiElementBuilder;
-        _constructorCache = constructorCache;
-        _logger = logger;
-        _variationContextAccessor = variationContextAccessor;
-        _blockEditorVarianceHandler = blockEditorVarianceHandler;
-
-        _deliveryApiSettings = deliveryApiSettingsMonitor.CurrentValue;
-        _deliveryApiSettingsChangeSubscription = deliveryApiSettingsMonitor.OnChange(settings => _deliveryApiSettings = settings);
     }
 
     /// <summary>
@@ -296,8 +328,8 @@ public class RteBlockRenderingValueConverter : SimpleRichTextValueConverter, IDe
             return null;
         }
 
-        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _variationContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache);
-        return creator.CreateBlockModel(owner, referenceCacheLevel, blocks, preview, configuration.Blocks);
+        var creator = new RichTextBlockPropertyValueCreator(_blockEditorConverter, _variationContextAccessor, _propertyRenderingContextAccessor, _blockEditorVarianceHandler, _jsonSerializer, _constructorCache, _languageService);
+        return creator.CreateBlockModelAsync(owner, referenceCacheLevel, blocks, preview, configuration.Blocks).GetAwaiter().GetResult();
     }
 
     private string RenderRichTextBlockModel(string source, RichTextBlockModel? richTextBlockModel)
