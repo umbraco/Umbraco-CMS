@@ -62,11 +62,6 @@ export class UmbSplitPanelElement extends UmbLitElement {
 
 	#hasInitialized = false;
 
-	override disconnectedCallback() {
-		super.disconnectedCallback();
-		this.#disconnect();
-	}
-
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 
@@ -180,13 +175,48 @@ export class UmbSplitPanelElement extends UmbLitElement {
 	#disconnect() {
 		this.dividerTouchAreaElement.removeEventListener('pointerdown', this.#onDragStart);
 		this.dividerTouchAreaElement.removeEventListener('touchstart', this.#onDragStart);
-		this.dividerElement.style.display = 'none';
-		this.mainElement.style.display = 'flex';
+		if (!this.#mobileQuery.matches) {
+			this.dividerElement.style.display = 'none';
+			this.mainElement.style.display = 'flex';
+		}
 		this.#hasInitialized = false;
 	}
 
+	readonly #mobileQuery = window.matchMedia('(max-width: 920px)');
+
+	override connectedCallback() {
+		super.connectedCallback();
+		this.#mobileQuery.addEventListener('change', this.#onMobileChange);
+	}
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		this.#mobileQuery.removeEventListener('change', this.#onMobileChange);
+		this.#disconnect();
+	}
+
+	#onMobileChange = (e: MediaQueryListEvent) => {
+		if (e.matches) {
+			// Switched to mobile — clear the inline grid style set by #connect
+			if (this.mainElement) {
+				this.mainElement.style.display = '';
+				this.mainElement.style.gridTemplateColumns = '';
+			}
+			if (this.dividerElement) {
+				this.dividerElement.style.display = '';
+			}
+		} else {
+			// Switched to desktop — re-initialize grid layout
+			if (this.#hasBothPanels) {
+				this.#connect();
+			}
+		}
+	};
+
 	async #connect() {
 		this.#hasInitialized = true;
+
+		if (this.#mobileQuery.matches) return;
 
 		this.mainElement.style.display = 'grid';
 		this.mainElement.style.gridTemplateColumns = `${this.position} 0px 1fr`;
@@ -302,6 +332,30 @@ export class UmbSplitPanelElement extends UmbLitElement {
 			width: var(--umb-split-panel-divider-touch-area-width);
 			cursor: col-resize;
 		}
+		@media (max-width: 920px) {
+			#main {
+				position: relative;
+			}
+			::slotted(umb-section-sidebar) {
+				position: absolute !important;
+				width: 100% !important;
+				left: 0 !important;
+				top: 0 !important;
+				z-index: 100;
+			}
+			::slotted(umb-section-main) {
+				position: absolute !important;
+				left: 0 !important;
+				top: 72px !important;
+				width: 100% !important;
+				max-width: 100% !important;
+				height: calc(100% - 72px) !important;
+			}
+			#divider {
+				display: none !important;
+			}
+		}
+
 		/* Do we want a line that shows the divider? */
 		#divider::after {
 			content: '';
