@@ -100,6 +100,10 @@ import type {
 	MemberReferenceResponseModel,
 	// News
 	NewsDashboardItemResponseModel,
+	// Webhook
+	WebhookResponseModel,
+	WebhookLogResponseModel,
+	WebhookEventResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 // ============================================================================
@@ -174,6 +178,14 @@ export type UmbMockUserModel = UserResponseModel & UserItemResponseModel;
 
 export type UmbMockUserGroupModel = UserGroupResponseModel & UserGroupItemResponseModel;
 
+export type UmbMockWebhookModel = WebhookResponseModel;
+
+export type UmbMockWebhookEventModel = WebhookEventResponseModel;
+
+export type UmbMockWebhookDeliveryModel = WebhookLogResponseModel;
+
+export type UmbMockAuditLogModel = AuditLogResponseModel;
+
 export type UmbMockTrackedReferenceItemModel =
 	| DefaultReferenceResponseModel
 	| DocumentReferenceResponseModel
@@ -227,6 +239,9 @@ export interface UmbMockDataSet {
 	user?: Array<UmbMockUserModel>;
 	userGroup?: Array<UmbMockUserGroupModel>;
 	objectType?: Array<ObjectTypeResponseModel>;
+	webhook?: Array<UmbMockWebhookModel>;
+	webhookEvent?: Array<UmbMockWebhookEventModel>;
+	webhookDelivery?: Array<UmbMockWebhookDeliveryModel>;
 
 	// Log viewer data (optional, defaults to empty arrays/default values)
 	logViewerSavedSearches?: Array<SavedLogSearchResponseModel>;
@@ -235,7 +250,7 @@ export interface UmbMockDataSet {
 	logs?: Array<LogMessageResponseModel>;
 
 	// Audit logs
-	auditLogs?: Array<AuditLogResponseModel>;
+	auditLogs?: Array<UmbMockAuditLogModel>;
 
 	// Health check data
 	healthGroups?: Array<HealthCheckGroupWithResultResponseModel & { name: string }>;

@@ -83,10 +83,10 @@ export class UmbMultipleColorPickerItemInputElement extends UUIFormControlWithBa
 
 	async #onDelete() {
 		await umbConfirmModal(this, {
-			headline: `${this.localize.term('actions_delete')} ${this.value || ''}`,
-			content: this.localize.term('content_nestedContentDeleteItem'),
+			headline: `#actions_delete ${this.value || ''}`,
+			content: '#content_nestedContentDeleteItem',
 			color: 'danger',
-			confirmLabel: this.localize.term('actions_delete'),
+			confirmLabel: '#actions_delete',
 		});
 
 		this.dispatchEvent(new UmbDeleteEvent());

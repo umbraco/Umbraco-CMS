@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Deploy;
 
@@ -159,6 +160,42 @@ public class UdiTests
 
         // *not* testing whether Udi.Create(type, invalidValue) throws
         // because we don't throw anymore - see U4-10409
+    }
+
+    [Test]
+    public void CreateRootUdi_ForGuidEntityType_ReturnsRootGuidUdi()
+    {
+        var udi = Udi.Create(Constants.UdiEntityType.Document);
+        Assert.AreEqual(Constants.UdiEntityType.Document, udi.EntityType);
+        Assert.IsTrue(udi.IsRoot);
+        Assert.IsInstanceOf<GuidUdi>(udi);
+        Assert.AreEqual(Guid.Empty, ((GuidUdi)udi).Guid);
+    }
+
+    [Test]
+    public void CreateRootUdi_ForStringEntityType_ReturnsRootStringUdi()
+    {
+        var udi = Udi.Create(Constants.UdiEntityType.Language);
+        Assert.AreEqual(Constants.UdiEntityType.Language, udi.EntityType);
+        Assert.IsTrue(udi.IsRoot);
+        Assert.IsInstanceOf<StringUdi>(udi);
+        Assert.AreEqual(string.Empty, ((StringUdi)udi).Id);
+    }
+
+    [Test]
+    public void CreateRootUdi_ForUnknownEntityType_ThrowsArgumentException()
+    {
+        const string unknownType = "not-a-real-entity-type";
+        ArgumentException? ex = Assert.Throws<ArgumentException>(() => Udi.Create(unknownType));
+        StringAssert.Contains(unknownType, ex!.Message);
+    }
+
+    [Test]
+    public void CreateRootUdi_WhenCalledTwice_ReturnsSameCachedInstance()
+    {
+        var first = Udi.Create(Constants.UdiEntityType.Media);
+        var second = Udi.Create(Constants.UdiEntityType.Media);
+        Assert.AreSame(first, second);
     }
 
     [Test]
