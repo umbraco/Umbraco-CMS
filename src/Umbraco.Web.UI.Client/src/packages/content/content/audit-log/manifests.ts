@@ -13,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		meta: {
 			mappings: [
 				{ operation: 'ScheduledPublish', label: 'Scheduled publish' },
-				{ operation: 'Rollback', label: 'User rollback' },
+				{ operation: 'Rollback', label: 'Rollback' },
 				{ operation: 'Import', label: 'Imported' },
 				{ operation: 'Export', label: 'Exported' },
 				{ operation: 'PackageInstall', label: 'Package install' },
