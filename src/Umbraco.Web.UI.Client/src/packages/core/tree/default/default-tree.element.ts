@@ -1,10 +1,19 @@
-import type { UmbTreeItemModel, UmbTreeItemModelBase, UmbTreeRootModel, UmbTreeSelectionConfiguration, UmbTreeStartNode } from '../types.js';
+import type {
+	UmbTreeItemModel,
+	UmbTreeItemModelBase,
+	UmbTreeRootModel,
+	UmbTreeSelectionConfiguration,
+	UmbTreeStartNode,
+} from '../types.js';
 import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
+
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
+
+import '../components/tree-toolbar.element.js';
 
 @customElement('umb-default-tree')
 export class UmbDefaultTreeElement extends UmbLitElement {
@@ -130,8 +139,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 	override render() {
 		return html`
-			${!this.hideToolbar ? html`<umb-tree-toolbar></umb-tree-toolbar>` : nothing}
-			${this._viewElement ?? nothing}
+			${!this.hideToolbar ? html`<umb-tree-toolbar></umb-tree-toolbar>` : nothing} ${this._viewElement ?? nothing}
 		`;
 	}
 
