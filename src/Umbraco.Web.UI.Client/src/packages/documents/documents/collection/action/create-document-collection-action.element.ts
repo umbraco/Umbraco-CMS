@@ -76,6 +76,19 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		});
 	}
 
+	#onClick(event: MouseEvent, item: UmbAllowedDocumentTypeModel) {
+		// Let modified/non-primary clicks (open in new tab, new window, etc.) use native link navigation.
+		if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+			return;
+		}
+		// Cancel native anchor navigation and stop the window-level router-slot click handler
+		// (see core/router/router-slot/util/anchor.ts) from SPA-navigating before we can decide
+		// whether to open the blueprint picker.
+		event.preventDefault();
+		event.stopPropagation();
+		this.#onSelect(item);
+	}
+
 	async #onSelect(item: UmbAllowedDocumentTypeModel) {
 		if (!item.unique) {
 			throw new Error('Item unique is missing');
@@ -100,6 +113,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 				preselectedDocumentType: {
 					unique: item.unique,
 					icon: item.icon ?? undefined,
+					blueprints: data,
 				},
 			},
 		});
@@ -122,7 +136,12 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 			this.localize.string(item.name);
 
 		return html`
-			<uui-button color="default" label=${label} look="outline" @click=${() => this.#onSelect(item)}></uui-button>
+			<uui-button
+				color="default"
+				href=${this.#getCreateUrl(item)}
+				label=${label}
+				look="outline"
+				@click=${(event: MouseEvent) => this.#onClick(event, item)}></uui-button>
 		`;
 	}
 
@@ -148,7 +167,10 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 							this._allowedDocumentTypes,
 							(item) => item.unique,
 							(item) => html`
-								<uui-menu-item label=${this.localize.string(item.name)} @click-label=${() => this.#onSelect(item)}>
+								<uui-menu-item
+									label=${this.localize.string(item.name)}
+									href=${this.#getCreateUrl(item)}
+									@click=${(event: MouseEvent) => this.#onClick(event, item)}>
 									<umb-icon slot="icon" name=${item.icon ?? 'icon-document'}></umb-icon>
 								</uui-menu-item>
 							`,

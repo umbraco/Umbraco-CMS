@@ -52,8 +52,19 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 		const preselectedDocumentType = this.data?.preselectedDocumentType;
 
 		if (preselectedDocumentType?.unique) {
+			this.#documentTypeUnique = preselectedDocumentType.unique;
 			this.#documentTypeIcon = preselectedDocumentType.icon ?? '';
-			await this.#onSelectDocumentType(preselectedDocumentType.unique);
+			if (preselectedDocumentType.blueprints) {
+				this._availableBlueprints = preselectedDocumentType.blueprints;
+			} else {
+				const { data } = await this.#documentBlueprintItemRepository.requestItemsByDocumentType(
+					preselectedDocumentType.unique,
+				);
+				this._availableBlueprints = data ?? [];
+			}
+			if (!this._availableBlueprints.length) {
+				this.#onNavigate(preselectedDocumentType.unique);
+			}
 			this._loading = false;
 		} else {
 			this.#retrieveAllowedDocumentTypesOf(documentTypeUnique, parentUnique || null);
