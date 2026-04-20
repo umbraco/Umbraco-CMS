@@ -448,7 +448,6 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		css`
 			:host {
 				position: relative;
-				display: block;
 				width: 100%;
 				display: flex;
 				flex-direction: column-reverse;
