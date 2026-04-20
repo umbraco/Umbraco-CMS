@@ -330,6 +330,29 @@ Phases 1 and 2 can run in parallel. Phases 3 through 7 are sequential.
 
 ---
 
+## 7. Progress tracker
+
+Each phase requires review and sign-off before the next begins.
+
+- [ ] **Phase 0** — Pre-flight (read-only checks)
+- [ ] **Phase 1** — New extension types (`ManifestTreeView`, `ManifestTreeItemCard`)
+- [ ] **Phase 2** — `expansion.expandTo()` convenience method + tests
+- [ ] **Phase 3** — Extract Classic view + shell refactor (invasive)
+  - [ ] 3.1 — Optional `hideTreeItemActions` / `isMenu` on `UmbTreeContext`
+  - [ ] 3.2 — `<umb-classic-tree-view>` element + manifest
+  - [ ] 3.3 — `UmbTreeViewManager` + `UMB_TREE_VIEW_CONTEXT` token
+  - [ ] 3.4 — Convert `<umb-default-tree>` into a shell
+  - [ ] 3.5 — Register Classic view manifests
+- [ ] **Phase 4** — `<umb-tree-toolbar>` + `<umb-tree-view-bundle>` elements
+- [ ] **Phase 5** — Card view + card-item routing
+  - [ ] 5.1 — `<umb-default-tree-item-card>` + `UmbTreeItemCardNavigateEvent`
+  - [ ] 5.2 — `<umb-tree-item-card>` routing element
+  - [ ] 5.3 — `<umb-card-tree-view>` element + manifest
+- [ ] **Phase 6** — Breadcrumb in `<umb-tree-picker-modal>`
+- [ ] **Phase 7** — Localization, unit tests, manual smoke tests
+
+---
+
 ## 6. File inventory
 
 ### New files
