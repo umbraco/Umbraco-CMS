@@ -143,7 +143,6 @@ public static partial class UmbracoBuilderExtensions
         // register manifest parser, will be injected in collection builders where needed
         builder.Services.AddSingleton<IPackageManifestReader, BackOfficePackageManifestReader>();
         builder.Services.AddSingleton<IPackageManifestReader, AppPluginsPackageManifestReader>();
-        builder.Services.AddSingleton<IPackageManifestReader, AppPluginsExtensionsFolderPackageManifestReader>();
         builder.Services.AddSingleton<IPackageManifestService, PackageManifestService>();
 
         builder.MediaUrlGenerators()
