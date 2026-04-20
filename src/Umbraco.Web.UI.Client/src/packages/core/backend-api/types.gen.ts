@@ -5269,7 +5269,7 @@ export type PutDocumentByIdNotificationsResponses = {
 };
 
 export type PatchDocumentByIdPatchData = {
-    body: PatchDocumentRequestModel;
+    body?: PatchDocumentRequestModel;
     path: {
         id: string;
     };
@@ -5295,7 +5295,7 @@ export type PatchDocumentByIdPatchErrors = {
      */
     404: ProblemDetails;
     /**
-     * Unprocessable Entity
+     * Unprocessable Content
      */
     422: ProblemDetails;
 };

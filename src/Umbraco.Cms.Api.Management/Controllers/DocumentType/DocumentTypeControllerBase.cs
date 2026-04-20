@@ -118,6 +118,10 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                     .WithTitle("Invalid IsElement flag")
                     .WithDetail("Cannot change to document type because this element type is used in the configuration of a data type.")
                     .Build()),
+                ContentTypeOperationStatus.InvalidElementFlagElementHasContent => new BadRequestObjectResult(problemDetailsBuilder
+                    .WithTitle("Invalid IsElement flag")
+                    .WithDetail("Cannot change to document type because content has already been created with this element type.")
+                    .Build()),
                 ContentTypeOperationStatus.InvalidElementFlagComparedToParent => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")
                     .WithDetail("Can not create a documentType with inheritance composition where the parent and the new type's IsElement flag are different.")

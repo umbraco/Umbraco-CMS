@@ -1,0 +1,75 @@
+import type { UmbMockDocumentBlueprintModel } from '../../mock-data-set.types.js';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+
+export const data: Array<UmbMockDocumentBlueprintModel> = [
+	{
+		id: 'the-simplest-document-id',
+		documentType: {
+			id: 'the-simplest-document-type-id',
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		isFolder: false,
+		parent: null,
+		name: 'The Simplest Document Blueprint',
+		variants: [
+			{
+				state: DocumentVariantStateModel.DRAFT,
+				publishDate: '2023-02-06T15:32:24.957009',
+				culture: 'en-us',
+				segment: null,
+				name: 'The Simplest Document Blueprint',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'the-simplest-document-type-id-blueprint',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.TextBox',
+				alias: 'prop1',
+				culture: null,
+				segment: null,
+				value: 'my blueprint value',
+			},
+		],
+		flags: [],
+		noAccess: false,
+	},
+	{
+		id: 'forbidden',
+		documentType: {
+			id: 'the-simplest-document-type-id',
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		isFolder: false,
+		parent: null,
+		name: 'A Forbidden Document Blueprint',
+		variants: [
+			{
+				state: DocumentVariantStateModel.DRAFT,
+				publishDate: '2023-02-06T15:32:24.957009',
+				culture: 'en-US',
+				segment: null,
+				name: 'A Forbidden Document Blueprint',
+				createDate: '2023-02-06T15:32:05.350038',
+				updateDate: '2023-02-06T15:32:24.957009',
+				id: 'forbidden-blueprint',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.TextBox',
+				alias: 'prop1',
+				culture: null,
+				segment: null,
+				value: 'my blueprint value',
+			},
+		],
+		flags: [],
+		noAccess: false,
+	},
+];

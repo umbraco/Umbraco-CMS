@@ -16,7 +16,7 @@ export class UmbUserGroupItemStore extends UmbItemStoreBase<UmbUserGroupItemMode
 	 * @memberof UmbUserGroupItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_USER_GROUP_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_USER_GROUP_ITEM_STORE_CONTEXT);
 	}
 }
 

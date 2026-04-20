@@ -563,6 +563,8 @@ For detailed information about individual projects, see their CLAUDE.md files:
 - **API Infrastructure**: `/src/Umbraco.Cms.Api.Common/CLAUDE.md` - OpenAPI, authentication, serialization
 - **Backoffice Frontend**: `/src/Umbraco.Web.UI.Client/CLAUDE.md` - Lit web components, extension system, auth client
 
+**Important**: When working on backoffice client code (anything under `src/Umbraco.Web.UI.Client/`), read `/src/Umbraco.Web.UI.Client/CLAUDE.md` first. It contains action-specific checklists (deprecation, testing, security, etc.) that are not duplicated here.
+
 ### Getting Help
 
 - **Official Docs**: https://docs.umbraco.com/
