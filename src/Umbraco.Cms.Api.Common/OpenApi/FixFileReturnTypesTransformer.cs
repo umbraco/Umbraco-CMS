@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 /// </summary>
 /// <remarks>Can be removed once https://github.com/dotnet/aspnetcore/pull/63504 and
 /// https://github.com/dotnet/aspnetcore/pull/64562 are released.</remarks>
-public class FixFileReturnTypesTransformer : IOpenApiSchemaTransformer
+internal class FixFileReturnTypesTransformer : IOpenApiSchemaTransformer
 {
     private static readonly Type[] _binaryStringTypes =
     [

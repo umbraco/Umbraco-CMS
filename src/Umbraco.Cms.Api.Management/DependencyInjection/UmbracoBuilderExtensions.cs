@@ -29,7 +29,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
         builder.Services.AddSingleton<IManagementApiRouteBuilder, ManagementApiRouteBuilder>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
-        builder.AddUmbracoApiOpenApiUI();
+        builder.AddUmbracoOpenApi();
 
 #pragma warning disable CS0618 // Type or member is obsolete
         if (!services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(JsonPatchService)))
@@ -95,14 +95,15 @@ public static partial class UmbracoBuilderExtensions
                 })
                 .AddJsonOptions(Constants.JsonOptionsNames.BackOffice, _ => { });
 
-            builder.Services.AddUmbracoApi<ConfigureUmbracoManagementApiOpenApiOptions>(ManagementApiConfiguration.ApiName, ManagementApiConfiguration.ApiTitle);
             builder.Services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>();
 
             // Configures the JSON options for the Open API schema generation (based on the back-office MVC JSON options)
             builder.Services.ConfigureOptions<ConfigureUmbracoBackofficeHttpJsonOptions>();
 
-            // Replaces the internal Microsoft OpenApiSchemaService in order to ensure the correct JSON options are used
-            builder.Services.ReplaceOpenApiSchemaService(ManagementApiConfiguration.ApiName, Constants.JsonOptionsNames.BackOffice);
+            builder.AddUmbracoOpenApiDocument<ConfigureUmbracoManagementApiOpenApiOptions>(
+                ManagementApiConfiguration.ApiName,
+                ManagementApiConfiguration.ApiTitle,
+                Constants.JsonOptionsNames.BackOffice);
 
             services.Configure<UmbracoPipelineOptions>(options =>
             {

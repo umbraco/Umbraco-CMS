@@ -30,13 +30,13 @@ internal static class OpenApiSchemaServiceExtensions
         string documentName,
         string jsonOptionsName)
     {
-        const string OpenApiSchemaServiceFullName = "Microsoft.AspNetCore.OpenApi.OpenApiSchemaService";
+        const string openApiSchemaServiceFullName = "Microsoft.AspNetCore.OpenApi.OpenApiSchemaService";
 
         ServiceDescriptor descriptor = services.FirstOrDefault(sd =>
-            sd.ServiceType.FullName == OpenApiSchemaServiceFullName
+            sd.ServiceType.FullName == openApiSchemaServiceFullName
             && Equals(sd.ServiceKey, documentName))
             ?? throw new InvalidOperationException(
-                $"Could not find a registration for {OpenApiSchemaServiceFullName} keyed with '{documentName}'. "
+                $"Could not find a registration for {openApiSchemaServiceFullName} keyed with '{documentName}'. "
                 + $"Ensure AddOpenApi(\"{documentName}\") has been called before {nameof(ReplaceOpenApiSchemaService)}, "
                 + "or check whether the internal Microsoft.AspNetCore.OpenApi registration shape has changed.");
 
@@ -47,7 +47,7 @@ internal static class OpenApiSchemaServiceExtensions
             (sp, key) => ActivatorUtilities.CreateInstance(
                 sp,
                 descriptor.ServiceType,
-                key!,
+                key,
                 Options.Create(sp.GetRequiredService<IOptionsMonitor<JsonOptions>>().Get(jsonOptionsName))));
 
         return services;
