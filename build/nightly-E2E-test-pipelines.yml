@@ -3,14 +3,14 @@ name: Nightly_E2E_Test_$(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName
 pr: none
 trigger: none
 
-schedules:
-  - cron: '0 0 * * *'
-    displayName: Daily midnight build
-    branches:
-      include:
-        - v15/dev
-        - main
-        - v17/dev
+# schedules:
+#   - cron: '0 0 * * *'
+#     displayName: Daily midnight build
+#     branches:
+#       include:
+#         - v15/dev
+#         - main
+#         - v17/dev
 
 parameters:
   - name: skipIntegrationTests
