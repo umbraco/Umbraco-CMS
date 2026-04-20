@@ -156,7 +156,7 @@ internal sealed class MediaCacheService : IMediaCacheService
             return false;
         }
 
-        return await _hybridCache.ExistsAsync<ContentCacheNode?>($"{keyAttempt.Result}", CancellationToken.None);
+        return await _hybridCache.ExistsAsync<ContentCacheNode?>(GetCacheKey(keyAttempt.Result), CancellationToken.None);
     }
 
     public async Task RefreshMediaAsync(IMedia media)
@@ -332,9 +332,8 @@ internal sealed class MediaCacheService : IMediaCacheService
 
     private static string GetCacheKey(Guid key) => $"{key}";
 
-    // Generates the cache tags for a given CacheNode
+    // Generates the cache tags for a given CacheNode.
     // We use the tags to be able to clear all cache entries that are related to a given content item.
-    // Tags for now are only content/media, but can be expanded with draft/published later.
     private static HashSet<string> GenerateTags(ContentCacheNode? cacheNode) => cacheNode is null ? [] : [Constants.Cache.Tags.Media, MediaTypeIdTag(cacheNode.ContentTypeId)];
 
     private async Task ClearPublishedCacheAsync(Guid key)
