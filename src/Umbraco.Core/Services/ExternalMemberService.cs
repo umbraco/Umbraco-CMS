@@ -206,28 +206,20 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
 
-        // When true (default), a login is treated as a member update: UpdateDate is bumped and the member index refreshes.
-        // When false, none of that happens — the repository leaves updateDate untouched, and the IndexableFieldsChanged state
-        // flag tells the Examine indexing handler to skip re-indexing since no indexed field actually changed.
-        // This is configurable so implementors can decide whether a login constitutes an "update" to the member or not.
-        // They can avoid unnecessary index refreshes if not, but if they need it to be treated as an update, e.g. for an active members
-        // dashboard driven by the search index, then they can have that too.
-        bool bumpUpdateDate = _securitySettings.CurrentValue.TreatLoginAsMemberUpdate;
-
         if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug(
-                "External member {MemberKey} login — lightweight update path (bumpUpdateDate={BumpUpdateDate}, re-index={ReIndex}).",
-                member.Key,
-                bumpUpdateDate,
-                bumpUpdateDate);
+                "External member {MemberKey} login — lightweight update path (UpdateDate unchanged, no re-index).",
+                member.Key);
         }
 
-        // Mirror the content-member pattern (MemberService.UpdateLoginPropertiesAsync): we set
-        // well-known state flags that downstream handlers can read to short-circuit expensive work.
+        // Login is not a member update: UpdateDate is intentionally left untouched, and the
+        // IndexableFieldsChanged state flag tells the Examine indexing handler to skip the
+        // re-index since no indexed field has changed. Mirror the content-member pattern
+        // (MemberService.UpdateLoginPropertiesAsync) so downstream handlers see the same shape.
         var savingNotification = new ExternalMemberSavingNotification(member, evtMsgs);
         savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
-        savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, bumpUpdateDate);
+        savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, false);
 
         if (scope.Notifications.PublishCancelable(savingNotification))
         {
@@ -235,12 +227,7 @@ internal sealed class ExternalMemberService : RepositoryService, IExternalMember
             return Attempt.FailWithStatus(ExternalMemberOperationStatus.CancelledByNotification, member);
         }
 
-        if (bumpUpdateDate)
-        {
-            member.UpdateDate = DateTime.UtcNow;
-        }
-
-        await _repository.UpdateLoginPropertiesAsync(member, bumpUpdateDate);
+        await _repository.UpdateLoginPropertiesAsync(member);
 
         scope.Notifications.Publish(
             new ExternalMemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));

@@ -68,8 +68,8 @@ public class ExternalMemberIdentity
     ///     Gets or sets the date and time when the external member was last updated.
     /// </summary>
     /// <remarks>
-    ///     Whether a login operation updates this value is governed by
-    ///     <c>SecuritySettings.TreatLoginAsMemberUpdate</c>.
+    ///     Reflects real edits to the member (name, email, profile data, etc.). Login operations
+    ///     do not bump this value — login is not treated as a member update.
     /// </remarks>
     public DateTime UpdateDate { get; set; }
 

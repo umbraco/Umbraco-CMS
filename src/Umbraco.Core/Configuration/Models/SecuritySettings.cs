@@ -48,11 +48,6 @@ public class SecuritySettings
     internal const bool StaticAllowConcurrentLogins = false;
 
     /// <summary>
-    ///     The default value for treating a member login as a member update.
-    /// </summary>
-    internal const bool StaticTreatLoginAsMemberUpdate = true;
-
-    /// <summary>
     ///     The default authentication cookie name.
     /// </summary>
     internal const string StaticAuthCookieName = "UMB_UCONTEXT";
@@ -218,28 +213,6 @@ public class SecuritySettings
     ///     Gets the effective concurrent login setting for members.
     /// </summary>
     public bool GetMemberAllowConcurrentLogins() => MemberAllowConcurrentLogins ?? AllowConcurrentLogins;
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether a member login is treated as a member update.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         When <c>true</c> (default), a login bumps the member's <c>UpdateDate</c> (and, for content
-    ///         members, the corresponding <c>ContentVersionDto.VersionDate</c>). Because <c>UpdateDate</c>
-    ///         is part of the member's Examine value set, the member index is also refreshed as a
-    ///         downstream consequence. Applies to both content members and external members.
-    ///     </para>
-    ///     <para>
-    ///         When <c>false</c>, a login does not modify <c>UpdateDate</c>. The Examine re-index is
-    ///         skipped (since no indexed field changed), which reduces Lucene writer contention and
-    ///         CPU pressure on sites with high concurrent-login volume (e.g. external-provider OIDC
-    ///         callbacks at scale). Note that <c>UpdateDate</c> will then only reflect real member
-    ///         edits, not login activity; consumers that need a last-activity signal should read
-    ///         <c>LastLoginDate</c> directly.
-    ///     </para>
-    /// </remarks>
-    [DefaultValue(StaticTreatLoginAsMemberUpdate)]
-    public bool TreatLoginAsMemberUpdate { get; set; } = StaticTreatLoginAsMemberUpdate;
 
     /// <summary>
     /// Gets or sets the default duration (in milliseconds) of failed login attempts.

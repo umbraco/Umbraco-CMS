@@ -134,9 +134,9 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
         ///     Gets a value indicating whether any indexable field changed as part of the originating save.
         /// </summary>
         /// <remarks>
-        ///     Defaults to <c>true</c> for backward compatibility. When explicitly set to <c>false</c>
-        ///     (e.g. by a login-only update when <c>SecuritySettings.TreatLoginAsMemberUpdate</c> is
-        ///     <c>false</c>), Examine indexing handlers will skip re-indexing this payload.
+        ///     Defaults to <c>true</c> for backward compatibility. Explicitly set to <c>false</c>
+        ///     on login-only updates (which do not bump <c>UpdateDate</c>) so that the Examine
+        ///     indexing handlers skip re-indexing this payload.
         /// </remarks>
         public bool IndexableFieldsChanged { get; } = true;
     }

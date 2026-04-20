@@ -106,21 +106,17 @@ internal sealed class ExternalMemberRepository : IExternalMemberRepository
     }
 
     /// <inheritdoc />
-    public async Task UpdateLoginPropertiesAsync(ExternalMemberIdentity member, bool bumpUpdateDate)
+    public async Task UpdateLoginPropertiesAsync(ExternalMemberIdentity member)
     {
         NPocoSqlExtensions.SqlUpd<ExternalMemberDto> GetSetExpression(NPocoSqlExtensions.SqlUpd<ExternalMemberDto> _)
         {
             var setExpression = new NPocoSqlExtensions.SqlUpd<ExternalMemberDto>(SqlContext);
             setExpression.Set(x => x.LastLoginDate, member.LastLoginDate);
             setExpression.Set(x => x.SecurityStamp, member.SecurityStamp);
-            if (bumpUpdateDate)
-            {
-                setExpression.Set(x => x.UpdateDate, member.UpdateDate);
-            }
-
             return setExpression;
         }
 
+        // Login is not a member update — updateDate is intentionally left untouched.
         Sql<ISqlContext> sql = SqlContext.Sql()
             .Update<ExternalMemberDto>(GetSetExpression)
             .Where<ExternalMemberDto>(x => x.Key == member.Key);
