@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Data.Common;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -52,7 +51,7 @@ internal partial class UserService : RepositoryService, IUserService
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly IRuntimeState _runtimeState;
+    private readonly IBackOfficeUserReader _backOfficeUserReader;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserService" /> class.
@@ -76,7 +75,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="isoCodeValidator">The validator for ISO codes.</param>
     /// <param name="forgotPasswordSender">The sender for forgot password emails.</param>
     /// <param name="userIdKeyResolver">The resolver for user ID to key mappings.</param>
-    /// <param name="runtimeState">The runtime state for checking upgrade status.</param>
+    /// <param name="backOfficeUserReader">The shared reader used for back office user lookups.</param>
     public UserService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -97,7 +96,7 @@ internal partial class UserService : RepositoryService, IUserService
         IIsoCodeValidator isoCodeValidator,
         IUserForgotPasswordSender forgotPasswordSender,
         IUserIdKeyResolver userIdKeyResolver,
-        IRuntimeState runtimeState)
+        IBackOfficeUserReader backOfficeUserReader)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -113,7 +112,7 @@ internal partial class UserService : RepositoryService, IUserService
         _isoCodeValidator = isoCodeValidator;
         _forgotPasswordSender = forgotPasswordSender;
         _userIdKeyResolver = userIdKeyResolver;
-        _runtimeState = runtimeState;
+        _backOfficeUserReader = backOfficeUserReader;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
@@ -1700,8 +1699,7 @@ internal partial class UserService : RepositoryService, IUserService
             return Array.Empty<IUser>();
         }
 
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return _userRepository.GetAllInGroup(groupId.Value);
+        return _backOfficeUserReader.GetAllInGroup(groupId.Value);
     }
 
     /// <inheritdoc/>
@@ -1742,46 +1740,15 @@ internal partial class UserService : RepositoryService, IUserService
 
     /// <inheritdoc/>
     public IUser? GetUserById(int id)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-
-        try
-        {
-            return _userRepository.Get(id);
-        }
-        catch (DbException)
-        {
-            // During upgrades the user table schema may be mid-migration, so fall back to
-            // a minimal query that only resolves the fields needed for authorization.
-            if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Upgrading)
-            {
-                return _userRepository.GetForUpgrade(id);
-            }
-
-            throw;
-        }
-    }
+        => _backOfficeUserReader.GetById(id);
 
     /// <inheritdoc/>
     public Task<IUser?> GetAsync(Guid key)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        return Task.FromResult(_userRepository.Get(key));
-    }
+        => Task.FromResult(_backOfficeUserReader.GetByKey(key));
 
     /// <inheritdoc/>
     public Task<IEnumerable<IUser>> GetAsync(IEnumerable<Guid> keys)
-    {
-        Guid[] keysArray = keys.ToArray();
-        if (keysArray.Length == 0)
-        {
-            return Task.FromResult(Enumerable.Empty<IUser>());
-        }
-
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<IUser> users = _userRepository.GetMany(keysArray);
-        return Task.FromResult(users);
-    }
+        => Task.FromResult(_backOfficeUserReader.GetManyByKey(keys));
 
     /// <inheritdoc/>
     public async Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLinkedLoginsAsync(Guid userKey)
@@ -1806,17 +1773,7 @@ internal partial class UserService : RepositoryService, IUserService
 
     /// <inheritdoc/>
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
-    {
-        if (ids is null || ids.Length <= 0)
-        {
-            return Enumerable.Empty<IUser>();
-        }
-
-        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
-        List<int> idsAsList = [.. ids];
-        IQuery<IUser> query = Query<IUser>().Where(x => idsAsList.Contains(x.Id));
-        return _userRepository.Get(query);
-    }
+        => ids is null ? Enumerable.Empty<IUser>() : _backOfficeUserReader.GetManyById(ids);
 
     /// <inheritdoc/>
     public void ReplaceUserGroupPermissions(int groupId, ISet<string> permissions, params int[] entityIds)
