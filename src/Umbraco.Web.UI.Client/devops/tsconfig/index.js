@@ -51,6 +51,7 @@ const tsConfigBase = {
 		'storybook/stories/**/*.ts',
 		'examples/**/*.ts',
 	],
+	exclude: ['node_modules', 'dist', 'dist-cms', 'mocks/tools'],
 	references: [
 		{
 			path: './tsconfig.node.json',
