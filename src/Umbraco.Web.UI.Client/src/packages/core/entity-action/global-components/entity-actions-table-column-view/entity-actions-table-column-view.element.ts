@@ -14,10 +14,7 @@ const deprecation = new UmbDeprecation({
 
 @customElement('umb-entity-actions-table-column-view')
 export class UmbEntityActionsTableColumnViewElement extends UmbLitElement implements UmbTableColumnLayoutElement {
-	@property({ attribute: false })
 	column!: UmbTableColumn;
-
-	@property({ attribute: false })
 	item!: UmbTableItem;
 
 	@property({ attribute: false })
@@ -25,10 +22,12 @@ export class UmbEntityActionsTableColumnViewElement extends UmbLitElement implem
 		return this.#value;
 	}
 	set value(newValue: UmbEntityActionsTableColumnValue) {
+		const oldValue = this.#value;
 		this.#value = newValue ?? {};
 		if ('entityType' in this.#value || 'unique' in this.#value) {
 			deprecation.warn();
 		}
+		this.requestUpdate('value', oldValue);
 	}
 	#value: UmbEntityActionsTableColumnValue = {};
 

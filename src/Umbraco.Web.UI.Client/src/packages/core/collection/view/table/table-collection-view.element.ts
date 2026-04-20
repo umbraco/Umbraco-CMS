@@ -40,7 +40,16 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 
 	#rowContexts = new Map<string, { host: UmbElementControllerHost; entityContext: UmbEntityContext }>();
 
-	#onRowRendered = (element: HTMLElement, item: UmbTableItem) => {
+	#onRowRendered = (element: HTMLElement | undefined, item: UmbTableItem) => {
+		if (!element) {
+			const existing = this.#rowContexts.get(item.id);
+			if (existing) {
+				existing.host.destroy();
+				this.#rowContexts.delete(item.id);
+			}
+			return;
+		}
+
 		const existing = this.#rowContexts.get(item.id);
 		if (existing) {
 			existing.entityContext.setEntityType(item.entityType);

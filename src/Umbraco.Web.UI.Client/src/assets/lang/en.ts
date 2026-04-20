@@ -967,6 +967,8 @@ export default {
 		search: 'Search',
 		searchNoResult: 'Sorry, we can not find what you are looking for.',
 		noItemsInList: 'No items have been added',
+		scrollLeft: 'Scroll left',
+		scrollRight: 'Scroll right',
 		server: 'Server',
 		settings: 'Settings',
 		shared: 'Shared',
@@ -1637,6 +1639,7 @@ export default {
 		tabRules: 'Editor',
 	},
 	template: {
+		notAllowed: 'The selected template is no longer allowed on this document type.',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',

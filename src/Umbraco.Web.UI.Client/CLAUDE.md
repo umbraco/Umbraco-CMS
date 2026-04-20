@@ -6,6 +6,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 
 ### Architecture & Design
 - **[Architecture](./docs/architecture.md)** - Technology stack, design philosophy, developer roles, package system, import map pipeline, design patterns
+- **[Manifests & Aliases](./docs/manifests.md)** - Manifest shape, alias conventions, alias constants, how aliases connect extensions, registration, registry operations, kind merging
 - **[Entities](./docs/entities.md)** - Entity types, entity context, how entityType connects workspaces/trees/actions/routing
 - **[Workspaces](./docs/workspaces.md)** - Workspace types, base classes, extension points, workspace contexts, save flow, routing
 - **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement, observable state (UmbArrayState, UmbObjectState, etc.), Context API, controller lifecycle
@@ -31,6 +32,24 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 ### Security & AI
 - **[Security](./docs/security.md)** - XSS prevention, authentication, input validation
 - **[Agentic Workflow](./docs/agentic-workflow.md)** - Three-phase AI development process
+
+---
+
+## Required Reading Before Acting
+
+**Before performing any of these actions, you MUST read the linked doc first:**
+
+| Before you... | Read |
+|----------------|------|
+| Deprecate or remove a public API | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning |
+| Create a new element or component | [docs/style-guide.md](./docs/style-guide.md) |
+| Create a repository or data source | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md) |
+| Add error handling or debugging | [docs/error-handling.md](./docs/error-handling.md) |
+| Write or modify tests | [docs/testing.md](./docs/testing.md) |
+| Work with auth or security | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md) |
+| Scaffold a new package or module | [docs/package-development.md](./docs/package-development.md) |
+
+This is not optional. Skipping these leads to convention violations that are caught in review.
 
 ---
 

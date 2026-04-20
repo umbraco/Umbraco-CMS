@@ -96,6 +96,15 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// SQLite does not have the concept of guids / uuid / uniqueidentifier and columns are also
+    /// case sensitive by default.
+    /// Guids are serialized in uppercase by ORMs so we need to ensure they are stored in uppercase to
+    /// avoid case sensitivity issues when comparing values.
+    /// </remarks>
+    public override string FormatGuid(Guid guid) => guid.ToString().ToUpperInvariant();
+
+    /// <inheritdoc />
     public override string Format(TableDefinition table)
     {
         var columns = Format(table.Columns);
@@ -204,7 +213,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     /// <inheritdoc />
     public override bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName)
     {
-        IEnumerable<string> items = db.Fetch<string>($"select sql from sqlite_master where type = 'table' and name = '{tableName}'")
+        IEnumerable<string> items = db.Fetch<string>("select sql from sqlite_master where type = 'table' and name = @0", tableName)
             .Where(x => x.Contains($"CONSTRAINT {primaryKeyName} PRIMARY KEY"));
 
         return items.Any();
