@@ -79,9 +79,6 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
             .AddDocumentTransformer<TagActionsByGroupNameTransformer>()
             .AddDocumentTransformer<SortTagsAndPathsTransformer>();
 
-        options.AddSchemaTransformer<RequireNonNullablePropertiesSchemaTransformer>();
-        options.AddSchemaTransformer<FixFileReturnTypesTransformer>();
-        options.AddOperationTransformer<MimeTypesTransformer>();
     }
 
     /// <summary>

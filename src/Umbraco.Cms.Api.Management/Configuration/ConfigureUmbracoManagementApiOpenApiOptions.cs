@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Api.Management.OpenApi.Transformers;
@@ -32,6 +33,9 @@ public class ConfigureUmbracoManagementApiOpenApiOptions : ConfigureUmbracoOpenA
         // Sets Security requirement on backoffice apis
         options.AddBackofficeSecurityRequirements();
 
+        options.AddSchemaTransformer<RequireNonNullablePropertiesSchemaTransformer>();
+        options.AddSchemaTransformer<FixFileReturnTypesTransformer>();
+        options.AddOperationTransformer<MimeTypesTransformer>();
         options.AddOperationTransformer<ResponseHeaderTransformer>();
         options.AddOperationTransformer<NotificationHeaderTransformer>();
     }
