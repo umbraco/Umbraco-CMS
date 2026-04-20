@@ -19,6 +19,9 @@ public static partial class StringExtensions
     [GeneratedRegex(@"<[a-zA-Z/!][\s\S]*?>")]
     private static partial Regex StringHtmlRegex();
 
+    [GeneratedRegex(@"(?<extension>\.[^\.\?]+)(\?.*|$)")]
+    private static partial Regex GetFileExtensionRegex();
+
     /// <summary>
     /// Removes all whitespace characters including new lines, tabs, and spaces.
     /// </summary>
@@ -98,8 +101,7 @@ public static partial class StringExtensions
     public static string GetFileExtension(this string file)
     {
         // Find any characters between the last . and the start of a query string or the end of the string
-        const string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
-        Match match = Regex.Match(file, pattern);
+        Match match = GetFileExtensionRegex().Match(file);
         return match.Success
             ? match.Groups["extension"].Value
             : string.Empty;
