@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Umbraco.Cms.Api.Common.Builders;
+using Umbraco.Cms.Api.Delivery.Caching;
 using Umbraco.Cms.Api.Delivery.Filters;
 using Umbraco.Cms.Api.Delivery.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DeliveryApi;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Delivery.Controllers.Content;
@@ -49,6 +51,13 @@ public abstract class ContentApiControllerBase : DeliveryApiControllerBase
                 .WithDetail($"Content query status \"{status}\" was not expected here")
                 .Build()),
         };
+
+    /// <summary>
+    ///     Stores the resolved content items in the HTTP context for use by the output cache policy.
+    /// </summary>
+    /// <param name="items">The resolved published content items.</param>
+    protected void SetOutputCacheContent(params IPublishedContent[] items)
+        => HttpContext.Items[DeliveryApiOutputCacheKeys.ResolvedContentItemsKey] = items;
 
     /// <summary>
     ///     Creates a 403 Forbidden result.
