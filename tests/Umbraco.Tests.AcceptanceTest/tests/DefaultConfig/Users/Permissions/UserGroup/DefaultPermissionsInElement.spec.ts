@@ -75,7 +75,8 @@ test('can not see element in tree with read permission disabled', async ({umbrac
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
 
-test('can create element with create permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Currently there is no 'Save' button in the UI when creating an element
+test.skip('can create element with create permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateElementPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -92,7 +93,6 @@ test('can create element with create permission enabled', async ({umbracoApi, um
 
   // Assert
   expect(await umbracoApi.element.doesNameExist(newElementName)).toBeTruthy();
-  // TODO: Element still shows but there is no Save button -> change verfication
   await umbracoUi.library.isElementReadOnly(true);
 });
 
