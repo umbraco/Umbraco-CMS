@@ -229,6 +229,20 @@ export class UmbBodyLayoutElement extends LitElement {
 				padding-top: 0;
 				margin-top: 0;
 			}
+
+			@media (max-width: 920px) {
+				#main {
+					padding: 0;
+					margin-top: 8px;
+				}
+
+				#navigation-slot {
+					width: 32px;
+					max-width: 32px;
+					min-width: 0;
+					overflow: hidden;
+				}
+			}
 		`,
 	];
 }

@@ -31,6 +31,12 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 			umb-backoffice-header-sections {
 				flex: 1 1 auto;
 			}
+
+			@media (max-width: 920px) {
+				#appHeader {
+					padding-left: 5px;
+				}
+			}
 		`,
 	];
 }
