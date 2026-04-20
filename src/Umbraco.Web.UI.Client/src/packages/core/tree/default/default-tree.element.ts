@@ -1,14 +1,9 @@
-import type {
-	UmbTreeItemModel,
-	UmbTreeItemModelBase,
-	UmbTreeRootModel,
-	UmbTreeSelectionConfiguration,
-	UmbTreeStartNode,
-} from '../types.js';
+import type { UmbTreeItemModel, UmbTreeItemModelBase, UmbTreeRootModel, UmbTreeSelectionConfiguration, UmbTreeStartNode } from '../types.js';
 import type { UmbTreeExpansionModel } from '../expansion-manager/types.js';
 import type { UmbDefaultTreeContext } from './default-tree.context.js';
-import { css, customElement, html, nothing, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 @customElement('umb-default-tree')
@@ -26,7 +21,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	}
 	public set api(value: UmbDefaultTreeContext<UmbTreeItemModel, UmbTreeRootModel> | undefined) {
 		this._api = value;
-		this.#observeData();
+		if (value?.view) {
+			this.observe(value.view.currentView, async (manifest) => {
+				this._viewElement = manifest ? await createExtensionElement(manifest) : null;
+			});
+		}
 	}
 
 	@property({ type: Object, attribute: false })
@@ -59,45 +58,17 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	@property({ attribute: false })
 	expansion: UmbTreeExpansionModel = [];
 
-	@state()
-	private _rootItems: UmbTreeItemModel[] = [];
+	/**
+	 * When true the view-switcher toolbar is hidden.
+	 * Defaults to true for backwards compatibility — existing trees stay toolbar-less
+	 * until a consumer explicitly opts in with hide-toolbar="false".
+	 * Note: hideTreeRoot and hideTreeItemActions default to false; this is the intentional exception.
+	 */
+	@property({ type: Boolean, attribute: 'hide-toolbar' })
+	hideToolbar: boolean = true;
 
 	@state()
-	private _treeRoot?: UmbTreeRootModel;
-
-	@state()
-	private _currentPage = 1;
-
-	@state()
-	private _hasPreviousItems = false;
-
-	@state()
-	private _hasNextItems = false;
-
-	@state()
-	private _isLoadingPrevChildren = false;
-
-	@state()
-	private _isLoadingNextChildren = false;
-
-	#observeData() {
-		this.observe(this._api?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot), '_observeTreeRoot');
-		this.observe(this._api?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []), '_observeRootItems');
-		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1), '_observeCurrentPage');
-		this.observe(this._api?.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false), '_observeIsLoadingPrevChildren');
-		this.observe(this._api?.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false), '_observeIsLoadingNextChildren');
-
-		this.observe(
-			this._api?.targetPagination?.totalPrevItems,
-			(value) => (this._hasPreviousItems = value ? value > 0 : false),
-			'_observeTotalPrevItems',
-		);
-		this.observe(
-			this._api?.targetPagination?.totalNextItems,
-			(value) => (this._hasNextItems = value ? value > 0 : false),
-			'_observeTotalNextItems',
-		);
-	}
+	private _viewElement?: HTMLElement | null;
 
 	protected override async updated(
 		_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>,
@@ -107,7 +78,6 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 
 		if (_changedProperties.has('selectionConfiguration')) {
 			this._selectionConfiguration = this.selectionConfiguration;
-
 			this._api!.selection.setMultiple(this._selectionConfiguration.multiple ?? false);
 			this._api!.selection.setSelectable(this._selectionConfiguration.selectable ?? true);
 			this._api!.selection.setSelection(this._selectionConfiguration.selection ?? []);
@@ -140,6 +110,14 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		if (_changedProperties.has('expansion')) {
 			this._api!.setExpansion(this.expansion);
 		}
+
+		if (_changedProperties.has('hideTreeItemActions')) {
+			this._api!.setHideTreeItemActions?.(this.hideTreeItemActions);
+		}
+
+		if (_changedProperties.has('isMenu')) {
+			this._api!.setIsMenu?.(this.isMenu ?? false);
+		}
 	}
 
 	getSelection() {
@@ -150,72 +128,16 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		return this._api?.expansion.getExpansion();
 	}
 
-	#onLoadPrev(event: any) {
-		event.stopPropagation();
-		this._api?.loadPrevItems?.();
-	}
-
-	#onLoadNext(event: any) {
-		event.stopPropagation();
-		const next = (this._currentPage = this._currentPage + 1);
-		this._api?.pagination.setCurrentPageNumber(next);
-	}
-
 	override render() {
-		return html` ${this.#renderTreeRoot()} ${this.#renderRootItems()}`;
-	}
-
-	#renderTreeRoot() {
-		if (this.hideTreeRoot || this._treeRoot === undefined) return nothing;
 		return html`
-			<umb-tree-item
-				.entityType=${this._treeRoot.entityType}
-				.props=${{
-					hideActions: this.hideTreeItemActions,
-					item: this._treeRoot,
-					isMenu: this.isMenu,
-				}}></umb-tree-item>
+			${!this.hideToolbar ? html`<umb-tree-toolbar></umb-tree-toolbar>` : nothing}
+			${this._viewElement ?? nothing}
 		`;
 	}
 
-	#renderRootItems() {
-		// only show the root items directly if the tree root is hidden
-		if (this.hideTreeRoot === true) {
-			return html`
-				${this.#renderLoadPrevButton()}
-				${repeat(
-					this._rootItems,
-					(item, index) => item.name + '___' + index,
-					(item) => html`
-						<umb-tree-item
-							.entityType=${item.entityType}
-							.props=${{ hideActions: this.hideTreeItemActions, item, isMenu: this.isMenu }}></umb-tree-item>
-					`,
-				)}
-				${this.#renderLoadNextButton()}
-			`;
-		} else {
-			return nothing;
-		}
-	}
-
-	#renderLoadPrevButton() {
-		if (!this._hasPreviousItems) return nothing;
-		return html`<umb-tree-load-prev-button
-			@click=${this.#onLoadPrev}
-			.loading=${this._isLoadingPrevChildren}></umb-tree-load-prev-button>`;
-	}
-
-	#renderLoadNextButton() {
-		if (!this._hasNextItems) return nothing;
-		return html`<umb-tree-load-more-button
-			@click=${this.#onLoadNext}
-			.loading=${this._isLoadingNextChildren}></umb-tree-load-more-button> `;
-	}
-
 	static override styles = css`
-		#load-more {
-			width: 100%;
+		:host {
+			display: contents;
 		}
 	`;
 }

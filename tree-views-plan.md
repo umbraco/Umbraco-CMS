@@ -17,7 +17,7 @@ Introduce "views" for `<umb-tree>`, analogous to collection views. v1 ships two 
 - New extension type **`treeView`**, mirroring the shape of `collectionView`. Manifest: `{ type: 'treeView', alias, name, kind?, element, meta: { label, icon } }`. No `pathName` (no routing).
 - New extension type **`treeItemCard`** for per-entity card-item rendering. Follows the `treeItem` pattern (not prefixed with `entity`, keeping consistency with existing tree manifests).
 - **Default view = highest `weight`** registered entry. No dedicated default-config.
-- **View selection is persisted** via `UmbInteractionMemoryManager` with a plain unique key (e.g. `'UmbTreeActiveView'`). The tree's view manager consumes the ambient `UMB_INTERACTION_MEMORY_CONTEXT`. Host isolation (picker vs. workspace) is achieved by different hosts provisioning different memory contexts — the tree has **no knowledge** of where it is used.
+- **View selection persistence is deferred to Phase 8.** The approach (dedicated interaction manager on the tree context vs. consuming `UMB_INTERACTION_MEMORY_CONTEXT`) needs further design before implementation.
 
 ### 1.3 Architecture
 
@@ -125,7 +125,7 @@ Each phase lists dependencies, files to create/edit, and parallelizability. Phas
 #### 3.3 View manager + context token
 
 **Create**:
-- `src/packages/core/tree/view/tree-view.manager.ts` — `UmbTreeViewManager extends UmbContextBase`. Shaped like `UmbCollectionViewManager` minus route code. Holds `#views: UmbArrayState<ManifestTreeView>`, `#currentView: UmbObjectState<ManifestTreeView | undefined>`, methods `setCurrentView`, `getCurrentView`. Observes `treeView` manifests via `UmbExtensionsManifestInitializer`. Consumes `UMB_INTERACTION_MEMORY_CONTEXT` (gracefully tolerates absence); reads/writes memory entry with unique `'UmbTreeActiveView'`. Default selection = highest-weight manifest.
+- `src/packages/core/tree/view/tree-view.manager.ts` — `UmbTreeViewManager extends UmbContextBase`. Shaped like `UmbCollectionViewManager` minus route code. Holds `#views: UmbArrayState<ManifestTreeView>`, `#currentView: UmbObjectState<ManifestTreeView | undefined>`, methods `setCurrentView`, `getCurrentView`. Observes `treeView` manifests via `UmbExtensionsManifestInitializer`. Default selection = highest-weight manifest. **No interaction memory in this phase** — view selection persistence is deferred to Phase 8.
 - `src/packages/core/tree/view/tree-view.context.token.ts` — `UMB_TREE_VIEW_CONTEXT`.
 
 #### 3.4 Convert `<umb-default-tree>` into a shell
@@ -219,6 +219,19 @@ Each phase lists dependencies, files to create/edit, and parallelizability. Phas
   - Also set `hide-toolbar="false"` on the `<umb-tree>` inside the picker so the view switcher appears (line 199-218).
 
 **Acceptance**: opening a picker in Card view shows a breadcrumb under the header; clicking a breadcrumb entry jumps back up the tree; opening in Classic shows no breadcrumb (expansion may be empty).
+
+### Phase 8 — View selection persistence (UX enhancement)
+
+**Deps**: Phase 3.
+
+This phase is deferred — it is a UX enhancement that does not affect correctness. The approach needs further design: rather than consuming `UMB_INTERACTION_MEMORY_CONTEXT` directly in `UmbTreeViewManager`, the preferred direction is to introduce a dedicated interaction manager on the tree context itself (similar to how expansion state is owned by `UmbTreeExpansionManager`), keeping view persistence local to the tree without coupling `UmbTreeViewManager` to a specific memory provider.
+
+**Open questions to resolve before implementing**:
+- Should the tree context expose an `UmbInteractionManager`-like object, or should `UmbTreeViewManager` accept an optional persistence adapter?
+- Which host isolation model ensures that picker and workspace trees do not share the same persisted view selection?
+- How should this interact with the fallback (CLASSIC_FALLBACK) when no treeView manifests are registered?
+
+**Acceptance**: switching view in a picker persists the selection for that picker session; switching back to Classic and re-opening the picker restores the Card view. Workspace trees do not share picker view selection.
 
 ### Phase 7 — Localization, tests, polish
 
@@ -324,9 +337,11 @@ Phase 0 (read)
                                  Phase 6 (picker breadcrumb)
                                    ▼
                                  Phase 7 (localization + tests + smoke)
+                                   ▼
+                                 Phase 8 (view selection persistence — UX enhancement)
 ```
 
-Phases 1 and 2 can run in parallel. Phases 3 through 7 are sequential.
+Phases 1 and 2 can run in parallel. Phases 3 through 7 are sequential. Phase 8 can be tackled independently after Phase 3.
 
 ---
 
@@ -338,12 +353,12 @@ Each phase requires review and sign-off before the next begins.
 - [x] **Phase 1** — New extension types (`ManifestTreeView`, `ManifestTreeItemCard`)
 - [x] **Phase 2** — `expansion.expandTo()` convenience method + tests
   - ⚠️ **Needs revisit** — current implementation is not satisfactory. Revisit before Phase 5 and figure out an alternative approach before the card view depends on it.
-- [ ] **Phase 3** — Extract Classic view + shell refactor (invasive)
-  - [ ] 3.1 — Optional `hideTreeItemActions` / `isMenu` on `UmbTreeContext`
-  - [ ] 3.2 — `<umb-classic-tree-view>` element + manifest
-  - [ ] 3.3 — `UmbTreeViewManager` + `UMB_TREE_VIEW_CONTEXT` token
-  - [ ] 3.4 — Convert `<umb-default-tree>` into a shell
-  - [ ] 3.5 — Register Classic view manifests
+- [x] **Phase 3** — Extract Classic view + shell refactor (invasive)
+  - [x] 3.1 — Optional `hideTreeItemActions` / `isMenu` on `UmbTreeContext`
+  - [x] 3.2 — `<umb-classic-tree-view>` element + manifest
+  - [x] 3.3 — `UmbTreeViewManager` + `UMB_TREE_VIEW_CONTEXT` token
+  - [x] 3.4 — Convert `<umb-default-tree>` into a shell
+  - [x] 3.5 — Register Classic view manifests
 - [ ] **Phase 4** — `<umb-tree-toolbar>` + `<umb-tree-view-bundle>` elements
 - [ ] **Phase 5** — Card view + card-item routing
   - [ ] 5.1 — `<umb-default-tree-item-card>` + `UmbTreeItemCardNavigateEvent`
@@ -351,6 +366,7 @@ Each phase requires review and sign-off before the next begins.
   - [ ] 5.3 — `<umb-card-tree-view>` element + manifest
 - [ ] **Phase 6** — Breadcrumb in `<umb-tree-picker-modal>`
 - [ ] **Phase 7** — Localization, unit tests, manual smoke tests
+- [ ] **Phase 8** — View selection persistence (UX enhancement — design TBD)
 
 ---
 

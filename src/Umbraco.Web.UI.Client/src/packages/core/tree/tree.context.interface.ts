@@ -4,6 +4,7 @@ import type { UmbTreeExpansionModel } from './expansion-manager/types.js';
 import type { UmbTreeItemActiveManager } from './active-manager/tree-active-manager.js';
 import type { UmbTreeRepository } from './data/tree-repository.interface.js';
 import type { UmbTreeRootItemsRequestArgs } from './data/types.js';
+import type { UmbTreeViewManager } from './view/tree-view.manager.js';
 import type { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type {
@@ -20,10 +21,13 @@ export interface UmbTreeContext<
 	manifest: ManifestTree | undefined;
 
 	readonly activeManager: UmbTreeItemActiveManager;
+	readonly view?: UmbTreeViewManager;
 
 	readonly treeRoot: Observable<TreeRootType | undefined>;
 	readonly hideTreeRoot: Observable<boolean | undefined>;
 	readonly expandTreeRoot: Observable<boolean | undefined>;
+	readonly hideTreeItemActions?: Observable<boolean>;
+	readonly isMenu?: Observable<boolean>;
 
 	selectableFilter?(item: TreeItemType): boolean;
 	filter?(item: TreeItemType): boolean;
@@ -51,6 +55,12 @@ export interface UmbTreeContext<
 
 	setHideTreeRoot(hideTreeRoot: boolean): void;
 	getHideTreeRoot(): boolean;
+
+	setHideTreeItemActions?(value: boolean): void;
+	getHideTreeItemActions?(): boolean;
+
+	setIsMenu?(value: boolean): void;
+	getIsMenu?(): boolean;
 
 	setStartNode(startNode: UmbTreeStartNode | undefined): void;
 	getStartNode(): UmbTreeStartNode | undefined;

@@ -1,5 +1,6 @@
 import { UmbTreeItemActiveManager } from '../active-manager/tree-active-manager.js';
 import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
+import { UmbTreeViewManager } from '../view/tree-view.manager.js';
 import { UmbTreeItemChildrenManager } from '../tree-item/tree-item-children.manager.js';
 import { UmbTreeItemTargetExpansionManager } from '../tree-item/tree-item-expansion.manager.js';
 import { UMB_TREE_CONTEXT } from '../tree.context.token.js';
@@ -31,9 +32,16 @@ export class UmbDefaultTreeContext<
 	public filter?: (item: TreeItemType) => boolean = () => true;
 	public readonly selection = new UmbSelectionManager(this);
 	public readonly expansion = new UmbTreeExpansionManager(this);
+	public readonly view = new UmbTreeViewManager(this);
 
 	#hideTreeRoot = new UmbBooleanState(false);
 	public readonly hideTreeRoot = this.#hideTreeRoot.asObservable();
+
+	#hideTreeItemActions = new UmbBooleanState(false);
+	public readonly hideTreeItemActions = this.#hideTreeItemActions.asObservable();
+
+	#isMenu = new UmbBooleanState(false);
+	public readonly isMenu = this.#isMenu.asObservable();
 
 	#expandTreeRoot = new UmbBooleanState(undefined);
 	public readonly expandTreeRoot = this.#expandTreeRoot.asObservable();
@@ -188,6 +196,22 @@ export class UmbDefaultTreeContext<
 				}
 			}
 		}
+	}
+
+	setHideTreeItemActions(value: boolean) {
+		this.#hideTreeItemActions.setValue(value);
+	}
+
+	getHideTreeItemActions(): boolean {
+		return this.#hideTreeItemActions.getValue();
+	}
+
+	setIsMenu(value: boolean) {
+		this.#isMenu.setValue(value);
+	}
+
+	getIsMenu(): boolean {
+		return this.#isMenu.getValue();
 	}
 
 	/**
