@@ -55,6 +55,14 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 		if (!propertyDatasetContext) throw new Error('Could not get property dataset context to copy.');
 		if (!propertyContext) throw new Error('Could not get property context to copy.');
 
+		this.#writeClipboardEntry(clipboardContext, propertyDatasetContext, propertyContext);
+	}
+
+	#writeClipboardEntry(
+		clipboardContext: typeof UMB_CLIPBOARD_PROPERTY_CONTEXT.TYPE,
+		propertyDatasetContext: typeof UMB_PROPERTY_DATASET_CONTEXT.TYPE,
+		propertyContext: typeof UMB_PROPERTY_CONTEXT.TYPE,
+	) {
 		const editorUiAlias = propertyContext.getEditorManifest()?.alias;
 		if (!editorUiAlias) throw new Error('Could not determine property editor UI alias for clipboard entry.');
 
