@@ -8,13 +8,14 @@ const password = '0123456789';
 const documentTypeName = 'Test Register Page Type';
 const documentName = 'Test Register Page';
 const templateName = 'Test Register Template';
+let url = '';
 
-test.beforeEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(documentName);
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.template.ensureNameNotExists(templateName);
-  await umbracoApi.member.ensureNameNotExists(memberName);
-  await umbracoApi.member.ensureNameNotExists(otherMemberName);
+test.beforeEach(async ({umbracoApi, umbracoUi}) => {
+  const templateId = await umbracoApi.template.createMemberRegistrationTemplate(templateName);
+  const documentId = await umbracoApi.document.createPublishedDocumentForTemplate(documentName, documentTypeName, templateId);
+  url = await umbracoApi.document.getDocumentUrl(documentId);
+  await umbracoUi.contentRender.navigateToRenderedContentPage(url);
+  await umbracoUi.memberAuthentication.isNotLoggedIn();
 });
 
 test.afterEach(async ({umbracoApi, umbracoUi}) => {
@@ -27,13 +28,6 @@ test.afterEach(async ({umbracoApi, umbracoUi}) => {
 });
 
 test('anonymous user can register and is automatically logged in', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const templateId = await umbracoApi.template.createMemberRegistrationTemplate(templateName);
-  const documentId = await umbracoApi.document.createPublishedDocumentForTemplate(documentName, documentTypeName, templateId);
-  const url = await umbracoApi.document.getDocumentUrl(documentId);
-  await umbracoUi.contentRender.navigateToRenderedContentPage(url);
-  await umbracoUi.memberAuthentication.isNotLoggedIn();
-
   // Act
   await umbracoUi.memberAuthentication.fillRegisterForm(memberName, email, password);
   await umbracoUi.memberAuthentication.submitRegisterForm();
@@ -45,12 +39,6 @@ test('anonymous user can register and is automatically logged in', async ({umbra
 });
 
 test('cannot register when password and confirm password do not match', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const templateId = await umbracoApi.template.createMemberRegistrationTemplate(templateName);
-  const documentId = await umbracoApi.document.createPublishedDocumentForTemplate(documentName, documentTypeName, templateId);
-  const url = await umbracoApi.document.getDocumentUrl(documentId);
-  await umbracoUi.contentRender.navigateToRenderedContentPage(url);
-
   // Act
   await umbracoUi.memberAuthentication.fillRegisterForm(memberName, email, password, 'somethingDifferent!1');
   await umbracoUi.memberAuthentication.submitRegisterForm();
@@ -63,15 +51,9 @@ test('cannot register when password and confirm password do not match', async ({
 
 test('cannot register a duplicate email', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const templateId = await umbracoApi.template.createMemberRegistrationTemplate(templateName);
-  const documentId = await umbracoApi.document.createPublishedDocumentForTemplate(documentName, documentTypeName, templateId);
-  const url = await umbracoApi.document.getDocumentUrl(documentId);
-  await umbracoUi.contentRender.navigateToRenderedContentPage(url);
   await umbracoUi.memberAuthentication.fillRegisterForm(memberName, email, password);
   await umbracoUi.memberAuthentication.submitRegisterForm();
   await umbracoUi.memberAuthentication.isAuthenticated(email);
-
-  // Sign the auto-logged-in member out so the second registration runs anonymously.
   await umbracoUi.memberAuthentication.clearMemberAuthCookie();
   await umbracoUi.contentRender.navigateToRenderedContentPage(url);
   await umbracoUi.memberAuthentication.isNotLoggedIn();

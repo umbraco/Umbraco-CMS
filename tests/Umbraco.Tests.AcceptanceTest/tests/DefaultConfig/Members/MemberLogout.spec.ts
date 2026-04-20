@@ -11,11 +11,6 @@ const templateName = 'Test Logout Template';
 let memberTypeId = '';
 
 test.beforeEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(documentName);
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-  await umbracoApi.template.ensureNameNotExists(templateName);
-  await umbracoApi.member.ensureNameNotExists(memberName);
-  await umbracoApi.memberType.ensureNameNotExists(memberTypeName);
   memberTypeId = await umbracoApi.memberType.createDefaultMemberType(memberTypeName);
 });
 
