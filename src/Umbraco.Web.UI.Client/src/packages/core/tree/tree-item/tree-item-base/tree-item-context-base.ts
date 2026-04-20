@@ -272,6 +272,7 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeFoldersOnly();
+			this.#observeAdditionalRequestArgs();
 			this.#observeActive();
 		}).asPromise();
 	}
@@ -299,7 +300,7 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	#observeIsSelected() {
-		if (!this.treeContext || !this.unique) return;
+		if (!this.treeContext || this.unique === undefined) return;
 
 		this.observe(
 			this.treeContext.selection.selection.pipe(map((selection) => selection.includes(this.unique!))),
@@ -319,6 +320,19 @@ export abstract class UmbTreeItemContextBase<
 				this._treeItemChildrenManager.setFoldersOnly(foldersOnly ?? false);
 			},
 			'observeFoldersOnly',
+		);
+	}
+
+	#observeAdditionalRequestArgs() {
+		if (this.unique === undefined) return;
+
+		this.observe(
+			this.treeContext?.additionalRequestArgs,
+			(additionalRequestArgs) => {
+				if (!additionalRequestArgs) return;
+				this._treeItemChildrenManager.setAdditionalRequestArgs(additionalRequestArgs);
+			},
+			'observeAdditionalRequestArgs',
 		);
 	}
 

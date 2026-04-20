@@ -66,7 +66,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     {
         if (mediaType.IsSystemMediaType() && mediaType.Alias != model.Alias)
         {
-            return Attempt.FailWithStatus<IMediaType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.NotAllowed, null);
+            return Attempt.FailWithStatus<IMediaType?, ContentTypeOperationStatus>(ContentTypeOperationStatus.SystemAliasChangeNotAllowed, null);
         }
 
         Attempt<IMediaType?, ContentTypeOperationStatus> result = await ValidateAndMapForUpdateAsync(mediaType, model);
@@ -111,7 +111,7 @@ internal sealed class MediaTypeEditingService : ContentTypeEditingServiceBase<IM
     /// <inheritdoc />
     public async Task<PagedModel<MediaTypeFileExtensionMatchResult>> GetMediaTypesForFileExtensionWithMatchInfoAsync(string fileExtension, int skip, int take)
     {
-        fileExtension = fileExtension.TrimStart(Constants.CharArrays.Period);
+        fileExtension = fileExtension.TrimStart(Constants.CharArrays.Period).ToLowerInvariant();
 
         IMediaType[] candidateMediaTypes = _mediaTypeService.GetAll().Where(mt => mt.CompositionPropertyTypes.Any(pt => pt.Alias == Constants.Conventions.Media.File)).ToArray();
         var results = new List<MediaTypeFileExtensionMatchResult>();

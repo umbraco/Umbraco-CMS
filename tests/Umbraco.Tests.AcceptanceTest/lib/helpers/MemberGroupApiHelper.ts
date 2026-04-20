@@ -68,4 +68,9 @@ export class MemberGroupApiHelper {
     }
     return null;
   }
+
+  async createDefaultMemberGroup(name: string) {
+    await this.ensureNameNotExists(name);
+    return await this.create(name);
+  }
 }

@@ -71,8 +71,10 @@ export class UmbPropertyEditorUITagsElement
 		this.addFormControlElement(this.shadowRoot!.querySelector('umb-tags-input')!);
 	}
 
-	#onChange(event: CustomEvent) {
-		this.value = ((event.target as UmbTagsInputElement).value as string).split(',');
+	#onChange(event: UmbChangeEvent) {
+		event.stopPropagation();
+		const tagsInput = event.currentTarget as UmbTagsInputElement;
+		this.value = this._storageType?.toLowerCase() === 'csv' ? (tagsInput.value as string).split(',') : tagsInput.items;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 

@@ -52,6 +52,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IValidateOptions<DeliveryApiSettings>, DeliveryApiSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<GlobalSettings>, GlobalSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<HealthChecksSettings>, HealthChecksSettingsValidator>();
+        builder.Services.AddSingleton<IValidateOptions<HostingSettings>, HostingSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<LoggingSettings>, LoggingSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<RequestHandlerSettings>, RequestHandlerSettingsValidator>();
         builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
@@ -101,7 +102,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<CacheSettings>()
             .AddUmbracoOptions<SystemDateMigrationSettings>()
             .AddUmbracoOptions<DistributedJobSettings>()
-            .AddUmbracoOptions<BackOfficeTokenCookieSettings>();
+            .AddUmbracoOptions<BackOfficeTokenCookieSettings>()
+            .AddUmbracoOptions<WebsiteSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();

@@ -15,7 +15,7 @@ export class UmbRelationTypeDetailStore extends UmbDetailStoreBase<UmbRelationTy
 	 * @memberof UmbRelationTypeDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_RELATION_TYPE_DETAIL_STORE_CONTEXT);
 	}
 }
 
