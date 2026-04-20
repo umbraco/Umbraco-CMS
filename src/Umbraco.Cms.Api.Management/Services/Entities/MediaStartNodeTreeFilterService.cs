@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Api.Management.Services.Entities;
 /// User start node tree filter service for media trees.
 /// Resolves the current user's media start nodes.
 /// </summary>
-internal sealed class MediaStartNodeTreeFilterService : UserStartNodeTreeFilterService, IMediaStartNodeTreeFilterService, ILegacyUserStartNodeTreeFilterService
+internal sealed class MediaStartNodeTreeFilterService : UserStartNodeTreeFilterService, IMediaStartNodeTreeFilterService
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
@@ -30,12 +30,6 @@ internal sealed class MediaStartNodeTreeFilterService : UserStartNodeTreeFilterS
 
     /// <inheritdoc />
     protected override UmbracoObjectTypes TreeObjectType => UmbracoObjectTypes.Media;
-
-    /// <inheritdoc/>
-    public int[] GetUserStartNodeIds() => CalculateUserStartNodeIds();
-
-    /// <inheritdoc/>
-    public string[] GetUserStartNodePaths() => CalculateUserStartNodePaths();
 
     /// <inheritdoc />
     protected override int[] CalculateUserStartNodeIds()

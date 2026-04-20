@@ -28,10 +28,14 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document.Tree;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForContentTree)]
 public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBase<DocumentTreeItemResponseModel>
 {
-    private readonly IDocumentStartNodeTreeFilterService _treeFilterService;
     private readonly IPublicAccessService _publicAccessService;
     private readonly IDocumentPresentationFactory _documentPresentationFactory;
     private readonly IDocumentPermissionFilterService _documentPermissionFilterService;
+
+    // Only populated by the obsolete constructor path; used solely by the obsolete
+    // GetUserStartNodeIds / GetUserStartNodePaths overrides below.
+    private readonly AppCaches? _appCaches;
+    private readonly IBackOfficeSecurityAccessor? _backofficeSecurityAccessor;
 
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     protected DocumentTreeControllerBase(
@@ -90,8 +94,9 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         IDocumentPermissionFilterService documentPermissionFilterService)
         : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
     {
-        _treeFilterService = StaticServiceProvider.Instance.GetRequiredService<IDocumentStartNodeTreeFilterService>();
         _publicAccessService = publicAccessService;
+        _appCaches = appCaches;
+        _backofficeSecurityAccessor = backofficeSecurityAccessor;
         _documentPresentationFactory = documentPresentationFactory;
         _documentPermissionFilterService = documentPermissionFilterService;
     }
@@ -115,7 +120,6 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         IDocumentPermissionFilterService documentPermissionFilterService)
         : base(entityService, flagProviders, treeFilterService)
     {
-        _treeFilterService = treeFilterService;
         _publicAccessService = publicAccessService;
         _documentPresentationFactory = documentPresentationFactory;
         _documentPermissionFilterService = documentPermissionFilterService;
@@ -145,17 +149,27 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
         return responseModel;
     }
 
-    // Falls back to empty when _treeFilterService is a custom IDocumentStartNodeTreeFilterService
-    // that does not implement the internal ILegacyUserStartNodeTreeFilterService interface.
-    // This is safe because these methods are obsolete and no longer called by the base class.
+    // Only invoked via the CallbackStartNodeTreeFilterService wired up by the obsolete
+    // UserStartNodeTreeControllerBase constructor. The non-obsolete constructor path
+    // routes start node resolution through IDocumentStartNodeTreeFilterService and
+    // never calls these overrides; hence the null-forgiving operator on _appCaches.
+    /// <inheritdoc/>
+    [Obsolete("No longer used. Register a custom IDocumentStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
+    protected override int[] GetUserStartNodeIds()
+        => _backofficeSecurityAccessor?
+               .BackOfficeSecurity?
+               .CurrentUser?
+               .CalculateContentStartNodeIds(EntityService, _appCaches!)
+           ?? [];
 
     /// <inheritdoc/>
     [Obsolete("No longer used. Register a custom IDocumentStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
-    protected override int[] GetUserStartNodeIds() => (_treeFilterService as ILegacyUserStartNodeTreeFilterService)?.GetUserStartNodeIds() ?? [];
-
-    /// <inheritdoc/>
-    [Obsolete("No longer used. Register a custom IDocumentStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
-    protected override string[] GetUserStartNodePaths() => (_treeFilterService as ILegacyUserStartNodeTreeFilterService)?.GetUserStartNodePaths() ?? [];
+    protected override string[] GetUserStartNodePaths()
+        => _backofficeSecurityAccessor?
+               .BackOfficeSecurity?
+               .CurrentUser?
+               .GetContentStartNodePaths(EntityService, _appCaches!)
+           ?? [];
 
     /// <inheritdoc/>
     protected override Task<(IEntitySlim[] Entities, long TotalItems)> FilterTreeEntities(IEntitySlim[] entities, long totalItems)

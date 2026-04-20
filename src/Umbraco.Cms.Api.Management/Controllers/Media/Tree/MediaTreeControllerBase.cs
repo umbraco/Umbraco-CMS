@@ -27,8 +27,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForMediaTree)]
 public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTreeItemResponseModel>
 {
-    private readonly IMediaStartNodeTreeFilterService _treeFilterService;
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
+
+    // Only populated by the obsolete constructor path; used solely by the obsolete
+    // GetUserStartNodeIds / GetUserStartNodePaths overrides below.
+    private readonly AppCaches? _appCaches;
+    private readonly IBackOfficeSecurityAccessor? _backofficeSecurityAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Controllers.Media.Tree.MediaTreeControllerBase"/> class.
@@ -84,7 +88,8 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
               dataTypeService)
     {
         _mediaPresentationFactory = mediaPresentationFactory;
-        _treeFilterService = StaticServiceProvider.Instance.GetRequiredService<IMediaStartNodeTreeFilterService>();
+        _appCaches = appCaches;
+        _backofficeSecurityAccessor = backofficeSecurityAccessor;
     }
 
     /// <summary>
@@ -100,18 +105,17 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
         FlagProviderCollection flagProviders,
         IMediaStartNodeTreeFilterService treeFilterService,
         IMediaPresentationFactory mediaPresentationFactory)
-        : base(entityService, flagProviders, treeFilterService)
-    {
-        _treeFilterService = treeFilterService;
+        : base(entityService, flagProviders, treeFilterService) =>
         _mediaPresentationFactory = mediaPresentationFactory;
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MediaTreeControllerBase"/> class.
     /// </summary>
     /// <remarks>
-    /// This constructor exists solely to disambiguate DI container constructor resolution between the new
-    /// and the existing obsolete constructors; all parameters except those forwarded to the non-obsolete
+    /// This constructor is a parameter superset of the new and existing obsolete constructors. It exists
+    /// solely because <see cref="ActivatorUtilitiesConstructorAttribute"/> is not honoured by the DI
+    /// <c>CallSiteFactory</c> at <c>ServiceProvider</c> <c>ValidateOnBuild</c> time, which requires an
+    /// unambiguous single best-match constructor; all parameters except those forwarded to the non-obsolete
     /// constructor are ignored.
     /// </remarks>
     /// <param name="entityService">Service for accessing and managing entities within the system.</param>
@@ -158,13 +162,23 @@ public class MediaTreeControllerBase : UserStartNodeTreeControllerBase<MediaTree
         return responseModel;
     }
 
-    // Falls back to empty when _treeFilterService is a custom IMediaStartNodeTreeFilterService
-    // that does not implement the internal ILegacyUserStartNodeTreeFilterService interface.
-    // This is safe because these methods are obsolete and no longer called by the base class.
+    // Only invoked via the CallbackStartNodeTreeFilterService wired up by the obsolete
+    // UserStartNodeTreeControllerBase constructor. The non-obsolete constructor path
+    // routes start node resolution through IMediaStartNodeTreeFilterService and
+    // never calls these overrides; hence the null-forgiving operator on _appCaches.
+    [Obsolete("No longer used. Register a custom IMediaStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
+    protected override int[] GetUserStartNodeIds()
+        => _backofficeSecurityAccessor?
+               .BackOfficeSecurity?
+               .CurrentUser?
+               .CalculateMediaStartNodeIds(EntityService, _appCaches!)
+           ?? [];
 
     [Obsolete("No longer used. Register a custom IMediaStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
-    protected override int[] GetUserStartNodeIds() => (_treeFilterService as ILegacyUserStartNodeTreeFilterService)?.GetUserStartNodeIds() ?? [];
-
-    [Obsolete("No longer used. Register a custom IMediaStartNodeTreeFilterService instead. Scheduled for removal in Umbraco 19.")]
-    protected override string[] GetUserStartNodePaths() => (_treeFilterService as ILegacyUserStartNodeTreeFilterService)?.GetUserStartNodePaths() ?? [];
+    protected override string[] GetUserStartNodePaths()
+        => _backofficeSecurityAccessor?
+               .BackOfficeSecurity?
+               .CurrentUser?
+               .GetMediaStartNodePaths(EntityService, _appCaches!)
+           ?? [];
 }
