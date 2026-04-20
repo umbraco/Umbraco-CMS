@@ -138,7 +138,7 @@ export class UmbContentTypeDesignEditorPropertyElement extends UmbLitElement {
 		await umbConfirmModal(this, {
 			headline: `${this.localize.term('actions_delete')} property`,
 			content: html`<umb-localize key="contentTypeEditor_confirmDeletePropertyMessage" .args=${[this._property.name ?? unique]}>Are you sure you want to delete the property <strong>${this._property.name ?? unique}</strong></umb-localize></div>`,
-			confirmLabel: this.localize.term('actions_delete'),
+			confirmLabel: '#actions_delete',
 			color: 'danger',
 		});
 

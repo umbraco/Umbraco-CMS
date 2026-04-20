@@ -10,12 +10,27 @@ import { UmbMockMediaCollectionManager } from './media-collection.manager.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	CreateMediaRequestModel,
+	GetMediaUrlsResponse,
 	MediaCollectionResponseModel,
 	MediaItemResponseModel,
 	MediaResponseModel,
 	MediaTreeItemResponseModel,
 	MediaValueResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
+
+export function getMediaFileUrl(item: UmbMockMediaModel): string | null {
+	const fileValue = item.values.find((v) => v.alias === 'umbracoFile');
+	if (!fileValue?.value) return null;
+
+	// ImageCropper stores { src, focalPoint, crops }, UploadField stores the path directly
+	if (typeof fileValue.value === 'object' && 'src' in (fileValue.value as Record<string, unknown>)) {
+		return (fileValue.value as { src: string }).src;
+	}
+	if (typeof fileValue.value === 'string') {
+		return fileValue.value;
+	}
+	return null;
+}
 
 export class UmbMediaMockDB extends UmbEntityMockDbBase<UmbMockMediaModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockMediaModel>(this, treeItemMapper);
@@ -33,6 +48,17 @@ export class UmbMediaMockDB extends UmbEntityMockDbBase<UmbMockMediaModel> {
 		super.setData(data);
 		// Update recycleBin's data to match - it has its own data array
 		this.recycleBin.setData(data);
+	}
+
+	getFileUrls(ids: string[]): GetMediaUrlsResponse {
+		return ids.map((id) => {
+			const item = this.read(id);
+			const fileUrl = item ? getMediaFileUrl(item) : null;
+			return {
+				id,
+				urlInfos: fileUrl ? [{ culture: null, url: fileUrl }] : [],
+			};
+		});
 	}
 }
 
