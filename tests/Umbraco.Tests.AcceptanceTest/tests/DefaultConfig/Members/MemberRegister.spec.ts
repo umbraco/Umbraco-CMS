@@ -15,7 +15,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   const documentId = await umbracoApi.document.createPublishedDocumentForTemplate(documentName, documentTypeName, templateId);
   url = await umbracoApi.document.getDocumentUrl(documentId);
   await umbracoUi.contentRender.navigateToRenderedContentPage(url);
-  await umbracoUi.memberAuthentication.isNotLoggedIn();
+  await umbracoUi.memberAuthentication.isAnonymous();
 });
 
 test.afterEach(async ({umbracoApi, umbracoUi}) => {
@@ -44,7 +44,7 @@ test('cannot register when password and confirm password do not match', async ({
   await umbracoUi.memberAuthentication.submitRegisterForm();
 
   // Assert
-  await umbracoUi.memberAuthentication.isNotLoggedIn();
+  await umbracoUi.memberAuthentication.isAnonymous();
   await umbracoUi.memberAuthentication.doesValidationErrorShow('do not match');
   expect(await umbracoApi.member.doesNameExist(memberName)).toBeFalsy();
 });
@@ -56,14 +56,14 @@ test('cannot register a duplicate email', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.memberAuthentication.isAuthenticated(email);
   await umbracoUi.memberAuthentication.clearMemberAuthCookie();
   await umbracoUi.contentRender.navigateToRenderedContentPage(url);
-  await umbracoUi.memberAuthentication.isNotLoggedIn();
+  await umbracoUi.memberAuthentication.isAnonymous();
 
   // Act
   await umbracoUi.memberAuthentication.fillRegisterForm(otherMemberName, email, password);
   await umbracoUi.memberAuthentication.submitRegisterForm();
 
   // Assert
-  await umbracoUi.memberAuthentication.isNotLoggedIn();
+  await umbracoUi.memberAuthentication.isAnonymous();
   await umbracoUi.memberAuthentication.doesValidationErrorShow('is already taken');
   expect(await umbracoApi.member.doesNameExist(otherMemberName)).toBeFalsy();
 });

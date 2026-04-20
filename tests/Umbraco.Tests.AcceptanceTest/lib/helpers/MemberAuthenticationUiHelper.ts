@@ -103,7 +103,7 @@ export class MemberAuthenticationUiHelper extends UiBaseLocators {
     await expect(this.authNameMarker).toHaveText(expectedUsername);
   }
 
-  async isNotLoggedIn() {
+  async isAnonymous() {
     await expect(this.authStateMarker).toHaveText('anonymous');
   }
 

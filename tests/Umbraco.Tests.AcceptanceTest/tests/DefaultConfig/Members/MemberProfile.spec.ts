@@ -52,7 +52,7 @@ test('logged-in member can update their display name', async ({umbracoApi, umbra
 
 test('anonymous user cannot see the profile form', async ({umbracoUi}) => {
   // Arrange
-  await umbracoUi.memberAuthentication.isNotLoggedIn();
+  await umbracoUi.memberAuthentication.isAnonymous();
 
   // Assert
   await umbracoUi.memberAuthentication.isProfileFormHidden();

@@ -30,7 +30,7 @@ test.afterEach(async ({umbracoApi, umbracoUi}) => {
 test('member can log in with valid credentials', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.member.createApprovedMember(memberName, memberTypeId, email, username, password);
-  await umbracoUi.memberAuthentication.isNotLoggedIn();
+  await umbracoUi.memberAuthentication.isAnonymous();
 
   // Act
   await umbracoUi.memberAuthentication.fillLoginForm(username, password);
@@ -49,7 +49,7 @@ test('member cannot log in with invalid password', async ({umbracoApi, umbracoUi
   await umbracoUi.memberAuthentication.submitLoginForm();
 
   // Assert
-  await umbracoUi.memberAuthentication.isNotLoggedIn();
+  await umbracoUi.memberAuthentication.isAnonymous();
   await umbracoUi.memberAuthentication.doesValidationErrorShow('Invalid username or password');
 });
 
@@ -62,7 +62,7 @@ test('member cannot log in when not approved', async ({umbracoApi, umbracoUi}) =
   await umbracoUi.memberAuthentication.submitLoginForm();
 
   // Assert
-  await umbracoUi.memberAuthentication.isNotLoggedIn();
+  await umbracoUi.memberAuthentication.isAnonymous();
   await umbracoUi.memberAuthentication.doesValidationErrorShow('Member is not allowed');
 });
 
@@ -76,6 +76,6 @@ test('member cannot log in when locked out', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.memberAuthentication.submitLoginForm();
 
   // Assert
-  await umbracoUi.memberAuthentication.isNotLoggedIn();
+  await umbracoUi.memberAuthentication.isAnonymous();
   await umbracoUi.memberAuthentication.doesValidationErrorShow('Member is locked out');
 });

@@ -38,5 +38,5 @@ test('logged-in member can log out', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.memberAuthentication.clickLogoutButton();
 
   // Assert
-  await umbracoUi.memberAuthentication.isNotLoggedIn();
+  await umbracoUi.memberAuthentication.isAnonymous();
 });
