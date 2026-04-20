@@ -64,7 +64,7 @@ public class DeliveryApiTests
 
         var publishStatusQueryService = new Mock<IDocumentPublishStatusQueryService>();
         publishStatusQueryService
-            .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Setup(x => x.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns(true);
         publishStatusQueryService
             .Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()))

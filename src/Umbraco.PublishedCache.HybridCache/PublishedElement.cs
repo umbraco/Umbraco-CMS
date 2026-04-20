@@ -185,7 +185,7 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
                 culture ??= VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
                 IDocumentPublishStatusQueryService publishStatusQueryService =
                     StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusQueryService>();
-                return publishStatusQueryService.IsDocumentPublished(Key, culture);
+                return publishStatusQueryService.IsPublished(Key, culture);
             }
 
             return false;

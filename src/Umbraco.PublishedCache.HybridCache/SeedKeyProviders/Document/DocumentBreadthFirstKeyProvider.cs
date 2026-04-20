@@ -41,7 +41,7 @@ internal sealed class DocumentBreadthFirstKeyProvider : BreadthFirstKeyProvider,
             return new HashSet<Guid>();
         }
 
-        rootKeys = rootKeys.Where(x => _publishStatusService.IsDocumentPublishedInAnyCulture(x));
+        rootKeys = rootKeys.Where(x => _publishStatusService.IsPublishedInAnyCulture(x));
 
         foreach (Guid key in rootKeys)
         {
@@ -63,7 +63,7 @@ internal sealed class DocumentBreadthFirstKeyProvider : BreadthFirstKeyProvider,
                 continue;
             }
 
-            childKeys = childKeys.Where(x => _publishStatusService.IsDocumentPublishedInAnyCulture(x));
+            childKeys = childKeys.Where(x => _publishStatusService.IsPublishedInAnyCulture(x));
 
             foreach (Guid childKey in childKeys)
             {

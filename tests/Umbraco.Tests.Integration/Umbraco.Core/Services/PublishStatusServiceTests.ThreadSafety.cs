@@ -41,7 +41,7 @@ internal sealed partial class PublishStatusServiceTests
             }));
         }
 
-        // Readers - IsDocumentPublished
+        // Readers - IsPublished
         for (var i = 0; i < numberOfOperations; i++)
         {
             var key = documentKeys[i % documentKeys.Length];
@@ -49,7 +49,7 @@ internal sealed partial class PublishStatusServiceTests
             {
                 try
                 {
-                    _ = sut.IsDocumentPublished(key, DefaultCulture);
+                    _ = sut.IsPublished(key, DefaultCulture);
                 }
                 catch (Exception ex)
                 {
@@ -63,7 +63,7 @@ internal sealed partial class PublishStatusServiceTests
             }));
         }
 
-        // Readers - IsDocumentPublishedInAnyCulture
+        // Readers - IsPublishedInAnyCulture
         for (var i = 0; i < numberOfOperations; i++)
         {
             var key = documentKeys[i % documentKeys.Length];
@@ -71,7 +71,7 @@ internal sealed partial class PublishStatusServiceTests
             {
                 try
                 {
-                    _ = sut.IsDocumentPublishedInAnyCulture(key);
+                    _ = sut.IsPublishedInAnyCulture(key);
                 }
                 catch (Exception ex)
                 {
@@ -153,8 +153,8 @@ internal sealed partial class PublishStatusServiceTests
             {
                 try
                 {
-                    _ = sut.IsDocumentPublished(Textpage.Key, DefaultCulture);
-                    _ = sut.IsDocumentPublishedInAnyCulture(Subpage.Key);
+                    _ = sut.IsPublished(Textpage.Key, DefaultCulture);
+                    _ = sut.IsPublishedInAnyCulture(Subpage.Key);
                     _ = sut.HasPublishedAncestorPath(Subpage2.Key);
                 }
                 catch (Exception ex)

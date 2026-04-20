@@ -360,7 +360,7 @@ public partial class PublishedContentStatusFilteringServiceTests
     {
         var publishStatusQueryService = new Mock<IDocumentPublishStatusQueryService>();
         publishStatusQueryService
-            .Setup(p => p.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Setup(p => p.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns((Guid key, string culture) => items
                                                        .TryGetValue(key, out var item)
                                                    && idIsPublished(item.Id)

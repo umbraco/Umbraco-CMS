@@ -30,7 +30,7 @@ internal sealed class ContentTypeSeedKeyProvider : IDocumentSeedKeyProvider
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         var documentKeys = _databaseCacheRepository
             .GetDocumentKeysByContentTypeKeys(_cacheSettings.ContentTypeKeys, published: true)
-            .Where(key => _publishStatusService.IsDocumentPublishedInAnyCulture(key))
+            .Where(key => _publishStatusService.IsPublishedInAnyCulture(key))
             .ToHashSet();
         scope.Complete();
 

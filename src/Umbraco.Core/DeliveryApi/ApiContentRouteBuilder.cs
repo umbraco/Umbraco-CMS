@@ -160,7 +160,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     {
         // entirely unpublished content does not resolve any route, but we need one i.e. for preview to work,
         // so we'll use the content key as path.
-        if (isPreview && _publishStatusQueryService.IsDocumentPublished(content.Key, culture ?? string.Empty) is false)
+        if (isPreview && _publishStatusQueryService.IsPublished(content.Key, culture ?? string.Empty) is false)
         {
             return ContentPreviewPath(content);
         }

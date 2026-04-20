@@ -1071,7 +1071,7 @@ public class DocumentUrlService : IDocumentUrlService
         return attempt.Success ? attempt.Result : null;
     }
 
-    private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsDocumentPublished(contentKey, culture);
+    private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsPublished(contentKey, culture);
 
     /// <summary>
     /// Gets the children based on the latest published version of the content. (No aware of things in this scope).
@@ -1169,7 +1169,7 @@ public class DocumentUrlService : IDocumentUrlService
             return "#";
         }
 
-        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
+        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsPublished(documentKey, culture) is false)
         {
             return "#";
         }

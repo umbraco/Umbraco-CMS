@@ -60,12 +60,12 @@ public class DocumentPublishStatusService :
     }
 
     /// <inheritdoc/>
-    public bool IsDocumentPublished(Guid documentKey, string culture)
-        => IsPublished(documentKey, culture);
+    public new bool IsPublished(Guid documentKey, string culture)
+        => base.IsPublished(documentKey, culture);
 
     /// <inheritdoc/>
-    public bool IsDocumentPublishedInAnyCulture(Guid documentKey)
-        => IsPublishedInAnyCulture(documentKey);
+    public new bool IsPublishedInAnyCulture(Guid documentKey)
+        => base.IsPublishedInAnyCulture(documentKey);
 
     /// <inheritdoc/>
     public bool HasPublishedAncestorPath(Guid contentKey)
@@ -81,7 +81,7 @@ public class DocumentPublishStatusService :
 
         foreach (Guid key in keys)
         {
-            if (IsDocumentPublishedInAnyCulture(key) is false)
+            if (IsPublishedInAnyCulture(key) is false)
             {
                 return false;
             }
