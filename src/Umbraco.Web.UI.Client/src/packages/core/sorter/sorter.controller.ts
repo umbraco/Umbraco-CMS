@@ -1080,7 +1080,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 				return;
 			}
 
-			let verticalDirection = true;
+			let verticalDirection: boolean;
 			if (typeof placementResult === 'object') {
 				verticalDirection = placementResult.verticalDirection ?? false;
 				placeAfter = placementResult.placeAfter;
@@ -1433,7 +1433,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 	private _autoScrollY = 0;
 
 	#handleAutoScroll(clientX: number, clientY: number) {
-		let scrollRect: DOMRect | null = null;
+		let scrollRect: DOMRect | null;
 		if (this.#scrollElement) {
 			this.#autoScrollEl = this.#scrollElement;
 			scrollRect = this.#autoScrollEl.getBoundingClientRect();
