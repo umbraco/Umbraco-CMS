@@ -1002,7 +1002,7 @@ export class DocumentService {
             url: '/umbraco/management/api/v1/document/{id}/patch',
             ...options,
             headers: {
-                'Content-Type': 'application/json-patch+json',
+                'Content-Type': 'application/json',
                 ...options.headers
             }
         });
