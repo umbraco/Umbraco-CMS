@@ -49,8 +49,15 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 	override async firstUpdated() {
 		const parentUnique = this.data?.parent.unique;
 		const documentTypeUnique = this.data?.documentType?.unique || null;
+		const preselectedDocumentType = this.data?.preselectedDocumentType;
 
-		this.#retrieveAllowedDocumentTypesOf(documentTypeUnique, parentUnique || null);
+		if (preselectedDocumentType?.unique) {
+			this.#documentTypeIcon = preselectedDocumentType.icon ?? '';
+			await this.#onSelectDocumentType(preselectedDocumentType.unique);
+			this._loading = false;
+		} else {
+			this.#retrieveAllowedDocumentTypesOf(documentTypeUnique, parentUnique || null);
+		}
 
 		if (parentUnique) {
 			this.#retrieveHeadline(parentUnique);
@@ -111,7 +118,10 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 			throw new Error('Document type unique is not defined');
 		}
 		this.#documentTypeUnique = documentTypeUnique;
-		this.#documentTypeIcon = this._allowedDocumentTypes.find((dt) => dt.unique === documentTypeUnique)?.icon ?? '';
+		const matchedDocumentType = this._allowedDocumentTypes.find((dt) => dt.unique === documentTypeUnique);
+		if (matchedDocumentType) {
+			this.#documentTypeIcon = matchedDocumentType.icon ?? '';
+		}
 
 		const { data } = await this.#documentBlueprintItemRepository.requestItemsByDocumentType(documentTypeUnique);
 

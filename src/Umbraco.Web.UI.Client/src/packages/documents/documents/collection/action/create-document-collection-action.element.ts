@@ -1,9 +1,12 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import { UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UMB_DOCUMENT_CREATE_OPTIONS_MODAL } from '../../entity-actions/create/constants.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
+import { UmbDocumentBlueprintItemRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
@@ -26,6 +29,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	manifest?: ManifestCollectionAction;
 
 	#documentTypeStructureRepository = new UmbDocumentTypeStructureRepository(this);
+	#documentBlueprintItemRepository = new UmbDocumentBlueprintItemRepository(this);
 
 	constructor() {
 		super();
@@ -72,6 +76,35 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		});
 	}
 
+	async #onSelect(item: UmbAllowedDocumentTypeModel) {
+		if (!item.unique) {
+			throw new Error('Item unique is missing');
+		}
+
+		const createUrl = this.#getCreateUrl(item);
+
+		const { data } = await this.#documentBlueprintItemRepository.requestItemsByDocumentType(item.unique);
+
+		if (!data?.length) {
+			history.pushState(null, '', createUrl);
+			return;
+		}
+
+		await umbOpenModal(this, UMB_DOCUMENT_CREATE_OPTIONS_MODAL, {
+			data: {
+				parent: {
+					unique: this._documentUnique ?? null,
+					entityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+				},
+				documentType: this._documentTypeUnique ? { unique: this._documentTypeUnique } : null,
+				preselectedDocumentType: {
+					unique: item.unique,
+					icon: item.icon ?? undefined,
+				},
+			},
+		});
+	}
+
 	override render() {
 		return this._allowedDocumentTypes.length !== 1 ? this.#renderDropdown() : this.#renderCreateButton();
 	}
@@ -89,7 +122,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 			this.localize.string(item.name);
 
 		return html`
-			<uui-button color="default" href=${this.#getCreateUrl(item)} label=${label} look="outline"></uui-button>
+			<uui-button color="default" label=${label} look="outline" @click=${() => this.#onSelect(item)}></uui-button>
 		`;
 	}
 
@@ -115,7 +148,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 							this._allowedDocumentTypes,
 							(item) => item.unique,
 							(item) => html`
-								<uui-menu-item label=${this.localize.string(item.name)} href=${this.#getCreateUrl(item)}>
+								<uui-menu-item label=${this.localize.string(item.name)} @click-label=${() => this.#onSelect(item)}>
 									<umb-icon slot="icon" name=${item.icon ?? 'icon-document'}></umb-icon>
 								</uui-menu-item>
 							`,

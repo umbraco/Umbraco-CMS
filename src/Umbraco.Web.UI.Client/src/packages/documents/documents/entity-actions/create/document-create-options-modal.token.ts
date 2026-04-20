@@ -6,6 +6,10 @@ export interface UmbDocumentCreateOptionsModalData {
 	documentType: {
 		unique: string;
 	} | null;
+	preselectedDocumentType?: {
+		unique: string;
+		icon?: string;
+	} | null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
