@@ -83,11 +83,11 @@ export class UmbCompositionPickerModalElement extends UmbModalBaseElement<
 
 		if (existingCompositionHasBeenRemoved) {
 			await umbConfirmModal(this, {
-				headline: this.localize.term('general_remove'),
+				headline: '#general_remove',
 				content: html`<div style="max-width:400px">
 					${this.localize.term('contentTypeEditor_compositionRemoveWarning')}
 				</div>`,
-				confirmLabel: this.localize.term('general_submit'),
+				confirmLabel: '#general_submit',
 				color: 'danger',
 			});
 		}

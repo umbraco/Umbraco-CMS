@@ -21,6 +21,7 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 export class CultureService {
     /**
      * Gets a paginated collection of cultures available for creating languages.
+     *
      * Gets a paginated collection containing the English and localized names of all available cultures.
      */
     public static getCulture<ThrowOnError extends boolean = true>(options?: Options<GetCultureData, ThrowOnError>) {
@@ -40,6 +41,7 @@ export class CultureService {
 export class DataTypeService {
     /**
      * Creates a new data type.
+     *
      * Creates a new data type with the configuration specified in the request model.
      */
     public static postDataType<ThrowOnError extends boolean = true>(options?: Options<PostDataTypeData, ThrowOnError>) {
@@ -61,6 +63,7 @@ export class DataTypeService {
     
     /**
      * Deletes a data type.
+     *
      * Deletes a data type identified by the provided Id.
      */
     public static deleteDataTypeById<ThrowOnError extends boolean = true>(options: Options<DeleteDataTypeByIdData, ThrowOnError>) {
@@ -78,6 +81,7 @@ export class DataTypeService {
     
     /**
      * Gets a data type.
+     *
      * Gets a data type identified by the provided Id.
      */
     public static getDataTypeById<ThrowOnError extends boolean = true>(options: Options<GetDataTypeByIdData, ThrowOnError>) {
@@ -95,6 +99,7 @@ export class DataTypeService {
     
     /**
      * Updates a data type.
+     *
      * Updates a data type identified by the provided Id with the details from the request model.
      */
     public static putDataTypeById<ThrowOnError extends boolean = true>(options: Options<PutDataTypeByIdData, ThrowOnError>) {
@@ -116,6 +121,7 @@ export class DataTypeService {
     
     /**
      * Copies a data type.
+     *
      * Creates a duplicate of an existing data type identified by the provided unique Id. The copied data type will be given a new Id and have ' (copy)' appended to its name. Optionally, the copy can be placed in a specific container by providing a target container Id.
      */
     public static postDataTypeByIdCopy<ThrowOnError extends boolean = true>(options: Options<PostDataTypeByIdCopyData, ThrowOnError>) {
@@ -137,6 +143,7 @@ export class DataTypeService {
     
     /**
      * Checks if a data type is used.
+     *
      * Checks if the data type identified by the provided Id is used in any content, media, or member types.
      */
     public static getDataTypeByIdIsUsed<ThrowOnError extends boolean = true>(options: Options<GetDataTypeByIdIsUsedData, ThrowOnError>) {
@@ -154,6 +161,7 @@ export class DataTypeService {
     
     /**
      * Moves a data type.
+     *
      * Moves an existing data type identified by Id to a different container. The target container Id must be provided in the request model.
      */
     public static putDataTypeByIdMove<ThrowOnError extends boolean = true>(options: Options<PutDataTypeByIdMoveData, ThrowOnError>) {
@@ -175,6 +183,7 @@ export class DataTypeService {
     
     /**
      * Gets a paged collection of entities that are referenced by a data type.
+     *
      * Gets a paged collection of entities that are referenced by the data type with the provided Id, so you can see where it is being used.
      */
     public static getDataTypeByIdReferencedBy<ThrowOnError extends boolean = true>(options: Options<GetDataTypeByIdReferencedByData, ThrowOnError>) {
@@ -205,6 +214,7 @@ export class DataTypeService {
     
     /**
      * Gets multiple data types.
+     *
      * Gets multiple data types identified by the provided Ids.
      */
     public static getDataTypeBatch<ThrowOnError extends boolean = true>(options?: Options<GetDataTypeBatchData, ThrowOnError>) {
@@ -222,6 +232,7 @@ export class DataTypeService {
     
     /**
      * Gets the data type configuration.
+     *
      * Gets the configuration settings for data types.
      */
     public static getDataTypeConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetDataTypeConfigurationData, ThrowOnError>) {
@@ -239,6 +250,7 @@ export class DataTypeService {
     
     /**
      * Creates a data type folder.
+     *
      * Creates a new data type folder with the provided name and parent location.
      */
     public static postDataTypeFolder<ThrowOnError extends boolean = true>(options?: Options<PostDataTypeFolderData, ThrowOnError>) {
@@ -260,6 +272,7 @@ export class DataTypeService {
     
     /**
      * Deletes a data type folder.
+     *
      * Deletes a data type folder identified by the provided Id.
      */
     public static deleteDataTypeFolderById<ThrowOnError extends boolean = true>(options: Options<DeleteDataTypeFolderByIdData, ThrowOnError>) {
@@ -277,6 +290,7 @@ export class DataTypeService {
     
     /**
      * Gets a data type folder.
+     *
      * Gets a data type folder identified by the provided Id.
      */
     public static getDataTypeFolderById<ThrowOnError extends boolean = true>(options: Options<GetDataTypeFolderByIdData, ThrowOnError>) {
@@ -294,6 +308,7 @@ export class DataTypeService {
     
     /**
      * Updates a data type folder.
+     *
      * Updates a data type folder identified by the provided Id with the details provided in the request model.
      */
     public static putDataTypeFolderById<ThrowOnError extends boolean = true>(options: Options<PutDataTypeFolderByIdData, ThrowOnError>) {
@@ -328,6 +343,7 @@ export class DataTypeService {
     
     /**
      * Gets a filtered collection of data types.
+     *
      * Filters data types based on the provided criteria with support for pagination.
      */
     public static getFilterDataType<ThrowOnError extends boolean = true>(options?: Options<GetFilterDataTypeData, ThrowOnError>) {
@@ -345,6 +361,7 @@ export class DataTypeService {
     
     /**
      * Gets a collection of data type items.
+     *
      * Gets a collection of data type items identified by the provided Ids.
      */
     public static getItemDataType<ThrowOnError extends boolean = true>(options?: Options<GetItemDataTypeData, ThrowOnError>) {
@@ -362,6 +379,7 @@ export class DataTypeService {
     
     /**
      * Gets ancestors for a collection of data type items.
+     *
      * Gets the ancestor chains for data type items identified by the provided Ids.
      */
     public static getItemDataTypeAncestors<ThrowOnError extends boolean = true>(options?: Options<GetItemDataTypeAncestorsData, ThrowOnError>) {
@@ -379,6 +397,7 @@ export class DataTypeService {
     
     /**
      * Searches data type items.
+     *
      * Searches data type items by the provided query with pagination support.
      */
     public static getItemDataTypeSearch<ThrowOnError extends boolean = true>(options?: Options<GetItemDataTypeSearchData, ThrowOnError>) {
@@ -396,6 +415,7 @@ export class DataTypeService {
     
     /**
      * Gets a collection of ancestor data type folders.
+     *
      * Gets a collection of data type folders that are ancestors to the provided Id.
      */
     public static getTreeDataTypeAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeDataTypeAncestorsData, ThrowOnError>) {
@@ -413,6 +433,7 @@ export class DataTypeService {
     
     /**
      * Gets a collection of data type tree child items.
+     *
      * Gets a paginated collection of data type tree items that are children of the provided parent Id.
      */
     public static getTreeDataTypeChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeDataTypeChildrenData, ThrowOnError>) {
@@ -430,6 +451,7 @@ export class DataTypeService {
     
     /**
      * Gets a collection of data type items from the root of the tree.
+     *
      * Gets a paginated collection of data type items from the root of the tree with optional filtering.
      */
     public static getTreeDataTypeRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeDataTypeRootData, ThrowOnError>) {
@@ -460,6 +482,7 @@ export class DataTypeService {
     
     /**
      * Gets a collection of data type tree sibling items.
+     *
      * Gets a paged collection of data type tree items that are siblings of the provided Id. The collection can be optionally filtered to return only folder, or folders and data types.
      */
     public static getTreeDataTypeSiblings<ThrowOnError extends boolean = true>(options?: Options<GetTreeDataTypeSiblingsData, ThrowOnError>) {
@@ -479,6 +502,7 @@ export class DataTypeService {
 export class DictionaryService {
     /**
      * Gets a paginated collection of dictionary items.
+     *
      * Gets a paginated collection of dictionary items with optional filtering by name.
      */
     public static getDictionary<ThrowOnError extends boolean = true>(options?: Options<GetDictionaryData, ThrowOnError>) {
@@ -496,6 +520,7 @@ export class DictionaryService {
     
     /**
      * Creates a new dictionary.
+     *
      * Creates a new dictionary with the configuration specified in the request model.
      */
     public static postDictionary<ThrowOnError extends boolean = true>(options?: Options<PostDictionaryData, ThrowOnError>) {
@@ -517,6 +542,7 @@ export class DictionaryService {
     
     /**
      * Deletes a dictionary.
+     *
      * Deletes a dictionary identified by the provided Id.
      */
     public static deleteDictionaryById<ThrowOnError extends boolean = true>(options: Options<DeleteDictionaryByIdData, ThrowOnError>) {
@@ -534,6 +560,7 @@ export class DictionaryService {
     
     /**
      * Gets a dictionary.
+     *
      * Gets a dictionary identified by the provided Id.
      */
     public static getDictionaryById<ThrowOnError extends boolean = true>(options: Options<GetDictionaryByIdData, ThrowOnError>) {
@@ -551,6 +578,7 @@ export class DictionaryService {
     
     /**
      * Updates a dictionary.
+     *
      * Updates a dictionary identified by the provided Id with the details from the request model.
      */
     public static putDictionaryById<ThrowOnError extends boolean = true>(options: Options<PutDictionaryByIdData, ThrowOnError>) {
@@ -572,6 +600,7 @@ export class DictionaryService {
     
     /**
      * Exports a dictionary.
+     *
      * Exports the dictionary identified by the provided Id to a downloadable format.
      */
     public static getDictionaryByIdExport<ThrowOnError extends boolean = true>(options: Options<GetDictionaryByIdExportData, ThrowOnError>) {
@@ -589,6 +618,7 @@ export class DictionaryService {
     
     /**
      * Moves a dictionary.
+     *
      * Moves a dictionary identified by the provided Id to a different location.
      */
     public static putDictionaryByIdMove<ThrowOnError extends boolean = true>(options: Options<PutDictionaryByIdMoveData, ThrowOnError>) {
@@ -610,6 +640,7 @@ export class DictionaryService {
     
     /**
      * Imports a dictionary.
+     *
      * Imports a dictionary from the provided file upload.
      */
     public static postDictionaryImport<ThrowOnError extends boolean = true>(options?: Options<PostDictionaryImportData, ThrowOnError>) {
@@ -631,6 +662,7 @@ export class DictionaryService {
     
     /**
      * Gets a collection of dictionary items.
+     *
      * Gets a collection of dictionary items identified by the provided Ids.
      */
     public static getItemDictionary<ThrowOnError extends boolean = true>(options?: Options<GetItemDictionaryData, ThrowOnError>) {
@@ -648,6 +680,7 @@ export class DictionaryService {
     
     /**
      * Gets a collection of ancestor dictionary items.
+     *
      * Gets a collection of dictionary items that are ancestors to the provided Id.
      */
     public static getTreeDictionaryAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeDictionaryAncestorsData, ThrowOnError>) {
@@ -665,6 +698,7 @@ export class DictionaryService {
     
     /**
      * Gets a collection of dictionary tree child items.
+     *
      * Gets a paginated collection of dictionary tree items that are children of the provided parent Id.
      */
     public static getTreeDictionaryChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeDictionaryChildrenData, ThrowOnError>) {
@@ -682,6 +716,7 @@ export class DictionaryService {
     
     /**
      * Gets a collection of dictionary items from the root of the tree.
+     *
      * Gets a paginated collection of dictionary items from the root of the tree with optional filtering.
      */
     public static getTreeDictionaryRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeDictionaryRootData, ThrowOnError>) {
@@ -701,6 +736,7 @@ export class DictionaryService {
 export class DocumentBlueprintService {
     /**
      * Creates a new document blueprint.
+     *
      * Creates a new document blueprint with the configuration specified in the request model.
      */
     public static postDocumentBlueprint<ThrowOnError extends boolean = true>(options?: Options<PostDocumentBlueprintData, ThrowOnError>) {
@@ -722,6 +758,7 @@ export class DocumentBlueprintService {
     
     /**
      * Deletes a document blueprint.
+     *
      * Deletes a document blueprint identified by the provided Id.
      */
     public static deleteDocumentBlueprintById<ThrowOnError extends boolean = true>(options: Options<DeleteDocumentBlueprintByIdData, ThrowOnError>) {
@@ -739,6 +776,7 @@ export class DocumentBlueprintService {
     
     /**
      * Gets a document blueprint.
+     *
      * Gets a document blueprint identified by the provided Id.
      */
     public static getDocumentBlueprintById<ThrowOnError extends boolean = true>(options: Options<GetDocumentBlueprintByIdData, ThrowOnError>) {
@@ -756,6 +794,7 @@ export class DocumentBlueprintService {
     
     /**
      * Updates a document blueprint.
+     *
      * Updates a document blueprint identified by the provided Id with the details from the request model.
      */
     public static putDocumentBlueprintById<ThrowOnError extends boolean = true>(options: Options<PutDocumentBlueprintByIdData, ThrowOnError>) {
@@ -777,6 +816,7 @@ export class DocumentBlueprintService {
     
     /**
      * Gets the audit log for a document blueprint.
+     *
      * Gets a paginated collection of audit log entries for the document blueprint identified by the provided Id.
      */
     public static getDocumentBlueprintByIdAuditLog<ThrowOnError extends boolean = true>(options: Options<GetDocumentBlueprintByIdAuditLogData, ThrowOnError>) {
@@ -794,6 +834,7 @@ export class DocumentBlueprintService {
     
     /**
      * Moves a document blueprint.
+     *
      * Moves a document blueprint identified by the provided Id to a different location.
      */
     public static putDocumentBlueprintByIdMove<ThrowOnError extends boolean = true>(options: Options<PutDocumentBlueprintByIdMoveData, ThrowOnError>) {
@@ -815,6 +856,7 @@ export class DocumentBlueprintService {
     
     /**
      * Scaffolds a document blueprint.
+     *
      * Creates a scaffold for a new document blueprint with default values.
      */
     public static getDocumentBlueprintByIdScaffold<ThrowOnError extends boolean = true>(options: Options<GetDocumentBlueprintByIdScaffoldData, ThrowOnError>) {
@@ -832,6 +874,7 @@ export class DocumentBlueprintService {
     
     /**
      * Creates a document blueprint folder.
+     *
      * Creates a new document blueprint folder with the provided name and parent location.
      */
     public static postDocumentBlueprintFolder<ThrowOnError extends boolean = true>(options?: Options<PostDocumentBlueprintFolderData, ThrowOnError>) {
@@ -853,6 +896,7 @@ export class DocumentBlueprintService {
     
     /**
      * Deletes a document blueprint folder.
+     *
      * Deletes a document blueprint folder identified by the provided Id.
      */
     public static deleteDocumentBlueprintFolderById<ThrowOnError extends boolean = true>(options: Options<DeleteDocumentBlueprintFolderByIdData, ThrowOnError>) {
@@ -870,6 +914,7 @@ export class DocumentBlueprintService {
     
     /**
      * Gets a document blueprint folder.
+     *
      * Gets a document blueprint folder identified by the provided Id.
      */
     public static getDocumentBlueprintFolderById<ThrowOnError extends boolean = true>(options: Options<GetDocumentBlueprintFolderByIdData, ThrowOnError>) {
@@ -887,6 +932,7 @@ export class DocumentBlueprintService {
     
     /**
      * Updates a document blueprint folder.
+     *
      * Updates a document blueprint folder identified by the provided Id with the details from the request model.
      */
     public static putDocumentBlueprintFolderById<ThrowOnError extends boolean = true>(options: Options<PutDocumentBlueprintFolderByIdData, ThrowOnError>) {
@@ -908,6 +954,7 @@ export class DocumentBlueprintService {
     
     /**
      * Creates a document blueprint from an existing document.
+     *
      * Creates a new document blueprint based on an existing document identified by the provided Id.
      */
     public static postDocumentBlueprintFromDocument<ThrowOnError extends boolean = true>(options?: Options<PostDocumentBlueprintFromDocumentData, ThrowOnError>) {
@@ -929,6 +976,7 @@ export class DocumentBlueprintService {
     
     /**
      * Gets a collection of document blueprint items.
+     *
      * Gets a collection of document blueprint items identified by the provided Ids.
      */
     public static getItemDocumentBlueprint<ThrowOnError extends boolean = true>(options?: Options<GetItemDocumentBlueprintData, ThrowOnError>) {
@@ -946,6 +994,7 @@ export class DocumentBlueprintService {
     
     /**
      * Gets a collection of ancestor document blueprint items.
+     *
      * Gets a collection of document blueprint items that are ancestors to the provided Id.
      */
     public static getTreeDocumentBlueprintAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentBlueprintAncestorsData, ThrowOnError>) {
@@ -963,6 +1012,7 @@ export class DocumentBlueprintService {
     
     /**
      * Gets a collection of document blueprint tree child items.
+     *
      * Gets a paginated collection of document blueprint tree items that are children of the provided parent Id.
      */
     public static getTreeDocumentBlueprintChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentBlueprintChildrenData, ThrowOnError>) {
@@ -980,6 +1030,7 @@ export class DocumentBlueprintService {
     
     /**
      * Gets a collection of document blueprint items from the root of the tree.
+     *
      * Gets a paginated collection of document blueprint items from the root of the tree with optional filtering.
      */
     public static getTreeDocumentBlueprintRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentBlueprintRootData, ThrowOnError>) {
@@ -997,6 +1048,7 @@ export class DocumentBlueprintService {
     
     /**
      * Gets a collection of document blueprint tree sibling items.
+     *
      * Gets a collection of document blueprint tree items that are siblings of the provided Id.
      */
     public static getTreeDocumentBlueprintSiblings<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentBlueprintSiblingsData, ThrowOnError>) {
@@ -1016,6 +1068,7 @@ export class DocumentBlueprintService {
 export class DocumentTypeService {
     /**
      * Creates a new document type.
+     *
      * Creates a new document type with the configuration specified in the request model.
      */
     public static postDocumentType<ThrowOnError extends boolean = true>(options?: Options<PostDocumentTypeData, ThrowOnError>) {
@@ -1037,6 +1090,7 @@ export class DocumentTypeService {
     
     /**
      * Deletes a document type.
+     *
      * Deletes a document type identified by the provided Id.
      */
     public static deleteDocumentTypeById<ThrowOnError extends boolean = true>(options: Options<DeleteDocumentTypeByIdData, ThrowOnError>) {
@@ -1054,6 +1108,7 @@ export class DocumentTypeService {
     
     /**
      * Gets a document type.
+     *
      * Gets a document type identified by the provided Id.
      */
     public static getDocumentTypeById<ThrowOnError extends boolean = true>(options: Options<GetDocumentTypeByIdData, ThrowOnError>) {
@@ -1071,6 +1126,7 @@ export class DocumentTypeService {
     
     /**
      * Updates a document type.
+     *
      * Updates a document type identified by the provided Id with the details from the request model.
      */
     public static putDocumentTypeById<ThrowOnError extends boolean = true>(options: Options<PutDocumentTypeByIdData, ThrowOnError>) {
@@ -1092,6 +1148,7 @@ export class DocumentTypeService {
     
     /**
      * Gets allowed child document types.
+     *
      * Gets a collection of document types that are allowed as children of the specified parent document type.
      */
     public static getDocumentTypeByIdAllowedChildren<ThrowOnError extends boolean = true>(options: Options<GetDocumentTypeByIdAllowedChildrenData, ThrowOnError>) {
@@ -1109,6 +1166,7 @@ export class DocumentTypeService {
     
     /**
      * Gets allowed parent document types.
+     *
      * Gets a collection of document types that are allowed as parents of the specified document type.
      */
     public static getDocumentTypeByIdAllowedParents<ThrowOnError extends boolean = true>(options: Options<GetDocumentTypeByIdAllowedParentsData, ThrowOnError>) {
@@ -1126,6 +1184,7 @@ export class DocumentTypeService {
     
     /**
      * Gets document blueprints for a document type.
+     *
      * Gets a collection of document blueprints available for the specified document type.
      */
     public static getDocumentTypeByIdBlueprint<ThrowOnError extends boolean = true>(options: Options<GetDocumentTypeByIdBlueprintData, ThrowOnError>) {
@@ -1143,6 +1202,7 @@ export class DocumentTypeService {
     
     /**
      * Gets composition references.
+     *
      * Gets a collection of document types that reference the specified document type as a composition.
      */
     public static getDocumentTypeByIdCompositionReferences<ThrowOnError extends boolean = true>(options: Options<GetDocumentTypeByIdCompositionReferencesData, ThrowOnError>) {
@@ -1160,6 +1220,7 @@ export class DocumentTypeService {
     
     /**
      * Copies a document type.
+     *
      * Creates a duplicate of an existing document type identified by the provided Id.
      */
     public static postDocumentTypeByIdCopy<ThrowOnError extends boolean = true>(options: Options<PostDocumentTypeByIdCopyData, ThrowOnError>) {
@@ -1181,6 +1242,7 @@ export class DocumentTypeService {
     
     /**
      * Exports a document type.
+     *
      * Exports the document type identified by the provided Id to a downloadable format.
      */
     public static getDocumentTypeByIdExport<ThrowOnError extends boolean = true>(options: Options<GetDocumentTypeByIdExportData, ThrowOnError>) {
@@ -1198,6 +1260,7 @@ export class DocumentTypeService {
     
     /**
      * Imports a document type.
+     *
      * Imports a document type from the provided file upload.
      */
     public static putDocumentTypeByIdImport<ThrowOnError extends boolean = true>(options: Options<PutDocumentTypeByIdImportData, ThrowOnError>) {
@@ -1219,6 +1282,7 @@ export class DocumentTypeService {
     
     /**
      * Moves a document type.
+     *
      * Moves a document type identified by the provided Id to a different location.
      */
     public static putDocumentTypeByIdMove<ThrowOnError extends boolean = true>(options: Options<PutDocumentTypeByIdMoveData, ThrowOnError>) {
@@ -1253,6 +1317,7 @@ export class DocumentTypeService {
     
     /**
      * Creates a template for a document type.
+     *
      * Creates a new template associated with the document type identified by the provided Id.
      */
     public static postDocumentTypeByIdTemplate<ThrowOnError extends boolean = true>(options: Options<PostDocumentTypeByIdTemplateData, ThrowOnError>) {
@@ -1274,6 +1339,7 @@ export class DocumentTypeService {
     
     /**
      * Gets document types allowed at root.
+     *
      * Gets a collection of document types that are allowed to be created at the root level.
      */
     public static getDocumentTypeAllowedAtRoot<ThrowOnError extends boolean = true>(options?: Options<GetDocumentTypeAllowedAtRootData, ThrowOnError>) {
@@ -1291,6 +1357,7 @@ export class DocumentTypeService {
     
     /**
      * Gets available compositions.
+     *
      * Gets a collection of document types that are available to use as compositions for the specified document type.
      */
     public static postDocumentTypeAvailableCompositions<ThrowOnError extends boolean = true>(options?: Options<PostDocumentTypeAvailableCompositionsData, ThrowOnError>) {
@@ -1312,6 +1379,7 @@ export class DocumentTypeService {
     
     /**
      * Gets multiple document types.
+     *
      * Gets multiple document types identified by the provided Ids.
      */
     public static getDocumentTypeBatch<ThrowOnError extends boolean = true>(options?: Options<GetDocumentTypeBatchData, ThrowOnError>) {
@@ -1329,6 +1397,7 @@ export class DocumentTypeService {
     
     /**
      * Gets the document type configuration.
+     *
      * Gets the configuration settings for document types.
      */
     public static getDocumentTypeConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetDocumentTypeConfigurationData, ThrowOnError>) {
@@ -1346,6 +1415,7 @@ export class DocumentTypeService {
     
     /**
      * Creates a document type folder.
+     *
      * Creates a new document type folder with the provided name and parent location.
      */
     public static postDocumentTypeFolder<ThrowOnError extends boolean = true>(options?: Options<PostDocumentTypeFolderData, ThrowOnError>) {
@@ -1367,6 +1437,7 @@ export class DocumentTypeService {
     
     /**
      * Deletes a document type folder.
+     *
      * Deletes a document type folder identified by the provided Id.
      */
     public static deleteDocumentTypeFolderById<ThrowOnError extends boolean = true>(options: Options<DeleteDocumentTypeFolderByIdData, ThrowOnError>) {
@@ -1384,6 +1455,7 @@ export class DocumentTypeService {
     
     /**
      * Gets a document type folder.
+     *
      * Gets a document type folder identified by the provided Id.
      */
     public static getDocumentTypeFolderById<ThrowOnError extends boolean = true>(options: Options<GetDocumentTypeFolderByIdData, ThrowOnError>) {
@@ -1401,6 +1473,7 @@ export class DocumentTypeService {
     
     /**
      * Updates a document type folder.
+     *
      * Updates a document type folder identified by the provided Id with the details from the request model.
      */
     public static putDocumentTypeFolderById<ThrowOnError extends boolean = true>(options: Options<PutDocumentTypeFolderByIdData, ThrowOnError>) {
@@ -1422,6 +1495,7 @@ export class DocumentTypeService {
     
     /**
      * Imports a document type.
+     *
      * Imports a document type from the provided file upload.
      */
     public static postDocumentTypeImport<ThrowOnError extends boolean = true>(options?: Options<PostDocumentTypeImportData, ThrowOnError>) {
@@ -1443,6 +1517,7 @@ export class DocumentTypeService {
     
     /**
      * Gets a collection of document type items.
+     *
      * Gets a collection of document type items identified by the provided Ids.
      */
     public static getItemDocumentType<ThrowOnError extends boolean = true>(options?: Options<GetItemDocumentTypeData, ThrowOnError>) {
@@ -1460,6 +1535,7 @@ export class DocumentTypeService {
     
     /**
      * Gets ancestors for a collection of document type items.
+     *
      * Gets the ancestor chains for document type items identified by the provided Ids.
      */
     public static getItemDocumentTypeAncestors<ThrowOnError extends boolean = true>(options?: Options<GetItemDocumentTypeAncestorsData, ThrowOnError>) {
@@ -1477,6 +1553,7 @@ export class DocumentTypeService {
     
     /**
      * Searches document type items.
+     *
      * Searches document type items by the provided query with pagination support.
      */
     public static getItemDocumentTypeSearch<ThrowOnError extends boolean = true>(options?: Options<GetItemDocumentTypeSearchData, ThrowOnError>) {
@@ -1494,6 +1571,7 @@ export class DocumentTypeService {
     
     /**
      * Gets a collection of ancestor document type items.
+     *
      * Gets a collection of document type items that are ancestors to the provided Id.
      */
     public static getTreeDocumentTypeAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentTypeAncestorsData, ThrowOnError>) {
@@ -1511,6 +1589,7 @@ export class DocumentTypeService {
     
     /**
      * Gets a collection of document type tree child items.
+     *
      * Gets a paginated collection of document type tree items that are children of the provided parent Id.
      */
     public static getTreeDocumentTypeChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentTypeChildrenData, ThrowOnError>) {
@@ -1528,6 +1607,7 @@ export class DocumentTypeService {
     
     /**
      * Gets a collection of document type items from the root of the tree.
+     *
      * Gets a paginated collection of document type items from the root of the tree with optional filtering.
      */
     public static getTreeDocumentTypeRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentTypeRootData, ThrowOnError>) {
@@ -1558,6 +1638,7 @@ export class DocumentTypeService {
     
     /**
      * Gets a collection of document type tree sibling items.
+     *
      * Gets a collection of document type tree items that are siblings of the provided Id.
      */
     public static getTreeDocumentTypeSiblings<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentTypeSiblingsData, ThrowOnError>) {
@@ -1577,6 +1658,7 @@ export class DocumentTypeService {
 export class DocumentVersionService {
     /**
      * Gets a paginated collection of versions for a specific document.
+     *
      * Gets a paginated collection of versions for a specific document and optional culture. Each result describes the version and includes details of the document type, editor, version date, and published status.
      */
     public static getDocumentVersion<ThrowOnError extends boolean = true>(options: Options<GetDocumentVersionData, ThrowOnError>) {
@@ -1594,6 +1676,7 @@ export class DocumentVersionService {
     
     /**
      * Gets a specific document version.
+     *
      * Gets a specific document version by its Id. If found, the result describes the version and includes details of the document type, editor, version date, and published status.
      */
     public static getDocumentVersionById<ThrowOnError extends boolean = true>(options: Options<GetDocumentVersionByIdData, ThrowOnError>) {
@@ -1611,6 +1694,7 @@ export class DocumentVersionService {
     
     /**
      * Sets the prevent clean up status for a document version.
+     *
      * Sets the prevent clean up boolean status for a document version to the provided value. This controls whether the version will be a candidate for removal in content history clean up.
      */
     public static putDocumentVersionByIdPreventCleanup<ThrowOnError extends boolean = true>(options: Options<PutDocumentVersionByIdPreventCleanupData, ThrowOnError>) {
@@ -1628,6 +1712,7 @@ export class DocumentVersionService {
     
     /**
      * Rolls back a document to a specific version.
+     *
      * Rolls back a document to the version indicated by the provided Id. This will archive the current version of the document and publish the provided one.
      */
     public static postDocumentVersionByIdRollback<ThrowOnError extends boolean = true>(options: Options<PostDocumentVersionByIdRollbackData, ThrowOnError>) {
@@ -1647,6 +1732,7 @@ export class DocumentVersionService {
 export class DocumentByIdValidate1Service {
     /**
      * Validates updating a document.
+     *
      * Validates the request model for updating a document without actually updating it.
      */
     public static putUmbracoManagementApiV11DocumentByIdValidate11<ThrowOnError extends boolean = true>(options: Options<PutUmbracoManagementApiV11DocumentByIdValidate11Data, ThrowOnError>) {
@@ -1674,6 +1760,7 @@ export class PutUmbracoManagementApiV1Service {
 export class DocumentService {
     /**
      * Gets a document collection.
+     *
      * Gets a document collection identified by the provided Id.
      */
     public static getCollectionDocumentById<ThrowOnError extends boolean = true>(options: Options<GetCollectionDocumentByIdData, ThrowOnError>) {
@@ -1691,6 +1778,7 @@ export class DocumentService {
     
     /**
      * Creates a new document.
+     *
      * Creates a new document with the configuration specified in the request model.
      */
     public static postDocument<ThrowOnError extends boolean = true>(options?: Options<PostDocumentData, ThrowOnError>) {
@@ -1712,6 +1800,7 @@ export class DocumentService {
     
     /**
      * Deletes a document.
+     *
      * Deletes a document identified by the provided Id.
      */
     public static deleteDocumentById<ThrowOnError extends boolean = true>(options: Options<DeleteDocumentByIdData, ThrowOnError>) {
@@ -1729,6 +1818,7 @@ export class DocumentService {
     
     /**
      * Gets a document.
+     *
      * Gets a document identified by the provided Id.
      */
     public static getDocumentById<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdData, ThrowOnError>) {
@@ -1746,6 +1836,7 @@ export class DocumentService {
     
     /**
      * Updates a document.
+     *
      * Updates a document identified by the provided Id with the details from the request model.
      */
     public static putDocumentById<ThrowOnError extends boolean = true>(options: Options<PutDocumentByIdData, ThrowOnError>) {
@@ -1767,6 +1858,7 @@ export class DocumentService {
     
     /**
      * Gets the audit log for a document.
+     *
      * Gets a paginated collection of audit log entries for the document identified by the provided Id.
      */
     public static getDocumentByIdAuditLog<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdAuditLogData, ThrowOnError>) {
@@ -1784,7 +1876,9 @@ export class DocumentService {
     
     /**
      * Gets available segments.
+     *
      * Gets a collection of available content segments for the system.
+     *
      * @deprecated
      */
     public static getDocumentByIdAvailableSegmentOptions<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdAvailableSegmentOptionsData, ThrowOnError>) {
@@ -1802,6 +1896,7 @@ export class DocumentService {
     
     /**
      * Copies a document.
+     *
      * Creates a duplicate of an existing document identified by the provided Id.
      */
     public static postDocumentByIdCopy<ThrowOnError extends boolean = true>(options: Options<PostDocumentByIdCopyData, ThrowOnError>) {
@@ -1823,6 +1918,7 @@ export class DocumentService {
     
     /**
      * Gets domains for a document.
+     *
      * Gets the domains and culture settings assigned to the document identified by the provided Id.
      */
     public static getDocumentByIdDomains<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdDomainsData, ThrowOnError>) {
@@ -1840,6 +1936,7 @@ export class DocumentService {
     
     /**
      * Updates the domains for a document.
+     *
      * Updates the domains for the document identified by the provided Id with the details from the request model.
      */
     public static putDocumentByIdDomains<ThrowOnError extends boolean = true>(options: Options<PutDocumentByIdDomainsData, ThrowOnError>) {
@@ -1861,6 +1958,7 @@ export class DocumentService {
     
     /**
      * Moves a document.
+     *
      * Moves a document identified by the provided Id to a different location.
      */
     public static putDocumentByIdMove<ThrowOnError extends boolean = true>(options: Options<PutDocumentByIdMoveData, ThrowOnError>) {
@@ -1882,6 +1980,7 @@ export class DocumentService {
     
     /**
      * Moves a document to the recycle bin.
+     *
      * Moves a document identified by the provided Id to the recycle bin.
      */
     public static putDocumentByIdMoveToRecycleBin<ThrowOnError extends boolean = true>(options: Options<PutDocumentByIdMoveToRecycleBinData, ThrowOnError>) {
@@ -1899,6 +1998,7 @@ export class DocumentService {
     
     /**
      * Gets notifications for a document.
+     *
      * Gets the notifications for the document identified by the provided Id.
      */
     public static getDocumentByIdNotifications<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdNotificationsData, ThrowOnError>) {
@@ -1916,6 +2016,7 @@ export class DocumentService {
     
     /**
      * Updates notification subscriptions for a document.
+     *
      * Updates which actions the current user is subscribed to receive notifications for on the specified document.
      */
     public static putDocumentByIdNotifications<ThrowOnError extends boolean = true>(options: Options<PutDocumentByIdNotificationsData, ThrowOnError>) {
@@ -1957,6 +2058,7 @@ export class DocumentService {
     
     /**
      * Gets the preview URL for a document.
+     *
      * Gets the preview URL for the document identified by the provided Id.
      */
     public static getDocumentByIdPreviewUrl<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdPreviewUrlData, ThrowOnError>) {
@@ -1974,6 +2076,7 @@ export class DocumentService {
     
     /**
      * Removes public access settings for a document.
+     *
      * Removes public access protection/rules for the document identified by the provided Id.
      */
     public static deleteDocumentByIdPublicAccess<ThrowOnError extends boolean = true>(options: Options<DeleteDocumentByIdPublicAccessData, ThrowOnError>) {
@@ -1991,6 +2094,7 @@ export class DocumentService {
     
     /**
      * Gets public access rules for a document.
+     *
      * Gets the public access protection settings for the document identified by the provided Id.
      */
     public static getDocumentByIdPublicAccess<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdPublicAccessData, ThrowOnError>) {
@@ -2008,6 +2112,7 @@ export class DocumentService {
     
     /**
      * Creates public access rules for a document.
+     *
      * Creates public access protection for the document identified by the provided Id.
      */
     public static postDocumentByIdPublicAccess<ThrowOnError extends boolean = true>(options: Options<PostDocumentByIdPublicAccessData, ThrowOnError>) {
@@ -2029,6 +2134,7 @@ export class DocumentService {
     
     /**
      * Updates public access protection for a document.
+     *
      * Updates the member protection settings for a document, controlling which members or member groups can access it.
      */
     public static putDocumentByIdPublicAccess<ThrowOnError extends boolean = true>(options: Options<PutDocumentByIdPublicAccessData, ThrowOnError>) {
@@ -2050,6 +2156,7 @@ export class DocumentService {
     
     /**
      * Publishes a document.
+     *
      * Publishes a document identified by the provided Id.
      */
     public static putDocumentByIdPublish<ThrowOnError extends boolean = true>(options: Options<PutDocumentByIdPublishData, ThrowOnError>) {
@@ -2071,6 +2178,7 @@ export class DocumentService {
     
     /**
      * Publishes a document with its descendants.
+     *
      * Publishes a document and its descendants identified by the provided Id.
      */
     public static putDocumentByIdPublishWithDescendants<ThrowOnError extends boolean = true>(options: Options<PutDocumentByIdPublishWithDescendantsData, ThrowOnError>) {
@@ -2092,6 +2200,7 @@ export class DocumentService {
     
     /**
      * Gets the result of publishing a document with descendants.
+     *
      * Gets the status and result of a publish with descendants operation.
      */
     public static getDocumentByIdPublishWithDescendantsResultByTaskId<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdPublishWithDescendantsResultByTaskIdData, ThrowOnError>) {
@@ -2109,6 +2218,7 @@ export class DocumentService {
     
     /**
      * Gets a document.
+     *
      * Gets a document identified by the provided Id.
      */
     public static getDocumentByIdPublished<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdPublishedData, ThrowOnError>) {
@@ -2126,6 +2236,7 @@ export class DocumentService {
     
     /**
      * Gets a collection of items that reference documents.
+     *
      * Gets a paginated collection of items that reference the documents identified by the provided Ids.
      */
     public static getDocumentByIdReferencedBy<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdReferencedByData, ThrowOnError>) {
@@ -2143,6 +2254,7 @@ export class DocumentService {
     
     /**
      * Gets document descendants that are referenced.
+     *
      * Gets a paginated collection of descendant documents that are referenced by other content.
      */
     public static getDocumentByIdReferencedDescendants<ThrowOnError extends boolean = true>(options: Options<GetDocumentByIdReferencedDescendantsData, ThrowOnError>) {
@@ -2160,6 +2272,7 @@ export class DocumentService {
     
     /**
      * Unpublishes a document.
+     *
      * Unpublishes a document identified by the provided Id.
      */
     public static putDocumentByIdUnpublish<ThrowOnError extends boolean = true>(options: Options<PutDocumentByIdUnpublishData, ThrowOnError>) {
@@ -2181,6 +2294,7 @@ export class DocumentService {
     
     /**
      * Gets a collection of items that reference documents.
+     *
      * Gets a paginated collection of items that reference the documents identified by the provided Ids.
      */
     public static getDocumentAreReferenced<ThrowOnError extends boolean = true>(options?: Options<GetDocumentAreReferencedData, ThrowOnError>) {
@@ -2198,6 +2312,7 @@ export class DocumentService {
     
     /**
      * Gets the document configuration.
+     *
      * Gets the configuration settings for documents.
      */
     public static getDocumentConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetDocumentConfigurationData, ThrowOnError>) {
@@ -2215,6 +2330,7 @@ export class DocumentService {
     
     /**
      * Sorts documents.
+     *
      * Sorts documents in the specified parent container according to the provided sort order.
      */
     public static putDocumentSort<ThrowOnError extends boolean = true>(options?: Options<PutDocumentSortData, ThrowOnError>) {
@@ -2236,6 +2352,7 @@ export class DocumentService {
     
     /**
      * Gets URLs for a document.
+     *
      * Gets the URLs for the document identified by the provided Id.
      */
     public static getDocumentUrls<ThrowOnError extends boolean = true>(options?: Options<GetDocumentUrlsData, ThrowOnError>) {
@@ -2253,6 +2370,7 @@ export class DocumentService {
     
     /**
      * Validates creating a document.
+     *
      * Validates the request model for creating a new document without actually creating it.
      */
     public static postDocumentValidate<ThrowOnError extends boolean = true>(options?: Options<PostDocumentValidateData, ThrowOnError>) {
@@ -2274,6 +2392,7 @@ export class DocumentService {
     
     /**
      * Gets a collection of document items.
+     *
      * Gets a collection of document items identified by the provided Ids.
      */
     public static getItemDocument<ThrowOnError extends boolean = true>(options?: Options<GetItemDocumentData, ThrowOnError>) {
@@ -2291,6 +2410,7 @@ export class DocumentService {
     
     /**
      * Gets ancestors for a collection of document items.
+     *
      * Gets the ancestor chains for document items identified by the provided Ids.
      */
     public static getItemDocumentAncestors<ThrowOnError extends boolean = true>(options?: Options<GetItemDocumentAncestorsData, ThrowOnError>) {
@@ -2308,6 +2428,7 @@ export class DocumentService {
     
     /**
      * Searches document items.
+     *
      * Searches document items by the provided query with pagination support.
      */
     public static getItemDocumentSearch<ThrowOnError extends boolean = true>(options?: Options<GetItemDocumentSearchData, ThrowOnError>) {
@@ -2325,6 +2446,7 @@ export class DocumentService {
     
     /**
      * Empties the document recycle bin.
+     *
      * Permanently deletes all documents in the recycle bin. This operation cannot be undone.
      */
     public static deleteRecycleBinDocument<ThrowOnError extends boolean = true>(options?: Options<DeleteRecycleBinDocumentData, ThrowOnError>) {
@@ -2342,6 +2464,7 @@ export class DocumentService {
     
     /**
      * Deletes a document.
+     *
      * Deletes a document identified by the provided Id.
      */
     public static deleteRecycleBinDocumentById<ThrowOnError extends boolean = true>(options: Options<DeleteRecycleBinDocumentByIdData, ThrowOnError>) {
@@ -2359,6 +2482,7 @@ export class DocumentService {
     
     /**
      * Gets the original parent of a document in the recycle bin.
+     *
      * Gets the original parent location of a document before it was moved to the recycle bin.
      */
     public static getRecycleBinDocumentByIdOriginalParent<ThrowOnError extends boolean = true>(options: Options<GetRecycleBinDocumentByIdOriginalParentData, ThrowOnError>) {
@@ -2376,6 +2500,7 @@ export class DocumentService {
     
     /**
      * Restores a document from the recycle bin.
+     *
      * Restores a document from the recycle bin to its original location or a specified parent.
      */
     public static putRecycleBinDocumentByIdRestore<ThrowOnError extends boolean = true>(options: Options<PutRecycleBinDocumentByIdRestoreData, ThrowOnError>) {
@@ -2397,6 +2522,7 @@ export class DocumentService {
     
     /**
      * Gets a collection of documents in the recycle bin.
+     *
      * Gets a paginated collection of documents that are children of the provided parent in the recycle bin.
      */
     public static getRecycleBinDocumentChildren<ThrowOnError extends boolean = true>(options?: Options<GetRecycleBinDocumentChildrenData, ThrowOnError>) {
@@ -2414,6 +2540,7 @@ export class DocumentService {
     
     /**
      * Gets items referencing a document in the recycle bin.
+     *
      * Gets a paginated collection of items that reference the document in the recycle bin.
      */
     public static getRecycleBinDocumentReferencedBy<ThrowOnError extends boolean = true>(options?: Options<GetRecycleBinDocumentReferencedByData, ThrowOnError>) {
@@ -2431,6 +2558,7 @@ export class DocumentService {
     
     /**
      * Gets documents at the root of the recycle bin.
+     *
      * Gets a paginated collection of documents at the root level of the recycle bin.
      */
     public static getRecycleBinDocumentRoot<ThrowOnError extends boolean = true>(options?: Options<GetRecycleBinDocumentRootData, ThrowOnError>) {
@@ -2448,6 +2576,7 @@ export class DocumentService {
     
     /**
      * Gets sibling documents in the recycle bin.
+     *
      * Gets a collection of sibling documents in the recycle bin at the same level as the provided Id.
      */
     public static getRecycleBinDocumentSiblings<ThrowOnError extends boolean = true>(options?: Options<GetRecycleBinDocumentSiblingsData, ThrowOnError>) {
@@ -2465,6 +2594,7 @@ export class DocumentService {
     
     /**
      * Gets a collection of ancestor document items.
+     *
      * Gets a collection of document items that are ancestors to the provided Id.
      */
     public static getTreeDocumentAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentAncestorsData, ThrowOnError>) {
@@ -2482,6 +2612,7 @@ export class DocumentService {
     
     /**
      * Gets a collection of document tree child items.
+     *
      * Gets a paginated collection of document tree items that are children of the provided parent Id.
      */
     public static getTreeDocumentChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentChildrenData, ThrowOnError>) {
@@ -2499,6 +2630,7 @@ export class DocumentService {
     
     /**
      * Gets a collection of document items from the root of the tree.
+     *
      * Gets a paginated collection of document items from the root of the tree with optional filtering.
      */
     public static getTreeDocumentRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentRootData, ThrowOnError>) {
@@ -2516,6 +2648,7 @@ export class DocumentService {
     
     /**
      * Gets a collection of document tree sibling items.
+     *
      * Gets a collection of document tree items that are siblings of the provided Id.
      */
     public static getTreeDocumentSiblings<ThrowOnError extends boolean = true>(options?: Options<GetTreeDocumentSiblingsData, ThrowOnError>) {
@@ -2536,6 +2669,7 @@ export class DocumentService {
 export class DynamicRootService {
     /**
      * Gets dynamic roots.
+     *
      * Gets a collection of dynamic root items based on the provided query configuration.
      */
     public static postDynamicRootQuery<ThrowOnError extends boolean = true>(options?: Options<PostDynamicRootQueryData, ThrowOnError>) {
@@ -2557,6 +2691,7 @@ export class DynamicRootService {
     
     /**
      * Gets dynamic root query steps.
+     *
      * Gets a collection of available query steps for configuring dynamic root queries.
      */
     public static getDynamicRootSteps<ThrowOnError extends boolean = true>(options?: Options<GetDynamicRootStepsData, ThrowOnError>) {
@@ -2576,6 +2711,7 @@ export class DynamicRootService {
 export class HealthCheckService {
     /**
      * Gets a collection of health check groups.
+     *
      * Gets a collection of health check groups with their associated health checks.
      */
     public static getHealthCheckGroup<ThrowOnError extends boolean = true>(options?: Options<GetHealthCheckGroupData, ThrowOnError>) {
@@ -2593,6 +2729,7 @@ export class HealthCheckService {
     
     /**
      * Gets a health check group by name.
+     *
      * Gets a health check group and all its associated health checks identified by the provided group name.
      */
     public static getHealthCheckGroupByName<ThrowOnError extends boolean = true>(options: Options<GetHealthCheckGroupByNameData, ThrowOnError>) {
@@ -2610,6 +2747,7 @@ export class HealthCheckService {
     
     /**
      * Executes all health checks in a group.
+     *
      * Runs all health checks in the group identified by the provided name and returns the results.
      */
     public static postHealthCheckGroupByNameCheck<ThrowOnError extends boolean = true>(options: Options<PostHealthCheckGroupByNameCheckData, ThrowOnError>) {
@@ -2627,6 +2765,7 @@ export class HealthCheckService {
     
     /**
      * Executes a health check action.
+     *
      * Executes a specific action to fix or address a health check issue.
      */
     public static postHealthCheckExecuteAction<ThrowOnError extends boolean = true>(options?: Options<PostHealthCheckExecuteActionData, ThrowOnError>) {
@@ -2650,7 +2789,9 @@ export class HealthCheckService {
 export class HelpService {
     /**
      * Gets help information.
+     *
      * Gets help information and documentation resources for the Umbraco back office.
+     *
      * @deprecated
      */
     public static getHelp<ThrowOnError extends boolean = true>(options?: Options<GetHelpData, ThrowOnError>) {
@@ -2670,6 +2811,7 @@ export class HelpService {
 export class ImagingService {
     /**
      * Gets URLs for image resizing.
+     *
      * Gets a collection of URLs for resizing images with the provided dimensions and options.
      */
     public static getImagingResizeUrls<ThrowOnError extends boolean = true>(options?: Options<GetImagingResizeUrlsData, ThrowOnError>) {
@@ -2689,6 +2831,7 @@ export class ImagingService {
 export class ImportService {
     /**
      * Analyzes an import file.
+     *
      * Analyzes the uploaded import file and returns an analysis of the imported entities.
      */
     public static getImportAnalyze<ThrowOnError extends boolean = true>(options?: Options<GetImportAnalyzeData, ThrowOnError>) {
@@ -2708,6 +2851,7 @@ export class ImportService {
 export class IndexerService {
     /**
      * Gets a collection of indexers.
+     *
      * Gets a collection of configured search indexers in the Umbraco installation.
      */
     public static getIndexer<ThrowOnError extends boolean = true>(options?: Options<GetIndexerData, ThrowOnError>) {
@@ -2725,6 +2869,7 @@ export class IndexerService {
     
     /**
      * Gets indexer details.
+     *
      * Gets detailed information about the indexer identified by the provided name.
      */
     public static getIndexerByIndexName<ThrowOnError extends boolean = true>(options: Options<GetIndexerByIndexNameData, ThrowOnError>) {
@@ -2742,6 +2887,7 @@ export class IndexerService {
     
     /**
      * Rebuilds an indexer.
+     *
      * Rebuilds the search index for the indexer identified by the provided name.
      */
     public static postIndexerByIndexNameRebuild<ThrowOnError extends boolean = true>(options: Options<PostIndexerByIndexNameRebuildData, ThrowOnError>) {
@@ -2761,6 +2907,7 @@ export class IndexerService {
 export class InstallService {
     /**
      * Gets install settings.
+     *
      * Gets the current installation settings and status.
      */
     public static getInstallSettings<ThrowOnError extends boolean = true>(options?: Options<GetInstallSettingsData, ThrowOnError>) {
@@ -2772,6 +2919,7 @@ export class InstallService {
     
     /**
      * Performs installation setup.
+     *
      * Performs the initial setup and installation of Umbraco.
      */
     public static postInstallSetup<ThrowOnError extends boolean = true>(options?: Options<PostInstallSetupData, ThrowOnError>) {
@@ -2787,6 +2935,7 @@ export class InstallService {
     
     /**
      * Validates database connection.
+     *
      * Validates the database connection settings provided during installation.
      */
     public static postInstallValidateDatabase<ThrowOnError extends boolean = true>(options?: Options<PostInstallValidateDatabaseData, ThrowOnError>) {
@@ -2804,6 +2953,7 @@ export class InstallService {
 export class LanguageService {
     /**
      * Gets a collection of language items.
+     *
      * Gets a collection of language items identified by the provided Ids.
      */
     public static getItemLanguage<ThrowOnError extends boolean = true>(options?: Options<GetItemLanguageData, ThrowOnError>) {
@@ -2821,6 +2971,7 @@ export class LanguageService {
     
     /**
      * Gets the default language.
+     *
      * Gets the default language configured for the Umbraco installation.
      */
     public static getItemLanguageDefault<ThrowOnError extends boolean = true>(options?: Options<GetItemLanguageDefaultData, ThrowOnError>) {
@@ -2838,6 +2989,7 @@ export class LanguageService {
     
     /**
      * Gets a paginated collection of languages.
+     *
      * Gets a paginated collection of all configured languages.
      */
     public static getLanguage<ThrowOnError extends boolean = true>(options?: Options<GetLanguageData, ThrowOnError>) {
@@ -2855,6 +3007,7 @@ export class LanguageService {
     
     /**
      * Creates a new language.
+     *
      * Creates a new language with the configuration specified in the request model.
      */
     public static postLanguage<ThrowOnError extends boolean = true>(options?: Options<PostLanguageData, ThrowOnError>) {
@@ -2876,6 +3029,7 @@ export class LanguageService {
     
     /**
      * Deletes a language.
+     *
      * Deletes a language identified by the provided Id.
      */
     public static deleteLanguageByIsoCode<ThrowOnError extends boolean = true>(options: Options<DeleteLanguageByIsoCodeData, ThrowOnError>) {
@@ -2893,6 +3047,7 @@ export class LanguageService {
     
     /**
      * Gets a language by ISO code.
+     *
      * Gets a language identified by the provided ISO code.
      */
     public static getLanguageByIsoCode<ThrowOnError extends boolean = true>(options: Options<GetLanguageByIsoCodeData, ThrowOnError>) {
@@ -2910,6 +3065,7 @@ export class LanguageService {
     
     /**
      * Updates a language.
+     *
      * Updates a language identified by the provided Id with the details from the request model.
      */
     public static putLanguageByIsoCode<ThrowOnError extends boolean = true>(options: Options<PutLanguageByIsoCodeData, ThrowOnError>) {
@@ -2933,6 +3089,7 @@ export class LanguageService {
 export class LogViewerService {
     /**
      * Gets a collection of log sink levels.
+     *
      * Gets a collection of configured log sinks with their minimum log levels.
      */
     public static getLogViewerLevel<ThrowOnError extends boolean = true>(options?: Options<GetLogViewerLevelData, ThrowOnError>) {
@@ -2950,6 +3107,7 @@ export class LogViewerService {
     
     /**
      * Gets log level counts.
+     *
      * Gets the count of log entries for each log level within the specified date range.
      */
     public static getLogViewerLevelCount<ThrowOnError extends boolean = true>(options?: Options<GetLogViewerLevelCountData, ThrowOnError>) {
@@ -2967,6 +3125,7 @@ export class LogViewerService {
     
     /**
      * Gets a paginated collection of log entries.
+     *
      * Gets a paginated collection of log entries with optional filtering and date range.
      */
     public static getLogViewerLog<ThrowOnError extends boolean = true>(options?: Options<GetLogViewerLogData, ThrowOnError>) {
@@ -2984,6 +3143,7 @@ export class LogViewerService {
     
     /**
      * Gets a collection of log message templates.
+     *
      * Gets a paginated collection of unique message templates found in the logs.
      */
     public static getLogViewerMessageTemplate<ThrowOnError extends boolean = true>(options?: Options<GetLogViewerMessageTemplateData, ThrowOnError>) {
@@ -3001,6 +3161,7 @@ export class LogViewerService {
     
     /**
      * Gets a collection of saved log searches.
+     *
      * Gets a collection of saved log searches defined in the Umbraco installation.
      */
     public static getLogViewerSavedSearch<ThrowOnError extends boolean = true>(options?: Options<GetLogViewerSavedSearchData, ThrowOnError>) {
@@ -3018,6 +3179,7 @@ export class LogViewerService {
     
     /**
      * Creates a saved log search.
+     *
      * Creates a new saved log search with the provided name and query configuration.
      */
     public static postLogViewerSavedSearch<ThrowOnError extends boolean = true>(options?: Options<PostLogViewerSavedSearchData, ThrowOnError>) {
@@ -3039,6 +3201,7 @@ export class LogViewerService {
     
     /**
      * Deletes a saved log search.
+     *
      * Deletes a saved log search identified by the provided name.
      */
     public static deleteLogViewerSavedSearchByName<ThrowOnError extends boolean = true>(options: Options<DeleteLogViewerSavedSearchByNameData, ThrowOnError>) {
@@ -3056,6 +3219,7 @@ export class LogViewerService {
     
     /**
      * Gets a saved log search by name.
+     *
      * Gets a saved log search identified by the provided name.
      */
     public static getLogViewerSavedSearchByName<ThrowOnError extends boolean = true>(options: Options<GetLogViewerSavedSearchByNameData, ThrowOnError>) {
@@ -3073,6 +3237,7 @@ export class LogViewerService {
     
     /**
      * Validates if logs can be viewed.
+     *
      * Checks if the log files are within the size limit and can be viewed.
      */
     public static getLogViewerValidateLogsSize<ThrowOnError extends boolean = true>(options?: Options<GetLogViewerValidateLogsSizeData, ThrowOnError>) {
@@ -3092,6 +3257,7 @@ export class LogViewerService {
 export class ManifestService {
     /**
      * Gets all manifests.
+     *
      * Gets a collection of all package manifests including both public and private manifests.
      */
     public static getManifestManifest<ThrowOnError extends boolean = true>(options?: Options<GetManifestManifestData, ThrowOnError>) {
@@ -3109,6 +3275,7 @@ export class ManifestService {
     
     /**
      * Gets private manifests.
+     *
      * Gets a collection of private package manifests specific to the current user.
      */
     public static getManifestManifestPrivate<ThrowOnError extends boolean = true>(options?: Options<GetManifestManifestPrivateData, ThrowOnError>) {
@@ -3126,6 +3293,7 @@ export class ManifestService {
     
     /**
      * Gets public manifests.
+     *
      * Gets a collection of public package manifests available to all users.
      */
     public static getManifestManifestPublic<ThrowOnError extends boolean = true>(options?: Options<GetManifestManifestPublicData, ThrowOnError>) {
@@ -3139,6 +3307,7 @@ export class ManifestService {
 export class MediaTypeService {
     /**
      * Gets a collection of media type items.
+     *
      * Gets a collection of media type items identified by the provided Ids.
      */
     public static getItemMediaType<ThrowOnError extends boolean = true>(options?: Options<GetItemMediaTypeData, ThrowOnError>) {
@@ -3156,6 +3325,7 @@ export class MediaTypeService {
     
     /**
      * Gets a collection of media type items.
+     *
      * Gets a collection of allowed media type items for the specified file extension.
      */
     public static getItemMediaTypeAllowed<ThrowOnError extends boolean = true>(options?: Options<GetItemMediaTypeAllowedData, ThrowOnError>) {
@@ -3173,6 +3343,7 @@ export class MediaTypeService {
     
     /**
      * Gets ancestors for a collection of media type items.
+     *
      * Gets the ancestor chains for media type items identified by the provided Ids.
      */
     public static getItemMediaTypeAncestors<ThrowOnError extends boolean = true>(options?: Options<GetItemMediaTypeAncestorsData, ThrowOnError>) {
@@ -3190,6 +3361,7 @@ export class MediaTypeService {
     
     /**
      * Gets a collection of media type folder items.
+     *
      * Gets a paginated collection of media type folder items.
      */
     public static getItemMediaTypeFolders<ThrowOnError extends boolean = true>(options?: Options<GetItemMediaTypeFoldersData, ThrowOnError>) {
@@ -3207,6 +3379,7 @@ export class MediaTypeService {
     
     /**
      * Searches media type items.
+     *
      * Searches media type items by the provided query with pagination support.
      */
     public static getItemMediaTypeSearch<ThrowOnError extends boolean = true>(options?: Options<GetItemMediaTypeSearchData, ThrowOnError>) {
@@ -3224,6 +3397,7 @@ export class MediaTypeService {
     
     /**
      * Creates a new media type.
+     *
      * Creates a new media type with the configuration specified in the request model.
      */
     public static postMediaType<ThrowOnError extends boolean = true>(options?: Options<PostMediaTypeData, ThrowOnError>) {
@@ -3245,6 +3419,7 @@ export class MediaTypeService {
     
     /**
      * Deletes a media type.
+     *
      * Deletes a media type identified by the provided Id.
      */
     public static deleteMediaTypeById<ThrowOnError extends boolean = true>(options: Options<DeleteMediaTypeByIdData, ThrowOnError>) {
@@ -3262,6 +3437,7 @@ export class MediaTypeService {
     
     /**
      * Gets a media type.
+     *
      * Gets a media type identified by the provided Id.
      */
     public static getMediaTypeById<ThrowOnError extends boolean = true>(options: Options<GetMediaTypeByIdData, ThrowOnError>) {
@@ -3279,6 +3455,7 @@ export class MediaTypeService {
     
     /**
      * Updates a media type.
+     *
      * Updates a media type identified by the provided Id with the details from the request model.
      */
     public static putMediaTypeById<ThrowOnError extends boolean = true>(options: Options<PutMediaTypeByIdData, ThrowOnError>) {
@@ -3300,6 +3477,7 @@ export class MediaTypeService {
     
     /**
      * Gets allowed child media types.
+     *
      * Gets a collection of media types that are allowed as children of the specified parent media type.
      */
     public static getMediaTypeByIdAllowedChildren<ThrowOnError extends boolean = true>(options: Options<GetMediaTypeByIdAllowedChildrenData, ThrowOnError>) {
@@ -3317,6 +3495,7 @@ export class MediaTypeService {
     
     /**
      * Gets allowed parent media types.
+     *
      * Gets a collection of media types that are allowed as parents of the specified media type.
      */
     public static getMediaTypeByIdAllowedParents<ThrowOnError extends boolean = true>(options: Options<GetMediaTypeByIdAllowedParentsData, ThrowOnError>) {
@@ -3334,6 +3513,7 @@ export class MediaTypeService {
     
     /**
      * Gets composition references.
+     *
      * Gets a collection of media types that reference the specified media type as a composition.
      */
     public static getMediaTypeByIdCompositionReferences<ThrowOnError extends boolean = true>(options: Options<GetMediaTypeByIdCompositionReferencesData, ThrowOnError>) {
@@ -3351,6 +3531,7 @@ export class MediaTypeService {
     
     /**
      * Copies a media type.
+     *
      * Creates a duplicate of an existing media type identified by the provided Id.
      */
     public static postMediaTypeByIdCopy<ThrowOnError extends boolean = true>(options: Options<PostMediaTypeByIdCopyData, ThrowOnError>) {
@@ -3372,6 +3553,7 @@ export class MediaTypeService {
     
     /**
      * Exports a media type.
+     *
      * Exports the media type identified by the provided Id to a downloadable format.
      */
     public static getMediaTypeByIdExport<ThrowOnError extends boolean = true>(options: Options<GetMediaTypeByIdExportData, ThrowOnError>) {
@@ -3389,6 +3571,7 @@ export class MediaTypeService {
     
     /**
      * Imports a media type.
+     *
      * Imports a media type from the provided file upload.
      */
     public static putMediaTypeByIdImport<ThrowOnError extends boolean = true>(options: Options<PutMediaTypeByIdImportData, ThrowOnError>) {
@@ -3410,6 +3593,7 @@ export class MediaTypeService {
     
     /**
      * Moves a media type.
+     *
      * Moves a media type identified by the provided Id to a different location.
      */
     public static putMediaTypeByIdMove<ThrowOnError extends boolean = true>(options: Options<PutMediaTypeByIdMoveData, ThrowOnError>) {
@@ -3444,6 +3628,7 @@ export class MediaTypeService {
     
     /**
      * Gets media types allowed at root.
+     *
      * Gets a collection of media types that are allowed to be created at the root level.
      */
     public static getMediaTypeAllowedAtRoot<ThrowOnError extends boolean = true>(options?: Options<GetMediaTypeAllowedAtRootData, ThrowOnError>) {
@@ -3461,6 +3646,7 @@ export class MediaTypeService {
     
     /**
      * Gets available compositions.
+     *
      * Gets a collection of media types that are available to use as compositions for the specified media type.
      */
     public static postMediaTypeAvailableCompositions<ThrowOnError extends boolean = true>(options?: Options<PostMediaTypeAvailableCompositionsData, ThrowOnError>) {
@@ -3482,6 +3668,7 @@ export class MediaTypeService {
     
     /**
      * Gets multiple media types.
+     *
      * Gets multiple media types identified by the provided Ids.
      */
     public static getMediaTypeBatch<ThrowOnError extends boolean = true>(options?: Options<GetMediaTypeBatchData, ThrowOnError>) {
@@ -3499,6 +3686,7 @@ export class MediaTypeService {
     
     /**
      * Gets the media type configuration.
+     *
      * Gets the configuration settings for media types.
      */
     public static getMediaTypeConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetMediaTypeConfigurationData, ThrowOnError>) {
@@ -3516,6 +3704,7 @@ export class MediaTypeService {
     
     /**
      * Creates a media type folder.
+     *
      * Creates a new media type folder with the provided name and parent location.
      */
     public static postMediaTypeFolder<ThrowOnError extends boolean = true>(options?: Options<PostMediaTypeFolderData, ThrowOnError>) {
@@ -3537,6 +3726,7 @@ export class MediaTypeService {
     
     /**
      * Deletes a media type folder.
+     *
      * Deletes a media type folder identified by the provided Id.
      */
     public static deleteMediaTypeFolderById<ThrowOnError extends boolean = true>(options: Options<DeleteMediaTypeFolderByIdData, ThrowOnError>) {
@@ -3554,6 +3744,7 @@ export class MediaTypeService {
     
     /**
      * Gets a media type folder.
+     *
      * Gets a media type folder identified by the provided Id.
      */
     public static getMediaTypeFolderById<ThrowOnError extends boolean = true>(options: Options<GetMediaTypeFolderByIdData, ThrowOnError>) {
@@ -3571,6 +3762,7 @@ export class MediaTypeService {
     
     /**
      * Updates a media type folder.
+     *
      * Updates a media type folder identified by the provided Id with the details from the request model.
      */
     public static putMediaTypeFolderById<ThrowOnError extends boolean = true>(options: Options<PutMediaTypeFolderByIdData, ThrowOnError>) {
@@ -3592,6 +3784,7 @@ export class MediaTypeService {
     
     /**
      * Imports a media type.
+     *
      * Imports a media type from the provided file upload.
      */
     public static postMediaTypeImport<ThrowOnError extends boolean = true>(options?: Options<PostMediaTypeImportData, ThrowOnError>) {
@@ -3613,6 +3806,7 @@ export class MediaTypeService {
     
     /**
      * Gets a collection of ancestor media type items.
+     *
      * Gets a collection of media type items that are ancestors to the provided Id.
      */
     public static getTreeMediaTypeAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeMediaTypeAncestorsData, ThrowOnError>) {
@@ -3630,6 +3824,7 @@ export class MediaTypeService {
     
     /**
      * Gets a collection of media type tree child items.
+     *
      * Gets a paginated collection of media type tree items that are children of the provided parent Id.
      */
     public static getTreeMediaTypeChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeMediaTypeChildrenData, ThrowOnError>) {
@@ -3647,6 +3842,7 @@ export class MediaTypeService {
     
     /**
      * Gets a collection of media type items from the root of the tree.
+     *
      * Gets a paginated collection of media type items from the root of the tree with optional filtering.
      */
     public static getTreeMediaTypeRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeMediaTypeRootData, ThrowOnError>) {
@@ -3664,6 +3860,7 @@ export class MediaTypeService {
     
     /**
      * Gets a collection of media type tree sibling items.
+     *
      * Gets a collection of media type tree items that are siblings of the provided Id.
      */
     public static getTreeMediaTypeSiblings<ThrowOnError extends boolean = true>(options?: Options<GetTreeMediaTypeSiblingsData, ThrowOnError>) {
@@ -3683,6 +3880,7 @@ export class MediaTypeService {
 export class MediaService {
     /**
      * Gets a collection of media items.
+     *
      * Gets a paginated collection of media items, optionally filtered and sorted.
      */
     public static getCollectionMedia<ThrowOnError extends boolean = true>(options?: Options<GetCollectionMediaData, ThrowOnError>) {
@@ -3700,6 +3898,7 @@ export class MediaService {
     
     /**
      * Gets a collection of media items.
+     *
      * Gets a collection of media items identified by the provided Ids.
      */
     public static getItemMedia<ThrowOnError extends boolean = true>(options?: Options<GetItemMediaData, ThrowOnError>) {
@@ -3717,6 +3916,7 @@ export class MediaService {
     
     /**
      * Gets ancestors for a collection of media items.
+     *
      * Gets the ancestor chains for media items identified by the provided Ids.
      */
     public static getItemMediaAncestors<ThrowOnError extends boolean = true>(options?: Options<GetItemMediaAncestorsData, ThrowOnError>) {
@@ -3734,6 +3934,7 @@ export class MediaService {
     
     /**
      * Searches media items.
+     *
      * Searches media items by the provided query with pagination support.
      */
     public static getItemMediaSearch<ThrowOnError extends boolean = true>(options?: Options<GetItemMediaSearchData, ThrowOnError>) {
@@ -3751,6 +3952,7 @@ export class MediaService {
     
     /**
      * Creates a new media.
+     *
      * Creates a new media with the configuration specified in the request model.
      */
     public static postMedia<ThrowOnError extends boolean = true>(options?: Options<PostMediaData, ThrowOnError>) {
@@ -3772,6 +3974,7 @@ export class MediaService {
     
     /**
      * Deletes a media item.
+     *
      * Deletes a media item identified by the provided Id.
      */
     public static deleteMediaById<ThrowOnError extends boolean = true>(options: Options<DeleteMediaByIdData, ThrowOnError>) {
@@ -3789,6 +3992,7 @@ export class MediaService {
     
     /**
      * Gets a media item.
+     *
      * Gets a media item identified by the provided Id.
      */
     public static getMediaById<ThrowOnError extends boolean = true>(options: Options<GetMediaByIdData, ThrowOnError>) {
@@ -3806,6 +4010,7 @@ export class MediaService {
     
     /**
      * Updates a media item.
+     *
      * Updates a media item identified by the provided Id with the details from the request model.
      */
     public static putMediaById<ThrowOnError extends boolean = true>(options: Options<PutMediaByIdData, ThrowOnError>) {
@@ -3827,6 +4032,7 @@ export class MediaService {
     
     /**
      * Gets the audit log for a media item.
+     *
      * Gets a paginated collection of audit log entries for the media identified by the provided Id.
      */
     public static getMediaByIdAuditLog<ThrowOnError extends boolean = true>(options: Options<GetMediaByIdAuditLogData, ThrowOnError>) {
@@ -3844,6 +4050,7 @@ export class MediaService {
     
     /**
      * Moves a media item.
+     *
      * Moves a media item identified by the provided Id to a different location.
      */
     public static putMediaByIdMove<ThrowOnError extends boolean = true>(options: Options<PutMediaByIdMoveData, ThrowOnError>) {
@@ -3865,6 +4072,7 @@ export class MediaService {
     
     /**
      * Moves a media item to the recycle bin.
+     *
      * Moves a media item identified by the provided Id to the recycle bin.
      */
     public static putMediaByIdMoveToRecycleBin<ThrowOnError extends boolean = true>(options: Options<PutMediaByIdMoveToRecycleBinData, ThrowOnError>) {
@@ -3882,6 +4090,7 @@ export class MediaService {
     
     /**
      * Gets a collection of items that reference a media item.
+     *
      * Gets a paginated collection of items that reference the media item identified by the provided Id.
      */
     public static getMediaByIdReferencedBy<ThrowOnError extends boolean = true>(options: Options<GetMediaByIdReferencedByData, ThrowOnError>) {
@@ -3899,6 +4108,7 @@ export class MediaService {
     
     /**
      * Gets media descendants that are referenced.
+     *
      * Gets a paginated collection of descendant media items that are referenced by other content.
      */
     public static getMediaByIdReferencedDescendants<ThrowOnError extends boolean = true>(options: Options<GetMediaByIdReferencedDescendantsData, ThrowOnError>) {
@@ -3916,6 +4126,7 @@ export class MediaService {
     
     /**
      * Validates updating a media item.
+     *
      * Validates the request model for updating a media item without actually updating it.
      */
     public static putMediaByIdValidate<ThrowOnError extends boolean = true>(options: Options<PutMediaByIdValidateData, ThrowOnError>) {
@@ -3937,6 +4148,7 @@ export class MediaService {
     
     /**
      * Gets a collection of referenced media items.
+     *
      * Gets a paginated collection of media items that are referenced, identified by the provided Ids.
      */
     public static getMediaAreReferenced<ThrowOnError extends boolean = true>(options?: Options<GetMediaAreReferencedData, ThrowOnError>) {
@@ -3954,6 +4166,7 @@ export class MediaService {
     
     /**
      * Gets the media configuration.
+     *
      * Gets the configuration settings for media.
      */
     public static getMediaConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetMediaConfigurationData, ThrowOnError>) {
@@ -3971,6 +4184,7 @@ export class MediaService {
     
     /**
      * Sorts media items.
+     *
      * Sorts media items in the specified parent container according to the provided sort order.
      */
     public static putMediaSort<ThrowOnError extends boolean = true>(options?: Options<PutMediaSortData, ThrowOnError>) {
@@ -3992,6 +4206,7 @@ export class MediaService {
     
     /**
      * Gets URLs for media items.
+     *
      * Gets the URLs for the media items identified by the provided Ids.
      */
     public static getMediaUrls<ThrowOnError extends boolean = true>(options?: Options<GetMediaUrlsData, ThrowOnError>) {
@@ -4009,6 +4224,7 @@ export class MediaService {
     
     /**
      * Validates creating a media item.
+     *
      * Validates the request model for creating a new media item without actually creating it.
      */
     public static postMediaValidate<ThrowOnError extends boolean = true>(options?: Options<PostMediaValidateData, ThrowOnError>) {
@@ -4030,6 +4246,7 @@ export class MediaService {
     
     /**
      * Empties the media recycle bin.
+     *
      * Permanently deletes all media items in the recycle bin. This operation cannot be undone.
      */
     public static deleteRecycleBinMedia<ThrowOnError extends boolean = true>(options?: Options<DeleteRecycleBinMediaData, ThrowOnError>) {
@@ -4047,6 +4264,7 @@ export class MediaService {
     
     /**
      * Deletes a media item from the recycle bin.
+     *
      * Permanently deletes a media item from the recycle bin identified by the provided Id.
      */
     public static deleteRecycleBinMediaById<ThrowOnError extends boolean = true>(options: Options<DeleteRecycleBinMediaByIdData, ThrowOnError>) {
@@ -4064,6 +4282,7 @@ export class MediaService {
     
     /**
      * Gets the original parent of a media item in the recycle bin.
+     *
      * Gets the original parent location of a media item before it was moved to the recycle bin.
      */
     public static getRecycleBinMediaByIdOriginalParent<ThrowOnError extends boolean = true>(options: Options<GetRecycleBinMediaByIdOriginalParentData, ThrowOnError>) {
@@ -4081,6 +4300,7 @@ export class MediaService {
     
     /**
      * Restores a media item from the recycle bin.
+     *
      * Restores a media item from the recycle bin to its original location or a specified parent.
      */
     public static putRecycleBinMediaByIdRestore<ThrowOnError extends boolean = true>(options: Options<PutRecycleBinMediaByIdRestoreData, ThrowOnError>) {
@@ -4102,6 +4322,7 @@ export class MediaService {
     
     /**
      * Gets a collection of media items in the recycle bin.
+     *
      * Gets a paginated collection of media items that are children of the provided parent in the recycle bin.
      */
     public static getRecycleBinMediaChildren<ThrowOnError extends boolean = true>(options?: Options<GetRecycleBinMediaChildrenData, ThrowOnError>) {
@@ -4119,6 +4340,7 @@ export class MediaService {
     
     /**
      * Gets items referencing media in the recycle bin.
+     *
      * Gets a paginated collection of items that reference the media in the recycle bin.
      */
     public static getRecycleBinMediaReferencedBy<ThrowOnError extends boolean = true>(options?: Options<GetRecycleBinMediaReferencedByData, ThrowOnError>) {
@@ -4136,6 +4358,7 @@ export class MediaService {
     
     /**
      * Gets media at the root of the recycle bin.
+     *
      * Gets a paginated collection of media items at the root level of the recycle bin.
      */
     public static getRecycleBinMediaRoot<ThrowOnError extends boolean = true>(options?: Options<GetRecycleBinMediaRootData, ThrowOnError>) {
@@ -4153,6 +4376,7 @@ export class MediaService {
     
     /**
      * Gets sibling media in the recycle bin.
+     *
      * Gets a collection of sibling media items in the recycle bin at the same level as the provided Id.
      */
     public static getRecycleBinMediaSiblings<ThrowOnError extends boolean = true>(options?: Options<GetRecycleBinMediaSiblingsData, ThrowOnError>) {
@@ -4170,6 +4394,7 @@ export class MediaService {
     
     /**
      * Gets a collection of ancestor media items.
+     *
      * Gets a collection of media items that are ancestors to the provided Id.
      */
     public static getTreeMediaAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeMediaAncestorsData, ThrowOnError>) {
@@ -4187,6 +4412,7 @@ export class MediaService {
     
     /**
      * Gets a collection of media tree child items.
+     *
      * Gets a paginated collection of media tree items that are children of the provided parent Id.
      */
     public static getTreeMediaChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeMediaChildrenData, ThrowOnError>) {
@@ -4204,6 +4430,7 @@ export class MediaService {
     
     /**
      * Gets a collection of media items from the root of the tree.
+     *
      * Gets a paginated collection of media items from the root of the tree with optional filtering.
      */
     public static getTreeMediaRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeMediaRootData, ThrowOnError>) {
@@ -4221,6 +4448,7 @@ export class MediaService {
     
     /**
      * Gets a collection of media tree sibling items.
+     *
      * Gets a collection of media tree items that are siblings of the provided Id.
      */
     public static getTreeMediaSiblings<ThrowOnError extends boolean = true>(options?: Options<GetTreeMediaSiblingsData, ThrowOnError>) {
@@ -4240,6 +4468,7 @@ export class MediaService {
 export class MemberGroupService {
     /**
      * Gets a collection of member group items.
+     *
      * Gets a collection of member group items identified by the provided Ids.
      */
     public static getItemMemberGroup<ThrowOnError extends boolean = true>(options?: Options<GetItemMemberGroupData, ThrowOnError>) {
@@ -4257,6 +4486,7 @@ export class MemberGroupService {
     
     /**
      * Gets a paginated collection of member groups.
+     *
      * Gets a paginated collection of all member groups.
      */
     public static getMemberGroup<ThrowOnError extends boolean = true>(options?: Options<GetMemberGroupData, ThrowOnError>) {
@@ -4274,6 +4504,7 @@ export class MemberGroupService {
     
     /**
      * Creates a new member group.
+     *
      * Creates a new member group with the configuration specified in the request model.
      */
     public static postMemberGroup<ThrowOnError extends boolean = true>(options?: Options<PostMemberGroupData, ThrowOnError>) {
@@ -4295,6 +4526,7 @@ export class MemberGroupService {
     
     /**
      * Deletes a member group.
+     *
      * Deletes a member group identified by the provided Id.
      */
     public static deleteMemberGroupById<ThrowOnError extends boolean = true>(options: Options<DeleteMemberGroupByIdData, ThrowOnError>) {
@@ -4312,6 +4544,7 @@ export class MemberGroupService {
     
     /**
      * Gets a member group.
+     *
      * Gets a member group identified by the provided Id.
      */
     public static getMemberGroupById<ThrowOnError extends boolean = true>(options: Options<GetMemberGroupByIdData, ThrowOnError>) {
@@ -4329,6 +4562,7 @@ export class MemberGroupService {
     
     /**
      * Updates a member group.
+     *
      * Updates a member group identified by the provided Id with the details from the request model.
      */
     public static putMemberGroupById<ThrowOnError extends boolean = true>(options: Options<PutMemberGroupByIdData, ThrowOnError>) {
@@ -4350,6 +4584,7 @@ export class MemberGroupService {
     
     /**
      * Gets a collection of member group items from the root of the tree.
+     *
      * Gets a paginated collection of member group items from the root of the tree with optional filtering.
      */
     public static getTreeMemberGroupRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeMemberGroupRootData, ThrowOnError>) {
@@ -4369,6 +4604,7 @@ export class MemberGroupService {
 export class MemberTypeService {
     /**
      * Gets a collection of member type items.
+     *
      * Gets a collection of member type items identified by the provided Ids.
      */
     public static getItemMemberType<ThrowOnError extends boolean = true>(options?: Options<GetItemMemberTypeData, ThrowOnError>) {
@@ -4386,6 +4622,7 @@ export class MemberTypeService {
     
     /**
      * Gets ancestors for a collection of member type items.
+     *
      * Gets the ancestor chains for member type items identified by the provided Ids.
      */
     public static getItemMemberTypeAncestors<ThrowOnError extends boolean = true>(options?: Options<GetItemMemberTypeAncestorsData, ThrowOnError>) {
@@ -4403,6 +4640,7 @@ export class MemberTypeService {
     
     /**
      * Searches member type items.
+     *
      * Searches member type items by the provided query with pagination support.
      */
     public static getItemMemberTypeSearch<ThrowOnError extends boolean = true>(options?: Options<GetItemMemberTypeSearchData, ThrowOnError>) {
@@ -4420,6 +4658,7 @@ export class MemberTypeService {
     
     /**
      * Creates a new member type.
+     *
      * Creates a new member type with the configuration specified in the request model.
      */
     public static postMemberType<ThrowOnError extends boolean = true>(options?: Options<PostMemberTypeData, ThrowOnError>) {
@@ -4441,6 +4680,7 @@ export class MemberTypeService {
     
     /**
      * Deletes a member type.
+     *
      * Deletes a member type identified by the provided Id.
      */
     public static deleteMemberTypeById<ThrowOnError extends boolean = true>(options: Options<DeleteMemberTypeByIdData, ThrowOnError>) {
@@ -4458,6 +4698,7 @@ export class MemberTypeService {
     
     /**
      * Gets a member type.
+     *
      * Gets a member type identified by the provided Id.
      */
     public static getMemberTypeById<ThrowOnError extends boolean = true>(options: Options<GetMemberTypeByIdData, ThrowOnError>) {
@@ -4475,6 +4716,7 @@ export class MemberTypeService {
     
     /**
      * Updates a member type.
+     *
      * Updates a member type identified by the provided Id with the details from the request model.
      */
     public static putMemberTypeById<ThrowOnError extends boolean = true>(options: Options<PutMemberTypeByIdData, ThrowOnError>) {
@@ -4496,6 +4738,7 @@ export class MemberTypeService {
     
     /**
      * Gets composition references.
+     *
      * Gets a collection of member types that reference the specified member type as a composition.
      */
     public static getMemberTypeByIdCompositionReferences<ThrowOnError extends boolean = true>(options: Options<GetMemberTypeByIdCompositionReferencesData, ThrowOnError>) {
@@ -4513,6 +4756,7 @@ export class MemberTypeService {
     
     /**
      * Copies a member type.
+     *
      * Creates a duplicate of an existing member type identified by the provided Id.
      */
     public static postMemberTypeByIdCopy<ThrowOnError extends boolean = true>(options: Options<PostMemberTypeByIdCopyData, ThrowOnError>) {
@@ -4534,6 +4778,7 @@ export class MemberTypeService {
     
     /**
      * Exports a member type.
+     *
      * Exports the member type identified by the provided Id to a downloadable format.
      */
     public static getMemberTypeByIdExport<ThrowOnError extends boolean = true>(options: Options<GetMemberTypeByIdExportData, ThrowOnError>) {
@@ -4551,6 +4796,7 @@ export class MemberTypeService {
     
     /**
      * Imports a member type.
+     *
      * Imports a member type from the provided file upload.
      */
     public static putMemberTypeByIdImport<ThrowOnError extends boolean = true>(options: Options<PutMemberTypeByIdImportData, ThrowOnError>) {
@@ -4572,6 +4818,7 @@ export class MemberTypeService {
     
     /**
      * Moves a member type.
+     *
      * Moves a member type identified by the provided Id to a different location.
      */
     public static putMemberTypeByIdMove<ThrowOnError extends boolean = true>(options: Options<PutMemberTypeByIdMoveData, ThrowOnError>) {
@@ -4606,6 +4853,7 @@ export class MemberTypeService {
     
     /**
      * Gets member types allowed at root.
+     *
      * Gets a collection of member types that are allowed to be created at the root level.
      */
     public static getMemberTypeAllowedAtRoot<ThrowOnError extends boolean = true>(options?: Options<GetMemberTypeAllowedAtRootData, ThrowOnError>) {
@@ -4623,6 +4871,7 @@ export class MemberTypeService {
     
     /**
      * Gets available compositions.
+     *
      * Gets a collection of member types that are available to use as compositions for the specified member type.
      */
     public static postMemberTypeAvailableCompositions<ThrowOnError extends boolean = true>(options?: Options<PostMemberTypeAvailableCompositionsData, ThrowOnError>) {
@@ -4644,6 +4893,7 @@ export class MemberTypeService {
     
     /**
      * Gets multiple member types.
+     *
      * Gets multiple member types identified by the provided Ids.
      */
     public static getMemberTypeBatch<ThrowOnError extends boolean = true>(options?: Options<GetMemberTypeBatchData, ThrowOnError>) {
@@ -4661,6 +4911,7 @@ export class MemberTypeService {
     
     /**
      * Gets the member type configuration.
+     *
      * Gets the configuration settings for member types.
      */
     public static getMemberTypeConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetMemberTypeConfigurationData, ThrowOnError>) {
@@ -4678,6 +4929,7 @@ export class MemberTypeService {
     
     /**
      * Creates a member type folder.
+     *
      * Creates a new member type folder with the provided name and parent location.
      */
     public static postMemberTypeFolder<ThrowOnError extends boolean = true>(options?: Options<PostMemberTypeFolderData, ThrowOnError>) {
@@ -4699,6 +4951,7 @@ export class MemberTypeService {
     
     /**
      * Deletes a member type folder.
+     *
      * Deletes a member type folder identified by the provided Id.
      */
     public static deleteMemberTypeFolderById<ThrowOnError extends boolean = true>(options: Options<DeleteMemberTypeFolderByIdData, ThrowOnError>) {
@@ -4716,6 +4969,7 @@ export class MemberTypeService {
     
     /**
      * Gets a member type folder.
+     *
      * Gets a member type folder identified by the provided Id.
      */
     public static getMemberTypeFolderById<ThrowOnError extends boolean = true>(options: Options<GetMemberTypeFolderByIdData, ThrowOnError>) {
@@ -4733,6 +4987,7 @@ export class MemberTypeService {
     
     /**
      * Updates a member type folder.
+     *
      * Updates a member type folder identified by the provided Id with the details from the request model.
      */
     public static putMemberTypeFolderById<ThrowOnError extends boolean = true>(options: Options<PutMemberTypeFolderByIdData, ThrowOnError>) {
@@ -4754,6 +5009,7 @@ export class MemberTypeService {
     
     /**
      * Imports a member type.
+     *
      * Imports a member type from the provided file upload.
      */
     public static postMemberTypeImport<ThrowOnError extends boolean = true>(options?: Options<PostMemberTypeImportData, ThrowOnError>) {
@@ -4775,6 +5031,7 @@ export class MemberTypeService {
     
     /**
      * Gets a collection of ancestor member type items.
+     *
      * Gets a collection of member type items that are ancestors to the provided Id.
      */
     public static getTreeMemberTypeAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeMemberTypeAncestorsData, ThrowOnError>) {
@@ -4792,6 +5049,7 @@ export class MemberTypeService {
     
     /**
      * Gets a collection of member type tree child items.
+     *
      * Gets a paginated collection of member type tree items that are children of the provided parent Id.
      */
     public static getTreeMemberTypeChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeMemberTypeChildrenData, ThrowOnError>) {
@@ -4809,6 +5067,7 @@ export class MemberTypeService {
     
     /**
      * Gets a collection of member type items from the root of the tree.
+     *
      * Gets a paginated collection of member type items from the root of the tree with optional filtering.
      */
     public static getTreeMemberTypeRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeMemberTypeRootData, ThrowOnError>) {
@@ -4826,6 +5085,7 @@ export class MemberTypeService {
     
     /**
      * Gets sibling member types in the tree.
+     *
      * Gets a collection of member type tree items that are siblings of the provided Id.
      */
     public static getTreeMemberTypeSiblings<ThrowOnError extends boolean = true>(options?: Options<GetTreeMemberTypeSiblingsData, ThrowOnError>) {
@@ -4845,6 +5105,7 @@ export class MemberTypeService {
 export class MemberService {
     /**
      * Gets a filtered collection of members.
+     *
      * Filters members based on the provided criteria with support for pagination.
      */
     public static getFilterMember<ThrowOnError extends boolean = true>(options?: Options<GetFilterMemberData, ThrowOnError>) {
@@ -4862,6 +5123,7 @@ export class MemberService {
     
     /**
      * Gets a collection of member items.
+     *
      * Gets a collection of member items identified by the provided Ids.
      */
     public static getItemMember<ThrowOnError extends boolean = true>(options?: Options<GetItemMemberData, ThrowOnError>) {
@@ -4879,6 +5141,7 @@ export class MemberService {
     
     /**
      * Gets ancestors for a collection of member items.
+     *
      * Gets the ancestor chains for member items identified by the provided Ids.
      */
     public static getItemMemberAncestors<ThrowOnError extends boolean = true>(options?: Options<GetItemMemberAncestorsData, ThrowOnError>) {
@@ -4896,6 +5159,7 @@ export class MemberService {
     
     /**
      * Searches member items.
+     *
      * Searches member items by the provided query with pagination support.
      */
     public static getItemMemberSearch<ThrowOnError extends boolean = true>(options?: Options<GetItemMemberSearchData, ThrowOnError>) {
@@ -4913,6 +5177,7 @@ export class MemberService {
     
     /**
      * Creates a new member.
+     *
      * Creates a new member with the configuration specified in the request model.
      */
     public static postMember<ThrowOnError extends boolean = true>(options?: Options<PostMemberData, ThrowOnError>) {
@@ -4934,6 +5199,7 @@ export class MemberService {
     
     /**
      * Deletes a member.
+     *
      * Deletes a member identified by the provided Id.
      */
     public static deleteMemberById<ThrowOnError extends boolean = true>(options: Options<DeleteMemberByIdData, ThrowOnError>) {
@@ -4951,6 +5217,7 @@ export class MemberService {
     
     /**
      * Gets a member.
+     *
      * Gets a member identified by the provided Id.
      */
     public static getMemberById<ThrowOnError extends boolean = true>(options: Options<GetMemberByIdData, ThrowOnError>) {
@@ -4968,6 +5235,7 @@ export class MemberService {
     
     /**
      * Updates a member.
+     *
      * Updates a member identified by the provided Id with the details from the request model.
      */
     public static putMemberById<ThrowOnError extends boolean = true>(options: Options<PutMemberByIdData, ThrowOnError>) {
@@ -4989,6 +5257,7 @@ export class MemberService {
     
     /**
      * Gets a collection of items that reference members.
+     *
      * Gets a paginated collection of items that reference the members identified by the provided Ids.
      */
     public static getMemberByIdReferencedBy<ThrowOnError extends boolean = true>(options: Options<GetMemberByIdReferencedByData, ThrowOnError>) {
@@ -5006,6 +5275,7 @@ export class MemberService {
     
     /**
      * Gets a paginated collection of referenced descendant members.
+     *
      * Gets a paginated collection of descendant members that are referenced in relations for the member identified by the provided Id.
      */
     public static getMemberByIdReferencedDescendants<ThrowOnError extends boolean = true>(options: Options<GetMemberByIdReferencedDescendantsData, ThrowOnError>) {
@@ -5023,6 +5293,7 @@ export class MemberService {
     
     /**
      * Validates updating a member.
+     *
      * Validates the request model for updating a member without actually updating it.
      */
     public static putMemberByIdValidate<ThrowOnError extends boolean = true>(options: Options<PutMemberByIdValidateData, ThrowOnError>) {
@@ -5044,6 +5315,7 @@ export class MemberService {
     
     /**
      * Gets a collection of items that reference members.
+     *
      * Gets a paginated collection of items that reference the members identified by the provided Ids.
      */
     public static getMemberAreReferenced<ThrowOnError extends boolean = true>(options?: Options<GetMemberAreReferencedData, ThrowOnError>) {
@@ -5061,6 +5333,7 @@ export class MemberService {
     
     /**
      * Gets the member configuration.
+     *
      * Gets the configuration settings for members.
      */
     public static getMemberConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetMemberConfigurationData, ThrowOnError>) {
@@ -5078,6 +5351,7 @@ export class MemberService {
     
     /**
      * Validates creating a member.
+     *
      * Validates the request model for creating a new member without actually creating it.
      */
     public static postMemberValidate<ThrowOnError extends boolean = true>(options?: Options<PostMemberValidateData, ThrowOnError>) {
@@ -5101,6 +5375,7 @@ export class MemberService {
 export class ModelsBuilderService {
     /**
      * Builds models.
+     *
      * Triggers the models builder to generate strongly-typed models for content types.
      */
     public static postModelsBuilderBuild<ThrowOnError extends boolean = true>(options?: Options<PostModelsBuilderBuildData, ThrowOnError>) {
@@ -5118,6 +5393,7 @@ export class ModelsBuilderService {
     
     /**
      * Gets models builder dashboard data.
+     *
      * Gets the dashboard data and current state of the models builder.
      */
     public static getModelsBuilderDashboard<ThrowOnError extends boolean = true>(options?: Options<GetModelsBuilderDashboardData, ThrowOnError>) {
@@ -5135,6 +5411,7 @@ export class ModelsBuilderService {
     
     /**
      * Gets models builder status.
+     *
      * Gets the current status and configuration of the models builder.
      */
     public static getModelsBuilderStatus<ThrowOnError extends boolean = true>(options?: Options<GetModelsBuilderStatusData, ThrowOnError>) {
@@ -5154,6 +5431,7 @@ export class ModelsBuilderService {
 export class NewsDashboardService {
     /**
      * Gets news dashboard content.
+     *
      * Gets the news dashboard content including recent news items and updates for the Umbraco back office.
      */
     public static getNewsDashboard<ThrowOnError extends boolean = true>(options?: Options<GetNewsDashboardData, ThrowOnError>) {
@@ -5173,6 +5451,7 @@ export class NewsDashboardService {
 export class ObjectTypesService {
     /**
      * Gets a paginated collection of allowed object types.
+     *
      * Gets a paginated collection of object types that are allowed as relation type targets.
      */
     public static getObjectTypes<ThrowOnError extends boolean = true>(options?: Options<GetObjectTypesData, ThrowOnError>) {
@@ -5192,6 +5471,7 @@ export class ObjectTypesService {
 export class OEmbedService {
     /**
      * Queries OEmbed information.
+     *
      * Queries OEmbed information for the specified URL.
      */
     public static getOembedQuery<ThrowOnError extends boolean = true>(options?: Options<GetOembedQueryData, ThrowOnError>) {
@@ -5211,6 +5491,7 @@ export class OEmbedService {
 export class PackageService {
     /**
      * Runs pending package migrations.
+     *
      * Executes all pending package migrations to update the database schema.
      */
     public static postPackageByNameRunMigration<ThrowOnError extends boolean = true>(options: Options<PostPackageByNameRunMigrationData, ThrowOnError>) {
@@ -5228,6 +5509,7 @@ export class PackageService {
     
     /**
      * Gets the package configuration.
+     *
      * Gets the configuration settings for packages.
      */
     public static getPackageConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetPackageConfigurationData, ThrowOnError>) {
@@ -5245,6 +5527,7 @@ export class PackageService {
     
     /**
      * Gets a paginated collection of created packages.
+     *
      * Gets a paginated collection of all created packages.
      */
     public static getPackageCreated<ThrowOnError extends boolean = true>(options?: Options<GetPackageCreatedData, ThrowOnError>) {
@@ -5262,6 +5545,7 @@ export class PackageService {
     
     /**
      * Creates a new package.
+     *
      * Creates a new package with the configuration specified in the request model.
      */
     public static postPackageCreated<ThrowOnError extends boolean = true>(options?: Options<PostPackageCreatedData, ThrowOnError>) {
@@ -5283,6 +5567,7 @@ export class PackageService {
     
     /**
      * Deletes a package.
+     *
      * Deletes a package identified by the provided Id.
      */
     public static deletePackageCreatedById<ThrowOnError extends boolean = true>(options: Options<DeletePackageCreatedByIdData, ThrowOnError>) {
@@ -5300,6 +5585,7 @@ export class PackageService {
     
     /**
      * Gets a package.
+     *
      * Gets a package identified by the provided Id.
      */
     public static getPackageCreatedById<ThrowOnError extends boolean = true>(options: Options<GetPackageCreatedByIdData, ThrowOnError>) {
@@ -5317,6 +5603,7 @@ export class PackageService {
     
     /**
      * Updates a package.
+     *
      * Updates a package identified by the provided Id with the details from the request model.
      */
     public static putPackageCreatedById<ThrowOnError extends boolean = true>(options: Options<PutPackageCreatedByIdData, ThrowOnError>) {
@@ -5338,6 +5625,7 @@ export class PackageService {
     
     /**
      * Downloads a created package.
+     *
      * Downloads the package file for the created package identified by the provided Id.
      */
     public static getPackageCreatedByIdDownload<ThrowOnError extends boolean = true>(options: Options<GetPackageCreatedByIdDownloadData, ThrowOnError>) {
@@ -5355,6 +5643,7 @@ export class PackageService {
     
     /**
      * Gets all package migration statuses.
+     *
      * Gets a paginated collection of migration status for all installed packages.
      */
     public static getPackageMigrationStatus<ThrowOnError extends boolean = true>(options?: Options<GetPackageMigrationStatusData, ThrowOnError>) {
@@ -5374,6 +5663,7 @@ export class PackageService {
 export class PartialViewService {
     /**
      * Gets a collection of partial view items.
+     *
      * Gets a collection of partial view items identified by the provided Ids.
      */
     public static getItemPartialView<ThrowOnError extends boolean = true>(options?: Options<GetItemPartialViewData, ThrowOnError>) {
@@ -5391,6 +5681,7 @@ export class PartialViewService {
     
     /**
      * Creates a new partial view.
+     *
      * Creates a new partial view with the configuration specified in the request model.
      */
     public static postPartialView<ThrowOnError extends boolean = true>(options?: Options<PostPartialViewData, ThrowOnError>) {
@@ -5412,6 +5703,7 @@ export class PartialViewService {
     
     /**
      * Deletes a partial view.
+     *
      * Deletes a partial view identified by the provided Id.
      */
     public static deletePartialViewByPath<ThrowOnError extends boolean = true>(options: Options<DeletePartialViewByPathData, ThrowOnError>) {
@@ -5429,6 +5721,7 @@ export class PartialViewService {
     
     /**
      * Gets a partial view by path.
+     *
      * Gets a partial view identified by the provided file path.
      */
     public static getPartialViewByPath<ThrowOnError extends boolean = true>(options: Options<GetPartialViewByPathData, ThrowOnError>) {
@@ -5446,6 +5739,7 @@ export class PartialViewService {
     
     /**
      * Updates a partial view.
+     *
      * Updates a partial view identified by the provided Id with the details from the request model.
      */
     public static putPartialViewByPath<ThrowOnError extends boolean = true>(options: Options<PutPartialViewByPathData, ThrowOnError>) {
@@ -5467,6 +5761,7 @@ export class PartialViewService {
     
     /**
      * Renames a partial view.
+     *
      * Renames a partial view file to the specified new name.
      */
     public static putPartialViewByPathRename<ThrowOnError extends boolean = true>(options: Options<PutPartialViewByPathRenameData, ThrowOnError>) {
@@ -5488,6 +5783,7 @@ export class PartialViewService {
     
     /**
      * Creates a partial view folder.
+     *
      * Creates a new partial view folder with the provided name and parent location.
      */
     public static postPartialViewFolder<ThrowOnError extends boolean = true>(options?: Options<PostPartialViewFolderData, ThrowOnError>) {
@@ -5509,6 +5805,7 @@ export class PartialViewService {
     
     /**
      * Deletes a partial view folder.
+     *
      * Deletes a partial view folder identified by the provided Id.
      */
     public static deletePartialViewFolderByPath<ThrowOnError extends boolean = true>(options: Options<DeletePartialViewFolderByPathData, ThrowOnError>) {
@@ -5526,6 +5823,7 @@ export class PartialViewService {
     
     /**
      * Gets a partial view folder by path.
+     *
      * Gets a partial view folder identified by the provided file path.
      */
     public static getPartialViewFolderByPath<ThrowOnError extends boolean = true>(options: Options<GetPartialViewFolderByPathData, ThrowOnError>) {
@@ -5543,6 +5841,7 @@ export class PartialViewService {
     
     /**
      * Gets a paginated collection of partial view snippets.
+     *
      * Gets a paginated collection of available partial view code snippets that can be used when creating new partial views.
      */
     public static getPartialViewSnippet<ThrowOnError extends boolean = true>(options?: Options<GetPartialViewSnippetData, ThrowOnError>) {
@@ -5560,6 +5859,7 @@ export class PartialViewService {
     
     /**
      * Gets a partial view snippet.
+     *
      * Gets a partial view snippet identified by the provided Id.
      */
     public static getPartialViewSnippetById<ThrowOnError extends boolean = true>(options: Options<GetPartialViewSnippetByIdData, ThrowOnError>) {
@@ -5577,6 +5877,7 @@ export class PartialViewService {
     
     /**
      * Gets a collection of ancestor partial view items.
+     *
      * Gets a collection of partial view items that are ancestors to the provided Id.
      */
     public static getTreePartialViewAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreePartialViewAncestorsData, ThrowOnError>) {
@@ -5594,6 +5895,7 @@ export class PartialViewService {
     
     /**
      * Gets a collection of partial view tree child items.
+     *
      * Gets a paginated collection of partial view tree items that are children of the provided parent Id.
      */
     public static getTreePartialViewChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreePartialViewChildrenData, ThrowOnError>) {
@@ -5611,6 +5913,7 @@ export class PartialViewService {
     
     /**
      * Gets a collection of partial view items from the root of the tree.
+     *
      * Gets a paginated collection of partial view items from the root of the tree with optional filtering.
      */
     public static getTreePartialViewRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreePartialViewRootData, ThrowOnError>) {
@@ -5628,6 +5931,7 @@ export class PartialViewService {
     
     /**
      * Gets a collection of partial view tree sibling items.
+     *
      * Gets a collection of partial view tree items that are siblings of the provided Id.
      */
     public static getTreePartialViewSiblings<ThrowOnError extends boolean = true>(options?: Options<GetTreePartialViewSiblingsData, ThrowOnError>) {
@@ -5647,6 +5951,7 @@ export class PartialViewService {
 export class PreviewService {
     /**
      * Exits preview mode.
+     *
      * Exits preview mode and returns to the normal back office viewing experience.
      */
     public static deletePreview<ThrowOnError extends boolean = true>(options?: Options<DeletePreviewData, ThrowOnError>) {
@@ -5658,7 +5963,9 @@ export class PreviewService {
     
     /**
      * Enters preview mode.
+     *
      * Enters preview mode for the current user session, allowing viewing of unpublished content.
+     *
      * @deprecated
      */
     public static postPreview<ThrowOnError extends boolean = true>(options?: Options<PostPreviewData, ThrowOnError>) {
@@ -5678,6 +5985,7 @@ export class PreviewService {
 export class ProfilingService {
     /**
      * Gets profiling status.
+     *
      * Gets the current status of the MiniProfiler profiling tool.
      */
     public static getProfilingStatus<ThrowOnError extends boolean = true>(options?: Options<GetProfilingStatusData, ThrowOnError>) {
@@ -5695,6 +6003,7 @@ export class ProfilingService {
     
     /**
      * Updates the web profiling status.
+     *
      * Enables or disables web profiling according to the values provided in the request model.
      */
     public static putProfilingStatus<ThrowOnError extends boolean = true>(options?: Options<PutProfilingStatusData, ThrowOnError>) {
@@ -5718,6 +6027,7 @@ export class ProfilingService {
 export class PropertyTypeService {
     /**
      * Checks if a property type is used.
+     *
      * Checks if the property type identified by the provided content type id and property alias is used in any content, media, or members.
      */
     public static getPropertyTypeIsUsed<ThrowOnError extends boolean = true>(options?: Options<GetPropertyTypeIsUsedData, ThrowOnError>) {
@@ -5737,6 +6047,7 @@ export class PropertyTypeService {
 export class PublishedCacheService {
     /**
      * Rebuilds the published content cache.
+     *
      * Rebuilds the entire published content cache from scratch.
      */
     public static postPublishedCacheRebuild<ThrowOnError extends boolean = true>(options?: Options<PostPublishedCacheRebuildData, ThrowOnError>) {
@@ -5754,6 +6065,7 @@ export class PublishedCacheService {
     
     /**
      * Gets the rebuild cache status.
+     *
      * Gets the current status of the published content cache rebuild operation.
      */
     public static getPublishedCacheRebuildStatus<ThrowOnError extends boolean = true>(options?: Options<GetPublishedCacheRebuildStatusData, ThrowOnError>) {
@@ -5771,6 +6083,7 @@ export class PublishedCacheService {
     
     /**
      * Reloads the published content cache.
+     *
      * Reloads the published content cache from the database.
      */
     public static postPublishedCacheReload<ThrowOnError extends boolean = true>(options?: Options<PostPublishedCacheReloadData, ThrowOnError>) {
@@ -5790,6 +6103,7 @@ export class PublishedCacheService {
 export class RedirectManagementService {
     /**
      * Gets a paginated collection of redirect URLs.
+     *
      * Gets a paginated collection of redirect URLs with support for filtering and sorting.
      */
     public static getRedirectManagement<ThrowOnError extends boolean = true>(options?: Options<GetRedirectManagementData, ThrowOnError>) {
@@ -5807,6 +6121,7 @@ export class RedirectManagementService {
     
     /**
      * Deletes a redirect URL.
+     *
      * Deletes a redirect URL identified by the provided Id.
      */
     public static deleteRedirectManagementById<ThrowOnError extends boolean = true>(options: Options<DeleteRedirectManagementByIdData, ThrowOnError>) {
@@ -5824,6 +6139,7 @@ export class RedirectManagementService {
     
     /**
      * Gets a redirect URL.
+     *
      * Gets a redirect URL identified by the provided Id.
      */
     public static getRedirectManagementById<ThrowOnError extends boolean = true>(options: Options<GetRedirectManagementByIdData, ThrowOnError>) {
@@ -5841,6 +6157,7 @@ export class RedirectManagementService {
     
     /**
      * Gets the current redirect URL management status.
+     *
      * Retrieves the current status and configuration for redirect URL management.
      */
     public static getRedirectManagementStatus<ThrowOnError extends boolean = true>(options?: Options<GetRedirectManagementStatusData, ThrowOnError>) {
@@ -5858,6 +6175,7 @@ export class RedirectManagementService {
     
     /**
      * Sets the redirect URL tracking status.
+     *
      * Updates the redirect URL tracking configuration according to the provided status.
      */
     public static postRedirectManagementStatus<ThrowOnError extends boolean = true>(options?: Options<PostRedirectManagementStatusData, ThrowOnError>) {
@@ -5877,6 +6195,7 @@ export class RedirectManagementService {
 export class RelationTypeService {
     /**
      * Gets a collection of relation type items.
+     *
      * Gets a collection of relation type items identified by the provided Ids.
      */
     public static getItemRelationType<ThrowOnError extends boolean = true>(options?: Options<GetItemRelationTypeData, ThrowOnError>) {
@@ -5894,6 +6213,7 @@ export class RelationTypeService {
     
     /**
      * Gets a paginated collection of relation types.
+     *
      * Gets a paginated collection of all relation types configured in the system.
      */
     public static getRelationType<ThrowOnError extends boolean = true>(options?: Options<GetRelationTypeData, ThrowOnError>) {
@@ -5911,6 +6231,7 @@ export class RelationTypeService {
     
     /**
      * Gets a relation type.
+     *
      * Gets a relation type identified by the provided Id.
      */
     public static getRelationTypeById<ThrowOnError extends boolean = true>(options: Options<GetRelationTypeByIdData, ThrowOnError>) {
@@ -5930,6 +6251,7 @@ export class RelationTypeService {
 export class RelationService {
     /**
      * Gets relations by relation type.
+     *
      * Gets a collection of relations filtered by the specified relation type key.
      */
     public static getRelationByRelationTypeId<ThrowOnError extends boolean = true>(options: Options<GetRelationByRelationTypeIdData, ThrowOnError>) {
@@ -5949,6 +6271,7 @@ export class RelationService {
 export class ScriptService {
     /**
      * Gets a collection of script items.
+     *
      * Gets a collection of script items identified by the provided Ids.
      */
     public static getItemScript<ThrowOnError extends boolean = true>(options?: Options<GetItemScriptData, ThrowOnError>) {
@@ -5966,6 +6289,7 @@ export class ScriptService {
     
     /**
      * Creates a new script.
+     *
      * Creates a new script with the configuration specified in the request model.
      */
     public static postScript<ThrowOnError extends boolean = true>(options?: Options<PostScriptData, ThrowOnError>) {
@@ -5987,6 +6311,7 @@ export class ScriptService {
     
     /**
      * Deletes a script.
+     *
      * Deletes a script identified by the provided file path.
      */
     public static deleteScriptByPath<ThrowOnError extends boolean = true>(options: Options<DeleteScriptByPathData, ThrowOnError>) {
@@ -6004,6 +6329,7 @@ export class ScriptService {
     
     /**
      * Gets a script by path.
+     *
      * Gets a script identified by the provided file path.
      */
     public static getScriptByPath<ThrowOnError extends boolean = true>(options: Options<GetScriptByPathData, ThrowOnError>) {
@@ -6021,6 +6347,7 @@ export class ScriptService {
     
     /**
      * Updates a script.
+     *
      * Updates a script identified by the provided Id with the details from the request model.
      */
     public static putScriptByPath<ThrowOnError extends boolean = true>(options: Options<PutScriptByPathData, ThrowOnError>) {
@@ -6042,6 +6369,7 @@ export class ScriptService {
     
     /**
      * Renames a script.
+     *
      * Renames a script file to the specified new name.
      */
     public static putScriptByPathRename<ThrowOnError extends boolean = true>(options: Options<PutScriptByPathRenameData, ThrowOnError>) {
@@ -6063,6 +6391,7 @@ export class ScriptService {
     
     /**
      * Creates a script folder.
+     *
      * Creates a new script folder with the provided name and parent location.
      */
     public static postScriptFolder<ThrowOnError extends boolean = true>(options?: Options<PostScriptFolderData, ThrowOnError>) {
@@ -6084,6 +6413,7 @@ export class ScriptService {
     
     /**
      * Deletes a script folder.
+     *
      * Deletes a script folder identified by the provided Id.
      */
     public static deleteScriptFolderByPath<ThrowOnError extends boolean = true>(options: Options<DeleteScriptFolderByPathData, ThrowOnError>) {
@@ -6101,6 +6431,7 @@ export class ScriptService {
     
     /**
      * Gets a script folder by path.
+     *
      * Gets a script folder identified by the provided file path.
      */
     public static getScriptFolderByPath<ThrowOnError extends boolean = true>(options: Options<GetScriptFolderByPathData, ThrowOnError>) {
@@ -6118,6 +6449,7 @@ export class ScriptService {
     
     /**
      * Gets a collection of ancestor script items.
+     *
      * Gets a collection of script items that are ancestors to the provided Id.
      */
     public static getTreeScriptAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeScriptAncestorsData, ThrowOnError>) {
@@ -6135,6 +6467,7 @@ export class ScriptService {
     
     /**
      * Gets a collection of script tree child items.
+     *
      * Gets a paginated collection of script tree items that are children of the provided parent Id.
      */
     public static getTreeScriptChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeScriptChildrenData, ThrowOnError>) {
@@ -6152,6 +6485,7 @@ export class ScriptService {
     
     /**
      * Gets a collection of script items from the root of the tree.
+     *
      * Gets a paginated collection of script items from the root of the tree with optional filtering.
      */
     public static getTreeScriptRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeScriptRootData, ThrowOnError>) {
@@ -6169,6 +6503,7 @@ export class ScriptService {
     
     /**
      * Gets a collection of script tree sibling items.
+     *
      * Gets a collection of script tree items that are siblings of the provided Id.
      */
     public static getTreeScriptSiblings<ThrowOnError extends boolean = true>(options?: Options<GetTreeScriptSiblingsData, ThrowOnError>) {
@@ -6188,6 +6523,7 @@ export class ScriptService {
 export class SearcherService {
     /**
      * Gets a collection of searchers.
+     *
      * Gets a collection of configured searchers in the Umbraco installation.
      */
     public static getSearcher<ThrowOnError extends boolean = true>(options?: Options<GetSearcherData, ThrowOnError>) {
@@ -6220,6 +6556,7 @@ export class SearcherService {
 export class SecurityService {
     /**
      * Gets the security configuration.
+     *
      * Gets the configuration settings for security.
      */
     public static getSecurityConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetSecurityConfigurationData, ThrowOnError>) {
@@ -6237,6 +6574,7 @@ export class SecurityService {
     
     /**
      * Requests a password reset.
+     *
      * Initiates a password reset process by sending a reset link to the specified email address.
      */
     public static postSecurityForgotPassword<ThrowOnError extends boolean = true>(options?: Options<PostSecurityForgotPasswordData, ThrowOnError>) {
@@ -6258,6 +6596,7 @@ export class SecurityService {
     
     /**
      * Initiates password reset.
+     *
      * Initiates a password reset process for the user with the provided email.
      */
     public static postSecurityForgotPasswordReset<ThrowOnError extends boolean = true>(options?: Options<PostSecurityForgotPasswordResetData, ThrowOnError>) {
@@ -6279,6 +6618,7 @@ export class SecurityService {
     
     /**
      * Verifies a password reset token.
+     *
      * Verifies the provided password reset token for the specified user.
      */
     public static postSecurityForgotPasswordVerify<ThrowOnError extends boolean = true>(options?: Options<PostSecurityForgotPasswordVerifyData, ThrowOnError>) {
@@ -6296,6 +6636,7 @@ export class SecurityService {
 export class SegmentService {
     /**
      * Gets a paginated collection of segments.
+     *
      * Gets a paginated collection of segments with support for filtering and pagination.
      */
     public static getSegment<ThrowOnError extends boolean = true>(options?: Options<GetSegmentData, ThrowOnError>) {
@@ -6315,6 +6656,7 @@ export class SegmentService {
 export class ServerService {
     /**
      * Gets the server configuration.
+     *
      * Gets the configuration settings for servers.
      */
     public static getServerConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetServerConfigurationData, ThrowOnError>) {
@@ -6326,6 +6668,7 @@ export class ServerService {
     
     /**
      * Gets server information.
+     *
      * Gets detailed information about the server environment and configuration.
      */
     public static getServerInformation<ThrowOnError extends boolean = true>(options?: Options<GetServerInformationData, ThrowOnError>) {
@@ -6343,6 +6686,7 @@ export class ServerService {
     
     /**
      * Gets server status.
+     *
      * Gets the current operational status of the Umbraco server.
      */
     public static getServerStatus<ThrowOnError extends boolean = true>(options?: Options<GetServerStatusData, ThrowOnError>) {
@@ -6354,6 +6698,7 @@ export class ServerService {
     
     /**
      * Gets server troubleshooting information.
+     *
      * Gets troubleshooting information and diagnostics for the server.
      */
     public static getServerTroubleshooting<ThrowOnError extends boolean = true>(options?: Options<GetServerTroubleshootingData, ThrowOnError>) {
@@ -6371,7 +6716,9 @@ export class ServerService {
     
     /**
      * Checks for available upgrades.
+     *
      * Checks if there are any available upgrades for the Umbraco installation.
+     *
      * @deprecated
      */
     public static getServerUpgradeCheck<ThrowOnError extends boolean = true>(options?: Options<GetServerUpgradeCheckData, ThrowOnError>) {
@@ -6391,6 +6738,7 @@ export class ServerService {
 export class StaticFileService {
     /**
      * Gets a collection of static file items.
+     *
      * Gets a collection of static file items identified by the provided Ids.
      */
     public static getItemStaticFile<ThrowOnError extends boolean = true>(options?: Options<GetItemStaticFileData, ThrowOnError>) {
@@ -6408,6 +6756,7 @@ export class StaticFileService {
     
     /**
      * Gets a collection of ancestor static file items.
+     *
      * Gets a collection of static file items that are ancestors to the provided Id.
      */
     public static getTreeStaticFileAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeStaticFileAncestorsData, ThrowOnError>) {
@@ -6425,6 +6774,7 @@ export class StaticFileService {
     
     /**
      * Gets a collection of static file tree child items.
+     *
      * Gets a paginated collection of static file tree items that are children of the provided parent Id.
      */
     public static getTreeStaticFileChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeStaticFileChildrenData, ThrowOnError>) {
@@ -6442,6 +6792,7 @@ export class StaticFileService {
     
     /**
      * Gets a collection of static file items from the root of the tree.
+     *
      * Gets a paginated collection of static file items from the root of the tree with optional filtering.
      */
     public static getTreeStaticFileRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeStaticFileRootData, ThrowOnError>) {
@@ -6461,6 +6812,7 @@ export class StaticFileService {
 export class StylesheetService {
     /**
      * Gets a collection of stylesheet items.
+     *
      * Gets a collection of stylesheet items identified by the provided Ids.
      */
     public static getItemStylesheet<ThrowOnError extends boolean = true>(options?: Options<GetItemStylesheetData, ThrowOnError>) {
@@ -6478,6 +6830,7 @@ export class StylesheetService {
     
     /**
      * Creates a new stylesheet.
+     *
      * Creates a new stylesheet with the configuration specified in the request model.
      */
     public static postStylesheet<ThrowOnError extends boolean = true>(options?: Options<PostStylesheetData, ThrowOnError>) {
@@ -6499,6 +6852,7 @@ export class StylesheetService {
     
     /**
      * Deletes a stylesheet.
+     *
      * Deletes a stylesheet identified by the provided Id.
      */
     public static deleteStylesheetByPath<ThrowOnError extends boolean = true>(options: Options<DeleteStylesheetByPathData, ThrowOnError>) {
@@ -6516,6 +6870,7 @@ export class StylesheetService {
     
     /**
      * Gets a stylesheet by path.
+     *
      * Gets a stylesheet identified by the provided file path.
      */
     public static getStylesheetByPath<ThrowOnError extends boolean = true>(options: Options<GetStylesheetByPathData, ThrowOnError>) {
@@ -6533,6 +6888,7 @@ export class StylesheetService {
     
     /**
      * Updates a stylesheet.
+     *
      * Updates a stylesheet identified by the provided Id with the details from the request model.
      */
     public static putStylesheetByPath<ThrowOnError extends boolean = true>(options: Options<PutStylesheetByPathData, ThrowOnError>) {
@@ -6554,6 +6910,7 @@ export class StylesheetService {
     
     /**
      * Renames a stylesheet.
+     *
      * Renames a stylesheet file to the specified new name.
      */
     public static putStylesheetByPathRename<ThrowOnError extends boolean = true>(options: Options<PutStylesheetByPathRenameData, ThrowOnError>) {
@@ -6575,6 +6932,7 @@ export class StylesheetService {
     
     /**
      * Creates a stylesheet folder.
+     *
      * Creates a new stylesheet folder with the provided name and parent location.
      */
     public static postStylesheetFolder<ThrowOnError extends boolean = true>(options?: Options<PostStylesheetFolderData, ThrowOnError>) {
@@ -6596,6 +6954,7 @@ export class StylesheetService {
     
     /**
      * Deletes a stylesheet folder.
+     *
      * Deletes a stylesheet folder identified by the provided Id.
      */
     public static deleteStylesheetFolderByPath<ThrowOnError extends boolean = true>(options: Options<DeleteStylesheetFolderByPathData, ThrowOnError>) {
@@ -6613,6 +6972,7 @@ export class StylesheetService {
     
     /**
      * Gets a stylesheet folder by path.
+     *
      * Gets a stylesheet folder identified by the provided file path.
      */
     public static getStylesheetFolderByPath<ThrowOnError extends boolean = true>(options: Options<GetStylesheetFolderByPathData, ThrowOnError>) {
@@ -6630,6 +6990,7 @@ export class StylesheetService {
     
     /**
      * Gets a collection of ancestor stylesheet items.
+     *
      * Gets a collection of stylesheet items that are ancestors to the provided Id.
      */
     public static getTreeStylesheetAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeStylesheetAncestorsData, ThrowOnError>) {
@@ -6647,6 +7008,7 @@ export class StylesheetService {
     
     /**
      * Gets a collection of stylesheet tree child items.
+     *
      * Gets a paginated collection of stylesheet tree items that are children of the provided parent Id.
      */
     public static getTreeStylesheetChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeStylesheetChildrenData, ThrowOnError>) {
@@ -6664,6 +7026,7 @@ export class StylesheetService {
     
     /**
      * Gets a collection of stylesheet items from the root of the tree.
+     *
      * Gets a paginated collection of stylesheet items from the root of the tree with optional filtering.
      */
     public static getTreeStylesheetRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeStylesheetRootData, ThrowOnError>) {
@@ -6681,6 +7044,7 @@ export class StylesheetService {
     
     /**
      * Gets a collection of stylesheet tree sibling items.
+     *
      * Gets a collection of stylesheet tree items that are siblings of the provided Id.
      */
     public static getTreeStylesheetSiblings<ThrowOnError extends boolean = true>(options?: Options<GetTreeStylesheetSiblingsData, ThrowOnError>) {
@@ -6700,6 +7064,7 @@ export class StylesheetService {
 export class TagService {
     /**
      * Gets a collection of tags.
+     *
      * Gets a collection of tags filtered by the provided query string.
      */
     public static getTag<ThrowOnError extends boolean = true>(options?: Options<GetTagData, ThrowOnError>) {
@@ -6719,6 +7084,7 @@ export class TagService {
 export class TelemetryService {
     /**
      * Gets telemetry data.
+     *
      * Gets telemetry data and statistics for the Umbraco installation.
      */
     public static getTelemetry<ThrowOnError extends boolean = true>(options?: Options<GetTelemetryData, ThrowOnError>) {
@@ -6736,6 +7102,7 @@ export class TelemetryService {
     
     /**
      * Gets telemetry information.
+     *
      * Gets the current telemetry configuration and consent level.
      */
     public static getTelemetryLevel<ThrowOnError extends boolean = true>(options?: Options<GetTelemetryLevelData, ThrowOnError>) {
@@ -6753,6 +7120,7 @@ export class TelemetryService {
     
     /**
      * Sets telemetry consent level.
+     *
      * Sets the telemetry consent level for anonymous usage data collection.
      */
     public static postTelemetryLevel<ThrowOnError extends boolean = true>(options?: Options<PostTelemetryLevelData, ThrowOnError>) {
@@ -6776,6 +7144,7 @@ export class TelemetryService {
 export class TemplateService {
     /**
      * Gets a collection of template items.
+     *
      * Gets a collection of template items identified by the provided Ids.
      */
     public static getItemTemplate<ThrowOnError extends boolean = true>(options?: Options<GetItemTemplateData, ThrowOnError>) {
@@ -6793,6 +7162,7 @@ export class TemplateService {
     
     /**
      * Gets ancestors for a collection of template items.
+     *
      * Gets the ancestor chains for template items identified by the provided Ids.
      */
     public static getItemTemplateAncestors<ThrowOnError extends boolean = true>(options?: Options<GetItemTemplateAncestorsData, ThrowOnError>) {
@@ -6810,6 +7180,7 @@ export class TemplateService {
     
     /**
      * Searches template items.
+     *
      * Searches template items by the provided query with pagination support.
      */
     public static getItemTemplateSearch<ThrowOnError extends boolean = true>(options?: Options<GetItemTemplateSearchData, ThrowOnError>) {
@@ -6827,6 +7198,7 @@ export class TemplateService {
     
     /**
      * Creates a new template.
+     *
      * Creates a new template with the configuration specified in the request model.
      */
     public static postTemplate<ThrowOnError extends boolean = true>(options?: Options<PostTemplateData, ThrowOnError>) {
@@ -6848,6 +7220,7 @@ export class TemplateService {
     
     /**
      * Deletes a template.
+     *
      * Deletes a template identified by the provided Id.
      */
     public static deleteTemplateById<ThrowOnError extends boolean = true>(options: Options<DeleteTemplateByIdData, ThrowOnError>) {
@@ -6865,6 +7238,7 @@ export class TemplateService {
     
     /**
      * Gets a template.
+     *
      * Gets a template identified by the provided Id.
      */
     public static getTemplateById<ThrowOnError extends boolean = true>(options: Options<GetTemplateByIdData, ThrowOnError>) {
@@ -6882,6 +7256,7 @@ export class TemplateService {
     
     /**
      * Updates a template.
+     *
      * Updates a template identified by the provided Id with the details from the request model.
      */
     public static putTemplateById<ThrowOnError extends boolean = true>(options: Options<PutTemplateByIdData, ThrowOnError>) {
@@ -6903,6 +7278,7 @@ export class TemplateService {
     
     /**
      * Gets the template configuration.
+     *
      * Gets the configuration settings for templates.
      */
     public static getTemplateConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetTemplateConfigurationData, ThrowOnError>) {
@@ -6920,6 +7296,7 @@ export class TemplateService {
     
     /**
      * Executes a template query.
+     *
      * Executes a template query with the provided parameters and returns the matching content results with execution metrics.
      */
     public static postTemplateQueryExecute<ThrowOnError extends boolean = true>(options?: Options<PostTemplateQueryExecuteData, ThrowOnError>) {
@@ -6941,6 +7318,7 @@ export class TemplateService {
     
     /**
      * Gets template query settings.
+     *
      * Gets the available configuration settings for template queries including document type aliases, properties, and operators.
      */
     public static getTemplateQuerySettings<ThrowOnError extends boolean = true>(options?: Options<GetTemplateQuerySettingsData, ThrowOnError>) {
@@ -6958,6 +7336,7 @@ export class TemplateService {
     
     /**
      * Gets a collection of ancestor template items.
+     *
      * Gets a collection of template items that are ancestors to the provided Id.
      */
     public static getTreeTemplateAncestors<ThrowOnError extends boolean = true>(options?: Options<GetTreeTemplateAncestorsData, ThrowOnError>) {
@@ -6975,6 +7354,7 @@ export class TemplateService {
     
     /**
      * Gets a collection of template tree child items.
+     *
      * Gets a paginated collection of template tree items that are children of the provided parent Id.
      */
     public static getTreeTemplateChildren<ThrowOnError extends boolean = true>(options?: Options<GetTreeTemplateChildrenData, ThrowOnError>) {
@@ -6992,6 +7372,7 @@ export class TemplateService {
     
     /**
      * Gets a collection of template items from the root of the tree.
+     *
      * Gets a paginated collection of template items from the root of the tree with optional filtering.
      */
     public static getTreeTemplateRoot<ThrowOnError extends boolean = true>(options?: Options<GetTreeTemplateRootData, ThrowOnError>) {
@@ -7009,6 +7390,7 @@ export class TemplateService {
     
     /**
      * Gets a collection of template tree sibling items.
+     *
      * Gets a collection of template tree items that are siblings of the provided Id.
      */
     public static getTreeTemplateSiblings<ThrowOnError extends boolean = true>(options?: Options<GetTreeTemplateSiblingsData, ThrowOnError>) {
@@ -7028,6 +7410,7 @@ export class TemplateService {
 export class TemporaryFileService {
     /**
      * Creates a temporary file.
+     *
      * Uploads and creates a temporary file that can be used in subsequent operations.
      */
     public static postTemporaryFile<ThrowOnError extends boolean = true>(options?: Options<PostTemporaryFileData, ThrowOnError>) {
@@ -7050,6 +7433,7 @@ export class TemporaryFileService {
     
     /**
      * Deletes a temporary file.
+     *
      * Deletes a temporary file identified by the provided Id.
      */
     public static deleteTemporaryFileById<ThrowOnError extends boolean = true>(options: Options<DeleteTemporaryFileByIdData, ThrowOnError>) {
@@ -7067,6 +7451,7 @@ export class TemporaryFileService {
     
     /**
      * Gets a temporary file.
+     *
      * Gets a temporary file identified by the provided Id.
      */
     public static getTemporaryFileById<ThrowOnError extends boolean = true>(options: Options<GetTemporaryFileByIdData, ThrowOnError>) {
@@ -7084,6 +7469,7 @@ export class TemporaryFileService {
     
     /**
      * Gets the temporary file configuration.
+     *
      * Gets the configuration settings for temporary files.
      */
     public static getTemporaryFileConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetTemporaryFileConfigurationData, ThrowOnError>) {
@@ -7103,6 +7489,7 @@ export class TemporaryFileService {
 export class UpgradeService {
     /**
      * Authorizes the upgrade.
+     *
      * Authorizes the currently authenticated user to perform the upgrade.
      */
     public static postUpgradeAuthorize<ThrowOnError extends boolean = true>(options?: Options<PostUpgradeAuthorizeData, ThrowOnError>) {
@@ -7120,6 +7507,7 @@ export class UpgradeService {
     
     /**
      * Gets upgrade settings.
+     *
      * Gets the current upgrade settings and status for the Umbraco installation.
      */
     public static getUpgradeSettings<ThrowOnError extends boolean = true>(options?: Options<GetUpgradeSettingsData, ThrowOnError>) {
@@ -7139,6 +7527,7 @@ export class UpgradeService {
 export class UserDataService {
     /**
      * Gets user data.
+     *
      * Gets user-specific data stored for the current authenticated user.
      */
     public static getUserData<ThrowOnError extends boolean = true>(options?: Options<GetUserDataData, ThrowOnError>) {
@@ -7156,6 +7545,7 @@ export class UserDataService {
     
     /**
      * Creates user data.
+     *
      * Creates user-specific data for the current authenticated user with the provided key and value.
      */
     public static postUserData<ThrowOnError extends boolean = true>(options?: Options<PostUserDataData, ThrowOnError>) {
@@ -7177,6 +7567,7 @@ export class UserDataService {
     
     /**
      * Updates user data.
+     *
      * Updates user-specific data for the current authenticated user.
      */
     public static putUserData<ThrowOnError extends boolean = true>(options?: Options<PutUserDataData, ThrowOnError>) {
@@ -7198,6 +7589,7 @@ export class UserDataService {
     
     /**
      * Deletes user data.
+     *
      * Deletes user data identified by the provided Id.
      */
     public static deleteUserDataById<ThrowOnError extends boolean = true>(options: Options<DeleteUserDataByIdData, ThrowOnError>) {
@@ -7215,6 +7607,7 @@ export class UserDataService {
     
     /**
      * Gets user data.
+     *
      * Gets user data identified by the provided Id.
      */
     public static getUserDataById<ThrowOnError extends boolean = true>(options: Options<GetUserDataByIdData, ThrowOnError>) {
@@ -7234,6 +7627,7 @@ export class UserDataService {
 export class UserGroupService {
     /**
      * Gets a filtered collection of user groups.
+     *
      * Filters user groups based on the provided criteria with support for pagination.
      */
     public static getFilterUserGroup<ThrowOnError extends boolean = true>(options?: Options<GetFilterUserGroupData, ThrowOnError>) {
@@ -7251,6 +7645,7 @@ export class UserGroupService {
     
     /**
      * Gets a collection of user group items.
+     *
      * Gets a collection of user group items identified by the provided Ids.
      */
     public static getItemUserGroup<ThrowOnError extends boolean = true>(options?: Options<GetItemUserGroupData, ThrowOnError>) {
@@ -7268,6 +7663,7 @@ export class UserGroupService {
     
     /**
      * Deletes multiple user groups.
+     *
      * Deletes multiple user groups identified by the provided Ids. This operation cannot be undone.
      */
     public static deleteUserGroup<ThrowOnError extends boolean = true>(options?: Options<DeleteUserGroupData, ThrowOnError>) {
@@ -7289,6 +7685,7 @@ export class UserGroupService {
     
     /**
      * Gets a paginated collection of user groups.
+     *
      * Gets a paginated collection of all user groups.
      */
     public static getUserGroup<ThrowOnError extends boolean = true>(options?: Options<GetUserGroupData, ThrowOnError>) {
@@ -7306,6 +7703,7 @@ export class UserGroupService {
     
     /**
      * Creates a new user group.
+     *
      * Creates a new user group with the configuration specified in the request model.
      */
     public static postUserGroup<ThrowOnError extends boolean = true>(options?: Options<PostUserGroupData, ThrowOnError>) {
@@ -7327,6 +7725,7 @@ export class UserGroupService {
     
     /**
      * Deletes a user group.
+     *
      * Deletes a user group identified by the provided Id.
      */
     public static deleteUserGroupById<ThrowOnError extends boolean = true>(options: Options<DeleteUserGroupByIdData, ThrowOnError>) {
@@ -7344,6 +7743,7 @@ export class UserGroupService {
     
     /**
      * Gets a user group.
+     *
      * Gets a user group identified by the provided Id.
      */
     public static getUserGroupById<ThrowOnError extends boolean = true>(options: Options<GetUserGroupByIdData, ThrowOnError>) {
@@ -7361,6 +7761,7 @@ export class UserGroupService {
     
     /**
      * Updates a user group.
+     *
      * Updates a user group identified by the provided Id with the details from the request model.
      */
     public static putUserGroupById<ThrowOnError extends boolean = true>(options: Options<PutUserGroupByIdData, ThrowOnError>) {
@@ -7382,6 +7783,7 @@ export class UserGroupService {
     
     /**
      * Removes users from a user group.
+     *
      * Removes the specified users from the user group identified by the provided Id.
      */
     public static deleteUserGroupByIdUsers<ThrowOnError extends boolean = true>(options: Options<DeleteUserGroupByIdUsersData, ThrowOnError>) {
@@ -7403,6 +7805,7 @@ export class UserGroupService {
     
     /**
      * Adds users to a user group.
+     *
      * Adds the specified users to the user group identified by the provided Id.
      */
     public static postUserGroupByIdUsers<ThrowOnError extends boolean = true>(options: Options<PostUserGroupByIdUsersData, ThrowOnError>) {
@@ -7426,6 +7829,7 @@ export class UserGroupService {
 export class UserService {
     /**
      * Gets a filtered collection of users.
+     *
      * Filters users based on the provided criteria with support for pagination.
      */
     public static getFilterUser<ThrowOnError extends boolean = true>(options?: Options<GetFilterUserData, ThrowOnError>) {
@@ -7443,6 +7847,7 @@ export class UserService {
     
     /**
      * Gets a collection of user items.
+     *
      * Gets a collection of user items identified by the provided Ids.
      */
     public static getItemUser<ThrowOnError extends boolean = true>(options?: Options<GetItemUserData, ThrowOnError>) {
@@ -7460,6 +7865,7 @@ export class UserService {
     
     /**
      * Deletes multiple users.
+     *
      * Deletes multiple users identified by the provided Ids. This operation cannot be undone.
      */
     public static deleteUser<ThrowOnError extends boolean = true>(options?: Options<DeleteUserData, ThrowOnError>) {
@@ -7481,6 +7887,7 @@ export class UserService {
     
     /**
      * Gets a paginated collection of users.
+     *
      * Gets a paginated collection of all users.
      */
     public static getUser<ThrowOnError extends boolean = true>(options?: Options<GetUserData, ThrowOnError>) {
@@ -7498,6 +7905,7 @@ export class UserService {
     
     /**
      * Creates a new user.
+     *
      * Creates a new user with the configuration specified in the request model.
      */
     public static postUser<ThrowOnError extends boolean = true>(options?: Options<PostUserData, ThrowOnError>) {
@@ -7519,6 +7927,7 @@ export class UserService {
     
     /**
      * Deletes a user.
+     *
      * Deletes a user identified by the provided Id.
      */
     public static deleteUserById<ThrowOnError extends boolean = true>(options: Options<DeleteUserByIdData, ThrowOnError>) {
@@ -7536,6 +7945,7 @@ export class UserService {
     
     /**
      * Gets a user.
+     *
      * Gets a user identified by the provided Id.
      */
     public static getUserById<ThrowOnError extends boolean = true>(options: Options<GetUserByIdData, ThrowOnError>) {
@@ -7553,6 +7963,7 @@ export class UserService {
     
     /**
      * Updates a user.
+     *
      * Updates a user identified by the provided Id with the details from the request model.
      */
     public static putUserById<ThrowOnError extends boolean = true>(options: Options<PutUserByIdData, ThrowOnError>) {
@@ -7574,6 +7985,7 @@ export class UserService {
     
     /**
      * Lists two-factor providers for a user.
+     *
      * Gets a list of available two-factor authentication providers for the specified user.
      */
     public static getUserById2Fa<ThrowOnError extends boolean = true>(options: Options<GetUserById2FaData, ThrowOnError>) {
@@ -7591,6 +8003,7 @@ export class UserService {
     
     /**
      * Disables two-factor authentication for a user.
+     *
      * Disables the specified two-factor authentication provider for a user.
      */
     public static deleteUserById2FaByProviderName<ThrowOnError extends boolean = true>(options: Options<DeleteUserById2FaByProviderNameData, ThrowOnError>) {
@@ -7608,6 +8021,7 @@ export class UserService {
     
     /**
      * Calculates start nodes for users.
+     *
      * Calculates the start nodes for the users identified by the provided Ids based on their permissions.
      */
     public static getUserByIdCalculateStartNodes<ThrowOnError extends boolean = true>(options: Options<GetUserByIdCalculateStartNodesData, ThrowOnError>) {
@@ -7625,6 +8039,7 @@ export class UserService {
     
     /**
      * Changes a user's password.
+     *
      * Changes the password for the user identified by the provided Id.
      */
     public static postUserByIdChangePassword<ThrowOnError extends boolean = true>(options: Options<PostUserByIdChangePasswordData, ThrowOnError>) {
@@ -7646,6 +8061,7 @@ export class UserService {
     
     /**
      * Gets all client credentials for a user.
+     *
      * Gets a collection of OAuth client credentials for the user identified by the provided Id.
      */
     public static getUserByIdClientCredentials<ThrowOnError extends boolean = true>(options: Options<GetUserByIdClientCredentialsData, ThrowOnError>) {
@@ -7663,6 +8079,7 @@ export class UserService {
     
     /**
      * Creates client credentials for a user.
+     *
      * Creates OAuth client credentials for the user identified by the provided Id.
      */
     public static postUserByIdClientCredentials<ThrowOnError extends boolean = true>(options: Options<PostUserByIdClientCredentialsData, ThrowOnError>) {
@@ -7684,6 +8101,7 @@ export class UserService {
     
     /**
      * Deletes client credentials for a user.
+     *
      * Deletes client credentials identified by the provided client Id for a user.
      */
     public static deleteUserByIdClientCredentialsByClientId<ThrowOnError extends boolean = true>(options: Options<DeleteUserByIdClientCredentialsByClientIdData, ThrowOnError>) {
@@ -7701,6 +8119,7 @@ export class UserService {
     
     /**
      * Resets a user's password.
+     *
      * Resets the password for the user using the provided reset token.
      */
     public static postUserByIdResetPassword<ThrowOnError extends boolean = true>(options: Options<PostUserByIdResetPasswordData, ThrowOnError>) {
@@ -7718,6 +8137,7 @@ export class UserService {
     
     /**
      * Clears a user's avatar.
+     *
      * Removes the avatar image for the user identified by the provided Id.
      */
     public static deleteUserAvatarById<ThrowOnError extends boolean = true>(options: Options<DeleteUserAvatarByIdData, ThrowOnError>) {
@@ -7735,6 +8155,7 @@ export class UserService {
     
     /**
      * Sets a user's avatar.
+     *
      * Sets or updates the avatar image for the user identified by the provided Id.
      */
     public static postUserAvatarById<ThrowOnError extends boolean = true>(options: Options<PostUserAvatarByIdData, ThrowOnError>) {
@@ -7756,6 +8177,7 @@ export class UserService {
     
     /**
      * Gets the user configuration.
+     *
      * Gets the configuration settings for users.
      */
     public static getUserConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetUserConfigurationData, ThrowOnError>) {
@@ -7773,6 +8195,7 @@ export class UserService {
     
     /**
      * Gets the current user.
+     *
      * Gets the currently authenticated back office user's information and permissions.
      */
     public static getUserCurrent<ThrowOnError extends boolean = true>(options?: Options<GetUserCurrentData, ThrowOnError>) {
@@ -7790,6 +8213,7 @@ export class UserService {
     
     /**
      * Lists two-factor providers for the current user.
+     *
      * Gets a list of available two-factor authentication providers for the current user.
      */
     public static getUserCurrent2Fa<ThrowOnError extends boolean = true>(options?: Options<GetUserCurrent2FaData, ThrowOnError>) {
@@ -7807,6 +8231,7 @@ export class UserService {
     
     /**
      * Disables two-factor authentication for the current user.
+     *
      * Disables the specified two-factor authentication provider for the currently authenticated user.
      */
     public static deleteUserCurrent2FaByProviderName<ThrowOnError extends boolean = true>(options: Options<DeleteUserCurrent2FaByProviderNameData, ThrowOnError>) {
@@ -7824,6 +8249,7 @@ export class UserService {
     
     /**
      * Gets two-factor setup information.
+     *
      * Gets the setup information for configuring a two-factor authentication provider.
      */
     public static getUserCurrent2FaByProviderName<ThrowOnError extends boolean = true>(options: Options<GetUserCurrent2FaByProviderNameData, ThrowOnError>) {
@@ -7841,6 +8267,7 @@ export class UserService {
     
     /**
      * Enables two-factor authentication for the current user.
+     *
      * Enables the specified two-factor authentication provider for the currently authenticated user.
      */
     public static postUserCurrent2FaByProviderName<ThrowOnError extends boolean = true>(options: Options<PostUserCurrent2FaByProviderNameData, ThrowOnError>) {
@@ -7862,6 +8289,7 @@ export class UserService {
     
     /**
      * Sets the current user's avatar.
+     *
      * Sets or updates the avatar image for the currently authenticated user.
      */
     public static postUserCurrentAvatar<ThrowOnError extends boolean = true>(options?: Options<PostUserCurrentAvatarData, ThrowOnError>) {
@@ -7883,6 +8311,7 @@ export class UserService {
     
     /**
      * Changes the current user's password.
+     *
      * Changes the password for the currently authenticated user.
      */
     public static postUserCurrentChangePassword<ThrowOnError extends boolean = true>(options?: Options<PostUserCurrentChangePasswordData, ThrowOnError>) {
@@ -7904,6 +8333,7 @@ export class UserService {
     
     /**
      * Gets the current user's configuration.
+     *
      * Gets the configuration settings for the current user.
      */
     public static getUserCurrentConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetUserCurrentConfigurationData, ThrowOnError>) {
@@ -7921,6 +8351,7 @@ export class UserService {
     
     /**
      * Lists external login providers.
+     *
      * Gets a list of configured external login providers for authentication.
      */
     public static getUserCurrentLoginProviders<ThrowOnError extends boolean = true>(options?: Options<GetUserCurrentLoginProvidersData, ThrowOnError>) {
@@ -7938,6 +8369,7 @@ export class UserService {
     
     /**
      * Gets permissions for the current user.
+     *
      * Gets the permissions for the currently authenticated user.
      */
     public static getUserCurrentPermissions<ThrowOnError extends boolean = true>(options?: Options<GetUserCurrentPermissionsData, ThrowOnError>) {
@@ -7955,6 +8387,7 @@ export class UserService {
     
     /**
      * Gets document permissions for the current user.
+     *
      * Gets the document permissions for the currently authenticated user.
      */
     public static getUserCurrentPermissionsDocument<ThrowOnError extends boolean = true>(options?: Options<GetUserCurrentPermissionsDocumentData, ThrowOnError>) {
@@ -7972,6 +8405,7 @@ export class UserService {
     
     /**
      * Gets media permissions for the current user.
+     *
      * Gets the media permissions for the currently authenticated user.
      */
     public static getUserCurrentPermissionsMedia<ThrowOnError extends boolean = true>(options?: Options<GetUserCurrentPermissionsMediaData, ThrowOnError>) {
@@ -7989,6 +8423,7 @@ export class UserService {
     
     /**
      * Disables users.
+     *
      * Disables the user accounts identified by the provided Ids.
      */
     public static postUserDisable<ThrowOnError extends boolean = true>(options?: Options<PostUserDisableData, ThrowOnError>) {
@@ -8010,6 +8445,7 @@ export class UserService {
     
     /**
      * Enables users.
+     *
      * Enables the user accounts identified by the provided Ids.
      */
     public static postUserEnable<ThrowOnError extends boolean = true>(options?: Options<PostUserEnableData, ThrowOnError>) {
@@ -8031,6 +8467,7 @@ export class UserService {
     
     /**
      * Invites new users.
+     *
      * Sends invitation emails to create new user accounts with the specified details.
      */
     public static postUserInvite<ThrowOnError extends boolean = true>(options?: Options<PostUserInviteData, ThrowOnError>) {
@@ -8052,6 +8489,7 @@ export class UserService {
     
     /**
      * Creates an initial password for a user.
+     *
      * Creates an initial password for a newly invited user using the provided token.
      */
     public static postUserInviteCreatePassword<ThrowOnError extends boolean = true>(options?: Options<PostUserInviteCreatePasswordData, ThrowOnError>) {
@@ -8067,6 +8505,7 @@ export class UserService {
     
     /**
      * Resends a user invitation.
+     *
      * Resends the invitation email for the users identified by the provided Ids.
      */
     public static postUserInviteResend<ThrowOnError extends boolean = true>(options?: Options<PostUserInviteResendData, ThrowOnError>) {
@@ -8088,6 +8527,7 @@ export class UserService {
     
     /**
      * Verifies a user invitation.
+     *
      * Verifies that the invitation token is valid for creating a new user account.
      */
     public static postUserInviteVerify<ThrowOnError extends boolean = true>(options?: Options<PostUserInviteVerifyData, ThrowOnError>) {
@@ -8103,6 +8543,7 @@ export class UserService {
     
     /**
      * Updates user group assignments.
+     *
      * Updates the user group assignments for the specified users.
      */
     public static postUserSetUserGroups<ThrowOnError extends boolean = true>(options?: Options<PostUserSetUserGroupsData, ThrowOnError>) {
@@ -8124,6 +8565,7 @@ export class UserService {
     
     /**
      * Unlocks users.
+     *
      * Unlocks the user accounts identified by the provided Ids.
      */
     public static postUserUnlock<ThrowOnError extends boolean = true>(options?: Options<PostUserUnlockData, ThrowOnError>) {
@@ -8147,6 +8589,7 @@ export class UserService {
 export class WebhookService {
     /**
      * Gets a collection of webhook items.
+     *
      * Gets a collection of webhook items identified by the provided Ids.
      */
     public static getItemWebhook<ThrowOnError extends boolean = true>(options?: Options<GetItemWebhookData, ThrowOnError>) {
@@ -8164,6 +8607,7 @@ export class WebhookService {
     
     /**
      * Gets a paginated collection of webhooks.
+     *
      * Gets a paginated collection of all webhooks.
      */
     public static getWebhook<ThrowOnError extends boolean = true>(options?: Options<GetWebhookData, ThrowOnError>) {
@@ -8181,6 +8625,7 @@ export class WebhookService {
     
     /**
      * Creates a new webhook.
+     *
      * Creates a new webhook with the configuration specified in the request model.
      */
     public static postWebhook<ThrowOnError extends boolean = true>(options?: Options<PostWebhookData, ThrowOnError>) {
@@ -8202,6 +8647,7 @@ export class WebhookService {
     
     /**
      * Deletes a webhook.
+     *
      * Deletes a webhook identified by the provided Id.
      */
     public static deleteWebhookById<ThrowOnError extends boolean = true>(options: Options<DeleteWebhookByIdData, ThrowOnError>) {
@@ -8219,6 +8665,7 @@ export class WebhookService {
     
     /**
      * Gets a webhook.
+     *
      * Gets a webhook identified by the provided Id.
      */
     public static getWebhookById<ThrowOnError extends boolean = true>(options: Options<GetWebhookByIdData, ThrowOnError>) {
@@ -8236,6 +8683,7 @@ export class WebhookService {
     
     /**
      * Updates a webhook.
+     *
      * Updates a webhook identified by the provided Id with the details from the request model.
      */
     public static putWebhookById<ThrowOnError extends boolean = true>(options: Options<PutWebhookByIdData, ThrowOnError>) {
@@ -8257,6 +8705,7 @@ export class WebhookService {
     
     /**
      * Gets a paginated collection of webhook logs for a specific webhook.
+     *
      * Gets a paginated collection of webhook logs for the webhook identified by the provided Id.
      */
     public static getWebhookByIdLogs<ThrowOnError extends boolean = true>(options: Options<GetWebhookByIdLogsData, ThrowOnError>) {
@@ -8274,6 +8723,7 @@ export class WebhookService {
     
     /**
      * Gets a paginated collection of webhook events.
+     *
      * Gets a paginated collection of available webhook events that can be subscribed to.
      */
     public static getWebhookEvents<ThrowOnError extends boolean = true>(options?: Options<GetWebhookEventsData, ThrowOnError>) {
@@ -8291,6 +8741,7 @@ export class WebhookService {
     
     /**
      * Gets a paginated collection of webhook logs.
+     *
      * Gets a paginated collection of webhook logs for all webhooks.
      */
     public static getWebhookLogs<ThrowOnError extends boolean = true>(options?: Options<GetWebhookLogsData, ThrowOnError>) {

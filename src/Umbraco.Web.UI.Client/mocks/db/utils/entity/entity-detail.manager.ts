@@ -29,6 +29,14 @@ export class UmbMockEntityDetailManager<MockType extends { id: string }> {
 		return mappedItem;
 	}
 
+	list(options: { skip?: number; take?: number } = {}): { items: Array<MockType>; total: number } {
+		const skip = options.skip ?? 0;
+		const take = options.take ?? 100;
+		const all = this.#db.getAll();
+		const items = all.slice(skip, skip + take).map((item) => this.#readResponseMapper(item));
+		return { items, total: all.length };
+	}
+
 	readBatch(ids: Array<string>): { items: Array<MockType>; total: number } {
 		const items = ids
 			.map((id) => {
