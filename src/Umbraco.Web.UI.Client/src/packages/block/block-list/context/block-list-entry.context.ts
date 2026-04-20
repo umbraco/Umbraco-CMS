@@ -58,24 +58,34 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 
 	override async copyToClipboard() {
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		if (!propertyDatasetContext) throw new Error('Could not get property dataset context to copy.');
+
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
+		if (!propertyContext) throw new Error('Could not get property context to copy.');
+
 		const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
-		if (!propertyDatasetContext || !propertyContext || !clipboardContext) {
-			throw new Error('Could not get required contexts to copy.');
-		}
+		if (!clipboardContext) throw new Error('Could not get clipboard context to copy.');
 
 		const workspaceName = this.localize.string(propertyDatasetContext.getName());
 		const propertyLabel = this.localize.string(propertyContext.getLabel());
 		const blockLabel = this.getName();
-
 		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
 
+		clipboardContext.write({
+			icon: this.getContentElementTypeIcon(),
+			name: entryName,
+			propertyValue: this.#buildPropertyValue(),
+			propertyEditorUiAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
+		});
+	}
+
+	#buildPropertyValue(): UmbBlockListValueModel {
 		const content = this.getContent();
 		const layout = this.getLayout();
 		const settings = this.getSettings();
 		const expose = this.getExpose();
 
-		const propertyValue: UmbBlockListValueModel = {
+		return {
 			contentData: content ? [structuredClone(content)] : [],
 			layout: {
 				[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
@@ -83,12 +93,5 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 			settingsData: settings ? [structuredClone(settings)] : [],
 			expose: expose ? [structuredClone(expose)] : [],
 		};
-
-		clipboardContext.write({
-			icon: this.getContentElementTypeIcon(),
-			name: entryName,
-			propertyValue,
-			propertyEditorUiAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
-		});
 	}
 }

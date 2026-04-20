@@ -49,23 +49,36 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 		}
 
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
+		if (!propertyDatasetContext) throw new Error('Could not get property dataset context to copy.');
+
 		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		if (!propertyDatasetContext || !propertyContext) {
-			throw new Error('Could not get required contexts to copy.');
+		if (!propertyContext) throw new Error('Could not get property context to copy.');
+
+		const editorUiManifest = propertyContext.getEditorManifest();
+		if (!editorUiManifest?.alias) {
+			throw new Error('Could not determine property editor UI alias for clipboard entry.');
 		}
 
 		const workspaceName = this.localize.string(propertyDatasetContext.getName());
 		const propertyLabel = this.localize.string(propertyContext.getLabel());
 		const blockLabel = this.getName();
-
 		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
 
+		clipboardContext.write({
+			icon: this.getContentElementTypeIcon(),
+			name: entryName,
+			propertyValue: this.#buildPropertyValue(),
+			propertyEditorUiAlias: editorUiManifest.alias,
+		});
+	}
+
+	#buildPropertyValue(): UmbBlockRteValueModel {
 		const content = this.getContent();
 		const layout = this.getLayout();
 		const settings = this.getSettings();
 		const expose = this.getExpose();
 
-		const propertyValue: UmbBlockRteValueModel = {
+		return {
 			contentData: content ? [structuredClone(content)] : [],
 			layout: {
 				[UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
@@ -73,17 +86,5 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 			settingsData: settings ? [structuredClone(settings)] : [],
 			expose: expose ? [structuredClone(expose)] : [],
 		};
-
-		const editorUiManifest = propertyContext.getEditorManifest();
-		if (!editorUiManifest?.alias) {
-			throw new Error('Could not determine property editor UI alias for clipboard entry.');
-		}
-
-		clipboardContext.write({
-			icon: this.getContentElementTypeIcon(),
-			name: entryName,
-			propertyValue,
-			propertyEditorUiAlias: editorUiManifest.alias,
-		});
 	}
 }
