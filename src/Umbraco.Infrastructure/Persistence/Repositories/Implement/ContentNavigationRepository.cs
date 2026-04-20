@@ -1,4 +1,5 @@
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -54,9 +55,13 @@ public class ContentNavigationRepository : INavigationRepository
             return Enumerable.Empty<NavigationDto>();
         }
 
+        // Containers (e.g. element containers) don't have umbracoContent rows, so we need LEFT JOIN
+        // when the query includes them. Documents and media always have content rows, so INNER JOIN
+        // gives the query optimizer more information.
+        var includesContainerTypes = objectTypeKeysArray.Contains(Constants.ObjectTypes.ElementContainer);
+
         ISqlSyntaxProvider syntax = AmbientScope.SqlContext.SqlSyntax;
 
-        // LEFT JOIN umbracoContent since some nodes (e.g. containers) may not have content rows
         Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql()
             .Select(
                 $"n.{syntax.GetQuotedColumnName(NodeDto.IdColumnName)} as {syntax.GetQuotedColumnName(NodeDto.IdColumnName)}",
@@ -65,9 +70,22 @@ public class ContentNavigationRepository : INavigationRepository
                 $"n.{syntax.GetQuotedColumnName(NodeDto.ParentIdColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.ParentIdColumnName)}",
                 $"n.{syntax.GetQuotedColumnName(NodeDto.SortOrderColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.SortOrderColumnName)}",
                 $"n.{syntax.GetQuotedColumnName(NodeDto.TrashedColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.TrashedColumnName)}")
-            .From<NodeDto>("n")
-            .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId, "n", "c")
-            .LeftJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn")
+            .From<NodeDto>("n");
+
+        if (includesContainerTypes)
+        {
+            sql = sql
+                .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId, "n", "c")
+                .LeftJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn");
+        }
+        else
+        {
+            sql = sql
+                .InnerJoin<ContentDto>("c").On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId, "n", "c")
+                .InnerJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn");
+        }
+
+        sql = sql
             .WhereIn<NodeDto>(n => n.NodeObjectType, objectTypeKeysArray, "n")
             .Where<NodeDto>(n => n.Trashed == trashed, "n")
             .OrderBy<NodeDto>(n => n.Path, "n"); // make sure that we get the parent items first
