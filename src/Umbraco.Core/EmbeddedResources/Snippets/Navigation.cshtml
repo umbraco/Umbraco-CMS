@@ -1,11 +1,9 @@
 @using Umbraco.Cms.Core.Models.PublishedContent
-@using Umbraco.Cms.Core.PublishedCache
 @using Umbraco.Cms.Core.Routing
 @using Umbraco.Cms.Core.Services.Navigation
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
-@inject IVariationContextAccessor VariationContextAccessor
-@inject IPublishedContentCache PublishedContentCache
 @inject IDocumentNavigationQueryService DocumentNavigationQueryService
+@inject IPublishedContentStatusFilteringService PublishedStatusFilteringService
 @inject IPublishedValueFallback PublishedValueFallback
 @inject IPublishedUrlProvider PublishedUrlProvider
 @*
@@ -14,14 +12,14 @@
     It also highlights the current active page/section in the navigation with the CSS class "current".
 *@
 
-@{ var selection = Model?.Content.Root(PublishedContentCache, DocumentNavigationQueryService).Children(VariationContextAccessor, PublishedContentCache, DocumentNavigationQueryService).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
+@{ var selection = Model?.Root(DocumentNavigationQueryService, PublishedStatusFilteringService).Children(DocumentNavigationQueryService, PublishedStatusFilteringService).Where(x => x.IsVisible(PublishedValueFallback)).ToArray(); }
 
 @if (selection?.Length > 0)
 {
     <ul>
         @foreach (var item in selection)
         {
-            <li class="@(item.IsAncestorOrSelf(Model?.Content) ? "current" : null)">
+            <li class="@(item.IsAncestorOrSelf(Model) ? "current" : null)">
                 <a href="@item.Url(PublishedUrlProvider)">@item.Name</a>
             </li>
         }
