@@ -55,7 +55,7 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         var elementKey = await CreateElement("Draft Element");
 
         // Act
-        IPublishedElement? result = await PublishedElementCache.GetByKeyAsync(elementKey, preview: true);
+        IPublishedElement? result = await PublishedElementCache.GetByIdAsync(elementKey, preview: true);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -69,7 +69,7 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         var elementKey = await CreateAndPublishElement("Published Element");
 
         // Act
-        IPublishedElement? result = await PublishedElementCache.GetByKeyAsync(elementKey, preview: false);
+        IPublishedElement? result = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -83,7 +83,7 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         var elementKey = await CreateElement("Unpublished Element");
 
         // Act
-        IPublishedElement? result = await PublishedElementCache.GetByKeyAsync(elementKey, preview: false);
+        IPublishedElement? result = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
 
         // Assert
         Assert.That(result, Is.Null);
@@ -96,7 +96,7 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         var elementKey = await CreateAndPublishElement("Published Element");
 
         // Act — request draft version of published element
-        IPublishedElement? result = await PublishedElementCache.GetByKeyAsync(elementKey, preview: true);
+        IPublishedElement? result = await PublishedElementCache.GetByIdAsync(elementKey, preview: true);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -120,7 +120,7 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         Assert.That(updateResult.Success, Is.True);
 
         // Act
-        IPublishedElement? result = await PublishedElementCache.GetByKeyAsync(elementKey, preview: true);
+        IPublishedElement? result = await PublishedElementCache.GetByIdAsync(elementKey, preview: true);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -134,7 +134,7 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         var elementKey = await CreateAndPublishElement("To Be Deleted");
 
         // Verify it exists first
-        var before = await PublishedElementCache.GetByKeyAsync(elementKey, preview: false);
+        var before = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
         Assert.That(before, Is.Not.Null);
 
         // Act — delete via the element service
@@ -144,7 +144,7 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         elementService.Delete(element!);
 
         // Assert
-        IPublishedElement? result = await PublishedElementCache.GetByKeyAsync(elementKey, preview: false);
+        IPublishedElement? result = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
         Assert.That(result, Is.Null);
     }
 
@@ -155,7 +155,7 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         var elementKey = await CreateAndPublishElement("My Element Name");
 
         // Act
-        IPublishedElement? result = await PublishedElementCache.GetByKeyAsync(elementKey, preview: false);
+        IPublishedElement? result = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
 
         // Assert
         Assert.That(result, Is.Not.Null);
@@ -172,7 +172,7 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         await ElementEditingService.MoveToRecycleBinAsync(elementKey, Constants.Security.SuperUserKey);
 
         // Assert
-        var result = await PublishedElementCache.GetByKeyAsync(elementKey, preview: false);
+        var result = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
         Assert.That(result, Is.Null);
     }
 
@@ -183,14 +183,14 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         var elementKey = await CreateAndPublishElement("Published Element");
 
         // Verify it's in the published cache
-        var before = await PublishedElementCache.GetByKeyAsync(elementKey, preview: false);
+        var before = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
         Assert.That(before, Is.Not.Null);
 
         // Act — trash the element
         await ElementEditingService.MoveToRecycleBinAsync(elementKey, Constants.Security.SuperUserKey);
 
         // Assert
-        var after = await PublishedElementCache.GetByKeyAsync(elementKey, preview: false);
+        var after = await PublishedElementCache.GetByIdAsync(elementKey, preview: false);
         Assert.That(after, Is.Null);
     }
 
@@ -209,8 +209,8 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         await PublishElement(element2Key);
 
         // Verify both elements are in the published cache
-        var before1 = await PublishedElementCache.GetByKeyAsync(element1Key, preview: false);
-        var before2 = await PublishedElementCache.GetByKeyAsync(element2Key, preview: false);
+        var before1 = await PublishedElementCache.GetByIdAsync(element1Key, preview: false);
+        var before2 = await PublishedElementCache.GetByIdAsync(element2Key, preview: false);
         Assert.That(before1, Is.Not.Null);
         Assert.That(before2, Is.Not.Null);
 
@@ -219,8 +219,8 @@ internal sealed class ElementHybridCacheTests : UmbracoIntegrationTest
         Assert.That(trashResult.Success, Is.True);
 
         // Assert — elements should no longer be in the published cache
-        var after1 = await PublishedElementCache.GetByKeyAsync(element1Key, preview: false);
-        var after2 = await PublishedElementCache.GetByKeyAsync(element2Key, preview: false);
+        var after1 = await PublishedElementCache.GetByIdAsync(element1Key, preview: false);
+        var after2 = await PublishedElementCache.GetByIdAsync(element2Key, preview: false);
         Assert.That(after1, Is.Null);
         Assert.That(after2, Is.Null);
     }

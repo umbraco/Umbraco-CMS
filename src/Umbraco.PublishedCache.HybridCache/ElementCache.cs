@@ -20,6 +20,6 @@ public sealed class ElementCache : IPublishedElementCache
     }
 
     /// <inheritdoc />
-    public async Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null)
+    public async Task<IPublishedElement?> GetByIdAsync(Guid key, bool? preview = null)
         => await _elementCacheService.GetByKeyAsync(key, preview);
 }

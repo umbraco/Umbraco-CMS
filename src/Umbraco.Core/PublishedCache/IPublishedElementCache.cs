@@ -13,5 +13,5 @@ public interface IPublishedElementCache
     /// <param name="key">The element's unique key.</param>
     /// <param name="preview">Optional value indicating whether to include unpublished content.</param>
     /// <returns>The published element, or <c>null</c> if not found.</returns>
-    Task<IPublishedElement?> GetByKeyAsync(Guid key, bool? preview = null);
+    Task<IPublishedElement?> GetByIdAsync(Guid key, bool? preview = null);
 }

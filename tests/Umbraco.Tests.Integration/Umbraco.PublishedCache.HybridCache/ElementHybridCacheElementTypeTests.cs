@@ -53,7 +53,7 @@ internal sealed class ElementHybridCacheElementTypeTests : UmbracoIntegrationTes
     {
         // Arrange
         var elementKey = await CreateAndPublishElement("Test Element");
-        var oldElement = await PublishedElementCache.GetByKeyAsync(elementKey, true);
+        var oldElement = await PublishedElementCache.GetByIdAsync(elementKey, true);
         Assert.That(oldElement, Is.Not.Null);
         Assert.That(oldElement!.GetProperty("title"), Is.Not.Null);
 
@@ -62,7 +62,7 @@ internal sealed class ElementHybridCacheElementTypeTests : UmbracoIntegrationTes
         await ContentTypeService.UpdateAsync(_elementType, Constants.Security.SuperUserKey);
 
         // Assert
-        var newElement = await PublishedElementCache.GetByKeyAsync(elementKey, true);
+        var newElement = await PublishedElementCache.GetByIdAsync(elementKey, true);
         Assert.That(newElement, Is.Not.Null);
         Assert.That(newElement!.GetProperty("title"), Is.Null);
     }
@@ -72,7 +72,7 @@ internal sealed class ElementHybridCacheElementTypeTests : UmbracoIntegrationTes
     {
         // Arrange
         var elementKey = await CreateAndPublishElement("Test Element");
-        var oldElement = await PublishedElementCache.GetByKeyAsync(elementKey, true);
+        var oldElement = await PublishedElementCache.GetByIdAsync(elementKey, true);
         Assert.That(oldElement, Is.Not.Null);
         Assert.That(oldElement!.GetProperty("title"), Is.Not.Null);
 
@@ -81,7 +81,7 @@ internal sealed class ElementHybridCacheElementTypeTests : UmbracoIntegrationTes
         await ContentTypeService.UpdateAsync(_elementType, Constants.Security.SuperUserKey);
 
         // Assert — property values should still be available
-        var newElement = await PublishedElementCache.GetByKeyAsync(elementKey, true);
+        var newElement = await PublishedElementCache.GetByIdAsync(elementKey, true);
         Assert.That(newElement, Is.Not.Null);
         Assert.That(newElement!.GetProperty("title"), Is.Not.Null);
     }
@@ -91,14 +91,14 @@ internal sealed class ElementHybridCacheElementTypeTests : UmbracoIntegrationTes
     {
         // Arrange
         var elementKey = await CreateAndPublishElement("Test Element");
-        var element = await PublishedElementCache.GetByKeyAsync(elementKey, preview: true);
+        var element = await PublishedElementCache.GetByIdAsync(elementKey, preview: true);
         Assert.That(element, Is.Not.Null);
 
         // Act
         await ContentTypeService.DeleteAsync(element!.ContentType.Key, Constants.Security.SuperUserKey);
 
         // Assert
-        var elementAgain = await PublishedElementCache.GetByKeyAsync(elementKey, preview: true);
+        var elementAgain = await PublishedElementCache.GetByIdAsync(elementKey, preview: true);
         Assert.That(elementAgain, Is.Null);
     }
 
