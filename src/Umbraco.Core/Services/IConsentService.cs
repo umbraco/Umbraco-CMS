@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Consent can be given or revoked or changed via the <see cref="RegisterConsent" /> method, which
+///         Consent can be given or revoked or changed via the <see cref="RegisterConsentAsync" /> method, which
 ///         creates a new <see cref="IConsent" /> entity to track the consent. Revoking a consent is performed by
 ///         registering a revoked consent.
 ///     </para>

@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 ///     Represents a repository for <see cref="IConsent" /> entities.
 /// </summary>
-public interface IConsentRepository : IAsyncReadWriteRepository<int, IConsent>
+public interface IConsentRepository
 {
     /// <summary>
     ///     Clears the current flag.
@@ -31,4 +31,6 @@ public interface IConsentRepository : IAsyncReadWriteRepository<int, IConsent>
         bool contextStartsWith = false,
         bool actionStartsWith = false,
         bool includeHistory = false);
+
+    Task SaveAsync(IConsent consent, CancellationToken cancellationToken);
 }

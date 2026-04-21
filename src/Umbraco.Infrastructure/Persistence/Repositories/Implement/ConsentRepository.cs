@@ -1,39 +1,31 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <summary>
-///     Represents the NPoco implementation of <see cref="IConsentRepository" />.
+///     Represents the EFCore implementation of <see cref="IConsentRepository" />.
 /// </summary>
-internal sealed class ConsentRepository : AsyncEntityRepositoryBase<int, IConsent>, IConsentRepository
+internal sealed class ConsentRepository : IConsentRepository
 {
+    private readonly IEFCoreScopeAccessor<UmbracoDbContext> _scopeAccessor;
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="ConsentRepository" /> class.
     /// </summary>
     public ConsentRepository(
-        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
-        AppCaches cache,
-        ILogger<ConsentRepository> logger,
-        IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
-        : base(
-            scopeAccessor,
-            cache,
-            logger,
-            repositoryCacheVersionService,
-            cacheSyncService)
-    {
-    }
+        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor) =>
+        _scopeAccessor = scopeAccessor;
+
+    private IEFCoreScope<UmbracoDbContext> AmbientScope
+        => _scopeAccessor.AmbientScope
+           ?? throw new InvalidOperationException("Cannot run a repository without an ambient scope.");
 
     /// <inheritdoc />
     public async Task ClearCurrentAsync(string source, string context, string action) =>
@@ -89,8 +81,24 @@ internal sealed class ConsentRepository : AsyncEntityRepositoryBase<int, IConsen
         });
     }
 
-    /// <inheritdoc />
-    protected override async Task PersistNewItemAsync(IConsent entity)
+    /// <summary>
+    ///     Adds or updates an <see cref="IConsent"/>, backed by the cache policy.
+    /// </summary>
+    /// <param name="consent">The consent to save.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    public async Task SaveAsync(IConsent consent, CancellationToken cancellationToken)
+    {
+        if (consent.HasIdentity == false)
+        {
+            await PersistNewItemAsync(consent);
+        }
+        else
+        {
+            await PersistUpdatedItemAsync(consent);
+        }
+    }
+
+    private async Task PersistNewItemAsync(IConsent entity)
     {
         entity.AddingEntity();
 
@@ -107,8 +115,7 @@ internal sealed class ConsentRepository : AsyncEntityRepositoryBase<int, IConsen
         entity.ResetDirtyProperties();
     }
 
-    /// <inheritdoc />
-    protected override async Task PersistUpdatedItemAsync(IConsent entity)
+    private async Task PersistUpdatedItemAsync(IConsent entity)
     {
         entity.UpdatingEntity();
 
@@ -122,15 +129,5 @@ internal sealed class ConsentRepository : AsyncEntityRepositoryBase<int, IConsen
         });
 
         entity.ResetDirtyProperties();
-        IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IConsent, int>(entity.Id));
     }
-
-    /// <inheritdoc />
-    protected override Task<IConsent?> PerformGetAsync(int id) => throw new NotSupportedException();
-
-    /// <inheritdoc />
-    protected override Task<IEnumerable<IConsent>?> PerformGetAllAsync() => throw new NotSupportedException();
-
-    /// <inheritdoc/>
-    protected override Task<IEnumerable<IConsent>?> PerformGetManyAsync(int[]? keys) => throw new NotSupportedException();
 }
