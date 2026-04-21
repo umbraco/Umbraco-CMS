@@ -306,7 +306,16 @@ stages:
               command: test
               projects: "tests/Umbraco.Tests.Integration/Umbraco.Tests.Integration.csproj"
               testRunTitle: Integration Tests SQL Server - $(Agent.OS)
-              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build'
+              arguments: '--filter "$(testFilter)" --configuration $(buildConfiguration) --no-build --blame-hang-timeout 10min --blame-hang-dump-type full'
+
+          # Added so we can test failing integration tests
+          - task: PublishPipelineArtifact@1
+            displayName: Publish hang dumps
+            condition: failed()
+            inputs:
+              targetPath: $(Agent.TempDirectory)
+              artifact: hang-dumps-sqlserver-$(Agent.OS)-$(System.JobAttempt)
+              publishLocation: pipeline
 
           # Stop SQL Server
           - pwsh: docker stop mssql
