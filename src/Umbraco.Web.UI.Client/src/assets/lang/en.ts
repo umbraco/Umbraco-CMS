@@ -436,6 +436,11 @@ export default {
 		memberHasPassword: 'The member already has a password set',
 		memberKindDefault: 'Member',
 		memberKindApi: 'API Member',
+		memberKindExternalOnly: 'External',
+		profileData: 'Profile data',
+		externalMemberTitle: 'External member',
+		externalMemberDescription:
+			'This member is managed by an external authentication provider. Identity data such as email and username is maintained by the provider, not Umbraco.',
 		memberLockoutNotEnabled: 'Lockout is not enabled for this member',
 		memberNotInGroup: "The member is not in group '%0%'",
 	},
@@ -2232,6 +2237,10 @@ export default {
 		'2faCodeInput': 'Verification code',
 		'2faCodeInputHelp': 'Please enter the verification code',
 		'2faInvalidCode': 'Invalid code entered',
+		addUsersToGroupError: 'Could not add users to the group.',
+		removeUsersFromGroupError: 'Could not remove users from the group.',
+		andMore: 'and %0% more',
+		usersNotManagedFromGroup: 'not manageable from this screen.',
 	},
 	validation: {
 		validation: 'Validation',
@@ -2647,6 +2656,7 @@ export default {
 			'Master Umbraco with official training. Get practical experience through instructor-led courses and earn certifications that help you grow your skills and career.',
 	},
 	blockEditor: {
+		labelCreateModalSize: 'Create modal size',
 		headlineCreateBlock: 'Pick Element Type',
 		headlineAddSettingsElementType: 'Attach a settings Element Type',
 		headlineAddCustomView: 'Select view',
