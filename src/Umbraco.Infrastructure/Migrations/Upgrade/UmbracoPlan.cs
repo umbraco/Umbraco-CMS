@@ -183,6 +183,7 @@ public partial class UmbracoPlan : MigrationPlan
         // To 17.4.0
         To<V_17_4_0.AddContentVersionDateIndex>("{D4E5F6A7-B8C9-4D0E-A1F2-3B4C5D6E7F80}");
         To<V_17_4_0.AddDimensionsToSvg>("{72970B86-59D8-403C-B322-FFF43F9DB199}");
+        To<V_17_4_0.AddExternalMemberTables>("{D7E8F9A0-B1C2-4D3E-A5F6-7890ABCDEF12}");
 
         // To 18.0.0
         // TODO (V18): Enable on 18 branch
