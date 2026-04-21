@@ -1215,16 +1215,23 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         #region Utilities
 
         protected virtual string? EnsureUniqueNodeName(int parentId, string? nodeName, int id = 0)
+            => EnsureUniqueNodeName(parentId, nodeName, id, out _);
+
+        private protected string? EnsureUniqueNodeName(int parentId, string? nodeName, int id, out List<SimilarNodeName> siblings)
         {
-            SqlTemplate? template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName, tsql => tsql
-                .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text!, "name"))
-                .From<NodeDto>()
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
+            SqlTemplate template = SqlContext.Templates.Get(
+                Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName,
+                tsql => tsql
+                    .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text!, "name"))
+                    .From<NodeDto>()
+                    .Where<NodeDto>(x =>
+                        x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
+                        x.ParentId == SqlTemplate.Arg<int>("parentId")));
 
             Sql<ISqlContext> sql = template.Sql(NodeObjectTypeId, parentId);
-            List<SimilarNodeName>? names = Database.Fetch<SimilarNodeName>(sql);
+            siblings = Database.Fetch<SimilarNodeName>(sql);
 
-            return SimilarNodeName.GetUniqueName(names, id, nodeName);
+            return SimilarNodeName.GetUniqueName(siblings, id, nodeName);
         }
 
         protected virtual bool SortorderExists(int parentId, int sortOrder)

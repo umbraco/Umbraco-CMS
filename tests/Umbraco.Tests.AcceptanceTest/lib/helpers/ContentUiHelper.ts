@@ -192,6 +192,11 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly cardCollectionView: Locator;
   private readonly cardContentNode: Locator;
   private readonly containerSetupBtn: Locator;
+  private readonly containerEditBtn: Locator;
+  private readonly loginPageSelectedItem: Locator;
+  private readonly errorPageSelectedItem: Locator;
+  private readonly publishModalBtn: Locator;
+  private readonly unpublishModalBtn: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -213,6 +218,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.enterTagTxt = page.getByPlaceholder('Enter tag');
     this.menuItemTree = page.locator('umb-menu-item-tree-default');
     this.confirmToUnpublishBtn = page.locator('umb-document-unpublish-modal').getByLabel('Unpublish');
+    this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
     this.dropdown = page.locator('select#native');
     this.splitView = page.locator('#splitViews');
     this.setADateTxt = page.getByLabel('Set a date…');
@@ -308,6 +314,9 @@ export class ContentUiHelper extends UiBaseLocators {
     this.linkToManualBtn = this.linkPickerModal.getByTestId('action:external').locator('#button');
     this.umbDocumentCollection = page.locator('umb-document-collection');
     this.documentTableColumnName = this.listView.locator('umb-document-table-column-name');
+    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
+    this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
+    this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     //Block Grid - Block List
     this.addBlockElementBtn = page.locator('uui-button-group > uui-button').first().filter({has: page.locator('#button')});
     this.formValidationMessage = page.locator('#splitViews umb-form-validation-message #messages');
@@ -340,7 +349,6 @@ export class ContentUiHelper extends UiBaseLocators {
     this.blockWorkspace = page.locator('umb-block-workspace-editor');
     this.tiptapInput = page.locator('umb-input-tiptap');
     this.rteBlockInline = page.locator('umb-rte-block-inline');
-    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
     this.modalCreateBtn = this.backofficeModalContainer.getByLabel('Create', {exact: true});
     this.modalUpdateBtn = this.backofficeModalContainer.getByLabel('Update', {exact: true});
     this.rteBlock = page.locator('umb-rte-block');
@@ -399,6 +407,9 @@ export class ContentUiHelper extends UiBaseLocators {
     this.cardContentNode = this.cardCollectionView.locator('uui-card-content-node');
     // Public Access
     this.containerSetupBtn = this.container.getByLabel('Setup');
+    this.containerEditBtn = this.container.getByLabel('Edit');
+    this.loginPageSelectedItem = page.locator('.select-item').filter({hasText: 'Login Page'});
+    this.errorPageSelectedItem = page.locator('.select-item').filter({hasText: 'Error Page'});
   }
 
   async enterContentName(name: string) {
@@ -1204,6 +1215,14 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.manualLinkRemoveBtn);
   }
 
+  async clickPublishModalButton() {
+    await this.click(this.publishModalBtn);
+  }
+
+  async clickUnpublishModalButton() {
+    await this.click(this.unpublishModalBtn);
+  }
+
   // Block Grid - Block List
   async clickAddBlockElementButton() {
     await this.click(this.addBlockElementBtn);
@@ -1903,5 +1922,54 @@ export class ContentUiHelper extends UiBaseLocators {
     const contentLocator = this.cardContentNode.filter({hasText: contentName});
     await this.waitForVisible(contentLocator);
     await this.click(contentLocator.locator('#select-checkbox'), {force: true});
+  }
+
+  async isContentCardWithNameSelected(contentName: string, isSelected: boolean = true) {
+    const contentLocator = this.cardContentNode.filter({hasText: contentName});
+    if (isSelected) {
+      await expect(contentLocator).toHaveAttribute('selected');
+    } else {
+      await expect(contentLocator).not.toHaveAttribute('selected');
+    }
+  }
+
+  async addGroupBasedPublicAccessWithPrefilledPages(memberGroupName: string) {
+    await this.click(this.groupBasedProtectionBtn);
+    await this.clickNextButton();
+    await this.click(this.chooseMemberGroupBtn);
+    await this.click(this.page.getByLabel(memberGroupName));
+    await this.clickChooseModalButton();
+    await this.click(this.containerSetupBtn);
+  }
+
+  async isDocumentSelectedAsLoginPage(documentName: string) {
+    return await this.isVisible(this.loginPageSelectedItem.locator('uui-ref-node[name="' + documentName + '"]'));
+  }
+
+  async isDocumentSelectedAsErrorPage(documentName: string) {
+    return await this.isVisible(this.errorPageSelectedItem.locator('uui-ref-node[name="' + documentName + '"]'));
+  }
+
+  async isMemberGroupSelected(memberGroupName: string) {
+    return await this.isVisible(this.page.locator('umb-input-member-group uui-ref-node[name="' + memberGroupName + '"]'));
+  }
+  
+  async clickRemoveProtectionButton() {
+    await this.click(this.container.getByLabel('Remove protection'));
+  }
+
+  async updateGroupBasedPublicAccess(memberGroupName: string) {
+    await this.click(this.chooseMemberGroupBtn);
+    await this.click(this.page.getByLabel(memberGroupName));
+    await this.clickChooseModalButton();
+    await this.click(this.containerEditBtn);
+  }
+
+  async isPublicAccessHeadlineVisible(headline: string) {
+    await this.isVisible(this.container.getByRole('heading', {name: headline, exact: true}));
+  }
+
+  async doesPublicAccessHaveMemberGroupName(name: string) {
+    await this.isVisible(this.container.locator('umb-input-member-group').getByText(name));
   }
 }

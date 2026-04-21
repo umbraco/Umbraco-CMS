@@ -1,8 +1,10 @@
+import { handlers } from '../mocks/e2e-handlers.js';
+// eslint-disable-next-line local-rules/enforce-umbraco-external-imports
 import { expect, test as base } from '@playwright/test';
+// eslint-disable-next-line local-rules/enforce-umbraco-external-imports
 import { createWorkerFixture } from 'playwright-msw';
+// eslint-disable-next-line local-rules/enforce-umbraco-external-imports
 import type { MockServiceWorker } from 'playwright-msw';
-
-import { handlers } from '../src/mocks/e2e-handlers.js';
 
 const test = base.extend<{
 	worker: MockServiceWorker;
