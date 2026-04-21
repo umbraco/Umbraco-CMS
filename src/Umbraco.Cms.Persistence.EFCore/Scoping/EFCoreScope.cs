@@ -228,7 +228,6 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         _originalConnectionString ??= _dbContext.Database.GetConnectionString();
 
         // Check if we are already in a transaction before starting one.
-
         if (_dbContext.Database.CurrentTransaction is null)
         {
             if (_shareUmbracoConnection)

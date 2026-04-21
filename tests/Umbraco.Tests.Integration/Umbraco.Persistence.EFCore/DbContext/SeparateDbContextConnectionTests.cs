@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -15,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 public class SeparateDbContextConnectionTests : UmbracoIntegrationTest
 {
-    private static readonly string DbFilePath =
+    private static readonly string _dbFilePath =
         Path.Combine(Path.GetTempPath(), $"separate-test-{Guid.NewGuid():N}.db");
 
     private IEFCoreScopeProvider<SeparateDbContext> EfCoreScopeProvider =>
@@ -26,7 +25,7 @@ public class SeparateDbContextConnectionTests : UmbracoIntegrationTest
         builder.Services.AddUmbracoDbContext<SeparateDbContext>(
             (_, options, _, _) =>
             {
-                options.UseSqlite($"Data Source={DbFilePath}");
+                options.UseSqlite($"Data Source={_dbFilePath}");
             },
             shareUmbracoConnection: false);
     }
@@ -34,9 +33,9 @@ public class SeparateDbContextConnectionTests : UmbracoIntegrationTest
     [OneTimeTearDown]
     public void CleanUp()
     {
-        if (File.Exists(DbFilePath))
+        if (File.Exists(_dbFilePath))
         {
-            File.Delete(DbFilePath);
+            File.Delete(_dbFilePath);
         }
     }
 
@@ -55,7 +54,9 @@ public class SeparateDbContextConnectionTests : UmbracoIntegrationTest
         await scope.ExecuteWithContextAsync<Task>(async db =>
         {
             var connectionString = db.Database.GetConnectionString();
-            Assert.That(connectionString, Does.Contain(DbFilePath),
+            Assert.That(
+                connectionString,
+                Does.Contain(_dbFilePath),
                 "The DbContext should use its own configured connection string, " +
                 "not the Umbraco main database connection.");
         });

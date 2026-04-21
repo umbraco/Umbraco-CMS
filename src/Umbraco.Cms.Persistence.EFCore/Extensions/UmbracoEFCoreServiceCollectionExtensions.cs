@@ -43,17 +43,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         this IServiceCollection services,
         Action<DbContextOptionsBuilder, string?, string?, IServiceProvider?>? optionsAction = null)
         where T : DbContext
-    {
-#pragma warning disable CS0618 // Type or member is obsolete
-        return AddUmbracoDbContext<T>(
-            services,
-            (IServiceProvider provider, DbContextOptionsBuilder optionsBuilder, string? connectionString, string? providerName) =>
-            {
-                ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
-                optionsAction?.Invoke(optionsBuilder, connectionStrings.ConnectionString, connectionStrings.ProviderName, provider);
-            });
-#pragma warning restore CS0618 // Type or member is obsolete
-    }
+        => AddUmbracoDbContext<T>(services, optionsAction, shareUmbracoConnection: true);
 
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
