@@ -1,6 +1,5 @@
 using System.Diagnostics;
-using System.Linq;
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;

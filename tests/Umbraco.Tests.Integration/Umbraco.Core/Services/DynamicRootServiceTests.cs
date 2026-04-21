@@ -207,7 +207,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, startNodeSelector.Context.CurrentKey.Value);
+            Assert.That(result, Has.Member(startNodeSelector.Context.CurrentKey.Value));
         });
     }
 
@@ -328,7 +328,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, ContentActs2022.Key);
+            Assert.That(result, Has.Member(ContentActs2022.Key));
         });
     }
 
@@ -377,7 +377,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, contentNewActs.Key);
+            Assert.That(result, Has.Member(contentNewActs.Key));
         });
     }
 
@@ -416,7 +416,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, ContentStages2022.Key);
+            Assert.That(result, Has.Member(ContentStages2022.Key));
         });
     }
 
@@ -449,7 +449,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, startNodeSelector.Context.CurrentKey.Value);
+            Assert.That(result, Has.Member(startNodeSelector.Context.CurrentKey.Value));
         });
     }
 
@@ -475,7 +475,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            CollectionAssert.Contains(result, startNodeSelector.Context.ParentKey);
+            Assert.That(result, Has.Member(startNodeSelector.Context.ParentKey));
         });
     }
 

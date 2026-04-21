@@ -984,7 +984,7 @@ internal sealed partial class UserServiceTests : UmbracoIntegrationTest
         var profiles = UserService.GetProfilesById(42);
 
         // Assert
-        CollectionAssert.IsEmpty(profiles);
+        Assert.That(profiles, Is.Empty);
     }
 
     [Test]

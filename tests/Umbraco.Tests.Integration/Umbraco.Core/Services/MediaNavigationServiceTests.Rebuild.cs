@@ -49,10 +49,10 @@ internal sealed partial class MediaNavigationServiceTests
 
             // Verify that we have the same items as in the original built state of MediaNavigationService
             Assert.AreEqual(originalParentKey, parentKeyFromRebuild);
-            CollectionAssert.AreEquivalent(originalChildrenKeys, childrenKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalDescendantsKeys, descendantsKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalAncestorsKeys, ancestorsKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalSiblingsKeys, siblingsKeysFromRebuild);
+            Assert.That(childrenKeysFromRebuild, Is.EquivalentTo(originalChildrenKeys));
+            Assert.That(descendantsKeysFromRebuild, Is.EquivalentTo(originalDescendantsKeys));
+            Assert.That(ancestorsKeysFromRebuild, Is.EquivalentTo(originalAncestorsKeys));
+            Assert.That(siblingsKeysFromRebuild, Is.EquivalentTo(originalSiblingsKeys));
         });
     }
 
@@ -97,10 +97,10 @@ internal sealed partial class MediaNavigationServiceTests
 
             // Verify that we have the same items as in the original built state of MediaNavigationService
             Assert.AreEqual(originalParentKey, parentKeyFromRebuild);
-            CollectionAssert.AreEquivalent(originalChildrenKeys, childrenKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalDescendantsKeys, descendantsKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalAncestorsKeys, ancestorsKeysFromRebuild);
-            CollectionAssert.AreEquivalent(originalSiblingsKeys, siblingsKeysFromRebuild);
+            Assert.That(childrenKeysFromRebuild, Is.EquivalentTo(originalChildrenKeys));
+            Assert.That(descendantsKeysFromRebuild, Is.EquivalentTo(originalDescendantsKeys));
+            Assert.That(ancestorsKeysFromRebuild, Is.EquivalentTo(originalAncestorsKeys));
+            Assert.That(siblingsKeysFromRebuild, Is.EquivalentTo(originalSiblingsKeys));
         });
     }
 }

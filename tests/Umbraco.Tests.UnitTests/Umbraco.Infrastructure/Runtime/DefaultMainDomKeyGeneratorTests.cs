@@ -1,4 +1,4 @@
-using AutoFixture.NUnit3;
+using AutoFixture.NUnit4;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
