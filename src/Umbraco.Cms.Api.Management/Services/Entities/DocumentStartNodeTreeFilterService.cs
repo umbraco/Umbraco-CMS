@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Api.Management.Services.Entities;
 /// User start node tree filter service for document (content) trees.
 /// Resolves the current user's content start nodes.
 /// </summary>
-internal sealed class DocumentStartNodeTreeFilterService : UserStartNodeTreeFilterService, IDocumentStartNodeTreeFilterService, ILegacyUserStartNodeTreeFilterService
+internal sealed class DocumentStartNodeTreeFilterService : UserStartNodeTreeFilterService, IDocumentStartNodeTreeFilterService
 {
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
@@ -30,12 +30,6 @@ internal sealed class DocumentStartNodeTreeFilterService : UserStartNodeTreeFilt
 
     /// <inheritdoc />
     protected override UmbracoObjectTypes TreeObjectType => UmbracoObjectTypes.Document;
-
-    /// <inheritdoc/>
-    public int[] GetUserStartNodeIds() => CalculateUserStartNodeIds();
-
-    /// <inheritdoc/>
-    public string[] GetUserStartNodePaths() => CalculateUserStartNodePaths();
 
     /// <inheritdoc />
     protected override int[] CalculateUserStartNodeIds()
