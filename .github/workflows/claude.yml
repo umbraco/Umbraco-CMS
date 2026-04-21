@@ -25,7 +25,7 @@ jobs:
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -36,7 +36,7 @@ jobs:
           label_trigger: "claude"
           base_branch: "main"
           additional_permissions: "actions: read"
-          claude_args: "--model claude-sonnet-4-6 --max-turns 25 --allowedTools 'Bash(gh:*),Bash(git:*),Bash(npm:*),Bash(dotnet:*)'"
+          claude_args: "--model claude-sonnet-4-6 --max-turns 50 --allowedTools 'Bash(gh:*),Bash(git:*),Bash(npm:*),Bash(dotnet:*)'"
           prompt: |
             You are an AI assistant for the Umbraco CMS repository, an open-source
             .NET CMS that welcomes community contributions.

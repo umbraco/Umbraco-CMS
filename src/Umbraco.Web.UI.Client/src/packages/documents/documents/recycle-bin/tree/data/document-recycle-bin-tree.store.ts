@@ -15,7 +15,7 @@ export class UmbDocumentRecycleBinTreeStore extends UmbUniqueTreeStore {
 	 * @memberof UmbDocumentRecycleBinTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_CONTEXT.toString());
+		super(host, UMB_DOCUMENT_RECYCLE_BIN_TREE_STORE_CONTEXT);
 	}
 }
 

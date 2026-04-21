@@ -1,3 +1,5 @@
+using System.Collections.Frozen;
+
 namespace Umbraco.Cms.Core;
 
 /// <summary>
@@ -9,33 +11,38 @@ namespace Umbraco.Cms.Core;
 public static class Enum<T>
     where T : struct
 {
-    private static readonly List<T> Values;
-    private static readonly Dictionary<string, T> InsensitiveNameToValue;
-    private static readonly Dictionary<string, T> SensitiveNameToValue;
-    private static readonly Dictionary<int, T> IntToValue;
-    private static readonly Dictionary<T, string> ValueToName;
+    private static readonly T[] _values;
+    private static readonly FrozenDictionary<string, T> _insensitiveNameToValue;
+    private static readonly FrozenDictionary<string, T> _sensitiveNameToValue;
+    private static readonly FrozenDictionary<int, T> _intToValue;
+    private static readonly FrozenDictionary<T, string> _valueToName;
 
     /// <summary>
     ///     Static constructor that initializes the enum value dictionaries.
     /// </summary>
     static Enum()
     {
-        Values = Enum.GetValues(typeof(T)).Cast<T>().ToList();
+        _values = Enum.GetValues(typeof(T)).Cast<T>().ToArray();
 
-        IntToValue = new Dictionary<int, T>();
-        ValueToName = new Dictionary<T, string>();
-        SensitiveNameToValue = new Dictionary<string, T>();
-        InsensitiveNameToValue = new Dictionary<string, T>(StringComparer.InvariantCultureIgnoreCase);
+        Dictionary<int, T> intToValue = new();
+        Dictionary<T, string> valueToName = new();
+        Dictionary<string, T> sensitiveNameToValue = new();
+        Dictionary<string, T> insensitiveNameToValue = new(StringComparer.InvariantCultureIgnoreCase);
 
-        foreach (T value in Values)
+        foreach (T value in _values)
         {
             var name = value.ToString();
 
-            IntToValue[Convert.ToInt32(value)] = value;
-            ValueToName[value] = name!;
-            SensitiveNameToValue[name!] = value;
-            InsensitiveNameToValue[name!] = value;
+            intToValue[Convert.ToInt32(value)] = value;
+            valueToName[value] = name!;
+            sensitiveNameToValue[name!] = value;
+            insensitiveNameToValue[name!] = value;
         }
+
+        _intToValue = intToValue.ToFrozenDictionary();
+        _valueToName = valueToName.ToFrozenDictionary();
+        _sensitiveNameToValue = sensitiveNameToValue.ToFrozenDictionary();
+        _insensitiveNameToValue = insensitiveNameToValue.ToFrozenDictionary(StringComparer.InvariantCultureIgnoreCase);
     }
 
     /// <summary>
@@ -43,40 +50,40 @@ public static class Enum<T>
     /// </summary>
     /// <param name="value">The enum value to check.</param>
     /// <returns><c>true</c> if the value is defined; otherwise, <c>false</c>.</returns>
-    public static bool IsDefined(T value) => ValueToName.ContainsKey(value);
+    public static bool IsDefined(T value) => _valueToName.ContainsKey(value);
 
     /// <summary>
     ///     Determines whether the specified string is a defined name in the enumeration.
     /// </summary>
     /// <param name="value">The string value to check.</param>
     /// <returns><c>true</c> if the name is defined; otherwise, <c>false</c>.</returns>
-    public static bool IsDefined(string value) => SensitiveNameToValue.ContainsKey(value);
+    public static bool IsDefined(string value) => _sensitiveNameToValue.ContainsKey(value);
 
     /// <summary>
     ///     Determines whether the specified integer is a defined value in the enumeration.
     /// </summary>
     /// <param name="value">The integer value to check.</param>
     /// <returns><c>true</c> if the value is defined; otherwise, <c>false</c>.</returns>
-    public static bool IsDefined(int value) => IntToValue.ContainsKey(value);
+    public static bool IsDefined(int value) => _intToValue.ContainsKey(value);
 
     /// <summary>
     ///     Gets all values defined in the enumeration.
     /// </summary>
     /// <returns>An enumerable containing all enum values.</returns>
-    public static IEnumerable<T> GetValues() => Values;
+    public static IEnumerable<T> GetValues() => _values;
 
     /// <summary>
     ///     Gets all names defined in the enumeration.
     /// </summary>
     /// <returns>An array containing all enum names.</returns>
-    public static string[] GetNames() => ValueToName.Values.ToArray();
+    public static string[] GetNames() => _valueToName.Values.ToArray();
 
     /// <summary>
     ///     Gets the name of the specified enum value.
     /// </summary>
     /// <param name="value">The enum value.</param>
     /// <returns>The name of the value, or null if not found.</returns>
-    public static string? GetName(T value) => ValueToName.GetValueOrDefault(value);
+    public static string? GetName(T value) => _valueToName.GetValueOrDefault(value);
 
     /// <summary>
     ///     Parses the string representation of an enum value.
@@ -87,7 +94,7 @@ public static class Enum<T>
     /// <exception cref="ArgumentException">The string is not a valid enum name.</exception>
     public static T Parse(string value, bool ignoreCase = false)
     {
-        Dictionary<string, T> names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
+        FrozenDictionary<string, T> names = ignoreCase ? _insensitiveNameToValue : _sensitiveNameToValue;
 
         return names.TryGetValue(value, out T parsed) ? parsed : Throw();
 
@@ -103,7 +110,7 @@ public static class Enum<T>
     /// <returns><c>true</c> if parsing succeeded; otherwise, <c>false</c>.</returns>
     public static bool TryParse(string value, out T returnValue, bool ignoreCase = false)
     {
-        Dictionary<string, T> names = ignoreCase ? InsensitiveNameToValue : SensitiveNameToValue;
+        FrozenDictionary<string, T> names = ignoreCase ? _insensitiveNameToValue : _sensitiveNameToValue;
 
         return names.TryGetValue(value, out returnValue);
     }
@@ -120,7 +127,7 @@ public static class Enum<T>
             return null;
         }
 
-        if (InsensitiveNameToValue.TryGetValue(value, out T parsed))
+        if (_insensitiveNameToValue.TryGetValue(value, out T parsed))
         {
             return parsed;
         }
@@ -135,7 +142,7 @@ public static class Enum<T>
     /// <returns>The enum value, or null if the integer is not valid.</returns>
     public static T? CastOrNull(int value)
     {
-        if (IntToValue.TryGetValue(value, out T foundValue))
+        if (_intToValue.TryGetValue(value, out T foundValue))
         {
             return foundValue;
         }

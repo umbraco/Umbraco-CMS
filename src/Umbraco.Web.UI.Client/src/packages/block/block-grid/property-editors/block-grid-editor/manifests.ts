@@ -40,6 +40,12 @@ const propertyEditorUi: UmbExtensionManifest = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
 				{
+					alias: 'createModalSize',
+					label: '#blockEditor_labelCreateModalSize',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+					config: [{ alias: 'defaultOptionLabel', value: 'Auto' }],
+				},
+				{
 					alias: 'gridColumns',
 					label: 'Grid Columns',
 					description: 'Set the number of columns for the layout.',
