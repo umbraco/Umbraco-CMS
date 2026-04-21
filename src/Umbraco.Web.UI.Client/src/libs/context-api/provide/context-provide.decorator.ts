@@ -110,10 +110,7 @@ function setupStandardDecorator<
 			return protoOrTarget.set.call(this, value);
 		},
 		init(this: any, value: InstanceType) {
-			// Defer controller creation to avoid timing issues with private fields
-			queueMicrotask(() => {
-				new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, context, value);
-			});
+			new UmbContextProviderController<BaseType, ResultType, InstanceType>(this, context, value);
 			return value;
 		},
 	};
@@ -150,7 +147,10 @@ function setupLegacyDecorator<
 	// Strategy 1: Use addInitializer if available (LitElement classes)
 	if (constructor.addInitializer) {
 		constructor.addInitializer((element: any): void => {
-			// Defer controller creation to avoid timing issues with private fields
+			// Defer to a microtask so the class-field initializer has run and
+			// element[propertyKey] is readable. addInitializer fires inside super(),
+			// which is before any subclass field initializer (including the one the
+			// decorator is attached to) runs.
 			queueMicrotask(() => {
 				const initialValue = element[propertyKey];
 				new UmbContextProviderController<BaseType, ResultType, InstanceType>(element, context, initialValue);
