@@ -1,16 +1,9 @@
-import type { UmbTreeContext } from '../../tree.context.interface.js';
 import type { UmbTreeItemModel, UmbTreeRootModel } from '../../types.js';
-import { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
+import { UmbTreeViewElementBase } from '../tree-view-element-base.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-classic-tree-view')
-export class UmbClassicTreeViewElement extends UmbLitElement {
-	#treeContext?: UmbTreeContext;
-
-	@state()
-	private _treeRoot?: UmbTreeRootModel;
-
+export class UmbClassicTreeViewElement extends UmbTreeViewElementBase {
 	@state()
 	private _rootItems: UmbTreeItemModel[] = [];
 
@@ -38,64 +31,56 @@ export class UmbClassicTreeViewElement extends UmbLitElement {
 	@state()
 	private _isMenu = false;
 
-	constructor() {
-		super();
-		this.consumeContext(UMB_TREE_CONTEXT, (context) => {
-			this.#treeContext = context;
-			this.#observeContext();
-		});
-	}
-
-	#observeContext() {
-		this.observe(this.#treeContext?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot), '_observeTreeRoot');
-		this.observe(this.#treeContext?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []), '_observeRootItems');
+	protected override _observeContext() {
+		super._observeContext();
+		this.observe(this._treeContext?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []), '_observeRootItems');
 		this.observe(
-			this.#treeContext?.pagination.currentPage,
+			this._treeContext?.pagination.currentPage,
 			(value) => (this._currentPage = value ?? 1),
 			'_observeCurrentPage',
 		);
 		this.observe(
-			this.#treeContext?.isLoadingPrevChildren,
+			this._treeContext?.isLoadingPrevChildren,
 			(value) => (this._isLoadingPrevChildren = value ?? false),
 			'_observeIsLoadingPrevChildren',
 		);
 		this.observe(
-			this.#treeContext?.isLoadingNextChildren,
+			this._treeContext?.isLoadingNextChildren,
 			(value) => (this._isLoadingNextChildren = value ?? false),
 			'_observeIsLoadingNextChildren',
 		);
 		this.observe(
-			this.#treeContext?.targetPagination?.totalPrevItems,
+			this._treeContext?.targetPagination?.totalPrevItems,
 			(value) => (this._hasPreviousItems = value ? value > 0 : false),
 			'_observeTotalPrevItems',
 		);
 		this.observe(
-			this.#treeContext?.targetPagination?.totalNextItems,
+			this._treeContext?.targetPagination?.totalNextItems,
 			(value) => (this._hasNextItems = value ? value > 0 : false),
 			'_observeTotalNextItems',
 		);
 		this.observe(
-			this.#treeContext?.hideTreeRoot,
+			this._treeContext?.hideTreeRoot,
 			(value) => (this._hideTreeRoot = value ?? false),
 			'_observeHideTreeRoot',
 		);
 		this.observe(
-			this.#treeContext?.hideTreeItemActions,
+			this._treeContext?.hideTreeItemActions,
 			(value) => (this._hideTreeItemActions = value ?? false),
 			'_observeHideTreeItemActions',
 		);
-		this.observe(this.#treeContext?.isMenu, (value) => (this._isMenu = value ?? false), '_observeIsMenu');
+		this.observe(this._treeContext?.isMenu, (value) => (this._isMenu = value ?? false), '_observeIsMenu');
 	}
 
 	#onLoadPrev(event: Event) {
 		event.stopPropagation();
-		this.#treeContext?.loadPrevItems?.();
+		this._treeContext?.loadPrevItems?.();
 	}
 
 	#onLoadNext(event: Event) {
 		event.stopPropagation();
 		const next = (this._currentPage = this._currentPage + 1);
-		this.#treeContext?.pagination.setCurrentPageNumber(next);
+		this._treeContext?.pagination.setCurrentPageNumber(next);
 	}
 
 	override render() {
@@ -106,7 +91,7 @@ export class UmbClassicTreeViewElement extends UmbLitElement {
 		if (this._hideTreeRoot || this._treeRoot === undefined) return nothing;
 		return html`
 			<umb-tree-item
-				.entityType=${this._treeRoot.entityType}
+				.entityType=${(this._treeRoot as UmbTreeRootModel).entityType}
 				.props=${{
 					hideActions: this._hideTreeItemActions,
 					item: this._treeRoot,

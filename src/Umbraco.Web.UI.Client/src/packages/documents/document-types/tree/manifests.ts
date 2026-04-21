@@ -1,5 +1,6 @@
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE, UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE } from '../entity.js';
 import { UMB_DOCUMENT_TYPE_ROOT_WORKSPACE_ALIAS } from '../constants.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UMB_DOCUMENT_TYPE_TREE_ALIAS,
 	UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS,

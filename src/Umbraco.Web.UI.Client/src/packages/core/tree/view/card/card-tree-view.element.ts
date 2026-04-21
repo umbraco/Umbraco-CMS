@@ -1,62 +1,35 @@
-import type { UmbTreeContext } from '../../tree.context.interface.js';
 import type { UmbTreeItemModel } from '../../types.js';
 import type { UmbTreeExpansionModel } from '../../expansion-manager/types.js';
-import { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
 import type { UmbTreeItemOpenEvent } from '../../tree-item/events/tree-item-open.event.js';
+import { UmbTreeViewElementBase } from '../tree-view-element-base.js';
 import type { UmbEntityExpansionEntryModel } from '@umbraco-cms/backoffice/utils';
 import type { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import '../../tree-item-card/tree-item-card.element.js';
 
 @customElement('umb-card-tree-view')
-export class UmbCardTreeViewElement extends UmbLitElement {
-	#treeContext?: UmbTreeContext;
+export class UmbCardTreeViewElement extends UmbTreeViewElementBase {
 	#nameCache = new Map<string | null, string>();
 
 	@state()
 	private _items: UmbTreeItemModel[] = [];
 
 	@state()
-	private _selectable = false;
-
-	@state()
-	private _selectOnly = false;
-
-	@state()
-	private _selection: Array<string | null> = [];
-
-	@state()
 	private _expansion: UmbTreeExpansionModel = [];
 
-	@state()
-	private _rootName = '';
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_TREE_CONTEXT, (context) => {
-			this.#treeContext = context;
-			this.#observeContext();
-		});
-	}
-
-	#observeContext() {
-		if (!this.#treeContext) return;
+	protected override _observeContext() {
+		super._observeContext();
 
 		this.observe(
-			this.#treeContext.treeRoot,
-			(root) => {
-				this._rootName = root?.name ?? '';
-				this.#nameCache.set(null, root?.name ?? '');
-			},
-			'_observeRoot',
+			this._treeContext?.treeRoot,
+			(root) => this.#nameCache.set(null, root?.name ?? ''),
+			'_observeRootCache',
 		);
 
 		this.observe(
-			this.#treeContext.rootItems,
+			this._treeContext?.rootItems,
 			(items) => {
-				// Only use rootItems when not drilled in.
 				if (this._expansion.length === 0) {
 					this._items = items ?? [];
 					this.#cacheItemNames(items ?? []);
@@ -66,25 +39,7 @@ export class UmbCardTreeViewElement extends UmbLitElement {
 		);
 
 		this.observe(
-			this.#treeContext.selection.selectable,
-			(selectable) => (this._selectable = selectable ?? false),
-			'_observeSelectable',
-		);
-
-		this.observe(
-			this.#treeContext.selectOnly,
-			(selectOnly) => (this._selectOnly = selectOnly ?? false),
-			'_observeSelectOnly',
-		);
-
-		this.observe(
-			this.#treeContext.selection.selection,
-			(selection) => (this._selection = selection ?? []),
-			'_observeSelection',
-		);
-
-		this.observe(
-			this.#treeContext.expansion.expansion,
+			this._treeContext?.expansion.expansion,
 			async (expansion) => {
 				this._expansion = expansion ?? [];
 				await this.#loadItemsForCurrentLocation();
@@ -103,10 +58,9 @@ export class UmbCardTreeViewElement extends UmbLitElement {
 		const currentParent = this.#getCurrentParent();
 
 		if (!currentParent) {
-			// At the root — items come from the context's rootItems observable.
-			this._items = this.#treeContext?.rootItems
+			this._items = this._treeContext?.rootItems
 				? await new Promise((resolve) => {
-						const sub = this.#treeContext!.rootItems.subscribe((items) => {
+						const sub = this._treeContext!.rootItems.subscribe((items) => {
 							resolve(items ?? []);
 							sub.unsubscribe();
 						});
@@ -116,7 +70,7 @@ export class UmbCardTreeViewElement extends UmbLitElement {
 			return;
 		}
 
-		const repository = this.#treeContext?.getRepository();
+		const repository = this._treeContext?.getRepository();
 		if (!repository) return;
 
 		const { data } = await repository.requestTreeItemsOf({
@@ -131,32 +85,21 @@ export class UmbCardTreeViewElement extends UmbLitElement {
 		return this._expansion.length > 0 ? this._expansion[this._expansion.length - 1] : undefined;
 	}
 
-	#onSelected(e: UmbSelectedEvent) {
-		e.stopPropagation();
-		this.#treeContext?.selection.select(e.unique);
-	}
-
-	#onDeselected(e: UmbDeselectedEvent) {
-		e.stopPropagation();
-		this.#treeContext?.selection.deselect(e.unique);
-	}
-
 	#onOpen(e: UmbTreeItemOpenEvent) {
 		e.stopPropagation();
-		// Cache the name before _items is replaced by the drill-in load.
 		const item = this._items.find((i) => i.unique === e.unique);
 		if (item) this.#nameCache.set(e.unique, item.name);
 
-		const current = this.#treeContext?.expansion.getExpansion() ?? [];
-		this.#treeContext?.expansion.setExpansion([...current, { unique: e.unique, entityType: e.entityType }]);
+		const current = this._treeContext?.expansion.getExpansion() ?? [];
+		this._treeContext?.expansion.setExpansion([...current, { unique: e.unique, entityType: e.entityType }]);
 	}
 
 	#navigateTo(index: number) {
-		this.#treeContext?.expansion.setExpansion(this._expansion.slice(0, index + 1));
+		this._treeContext?.expansion.setExpansion(this._expansion.slice(0, index + 1));
 	}
 
 	#navigateToRoot() {
-		this.#treeContext?.expansion.setExpansion([]);
+		this._treeContext?.expansion.setExpansion([]);
 	}
 
 	override render() {
@@ -166,8 +109,8 @@ export class UmbCardTreeViewElement extends UmbLitElement {
 				? html`
 						<div
 							id="grid"
-							@selected=${this.#onSelected}
-							@deselected=${this.#onDeselected}
+							@selected=${(e: UmbSelectedEvent) => this._selectItem(e.unique)}
+							@deselected=${(e: UmbDeselectedEvent) => this._deselectItem(e.unique)}
 							@umb-tree-item-open=${this.#onOpen}>
 							${repeat(
 								this._items,
@@ -176,9 +119,9 @@ export class UmbCardTreeViewElement extends UmbLitElement {
 									<umb-tree-item-card
 										.entityType=${item.entityType}
 										.item=${item}
-										.selectable=${this._selectable}
+										.selectable=${this._isSelectableItem(item)}
 										.selectOnly=${this._selectOnly}
-										.selected=${this._selection.includes(item.unique)}></umb-tree-item-card>
+										.selected=${this._isSelectedItem(item.unique)}></umb-tree-item-card>
 								`,
 							)}
 						</div>
@@ -192,7 +135,7 @@ export class UmbCardTreeViewElement extends UmbLitElement {
 
 		return html`
 			<uui-breadcrumbs>
-				<uui-breadcrumb-item @click=${this.#navigateToRoot}>${this._rootName}</uui-breadcrumb-item>
+				<uui-breadcrumb-item @click=${this.#navigateToRoot}>${this._treeRoot?.name ?? ''}</uui-breadcrumb-item>
 				${this._expansion.map((entry, index) => {
 					const isLast = index === this._expansion.length - 1;
 					const name = this.#nameCache.get(entry.unique) ?? '...';
