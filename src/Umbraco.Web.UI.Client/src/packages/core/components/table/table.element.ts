@@ -4,6 +4,7 @@ import {
 	customElement,
 	html,
 	ifDefined,
+	keyed,
 	property,
 	repeat,
 	state,
@@ -279,20 +280,27 @@ export class UmbTableElement extends UmbLitElement {
 
 	override render() {
 		const style = !(this.config.allowSelection === false && this.config.hideIcon === true) ? 'width: 60px' : undefined;
-		return html`
-			<uui-table class="uui-text">
-				<uui-table-column style=${ifDefined(style)}></uui-table-column>
-				<uui-table-head>
-					${this._renderHeaderCheckboxCell()}
-					${repeat(
-						this.columns,
-						(column) => column.alias,
-						(column) => this._renderHeaderCell(column),
-					)}
-				</uui-table-head>
-				${repeat(this.items, (item) => item.id, this._renderRow)}
-			</uui-table>
-		`;
+		// Firefox's `display: table-*` engine does not reliably relayout when cells are
+		// inserted or removed from existing rows. Key the whole table on the column
+		// signature so the table is rebuilt whenever the column set changes.
+		const columnKey = this.columns.map((column) => column.alias).join('|');
+		return keyed(
+			columnKey,
+			html`
+				<uui-table class="uui-text">
+					<uui-table-column style=${ifDefined(style)}></uui-table-column>
+					<uui-table-head>
+						${this._renderHeaderCheckboxCell()}
+						${repeat(
+							this.columns,
+							(column) => column.alias,
+							(column) => this._renderHeaderCell(column),
+						)}
+					</uui-table-head>
+					${repeat(this.items, (item) => item.id, this._renderRow)}
+				</uui-table>
+			`,
+		);
 	}
 
 	private _renderHeaderCell(column: UmbTableColumn) {
