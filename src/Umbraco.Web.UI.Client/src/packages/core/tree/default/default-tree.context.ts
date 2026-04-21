@@ -40,6 +40,11 @@ export class UmbDefaultTreeContext<
 	#hideTreeItemActions = new UmbBooleanState(false);
 	public readonly hideTreeItemActions = this.#hideTreeItemActions.asObservable();
 
+	#selectOnly = new UmbBooleanState(undefined);
+	public readonly selectOnly = this.#selectOnly.asObservable();
+
+	#selectOnlyConfig?: boolean;
+
 	#isMenu = new UmbBooleanState(false);
 	public readonly isMenu = this.#isMenu.asObservable();
 
@@ -83,6 +88,13 @@ export class UmbDefaultTreeContext<
 		this.#treeItemChildrenManager.setTakeSize(50);
 		// always load the tree root because we need the root entity to reload the entire tree
 		this.#loadTreeRoot();
+
+		// Auto-enable selectOnly when a selection exists and it was not explicitly set.
+		this.observe(this.selection.selection, (selection) => {
+			if (this.#selectOnlyConfig === undefined) {
+				this.#selectOnly.setValue((selection?.length ?? 0) > 0);
+			}
+		});
 	}
 
 	// TODO: find a generic way to do this
@@ -207,6 +219,16 @@ export class UmbDefaultTreeContext<
 
 	getHideTreeItemActions(): boolean {
 		return this.#hideTreeItemActions.getValue();
+	}
+
+	setSelectOnly(value: boolean | undefined) {
+		this.#selectOnlyConfig = value;
+		// If undefined (auto-detect), compute from current selection so re-renders don't reset the auto-detected state.
+		this.#selectOnly.setValue(value ?? (this.selection.getSelection()?.length ?? 0) > 0);
+	}
+
+	getSelectOnly(): boolean {
+		return this.#selectOnly.getValue() ?? false;
 	}
 
 	setIsMenu(value: boolean) {

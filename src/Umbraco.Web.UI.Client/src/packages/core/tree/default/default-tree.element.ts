@@ -90,6 +90,7 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 			this._api!.selection.setMultiple(this._selectionConfiguration.multiple ?? false);
 			this._api!.selection.setSelectable(this._selectionConfiguration.selectable ?? true);
 			this._api!.selection.setSelection(this._selectionConfiguration.selection ?? []);
+			this._api!.setSelectOnly(this._selectionConfiguration.selectOnly);
 		}
 
 		if (_changedProperties.has('startNode')) {

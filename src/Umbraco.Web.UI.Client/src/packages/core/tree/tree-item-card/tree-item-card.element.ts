@@ -1,7 +1,7 @@
-import type { ManifestTreeItemCard } from './tree-item-card.extension.js';
 import type { UmbTreeItemModel } from '../types.js';
-import { UmbDefaultTreeItemCardElement } from './default/default-tree-item-card.element.js';
 import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
+import type { ManifestTreeItemCard } from './tree-item-card.extension.js';
+import { UmbDefaultTreeItemCardElement } from './default/default-tree-item-card.element.js';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -43,6 +43,16 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 	public set selectable(value) {
 		this.#selectable = value;
 		if (this._component) this._component.selectable = value;
+	}
+
+	#selectOnly = false;
+	@property({ type: Boolean, reflect: true })
+	public get selectOnly() {
+		return this.#selectOnly;
+	}
+	public set selectOnly(value) {
+		this.#selectOnly = value;
+		if (this._component) this._component.selectOnly = value;
 	}
 
 	#selected = false;
@@ -96,6 +106,7 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 
 				component.item = this.#item;
 				component.selectable = this.#selectable;
+				component.selectOnly = this.#selectOnly;
 				component.selected = this.#selected;
 
 				component.addEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);

@@ -21,6 +21,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		multiple: false,
 		selectable: true,
 		selection: [],
+		selectOnly: true,
 	};
 
 	@state()
@@ -197,25 +198,23 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		}
 
 		return html`
-			<uui-box>
-				<umb-tree
-					alias=${ifDefined(this.data?.treeAlias)}
-					.props=${{
-						hideToolbar: false,
-						hideTreeItemActions: true,
-						hideTreeRoot: this.data?.hideTreeRoot,
-						expandTreeRoot: this.data?.expandTreeRoot,
-						selectionConfiguration: this._selectionConfiguration,
-						filter: this.data?.filter,
-						selectableFilter: this.data?.pickableFilter,
-						startNode: this.data?.startNode,
-						foldersOnly: this.data?.foldersOnly,
-						expansion: this._treeExpansion,
-					}}
-					@selected=${this.#onTreeItemSelected}
-					@deselected=${this.#onTreeItemDeselected}
-					@expansion-change=${this.#onTreeItemExpansionChange}></umb-tree
-			></uui-box>
+			<umb-tree
+				alias=${ifDefined(this.data?.treeAlias)}
+				.props=${{
+					hideToolbar: false,
+					hideTreeItemActions: true,
+					hideTreeRoot: this.data?.hideTreeRoot,
+					expandTreeRoot: this.data?.expandTreeRoot,
+					selectionConfiguration: this._selectionConfiguration,
+					filter: this.data?.filter,
+					selectableFilter: this.data?.pickableFilter,
+					startNode: this.data?.startNode,
+					foldersOnly: this.data?.foldersOnly,
+					expansion: this._treeExpansion,
+				}}
+				@selected=${this.#onTreeItemSelected}
+				@deselected=${this.#onTreeItemDeselected}
+				@expansion-change=${this.#onTreeItemExpansionChange}></umb-tree>
 		`;
 	}
 

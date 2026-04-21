@@ -28,6 +28,7 @@ export interface UmbTreeContext<
 	readonly expandTreeRoot: Observable<boolean | undefined>;
 	readonly hideTreeItemActions?: Observable<boolean>;
 	readonly isMenu?: Observable<boolean>;
+	readonly selectOnly: Observable<boolean | undefined>;
 
 	selectableFilter?(item: TreeItemType): boolean;
 	filter?(item: TreeItemType): boolean;
@@ -58,6 +59,9 @@ export interface UmbTreeContext<
 
 	setHideTreeItemActions?(value: boolean): void;
 	getHideTreeItemActions?(): boolean;
+
+	setSelectOnly(value: boolean | undefined): void;
+	getSelectOnly(): boolean;
 
 	setIsMenu?(value: boolean): void;
 	getIsMenu?(): boolean;

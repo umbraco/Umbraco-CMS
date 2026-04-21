@@ -14,6 +14,9 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 	selectable = false;
 
 	@property({ type: Boolean })
+	selectOnly = false;
+
+	@property({ type: Boolean })
 	selected = false;
 
 	#onSelected(e: CustomEvent) {
@@ -47,6 +50,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 			<umb-figure-card
 				name=${this.item.name}
 				?selectable=${this.selectable}
+				?select-only=${this.selectOnly}
 				?selected=${this.selected}
 				background-color="var(--uui-color-surface)"
 				@selected=${this.#onSelected}

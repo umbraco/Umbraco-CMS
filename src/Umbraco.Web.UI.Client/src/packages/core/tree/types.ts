@@ -25,6 +25,7 @@ export interface UmbTreeRootModel extends UmbTreeItemModelBase {
 export type UmbTreeSelectionConfiguration = {
 	multiple?: boolean;
 	selectable?: boolean;
+	selectOnly?: boolean;
 	selection?: Array<string | null>;
 };
 
