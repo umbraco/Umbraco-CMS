@@ -1185,17 +1185,13 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             return setExpression;
         }
 
-        member.UpdatingEntity();
-
+        // Login is not considered a member update: neither UpdateDate nor the associated
+        // ContentVersionDto.VersionDate is touched. Any change to actual member data (name, email,
+        // properties, etc.) goes through the full Save path which does bump both.
         Sql<ISqlContext> updateMemberQuery = Sql()
             .Update<MemberDto>(m => GetMemberSetExpression(member, m))
             .Where<MemberDto>(m => m.NodeId == member.Id);
         await Database.ExecuteAsync(updateMemberQuery);
-
-        Sql<ISqlContext> updateContentVersionQuery = Sql()
-            .Update<ContentVersionDto>(m => m.Set(x => x.VersionDate, member.UpdateDate))
-            .Where<ContentVersionDto>(m => m.NodeId == member.Id && m.Current == true);
-        await Database.ExecuteAsync(updateContentVersionQuery);
 
         OnUowRefreshedEntity(new MemberRefreshNotification(member, new EventMessages()));
 
