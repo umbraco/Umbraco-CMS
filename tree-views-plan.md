@@ -359,11 +359,11 @@ Each phase requires review and sign-off before the next begins.
   - [x] 3.3 — `UmbTreeViewManager` + `UMB_TREE_VIEW_CONTEXT` token
   - [x] 3.4 — Convert `<umb-default-tree>` into a shell
   - [x] 3.5 — Register Classic view manifests
-- [ ] **Phase 4** — `<umb-tree-toolbar>` + `<umb-tree-view-bundle>` elements
-- [ ] **Phase 5** — Card view + card-item routing
-  - [ ] 5.1 — `<umb-default-tree-item-card>` + `UmbTreeItemCardNavigateEvent`
-  - [ ] 5.2 — `<umb-tree-item-card>` routing element
-  - [ ] 5.3 — `<umb-card-tree-view>` element + manifest
+- [x] **Phase 4** — `<umb-tree-toolbar>` + `<umb-tree-view-bundle>` elements
+- [x] **Phase 5** — Card view + card-item routing
+  - [x] 5.1 — `<umb-default-tree-item-card>` + `UmbTreeItemCardNavigateEvent`
+  - [x] 5.2 — `<umb-tree-item-card>` routing element
+  - [x] 5.3 — `<umb-card-tree-view>` element + manifest
 - [ ] **Phase 6** — Breadcrumb in `<umb-tree-picker-modal>`
 - [ ] **Phase 7** — Localization, unit tests, manual smoke tests
 - [ ] **Phase 8** — View selection persistence (UX enhancement — design TBD)

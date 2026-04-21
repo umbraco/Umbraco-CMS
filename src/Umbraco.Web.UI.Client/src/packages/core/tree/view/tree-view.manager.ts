@@ -31,28 +31,43 @@ export class UmbTreeViewManager extends UmbControllerBase {
 	#currentView = new UmbObjectState<ManifestTreeView | undefined>(undefined);
 	public readonly currentView = this.#currentView.asObservable();
 
+	#treeAlias?: string;
+	#extensionsInitializer?: UmbExtensionsManifestInitializer<any, any>;
+
 	constructor(host: UmbControllerHost) {
 		super(host);
+	}
 
-		new UmbExtensionsManifestInitializer(this, umbExtensionsRegistry, 'treeView', null, (result) => {
-			const views = result.map((v) => v.manifest);
+	setTreeAlias(treeAlias: string) {
+		if (this.#treeAlias === treeAlias) return;
+		this.#treeAlias = treeAlias;
+		this.#extensionsInitializer?.destroy();
 
-			this.#views.setValue(views);
+		this.#extensionsInitializer = new UmbExtensionsManifestInitializer(
+			this,
+			umbExtensionsRegistry,
+			'treeView',
+			(manifest: ManifestTreeView) => !manifest.forTrees?.length || manifest.forTrees.includes(treeAlias),
+			(result) => {
+				const views = result.map((v) => v.manifest);
 
-			if (!views.length) {
-				// No treeView manifests registered — use the built-in classic fallback.
-				new UmbDeprecation({
-					removeInVersion: '19.0.0',
-					deprecated: 'Implicit classic tree view fallback',
-					solution:
-						"Register a treeView manifest with `kind: 'classic'` on your tree. The automatic fallback will be removed in Umbraco 19.",
-				}).warn();
-				this.#currentView.setValue(CLASSIC_FALLBACK);
-				return;
-			}
+				this.#views.setValue(views);
 
-			this.#currentView.setValue(views[0]);
-		});
+				if (!views.length) {
+					// No treeView manifests registered for this tree — use the built-in classic fallback.
+					new UmbDeprecation({
+						removeInVersion: '19.0.0',
+						deprecated: 'Implicit classic tree view fallback',
+						solution:
+							"Register a treeView manifest with `kind: 'classic'` on your tree. The automatic fallback will be removed in Umbraco 19.",
+					}).warn();
+					this.#currentView.setValue(CLASSIC_FALLBACK);
+					return;
+				}
+
+				this.#currentView.setValue(views[0]);
+			},
+		);
 	}
 
 	setCurrentView(view: ManifestTreeView) {

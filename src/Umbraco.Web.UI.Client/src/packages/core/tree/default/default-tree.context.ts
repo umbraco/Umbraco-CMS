@@ -101,6 +101,9 @@ export class UmbDefaultTreeContext<
 	public set manifest(manifest: ManifestTree | undefined) {
 		if (this.#manifest === manifest) return;
 		this.#manifest = manifest;
+		if (manifest?.alias) {
+			this.view.setTreeAlias(manifest.alias);
+		}
 		this.#observeRepository(this.#manifest?.meta.repositoryAlias);
 	}
 	public get manifest() {

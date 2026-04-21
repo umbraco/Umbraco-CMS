@@ -11,9 +11,10 @@ import {
 import { UmbDocumentTypeTreeStore } from './document-type.tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
+import { manifests as viewManifests } from './views/manifests.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
 
-export const manifests: Array<UmbExtensionManifest> = [
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
 		type: 'repository',
 		alias: UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS,
@@ -64,6 +65,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	...viewManifests,
 	...folderManifests,
 	...treeItemChildrenManifests,
 ];

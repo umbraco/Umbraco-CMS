@@ -4,6 +4,10 @@ export interface ManifestTreeView
 	extends ManifestElement,
 		ManifestWithDynamicConditions<UmbExtensionConditionConfig> {
 	type: 'treeView';
+	/**
+	 * The tree aliases this view applies to. When omitted, the view applies to all trees.
+	 */
+	forTrees?: Array<string>;
 	meta: MetaTreeView;
 }
 

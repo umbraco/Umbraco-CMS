@@ -48,11 +48,7 @@ export class UmbClassicTreeViewElement extends UmbLitElement {
 
 	#observeContext() {
 		this.observe(this.#treeContext?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot), '_observeTreeRoot');
-		this.observe(
-			this.#treeContext?.rootItems,
-			(rootItems) => (this._rootItems = rootItems ?? []),
-			'_observeRootItems',
-		);
+		this.observe(this.#treeContext?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []), '_observeRootItems');
 		this.observe(
 			this.#treeContext?.pagination.currentPage,
 			(value) => (this._currentPage = value ?? 1),
