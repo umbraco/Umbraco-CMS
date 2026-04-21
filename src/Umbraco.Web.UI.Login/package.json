@@ -14,7 +14,7 @@
     "npm": ">=10.9"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.96.0",
+    "@hey-api/openapi-ts": "^0.85.2",
     "@umbraco-cms/backoffice": "^17.3.4",
     "msw": "^2.12.7",
     "typescript": "^5.9.3",
