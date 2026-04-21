@@ -132,6 +132,7 @@ export class UiBaseLocators extends BasePage {
   public readonly systemFieldsOption: Locator;
   public readonly chooseFieldValueDropDown: Locator;
   public readonly breadcrumbsTemplateModal: Locator;
+  public readonly pageFieldBuilderSubmitBtn: Locator;
 
   // Rename
   public readonly newNameTxt: Locator;
@@ -207,6 +208,8 @@ export class UiBaseLocators extends BasePage {
   public readonly createActionButtonCollection: Locator;
   public readonly createActionBtn: Locator;
   public readonly createOptionActionListModal: Locator;
+  public readonly clearSelectionBtn: Locator;
+  public readonly collectionSelectionActions: Locator;
 
   // Reference & Entity
   public readonly confirmActionModalEntityReferences: Locator;
@@ -411,14 +414,12 @@ export class UiBaseLocators extends BasePage {
 
     // Insert & Template
     this.insertValueBtn = page
-      .locator("uui-button")
+      .locator("uui-card")
       .filter({ has: page.locator('[key="template_insertPageField"]') });
     this.insertPartialViewBtn = page
-      .locator("uui-button")
+      .locator("uui-card")
       .filter({ has: page.locator('[key="template_insertPartialView"]') });
-    this.insertDictionaryItemBtn = page
-      .locator("uui-button")
-      .filter({ has: page.locator('[key="template_insertDictionaryItem"]') });
+    this.insertDictionaryItemBtn = page.locator('uui-card[label="Dictionary item"]');
     this.chooseFieldDropDown = page.locator("#preview #expand-symbol-wrapper");
     this.systemFieldsOption = page.getByText("System fields");
     this.chooseFieldValueDropDown = page.locator(
@@ -427,6 +428,7 @@ export class UiBaseLocators extends BasePage {
     this.breadcrumbsTemplateModal = page
       .locator("uui-modal-sidebar")
       .locator("umb-template-workspace-editor uui-breadcrumbs");
+    this.pageFieldBuilderSubmitBtn = page.locator('umb-templating-page-field-builder-modal').getByRole('button', {name: 'Submit'});
 
     // Rename
     this.newNameTxt = page.getByRole("textbox", { name: "Enter new name..." });
@@ -550,6 +552,8 @@ export class UiBaseLocators extends BasePage {
     this.createOptionActionListModal = page.locator(
       "umb-entity-create-option-action-list-modal",
     );
+    this.clearSelectionBtn = page.locator('umb-collection-selection-actions').getByLabel('Clear selection');
+    this.collectionSelectionActions = page.locator('umb-collection-selection-actions');
 
     // Reference & Entity
     this.confirmActionModalEntityReferences = page.locator(
@@ -1453,6 +1457,7 @@ export class UiBaseLocators extends BasePage {
   async insertDictionaryItem(dictionaryName: string) {
     await this.clickInsertButton();
     await this.click(this.insertDictionaryItemBtn);
+    await this.clickSubmitButton();
     await this.click(this.page.getByLabel(dictionaryName));
     await this.click(this.chooseBtn);
   }
@@ -1460,16 +1465,18 @@ export class UiBaseLocators extends BasePage {
   async insertSystemFieldValue(fieldValue: string) {
     await this.clickInsertButton();
     await this.click(this.insertValueBtn);
+    await this.clickSubmitButton();
     await this.click(this.chooseFieldDropDown);
     await this.click(this.systemFieldsOption);
     await this.click(this.chooseFieldValueDropDown);
     await this.click(this.page.getByText(fieldValue));
-    await this.clickSubmitButton();
+    await this.click(this.pageFieldBuilderSubmitBtn);
   }
 
   async insertPartialView(partialViewName: string) {
     await this.clickInsertButton();
     await this.click(this.insertPartialViewBtn);
+    await this.clickSubmitButton();
     await this.click(this.page.getByLabel(partialViewName));
     await this.clickChooseButton();
   }
@@ -1699,6 +1706,14 @@ export class UiBaseLocators extends BasePage {
   }
 
   // Collection Methods
+  async clickClearSelectionButton() {
+    await this.click(this.clearSelectionBtn);
+  }
+
+  async isCollectionSelectionActionsVisible(isVisible: boolean = true) {
+    await this.isVisible(this.collectionSelectionActions, isVisible);
+  }
+
   async clickCreateActionButton() {
     await this.click(this.createActionBtn);
   }

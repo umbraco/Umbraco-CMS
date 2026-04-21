@@ -616,7 +616,7 @@ export default {
 		noMacroParams: 'Der er ingen parametre for denne makro',
 		noMacros: 'Der er ikke tilføjet nogen makroer',
 		externalLoginProviders: 'Eksternt login',
-		exceptionDetail: 'Undtagelsesdetaljer',
+		exceptionDetail: 'Fejldetaljer',
 		stacktrace: 'Stacktrace',
 		innerException: 'Indre undtagelse',
 		linkYour: 'Link din {0} konto',
@@ -636,7 +636,7 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
-		seeErrorAction: 'Se fejlen',
+		seeErrorAction: 'Se hele fejlbeskeden',
 		seeErrorDialogHeadline: 'Fejl detaljer',
 		selectEvent: 'Vælg begivenhed',
 		editWebhook: 'Rediger webhook',
@@ -2263,6 +2263,10 @@ export default {
 		enableError:
 			'Der opstod en fejl under forsøget på at slå URL trackeren til, der findes mere information\n      i logfilen.\n    ',
 	},
+	embeddedMedia: {
+		dimensionsDescription:
+			'Disse værdier sendes som den maksimale bredde og højde til embed-udbyderen. Udbyderen kan justere de endelige dimensioner for at overholde sine egne begrænsninger.',
+	},
 	emptyStates: {
 		emptyDictionaryTree: 'Ingen ordbog elementer at vælge imellem',
 	},
@@ -2324,7 +2328,8 @@ export default {
 		openBackofficeSearch: 'Åben backoffice søgning',
 		openCloseBackofficeHelp: 'Åben/Luk backoffice hjælp',
 		openCloseBackofficeProfileOptions: 'Åben/Luk dine profil indstillinger',
-		profileOptions: 'Profil indstillinger',
+		profileOptions: 'Brugerprofil for %0% (%1%)',
+		profileOptionsDefault: 'Brugerprofil',
 		assignDomainDescription: 'Tilføj domæne på %0%',
 		createDescription: 'Opret ny node under %0%',
 		protectDescription: 'Opsæt offentlig adgang på %0%',

@@ -1557,7 +1557,8 @@ export type MemberItemResponseModel = {
 
 export enum MemberKindModel {
     DEFAULT = 'Default',
-    API = 'Api'
+    API = 'Api',
+    EXTERNAL_ONLY = 'ExternalOnly'
 }
 
 export type MemberReferenceResponseModel = {
@@ -1584,6 +1585,7 @@ export type MemberResponseModel = {
     lastPasswordChangeDate?: string | null;
     groups: Array<string>;
     kind: MemberKindModel;
+    profileData?: string | null;
 };
 
 export type MemberTypeCompositionModel = {
@@ -2197,6 +2199,16 @@ export type PasswordConfigurationResponseModel = {
     requireDigit: boolean;
     requireLowercase: boolean;
     requireUppercase: boolean;
+};
+
+export type PatchDocumentRequestModel = {
+    operations: Array<PatchOperationRequestModel>;
+};
+
+export type PatchOperationRequestModel = {
+    op: string;
+    path: string;
+    value?: unknown;
 };
 
 export type ProblemDetails = {
@@ -4687,6 +4699,40 @@ export type PutDocumentBlueprintByIdResponses = {
     200: unknown;
 };
 
+export type GetDocumentBlueprintByIdAuditLogData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: {
+        orderDirection?: DirectionModel;
+        sinceDate?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/document-blueprint/{id}/audit-log';
+};
+
+export type GetDocumentBlueprintByIdAuditLogErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+};
+
+export type GetDocumentBlueprintByIdAuditLogResponses = {
+    /**
+     * OK
+     */
+    200: PagedAuditLogResponseModel;
+};
+
+export type GetDocumentBlueprintByIdAuditLogResponse = GetDocumentBlueprintByIdAuditLogResponses[keyof GetDocumentBlueprintByIdAuditLogResponses];
+
 export type PutDocumentBlueprintByIdMoveData = {
     body?: MoveDocumentBlueprintRequestModel;
     path: {
@@ -6775,6 +6821,47 @@ export type PutDocumentByIdNotificationsErrors = {
 export type PutDocumentByIdNotificationsError = PutDocumentByIdNotificationsErrors[keyof PutDocumentByIdNotificationsErrors];
 
 export type PutDocumentByIdNotificationsResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PatchDocumentByIdPatchData = {
+    body?: PatchDocumentRequestModel;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/umbraco/management/api/v1/document/{id}/patch';
+};
+
+export type PatchDocumentByIdPatchErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+    /**
+     * Unprocessable Content
+     */
+    422: ProblemDetails;
+};
+
+export type PatchDocumentByIdPatchError = PatchDocumentByIdPatchErrors[keyof PatchDocumentByIdPatchErrors];
+
+export type PatchDocumentByIdPatchResponses = {
     /**
      * OK
      */

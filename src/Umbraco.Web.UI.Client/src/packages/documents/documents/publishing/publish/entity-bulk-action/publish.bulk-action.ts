@@ -167,10 +167,10 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		// If there is only one language available, or all selected documents are invariant, we can skip the modal and publish directly:
 		if (options.length === 1 || allInvariant) {
 			const confirm = await umbConfirmModal(this, {
-				headline: localize.term('content_readyToPublish'),
-				content: localize.term('prompt_confirmListViewPublish'),
+				headline: '#content_readyToPublish',
+				content: '#prompt_confirmListViewPublish',
 				color: 'positive',
-				confirmLabel: localize.term('actions_publish'),
+				confirmLabel: '#actions_publish',
 			}).catch(() => false);
 
 			if (confirm !== false) {

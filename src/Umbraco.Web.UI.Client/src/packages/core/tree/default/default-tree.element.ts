@@ -81,19 +81,21 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 	private _isLoadingNextChildren = false;
 
 	#observeData() {
-		this.observe(this._api?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot));
-		this.observe(this._api?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []));
-		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1));
-		this.observe(this._api?.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false));
-		this.observe(this._api?.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false));
+		this.observe(this._api?.treeRoot, (treeRoot) => (this._treeRoot = treeRoot), '_observeTreeRoot');
+		this.observe(this._api?.rootItems, (rootItems) => (this._rootItems = rootItems ?? []), '_observeRootItems');
+		this.observe(this._api?.pagination.currentPage, (value) => (this._currentPage = value ?? 1), '_observeCurrentPage');
+		this.observe(this._api?.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false), '_observeIsLoadingPrevChildren');
+		this.observe(this._api?.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false), '_observeIsLoadingNextChildren');
 
 		this.observe(
 			this._api?.targetPagination?.totalPrevItems,
 			(value) => (this._hasPreviousItems = value ? value > 0 : false),
+			'_observeTotalPrevItems',
 		);
 		this.observe(
 			this._api?.targetPagination?.totalNextItems,
 			(value) => (this._hasNextItems = value ? value > 0 : false),
+			'_observeTotalNextItems',
 		);
 	}
 

@@ -436,6 +436,11 @@ export default {
 		memberHasPassword: 'The member already has a password set',
 		memberKindDefault: 'Member',
 		memberKindApi: 'API Member',
+		memberKindExternalOnly: 'External',
+		profileData: 'Profile data',
+		externalMemberTitle: 'External member',
+		externalMemberDescription:
+			'This member is managed by an external authentication provider. Identity data such as email and username is maintained by the provider, not Umbraco.',
 		memberLockoutNotEnabled: 'Lockout is not enabled for this member',
 		memberNotInGroup: "The member is not in group '%0%'",
 	},
@@ -669,7 +674,7 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
-		seeErrorAction: 'See error',
+		seeErrorAction: 'Full Error Message',
 		seeErrorDialogHeadline: 'Error details',
 	},
 	dictionary: {
@@ -958,6 +963,7 @@ export default {
 		rename: 'Rename',
 		renew: 'Renew',
 		required: 'Required',
+		reset: 'Reset',
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
@@ -966,6 +972,8 @@ export default {
 		search: 'Search',
 		searchNoResult: 'Sorry, we can not find what you are looking for.',
 		noItemsInList: 'No items have been added',
+		scrollLeft: 'Scroll left',
+		scrollRight: 'Scroll right',
 		server: 'Server',
 		settings: 'Settings',
 		shared: 'Shared',
@@ -1636,6 +1644,7 @@ export default {
 		tabRules: 'Editor',
 	},
 	template: {
+		notAllowed: 'The selected template is no longer allowed on this document type.',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
@@ -2114,6 +2123,7 @@ export default {
 		password: 'Password',
 		resetPassword: 'Reset password',
 		passwordChanged: 'Your password has been changed!',
+		passwordCopied: 'Password copied',
 		passwordChangedGeneric: 'Password changed',
 		passwordConfirm: 'Please confirm the new password',
 		passwordEnterNew: 'Enter your new password',
@@ -2167,6 +2177,7 @@ export default {
 		updateDate: 'User last updated',
 		userCreated: 'has been created',
 		userCreatedSuccessHelp: 'The new user has successfully been created. To log in to Umbraco use the password below.',
+		userCreatedApiSuccessHelp: 'Set client credentials for the account via the user\'s profile.',
 		userHasPassword: 'The user already has a password set',
 		userHasGroup: "The user is already in group '%0%'",
 		userLockoutNotEnabled: 'Lockout is not enabled for this user',
@@ -2226,6 +2237,10 @@ export default {
 		'2faCodeInput': 'Verification code',
 		'2faCodeInputHelp': 'Please enter the verification code',
 		'2faInvalidCode': 'Invalid code entered',
+		addUsersToGroupError: 'Could not add users to the group.',
+		removeUsersFromGroupError: 'Could not remove users from the group.',
+		andMore: 'and %0% more',
+		usersNotManagedFromGroup: 'not manageable from this screen.',
 	},
 	validation: {
 		validation: 'Validation',
@@ -2356,6 +2371,10 @@ export default {
 		enableError: 'Error enabling the URL tracker, more information can be found in your log file.',
 		culture: 'Culture',
 	},
+	embeddedMedia: {
+		dimensionsDescription:
+			'These values are passed as the maximum width and height to the embed provider. The provider may adjust the final dimensions to fit its own constraints.',
+	},
 	emptyStates: {
 		emptyDictionaryTree: 'No Dictionary items to choose from',
 	},
@@ -2417,7 +2436,8 @@ export default {
 		openBackofficeSearch: 'Open backoffice search',
 		openCloseBackofficeHelp: 'Open/Close backoffice help',
 		openCloseBackofficeProfileOptions: 'Open/Close your profile options',
-		profileOptions: 'Profile options',
+		profileOptions: 'User profile for %0% (%1%)',
+		profileOptionsDefault: 'User profile',
 		assignDomainDescription: 'Setup Culture and Hostnames for %0%',
 		createDescription: 'Create new node under %0%',
 		protectDescription: 'Setup access restrictions on %0%',
@@ -2636,6 +2656,7 @@ export default {
 			'Master Umbraco with official training. Get practical experience through instructor-led courses and earn certifications that help you grow your skills and career.',
 	},
 	blockEditor: {
+		labelCreateModalSize: 'Create modal size',
 		headlineCreateBlock: 'Pick Element Type',
 		headlineAddSettingsElementType: 'Attach a settings Element Type',
 		headlineAddCustomView: 'Select view',
@@ -2845,6 +2866,9 @@ export default {
 	},
 	rte: {
 		label: 'Rich Text Editor',
+		config_allowedMediaTypes: 'Accepted media types',
+		config_allowedMediaTypes_description:
+			'Limit to specific media types for the media picker toolbar and drag-and-drop uploads.',
 		config_blocks: 'Available Blocks',
 		config_blocks_description: 'Define the available blocks.',
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
