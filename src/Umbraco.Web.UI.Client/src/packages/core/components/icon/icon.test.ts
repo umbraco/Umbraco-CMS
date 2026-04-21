@@ -17,4 +17,43 @@ describe('UmbIconElement', () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
 		});
 	}
+
+	describe('color handling', () => {
+		it('does not set --uui-icon-color when no color is provided', () => {
+			expect(element.style.getPropertyValue('--uui-icon-color')).to.equal('');
+		});
+
+		it('sets --uui-icon-color to a raw color value', async () => {
+			element.color = '#ff0000';
+			await element.updateComplete;
+			expect(element.style.getPropertyValue('--uui-icon-color')).to.equal('#ff0000');
+		});
+
+		it('resolves a color alias to the matching CSS variable', async () => {
+			element.color = 'color-red';
+			await element.updateComplete;
+			expect(element.style.getPropertyValue('--uui-icon-color')).to.equal('var(--uui-palette-maroon-flush)');
+		});
+
+		it('resolves a color suffix from the name property', async () => {
+			element.name = 'icon-heart color-red';
+			await element.updateComplete;
+			expect(element.style.getPropertyValue('--uui-icon-color')).to.equal('var(--uui-palette-maroon-flush)');
+		});
+
+		it('prefers the color property over the name suffix', async () => {
+			element.name = 'icon-heart color-red';
+			element.color = 'color-green';
+			await element.updateComplete;
+			expect(element.style.getPropertyValue('--uui-icon-color')).to.equal('var(--uui-palette-jungle-green)');
+		});
+
+		it('removes --uui-icon-color when color is cleared', async () => {
+			element.color = 'color-red';
+			await element.updateComplete;
+			element.color = '';
+			await element.updateComplete;
+			expect(element.style.getPropertyValue('--uui-icon-color')).to.equal('');
+		});
+	});
 });

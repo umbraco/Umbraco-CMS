@@ -15,7 +15,7 @@ export class UmbMemberTypeTreeStore extends UmbUniqueTreeStore {
 	 * @memberof UmbMemberTypeTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT.toString());
+		super(host, UMB_MEMBER_TYPE_TREE_STORE_CONTEXT);
 	}
 }
 
