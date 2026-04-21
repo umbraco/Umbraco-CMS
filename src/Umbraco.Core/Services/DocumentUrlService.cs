@@ -41,7 +41,7 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IKeyValueService _keyValueService;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly IDomainCacheService _domainCacheService;
     private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
@@ -149,7 +149,9 @@ public class DocumentUrlService : IDocumentUrlService
         IKeyValueService keyValueService,
         IIdKeyMap idKeyMap,
         IDocumentNavigationQueryService documentNavigationQueryService,
+#pragma warning disable CS0618 // Type or member is obsolete
         IPublishStatusQueryService publishStatusQueryService,
+#pragma warning restore CS0618 // Type or member is obsolete
         IDomainCacheService domainCacheService)
         :this(
             logger,
@@ -174,6 +176,7 @@ public class DocumentUrlService : IDocumentUrlService
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
     /// </summary>
+    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public DocumentUrlService(
         ILogger<DocumentUrlService> logger,
         IDocumentUrlRepository documentUrlRepository,
@@ -188,7 +191,93 @@ public class DocumentUrlService : IDocumentUrlService
         IKeyValueService keyValueService,
         IIdKeyMap idKeyMap,
         IDocumentNavigationQueryService documentNavigationQueryService,
+#pragma warning disable CS0618 // Type or member is obsolete
         IPublishStatusQueryService publishStatusQueryService,
+#pragma warning restore CS0618 // Type or member is obsolete
+        IDomainCacheService domainCacheService,
+        IDefaultCultureAccessor defaultCultureAccessor)
+        : this(
+            logger,
+            documentUrlRepository,
+            documentRepository,
+            coreScopeProvider,
+            globalSettings,
+            webRoutingSettings,
+            urlSegmentProviderCollection,
+            contentService,
+            shortStringHelper,
+            languageService,
+            keyValueService,
+            idKeyMap,
+            documentNavigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusQueryService>(),
+            domainCacheService,
+            defaultCultureAccessor)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
+    /// </summary>
+    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    public DocumentUrlService(
+        ILogger<DocumentUrlService> logger,
+        IDocumentUrlRepository documentUrlRepository,
+        IDocumentRepository documentRepository,
+        ICoreScopeProvider coreScopeProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<WebRoutingSettings> webRoutingSettings,
+        UrlSegmentProviderCollection urlSegmentProviderCollection,
+        IContentService contentService,
+        IShortStringHelper shortStringHelper,
+        ILanguageService languageService,
+        IKeyValueService keyValueService,
+        IIdKeyMap idKeyMap,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+#pragma warning disable CS0618 // Type or member is obsolete
+        IPublishStatusQueryService publishStatusQueryService,
+#pragma warning restore CS0618 // Type or member is obsolete
+        IDocumentPublishStatusQueryService documentPublishStatusQueryService,
+        IDomainCacheService domainCacheService,
+        IDefaultCultureAccessor defaultCultureAccessor)
+        : this(
+            logger,
+            documentUrlRepository,
+            documentRepository,
+            coreScopeProvider,
+            globalSettings,
+            webRoutingSettings,
+            urlSegmentProviderCollection,
+            contentService,
+            shortStringHelper,
+            languageService,
+            keyValueService,
+            idKeyMap,
+            documentNavigationQueryService,
+            documentPublishStatusQueryService,
+            domainCacheService,
+            defaultCultureAccessor)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
+    /// </summary>
+    public DocumentUrlService(
+        ILogger<DocumentUrlService> logger,
+        IDocumentUrlRepository documentUrlRepository,
+        IDocumentRepository documentRepository,
+        ICoreScopeProvider coreScopeProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IOptions<WebRoutingSettings> webRoutingSettings,
+        UrlSegmentProviderCollection urlSegmentProviderCollection,
+        IContentService contentService,
+        IShortStringHelper shortStringHelper,
+        ILanguageService languageService,
+        IKeyValueService keyValueService,
+        IIdKeyMap idKeyMap,
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         IDomainCacheService domainCacheService,
         IDefaultCultureAccessor defaultCultureAccessor)
     {
@@ -982,7 +1071,7 @@ public class DocumentUrlService : IDocumentUrlService
         return attempt.Success ? attempt.Result : null;
     }
 
-    private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsDocumentPublished(contentKey, culture);
+    private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsPublished(contentKey, culture);
 
     /// <summary>
     /// Gets the children based on the latest published version of the content. (No aware of things in this scope).
@@ -1080,7 +1169,7 @@ public class DocumentUrlService : IDocumentUrlService
             return "#";
         }
 
-        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
+        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsPublished(documentKey, culture) is false)
         {
             return "#";
         }

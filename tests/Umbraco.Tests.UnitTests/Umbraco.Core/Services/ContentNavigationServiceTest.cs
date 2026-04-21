@@ -21,7 +21,7 @@ public class ContentNavigationServiceTest
         var rootKey = Guid.NewGuid();
         IEnumerable<INavigationModel> navigationNodes = [new NavigationDto {Key = rootKey, ParentId = -1, Id = 1, Trashed = false}];
         var navigationRepoMock = new Mock<INavigationRepository>();
-        navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(Constants.ObjectTypes.Document))
+        navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(It.Is<IEnumerable<Guid>>(keys => keys.Count() == 1 && keys.Contains(Constants.ObjectTypes.Document))))
             .Returns(navigationNodes);
 
         var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), navigationRepoMock.Object, Mock.Of<IContentTypeService>());
@@ -45,7 +45,7 @@ public class ContentNavigationServiceTest
             new NavigationDto {Key = grandChildKey, ParentId = 2, Id = 3, Trashed = false}];
 
         var navigationRepoMock = new Mock<INavigationRepository>();
-        navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(Constants.ObjectTypes.Document))
+        navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(It.Is<IEnumerable<Guid>>(keys => keys.Count() == 1 && keys.Contains(Constants.ObjectTypes.Document))))
             .Returns(navigationNodes);
 
         var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), navigationRepoMock.Object, Mock.Of<IContentTypeService>());
@@ -69,7 +69,7 @@ public class ContentNavigationServiceTest
             new NavigationDto {Key = grandChildKey, ParentId = 2, Id = 3, Trashed = false}];
 
         var navigationRepoMock = new Mock<INavigationRepository>();
-        navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(Constants.ObjectTypes.Document))
+        navigationRepoMock.Setup(x => x.GetContentNodesByObjectType(It.Is<IEnumerable<Guid>>(keys => keys.Count() == 1 && keys.Contains(Constants.ObjectTypes.Document))))
             .Returns(navigationNodes);
 
         var contentNavigationService = new DocumentNavigationService(GetScopeProvider(), navigationRepoMock.Object, Mock.Of<IContentTypeService>());

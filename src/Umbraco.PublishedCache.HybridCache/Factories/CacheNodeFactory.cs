@@ -100,7 +100,7 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             CreatorId = element.CreatorId,
             ContentTypeId = element.ContentTypeId,
             Data = contentData,
-            IsDraft = false,
+            IsDraft = preview,
         };
     }
 
