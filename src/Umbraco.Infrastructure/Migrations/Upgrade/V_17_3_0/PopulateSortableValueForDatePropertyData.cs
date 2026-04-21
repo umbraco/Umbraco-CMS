@@ -14,6 +14,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_3_0;
 /// </summary>
 public class PopulateSortableValueForDatePropertyData : AsyncMigrationBase
 {
+    // Updates are performed in batches to keep individual command durations bounded and to avoid
+    // holding locks across the entire table for the full duration of the migration.
+    private const int BatchSize = 10000;
+
     // Property editor aliases that store date/time as JSON and implement IDataValueSortable.
     private static readonly string[] _dateTimePropertyEditorAliases =
     [
@@ -37,6 +41,7 @@ public class PopulateSortableValueForDatePropertyData : AsyncMigrationBase
     /// <inheritdoc/>
     protected override Task MigrateAsync()
     {
+        EnsureLongCommandTimeout(Database);
         ExecuteMigration(Database, DatabaseType, _logger);
         return Task.CompletedTask;
     }
@@ -50,12 +55,43 @@ public class PopulateSortableValueForDatePropertyData : AsyncMigrationBase
     /// <returns>The number of rows affected.</returns>
     public static int ExecuteMigration(IUmbracoDatabase database, DatabaseType databaseType, ILogger logger)
     {
-        // Build the IN clause for the property editor aliases.
-        var aliasesInClause = string.Join(", ", _dateTimePropertyEditorAliases.Select(a => $"'{a}'"));
+        // Resolve the relevant property type ids up front so the UPDATE can filter with a static IN list.
+        // A subquery here causes SQL Server to pick a scan-with-row-goal plan for the batched UPDATE,
+        // evaluating TRY_CAST(JSON_VALUE(textValue, '$.date')) on every row of umbracoPropertyData before
+        // the semi-join prunes anything — poor performance on large tables even when no rows ultimately match.
+        // A static IN list lets the optimizer drive the query off the IX_umbracoPropertyData_PropertyTypeId
+        // index, so TRY_CAST / datetime() only evaluate on rows already narrowed down by property type.
+        List<int> propertyTypeIds = GetSortablePropertyTypeIds(database);
+        if (propertyTypeIds.Count == 0)
+        {
+            logger.LogInformation(
+                "Skipping sortableValue population; no property types using date/time editors were found.");
+            return 0;
+        }
+
+        logger.LogInformation(
+            "Populating sortableValue for property data across {PropertyTypeCount} date/time property type(s).",
+            propertyTypeIds.Count);
+
+        var idsInClause = string.Join(", ", propertyTypeIds);
 
         return databaseType == DatabaseType.SQLite
-            ? MigrateSQLite(database, aliasesInClause, logger)
-            : MigrateSqlServer(database, aliasesInClause, logger);
+            ? MigrateSQLite(database, idsInClause, logger)
+            : MigrateSqlServer(database, idsInClause, logger);
+    }
+
+    private static List<int> GetSortablePropertyTypeIds(IUmbracoDatabase database)
+    {
+        var aliasesInClause = string.Join(", ", _dateTimePropertyEditorAliases.Select(a => $"'{a}'"));
+        var sql = $@"
+SELECT id
+FROM cmsPropertyType
+WHERE dataTypeId IN (
+    SELECT nodeId
+    FROM umbracoDataType
+    WHERE propertyEditorAlias IN ({aliasesInClause})
+)";
+        return database.Fetch<int>(sql);
     }
 
     /// <summary>
@@ -64,36 +100,22 @@ public class PopulateSortableValueForDatePropertyData : AsyncMigrationBase
     /// <remarks>
     /// The JSON format is: {"date":"2025-11-05T15:31:00+00:00","timeZone":"UTC"}
     /// We extract the date, parse it as datetimeoffset, convert to UTC, and format as ISO 8601.
-    /// The resulting format is: 2025-11-05T15:31:00.0000000+00:00
+    /// The resulting format is: 2025-11-05T15:31:00.0000000+00:00.
+    /// TRY_CAST is used so rows with unparseable dates are skipped rather than aborting the migration;
+    /// the same guard in the WHERE clause ensures the batch loop always makes progress.
     /// </remarks>
-    private static int MigrateSqlServer(IUmbracoDatabase database, string aliasesInClause, ILogger logger)
+    private static int MigrateSqlServer(IUmbracoDatabase database, string propertyTypeIdsInClause, ILogger logger)
     {
-        // SQL Server: Use ISJSON to validate JSON before parsing, then use JSON_VALUE to extract the date,
-        // CAST to datetimeoffset, SWITCHOFFSET to convert to UTC, and CONVERT with style 127 for ISO 8601 format.
-        // Style 127 produces: yyyy-MM-ddTHH:mm:ss.nnnnnnn or yyyy-MM-ddTHH:mm:ss.nnnnnnn+00:00
         var sql = $@"
-UPDATE umbracoPropertyData
-SET sortableValue = CONVERT(varchar(50), SWITCHOFFSET(CAST(JSON_VALUE(textValue, '$.date') AS datetimeoffset), '+00:00'), 127)
-WHERE propertyTypeId IN (
-    SELECT id
-    FROM cmsPropertyType
-    WHERE dataTypeId IN (
-        SELECT nodeId
-        FROM umbracoDataType
-        WHERE propertyEditorAlias IN ({aliasesInClause})
-    )
-)
+UPDATE TOP ({BatchSize}) umbracoPropertyData
+SET sortableValue = CONVERT(varchar(50), SWITCHOFFSET(TRY_CAST(JSON_VALUE(textValue, '$.date') AS datetimeoffset), '+00:00'), 127)
+WHERE propertyTypeId IN ({propertyTypeIdsInClause})
 AND textValue IS NOT NULL
 AND sortableValue IS NULL
 AND ISJSON(textValue) = 1
-AND JSON_VALUE(textValue, '$.date') IS NOT NULL";
+AND TRY_CAST(JSON_VALUE(textValue, '$.date') AS datetimeoffset) IS NOT NULL";
 
-        var rowsAffected = database.Execute(sql);
-        logger.LogInformation(
-            "Populated sortableValue for {RowCount} property data rows using SQL Server JSON functions.",
-            rowsAffected);
-
-        return rowsAffected;
+        return ExecuteInBatches(database, sql, logger, "SQL Server");
     }
 
     /// <summary>
@@ -103,36 +125,54 @@ AND JSON_VALUE(textValue, '$.date') IS NOT NULL";
     /// SQLite has limited datetime manipulation capabilities, so we extract the date string
     /// and use strftime to normalize it. For dates with timezone offsets, SQLite's datetime
     /// function can parse ISO 8601 format and converts to UTC.
-    /// The resulting format is: yyyy-MM-ddTHH:mm:ssZ
+    /// The resulting format is: yyyy-MM-ddTHH:mm:ssZ.
+    /// The datetime() IS NOT NULL guard in the WHERE clause excludes unparseable dates so the
+    /// batch loop always makes progress (writing NULL back would otherwise re-select the row).
     /// </remarks>
-    private static int MigrateSQLite(IUmbracoDatabase database, string aliasesInClause, ILogger logger)
+    private static int MigrateSQLite(IUmbracoDatabase database, string propertyTypeIdsInClause, ILogger logger)
     {
-        // SQLite: Use json_valid to validate JSON before parsing, then use json_extract to get the date value,
-        // datetime() to parse and normalize to UTC. The datetime() function automatically handles timezone
-        // offsets in ISO 8601 format and converts to UTC.
-        // We then format using strftime to get a consistent sortable format.
+        // SQLite's default build does not support UPDATE ... LIMIT, so constrain the update via a
+        // subquery that selects a batch of matching row ids.
         var sql = $@"
 UPDATE umbracoPropertyData
 SET sortableValue = strftime('%Y-%m-%dT%H:%M:%SZ', datetime(json_extract(textValue, '$.date')))
-WHERE propertyTypeId IN (
+WHERE id IN (
     SELECT id
-    FROM cmsPropertyType
-    WHERE dataTypeId IN (
-        SELECT nodeId
-        FROM umbracoDataType
-        WHERE propertyEditorAlias IN ({aliasesInClause})
-    )
-)
-AND textValue IS NOT NULL
-AND sortableValue IS NULL
-AND json_valid(textValue) = 1
-AND json_extract(textValue, '$.date') IS NOT NULL";
+    FROM umbracoPropertyData
+    WHERE propertyTypeId IN ({propertyTypeIdsInClause})
+    AND textValue IS NOT NULL
+    AND sortableValue IS NULL
+    AND json_valid(textValue) = 1
+    AND datetime(json_extract(textValue, '$.date')) IS NOT NULL
+    LIMIT {BatchSize}
+)";
 
-        var rowsAffected = database.Execute(sql);
+        return ExecuteInBatches(database, sql, logger, "SQLite");
+    }
+
+    private static int ExecuteInBatches(IUmbracoDatabase database, string sql, ILogger logger, string databaseProviderName)
+    {
+        var totalRowsAffected = 0;
+        while (true)
+        {
+            var rowsAffected = database.Execute(sql);
+            if (rowsAffected <= 0)
+            {
+                break;
+            }
+
+            totalRowsAffected += rowsAffected;
+            logger.LogInformation(
+                "Populated sortableValue for batch of {BatchRowCount} property data rows ({TotalRowCount} total so far).",
+                rowsAffected,
+                totalRowsAffected);
+        }
+
         logger.LogInformation(
-            "Populated sortableValue for {RowCount} property data rows using SQLite JSON functions.",
-            rowsAffected);
+            "Populated sortableValue for {RowCount} property data rows using {DatabaseFlavour} JSON functions.",
+            totalRowsAffected,
+            databaseProviderName);
 
-        return rowsAffected;
+        return totalRowsAffected;
     }
 }
