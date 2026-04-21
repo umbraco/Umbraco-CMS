@@ -4,6 +4,7 @@ import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../e
 import { UMB_DOCUMENT_CREATE_OPTIONS_MODAL } from '../../entity-actions/create/constants.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
+import { UmbDocumentBlueprintItemRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbCollectionCreatePopoverScrollMixin } from '@umbraco-cms/backoffice/collection';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -26,6 +27,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbCollectionCreat
 	manifest?: ManifestCollectionAction;
 
 	#documentTypeStructureRepository = new UmbDocumentTypeStructureRepository(this);
+	#documentBlueprintItemRepository = new UmbDocumentBlueprintItemRepository(this);
 
 	constructor() {
 		super();
@@ -65,6 +67,49 @@ export class UmbCreateDocumentCollectionActionElement extends UmbCollectionCreat
 		});
 	}
 
+	#onClick(event: MouseEvent, item: UmbAllowedDocumentTypeModel) {
+		// Let modified/non-primary clicks (open in new tab, new window, etc.) use native link navigation.
+		if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+			return;
+		}
+		// Cancel native anchor navigation and stop the window-level router-slot click handler
+		// (see core/router/router-slot/util/anchor.ts) from SPA-navigating before we can decide
+		// whether to open the blueprint picker.
+		event.preventDefault();
+		event.stopPropagation();
+		this.#onSelect(item);
+	}
+
+	async #onSelect(item: UmbAllowedDocumentTypeModel) {
+		if (!item.unique) {
+			throw new Error('Item unique is missing');
+		}
+
+		const createUrl = this.#getCreateUrl(item);
+
+		const { data } = await this.#documentBlueprintItemRepository.requestItemsByDocumentType(item.unique);
+
+		if (!data?.length) {
+			history.pushState(null, '', createUrl);
+			return;
+		}
+
+		await umbOpenModal(this, UMB_DOCUMENT_CREATE_OPTIONS_MODAL, {
+			data: {
+				parent: {
+					unique: this._documentUnique ?? null,
+					entityType: this._documentUnique ? UMB_DOCUMENT_ENTITY_TYPE : UMB_DOCUMENT_ROOT_ENTITY_TYPE,
+				},
+				documentType: this._documentTypeUnique ? { unique: this._documentTypeUnique } : null,
+				preselectedDocumentType: {
+					unique: item.unique,
+					icon: item.icon ?? undefined,
+					blueprints: data,
+				},
+			},
+		});
+	}
+
 	override render() {
 		return this._allowedDocumentTypes.length !== 1 ? this.#renderDropdown() : this.#renderCreateButton();
 	}
@@ -82,7 +127,12 @@ export class UmbCreateDocumentCollectionActionElement extends UmbCollectionCreat
 			this.localize.string(item.name);
 
 		return html`
-			<uui-button color="default" href=${this.#getCreateUrl(item)} label=${label} look="outline"></uui-button>
+			<uui-button
+				color="default"
+				href=${this.#getCreateUrl(item)}
+				label=${label}
+				look="outline"
+				@click=${(event: MouseEvent) => this.#onClick(event, item)}></uui-button>
 		`;
 	}
 
@@ -108,7 +158,10 @@ export class UmbCreateDocumentCollectionActionElement extends UmbCollectionCreat
 							this._allowedDocumentTypes,
 							(item) => item.unique,
 							(item) => html`
-								<uui-menu-item label=${this.localize.string(item.name)} href=${this.#getCreateUrl(item)}>
+								<uui-menu-item
+									label=${this.localize.string(item.name)}
+									href=${this.#getCreateUrl(item)}
+									@click=${(event: MouseEvent) => this.#onClick(event, item)}>
 									<umb-icon slot="icon" name=${item.icon ?? 'icon-document'}></umb-icon>
 								</uui-menu-item>
 							`,
