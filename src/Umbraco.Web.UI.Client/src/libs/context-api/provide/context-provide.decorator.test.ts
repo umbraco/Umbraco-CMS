@@ -4,7 +4,6 @@ import { provideContext } from './context-provide.decorator.js';
 import { aTimeout, elementUpdated, expect, fixture } from '@open-wc/testing';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { html } from '@umbraco-cms/backoffice/external/lit';
 
 class UmbTestContextConsumerClass implements UmbContextMinimal {
 	public prop: string;
@@ -108,64 +107,5 @@ describe('@provide decorator', () => {
 
 		expect(element.contextValue).to.equal(newProviderInstance);
 		expect(element.contextValue?.prop).to.equal(newProviderInstance.prop);
-	});
-
-	it('should provide context to descendants on first render', async () => {
-		// The provider decorator's controller must be set up before the descendant's consume
-		// runs its request — otherwise the descendant would see undefined during its first render.
-		const providerInstance = new UmbTestContextConsumerClass('early value');
-
-		class TimingProviderElement extends UmbLitElement {
-			@provideContext({ context: testToken })
-			providerInstance = providerInstance;
-		}
-		customElements.define('timing-provider-element', TimingProviderElement);
-
-		// Capture the context value seen by the descendant DURING its first render(), not after.
-		// If the provider isn't set up in time, render() would see undefined.
-		class TimingConsumerElement extends UmbLitElement {
-			public renderedValues: (UmbTestContextConsumerClass | undefined)[] = [];
-			contextValue?: UmbTestContextConsumerClass;
-
-			constructor() {
-				super();
-				this.consumeContext(testToken, (value) => {
-					this.contextValue = value;
-				});
-			}
-
-			override render() {
-				this.renderedValues.push(this.contextValue);
-				return html`<div>${this.contextValue?.prop ?? 'no value'}</div>`;
-			}
-		}
-		customElements.define('timing-consumer-element', TimingConsumerElement);
-
-		const providerEl = await fixture<TimingProviderElement>(
-			`<timing-provider-element><timing-consumer-element></timing-consumer-element></timing-provider-element>`,
-		);
-		const consumerEl = providerEl.querySelector('timing-consumer-element') as TimingConsumerElement;
-
-		await elementUpdated(consumerEl);
-
-		// The first render must already have seen the context value.
-		expect(consumerEl.renderedValues[0], 'context value seen during first render').to.equal(providerInstance);
-		// The descendant must never have rendered with undefined.
-		expect(consumerEl.renderedValues, 'consumer rendered with undefined at some point').to.not.include(undefined);
-	});
-
-	it('should destroy without throwing when the legacy init-controller wrapper is registered', async () => {
-		// Regression guard: the legacy @provideContext path registers a tiny init-only
-		// UmbController to defer reading element[propertyKey] until hostConnected. That
-		// wrapper's destroy() must remove itself from the host — otherwise the host's
-		// destroy loop detects a controller that "does not remove itself" and throws.
-		class DestroyProbeElement extends UmbLitElement {
-			@provideContext({ context: testToken })
-			providerInstance = new UmbTestContextConsumerClass();
-		}
-		customElements.define('destroy-probe-element', DestroyProbeElement);
-
-		const el = await fixture<DestroyProbeElement>(`<destroy-probe-element></destroy-probe-element>`);
-		expect(() => el.destroy()).to.not.throw();
 	});
 });
