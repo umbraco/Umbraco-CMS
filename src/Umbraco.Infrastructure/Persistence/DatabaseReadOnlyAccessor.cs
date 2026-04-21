@@ -7,16 +7,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence;
 /// </summary>
 internal sealed class DatabaseReadOnlyAccessor : IDatabaseReadOnlyAccessor
 {
-    private readonly IScopeAccessor _scopeAccessor;
+    private readonly IScopeProvider _scopeProvider;
     private bool? _isReadOnly;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DatabaseReadOnlyAccessor"/> class.
     /// </summary>
-    /// <param name="scopeAccessor">Provides access to the ambient scope for database access.</param>
-    public DatabaseReadOnlyAccessor(IScopeAccessor scopeAccessor)
+    /// <param name="scopeProvider">Provides scope creation for database access.</param>
+    public DatabaseReadOnlyAccessor(IScopeProvider scopeProvider)
     {
-        _scopeAccessor = scopeAccessor;
+        _scopeProvider = scopeProvider;
     }
 
     /// <inheritdoc />
@@ -25,11 +25,7 @@ internal sealed class DatabaseReadOnlyAccessor : IDatabaseReadOnlyAccessor
 
     private bool Check()
     {
-        IScope? scope = _scopeAccessor.AmbientScope;
-        if (scope is null)
-        {
-            throw new InvalidOperationException("DatabaseReadOnlyAccessor requires an ambient scope.");
-        }
+        using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
 
         if (scope.Database.DatabaseType.IsSqlServer() is false)
         {

@@ -23,6 +23,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     private bool _disposed;
     private TDbContext? _dbContext;
     private IDbContextFactory<TDbContext> _dbContextFactory;
+    private string? _originalConnectionString;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EFCoreScope{TDbContext}"/> class.
@@ -217,6 +218,8 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             _dbContext = FindDbContext();
         }
 
+        _originalConnectionString ??= _dbContext.Database.GetConnectionString();
+
         // Check if we are already in a transaction before starting one
         if (_dbContext.Database.CurrentTransaction is null)
         {
@@ -292,7 +295,19 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
             {
                 try
                 {
-                    _dbContext?.Database.SetDbConnection(null);
+                    if (_dbContext is not null)
+                    {
+                        _dbContext.Database.SetDbConnection(null);
+
+                        // SetDbConnection(null) clears EF Core's internal _connectionString field,
+                        // which is not restored from options. For pooled contexts, we must restore
+                        // the original connection string so the context is usable when returned
+                        // from the pool. See https://github.com/umbraco/Umbraco-CMS/issues/22211
+                        if (_originalConnectionString is not null)
+                        {
+                            _dbContext.Database.SetConnectionString(_originalConnectionString);
+                        }
+                    }
                 }
                 catch
                 {

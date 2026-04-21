@@ -42,7 +42,8 @@
     emptyValue: 'Value cannot be empty',
     nullValue: 'Value cannot be null',
     invalidEmail: 'Invalid email',
-    emptyManualLinkPicker: 'Please enter an URL or Anchor.'
+    emptyManualLinkPicker: 'Please enter an URL or Anchor.',
+    needMoreItems: 'This field needs more items',
   }
 
   public static readonly inputTypes = {
@@ -163,7 +164,8 @@
     6: ['Overlay size', 'Select the width of the overlay (link picker).'],
     7: ['Available Blocks', 'Define the available blocks.'],
     8: ['Image Upload Folder', 'Choose the upload location of pasted images.'],
-    9: ['Ignore User Start Nodes', ''],
+    9: ['Accepted media types', 'Limit to specific media types for the media picker toolbar and drag-and-drop uploads.'],
+    10: ['Ignore User Start Nodes', ''],
   }
 
   public static readonly tinyMCESettings = {
@@ -282,6 +284,8 @@
     language: '/umbraco/management/api/v1/language',
     media: '/umbraco/management/api/v1/media',
     mediaType: '/umbraco/management/api/v1/media-type',
+    memberType: '/umbraco/management/api/v1/member-type',
+    memberTypeFolder: '/umbraco/management/api/v1/member-type/folder',
     mediaTypeFolder: '/umbraco/management/api/v1/media-type/folder',
     member: '/umbraco/management/api/v1/member',
     memberGroup: '/umbraco/management/api/v1/member-group',

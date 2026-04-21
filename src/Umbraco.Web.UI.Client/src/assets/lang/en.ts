@@ -669,7 +669,7 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
-		seeErrorAction: 'See error',
+		seeErrorAction: 'Full Error Message',
 		seeErrorDialogHeadline: 'Error details',
 	},
 	dictionary: {
@@ -958,6 +958,7 @@ export default {
 		rename: 'Rename',
 		renew: 'Renew',
 		required: 'Required',
+		reset: 'Reset',
 		retrieve: 'Retrieve',
 		retry: 'Retry',
 		rights: 'Permissions',
@@ -966,6 +967,8 @@ export default {
 		search: 'Search',
 		searchNoResult: 'Sorry, we can not find what you are looking for.',
 		noItemsInList: 'No items have been added',
+		scrollLeft: 'Scroll left',
+		scrollRight: 'Scroll right',
 		server: 'Server',
 		settings: 'Settings',
 		shared: 'Shared',
@@ -1636,6 +1639,7 @@ export default {
 		tabRules: 'Editor',
 	},
 	template: {
+		notAllowed: 'The selected template is no longer allowed on this document type.',
 		productionMode: 'Production Mode',
 		runtimeModeProduction: 'Content is not editable when using runtime mode <code>Production</code>.',
 		deleteByIdFailed: 'Failed to delete template with ID %0%',
@@ -2056,7 +2060,7 @@ export default {
 		},
 		changePassword: 'Change your password',
 		changePhoto: 'Change photo',
-		configureMfa: 'Configure MFA',
+		configureMfa: 'Configure 2FA',
 		emailRequired: 'Required - enter an email address for this user',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2356,6 +2360,10 @@ export default {
 		enableError: 'Error enabling the URL tracker, more information can be found in your log file.',
 		culture: 'Culture',
 	},
+	embeddedMedia: {
+		dimensionsDescription:
+			'These values are passed as the maximum width and height to the embed provider. The provider may adjust the final dimensions to fit its own constraints.',
+	},
 	emptyStates: {
 		emptyDictionaryTree: 'No Dictionary items to choose from',
 	},
@@ -2417,7 +2425,8 @@ export default {
 		openBackofficeSearch: 'Open backoffice search',
 		openCloseBackofficeHelp: 'Open/Close backoffice help',
 		openCloseBackofficeProfileOptions: 'Open/Close your profile options',
-		profileOptions: 'Profile options',
+		profileOptions: 'User profile for %0% (%1%)',
+		profileOptionsDefault: 'User profile',
 		assignDomainDescription: 'Setup Culture and Hostnames for %0%',
 		createDescription: 'Create new node under %0%',
 		protectDescription: 'Setup access restrictions on %0%',
@@ -2845,6 +2854,9 @@ export default {
 	},
 	rte: {
 		label: 'Rich Text Editor',
+		config_allowedMediaTypes: 'Accepted media types',
+		config_allowedMediaTypes_description:
+			'Limit to specific media types for the media picker toolbar and drag-and-drop uploads.',
 		config_blocks: 'Available Blocks',
 		config_blocks_description: 'Define the available blocks.',
 		config_ignoreUserStartNodes: 'Ignore User Start Nodes',
