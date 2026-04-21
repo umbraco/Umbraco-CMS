@@ -1,10 +1,12 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import { UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_DOCUMENT_CREATE_OPTIONS_MODAL } from '../../entity-actions/create/constants.js';
+import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbCollectionCreatePopoverScrollMixin } from '@umbraco-cms/backoffice/collection';
+import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
