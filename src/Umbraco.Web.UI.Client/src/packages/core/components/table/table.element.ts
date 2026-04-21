@@ -178,11 +178,29 @@ export class UmbTableElement extends UmbLitElement {
 	@state()
 	private _selectionMode = false;
 
+	#lastColumnKey = '';
+
 	override updated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.updated(changedProperties);
 		if (changedProperties.has('selection')) {
 			this._selectionMode = this.selection.length > 0;
 		}
+
+		// The `keyed` directive in `render()` rebuilds the `<uui-table>` element when the column
+		// signature changes. The sorter caches its container element on first initialization, so
+		// when the table is replaced we need to reattach it to the fresh node.
+		if (changedProperties.has('columns') && this._sortable) {
+			const columnKey = this.#getColumnKey();
+			if (columnKey !== this.#lastColumnKey) {
+				this.#lastColumnKey = columnKey;
+				this.#sorter.disable();
+				this.#sorter.enable();
+			}
+		}
+	}
+
+	#getColumnKey() {
+		return JSON.stringify(this.columns.map((column) => column.alias));
 	}
 
 	#sorter = new UmbSorterController<UmbTableItem>(this, {
@@ -284,9 +302,8 @@ export class UmbTableElement extends UmbLitElement {
 		// Firefox's `display: table-*` engine does not reliably relayout when cells are
 		// inserted or removed from existing rows. Key the whole table on the column
 		// signature so the table is rebuilt whenever the column set changes.
-		const columnKey = this.columns.map((column) => column.alias).join('|');
 		return keyed(
-			columnKey,
+			this.#getColumnKey(),
 			html`
 				<uui-table class="uui-text">
 					<uui-table-column style=${ifDefined(style)}></uui-table-column>
