@@ -1,13 +1,12 @@
 import { UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMemberTypeStructureRepository } from '@umbraco-cms/backoffice/member-type';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbCollectionCreatePopoverScrollMixin } from '@umbraco-cms/backoffice/collection';
+import { UmbPopoverScrollElement } from '@umbraco-cms/backoffice/collection';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMemberTypeModel } from '@umbraco-cms/backoffice/member-type';
 
 @customElement('umb-create-member-collection-action')
-export class UmbCreateMemberCollectionActionElement extends UmbCollectionCreatePopoverScrollMixin(UmbLitElement) {
+export class UmbCreateMemberCollectionActionElement extends UmbPopoverScrollElement {
 	@state()
 	private _allowedMemberTypes: Array<UmbAllowedMemberTypeModel> = [];
 

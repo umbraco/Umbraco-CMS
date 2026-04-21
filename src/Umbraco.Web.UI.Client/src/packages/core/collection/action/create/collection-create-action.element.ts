@@ -1,16 +1,15 @@
 import { customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { UmbCollectionCreatePopoverScrollMixin } from './collection-create-popover-scroll.mixin.js';
+import { UmbPopoverScrollElement } from './collection-create-popover-scroll.mixin.js';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 type ManifestType = ManifestEntityCreateOptionAction;
 
 @customElement('umb-collection-create-action-button')
-export class UmbCollectionCreateActionButtonElement extends UmbCollectionCreatePopoverScrollMixin(UmbLitElement) {
+export class UmbCollectionCreateActionButtonElement extends UmbPopoverScrollElement {
 	@state()
 	private _multipleOptions = false;
 
@@ -23,12 +22,6 @@ export class UmbCollectionCreateActionButtonElement extends UmbCollectionCreateP
 	#createLabel = this.localize.term('general_create');
 	#entityContext?: typeof UMB_ENTITY_CONTEXT.TYPE;
 
-	#onPopoverToggle(event: PointerEvent) {
-		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		this._onPopoverToggle(event as unknown as ToggleEvent);
-	}
 
 	async #onClick(event: Event, controller: UmbExtensionApiInitializer<ManifestType>, href?: string) {
 		// skip if href is defined
@@ -121,7 +114,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbCollectionCreateP
 			<uui-popover-container
 				id="collection-action-menu-popover"
 				placement="bottom-start"
-				@toggle=${this.#onPopoverToggle}>
+				@toggle=${this._onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
 						${this._apiControllers.map((controller, index) => this.#renderMenuItem(controller, index))}

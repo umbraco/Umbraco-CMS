@@ -3,14 +3,13 @@ import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbCollectionCreatePopoverScrollMixin } from '@umbraco-cms/backoffice/collection';
+import { UmbPopoverScrollElement } from '@umbraco-cms/backoffice/collection';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-create-media-collection-action')
-export class UmbCreateMediaCollectionActionElement extends UmbCollectionCreatePopoverScrollMixin(UmbLitElement) {
+export class UmbCreateMediaCollectionActionElement extends UmbPopoverScrollElement {
 	@state()
 	private _allowedMediaTypes: Array<UmbAllowedMediaTypeModel> = [];
 
