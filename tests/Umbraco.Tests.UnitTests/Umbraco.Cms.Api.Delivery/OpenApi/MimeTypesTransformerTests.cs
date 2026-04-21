@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using NUnit.Framework;
-using Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
+using Umbraco.Cms.Api.Common.OpenApi;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Delivery.OpenApi;
 
@@ -16,39 +20,29 @@ public class MimeTypesTransformerTests
     public async Task TransformAsync_Removes_Non_Json_MimeTypes_From_Responses()
     {
         // Arrange
-        var document = new OpenApiDocument
+        var operation = new OpenApiOperation
         {
-            Paths = new OpenApiPaths
+            Responses = new OpenApiResponses
             {
-                ["/test"] = new OpenApiPathItem
+                ["200"] = new OpenApiResponse
                 {
-                    Operations = new Dictionary<HttpMethod, OpenApiOperation>
+                    Content = new Dictionary<string, OpenApiMediaType>
                     {
-                        [HttpMethod.Get] = new()
-                        {
-                            Responses = new OpenApiResponses
-                            {
-                                ["200"] = new OpenApiResponse
-                                {
-                                    Content = new Dictionary<string, OpenApiMediaType>
-                                    {
-                                        ["application/json"] = new(),
-                                        ["application/xml"] = new(),
-                                        ["text/plain"] = new(),
-                                    },
-                                },
-                            },
-                        },
+                        ["application/json"] = new(),
+                        ["application/xml"] = new(),
+                        ["text/plain"] = new(),
                     },
                 },
             },
         };
 
+        OpenApiOperationTransformerContext context = CreateContext();
+
         // Act
-        await _transformer.TransformAsync(document, null!, CancellationToken.None);
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert
-        var response = (OpenApiResponse)document.Paths["/test"].Operations![HttpMethod.Get].Responses!["200"];
+        var response = (OpenApiResponse)operation.Responses!["200"];
         Assert.AreEqual(1, response.Content?.Count);
         Assert.IsTrue(response.Content?.ContainsKey("application/json"));
     }
@@ -57,35 +51,25 @@ public class MimeTypesTransformerTests
     public async Task TransformAsync_Removes_Non_Json_MimeTypes_From_RequestBodies()
     {
         // Arrange
-        var document = new OpenApiDocument
+        var operation = new OpenApiOperation
         {
-            Paths = new OpenApiPaths
+            RequestBody = new OpenApiRequestBody
             {
-                ["/test"] = new OpenApiPathItem
+                Content = new Dictionary<string, OpenApiMediaType>
                 {
-                    Operations = new Dictionary<HttpMethod, OpenApiOperation>
-                    {
-                        [HttpMethod.Post] = new()
-                        {
-                            RequestBody = new OpenApiRequestBody
-                            {
-                                Content = new Dictionary<string, OpenApiMediaType>
-                                {
-                                    ["application/json"] = new(),
-                                    ["application/x-www-form-urlencoded"] = new(),
-                                },
-                            },
-                        },
-                    },
+                    ["application/json"] = new(),
+                    ["application/x-www-form-urlencoded"] = new(),
                 },
             },
         };
 
+        OpenApiOperationTransformerContext context = CreateContext();
+
         // Act
-        await _transformer.TransformAsync(document, null!, CancellationToken.None);
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert
-        var requestBody = (OpenApiRequestBody)document.Paths["/test"].Operations![HttpMethod.Post].RequestBody!;
+        var requestBody = (OpenApiRequestBody)operation.RequestBody!;
         Assert.AreEqual(1, requestBody.Content?.Count);
         Assert.IsTrue(requestBody.Content?.ContainsKey("application/json"));
     }
@@ -94,38 +78,28 @@ public class MimeTypesTransformerTests
     public async Task TransformAsync_Preserves_All_MimeTypes_When_Json_Not_Present()
     {
         // Arrange
-        var document = new OpenApiDocument
+        var operation = new OpenApiOperation
         {
-            Paths = new OpenApiPaths
+            Responses = new OpenApiResponses
             {
-                ["/test"] = new OpenApiPathItem
+                ["200"] = new OpenApiResponse
                 {
-                    Operations = new Dictionary<HttpMethod, OpenApiOperation>
+                    Content = new Dictionary<string, OpenApiMediaType>
                     {
-                        [HttpMethod.Get] = new()
-                        {
-                            Responses = new OpenApiResponses
-                            {
-                                ["200"] = new OpenApiResponse
-                                {
-                                    Content = new Dictionary<string, OpenApiMediaType>
-                                    {
-                                        ["application/xml"] = new(),
-                                        ["text/plain"] = new(),
-                                    },
-                                },
-                            },
-                        },
+                        ["application/xml"] = new(),
+                        ["text/plain"] = new(),
                     },
                 },
             },
         };
 
+        OpenApiOperationTransformerContext context = CreateContext();
+
         // Act
-        await _transformer.TransformAsync(document, null!, CancellationToken.None);
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
         // Assert - All MIME types preserved when JSON is not present
-        var response = (OpenApiResponse)document.Paths["/test"].Operations![HttpMethod.Get].Responses!["200"];
+        var response = (OpenApiResponse)operation.Responses!["200"];
         Assert.AreEqual(2, response.Content?.Count);
         Assert.IsTrue(response.Content?.ContainsKey("application/xml"));
         Assert.IsTrue(response.Content?.ContainsKey("text/plain"));
@@ -135,100 +109,143 @@ public class MimeTypesTransformerTests
     public async Task TransformAsync_Handles_Null_Content()
     {
         // Arrange
-        var document = new OpenApiDocument
+        var operation = new OpenApiOperation
         {
-            Paths = new OpenApiPaths
+            Responses = new OpenApiResponses
             {
-                ["/test"] = new OpenApiPathItem
-                {
-                    Operations = new Dictionary<HttpMethod, OpenApiOperation>
-                    {
-                        [HttpMethod.Get] = new()
-                        {
-                            Responses = new OpenApiResponses
-                            {
-                                ["200"] = new OpenApiResponse { Content = null },
-                            },
-                        },
-                    },
-                },
+                ["200"] = new OpenApiResponse { Content = null },
             },
         };
 
-        // Act & Assert - should not throw
-        await _transformer.TransformAsync(document, null!, CancellationToken.None);
-    }
-
-    [Test]
-    public async Task TransformAsync_Handles_Empty_Paths()
-    {
-        // Arrange
-        var document = new OpenApiDocument
-        {
-            Paths = new OpenApiPaths(),
-        };
+        OpenApiOperationTransformerContext context = CreateContext();
 
         // Act & Assert - should not throw
-        await _transformer.TransformAsync(document, null!, CancellationToken.None);
-    }
-
-    [Test]
-    public async Task TransformAsync_Handles_Null_Operations()
-    {
-        // Arrange
-        var document = new OpenApiDocument
-        {
-            Paths = new OpenApiPaths
-            {
-                ["/test"] = new OpenApiPathItem { Operations = null },
-            },
-        };
-
-        // Act & Assert - should not throw
-        await _transformer.TransformAsync(document, null!, CancellationToken.None);
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
     }
 
     [Test]
     public async Task TransformAsync_Handles_Null_RequestBody()
     {
         // Arrange
-        var document = new OpenApiDocument
-        {
-            Paths = new OpenApiPaths
-            {
-                ["/test"] = new OpenApiPathItem
-                {
-                    Operations = new Dictionary<HttpMethod, OpenApiOperation>
-                    {
-                        [HttpMethod.Post] = new() { RequestBody = null },
-                    },
-                },
-            },
-        };
+        var operation = new OpenApiOperation { RequestBody = null };
+
+        OpenApiOperationTransformerContext context = CreateContext();
 
         // Act & Assert - should not throw
-        await _transformer.TransformAsync(document, null!, CancellationToken.None);
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
     }
 
     [Test]
     public async Task TransformAsync_Handles_Null_Responses()
     {
         // Arrange
-        var document = new OpenApiDocument
+        var operation = new OpenApiOperation { Responses = null };
+
+        OpenApiOperationTransformerContext context = CreateContext();
+
+        // Act & Assert - should not throw
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
+    }
+
+    [Test]
+    public async Task TransformAsync_Keeps_Only_Consumes_ContentTypes_For_RequestBody()
+    {
+        // Arrange
+        var operation = new OpenApiOperation
         {
-            Paths = new OpenApiPaths
+            RequestBody = new OpenApiRequestBody
             {
-                ["/test"] = new OpenApiPathItem
+                Content = new Dictionary<string, OpenApiMediaType>
                 {
-                    Operations = new Dictionary<HttpMethod, OpenApiOperation>
-                    {
-                        [HttpMethod.Get] = new() { Responses = null },
-                    },
+                    ["application/json"] = new(),
+                    ["application/xml"] = new(),
+                    ["multipart/form-data"] = new(),
                 },
             },
         };
 
-        // Act & Assert - should not throw
-        await _transformer.TransformAsync(document, null!, CancellationToken.None);
+        OpenApiOperationTransformerContext context = CreateContext(new ConsumesAttribute("multipart/form-data"));
+
+        // Act
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
+
+        // Assert
+        var requestBody = (OpenApiRequestBody)operation.RequestBody!;
+        Assert.AreEqual(1, requestBody.Content?.Count);
+        Assert.IsTrue(requestBody.Content?.ContainsKey("multipart/form-data"));
     }
+
+    [Test]
+    public async Task TransformAsync_Consumes_With_Multiple_ContentTypes_Keeps_All_Declared()
+    {
+        // Arrange
+        var operation = new OpenApiOperation
+        {
+            RequestBody = new OpenApiRequestBody
+            {
+                Content = new Dictionary<string, OpenApiMediaType>
+                {
+                    ["application/json"] = new(),
+                    ["application/xml"] = new(),
+                    ["text/plain"] = new(),
+                },
+            },
+        };
+
+        OpenApiOperationTransformerContext context = CreateContext(
+            new ConsumesAttribute("application/json", "text/plain"));
+
+        // Act
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
+
+        // Assert
+        var requestBody = (OpenApiRequestBody)operation.RequestBody!;
+        Assert.AreEqual(2, requestBody.Content?.Count);
+        Assert.IsTrue(requestBody.Content?.ContainsKey("application/json"));
+        Assert.IsTrue(requestBody.Content?.ContainsKey("text/plain"));
+    }
+
+    [Test]
+    public async Task TransformAsync_Consumes_Preserves_Schema_From_Existing_Entry()
+    {
+        // Arrange
+        var existingSchema = new OpenApiSchema();
+        var operation = new OpenApiOperation
+        {
+            RequestBody = new OpenApiRequestBody
+            {
+                Content = new Dictionary<string, OpenApiMediaType>
+                {
+                    ["application/json"] = new() { Schema = existingSchema },
+                },
+            },
+        };
+
+        OpenApiOperationTransformerContext context = CreateContext(
+            new ConsumesAttribute("multipart/form-data"));
+
+        // Act
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
+
+        // Assert
+        var requestBody = (OpenApiRequestBody)operation.RequestBody!;
+        Assert.AreEqual(1, requestBody.Content?.Count);
+        Assert.IsTrue(requestBody.Content?.ContainsKey("multipart/form-data"));
+        Assert.AreSame(existingSchema, requestBody.Content!["multipart/form-data"].Schema);
+    }
+
+    private static OpenApiOperationTransformerContext CreateContext(params object[] endpointMetadata) =>
+        new()
+        {
+            Document = new OpenApiDocument(),
+            Description = new ApiDescription
+            {
+                ActionDescriptor = new ActionDescriptor
+                {
+                    EndpointMetadata = endpointMetadata.ToList(),
+                },
+            },
+            DocumentName = "test",
+            ApplicationServices = null!,
+        };
 }
