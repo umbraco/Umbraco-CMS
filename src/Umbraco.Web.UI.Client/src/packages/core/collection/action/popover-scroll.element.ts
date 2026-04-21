@@ -19,22 +19,22 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
  */
 export abstract class UmbPopoverScrollElement extends UmbLitElement {
 	static override properties = {
-		_popoverOpen: { state: true },
+		popoverOpen: { state: true },
 	};
 
-	private __popoverOpen = false;
+	#popoverOpen = false;
 
-	protected get _popoverOpen(): boolean {
-		return this.__popoverOpen;
+	protected get popoverOpen(): boolean {
+		return this.#popoverOpen;
 	}
 
-	protected set _popoverOpen(value: boolean) {
-		const oldValue = this.__popoverOpen;
-		this.__popoverOpen = value;
+	protected set popoverOpen(value: boolean) {
+		const oldValue = this.#popoverOpen;
+		this.#popoverOpen = value;
 		if (value) {
 			this.#updateScrollHeight();
 		}
-		this.requestUpdate('_popoverOpen', oldValue);
+		this.requestUpdate('popoverOpen', oldValue);
 	}
 
 	@query('uui-button[popovertarget]')
@@ -48,7 +48,7 @@ export abstract class UmbPopoverScrollElement extends UmbLitElement {
 		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		this._popoverOpen = event.newState === 'open';
+		this.popoverOpen = event.newState === 'open';
 	};
 
 	#updateScrollHeight() {
@@ -67,4 +67,5 @@ export abstract class UmbPopoverScrollElement extends UmbLitElement {
 		`,
 	];
 }
+
 

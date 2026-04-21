@@ -2,7 +2,7 @@ import { customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/e
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { UmbPopoverScrollElement } from './collection-create-popover-scroll.mixin.js';
+import { UmbPopoverScrollElement } from '../popover-scroll.element.js';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
@@ -103,7 +103,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbPopoverScrollElem
 				color="default"
 				look="outline">
 				${this.#createLabel}
-				<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
+				<uui-symbol-expand .open=${this.popoverOpen}></uui-symbol-expand>
 			</uui-button>
 			${this.#renderDropdown()}
 		`;

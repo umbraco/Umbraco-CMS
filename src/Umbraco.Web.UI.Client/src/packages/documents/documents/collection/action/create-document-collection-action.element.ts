@@ -145,7 +145,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbPopoverScrollEl
 		return html`
 			<uui-button popovertarget="collection-action-menu-popover" label=${label} color="default" look="outline">
 				${label}
-				<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
+				<uui-symbol-expand .open=${this.popoverOpen}></uui-symbol-expand>
 			</uui-button>
 			<uui-popover-container
 				id="collection-action-menu-popover"
