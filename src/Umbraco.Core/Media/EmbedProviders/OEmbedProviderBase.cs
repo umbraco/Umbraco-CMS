@@ -120,12 +120,13 @@ public abstract class OEmbedProviderBase : IEmbedProvider
     /// <returns>A task that represents the asynchronous operation, containing the response as an <see cref="XmlDocument"/>.</returns>
     public virtual async Task<XmlDocument> GetXmlResponseAsync(string url, CancellationToken cancellationToken)
     {
-        var response =  await DownloadResponseAsync(url, cancellationToken);
+        var response = await DownloadResponseAsync(url, cancellationToken);
         var doc = new XmlDocument { XmlResolver = null };
         var settings = new XmlReaderSettings
         {
             DtdProcessing = DtdProcessing.Prohibit,
-            XmlResolver = null
+            XmlResolver = null,
+            CloseInput = true
         };
         using var reader = XmlReader.Create(new StringReader(response), settings);
         doc.Load(reader);

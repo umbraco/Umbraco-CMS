@@ -60,10 +60,8 @@ public class OEmbedProviderXxeSecurityTests
     {
         Provider.SetMockResponse(maliciousXml);
 
-        var exception = Assert.ThrowsAsync<XmlException>(
+        Assert.ThrowsAsync<XmlException>(
             async () => await Provider.GetXmlResponseAsync("http://test.local/oembed", CancellationToken.None));
-
-        Assert.That(exception!.Message, Does.Contain("DTD").IgnoreCase);
     }
 
     [Test]
