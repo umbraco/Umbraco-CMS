@@ -1,11 +1,11 @@
 import type { UmbValueSummaryResolver } from '../extensions/value-summary-resolver.interface.js';
 import type { ManifestValueSummary } from '../extensions/value-summary.extension.js';
+import { loadValueSummaryResolver } from '../extensions/load-value-summary-resolver.function.js';
 import { UMB_VALUE_SUMMARY_COORDINATOR_CONTEXT } from './value-summary-coordinator.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-import { loadValueSummaryResolver } from '../extensions/load-value-summary-resolver.function.js';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
@@ -16,6 +16,8 @@ interface ResolvedEntry {
 
 /**
  * Converts a value to a stable string key for caching.
+ * @param {unknown} v value
+ * @returns {string} key
  */
 function toValueKey(v: unknown): string {
 	return v !== null && typeof v === 'object' ? JSON.stringify(v) : `${typeof v}:${String(v)}`;
@@ -32,6 +34,11 @@ export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
 		super(host, UMB_VALUE_SUMMARY_COORDINATOR_CONTEXT);
 	}
 
+	/**
+	 * Registers a value for display resolution.
+	 * @param {string} valueType - The value type key identifying the resolver manifest.
+	 * @param {unknown} value - The raw value to resolve.
+	 */
 	preRegister(valueType: string, value: unknown): void {
 		const manifest = this.#getManifest(valueType);
 
@@ -45,6 +52,12 @@ export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
 		}
 	}
 
+	/**
+	 * Returns an observable that emits the resolved display value for the given raw value.
+	 * @param {string} valueType - The value type key identifying the resolver manifest.
+	 * @param {unknown} rawValue - The raw value whose resolved form is observed.
+	 * @returns {Observable<unknown | undefined>} An observable emitting the resolved value, or `undefined` until resolution completes.
+	 */
 	observeResolvedValue(valueType: string, rawValue: unknown): Observable<unknown | undefined> {
 		const key = `${valueType}:${toValueKey(rawValue)}`;
 		return this.#state.asObservablePart((items) => items.find((x) => x.key === key)?.value);
