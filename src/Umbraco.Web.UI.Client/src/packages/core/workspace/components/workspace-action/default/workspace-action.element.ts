@@ -110,11 +110,9 @@ export class UmbWorkspaceActionElement<
 		if (this._href) {
 			event.stopPropagation();
 		}
-		// If its a link or has additional options, then we do not want to display state on the button. [NL]
+		// If its a link, then we do not want to display state on the button. [NL]
 		if (!this._href) {
-			if (!this._additionalOptions) {
-				this._buttonState = 'waiting';
-			}
+			this._buttonState = 'waiting';
 
 			try {
 				const api = this._actionApi ?? this.#api;
@@ -144,8 +142,6 @@ export class UmbWorkspaceActionElement<
 	}
 
 	#initButtonStateReset() {
-		/* When the button has additional options, we do not show the waiting state.
-    Therefore, we need to ensure the button state is reset, so we are able to show the success state again. */
 		this.#clearButtonStateResetTimeout();
 
 		this.#buttonStateResetTimeoutId = window.setTimeout(() => {
