@@ -29,6 +29,7 @@ export interface UmbTableItemData {
 
 export interface UmbTableColumn {
 	name: string;
+	/** Unique identifier for the column — must be unique within a given table instance, as it is used as the key for header and cell reconciliation. */
 	alias: string;
 	elementName?: string;
 	width?: string;
