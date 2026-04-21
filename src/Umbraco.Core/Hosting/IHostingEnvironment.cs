@@ -81,8 +81,21 @@ public interface IHostingEnvironment
     bool IsHosted { get; }
 
     /// <summary>
-    ///     Gets the main application url.
+    ///     Gets the main application URL, or <see langword="null" /> if no URL has been configured or detected yet.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The value is populated from <see cref="Configuration.Models.WebRoutingSettings.UmbracoApplicationUrl" /> when
+    ///         it is set, and otherwise from the first (or every) incoming request depending on
+    ///         <see cref="Configuration.Models.WebRoutingSettings.ApplicationUrlDetection" />.
+    ///     </para>
+    ///     <para>
+    ///         This property can be <see langword="null" /> — for example when
+    ///         <see cref="Configuration.Models.ApplicationUrlDetection.None" /> is configured and no explicit
+    ///         <see cref="Configuration.Models.WebRoutingSettings.UmbracoApplicationUrl" /> is provided, or before the first
+    ///         request has been observed. Consumers must therefore null-check before use.
+    ///     </para>
+    /// </remarks>
     Uri? ApplicationMainUrl { get; }
 
     /// <summary>
