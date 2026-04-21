@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 using Umbraco.Cms.Tests.Integration.Implementations;
@@ -25,6 +26,13 @@ public class GlobalSetupTeardown
     [OneTimeSetUp]
     public void SetUp()
     {
+        // Guarantee enough thread-pool threads so async continuations can always schedule,
+        // even when sync-over-async paths in production code hold worker threads. Without this,
+        // NUnit 4 (which dropped the pumping sync-context used by NUnit 3) can deadlock on
+        // low-core CI agents via ContentCacheRefresher's sync-over-async pattern.
+        var minThreads = Math.Max(Environment.ProcessorCount * 4, 32);
+        ThreadPool.SetMinThreads(minThreads, minThreads);
+
         var builder = new ConfigurationBuilder();
         builder.AddJsonFile("appsettings.Tests.json");
         builder.AddJsonFile("appsettings.Tests.Local.json", true);
