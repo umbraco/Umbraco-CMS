@@ -18,12 +18,7 @@ internal static class OpenApiSchemaServiceExtensions
     /// <param name="jsonOptionsName">The named <see cref="JsonOptions"/> to use during schema generation for this document.</param>
     /// <returns>The same <see cref="IServiceCollection"/> for chaining.</returns>
     /// <remarks>
-    /// Microsoft.AspNetCore.OpenApi resolves a single, default-named <see cref="JsonOptions"/> for schema generation,
-    /// which means schema output is shared across every consumer of the host. As a CMS we need different JSON options per
-    /// API (e.g. camelCase, custom type resolvers) without polluting the default options that consumer code depends on.
-    /// Until <see href="https://github.com/dotnet/aspnetcore/issues/60738"/> is addressed upstream this requires reaching
-    /// into the internal <c>OpenApiSchemaService</c> registration. Note that <c>dotnet/aspnet-api-versioning</c>
-    /// (Asp.Versioning.OpenApi) uses the same workaround for per-version schema services.
+    /// Workaround for <see href="https://github.com/dotnet/aspnetcore/issues/66340">dotnet/aspnetcore#66340</see>.
     /// </remarks>
     public static IServiceCollection ReplaceOpenApiSchemaService(
         this IServiceCollection services,
