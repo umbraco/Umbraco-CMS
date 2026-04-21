@@ -101,6 +101,27 @@ internal sealed class FixLabelDataTypeDbTypeFromConfigurationTests : UmbracoInte
     }
 
     [Test]
+    public async Task Relocates_VarcharValue_Content_When_Label_Is_Already_Ntext()
+    {
+        // Covers the workaround scenario: a user manually re-saved the Label data type after upgrading,
+        // so dbType is already Ntext, but any content saved before that re-save is still stuck in
+        // varcharValue. The migration's relocation step must run regardless of whether this run
+        // transitioned the data type, and must move those legacy rows into textValue.
+        IDataType dataType = await CreateLabelDataType(ValueTypes.Text);
+        IContentType contentType = await CreateContentTypeWithLabelProperty(dataType);
+        IContent content = await CreateContent(contentType);
+
+        await AssertDbTypeInDatabase(dataType.Id, ValueStorageType.Ntext);
+        var propertyTypeId = contentType.PropertyTypes.Single(pt => pt.Alias == "testLabel").Id;
+        await InsertPropertyDataVarcharValue(content.Id, propertyTypeId, "legacy-varchar");
+
+        await ExecuteMigration();
+
+        await AssertDbTypeInDatabase(dataType.Id, ValueStorageType.Ntext);
+        await AssertPropertyDataMoved(propertyTypeId, expectedTextValue: "legacy-varchar");
+    }
+
+    [Test]
     public async Task Leaves_Existing_TextValue_Untouched_When_Moving_To_Ntext()
     {
         // Scenario A: an upgraded v13 database already has the value in textValue (because v13 stored
