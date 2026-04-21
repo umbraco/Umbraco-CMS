@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations.Upgrad
 
 [TestFixture]
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
-internal sealed class FixLabelDataTypeDbTypeFromConfigurationTest : UmbracoIntegrationTest
+internal sealed class FixLabelDataTypeDbTypeFromConfigurationTests : UmbracoIntegrationTest
 {
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
@@ -98,6 +98,26 @@ internal sealed class FixLabelDataTypeDbTypeFromConfigurationTest : UmbracoInteg
 
         await AssertDbTypeInDatabase(dataType.Id, ValueStorageType.Ntext);
         await AssertPropertyDataMoved(propertyTypeId, expectedTextValue: "stored-as-varchar");
+    }
+
+    [Test]
+    public async Task Leaves_Existing_TextValue_Untouched_When_Moving_To_Ntext()
+    {
+        // Scenario A: an upgraded v13 database already has the value in textValue (because v13 stored
+        // Long-String Label values there). Only the dbType is wrong; the relocation UPDATE must leave
+        // the textValue row alone — its AND varcharValue IS NOT NULL guard is what protects it.
+        IDataType dataType = await CreateLabelDataType(ValueTypes.Text);
+        IContentType contentType = await CreateContentTypeWithLabelProperty(dataType);
+        IContent content = await CreateContent(contentType);
+
+        await SetDbTypeInDatabase(dataType.Id, ValueStorageType.Nvarchar);
+        var propertyTypeId = contentType.PropertyTypes.Single(pt => pt.Alias == "testLabel").Id;
+        await InsertPropertyDataTextValue(content.Id, propertyTypeId, "stored-as-textvalue");
+
+        await ExecuteMigration();
+
+        await AssertDbTypeInDatabase(dataType.Id, ValueStorageType.Ntext);
+        await AssertPropertyDataMoved(propertyTypeId, expectedTextValue: "stored-as-textvalue");
     }
 
     private async Task<IDataType> CreateLabelDataType(string? valueType)
@@ -188,6 +208,27 @@ internal sealed class FixLabelDataTypeDbTypeFromConfigurationTest : UmbracoInteg
             LanguageId = null,
             Segment = null,
             VarcharValue = value,
+        };
+        await scope.Database.InsertAsync(propertyDataDto);
+
+        scope.Complete();
+    }
+
+    private async Task InsertPropertyDataTextValue(int contentId, int propertyTypeId, string value)
+    {
+        using IScope scope = ScopeProvider.CreateScope();
+
+        var versionId = await scope.Database.ExecuteScalarAsync<int>(
+            "SELECT id FROM umbracoContentVersion WHERE nodeId = @0 AND [current] = 1",
+            contentId);
+
+        var propertyDataDto = new PropertyDataDto
+        {
+            VersionId = versionId,
+            PropertyTypeId = propertyTypeId,
+            LanguageId = null,
+            Segment = null,
+            TextValue = value,
         };
         await scope.Database.InsertAsync(propertyDataDto);
 
