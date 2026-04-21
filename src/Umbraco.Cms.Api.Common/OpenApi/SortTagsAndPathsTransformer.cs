@@ -26,7 +26,11 @@ internal class SortTagsAndPathsTransformer : IOpenApiDocumentTransformer
 
         var sortedPaths = new OpenApiPaths();
         foreach (KeyValuePair<string, IOpenApiPathItem> keyValuePair in document.Paths
-                     .OrderBy(x => x.Value.Operations?.FirstOrDefault().Value?.Tags?.FirstOrDefault()?.Name)
+                     .OrderBy(x => x.Value.Operations?.Values
+                         .SelectMany(op => op.Tags ?? Enumerable.Empty<OpenApiTagReference>())
+                         .OrderBy(t => t.Name)
+                         .FirstOrDefault()?
+                         .Name)
                      .ThenBy(x => x.Key))
         {
             sortedPaths.Add(keyValuePair.Key, keyValuePair.Value);
