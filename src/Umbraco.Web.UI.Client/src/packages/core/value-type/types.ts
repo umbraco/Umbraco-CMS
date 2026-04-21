@@ -1,5 +1,5 @@
-// Base declaration — packages extend via declaration merging
 declare global {
+	// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- intentionally empty; packages extend via declaration merging
 	interface UmbValueTypeMap {}
 }
 

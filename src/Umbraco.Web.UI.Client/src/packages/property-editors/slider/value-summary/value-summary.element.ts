@@ -1,9 +1,9 @@
-import type { UmbSliderPropertyEditorValue } from '../value-type/types.js';
+import type { UmbSliderPropertyEditorUiValue } from '../types.js';
 import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 
 @customElement('umb-slider-property-editor-value-summary')
-export class UmbSliderPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<UmbSliderPropertyEditorValue> {
+export class UmbSliderPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<UmbSliderPropertyEditorUiValue> {
 	override render() {
 		if (!this._value) return nothing;
 
