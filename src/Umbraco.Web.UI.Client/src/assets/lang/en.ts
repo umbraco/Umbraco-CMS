@@ -2703,6 +2703,7 @@ export default {
 			'Master Umbraco with official training. Get practical experience through instructor-led courses and earn certifications that help you grow your skills and career.',
 	},
 	blockEditor: {
+		labelCreateModalSize: 'Create modal size',
 		headlineCreateBlock: 'Pick Element Type',
 		headlineAddSettingsElementType: 'Attach a settings Element Type',
 		headlineAddCustomView: 'Select view',
