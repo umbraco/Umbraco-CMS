@@ -103,17 +103,21 @@ WHERE dataTypeId IN (
     /// The resulting format is: 2025-11-05T15:31:00.0000000+00:00.
     /// TRY_CAST is used so rows with unparseable dates are skipped rather than aborting the migration;
     /// the same guard in the WHERE clause ensures the batch loop always makes progress.
+    /// The parsed datetimeoffset is computed once via CROSS APPLY and reused for both the filter
+    /// and the assignment, avoiding a second JSON_VALUE + TRY_CAST per row.
     /// </remarks>
     private static int MigrateSqlServer(IUmbracoDatabase database, string propertyTypeIdsInClause, ILogger logger)
     {
         var sql = $@"
-UPDATE TOP ({BatchSize}) umbracoPropertyData
-SET sortableValue = CONVERT(varchar(50), SWITCHOFFSET(TRY_CAST(JSON_VALUE(textValue, '$.date') AS datetimeoffset), '+00:00'), 127)
-WHERE propertyTypeId IN ({propertyTypeIdsInClause})
-AND textValue IS NOT NULL
-AND sortableValue IS NULL
-AND ISJSON(textValue) = 1
-AND TRY_CAST(JSON_VALUE(textValue, '$.date') AS datetimeoffset) IS NOT NULL";
+UPDATE TOP ({BatchSize}) pd
+SET sortableValue = CONVERT(varchar(50), SWITCHOFFSET(parsed.parsedDate, '+00:00'), 127)
+FROM umbracoPropertyData pd
+CROSS APPLY (SELECT TRY_CAST(JSON_VALUE(pd.textValue, '$.date') AS datetimeoffset) AS parsedDate) parsed
+WHERE pd.propertyTypeId IN ({propertyTypeIdsInClause})
+AND pd.textValue IS NOT NULL
+AND pd.sortableValue IS NULL
+AND ISJSON(pd.textValue) = 1
+AND parsed.parsedDate IS NOT NULL";
 
         return ExecuteInBatches(database, sql, logger, "SQL Server");
     }
