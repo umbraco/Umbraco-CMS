@@ -7,8 +7,8 @@ public class UmbracoOpenApiOptions
 {
     /// <summary>
     /// Gets or sets whether OpenAPI documents are enabled.
-    /// Default: enabled in non-production environments to avoid exposing
-    /// API structure on public-facing websites.
+    /// Configured to <c>true</c> in non-production environments by default; <c>false</c> until configured.
+    /// This avoids exposing API structure on public-facing websites.
     /// </summary>
     public bool Enabled { get; set; }
 
