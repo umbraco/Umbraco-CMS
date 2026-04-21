@@ -59,7 +59,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 	}
 
 	#renderIcon(item: UmbTreeItemModel) {
-		const icon = item.icon || getItemFallbackIcon();
+		const icon = item.isFolder ? 'icon-folder' : item.icon || getItemFallbackIcon();
 		return html`<umb-icon name=${icon}></umb-icon>`;
 	}
 }
