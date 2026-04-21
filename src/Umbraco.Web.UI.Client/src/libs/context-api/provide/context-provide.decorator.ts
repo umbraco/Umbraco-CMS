@@ -133,7 +133,7 @@ function setupLegacyDecorator<
 	if (constructor.addInitializer) {
 		constructor.addInitializer((element: any): void => {
 			let initialized = false;
-			element.addUmbController({
+			const initCtrl = {
 				controllerAlias: Symbol(`provideContext:init:${propertyKey}`),
 				hostConnected() {
 					if (initialized) return;
@@ -142,8 +142,14 @@ function setupLegacyDecorator<
 					new UmbContextProviderController<BaseType, ResultType, InstanceType>(element, context, initialValue);
 				},
 				hostDisconnected() {},
-				destroy() {},
-			});
+				// Must remove self from the host, otherwise the host's destroy loop detects
+				// a controller that "does not remove itself" and throws. removeUmbController
+				// re-enters destroy() once; the second call is a no-op because indexOf is -1.
+				destroy() {
+					element.removeUmbController(initCtrl);
+				},
+			};
+			element.addUmbController(initCtrl);
 		});
 		return;
 	}

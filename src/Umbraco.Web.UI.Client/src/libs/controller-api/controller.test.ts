@@ -264,14 +264,15 @@ describe('UmbController', () => {
 				static {
 					this.addInitializer((instance: any) => {
 						initializerRan = true;
-						instance.addUmbController({
+						const ctrl = {
 							controllerAlias: Symbol('early'),
 							hostConnected: () => {
 								hostConnectedFired = true;
 							},
 							hostDisconnected: () => {},
-							destroy: () => {},
-						});
+							destroy: () => instance.removeUmbController(ctrl),
+						};
+						instance.addUmbController(ctrl);
 					});
 				}
 			}

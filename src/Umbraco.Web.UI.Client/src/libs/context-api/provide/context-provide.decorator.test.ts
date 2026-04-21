@@ -153,4 +153,19 @@ describe('@provide decorator', () => {
 		// The descendant must never have rendered with undefined.
 		expect(consumerEl.renderedValues, 'consumer rendered with undefined at some point').to.not.include(undefined);
 	});
+
+	it('should destroy without throwing when the legacy init-controller wrapper is registered', async () => {
+		// Regression guard: the legacy @provideContext path registers a tiny init-only
+		// UmbController to defer reading element[propertyKey] until hostConnected. That
+		// wrapper's destroy() must remove itself from the host — otherwise the host's
+		// destroy loop detects a controller that "does not remove itself" and throws.
+		class DestroyProbeElement extends UmbLitElement {
+			@provideContext({ context: testToken })
+			providerInstance = new UmbTestContextConsumerClass();
+		}
+		customElements.define('destroy-probe-element', DestroyProbeElement);
+
+		const el = await fixture<DestroyProbeElement>(`<destroy-probe-element></destroy-probe-element>`);
+		expect(() => el.destroy()).to.not.throw();
+	});
 });
