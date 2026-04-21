@@ -18,7 +18,7 @@ interface ResolvedEntry {
  * Converts a value to a stable string key for caching.
  */
 function toValueKey(v: unknown): string {
-	return v !== null && typeof v === 'object' ? JSON.stringify(v) : String(v);
+	return v !== null && typeof v === 'object' ? JSON.stringify(v) : `${typeof v}:${String(v)}`;
 }
 
 export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
