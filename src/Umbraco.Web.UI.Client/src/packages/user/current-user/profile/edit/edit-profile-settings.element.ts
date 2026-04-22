@@ -1,7 +1,7 @@
 import { UmbCurrentUserRepository } from '../../repository/index.js';
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
 import type { UmbCurrentUserModel } from '../../types.js';
-import { css, customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
@@ -39,9 +39,10 @@ export class UmbCurrentUserEditProfileSettingsElement extends UmbLitElement {
 		}
 	}
 
-	async save() {
-		if (this._languageIsoCode === this._currentUser?.languageIsoCode) return;
-		await this.#currentUserRepository.updateProfile(this._languageIsoCode);
+	async save(): Promise<boolean> {
+		if (this._languageIsoCode === this._currentUser?.languageIsoCode) return true;
+		const { error } = await this.#currentUserRepository.updateProfile(this._languageIsoCode);
+		return !error;
 	}
 
 	override render() {
@@ -57,7 +58,7 @@ export class UmbCurrentUserEditProfileSettingsElement extends UmbLitElement {
 					slot="editor"
 					name="language"
 					label=${this.localize.term('user_language')}
-					value=${ifDefined(this._languageIsoCode ?? undefined)}
+					value=${this._languageIsoCode}
 					@change=${this.#onLanguageChange}>
 				</umb-ui-culture-input>
 			</umb-property-layout>

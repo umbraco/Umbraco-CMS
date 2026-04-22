@@ -167,21 +167,26 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 		});
 
 		if (status === TemporaryFileStatus.ERROR) {
-			return { error: new Error('Avatar upload failed') };
+			const error = new Error('Avatar upload failed');
+			this.#peekError(error);
+			return { error };
 		}
 
 		const { error } = await this.#currentUserSource.uploadCurrentUserAvatar(temporaryUnique);
 
-		if (!error) {
-			const localUrl = URL.createObjectURL(file);
-			// The server returns 5 different sizes of the avatar, so we mimic that here
-			this.#currentUserStore?.update({ avatarUrls: [localUrl, localUrl, localUrl, localUrl, localUrl] });
-
-			const notification = { data: { message: this.#localize.term('user_avatarUploadSuccess') } };
-			this.notificationContext?.peek('positive', notification);
+		if (error) {
+			this.#peekError(error);
+			return { error };
 		}
 
-		return { error };
+		// Refresh from server so the store holds the real resized avatar URLs (not a local blob).
+		await this.requestCurrentUser();
+
+		this.notificationContext?.peek('positive', {
+			data: { message: this.#localize.term('user_avatarUploadSuccess') },
+		});
+
+		return { error: undefined };
 	}
 
 	/**
@@ -192,14 +197,18 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 
 		const { error } = await this.#currentUserSource.deleteCurrentUserAvatar();
 
-		if (!error) {
-			this.#currentUserStore?.update({ avatarUrls: [] });
-
-			const notification = { data: { message: this.#localize.term('user_avatarDeleteSuccess') } };
-			this.notificationContext?.peek('positive', notification);
+		if (error) {
+			this.#peekError(error);
+			return { error };
 		}
 
-		return { error };
+		this.#currentUserStore?.update({ avatarUrls: [] });
+
+		this.notificationContext?.peek('positive', {
+			data: { message: this.#localize.term('user_avatarDeleteSuccess') },
+		});
+
+		return { error: undefined };
 	}
 
 	/**
@@ -212,12 +221,18 @@ export class UmbCurrentUserRepository extends UmbRepositoryBase {
 		const { error } = await this.#currentUserSource.updateCurrentUserProfile(languageIsoCode);
 
 		if (error) {
+			this.#peekError(error);
 			return { error };
 		}
 
 		await this.requestCurrentUser();
 
-		return {};
+		return { error: undefined };
+	}
+
+	#peekError(error: { message?: string } | Error) {
+		const message = error.message ?? this.#localize.term('user_unknownFailure');
+		this.notificationContext?.peek('danger', { data: { message } });
 	}
 }
 

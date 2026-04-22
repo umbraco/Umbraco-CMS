@@ -112,15 +112,20 @@ export class UmbCurrentUserEditProfileAvatarElement extends UmbLitElement {
 		this._pendingDelete = (this._currentUser?.avatarUrls.length ?? 0) > 0;
 	};
 
-	async save() {
+	async save(): Promise<boolean> {
+		let error;
 		if (this._pendingFile) {
-			await this.#currentUserRepository.uploadAvatar(this._pendingFile);
+			({ error } = await this.#currentUserRepository.uploadAvatar(this._pendingFile));
 		} else if (this._pendingDelete) {
-			await this.#currentUserRepository.deleteAvatar();
+			({ error } = await this.#currentUserRepository.deleteAvatar());
 		}
+
+		if (error) return false;
+
 		this.#revokePendingPreviewUrl();
 		this._pendingFile = undefined;
 		this._pendingDelete = false;
+		return true;
 	}
 
 	get #displayAvatarUrls(): string[] {

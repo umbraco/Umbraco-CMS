@@ -31,9 +31,14 @@ export class UmbCurrentUserEditProfileModalElement extends UmbModalBaseElement {
 	}
 
 	protected override async _submitModal() {
-		await this._avatarEl?.save();
-		await this._profileSettingsEl?.save();
-		this.modalContext?.submit();
+		const [avatarOk, settingsOk] = await Promise.all([
+			this._avatarEl?.save() ?? true,
+			this._profileSettingsEl?.save() ?? true,
+		]);
+
+		// Keep the modal open when a save reports failure — the repository has already surfaced a danger notification.
+		if (!avatarOk || !settingsOk) return;
+
 		super._submitModal();
 	}
 
