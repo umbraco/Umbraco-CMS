@@ -31,6 +31,8 @@ import { umbConfirmModal, umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbSorterController } from '@umbraco-cms/backoffice/sorter';
 
+import '@umbraco-cms/backoffice/components';
+
 @customElement('umb-content-type-design-editor')
 export class UmbContentTypeDesignEditorElement extends UmbLitElement implements UmbWorkspaceViewElement {
 	#sorter = new UmbSorterController<UmbPropertyTypeContainerMergedModel, UUITabElement>(this, {
@@ -292,7 +294,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (!tab || !tab.ownerId) return;
 		const tabName = tab.name === '' ? this.localize.term('general_unnamed') : tab.name;
 		const modalData: UmbConfirmModalData = {
-			headline: this.localize.term('contentTypeEditor_deleteTab'),
+			headline: '#contentTypeEditor_deleteTab',
 			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tabName]}>
 					Are you sure you want to delete the tab <strong>${tabName}</strong>
 				</umb-localize>
@@ -301,8 +303,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 						This will delete all items that doesn't belong to a composition.
 					</umb-localize>
 				</div>`,
-			cancelLabel: this.localize.term('general_cancel'),
-			confirmLabel: this.localize.term('actions_delete'),
+			cancelLabel: '#general_cancel',
+			confirmLabel: '#actions_delete',
 			color: 'danger',
 		};
 
@@ -464,7 +466,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		return html`
 			<umb-body-layout header-fit-height>
 				<div id="header" slot="header">
-					<div id="container-list">${this.renderTabsNavigation()} ${this.#renderAddButton()}</div>
+					<div id="container-list">${this.renderTabsNavigation()}</div>
 					${this.#renderActions()}
 				</div>
 				<umb-router-slot
@@ -483,7 +485,11 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#renderAddButton() {
 		if (this._sortModeActive) return;
 		return html`
-			<uui-button id="add-tab" data-mark="add-tab-button" @click="${this.#addTab}" label=${this.localize.term('contentTypeEditor_addTab')}>
+			<uui-button
+				id="add-tab"
+				data-mark="add-tab-button"
+				@click="${this.#addTab}"
+				label=${this.localize.term('contentTypeEditor_addTab')}>
 				<uui-icon name="icon-add"></uui-icon>
 				<umb-localize key="contentTypeEditor_addTab">Add tab</umb-localize>
 			</uui-button>
@@ -524,19 +530,20 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	}
 
 	renderTabsNavigation() {
-		if (!this._tabs || this._tabs.length === 0) return;
-
 		return html`
-			<div id="tabs-group">
-				<uui-tab-group>
-					${this.renderRootTab()}
-					${repeat(
-						this._tabs,
-						(tab) => tab.ownerId ?? tab.ids[0],
-						(tab) => this.renderTab(tab),
-					)}
-				</uui-tab-group>
-			</div>
+			<umb-scrollable-container id="tabs-group">
+				${this._tabs && this._tabs.length > 0
+					? html`<uui-tab-group>
+							${this.renderRootTab()}
+							${repeat(
+								this._tabs,
+								(tab) => tab.ownerId ?? tab.ids[0],
+								(tab) => this.renderTab(tab),
+							)}
+						</uui-tab-group>`
+					: nothing}
+				${this.#renderAddButton()}
+			</umb-scrollable-container>
 		`;
 	}
 
@@ -695,10 +702,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			#container-list {
 				display: flex;
+				overflow-x: hidden;
+				min-width: 0;
+				flex: 1;
 			}
 
 			#tabs-group {
-				display: flex;
+				min-width: 0;
 			}
 
 			#actions {
@@ -708,6 +718,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			uui-tab-group {
 				flex-wrap: nowrap;
+				flex-shrink: 0;
 			}
 
 			uui-tab.content-tab-is-empty {
@@ -773,6 +784,10 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 
 			[drag-placeholder] {
 				opacity: 0.2;
+			}
+
+			#add-tab {
+				flex-shrink: 0;
 			}
 		`,
 	];

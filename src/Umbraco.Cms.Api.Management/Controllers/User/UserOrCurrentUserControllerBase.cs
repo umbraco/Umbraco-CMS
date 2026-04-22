@@ -140,6 +140,10 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithDetail("The target user type does not support this operation.")
                 .Build()),
             UserOperationStatus.Forbidden => Forbidden(),
+            UserOperationStatus.ApplicationUrlNotConfigured => BadRequest(problemDetailsBuilder
+                .WithTitle("Application URL not configured")
+                .WithDetail("The application URL is not configured. Set Umbraco:CMS:WebRouting:UmbracoApplicationUrl in configuration, or change Umbraco:CMS:WebRouting:ApplicationUrlDetection to 'FirstRequest' or 'EveryRequest'.")
+                .Build()),
             _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown user operation status.")
                 .Build()),

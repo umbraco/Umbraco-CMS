@@ -45,7 +45,7 @@
       Most other transitive dependencies don't have this problem because extension code doesn't
       use their types directly - only Swashbuckle/OpenApi types are referenced in the composer.
     -->
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
     <PackageReference Include="Umbraco.Cms.Web.Common" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
     <PackageReference Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
   </ItemGroup>
