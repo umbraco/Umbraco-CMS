@@ -1,48 +1,36 @@
-import { UmbCurrentUserRepository } from '../../repository/index.js';
-import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
-import type { UmbCurrentUserModel } from '../../types.js';
+import { UMB_CURRENT_USER_WORKSPACE_CONTEXT } from './current-user-workspace.context-token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbUiCultureInputElement } from '@umbraco-cms/backoffice/localization';
 
-@customElement('umb-current-user-edit-profile-settings')
-export class UmbCurrentUserEditProfileSettingsElement extends UmbLitElement {
-	@state()
-	private _currentUser?: UmbCurrentUserModel;
+@customElement('umb-current-user-workspace-settings')
+export class UmbCurrentUserWorkspaceSettingsElement extends UmbLitElement {
+	#workspaceContext?: typeof UMB_CURRENT_USER_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _languageIsoCode = '';
 
-	#currentUserRepository = new UmbCurrentUserRepository(this);
-
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+		this.consumeContext(UMB_CURRENT_USER_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
+			if (!context) return;
+
 			this.observe(
-				context?.currentUser,
-				(currentUser) => {
-					this._currentUser = currentUser;
-					if (currentUser) {
-						this._languageIsoCode = currentUser.languageIsoCode;
-					}
-				},
-				'umbCurrentUserObserver',
+				context.languageIsoCode,
+				(code) => (this._languageIsoCode = code ?? ''),
+				'umbCurrentUserWorkspaceLanguageObserver',
 			);
 		});
 	}
 
 	#onLanguageChange(event: UmbChangeEvent & { target: UmbUiCultureInputElement }) {
-		if (typeof event.target?.value === 'string') {
-			this._languageIsoCode = event.target.value;
+		const value = event.target?.value;
+		if (typeof value === 'string') {
+			this.#workspaceContext?.setLanguageIsoCode(value);
 		}
-	}
-
-	async save(): Promise<boolean> {
-		if (this._languageIsoCode === this._currentUser?.languageIsoCode) return true;
-		const { error } = await this.#currentUserRepository.updateProfile(this._languageIsoCode);
-		return !error;
 	}
 
 	override render() {
@@ -74,10 +62,10 @@ export class UmbCurrentUserEditProfileSettingsElement extends UmbLitElement {
 	];
 }
 
-export default UmbCurrentUserEditProfileSettingsElement;
+export default UmbCurrentUserWorkspaceSettingsElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-current-user-edit-profile-settings': UmbCurrentUserEditProfileSettingsElement;
+		'umb-current-user-workspace-settings': UmbCurrentUserWorkspaceSettingsElement;
 	}
 }

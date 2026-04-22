@@ -1,10 +1,11 @@
-import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
-import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../../section/constants.js';
-import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '../../current-user-action.extension.js';
-import { UMB_CURRENT_USER_EDIT_PROFILE_MODAL } from './edit-profile-modal.token.js';
+import { UMB_CURRENT_USER_CONTEXT } from '../current-user.context.token.js';
+import { UMB_CURRENT_USER_ENTITY_TYPE } from '../entity.js';
+import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../section/constants.js';
+import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '../current-user-action.extension.js';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 import { UMB_USER_WORKSPACE_PATH } from '@umbraco-cms/backoffice/user';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 export class UmbEditProfileCurrentUserAction<ArgsMetaType = never>
@@ -39,7 +40,10 @@ export class UmbEditProfileCurrentUserAction<ArgsMetaType = never>
 	async execute() {
 		await this.#init;
 		if (this.#hasAccessToUserSection) return;
-		await umbOpenModal(this, UMB_CURRENT_USER_EDIT_PROFILE_MODAL);
+		await umbOpenModal(this, UMB_WORKSPACE_MODAL, {
+			data: { entityType: UMB_CURRENT_USER_ENTITY_TYPE, preset: {} },
+			modal: { size: 'small' },
+		});
 	}
 }
 

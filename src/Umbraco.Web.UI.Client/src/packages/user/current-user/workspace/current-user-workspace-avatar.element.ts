@@ -1,27 +1,28 @@
-import { UmbCurrentUserRepository } from '../../repository/current-user.repository.js';
-import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
-import type { UmbCurrentUserModel } from '../../types.js';
+import { UMB_CURRENT_USER_WORKSPACE_CONTEXT } from './current-user-workspace.context-token.js';
 import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 
-@customElement('umb-current-user-edit-profile-avatar')
-export class UmbCurrentUserEditProfileAvatarElement extends UmbLitElement {
-	#currentUserRepository = new UmbCurrentUserRepository(this);
-
+@customElement('umb-current-user-workspace-avatar')
+export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
 	#temporaryFileConfigRepository = new UmbTemporaryFileConfigRepository(this);
+
+	#workspaceContext?: typeof UMB_CURRENT_USER_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _allowedFileTypes = 'image/*';
 
 	@state()
-	private _currentUser?: UmbCurrentUserModel;
+	private _name?: string;
 
 	@state()
-	private _pendingDelete = false;
+	private _avatarUrls: Array<string> = [];
 
 	@state()
 	private _pendingFile?: File;
+
+	@state()
+	private _pendingDelete = false;
 
 	@state()
 	private _pendingPreviewUrl?: string;
@@ -32,16 +33,34 @@ export class UmbCurrentUserEditProfileAvatarElement extends UmbLitElement {
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(context?.currentUser, (currentUser) => (this._currentUser = currentUser), 'umbCurrentUserObserver');
+		this.consumeContext(UMB_CURRENT_USER_WORKSPACE_CONTEXT, (context) => {
+			this.#workspaceContext = context;
+			if (!context) return;
+
+			this.observe(context.name, (name) => (this._name = name), 'umbCurrentUserWorkspaceAvatarNameObserver');
+			this.observe(
+				context.avatarUrls,
+				(urls) => (this._avatarUrls = urls ?? []),
+				'umbCurrentUserWorkspaceAvatarUrlsObserver',
+			);
+			this.observe(
+				context.pendingAvatarFile,
+				(file) => (this._pendingFile = file),
+				'umbCurrentUserWorkspaceAvatarFileObserver',
+			);
+			this.observe(
+				context.pendingAvatarDelete,
+				(pendingDelete) => (this._pendingDelete = pendingDelete),
+				'umbCurrentUserWorkspaceAvatarDeleteObserver',
+			);
+			this.observe(
+				context.pendingAvatarPreviewUrl,
+				(url) => (this._pendingPreviewUrl = url),
+				'umbCurrentUserWorkspaceAvatarPreviewObserver',
+			);
 		});
 
 		this.#observeAllowedFileTypes();
-	}
-
-	override disconnectedCallback() {
-		super.disconnectedCallback();
-		this.#revokePendingPreviewUrl();
 	}
 
 	async #observeAllowedFileTypes() {
@@ -59,20 +78,10 @@ export class UmbCurrentUserEditProfileAvatarElement extends UmbLitElement {
 		);
 	}
 
-	#revokePendingPreviewUrl() {
-		if (this._pendingPreviewUrl) {
-			URL.revokeObjectURL(this._pendingPreviewUrl);
-			this._pendingPreviewUrl = undefined;
-		}
-	}
-
 	#uploadAvatar = async () => {
 		try {
 			const selectedFile = await this.#selectAvatar();
-			this.#revokePendingPreviewUrl();
-			this._pendingFile = selectedFile;
-			this._pendingPreviewUrl = URL.createObjectURL(selectedFile);
-			this._pendingDelete = false;
+			this.#workspaceContext?.setAvatarFile(selectedFile);
 		} catch (error) {
 			console.error(error);
 		}
@@ -107,51 +116,29 @@ export class UmbCurrentUserEditProfileAvatarElement extends UmbLitElement {
 	}
 
 	#deleteAvatar = () => {
-		this.#revokePendingPreviewUrl();
-		this._pendingFile = undefined;
-		this._pendingDelete = (this._currentUser?.avatarUrls.length ?? 0) > 0;
+		this.#workspaceContext?.markAvatarForDeletion();
 	};
 
-	async save(): Promise<boolean> {
-		let error;
-		if (this._pendingFile) {
-			({ error } = await this.#currentUserRepository.uploadAvatar(this._pendingFile));
-		} else if (this._pendingDelete) {
-			({ error } = await this.#currentUserRepository.deleteAvatar());
-		}
-
-		if (error) return false;
-
-		this.#revokePendingPreviewUrl();
-		this._pendingFile = undefined;
-		this._pendingDelete = false;
-		return true;
-	}
-
-	get #displayAvatarUrls(): string[] {
+	get #displayAvatarUrls(): Array<string> {
 		if (this._pendingDelete) return [];
 		if (this._pendingPreviewUrl) return Array(5).fill(this._pendingPreviewUrl);
-		return this._currentUser?.avatarUrls ?? [];
+		return this._avatarUrls;
 	}
 
-	#hasAvatar() {
+	#hasAvatar(): boolean {
 		if (this._pendingDelete) return false;
 		if (this._pendingFile) return true;
-		if (!this._currentUser) return false;
-		return this._currentUser.avatarUrls.length > 0;
+		return this._avatarUrls.length > 0;
 	}
 
 	override render() {
-		if (!this._currentUser) return nothing;
+		if (!this._name) return nothing;
 		return html`
 			<uui-box>
 				<form id="AvatarUploadForm" novalidate>
-					<umb-user-avatar
-						id="Avatar"
-						.name=${this._currentUser.name}
-						.imgUrls=${this.#displayAvatarUrls}></umb-user-avatar>
+					<umb-user-avatar id="Avatar" .name=${this._name} .imgUrls=${this.#displayAvatarUrls}></umb-user-avatar>
 					<input id="AvatarFileField" type="file" name="avatarFile" accept=${this._allowedFileTypes} required hidden />
-					<uui-button label="${this.localize.term('user_changePhoto')}" @click=${this.#uploadAvatar}></uui-button>
+					<uui-button label=${this.localize.term('user_changePhoto')} @click=${this.#uploadAvatar}></uui-button>
 					${this.#hasAvatar()
 						? html`
 								<uui-button
@@ -186,10 +173,10 @@ export class UmbCurrentUserEditProfileAvatarElement extends UmbLitElement {
 	];
 }
 
-export default UmbCurrentUserEditProfileAvatarElement;
+export default UmbCurrentUserWorkspaceAvatarElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-current-user-edit-profile-avatar': UmbCurrentUserEditProfileAvatarElement;
+		'umb-current-user-workspace-avatar': UmbCurrentUserWorkspaceAvatarElement;
 	}
 }
