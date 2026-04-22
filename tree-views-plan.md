@@ -10,7 +10,7 @@ Introduce "views" for `<umb-tree>`, analogous to collection views. v1 ships two 
 
 - **v1 views**: `Umb.TreeView.Classic` (the current expandable tree) + `Umb.TreeView.Card` (new, shows one level of children at a time with double-click to navigate into a child). Table view is explicitly deferred.
 - **Consumers**: workspace-embedded trees, section sidebars, `<umb-tree-picker-modal>`.
-- **No URL reflection.** Tree-view selection and drill position live in context state only. Persistence is runtime via `UmbInteractionMemoryManager`. Deep-linking is imperative (`expansion.expandTo(entity)`).
+- **No URL reflection.** Tree-view selection and drill position live in context state only. Persistence is runtime via `UmbInteractionMemoryManager`. Deep-linking for classic view is via expansion state; card view navigation is driven by the picker's `_currentLocation` prop.
 
 ### 1.2 Extension model
 
@@ -30,25 +30,37 @@ Introduce "views" for `<umb-tree>`, analogous to collection views. v1 ships two 
 
 ### 1.4 State
 
-- **Reuse `UmbTreeExpansionManager`** (`src/packages/core/tree/expansion-manager/tree-expansion-manager.ts`). Convention: **last entry in expansion = current card-view location**.
-- Classic view treats expansion as a multi-set; card view treats it as a linked chain. Same underlying array.
-- New convenience method **`expansion.expandTo(entity, { repository, startNode? })`**: calls `requestTreeItemAncestors`, links entries via `linkEntityExpansionEntries`, calls `setExpansion(chain)`. Server-authoritative ancestry — no client-side chain inference.
-- **On card view mount**, always call `expandTo(lastEntry)` when expansion is non-empty. This normalizes any classic-view expansion state (which may contain unrelated sibling expansions) into a valid breadcrumb chain. Cost: one `requestTreeItemAncestors` call per view switch. Benefit: zero stale-`target` edge cases.
-- **`startNode`** unchanged. Remains mount-time scope. `expandTo` must respect it (chain starts at start-node, not above).
+- **Expansion state is classic-view only.** `UmbTreeExpansionManager` tracks which nodes are expanded/collapsed in the classic list view (a multi-set). Card view does not use expansion for navigation.
+- **`expandTo()` removed.** The previously planned `expansion.expandTo()` method has been removed — its use case (normalising expansion as a navigation chain for card view) is gone with the new architecture.
+- **Card view navigation is driven by `startNode`.** The picker owns two values: `_initialStartNode` (the caller-configured ceiling, immutable) and `_currentLocation` (the current navigation position, changes as the user drills in). The picker always passes `_currentLocation` as the `startNode` prop to `<umb-tree>`. From the tree's perspective there is no distinction between ceiling and navigation depth — it simply renders children of whatever `startNode` it receives.
+- **`startNode` prop is dynamic.** `setStartNode()` in `UmbDefaultTreeContext` already calls `loadTree()`, so the tree reloads automatically whenever the picker updates `_currentLocation`.
 
 ### 1.5 Interaction
 
 - Single-click: existing behavior (picker → toggle selection; workspace → open workspace).
-- **Double-click** on a card: navigate into that item.
-- Keyboard: **Enter** = single-click action, **Right Arrow** = navigate into.
+- **Double-click** on a card: navigate into that item. The card element calls `treeContext.open({ unique, entityType })` — a new method on `UmbTreeContext`. The context dispatches `UmbTreeItemOpenEvent` on its host element via `getHostElement().dispatchEvent(...)` so the event bubbles up to the picker.
+- **Classic view has no drill gesture.** Classic view is scoped to whatever `startNode` the picker passes; the user navigates back up only via the breadcrumb. No "enter this node" action exists on classic tree items.
+- Keyboard: **Enter** = single-click action, **Right Arrow** = navigate into (card view only).
 - No explicit drill affordance on cards in v1. Discoverability via behavior.
 
 ### 1.6 Breadcrumb
 
-- **Not a shared element** in v1. Each consumer renders its own breadcrumb from tree context state.
-  - `<umb-tree-picker-modal>` renders it below its header.
-  - Workspace integration (later) renders it in the workspace footer.
-- Breadcrumb walks the linked chain in the expansion array and renders clickable anchors that truncate the expansion to the clicked depth.
+- **Lives in the picker modal**, not in a tree view. It is always visible regardless of which view (Classic or Card) is active, and is rendered directly in `<umb-tree-picker-modal>` above `<umb-tree>`.
+- **Both views are scoped by the breadcrumb.** The picker passes `_currentLocation` as `startNode` to `<umb-tree>`. Classic view shows an expandable subtree from that node; card view shows that node's children as cards.
+- **Picker state:**
+  - `_initialStartNode`: the caller-configured ceiling (`UmbTreeStartNode | undefined`). Immutable during the session. Determines the topmost (non-clickable) breadcrumb entry.
+  - `_currentLocation`: the current navigation position (`UmbTreeStartNode | undefined`). Always passed as `startNode` prop. Starts equal to `_initialStartNode`.
+  - `_breadcrumb`: `Array<{ unique: string | null, entityType: string, name: string }>`. Built from the ancestors response. First entry = ceiling, last entry = current location.
+- **Initial breadcrumb population:**
+  - No ceiling configured → call `repository.requestTreeRoot()` to get the root item name. Single entry, non-clickable until the user navigates deeper.
+  - Ceiling configured → call `repository.requestTreeItemAncestors({ treeItem: _initialStartNode })`. The backend returns ancestors including the item itself (`includeSelf = true` is the default). Slice the chain at the ceiling unique. Single entry on first open.
+- **Repository access:** The picker looks up the `ManifestTree` by `treeAlias` from `umbExtensionsRegistry` → reads `meta.repositoryAlias` → instantiates via `UmbExtensionApiInitializer`. The breadcrumb is outside `<umb-tree>` and cannot consume the tree context.
+- **Forward navigation (card view double-click):** `UmbTreeItemOpenEvent` bubbles from the card element through `<umb-tree>` to the picker. The picker:
+  1. Immediately sets `_currentLocation = { unique, entityType }` from the event (optimistic — tree starts reloading at once).
+  2. Asynchronously calls `requestTreeItemAncestors({ treeItem: { unique, entityType } })` to get the full chain with names. Slices at the ceiling unique. Updates `_breadcrumb`.
+- **Backward navigation (breadcrumb click):** Clicking a breadcrumb entry sets `_currentLocation` to that entry's `{ unique, entityType }` and truncates `_breadcrumb` to that index. The `startNode` prop on `<umb-tree>` updates, triggering a tree reload.
+- **Ceiling entry** is always non-clickable (first item). All other entries are clickable.
+- **Variant-aware name resolution** (e.g. `DocumentItemDataResolver` for culture-specific names) is deferred to v2. v1 uses raw `name` from the tree item response.
 
 ### 1.7 Opt-out
 
@@ -93,17 +105,17 @@ Each phase lists dependencies, files to create/edit, and parallelizability. Phas
 
 **Acceptance**: repo compiles; new manifest types appear in `UmbExtensionManifestMap`; no runtime changes.
 
-### Phase 2 — `expansion.expandTo(entity)` convenience method
+### Phase 2 — Remove `expandTo()` from expansion manager
 
-**Deps**: Phase 0. **Parallelizable with Phase 1.**
+**Deps**: none (pure deletion). **Can be done at any time.**
+
+The `expandTo()` method was added in anticipation of card-view navigation but is now superseded by the `_currentLocation`/`startNode` approach in the picker. It was never called outside its own test file.
 
 **Edit**:
-- `src/packages/core/tree/expansion-manager/tree-expansion-manager.ts` — add `async expandTo(entity, options: { repository, startNode? }): Promise<void>`. Fetches ancestors via `repository.requestTreeItemAncestors({ treeItem: entity })`, prepends `startNode` to the chain (if provided, chain starts there, not root), links via `linkEntityExpansionEntries` from `@umbraco-cms/backoffice/utils`, calls `setExpansion(chain)`. On repository error, leaves expansion unchanged.
+- `src/packages/core/tree/expansion-manager/tree-expansion-manager.ts` — delete the `expandTo()` method and any imports it introduced.
+- `src/packages/core/tree/expansion-manager/tree-expansion-manager.test.ts` — delete the `expandTo` describe block.
 
-**Edit**:
-- `src/packages/core/tree/expansion-manager/tree-expansion-manager.test.ts` — add tests: happy path (ancestors `[A, B, C]`, target `D` → chain `[A→B→C→D]`), with `startNode`, target is root, repository error.
-
-**Acceptance**: unit tests pass.
+**Acceptance**: repo compiles; no remaining references to `expandTo`.
 
 ### Phase 3 — Extract Classic render + shell refactor (the invasive step)
 
@@ -164,61 +176,85 @@ Each phase lists dependencies, files to create/edit, and parallelizability. Phas
 
 ### Phase 5 — Card view + card-item routing
 
-**Deps**: Phases 1, 2, 3, 4.
+**Deps**: Phases 1, 3, 4.
 
-#### 5.1 Default card item element
-
-**Create**:
-- `src/packages/core/tree/tree-item-card/default/default-tree-item-card.element.ts` — `umb-default-tree-item-card`. Renders `<uui-card-content-node>` (or equivalent) with icon + name + `hasChildren` chevron. Fires `UmbSelectedEvent` on single-click (selection context) and a new `UmbTreeItemCardNavigateEvent` on double-click / Right Arrow / Enter-in-navigation-mode.
-- `src/packages/core/tree/tree-item-card/default/index.ts` — barrel.
-- `src/packages/core/tree/tree-item-card/events/tree-item-card-navigate.event.ts` — `UmbTreeItemCardNavigateEvent` carrying `{ entity: UmbEntityExpansionEntryModel }`.
-
-#### 5.2 Card item routing element
-
-**Create**:
-- `src/packages/core/tree/tree-item-card/tree-item-card.element.ts` — `umb-tree-item-card`. Routes to the `entityType`-appropriate `treeItemCard` manifest. Fallback: `umb-default-tree-item-card`. Mirror the structure of `tree-item/tree-item.element.ts`. `getExtensionType()` returns `'treeItemCard'`; `getDefaultElementName()` returns `'umb-default-tree-item-card'`.
+#### 5.1 Add `open()` to tree context
 
 **Edit**:
-- `src/packages/core/tree/tree-item-card/index.ts` — side-import and export the elements.
+- `src/packages/core/tree/tree.context.interface.ts` — add `open(item: { unique: string; entityType: string }): void` to the interface.
+- `src/packages/core/tree/default/default-tree.context.ts` — implement `open(item)`: calls `this.getHostElement().dispatchEvent(new UmbTreeItemOpenEvent(item))`. The event is `composed: true` + `bubbles: true` so it crosses shadow DOM and reaches the picker.
 
-#### 5.3 Card view element
-
-**Create**:
-- `src/packages/core/tree/view/card/card-tree-view.element.ts` — `umb-card-tree-view`, extends `UmbLitElement`. Consumes `UMB_TREE_CONTEXT`. Observes `expansion`, `startNode`, `selection`. Derives current location = last entry in expansion.
-  - **On mount**: if expansion is non-empty, call `treeContext.expansion.expandTo(lastEntry, { repository, startNode })` to normalize the chain (see §1.4). Then fetch children of the current location.
-  - Children fetch: `undefined` location + no startNode → `repository.requestTreeRootItems({ paging })`. Otherwise `repository.requestTreeItemsOf({ parent: currentLocation, paging })`.
-  - Render: grid of `<umb-tree-item-card>`, passing item and wiring handlers:
-    - `@selected` / `@deselected` → `treeContext.selection.select / deselect`.
-    - `@umb-tree-item-card-navigate` → `treeContext.expansion.expandTo(entity, { repository, startNode })`.
-    - Keyboard on card: `Enter` dispatches selection (picker) or opens workspace (workspace), `Right Arrow` dispatches navigate.
-  - Pagination: reuse existing `<umb-tree-load-more-button>` at the bottom of the grid, wired to `treeContext.targetPagination` (same as Classic view).
-  - Empty state: `#treeView_cardEmptyAtLocation` / `#treeView_cardEmptyRoot`.
-- `src/packages/core/tree/view/card/manifests.ts` — `{ type: 'treeView', alias: 'Umb.TreeView.Card', element: () => import('./card-tree-view.element.js'), weight: 900, meta: { label: '#treeView_card', icon: 'icon-grid' } }`.
-- `src/packages/core/tree/view/card/index.ts` — barrel.
+#### 5.2 Default card item element
 
 **Edit**:
-- `src/packages/core/tree/manifests.ts` — spread Card manifests in.
+- `src/packages/core/tree/tree-item-card/default/default-tree-item-card.element.ts` — on double-click / Right Arrow, call `treeContext.open({ unique: item.unique, entityType: item.entityType })` via the consumed `UMB_TREE_CONTEXT`. Do **not** dispatch a DOM event directly. `UmbTreeItemCardNavigateEvent` is not needed and should not be created.
+- `src/packages/core/tree/tree-item-card/default/index.ts` — barrel (no events subfolder).
+
+#### 5.3 Card item routing element
+
+Already implemented. No changes needed beyond removing any reference to `UmbTreeItemCardNavigateEvent` if it exists.
+
+#### 5.4 Card view element (slim)
+
+**Edit** `src/packages/core/tree/view/card/card-tree-view.element.ts` — strip down to a slim grid renderer:
+- **Remove**: breadcrumb render (`#renderBreadcrumb`, `<uui-breadcrumbs>`), `#navigateTo`, `#navigateToRoot`, `_expansion` state, `#loadItemsForCurrentLocation`, `#nameCache`, `_observeExpansion` observer, `e.stopPropagation()` in `#onOpen`.
+- **Keep**: observe `rootItems` from context, render grid of `<umb-tree-item-card>`, wire `@selected`/`@deselected` to context selection, wire `@umb-tree-item-open` to call `treeContext.open(item)` (which dispatches the event upward — **do not call `stopPropagation()`**).
+- Keyboard on card: `Enter` = single-click action, `Right Arrow` = call `treeContext.open(item)`.
+- Pagination: `<umb-tree-load-more-button>` at grid bottom.
+- Empty state: `#treeView_cardEmptyRoot`.
+
+**Edit**:
+- `src/packages/core/tree/manifests.ts` — spread Card manifests in (already done; verify only).
 
 **Acceptance**:
-- Card view renders root items when no drill state.
-- Double-click on a card navigates into the child; children render; previous level is reachable via breadcrumb (Phase 6).
+- Card view renders `rootItems` (scoped by whatever `startNode` the picker passes).
+- Double-click fires `UmbTreeItemOpenEvent` upward to the picker; picker drives breadcrumb and `startNode` update.
 - Single-click in picker toggles selection; single-click in workspace opens workspace.
 - Keyboard: Enter and Right Arrow behave as specified.
-- Empty state appears at drilled-in node with no children.
+- No breadcrumb or navigation state inside the card view element itself.
 
 ### Phase 6 — Breadcrumb in the picker modal
 
-**Deps**: Phases 2, 5.
+**Deps**: Phase 5 (requires `treeContext.open()` and the slimmed card view).
 
-**Edit**:
-- `src/packages/core/tree/tree-picker-modal/tree-picker-modal.element.ts` — below the header, render a breadcrumb row:
-  - Reads `this._treeExpansion` (already observed, line 39).
-  - Walks the linked chain (entries with `target` pointing forward).
-  - Each entry (except the final) is a clickable anchor; on click, truncates expansion to-and-including that entry via `this._pickerContext.expansion.setExpansion(chainUpTo)`.
-  - Final entry = current location, non-clickable.
-  - Also set `hide-toolbar="false"` on the `<umb-tree>` inside the picker so the view switcher appears (line 199-218).
+**Edit** `src/packages/core/tree/tree-picker-modal/tree-picker-modal.element.ts`:
 
-**Acceptance**: opening a picker in Card view shows a breadcrumb under the header; clicking a breadcrumb entry jumps back up the tree; opening in Classic shows no breadcrumb (expansion may be empty).
+#### State
+Add to the picker element:
+- `_initialStartNode: UmbTreeStartNode | undefined` — set from `this.data?.startNode` on init, immutable.
+- `_currentLocation: UmbTreeStartNode | undefined` — starts equal to `_initialStartNode`, updated on navigation.
+- `_breadcrumb: Array<{ unique: string | null; entityType: string; name: string }>` — always at least one entry.
+
+#### Repository initialisation
+On `connectedCallback` / first render: use `UmbExtensionApiInitializer` to look up the `ManifestTree` by `this.data.treeAlias` from `umbExtensionsRegistry` → read `meta.repositoryAlias` → instantiate the tree repository. Store as `_treeRepository`.
+
+#### Initial breadcrumb
+After repository is ready:
+- No `_initialStartNode`: call `_treeRepository.requestTreeRoot()` → use the returned item's `name` as the single ceiling entry (`unique: null`).
+- `_initialStartNode` set: call `_treeRepository.requestTreeItemAncestors({ treeItem: _initialStartNode })` → response includes self (backend default). Slice to the entry matching `_initialStartNode.unique` (discard any ancestors above it). The last item gives the name.
+
+#### Forward navigation
+Listen to `UmbTreeItemOpenEvent` on the picker element (it bubbles up from the card view through `<umb-tree>`):
+1. Immediately set `_currentLocation = { unique: e.unique, entityType: e.entityType }`. The `startNode` prop on `<umb-tree>` updates at once — tree starts reloading optimistically.
+2. Asynchronously call `_treeRepository.requestTreeItemAncestors({ treeItem: _currentLocation })`. Slice chain at `_initialStartNode.unique` (or keep all if no ceiling). Map to `_breadcrumb` array with names from response.
+
+#### Backward navigation
+Each non-last breadcrumb entry is clickable. On click:
+- Set `_currentLocation = { unique: entry.unique, entityType: entry.entityType }` (or `undefined` if entry is the root ceiling with `unique: null`).
+- Truncate `_breadcrumb` to that index.
+- The `startNode` prop update triggers tree reload automatically.
+
+#### Template
+- Render `<uui-breadcrumbs>` above `<umb-tree>`. Always visible.
+- Pass `_currentLocation` as `startNode` prop to `<umb-tree>`.
+- Set `hide-toolbar="false"` on `<umb-tree>` so the view switcher appears.
+
+**Acceptance**:
+- Breadcrumb is always visible when the picker opens, showing at minimum the root or configured ceiling.
+- Switching between Classic and Card views does not reset the breadcrumb or navigation position.
+- Card view double-click updates the breadcrumb and rescopes the tree; names fill in asynchronously.
+- Clicking a breadcrumb entry navigates back; both views show the correct subtree.
+- Classic view with a drilled-in startNode shows that subtree in expanded form (no drill gesture, only breadcrumb for going back).
 
 ### Phase 8 — View selection persistence (UX enhancement)
 
@@ -249,19 +285,22 @@ Reference keys via `#treeView_*` in manifests.
 
 #### 7.2 Unit tests
 
-- `tree-expansion-manager.test.ts` — Phase 2 additions.
-- `tree-view.manager.test.ts` — views populate, default = highest weight, memory read/write, graceful when no memory context.
+- `tree-view.manager.test.ts` — views populate, default = highest weight, graceful when no manifests registered.
 - `tree-view-bundle.element.test.ts` — hidden with 0/1 views; popover and click-to-change with 2+.
-- `classic-tree-view.element.test.ts` — parity tests copied/adapted from anything currently testing `<umb-default-tree>`'s render (none currently exists — this is a coverage gap worth filling in this pass).
+- `classic-tree-view.element.test.ts` — parity tests for classic render (coverage gap worth filling in this pass).
 - `card-tree-view.element.test.ts`:
-  - Renders root items when expansion empty and no `startNode`.
-  - Renders `startNode`'s children when `startNode` set and expansion empty.
-  - Navigating into a card appends the entity to expansion and fetches its children.
-  - Navigating up (breadcrumb click truncates expansion) refetches parent's children.
-  - Single-click vs double-click disambiguation uses the DOM native `click` / `dblclick` distinction.
-  - Keyboard: `Enter` dispatches selection/open; `Right Arrow` dispatches navigate.
-  - Empty state at drilled-in node with no children.
-  - On mount with existing expansion, calls `expandTo(lastEntry)` once to normalize.
+  - Renders `rootItems` from context (scoped by whatever `startNode` is set).
+  - Double-click calls `treeContext.open({ unique, entityType })`.
+  - Single-click toggles selection via context.
+  - Keyboard: `Enter` dispatches selection/open; `Right Arrow` calls `treeContext.open()`.
+  - Empty state when `rootItems` is empty.
+  - No breadcrumb rendered inside the card view element.
+- `tree-picker-modal` breadcrumb tests:
+  - Breadcrumb shows root entry on open (no ceiling configured).
+  - Breadcrumb shows ceiling entry on open (ceiling configured).
+  - `UmbTreeItemOpenEvent` triggers optimistic `_currentLocation` update and async name fetch.
+  - Breadcrumb click truncates array and updates `_currentLocation`.
+  - Switching views does not reset `_currentLocation` or `_breadcrumb`.
 
 #### 7.3 Manual smoke tests
 
@@ -281,7 +320,7 @@ Reference keys via `#treeView_*` in manifests.
 - **`UmbDefaultTreeElement` class**: `api`, `getSelection()`, `getExpansion()` preserved. Private render methods removed — safe, not public API.
 - **`UmbTreeContext` interface**: new members (`hideTreeItemActions?`, optional setters/getters) added as **optional**. Non-breaking for external implementors.
 - **Subclasses**: `UmbDocumentTreeElement`, `UmbMediaTreeElement` are empty-body `extends UmbDefaultTreeElement`. No source edits required. Verified.
-- **`UmbTreeExpansionManager`**: `expandTo` is a new public method. Additive.
+- **`UmbTreeExpansionManager`**: `expandTo` was added in Phase 2 and is now removed (Phase 2 revised). It was never called outside its own test file — no external consumers to break.
 - **Kind manifest `Umb.Kind.Tree.Default`**: element name + api class unchanged.
 
 ### 3.2 Visual regressions
@@ -300,7 +339,8 @@ Reference keys via `#treeView_*` in manifests.
 ### 4.1 Decided, but worth monitoring
 
 - **`hideToolbar` default inconsistency**: `hideTreeRoot` and `hideTreeItemActions` default to `false`; `hideToolbar` defaults to `true`. Documented in JSDoc. Accepted trade-off for backwards compat.
-- **One extra `requestTreeItemAncestors` call per view switch**: accepted cost for server-authoritative breadcrumbs. Alternative (client-side chain inference) rejected as "magical".
+- **Optimistic `startNode` update**: picker updates `_currentLocation` immediately on open event; breadcrumb names arrive async. There is a brief window where the tree is reloading but breadcrumb entries show `name` from the previous state. Accepted for responsiveness.
+- **`includeSelf` on ancestors endpoint**: the backend `GetAncestors` method defaults to `includeSelf = true`. The picker relies on this to get the opened item's own name. If a custom tree repository overrides this behaviour, breadcrumb names may be missing. Documented assumption.
 
 ### 4.2 Implementation-time decisions
 
@@ -313,6 +353,7 @@ Reference keys via `#treeView_*` in manifests.
 - Table view.
 - URL reflection / deep-linking via URL.
 - Shared `<umb-tree-breadcrumb>` element (extract if/when workspace footer needs one).
+- Variant-aware breadcrumb names via `DocumentItemDataResolver` (v1 uses raw `name` from tree item response).
 - Discoverability affordance on cards (chevron on hover, tooltip, etc.).
 - Filtering / search within a tree view.
 - `treeHostContext` condition.
@@ -325,23 +366,23 @@ Reference keys via `#treeView_*` in manifests.
 
 ```
 Phase 0 (read)
-  ├─► Phase 1 (extension types) ──┐
-  └─► Phase 2 (expandTo)  ────────┤
-                                   ▼
-                                 Phase 3 (shell + Classic)
-                                   ▼
-                                 Phase 4 (toolbar + bundle)
-                                   ▼
-                                 Phase 5 (Card view + card-item routing)
-                                   ▼
-                                 Phase 6 (picker breadcrumb)
-                                   ▼
-                                 Phase 7 (localization + tests + smoke)
-                                   ▼
-                                 Phase 8 (view selection persistence — UX enhancement)
+  └─► Phase 1 (extension types)
+        ▼
+      Phase 2 (remove expandTo — independent cleanup, any time)
+      Phase 3 (shell + Classic)
+        ▼
+      Phase 4 (toolbar + bundle)
+        ▼
+      Phase 5 (open() on context + slim card view)
+        ▼
+      Phase 6 (picker breadcrumb)
+        ▼
+      Phase 7 (localization + tests + smoke)
+        ▼
+      Phase 8 (view selection persistence — UX enhancement)
 ```
 
-Phases 1 and 2 can run in parallel. Phases 3 through 7 are sequential. Phase 8 can be tackled independently after Phase 3.
+Phase 2 is independent cleanup with no dependents. Phases 3 through 7 are sequential. Phase 8 can be tackled independently after Phase 3.
 
 ---
 
@@ -351,8 +392,7 @@ Each phase requires review and sign-off before the next begins.
 
 - [x] **Phase 0** — Pre-flight (read-only checks)
 - [x] **Phase 1** — New extension types (`ManifestTreeView`, `ManifestTreeItemCard`)
-- [x] **Phase 2** — `expansion.expandTo()` convenience method + tests
-  - ⚠️ **Needs revisit** — current implementation is not satisfactory. Revisit before Phase 5 and figure out an alternative approach before the card view depends on it.
+- [ ] **Phase 2** — Remove `expandTo()` from expansion manager + tests (independent cleanup)
 - [x] **Phase 3** — Extract Classic view + shell refactor (invasive)
   - [x] 3.1 — Optional `hideTreeItemActions` / `isMenu` on `UmbTreeContext`
   - [x] 3.2 — `<umb-classic-tree-view>` element + manifest
@@ -360,10 +400,11 @@ Each phase requires review and sign-off before the next begins.
   - [x] 3.4 — Convert `<umb-default-tree>` into a shell
   - [x] 3.5 — Register Classic view manifests
 - [x] **Phase 4** — `<umb-tree-toolbar>` + `<umb-tree-view-bundle>` elements
-- [x] **Phase 5** — Card view + card-item routing
-  - [x] 5.1 — `<umb-default-tree-item-card>` + `UmbTreeItemCardNavigateEvent`
-  - [x] 5.2 — `<umb-tree-item-card>` routing element
-  - [x] 5.3 — `<umb-card-tree-view>` element + manifest
+- [ ] **Phase 5** — `open()` on tree context + card view refactor (slim)
+  - [ ] 5.1 — Add `open()` to `UmbTreeContext` interface + `UmbDefaultTreeContext` implementation
+  - [ ] 5.2 — Update `<umb-default-tree-item-card>` to call `treeContext.open()` (remove `UmbTreeItemCardNavigateEvent`)
+  - [ ] 5.3 — `<umb-tree-item-card>` routing element — verify no `UmbTreeItemCardNavigateEvent` references
+  - [ ] 5.4 — Slim down `<umb-card-tree-view>`: remove breadcrumb, expansion-based navigation, name cache
 - [ ] **Phase 6** — Breadcrumb in `<umb-tree-picker-modal>`
 - [ ] **Phase 7** — Localization, unit tests, manual smoke tests
 - [ ] **Phase 8** — View selection persistence (UX enhancement — design TBD)
@@ -394,7 +435,7 @@ src/packages/core/tree/tree-item-card/tree-item-card.element.ts
 src/packages/core/tree/tree-item-card/index.ts
 src/packages/core/tree/tree-item-card/default/default-tree-item-card.element.ts
 src/packages/core/tree/tree-item-card/default/index.ts
-src/packages/core/tree/tree-item-card/events/tree-item-card-navigate.event.ts
+(no events subfolder — UmbTreeItemCardNavigateEvent is not needed)
 
 src/packages/core/tree/components/tree-toolbar.element.ts
 src/packages/core/tree/components/tree-view-bundle.element.ts
@@ -412,7 +453,9 @@ src/packages/core/tree/manifests.ts                               (register Clas
 src/packages/core/tree/tree.context.interface.ts                  (optional hideTreeItemActions, isMenu)
 src/packages/core/tree/default/default-tree.context.ts            (implement new optional members)
 src/packages/core/tree/default/default-tree.element.ts            (shell refactor — remove render methods, add hideToolbar, mount view manager)
-src/packages/core/tree/expansion-manager/tree-expansion-manager.ts       (add expandTo)
-src/packages/core/tree/expansion-manager/tree-expansion-manager.test.ts  (expandTo tests)
+src/packages/core/tree/tree.context.interface.ts                          (add open() method)
+src/packages/core/tree/default/default-tree.context.ts                    (implement open())
+src/packages/core/tree/expansion-manager/tree-expansion-manager.ts        (remove expandTo)
+src/packages/core/tree/expansion-manager/tree-expansion-manager.test.ts   (remove expandTo tests)
 src/packages/core/tree/tree-picker-modal/tree-picker-modal.element.ts    (breadcrumb render, hide-toolbar=false)
 ```
