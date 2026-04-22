@@ -87,16 +87,15 @@ export class UmbDocumentUrlsDataResolver extends UmbControllerBase {
 	}
 
 	#getDataForCurrentCulture(): Array<UmbDocumentUrlModel> | undefined {
-		// If the local variant is invariant, the document doesn't vary by culture.
-		// URLs returned from the server carry the culture of the domain that produced
-		// them (e.g. "da") which intentionally differs from the backoffice's display
-		// culture, so filtering by culture would drop valid URLs.
+		// Invariant document: return all URLs. The server tags each URL with the
+		// culture of the domain that produced it.
 		if (this.#variantId?.isCultureInvariant()) {
 			return this.#data;
 		}
 
+		// Variant document: filter to the culture currently being viewed.
+		// If no culture can be resolved at all, fall back to returning everything.
 		const culture = this.#getCurrentCulture();
-		// If there is no culture context (invariant data) we return all urls
 		return culture ? this.#data?.filter((x) => x.culture === culture) : this.#data;
 	}
 }
