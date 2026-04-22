@@ -165,7 +165,6 @@ export class UmbPropertyEditorUIBlockSingleElement
 	constructor() {
 		super();
 
-		/*
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
 			if (context) {
 				this.observe(
@@ -210,7 +209,7 @@ export class UmbPropertyEditorUIBlockSingleElement
 				this.removeUmbControllerByAlias('blockTypeConfigurationCheck');
 			}
 		}).passContextAliasMatches();
-*/
+
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this.#gotPropertyContext(context);
 		});
