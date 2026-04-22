@@ -275,7 +275,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
                 app.UseUmbraco()
                     .WithMiddleware(u =>
                     {
-                        // Delivery API doesn't need special middleware
+                        // Delivery API doesn't need special middleware.
                     })
                     .WithEndpoints(u =>
                     {
@@ -299,6 +299,60 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
         // Verify backoffice marker is NOT registered
         var backofficeMarker = factory.Services.GetService<IBackOfficeEnabledMarker>();
         Assert.That(backofficeMarker, Is.Null, "IBackOfficeEnabledMarker should NOT be registered when using AddCore() without AddBackOffice()");
+    }
+
+    /// <summary>
+    /// Verifies that IUserService read operations work in a delivery-only scenario (no backoffice).
+    /// Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22404 where
+    /// these methods used service location to resolve IBackOfficeUserStore, which isn't
+    /// registered without AddBackOffice(). This crashed Examine indexing via ContentValueSetBuilder.
+    /// </summary>
+    [Test]
+    public async Task CoreWithDeliveryApi_UserServiceReadMethodsDoNotThrow()
+    {
+        // Arrange
+        using var factory = CreateFactory(
+            configureUmbraco: builder =>
+            {
+                builder
+                    .AddCore()
+                    .AddDeliveryApi()
+                    .AddUmbracoSqlServerSupport()
+                    .AddUmbracoSqliteSupport()
+                    .AddComposers();
+            },
+            configureApp: app =>
+            {
+                app.UseUmbraco()
+                    .WithMiddleware(u =>
+                    {
+                        // Delivery API doesn't need special middleware.
+                    })
+                    .WithEndpoints(u =>
+                    {
+                        u.UseDeliveryApiEndpoints();
+                    });
+            });
+
+        // Boot the application
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false,
+            BaseAddress = new Uri("https://localhost/", UriKind.Absolute),
+        });
+        await client.GetAsync("/");
+
+        // Act & Assert - all read methods must work without IBackOfficeUserStore.
+        using var scope = factory.Services.CreateScope();
+        var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+
+        // Use non-empty arguments so the repository-backed code paths are exercised,
+        // not just the early-return guards for null/empty input.
+        Assert.DoesNotThrow(() => userService.GetUsersById(-1));
+        Assert.DoesNotThrow(() => userService.GetUserById(-1));
+        Assert.DoesNotThrow(() => userService.GetAsync(Guid.Empty).GetAwaiter().GetResult());
+        Assert.DoesNotThrow(() => userService.GetAsync(new[] { Guid.Empty }).GetAwaiter().GetResult());
+        Assert.DoesNotThrow(() => userService.GetAllInGroup(-1));
     }
 
     /// <summary>

@@ -1728,7 +1728,8 @@ export type MemberItemResponseModel = {
 
 export enum MemberKindModel {
     DEFAULT = 'Default',
-    API = 'Api'
+    API = 'Api',
+    EXTERNAL_ONLY = 'ExternalOnly'
 }
 
 export type MemberReferenceResponseModel = {
@@ -1755,6 +1756,7 @@ export type MemberResponseModel = {
     lastPasswordChangeDate?: string | null;
     groups: Array<string>;
     kind: MemberKindModel;
+    profileData?: string | null;
 };
 
 export type MemberTypeCompositionModel = {
