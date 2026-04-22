@@ -77,6 +77,8 @@ internal sealed class UmbracoCmsSchema
         public required CacheSettings Cache { get; set; }
 
         public required DistributedJobSettings DistributedJobSettings { get; set; }
+
+        public required WebsiteSettings Website { get; set; }
     }
 
     public class InstallDefaultDataNamedOptions

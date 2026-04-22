@@ -15,7 +15,7 @@ export class UmbMediaTreeStore extends UmbUniqueTreeStore {
 	 * @memberof UmbMediaTreeStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MEDIA_TREE_STORE_CONTEXT.toString());
+		super(host, UMB_MEDIA_TREE_STORE_CONTEXT);
 	}
 }
 

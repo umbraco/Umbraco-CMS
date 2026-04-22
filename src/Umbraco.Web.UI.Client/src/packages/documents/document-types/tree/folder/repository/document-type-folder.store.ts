@@ -15,7 +15,7 @@ export class UmbDocumentTypeFolderStore extends UmbDetailStoreBase<UmbFolderMode
 	 * @memberof UmbDocumentTypeStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DOCUMENT_TYPE_FOLDER_STORE_CONTEXT.toString());
+		super(host, UMB_DOCUMENT_TYPE_FOLDER_STORE_CONTEXT);
 	}
 }
 

@@ -1,0 +1,75 @@
+using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Api.Management.Factories;
+using Umbraco.Cms.Api.Management.OperationStatus;
+using Umbraco.Cms.Api.Management.Patchers;
+using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Patching;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
+
+namespace Umbraco.Cms.Api.Management.Controllers.Document;
+
+[ApiVersion("1.0")]
+public class PatchDocumentController : PatchDocumentControllerBase
+{
+    private readonly IContentEditingService _contentEditingService;
+    private readonly IDocumentPatcher _documentPatcher;
+    private readonly IDocumentEditingPresentationFactory _presentationFactory;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+
+    public PatchDocumentController(
+        IAuthorizationService authorizationService,
+        IContentEditingService contentEditingService,
+        IDocumentPatcher documentPatcher,
+        IDocumentEditingPresentationFactory presentationFactory,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+        : base(authorizationService)
+    {
+        _contentEditingService = contentEditingService;
+        _documentPatcher = documentPatcher;
+        _presentationFactory = presentationFactory;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+    }
+
+    [HttpPatch("{id:guid}/patch")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    [EndpointSummary("Make partial updates to a document. For more information, see the documentation at https://docs.umbraco.com/umbraco-cms/reference/management-api/patching/document-endpoint-guide or https://docs.umbraco.com/umbraco-cms/reference/management-api/patching/document-endpoint-spec")]
+    [Consumes("application/json-patch+json")]
+    public async Task<IActionResult> Patch(
+        CancellationToken cancellationToken,
+        Guid id,
+        PatchDocumentRequestModel requestModel)
+        => await HandleRequest(id, async () =>
+        {
+            ContentPatchModel patchModel = _presentationFactory.MapPatchModel(requestModel);
+
+            // Apply PATCH operations to create an update request model
+            Attempt<UpdateDocumentRequestModel, ContentPatchingOperationStatus> patchResult =
+                await _documentPatcher.ApplyPatchAsync(id, patchModel);
+
+            if (patchResult.Success is false)
+            {
+                return ContentPatchingOperationStatusResult(patchResult.Status);
+            }
+
+            ContentUpdateModel contentUpdateModel = _presentationFactory.MapUpdateModel(patchResult.Result);
+
+            // Use the standard update method to save the patched content
+            Attempt<ContentUpdateResult, ContentEditingOperationStatus> updateResult =
+                await _contentEditingService.UpdateAsync(id, contentUpdateModel, CurrentUserKey(_backOfficeSecurityAccessor));
+
+            return updateResult.Success
+                ? Ok()
+                : ContentEditingOperationStatusResult(updateResult.Status);
+        });
+}

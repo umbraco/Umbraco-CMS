@@ -16,7 +16,7 @@ export class UmbLanguageItemStore extends UmbItemStoreBase<UmbLanguageItemModel>
 	 * @memberof UmbLanguageItemStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_LANGUAGE_ITEM_STORE_CONTEXT.toString());
+		super(host, UMB_LANGUAGE_ITEM_STORE_CONTEXT);
 	}
 }
 
