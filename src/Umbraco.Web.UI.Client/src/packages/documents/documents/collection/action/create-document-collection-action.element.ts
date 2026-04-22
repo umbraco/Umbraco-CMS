@@ -49,8 +49,7 @@ export class UmbCreateDocumentCollectionActionElement extends UmbPopoverScrollEl
 
 	async #retrieveAllowedDocumentTypesOf(unique: string | null, parentContentUnique: string | null) {
 		const { data } = await this.#documentTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
-
-		if (data && data.items) {
+		if (data?.items) {
 			this._allowedDocumentTypes = data.items;
 		}
 	}
@@ -66,11 +65,14 @@ export class UmbCreateDocumentCollectionActionElement extends UmbPopoverScrollEl
 		});
 	}
 
+	/** Returns true for non-primary or modifier-key clicks that should use native link navigation. */
+	#isModifiedClick(event: MouseEvent): boolean {
+		return event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey;
+	}
+
 	#onClick(event: MouseEvent, item: UmbAllowedDocumentTypeModel) {
 		// Let modified/non-primary clicks (open in new tab, new window, etc.) use native link navigation.
-		if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
-			return;
-		}
+		if (this.#isModifiedClick(event)) return;
 		// Cancel native anchor navigation and stop the window-level router-slot click handler
 		// (see core/router/router-slot/util/anchor.ts) from SPA-navigating before we can decide
 		// whether to open the blueprint picker.
@@ -114,7 +116,6 @@ export class UmbCreateDocumentCollectionActionElement extends UmbPopoverScrollEl
 	}
 
 	#renderCreateButton() {
-		if (this._allowedDocumentTypes.length !== 1) return;
 
 		const item = this._allowedDocumentTypes[0];
 		// TODO: Stop appending values to labels, instead we need to parse the name as a argument to the label. [NL]
