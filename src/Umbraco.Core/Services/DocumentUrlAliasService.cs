@@ -307,7 +307,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
     /// <summary>
     /// Internal implementation that processes a single document without creating its own scope.
-    /// Caller must ensure a scope with write lock is active.
+    /// Caller must ensure a scope is active. A write lock on <see cref="Constants.Locks.DocumentUrlAliases"/>
+    /// is required whenever this method may perform database writes — i.e. on all server roles except
+    /// <see cref="ServerRole.Subscriber"/>, where persistence is skipped and the write lock is not taken.
     /// </summary>
     private async Task CreateOrUpdateAliasesInternalAsync(Guid documentKey)
     {
