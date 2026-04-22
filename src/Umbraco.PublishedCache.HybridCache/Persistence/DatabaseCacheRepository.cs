@@ -105,6 +105,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             return null;
         }
 
+        if (preview is false && dto.Published && dto.PubName is null)
+        {
+            _logger.LogWarning(
+                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
+                key);
+            return null;
+        }
+
         return CreateElementNodeKit(preview, dto);
     }
 
@@ -119,9 +127,23 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         }
 
         ContentCacheNode? draftNode = CreateElementNodeKit(true, dto);
-        ContentCacheNode? publishedNode = dto.PubDataRaw is null && dto.PubData is null
-            ? null
-            : CreateElementNodeKit(false, dto);
+
+        ContentCacheNode? publishedNode;
+        if (dto.PubDataRaw is null && dto.PubData is null)
+        {
+            publishedNode = null;
+        }
+        else if (dto.Published && dto.PubName is null)
+        {
+            _logger.LogWarning(
+                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
+                key);
+            publishedNode = null;
+        }
+        else
+        {
+            publishedNode = CreateElementNodeKit(false, dto);
+        }
 
         return (draftNode, publishedNode);
     }
