@@ -149,6 +149,17 @@ export class UmbExtensionElementAndApiInitializer<
 			return false;
 		}
 
+		// A previous _conditionsAreGood() on this same initializer may have already
+		// assigned this.#api / this.#component and resolved before us. The API's host is
+		// the transient element (see createExtensionElementWithApi), not this initializer,
+		// so nothing else in the controller-host chain will clean an orphaned pair up.
+		if (this.#api && this.#api !== newApi) {
+			this.#api.destroy?.();
+		}
+		if (this.#component && this.#component !== newComponent && 'destroy' in this.#component) {
+			(this.#component as unknown as { destroy: () => void }).destroy();
+		}
+
 		this.#api = newApi;
 		if (this.#api) {
 			this.#assignApiProps();

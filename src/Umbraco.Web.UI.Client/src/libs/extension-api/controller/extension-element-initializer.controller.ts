@@ -81,9 +81,20 @@ export class UmbExtensionElementInitializer<
 
 		const newComponent = await createExtensionElement(manifest, this.#defaultElement);
 		if (!this._isConditionsPositive) {
+			if (newComponent && 'destroy' in newComponent) {
+				(newComponent as unknown as { destroy: () => void }).destroy();
+			}
 			// We are not positive anymore, so we will back out of this creation.
 			return false;
 		}
+
+		if (this.#component && this.#component !== newComponent) {
+			if ('destroy' in this.#component) {
+				(this.#component as unknown as { destroy: () => void }).destroy();
+			}
+			this.#component = undefined;
+		}
+
 		this.#component = newComponent as ExtensionElementInterface;
 		if (this.#component) {
 			this.#assignProperties();

@@ -92,9 +92,19 @@ export class UmbExtensionApiInitializer<
 			this.#constructorArguments as any,
 		);
 		if (!this._isConditionsPositive) {
+			newApi?.destroy?.();
 			// We are not positive anymore, so we will back out of this creation.
 			return false;
 		}
+
+		// A previous _conditionsAreGood() on this same initializer may have already
+		// assigned this.#api and resolved before us. Without cleanup that instance would
+		// keep running until this._host is destroyed — not a hard leak, but any
+		// subscriptions / context consumers / async setup it started stay alive.
+		if (this.#api && this.#api !== newApi) {
+			this.#api.destroy?.();
+		}
+
 		this.#api = newApi;
 
 		if (this.#api) {

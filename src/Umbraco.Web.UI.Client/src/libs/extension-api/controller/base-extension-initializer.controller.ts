@@ -169,8 +169,8 @@ export abstract class UmbBaseExtensionInitializer<
 		}
 	}
 
-	#gotConditions = (manifests: ManifestCondition[]) => {
-		manifests.forEach(this.#gotCondition);
+	#gotConditions = (manifests: ManifestCondition[] | undefined) => {
+		manifests?.forEach(this.#gotCondition);
 	};
 
 	#gotCondition = async (conditionManifest: ManifestCondition) => {
@@ -237,12 +237,19 @@ export abstract class UmbBaseExtensionInitializer<
 		return undefined;
 	}
 
-	#conditionsAreInitialized() {
+	#checkConditionsAreGood() {
 		// Not good if we don't have a manifest.
+		if (this.#manifest === undefined) return false;
 		// Only good if conditions of manifest is equal to the amount of condition controllers (one for each condition). [NL]
-		return (
-			this.#manifest !== undefined && this.#conditionControllers.length === (this.#manifest.conditions ?? []).length
+		const hasAllConditions = (this.#manifest.conditions ?? []).length === this.#conditionControllers.length;
+		if (hasAllConditions === false) return false;
+		// Compare all manifest conditions with the condition controllers configs to be sure we have the right ones, as we might end up in a state where we have the same amount of controllers as conditions, but they are not the right ones. [NL]
+		const allConditionsHaveControllers = (this.#manifest.conditions ?? []).every((condition) =>
+			this.#conditionControllers.some((controller) => controller.config.alias === condition.alias),
 		);
+		if (allConditionsHaveControllers === false) return false;
+		// Only good if all the conditions are permitted:
+		return this.#conditionControllers.some((condition) => condition.permitted === false) === false;
 	}
 
 	#onConditionsChangedCallback = async () => {
@@ -255,20 +262,25 @@ export abstract class UmbBaseExtensionInitializer<
 		let oldValue = this.#isPermitted ?? false;
 
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
-		const isPositive =
-			this.#conditionsAreInitialized() &&
-			this.#conditionControllers.some((condition) => condition.permitted === false) === false;
+		const isPositive = this.#checkConditionsAreGood();
 
+		if (this._isConditionsPositive === isPositive) {
+			// No change in the conditions, so we don't need to do anything, this is an optimization to prevent multiple calls to the callback when there is no change. [NL]
+			return;
+		}
 		this._isConditionsPositive = isPositive;
 
 		if (isPositive === true) {
 			if (this.#isPermitted !== true) {
-				const newPermission = await this._conditionsAreGood();
-				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time. [NL]
-				if (newPermission === false || this._isConditionsPositive === false) {
+				let newPermission = await this._conditionsAreGood();
+
+				const stillPositive = this.#checkConditionsAreGood();
+
+				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time, or we got destroyed. [NL]
+				if (stillPositive === false || newPermission === false || this._isConditionsPositive !== true) {
 					// Then we need to revert the above work:
-					this._conditionsAreBad();
-					return;
+					await this._conditionsAreBad();
+					newPermission = false;
 				}
 				// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time. [NL]
 				oldValue = this.#isPermitted ?? false;
@@ -278,8 +290,8 @@ export abstract class UmbBaseExtensionInitializer<
 			// Clean up:
 			await this._conditionsAreBad();
 
-			// Only continue if we are still negative, otherwise it means that something changed in the mean time. [NL]
-			if (this._isConditionsPositive === true) {
+			// Only continue if we are still negative, otherwise it means that something changed in the mean time, or we got destroyed. [NL]
+			if (this._isConditionsPositive !== false) {
 				return;
 			}
 			// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time. [NL]
@@ -337,7 +349,7 @@ export abstract class UmbBaseExtensionInitializer<
 		this.#promiseResolvers = [];
 		this.#clearPermittedState(); // This fires the callback as not permitted, if it was permitted before. [NL]
 		this.#isPermitted = undefined;
-		this._isConditionsPositive = false;
+		this._isConditionsPositive = undefined;
 		this.#overwrites = [];
 		this.#cleanConditions();
 		this.#onPermissionChanged = undefined;

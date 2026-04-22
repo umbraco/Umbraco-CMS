@@ -127,6 +127,7 @@ export class UmbPropertyEditorUIBlockGridElement
 			},
 		);
 
+		/*
 		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (context) => {
 			if (context) {
 				this.observe(
@@ -170,7 +171,7 @@ export class UmbPropertyEditorUIBlockGridElement
 				this.removeUmbControllerByAlias('observeBlockTypes');
 			}
 		}).passContextAliasMatches();
-
+*/
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 			this.#handleReadonly();
 

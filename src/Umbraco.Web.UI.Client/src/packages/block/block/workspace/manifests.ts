@@ -1,3 +1,4 @@
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
 import {
 	UMB_BLOCK_WORKSPACE_ALIAS,
 	UMB_BLOCK_WORKSPACE_VIEW_CONTENT,
@@ -6,7 +7,7 @@ import {
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
-	{
+	/*{
 		type: 'workspaceAction',
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Block.SubmitCreate',
@@ -16,6 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#general_create',
 			look: 'primary',
 			color: 'positive',
+			workspaceContextToken: UMB_BLOCK_WORKSPACE_CONTEXT,
 		},
 		conditions: [
 			{
@@ -31,7 +33,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: false,
 			},
 		],
-	},
+	},*/
 	{
 		type: 'workspaceAction',
 		kind: 'default',
@@ -42,6 +44,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#general_update',
 			look: 'primary',
 			color: 'positive',
+			workspaceContextToken: UMB_BLOCK_WORKSPACE_CONTEXT,
 		},
 		conditions: [
 			{
