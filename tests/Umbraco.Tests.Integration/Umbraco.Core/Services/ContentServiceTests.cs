@@ -2213,6 +2213,51 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    public void Copying_Published_Culture_Variant_Document_Does_Not_Carry_Over_Per_Culture_Published_Flags()
+    {
+        // see https://github.com/umbraco/Umbraco-CMS/issues/22540
+        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr, out _);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(ContentService.Save(content).Success);
+            Assert.IsTrue(ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode }).Success);
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
+        });
+
+        // re-get to ensure we copy from the persisted state
+        content = ContentService.GetById(content.Id);
+
+        // Act
+        var copy = ContentService.Copy(content, content.ParentId, false);
+
+        // re-get the copy from the database so we assert on persisted state, not the in-memory copy
+        var persistedCopy = ContentService.GetById(copy.Id);
+
+        // Assert
+        Assert.That(persistedCopy, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            // the copy itself should not be published
+            Assert.IsFalse(persistedCopy.Published);
+
+            // no culture variations should be marked as published on the copy
+            Assert.IsFalse(persistedCopy.IsCulturePublished(langFr.IsoCode));
+            Assert.IsFalse(persistedCopy.IsCulturePublished(langUk.IsoCode));
+            Assert.IsEmpty(persistedCopy.PublishedCultures);
+
+            // sanity: culture names are still preserved (edit-side data, not publish-side) - Copy appends a " (n)" suffix to avoid sibling collisions
+            Assert.That(persistedCopy.GetCultureName(langFr.IsoCode), Does.StartWith("content-fr"));
+            Assert.That(persistedCopy.GetCultureName(langUk.IsoCode), Does.StartWith("content-en"));
+        });
+    }
+
+    [Test]
     public void Can_Copy_And_Modify_Content_With_Events()
     {
         // see https://github.com/umbraco/Umbraco-CMS/issues/5513
