@@ -10,23 +10,14 @@ export class UmbBlockWorkspaceIsReadOnlyCondition
 {
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<BlockWorkspaceIsReadOnlyConditionConfig>) {
 		super(host, args);
-		console.log('BlockWorkspaceIsReadOnlyCondition init');
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, async (context) => {
-			// await 2 seconds:
-			//await new Promise((resolve) => setTimeout(resolve, 2000));
 			this.observe(
 				context?.readOnlyGuard.isPermittedForObservableVariant(context.variantId),
 				(isReadOnly) => {
 					if (isReadOnly !== undefined) {
 						const match = this.config.match !== undefined ? args.config.match : true;
 						this.permitted = isReadOnly === match;
-						console.log('BlockWorkspaceIsReadOnlyCondition', this.permitted, {
-							context,
-							isReadOnly,
-							match,
-							permitted: this.permitted,
-						});
 					}
 				},
 				'observeIsReadOnly',

@@ -316,8 +316,9 @@ export abstract class UmbBaseExtensionInitializer<
 
 				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time, or we got destroyed. [NL]
 				if (newPermission === false || this._isConditionsPositive !== true) {
-					// Then we need to revert the above work:
-					await this._conditionsAreBad();
+					// Then we need to revert the above work. Sync call — see the note in
+					// the else-if branch on why we don't await. [NL]
+					this._conditionsAreBad();
 					newPermission = false;
 				}
 				// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time. [NL]
@@ -325,17 +326,17 @@ export abstract class UmbBaseExtensionInitializer<
 				this.#isPermitted = newPermission;
 			}
 		} else if (this.#isPermitted !== false) {
-			// Clean up:
-			await this._conditionsAreBad();
-
-			// Only continue if we are still negative, otherwise it means that something changed in the mean time, or we got destroyed. [NL]
-			if (this._isConditionsPositive !== false) {
-				return;
-			}
-			// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time. [NL]
+			// clean-up any current [NL]
+			this._conditionsAreBad();
 			oldValue = this.#isPermitted ?? false;
 			this.#isPermitted = false;
 		}
+		// [DIAG — remove once the submit-button-not-showing bug is diagnosed]
+		console.log(
+			`[init ${this.#alias}] isPositive=${isPositive} #isPermitted=${this.#isPermitted} ` +
+				`condCount=${this.#conditionControllers.length} ` +
+				`condPermitted=${this.#conditionControllers.map((c) => c.permitted).join(',')}`,
+		);
 		if (oldValue !== this.#isPermitted && this.#isPermitted !== undefined) {
 			if (this.#isPermitted === true) {
 				this.#promiseResolvers.forEach((x) => x());
