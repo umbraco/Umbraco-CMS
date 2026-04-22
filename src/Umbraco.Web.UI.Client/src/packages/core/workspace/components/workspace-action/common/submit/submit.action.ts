@@ -26,7 +26,6 @@ export class UmbSubmitWorkspaceAction<
 		)
 			.asPromise()
 			.catch(() => {
-				console.log('KNAP FEJLER!');
 				return undefined;
 			});
 	}

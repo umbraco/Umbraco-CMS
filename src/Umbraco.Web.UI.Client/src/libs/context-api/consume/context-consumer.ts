@@ -255,15 +255,6 @@ export class UmbContextConsumer<
 			this.#promiseRejecter(
 				`Context request was cancelled, host was disconnected. (Context Alias: ${this.#contextAlias} with API Alias: ${this.#apiAlias}). Controller is hosted on ${hostElement?.parentNode?.nodeName ?? 'Not attached node'} > ${hostElement?.nodeName}`,
 			);
-			console.log('failed consumption details:', {
-				contextAlias: this.#contextAlias,
-				apiAlias: this.#apiAlias,
-				hostElement,
-				discriminator: this.#discriminator,
-				currentScope: this.#currentScope,
-				instance: this.#instance,
-				promiseOptions: this.#promiseOptions,
-			});
 		}
 		this.#promise = undefined;
 		this.#promiseOptions = undefined;
