@@ -97,6 +97,30 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlAliasService"/> class.
     /// </summary>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
+    public DocumentUrlAliasService(
+        ILogger<DocumentUrlAliasService> logger,
+        IDocumentUrlAliasRepository documentUrlAliasRepository,
+        ICoreScopeProvider coreScopeProvider,
+        ILanguageService languageService,
+        IKeyValueService keyValueService,
+        IContentService contentService,
+        IDocumentNavigationQueryService documentNavigationQueryService)
+        : this(
+            logger,
+            documentUrlAliasRepository,
+            coreScopeProvider,
+            languageService,
+            keyValueService,
+            contentService,
+            documentNavigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IServerRoleAccessor>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentUrlAliasService"/> class.
+    /// </summary>
     public DocumentUrlAliasService(
         ILogger<DocumentUrlAliasService> logger,
         IDocumentUrlAliasRepository documentUrlAliasRepository,
