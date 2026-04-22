@@ -43,14 +43,14 @@ export class UmbPropertyEditorUINumberElement
 	@state()
 	private _step?: number;
 
-	/**
-	 * The default step to use when one is not explicitly configured on the data type.
-	 */
-	@state()
-	private _defaultStep = 1;
-
 	@state()
 	private _placeholder?: string;
+
+	/**
+	 * Default step value used when one is not configured on the data type.
+	 * Subclasses can override to change the default (e.g. decimal uses a sub-integer step).
+	 */
+	protected defaultStep = 1;
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
@@ -65,14 +65,6 @@ export class UmbPropertyEditorUINumberElement
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
 			this._label = context?.getLabel();
-
-			// If the property editor schema alias is 'Umbraco.Decimal', we set the default step from 1 used for integers
-			// to a smaller value to allow decimal numbers.
-			// We use 0.000001 (matching the precision available for persistence in the database).
-			const schemaAlias = context?.getEditorManifest()?.meta?.propertyEditorSchemaAlias;
-			if (schemaAlias === 'Umbraco.Decimal') {
-				this._defaultStep = 0.000001;
-			}
 		});
 
 		this.addValidator(
@@ -123,7 +115,7 @@ export class UmbPropertyEditorUINumberElement
 				label=${ifDefined(this._label)}
 				min=${ifDefined(this._min)}
 				max=${ifDefined(this._max)}
-				step=${this._step ?? this._defaultStep}
+				step=${this._step ?? this.defaultStep}
 				value=${this.value?.toString() ?? ''}
 				.placeholder=${this._placeholder ?? ''}
 				.requiredMessage=${this.mandatoryMessage}
