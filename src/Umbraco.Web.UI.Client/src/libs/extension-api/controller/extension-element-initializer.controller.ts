@@ -76,18 +76,17 @@ export class UmbExtensionElementInitializer<
 		});
 	};
 
-	protected async _conditionsAreGood() {
+	protected async _conditionsAreGood(signal: AbortSignal) {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
 		const newComponent = await createExtensionElement(manifest, this.#defaultElement);
-		if (!this._isConditionsPositive) {
+
+		if (signal.aborted || !this._isConditionsPositive) {
 			if (newComponent && 'destroy' in newComponent) {
 				(newComponent as unknown as { destroy: () => void }).destroy();
 			}
-			// We are not positive anymore, so we will back out of this creation.
 			return false;
 		}
-
 		if (this.#component && this.#component !== newComponent) {
 			if ('destroy' in this.#component) {
 				(this.#component as unknown as { destroy: () => void }).destroy();

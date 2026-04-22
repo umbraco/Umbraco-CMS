@@ -252,15 +252,33 @@ export abstract class UmbBaseExtensionInitializer<
 		return this.#conditionControllers.some((condition) => condition.permitted === false) === false;
 	}
 
+	// The currently-pending `_conditionsAreGood()` promise, tagged with the manifest it
+	// was started for and with an AbortController whose signal is passed to the subclass.
+	//
+	// When a new positive-transition callback fires while a previous good-call is still
+	// loading, we *share* the pending promise (for the same manifest) instead of starting
+	// a parallel load. Because the subclass's factory + assignment then runs only once
+	// per entry, `this.#api` / `this.#component` are assigned exactly once.
+	//
+	// The signal is aborted when the entry is invalidated — on destroy, or when a new
+	// callback arrives with a different manifest (cache miss). The subclass should check
+	// `signal.aborted` after its async work and refuse to commit if set, so a stale
+	// in-flight load can't overwrite the assignments from a newer, superseding call. [NL]
+	#pendingGoodCall?: { manifest: ManifestType; promise: Promise<boolean>; abortController: AbortController };
+
+	#abortPendingGoodCall() {
+		if (this.#pendingGoodCall) {
+			this.#pendingGoodCall.abortController.abort();
+			this.#pendingGoodCall = undefined;
+		}
+	}
+
 	#onConditionsChangedCallback = async () => {
 		if (this.#manifest === undefined) {
 			// This is cause by this controller begin destroyed in the mean time. [NL]
 			// When writing this the only plausible case is a call from the conditionController to the onChange callback.
 			return;
 		}
-		// We will collect old value here, but we need to re-collect it after a async method have been called, as it could have changed in the mean time. [NL]
-		let oldValue = this.#isPermitted ?? false;
-
 		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
 		const isPositive = this.#checkConditionsAreGood();
 
@@ -268,16 +286,36 @@ export abstract class UmbBaseExtensionInitializer<
 			// No change in the conditions, so we don't need to do anything, this is an optimization to prevent multiple calls to the callback when there is no change. [NL]
 			return;
 		}
+		// We will collect old value here, but we need to re-collect it after a async method have been called, as it could have changed in the mean time. [NL]
+		let oldValue = this.#isPermitted ?? false;
+
 		this._isConditionsPositive = isPositive;
 
 		if (isPositive === true) {
 			if (this.#isPermitted !== true) {
-				let newPermission = await this._conditionsAreGood();
-
-				const stillPositive = this.#checkConditionsAreGood();
+				let newPermission: boolean;
+				// check current pending _conditionsAreGood call: [NL]
+				let entry = this.#pendingGoodCall;
+				if (entry && entry.manifest === this.#manifest) {
+					newPermission = await entry.promise;
+				} else {
+					// Since this is a new call, then lets abort the pending call. [NL]
+					this.#abortPendingGoodCall();
+					await this._conditionsAreBad();
+					const abortController = new AbortController();
+					const promise = this._conditionsAreGood(abortController.signal);
+					entry = { manifest: this.#manifest, promise, abortController };
+					this.#pendingGoodCall = entry;
+					newPermission = await promise;
+				}
+				if (this.#pendingGoodCall !== entry) {
+					return;
+				} else {
+					this.#pendingGoodCall = undefined;
+				}
 
 				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time, or we got destroyed. [NL]
-				if (stillPositive === false || newPermission === false || this._isConditionsPositive !== true) {
+				if (newPermission === false || this._isConditionsPositive !== true) {
 					// Then we need to revert the above work:
 					await this._conditionsAreBad();
 					newPermission = false;
@@ -307,7 +345,7 @@ export abstract class UmbBaseExtensionInitializer<
 		}
 	};
 
-	protected abstract _conditionsAreGood(): Promise<boolean>;
+	protected abstract _conditionsAreGood(signal: AbortSignal): Promise<boolean>;
 
 	protected abstract _conditionsAreBad(): Promise<void>;
 
@@ -347,6 +385,9 @@ export abstract class UmbBaseExtensionInitializer<
 		if (!this.#extensionRegistry) return;
 		this.#manifest = undefined;
 		this.#promiseResolvers = [];
+		// Abort any pending good-call so its subclass run refuses to commit (sees
+		// `signal.aborted`) instead of trying to assign into a destroyed initializer. [NL]
+		this.#abortPendingGoodCall();
 		this.#clearPermittedState(); // This fires the callback as not permitted, if it was permitted before. [NL]
 		this.#isPermitted = undefined;
 		this._isConditionsPositive = undefined;

@@ -83,7 +83,7 @@ export class UmbExtensionApiInitializer<
 	};
 	*/
 
-	protected async _conditionsAreGood() {
+	protected async _conditionsAreGood(signal: AbortSignal) {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
 		const newApi = await createExtensionApi<ExtensionApiInterface>(
@@ -91,12 +91,11 @@ export class UmbExtensionApiInitializer<
 			manifest as unknown as ManifestApi<ExtensionApiInterface>,
 			this.#constructorArguments as any,
 		);
-		if (!this._isConditionsPositive) {
+
+		if (signal.aborted || !this._isConditionsPositive) {
 			newApi?.destroy?.();
-			// We are not positive anymore, so we will back out of this creation.
 			return false;
 		}
-
 		// A previous _conditionsAreGood() on this same initializer may have already
 		// assigned this.#api and resolved before us. Without cleanup that instance would
 		// keep running until this._host is destroyed — not a hard leak, but any

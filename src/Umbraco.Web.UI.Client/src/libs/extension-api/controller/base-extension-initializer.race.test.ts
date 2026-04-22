@@ -1,8 +1,4 @@
-import type {
-	ManifestCondition,
-	ManifestWithDynamicConditions,
-	UmbConditionConfigBase,
-} from '../types/index.js';
+import type { ManifestCondition, ManifestWithDynamicConditions, UmbConditionConfigBase } from '../types/index.js';
 import type { UmbConditionControllerArguments } from '../condition/condition-controller-arguments.type.js';
 import { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import { UmbBaseExtensionInitializer } from './index.js';
@@ -53,9 +49,10 @@ class UmbSlowGoodExtensionController extends UmbBaseExtensionInitializer {
 		this._init();
 	}
 
-	protected async _conditionsAreGood() {
+	protected async _conditionsAreGood(signal: AbortSignal) {
 		this.goodCalls++;
 		await new Promise((r) => setTimeout(r, UmbSlowGoodExtensionController.goodDelayMs));
+		if (signal.aborted) return false;
 		return true;
 	}
 
@@ -98,11 +95,8 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 	// land at permitted=true after one good-call.
 	it('settles at true after a single flip to true', async () => {
 		const history: boolean[] = [];
-		const controller = new UmbSlowGoodExtensionController(
-			hostElement,
-			extensionRegistry,
-			manifest.alias,
-			(p) => history.push(p),
+		const controller = new UmbSlowGoodExtensionController(hostElement, extensionRegistry, manifest.alias, (p) =>
+			history.push(p),
 		);
 
 		// Wait for manifest + condition wiring.
@@ -121,11 +115,8 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 	// settle at permitted=true.
 	it('settles at true after flipping true → false → true while _conditionsAreGood is in flight', async () => {
 		const history: boolean[] = [];
-		const controller = new UmbSlowGoodExtensionController(
-			hostElement,
-			extensionRegistry,
-			manifest.alias,
-			(p) => history.push(p),
+		const controller = new UmbSlowGoodExtensionController(hostElement, extensionRegistry, manifest.alias, (p) =>
+			history.push(p),
 		);
 
 		await wait(0);
@@ -154,11 +145,8 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 	// the earlier in-flight `_conditionsAreGood` finally resolves. Final should still be true.
 	it('settles at true after flipping true → false → true → false → true', async () => {
 		const history: boolean[] = [];
-		const controller = new UmbSlowGoodExtensionController(
-			hostElement,
-			extensionRegistry,
-			manifest.alias,
-			(p) => history.push(p),
+		const controller = new UmbSlowGoodExtensionController(hostElement, extensionRegistry, manifest.alias, (p) =>
+			history.push(p),
 		);
 
 		await wait(0);
@@ -171,10 +159,7 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 
 		await wait(UmbSlowGoodExtensionController.goodDelayMs * 3 + 80);
 
-		expect(
-			controller.permitted,
-			`expected permitted=true. callback history: ${JSON.stringify(history)}`,
-		).to.be.true;
+		expect(controller.permitted, `expected permitted=true. callback history: ${JSON.stringify(history)}`).to.be.true;
 		expect(lastManualCondition!.permitted, 'condition final state').to.be.true;
 		controller.destroy();
 	});
@@ -184,11 +169,8 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 	// +true flip must not clobber the later -false decision.
 	it('settles at false after flipping true → false → true → false', async () => {
 		const history: boolean[] = [];
-		const controller = new UmbSlowGoodExtensionController(
-			hostElement,
-			extensionRegistry,
-			manifest.alias,
-			(p) => history.push(p),
+		const controller = new UmbSlowGoodExtensionController(hostElement, extensionRegistry, manifest.alias, (p) =>
+			history.push(p),
 		);
 
 		await wait(0);
@@ -200,10 +182,7 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 
 		await wait(UmbSlowGoodExtensionController.goodDelayMs * 3 + 80);
 
-		expect(
-			controller.permitted,
-			`expected permitted=false. callback history: ${JSON.stringify(history)}`,
-		).to.be.false;
+		expect(controller.permitted, `expected permitted=false. callback history: ${JSON.stringify(history)}`).to.be.false;
 		expect(lastManualCondition!.permitted, 'condition final state').to.be.false;
 		controller.destroy();
 	});
@@ -213,11 +192,8 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 	// spread across microtasks.
 	it('settles at true when flips are separated by microtask gaps (true → false → true)', async () => {
 		const history: boolean[] = [];
-		const controller = new UmbSlowGoodExtensionController(
-			hostElement,
-			extensionRegistry,
-			manifest.alias,
-			(p) => history.push(p),
+		const controller = new UmbSlowGoodExtensionController(hostElement, extensionRegistry, manifest.alias, (p) =>
+			history.push(p),
 		);
 
 		await wait(0);
@@ -230,10 +206,7 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 
 		await wait(UmbSlowGoodExtensionController.goodDelayMs * 2 + 60);
 
-		expect(
-			controller.permitted,
-			`expected permitted=true. history: ${JSON.stringify(history)}`,
-		).to.be.true;
+		expect(controller.permitted, `expected permitted=true. history: ${JSON.stringify(history)}`).to.be.true;
 		controller.destroy();
 	});
 
@@ -242,11 +215,8 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 	// overlap with different pending states.
 	it('settles at true when a flip arrives mid-resolution of a previous good-call', async () => {
 		const history: boolean[] = [];
-		const controller = new UmbSlowGoodExtensionController(
-			hostElement,
-			extensionRegistry,
-			manifest.alias,
-			(p) => history.push(p),
+		const controller = new UmbSlowGoodExtensionController(hostElement, extensionRegistry, manifest.alias, (p) =>
+			history.push(p),
 		);
 
 		await wait(0);
@@ -259,10 +229,7 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 
 		await wait(UmbSlowGoodExtensionController.goodDelayMs * 2 + 80);
 
-		expect(
-			controller.permitted,
-			`expected permitted=true. history: ${JSON.stringify(history)}`,
-		).to.be.true;
+		expect(controller.permitted, `expected permitted=true. history: ${JSON.stringify(history)}`).to.be.true;
 		controller.destroy();
 	});
 
@@ -270,11 +237,8 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 	// across callbacks, this should expose it.
 	it('settles at true after ten rapid flips ending at true', async () => {
 		const history: boolean[] = [];
-		const controller = new UmbSlowGoodExtensionController(
-			hostElement,
-			extensionRegistry,
-			manifest.alias,
-			(p) => history.push(p),
+		const controller = new UmbSlowGoodExtensionController(hostElement, extensionRegistry, manifest.alias, (p) =>
+			history.push(p),
 		);
 
 		await wait(0);
@@ -287,10 +251,7 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 
 		await wait(UmbSlowGoodExtensionController.goodDelayMs * 4 + 100);
 
-		expect(
-			controller.permitted,
-			`expected permitted=true. history: ${JSON.stringify(history)}`,
-		).to.be.true;
+		expect(controller.permitted, `expected permitted=true. history: ${JSON.stringify(history)}`).to.be.true;
 		controller.destroy();
 	});
 
@@ -299,11 +260,8 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 	// obviously work — it's the control against which the above race tests stand out.
 	it('settles at the final value when flips are spaced out longer than the good-delay', async () => {
 		const history: boolean[] = [];
-		const controller = new UmbSlowGoodExtensionController(
-			hostElement,
-			extensionRegistry,
-			manifest.alias,
-			(p) => history.push(p),
+		const controller = new UmbSlowGoodExtensionController(hostElement, extensionRegistry, manifest.alias, (p) =>
+			history.push(p),
 		);
 
 		await wait(0);
@@ -315,10 +273,8 @@ describe('UmbBaseExtensionInitializer — condition-flip race with slow _conditi
 		lastManualCondition!.flipTo(true);
 		await wait(UmbSlowGoodExtensionController.goodDelayMs + 20);
 
-		expect(
-			controller.permitted,
-			`expected permitted=true (well-spaced flips). history: ${JSON.stringify(history)}`,
-		).to.be.true;
+		expect(controller.permitted, `expected permitted=true (well-spaced flips). history: ${JSON.stringify(history)}`).to
+			.be.true;
 		controller.destroy();
 	});
 });
@@ -399,10 +355,7 @@ describe('UmbExtensionApiInitializer — condition-flip race with a slow API fac
 
 		await wait(200);
 
-		expect(
-			controller.permitted,
-			`expected permitted=true. callback history: ${JSON.stringify(history)}`,
-		).to.be.true;
+		expect(controller.permitted, `expected permitted=true. callback history: ${JSON.stringify(history)}`).to.be.true;
 		expect(controller.api, 'api instance should exist when permitted').to.exist;
 
 		controller.destroy();
@@ -427,10 +380,7 @@ describe('UmbExtensionApiInitializer — condition-flip race with a slow API fac
 
 		await wait(200);
 
-		expect(
-			controller.permitted,
-			`expected permitted=false. callback history: ${JSON.stringify(history)}`,
-		).to.be.false;
+		expect(controller.permitted, `expected permitted=false. callback history: ${JSON.stringify(history)}`).to.be.false;
 		expect(controller.api, 'api instance should be destroyed when not permitted').to.be.undefined;
 
 		controller.destroy();

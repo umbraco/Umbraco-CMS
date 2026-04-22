@@ -69,8 +69,9 @@ class UmbSlowGoodController extends UmbBaseExtensionInitializer {
 		this._init();
 	}
 
-	protected async _conditionsAreGood() {
+	protected async _conditionsAreGood(signal: AbortSignal) {
 		await new Promise((r) => setTimeout(r, UmbSlowGoodController.goodDelayMs));
+		if (signal.aborted) return false;
 		return true;
 	}
 

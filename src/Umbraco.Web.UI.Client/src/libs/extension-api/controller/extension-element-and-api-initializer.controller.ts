@@ -132,7 +132,7 @@ export class UmbExtensionElementAndApiInitializer<
 		});
 	};
 
-	protected async _conditionsAreGood() {
+	protected async _conditionsAreGood(signal: AbortSignal) {
 		const manifest = this.manifest!; // In this case we are sure its not undefined.
 
 		const { element: newComponent, api: newApi } = await createExtensionElementWithApi<
@@ -140,12 +140,11 @@ export class UmbExtensionElementAndApiInitializer<
 			ExtensionApiInterface
 		>(manifest, this.#constructorArguments as any, this.#defaultElement, this.#defaultApi);
 
-		if (!this._isConditionsPositive) {
+		if (signal.aborted || !this._isConditionsPositive) {
 			newApi?.destroy?.();
 			if (newComponent && 'destroy' in newComponent) {
 				(newComponent as unknown as { destroy: () => void }).destroy();
 			}
-			// We are not positive anymore, so we will back out of this creation.
 			return false;
 		}
 
@@ -167,7 +166,6 @@ export class UmbExtensionElementAndApiInitializer<
 		} else {
 			console.warn('Manifest did not provide any useful data for a api to be created.');
 		}
-
 		this.#component = newComponent;
 		if (this.#component) {
 			this.#assignElProps();
