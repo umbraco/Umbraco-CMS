@@ -37,7 +37,9 @@ public interface IRepositoryCacheVersionAccessor
     /// <param name="cacheKey">Key of the changed version.</param>
     /// <param name="newVersion">The new version GUID that was just written to the database.</param>
     void VersionChanged(string cacheKey, Guid newVersion)
-    { }
+    {
+        VersionChanged(cacheKey);
+    }
 
     /// <summary>
     /// Notifies the accessor that caches have been synchronized.
