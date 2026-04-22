@@ -200,26 +200,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		);
 
 		this.observe(
-			// TODO: Again we need to parse on all variants....
-			manager.readOnlyState.permitted,
-			(isReadOnly) => {
-				const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
-
-				if (isReadOnly) {
-					const rule = {
-						unique,
-						variantId: this.#variantId.getValue(),
-					};
-
-					this.readOnlyGuard?.addRule(rule);
-				} else {
-					this.readOnlyGuard?.removeRule(unique);
-				}
-			},
-			'observeIsReadOnly',
-		);
-
-		this.observe(
 			this.content.contentTypeId,
 			(contentTypeId) => {
 				this.observe(
