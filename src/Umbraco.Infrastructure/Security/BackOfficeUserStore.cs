@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -42,10 +43,25 @@ public class BackOfficeUserStore :
     private readonly IRuntimeState _runtimeState;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly ILogger<BackOfficeUserStore> _logger;
+    private readonly IBackOfficeUserReader _backOfficeUserReader;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="BackOfficeUserStore" /> class.
     /// </summary>
+    /// <param name="scopeProvider">Provides database transaction scopes for data operations.</param>
+    /// <param name="entityService">Service for managing Umbraco entities.</param>
+    /// <param name="externalLoginService">Handles external login providers with key support.</param>
+    /// <param name="globalSettings">The global configuration settings for Umbraco.</param>
+    /// <param name="mapper">Maps between domain and view models in Umbraco.</param>
+    /// <param name="describer">Provides error descriptions for back office user operations.</param>
+    /// <param name="appCaches">Provides access to application-level caches.</param>
+    /// <param name="twoFactorLoginService">Service for managing two-factor authentication for users.</param>
+    /// <param name="userGroupService">Service for managing user groups in the back office.</param>
+    /// <param name="userRepository">Repository for accessing and persisting user data.</param>
+    /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
+    /// <param name="eventMessagesFactory">Factory for creating event message collections.</param>
+    /// <param name="logger">Logger instance for logging operations related to the user store.</param>
+    /// <param name="backOfficeUserReader">The shared reader used for back office user lookups.</param>
     [ActivatorUtilitiesConstructor]
     public BackOfficeUserStore(
         ICoreScopeProvider scopeProvider,
@@ -60,7 +76,8 @@ public class BackOfficeUserStore :
         IUserRepository userRepository,
         IRuntimeState runtimeState,
         IEventMessagesFactory eventMessagesFactory,
-        ILogger<BackOfficeUserStore> logger)
+        ILogger<BackOfficeUserStore> logger,
+        IBackOfficeUserReader backOfficeUserReader)
         : base(describer)
     {
         _scopeProvider = scopeProvider;
@@ -75,7 +92,56 @@ public class BackOfficeUserStore :
         _runtimeState = runtimeState;
         _eventMessagesFactory = eventMessagesFactory;
         _logger = logger;
-        _externalLoginService = externalLoginService;
+        _backOfficeUserReader = backOfficeUserReader;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BackOfficeUserStore" /> class.
+    /// </summary>
+    /// <param name="scopeProvider">Provides database transaction scopes for data operations.</param>
+    /// <param name="entityService">Service for managing Umbraco entities.</param>
+    /// <param name="externalLoginService">Handles external login providers with key support.</param>
+    /// <param name="globalSettings">The global configuration settings for Umbraco.</param>
+    /// <param name="mapper">Maps between domain and view models in Umbraco.</param>
+    /// <param name="describer">Provides error descriptions for back office user operations.</param>
+    /// <param name="appCaches">Provides access to application-level caches.</param>
+    /// <param name="twoFactorLoginService">Service for managing two-factor authentication for users.</param>
+    /// <param name="userGroupService">Service for managing user groups in the back office.</param>
+    /// <param name="userRepository">Repository for accessing and persisting user data.</param>
+    /// <param name="runtimeState">Represents the current runtime state of the Umbraco application.</param>
+    /// <param name="eventMessagesFactory">Factory for creating event message collections.</param>
+    /// <param name="logger">Logger instance for logging operations related to the user store.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public BackOfficeUserStore(
+        ICoreScopeProvider scopeProvider,
+        IEntityService entityService,
+        IExternalLoginWithKeyService externalLoginService,
+        IOptionsSnapshot<GlobalSettings> globalSettings,
+        IUmbracoMapper mapper,
+        BackOfficeErrorDescriber describer,
+        AppCaches appCaches,
+        ITwoFactorLoginService twoFactorLoginService,
+        IUserGroupService userGroupService,
+        IUserRepository userRepository,
+        IRuntimeState runtimeState,
+        IEventMessagesFactory eventMessagesFactory,
+        ILogger<BackOfficeUserStore> logger)
+        : this(
+            scopeProvider,
+            entityService,
+            externalLoginService,
+            globalSettings,
+            mapper,
+            describer,
+            appCaches,
+            twoFactorLoginService,
+            userGroupService,
+            userRepository,
+            runtimeState,
+            eventMessagesFactory,
+            logger,
+            StaticServiceProvider.Instance.GetRequiredService<IBackOfficeUserReader>())
+    {
     }
 
     /// <inheritdoc />
@@ -246,68 +312,37 @@ public class BackOfficeUserStore :
         return SaveAsync(user);
     }
 
+    /// <summary>
+    /// Asynchronously retrieves a user by their unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to retrieve.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the <see cref="IUser"/> if found; otherwise, <c>null</c>.</returns>
     public Task<IUser?> GetAsync(int id)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        => Task.FromResult(_backOfficeUserReader.GetById(id));
 
-        try
-        {
-            return Task.FromResult(_userRepository.Get(id));
-        }
-        catch (DbException)
-        {
-            // TODO: refactor users/upgrade
-            // currently kinda accepting anything on upgrade, but that won't deal with all cases
-            // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
-            // be better BUT requires that the app restarts after the upgrade!
-            if (IsUpgrading)
-            {
-                // NOTE: this will not be cached
-                return Task.FromResult(_userRepository.GetForUpgrade(id));
-            }
-
-            throw;
-        }
-    }
-
+    /// <summary>
+    /// Asynchronously retrieves the users with the specified IDs.
+    /// </summary>
+    /// <param name="ids">An array of user IDs to retrieve. If null or empty, an empty collection is returned.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="IEnumerable{IUser}"/> of users matching the specified IDs.
+    /// </returns>
     public Task<IEnumerable<IUser>> GetUsersAsync(params int[]? ids)
-    {
-        if (ids is null || ids.Length <= 0)
-        {
-            return Task.FromResult(Enumerable.Empty<IUser>());
-        }
+        => Task.FromResult(ids is null ? Enumerable.Empty<IUser>() : _backOfficeUserReader.GetManyById(ids));
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-
-        // Need to use a List here because the expression tree cannot convert the array when used in Contains.
-        // See ExpressionTests.Sql_In().
-        List<int> idsAsList = [.. ids];
-        IQuery<IUser> query = _scopeProvider.CreateQuery<IUser>().Where(x => idsAsList.Contains(x.Id));
-
-        IEnumerable<IUser> users = _userRepository.Get(query);
-
-        return Task.FromResult(users);
-    }
-
+    /// <summary>
+    /// Asynchronously retrieves the users with the specified IDs.
+    /// </summary>
+    /// <param name="ids">An array of user IDs to retrieve. If <c>null</c> or empty, an empty collection is returned.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains an <see cref="IEnumerable{IUser}"/> of users matching the specified IDs.
+    /// </returns>
     public Task<IEnumerable<IUser>> GetUsersAsync(params Guid[]? keys)
-    {
-        if (keys is null || keys.Length <= 0)
-        {
-            return Task.FromResult(Enumerable.Empty<IUser>());
-        }
-
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<IUser> users = _userRepository.GetMany(keys);
-
-        return Task.FromResult(users);
-    }
+        => Task.FromResult(keys is null ? Enumerable.Empty<IUser>() : _backOfficeUserReader.GetManyByKey(keys));
 
     /// <inheritdoc />
     public Task<IUser?> GetAsync(Guid key)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return Task.FromResult(_userRepository.Get(key));
-    }
+        => Task.FromResult(_backOfficeUserReader.GetByKey(key));
 
     /// <inheritdoc />
     public Task<IUser?> GetByUserNameAsync(string username)
@@ -363,11 +398,7 @@ public class BackOfficeUserStore :
 
     /// <inheritdoc />
     public Task<IEnumerable<IUser>> GetAllInGroupAsync(int groupId)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        IEnumerable<IUser> usersInGroup = _userRepository.GetAllInGroup(groupId);
-        return Task.FromResult(usersInGroup);
-    }
+        => Task.FromResult(_backOfficeUserReader.GetAllInGroup(groupId));
 
     private bool IsUpgrading =>
         _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade || _runtimeState.Level == RuntimeLevel.Upgrading;
@@ -611,11 +642,14 @@ public class BackOfficeUserStore :
     }
 
     /// <summary>
-    ///     Lists all users of a given role.
+    ///     Returns all users that belong to the specified role.
     /// </summary>
     /// <remarks>
-    ///     Identity Role names are equal to Umbraco UserGroup alias.
+    ///     Identity role names correspond to Umbraco UserGroup aliases.
     /// </remarks>
+    /// <param name="normalizedRoleName">The normalized name of the role (UserGroup alias) whose users are to be listed.</param>
+    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="BackOfficeIdentityUser"/> objects in the specified role.</returns>
     public override async Task<IList<BackOfficeIdentityUser>> GetUsersInRoleAsync(
         string normalizedRoleName,
         CancellationToken cancellationToken = default)

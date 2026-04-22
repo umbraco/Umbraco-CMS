@@ -13,6 +13,11 @@ public class DeleteDefaultConstraintBuilder : ExpressionBuilderBase<DeleteDefaul
 {
     private readonly IMigrationContext _context;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteDefaultConstraintBuilder"/> class with the specified migration context and delete default constraint expression.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> to use for the migration operation.</param>
+    /// <param name="expression">The <see cref="DeleteDefaultConstraintExpression"/> representing the default constraint to be deleted.</param>
     public DeleteDefaultConstraintBuilder(IMigrationContext context, DeleteDefaultConstraintExpression expression)
         : base(expression) =>
         _context = context;

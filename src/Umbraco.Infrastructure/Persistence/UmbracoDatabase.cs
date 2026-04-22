@@ -36,6 +36,13 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
     ///     <para>Used by UmbracoDatabaseFactory to create databases.</para>
     ///     <para>Also used by DatabaseBuilder for creating databases and installing/upgrading.</para>
     /// </remarks>
+    /// <param name="connectionString">The connection string used to connect to the database.</param>
+    /// <param name="sqlContext">The <see cref="ISqlContext"/> providing SQL context and helpers for database operations.</param>
+    /// <param name="provider">The <see cref="DbProviderFactory"/> used to create database provider-specific instances.</param>
+    /// <param name="logger">The <see cref="ILogger{UmbracoDatabase}"/> instance for logging database operations.</param>
+    /// <param name="bulkSqlInsertProvider">An optional <see cref="IBulkSqlInsertProvider"/> for performing bulk SQL insert operations.</param>
+    /// <param name="databaseSchemaCreatorFactory">A factory for creating <see cref="DatabaseSchemaCreator"/> instances.</param>
+    /// <param name="mapperCollection">An optional collection of <see cref="IMapper"/> instances for mapping database entities.</param>
     public UmbracoDatabase(
         string connectionString,
         ISqlContext sqlContext,
@@ -212,12 +219,21 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
 
     internal IEnumerable<CommandInfo>? Commands => _commands;
 
+    /// <summary>
+    /// Inserts a collection of records of type <typeparamref name="T"/> into the database in a single bulk operation.
+    /// </summary>
+    /// <typeparam name="T">The type of records to insert.</typeparam>
+    /// <param name="records">The collection of records to insert.</param>
+    /// <returns>The number of records successfully inserted.</returns>
     public int BulkInsertRecords<T>(IEnumerable<T> records) =>
         _bulkSqlInsertProvider?.BulkInsertRecords(this, records) ?? 0;
 
     /// <summary>
-    ///     Returns the <see cref="DatabaseSchemaResult" /> for the database
+    /// Validates the current database schema and returns the result.
     /// </summary>
+    /// <returns>
+    /// A <see cref="DatabaseSchemaResult" /> representing the outcome of the schema validation process for the current database.
+    /// </returns>
     public DatabaseSchemaResult ValidateSchema()
     {
         DatabaseSchemaCreator? dbSchema = _databaseSchemaCreatorFactory?.Create(this);
@@ -226,6 +242,11 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
         return databaseSchemaValidationResult ?? new DatabaseSchemaResult();
     }
 
+    /// <summary>
+    /// Executes the specified database command as a non-query operation (such as INSERT, UPDATE, or DELETE) against the database.
+    /// </summary>
+    /// <param name="command">The <see cref="DbCommand"/> to execute.</param>
+    /// <returns>The number of rows affected by the command.</returns>
     public int ExecuteNonQuery(DbCommand command)
     {
         OnExecutingCommand(command);
@@ -235,8 +256,9 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
     }
 
     /// <summary>
-    ///     Returns true if Umbraco database tables are detected to be installed
+    /// Determines whether the required Umbraco database tables are present, indicating that Umbraco is installed.
     /// </summary>
+    /// <returns>True if the Umbraco database tables are detected to be installed; otherwise, false.</returns>
     public bool IsUmbracoInstalled() => ValidateSchema().DetermineHasInstalledVersion();
 
     #endregion
@@ -357,9 +379,16 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
 
     #endregion
 
-    // used for tracking commands
+    /// <summary>
+    /// Represents information about a command executed against the Umbraco database.
+    /// </summary>
+    /// <remarks>used for tracking commands</remarks>
     public class CommandInfo
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.UmbracoDatabase.CommandInfo"/> class, wrapping the specified database command.
+        /// </summary>
+        /// <param name="cmd">The <see cref="System.Data.IDbCommand"/> to wrap.</param>
         public CommandInfo(IDbCommand cmd)
         {
             Text = cmd.CommandText;
@@ -372,14 +401,28 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
             Parameters = parameters.ToArray();
         }
 
+        /// <summary>
+        /// Gets the SQL command text associated with this command.
+        /// </summary>
         public string Text { get; }
 
+        /// <summary>
+        /// Gets the array of parameters associated with this database command.
+        /// </summary>
         public ParameterInfo[] Parameters { get; }
     }
 
-    // used for tracking commands
+    /// <summary>
+    /// Contains metadata about a parameter used in database commands executed by <see cref="UmbracoDatabase"/>.
+    /// </summary>
+    /// <remarks>used for tracking commands</remarks>
     public class ParameterInfo
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.UmbracoDatabase.ParameterInfo"/> class,
+        /// wrapping the specified <see cref="IDbDataParameter"/>.
+        /// </summary>
+        /// <param name="parameter">The <see cref="IDbDataParameter"/> to be wrapped by this <see cref="ParameterInfo"/> instance.</param>
         public ParameterInfo(IDbDataParameter parameter)
         {
             Name = parameter.ParameterName;
@@ -388,12 +431,22 @@ public class UmbracoDatabase : Database, IUmbracoDatabase
             Size = parameter.Size;
         }
 
+        /// <summary>Gets the name of the parameter.</summary>
         public string Name { get; }
 
+        /// <summary>
+        /// Gets the value assigned to the parameter.
+        /// </summary>
         public object? Value { get; }
 
+        /// <summary>
+        /// Gets the type of the parameter as understood by the database.
+        /// </summary>
         public DbType DbType { get; }
 
+        /// <summary>
+        /// Gets the size of the database parameter.
+        /// </summary>
         public int Size { get; }
     }
 

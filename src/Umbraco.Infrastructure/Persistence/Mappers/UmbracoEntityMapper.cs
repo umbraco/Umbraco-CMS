@@ -3,9 +3,17 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
+/// <summary>
+/// Provides functionality to map properties of Umbraco entities to their corresponding database columns.
+/// </summary>
 [MapperFor(typeof(IUmbracoEntity))]
 public sealed class UmbracoEntityMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UmbracoEntityMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">The lazy-loaded SQL context used for database operations.</param>
+    /// <param name="maps">The configuration store containing mapping definitions.</param>
     public UmbracoEntityMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

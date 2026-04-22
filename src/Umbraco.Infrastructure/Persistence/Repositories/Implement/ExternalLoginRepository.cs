@@ -17,6 +17,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdentityUserLogin>, IExternalLoginWithKeyRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ExternalLoginRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing data retrieval.</param>
+    /// <param name="logger">The logger used for logging repository events and errors.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
     public ExternalLoginRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -66,10 +74,14 @@ internal sealed class ExternalLoginRepository : EntityRepositoryBase<int, IIdent
     /// <inheritdoc />
     public void DeleteUserLogins(Guid userOrMemberKey)
     {
-        Sql<ISqlContext> sql = SqlContext.Sql()
-            .Delete<ExternalLoginDto>()
+        // Find login IDs first, then use the shared helper that deletes tokens before logins.
+        Sql<ISqlContext> sql = Sql()
+            .Select<ExternalLoginDto>(x => x.Id)
+            .From<ExternalLoginDto>()
             .Where<ExternalLoginDto>(x => x.UserOrMemberKey == userOrMemberKey);
-        Database.Execute(sql);
+
+        var loginIds = Database.Query<ExternalLoginDto>(sql).Select(x => x.Id).ToList();
+        DeleteExternalLogins(loginIds);
     }
 
     /// <inheritdoc />

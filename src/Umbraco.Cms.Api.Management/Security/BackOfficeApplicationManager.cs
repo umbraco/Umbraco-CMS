@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.AspNetCore.Hosting;
@@ -15,6 +15,9 @@ using Umbraco.Cms.Infrastructure.Security;
 
 namespace Umbraco.Cms.Api.Management.Security;
 
+/// <summary>
+/// Manages back office applications in the Umbraco CMS management security context.
+/// </summary>
 public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IBackOfficeApplicationManager
 {
     private readonly IWebHostEnvironment _webHostEnvironment;
@@ -24,6 +27,13 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
     private readonly string _authorizeCallbackPathName;
     private readonly string _authorizeCallbackLogoutPathName;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeApplicationManager"/> class with the specified dependencies.
+    /// </summary>
+    /// <param name="applicationManager">The OpenIddict application manager used for managing backoffice applications.</param>
+    /// <param name="webHostEnvironment">Provides information about the web hosting environment.</param>
+    /// <param name="securitySettings">The security settings options for configuration.</param>
+    /// <param name="runtimeState">The current runtime state of the Umbraco application.</param>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
@@ -40,6 +50,14 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         _logger = StaticServiceProvider.Instance.GetRequiredService<ILogger<BackOfficeApplicationManager>>();
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeApplicationManager"/> class.
+    /// </summary>
+    /// <param name="applicationManager">The OpenIddict application manager used for managing backoffice authentication applications.</param>
+    /// <param name="webHostEnvironment">Provides information about the web hosting environment.</param>
+    /// <param name="securitySettings">The security settings options for configuring backoffice security.</param>
+    /// <param name="runtimeState">The current runtime state of the Umbraco application.</param>
+    /// <param name="logger">The logger used for logging events related to the backoffice application manager.</param>
     public BackOfficeApplicationManager(
         IOpenIddictApplicationManager applicationManager,
         IWebHostEnvironment webHostEnvironment,
@@ -56,6 +74,16 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         _authorizeCallbackLogoutPathName = securitySettings.Value.AuthorizeCallbackLogoutPathName;
     }
 
+    /// <summary>
+    /// Ensures that the back office application is properly configured with the specified back office hosts.
+    /// This includes merging the provided hosts with those already configured, validating that all hosts are absolute URIs,
+    /// and creating or updating the OpenId applications required for back office authentication.
+    /// In production environments, developer-specific OpenId applications (such as Swagger and Postman) are removed;
+    /// in non-production environments, these are created or updated as needed.
+    /// </summary>
+    /// <param name="backOfficeHosts">A collection of absolute <see cref="Uri"/> instances representing the back office hosts to configure.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task EnsureBackOfficeApplicationAsync(IEnumerable<Uri> backOfficeHosts, CancellationToken cancellationToken = default)
     {
         // Install is okay without this, because we do not need a token to install,
@@ -110,6 +138,14 @@ public class BackOfficeApplicationManager : OpenIdDictApplicationManagerBase, IB
         }
     }
 
+    /// <summary>
+    /// Ensures that a back-office client credentials application with the specified client ID and secret exists.
+    /// If such an application does not exist, it will be created; if it exists, it will be updated as necessary.
+    /// </summary>
+    /// <param name="clientId">The client identifier for the back-office application.</param>
+    /// <param name="clientSecret">The client secret for the back-office application.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+    /// <returns>A task that represents the asynchronous operation. The task does not return a value.</returns>
     public async Task EnsureBackOfficeClientCredentialsApplicationAsync(string clientId, string clientSecret, CancellationToken cancellationToken = default)
     {
         var applicationDescriptor = new OpenIddictApplicationDescriptor

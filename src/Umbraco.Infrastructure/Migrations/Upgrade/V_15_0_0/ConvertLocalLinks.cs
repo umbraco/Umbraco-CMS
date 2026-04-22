@@ -40,6 +40,17 @@ public class ConvertLocalLinks : MigrationBase
     /// <summary>
     /// Initializes a new instance of the <see cref="ConvertLocalLinks"/> class.
     /// </summary>
+    /// <param name="context">The migration context for the upgrade process.</param>
+    /// <param name="umbracoContextFactory">Factory for creating Umbraco context instances.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="logger">The logger used for logging migration operations.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="languageService">Service for managing languages.</param>
+    /// <param name="jsonSerializer">Serializer for handling JSON data.</param>
+    /// <param name="localLinkProcessor">Processor for handling local links in content.</param>
+    /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="coreScopeProvider">Provider for managing database scopes.</param>
+    /// <param name="linkMigrationTracker">Tracks the progress of local link migrations.</param>
     public ConvertLocalLinks(
         IMigrationContext context,
         IUmbracoContextFactory umbracoContextFactory,
@@ -67,8 +78,18 @@ public class ConvertLocalLinks : MigrationBase
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ConvertLocalLinks"/> class.
+    /// Initializes a new instance of the <see cref="ConvertLocalLinks"/> class, used for migrating and converting local links during the upgrade process.
     /// </summary>
+    /// <param name="context">The migration context providing state and services for the migration.</param>
+    /// <param name="umbracoContextFactory">Factory for creating Umbraco context instances.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="logger">The logger used for logging migration operations.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="languageService">Service for managing languages.</param>
+    /// <param name="jsonSerializer">Serializer for handling JSON data.</param>
+    /// <param name="localLinkProcessor">Processor for handling local link conversion logic.</param>
+    /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="coreScopeProvider">Provider for managing database transaction scopes.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal along with all other migrations to 17 in Umbraco 18.")]
     public ConvertLocalLinks(
         IMigrationContext context,

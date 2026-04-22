@@ -7,9 +7,17 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Folder;
 
+/// <summary>
+/// API controller responsible for handling requests to update data type folders in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class UpdateDataTypeFolderController : DataTypeFolderControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateDataTypeFolderController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and authentication.</param>
+    /// <param name="dataTypeContainerService">Service used to manage data type folders (containers).</param>
     public UpdateDataTypeFolderController(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IDataTypeContainerService dataTypeContainerService)

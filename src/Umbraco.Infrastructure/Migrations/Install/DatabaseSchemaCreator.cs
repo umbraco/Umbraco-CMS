@@ -45,6 +45,8 @@ public class DatabaseSchemaCreator
         typeof(MemberPropertyTypeDto),
         typeof(MemberDto),
         typeof(Member2MemberGroupDto),
+        typeof(ExternalMemberDto),
+        typeof(ExternalMember2MemberGroupDto),
         typeof(PropertyTypeGroupDto),
         typeof(PropertyTypeDto),
         typeof(PropertyDataDto),
@@ -109,6 +111,12 @@ public class DatabaseSchemaCreator
     /// <summary>
     /// Initializes a new instance of the <see cref="DatabaseSchemaCreator"/> class.
     /// </summary>
+    /// <param name="database">The Umbraco database instance to use for schema creation, or <c>null</c> if not provided.</param>
+    /// <param name="logger">The logger used for logging schema creation operations.</param>
+    /// <param name="loggerFactory">The factory used to create logger instances.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="eventAggregator">The event aggregator for publishing and subscribing to events during schema creation.</param>
+    /// <param name="defaultDataCreationSettings">The settings that control default data creation during installation.</param>
     public DatabaseSchemaCreator(
         IUmbracoDatabase? database,
         ILogger<DatabaseSchemaCreator> logger,
@@ -606,8 +614,9 @@ public class DatabaseSchemaCreator
     }
 
     /// <summary>
-    ///     Drops the table for the specified <paramref name="tableName"/>
+    /// Drops the specified table from the database.
     /// </summary>
+    /// <param name="tableName">The name of the table to drop.</param>
     public void DropTable(string? tableName)
     {
         var sql = new Sql(string.Format(SqlSyntax.DropTable, SqlSyntax.GetQuotedTableName(tableName)));

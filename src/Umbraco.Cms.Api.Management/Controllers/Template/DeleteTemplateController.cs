@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template;
 
+/// <summary>
+/// Controller responsible for handling requests to delete templates.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeleteTemplateController : TemplateControllerBase
 {
@@ -20,6 +23,12 @@ public class DeleteTemplateController : TemplateControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IOptions<RuntimeSettings> _runtimeSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeleteTemplateController"/> class, responsible for handling template deletion operations.
+    /// </summary>
+    /// <param name="templateService">The service used to manage templates.</param>
+    /// <param name="backOfficeSecurityAccessor">Provides access to back office security features.</param>
+    /// <param name="runtimeSettings">The runtime configuration settings.</param>
     [ActivatorUtilitiesConstructor]
     public DeleteTemplateController(
         ITemplateService templateService,
@@ -42,6 +51,12 @@ public class DeleteTemplateController : TemplateControllerBase
     {
     }
 
+    /// <summary>
+    /// Deletes the template with the specified unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the template to delete.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
     [HttpDelete("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

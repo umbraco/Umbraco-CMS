@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -240,7 +240,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
-        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
+        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
     }
 
     [Test]
@@ -265,7 +265,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         });
 
         // Act
-        ContentService.Unpublish(Textpage );
+        ContentService.Unpublish(Textpage);
 
         Assert.Multiple(() =>
         {
@@ -330,7 +330,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
-        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
+        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
     }
 
     [TestCase("/child-of-second-root", "en-US", true, ExpectedResult = "FF6654FB-BC68-4A65-8C6C-135567F50BD6")]
@@ -354,7 +354,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
-        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
+        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
     }
 
     [TestCase(TextpageKey, "en-US", ExpectedResult = "/")]
@@ -779,11 +779,12 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         var database = ScopeAccessor.AmbientScope!.Database;
 
         // Delete any existing URL rows to start clean.
-        database.Execute("DELETE FROM umbracoDocumentUrl");
+        database.Execute(database.SqlContext.Sql().Delete<DocumentUrlDto>());
 
         // Insert stale rows: one per (document × language × draft/published).
         // These simulate pre-v17.3 data where invariant documents had per-language rows.
         var staleRowCount = 0;
+        var syntax = database.SqlContext.SqlSyntax;
         foreach (var documentKey in documentKeys)
         {
             foreach (var languageId in languageIds)
@@ -791,7 +792,13 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
                 foreach (var isDraft in new[] { true, false })
                 {
                     database.Execute(
-                        "INSERT INTO umbracoDocumentUrl (uniqueId, languageId, isDraft, urlSegment, isPrimary) VALUES (@0, @1, @2, @3, @4)",
+                        $"INSERT INTO {syntax.GetQuotedTableName(DocumentUrlDto.TableName)}" +
+                        $" ({syntax.GetQuotedColumnName(DocumentUrlDto.UniqueIdColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.LanguageIdColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.IsDraftColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.UrlSegmentColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.IsPrimaryColumnName)})" +
+                        " VALUES (@0, @1, @2, @3, @4)",
                         documentKey,
                         languageId,
                         isDraft,
@@ -833,7 +840,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         Assert.DoesNotThrow(() => DocumentUrlRepository.Save(newSegments));
 
         // Verify: old rows deleted, new rows inserted.
-        var remainingRows = database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoDocumentUrl");
+        var remainingRows = database.ExecuteScalar<int>(database.SqlContext.Sql().SelectCount().From<DocumentUrlDto>());
         Assert.That(
             remainingRows,
             Is.EqualTo(newSegments.Count),
@@ -843,4 +850,39 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     }
 
     #endregion
+
+    // Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22293.
+    // An inconsistent database state (umbracoDocument.published = 1 but no matching
+    // umbracoDocumentVersion with published = 1) previously caused RebuildAllUrlsAsync
+    // to NRE in DocumentRepository.MapDtosToContent when dereferencing PublishedVersionDto.
+    [Test]
+    public async Task RebuildAllUrlsAsync_Handles_Node_With_Inconsistent_Published_State()
+    {
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        using (var scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            var db = ScopeAccessor.AmbientScope!.Database;
+            var updateSql = ScopeAccessor.AmbientScope.SqlContext.Sql()
+                .Update<DocumentVersionDto>(u => u.Set(x => x.Published, false))
+                .WhereIn<DocumentVersionDto>(
+                    x => x.Id,
+                    ScopeAccessor.AmbientScope.SqlContext.Sql()
+                        .Select<DocumentVersionDto>(x => x.Id)
+                        .From<DocumentVersionDto>()
+                        .InnerJoin<ContentVersionDto>()
+                        .On<DocumentVersionDto, ContentVersionDto>((dv, cv) => dv.Id == cv.Id)
+                        .Where<ContentVersionDto>(x => x.NodeId == Subpage.Id)
+                        .Where<DocumentVersionDto>(x => x.Published == true));
+            db.Execute(updateSql);
+        }
+
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        Assert.DoesNotThrowAsync(() => DocumentUrlService.RebuildAllUrlsAsync());
+        Assert.That(
+            DocumentUrlService.GetUrlSegment(Textpage.Key, isoCode, false),
+            Is.Not.Null,
+            "Healthy sibling should still have a published URL segment after rebuild.");
+    }
 }

@@ -1,7 +1,11 @@
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
+/// <summary>
+/// Represents a handler that defines methods for managing indexing operations related to Umbraco content and data.
+/// </summary>
 public interface IUmbracoIndexingHandler
 {
     /// <summary>
@@ -13,10 +17,46 @@ public interface IUmbracoIndexingHandler
     /// </remarks>
     bool Enabled { get; }
 
+    /// <summary>
+    /// Re-indexes the specified content item in the search index.
+    /// </summary>
+    /// <param name="sender">The <see cref="IContent"/> instance to re-index.</param>
+    /// <param name="isPublished">True if the content item is published; otherwise, false.</param>
     void ReIndexForContent(IContent sender, bool isPublished);
 
+    /// <summary>
+    /// Re-indexes the specified <see cref="IMember"/> in the search index.
+    /// </summary>
+    /// <param name="member">The <see cref="IMember"/> instance to re-index.</param>
     void ReIndexForMember(IMember member);
 
+    /// <summary>
+    /// Re-indexes the specified <see cref="ExternalMemberIdentity"/> in the search index.
+    /// </summary>
+    /// <param name="member">The <see cref="ExternalMemberIdentity"/> instance to re-index.</param>
+    // TODO (V19): Remove the default implementation.
+    void ReIndexForExternalMember(ExternalMemberIdentity member)
+    {
+    }
+
+    /// <summary>
+    ///     Remove an external member from the member indexes.
+    /// </summary>
+    /// <param name="externalMemberId">The external member ID to remove from member indexes.</param>
+    /// <remarks>
+    ///     External members have their own ID space (separate from <c>umbracoNode</c>) so they must
+    ///     be removed from member-only indexes rather than through <see cref="DeleteIndexForEntity"/>.
+    /// </remarks>
+    // TODO (V19): Remove the default implementation.
+    void DeleteExternalMemberFromIndex(int externalMemberId)
+    {
+    }
+
+    /// <summary>
+    /// Re-indexes the specified media item in the search index.
+    /// </summary>
+    /// <param name="sender">The <see cref="IMedia"/> item to re-index.</param>
+    /// <param name="isPublished">True if the media item is published; otherwise, false.</param>
     void ReIndexForMedia(IMedia sender, bool isPublished);
 
     /// <summary>
@@ -27,13 +67,13 @@ public interface IUmbracoIndexingHandler
     /// <summary>
     ///     Deletes all documents for the content type Ids
     /// </summary>
-    /// <param name="removedContentTypes"></param>
+    /// <param name="removedContentTypes">The content type IDs whose documents should be deleted.</param>
     void DeleteDocumentsForContentTypes(IReadOnlyCollection<int> removedContentTypes);
 
     /// <summary>
     ///     Remove an item from an index
     /// </summary>
-    /// <param name="entityId"></param>
+    /// <param name="entityId">The entity ID to remove from the index.</param>
     /// <param name="keepIfUnpublished">
     ///     If true, indicates that we will only delete this item from indexes that don't support unpublished content.
     ///     If false it will delete this from all indexes regardless.
@@ -43,7 +83,7 @@ public interface IUmbracoIndexingHandler
     /// <summary>
     ///     Remove items from an index
     /// </summary>
-    /// <param name="entityIds"></param>
+    /// <param name="entityIds">The entity IDs to remove from the index.</param>
     /// <param name="keepIfUnpublished">
     ///     If true, indicates that we will only delete this item from indexes that don't support unpublished content.
     ///     If false it will delete this from all indexes regardless.

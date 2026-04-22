@@ -94,6 +94,13 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.Cannot_Create_With_Variant_Property_Value_For_Invariant_Content(Umbraco.Cms.Core.Models.ContentVariation)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.Cannot_Move_To_Recycle_Bin_When_Content_Is_Related_As_A_Child_And_Configured_To_Disable_When_Related</Target>
     <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>

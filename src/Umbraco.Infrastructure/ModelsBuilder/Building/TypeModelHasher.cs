@@ -3,8 +3,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
+/// <summary>
+/// Provides methods to compute hash values for type models, typically used to detect changes in model definitions.
+/// </summary>
 public class TypeModelHasher
 {
+    /// <summary>
+    /// Generates a hash string representing the given collection of <see cref="Umbraco.Cms.Infrastructure.ModelsBuilder.Building.TypeModel"/> instances.
+    /// The hash is computed based on important properties of the content type models and their properties,
+    /// including the ModelsBuilder API version to ensure changes trigger model rebuilds.
+    /// </summary>
+    /// <param name="typeModels">The collection of <see cref="Umbraco.Cms.Infrastructure.ModelsBuilder.Building.TypeModel"/> to hash.</param>
+    /// <returns>A string hash representing the combined state of the provided type models.</returns>
     public static string Hash(IEnumerable<TypeModel> typeModels)
     {
         var builder = new StringBuilder();

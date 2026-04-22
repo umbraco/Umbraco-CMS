@@ -188,16 +188,9 @@ stages:
             parameters:
               nodeVersion: ${{ variables.nodeVersion }}
               npm_config_cache: ${{ variables.npm_config_cache }}
-          - bash: |
-              echo "##[command]Install nbgv"
-              dotnet tool install --tool-path . nbgv
-              echo "##[command]Running nbgv get-version"
-              PACKAGE_VERSION=$(nbgv get-version -v NpmPackageVersion)
-              echo "##[command]Running npm version"
-              echo "##[debug]Version: $PACKAGE_VERSION"
-              cd tests/Umbraco.Tests.AcceptanceTest
-              npm version $PACKAGE_VERSION --allow-same-version --no-git-tag-version
-            displayName: Set NPM Version
+          - template: templates/set-npm-version.yml
+            parameters:
+              workingDirectory: tests/Umbraco.Tests.AcceptanceTest
           - bash: |
               echo "##[command]Running npm pack"
               mkdir $(Build.ArtifactStagingDirectory)/npm-testhelpers
@@ -614,7 +607,6 @@ stages:
       UMBRACO__CMS__GLOBAL__VERSIONCHECKPERIOD: 0
       UMBRACO__CMS__GLOBAL__USEHTTPS: true
       UMBRACO__CMS__HEALTHCHECKS__NOTIFICATION__ENABLED: false
-      UMBRACO__CMS__KEEPALIVE__DISABLEKEEPALIVETASK: true
       UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL: https://localhost:44331/
       ASPNETCORE_URLS: https://localhost:44331
     jobs:

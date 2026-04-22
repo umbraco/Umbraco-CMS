@@ -24,6 +24,13 @@ export const manifest: ManifestPropertyEditorSchema = {
 					weight: 90,
 				},
 				{
+					alias: 'allowedMediaTypes',
+					label: '#rte_config_allowedMediaTypes',
+					description: '{#rte_config_allowedMediaTypes_description}',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.MediaTypePicker',
+					weight: 91,
+				},
+				{
 					alias: 'ignoreUserStartNodes',
 					label: '#rte_config_ignoreUserStartNodes',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',

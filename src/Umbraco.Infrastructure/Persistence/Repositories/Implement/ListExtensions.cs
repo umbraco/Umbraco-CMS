@@ -17,12 +17,25 @@ internal static class ListExtensions
         items.Any(x => x.Suffix.HasValue);
 }
 
-internal sealed class SimilarNodeName
+internal sealed partial class SimilarNodeName
 {
+    /// <summary>
+    /// Gets or sets the unique identifier for this SimilarNodeName instance.
+    /// </summary>
     public int Id { get; set; }
 
+    /// <summary>
+    /// Gets or sets the name of a node that is considered similar, typically used for comparison or validation purposes.
+    /// </summary>
     public string? Name { get; set; }
 
+    /// <summary>
+    /// Returns a unique node name by comparing the proposed name against a collection of similar node names, excluding the node with the specified ID.
+    /// </summary>
+    /// <param name="names">A collection of <see cref="SimilarNodeName"/> objects to check for name uniqueness.</param>
+    /// <param name="nodeId">The ID of the node to exclude from the uniqueness check (typically the current node).</param>
+    /// <param name="nodeName">The proposed node name to validate and make unique if necessary.</param>
+    /// <returns>A unique node name based on <paramref name="nodeName"/>, or <c>null</c> if a unique name cannot be generated.</returns>
     public static string? GetUniqueName(IEnumerable<SimilarNodeName> names, int nodeId, string? nodeName)
     {
         IEnumerable<string?> items = names
@@ -181,11 +194,14 @@ internal sealed class SimilarNodeName
         return current;
     }
 
-    internal sealed class StructuredName
+    internal sealed partial class StructuredName
     {
         internal const uint Initialsuffix = 1;
         private const string Spacecharacter = " ";
-        private const string Suffixedpattern = @"(.*) \(([1-9]\d*)\)$";
+
+        [GeneratedRegex(@"(.*) \(([1-9]\d*)\)$")]
+        private static partial Regex SuffixedPatternRegex();
+
         internal static readonly uint? _nosuffix = default;
 
         internal StructuredName(string? name)
@@ -197,8 +213,7 @@ internal sealed class SimilarNodeName
                 return;
             }
 
-            var rg = new Regex(Suffixedpattern);
-            MatchCollection matches = rg.Matches(name);
+            MatchCollection matches = SuffixedPatternRegex().Matches(name);
             if (matches.Count > 0)
             {
                 Match match = matches[0];
@@ -214,6 +229,10 @@ internal sealed class SimilarNodeName
             Text = name;
         }
 
+        /// <summary>
+        /// Gets the full name of the node, including the suffix in parentheses if the suffix is greater than zero.
+        /// For example, returns "NodeName (2)" if the suffix is 2, otherwise just the trimmed node name.
+        /// </summary>
         public string FullName
         {
             get

@@ -6,6 +6,10 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.TemporaryFile;
 
+/// <summary>
+/// Serves as the base controller for managing temporary file operations in the API.
+/// Provides common functionality for derived controllers handling temporary files.
+/// </summary>
 [VersionedApiBackOfficeRoute("temporary-file")]
 [ApiExplorerSettings(GroupName = "Temporary File")]
 public abstract class TemporaryFileControllerBase : ManagementApiControllerBase

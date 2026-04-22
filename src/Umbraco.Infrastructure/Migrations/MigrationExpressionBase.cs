@@ -1,3 +1,4 @@
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
@@ -20,6 +21,9 @@ public abstract class MigrationExpressionBase : IMigrationExpression
     protected MigrationExpressionBase(IMigrationContext context) =>
         Context = context ?? throw new ArgumentNullException(nameof(context));
 
+    /// <summary>
+    /// Gets the database type associated with the current migration context.
+    /// </summary>
     public IDatabaseType DatabaseType => Context.Database.DatabaseType;
 
     protected IMigrationContext Context { get; }
@@ -30,6 +34,9 @@ public abstract class MigrationExpressionBase : IMigrationExpression
 
     protected IUmbracoDatabase Database => Context.Database;
 
+    /// <summary>
+    /// Gets the collection of migration expressions that define the operations to be performed during a database migration.
+    /// </summary>
     public List<IMigrationExpression> Expressions => _expressions ??= new List<IMigrationExpression>();
 
     /// <summary>
@@ -38,6 +45,13 @@ public abstract class MigrationExpressionBase : IMigrationExpression
     /// </summary>
     internal string? Name { get; set; }
 
+    /// <summary>
+    /// Executes the migration expression by running the generated SQL statements and any nested expressions.
+    /// Throws an exception if the expression has already been executed.
+    /// Splits SQL on "GO" batch separators, logs when SQL is empty, and executes each statement.
+    /// For SQLite databases, skips execution of constraint and foreign key expressions due to platform limitations.
+    /// After executing its own SQL, recursively executes any child migration expressions.
+    /// </summary>
     public virtual void Execute()
     {
         if (_executed)
@@ -94,15 +108,15 @@ public abstract class MigrationExpressionBase : IMigrationExpression
         }
 
         // HACK: We're handling all the constraints higher up the stack for SQLite.
-            if (Context.Database.DatabaseType.IsSqlite())
-            {
-                _expressions = _expressions
-                    .Where(x => x is not CreateConstraintExpression)
-                    .Where(x => x is not CreateForeignKeyExpression)
-                    .ToList();
-            }
+        if (Context.Database.DatabaseType.IsSqlite())
+        {
+            _expressions = _expressions
+                .Where(x => x is not CreateConstraintExpression)
+                .Where(x => x is not CreateForeignKeyExpression)
+                .ToList();
+        }
 
-            foreach (IMigrationExpression expression in _expressions)
+        foreach (IMigrationExpression expression in _expressions)
         {
             expression.Execute();
         }
@@ -165,6 +179,12 @@ public abstract class MigrationExpressionBase : IMigrationExpression
         if (val == null)
         {
             return "NULL";
+        }
+
+        // Format Guids via the syntax provider to ensure consistent storage (e.g. Guids need to be uppercase for SQLite).
+        if (val is Guid guid)
+        {
+            return SqlSyntax.GetQuotedValue(SqlSyntax.FormatGuid(guid));
         }
 
         Type type = val.GetType();

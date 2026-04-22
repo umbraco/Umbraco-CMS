@@ -20,6 +20,15 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
     private const string TextNodeName = "#text";
     private const string CommentNodeName = "#comment";
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.DeliveryApi.ApiRichTextElementParser"/> class.
+    /// </summary>
+    /// <param name="apiContentRouteBuilder">An instance of <see cref="IApiContentRouteBuilder"/> used to build API content routes.</param>
+    /// <param name="mediaUrlProvider">An instance of <see cref="IApiMediaUrlProvider"/> used to provide media URLs.</param>
+    /// <param name="publishedContentCache">An instance of <see cref="IPublishedContentCache"/> for accessing published content.</param>
+    /// <param name="publishedMediaCache">An instance of <see cref="IPublishedMediaCache"/> for accessing published media.</param>
+    /// <param name="apiElementBuilder">An instance of <see cref="IApiElementBuilder"/> used to build API elements.</param>
+    /// <param name="logger">An instance of <see cref="ILogger{ApiRichTextElementParser}"/> used for logging.</param>
     public ApiRichTextElementParser(
         IApiContentRouteBuilder apiContentRouteBuilder,
         IApiMediaUrlProvider mediaUrlProvider,
@@ -35,6 +44,14 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
         _logger = logger;
     }
 
+    /// <summary>
+    /// Attempts to parse the specified HTML string into a rich text element.
+    /// </summary>
+    /// <param name="html">The HTML string to parse as a rich text element.</param>
+    /// <param name="richTextBlockModel">An optional context model used during parsing, or <c>null</c> if not applicable.</param>
+    /// <returns>
+    /// An <see cref="IRichTextElement"/> representing the parsed content if successful; otherwise, <c>null</c> if parsing fails.
+    /// </returns>
     public IRichTextElement? Parse(string html, RichTextBlockModel? richTextBlockModel)
     {
         try

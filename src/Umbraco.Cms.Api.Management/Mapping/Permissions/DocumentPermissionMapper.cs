@@ -34,6 +34,11 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
     /// <inheritdoc/>
     public string Context => DocumentGranularPermission.ContextType;
 
+    /// <summary>
+    /// Maps a <see cref="UserGroup2GranularPermissionDto"/> to an <see cref="IGranularPermission"/> instance.
+    /// </summary>
+    /// <param name="dto">The DTO containing user group granular permission data.</param>
+    /// <returns>An <see cref="IGranularPermission"/> representing the mapped document permission.</returns>
     public IGranularPermission MapFromDto(UserGroup2GranularPermissionDto dto) =>
         new DocumentGranularPermission()
         {

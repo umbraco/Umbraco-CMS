@@ -15,14 +15,39 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
 
     protected IFileSystem? FileSystem { get; }
 
+    /// <summary>
+    /// Creates and persists a new folder at the specified path.
+    /// </summary>
+    /// <param name="folderPath">The path where the new folder will be created.</param>
     public virtual void AddFolder(string folderPath) => PersistNewItem(new Folder(folderPath));
 
+    /// <summary>
+    /// Deletes the folder located at the given path from the underlying storage.
+    /// </summary>
+    /// <param name="folderPath">The path of the folder to delete.</param>
     public virtual void DeleteFolder(string folderPath) => PersistDeletedItem(new Folder(folderPath));
 
+    /// <summary>
+    /// Determines whether the specified folder exists in the file system.
+    /// </summary>
+    /// <param name="folderPath">The path of the folder to check.</param>
+    /// <returns><c>true</c> if the folder exists; otherwise, <c>false</c>.</returns>
     public virtual bool FolderExists(string folderPath) => FileSystem?.DirectoryExists(folderPath) is true;
 
+    /// <summary>
+    /// Determines whether the specified folder contains any files or directories.
+    /// </summary>
+    /// <param name="folderPath">The path of the folder to check for content.</param>
+    /// <returns><c>true</c> if the folder contains any files or directories; otherwise, <c>false</c>.</returns>
     public virtual bool FolderHasContent(string folderPath) => FileSystem?.GetFiles(folderPath).Any() is true || FileSystem?.GetDirectories(folderPath).Any() is true;
 
+    /// <summary>
+    /// Returns a stream for reading the contents of the specified file.
+    /// </summary>
+    /// <param name="filepath">The path of the file to read.</param>
+    /// <returns>
+    /// A <see cref="Stream"/> for reading the file's contents, or <see cref="Stream.Null"/> if the file does not exist or cannot be opened.
+    /// </returns>
     public Stream GetFileContentStream(string filepath)
     {
         if (FileSystem?.FileExists(filepath) == false)
@@ -108,8 +133,20 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
         return null;
     }
 
+    /// <summary>
+    /// Replaces or creates the file at the specified <paramref name="filepath"/> with the provided content stream.
+    /// </summary>
+    /// <param name="filepath">The path of the file to write or overwrite.</param>
+    /// <param name="content">A stream containing the new content for the file.</param>
     public void SetFileContent(string filepath, Stream content) => FileSystem?.AddFile(filepath, content, true);
 
+    /// <summary>
+    /// Returns the size of the specified file in bytes.
+    /// </summary>
+    /// <param name="filename">The name of the file whose size is to be retrieved.</param>
+    /// <returns>
+    /// The size of the file in bytes, or -1 if the file does not exist or an error occurs (such as a race condition).
+    /// </returns>
     public long GetFileSize(string filename)
     {
         if (FileSystem?.FileExists(filename) == false)
@@ -129,6 +166,10 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
 
     #region Implementation of IRepository<TId,TEntity>
 
+    /// <summary>
+    /// Saves the specified entity to the file system. If the entity does not already exist, a new file is created; otherwise, the existing file is updated.
+    /// </summary>
+    /// <param name="entity">The entity to be saved to the file system.</param>
     public virtual void Save(TEntity entity)
     {
         if (FileSystem?.FileExists(entity.OriginalPath) == false)
@@ -141,18 +182,43 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
         }
     }
 
+    /// <summary>
+    /// Deletes the specified entity from the repository.
+    /// This virtual method calls <see cref="PersistDeletedItem"/> to perform the deletion.
+    /// </summary>
+    /// <param name="entity">The entity to delete.</param>
     public virtual void Delete(TEntity entity) => PersistDeletedItem(entity);
 
+    /// <summary>
+    /// Gets an entity by its identifier.
+    /// </summary>
+    /// <param name="id">The identifier of the entity to get.</param>
+    /// <returns>The entity if found; otherwise, null.</returns>
     public abstract TEntity? Get(TId? id);
 
+    /// <summary>
+    /// Retrieves the entities corresponding to the specified identifiers.
+    /// </summary>
+    /// <param name="ids">The identifiers of the entities to retrieve. If null or empty, no entities are returned.</param>
+    /// <returns>An enumerable collection of entities matching the specified identifiers.</returns>
     public abstract IEnumerable<TEntity> GetMany(params TId[]? ids);
 
+    /// <summary>
+    /// Determines whether a file with the specified identifier exists.
+    /// </summary>
+    /// <param name="id">The identifier of the file to check for existence.</param>
+    /// <returns>True if the file exists; otherwise, false.</returns>
     public virtual bool Exists(TId id) => FileSystem?.FileExists(id!.ToString()!) ?? false;
 
     #endregion
 
     #region Implementation of IUnitOfWorkRepository
 
+    /// <summary>
+    /// Persists a new entity item to the repository, adding it to the underlying storage.
+    /// If the entity is a folder, it is persisted using folder-specific logic.
+    /// </summary>
+    /// <param name="entity">The entity to persist. If the entity is a folder, it will be handled accordingly.</param>
     public void PersistNewItem(IEntity entity)
     {
         // special case for folder
@@ -166,8 +232,16 @@ internal abstract class FileRepository<TId, TEntity> : IReadRepository<TId, TEnt
         }
     }
 
+    /// <summary>
+    /// Persists changes to an existing entity in the repository.
+    /// </summary>
+    /// <param name="entity">The entity with updated values to persist.</param>
     public void PersistUpdatedItem(IEntity entity) => PersistUpdatedItem((TEntity)entity);
 
+    /// <summary>
+    /// Persists the deletion of the specified entity. If the entity is a folder, it is handled by <see cref="PersistDeletedFolder"/>; otherwise, the entity is deleted using the generic deletion logic.
+    /// </summary>
+    /// <param name="entity">The entity to be deleted. If the entity is a folder, special deletion logic is applied.</param>
     public void PersistDeletedItem(IEntity entity)
     {
         // special case for folder

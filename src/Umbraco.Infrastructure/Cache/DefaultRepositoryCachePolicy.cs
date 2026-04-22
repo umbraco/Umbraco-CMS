@@ -27,6 +27,14 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
     private static readonly TEntity[] _emptyEntities = new TEntity[0]; // const
     private readonly RepositoryCachePolicyOptions _options;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultRepositoryCachePolicy{TEntity, TId}"/> class.
+    /// </summary>
+    /// <param name="cache">The application-level policy cache used for storing repository items.</param>
+    /// <param name="scopeAccessor">Provides access to the current scope.</param>
+    /// <param name="options">The options that configure repository cache policy behavior.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across instances.</param>
     public DefaultRepositoryCachePolicy(
         IAppPolicyCache cache,
         IScopeAccessor scopeAccessor,
@@ -36,6 +44,12 @@ public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyB
         : base(cache, scopeAccessor, repositoryCacheVersionService, cacheSyncService) =>
         _options = options ?? throw new ArgumentNullException(nameof(options));
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DefaultRepositoryCachePolicy{TEntity, TId}"/> class, which manages caching for repository entities.
+    /// </summary>
+    /// <param name="cache">The application-level policy cache used for storing cached items.</param>
+    /// <param name="scopeAccessor">Provides access to the current scope for cache operations.</param>
+    /// <param name="options">The configuration options for the repository cache policy.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
     public DefaultRepositoryCachePolicy(
         IAppPolicyCache cache,

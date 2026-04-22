@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 
+/// <summary>
+/// Represents the counts of log entries grouped by their log levels.
+/// </summary>
 public class LogLevelCountsReponseModel
 {
     /// <summary>

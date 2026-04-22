@@ -10,6 +10,9 @@ using Umbraco.Cms.Infrastructure.Services;
 
 namespace Umbraco.Cms.Api.Management.DependencyInjection;
 
+/// <summary>
+/// Provides extension methods for configuring search management services.
+/// </summary>
 public static class SearchManagementBuilderExtensions
 {
     internal static IUmbracoBuilder AddSearchManagement(this IUmbracoBuilder builder)

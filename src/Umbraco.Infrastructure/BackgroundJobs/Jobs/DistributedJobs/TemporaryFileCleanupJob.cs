@@ -21,6 +21,8 @@ internal class TemporaryFileCleanupJob : IDistributedBackgroundJob
     /// <summary>
     ///     Initializes a new instance of the <see cref="TemporaryFileCleanupJob" /> class.
     /// </summary>
+    /// <param name="logger">The logger used to record job execution details and errors.</param>
+    /// <param name="temporaryFileService">The service responsible for managing temporary files.</param>
     public TemporaryFileCleanupJob(
         ILogger<TemporaryFileCleanupJob> logger,
         ITemporaryFileService temporaryFileService)

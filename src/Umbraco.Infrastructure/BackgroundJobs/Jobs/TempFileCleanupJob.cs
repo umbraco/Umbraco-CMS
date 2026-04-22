@@ -17,12 +17,21 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// </remarks>
 public class TempFileCleanupJob : IRecurringBackgroundJob
 {
+    /// <summary>
+    /// Gets the time interval between each execution of the temporary file cleanup job.
+    /// </summary>
     public TimeSpan Period { get => TimeSpan.FromMinutes(60); }
 
-    // Runs on all servers
+    /// <summary>
+    /// Gets the server roles on which this job runs. This job is configured to run on all server roles.
+    /// </summary>
+    /// <remarks>Runs on all servers</remarks>
     public ServerRole[] ServerRoles { get => Enum.GetValues<ServerRole>(); }
 
-    // No-op event as the period never changes on this job
+    /// <summary>
+    /// Occurs when the period of the TempFileCleanupJob changes.
+    /// </summary>
+    /// <remarks>No-op event as the period never changes on this job</remarks>
     public event EventHandler PeriodChanged { add { } remove { } }
 
     private readonly TimeSpan _age = TimeSpan.FromDays(1);
@@ -43,6 +52,10 @@ public class TempFileCleanupJob : IRecurringBackgroundJob
         _tempFolders = _ioHelper.GetTempFolders();
     }
 
+    /// <summary>
+    /// Asynchronously executes the cleanup of temporary files in the configured temporary folders.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous cleanup operation.</returns>
     public Task RunJobAsync()
     {
         foreach (DirectoryInfo folder in _tempFolders)

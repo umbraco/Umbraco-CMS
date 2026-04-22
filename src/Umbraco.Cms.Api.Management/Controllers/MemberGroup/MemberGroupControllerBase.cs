@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.Builders;
@@ -9,6 +9,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.MemberGroup;
 
+/// <summary>
+/// Serves as the base controller for API endpoints that manage member groups in Umbraco CMS.
+/// Provides common functionality for derived member group controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute($"{Constants.UdiEntityType.MemberGroup}")]
 [ApiExplorerSettings(GroupName = "Member Group")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMembers)]

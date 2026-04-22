@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Notifications;
@@ -92,17 +93,29 @@ internal sealed class ContentRelationsUpdate :
 
         if (references.Count == 0)
         {
+            // Query existing relations before deleting, so we can publish notifications.
+            IRelation[] deletedRelations = GetExistingAutomaticRelations(scope, entity.Id, automaticRelationTypeAliases);
+
             // Delete all relations using the automatic relation type aliases.
             _relationRepository.DeleteByParent(entity.Id, automaticRelationTypeAliases.ToArray());
 
-            // No need to add new references/relations
+            if (deletedRelations.Length > 0)
+            {
+                scope.Notifications.Publish(new RelationDeletedNotification(deletedRelations, new EventMessages()) { IsAutomatic = true });
+            }
+
             return;
         }
 
-        // Lookup all relation type IDs.
+        // Lookup all relation types.
         var relationTypeLookup = _relationTypeRepository.GetMany(Array.Empty<int>())
             .Where(x => automaticRelationTypeAliases.Contains(x.Alias))
-            .ToDictionary(x => x.Alias, x => x.Id);
+            .ToDictionary(x => x.Alias);
+
+        if (relationTypeLookup.Count == 0)
+        {
+            return;
+        }
 
         // Lookup node IDs for all GUID based UDIs.
         IEnumerable<Guid> keys = references.Select(x => x.Udi).OfType<GuidUdi>().Select(x => x.Guid);
@@ -123,12 +136,12 @@ internal sealed class ContentRelationsUpdate :
                 // Reference does not specify a relation type alias, so skip adding a relation.
                 _logger.LogDebug("The reference to {Udi} does not specify a relation type alias, so it will not be saved as relation.", reference.Udi);
             }
-            else if (!automaticRelationTypeAliases.Contains(reference.RelationTypeAlias))
+            else if (automaticRelationTypeAliases.Contains(reference.RelationTypeAlias) is false)
             {
                 // Returning a reference that doesn't use an automatic relation type is an issue that should be fixed in code.
                 _logger.LogError("The reference to {Udi} uses a relation type {RelationTypeAlias} that is not an automatic relation type.", reference.Udi, reference.RelationTypeAlias);
             }
-            else if (!relationTypeLookup.TryGetValue(reference.RelationTypeAlias, out int relationTypeId))
+            else if (relationTypeLookup.TryGetValue(reference.RelationTypeAlias, out IRelationType? relationType) is false)
             {
                 // A non-existent relation type could be caused by an environment issue (e.g. it was manually removed).
                 _logger.LogWarning("The reference to {Udi} uses a relation type {RelationTypeAlias} that does not exist.", reference.Udi, reference.RelationTypeAlias);
@@ -140,31 +153,83 @@ internal sealed class ContentRelationsUpdate :
             }
             else
             {
-                relations.Add((id, relationTypeId));
+                relations.Add((id, relationType.Id));
             }
         }
 
         // Get all existing relations (optimize for adding new and keeping existing relations).
-        IQuery<IRelation> query = scope.SqlContext.Query<IRelation>().Where(x => x.ParentId == entity.Id).WhereIn(x => x.RelationTypeId, relationTypeLookup.Values);
+        IQuery<IRelation> query = scope.SqlContext.Query<IRelation>()
+            .Where(x => x.ParentId == entity.Id)
+            .WhereIn(x => x.RelationTypeId, relationTypeLookup.Values
+            .Select(x => x.Id));
         var existingRelations = _relationRepository.GetPagedRelationsByQuery(query, 0, int.MaxValue, out _, null)
             .ToDictionary(x => (x.ChildId, x.RelationTypeId)); // Relations are unique by parent ID, child ID and relation type ID.
 
         // Add relations that don't exist yet.
-        IEnumerable<ReadOnlyRelation> relationsToAdd = relations.Except(existingRelations.Keys).Select(x => new ReadOnlyRelation(entity.Id, x.ChildId, x.RelationTypeId));
+        var newRelationKeys = relations.Except(existingRelations.Keys).ToList();
+        IEnumerable<ReadOnlyRelation> relationsToAdd = newRelationKeys.Select(x => new ReadOnlyRelation(entity.Id, x.ChildId, x.RelationTypeId));
         _relationRepository.SaveBulk(relationsToAdd);
 
+        // Publish saved notification for the newly added relations.
+        // NOTE: Only RelationSavedNotification is published (not RelationSavingNotification) because
+        // SaveBulk is used for performance and does not support cancellation.
+        // The Relation objects will have Id = 0 because SaveBulk does not return database identities.
+        // ParentId, ChildId, and RelationType are fully populated.
+        if (newRelationKeys.Count > 0)
+        {
+            var relationTypeById = relationTypeLookup.Values.ToDictionary(x => x.Id);
+            IRelation[] savedRelations = newRelationKeys
+                .Where(x => relationTypeById.ContainsKey(x.RelationTypeId))
+                .Select(x => new Relation(entity.Id, x.ChildId, relationTypeById[x.RelationTypeId]))
+                .ToArray<IRelation>();
+
+            scope.Notifications.Publish(new RelationSavedNotification(savedRelations, new EventMessages()) { IsAutomatic = true });
+        }
+
         // Delete relations that don't exist anymore.
-        foreach (IRelation relation in existingRelations.Where(x => !relations.Contains(x.Key)).Select(x => x.Value))
+        IRelation[] relationsToDelete = existingRelations.Where(x => !relations.Contains(x.Key)).Select(x => x.Value).ToArray();
+        foreach (IRelation relation in relationsToDelete)
         {
             _relationRepository.Delete(relation);
         }
+
+        // Publish deleted notification for the removed relations.
+        if (relationsToDelete.Length > 0)
+        {
+            scope.Notifications.Publish(new RelationDeletedNotification(relationsToDelete, new EventMessages()) { IsAutomatic = true });
+        }
+    }
+
+    private IRelation[] GetExistingAutomaticRelations(IScope scope, int entityId, ISet<string> automaticRelationTypeAliases)
+    {
+        int[] relationTypeIds = _relationTypeRepository.GetMany(Array.Empty<int>())
+            .Where(x => automaticRelationTypeAliases.Contains(x.Alias))
+            .Select(x => x.Id)
+            .ToArray();
+
+        if (relationTypeIds.Length == 0)
+        {
+            return [];
+        }
+
+        IQuery<IRelation> query = scope.SqlContext.Query<IRelation>()
+            .Where(x => x.ParentId == entityId)
+            .WhereIn(x => x.RelationTypeId, relationTypeIds);
+
+        return _relationRepository.GetPagedRelationsByQuery(query, 0, int.MaxValue, out _, null).ToArray();
     }
 
     private sealed class NodeIdKey
     {
+        /// <summary>
+        /// Gets or sets the unique identifier for the node.
+        /// </summary>
         [Column("id")]
         public int NodeId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the unique GUID that identifies the node in the database.
+        /// </summary>
         [Column("uniqueId")]
         public Guid UniqueId { get; set; }
     }

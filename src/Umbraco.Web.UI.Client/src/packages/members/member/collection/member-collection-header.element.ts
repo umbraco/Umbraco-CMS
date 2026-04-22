@@ -63,7 +63,7 @@ export class UmbMemberCollectionHeaderElement extends UmbLitElement {
 
 	#renderContentTypeFilter() {
 		return html`
-			<umb-dropdown data-mark="dropdown:filter">
+			<umb-dropdown data-mark="dropdown:filter" label=${this.localize.term('defaultdialogs_selectMemberType')}>
 				<span slot="label">${this.#getContentTypeFilterLabel}</span>
 				<div id="dropdown-layout">
 					<uui-button

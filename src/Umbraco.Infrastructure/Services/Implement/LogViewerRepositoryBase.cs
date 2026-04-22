@@ -17,7 +17,7 @@ public abstract class LogViewerRepositoryBase : ILogViewerRepository
     /// <summary>
     /// Initializes a new instance of the <see cref="LogViewerRepositoryBase"/> class.
     /// </summary>
-    /// <param name="umbracoFileConfig"></param>
+    /// <param name="umbracoFileConfig">The Umbraco file configuration for log file paths.</param>
     public LogViewerRepositoryBase(UmbracoFileConfiguration umbracoFileConfig) => _umbracoFileConfig = umbracoFileConfig;
 
     /// <inheritdoc />
@@ -59,8 +59,9 @@ public abstract class LogViewerRepositoryBase : ILogViewerRepository
     }
 
     /// <summary>
-    /// Gets the minimum-level log value from the config file.
+    /// Gets the minimum log level specified in the configuration file.
     /// </summary>
+    /// <returns>The minimum <see cref="LogLevel"/> configured for logging.</returns>
     public virtual LogLevel RestrictedToMinimumLevel()
     {
         LogEventLevel minLevel = _umbracoFileConfig.RestrictedToMinimumLevel;

@@ -34,8 +34,9 @@ public class RuntimeState : IRuntimeState
     private readonly IDatabaseAvailabilityCheck _databaseAvailabilityCheck = null!;
 
     /// <summary>
-    /// The initial <see cref="RuntimeState"/>
+    /// Creates and returns the initial <see cref="RuntimeState"/> instance representing the booting state of the application.
     /// </summary>
+    /// <returns>The initial <see cref="RuntimeState"/> instance representing the booting state.</returns>
     public static RuntimeState Booting() => new RuntimeState() { Level = RuntimeLevel.Boot };
 
     /// <summary>
@@ -45,8 +46,17 @@ public class RuntimeState : IRuntimeState
     { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RuntimeState" /> class.
+    /// Initializes a new instance of the <see cref="RuntimeState" /> class with the specified configuration and services.
     /// </summary>
+    /// <param name="globalSettings">The global settings for the Umbraco application.</param>
+    /// <param name="unattendedSettings">The unattended installation and upgrade settings.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="logger">The logger used for logging runtime state information.</param>
+    /// <param name="packageMigrationState">Tracks the state of pending package migrations.</param>
+    /// <param name="conflictingRouteService">Service for detecting conflicting routes in the application.</param>
+    /// <param name="databaseProviderMetadata">A collection of metadata describing available database providers.</param>
+    /// <param name="runtimeModeValidationService">Service for validating the runtime mode of the application.</param>
     [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
     public RuntimeState(
        IOptions<GlobalSettings> globalSettings,
@@ -75,6 +85,16 @@ public class RuntimeState : IRuntimeState
     /// <summary>
     /// Initializes a new instance of the <see cref="RuntimeState" /> class.
     /// </summary>
+    /// <param name="globalSettings">The global settings for the Umbraco application.</param>
+    /// <param name="unattendedSettings">The unattended installation and upgrade settings.</param>
+    /// <param name="umbracoVersion">Provides information about the current Umbraco version.</param>
+    /// <param name="databaseFactory">Factory for creating Umbraco database connections.</param>
+    /// <param name="logger">The logger used for logging runtime state information.</param>
+    /// <param name="packageMigrationState">Tracks the state of pending package migrations.</param>
+    /// <param name="conflictingRouteService">Service for detecting conflicting routes in the application.</param>
+    /// <param name="databaseProviderMetadata">A collection of metadata for available database providers.</param>
+    /// <param name="runtimeModeValidationService">Service for validating the current runtime mode.</param>
+    /// <param name="databaseAvailabilityCheck">Service to check the availability of the database.</param>
     public RuntimeState(
        IOptions<GlobalSettings> globalSettings,
        IOptions<UnattendedSettings> unattendedSettings,
@@ -113,6 +133,9 @@ public class RuntimeState : IRuntimeState
 
     /// <inheritdoc />
     public string? FinalMigrationState { get; private set; }
+
+    /// <inheritdoc />
+    public SemVersion? CurrentMigrationVersion { get; private set; }
 
     /// <inheritdoc />
     public RuntimeLevel Level { get; internal set; } = RuntimeLevel.Unknown;
@@ -261,6 +284,12 @@ public class RuntimeState : IRuntimeState
         }
     }
 
+    /// <summary>
+    /// Configures the runtime state by setting the specified runtime level and reason, and optionally records an exception that caused the boot process to fail.
+    /// </summary>
+    /// <param name="level">The <see cref="RuntimeLevel"/> to set for the runtime state.</param>
+    /// <param name="reason">The <see cref="RuntimeLevelReason"/> indicating why the runtime level is being set.</param>
+    /// <param name="bootFailedException">An optional <see cref="Exception"/> that caused the boot to fail. If provided, it will be wrapped in a <see cref="BootFailedException"/> and stored.</param>
     public void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception? bootFailedException = null)
     {
         Level = level;
@@ -333,7 +362,8 @@ public class RuntimeState : IRuntimeState
 
     private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string?>? keyValues)
     {
-        var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
+        var plan = new UmbracoPlan(_umbracoVersion);
+        var upgrader = new Upgrader(plan);
         var stateValueKey = upgrader.StateValueKey;
 
         if (keyValues?.TryGetValue(stateValueKey, out var value) ?? false)
@@ -341,11 +371,13 @@ public class RuntimeState : IRuntimeState
             CurrentMigrationState = value;
         }
 
-        FinalMigrationState = upgrader.Plan.FinalState;
-        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        FinalMigrationState = plan.FinalState;
+        CurrentMigrationVersion = plan.GetVersionForState(CurrentMigrationState);
+        if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
         }
+
         return CurrentMigrationState != FinalMigrationState;
     }
 }

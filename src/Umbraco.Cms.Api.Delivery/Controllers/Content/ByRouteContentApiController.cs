@@ -64,6 +64,7 @@ public class ByRouteContentApiController : ContentApiItemControllerBase
                 return deniedAccessResult;
             }
 
+            SetOutputCacheContent(contentItem);
             return Ok(ApiContentResponseBuilder.Build(contentItem));
         }
 

@@ -70,13 +70,13 @@ export class MediaDeliveryApiHelper {
       expect(mediaItemJson.bytes).toBeNull();  
     }
     // Verify width and height (in pixels), focalPoint and crops are included for most images.
-    if (mediaTypeName === 'Image') {
+    if (mediaTypeName === 'Image' || mediaTypeName === 'Vector Graphics (SVG)') {
       const mediaWidth = mediaData.values.find(x => x.alias === 'umbracoWidth')?.value;
       const mediaHeight = mediaData.values.find(x => x.alias === 'umbracoHeight')?.value;
-      expect(mediaItemJson.width).toBe(mediaWidth ? Number(mediaWidth) : null);
-      expect(mediaItemJson.height).toBe(mediaHeight ? Number(mediaHeight) : null);
-      expect(mediaItemJson.focalPoint).toBe(mediaData.values[0].value.focalPoint);
-      expect(mediaItemJson.crops).toEqual(mediaData.values[0].value.crops);
+      expect(mediaItemJson.width).toBe(mediaWidth ? Number(mediaWidth) : 0);
+      expect(mediaItemJson.height).toBe(mediaHeight ? Number(mediaHeight) : 0);
+      expect(mediaItemJson.focalPoint).toBe(mediaData.values[0].value.focalPoint ? mediaData.values[0].value.focalPoint : null);
+      expect(mediaItemJson.crops).toEqual(mediaData.values[0].value.crops ? mediaData.values[0].value.crops : null);
     } else {
       expect(mediaItemJson.width).toBeNull();
       expect(mediaItemJson.height).toBeNull();

@@ -1,10 +1,17 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0;
 
+/// <summary>
+/// Represents a migration step that adds the <c>ExceptionOccured</c> column to the relevant database table as part of the upgrade to version 13.0.0.
+/// </summary>
 public class AddExceptionOccured : MigrationBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_13_0_0.AddExceptionOccured"/> class.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> for the migration.</param>
     public AddExceptionOccured(IMigrationContext context) : base(context)
     {
     }

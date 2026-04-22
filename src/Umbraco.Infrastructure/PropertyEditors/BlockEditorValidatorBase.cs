@@ -8,6 +8,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
+/// <summary>
+/// Provides a base class for implementing validation logic for block editor values and layouts in Umbraco.
+/// </summary>
 public abstract class BlockEditorValidatorBase<TValue, TLayout> : ComplexEditorValidator
     where TValue : BlockValue<TLayout>, new()
     where TLayout : class, IBlockLayoutItem, new()
