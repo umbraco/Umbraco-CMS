@@ -584,10 +584,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             yield break;
         }
 
+        // Collapse duplicates that arise after normalization.
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var alias in rawValue.Split(',', StringSplitOptions.RemoveEmptyEntries))
         {
             var normalized = this.NormalizeAlias(alias);
-            if (!string.IsNullOrEmpty(normalized))
+            if (string.IsNullOrEmpty(normalized) is false && seen.Add(normalized))
             {
                 yield return normalized;
             }
