@@ -34,8 +34,16 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
 			this.#appLanguage = instance;
 			this.observe(this.#appLanguage?.appLanguageCulture, (appCulture) => {
+				const previousCulture = this.#appCulture;
 				this.#appCulture = appCulture;
 				this.#generateRoutes();
+				if (previousCulture && appCulture && previousCulture !== appCulture && this.#workspaceRoute) {
+					const currentPath = window.location.pathname;
+					const expectedOldPath = this.#workspaceRoute + '/' + previousCulture;
+					if (currentPath === expectedOldPath && this.#variants?.some((v) => v.unique === appCulture)) {
+						history.replaceState(null, '', this.#workspaceRoute + '/' + appCulture + window.location.search);
+					}
+				}
 			});
 		});
 
