@@ -228,8 +228,8 @@ stages:
               vmImage: "windows-latest"
               Tests__Database__DatabaseType: LocalDb
               Tests__Database__SQLServerMasterConnectionString: N/A
-              # ManagementApi, remainder (complement of Part4).
-              testFilter: "FullyQualifiedName~ManagementApi & !(FullyQualifiedName~ManagementApi.Element. | FullyQualifiedName~ManagementApi.User. | FullyQualifiedName~ManagementApi.Document. | FullyQualifiedName~ManagementApi.DataType. | FullyQualifiedName~ManagementApi.DocumentType. | FullyQualifiedName~ManagementApi.MediaType. | FullyQualifiedName~ManagementApi.Template.)"
+              # ManagementApi, remainder (complement of Part4). vstest filters do not support group
+              testFilter: "FullyQualifiedName~ManagementApi & FullyQualifiedName!~ManagementApi.Element. & FullyQualifiedName!~ManagementApi.User. & FullyQualifiedName!~ManagementApi.Document. & FullyQualifiedName!~ManagementApi.DataType. & FullyQualifiedName!~ManagementApi.DocumentType. & FullyQualifiedName!~ManagementApi.MediaType. & FullyQualifiedName!~ManagementApi.Template."
             LinuxPart1Of4:
               vmImage: "ubuntu-latest"
               Tests__Database__DatabaseType: SqlServer
