@@ -321,12 +321,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         string[] roleNames1 = { "TR1", "TR2" };
         MemberService.AssignRoles(new[] { member.Id }, roleNames1);
         var memberRoles = MemberService.GetAllRoles(member.Id);
-        Assert.That(memberRoles, Is.EquivalentTo(roleNames1));
+        CollectionAssert.AreEquivalent(roleNames1, memberRoles);
 
         string[] roleNames2 = { "TR3", "TR4" };
         MemberService.ReplaceRoles(new[] { member.Id }, roleNames2);
         memberRoles = MemberService.GetAllRoles(member.Id);
-        Assert.That(memberRoles, Is.EquivalentTo(roleNames2));
+        CollectionAssert.AreEquivalent(roleNames2, memberRoles);
     }
 
     [Test]
@@ -1544,7 +1544,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(3, members.Length);
-            Assert.That(members.Select(m => m.Key).ToArray(), Is.EquivalentTo(new[] { memberA.Key, memberB.Key, memberC.Key }));
+            CollectionAssert.AreEquivalent(new [] { memberA.Key, memberB.Key, memberC.Key }, members.Select(m => m.Key).ToArray());
         });
     }
 

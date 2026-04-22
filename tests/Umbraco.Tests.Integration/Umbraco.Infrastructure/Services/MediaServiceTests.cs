@@ -368,9 +368,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     /// After the fix, write locks are acquired before publishing notifications, so the deadlock cannot occur.
     /// </remarks>
     [Test]
-    [CancelAfter(10000)]
+    [Timeout(10000)]
     [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
-    public async Task Parallel_Media_Save_Does_Not_Deadlock_When_Notification_Handler_Acquires_Read_Lock(CancellationToken _ = default)
+    public async Task Parallel_Media_Save_Does_Not_Deadlock_When_Notification_Handler_Acquires_Read_Lock()
     {
         // Arrange
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");
@@ -412,9 +412,8 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         await Task.WhenAll(tasks);
 
         // Assert
-        Assert.That(
+        Assert.IsEmpty(
             exceptions,
-            Is.Empty,
             $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
 
         // Verify all media items were updated successfully
@@ -430,9 +429,9 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
     /// Verifies that parallel media deletes don't deadlock when a notification handler is registered.
     /// </summary>
     [Test]
-    [CancelAfter(10000)]
+    [Timeout(10000)]
     [ConfigureBuilder(ActionName = nameof(ConfigureConcurrencyTest))]
-    public async Task Parallel_Media_Delete_Does_Not_Deadlock(CancellationToken _ = default)
+    public async Task Parallel_Media_Delete_Does_Not_Deadlock()
     {
         // Arrange
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMedia", "Test Media");
@@ -473,9 +472,8 @@ internal sealed class MediaServiceTests : UmbracoIntegrationTest
         await Task.WhenAll(tasks);
 
         // Assert
-        Assert.That(
+        Assert.IsEmpty(
             exceptions,
-            Is.Empty,
             $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
 
         // Verify all media items were deleted

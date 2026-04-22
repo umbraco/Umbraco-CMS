@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -13,6 +14,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
 {
     private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
+
+    private IShortStringHelper ShortStringHelper => GetRequiredService<IShortStringHelper>();
 
     [Test]
     public async Task Can_Create_User_Group()
@@ -43,8 +46,8 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(userGroup.Description, createdUserGroup.Description);
         Assert.AreEqual(userGroup.Icon, createdUserGroup.Icon);
         Assert.AreEqual(userGroup.HasAccessToAllLanguages, createdUserGroup.HasAccessToAllLanguages);
-        Assert.That(createdUserGroup.Permissions, Is.EquivalentTo(userGroup.Permissions));
-        Assert.That(createdUserGroup.AllowedSections, Is.EquivalentTo(userGroup.AllowedSections));
+        CollectionAssert.AreEquivalent(userGroup.Permissions, createdUserGroup.Permissions);
+        CollectionAssert.AreEquivalent(userGroup.AllowedSections, createdUserGroup.AllowedSections);
     }
 
     [Test]
@@ -89,8 +92,8 @@ internal sealed class UserGroupServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(createdUserGroup.Description, updatedUserGroup.Description);
         Assert.AreEqual(createdUserGroup.Icon, updatedUserGroup.Icon);
         Assert.AreEqual(createdUserGroup.HasAccessToAllLanguages, updatedUserGroup.HasAccessToAllLanguages);
-        Assert.That(updatedUserGroup.Permissions, Is.EquivalentTo(createdUserGroup.Permissions));
-        Assert.That(updatedUserGroup.AllowedSections, Is.EquivalentTo(createdUserGroup.AllowedSections));
+        CollectionAssert.AreEquivalent(createdUserGroup.Permissions, updatedUserGroup.Permissions);
+        CollectionAssert.AreEquivalent(createdUserGroup.AllowedSections, updatedUserGroup.AllowedSections);
     }
 
     [Test]
