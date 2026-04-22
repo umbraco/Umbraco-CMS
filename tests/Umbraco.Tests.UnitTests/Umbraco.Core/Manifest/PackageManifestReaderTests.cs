@@ -392,10 +392,10 @@ public class PackageManifestReaderTests
     // ---------------------------------------------------------------------
 
     [Test]
-    public async Task Produces_Both_Manifests_When_Package_Has_Json_And_Extensions_Folder()
+    public async Task Produces_Only_PackageManifest_When_Package_Has_Both_PackageManifest_And_Extensions_Folder()
     {
         // Package has BOTH an umbraco-package.json AND an extensions/ folder.
-        // The reader is additive — it yields one manifest per source.
+        // The reader is NOT additive — it prioritizes the package manifest over the bundle manifest.
         var packageFolder = CreatePackageFolderWithManifestAndExtensions(
             "Hybrid",
             DefaultPackageManifestContent("Hybrid Package"),
@@ -404,16 +404,11 @@ public class PackageManifestReaderTests
 
         var result = (await _reader.ReadPackageManifestsAsync()).ToList();
 
-        Assert.AreEqual(2, result.Count);
+        Assert.AreEqual(1, result.Count);
 
-        var fromJson = result.Single(m => m.Name == "Hybrid Package");
-        Assert.AreEqual("1.2.3", fromJson.Version);
-        Assert.AreEqual(2, fromJson.Extensions.Length);
-
-        var fromFolder = result.Single(m => m.Name == "Hybrid");
-        Assert.IsNull(fromFolder.Version);
-        Assert.AreEqual(1, fromFolder.Extensions.Length);
-        Assert.AreEqual("Hybrid.Extensions.Bundle.dashboard", GetProperty(fromFolder.Extensions.First(), "alias"));
+        var manifest = result.Single(m => m.Name == "Hybrid Package");
+        Assert.AreEqual("1.2.3", manifest.Version);
+        Assert.AreEqual(2, manifest.Extensions.Length);
     }
 
     // ---------------------------------------------------------------------
