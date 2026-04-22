@@ -44,8 +44,8 @@ jobs:
           # Enable progress tracking
           track_progress: true
 
-          # Debug (remove when not needed)
-          show_full_output: true
+          # Debug (set to true to show full output in logs, false to hide it and only post comments on the PR)
+          show_full_output: false
 
           additional_permissions: "actions: read"
           claude_args: "--model claude-sonnet-4-6 --allowedTools 'Bash(gh:*),Bash(git:*)'"

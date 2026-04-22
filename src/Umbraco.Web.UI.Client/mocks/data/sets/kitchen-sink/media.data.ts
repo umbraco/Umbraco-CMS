@@ -106,7 +106,7 @@ export const data: Array<UmbMockMediaModel> = [
 						top: 0.5,
 					},
 					crops: [],
-					src: '/umbraco/backoffice/assets/umb-pattern--blue.png',
+					src: '/umbraco/backoffice/assets/umb-pattern-blue.png',
 				},
 			},
 			{

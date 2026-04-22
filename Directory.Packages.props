@@ -88,5 +88,8 @@
     <!-- Markdown references vulnerable version of the following: -->
     <!-- TODO (V19): Remove these pinned dependencies when the Markdown dependency is removed. -->
     <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
+    <!-- Examine (via Microsoft.AspNetCore.DataProtection 8.0.4) references a vulnerable version of the following: -->
+    <!-- TODO: Remove this pinned dependency when Examine updates its Microsoft.AspNetCore.DataProtection reference. -->
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="10.0.6" />
   </ItemGroup>
 </Project>
