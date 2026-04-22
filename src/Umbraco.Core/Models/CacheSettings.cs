@@ -45,6 +45,11 @@ public class CacheSettings
     internal const int StaticElementSeedBatchSize = 100;
 
     /// <summary>
+    ///     The default mode for rebuilding the database cache on content type structural changes.
+    /// </summary>
+    internal const ContentTypeRebuildMode StaticContentTypeRebuildMode = ContentTypeRebuildMode.Immediate;
+
+    /// <summary>
     /// Gets or sets a value for the collection of content type ids to always have in the cache.
     /// </summary>
     public List<Guid> ContentTypeKeys { get; set; } = new();
@@ -84,6 +89,17 @@ public class CacheSettings
     /// </summary>
     [DefaultValue(StaticElementSeedBatchSize)]
     public int ElementSeedBatchSize { get; set; } = StaticElementSeedBatchSize;
+
+    /// <summary>
+    ///     Gets or sets the mode for rebuilding the database cache when content type structural changes occur.
+    /// </summary>
+    /// <remarks>
+    ///     <see cref="ContentTypeRebuildMode.Immediate" /> (default) rebuilds immediately during the save.
+    ///     <see cref="ContentTypeRebuildMode.Deferred" /> defers the rebuild to a background task with de-duplication,
+    ///     allowing the save to return faster at the cost of temporarily stale content.
+    /// </remarks>
+    [DefaultValue(StaticContentTypeRebuildMode)]
+    public ContentTypeRebuildMode ContentTypeRebuildMode { get; set; } = StaticContentTypeRebuildMode;
 
     /// <summary>
     ///     Gets or sets the cache entry settings for documents, media and elements.
