@@ -2715,6 +2715,11 @@ export enum TreeItemKindModel {
     ALL = 'All'
 }
 
+export type TwoFactorAuthInfo = {
+    qrCodeSetupImageUrl?: string | null;
+    secret?: string | null;
+};
+
 export type UnknownTypePermissionPresentationModel = {
     $type: string;
     verbs: Array<string>;
@@ -17292,7 +17297,7 @@ export type GetUserCurrent2FaByProviderNameResponses = {
     /**
      * OK
      */
-    200: NoopSetupTwoFactorModel;
+    200: NoopSetupTwoFactorModel | TwoFactorAuthInfo;
 };
 
 export type GetUserCurrent2FaByProviderNameResponse = GetUserCurrent2FaByProviderNameResponses[keyof GetUserCurrent2FaByProviderNameResponses];
@@ -17327,7 +17332,7 @@ export type PostUserCurrent2FaByProviderNameResponses = {
     /**
      * OK
      */
-    200: NoopSetupTwoFactorModel;
+    200: NoopSetupTwoFactorModel | TwoFactorAuthInfo;
 };
 
 export type PostUserCurrent2FaByProviderNameResponse = PostUserCurrent2FaByProviderNameResponses[keyof PostUserCurrent2FaByProviderNameResponses];
@@ -17493,7 +17498,7 @@ export type GetUserCurrentPermissionsDocumentResponses = {
     /**
      * OK
      */
-    200: Array<UserPermissionsResponseModel>;
+    200: UserPermissionsResponseModel;
 };
 
 export type GetUserCurrentPermissionsDocumentResponse = GetUserCurrentPermissionsDocumentResponses[keyof GetUserCurrentPermissionsDocumentResponses];
