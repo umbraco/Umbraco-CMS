@@ -1560,7 +1560,8 @@ export type MemberItemResponseModel = {
 
 export enum MemberKindModel {
     DEFAULT = 'Default',
-    API = 'Api'
+    API = 'Api',
+    EXTERNAL_ONLY = 'ExternalOnly'
 }
 
 export type MemberReferenceResponseModel = {
@@ -1587,6 +1588,7 @@ export type MemberResponseModel = {
     lastPasswordChangeDate?: string | null;
     groups: Array<string>;
     kind: MemberKindModel;
+    profileData?: string | null;
 };
 
 export type MemberTypeCompositionModel = {
@@ -2715,6 +2717,11 @@ export enum TreeItemKindModel {
     FOLDER = 'Folder',
     ALL = 'All'
 }
+
+export type TwoFactorAuthInfo = {
+    qrCodeSetupImageUrl?: string | null;
+    secret?: string | null;
+};
 
 export type UnknownTypePermissionPresentationModel = {
     $type: string;
@@ -17293,7 +17300,7 @@ export type GetUserCurrent2FaByProviderNameResponses = {
     /**
      * OK
      */
-    200: NoopSetupTwoFactorModel;
+    200: NoopSetupTwoFactorModel | TwoFactorAuthInfo;
 };
 
 export type GetUserCurrent2FaByProviderNameResponse = GetUserCurrent2FaByProviderNameResponses[keyof GetUserCurrent2FaByProviderNameResponses];
@@ -17328,7 +17335,7 @@ export type PostUserCurrent2FaByProviderNameResponses = {
     /**
      * OK
      */
-    200: NoopSetupTwoFactorModel;
+    200: NoopSetupTwoFactorModel | TwoFactorAuthInfo;
 };
 
 export type PostUserCurrent2FaByProviderNameResponse = PostUserCurrent2FaByProviderNameResponses[keyof PostUserCurrent2FaByProviderNameResponses];
@@ -17494,7 +17501,7 @@ export type GetUserCurrentPermissionsDocumentResponses = {
     /**
      * OK
      */
-    200: Array<UserPermissionsResponseModel>;
+    200: UserPermissionsResponseModel;
 };
 
 export type GetUserCurrentPermissionsDocumentResponse = GetUserCurrentPermissionsDocumentResponses[keyof GetUserCurrentPermissionsDocumentResponses];
