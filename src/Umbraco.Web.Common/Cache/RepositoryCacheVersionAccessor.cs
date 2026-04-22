@@ -91,7 +91,17 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
         // Populate scope cache so subsequent reads within this scope skip the DB.
         if (databaseVersion.Version is not null)
         {
-            scopeCache?.TryAdd(cacheKey, Guid.Parse(databaseVersion.Version));
+            if (Guid.TryParse(databaseVersion.Version, out Guid parsedVersion))
+            {
+                scopeCache?.TryAdd(cacheKey, parsedVersion);
+            }
+            else
+            {
+                _logger.LogWarning(
+                    "Cache version for key {CacheKey} has an invalid GUID value '{CacheVersion}' and will not be added to the scope cache",
+                    cacheKey,
+                    databaseVersion.Version);
+            }
         }
 
         return databaseVersion;
