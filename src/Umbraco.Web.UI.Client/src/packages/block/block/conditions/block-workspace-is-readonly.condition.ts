@@ -11,7 +11,7 @@ export class UmbBlockWorkspaceIsReadOnlyCondition
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<BlockWorkspaceIsReadOnlyConditionConfig>) {
 		super(host, args);
 
-		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, async (context) => {
+		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
 				context?.readOnlyGuard.isPermittedForObservableVariant(context.variantId),
 				(isReadOnly) => {
