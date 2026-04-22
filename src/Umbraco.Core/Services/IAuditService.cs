@@ -40,7 +40,12 @@ public interface IAuditService : IService
     /// <param name="entityType">The entity type of the affected object.</param>
     /// <param name="comment">The comment associated with the audit entry.</param>
     /// <param name="parameters">The parameters associated with the audit entry.</param>
-    /// <param name="typeAlias">An optional type alias for custom audit entries (e.g. "Umb.Workflow.Approved").</param>
+    /// <param name="typeAlias">
+    ///    An optional type alias for custom audit entries (e.g. "Umb.Workflow.Approved").
+    ///    Note: the default interface implementation delegates to the obsolete <see cref="Add"/> method and therefore
+    ///    discards this value. Custom <see cref="IAuditService"/> implementations should override this method to persist
+    ///    the type alias.
+    /// </param>
     /// <returns>Result of the add audit log operation.</returns>
     // TODO (V19): Remove the default implementation when the obsolete Add method is removed.
     async Task<Attempt<AuditLogOperationStatus>> AddAsync(

@@ -43,6 +43,7 @@ public class ContentService : RepositoryService, IContentService
     private readonly IIdKeyMap _idKeyMap;
     private ContentSettings _contentSettings;
     private readonly IRelationService _relationService;
+    private readonly IAuditTriggerAccessor _auditTriggerAccessor;
     private IQuery<IContent>? _queryNotTrashed;
 
     #region Constructors
@@ -67,6 +68,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="idKeyMap">The ID key map.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
+    /// <param name="auditTriggerAccessor">The audit trigger accessor.</param>
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -84,7 +86,8 @@ public class ContentService : RepositoryService, IContentService
         PropertyEditorCollection propertyEditorCollection,
         IIdKeyMap idKeyMap,
         IOptionsMonitor<ContentSettings> optionsMonitor,
-        IRelationService relationService)
+        IRelationService relationService,
+        IAuditTriggerAccessor auditTriggerAccessor)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _documentRepository = documentRepository;
@@ -105,29 +108,57 @@ public class ContentService : RepositoryService, IContentService
             _contentSettings = contentSettings;
         });
         _relationService = relationService;
+        _auditTriggerAccessor = auditTriggerAccessor;
         _logger = loggerFactory.CreateLogger<ContentService>();
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentService"/> class.
     /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="documentRepository">The document repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="auditRepository">The audit repository.</param>
-    /// <param name="contentTypeRepository">The content type repository.</param>
-    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
-    /// <param name="languageRepository">The language repository.</param>
-    /// <param name="propertyValidationService">The property validation service.</param>
-    /// <param name="shortStringHelper">The short string helper.</param>
-    /// <param name="cultureImpactFactory">The culture impact factory.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="propertyEditorCollection">The property editor collection.</param>
-    /// <param name="idKeyMap">The ID key map.</param>
-    /// <param name="optionsMonitor">The content settings options monitor.</param>
-    /// <param name="relationService">The relation service.</param>
+    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    public ContentService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IDocumentRepository documentRepository,
+        IEntityRepository entityRepository,
+        IAuditService auditService,
+        IContentTypeRepository contentTypeRepository,
+        IDocumentBlueprintRepository documentBlueprintRepository,
+        ILanguageRepository languageRepository,
+        Lazy<IPropertyValidationService> propertyValidationService,
+        IShortStringHelper shortStringHelper,
+        ICultureImpactFactory cultureImpactFactory,
+        IUserIdKeyResolver userIdKeyResolver,
+        PropertyEditorCollection propertyEditorCollection,
+        IIdKeyMap idKeyMap,
+        IOptionsMonitor<ContentSettings> optionsMonitor,
+        IRelationService relationService)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            documentRepository,
+            entityRepository,
+            auditService,
+            contentTypeRepository,
+            documentBlueprintRepository,
+            languageRepository,
+            propertyValidationService,
+            shortStringHelper,
+            cultureImpactFactory,
+            userIdKeyResolver,
+            propertyEditorCollection,
+            idKeyMap,
+            optionsMonitor,
+            relationService,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditTriggerAccessor>())
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentService"/> class.
+    /// </summary>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ContentService(
         ICoreScopeProvider provider,
@@ -164,31 +195,14 @@ public class ContentService : RepositoryService, IContentService
             propertyEditorCollection,
             idKeyMap,
             optionsMonitor,
-            relationService)
+            relationService,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditTriggerAccessor>())
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentService"/> class.
     /// </summary>
-    /// <param name="provider">The core scope provider.</param>
-    /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="eventMessagesFactory">The event messages factory.</param>
-    /// <param name="documentRepository">The document repository.</param>
-    /// <param name="entityRepository">The entity repository.</param>
-    /// <param name="auditRepository">The audit repository.</param>
-    /// <param name="auditService">The audit service.</param>
-    /// <param name="contentTypeRepository">The content type repository.</param>
-    /// <param name="documentBlueprintRepository">The document blueprint repository.</param>
-    /// <param name="languageRepository">The language repository.</param>
-    /// <param name="propertyValidationService">The property validation service.</param>
-    /// <param name="shortStringHelper">The short string helper.</param>
-    /// <param name="cultureImpactFactory">The culture impact factory.</param>
-    /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="propertyEditorCollection">The property editor collection.</param>
-    /// <param name="idKeyMap">The ID key map.</param>
-    /// <param name="optionsMonitor">The content settings options monitor.</param>
-    /// <param name="relationService">The relation service.</param>
     [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ContentService(
         ICoreScopeProvider provider,
@@ -226,7 +240,8 @@ public class ContentService : RepositoryService, IContentService
             propertyEditorCollection,
             idKeyMap,
             optionsMonitor,
-            relationService)
+            relationService,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditTriggerAccessor>())
     {
     }
 
@@ -271,12 +286,10 @@ public class ContentService : RepositoryService, IContentService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            ScopeProvider.Context?.Enlist(
-                Constants.Audit.TriggerEnlistmentKey,
-                () => new AuditTrigger(
-                    Constants.Audit.TriggerSources.Core,
-                    Constants.Audit.TriggerOperations.Rollback,
-                    SuppressForAuditTypes: [AuditType.RollBack]));
+            _auditTriggerAccessor.Set(new AuditTrigger(
+                Constants.Audit.TriggerSources.Core,
+                Constants.Audit.TriggerOperations.Rollback,
+                SuppressForAuditTypes: [AuditType.RollBack]));
 
             var rollingBackNotification = new ContentRollingBackNotification(content, evtMsgs);
             if (scope.Notifications.PublishCancelable(rollingBackNotification))
