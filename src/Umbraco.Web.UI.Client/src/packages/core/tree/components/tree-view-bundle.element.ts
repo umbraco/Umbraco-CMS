@@ -83,7 +83,7 @@ export class UmbTreeViewBundleElement extends UmbLitElement {
 	#renderItem(view: ManifestTreeView) {
 		return html`
 			<uui-menu-item
-				label=${view.meta.label}
+				label=${this.localize.string(view.meta.label)}
 				@click-label=${() => this.#onClick(view)}
 				?active=${view.alias === this._currentView?.alias}>
 				<umb-icon slot="icon" name=${view.meta.icon}></umb-icon>

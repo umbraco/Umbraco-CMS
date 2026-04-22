@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			element: () => import('./card-tree-view.element.js'),
 			weight: 900,
 			meta: {
-				label: '#treeView_card',
+				label: '#tree_cardViewLabel',
 				icon: 'icon-grid',
 			},
 		},

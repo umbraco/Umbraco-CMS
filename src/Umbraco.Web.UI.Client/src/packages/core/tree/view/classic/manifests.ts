@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			element: () => import('./classic-tree-view.element.js'),
 			weight: 1000,
 			meta: {
-				label: '#treeView_classic',
+				label: '#tree_classicViewLabel',
 				icon: 'icon-blockquote',
 			},
 		},

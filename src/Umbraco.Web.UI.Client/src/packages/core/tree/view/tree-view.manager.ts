@@ -19,7 +19,7 @@ const CLASSIC_FALLBACK: ManifestTreeView = {
 	element: () => import('./classic/classic-tree-view.element.js'),
 	weight: 0,
 	meta: {
-		label: '#treeView_classic',
+		label: '#tree_classicViewLabel',
 		icon: 'icon-blockquote',
 	},
 };

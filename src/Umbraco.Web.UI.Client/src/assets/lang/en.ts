@@ -2037,6 +2037,10 @@ export default {
 		advancedGroup: 'Advanced',
 		webhooks: 'Webhooks',
 	},
+	tree: {
+		classicViewLabel: 'Classic',
+		cardViewLabel: 'Cards',
+	},
 	update: {
 		updateAvailable: 'New update ready',
 		updateDownloadText: '%0% is ready, click here for download',
