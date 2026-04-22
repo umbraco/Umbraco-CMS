@@ -1,19 +1,24 @@
-import type { UmbCurrentUserModel } from '../../types.js';
-import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
 import { UmbCurrentUserRepository } from '../../repository/current-user.repository.js';
-import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
-import { css, html, customElement, query, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
+import type { UmbCurrentUserModel } from '../../types.js';
+import { css, customElement, html, nothing, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTemporaryFileConfigRepository } from '@umbraco-cms/backoffice/temporary-file';
 
-import '../../../../user/user/components/user-avatar/user-avatar.element.js';
+@customElement('umb-current-user-edit-profile-avatar')
+export class UmbCurrentUserEditProfileAvatarElement extends UmbLitElement {
+	#currentUserRepository = new UmbCurrentUserRepository(this);
 
-@customElement('umb-current-user-workspace-avatar')
-export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
+	#temporaryFileConfigRepository = new UmbTemporaryFileConfigRepository(this);
+
+	@state()
+	private _allowedFileTypes = 'image/*';
+
 	@state()
 	private _currentUser?: UmbCurrentUserModel;
 
 	@state()
-	private _allowedFileTypes = 'image/*';
+	private _pendingDelete = false;
 
 	@state()
 	private _pendingFile?: File;
@@ -21,23 +26,14 @@ export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
 	@state()
 	private _pendingPreviewUrl?: string;
 
-	@state()
-	private _pendingDelete = false;
-
 	@query('#AvatarFileField')
 	private _avatarFileField?: HTMLInputElement;
-
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
-	#currentUserRepository = new UmbCurrentUserRepository(this);
-	#temporaryFileConfigRepository = new UmbTemporaryFileConfigRepository(this);
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
-			this.#currentUserContext = instance;
-			if (!this.#currentUserContext) return;
-			this.#observeCurrentUser();
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(context?.currentUser, (currentUser) => (this._currentUser = currentUser), 'umbCurrentUserObserver');
 		});
 
 		this.#observeAllowedFileTypes();
@@ -62,16 +58,6 @@ export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
 			'_imageFileTypes',
 		);
 	}
-
-	#observeCurrentUser = () => {
-		this.observe(
-			this.#currentUserContext!.currentUser,
-			(user) => {
-				this._currentUser = user;
-			},
-			'umbCurrentUserObserver',
-		);
-	};
 
 	#revokePendingPreviewUrl() {
 		if (this._pendingPreviewUrl) {
@@ -195,10 +181,10 @@ export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
 	];
 }
 
-export default UmbCurrentUserWorkspaceAvatarElement;
+export default UmbCurrentUserEditProfileAvatarElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-current-user-workspace-avatar': UmbCurrentUserWorkspaceAvatarElement;
+		'umb-current-user-edit-profile-avatar': UmbCurrentUserEditProfileAvatarElement;
 	}
 }

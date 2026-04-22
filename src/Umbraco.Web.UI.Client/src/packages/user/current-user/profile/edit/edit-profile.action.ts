@@ -23,7 +23,6 @@ export class UmbEditProfileCurrentUserAction<ArgsMetaType = never>
 				this.observe(
 					context?.currentUser,
 					(currentUser) => {
-						console.log('currentUser', currentUser);
 						this.#unique = currentUser?.unique;
 						this.#hasAccessToUserSection = currentUser?.allowedSections?.includes(UMB_USER_MANAGEMENT_SECTION_ALIAS);
 						resolve();

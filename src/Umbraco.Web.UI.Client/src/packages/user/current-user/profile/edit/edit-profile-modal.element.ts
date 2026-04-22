@@ -1,85 +1,65 @@
-import type { UmbCurrentUserModel } from '../../types.js';
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
-import type { UmbCurrentUserWorkspaceProfileSettingsElement } from './edit-profile-settings.element.js';
-import type { UmbCurrentUserWorkspaceAvatarElement } from './edit-profile-avatar.element.js';
-import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
+import type { UmbCurrentUserEditProfileAvatarElement } from './edit-profile-avatar.element.js';
+import type { UmbCurrentUserEditProfileSettingsElement } from './edit-profile-settings.element.js';
+import { css, customElement, html, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 
 import './edit-profile-avatar.element.js';
 import './edit-profile-settings.element.js';
 
-@customElement('umb-current-user-workspace-modal')
-export class UmbCurrentUserWorkspaceModalElement extends UmbLitElement {
-	@property({ attribute: false })
-	modalContext?: UmbModalContext;
-
-	@query('umb-current-user-workspace-avatar')
-	private _avatar?: UmbCurrentUserWorkspaceAvatarElement;
-
-	@query('umb-current-user-workspace-profile-settings')
-	private _profileSettings?: UmbCurrentUserWorkspaceProfileSettingsElement;
-
+@customElement('umb-current-user-edit-profile-modal')
+export class UmbCurrentUserEditProfileModalElement extends UmbModalBaseElement {
 	@state()
-	private _currentUser?: UmbCurrentUserModel;
+	private _headline?: string;
 
-	private _close() {
-		this.modalContext?.reject();
-	}
+	@query('umb-current-user-edit-profile-avatar')
+	private _avatarEl?: UmbCurrentUserEditProfileAvatarElement;
 
-	private async _save() {
-		await this._profileSettings?.save();
-		await this._avatar?.save();
-		this.modalContext?.submit();
-	}
-
-	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
+	@query('umb-current-user-edit-profile-settings')
+	private _profileSettingsEl?: UmbCurrentUserEditProfileSettingsElement;
 
 	constructor() {
 		super();
 
-		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
-			this.#currentUserContext = instance;
-			this._observeCurrentUser();
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(
+				context?.currentUser,
+				(currentUser) => (this._headline = currentUser?.name),
+				'umbCurrentUserObserver',
+			);
 		});
 	}
 
-	private async _observeCurrentUser() {
-		if (!this.#currentUserContext) return;
-
-		this.observe(
-			this.#currentUserContext.currentUser,
-			(currentUser) => {
-				this._currentUser = currentUser;
-			},
-			'umbCurrentUserObserver',
-		);
+	protected override async _submitModal() {
+		await this._avatarEl?.save();
+		await this._profileSettingsEl?.save();
+		this.modalContext?.submit();
+		super._submitModal();
 	}
 
 	override render() {
 		return html`
-			<umb-body-layout headline="${this._currentUser?.name || ''}">
-				<div id="main">
-					<umb-stack>
-						<umb-current-user-workspace-avatar></umb-current-user-workspace-avatar>
-						<umb-current-user-workspace-profile-settings></umb-current-user-workspace-profile-settings>
-					</umb-stack>
-				</div>
-				<div slot="actions">
-					<uui-button @click=${this._close} look="secondary" .label=${this.localize.term('general_close')}>
-						${this.localize.term('general_close')}
-					</uui-button>
-					<uui-button @click=${this._save} look="primary" color="positive" .label=${this.localize.term('buttons_save')}>
-						${this.localize.term('buttons_save')}
-					</uui-button>
-				</div>
+			<umb-body-layout headline=${this._headline ?? ''}>
+				<umb-stack look="compact">
+					<umb-current-user-edit-profile-avatar></umb-current-user-edit-profile-avatar>
+					<umb-current-user-edit-profile-settings></umb-current-user-edit-profile-settings>
+				</umb-stack>
+				<uui-button
+					slot="actions"
+					look="secondary"
+					label=${this.localize.term('general_close')}
+					@click=${this._rejectModal}></uui-button>
+				<uui-button
+					slot="actions"
+					color="positive"
+					look="primary"
+					label=${this.localize.term('buttons_save')}
+					@click=${this._submitModal}></uui-button>
 			</umb-body-layout>
 		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: block;
@@ -90,10 +70,10 @@ export class UmbCurrentUserWorkspaceModalElement extends UmbLitElement {
 	];
 }
 
-export default UmbCurrentUserWorkspaceModalElement;
+export default UmbCurrentUserEditProfileModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-current-user-workspace-modal': UmbCurrentUserWorkspaceModalElement;
+		'umb-current-user-edit-profile-modal': UmbCurrentUserEditProfileModalElement;
 	}
 }
