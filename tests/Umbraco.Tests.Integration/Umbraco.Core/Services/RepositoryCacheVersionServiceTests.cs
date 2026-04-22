@@ -96,6 +96,79 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
         Assert.AreNotEqual(contentVersion, mediaVersion, "Cache versions should be unique for different repository types.");
     }
 
+    [Test]
+    public async Task SetCachesSyncedAsync_RestoresSyncAfterRemoteUpdate()
+    {
+        await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
+        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>());
+
+        // Simulate a remote update — local service is now out of sync.
+        using (var scope = CoreScopeProvider.CreateCoreScope())
+        {
+            await RepositoryCacheVersionRepository.SaveAsync(GetRepositoryRandomCacheVersion());
+            scope.Complete();
+        }
+
+        Assert.IsFalse(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), "Expected out of sync after remote update.");
+
+        // Re-sync from the database.
+        await RepositoryCacheVersionService.SetCachesSyncedAsync();
+
+        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), "Expected in sync after SetCachesSyncedAsync.");
+    }
+
+    [Test]
+    public async Task IsCacheSyncedAsync_ReturnsTrueWhenLocalIsUninitializedButDbHasVersion()
+    {
+        // Write directly to DB — simulates another instance having written a version
+        // before this instance ever checked.
+        using (var scope = CoreScopeProvider.CreateCoreScope())
+        {
+            await RepositoryCacheVersionRepository.SaveAsync(GetRepositoryRandomCacheVersion());
+            scope.Complete();
+        }
+
+        // First check: local has no version, DB has one → service initialises from DB and returns true.
+        var isSynced = await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>();
+        Assert.IsTrue(isSynced, "Should be synced when local is uninitialised but DB has a version.");
+
+        // Second check: local version now matches DB version → still synced.
+        isSynced = await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>();
+        Assert.IsTrue(isSynced, "Should remain synced on subsequent checks.");
+    }
+
+    [Test]
+    public async Task SetCachesSyncedAsync_SyncsAllEntityTypesFromDb()
+    {
+        await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
+        await RepositoryCacheVersionService.SetCacheUpdatedAsync<IMedia>();
+
+        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>());
+        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IMedia>());
+
+        var mediaKey = ((RepositoryCacheVersionService)RepositoryCacheVersionService).GetCacheKey<IMedia>();
+
+        // Simulate remote updates for both entity types.
+        using (var scope = CoreScopeProvider.CreateCoreScope())
+        {
+            await RepositoryCacheVersionRepository.SaveAsync(GetRepositoryRandomCacheVersion());
+            await RepositoryCacheVersionRepository.SaveAsync(new RepositoryCacheVersion
+            {
+                Identifier = mediaKey,
+                Version = Guid.NewGuid().ToString(),
+            });
+            scope.Complete();
+        }
+
+        Assert.IsFalse(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), "IContent should be out of sync.");
+        Assert.IsFalse(await RepositoryCacheVersionService.IsCacheSyncedAsync<IMedia>(), "IMedia should be out of sync.");
+
+        await RepositoryCacheVersionService.SetCachesSyncedAsync();
+
+        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IContent>(), "IContent should be synced after SetCachesSyncedAsync.");
+        Assert.IsTrue(await RepositoryCacheVersionService.IsCacheSyncedAsync<IMedia>(), "IMedia should be synced after SetCachesSyncedAsync.");
+    }
+
     private RepositoryCacheVersion GetRepositoryRandomCacheVersion()
         => new()
         {
