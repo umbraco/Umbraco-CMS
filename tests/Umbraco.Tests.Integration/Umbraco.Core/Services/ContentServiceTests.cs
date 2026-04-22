@@ -18,6 +18,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -2212,23 +2213,17 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         // Assert.AreNotEqual(content.Name, copy.Name);
     }
 
+    /// <summary>
+    /// Provides a regression test for https://github.com/umbraco/Umbraco-CMS/issues/22540.
+    /// </summary>
     [Test]
     public void Can_Copy_Culture_Variant_Document_Without_Per_Culture_Published_Flags()
     {
-        // see https://github.com/umbraco/Umbraco-CMS/issues/22540
+        // Arrange
         var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr, out _);
 
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(ContentService.Save(content).Success);
-            Assert.IsTrue(ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode }).Success);
-        });
-
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
-            Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
-        });
+        Assert.IsTrue(ContentService.Save(content).Success);
+        Assert.IsTrue(ContentService.Publish(content, [langFr.IsoCode, langUk.IsoCode]).Success);
 
         // re-get to ensure we copy from the persisted state
         content = ContentService.GetById(content.Id);
@@ -2236,44 +2231,32 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         // Act
         var copy = ContentService.Copy(content, content.ParentId, false);
 
-        // re-get the copy from the database so we assert on persisted state, not the in-memory copy
-        var persistedCopy = ContentService.GetById(copy.Id);
-
-        // Assert
-        Assert.That(persistedCopy, Is.Not.Null);
-        Assert.Multiple(() =>
-        {
-            // the copy itself should not be published
-            Assert.IsFalse(persistedCopy.Published);
-
-            // no culture variations should be marked as published on the copy
-            Assert.IsFalse(persistedCopy.IsCulturePublished(langFr.IsoCode));
-            Assert.IsFalse(persistedCopy.IsCulturePublished(langUk.IsoCode));
-            Assert.IsEmpty(persistedCopy.PublishedCultures);
-
-            // sanity: culture names are still preserved (edit-side data, not publish-side) - Copy appends a " (n)" suffix to avoid sibling collisions
-            Assert.That(persistedCopy.GetCultureName(langFr.IsoCode), Does.StartWith("content-fr"));
-            Assert.That(persistedCopy.GetCultureName(langUk.IsoCode), Does.StartWith("content-en"));
-        });
+        // Assert against umbracoDocumentCultureVariation directly - IContent's re-materialisation
+        // after GetById hides the DB-level inconsistency that issue #22540 is actually about.
+        AssertCultureVariationRowsForUnpublishedCopy(copy!.Id, langUk, langFr, "content-en", "content-fr");
     }
 
+    /// <summary>
+    /// Provides a regression test for https://github.com/umbraco/Umbraco-CMS/issues/22540 (covers the
+    /// recursive descendant path).
+    /// </summary>
     [Test]
     public void Can_Copy_Recursive_Culture_Variant_Document_Without_Per_Culture_Published_Flags_On_Descendants()
     {
-        // see https://github.com/umbraco/Umbraco-CMS/issues/22540 - covers the recursive descendant path
+        // Arrange
         CreateEnglishAndFrenchDocumentType(out var langUk, out var langFr, out var contentType);
 
         IContent parent = new Content("parent", Constants.System.Root, contentType);
         parent.SetCultureName("parent-fr", langFr.IsoCode);
         parent.SetCultureName("parent-en", langUk.IsoCode);
         Assert.IsTrue(ContentService.Save(parent).Success);
-        Assert.IsTrue(ContentService.Publish(parent, new[] { langFr.IsoCode, langUk.IsoCode }).Success);
+        Assert.IsTrue(ContentService.Publish(parent, [langFr.IsoCode, langUk.IsoCode]).Success);
 
         IContent child = new Content("child", parent.Id, contentType);
         child.SetCultureName("child-fr", langFr.IsoCode);
         child.SetCultureName("child-en", langUk.IsoCode);
         Assert.IsTrue(ContentService.Save(child).Success);
-        Assert.IsTrue(ContentService.Publish(child, new[] { langFr.IsoCode, langUk.IsoCode }).Success);
+        Assert.IsTrue(ContentService.Publish(child, [langFr.IsoCode, langUk.IsoCode]).Success);
 
         // re-get to ensure we copy from the persisted state
         parent = ContentService.GetById(parent.Id);
@@ -2281,18 +2264,44 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         // Act: copy the branch (recursive)
         var copy = ContentService.Copy(parent, parent.ParentId, false, recursive: true);
 
-        // Assert: descendants of the copy should also have no per-culture published flags
         var childCopy = ContentService
-            .GetPagedChildren(copy.Id, 0, 500, out _, propertyAliases: null, filter: null, ordering: null)
+            .GetPagedChildren(copy!.Id, 0, 500, out _, propertyAliases: null, filter: null, ordering: null)
             .First();
 
-        Assert.That(childCopy, Is.Not.Null);
+        // Assert against umbracoDocumentCultureVariation directly for both the root copy and the descendant copy.
+        AssertCultureVariationRowsForUnpublishedCopy(copy.Id, langUk, langFr, "parent-en", "parent-fr");
+        AssertCultureVariationRowsForUnpublishedCopy(childCopy.Id, langUk, langFr, "child-en", "child-fr");
+    }
+
+    private void AssertCultureVariationRowsForUnpublishedCopy(
+        int nodeId,
+        Language langUk,
+        Language langFr,
+        string expectedUkNamePrefix,
+        string expectedFrNamePrefix)
+    {
+        using var scope = ScopeProvider.CreateScope(autoComplete: true);
+        var rows = scope.Database.Fetch<DocumentCultureVariationDto>(
+            "WHERE nodeId = @0",
+            nodeId);
+
+        Assert.That(
+            rows,
+            Has.Count.EqualTo(2),
+            $"Expected one umbracoDocumentCultureVariation row per culture for node {nodeId}.");
+
+        var ukRow = rows.Single(r => r.LanguageId == langUk.Id);
+        var frRow = rows.Single(r => r.LanguageId == langFr.Id);
+
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(childCopy.Published);
-            Assert.IsFalse(childCopy.IsCulturePublished(langFr.IsoCode));
-            Assert.IsFalse(childCopy.IsCulturePublished(langUk.IsoCode));
-            Assert.IsEmpty(childCopy.PublishedCultures);
+            // the actual bug: umbracoDocumentCultureVariation.published must be 0 on an unpublished copy
+            Assert.IsFalse(ukRow.Published, $"en-GB row on node {nodeId} should have published=0.");
+            Assert.IsFalse(frRow.Published, $"fr-FR row on node {nodeId} should have published=0.");
+
+            // sanity: edit-side culture names are still preserved (Copy appends " (n)" to avoid sibling collisions)
+            Assert.That(ukRow.Name, Does.StartWith(expectedUkNamePrefix));
+            Assert.That(frRow.Name, Does.StartWith(expectedFrNamePrefix));
         });
     }
 
