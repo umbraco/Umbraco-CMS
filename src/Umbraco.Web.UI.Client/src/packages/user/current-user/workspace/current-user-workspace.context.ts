@@ -17,6 +17,10 @@ export class UmbCurrentUserWorkspaceContext
 	extends UmbSubmittableWorkspaceContextBase<UmbCurrentUserModel>
 	implements UmbSubmittableWorkspaceContext
 {
+	// State is split in two: #data holds the editable copy of the persisted user (seeded from the server,
+	// refreshed on store updates) and drives fields like language; #pendingAvatar holds transient UI state
+	// (selected file, preview URL, delete flag) that is separate because avatar URLs are server-resolved
+	// and shouldn't round-trip through the editable model.
 	readonly #data = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
 	readonly data = this.#data.asObservable();
 	readonly name = this.#data.asObservablePart((data) => data?.name);
@@ -30,12 +34,13 @@ export class UmbCurrentUserWorkspaceContext
 	readonly pendingAvatarPreviewUrl = this.#pendingAvatar.asObservablePart((p) => p.previewUrl);
 
 	#persistedLanguageIsoCode?: string;
+	#loadPromise?: Promise<void>;
 
 	readonly #repository = new UmbCurrentUserRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CURRENT_USER_WORKSPACE_ALIAS);
-		this.#load();
+		this.#loadPromise = this.#load();
 	}
 
 	async #load() {
@@ -110,6 +115,7 @@ export class UmbCurrentUserWorkspaceContext
 	}
 
 	protected async submit(): Promise<void> {
+		await this.#loadPromise;
 		const data = this.#data.getValue();
 		if (!data) throw new Error('Current user data not loaded');
 

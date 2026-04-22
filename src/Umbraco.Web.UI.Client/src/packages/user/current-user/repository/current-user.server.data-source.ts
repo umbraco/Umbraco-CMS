@@ -172,7 +172,7 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 	}
 
 	/**
- 	 * Update the current user's profile
+	 * Update the current user's profile
 	 * @param languageIsoCode
 	 */
 	async updateCurrentUserProfile(languageIsoCode: string) {

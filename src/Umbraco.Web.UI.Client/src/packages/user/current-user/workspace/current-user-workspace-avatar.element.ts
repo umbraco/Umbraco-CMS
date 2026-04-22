@@ -65,6 +65,7 @@ export class UmbCurrentUserWorkspaceAvatarElement extends UmbLitElement {
 
 	async #observeAllowedFileTypes() {
 		await this.#temporaryFileConfigRepository.initialized;
+		if (!this.isConnected) return;
 		this.observe(
 			this.#temporaryFileConfigRepository.part('imageFileTypes'),
 			(fileTypes) => {
