@@ -59,8 +59,8 @@ public class UmbRegisterController : SurfaceController
         {
             TempData["FormSuccess"] = true;
 
-            // If there is a specified path to redirect to then use it.
-            if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
+            // If there is a specified path to redirect and validated as a local URL, then use it.
+            if (!model.RedirectUrl.IsNullOrWhiteSpace() && Url.IsLocalUrl(model.RedirectUrl!))
             {
                 return Redirect(model.RedirectUrl!);
             }
