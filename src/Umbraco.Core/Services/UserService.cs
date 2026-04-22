@@ -51,6 +51,7 @@ internal partial class UserService : RepositoryService, IUserService
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IBackOfficeUserReader _backOfficeUserReader;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserService" /> class.
@@ -74,6 +75,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="isoCodeValidator">The validator for ISO codes.</param>
     /// <param name="forgotPasswordSender">The sender for forgot password emails.</param>
     /// <param name="userIdKeyResolver">The resolver for user ID to key mappings.</param>
+    /// <param name="backOfficeUserReader">The shared reader used for back office user lookups.</param>
     public UserService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -93,7 +95,8 @@ internal partial class UserService : RepositoryService, IUserService
         IOptions<ContentSettings> contentSettings,
         IIsoCodeValidator isoCodeValidator,
         IUserForgotPasswordSender forgotPasswordSender,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IBackOfficeUserReader backOfficeUserReader)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -109,6 +112,7 @@ internal partial class UserService : RepositoryService, IUserService
         _isoCodeValidator = isoCodeValidator;
         _forgotPasswordSender = forgotPasswordSender;
         _userIdKeyResolver = userIdKeyResolver;
+        _backOfficeUserReader = backOfficeUserReader;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
@@ -1756,10 +1760,7 @@ internal partial class UserService : RepositoryService, IUserService
             return Array.Empty<IUser>();
         }
 
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
+        return _backOfficeUserReader.GetAllInGroup(groupId.Value);
     }
 
     /// <inheritdoc/>
@@ -1800,30 +1801,15 @@ internal partial class UserService : RepositoryService, IUserService
 
     /// <inheritdoc/>
     public IUser? GetUserById(int id)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAsync(id).GetAwaiter().GetResult();
-    }
+        => _backOfficeUserReader.GetById(id);
 
     /// <inheritdoc/>
     public Task<IUser?> GetAsync(Guid key)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAsync(key);
-    }
+        => Task.FromResult(_backOfficeUserReader.GetByKey(key));
 
     /// <inheritdoc/>
     public Task<IEnumerable<IUser>> GetAsync(IEnumerable<Guid> keys)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetUsersAsync(keys.ToArray());
-    }
+        => Task.FromResult(_backOfficeUserReader.GetManyByKey(keys));
 
     /// <inheritdoc/>
     public async Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLinkedLoginsAsync(Guid userKey)
@@ -1848,12 +1834,7 @@ internal partial class UserService : RepositoryService, IUserService
 
     /// <inheritdoc/>
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetUsersAsync(ids).GetAwaiter().GetResult();
-    }
+        => ids is null ? Enumerable.Empty<IUser>() : _backOfficeUserReader.GetManyById(ids);
 
     /// <inheritdoc/>
     public void ReplaceUserGroupPermissions(int groupId, ISet<string> permissions, params int[] entityIds)

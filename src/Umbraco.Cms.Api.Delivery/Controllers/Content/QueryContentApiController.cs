@@ -62,8 +62,10 @@ public class QueryContentApiController : ContentApiControllerBase
         }
 
         PagedModel<Guid> pagedResult = queryAttempt.Result;
-        IEnumerable<IPublishedContent> contentItems = ApiPublishedContentCache.GetByIds(pagedResult.Items);
+        IPublishedContent[] contentItems = ApiPublishedContentCache.GetByIds(pagedResult.Items).ToArray();
         IApiContentResponse[] apiContentItems = contentItems.Select(ApiContentResponseBuilder.Build).WhereNotNull().ToArray();
+
+        SetOutputCacheContent(contentItems);
 
         var model = new PagedViewModel<IApiContentResponse>
         {
