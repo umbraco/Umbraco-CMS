@@ -377,4 +377,84 @@ describe('UmbExtensionElementAndApiInitializer — condition-flip race with a sl
 			`API leak: ${apiCtorCount} constructed, only ${apiDestroyCount} destroyed`,
 		).to.equal(apiCtorCount);
 	});
+
+	// Regression test for the "bad-path restored-during-await" bug that made the submit
+	// button fail to show after a brief readonly flip. Sequence:
+	//
+	//   1. Good-call completes — `this.#api` / `this.#component` assigned, `#isPermitted=true`.
+	//   2. Condition flips `false` — base enters the else-if, `_conditionsAreBad()` runs
+	//      synchronously and destroys `this.#component`. Before the fix, the base then
+	//      `await`-ed that call. The await yielded a microtask.
+	//   3. Condition flips `true` during that microtask — a new callback fired synchronously,
+	//      saw `_isConditionsPositive` flip back to `true` and `#isPermitted` still `true`
+	//      (the bad-path hadn't committed yet), hit the `#isPermitted !== true` dead-zone
+	//      and did nothing.
+	//   4. Bad-path resumed, saw `_isConditionsPositive !== false`, and bailed out early
+	//      without committing `#isPermitted = false`.
+	//   5. End state: `#isPermitted = true`, `#component = undefined`. Lit's `ext.component`
+	//      was `undefined` — button visible in the permitted list but with nothing to render.
+	//
+	// The fix dropped the `await` on `_conditionsAreBad` and removed the "restored during
+	// await" early-return so `#isPermitted = false` is always committed after destruction.
+	// Any subsequent restore-callback then enters the good-branch and rebuilds.
+	//
+	// This test asserts the INVARIANT: after the flip burst settles, `permitted` and
+	// `component` must agree. Either both present (rebuilt) or both absent (stayed negative).
+	// Before the fix, `permitted=true` with `component=undefined` was the observed failure.
+	it('keeps permitted/component state consistent after a false→true flip during bad-path', async () => {
+		const controller = new UmbExtensionElementAndApiInitializer<TestManifest>(
+			hostElement,
+			extensionRegistry,
+			baseManifest.alias,
+			[hostElement],
+			() => {
+				/* state check at the end; onChange noise is irrelevant */
+			},
+		);
+
+		await wait(0);
+		expect(lastManualCondition, 'condition must exist').to.exist;
+
+		// Drive to permitted=true with component assigned.
+		lastManualCondition!.flipTo(true);
+		await wait(120); // factory delay + buffer
+		expect(controller.permitted, 'setup: should be permitted after initial true flip').to.be.true;
+		expect(controller.component, 'setup: component should exist after initial true flip').to.exist;
+
+		// Now the race. `flipTo(false)` → bad-path destroys component synchronously (before
+		// the fix, then awaited). `flipTo(true)` happens in the same sync turn — this is the
+		// microtask-interleaving that used to dead-zone and strand `#isPermitted=true` with
+		// a destroyed component.
+		lastManualCondition!.flipTo(false);
+		lastManualCondition!.flipTo(true);
+
+		// Allow any pending rebuild good-call + rAF notifications to settle.
+		await wait(200);
+
+		// The invariant: permitted and component must be consistent. Before the fix, the
+		// failure was `permitted=true` with `component=undefined`.
+		if (controller.permitted) {
+			expect(
+				controller.component,
+				'state inconsistency: permitted=true but component is undefined — ' +
+					'bad-path destroyed component then bailed out without committing isPermitted=false, ' +
+					'so nothing ever triggered a rebuild.',
+			).to.exist;
+			expect(controller.api, 'state inconsistency: permitted=true but api is undefined').to.exist;
+		} else {
+			expect(controller.component, 'consistency: not permitted but component lingered').to.be.undefined;
+			expect(controller.api, 'consistency: not permitted but api lingered').to.be.undefined;
+		}
+
+		// The condition's final state was `true`, so the happy path is to end permitted with
+		// a rebuilt component. Explicit check so a silently-negative-ending regression also
+		// surfaces.
+		expect(
+			controller.permitted,
+			'after a false→true burst the controller should settle at permitted=true (rebuilt)',
+		).to.be.true;
+		expect(controller.component, 'component should have been rebuilt after the burst').to.exist;
+
+		controller.destroy();
+	});
 });
