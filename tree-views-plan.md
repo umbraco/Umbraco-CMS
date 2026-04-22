@@ -392,7 +392,7 @@ Each phase requires review and sign-off before the next begins.
 
 - [x] **Phase 0** — Pre-flight (read-only checks)
 - [x] **Phase 1** — New extension types (`ManifestTreeView`, `ManifestTreeItemCard`)
-- [ ] **Phase 2** — Remove `expandTo()` from expansion manager + tests (independent cleanup)
+- [x] **Phase 2** — Remove `expandTo()` from expansion manager + tests (independent cleanup)
 - [x] **Phase 3** — Extract Classic view + shell refactor (invasive)
   - [x] 3.1 — Optional `hideTreeItemActions` / `isMenu` on `UmbTreeContext`
   - [x] 3.2 — `<umb-classic-tree-view>` element + manifest
@@ -400,13 +400,16 @@ Each phase requires review and sign-off before the next begins.
   - [x] 3.4 — Convert `<umb-default-tree>` into a shell
   - [x] 3.5 — Register Classic view manifests
 - [x] **Phase 4** — `<umb-tree-toolbar>` + `<umb-tree-view-bundle>` elements
-- [ ] **Phase 5** — `open()` on tree context + card view refactor (slim)
-  - [ ] 5.1 — Add `open()` to `UmbTreeContext` interface + `UmbDefaultTreeContext` implementation
-  - [ ] 5.2 — Update `<umb-default-tree-item-card>` to call `treeContext.open()` (remove `UmbTreeItemCardNavigateEvent`)
-  - [ ] 5.3 — `<umb-tree-item-card>` routing element — verify no `UmbTreeItemCardNavigateEvent` references
-  - [ ] 5.4 — Slim down `<umb-card-tree-view>`: remove breadcrumb, expansion-based navigation, name cache
-- [ ] **Phase 6** — Breadcrumb in `<umb-tree-picker-modal>`
-- [ ] **Phase 7** — Localization, unit tests, manual smoke tests
+- [x] **Phase 5** — `open()` on tree context + card view refactor (slim)
+  - [x] 5.1 — Add `open()` to `UmbTreeContext` interface + `UmbDefaultTreeContext` implementation
+  - [x] 5.2 — Update `<umb-default-tree-item-card>` to call `treeContext.open()` (remove `UmbTreeItemCardNavigateEvent`)
+  - [x] 5.3 — `<umb-tree-item-card>` routing element — verify no `UmbTreeItemCardNavigateEvent` references
+  - [x] 5.4 — Slim down `<umb-card-tree-view>`: remove breadcrumb, expansion-based navigation, name cache
+- [x] **Phase 6** — Breadcrumb in `<umb-tree-picker-modal>`
+- [x] **Phase 7** — Localization, unit tests, manual smoke tests
+  - [x] 7.1 — Add `treeView_classic` / `treeView_card` keys to `en.ts`
+  - [x] 7.2 — `tree-view.manager.test.ts` (10 tests passing)
+  - [ ] 7.3 — Manual smoke tests (user sign-off required)
 - [ ] **Phase 8** — View selection persistence (UX enhancement — design TBD)
 
 ---
