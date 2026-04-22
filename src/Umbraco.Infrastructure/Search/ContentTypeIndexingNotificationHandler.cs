@@ -169,14 +169,14 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
         var isDeferred = _cacheSettings.CurrentValue.ContentTypeRebuildMode == ContentTypeRebuildMode.Deferred;
 
-        foreach (KeyValuePair<string, (List<int> removedIds, List<int> refreshedIds)> ci in changedIds)
+        foreach (KeyValuePair<string, (List<int> removedIds, List<int> refreshedIds)> changedId in changedIds)
         {
-            if (ci.Value.refreshedIds.Count > 0)
+            if (changedId.Value.refreshedIds.Count > 0)
             {
                 if (isDeferred)
                 {
-                    var distinctIds = ci.Value.refreshedIds.Distinct().ToArray();
-                    switch (ci.Key)
+                    var distinctIds = changedId.Value.refreshedIds.Distinct().ToArray();
+                    switch (changedId.Key)
                     {
                         case var itemType when itemType == typeof(IContentType).Name:
                             _deferredSearchReindexService.QueueContentTypeReindex(distinctIds);
@@ -191,17 +191,17 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
                 }
                 else
                 {
-                    switch (ci.Key)
+                    switch (changedId.Key)
                     {
                         case var itemType when itemType == typeof(IContentType).Name:
-                            RefreshContentOfContentTypes(ci.Value.refreshedIds.Distinct()
+                            RefreshContentOfContentTypes(changedId.Value.refreshedIds.Distinct()
                                 .ToArray());
                             break;
                         case var itemType when itemType == typeof(IMediaType).Name:
-                            RefreshMediaOfMediaTypes(ci.Value.refreshedIds.Distinct().ToArray());
+                            RefreshMediaOfMediaTypes(changedId.Value.refreshedIds.Distinct().ToArray());
                             break;
                         case var itemType when itemType == typeof(IMemberType).Name:
-                            RefreshMemberOfMemberTypes(ci.Value.refreshedIds.Distinct()
+                            RefreshMemberOfMemberTypes(changedId.Value.refreshedIds.Distinct()
                                 .ToArray());
                             break;
                     }
@@ -209,7 +209,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             }
 
             // Delete all content of this content/media/member type that is in any content indexer by looking up matched examine docs
-            _umbracoIndexingHandler.DeleteDocumentsForContentTypes(ci.Value.removedIds);
+            _umbracoIndexingHandler.DeleteDocumentsForContentTypes(changedId.Value.removedIds);
         }
     }
 
