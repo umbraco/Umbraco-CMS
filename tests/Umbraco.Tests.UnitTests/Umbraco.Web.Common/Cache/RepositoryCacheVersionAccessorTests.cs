@@ -296,7 +296,7 @@ public class RepositoryCacheVersionAccessorTests
         public int CreatedThreadId => Environment.CurrentManagedThreadId;
 
         public void Enlist(string key, Action<bool> action, int priority = 100)
-            => _actions[key] = action;
+            => _actions.TryAdd(key, action);
 
         public T? Enlist<T>(string key, Func<T> creator, Action<bool, T?>? action = null, int priority = 100)
             => throw new NotSupportedException();
