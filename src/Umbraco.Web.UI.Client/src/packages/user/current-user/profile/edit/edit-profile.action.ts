@@ -12,25 +12,22 @@ export class UmbEditProfileCurrentUserAction<ArgsMetaType = never>
 	implements UmbCurrentUserAction<ArgsMetaType>
 {
 	#hasAccessToUserSection? = false;
-	#init: Promise<void>;
+	#init: Promise<typeof UMB_CURRENT_USER_CONTEXT.TYPE | undefined>;
 	#unique?: string;
 
 	constructor(host: UmbControllerHost, args: UmbCurrentUserActionArgs<ArgsMetaType>) {
 		super(host, args);
 
-		this.#init = new Promise<void>((resolve) => {
-			this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-				this.observe(
-					context?.currentUser,
-					(currentUser) => {
-						this.#unique = currentUser?.unique;
-						this.#hasAccessToUserSection = currentUser?.allowedSections?.includes(UMB_USER_MANAGEMENT_SECTION_ALIAS);
-						resolve();
-					},
-					'umbEditProfileCurrentUserActionObserver',
-				);
-			});
-		});
+		this.#init = this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+			this.observe(
+				context?.currentUser,
+				(currentUser) => {
+					this.#unique = currentUser?.unique;
+					this.#hasAccessToUserSection = currentUser?.allowedSections?.includes(UMB_USER_MANAGEMENT_SECTION_ALIAS);
+				},
+				'umbEditProfileCurrentUserActionObserver',
+			);
+		}).asPromise();
 	}
 
 	async getHref() {
