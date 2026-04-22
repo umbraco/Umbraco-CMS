@@ -71,11 +71,7 @@ export class UmbPropertyEditorUIBlockGridElement
 	public set readonly(value) {
 		this.#readonly = value;
 
-		if (this.#readonly) {
-			this.#managerContext.readOnlyState.fallbackToPermitted();
-		} else {
-			this.#managerContext.readOnlyState.fallbackToNotPermitted();
-		}
+		this.#handleReadonly();
 	}
 	public get readonly() {
 		return this.#readonly;
@@ -175,9 +171,11 @@ export class UmbPropertyEditorUIBlockGridElement
 			}
 		}).passContextAliasMatches();
 
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (context) => {
+		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
+			this.#handleReadonly();
+
 			this.observe(
-				context?.dataPath,
+				propertyContext?.dataPath,
 				(dataPath) => {
 					if (dataPath) {
 						// Set the data path for the local validation context:
@@ -187,10 +185,7 @@ export class UmbPropertyEditorUIBlockGridElement
 				},
 				'observeDataPath',
 			);
-		});
 
-		// TODO: Prevent initial notification from these observes
-		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
 			this.observe(
 				observeMultiple([
 					this.#managerContext.layouts,
@@ -243,12 +238,21 @@ export class UmbPropertyEditorUIBlockGridElement
 				context?.displayVariantId,
 				(variantId) => {
 					this.#managerContext.setVariantId(variantId);
+					this.#handleReadonly();
 				},
 				'observeContextualVariantId',
 			);
 		});
 
 		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
+	}
+
+	#handleReadonly() {
+		this.#managerContext.readOnlyState.addRule({
+			unique: 'UMB_PROPERTY_READONLY',
+			permitted: this.#readonly,
+			variantId: this.#managerContext.getVariantId(),
+		});
 	}
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
