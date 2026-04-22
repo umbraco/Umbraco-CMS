@@ -3,7 +3,6 @@ import { expect } from '@open-wc/testing';
 import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -105,52 +104,4 @@ describe('UmbTreeExpansionManager', () => {
 		});
 	});
 
-	describe('expandTo', () => {
-		const nodeA = { entityType: 'test', unique: 'a' };
-		const nodeB = { entityType: 'test', unique: 'b' };
-		const nodeC = { entityType: 'test', unique: 'c' };
-		const nodeD = { entityType: 'test', unique: 'd' };
-
-		const makeRepository = (ancestors: Array<{ entityType: string; unique: string }>, error?: Error) =>
-			({
-				requestTreeItemAncestors: async () => (error ? { data: undefined, error } : { data: ancestors }),
-			}) as unknown as UmbTreeRepository;
-
-		it('has an expandTo method', () => {
-			expect(manager).to.have.property('expandTo').that.is.a('function');
-		});
-
-		it('builds a linked chain from ancestors + target', async () => {
-			await manager.expandTo(nodeD, { repository: makeRepository([nodeA, nodeB, nodeC]) });
-			expect(manager.getExpansion()).to.deep.equal([
-				{ entityType: 'test', unique: 'a', target: { entityType: 'test', unique: 'b' } },
-				{ entityType: 'test', unique: 'b', target: { entityType: 'test', unique: 'c' } },
-				{ entityType: 'test', unique: 'c', target: { entityType: 'test', unique: 'd' } },
-				{ entityType: 'test', unique: 'd' },
-			]);
-		});
-
-		it('clips the chain to startNode when provided', async () => {
-			await manager.expandTo(nodeD, {
-				repository: makeRepository([nodeA, nodeB, nodeC]),
-				startNode: nodeB,
-			});
-			expect(manager.getExpansion()).to.deep.equal([
-				{ entityType: 'test', unique: 'b', target: { entityType: 'test', unique: 'c' } },
-				{ entityType: 'test', unique: 'c', target: { entityType: 'test', unique: 'd' } },
-				{ entityType: 'test', unique: 'd' },
-			]);
-		});
-
-		it('sets a single-entry chain when the target has no ancestors', async () => {
-			await manager.expandTo(nodeA, { repository: makeRepository([]) });
-			expect(manager.getExpansion()).to.deep.equal([{ entityType: 'test', unique: 'a' }]);
-		});
-
-		it('leaves expansion unchanged on repository error', async () => {
-			manager.setExpansion([nodeA]);
-			await manager.expandTo(nodeD, { repository: makeRepository([], new Error('network error')) });
-			expect(manager.getExpansion()).to.deep.equal([nodeA]);
-		});
-	});
 });

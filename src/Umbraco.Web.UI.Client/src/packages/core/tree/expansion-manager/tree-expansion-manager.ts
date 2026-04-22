@@ -1,8 +1,6 @@
 import type { UmbTreeExpansionModel } from './types.js';
-import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
-import type { UmbTreeStartNode } from '../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbEntityExpansionManager, linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
+import { UmbEntityExpansionManager } from '@umbraco-cms/backoffice/utils';
 import type { Observable } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbEntityExpansionEntryModel } from '@umbraco-cms/backoffice/utils';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
@@ -101,35 +99,5 @@ export class UmbTreeExpansionManager extends UmbControllerBase {
 	 */
 	public async getItem(entity: UmbEntityModel): Promise<UmbEntityExpansionEntryModel | undefined> {
 		return this.#manager.getItem(entity);
-	}
-
-	/**
-	 * Expands the tree to the given entity by fetching its ancestors from the repository,
-	 * building a linked chain, and replacing the current expansion state.
-	 * If a startNode is provided the chain is clipped to begin at that node.
-	 * On repository error the expansion state is left unchanged.
-	 * @param {UmbEntityModel} entity The target entity to expand to
-	 * @param {{ repository: UmbTreeRepository; startNode?: UmbTreeStartNode }} options
-	 * @memberof UmbTreeExpansionManager
-	 */
-	public async expandTo(
-		entity: { unique: string; entityType: string },
-		options: { repository: UmbTreeRepository; startNode?: UmbTreeStartNode },
-	): Promise<void> {
-		const { data, error } = await options.repository.requestTreeItemAncestors({ treeItem: entity });
-		if (error || !data) return;
-
-		let chain: Array<UmbEntityModel> = [...data, entity];
-
-		if (options.startNode) {
-			const startIndex = chain.findIndex(
-				(item) => item.unique === options.startNode!.unique && item.entityType === options.startNode!.entityType,
-			);
-			if (startIndex !== -1) {
-				chain = chain.slice(startIndex);
-			}
-		}
-
-		this.setExpansion(linkEntityExpansionEntries(chain));
 	}
 }
