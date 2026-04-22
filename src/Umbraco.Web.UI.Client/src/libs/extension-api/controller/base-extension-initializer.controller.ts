@@ -252,18 +252,7 @@ export abstract class UmbBaseExtensionInitializer<
 		return this.#conditionControllers.some((condition) => condition.permitted === false) === false;
 	}
 
-	// The currently-pending `_conditionsAreGood()` promise, tagged with the manifest it
-	// was started for and with an AbortController whose signal is passed to the subclass.
-	//
-	// When a new positive-transition callback fires while a previous good-call is still
-	// loading, we *share* the pending promise (for the same manifest) instead of starting
-	// a parallel load. Because the subclass's factory + assignment then runs only once
-	// per entry, `this.#api` / `this.#component` are assigned exactly once.
-	//
-	// The signal is aborted when the entry is invalidated — on destroy, or when a new
-	// callback arrives with a different manifest (cache miss). The subclass should check
-	// `signal.aborted` after its async work and refuse to commit if set, so a stale
-	// in-flight load can't overwrite the assignments from a newer, superseding call. [NL]
+	// The currently-pending `_conditionsAreGood()` promise and manifest, to detect if we can reuse it.
 	#pendingGoodCall?: { manifest: ManifestType; promise: Promise<boolean>; abortController: AbortController };
 
 	#abortPendingGoodCall() {
@@ -331,12 +320,6 @@ export abstract class UmbBaseExtensionInitializer<
 			oldValue = this.#isPermitted ?? false;
 			this.#isPermitted = false;
 		}
-		// [DIAG — remove once the submit-button-not-showing bug is diagnosed]
-		console.log(
-			`[init ${this.#alias}] isPositive=${isPositive} #isPermitted=${this.#isPermitted} ` +
-				`condCount=${this.#conditionControllers.length} ` +
-				`condPermitted=${this.#conditionControllers.map((c) => c.permitted).join(',')}`,
-		);
 		if (oldValue !== this.#isPermitted && this.#isPermitted !== undefined) {
 			if (this.#isPermitted === true) {
 				this.#promiseResolvers.forEach((x) => x());
