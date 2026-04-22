@@ -17,6 +17,11 @@ export class UmbBlockLanguageAccessWorkspaceContext extends UmbControllerBase {
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
+
+			this.#workspaceContext?.readOnlyGuard.fallbackToPermitted();
+			this.#workspaceContext?.content.readOnlyGuard.fallbackToPermitted();
+			this.#workspaceContext?.settings.readOnlyGuard.fallbackToPermitted();
+
 			this.observe(
 				instance?.variantId,
 				(variantId) => {
@@ -68,16 +73,15 @@ export class UmbBlockLanguageAccessWorkspaceContext extends UmbControllerBase {
 		this.#workspaceContext.content.readOnlyGuard.removeRule(unique);
 		this.#workspaceContext.settings.readOnlyGuard.removeRule(unique);
 
-		if (allowed || !culture || !this.#variantId) return;
+		if (!allowed || !culture || !this.#variantId) return;
 
 		const variantId = this.#variantId;
 		const rule = {
 			unique,
 			variantId,
-			message: 'You do not have permission to edit this culture',
 			// The rule semantics match the document workspace version:
-			// permitted: true = the variant is permitted to be read-only.
-			permitted: true,
+			// permitted: false = the variant is permitted to be edited.
+			permitted: false,
 		};
 
 		this.#workspaceContext.readOnlyGuard.addRule(rule);
