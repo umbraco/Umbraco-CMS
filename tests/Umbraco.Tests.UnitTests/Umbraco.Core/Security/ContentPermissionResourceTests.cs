@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using NUnit.Framework.Legacy;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Security.Authorization;
 

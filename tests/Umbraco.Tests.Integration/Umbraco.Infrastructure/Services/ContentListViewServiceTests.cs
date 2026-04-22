@@ -136,7 +136,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         Assert.Multiple(() =>
         {
             Assert.AreEqual(5, collectionItemsResult.Total);
-            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
         });
     }
 
@@ -324,7 +324,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         Assert.Multiple(() =>
         {
             Assert.AreEqual(5, collectionItemsResult.Total);
-            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
         });
     }
 
@@ -508,7 +508,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         Assert.Multiple(() =>
         {
             Assert.AreEqual(5, collectionItemsResult.Total);
-            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
             Assert.IsTrue(expectedNames.SequenceEqual(actualNames));
         });
     }
@@ -548,7 +548,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         Assert.Multiple(() =>
         {
             Assert.AreEqual(5, collectionItemsResult.Total);
-            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
             Assert.AreEqual(expectedFirstItemName, collectionItemsResult.Items.First().Name);
             Assert.AreEqual(expectedLastItemName, collectionItemsResult.Items.Last().Name);
         });
@@ -596,7 +596,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         {
             Assert.IsTrue(sortOrderProperty.IsSystem);
             Assert.AreEqual(5, collectionItemsResult.Total);
-            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
             Assert.IsTrue(expectedNames.SequenceEqual(actualNames));
         });
     }
@@ -640,7 +640,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         {
             Assert.IsFalse(priceProperty.IsSystem);
             Assert.AreEqual(5, collectionItemsResult.Total);
-            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
             Assert.IsTrue(expectedNames.SequenceEqual(actualNames));
         });
     }
@@ -824,7 +824,7 @@ internal sealed class ContentListViewServiceTests : ContentListViewServiceTestsB
         {
             Assert.AreEqual(5, collectionItemsResult.Total);
             Assert.AreEqual(expectedOrder.Length, actualOrder.Length);
-            Assert.That(actualOrder, Is.EqualTo(expectedOrder).AsCollection, $"Expected order: [{string.Join(", ", expectedOrder)}], Actual order: [{string.Join(", ", actualOrder)}]");
+            CollectionAssert.AreEqual(expectedOrder, actualOrder, $"Expected order: [{string.Join(", ", expectedOrder)}], Actual order: [{string.Join(", ", actualOrder)}]");
         });
     }
 
