@@ -37,6 +37,10 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 	@state()
 	private _initialLoadDone = false;
 
+	public getSelection() {
+		return this.#collectionContext?.selection.getSelection() ?? [];
+	}
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_COLLECTION_CONTEXT, async (context) => {

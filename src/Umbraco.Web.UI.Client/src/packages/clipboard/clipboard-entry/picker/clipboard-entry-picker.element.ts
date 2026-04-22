@@ -3,12 +3,13 @@ import type { UmbClipboardEntryDetailModel } from '../types.js';
 import UmbClipboardEntryDetailRepository from '../detail/clipboard-entry-detail.repository.js';
 import { css, customElement, html, nothing, property, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
 } from '@umbraco-cms/backoffice/entity-action';
-import { UmbSelectionManager } from '@umbraco-cms/backoffice/utils';
+import { UmbSelectionManager, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -21,6 +22,8 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 	@property({ type: Object })
 	config?: any;
+
+	#serverUrl = '';
 
 	@state()
 	private _items: Array<UmbClipboardEntryDetailModel> = [];
@@ -36,6 +39,9 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 		super();
 		this.#entityContext.setEntityType('clipboard-entry');
 		this.#entityContext.setUnique(null);
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
+		});
 	}
 
 	override connectedCallback(): void {
@@ -56,6 +62,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 	}
 
 	async #requestItems() {
+		debugger;
 		const { data } = await this.#collectionRepository.requestCollection({
 			types: this.config?.entryTypes ?? [],
 		});
@@ -176,6 +183,11 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 	#renderItem(item: UmbClipboardEntryDetailModel) {
 		const label = item.name ?? item.unique;
+
+		const path = item.thumbnail ? transformServerPathToClientPath(item.thumbnail.src) : undefined;
+
+		const imgSrc = path ? new URL(path, this.#serverUrl)?.href : undefined;
+
 		return html`
 			<uui-menu-item
 				label=${label}
@@ -185,6 +197,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 				@deselected=${() => this.#selectionManager.deselect(item.unique)}
 				?selected=${this.selection.includes(item.unique)}>
 				${this.#renderItemIcon(item)} ${this.#renderItemActions(item)}
+				${when(imgSrc, (src) => html`<img src=${src} alt="" decoding="async" />`)}
 			</uui-menu-item>
 		`;
 	}
@@ -193,6 +206,12 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 		const iconName = item.icon ?? 'icon-clipboard-entry';
 		return html`<umb-icon slot="icon" name=${iconName}></umb-icon>`;
 	}
+
+	// #renderItemThumb(item: UmbClipboardEntryDetailModel) {
+	// 	console.log(item.thumb);
+	// 	console.log(item.icon);
+	// 	return html`<img src=${item.thumb} alt="asd" decoding="async" />`;
+	// }
 
 	#renderItemActions(item: UmbClipboardEntryDetailModel) {
 		return html`

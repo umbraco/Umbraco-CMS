@@ -10,6 +10,7 @@ import {
 	repeat,
 	state,
 	when,
+	type PropertyValueMap,
 } from '@umbraco-cms/backoffice/external/lit';
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -21,6 +22,12 @@ import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/b
 import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_CLIPBOARD_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/clipboard';
+import type {
+	UmbCollectionConfiguration,
+	UmbCollectionElement,
+	UmbCollectionSelectionConfiguration,
+} from '@umbraco-cms/backoffice/collection';
 
 type UmbBlockTypeItemWithGroupKey = UmbBlockTypeWithGroupKey & UmbDocumentTypeItemModel;
 
@@ -55,6 +62,14 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	@state()
 	private _loading = true;
 
+	@state()
+	private _clipboardCollectionConfig: UmbCollectionSelectionConfiguration = {
+		selectable: true,
+		multiple: true,
+		selectOnly: true,
+		selection: [],
+	};
+
 	constructor() {
 		super();
 
@@ -88,6 +103,19 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		this.observe(this.#itemManager.items, async (items) => {
 			this.#observeBlockTypes(items);
 		});
+	}
+
+	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
+		super.updated(_changedProperties);
+
+		if (_changedProperties.has('value')) {
+			const selection = this.value?.clipboard?.selection ?? [];
+
+			this._clipboardCollectionConfig = {
+				...this._clipboardCollectionConfig,
+				selection: [...selection].filter((x) => x !== null),
+			};
+		}
 	}
 
 	override connectedCallback() {
@@ -167,8 +195,9 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	async #onClipboardPickerSelectionChange(event: UmbSelectionChangeEvent) {
-		const target = event.target as any;
-		const selection = target?.selection || [];
+		const target = event.target as UmbCollectionElement;
+
+		const selection = target?.getSelection() || [];
 		this.value = {
 			clipboard: {
 				selection,
@@ -176,9 +205,19 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		};
 	}
 
+	// async #onClipboardPickerSelectionChange(event: UmbSelectionChangeEvent) {
+	// 	const target = event.target as any;
+	// 	const selection = target?.selection || [];
+	// 	this.value = {
+	// 		clipboard: {
+	// 			selection,
+	// 		},
+	// 	};
+	// }
+
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('blockEditor_addBlock')}>
+			<umb-body-layout headline=${this.localize.term('blockEditor_addBlock')} ?main-no-padding=${this._openClipboard}>
 				${this.#renderViews()}${this.#renderMain()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
@@ -197,7 +236,15 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#renderClipboard() {
+		console.log('Render clipboard ' + this._openClipboard);
+		// const filterBlocks = this.data?.clipboardFilter()
 		return html`
+			<umb-collection
+				alias=${UMB_CLIPBOARD_COLLECTION_ALIAS}
+				.config=${{
+					selectionConfiguration: this._clipboardCollectionConfig,
+				}}
+				@selection-change=${this.#onClipboardPickerSelectionChange}></umb-collection>
 			<umb-clipboard-entry-picker
 				.config=${{ multiple: true, asyncFilter: this.data?.clipboardFilter }}
 				@selection-change=${this.#onClipboardPickerSelectionChange}></umb-clipboard-entry-picker>
@@ -206,6 +253,8 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	#renderCreateEmpty() {
 		if (this._loading) return html`<div id="loader"><uui-loader></uui-loader></div>`;
+		console.log('Render empty ' + this._openClipboard);
+
 		return html`
 			${when(
 				this.data?.blocks && this.data?.blocks.length > 8,
@@ -244,6 +293,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 		const path = block.thumbnail ? transformServerPathToClientPath(block.thumbnail) : undefined;
 		const imgSrc = path ? new URL(path, this.#serverUrl)?.href : undefined;
+		console.log(path);
 
 		return html`
 			<uui-card-block-type

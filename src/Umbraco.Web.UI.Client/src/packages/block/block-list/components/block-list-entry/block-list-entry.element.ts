@@ -7,7 +7,7 @@ import {
 } from '../../constants.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { stringOrStringArrayContains, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
@@ -23,6 +23,7 @@ import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/propert
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
 import '../unsupported-list-block/index.js';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 /**
  * @element umb-block-list-entry
@@ -59,6 +60,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	private _contentKey?: string | undefined;
 
 	#context = new UmbBlockListEntryContext(this);
+
+	#serverUrl = '';
 
 	@state()
 	private _contentTypeAlias?: string;
@@ -124,6 +127,9 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	constructor() {
 		super();
 		this.#init();
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
+		});
 	}
 
 	#init() {
@@ -319,6 +325,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		const layout = this.#context.getLayout();
 		const settings = this.#context.getSettings();
 		const expose = this.#context.getExpose();
+		//What if no thumbImg?
+		const thumbImg = this._blockViewProps.blockType?.thumbnail;
 
 		const propertyValue: UmbBlockListValueModel = {
 			contentData: content ? [structuredClone(content)] : [],
@@ -328,9 +336,18 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			settingsData: settings ? [structuredClone(settings)] : [],
 			expose: expose ? [structuredClone(expose)] : [],
 		};
+		console.log(thumbImg);
+		console.log(clipboardContext);
+
+		const path = thumbImg ? transformServerPathToClientPath(thumbImg) : undefined;
+
+		const imgSrc = path ? new URL(path, this.#serverUrl)?.href : undefined;
+
+		const thumbnail = imgSrc ? { src: imgSrc } : undefined;
 
 		clipboardContext.write({
 			icon: this._icon,
+			thumbnail,
 			name: entryName,
 			propertyValue,
 			propertyEditorUiAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
@@ -499,7 +516,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#renderDeleteAction() {
 		if (this._isReadOnly) return nothing;
-		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()} title=${this.localize.term('general_delete')}>
+		return html` <uui-button
+			label="delete"
+			look="secondary"
+			@click=${() => this.#context.requestDelete()}
+			title=${this.localize.term('general_delete')}>
 			<uui-icon name="icon-remove"></uui-icon>
 		</uui-button>`;
 	}

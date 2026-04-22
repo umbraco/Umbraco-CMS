@@ -20,4 +20,17 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+
+	{
+		type: 'collectionView',
+		kind: 'card',
+		alias: 'Umb.CollectionView.Clipboard.Card',
+		name: 'Clipboard Card Collection View',
+		conditions: [
+			{
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				match: UMB_CLIPBOARD_COLLECTION_ALIAS,
+			},
+		],
+	},
 ];

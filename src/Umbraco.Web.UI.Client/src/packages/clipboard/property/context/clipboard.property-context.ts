@@ -90,6 +90,10 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 	async write(args: {
 		name: string;
 		icon?: string;
+		thumbnail?: {
+			src: string;
+			alt?: string;
+		};
 		propertyValue: any;
 		propertyEditorUiAlias: string;
 	}): Promise<UmbClipboardEntryDetailModel | undefined> {
@@ -105,7 +109,12 @@ export class UmbClipboardPropertyContext extends UmbContextBase {
 			name: args.name,
 			values,
 			icon: args.icon,
+			thumbnail: args.thumbnail,
 		};
+
+		console.log(entryPreset);
+		console.log(args.icon);
+		console.log(args.thumbnail);
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
 		if (!notificationContext) {
