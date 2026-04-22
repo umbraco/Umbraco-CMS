@@ -2213,7 +2213,7 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
-    public void Copying_Published_Culture_Variant_Document_Does_Not_Carry_Over_Per_Culture_Published_Flags()
+    public void Can_Copy_Culture_Variant_Document_Without_Per_Culture_Published_Flags()
     {
         // see https://github.com/umbraco/Umbraco-CMS/issues/22540
         var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr, out _);
@@ -2254,6 +2254,45 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             // sanity: culture names are still preserved (edit-side data, not publish-side) - Copy appends a " (n)" suffix to avoid sibling collisions
             Assert.That(persistedCopy.GetCultureName(langFr.IsoCode), Does.StartWith("content-fr"));
             Assert.That(persistedCopy.GetCultureName(langUk.IsoCode), Does.StartWith("content-en"));
+        });
+    }
+
+    [Test]
+    public void Can_Copy_Recursive_Culture_Variant_Document_Without_Per_Culture_Published_Flags_On_Descendants()
+    {
+        // see https://github.com/umbraco/Umbraco-CMS/issues/22540 - covers the recursive descendant path
+        CreateEnglishAndFrenchDocumentType(out var langUk, out var langFr, out var contentType);
+
+        IContent parent = new Content("parent", Constants.System.Root, contentType);
+        parent.SetCultureName("parent-fr", langFr.IsoCode);
+        parent.SetCultureName("parent-en", langUk.IsoCode);
+        Assert.IsTrue(ContentService.Save(parent).Success);
+        Assert.IsTrue(ContentService.Publish(parent, new[] { langFr.IsoCode, langUk.IsoCode }).Success);
+
+        IContent child = new Content("child", parent.Id, contentType);
+        child.SetCultureName("child-fr", langFr.IsoCode);
+        child.SetCultureName("child-en", langUk.IsoCode);
+        Assert.IsTrue(ContentService.Save(child).Success);
+        Assert.IsTrue(ContentService.Publish(child, new[] { langFr.IsoCode, langUk.IsoCode }).Success);
+
+        // re-get to ensure we copy from the persisted state
+        parent = ContentService.GetById(parent.Id);
+
+        // Act: copy the branch (recursive)
+        var copy = ContentService.Copy(parent, parent.ParentId, false, recursive: true);
+
+        // Assert: descendants of the copy should also have no per-culture published flags
+        var childCopy = ContentService
+            .GetPagedChildren(copy.Id, 0, 500, out _, propertyAliases: null, filter: null, ordering: null)
+            .First();
+
+        Assert.That(childCopy, Is.Not.Null);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(childCopy.Published);
+            Assert.IsFalse(childCopy.IsCulturePublished(langFr.IsoCode));
+            Assert.IsFalse(childCopy.IsCulturePublished(langUk.IsoCode));
+            Assert.IsEmpty(childCopy.PublishedCultures);
         });
     }
 
