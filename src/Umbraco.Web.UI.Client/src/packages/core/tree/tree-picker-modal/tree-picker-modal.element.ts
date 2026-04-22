@@ -1,14 +1,25 @@
 import { UmbTreeItemPickerContext } from '../tree-item-picker/index.js';
 import type { UmbTreeElement } from '../tree.element.js';
-import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration } from '../types.js';
+import type { UmbTreeItemModelBase, UmbTreeSelectionConfiguration, UmbTreeStartNode } from '../types.js';
+import type { UmbTreeRepository } from '../data/tree-repository.interface.js';
+import type { ManifestTree } from '../extensions/types.js';
+import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
 import type { UmbTreePickerModalData, UmbTreePickerModalValue } from './types.js';
-import { customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UmbPickerModalBaseElement } from '@umbraco-cms/backoffice/picker';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbEntityExpansionModel, UmbExpansionChangeEvent } from '@umbraco-cms/backoffice/utils';
+import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
+
+interface UmbTreeBreadcrumbItem {
+	unique: string | null;
+	entityType: string;
+	name: string;
+}
 
 @customElement('umb-tree-picker-modal')
 export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase> extends UmbPickerModalBaseElement<
@@ -39,6 +50,16 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	@state()
 	private _treeExpansion: UmbEntityExpansionModel = [];
 
+	@state()
+	private _currentLocation?: UmbTreeStartNode;
+
+	@state()
+	private _breadcrumb: Array<UmbTreeBreadcrumbItem> = [];
+
+	private _initialStartNode?: UmbTreeStartNode;
+	private _repository?: UmbTreeRepository;
+	private _breadcrumbLoaded = false;
+
 	protected _pickerContext = new UmbTreeItemPickerContext(this);
 
 	constructor() {
@@ -55,6 +76,12 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 	override connectedCallback(): void {
 		super.connectedCallback();
 		this.#initCreateAction();
+		this.addEventListener(UmbTreeItemOpenEvent.TYPE, this.#onTreeItemOpen);
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.removeEventListener(UmbTreeItemOpenEvent.TYPE, this.#onTreeItemOpen);
 	}
 
 	protected override async updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
@@ -76,6 +103,14 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				...this._selectionConfiguration,
 				multiple,
 			};
+
+			if (this.data?.treeAlias) {
+				this._initialStartNode = this.data.startNode;
+				this._currentLocation = this.data.startNode;
+				this._breadcrumb = [];
+				this._breadcrumbLoaded = false;
+				this.#initRepository(this.data.treeAlias);
+			}
 		}
 
 		if (_changedProperties.has('value')) {
@@ -86,6 +121,95 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				selection: [...selection],
 			};
 		}
+	}
+
+	#initRepository(treeAlias: string) {
+		const treeManifest = umbExtensionsRegistry.getByAlias<ManifestTree>(treeAlias);
+		const repositoryAlias = treeManifest?.meta?.repositoryAlias;
+		if (!repositoryAlias) return;
+
+		new UmbExtensionApiInitializer<ManifestRepository<UmbTreeRepository>>(
+			this,
+			umbExtensionsRegistry,
+			repositoryAlias,
+			[this],
+			async (permitted, ctrl) => {
+				this._repository = permitted ? ctrl.api : undefined;
+				if (this._repository && !this._breadcrumbLoaded) {
+					this._breadcrumbLoaded = true;
+					await this.#loadInitialBreadcrumb();
+				}
+			},
+		);
+	}
+
+	async #loadInitialBreadcrumb() {
+		if (!this._repository) return;
+
+		if (this._initialStartNode) {
+			const { data } = await this._repository.requestTreeItemAncestors({
+				treeItem: this._initialStartNode,
+			});
+			const items = data ?? [];
+			const ceilingIndex = items.findIndex((item) => item.unique === this._initialStartNode!.unique);
+			const sliced = ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
+			this._breadcrumb = sliced.map((item) => ({
+				unique: item.unique,
+				entityType: item.entityType,
+				name: item.name,
+			}));
+		} else {
+			const { data: root } = await this._repository.requestTreeRoot();
+			if (root) {
+				this._breadcrumb = [{ unique: null, entityType: root.entityType, name: root.name }];
+			}
+		}
+	}
+
+	#onTreeItemOpen = async (event: UmbTreeItemOpenEvent) => {
+		event.stopPropagation();
+
+		const { unique, entityType } = event;
+		this._currentLocation = { unique, entityType };
+
+		if (!this._repository) return;
+
+		const { data } = await this._repository.requestTreeItemAncestors({
+			treeItem: { unique, entityType },
+		});
+		const items = data ?? [];
+
+		if (this._initialStartNode) {
+			const ceilingIndex = items.findIndex((item) => item.unique === this._initialStartNode!.unique);
+			const sliced = ceilingIndex >= 0 ? items.slice(ceilingIndex) : items;
+			this._breadcrumb = sliced.map((item) => ({
+				unique: item.unique,
+				entityType: item.entityType,
+				name: item.name,
+			}));
+		} else {
+			const root = this._breadcrumb[0];
+			this._breadcrumb = [
+				root,
+				...items.map((item) => ({
+					unique: item.unique,
+					entityType: item.entityType,
+					name: item.name,
+				})),
+			];
+		}
+	};
+
+	#onBreadcrumbItemClick(index: number) {
+		if (index === this._breadcrumb.length - 1) return;
+
+		const item = this._breadcrumb[index];
+		if (index === 0 && !this._initialStartNode) {
+			this._currentLocation = undefined;
+		} else {
+			this._currentLocation = { unique: item.unique!, entityType: item.entityType };
+		}
+		this._breadcrumb = this._breadcrumb.slice(0, index + 1);
 	}
 
 	#observePickerSelection() {
@@ -182,6 +306,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			</umb-body-layout>
 		`;
 	}
+
 	#renderSearch() {
 		const selectableFilter =
 			this.data?.search?.pickableFilter ?? this.data?.pickableFilter ?? this.#searchSelectableFilter;
@@ -198,6 +323,7 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		}
 
 		return html`
+			${this.#renderBreadcrumb()}
 			<umb-tree
 				alias=${ifDefined(this.data?.treeAlias)}
 				.props=${{
@@ -208,13 +334,35 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 					selectionConfiguration: this._selectionConfiguration,
 					filter: this.data?.filter,
 					selectableFilter: this.data?.pickableFilter,
-					startNode: this.data?.startNode,
+					startNode: this._currentLocation,
 					foldersOnly: this.data?.foldersOnly,
 					expansion: this._treeExpansion,
 				}}
 				@selected=${this.#onTreeItemSelected}
 				@deselected=${this.#onTreeItemDeselected}
 				@expansion-change=${this.#onTreeItemExpansionChange}></umb-tree>
+		`;
+	}
+
+	#renderBreadcrumb() {
+		if (!this._breadcrumb.length) return nothing;
+
+		return html`
+			<div id="breadcrumb">
+				<uui-breadcrumbs>
+					${repeat(
+						this._breadcrumb,
+						(item) => item.unique ?? 'root',
+						(item, index) => html`
+							<uui-breadcrumb-item
+								?last-item=${index === this._breadcrumb.length - 1}
+								@click=${() => this.#onBreadcrumbItemClick(index)}>
+								${this.localize.string(item.name)}
+							</uui-breadcrumb-item>
+						`,
+					)}
+				</uui-breadcrumbs>
+			</div>
 		`;
 	}
 
@@ -237,6 +385,17 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 			</div>
 		`;
 	}
+
+	static override styles = css`
+		uui-breadcrumbs {
+			overflow: hidden;
+			min-width: 0;
+		}
+
+		uui-breadcrumb-item:not([last-item]) {
+			cursor: pointer;
+		}
+	`;
 }
 
 export default UmbTreePickerModalElement;
