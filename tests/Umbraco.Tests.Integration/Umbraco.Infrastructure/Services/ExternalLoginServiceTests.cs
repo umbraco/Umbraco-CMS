@@ -281,7 +281,6 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    [Ignore("Skip For nightly")]
     [LongRunning]
     public async Task Concurrent_Save_Same_Login_Should_Not_Throw_Duplicate_Key_Exception()
     {
