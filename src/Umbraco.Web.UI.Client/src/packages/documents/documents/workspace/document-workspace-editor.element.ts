@@ -39,9 +39,9 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				this.#generateRoutes();
 				if (previousCulture && appCulture && previousCulture !== appCulture && this.#workspaceRoute) {
 					const currentPath = window.location.pathname;
-					const expectedOldPath = this.#workspaceRoute + '/' + previousCulture;
+					const expectedOldPath = `${this.#workspaceRoute}/${previousCulture}`;
 					if (currentPath === expectedOldPath && this.#variants?.some((v) => v.unique === appCulture)) {
-						history.replaceState(null, '', this.#workspaceRoute + '/' + appCulture + window.location.search);
+						history.replaceState(null, '', `${this.#workspaceRoute}/${appCulture}${window.location.search}`);
 					}
 				}
 			});
