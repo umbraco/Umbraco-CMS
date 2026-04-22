@@ -585,7 +585,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         }
 
         // Collapse duplicates that arise after normalization.
-        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var alias in rawValue.Split(',', StringSplitOptions.RemoveEmptyEntries))
         {
             var normalized = this.NormalizeAlias(alias);
