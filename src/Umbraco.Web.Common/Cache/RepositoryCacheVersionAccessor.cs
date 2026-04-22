@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Web.Common.Cache;
 public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
 {
     // Keyed by IScopeContext.InstanceId (root scope). Cleaned up via Enlist callback on scope exit.
-    private readonly ConcurrentDictionary<Guid, Dictionary<string, Guid>> _scopeVersionCaches = new();
+    private readonly ConcurrentDictionary<Guid, ConcurrentDictionary<string, Guid>> _scopeVersionCaches = new();
     private readonly IRequestCache _requestCache;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRepositoryCacheVersionRepository _repositoryCacheVersionRepository;
@@ -61,7 +61,7 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
         }
 
         // 1. Scope-level cache — survives request-cache invalidation within a transaction.
-        Dictionary<string, Guid>? scopeCache = GetOrRegisterScopeVersionCache();
+        ConcurrentDictionary<string, Guid>? scopeCache = GetOrRegisterScopeVersionCache();
         if (scopeCache is not null && scopeCache.TryGetValue(cacheKey, out Guid scopeVersion))
         {
             _logger.LogDebug("Cache version for key {CacheKey} found in scope cache", cacheKey);
@@ -111,7 +111,7 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
     public void VersionChanged(string cacheKey, Guid newVersion)
     {
         // Update scope cache in-place — no DB re-read needed.
-        Dictionary<string, Guid>? scopeCache = GetOrRegisterScopeVersionCache();
+        ConcurrentDictionary<string, Guid>? scopeCache = GetOrRegisterScopeVersionCache();
         if (scopeCache is not null)
         {
             scopeCache[cacheKey] = newVersion;
@@ -129,7 +129,7 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
         _requestCache.ClearOfType<RepositoryCacheVersion>();
     }
 
-    private Dictionary<string, Guid>? GetOrRegisterScopeVersionCache()
+    private ConcurrentDictionary<string, Guid>? GetOrRegisterScopeVersionCache()
     {
         IScopeContext? context = _coreScopeProvider.Context;
         if (context is null)
@@ -138,12 +138,12 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
         }
 
         Guid contextId = context.InstanceId;
-        if (_scopeVersionCaches.TryGetValue(contextId, out Dictionary<string, Guid>? cache))
+        if (_scopeVersionCaches.TryGetValue(contextId, out ConcurrentDictionary<string, Guid>? cache))
         {
             return cache;
         }
 
-        cache = new Dictionary<string, Guid>();
+        cache = new ConcurrentDictionary<string, Guid>();
         _scopeVersionCaches[contextId] = cache;
 
         // Enlist is used here for its intended purpose: lifecycle cleanup on scope exit.
