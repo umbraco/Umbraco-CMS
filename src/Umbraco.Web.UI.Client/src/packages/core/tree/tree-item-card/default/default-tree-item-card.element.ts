@@ -1,5 +1,6 @@
 import type { UmbTreeItemModel } from '../../types.js';
-import { UmbTreeItemOpenEvent } from '../../tree-item/events/tree-item-open.event.js';
+import type { UmbTreeContext } from '../../tree.context.interface.js';
+import { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
 import { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
@@ -7,6 +8,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-default-tree-item-card')
 export class UmbDefaultTreeItemCardElement extends UmbLitElement {
+	#treeContext?: UmbTreeContext;
+
 	@property({ type: Object, attribute: false })
 	item?: UmbTreeItemModel;
 
@@ -18,6 +21,13 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 
 	@property({ type: Boolean })
 	selected = false;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_TREE_CONTEXT, (context) => {
+			this.#treeContext = context;
+		});
+	}
 
 	#onSelected(e: CustomEvent) {
 		if (!this.item) return;
@@ -34,13 +44,13 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 	#onDblClick(e: MouseEvent) {
 		if (!this.item?.hasChildren) return;
 		e.stopPropagation();
-		this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: this.item.unique, entityType: this.item.entityType }));
+		this.#treeContext?.open(this.item);
 	}
 
 	#onKeyDown(e: KeyboardEvent) {
 		if (e.key === 'ArrowRight' && this.item?.hasChildren) {
 			e.stopPropagation();
-			this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: this.item.unique, entityType: this.item.entityType }));
+			this.#treeContext?.open(this.item);
 		}
 	}
 

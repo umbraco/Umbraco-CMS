@@ -48,6 +48,8 @@ export interface UmbTreeContext<
 
 	getRepository(): UmbTreeRepository | undefined;
 
+	open(item: TreeItemType): void;
+
 	loadTree(): void;
 	reloadTree(): void;
 	loadMore(): void;

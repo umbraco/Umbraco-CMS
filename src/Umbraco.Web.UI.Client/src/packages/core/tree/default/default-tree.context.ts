@@ -1,3 +1,4 @@
+import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
 import { UmbTreeItemActiveManager } from '../active-manager/tree-active-manager.js';
 import { UmbTreeExpansionManager } from '../expansion-manager/index.js';
 import { UmbTreeViewManager } from '../view/tree-view.manager.js';
@@ -139,6 +140,10 @@ export class UmbDefaultTreeContext<
 
 	public getRepository() {
 		return this.#repository;
+	}
+
+	public open(item: TreeItemType): void {
+		this.getHostElement().dispatchEvent(new UmbTreeItemOpenEvent({ unique: item.unique, entityType: item.entityType }));
 	}
 
 	/**
