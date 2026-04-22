@@ -12,13 +12,6 @@ export class UmbClipboardCollectionLocalStorageDataSource
 
 	async getCollection(filter: UmbClipboardCollectionFilterModel) {
 		const { entries, total } = await this.#localStorageManager.filter(filter);
-
-		if (!filter.asyncFilter) {
-			return { data: { items: entries, total } };
-		}
-
-		const results = await Promise.all(entries.map(filter.asyncFilter));
-		const filtered = entries.filter((_, i) => results[i]);
-		return { data: { items: filtered, total: filtered.length } };
+		return { data: { items: entries, total } };
 	}
 }

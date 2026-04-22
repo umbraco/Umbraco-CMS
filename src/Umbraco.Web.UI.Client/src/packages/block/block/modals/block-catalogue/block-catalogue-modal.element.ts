@@ -22,11 +22,12 @@ import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/b
 import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
-import {
-	UMB_CLIPBOARD_COLLECTION_ALIAS,
-	type UmbClipboardCollectionFilterModel,
-} from '@umbraco-cms/backoffice/clipboard';
-import type { UmbCollectionElement, UmbCollectionSelectionConfiguration } from '@umbraco-cms/backoffice/collection';
+import { UMB_CLIPBOARD_COLLECTION_ALIAS } from '@umbraco-cms/backoffice/clipboard';
+import type {
+	UmbCollectionConfiguration,
+	UmbCollectionElement,
+	UmbCollectionSelectionConfiguration,
+} from '@umbraco-cms/backoffice/collection';
 
 type UmbBlockTypeItemWithGroupKey = UmbBlockTypeWithGroupKey & UmbDocumentTypeItemModel;
 
@@ -204,6 +205,16 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		};
 	}
 
+	// async #onClipboardPickerSelectionChange(event: UmbSelectionChangeEvent) {
+	// 	const target = event.target as any;
+	// 	const selection = target?.selection || [];
+	// 	this.value = {
+	// 		clipboard: {
+	// 			selection,
+	// 		},
+	// 	};
+	// }
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('blockEditor_addBlock')} ?main-no-padding=${this._openClipboard}>
@@ -225,14 +236,18 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#renderClipboard() {
+		console.log('Render clipboard ' + this._openClipboard);
+		// const filterBlocks = this.data?.clipboardFilter()
 		return html`
 			<umb-collection
 				alias=${UMB_CLIPBOARD_COLLECTION_ALIAS}
 				.config=${{
 					selectionConfiguration: this._clipboardCollectionConfig,
 				}}
-				.filter=${{ asyncFilter: this.data?.clipboardFilter } as UmbClipboardCollectionFilterModel}
 				@selection-change=${this.#onClipboardPickerSelectionChange}></umb-collection>
+			<umb-clipboard-entry-picker
+				.config=${{ multiple: true, asyncFilter: this.data?.clipboardFilter }}
+				@selection-change=${this.#onClipboardPickerSelectionChange}></umb-clipboard-entry-picker>
 		`;
 	}
 
