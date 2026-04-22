@@ -9,7 +9,6 @@ import type {
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
-import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { UmbDocumentTypeDetailServerDataSource } from '@umbraco-cms/backoffice/document-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
@@ -29,9 +28,6 @@ export class UmbDocumentServerDataSource
 	 * @memberof UmbDocumentServerDataSource
 	 */
 	async createScaffold(preset: UmbDeepPartialObject<UmbDocumentDetailModel> = {}) {
-		let documentTypeIcon: string | null = null;
-		let documentTypeCollection: UmbReferenceByUnique | null = null;
-
 		const documentTypeUnique = preset.documentType?.unique;
 
 		if (!documentTypeUnique) {
@@ -40,8 +36,8 @@ export class UmbDocumentServerDataSource
 
 		// TODO: investigate if we can use the repository here instead
 		const { data } = await new UmbDocumentTypeDetailServerDataSource(this).read(documentTypeUnique);
-		documentTypeIcon = data?.icon ?? null;
-		documentTypeCollection = data?.collection ?? null;
+		const documentTypeIcon = data?.icon ?? null;
+		const documentTypeCollection = data?.collection ?? null;
 
 		const defaultData: UmbDocumentDetailModel = {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,

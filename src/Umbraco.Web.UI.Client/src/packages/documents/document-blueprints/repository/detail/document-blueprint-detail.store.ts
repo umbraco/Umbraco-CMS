@@ -15,7 +15,7 @@ export class UmbDocumentBlueprintDetailStore extends UmbDetailStoreBase<UmbDocum
 	 * @memberof UmbDocumentBlueprintDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DOCUMENT_BLUEPRINT_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_DOCUMENT_BLUEPRINT_DETAIL_STORE_CONTEXT);
 	}
 }
 

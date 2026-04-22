@@ -1,0 +1,25 @@
+const { http, HttpResponse } = window.MockServiceWorker;
+import { umbDocumentMockDb } from '../../db/document.db.js';
+import { UMB_SLUG } from './slug.js';
+import { umbracoPath } from '@umbraco-cms/backoffice/utils';
+
+export const itemHandlers = [
+	http.get(umbracoPath(`/item${UMB_SLUG}/search`), ({ request }) => {
+		const url = new URL(request.url);
+		const query = url.searchParams.get('query') ?? '';
+		const skip = Number(url.searchParams.get('skip')) || 0;
+		const take = Number(url.searchParams.get('take')) || 100;
+
+		const response = umbDocumentMockDb.item.search(query, skip, take);
+
+		return HttpResponse.json(response);
+	}),
+
+	http.get(umbracoPath(`/item${UMB_SLUG}`), ({ request }) => {
+		const url = new URL(request.url);
+		const ids = url.searchParams.getAll('id');
+		if (!ids) return;
+		const items = umbDocumentMockDb.item.getItems(ids);
+		return HttpResponse.json(items);
+	}),
+];
