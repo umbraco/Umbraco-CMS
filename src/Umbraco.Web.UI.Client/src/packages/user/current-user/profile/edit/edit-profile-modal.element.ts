@@ -1,14 +1,15 @@
 import type { UmbCurrentUserModel } from '../../types.js';
 import { UMB_CURRENT_USER_CONTEXT } from '../../current-user.context.token.js';
-import type { UmbCurrentUserWorkspaceProfileSettingsElement } from './current-user-workspace-profile-settings.element.js';
-import type { UmbCurrentUserWorkspaceAvatarElement } from './current-user-workspace-avatar.element.js';
+import type { UmbCurrentUserWorkspaceProfileSettingsElement } from './edit-profile-settings.element.js';
+import type { UmbCurrentUserWorkspaceAvatarElement } from './edit-profile-avatar.element.js';
 import { css, customElement, html, property, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbModalContext } from '@umbraco-cms/backoffice/modal';
 
-import './current-user-workspace-avatar.element.js';
-import './current-user-workspace-profile-settings.element.js';
+import './edit-profile-avatar.element.js';
+import './edit-profile-settings.element.js';
+
 @customElement('umb-current-user-workspace-modal')
 export class UmbCurrentUserWorkspaceModalElement extends UmbLitElement {
 	@property({ attribute: false })
