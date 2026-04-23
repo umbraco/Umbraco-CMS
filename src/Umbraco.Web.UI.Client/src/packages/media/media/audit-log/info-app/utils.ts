@@ -68,12 +68,3 @@ export function getMediaHistoryTagStyleAndText(type: UmbMediaAuditLogType): Hist
 			};
 	}
 }
-
-export const TimeOptions: Intl.DateTimeFormatOptions = {
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
-	hour: 'numeric',
-	minute: 'numeric',
-	second: 'numeric',
-};

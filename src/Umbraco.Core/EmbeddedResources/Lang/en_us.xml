@@ -394,6 +394,7 @@
     <key alias="invalidStep">The value %0% does not correspond with the configured step value of %1% and minimum value of %2%</key>
     <key alias="unexpectedRange">The value %0% is not expected to contain a range</key>
     <key alias="invalidRange">The value %0% is not expected to have a to value less than the from value</key>
+    <key alias="minimumRange">The range %0% does not meet the minimum required range of %1%</key>
     <key alias="entriesShort"><![CDATA[Minimum %0% entries, requires <strong>%1%</strong> more.]]></key>
     <key alias="entriesExceed"><![CDATA[Maximum %0% entries, you have entered <strong>%1%</strong> too many.]]></key>
     <key alias="stringLengthExceeded">The string length exceeds the maximum length of %0% characters, %1% too many.</key>
@@ -426,6 +427,7 @@
     <key alias="httpsCheckExpiredCertificate">Your website's SSL certificate has expired.</key>
     <key alias="httpsCheckExpiringCertificate">Your website's SSL certificate is expiring in %0% days.</key>
     <key alias="healthCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
+    <key alias="httpsCheckNoApplicationUrl">The application URL is not available. Configure Umbraco:CMS:WebRouting:UmbracoApplicationUrl or change ApplicationUrlDetection to enable this check.</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'Umbraco:CMS:Global:UseHttps' is set to 'false' in
       your appSettings.json file. Once you access this site using the HTTPS scheme, that should be set to 'true'.

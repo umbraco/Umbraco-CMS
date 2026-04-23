@@ -2,3 +2,4 @@ export { UMB_SCRIPT_TREE_REPOSITORY_ALIAS, UMB_SCRIPT_TREE_STORE_ALIAS, UMB_SCRI
 export { UMB_SCRIPT_TREE_STORE_CONTEXT } from './script-tree.store.context-token.js';
 
 export * from './folder/constants.js';
+export * from './tree-item-children/constants.js';

@@ -16,6 +16,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		meta: {
 			icon: 'icon-picture',
 			label: '#content_mediatype',
+			additionalOptions: true,
 		},
 	},
 ];

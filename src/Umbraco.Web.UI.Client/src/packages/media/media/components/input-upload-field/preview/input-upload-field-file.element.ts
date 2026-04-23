@@ -7,9 +7,13 @@ export default class UmbInputUploadFieldFileElement extends UmbLitElement implem
 	@property()
 	path: string = '';
 
+	@property({ attribute: false })
+	file?: File;
+
 	override render() {
 		if (!this.path) return html`<uui-loader></uui-loader>`;
-		const fileExt = this.path.split('.').pop() ?? '';
+		const name = this.file?.name ?? this.path;
+		const fileExt = name.split('.').pop() ?? '';
 		return html`<uui-symbol-file .type=${fileExt}></uui-symbol-file>`;
 	}
 }

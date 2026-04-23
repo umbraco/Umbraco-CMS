@@ -137,8 +137,38 @@ internal interface IDatabaseCacheRepository
     ///     If not null will process content for the matching members types, if empty will process all
     ///     members.
     /// </param>
+    [Obsolete("Use the overload accepting an executeStep delegate. Scheduled for removal in Umbraco 19.")]
     void Rebuild(
         IReadOnlyCollection<int>? contentTypeIds = null,
         IReadOnlyCollection<int>? mediaTypeIds = null,
-        IReadOnlyCollection<int>? memberTypeIds = null);
+        IReadOnlyCollection<int>? memberTypeIds = null)
+        => Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds, null);
+
+    /// <summary>
+    /// Rebuilds the caches for content, media and/or members based on the content type ids specified.
+    /// </summary>
+    /// <param name="contentTypeIds">
+    ///     If not null will process content for the matching content types, if empty will process all
+    ///     content.
+    /// </param>
+    /// <param name="mediaTypeIds">
+    ///     If not null will process content for the matching media types, if empty will process all
+    ///     media.
+    /// </param>
+    /// <param name="memberTypeIds">
+    ///     If not null will process content for the matching members types, if empty will process all
+    ///     members.
+    /// </param>
+    /// <param name="executeStep">
+    ///     Optional delegate that wraps each discrete step (delete, page read + insert) in a scope.
+    ///     When <c>null</c>, the caller is responsible for providing an ambient scope that covers the
+    ///     entire operation. When provided, the repository invokes the delegate for each step, allowing
+    ///     the caller to create and dispose a scope per step so that database locks are released between
+    ///     pages — preventing long-running background rebuilds from blocking foreground content saves.
+    /// </param>
+    void Rebuild(
+        IReadOnlyCollection<int>? contentTypeIds,
+        IReadOnlyCollection<int>? mediaTypeIds,
+        IReadOnlyCollection<int>? memberTypeIds,
+        Action<Action>? executeStep);
 }

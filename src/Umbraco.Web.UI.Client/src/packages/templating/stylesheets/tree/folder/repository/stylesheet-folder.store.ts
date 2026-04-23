@@ -15,7 +15,7 @@ export class UmbStylesheetFolderStore extends UmbDetailStoreBase<UmbFolderModel>
 	 * @memberof UmbStylesheetFolderStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_STYLESHEET_FOLDER_STORE_CONTEXT.toString());
+		super(host, UMB_STYLESHEET_FOLDER_STORE_CONTEXT);
 	}
 }
 

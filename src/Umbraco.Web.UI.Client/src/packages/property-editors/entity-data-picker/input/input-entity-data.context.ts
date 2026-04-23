@@ -119,7 +119,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 		await super.openPicker(pickerData);
 	}
 
-	#setModalToken() {
+	async #setModalToken() {
 		if (!this.#dataSourceApi) return;
 
 		const dataSourceApi = this.#dataSourceApi;
@@ -129,7 +129,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 
 		// Choose the picker type based on what the data source supports
 		if (isTreeDataSource) {
-			const token = this.#createTreeItemPickerModalToken(dataSourceApi);
+			const token = await this.#createTreeItemPickerModalToken(dataSourceApi);
 			this.setModalAlias(token);
 		} else if (isCollectionDataSource) {
 			const token = this.#createCollectionItemPickerModalToken(dataSourceApi);
@@ -139,8 +139,9 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 		}
 	}
 
-	#createTreeItemPickerModalToken(api: UmbPickerTreeDataSource) {
+	async #createTreeItemPickerModalToken(api: UmbPickerTreeDataSource) {
 		const supportsSearch = isPickerSearchableDataSource(api);
+		const startNode = api.requestTreeStartNode ? await api.requestTreeStartNode() : undefined;
 
 		return new UmbModalToken<UmbTreePickerModalData<UmbItemModel | UmbTreeItemModel>, UmbTreePickerModalValue>(
 			UMB_TREE_PICKER_MODAL_ALIAS,
@@ -160,6 +161,7 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 								pickableFilter: api.searchPickableFilter,
 							}
 						: undefined,
+					startNode,
 				},
 			},
 		);
