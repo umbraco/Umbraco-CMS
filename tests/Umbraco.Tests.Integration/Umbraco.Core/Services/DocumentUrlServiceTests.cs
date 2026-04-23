@@ -851,4 +851,39 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     }
 
     #endregion
+
+    // Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22293.
+    // An inconsistent database state (umbracoDocument.published = 1 but no matching
+    // umbracoDocumentVersion with published = 1) previously caused RebuildAllUrlsAsync
+    // to NRE in DocumentRepository.MapDtosToContent when dereferencing PublishedVersionDto.
+    [Test]
+    public async Task RebuildAllUrlsAsync_Handles_Node_With_Inconsistent_Published_State()
+    {
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        using (var scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            var db = ScopeAccessor.AmbientScope!.Database;
+            var updateSql = ScopeAccessor.AmbientScope.SqlContext.Sql()
+                .Update<DocumentVersionDto>(u => u.Set(x => x.Published, false))
+                .WhereIn<DocumentVersionDto>(
+                    x => x.Id,
+                    ScopeAccessor.AmbientScope.SqlContext.Sql()
+                        .Select<DocumentVersionDto>(x => x.Id)
+                        .From<DocumentVersionDto>()
+                        .InnerJoin<ContentVersionDto>()
+                        .On<DocumentVersionDto, ContentVersionDto>((dv, cv) => dv.Id == cv.Id)
+                        .Where<ContentVersionDto>(x => x.NodeId == Subpage.Id)
+                        .Where<DocumentVersionDto>(x => x.Published == true));
+            db.Execute(updateSql);
+        }
+
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        Assert.DoesNotThrowAsync(() => DocumentUrlService.RebuildAllUrlsAsync());
+        Assert.That(
+            DocumentUrlService.GetUrlSegment(Textpage.Key, isoCode, false),
+            Is.Not.Null,
+            "Healthy sibling should still have a published URL segment after rebuild.");
+    }
 }
