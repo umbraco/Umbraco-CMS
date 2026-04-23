@@ -31,13 +31,18 @@ internal class RequireNonNullablePropertiesSchemaTransformer : IOpenApiSchemaTra
 
     private static bool IsRequiredProperty(OpenApiSchema schema, JsonTypeInfo jsonTypeInfo, string propertyName)
     {
-        if (jsonTypeInfo.Properties.FirstOrDefault(p => p.Name == propertyName) is not { } property)
+        if (jsonTypeInfo.Properties.FirstOrDefault(p => p.Name == propertyName) is { } property)
         {
-            // If we can't find the property in the type (e.g. discriminator )'$type', use the schema type information
-            IOpenApiSchema? schemaProperty = schema.Properties?[propertyName];
-            return schemaProperty?.Type is { } propertyType && propertyType.HasFlag(JsonSchemaType.Null) is false;
+            return property.IsGetNullable is false;
         }
 
-        return property.IsGetNullable is false;
+        // If we can't find the property in the type (e.g. discriminator '$type'), use the schema type information.
+        if (schema.Properties?.TryGetValue(propertyName, out IOpenApiSchema? schemaProperty) is true
+            && schemaProperty?.Type is { } propertyType)
+        {
+            return propertyType.HasFlag(JsonSchemaType.Null) is false;
+        }
+
+        return false;
     }
 }
