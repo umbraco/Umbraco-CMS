@@ -4,6 +4,7 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
+using Microsoft.Data.SqlClient;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -351,9 +352,10 @@ internal sealed class ExternalLoginServiceTests : UmbracoIntegrationTest
 
     private static bool IsDeadlockException(Exception ex)
     {
+        const int DeadlockVictimErrorNumber = 1205;
         for (Exception? current = ex; current is not null; current = current.InnerException)
         {
-            if (current.Message.Contains("deadlock", StringComparison.OrdinalIgnoreCase))
+            if (current is SqlException sqlException && sqlException.Number == DeadlockVictimErrorNumber)
             {
                 return true;
             }
