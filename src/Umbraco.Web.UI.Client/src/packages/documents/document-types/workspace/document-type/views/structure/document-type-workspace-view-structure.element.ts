@@ -102,22 +102,29 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 					</div>
 				</umb-property-layout>
 
-				${when(
-					this._isElementType,
-					() => html`
 				<umb-property-layout alias="library" label=${this.localize.term('contentTypeEditor_allowInLibraryHeading')}>
 					<div slot="description">${this.localize.term('contentTypeEditor_allowInLibraryDescription')}</div>
 					<div slot="editor">
+						${when(
+							this._isElementType,
+							() => html`
 								<uui-toggle
 									label=${this.localize.term('contentTypeEditor_allowInLibraryHeading')}
 									?checked=${this._allowedInLibrary}
 									@change=${(e: CustomEvent) => {
 										this.#workspaceContext?.setAllowedInLibrary((e.target as UUIToggleElement).checked);
 									}}></uui-toggle>
+							`,
+							() => html`
+								<div class="info-message">
+									<umb-localize key="contentTypeEditor_elementTypeOnlySupport">
+										This is only applicable for an Element Type.
+									</umb-localize>
 								</div>
-						</umb-property-layout>
 							`,
 						)}
+					</div>
+				</umb-property-layout>
 
 				<umb-property-layout alias="ChildNodeType" label=${this.localize.term('contentTypeEditor_childNodesHeading')}>
 					<div slot="description">${this.localize.term('contentTypeEditor_childNodesDescription')}</div>
