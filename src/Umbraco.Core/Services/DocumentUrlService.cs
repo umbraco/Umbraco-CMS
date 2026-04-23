@@ -353,7 +353,7 @@ public class DocumentUrlService : IDocumentUrlService
     /// redundant at best, and blows up when the subscriber is configured against a read-only database connection.
     /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
     /// </remarks>
-    private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole == ServerRole.Subscriber;
+    private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
 
     /// <summary>
     /// Converts a collection of <see cref="PublishedDocumentUrlSegment"/> to cache key-value pairs for caching purposes.

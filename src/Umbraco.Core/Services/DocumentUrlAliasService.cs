@@ -150,7 +150,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// redundant at best, and blows up when the subscriber is configured against a read-only database connection.
     /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
     /// </remarks>
-    private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole == ServerRole.Subscriber;
+    private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
 
     /// <inheritdoc/>
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
