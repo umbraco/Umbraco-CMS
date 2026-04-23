@@ -4,28 +4,18 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.ContentPublishing;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.PropertyEditors;
 
-internal class BlockListWithReusableContentTest : BlockEditorElementVariationTestBase
+internal class BlockListWithReusableContentTest : BlockEditorWithReusableContentTestBase
 {
     public static void ConfigureAllowEditInvariantFromNonDefaultTrue(IUmbracoBuilder builder)
         => builder.Services.Configure<ContentSettings>(config =>
             config.AllowEditInvariantFromNonDefault = true);
-
-    private IElementEditingService ElementEditingService => GetRequiredService<IElementEditingService>();
-
-    private IElementPublishingService ElementPublishingService => GetRequiredService<IElementPublishingService>();
-
-    private IJsonSerializer JsonSerializer => GetRequiredService<IJsonSerializer>();
 
     [Test]
     public async Task Can_Handle_Reusable_Element()
@@ -921,71 +911,4 @@ internal class BlockListWithReusableContentTest : BlockEditorElementVariationTes
             {
                 new() { ContentElementTypeKey = elementType.Key, SettingsElementTypeKey = elementType.Key }
             });
-
-    private async Task<Guid> CreateAndPublishInvariantReusableElement(Guid elementTypeKey)
-    {
-        var createResult = await ElementEditingService.CreateAsync(
-            new ElementCreateModel
-            {
-                ContentTypeKey = elementTypeKey,
-                ParentKey = null,
-                Properties =
-                [
-                    new PropertyValueModel { Alias = "invariantText", Value = "The reusable invariant text" },
-                    new PropertyValueModel { Alias = "variantText", Value = "The reusable variant text" },
-                ],
-                Variants =
-                [
-                    new VariantModel { Name = "Reusable element" }
-                ],
-            },
-            Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
-
-        var elementKey = createResult.Result.Content!.Key;
-
-        var publishResult = await ElementPublishingService.PublishAsync(
-            elementKey,
-            [new CulturePublishScheduleModel { Culture = null }],
-            Constants.Security.SuperUserKey);
-        Assert.IsTrue(publishResult.Success);
-
-        return elementKey;
-    }
-
-    private async Task<Guid> CreateAndPublishVariantReusableElement(Guid elementTypeKey, string[] culturesToPublish)
-    {
-        var createResult = await ElementEditingService.CreateAsync(
-            new ElementCreateModel
-            {
-                ContentTypeKey = elementTypeKey,
-                ParentKey = null,
-                Properties =
-                [
-                    new PropertyValueModel { Alias = "invariantText", Value = "The reusable invariant text" },
-                    new PropertyValueModel { Alias = "variantText", Value = "The reusable English text", Culture = "en-US" },
-                    new PropertyValueModel { Alias = "variantText", Value = "The reusable Danish text", Culture = "da-DK" },
-                ],
-                Variants =
-                [
-                    new VariantModel { Name = "Reusable element (EN)", Culture = "en-US" },
-                    new VariantModel { Name = "Reusable element (DA)", Culture = "da-DK" }
-                ],
-            },
-            Constants.Security.SuperUserKey);
-        Assert.IsTrue(createResult.Success);
-
-        var elementKey = createResult.Result.Content!.Key;
-
-        if (culturesToPublish.Any())
-        {
-            var publishResult = await ElementPublishingService.PublishAsync(
-                elementKey,
-                culturesToPublish.Select(culture => new CulturePublishScheduleModel { Culture = culture }).ToArray(),
-                Constants.Security.SuperUserKey);
-            Assert.IsTrue(publishResult.Success);
-        }
-
-        return elementKey;
-    }
 }
