@@ -23,7 +23,6 @@ public static class FriendlyPublishedContentExtensions
     private static IMediaNavigationQueryService? _mediaNavigationQueryService;
     private static IPublishedModelFactory? _publishedModelFactory;
     private static IPublishedUrlProvider? _publishedUrlProvider;
-    private static IUserService? _userService;
     private static IUmbracoContextAccessor? _umbracoContextAccessor;
     private static ISiteDomainMapper? _siteDomainHelper;
     private static IExamineManager? _examineManager;
@@ -94,15 +93,6 @@ public static class FriendlyPublishedContentExtensions
         {
             _publishedUrlProvider ??= StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>();
             return _publishedUrlProvider;
-        }
-    }
-
-    private static IUserService UserService
-    {
-        get
-        {
-            _userService ??= StaticServiceProvider.Instance.GetRequiredService<IUserService>();
-            return _userService;
         }
     }
 
@@ -196,7 +186,6 @@ public static class FriendlyPublishedContentExtensions
         _mediaNavigationQueryService = null;
         _publishedModelFactory = null;
         _publishedUrlProvider = null;
-        _userService = null;
         _umbracoContextAccessor = null;
         _siteDomainHelper = null;
         _examineManager = null;
@@ -840,14 +829,14 @@ public static class FriendlyPublishedContentExtensions
     /// </summary>
     /// <param name="content">The content item.</param>
     public static string? CreatorName(this IPublishedContent content) =>
-        content.CreatorName(UserService);
+        ((IPublishedElement)content).CreatorName();
 
     /// <summary>
     ///     Gets the name of the content item writer.
     /// </summary>
     /// <param name="content">The content item.</param>
     public static string? WriterName(this IPublishedContent content) =>
-        content.WriterName(UserService);
+        ((IPublishedElement)content).WriterName();
 
     /// <summary>
     ///     Gets the culture assigned to a document by domains, in the context of a current Uri.
