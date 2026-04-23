@@ -38,18 +38,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		],
 	},
 	{
-		type: 'workspaceContext',
-		name: 'Block Language Access Workspace Context',
-		alias: 'Umb.WorkspaceContext.BlockLanguageAccess',
-		api: () => import('./permissions/block-language-access.workspace.context.js'),
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_BLOCK_WORKSPACE_ALIAS,
-			},
-		],
-	},
-	{
 		name: 'Language Backoffice Entry Point',
 		alias: 'Umb.EntryPoint.Language',
 		type: 'backofficeEntryPoint',
