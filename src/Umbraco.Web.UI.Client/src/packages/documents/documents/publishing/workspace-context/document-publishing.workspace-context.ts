@@ -440,17 +440,45 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		await this.#documentWorkspaceContext.reload();
 
-		const postReloadCurrent = this.#documentWorkspaceContext.getData();
-		if (!preReloadCurrent || !postReloadCurrent) return;
+		const freshServerData = this.#documentWorkspaceContext.getPersistedData();
+		if (!preReloadCurrent || !freshServerData) return;
 
-		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
+		// Mirror UmbContentWorkspaceDataManager.constructData's scope expansion: when
+		// the content varies by segment, the save scope also covers the segment variants
+		// of each selected culture (and invariant). Those segment variants were persisted
+		// server-side, so we must treat them as in-scope here too — otherwise the merge
+		// would restore pre-reload drafts over fresh server values and produce a false
+		// dirty state for segment variants that were actually saved.
+		let selectedVariants = [...variantIds];
+		let variantsToStore = [...variantIds, UmbVariantId.CreateInvariant()];
+
+		if (this.#documentWorkspaceContext.getVariesBySegment()) {
+			const dataSegments = Array.from(
+				new Set(preReloadCurrent.values.map((v) => v.segment).filter((s): s is string => !!s)),
+			);
+			variantsToStore = [
+				...variantsToStore,
+				...dataSegments.flatMap((segment) => variantsToStore.map((v) => v.toSegment(segment))),
+			];
+			selectedVariants = [
+				...selectedVariants,
+				...dataSegments.flatMap((segment) => selectedVariants.map((v) => v.toSegment(segment))),
+			];
+		}
+
 		const mergedCurrent = await new UmbMergeContentVariantDataController(this).process(
 			preReloadCurrent,
-			postReloadCurrent,
-			variantIds,
-			variantIdsIncludingInvariant,
+			freshServerData,
+			this.#dedupeVariantIds(selectedVariants),
+			this.#dedupeVariantIds(variantsToStore),
 		);
 		this.#documentWorkspaceContext.setData(mergedCurrent);
+	}
+
+	#dedupeVariantIds(variantIds: Array<UmbVariantId>): Array<UmbVariantId> {
+		const byKey = new Map<string, UmbVariantId>();
+		for (const variantId of variantIds) byKey.set(variantId.toString(), variantId);
+		return [...byKey.values()];
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
