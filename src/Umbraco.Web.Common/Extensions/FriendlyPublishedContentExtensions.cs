@@ -254,7 +254,7 @@ public static class FriendlyPublishedContentExtensions
     public static string Name(
         this IPublishedContent content,
         string? culture = null)
-        => content.Name(VariationContextAccessor, culture);
+        => ((IPublishedElement)content).Name(culture);
 
     /// <summary>
     ///     Gets the URL segment of the content item.
@@ -280,7 +280,7 @@ public static class FriendlyPublishedContentExtensions
     public static DateTime CultureDate(
         this IPublishedContent content,
         string? culture = null)
-        => content.CultureDate(VariationContextAccessor, culture);
+        => ((IPublishedElement)content).CultureDate(culture);
 
     /// <summary>
     ///     Returns the current template Alias
