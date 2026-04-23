@@ -256,6 +256,77 @@ Each non-last breadcrumb entry is clickable. On click:
 - Clicking a breadcrumb entry navigates back; both views show the correct subtree.
 - Classic view with a drilled-in startNode shows that subtree in expanded form (no drill gesture, only breadcrumb for going back).
 
+### Phase 9 — Tree item card api base + default kind
+
+**Deps**: Phase 5 (card view and `umb-tree-item-card` must exist).
+
+Architectural improvement: introduce a shared api base for tree item renderers so that card implementations have the same api contract as the classic tree item, and a default kind bundles element+api together for convenience.
+
+#### 9.1 Extract `UmbTreeItemApiBase`
+
+**Create**:
+- `src/packages/core/tree/tree-item/tree-item-base/tree-item-api-base.ts` — `UmbTreeItemApiBase` (abstract). Contains Cluster 1 only:
+  - Tree item data: `setTreeItem(item)`, `getTreeItem()`, observable `treeItem`
+  - Selection: `isSelectable`, `isSelected`, `select()`, `deselect()`
+  - Active state: `isActive`
+  - Path / href computation: `constructPath(...)`
+  - Entity actions availability: `hasActions`
+  - **Not included**: children, expansion, pagination (Cluster 2 — stays in `UmbTreeItemContextBase`)
+
+**Implementation note**: `UmbTreeItemContextBase` currently extends `UmbContextBase` (for context provision). Since TypeScript has single inheritance, the shared contract should be expressed as an **interface** `UmbTreeItemApi` that both `UmbTreeItemContextBase` and `UmbDefaultTreeItemCardApi` implement. `UmbTreeItemApiBase` is then an abstract class implementing `UmbTreeItemApi`, extended only by `UmbDefaultTreeItemCardApi` and any future non-context card api classes.
+
+**Edit**:
+- `src/packages/core/tree/tree-item/tree-item-base/tree-item-context-base.ts` — implement `UmbTreeItemApi` interface. Extract Cluster 1 methods/observables into a form compatible with the interface; no behavioral changes.
+- `src/packages/core/tree/tree-item/tree-item-base/index.ts` — export `UmbTreeItemApi`, `UmbTreeItemApiBase`.
+
+#### 9.2 Create `UmbDefaultTreeItemCardApi`
+
+**Create**:
+- `src/packages/core/tree/tree-item-card/default/default-tree-item-card.api.ts` — `UmbDefaultTreeItemCardApi extends UmbTreeItemApiBase`. Concrete default implementation:
+  - Implements all Cluster 1 members using internal state (mirroring the equivalent parts of `UmbTreeItemContextBase`).
+  - Does **not** consume `UMB_TREE_CONTEXT` for its own data — it receives the item model via `setTreeItem(item)` called by `umb-tree-item-card`.
+- `src/packages/core/tree/tree-item-card/default/index.ts` — re-export.
+
+#### 9.3 Create `Umb.Kind.TreeItemCard.Default`
+
+**Create**:
+- `src/packages/core/tree/tree-item-card/kinds/default/tree-item-card-default.kind.ts` — kind manifest:
+  ```ts
+  {
+    type: 'kind',
+    alias: 'Umb.Kind.TreeItemCard.Default',
+    matchType: 'treeItemCard',
+    element: () => import('../../default/default-tree-item-card.element.js'),
+    api: () => import('../../default/default-tree-item-card.api.js'),
+  }
+  ```
+- `src/packages/core/tree/tree-item-card/kinds/default/index.ts` — barrel.
+- `src/packages/core/tree/tree-item-card/kinds/index.ts` — barrel.
+
+**Edit**:
+- `src/packages/core/tree/manifests.ts` — spread kind manifest into exported manifests list.
+
+#### 9.4 Update `ManifestTreeItemCard`
+
+**Edit**:
+- `src/packages/core/tree/tree-item-card/tree-item-card.extension.ts` — add **required** `api` field (no fallback; cards are a new feature with no existing external implementations to break).
+
+#### 9.5 Update `umb-tree-item-card` for element+api wiring
+
+**Edit**:
+- `src/packages/core/tree/tree-item-card/tree-item-card.element.ts` — switch from `UmbExtensionsElementInitializer` to an initializer that handles element+api pairs (equivalent of `UmbExtensionWithApiSlot` for a single slot):
+  - Instantiates `manifest.api` alongside `manifest.element`.
+  - Passes the api instance to the element via `element.api = apiInstance`.
+  - On `set item(value)`: calls `api.setTreeItem(value)` in addition to forwarding `item` to the element.
+
+**Acceptance**:
+- `umb-default-tree-item-card` receives a fully populated `UmbDefaultTreeItemCardApi` instance via `api` property setter and `item` model via `item` property.
+- Entity-specific card manifests using `kind: 'Umb.Kind.TreeItemCard.Default'` get default element+api automatically.
+- `UmbTreeItemContextBase` continues to work identically — it now also satisfies `UmbTreeItemApi`.
+- No visual regressions; card view renders identically.
+
+---
+
 ### Phase 8 — View selection persistence (UX enhancement)
 
 **Deps**: Phase 3.
@@ -380,9 +451,10 @@ Phase 0 (read)
       Phase 7 (localization + tests + smoke)
         ▼
       Phase 8 (view selection persistence — UX enhancement)
+      Phase 9 (tree item card api base + default kind)
 ```
 
-Phase 2 is independent cleanup with no dependents. Phases 3 through 7 are sequential. Phase 8 can be tackled independently after Phase 3.
+Phase 2 is independent cleanup with no dependents. Phases 3 through 7 are sequential. Phases 8 and 9 can each be tackled independently after Phase 5; they do not depend on each other.
 
 ---
 
@@ -411,6 +483,12 @@ Each phase requires review and sign-off before the next begins.
   - [x] 7.2 — `tree-view.manager.test.ts` (10 tests passing)
   - [ ] 7.3 — Manual smoke tests (user sign-off required)
 - [ ] **Phase 8** — View selection persistence (UX enhancement — design TBD)
+- [ ] **Phase 9** — Tree item card api base + default kind
+  - [ ] 9.1 — Extract `UmbTreeItemApiBase` interface + abstract class; `UmbTreeItemContextBase` implements interface
+  - [ ] 9.2 — `UmbDefaultTreeItemCardApi` (concrete default card api)
+  - [ ] 9.3 — `Umb.Kind.TreeItemCard.Default` kind manifest
+  - [ ] 9.4 — Add required `api` field to `ManifestTreeItemCard`
+  - [ ] 9.5 — Update `umb-tree-item-card` for element+api pair wiring
 
 ---
 
@@ -446,6 +524,12 @@ src/packages/core/tree/components/tree-view-bundle.element.test.ts
 src/packages/core/tree/components/index.ts
 
 src/packages/core/tree/view/tree-view.manager.test.ts
+
+src/packages/core/tree/tree-item/tree-item-base/tree-item-api-base.ts
+src/packages/core/tree/tree-item-card/default/default-tree-item-card.api.ts
+src/packages/core/tree/tree-item-card/kinds/default/tree-item-card-default.kind.ts
+src/packages/core/tree/tree-item-card/kinds/default/index.ts
+src/packages/core/tree/tree-item-card/kinds/index.ts
 ```
 
 ### Edited files
@@ -461,4 +545,10 @@ src/packages/core/tree/default/default-tree.context.ts                    (imple
 src/packages/core/tree/expansion-manager/tree-expansion-manager.ts        (remove expandTo)
 src/packages/core/tree/expansion-manager/tree-expansion-manager.test.ts   (remove expandTo tests)
 src/packages/core/tree/tree-picker-modal/tree-picker-modal.element.ts    (breadcrumb render, hide-toolbar=false)
+src/packages/core/tree/tree-item/tree-item-base/tree-item-context-base.ts (implement UmbTreeItemApi interface)
+src/packages/core/tree/tree-item/tree-item-base/index.ts                  (export UmbTreeItemApi, UmbTreeItemApiBase)
+src/packages/core/tree/tree-item-card/tree-item-card.extension.ts         (add required api field)
+src/packages/core/tree/tree-item-card/tree-item-card.element.ts           (element+api pair wiring)
+src/packages/core/tree/tree-item-card/default/index.ts                    (re-export UmbDefaultTreeItemCardApi)
+src/packages/core/tree/manifests.ts                                        (register Umb.Kind.TreeItemCard.Default)
 ```
