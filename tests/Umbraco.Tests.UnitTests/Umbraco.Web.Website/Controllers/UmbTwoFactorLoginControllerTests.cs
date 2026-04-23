@@ -225,6 +225,7 @@ public class UmbTwoFactorLoginControllerTests
         IActionResult result = await controller.ValidateAndSaveSetup("Provider", "secret", "123456");
 
         Assert.IsInstanceOf<UmbracoPageResult>(result);
+        Assert.IsTrue(controller.ModelState["code"]!.Errors.Any(e => e.ErrorMessage == "Invalid Code"));
         _twoFactorLoginServiceMock.Verify(x => x.SaveAsync(It.IsAny<TwoFactorLogin>()), Times.Never);
     }
 
