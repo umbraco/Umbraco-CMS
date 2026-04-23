@@ -4,6 +4,7 @@ import { manifests as collectionMenuManifests } from './menu/manifests.js';
 import { manifests as collectionRepositoryManifests } from './repository/manifests.js';
 import { manifests as collectionViewManifests } from './views/manifests.js';
 import { manifests as itemManifests } from './item/manifests.js';
+import { manifests as filterManifests } from './filter/manifests.js';
 
 import { UMB_USER_COLLECTION_ALIAS } from './constants.js';
 
@@ -18,9 +19,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 			repositoryAlias: UMB_USER_COLLECTION_REPOSITORY_ALIAS,
 		},
 	},
+
 	...collectionActionManifests,
 	...collectionMenuManifests,
 	...collectionRepositoryManifests,
 	...collectionViewManifests,
 	...itemManifests,
+	...filterManifests,
 ];

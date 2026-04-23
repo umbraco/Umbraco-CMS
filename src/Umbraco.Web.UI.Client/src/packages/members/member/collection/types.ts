@@ -4,6 +4,7 @@ import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collectio
 
 export interface UmbMemberCollectionFilterModel extends UmbCollectionFilterModel {
 	memberTypeId?: string;
+	memberGroupName?: string;
 	orderBy?: string;
 	orderDirection?: UmbDirectionType;
 }

@@ -14,4 +14,35 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 		],
 	},
+	{
+		type: 'facetFilter',
+		kind: 'select',
+		alias: 'Example.Collection.SelectFilter',
+		name: 'Example Collection Select Filter',
+		meta: {
+			label: 'Status',
+		},
+		conditions: [
+			{
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				match: EXAMPLE_COLLECTION_ALIAS,
+			},
+		],
+	},
+	{
+		type: 'facetFilter',
+		kind: 'select',
+		alias: 'Example.Collection.MultiSelectFilter',
+		name: 'Example Collection Multi Select Filter',
+		meta: {
+			label: 'Tags',
+			multiple: true,
+		},
+		conditions: [
+			{
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				match: EXAMPLE_COLLECTION_ALIAS,
+			},
+		],
+	},
 ];

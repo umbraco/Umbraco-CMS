@@ -12,6 +12,7 @@ import type { ManifestCollection } from '../extensions/types.js';
 import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
 import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
+import { UmbFacetFilterManager } from '@umbraco-cms/backoffice/facet-filter';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbArrayState,
@@ -79,6 +80,7 @@ export class UmbDefaultCollectionContext<
 	public readonly selection = new UmbCollectionSelectionManager(this);
 	public readonly view = new UmbCollectionViewManager(this);
 	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
+	public readonly filtering = new UmbFacetFilterManager(this);
 
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;
@@ -105,6 +107,11 @@ export class UmbDefaultCollectionContext<
 
 		this.pagination.addEventListener(UmbChangeEvent.TYPE, this.#onPageChange);
 		this.#listenToEntityEvents();
+
+		// Observe active filters and reload collection when they change
+		this.observe(this.filtering.activeFilters, () => {
+			this.loadCollection();
+		});
 
 		// The parent entity context is used to get the parent entity for the collection items
 		// All items in the collection are children of the current entity context
@@ -298,6 +305,10 @@ export class UmbDefaultCollectionContext<
 		return this._requestCollection();
 	}
 
+	protected async _getFilterArgs(): Promise<Record<string, any>> {
+		return {};
+	}
+
 	protected async _requestCollection() {
 		await this._init;
 
@@ -306,13 +317,23 @@ export class UmbDefaultCollectionContext<
 
 		this._loading.setValue(true);
 
-		const filter = this._filter.getValue();
+		const filterArgs = await this._getFilterArgs();
+		const filters = await this.filtering.getActiveFilterValues();
+		const filter = { ...this._filter.getValue(), ...filterArgs, filters };
 		const { data } = await this._repository.requestCollection(filter);
 
 		if (data) {
 			this._items.setValue(data.items);
 			this._totalItems.setValue(data.total);
 			this.pagination.setTotalItems(data.total);
+
+			// If the response includes faceted results, push them to the filter manager
+			if ('facets' in data && data.facets) {
+				const facets = data.facets as Record<string, unknown>;
+				for (const [alias, result] of Object.entries(facets)) {
+					this.filtering.setFacetedResult(alias, result);
+				}
+			}
 		}
 
 		this._loading.setValue(false);
