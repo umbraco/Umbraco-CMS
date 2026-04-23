@@ -48,6 +48,13 @@ public class ContentService : RepositoryService, IContentService
 
     #region Constructors
 
+    // TODO (V19): Remove obsolete constructors and the ActivatorUtilitiesConstructor attribute.
+    // Also update UmbracoBuilder where this service is registered using:
+    //   Services.AddUnique<IContentService>(sp => ActivatorUtilities.CreateInstance<ContentService>(sp));
+    // We do this to allow the ActivatorUtilitiesConstructor to be used (it's otherwise ignored by AddUnique).
+    // Revert it to:
+    //   Services.AddUnique<IContentService, ContentService>();
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentService"/> class.
     /// </summary>
@@ -69,6 +76,7 @@ public class ContentService : RepositoryService, IContentService
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
     /// <param name="auditTriggerAccessor">The audit trigger accessor.</param>
+    [ActivatorUtilitiesConstructor]
     public ContentService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
