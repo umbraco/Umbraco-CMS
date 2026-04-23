@@ -22,6 +22,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Controllers;
 /// </summary>
 internal static class SurfaceControllerTestHelpers
 {
+    // Shared across tests: the registrations are static (logging only) and IServiceProvider is safe for concurrent
+    // resolution, so reusing a single instance avoids accumulating disposable provider state across large test runs.
+    private static readonly Lazy<ServiceProvider> SharedServiceProvider = new(() =>
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+        return services.BuildServiceProvider();
+    });
+
     /// <summary>
     ///     Configures the <see cref="ControllerBase.ControllerContext" />, URL helper, TempData provider and the
     ///     <see cref="UmbracoRouteValues" /> feature required for a Surface controller under test.
@@ -32,10 +41,6 @@ internal static class SurfaceControllerTestHelpers
         IPublishedContent? currentPage = null,
         string? userIdClaim = null)
     {
-        var services = new ServiceCollection();
-        services.AddLogging();
-        ServiceProvider serviceProvider = services.BuildServiceProvider();
-
         ClaimsPrincipal user;
         if (isAuthenticated)
         {
@@ -55,7 +60,7 @@ internal static class SurfaceControllerTestHelpers
 
         var httpContext = new DefaultHttpContext
         {
-            RequestServices = serviceProvider,
+            RequestServices = SharedServiceProvider.Value,
             User = user,
         };
 
