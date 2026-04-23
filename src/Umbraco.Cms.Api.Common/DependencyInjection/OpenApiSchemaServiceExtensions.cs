@@ -10,6 +10,12 @@ namespace Umbraco.Cms.Api.Common.DependencyInjection;
 internal static class OpenApiSchemaServiceExtensions
 {
     /// <summary>
+    /// The full name of the internal Microsoft type whose registration is replaced.
+    /// Used for a stringly-typed <see cref="ServiceDescriptor"/> lookup because the type is not publicly accessible.
+    /// </summary>
+    internal const string OpenApiSchemaServiceFullName = "Microsoft.AspNetCore.OpenApi.OpenApiSchemaService";
+
+    /// <summary>
     /// Replaces the internal Microsoft <c>OpenApiSchemaService</c> registration for the specified document so that schema
     /// generation uses the named <see cref="JsonOptions"/> rather than the default HTTP JSON options.
     /// </summary>
@@ -25,13 +31,11 @@ internal static class OpenApiSchemaServiceExtensions
         string documentName,
         string jsonOptionsName)
     {
-        const string openApiSchemaServiceFullName = "Microsoft.AspNetCore.OpenApi.OpenApiSchemaService";
-
         ServiceDescriptor descriptor = services.FirstOrDefault(sd =>
-            sd.ServiceType.FullName == openApiSchemaServiceFullName
+            sd.ServiceType.FullName == OpenApiSchemaServiceFullName
             && Equals(sd.ServiceKey, documentName))
             ?? throw new InvalidOperationException(
-                $"Could not find a registration for {openApiSchemaServiceFullName} keyed with '{documentName}'. "
+                $"Could not find a registration for {OpenApiSchemaServiceFullName} keyed with '{documentName}'. "
                 + $"Ensure AddOpenApi(\"{documentName}\") has been called before {nameof(ReplaceOpenApiSchemaService)}, "
                 + "or check whether the internal Microsoft.AspNetCore.OpenApi registration shape has changed.");
 
