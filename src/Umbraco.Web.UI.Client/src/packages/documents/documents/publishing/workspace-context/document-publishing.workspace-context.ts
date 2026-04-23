@@ -443,7 +443,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const freshServerData = this.#documentWorkspaceContext.getPersistedData();
 		if (!preReloadCurrent || !freshServerData) return;
 
-		// Mirror UmbContentWorkspaceDataManager.constructData's scope expansion: when
+		// Mirror UmbElementWorkspaceDataManager.constructData's scope expansion: when
 		// the content varies by segment, the save scope also covers the segment variants
 		// of each selected culture (and invariant). Those segment variants were persisted
 		// server-side, so we must treat them as in-scope here too — otherwise the merge
