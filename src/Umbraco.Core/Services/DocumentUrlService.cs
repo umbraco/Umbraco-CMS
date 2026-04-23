@@ -2,11 +2,9 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
@@ -14,6 +12,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -44,6 +43,7 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly IDomainCacheService _domainCacheService;
     private readonly IDefaultCultureAccessor _defaultCultureAccessor;
+    private readonly IServerRoleAccessor _serverRoleAccessor;
 
     private readonly ConcurrentDictionary<UrlCacheKey, UrlSegmentCache> _documentUrlCache = new();
     private readonly ConcurrentDictionary<string, int> _cultureToLanguageIdMap = new();
@@ -135,134 +135,6 @@ public class DocumentUrlService : IDocumentUrlService
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public DocumentUrlService(
-        ILogger<DocumentUrlService> logger,
-        IDocumentUrlRepository documentUrlRepository,
-        IDocumentRepository documentRepository,
-        ICoreScopeProvider coreScopeProvider,
-        IOptions<GlobalSettings> globalSettings,
-        UrlSegmentProviderCollection urlSegmentProviderCollection,
-        IContentService contentService,
-        IShortStringHelper shortStringHelper,
-        ILanguageService languageService,
-        IKeyValueService keyValueService,
-        IIdKeyMap idKeyMap,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-#pragma warning disable CS0618 // Type or member is obsolete
-        IPublishStatusQueryService publishStatusQueryService,
-#pragma warning restore CS0618 // Type or member is obsolete
-        IDomainCacheService domainCacheService)
-        :this(
-            logger,
-            documentUrlRepository,
-            documentRepository,
-            coreScopeProvider,
-            globalSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>(),
-            urlSegmentProviderCollection,
-            contentService,
-            shortStringHelper,
-            languageService,
-            keyValueService,
-            idKeyMap,
-            documentNavigationQueryService,
-            publishStatusQueryService,
-            domainCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
-    /// </summary>
-    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public DocumentUrlService(
-        ILogger<DocumentUrlService> logger,
-        IDocumentUrlRepository documentUrlRepository,
-        IDocumentRepository documentRepository,
-        ICoreScopeProvider coreScopeProvider,
-        IOptions<GlobalSettings> globalSettings,
-        IOptions<WebRoutingSettings> webRoutingSettings,
-        UrlSegmentProviderCollection urlSegmentProviderCollection,
-        IContentService contentService,
-        IShortStringHelper shortStringHelper,
-        ILanguageService languageService,
-        IKeyValueService keyValueService,
-        IIdKeyMap idKeyMap,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-#pragma warning disable CS0618 // Type or member is obsolete
-        IPublishStatusQueryService publishStatusQueryService,
-#pragma warning restore CS0618 // Type or member is obsolete
-        IDomainCacheService domainCacheService,
-        IDefaultCultureAccessor defaultCultureAccessor)
-        : this(
-            logger,
-            documentUrlRepository,
-            documentRepository,
-            coreScopeProvider,
-            globalSettings,
-            webRoutingSettings,
-            urlSegmentProviderCollection,
-            contentService,
-            shortStringHelper,
-            languageService,
-            keyValueService,
-            idKeyMap,
-            documentNavigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusQueryService>(),
-            domainCacheService,
-            defaultCultureAccessor)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
-    /// </summary>
-    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public DocumentUrlService(
-        ILogger<DocumentUrlService> logger,
-        IDocumentUrlRepository documentUrlRepository,
-        IDocumentRepository documentRepository,
-        ICoreScopeProvider coreScopeProvider,
-        IOptions<GlobalSettings> globalSettings,
-        IOptions<WebRoutingSettings> webRoutingSettings,
-        UrlSegmentProviderCollection urlSegmentProviderCollection,
-        IContentService contentService,
-        IShortStringHelper shortStringHelper,
-        ILanguageService languageService,
-        IKeyValueService keyValueService,
-        IIdKeyMap idKeyMap,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-#pragma warning disable CS0618 // Type or member is obsolete
-        IPublishStatusQueryService publishStatusQueryService,
-#pragma warning restore CS0618 // Type or member is obsolete
-        IDocumentPublishStatusQueryService documentPublishStatusQueryService,
-        IDomainCacheService domainCacheService,
-        IDefaultCultureAccessor defaultCultureAccessor)
-        : this(
-            logger,
-            documentUrlRepository,
-            documentRepository,
-            coreScopeProvider,
-            globalSettings,
-            webRoutingSettings,
-            urlSegmentProviderCollection,
-            contentService,
-            shortStringHelper,
-            languageService,
-            keyValueService,
-            idKeyMap,
-            documentNavigationQueryService,
-            documentPublishStatusQueryService,
-            domainCacheService,
-            defaultCultureAccessor)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
-    /// </summary>
     public DocumentUrlService(
         ILogger<DocumentUrlService> logger,
         IDocumentUrlRepository documentUrlRepository,
@@ -279,7 +151,8 @@ public class DocumentUrlService : IDocumentUrlService
         IDocumentNavigationQueryService documentNavigationQueryService,
         IDocumentPublishStatusQueryService publishStatusQueryService,
         IDomainCacheService domainCacheService,
-        IDefaultCultureAccessor defaultCultureAccessor)
+        IDefaultCultureAccessor defaultCultureAccessor,
+        IServerRoleAccessor serverRoleAccessor)
     {
         _logger = logger;
         _documentUrlRepository = documentUrlRepository;
@@ -297,6 +170,7 @@ public class DocumentUrlService : IDocumentUrlService
         _publishStatusQueryService = publishStatusQueryService;
         _domainCacheService = domainCacheService;
         _defaultCultureAccessor = defaultCultureAccessor;
+        _serverRoleAccessor = serverRoleAccessor;
     }
 
     /// <inheritdoc/>
@@ -310,7 +184,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        if (ShouldRebuildUrls())
+        if (SkipDatabaseWrites() is false && ShouldRebuildUrls())
         {
             _logger.LogInformation("Rebuilding all document URLs.");
             await RebuildAllUrlsAsync();
@@ -367,6 +241,12 @@ public class DocumentUrlService : IDocumentUrlService
     /// <inheritdoc/>
     public async Task RebuildAllUrlsAsync()
     {
+        if (SkipDatabaseWrites())
+        {
+            _logger.LogDebug("Skipping document URL rebuild — the current server role does not persist URL segments.");
+            return;
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
@@ -378,6 +258,17 @@ public class DocumentUrlService : IDocumentUrlService
 
         scope.Complete();
     }
+
+    /// <summary>
+    /// Indicates whether this instance should skip database writes for URL segments.
+    /// </summary>
+    /// <remarks>
+    /// On a <see cref="ServerRole.Subscriber"/> the scheduling publisher has already persisted URL segments to
+    /// the database before issuing the cache-refresh instruction that routed us here. Re-writing them locally is
+    /// redundant at best, and blows up when the subscriber is configured against a read-only database connection.
+    /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
+    /// </remarks>
+    private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
 
     /// <summary>
     /// Converts a collection of <see cref="PublishedDocumentUrlSegment"/> to cache key-value pairs for caching purposes.
@@ -688,7 +579,7 @@ public class DocumentUrlService : IDocumentUrlService
             }
         }
 
-        if (toSave.Count > 0)
+        if (toSave.Count > 0 && SkipDatabaseWrites() is false)
         {
             scope.WriteLock(Constants.Locks.DocumentUrls);
             _documentUrlRepository.Save(toSave);

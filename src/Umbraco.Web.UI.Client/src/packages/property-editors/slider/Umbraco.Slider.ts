@@ -22,10 +22,18 @@ export const manifest: ManifestPropertyEditorSchema = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 					config: [{ alias: 'step', value: '0.00001' }],
 				},
+				{
+					alias: 'minimumRange',
+					label: 'Minimum range',
+					description: '',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
+					config: [{ alias: 'step', value: '0.00001' }],
+				},
 			],
 			defaultData: [
 				{ alias: 'minVal', value: 0.0 },
 				{ alias: 'maxVal', value: 100.0 },
+				{ alias: 'minimumRange', value: 0.0 },
 			],
 		},
 	},
