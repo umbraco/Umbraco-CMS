@@ -86,60 +86,62 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 				<umb-property-layout alias="Root" label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}>
 					<div slot="description">${this.localize.term('contentTypeEditor_allowAtRootDescription')}</div>
 					<div slot="editor">
-						<uui-toggle
-							label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}
-							?checked=${this._allowedAtRoot}
-							?disabled=${this._isElementType}
-							@change=${(e: CustomEvent) => {
-								this.#workspaceContext?.setAllowedAtRoot((e.target as UUIToggleElement).checked);
-							}}></uui-toggle>
+						${when(
+							this._isElementType,
+							() => this.#renderElementDoesNotSupport(),
+							() => html`
+								<uui-toggle
+									label=${this.localize.term('contentTypeEditor_allowAtRootHeading')}
+									?checked=${this._allowedAtRoot}
+									?disabled=${this._isElementType}
+									@change=${(e: CustomEvent) => {
+										this.#workspaceContext?.setAllowedAtRoot((e.target as UUIToggleElement).checked);
+									}}></uui-toggle>
+							`,
+						)}
 					</div>
 				</umb-property-layout>
 
 				${when(
 					this._isElementType,
 					() => html`
-						<umb-property-layout alias="library" label=${this.localize.term('contentTypeEditor_allowInLibraryHeading')}>
-							<div slot="description">${this.localize.term('contentTypeEditor_allowInLibraryDescription')}</div>
-							<div slot="editor">
+				<umb-property-layout alias="library" label=${this.localize.term('contentTypeEditor_allowInLibraryHeading')}>
+					<div slot="description">${this.localize.term('contentTypeEditor_allowInLibraryDescription')}</div>
+					<div slot="editor">
 								<uui-toggle
 									label=${this.localize.term('contentTypeEditor_allowInLibraryHeading')}
 									?checked=${this._allowedInLibrary}
 									@change=${(e: CustomEvent) => {
 										this.#workspaceContext?.setAllowedInLibrary((e.target as UUIToggleElement).checked);
 									}}></uui-toggle>
-							</div>
+								</div>
 						</umb-property-layout>
-					`,
-				)}
+							`,
+						)}
 
 				<umb-property-layout alias="ChildNodeType" label=${this.localize.term('contentTypeEditor_childNodesHeading')}>
 					<div slot="description">${this.localize.term('contentTypeEditor_childNodesDescription')}</div>
 					<div slot="editor">
-						${this._isElementType
-							? html`
-									<div class="not-applicable-message">
-										<umb-localize key="contentTypeEditor_elementDoesNotSupport">
-											This is not applicable for an Element type.
-										</umb-localize>
-									</div>
-								`
-							: html`
-									<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
-									<umb-input-document-type
-										.documentTypesOnly=${true}
-										.selection=${this._allowedContentTypeUniques ?? []}
-										@change="${(e: CustomEvent & { target: UmbInputDocumentTypeElement }) => {
-											const sortedContentTypesList: Array<UmbContentTypeSortModel> = e.target.selection.map(
-												(id, index) => ({
-													contentType: { unique: id },
-													sortOrder: index,
-												}),
-											);
-											this.#workspaceContext?.setAllowedContentTypes(sortedContentTypesList);
-										}}">
-									</umb-input-document-type>
-								`}
+						${when(
+							this._isElementType,
+							() => this.#renderElementDoesNotSupport(),
+							() => html`
+								<!-- TODO: maybe we want to somehow display the hierarchy, but not necessary in the same way as old backoffice? -->
+								<umb-input-document-type
+									.documentTypesOnly=${true}
+									.selection=${this._allowedContentTypeUniques ?? []}
+									@change="${(e: CustomEvent & { target: UmbInputDocumentTypeElement }) => {
+										const sortedContentTypesList: Array<UmbContentTypeSortModel> = e.target.selection.map(
+											(id, index) => ({
+												contentType: { unique: id },
+												sortOrder: index,
+											}),
+										);
+										this.#workspaceContext?.setAllowedContentTypes(sortedContentTypesList);
+									}}">
+								</umb-input-document-type>
+							`,
+						)}
 					</div>
 				</umb-property-layout>
 			</uui-box>
@@ -148,27 +150,33 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 				<umb-property-layout alias="collection" label="${this.localize.term('contentTypeEditor_collection')}">
 					<div slot="description">${this.localize.term('contentTypeEditor_collectionDescription')}</div>
 					<div slot="editor">
-						${this._isElementType
-							? html`
-									<div class="not-applicable-message">
-										<umb-localize key="contentTypeEditor_elementDoesNotSupport">
-											This is not applicable for an Element type.
-										</umb-localize>
-									</div>
-								`
-							: html`
-									<umb-input-content-type-collection-configuration
-										default-value="c0808dd3-8133-4e4b-8ce8-e2bea84a96a4"
-										.value=${this._collection ?? undefined}
-										@change=${(e: CustomEvent) => {
-											const unique = (e.target as UmbInputContentTypeCollectionConfigurationElement).value as string;
-											this.#workspaceContext?.setCollection({ unique });
-										}}>
-									</umb-input-content-type-collection-configuration>
-								`}
+						${when(
+							this._isElementType,
+							() => this.#renderElementDoesNotSupport(),
+							() => html`
+								<umb-input-content-type-collection-configuration
+									default-value="c0808dd3-8133-4e4b-8ce8-e2bea84a96a4"
+									.value=${this._collection ?? undefined}
+									@change=${(e: CustomEvent) => {
+										const unique = (e.target as UmbInputContentTypeCollectionConfigurationElement).value as string;
+										this.#workspaceContext?.setCollection({ unique });
+									}}>
+								</umb-input-content-type-collection-configuration>
+							`,
+						)}
 					</div>
 				</umb-property-layout>
 			</uui-box>
+		`;
+	}
+
+	#renderElementDoesNotSupport() {
+		return html`
+			<div class="info-message">
+				<umb-localize key="contentTypeEditor_elementDoesNotSupport">
+					This is not applicable for an Element Type.
+				</umb-localize>
+			</div>
 		`;
 	}
 
@@ -193,7 +201,7 @@ export class UmbDocumentTypeWorkspaceViewStructureElement extends UmbLitElement 
 				display: flex;
 			}
 
-			.not-applicable-message {
+			.info-message {
 				color: var(--uui-color-text-alt);
 				font-style: italic;
 			}
