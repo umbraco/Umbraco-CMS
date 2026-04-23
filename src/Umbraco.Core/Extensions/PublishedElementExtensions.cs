@@ -305,7 +305,7 @@ public static class PublishedElementExtensions
     ///     Gets the culture date of the content item.
     /// </summary>
     /// <param name="content">The content item.</param>
-    /// <param name="variationContextAccessor"></param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
     /// <param name="culture">
     ///     The specific culture to get the name for. If null is used the current culture is used (Default is
     ///     null).
