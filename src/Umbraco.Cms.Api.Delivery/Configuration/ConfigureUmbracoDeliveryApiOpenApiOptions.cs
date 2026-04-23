@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Api.Delivery.Configuration;
 /// <summary>
 /// Configures the OpenAPI options for the Umbraco Delivery API.
 /// </summary>
-public class ConfigureUmbracoDeliveryApiOpenApiOptions : ConfigureUmbracoOpenApiOptionsBase
+internal class ConfigureUmbracoDeliveryApiOpenApiOptions : ConfigureUmbracoOpenApiOptionsBase
 {
     /// <inheritdoc />
     protected override string ApiName => DeliveryApiConfiguration.ApiName;

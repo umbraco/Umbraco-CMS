@@ -119,5 +119,4 @@ public static partial class UmbracoBuilderExtensions
 
         return builder;
     }
-
 }

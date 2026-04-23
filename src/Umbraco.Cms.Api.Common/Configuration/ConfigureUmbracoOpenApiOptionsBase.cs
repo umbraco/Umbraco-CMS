@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Api.Common.Configuration;
 /// <summary>
 /// Base class for configuring OpenAPI options for Umbraco APIs.
 /// </summary>
-public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOptions<OpenApiOptions>
+internal abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOptions<OpenApiOptions>
 {
     /// <summary>
     ///  Gets the name/identifier of the API to configure.
@@ -78,7 +78,6 @@ public abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOption
             .AddOperationTransformer<TagActionsByGroupNameTransformer>()
             .AddDocumentTransformer<TagActionsByGroupNameTransformer>()
             .AddDocumentTransformer<SortTagsAndPathsTransformer>();
-
     }
 
     /// <summary>

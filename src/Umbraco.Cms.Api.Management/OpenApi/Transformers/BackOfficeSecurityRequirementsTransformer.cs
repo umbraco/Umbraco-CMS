@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Api.Management.OpenApi.Transformers;
 /// <summary>
 /// Transforms OpenAPI operations to include back-office security requirements.
 /// </summary>
-public class BackOfficeSecurityRequirementsTransformer : IOpenApiOperationTransformer,
+internal class BackOfficeSecurityRequirementsTransformer : IOpenApiOperationTransformer,
     IOpenApiDocumentTransformer
 {
     /// <summary>

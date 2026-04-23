@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Api.Management.Serialization;
 /// <summary>
 /// Configures the Http JSON options for the Umbraco back-office API.
 /// </summary>
-public class ConfigureUmbracoBackofficeHttpJsonOptions : IConfigureNamedOptions<JsonOptions>
+internal class ConfigureUmbracoBackofficeHttpJsonOptions : IConfigureNamedOptions<JsonOptions>
 {
     private readonly IOptionsMonitor<Microsoft.AspNetCore.Mvc.JsonOptions> _mvcJsonOptions;
 

@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Api.Management.Configuration;
 /// <summary>
 /// Configures the OpenAPI options for the Umbraco Management API.
 /// </summary>
-public class ConfigureUmbracoManagementApiOpenApiOptions : ConfigureUmbracoOpenApiOptionsBase
+internal class ConfigureUmbracoManagementApiOpenApiOptions : ConfigureUmbracoOpenApiOptionsBase
 {
     /// <inheritdoc />
     protected override string ApiName => ManagementApiConfiguration.ApiName;

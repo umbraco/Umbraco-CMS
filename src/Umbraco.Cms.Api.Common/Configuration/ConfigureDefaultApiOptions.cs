@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Api.Common.Configuration;
 /// <summary>
 /// Configures the OpenAPI options for the Default API.
 /// </summary>
-public class ConfigureDefaultApiOptions : ConfigureUmbracoOpenApiOptionsBase
+internal class ConfigureDefaultApiOptions : ConfigureUmbracoOpenApiOptionsBase
 {
     /// <inheritdoc />
     protected override string ApiName => DefaultApiConfiguration.ApiName;
