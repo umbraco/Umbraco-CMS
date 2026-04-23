@@ -51,7 +51,7 @@ internal static class ApplicationBuilderExtensions
                 }));
             });
 
-internal static void MapManagementApiEndpoints(this IEndpointRouteBuilder endpoints)
+    internal static void MapManagementApiEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var backOfficePath = endpoints.ServiceProvider.GetRequiredService<IHostingEnvironment>().GetBackOfficePath();
 
