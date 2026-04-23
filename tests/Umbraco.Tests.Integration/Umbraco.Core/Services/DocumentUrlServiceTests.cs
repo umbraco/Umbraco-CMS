@@ -22,6 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Mock)]
 internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithContent
 {
+    private const string SubSubPage1Key = "09376F1F-AF4E-4E5E-8DCF-074A5C8A81E7";
     private const string SubSubPage2Key = "48AE405E-5142-4EBE-929F-55EB616F51F2";
     private const string SubSubPage3Key = "AACF2979-3F53-4184-B071-BA34D3338497";
 
@@ -46,6 +47,15 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         builder.UrlSegmentProviders().Insert<CustomUrlSegmentProvider1>();
         builder.UrlSegmentProviders().Insert<CustomUrlSegmentProvider2>();
+    }
+
+    public override void CreateTestData()
+    {
+        base.CreateTestData();
+
+        var subSubPage1 = ContentBuilder.CreateSimpleContent(ContentType, "Sub SUb Page 1", Subpage.Id);
+        subSubPage1.Key = new Guid(SubSubPage1Key);
+        ContentService.Save(subSubPage1, -1);
     }
 
     private abstract class CustomUrlSegmentProviderBase
@@ -361,12 +371,32 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     [TestCase(SubPageKey, "en-US", ExpectedResult = "/text-page-1-custom")]  // Has non-terminating custom URL segment provider.
     [TestCase(SubPage2Key, "en-US", ExpectedResult = "/text-page-2-custom")] // Has terminating custom URL segment provider.
     [TestCase(SubPage3Key, "en-US", ExpectedResult = "/text-page-3")]
+    [TestCase(SubSubPage1Key, "en-US", ExpectedResult = "/text-page-1-custom/sub-sub-page-1")]
     public string? GetLegacyRouteFormat_Returns_Expected_Route(string documentKey, string culture)
     {
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         return DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
     }
 
+    [TestCase(TextpageKey, "en-US", "/")]
+    [TestCase(SubPageKey, "en-US", "/text-page-1-custom")]  // Has non-terminating custom URL segment provider.
+    [TestCase(SubPage2Key, "en-US", "/text-page-2-custom")] // Has terminating custom URL segment provider.
+    [TestCase(SubPage3Key, "en-US", "/text-page-3")]
+    [TestCase(SubSubPage1Key, "en-US", "/text-page-1-custom/sub-sub-page-1")]
+    public async Task GetLegacyRouteFormat_WithDomainBinding_Returns_Expected_Route(string documentKey, string culture, string expectedPath)
+    {
+        await DomainService.UpdateDomainsAsync(
+            Textpage.Key,
+            new()
+            {
+                Domains = [new() { DomainName = "/test", IsoCode = "en-US" }],
+                DefaultIsoCode = "en-US"
+            });
+
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        var route = DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
+        Assert.AreEqual($"{Textpage.Id}{expectedPath}", route);
+    }
 
     [Test]
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync_Does_Not_Throw_When_Content_Does_Not_Exist()
