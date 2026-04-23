@@ -1626,10 +1626,15 @@ export default {
 		webhookSaved: 'Webhook saved',
 		editMultiContentPublishedText: '%0% documents published and are visible on the website',
 		editMultiContentUnpublishedText: '%0% documents unpublished and are no longer visible on the website',
+		editMultiElementPublishedText: '%0% elements published and are visible on the website',
+		editMultiElementUnpublishedText: '%0% elements unpublished and are no longer visible on the website',
 		editVariantUnpublishedText: '%0% unpublished and is no longer visible on the website',
 		editMultiVariantPublishedText: '%0% documents published for languages %1% and are visible on the website',
 		editMultiVariantUnpublishedText:
 			'%0% documents unpublished for languages %1% and are no longer visible on the website',
+		editMultiElementVariantPublishedText: '%0% elements published for languages %1% and are visible on the website',
+		editMultiElementVariantUnpublishedText:
+			'%0% elements unpublished for languages %1% and are no longer visible on the website',
 		editContentScheduledSavedText: 'A schedule for publishing has been updated',
 		editContentScheduledNotSavedText: 'The schedule for publishing could not be updated',
 		editVariantSendToPublishText: '%0% changes have been sent for approval',
