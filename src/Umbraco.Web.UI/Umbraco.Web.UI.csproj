@@ -25,6 +25,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Clean.Core" Version="7.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.5" />
+    <PackageReference Include="Umbraco.Community.User2FA" Version="17.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Add design/build time support for EF Core migrations -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" Version="10.0.6" />
     <!--

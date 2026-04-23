@@ -36116,10 +36116,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/UserPermissionsResponseModel"
-                  }
+                  "$ref": "#/components/schemas/UserPermissionsResponseModel"
                 }
               }
             }
@@ -44776,12 +44773,16 @@
         "anyOf": [
           {
             "$ref": "#/components/schemas/ISetupTwoFactorModelNoopSetupTwoFactorModel"
+          },
+          {
+            "$ref": "#/components/schemas/ISetupTwoFactorModelTwoFactorAuthInfo"
           }
         ],
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "NoopSetupTwoFactorModel": "#/components/schemas/ISetupTwoFactorModelNoopSetupTwoFactorModel"
+            "NoopSetupTwoFactorModel": "#/components/schemas/ISetupTwoFactorModelNoopSetupTwoFactorModel",
+            "TwoFactorAuthInfo": "#/components/schemas/ISetupTwoFactorModelTwoFactorAuthInfo"
           }
         }
       },
@@ -44795,6 +44796,31 @@
               "NoopSetupTwoFactorModel"
             ],
             "type": "string"
+          }
+        }
+      },
+      "ISetupTwoFactorModelTwoFactorAuthInfo": {
+        "required": [
+          "$type"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "TwoFactorAuthInfo"
+            ],
+            "type": "string"
+          },
+          "qrCodeSetupImageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "secret": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -46047,7 +46073,8 @@
       "MemberKindModel": {
         "enum": [
           "Default",
-          "Api"
+          "Api",
+          "ExternalOnly"
         ]
       },
       "MemberResponseModel": {
@@ -46120,6 +46147,12 @@
           },
           "kind": {
             "$ref": "#/components/schemas/MemberKindModel"
+          },
+          "profileData": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "id": {
             "type": "string",

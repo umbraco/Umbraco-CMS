@@ -1438,12 +1438,20 @@ export type IReferenceResponseModelMemberTypePropertyTypeReferenceResponseModel 
     name?: null | string;
 };
 
-export type ISetupTwoFactorModel = {
+export type ISetupTwoFactorModel = ({
     $type?: 'NoopSetupTwoFactorModel';
-} & ISetupTwoFactorModelNoopSetupTwoFactorModel;
+} & ISetupTwoFactorModelNoopSetupTwoFactorModel) | ({
+    $type?: 'TwoFactorAuthInfo';
+} & ISetupTwoFactorModelTwoFactorAuthInfo);
 
 export type ISetupTwoFactorModelNoopSetupTwoFactorModel = {
     $type: 'NoopSetupTwoFactorModel';
+};
+
+export type ISetupTwoFactorModelTwoFactorAuthInfo = {
+    $type: 'TwoFactorAuthInfo';
+    qrCodeSetupImageUrl?: null | string;
+    secret?: null | string;
 };
 
 export type ItemAncestorsResponseModelDocumentItemResponseModel = {
@@ -1768,7 +1776,8 @@ export type MemberItemResponseModel = {
 
 export enum MemberKindModel {
     DEFAULT = 'Default',
-    API = 'Api'
+    API = 'Api',
+    EXTERNAL_ONLY = 'ExternalOnly'
 }
 
 export type MemberResponseModel = {
@@ -1784,6 +1793,7 @@ export type MemberResponseModel = {
     lastPasswordChangeDate?: null | string;
     groups: Array<string>;
     kind: MemberKindModel;
+    profileData?: null | string;
     id: string;
     flags: Array<FlagModel>;
     values: Array<MemberValueResponseModel>;
@@ -18688,7 +18698,7 @@ export type GetUserCurrentPermissionsDocumentResponses = {
     /**
      * OK
      */
-    200: Array<UserPermissionsResponseModel>;
+    200: UserPermissionsResponseModel;
 };
 
 export type GetUserCurrentPermissionsDocumentResponse = GetUserCurrentPermissionsDocumentResponses[keyof GetUserCurrentPermissionsDocumentResponses];

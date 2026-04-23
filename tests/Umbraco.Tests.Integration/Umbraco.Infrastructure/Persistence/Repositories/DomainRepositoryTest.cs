@@ -417,4 +417,91 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(0, all2.Count());
         }
     }
+
+    [Test]
+    public void GetByName_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var contentId = CreateTestData("en-AU", out _);
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+            var content = DocumentRepository.Get(contentId);
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
+            var domain = (IDomain)new UmbracoDomain("clone-test.com") { RootContentId = content.Id, LanguageId = lang.Id };
+            repo.Save(domain);
+
+            var first = repo.GetByName("clone-test.com");
+            var second = repo.GetByName("clone-test.com");
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Exists_By_Name_Returns_Correct_Result()
+    {
+        var contentId = CreateTestData("en-AU", out _);
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+            var content = DocumentRepository.Get(contentId);
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
+            var domain = (IDomain)new UmbracoDomain("exists-test.com") { RootContentId = content.Id, LanguageId = lang.Id };
+            repo.Save(domain);
+
+            Assert.IsTrue(repo.Exists("exists-test.com"));
+            Assert.IsFalse(repo.Exists("nonexistent.com"));
+        }
+    }
+
+    [Test]
+    public void GetByName_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        var contentId = CreateTestData("en-AU", out _);
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+            var content = DocumentRepository.Get(contentId);
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
+            var domain = (IDomain)new UmbracoDomain("mutation-test.com") { RootContentId = content.Id, LanguageId = lang.Id };
+            repo.Save(domain);
+
+            var first = repo.GetByName("mutation-test.com");
+            Assert.IsNotNull(first);
+            var originalName = first!.DomainName;
+            first.DomainName = "MUTATED_" + Guid.NewGuid();
+
+            var second = repo.GetByName("mutation-test.com");
+            Assert.IsNotNull(second);
+            Assert.AreEqual(originalName, second!.DomainName, "Mutation of a returned entity should not affect the cached copy");
+        }
+    }
+
+    [Test]
+    public void GetAssignedDomains_Returns_Only_Matching_Domains()
+    {
+        var contentId = CreateTestData("en-AU", out _);
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repo = CreateRepository(provider);
+            var content = DocumentRepository.Get(contentId);
+            var lang = LanguageRepository.GetByIsoCode("en-AU");
+
+            repo.Save((IDomain)new UmbracoDomain("assigned1.com") { RootContentId = content.Id, LanguageId = lang.Id });
+            repo.Save((IDomain)new UmbracoDomain("assigned2.com") { RootContentId = content.Id, LanguageId = lang.Id });
+
+            var assigned = repo.GetAssignedDomains(content.Id, true).ToArray();
+            Assert.AreEqual(2, assigned.Length);
+
+            var unassigned = repo.GetAssignedDomains(-999, true).ToArray();
+            Assert.AreEqual(0, unassigned.Length);
+        }
+    }
 }

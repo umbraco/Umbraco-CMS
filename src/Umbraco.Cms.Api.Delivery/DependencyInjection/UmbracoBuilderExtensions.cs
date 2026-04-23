@@ -114,6 +114,10 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<MemberDeletedNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<AssignedMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<RemovedMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ExternalMemberSavedNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ExternalMemberDeletedNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<AssignedExternalMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<RemovedExternalMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
 
         // FIXME: remove this when Delivery API V1 is removed
         builder.Services.AddSingleton<MatcherPolicy, DeliveryApiItemsEndpointsMatcherPolicy>();
@@ -160,6 +164,7 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, DeliveryApiDocumentOutputCacheEvictionHandler>();
         builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, DeliveryApiMediaOutputCacheEvictionHandler>();
         builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, DeliveryApiMemberOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<ElementCacheRefresherNotification, DeliveryApiElementOutputCacheEvictionHandler>();
 
         // Register extension point default implementations.
         builder.Services.AddSingleton<IDeliveryApiOutputCacheTagProvider, DeliveryApiContentTypeOutputCacheTagProvider>();

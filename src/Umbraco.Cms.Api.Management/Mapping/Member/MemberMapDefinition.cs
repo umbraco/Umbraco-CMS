@@ -31,7 +31,7 @@ public class MemberMapDefinition : ContentMapDefinition<IMember, MemberValueResp
     public void DefineMaps(IUmbracoMapper mapper)
         => mapper.Define<IMember, MemberResponseModel>((_, _) => new MemberResponseModel(), Map);
 
-    // Umbraco.Code.MapAll -IsTwoFactorEnabled -Groups -Kind -Flags
+    // Umbraco.Code.MapAll -IsTwoFactorEnabled -Groups -Kind -Flags -ProfileData
     private void Map(IMember source, MemberResponseModel target, MapperContext context)
     {
         target.Id = source.Key;
