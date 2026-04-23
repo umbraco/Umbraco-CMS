@@ -1,6 +1,7 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
 import {UserBuilder} from "../builders";
 import {Page} from "@playwright/test";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class UserApiHelper {
   api: ApiHelpers;
@@ -298,5 +299,14 @@ export class UserApiHelper {
   async filterByUserGroupIds(userGroupIds: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/filter/user?skip=0&take=100&userGroupIds=' + userGroupIds);
     return await response.json();
+  }
+
+  // Current User Profile
+  async updateCurrentUserProfile(languageIsoCode: string) {
+    return await this.api.put(this.api.baseUrl + ConstantHelper.apiEndpoints.currentUserProfile, {languageIsoCode});
+  }
+
+  async clearCurrentUserAvatar() {
+    return await this.api.delete(this.api.baseUrl + ConstantHelper.apiEndpoints.currentUserAvatar);
   }
 }

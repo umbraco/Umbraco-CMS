@@ -202,6 +202,9 @@ export class UiBaseLocators extends BasePage {
   public readonly newPasswordTxt: Locator;
   public readonly confirmPasswordTxt: Locator;
   public readonly currentPasswordTxt: Locator;
+  public readonly changePhotoBtn: Locator;
+  public readonly removePhotoBtn: Locator;
+  public readonly languageBtn: Locator;
 
   // Collection & Table
   public readonly collectionTreeItemTableRow: Locator;
@@ -538,6 +541,9 @@ export class UiBaseLocators extends BasePage {
     this.currentPasswordTxt = page.locator('input[name="oldPassword"]');
     this.newPasswordTxt = page.locator('input[name="newPassword"]');
     this.confirmPasswordTxt = page.locator('input[name="confirmPassword"]');
+    this.changePhotoBtn = page.getByLabel('Change photo');
+    this.removePhotoBtn = page.getByLabel('Remove photo');
+    this.languageBtn = page.locator('[label="UI Culture"] select');
 
     // Collection & Table
     this.collectionTreeItemTableRow = page.locator(
@@ -2063,5 +2069,24 @@ export class UiBaseLocators extends BasePage {
       .filter({ hasText: mediaName })
       .locator("#select-checkbox");
     await this.isVisible(selectCheckboxLocator, isVisible);
+  }
+
+  async clickChangePhotoButton() {
+    await this.click(this.changePhotoBtn);
+  }
+
+  async clickRemovePhotoButton() {
+    await this.click(this.removePhotoBtn);
+  }
+
+  async changePhotoWithFileChooser(filePath: string) {
+    const fileChooserPromise = this.page.waitForEvent('filechooser');
+    await this.clickChangePhotoButton();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(filePath);
+  }
+
+  async selectUserLanguage(language: string) {
+    await this.languageBtn.selectOption(language, {force: true});
   }
 }
