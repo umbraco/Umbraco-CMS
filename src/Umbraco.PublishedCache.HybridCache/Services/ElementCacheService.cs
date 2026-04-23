@@ -287,11 +287,17 @@ internal sealed class ElementCacheService : IElementCacheService
     }
 
     public void Rebuild(IReadOnlyCollection<int> elementTypeIds)
-    {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        _databaseCacheRepository.Rebuild(elementTypeIds: elementTypeIds.ToList());
-        scope.Complete();
-    }
+        => _databaseCacheRepository.Rebuild(
+            null,
+            null,
+            null,
+            elementTypeIds.ToList(),
+            action =>
+            {
+                using ICoreScope scope = _scopeProvider.CreateCoreScope();
+                action();
+                scope.Complete();
+            });
 
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> elementTypeIds)
     {

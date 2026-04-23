@@ -149,11 +149,19 @@ internal interface IDatabaseCacheRepository
     ///     If not null will process content for the matching element types, if empty will process all
     ///     elements.
     /// </param>
+    /// <param name="executeStep">
+    ///     Optional delegate that wraps each discrete step (delete, page read + insert) in a scope.
+    ///     When <c>null</c>, the caller is responsible for providing an ambient scope that covers the
+    ///     entire operation. When provided, the repository invokes the delegate for each step, allowing
+    ///     the caller to create and dispose a scope per step so that database locks are released between
+    ///     pages — preventing long-running background rebuilds from blocking foreground content saves.
+    /// </param>
     void Rebuild(
-        IReadOnlyCollection<int>? contentTypeIds = null,
-        IReadOnlyCollection<int>? mediaTypeIds = null,
-        IReadOnlyCollection<int>? memberTypeIds = null,
-        IReadOnlyCollection<int>? elementTypeIds = null);
+        IReadOnlyCollection<int>? contentTypeIds,
+        IReadOnlyCollection<int>? mediaTypeIds,
+        IReadOnlyCollection<int>? memberTypeIds,
+        IReadOnlyCollection<int>? elementTypeIds,
+        Action<Action>? executeStep);
 
     #endregion
 }
