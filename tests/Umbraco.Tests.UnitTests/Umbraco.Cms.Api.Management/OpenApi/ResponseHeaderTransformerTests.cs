@@ -117,6 +117,31 @@ public class ResponseHeaderTransformerTests
     }
 
     [Test]
+    public async Task TransformAsync_Skips_Non_Numeric_Response_Keys()
+    {
+        // Arrange - OpenAPI permits "default" and status-class keys (e.g. "2XX") alongside numeric codes.
+        var operation = new OpenApiOperation
+        {
+            Responses = new OpenApiResponses
+            {
+                ["default"] = new OpenApiResponse(),
+                ["2XX"] = new OpenApiResponse(),
+                ["201"] = new OpenApiResponse(),
+            },
+        };
+
+        // Act & Assert - should not throw, and 201 should still be transformed.
+        await _transformer.TransformAsync(operation, null!, CancellationToken.None);
+
+        var createdResponse = (OpenApiResponse)operation.Responses["201"];
+        Assert.IsNotNull(createdResponse.Headers);
+        Assert.IsTrue(createdResponse.Headers.ContainsKey(Constants.Headers.GeneratedResource));
+
+        var defaultResponse = (OpenApiResponse)operation.Responses["default"];
+        Assert.IsNull(defaultResponse.Headers);
+    }
+
+    [Test]
     public async Task TransformAsync_Preserves_Existing_Headers()
     {
         // Arrange

@@ -18,7 +18,15 @@ internal sealed class ResponseHeaderTransformer : IOpenApiOperationTransformer
     {
         foreach ((var key, IOpenApiResponse value) in operation.Responses ?? new OpenApiResponses())
         {
-            switch (int.Parse(key))
+            // Response keys are usually numeric status codes, but OpenAPI also permits "default" and status-class keys
+            // (e.g. "2XX") — see https://spec.openapis.org/oas/v3.1.0#responses-object. Skip anything that isn't a
+            // plain integer given we only customize headers for specific status codes.
+            if (int.TryParse(key, out var statusCode) is false)
+            {
+                continue;
+            }
+
+            switch (statusCode)
             {
                 case StatusCodes.Status201Created:
                     // NOTE: The header order matters to the back-office client. Do not change.
