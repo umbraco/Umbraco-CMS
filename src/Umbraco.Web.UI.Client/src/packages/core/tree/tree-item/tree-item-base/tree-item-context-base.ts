@@ -229,6 +229,12 @@ export abstract class UmbTreeItemContextBase<
 		this.treeContext?.selection.deselect(this.unique);
 	}
 
+	public open() {
+		const item = this.getTreeItem();
+		if (!item) return;
+		this.treeContext?.open(item);
+	}
+
 	public showChildren() {
 		const entityType = this.entityType;
 		const unique = this.unique;

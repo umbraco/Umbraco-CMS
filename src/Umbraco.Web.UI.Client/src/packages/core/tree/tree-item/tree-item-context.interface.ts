@@ -27,6 +27,7 @@ export interface UmbTreeItemContext<TreeItemType extends UmbTreeItemModel = UmbT
 	setTreeItem(treeItem: TreeItemType | undefined): void;
 	select(): void;
 	deselect(): void;
+	open(): void;
 	constructPath(pathname: string, entityType: string, unique: string): string;
 	loadChildren(): void;
 	reloadChildren(): void;

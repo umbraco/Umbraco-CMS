@@ -89,14 +89,26 @@ export abstract class UmbTreeItemElementBase<
 			this.observe(this.#api.isActive, (value) => (this._isActive = value), '_observeIsActive');
 			this.observe(this.#api.isOpen, (value) => (this._isOpen = value), '_observeIsOpen');
 			this.observe(this.#api.isLoading, (value) => (this._isLoading = value), '_observeIsLoading');
-			this.observe(this.#api.isSelectableContext, (value) => (this._isSelectableContext = value), '_observeIsSelectableContext');
+			this.observe(
+				this.#api.isSelectableContext,
+				(value) => (this._isSelectableContext = value),
+				'_observeIsSelectableContext',
+			);
 			this.observe(this.#api.isSelectable, (value) => (this._isSelectable = value), '_observeIsSelectable');
 			this.observe(this.#api.isSelected, (value) => (this._isSelected = value), '_observeIsSelected');
 			this.observe(this.#api.path, (value) => (this._href = value), '_observePath');
 			this.observe(this.#api.pagination.currentPage, (value) => (this._currentPage = value), '_observeCurrentPage');
 			this.observe(this.#api.pagination.totalPages, (value) => (this._totalPages = value), '_observeTotalPages');
-			this.observe(this.#api.isLoadingPrevChildren, (value) => (this._isLoadingPrevChildren = value ?? false), '_observeIsLoadingPrevChildren');
-			this.observe(this.#api.isLoadingNextChildren, (value) => (this._isLoadingNextChildren = value ?? false), '_observeIsLoadingNextChildren');
+			this.observe(
+				this.#api.isLoadingPrevChildren,
+				(value) => (this._isLoadingPrevChildren = value ?? false),
+				'_observeIsLoadingPrevChildren',
+			);
+			this.observe(
+				this.#api.isLoadingNextChildren,
+				(value) => (this._isLoadingNextChildren = value ?? false),
+				'_observeIsLoadingNextChildren',
+			);
 
 			this.observe(
 				this.#api.targetPagination?.totalPrevItems,
@@ -190,6 +202,12 @@ export abstract class UmbTreeItemElementBase<
 	private _handleDeselectedItem(event: Event) {
 		event.stopPropagation();
 		this.#api?.deselect();
+	}
+
+	#handleDblClick(event: MouseEvent) {
+		if (!this._item?.hasChildren) return;
+		event.stopPropagation();
+		this.#api?.open();
 	}
 
 	private _onShowChildren(event: UUIMenuItemEvent) {
@@ -301,7 +319,7 @@ export abstract class UmbTreeItemElementBase<
 	}
 
 	renderLabel() {
-		return html`<slot name="label" slot="label"></slot>`;
+		return html`<span slot="label" @dblclick=${this.#handleDblClick}>${this._label}<slot name="label"></slot></span>`;
 	}
 
 	#renderActions() {
