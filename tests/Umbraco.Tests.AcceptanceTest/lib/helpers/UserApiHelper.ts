@@ -1,7 +1,7 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
 import {UserBuilder} from "../builders";
 import {Page} from "@playwright/test";
-import { ConstantHelper } from "./ConstantHelper";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class UserApiHelper {
   api: ApiHelpers;
