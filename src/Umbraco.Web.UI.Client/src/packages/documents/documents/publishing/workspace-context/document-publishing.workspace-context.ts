@@ -19,6 +19,7 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbMergeContentVariantDataController } from '@umbraco-cms/backoffice/content';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -182,7 +183,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				this.#notificationContext?.peek('positive', notification);
 
 				// reload the document so all states are updated after the publish operation
-				await this.#documentWorkspaceContext.reload();
+				await this.#reloadPreservingUnpublishedDrafts(variantIds);
 				this.#loadAndProcessLastPublished();
 
 				// request reload of this entity
@@ -412,12 +413,44 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			this.#clear();
 
 			// reload the document so all states are updated after the publish operation
-			await this.#documentWorkspaceContext.reload();
+			await this.#reloadPreservingUnpublishedDrafts(variantIds);
 			await this.#loadAndProcessLastPublished();
 
 			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 			this.#eventContext?.dispatchEvent(event);
 		}
+	}
+
+	/**
+	 * Reload the workspace while preserving in-memory drafts for variants the user did
+	 * not select in the publish / schedule modal. Without this, `reload()` replaces
+	 * `current` with the fresh server state for every variant, silently wiping unsaved
+	 * edits in variants outside the publish scope and clearing the dirty state that
+	 * drives the unsaved-changes warning (see #22577).
+	 *
+	 * After this runs:
+	 * - `persisted` = fresh server state (correct baseline for dirty detection).
+	 * - `current` = fresh server state for `variantIds`; pre-reload drafts for every
+	 *   other edited variant.
+	 */
+	async #reloadPreservingUnpublishedDrafts(variantIds: Array<UmbVariantId>): Promise<void> {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+
+		const preReloadCurrent = this.#documentWorkspaceContext.getData();
+
+		await this.#documentWorkspaceContext.reload();
+
+		const postReloadCurrent = this.#documentWorkspaceContext.getData();
+		if (!preReloadCurrent || !postReloadCurrent) return;
+
+		const variantIdsIncludingInvariant = [...variantIds, UmbVariantId.CreateInvariant()];
+		const mergedCurrent = await new UmbMergeContentVariantDataController(this).process(
+			preReloadCurrent,
+			postReloadCurrent,
+			variantIds,
+			variantIdsIncludingInvariant,
+		);
+		this.#documentWorkspaceContext.setData(mergedCurrent);
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
