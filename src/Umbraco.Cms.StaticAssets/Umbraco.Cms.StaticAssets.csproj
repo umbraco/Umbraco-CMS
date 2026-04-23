@@ -52,12 +52,12 @@
 
   <Target Name="RestoreBackoffice" Inputs="$(BackofficeProjectDirectory)package-lock.json" Outputs="$(BackofficeProjectDirectory)node_modules\.package-lock.json">
     <Message Importance="high" Text="Restoring Backoffice NPM packages..." />
-    <Exec Command="REM npm i --no-fund --no-audit" WorkingDirectory="$(BackofficeProjectDirectory)" />
+    <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(BackofficeProjectDirectory)" />
   </Target>
 
   <Target Name="BuildBackoffice" DependsOnTargets="RestoreBackoffice">
     <Message Importance="high" Text="Executing Backoffice NPM build script..." />
-    <Exec Command="REM npm run build:for:cms" WorkingDirectory="$(BackofficeProjectDirectory)" />
+    <Exec Command="npm run build:for:cms" WorkingDirectory="$(BackofficeProjectDirectory)" />
     <ItemGroup>
       <_BackofficeAssetsBuildOutput Include="$(BackofficeAssetsPath)\**" />
     </ItemGroup>
@@ -110,12 +110,12 @@
 
   <Target Name="RestoreLogin" Inputs="$(LoginProjectDirectory)package-lock.json" Outputs="$(LoginProjectDirectory)node_modules/.package-lock.json">
     <Message Importance="high" Text="Restoring Login NPM packages..." />
-    <Exec Command="REM npm i --no-fund --no-audit" WorkingDirectory="$(LoginProjectDirectory)" />
+    <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(LoginProjectDirectory)" />
   </Target>
 
   <Target Name="BuildLogin" DependsOnTargets="RestoreLogin">
     <Message Importance="high" Text="Executing Login NPM build script..." />
-    <Exec Command="REM npm run build" WorkingDirectory="$(LoginProjectDirectory)" />
+    <Exec Command="npm run build" WorkingDirectory="$(LoginProjectDirectory)" />
     <ItemGroup>
       <_LoginAssetsBuildOutput Include="$(LoginAssetsPath)\**" />
     </ItemGroup>

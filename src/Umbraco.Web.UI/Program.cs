@@ -5,14 +5,11 @@ using Umbraco.Cms.Web.UI.Extensions;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.CreateUmbracoBuilder()
-    .AddCore()
-    //.AddBackOfficeSignIn()
     .AddBackOffice()
     .AddWebsite()
 #if UseDeliveryApi
     .AddDeliveryApi()
 #endif
-    .AddDeliveryApi()
     .AddComposers()
     .Build();
 
