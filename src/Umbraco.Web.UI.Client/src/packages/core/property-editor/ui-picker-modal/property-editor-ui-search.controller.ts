@@ -21,12 +21,7 @@ interface SearchableUI {
 }
 
 /**
- * Controller that searches property editor UIs by label, name, keywords and group
- * using substring and fuzzy matching. Precomputes per-UI lowercased strings and
- * tokens once per loaded set, and supports cancellation: a newer call to
- * {@link UmbPropertyEditorUISearchController.search} aborts any in-flight
- * search, and {@link UmbPropertyEditorUISearchController.destroy} aborts any
- * in-flight search.
+ * @internal Not intended for public use. Subject to change without deprecation.
  */
 export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 	#uis: Array<ManifestPropertyEditorUi> = [];
@@ -57,15 +52,16 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 	 */
 	async search(query: string): Promise<Array<ManifestPropertyEditorUi>> {
 		this.#inFlight?.abort();
-		const controller = new AbortController();
-		this.#inFlight = controller;
-		const { signal } = controller;
-
+		this.#inFlight = undefined;
 		const normalizedQuery = query.toLowerCase().trim();
 		if (!normalizedQuery) return [];
 
 		const queryTokens = fuzzyTokenize(normalizedQuery);
 		if (queryTokens.length === 0) return [];
+
+		const controller = new AbortController();
+		this.#inFlight = controller;
+		const { signal } = controller;
 
 		const scored: Array<ScoredUI> = [];
 		for (let i = 0; i < this.#uis.length; i++) {
@@ -80,9 +76,10 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 			}
 		}
 
+		if (signal.aborted) throw this.#abortError();
+
 		scored.sort((a, b) => b.score - a.score || a.ui.name.localeCompare(b.ui.name));
 
-		if (signal.aborted) throw this.#abortError();
 		if (this.#inFlight === controller) {
 			this.#inFlight = undefined;
 		}

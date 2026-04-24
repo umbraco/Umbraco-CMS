@@ -23,7 +23,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 	private _ids?: Array<string>;
 
 	/**
-	 * Optional label of the property being edited. Used to provide AI-powered
+	 * Optional label of the property being edited. Used to surface label-based
 	 * suggestions in the property editor UI picker.
 	 */
 	@property({ type: String })

@@ -34,7 +34,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	public override set data(value: UmbDataTypePickerFlowModalData) {
 		super.data = value;
 		if (value?.suggestionQuery) {
-			void this.#loadSuggestions(value.suggestionQuery);
+			this.#loadSuggestions(value.suggestionQuery).catch(this.#onSearchError);
 		}
 	}
 
@@ -109,7 +109,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				this.#searchController.setPropertyEditorUIs(this.#propertyEditorUIs);
 				this.#suggestionSearchController.setPropertyEditorUIs(this.#propertyEditorUIs);
 
-				void this.#performFiltering();
+				this.#performFiltering().catch(this.#onSearchError);
 			}).asPromise(),
 		]);
 
@@ -223,23 +223,30 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	async #onLoadMore() {
 		this._currentPage = this._currentPage + 1;
-		void this.#handleFiltering();
+		this.#handleFiltering().catch(this.#onSearchError);
 	}
 
 	#onFilterInput(event: UUIInputEvent) {
 		this._isFiltering = true;
-		this.#currentFilterQuery = (event.target.value as string).toLocaleLowerCase();
+		this.#currentFilterQuery = (event.target.value as string).toLowerCase();
 		this.#debouncedFilterInput();
 	}
 
 	#debouncedFilterInput = debounce(() => {
 		this._currentPage = 1;
-		void this.#handleFiltering().catch((error) => {
-			if ((error as DOMException)?.name !== 'AbortError') {
-				console.error(error);
-			}
-		});
+		this.#handleFiltering().catch(this.#onSearchError);
 	}, 250);
+
+	#onSearchError = (error: unknown) => {
+		if ((error as DOMException)?.name !== 'AbortError') {
+			console.error(error);
+		}
+	};
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		this.#debouncedFilterInput.cancel();
+	}
 
 	async #handleFiltering() {
 		await this.#getDataTypes();
