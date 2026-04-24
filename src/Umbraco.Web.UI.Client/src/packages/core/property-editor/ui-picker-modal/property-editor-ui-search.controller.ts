@@ -17,6 +17,7 @@ interface SearchableUI {
 	keywordsLower: Array<string>;
 	groupLower: string;
 	allTokens: Array<string>;
+	allSearchableTokens: Array<string>;
 }
 
 /**
@@ -106,14 +107,16 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 		for (const keyword of keywordsLower) {
 			allTokens.push(...fuzzyTokenize(keyword));
 		}
+		const allSearchableTokens = [...allTokens, ...fuzzyTokenize(groupLower)];
 
-		cached = { labelLower, labelTokens, nameLower, keywordsLower, groupLower, allTokens };
+		cached = { labelLower, labelTokens, nameLower, keywordsLower, groupLower, allTokens, allSearchableTokens };
 		this.#searchable.set(ui, cached);
 		return cached;
 	}
 
 	#scoreUI(ui: ManifestPropertyEditorUi, query: string, queryTokens: Array<string>): number {
-		const { labelLower, labelTokens, nameLower, keywordsLower, groupLower, allTokens } = this.#getSearchable(ui);
+		const { labelLower, labelTokens, nameLower, keywordsLower, groupLower, allTokens, allSearchableTokens } =
+			this.#getSearchable(ui);
 
 		// Label substring match
 		if (labelLower.includes(query)) {
@@ -178,8 +181,7 @@ export class UmbPropertyEditorUISearchController extends UmbControllerBase {
 		}
 
 		// Fuzzy match on all tokens (secondary) — lower score range
-		const allSearchable = [...allTokens, ...fuzzyTokenize(groupLower)];
-		const allFuzzy = fuzzyMatchScore(queryTokens, allSearchable);
+		const allFuzzy = fuzzyMatchScore(queryTokens, allSearchableTokens);
 		if (allFuzzy > 0) {
 			return 1 + Math.floor(allFuzzy * 48);
 		}
