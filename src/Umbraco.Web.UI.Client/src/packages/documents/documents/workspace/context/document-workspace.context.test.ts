@@ -5,13 +5,13 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
-import { UmbDocumentDetailStore } from '../repository/detail/document-detail.store.js';
-import { manifests as documentDetailRepositoryManifests } from '../repository/detail/manifests.js';
-import { UmbDocumentTypeDetailStore } from '../../document-types/repository/detail/document-type-detail.store.js';
-import { UmbDataTypeDetailStore } from '../../../data-type/repository/detail/data-type-detail.store.js';
-import { UmbDataTypeItemStore } from '../../../data-type/repository/item/data-type-item.store.js';
-import { manifests as userPermissionConditionManifests } from '../user-permissions/document/conditions/manifests.js';
-import { manifests as dataTypeItemManifests } from '../../../data-type/repository/item/manifests.js';
+import { UmbDocumentDetailStore } from '../../repository/detail/document-detail.store.js';
+import { manifests as documentDetailRepositoryManifests } from '../../repository/detail/manifests.js';
+import { UmbDocumentTypeDetailStore } from '../../../document-types/repository/detail/document-type-detail.store.js';
+import { UmbDataTypeDetailStore } from '../../../../data-type/repository/detail/data-type-detail.store.js';
+import { UmbDataTypeItemStore } from '../../../../data-type/repository/item/data-type-item.store.js';
+import { manifests as userPermissionConditionManifests } from '../../user-permissions/document/conditions/manifests.js';
+import { manifests as dataTypeItemManifests } from '../../../../data-type/repository/item/manifests.js';
 
 const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';

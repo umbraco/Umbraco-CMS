@@ -1,8 +1,8 @@
-import { UmbDocumentTypeDetailRepository } from '../../document-types/repository/detail/document-type-detail.repository.js';
-import { UmbDocumentPropertyDatasetContext } from '../property-dataset-context/document-property-dataset.context.js';
-import type { UmbDocumentDetailRepository } from '../repository/index.js';
-import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UmbDocumentSegmentRepository } from '../repository/index.js';
-import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../types.js';
+import { UmbDocumentTypeDetailRepository } from '../../../document-types/repository/detail/document-type-detail.repository.js';
+import { UmbDocumentPropertyDatasetContext } from '../../property-dataset-context/document-property-dataset.context.js';
+import type { UmbDocumentDetailRepository } from '../../repository/index.js';
+import { UMB_DOCUMENT_DETAIL_REPOSITORY_ALIAS, UmbDocumentSegmentRepository } from '../../repository/index.js';
+import type { UmbDocumentDetailModel, UmbDocumentVariantModel } from '../../types.js';
 import {
 	UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN,
@@ -13,10 +13,10 @@ import {
 	UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN,
 	UMB_USER_PERMISSION_DOCUMENT_CREATE,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
-} from '../constants.js';
-import { UmbDocumentValidationRepository } from '../repository/validation/index.js';
-import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../index.js';
-import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from './constants.js';
+} from '../../constants.js';
+import { UmbDocumentValidationRepository } from '../../repository/validation/index.js';
+import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../index.js';
+import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
