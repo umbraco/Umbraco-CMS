@@ -18,10 +18,13 @@ public class FriendlyPublishedElementExtensionsTests
     private Mock<IVariationContextAccessor> _variationContextAccessor = null!;
     private Mock<IUserService> _userService = null!;
     private Mock<IPublishedValueFallback> _publishedValueFallback = null!;
+    private IServiceProvider _originalServiceProvider = null!;
 
     [SetUp]
     public void SetUp()
     {
+        _originalServiceProvider = StaticServiceProvider.Instance;
+
         _variationContextAccessor = new Mock<IVariationContextAccessor>(MockBehavior.Strict);
         _userService = new Mock<IUserService>(MockBehavior.Strict);
         _publishedValueFallback = new Mock<IPublishedValueFallback>(MockBehavior.Strict);
@@ -36,7 +39,11 @@ public class FriendlyPublishedElementExtensionsTests
     }
 
     [TearDown]
-    public void TearDown() => FriendlyPublishedElementExtensions.Reset();
+    public void TearDown()
+    {
+        FriendlyPublishedElementExtensions.Reset();
+        StaticServiceProvider.Instance = _originalServiceProvider;
+    }
 
     [Test]
     public void Name_Returns_Invariant_Name()

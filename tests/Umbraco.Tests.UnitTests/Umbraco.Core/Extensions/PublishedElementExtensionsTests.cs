@@ -32,6 +32,14 @@ public class PublishedElementExtensionsTests
     }
 
     [Test]
+    public void HasCulture_Is_Case_Insensitive()
+    {
+        var element = CreateElement(cultureCodes: ["en-US"]);
+
+        Assert.IsTrue(element.Object.HasCulture("EN-us"));
+    }
+
+    [Test]
     public void HasCulture_Null_Checks_Invariant()
     {
         var element = CreateElement(cultureCodes: [string.Empty]);
@@ -325,8 +333,9 @@ public class PublishedElementExtensionsTests
 
         var cultures = cultureCodes?.ToDictionary(
             c => c,
-            c => new PublishedCultureInfo(c, "Name", "name", DateTime.Now))
-            ?? new Dictionary<string, PublishedCultureInfo>();
+            c => new PublishedCultureInfo(c, "Name", "name", DateTime.Now),
+            StringComparer.OrdinalIgnoreCase)
+            ?? new Dictionary<string, PublishedCultureInfo>(StringComparer.OrdinalIgnoreCase);
 
         var element = new Mock<IPublishedElement>(MockBehavior.Strict);
         element.Setup(x => x.ContentType).Returns(contentType.Object);
