@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
 using Umbraco.Cms.Persistence.EFCore.Locking;
+using Umbraco.Cms.Persistence.EFCore.Migrations;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
 
 namespace Umbraco.Extensions;
@@ -178,7 +179,23 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             return;
         }
 
-        builder.UseDatabaseProvider(connectionStrings.ProviderName, connectionStrings.ConnectionString);
+        // Try built-in providers first; if not supported, fall back to registered IMigrationProviderSetup
+        try
+        {
+            builder.UseDatabaseProvider(connectionStrings.ProviderName, connectionStrings.ConnectionString);
+        }
+        catch (InvalidDataException)
+        {
+            IEnumerable<IMigrationProviderSetup> migrationProviders = serviceProvider.GetServices<IMigrationProviderSetup>();
+            IMigrationProviderSetup? migrationProvider = migrationProviders.FirstOrDefault(x => string.Equals(x.ProviderName, connectionStrings.ProviderName, StringComparison.OrdinalIgnoreCase));
+
+            if (migrationProvider is null)
+            {
+                throw;
+            }
+
+            migrationProvider.Setup(builder, connectionStrings.ConnectionString);
+        }
     }
 
     private static void SetupDbContext(Action<IServiceProvider, DbContextOptionsBuilder, string?, string?>? optionsAction, IServiceProvider provider, DbContextOptionsBuilder builder)
