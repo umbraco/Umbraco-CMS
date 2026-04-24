@@ -207,17 +207,19 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 
 	override render() {
 		return html`<div id="path">
-			${repeat(
-				this._paths,
-				(path) => path.unique,
-				(path) =>
-					html`<uui-button
-							compact
-							.label=${path.name}
-							?disabled=${this.currentMedia.unique === path.unique}
-							@click=${() => this.#goToFolder(path)}></uui-button
-						>/`,
-			)}${this.#renderFolderCreation()}
+			<uui-breadcrumbs>
+				${repeat(
+					this._paths,
+					(path) => path.unique,
+					(path) =>
+						html`<uui-breadcrumb-item
+							@click=${this.currentMedia.unique !== path.unique ? () => this.#goToFolder(path) : undefined}
+							?last-item=${this.currentMedia.unique === path.unique}>
+							${path.name}
+						</uui-breadcrumb-item>`,
+				)}
+			</uui-breadcrumbs>
+			${this.#renderFolderCreation()}
 		</div>`;
 	}
 
@@ -228,8 +230,7 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 				label=${this.localize.term('create_enterFolderName')}
 				placeholder=${this.localize.term('create_enterFolderName')}
 				@blur=${this.#addFolder}
-				@keypress=${this.#onKeypress}
-				auto-width></uui-input>`;
+				@keypress=${this.#onKeypress}></uui-input>`;
 		}
 
 		if (this._selectingFolderType) {
@@ -266,20 +267,15 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				margin: 0 var(--uui-size-3);
-			}
-			#path uui-button {
-				font-weight: bold;
-			}
-			#path uui-input {
-				height: 100%;
+				overflow: hidden;
+				min-width: 0;
 			}
 
 			#new-folder {
 				margin-left: var(--uui-size-2);
-			}
-
-			#path uui-button uui-icon {
-				--uui-icon-color: inherit;
+				width: 150px;
+				height: 100%;
+				flex-shrink: 0;
 			}
 
 			#folder-type-selection {
@@ -295,6 +291,16 @@ export class UmbMediaPickerFolderPathElement extends UmbLitElement {
 
 			#folder-type-selection umb-icon {
 				margin-right: var(--uui-size-1);
+			}
+
+			uui-breadcrumbs {
+				overflow: hidden;
+				min-width: 0;
+				flex: 0 1 auto;
+			}
+
+			uui-breadcrumbs uui-breadcrumb-item:not([last-item]) {
+				cursor: pointer;
 			}
 		`,
 	];
