@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Consent can be given or revoked or changed via the <see cref="RegisterConsent" /> method, which
+///         Consent can be given or revoked or changed via the <see cref="RegisterConsentAsync" /> method, which
 ///         creates a new <see cref="IConsent" /> entity to track the consent. Revoking a consent is performed by
 ///         registering a revoked consent.
 ///     </para>
@@ -28,7 +28,7 @@ public interface IConsentService : IService
     /// <param name="state">The state of the consent.</param>
     /// <param name="comment">Additional free text.</param>
     /// <returns>The corresponding consent entity.</returns>
-    IConsent RegisterConsent(string source, string context, string action, ConsentState state, string? comment = null);
+    Task<IConsent> RegisterConsentAsync(string source, string context, string action, ConsentState state, string? comment = null);
 
     /// <summary>
     ///     Retrieves consents.
@@ -41,7 +41,7 @@ public interface IConsentService : IService
     /// <param name="actionStartsWith">Determines whether <paramref name="action" /> is a start pattern.</param>
     /// <param name="includeHistory">Determines whether to include the history of consents.</param>
     /// <returns>Consents matching the parameters.</returns>
-    IEnumerable<IConsent> LookupConsent(
+    Task<IEnumerable<IConsent>> LookupConsentAsync(
         string? source = null,
         string? context = null,
         string? action = null,
