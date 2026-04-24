@@ -15,6 +15,7 @@ export class UmbBlockWorkspaceIsReadOnlyCondition
 			this.observe(
 				context?.readOnlyGuard.isPermittedForObservableVariant(context.variantId),
 				(isReadOnly) => {
+					// Only react to positives or negatives:
 					if (isReadOnly !== undefined) {
 						const match = args.config.match ?? true;
 						this.permitted = isReadOnly === match;
