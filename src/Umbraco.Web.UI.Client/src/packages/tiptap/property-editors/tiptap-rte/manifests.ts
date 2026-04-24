@@ -65,6 +65,13 @@ _Drag and drop the available actions onto the statusbar areas._`,
 						weight: 40,
 					},
 					{
+						alias: 'createModalSize',
+						label: '#blockEditor_labelCreateModalSize',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+						config: [{ alias: 'defaultOptionLabel', value: 'Auto' }],
+						weight: 55,
+					},
+					{
 						alias: 'overlaySize',
 						label: '#rte_config_overlaySize',
 						description: '{#rte_config_overlaySize_description}',

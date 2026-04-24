@@ -37,6 +37,12 @@ const propertyEditorUi: UmbExtensionManifest = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
 				{
+					alias: 'createModalSize',
+					label: '#blockEditor_labelCreateModalSize',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+					config: [{ alias: 'defaultOptionLabel', value: 'Auto' }],
+				},
+				{
 					alias: 'useSingleBlockMode',
 					label: 'Single block mode',
 					description: '_Deprecated: Use the Property Editor "Single Block" instead._',

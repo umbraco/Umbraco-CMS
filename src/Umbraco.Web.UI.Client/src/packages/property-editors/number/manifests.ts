@@ -13,7 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'propertyEditorUi',
 		alias: 'Umb.PropertyEditorUi.Decimal',
 		name: 'Decimal Property Editor UI',
-		element: () => import('./property-editor-ui-number.element.js'),
+		element: () => import('./property-editor-ui-decimal.element.js'),
 		meta: {
 			label: 'Decimal',
 			propertyEditorSchemaAlias: 'Umbraco.Decimal',

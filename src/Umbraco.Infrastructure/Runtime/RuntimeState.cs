@@ -135,6 +135,9 @@ public class RuntimeState : IRuntimeState
     public string? FinalMigrationState { get; private set; }
 
     /// <inheritdoc />
+    public SemVersion? CurrentMigrationVersion { get; private set; }
+
+    /// <inheritdoc />
     public RuntimeLevel Level { get; internal set; } = RuntimeLevel.Unknown;
 
     /// <inheritdoc />
@@ -359,7 +362,8 @@ public class RuntimeState : IRuntimeState
 
     private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string?>? keyValues)
     {
-        var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
+        var plan = new UmbracoPlan(_umbracoVersion);
+        var upgrader = new Upgrader(plan);
         var stateValueKey = upgrader.StateValueKey;
 
         if (keyValues?.TryGetValue(stateValueKey, out var value) ?? false)
@@ -367,11 +371,13 @@ public class RuntimeState : IRuntimeState
             CurrentMigrationState = value;
         }
 
-        FinalMigrationState = upgrader.Plan.FinalState;
-        if (_logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+        FinalMigrationState = plan.FinalState;
+        CurrentMigrationVersion = plan.GetVersionForState(CurrentMigrationState);
+        if (_logger.IsEnabled(LogLevel.Debug))
         {
             _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
         }
+
         return CurrentMigrationState != FinalMigrationState;
     }
 }

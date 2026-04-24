@@ -19,16 +19,30 @@ namespace Umbraco.Cms.Api.Management.Mapping.Permissions;
 /// </remarks>
 public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissionMapper
 {
-    private readonly Lazy<IEntityService> _entityService;
-    private readonly Lazy<IUserService> _userService;
+    private readonly Lazy<IContentPermissionService> _contentPermissionService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentPermissionMapper"/> class.
     /// </summary>
+    /// <param name="entityService">The entity service.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="contentPermissionService">The content permission service.</param>
+    // TODO (V19): Remove the entityService and userService parameters as they are not used in the current implementation.
+    public DocumentPermissionMapper(
+        Lazy<IEntityService> entityService,
+        Lazy<IUserService> userService,
+        Lazy<IContentPermissionService> contentPermissionService) => _contentPermissionService = contentPermissionService;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentPermissionMapper"/> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public DocumentPermissionMapper(Lazy<IEntityService> entityService, Lazy<IUserService> userService)
+        : this(
+            entityService,
+            userService,
+            new Lazy<IContentPermissionService>(StaticServiceProvider.Instance.GetRequiredService<IContentPermissionService>))
     {
-        _entityService = entityService;
-        _userService = userService;
     }
 
     /// <inheritdoc/>
@@ -110,25 +124,18 @@ public class DocumentPermissionMapper : IPermissionPresentationMapper, IPermissi
             .Distinct()
             .ToArray();
 
-        // Batch retrieve all documents by their keys.
-        var documents = _entityService.Value.GetAll<IContent>(documentKeysWithGranularPermissions)
-            .ToDictionary(doc => doc.Key, doc => doc.Path);
+        // Resolve permissions through IContentPermissionService so custom implementations are respected.
+        IEnumerable<NodePermissions> permissions = _contentPermissionService.Value
+            .GetPermissionsAsync(user, documentKeysWithGranularPermissions)
+            .GetAwaiter()
+            .GetResult();
 
-        // Iterate through each document key that has granular permissions.
-        foreach (Guid documentKey in documentKeysWithGranularPermissions)
+        foreach (NodePermissions nodePermission in permissions)
         {
-            // Retrieve the path from the pre-fetched documents.
-            if (!documents.TryGetValue(documentKey, out var path) || string.IsNullOrEmpty(path))
-            {
-                continue;
-            }
-
-            // With the path we can call the same logic as used server-side for authorizing access to resources.
-            EntityPermissionSet permissionsForPath = _userService.Value.GetPermissionsForPath(user, path);
             yield return new DocumentPermissionPresentationModel
             {
-                Document = new ReferenceByIdModel(documentKey),
-                Verbs = permissionsForPath.GetAllPermissions(),
+                Document = new ReferenceByIdModel(nodePermission.NodeKey),
+                Verbs = nodePermission.Permissions,
             };
         }
     }

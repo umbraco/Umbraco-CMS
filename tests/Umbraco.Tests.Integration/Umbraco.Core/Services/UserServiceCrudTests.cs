@@ -83,7 +83,8 @@ internal sealed partial class UserServiceCrudTests : UmbracoIntegrationTestWithC
             GetRequiredService<IOptions<ContentSettings>>(),
             GetRequiredService<IIsoCodeValidator>(),
             GetRequiredService<IUserForgotPasswordSender>(),
-            GetRequiredService<IUserIdKeyResolver>());
+            GetRequiredService<IUserIdKeyResolver>(),
+            GetRequiredService<IBackOfficeUserReader>());
     }
 
 

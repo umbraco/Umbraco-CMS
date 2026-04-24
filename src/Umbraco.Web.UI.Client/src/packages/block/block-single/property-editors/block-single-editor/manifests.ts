@@ -31,6 +31,12 @@ export const manifests: Array<UmbExtensionManifest> = [
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
 					},
 					{
+						alias: 'createModalSize',
+						label: '#blockEditor_labelCreateModalSize',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.OverlaySize',
+						config: [{ alias: 'defaultOptionLabel', value: 'Auto' }],
+					},
+					{
 						alias: 'maxPropertyWidth',
 						label: 'Property editor width',
 						description: 'Optional CSS override, example: 800px or 100%',
