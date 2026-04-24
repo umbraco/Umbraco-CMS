@@ -113,7 +113,8 @@
     <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(LoginProjectDirectory)" />
   </Target>
 
-  <Target Name="BuildLogin" DependsOnTargets="RestoreLogin">
+  <!-- BuildBackoffice must run first: Login depends on Client's dist-cms/ output for types via its file: dep -->
+  <Target Name="BuildLogin" DependsOnTargets="RestoreLogin;BuildBackoffice">
     <Message Importance="high" Text="Executing Login NPM build script..." />
     <Exec Command="npm run build" WorkingDirectory="$(LoginProjectDirectory)" />
     <ItemGroup>

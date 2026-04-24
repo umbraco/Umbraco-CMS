@@ -5,7 +5,31 @@ TypeScript/Lit login SPA for Umbraco CMS backoffice authentication. Provides the
 **Project Type**: TypeScript Library (Vite)
 **Runtime**: Node.js >= 22, npm >= 10.9
 **Output**: ES Module library → `../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login/`
-**Dependencies**: @umbraco-cms/backoffice, Lit, Vite
+**Dependencies**: @umbraco-cms/backoffice (sibling `file:` dep, see below), Lit, Vite
+
+---
+
+## ⚠️ Dependency on Umbraco.Web.UI.Client
+
+This project consumes `@umbraco-cms/backoffice` via a **local `file:` dependency** pointing at the sibling `../Umbraco.Web.UI.Client` project, not the published npm package.
+
+**Rationale**: Login only needs the backoffice for **types at build time** — at runtime, `vite.config.ts` externalises `/^@umbraco-cms/` and the importmap resolves it from the CMS host. Using the sibling keeps the login types in lockstep with the in-repo backoffice version (critical when the backoffice has breaking changes — e.g. a UUI major upgrade — that haven't shipped to npm yet).
+
+### The contract
+
+Before you can `npm run dev`, `npm run build`, or `npm run watch` in this folder:
+
+```bash
+cd ../Umbraco.Web.UI.Client
+npm install
+npm run build:for:cms
+```
+
+Without `dist-cms/` present, `tsc` cannot resolve any `@umbraco-cms/backoffice/*` subpath. A `prebuild` / `predev` / `prewatch` guard (`scripts/ensure-client-built.mjs`) enforces this with a clear error message.
+
+### How this interacts with the .NET build
+
+`Umbraco.Cms.StaticAssets.csproj` runs Client (`BuildBackoffice`) and Login (`BuildLogin`) as MSBuild targets. `BuildLogin` has `BuildBackoffice` in its `DependsOnTargets` to guarantee Client is built first. `dotnet build` therefore handles the ordering automatically — you only need the guard when driving Login standalone via npm.
 
 ---
 

@@ -224,15 +224,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				.filter((dataType) => dataType.name?.toLowerCase().includes(this.#currentFilterQuery))
 				.sort((a, b) => a.name.localeCompare(b.name));
 
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-expect-error
 			const grouped = Object.groupBy(filteredDataTypes, (dataType: UmbDataTypeItemModel) =>
 				fromCamelCase(this.#groupLookup[dataType.propertyEditorUiAlias] ?? 'Uncategorized'),
 			);
 
-			this._groupedDataTypes = Object.keys(grouped)
-				.sort((a, b) => a.localeCompare(b))
-				.map((key) => ({ key, items: grouped[key] }));
+			this._groupedDataTypes = Object.entries(grouped)
+				.sort(([a], [b]) => a.localeCompare(b))
+				.map(([key, items]) => ({ key, items: items ?? [] }));
 		} else {
 			this._groupedDataTypes = [];
 		}
@@ -245,15 +243,13 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 						propertyEditorUI.alias.toLowerCase().includes(this.#currentFilterQuery),
 				);
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-expect-error
 		const grouped = Object.groupBy(filteredUIs, (propertyEditorUi: ManifestPropertyEditorUi) =>
 			fromCamelCase(propertyEditorUi.meta.group ?? 'Uncategorized'),
 		);
 
-		this._groupedPropertyEditorUIs = Object.keys(grouped)
-			.sort((a, b) => a.localeCompare(b))
-			.map((key) => ({ key, items: grouped[key] }));
+		this._groupedPropertyEditorUIs = Object.entries(grouped)
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([key, items]) => ({ key, items: items ?? [] }));
 	}
 
 	override render() {

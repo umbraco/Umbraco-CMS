@@ -3,6 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "predev": "node scripts/ensure-client-built.mjs",
+    "prebuild": "node scripts/ensure-client-built.mjs",
+    "prewatch": "node scripts/ensure-client-built.mjs",
     "dev": "vite",
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
@@ -15,10 +18,10 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.85.2",
-    "@umbraco-cms/backoffice": "^17.3.4",
-    "msw": "^2.12.7",
-    "typescript": "^5.9.3",
-    "vite": "^7.3.2"
+    "@umbraco-cms/backoffice": "file:../Umbraco.Web.UI.Client",
+    "msw": "^2.13.5",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10"
   },
   "msw": {
     "workerDirectory": [

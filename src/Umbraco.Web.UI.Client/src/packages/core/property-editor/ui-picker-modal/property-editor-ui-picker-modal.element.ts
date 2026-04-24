@@ -57,15 +57,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#groupPropertyEditorUIs(items: Array<ManifestPropertyEditorUi>) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-expect-error
 		const grouped = Object.groupBy(items, (propertyEditorUi: ManifestPropertyEditorUi) =>
 			fromCamelCase(propertyEditorUi.meta.group),
 		);
 
-		this._groupedPropertyEditorUIs = Object.keys(grouped)
-			.sort((a, b) => a.localeCompare(b))
-			.map((key) => ({ key, items: grouped[key] }));
+		this._groupedPropertyEditorUIs = Object.entries(grouped)
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([key, items]) => ({ key, items: items ?? [] }));
 	}
 
 	override render() {

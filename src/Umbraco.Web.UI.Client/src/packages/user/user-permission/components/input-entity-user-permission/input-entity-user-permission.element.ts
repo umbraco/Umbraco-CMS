@@ -44,14 +44,14 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 				manifest.forEntityTypes.includes(this.entityType),
 			),
 			(manifests) => {
-				// TODO: groupBy is not known by TS yet
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-expect-error
 				const groupedPermissions = Object.groupBy(
 					manifests,
-					(manifest: ManifestEntityUserPermission) => manifest.meta.group,
-				) as Record<string, Array<ManifestEntityUserPermission>>;
-				this._groupedPermissions = Object.entries(groupedPermissions);
+					(manifest: ManifestEntityUserPermission) => manifest.meta.group ?? 'undefined',
+				);
+				this._groupedPermissions = Object.entries(groupedPermissions).map(([group, entries]) => [
+					group,
+					entries ?? [],
+				]);
 			},
 			'umbUserPermissionManifestsObserver',
 		);
