@@ -234,12 +234,16 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	#debouncedFilterInput = debounce(() => {
 		this._currentPage = 1;
-		this.#handleFiltering();
+		void this.#handleFiltering().catch((error) => {
+			if ((error as DOMException)?.name !== 'AbortError') {
+				console.error(error);
+			}
+		});
 	}, 250);
 
 	async #handleFiltering() {
 		await this.#getDataTypes();
-		this.#performFiltering();
+		await this.#performFiltering();
 	}
 
 	async #performFiltering() {
