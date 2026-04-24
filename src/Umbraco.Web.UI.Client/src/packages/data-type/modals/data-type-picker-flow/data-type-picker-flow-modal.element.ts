@@ -34,7 +34,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 	public override set data(value: UmbDataTypePickerFlowModalData) {
 		super.data = value;
 		if (value?.suggestionQuery) {
-			this.#loadSuggestions(value.suggestionQuery);
+			void this.#loadSuggestions(value.suggestionQuery);
 		}
 	}
 
@@ -109,7 +109,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 				this.#searchController.setPropertyEditorUIs(this.#propertyEditorUIs);
 				this.#suggestionSearchController.setPropertyEditorUIs(this.#propertyEditorUIs);
 
-				this.#performFiltering();
+				void this.#performFiltering();
 			}).asPromise(),
 		]);
 
@@ -223,7 +223,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 
 	async #onLoadMore() {
 		this._currentPage = this._currentPage + 1;
-		this.#handleFiltering();
+		void this.#handleFiltering();
 	}
 
 	#onFilterInput(event: UUIInputEvent) {
