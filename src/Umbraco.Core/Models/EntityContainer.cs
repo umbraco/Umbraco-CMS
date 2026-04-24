@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models;
@@ -7,7 +8,7 @@ namespace Umbraco.Cms.Core.Models;
 /// </summary>
 public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
 {
-    private static readonly Dictionary<Guid, Guid> ObjectTypeMap = new()
+    private static readonly FrozenDictionary<Guid, Guid> _objectTypeMap = new Dictionary<Guid, Guid>
     {
         { Constants.ObjectTypes.DataType, Constants.ObjectTypes.DataTypeContainer },
         { Constants.ObjectTypes.DocumentBlueprint, Constants.ObjectTypes.DocumentBlueprintContainer },
@@ -15,14 +16,14 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
         { Constants.ObjectTypes.MediaType, Constants.ObjectTypes.MediaTypeContainer },
         { Constants.ObjectTypes.MemberType, Constants.ObjectTypes.MemberTypeContainer },
         { Constants.ObjectTypes.Element, Constants.ObjectTypes.ElementContainer },
-    };
+    }.ToFrozenDictionary();
 
     /// <summary>
     ///     Initializes a new instance of an <see cref="EntityContainer" /> class.
     /// </summary>
     public EntityContainer(Guid containedObjectType)
     {
-        if (ObjectTypeMap.ContainsKey(containedObjectType) == false)
+        if (_objectTypeMap.ContainsKey(containedObjectType) == false)
         {
             throw new ArgumentException("Not a contained object type.", nameof(containedObjectType));
         }
@@ -59,7 +60,7 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
     /// <summary>
     ///     Gets the node object type of the container objects.
     /// </summary>
-    public Guid ContainerObjectType => ObjectTypeMap[ContainedObjectType];
+    public Guid ContainerObjectType => _objectTypeMap[ContainedObjectType];
 
     /// <summary>
     ///     Gets the container object type corresponding to a contained object type.
@@ -68,7 +69,7 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
     /// <returns>The object type of containers containing objects of the contained object type.</returns>
     public static Guid GetContainerObjectType(Guid containedObjectType)
     {
-        if (ObjectTypeMap.TryGetValue(containedObjectType, out Guid containerObjectType) == false)
+        if (_objectTypeMap.TryGetValue(containedObjectType, out Guid containerObjectType) == false)
         {
             throw new ArgumentException("Not a contained object type.", nameof(containedObjectType));
         }
@@ -83,7 +84,7 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
     /// <returns>The object type of objects that containers of the container object type can contain.</returns>
     public static Guid GetContainedObjectType(Guid containerObjectType)
     {
-        Guid contained = ObjectTypeMap.FirstOrDefault(x => x.Value == containerObjectType).Key;
+        Guid contained = _objectTypeMap.FirstOrDefault(x => x.Value == containerObjectType).Key;
         if (contained == default)
         {
             throw new ArgumentException("Not a container object type.", nameof(containerObjectType));

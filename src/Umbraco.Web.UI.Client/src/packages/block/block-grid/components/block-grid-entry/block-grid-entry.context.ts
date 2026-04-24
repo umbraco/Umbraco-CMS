@@ -20,7 +20,6 @@ import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -60,8 +59,6 @@ export class UmbBlockGridEntryContext
 	public getRelevantColumnSpanOptions() {
 		return this.#relevantColumnSpanOptions.getValue();
 	}
-
-	#localize = new UmbLocalizationController(this);
 
 	#canScale = new UmbBooleanState(false);
 	readonly canScale = this.#canScale.asObservable();
@@ -310,8 +307,9 @@ export class UmbBlockGridEntryContext
 			throw new Error('No clipboard context found');
 		}
 
-		const workspaceName = this.#localize.string(propertyDatasetContext?.getName());
-		const propertyLabel = this.#localize.string(propertyContext?.getLabel());
+		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
+		const propertyLabel = this.localize.string(propertyContext?.getLabel());
+
 		const blockLabel = this.getName();
 
 		const entryName = workspaceName
