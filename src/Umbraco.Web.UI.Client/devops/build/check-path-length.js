@@ -56,12 +56,7 @@ function checkPathLength(dir) {
 		const filePath = join(dir, file);
 		const isDirectory = statSync(filePath).isDirectory();
 
-		// Only check file paths against the limit — directories on their own
-		// don't violate Windows MAX_PATH; only actual files do. Also skip
-		// TypeScript declarations and tsbuildinfo, which live in dist-cms for
-		// sibling-project type consumption and are filtered out of the copy
-		// to wwwroot/umbraco/backoffice by copy-to-cms.js.
-		if (!isDirectory && !EXCLUDE_FROM_CHECK.test(filePath) && filePath.length > MAX_PATH_LENGTH) {
+		if (exceedsPathLimit(filePath, isDirectory)) {
 			hasError = true;
 
 			if (IS_AZURE_PIPELINES) {
@@ -92,4 +87,19 @@ function checkPathLength(dir) {
  */
 function mapFileToSourcePath(file) {
 	return file.replace(PROJECT_DIR, 'src').replace('.js', '.ts');
+}
+
+/**
+ * Whether a filesystem entry should be flagged as violating the Windows
+ * MAX_PATH guard. Directories don't violate MAX_PATH on their own, and
+ * TypeScript declarations / tsbuildinfo never ship to a CMS install, so
+ * neither counts toward the limit.
+ * @param {string} filePath
+ * @param {boolean} isDirectory
+ * @returns {boolean}
+ */
+function exceedsPathLimit(filePath, isDirectory) {
+	if (isDirectory) return false;
+	if (EXCLUDE_FROM_CHECK.test(filePath)) return false;
+	return filePath.length > MAX_PATH_LENGTH;
 }
