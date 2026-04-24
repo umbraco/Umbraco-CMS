@@ -251,7 +251,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	#renderToolbar() {
-		if (!this.#hasToolbar) return;
+		if (!this.#hasToolbar || this.readonly) return;
 		return html`
 			<umb-tiptap-toolbar
 				data-mark="tiptap-toolbar"
