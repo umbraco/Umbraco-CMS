@@ -1,3 +1,4 @@
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import { UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
@@ -5,29 +6,31 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 const IDENTIFIER_PREFIX = 'UMB_LANGUAGE_PERMISSION_';
 
-export class UmbBlockLanguageAccessWorkspaceCtrl extends UmbControllerBase {
+export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase {
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#variantId?: UmbVariantId;
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
 
-	constructor(host: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE) {
+	constructor(host: UmbControllerHost) {
 		super(host);
 
-		this.#workspaceContext = host;
+		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (instance) => {
+			this.#workspaceContext = instance;
 
-		this.#workspaceContext?.readOnlyGuard.fallbackToPermitted();
-		this.#workspaceContext?.content.readOnlyGuard.fallbackToPermitted();
-		this.#workspaceContext?.settings.readOnlyGuard.fallbackToPermitted();
+			this.#workspaceContext?.readOnlyGuard.fallbackToPermitted();
+			this.#workspaceContext?.content.readOnlyGuard.fallbackToPermitted();
+			this.#workspaceContext?.settings.readOnlyGuard.fallbackToPermitted();
 
-		this.observe(
-			host?.variantId,
-			(variantId) => {
-				this.#variantId = variantId;
-				this.#checkForLanguageAccess();
-			},
-			'observeBlockVariantId',
-		);
+			this.observe(
+				instance?.variantId,
+				(variantId) => {
+					this.#variantId = variantId;
+					this.#checkForLanguageAccess();
+				},
+				'observeBlockVariantId',
+			);
+		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
 			this.observe(
@@ -87,4 +90,4 @@ export class UmbBlockLanguageAccessWorkspaceCtrl extends UmbControllerBase {
 	}
 }
 
-export { UmbBlockLanguageAccessWorkspaceCtrl as api };
+export { UmbBlockLanguageAccessWorkspaceController as api };
