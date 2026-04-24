@@ -1205,8 +1205,8 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         var documentKey = new Guid(PageWithNoAliasKey);
         var duplicates = new List<PublishedDocumentUrlAlias>
         {
-            new() { DocumentKey = documentKey, NullableLanguageId = null, Alias = "dup-test" },
-            new() { DocumentKey = documentKey, NullableLanguageId = null, Alias = "dup-test" },
+            new() { DocumentKey = documentKey, LanguageId = null, Alias = "dup-test" },
+            new() { DocumentKey = documentKey, LanguageId = null, Alias = "dup-test" },
         };
 
         using (ICoreScope scope = CoreScopeProvider.CreateCoreScope())
