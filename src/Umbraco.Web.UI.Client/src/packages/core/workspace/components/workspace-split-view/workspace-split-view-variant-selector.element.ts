@@ -517,7 +517,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 		return html`
 			<div class="variant segment-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
-				${notCreated || variantId.segment !== null ? nothing : html`<div class="expand-area"></div>`}
 				<button
 					class="switch-button ${notCreated ? 'add-mode' : ''} ${this.#isReadOnlyCulture(variantId.culture)
 						? 'readonly-mode'
