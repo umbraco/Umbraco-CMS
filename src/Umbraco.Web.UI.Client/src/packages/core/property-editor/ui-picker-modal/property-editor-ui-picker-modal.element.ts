@@ -53,7 +53,13 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		this.#debouncedFilter();
 	}
 
-	#debouncedFilter = debounce(() => this.#performFiltering(), 250);
+	#debouncedFilter = debounce(() => {
+		void this.#performFiltering().catch((error) => {
+			if ((error as DOMException)?.name !== 'AbortError') {
+				console.error(error);
+			}
+		});
+	}, 250);
 
 	async #performFiltering() {
 		const query = this.#currentFilterQuery.trim();
