@@ -16,7 +16,6 @@ function findRule(rule: UmbVariantGuardRule, variantId: UmbVariantId) {
 	return rule.variantId?.compare(variantId) || rule.variantId === undefined;
 }
 
-// TODO: Check the need for this one.
 /**
  * Read only guard manager for variant rules.
  * @export
@@ -31,9 +30,15 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	isPermittedForVariant(variantId: UmbVariantId): Observable<boolean> {
-		return this._rules.asObservablePart((states) => {
-			return this.#resolvePermission(states, variantId);
-		});
+		return mergeObservables(
+			[
+				this._rules.asObservablePart((rules) => {
+					return this.#resolvePermission(rules, variantId);
+				}),
+				this._fallback,
+			],
+			([permitted, fallback]) => permitted ?? fallback,
+		);
 	}
 
 	/**
@@ -42,11 +47,28 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	isPermittedForObservableVariant(variantId: Observable<UmbVariantId | undefined>): Observable<boolean | undefined> {
-		return mergeObservables([this.rules, variantId], ([states, variantId]) => {
+		return mergeObservables([this.rules, variantId, this._fallback], ([states, variantId, fallback]) => {
 			if (!variantId) {
 				return undefined;
 			}
-			return this.#resolvePermission(states, variantId);
+			return this.#resolvePermission(states, variantId) ?? fallback;
+		});
+	}
+
+	/**
+	 * Observe the permission for multiple given variantIds
+	 * @param {Observable<UmbVariantId[]>} variantIds - Observable emitting the variantIds to evaluate
+	 * @returns {Observable<{ variantId: UmbVariantId; permitted: boolean }[]>} - Observable that emits an array of objects with a permitted boolean and the variantId
+	 * @memberof UmbReadOnlyVariantGuardManager
+	 */
+	isPermittedForObservableVariants(
+		variantIds: Observable<UmbVariantId[]>,
+	): Observable<{ variantId: UmbVariantId; permitted: boolean }[]> {
+		return mergeObservables([this.rules, variantIds, this._fallback], ([states, variantIds, fallback]) => {
+			if (!variantIds || variantIds.length === 0) {
+				return [];
+			}
+			return variantIds.map((id) => ({ variantId: id, permitted: this.#resolvePermission(states, id) ?? fallback }));
 		});
 	}
 
@@ -57,16 +79,16 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	getIsPermittedForVariant(variantId: UmbVariantId): boolean {
-		return this.#resolvePermission(this.getRules(), variantId);
+		return this.#resolvePermission(this.getRules(), variantId) ?? this._getFallback();
 	}
 
-	#resolvePermission(rules: UmbVariantGuardRule[], variantId: UmbVariantId) {
+	#resolvePermission(rules: UmbVariantGuardRule[], variantId: UmbVariantId): boolean | undefined {
 		if (rules.filter((x) => x.permitted === false).some((rule) => findRule(rule, variantId))) {
 			return false;
 		}
 		if (rules.filter((x) => x.permitted === true).some((rule) => findRule(rule, variantId))) {
 			return true;
 		}
-		return this._fallback;
+		return undefined;
 	}
 }
