@@ -31,6 +31,11 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		this.#usePropertyEditorUIs();
 	}
 
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#debouncedFilter.cancel();
+	}
+
 	#usePropertyEditorUIs() {
 		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
 			// Only include Property Editor UIs which has Property Editor Schema Alias
