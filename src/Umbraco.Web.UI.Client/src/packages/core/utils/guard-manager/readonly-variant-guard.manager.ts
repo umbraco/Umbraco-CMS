@@ -47,11 +47,11 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	isPermittedForObservableVariant(variantId: Observable<UmbVariantId | undefined>): Observable<boolean | undefined> {
-		return mergeObservables([this.rules, variantId, this._fallback], ([states, variantId, fallback]) => {
+		return mergeObservables([this.rules, variantId, this._fallback], ([rules, variantId, fallback]) => {
 			if (!variantId) {
 				return undefined;
 			}
-			return this.#resolvePermission(states, variantId) ?? fallback;
+			return this.#resolvePermission(rules, variantId) ?? fallback;
 		});
 	}
 
@@ -64,11 +64,11 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	isPermittedForObservableVariants(
 		variantIds: Observable<UmbVariantId[]>,
 	): Observable<{ variantId: UmbVariantId; permitted: boolean }[]> {
-		return mergeObservables([this.rules, variantIds, this._fallback], ([states, variantIds, fallback]) => {
+		return mergeObservables([this.rules, variantIds, this._fallback], ([rules, variantIds, fallback]) => {
 			if (!variantIds || variantIds.length === 0) {
 				return [];
 			}
-			return variantIds.map((id) => ({ variantId: id, permitted: this.#resolvePermission(states, id) ?? fallback }));
+			return variantIds.map((id) => ({ variantId: id, permitted: this.#resolvePermission(rules, id) ?? fallback }));
 		});
 	}
 
