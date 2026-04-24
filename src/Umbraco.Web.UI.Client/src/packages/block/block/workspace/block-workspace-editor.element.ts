@@ -20,9 +20,7 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 			this.observe(
 				context?.readOnlyGuard.isPermittedForObservableVariant(context.variantId),
 				(isReadOnly) => {
-					if (isReadOnly) {
-						this._readOnly = isReadOnly;
-					}
+					this._readOnly = isReadOnly;
 				},
 				'observeIsReadOnly',
 			);
