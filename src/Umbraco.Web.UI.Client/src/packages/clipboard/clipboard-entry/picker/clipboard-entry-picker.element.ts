@@ -156,7 +156,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 	override render() {
 		return html`
 			<div style="margin-bottom:20px; text-align: right;">
-				<span slot="header-actions">
+				<span>
 					${when(
 						this._items.length > 0,
 						() => html`
@@ -190,13 +190,14 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 		return html`
 			<umb-figure-card
 				name=${label}
+				label=${label}
 				selectable
 				?selected=${this.selection.includes(item.unique)}
-				?select-only=${this.selection.length == 0 ? false : true}
+				?select-only=${this.selection.length > 0}
 				@selected=${() => this.#selectionManager.select(item.unique)}
 				@deselected=${() => this.#selectionManager.deselect(item.unique)}
 				@open=${() => this.#onOpen(item)}>
-				${this.selection.length == 0 ? this.#renderItemActions(item) : nothing}
+				${this.selection.length === 0 ? this.#renderItemActions(item) : nothing}
 				${item.thumbnail ? this.#renderItemThumbnail(item) : this.#renderItemIcon(item)}
 			</umb-figure-card>
 		`;
@@ -239,10 +240,6 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 
 	static override styles = [
 		css`
-			:host {
-				--uui-menu-item-flat-structure: 1;
-			}
-
 			.blockGroup {
 				display: grid;
 				gap: 1rem;

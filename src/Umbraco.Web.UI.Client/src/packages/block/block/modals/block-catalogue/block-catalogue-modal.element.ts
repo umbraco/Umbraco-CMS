@@ -181,7 +181,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		const selected = event.unique;
 		this.value = {
 			clipboard: {
-				selection: selected ? [selected] : [],
+				selection: [selected],
 			},
 		};
 		this.modalContext?.submit();
@@ -193,7 +193,9 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 				${this.#renderViews()}${this.#renderMain()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
-					${this.value?.clipboard?.selection && this.value?.clipboard?.selection?.length > 0
+					${this.value?.clipboard?.selection &&
+					this.value?.clipboard?.selection?.length > 0 &&
+					this._openClipboard === true
 						? html`<uui-button
 								label=${this.localize.term('general_submit')}
 								look="primary"
