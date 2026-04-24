@@ -9,12 +9,18 @@ import { UmbDocumentDetailStore } from '../repository/detail/document-detail.sto
 import { manifests as documentDetailRepositoryManifests } from '../repository/detail/manifests.js';
 import { UmbDocumentTypeDetailStore } from '../../document-types/repository/detail/document-type-detail.store.js';
 import { UmbDataTypeDetailStore } from '../../../data-type/repository/detail/data-type-detail.store.js';
+import { UmbDataTypeItemStore } from '../../../data-type/repository/item/data-type-item.store.js';
 import { manifests as userPermissionConditionManifests } from '../user-permissions/document/conditions/manifests.js';
+import { manifests as dataTypeItemManifests } from '../../../data-type/repository/item/manifests.js';
 
 const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
 
-const TEST_MANIFESTS = [...documentDetailRepositoryManifests, ...userPermissionConditionManifests];
+const TEST_MANIFESTS = [
+	...documentDetailRepositoryManifests,
+	...userPermissionConditionManifests,
+	...dataTypeItemManifests,
+];
 
 @customElement('umb-test-document-workspace-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
@@ -23,6 +29,7 @@ class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLEle
 		new UmbDocumentDetailStore(this);
 		new UmbDocumentTypeDetailStore(this);
 		new UmbDataTypeDetailStore(this);
+		new UmbDataTypeItemStore(this);
 	}
 }
 
@@ -86,6 +93,205 @@ describe('UmbDocumentWorkspaceContext', () => {
 			it('returns undefined for an unknown alias', () => {
 				expect(context.getPropertyValue('nonExistent')).to.be.undefined;
 			});
+		});
+	});
+
+	describe('setPropertyValue', () => {
+		describe('invariant document', () => {
+			beforeEach(async () => {
+				await context.load(INVARIANT_DOCUMENT_ID);
+			});
+
+			it('updates the invariant property value', async () => {
+				await context.setPropertyValue('text', 'Updated text value');
+				expect(context.getPropertyValue('text')).to.equal('Updated text value');
+			});
+
+			it('throws for an unknown property alias', async () => {
+				let error: Error | undefined;
+				try {
+					await context.setPropertyValue('nonExistent', 'some value');
+				} catch (e) {
+					error = e as Error;
+				}
+				expect(error?.message).to.equal('Property alias "nonExistent" not found.');
+			});
+		});
+
+		describe('variant document', () => {
+			beforeEach(async () => {
+				await context.load(VARIANT_DOCUMENT_ID);
+			});
+
+			it('updates the en-US variant property value', async () => {
+				const variantId = UmbVariantId.Create({ culture: 'en-US', segment: null });
+				await context.setPropertyValue('variantText', 'Updated en-US text', variantId);
+				expect(context.getPropertyValue('variantText', variantId)).to.equal('Updated en-US text');
+			});
+
+			it('does not affect other culture variants when updating one', async () => {
+				const enUs = UmbVariantId.Create({ culture: 'en-US', segment: null });
+				const da = UmbVariantId.Create({ culture: 'da', segment: null });
+				await context.setPropertyValue('variantText', 'Updated en-US text', enUs);
+				expect(context.getPropertyValue('variantText', da)).to.equal('Dette er den danske varianttekst.');
+			});
+
+			it('updates the invariant property value without a variantId', async () => {
+				await context.setPropertyValue('text', 'Updated shared text');
+				expect(context.getPropertyValue('text')).to.equal('Updated shared text');
+			});
+		});
+	});
+
+	describe('getValues', () => {
+		it('returns undefined when no data is loaded', () => {
+			expect(context.getValues()).to.be.undefined;
+		});
+
+		it('returns all values after loading an invariant document', async () => {
+			await context.load(INVARIANT_DOCUMENT_ID);
+			const values = context.getValues();
+			expect(values).to.be.an('array').with.lengthOf(1);
+			expect(values![0].alias).to.equal('text');
+		});
+
+		it('returns all values across all variants after loading a variant document', async () => {
+			await context.load(VARIANT_DOCUMENT_ID);
+			const values = context.getValues();
+			expect(values).to.be.an('array').with.lengthOf(3);
+		});
+
+		it('reflects updates after setPropertyValue', async () => {
+			await context.load(INVARIANT_DOCUMENT_ID);
+			await context.setPropertyValue('text', 'Updated');
+			const values = context.getValues();
+			expect(values?.find((v) => v.alias === 'text')?.value).to.equal('Updated');
+		});
+	});
+
+	describe('values observable', () => {
+		it('emits the values array on subscribe after load', async () => {
+			await context.load(INVARIANT_DOCUMENT_ID);
+			let emitted: unknown;
+			const sub = context.values.subscribe((v) => (emitted = v));
+			expect(emitted).to.be.an('array').with.lengthOf(1);
+			sub.unsubscribe();
+		});
+
+		it('emits updated values after setPropertyValue', async () => {
+			await context.load(INVARIANT_DOCUMENT_ID);
+			const emissions: unknown[] = [];
+			const sub = context.values.subscribe((v) => emissions.push(v));
+
+			await context.setPropertyValue('text', 'Changed value');
+
+			const last = emissions.at(-1) as Array<{ alias: string; value: unknown }>;
+			expect(last?.find((v) => v.alias === 'text')?.value).to.equal('Changed value');
+			sub.unsubscribe();
+		});
+	});
+
+	describe('propertyValueByAlias', () => {
+		describe('invariant document', () => {
+			beforeEach(async () => {
+				await context.load(INVARIANT_DOCUMENT_ID);
+			});
+
+			it('returns an observable that emits the current value', async () => {
+				const obs = await context.propertyValueByAlias<string>('text');
+				let emitted: string | undefined;
+				const sub = obs!.subscribe((v) => (emitted = v));
+				expect(emitted).to.equal('This is the invariant text value.');
+				sub.unsubscribe();
+			});
+
+			it('returns an observable that emits undefined for an unknown alias', async () => {
+				const obs = await context.propertyValueByAlias<string>('nonExistent');
+				let emitted: string | undefined = 'sentinel';
+				const sub = obs!.subscribe((v) => (emitted = v));
+				expect(emitted).to.be.undefined;
+				sub.unsubscribe();
+			});
+
+			it('emits updated value after setPropertyValue', async () => {
+				const obs = await context.propertyValueByAlias<string>('text');
+				const emissions: Array<string | undefined> = [];
+				const sub = obs!.subscribe((v) => emissions.push(v));
+
+				await context.setPropertyValue('text', 'Live update');
+
+				expect(emissions.at(-1)).to.equal('Live update');
+				sub.unsubscribe();
+			});
+		});
+
+		describe('variant document', () => {
+			beforeEach(async () => {
+				await context.load(VARIANT_DOCUMENT_ID);
+			});
+
+			it('returns an observable filtered by variantId', async () => {
+				const variantId = UmbVariantId.Create({ culture: 'en-US', segment: null });
+				const obs = await context.propertyValueByAlias<string>('variantText', variantId);
+				let emitted: string | undefined;
+				const sub = obs!.subscribe((v) => (emitted = v));
+				expect(emitted).to.equal('This is the English variant text.');
+				sub.unsubscribe();
+			});
+		});
+	});
+
+	describe('initiatePropertyValueChange / finishPropertyValueChange', () => {
+		beforeEach(async () => {
+			await context.load(INVARIANT_DOCUMENT_ID);
+		});
+
+		it('suppresses values emissions while changes are initiated', async () => {
+			const emissions: unknown[] = [];
+			const sub = context.values.subscribe((v) => emissions.push(v));
+			const countAtStart = emissions.length;
+
+			context.initiatePropertyValueChange();
+			await context.setPropertyValue('text', 'Batched value');
+
+			expect(emissions.length).to.equal(countAtStart);
+
+			context.finishPropertyValueChange();
+			sub.unsubscribe();
+		});
+
+		it('emits once after finishPropertyValueChange', async () => {
+			const emissions: unknown[] = [];
+			const sub = context.values.subscribe((v) => emissions.push(v));
+			const countAtStart = emissions.length;
+
+			context.initiatePropertyValueChange();
+			await context.setPropertyValue('text', 'Value 1');
+			await context.setPropertyValue('text', 'Value 2');
+			context.finishPropertyValueChange();
+
+			expect(emissions.length).to.equal(countAtStart + 1);
+
+			const last = emissions.at(-1) as Array<{ alias: string; value: unknown }>;
+			expect(last?.find((v) => v.alias === 'text')?.value).to.equal('Value 2');
+			sub.unsubscribe();
+		});
+
+		it('supports nested initiate/finish pairs', async () => {
+			const emissions: unknown[] = [];
+			const sub = context.values.subscribe((v) => emissions.push(v));
+			const countAtStart = emissions.length;
+
+			context.initiatePropertyValueChange();
+			context.initiatePropertyValueChange();
+			await context.setPropertyValue('text', 'Nested value');
+
+			context.finishPropertyValueChange();
+			expect(emissions.length).to.equal(countAtStart); // still locked
+
+			context.finishPropertyValueChange();
+			expect(emissions.length).to.equal(countAtStart + 1); // now emits
+			sub.unsubscribe();
 		});
 	});
 });
