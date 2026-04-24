@@ -1,12 +1,15 @@
 import { UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
-import { customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMemberTypeStructureRepository } from '@umbraco-cms/backoffice/member-type';
-import { UmbPopoverScrollElement } from '@umbraco-cms/backoffice/collection';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMemberTypeModel } from '@umbraco-cms/backoffice/member-type';
 
 @customElement('umb-create-member-collection-action')
-export class UmbCreateMemberCollectionActionElement extends UmbPopoverScrollElement {
+export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
+	@state()
+	private _popoverOpen = false;
+
 	@state()
 	private _allowedMemberTypes: Array<UmbAllowedMemberTypeModel> = [];
 
@@ -14,6 +17,13 @@ export class UmbCreateMemberCollectionActionElement extends UmbPopoverScrollElem
 	manifest?: ManifestCollectionAction;
 
 	#memberTypeStructureRepository = new UmbMemberTypeStructureRepository(this);
+
+	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	#onPopoverToggle = (event: ToggleEvent): void => {
+		this._popoverOpen = event.newState === 'open';
+	};
 
 	override async firstUpdated() {
 		this.#retrieveAllowedMemberTypes();
@@ -65,12 +75,12 @@ export class UmbCreateMemberCollectionActionElement extends UmbPopoverScrollElem
 		return html`
 			<uui-button popovertarget="collection-action-menu-popover" label=${label} color="default" look="outline">
 				${label}
-				<uui-symbol-expand .open=${this.popoverOpen}></uui-symbol-expand>
+				<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
 			</uui-button>
 			<uui-popover-container
 				id="collection-action-menu-popover"
 				placement="bottom-start"
-				@toggle=${this._onPopoverToggle}>
+				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
 						${repeat(
@@ -87,6 +97,15 @@ export class UmbCreateMemberCollectionActionElement extends UmbPopoverScrollElem
 			</uui-popover-container>
 		`;
 	}
+
+	static override styles = [
+		css`
+			uui-scroll-container {
+				max-height: var(--uui-popover-container-available-height, 70vh);
+				overflow-y: auto;
+			}
+		`,
+	];
 }
 
 export default UmbCreateMemberCollectionActionElement;

@@ -1,15 +1,18 @@
-import { customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
-import { UmbPopoverScrollElement } from '../popover-scroll.element.js';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
 import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 type ManifestType = ManifestEntityCreateOptionAction;
 
 @customElement('umb-collection-create-action-button')
-export class UmbCollectionCreateActionButtonElement extends UmbPopoverScrollElement {
+export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
+	@state()
+	private _popoverOpen = false;
+
 	@state()
 	private _multipleOptions = false;
 
@@ -22,6 +25,12 @@ export class UmbCollectionCreateActionButtonElement extends UmbPopoverScrollElem
 	#createLabel = this.localize.term('general_create');
 	#entityContext?: typeof UMB_ENTITY_CONTEXT.TYPE;
 
+	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	#onPopoverToggle = (event: ToggleEvent): void => {
+		this._popoverOpen = event.newState === 'open';
+	};
 
 	async #onClick(event: Event, controller: UmbExtensionApiInitializer<ManifestType>, href?: string) {
 		// skip if href is defined
@@ -103,7 +112,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbPopoverScrollElem
 				color="default"
 				look="outline">
 				${this.#createLabel}
-				<uui-symbol-expand .open=${this.popoverOpen}></uui-symbol-expand>
+				<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
 			</uui-button>
 			${this.#renderDropdown()}
 		`;
@@ -114,7 +123,7 @@ export class UmbCollectionCreateActionButtonElement extends UmbPopoverScrollElem
 			<uui-popover-container
 				id="collection-action-menu-popover"
 				placement="bottom-start"
-				@toggle=${this._onPopoverToggle}>
+				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
 						${this._apiControllers.map((controller, index) => this.#renderMenuItem(controller, index))}
@@ -141,6 +150,15 @@ export class UmbCollectionCreateActionButtonElement extends UmbPopoverScrollElem
 			</uui-menu-item>
 		`;
 	}
+
+	static override styles = [
+		css`
+			uui-scroll-container {
+				max-height: var(--uui-popover-container-available-height, 70vh);
+				overflow-y: auto;
+			}
+		`,
+	];
 }
 
 export { UmbCollectionCreateActionButtonElement as element };

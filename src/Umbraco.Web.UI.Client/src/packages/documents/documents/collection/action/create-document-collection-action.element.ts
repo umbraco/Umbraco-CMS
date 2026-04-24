@@ -2,17 +2,20 @@ import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import { UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_DOCUMENT_CREATE_OPTIONS_MODAL } from '../../entity-actions/create/constants.js';
-import { customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbDocumentTypeStructureRepository } from '@umbraco-cms/backoffice/document-type';
 import { UmbDocumentBlueprintItemRepository } from '@umbraco-cms/backoffice/document-blueprint';
-import { UmbPopoverScrollElement } from '@umbraco-cms/backoffice/collection';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedDocumentTypeModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-create-document-collection-action')
-export class UmbCreateDocumentCollectionActionElement extends UmbPopoverScrollElement {
+export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
+	@state()
+	private _popoverOpen = false;
+
 	@state()
 	private _allowedDocumentTypes: Array<UmbAllowedDocumentTypeModel> = [];
 
@@ -27,6 +30,13 @@ export class UmbCreateDocumentCollectionActionElement extends UmbPopoverScrollEl
 
 	#documentTypeStructureRepository = new UmbDocumentTypeStructureRepository(this);
 	#documentBlueprintItemRepository = new UmbDocumentBlueprintItemRepository(this);
+
+	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	#onPopoverToggle = (event: ToggleEvent): void => {
+		this._popoverOpen = event.newState === 'open';
+	};
 
 	constructor() {
 		super();
@@ -116,7 +126,6 @@ export class UmbCreateDocumentCollectionActionElement extends UmbPopoverScrollEl
 	}
 
 	#renderCreateButton() {
-
 		const item = this._allowedDocumentTypes[0];
 		// TODO: Stop appending values to labels, instead we need to parse the name as a argument to the label. [NL]
 		const label =
@@ -146,12 +155,12 @@ export class UmbCreateDocumentCollectionActionElement extends UmbPopoverScrollEl
 		return html`
 			<uui-button popovertarget="collection-action-menu-popover" label=${label} color="default" look="outline">
 				${label}
-				<uui-symbol-expand .open=${this.popoverOpen}></uui-symbol-expand>
+				<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
 			</uui-button>
 			<uui-popover-container
 				id="collection-action-menu-popover"
 				placement="bottom-start"
-				@toggle=${this._onPopoverToggle}>
+				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
 						${repeat(
@@ -171,6 +180,15 @@ export class UmbCreateDocumentCollectionActionElement extends UmbPopoverScrollEl
 			</uui-popover-container>
 		`;
 	}
+
+	static override styles = [
+		css`
+			uui-scroll-container {
+				max-height: var(--uui-popover-container-available-height, 70vh);
+				overflow-y: auto;
+			}
+		`,
+	];
 }
 
 export default UmbCreateDocumentCollectionActionElement;

@@ -1,15 +1,18 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../constants.js';
 import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
-import { UmbPopoverScrollElement } from '@umbraco-cms/backoffice/collection';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
 import type { UmbAllowedMediaTypeModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 @customElement('umb-create-media-collection-action')
-export class UmbCreateMediaCollectionActionElement extends UmbPopoverScrollElement {
+export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
+	@state()
+	private _popoverOpen = false;
+
 	@state()
 	private _allowedMediaTypes: Array<UmbAllowedMediaTypeModel> = [];
 
@@ -23,6 +26,13 @@ export class UmbCreateMediaCollectionActionElement extends UmbPopoverScrollEleme
 	manifest?: ManifestCollectionAction;
 
 	#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
+
+	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
+	#onPopoverToggle = (event: ToggleEvent): void => {
+		this._popoverOpen = event.newState === 'open';
+	};
 
 	constructor() {
 		super();
@@ -92,12 +102,12 @@ export class UmbCreateMediaCollectionActionElement extends UmbPopoverScrollEleme
 		return html`
 			<uui-button popovertarget="collection-action-menu-popover" label=${label} color="default" look="outline">
 				${label}
-				<uui-symbol-expand .open=${this.popoverOpen}></uui-symbol-expand>
+				<uui-symbol-expand .open=${this._popoverOpen}></uui-symbol-expand>
 			</uui-button>
 			<uui-popover-container
 				id="collection-action-menu-popover"
 				placement="bottom-start"
-				@toggle=${this._onPopoverToggle}>
+				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
 					<uui-scroll-container>
 						${repeat(
@@ -114,6 +124,15 @@ export class UmbCreateMediaCollectionActionElement extends UmbPopoverScrollEleme
 			</uui-popover-container>
 		`;
 	}
+
+	static override styles = [
+		css`
+			uui-scroll-container {
+				max-height: var(--uui-popover-container-available-height, 70vh);
+				overflow-y: auto;
+			}
+		`,
+	];
 }
 
 export default UmbCreateMediaCollectionActionElement;

@@ -18,5 +18,5 @@ export * from './default/collection-default.context-token.js';
 export type * from './collection-filter-model.interface.js';
 export type * from './types.js';
 
-export { UmbCollectionActionElement, UmbCollectionActionBase, UmbPopoverScrollElement } from './action/index.js';
+export { UmbCollectionActionElement, UmbCollectionActionBase } from './action/index.js';
 export type { UmbCollectionDataSource, UmbCollectionRepository } from './repository/index.js';
