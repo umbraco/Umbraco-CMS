@@ -16,7 +16,7 @@ export class UmbBlockWorkspaceIsReadOnlyCondition
 				context?.readOnlyGuard.isPermittedForObservableVariant(context.variantId),
 				(isReadOnly) => {
 					if (isReadOnly !== undefined) {
-						const match = this.config.match !== undefined ? args.config.match : true;
+						const match = args.config.match ?? true;
 						this.permitted = isReadOnly === match;
 					}
 				},
