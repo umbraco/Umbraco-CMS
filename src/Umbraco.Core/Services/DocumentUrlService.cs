@@ -1175,10 +1175,10 @@ public class DocumentUrlService : IDocumentUrlService
 
         foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
         {
-            IEnumerable<Domain> domains = ancestorOrSelfKeyToDomains[ancestorOrSelfKey].WhereNotNull();
-            if (domains.Any())
+            Domain? domain = ancestorOrSelfKeyToDomains[ancestorOrSelfKey].WhereNotNull().FirstOrDefault();
+            if (domain is not null)
             {
-                foundDomain = domains.First();// What todo here that is better?
+                foundDomain = domain;
                 break;
             }
 
@@ -1186,10 +1186,11 @@ public class DocumentUrlService : IDocumentUrlService
             {
                 urlSegments.Add(segment);
             }
-
-            if (foundDomain is not null)
+            else
             {
-                break;
+                // There is no URL segment for this content key in the requested context.
+                // Exit early since the legacy route cannot be resolved.
+                return "#";
             }
         }
 
