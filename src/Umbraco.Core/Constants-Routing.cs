@@ -11,5 +11,7 @@ public static partial class Constants
         ///     Represents the route of unroutable content.
         /// </summary>
         public const string Unroutable = "#";
+
+        public const string UrlProviderException = "#ex";
     }
 }

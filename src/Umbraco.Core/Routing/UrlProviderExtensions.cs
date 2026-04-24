@@ -146,7 +146,7 @@ public static class UrlProviderExtensions
             catch (Exception ex)
             {
                 logger.LogError(ex, "GetUrl exception.");
-                url = "#ex";
+                url = Constants.Routing.UrlProviderException;
             }
 
             switch (url)
@@ -157,7 +157,7 @@ public static class UrlProviderExtensions
                     break;
 
                 // deal with exceptions
-                case "#ex":
+                case Constants.Routing.UrlProviderException:
                     result.Add(UrlInfo.AsMessage(textService.Localize("content", "getUrlException"), UrlProviderAlias, culture));
                     break;
 
