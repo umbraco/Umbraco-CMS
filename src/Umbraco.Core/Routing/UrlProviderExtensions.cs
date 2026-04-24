@@ -183,7 +183,7 @@ public static class UrlProviderExtensions
 
     private static UrlInfo HandleCouldNotGetUrl(IContent content, string culture, IContentService contentService, ILocalizedTextService textService)
     {
-        // document has a published version yet its URL is Constants.Routing.Unroutable => a parent must be
+        // document has a published version yet its URL is unrouteable => a parent must be
         // unpublished, walk up the tree until we find it, and report.
         IContent? parent = content;
         do
