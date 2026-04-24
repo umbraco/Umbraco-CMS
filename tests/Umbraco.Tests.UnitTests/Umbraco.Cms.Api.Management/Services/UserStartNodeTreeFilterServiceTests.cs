@@ -109,7 +109,7 @@ internal class UserStartNodeTreeFilterServiceTests
         };
 
         _userStartNodeEntitiesServiceMock
-            .Setup(x => x.RootUserAccessEntities(UmbracoObjectTypes.Document, startNodeIds))
+            .Setup(x => x.RootUserAccessEntities(new[] { UmbracoObjectTypes.Document }, startNodeIds))
             .Returns(expected);
 
         var sut = CreateService(startNodeIds, []);
@@ -137,7 +137,7 @@ internal class UserStartNodeTreeFilterServiceTests
 
         _userStartNodeEntitiesServiceMock
             .Setup(x => x.ChildUserAccessEntities(
-                UmbracoObjectTypes.Document,
+                new[] { UmbracoObjectTypes.Document },
                 startNodePaths,
                 parentKey,
                 0,
@@ -172,7 +172,7 @@ internal class UserStartNodeTreeFilterServiceTests
 
         _userStartNodeEntitiesServiceMock
             .Setup(x => x.SiblingUserAccessEntities(
-                UmbracoObjectTypes.Document,
+                new[] { UmbracoObjectTypes.Document },
                 startNodePaths,
                 target,
                 5,
