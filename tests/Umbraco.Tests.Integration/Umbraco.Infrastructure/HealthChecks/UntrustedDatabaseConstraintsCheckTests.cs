@@ -49,7 +49,7 @@ internal sealed class UntrustedDatabaseConstraintsCheckTests : UmbracoIntegratio
             Assert.Multiple(() =>
             {
                 Assert.That(status.ResultType, Is.EqualTo(StatusResultType.Warning));
-                Assert.That(status.Description, Does.Contain(TestConstraintName));
+                Assert.That(status.Message, Does.Contain(TestConstraintName));
                 Assert.That(status.ReadMoreLink, Is.Not.Null.And.Not.Empty);
             });
         }
