@@ -50,28 +50,28 @@ internal sealed class ConsentRepository : IConsentRepository
         {
             IQueryable<ConsentDto> query = db.Consents.AsQueryable();
 
-            if (string.IsNullOrWhiteSpace(source) == false)
+            if (string.IsNullOrWhiteSpace(source) is false)
             {
                 query = sourceStartsWith
                     ? query.Where(x => x.Source != null && x.Source.StartsWith(source))
                     : query.Where(x => x.Source == source);
             }
 
-            if (string.IsNullOrWhiteSpace(context) == false)
+            if (string.IsNullOrWhiteSpace(context) is false)
             {
                 query = contextStartsWith
                     ? query.Where(x => x.Context != null && x.Context.StartsWith(context))
                     : query.Where(x => x.Context == context);
             }
 
-            if (string.IsNullOrWhiteSpace(action) == false)
+            if (string.IsNullOrWhiteSpace(action) is false)
             {
                 query = actionStartsWith
                     ? query.Where(x => x.Action != null && x.Action.StartsWith(action))
                     : query.Where(x => x.Action == action);
             }
 
-            if (includeHistory == false)
+            if (includeHistory is false)
             {
                 query = query.Where(x => x.Current);
             }
@@ -81,14 +81,10 @@ internal sealed class ConsentRepository : IConsentRepository
         });
     }
 
-    /// <summary>
-    ///     Adds or updates an <see cref="IConsent"/>, backed by the cache policy.
-    /// </summary>
-    /// <param name="consent">The consent to save.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <inheritdoc/>
     public async Task SaveAsync(IConsent consent, CancellationToken cancellationToken)
     {
-        if (consent.HasIdentity == false)
+        if (consent.HasIdentity is false)
         {
             await PersistNewItemAsync(consent);
         }

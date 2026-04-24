@@ -32,5 +32,10 @@ public interface IConsentRepository
         bool actionStartsWith = false,
         bool includeHistory = false);
 
+    /// <summary>
+    ///     Adds or updates an <see cref="IConsent"/>.
+    /// </summary>
+    /// <param name="consent">The consent to save.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     Task SaveAsync(IConsent consent, CancellationToken cancellationToken);
 }
