@@ -71,7 +71,11 @@ export class UmbPropertyEditorUIBlockGridElement
 	public set readonly(value) {
 		this.#readonly = value;
 
-		this.#handleReadonly();
+		if (this.#readonly) {
+			this.#managerContext.readOnlyState.fallbackToPermitted();
+		} else {
+			this.#managerContext.readOnlyState.fallbackToNotPermitted();
+		}
 	}
 	public get readonly() {
 		return this.#readonly;
@@ -172,8 +176,6 @@ export class UmbPropertyEditorUIBlockGridElement
 		}).passContextAliasMatches();
 
 		this.consumeContext(UMB_PROPERTY_CONTEXT, (propertyContext) => {
-			this.#handleReadonly();
-
 			this.observe(
 				propertyContext?.dataPath,
 				(dataPath) => {
@@ -238,21 +240,12 @@ export class UmbPropertyEditorUIBlockGridElement
 				context?.displayVariantId,
 				(variantId) => {
 					this.#managerContext.setVariantId(variantId);
-					this.#handleReadonly();
 				},
 				'observeContextualVariantId',
 			);
 		});
 
 		this.observe(this.#managerContext.isSortMode, (isSortMode) => (this._isSortMode = isSortMode ?? false));
-	}
-
-	#handleReadonly() {
-		this.#managerContext.readOnlyState.addRule({
-			unique: 'UMB_PROPERTY_READONLY',
-			permitted: this.#readonly,
-			variantId: this.#managerContext.getVariantId(),
-		});
 	}
 
 	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
