@@ -13,8 +13,8 @@
     "generate:server-api": "openapi-ts"
   },
   "engines": {
-    "node": ">=24",
-    "npm": ">=10.9"
+    "node": ">=24.13",
+    "npm": ">=11"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.85.2",

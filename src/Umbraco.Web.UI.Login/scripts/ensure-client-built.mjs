@@ -7,6 +7,8 @@ const clientDir = resolve(here, '../../Umbraco.Web.UI.Client');
 const distCms = resolve(clientDir, 'dist-cms');
 
 if (!existsSync(distCms)) {
+	// Fixed relative path — the script lives at a known location, so showing
+	// the absolute path would just overflow the ASCII box in CI logs.
 	console.error(`
 ╭──────────────────────────────────────────────────────────────────────╮
 │ ERROR: Umbraco.Web.UI.Client has not been built.                     │
@@ -17,7 +19,7 @@ if (!existsSync(distCms)) {
 │                                                                      │
 │ Run this first:                                                      │
 │                                                                      │
-│   cd ${clientDir}
+│   cd ../Umbraco.Web.UI.Client                                        │
 │   npm install                                                        │
 │   npm run build:for:cms                                              │
 │                                                                      │

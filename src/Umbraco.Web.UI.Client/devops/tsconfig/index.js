@@ -22,14 +22,13 @@ const tsConfigBase = {
 		moduleResolution: 'bundler',
 		moduleDetection: 'force',
 		verbatimModuleSyntax: true,
-		target: 'es2022',
-		lib: ['es2022', 'dom', 'dom.iterable'],
+		target: 'es2024',
+		lib: ['es2024', 'dom', 'dom.iterable'],
 		outDir: './types',
 		allowSyntheticDefaultImports: true,
 		experimentalDecorators: true,
 		forceConsistentCasingInFileNames: true,
 		useDefineForClassFields: false,
-		baseUrl: '.',
 		incremental: true,
 		skipLibCheck: true,
 		noImplicitOverride: true,
@@ -41,6 +40,10 @@ const tsConfigBase = {
 		strict: true,
 		noFallthroughCasesInSwitch: true,
 		noImplicitReturns: true,
+		// Silences the TS 6.0 deprecation warning triggered by the implicit
+		// baseUrl TypeScript assigns when `paths` is declared without an
+		// explicit baseUrl. Remove when we stop using `paths`.
+		ignoreDeprecations: '6.0',
 	},
 	include: [
 		'src/**/*.ts',
