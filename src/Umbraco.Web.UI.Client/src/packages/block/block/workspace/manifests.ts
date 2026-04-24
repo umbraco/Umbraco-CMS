@@ -7,7 +7,7 @@ import {
 import { UMB_WORKSPACE_CONDITION_ALIAS, UmbSubmitWorkspaceAction } from '@umbraco-cms/backoffice/workspace';
 
 export const manifests: Array<UmbExtensionManifest> = [
-	/*{
+	{
 		type: 'workspaceAction',
 		kind: 'default',
 		alias: 'Umb.WorkspaceAction.Block.SubmitCreate',
@@ -33,7 +33,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 				match: false,
 			},
 		],
-	},*/
+	},
 	{
 		type: 'workspaceAction',
 		kind: 'default',
