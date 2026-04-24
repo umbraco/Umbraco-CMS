@@ -38,7 +38,7 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 
 	/**
 	 * @param {Observable<UmbVariantId | undefined>} variantId
-	 * @returns {Observable<boolean>} - Observable that emits true if the variantId is permitted to read, false otherwise
+	 * @returns {Observable<boolean | undefined>} - Observable that emits true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	isPermittedForObservableVariant(variantId: Observable<UmbVariantId | undefined>): Observable<boolean | undefined> {
