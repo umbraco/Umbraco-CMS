@@ -13,7 +13,7 @@ const propertyEditorUi: UmbExtensionManifest = {
 		propertyEditorSchemaAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-thumbnail-list',
 		group: 'richContent',
-		keywords: ['component', 'list', 'items', 'repeater', 'blocks', 'cards'],
+		keywords: ['component', 'list', 'items', 'blocks', 'cards', 'faq', 'testimonials', 'features', 'services'],
 		supportsReadOnly: true,
 		settings: {
 			properties: [

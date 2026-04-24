@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Image Cropper',
 			icon: 'icon-crop',
 			group: 'media',
-			keywords: ['image', 'crop', 'photo', 'thumbnail', 'avatar', 'headshot', 'profile'],
+			keywords: ['image', 'crop', 'photo', 'thumbnail', 'avatar', 'profile', 'cover', 'portrait'],
 			propertyEditorSchemaAlias: 'Umbraco.ImageCropper',
 		},
 	},

@@ -37,6 +37,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 				'no',
 				'on',
 				'off',
+				'checkbox',
+				'required',
+				'include',
 			],
 			supportsReadOnly: true,
 			settings: {

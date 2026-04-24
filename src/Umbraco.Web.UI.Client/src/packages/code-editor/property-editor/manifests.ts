@@ -10,7 +10,20 @@ export const manifest: ManifestPropertyEditorUi = {
 		propertyEditorSchemaAlias: 'Umbraco.Plain.String',
 		icon: 'icon-brackets',
 		group: 'richContent',
-		keywords: ['code', 'script', 'embed', 'snippet', 'json', 'html', 'css'],
+		keywords: [
+			'code',
+			'script',
+			'embed',
+			'snippet',
+			'json',
+			'html',
+			'css',
+			'javascript',
+			'js',
+			'xml',
+			'yaml',
+			'markup',
+		],
 		settings: {
 			properties: [
 				{
