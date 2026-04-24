@@ -310,7 +310,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
-		if (this._exposed) {
+		if (this._exposed || this._isReadOnly) {
 			return ext.component;
 		} else {
 			return html`<div>

@@ -428,7 +428,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			ext.component.classList.add('umb-block-grid__block--view');
 			ext.component.setAttribute('part', 'component');
 		}
-		if (this._exposed) {
+		if (this._exposed || this._isReadOnly) {
 			return ext.component;
 		} else {
 			return html`

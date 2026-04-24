@@ -358,7 +358,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
-		if (this._exposed) {
+		if (this._exposed || this._isReadOnly) {
 			return ext.component;
 		} else {
 			return html`<div style="min-height: var(--uui-size-16);">
