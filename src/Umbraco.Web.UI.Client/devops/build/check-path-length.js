@@ -11,6 +11,14 @@ const ERROR_COLOR = '\x1b[31m%s\x1b[0m';
 const SUCCESS_COLOR = '\x1b[32m%s\x1b[0m';
 const processExitCode = 1; // Default to 1 to fail the build, 0 to just log the issues
 
+// TypeScript declarations and tsc build info are only consumed by sibling
+// projects (e.g. Umbraco.Web.UI.Login) reading dist-cms for types. They are
+// filtered out of the copy to wwwroot/umbraco/backoffice by copy-to-cms.js
+// and therefore never reach Windows installs of the CMS itself. Their path
+// length does not matter for the cross-platform compatibility this check
+// enforces.
+const EXCLUDE_FROM_CHECK = /\.(d\.ts|tsbuildinfo)$/;
+
 console.log(`Checking path length in ${PROJECT_DIR} for paths exceeding ${MAX_PATH_LENGTH}...`);
 console.log('CI detected:', IS_CI);
 
@@ -46,7 +54,14 @@ function checkPathLength(dir) {
 
 	files.forEach(file => {
 		const filePath = join(dir, file);
-		if (filePath.length > MAX_PATH_LENGTH) {
+		const isDirectory = statSync(filePath).isDirectory();
+
+		// Only check file paths against the limit — directories on their own
+		// don't violate Windows MAX_PATH; only actual files do. Also skip
+		// TypeScript declarations and tsbuildinfo, which live in dist-cms for
+		// sibling-project type consumption and are filtered out of the copy
+		// to wwwroot/umbraco/backoffice by copy-to-cms.js.
+		if (!isDirectory && !EXCLUDE_FROM_CHECK.test(filePath) && filePath.length > MAX_PATH_LENGTH) {
 			hasError = true;
 
 			if (IS_AZURE_PIPELINES) {
@@ -58,7 +73,7 @@ function checkPathLength(dir) {
 			}
 		}
 
-		if (statSync(filePath).isDirectory()) {
+		if (isDirectory) {
 			const subHasError = checkPathLength(filePath);
 			if (subHasError) {
 				hasError = true;
