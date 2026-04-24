@@ -23,6 +23,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 				'switch',
 				'flag',
 				'enabled',
+				'show',
+				'hide',
 				'active',
 				'visible',
 				'featured',
