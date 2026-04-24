@@ -325,8 +325,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		const layout = this.#context.getLayout();
 		const settings = this.#context.getSettings();
 		const expose = this.#context.getExpose();
-		//What if no thumbImg?
-		const thumbImg = this._blockViewProps.blockType?.thumbnail;
+		const blockTypeThumbnail = this._blockViewProps.blockType?.thumbnail;
 
 		const propertyValue: UmbBlockListValueModel = {
 			contentData: content ? [structuredClone(content)] : [],
@@ -336,14 +335,12 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			settingsData: settings ? [structuredClone(settings)] : [],
 			expose: expose ? [structuredClone(expose)] : [],
 		};
-		console.log(thumbImg);
-		console.log(clipboardContext);
 
-		const path = thumbImg ? transformServerPathToClientPath(thumbImg) : undefined;
+		const path = blockTypeThumbnail ? transformServerPathToClientPath(blockTypeThumbnail) : undefined;
 
-		const imgSrc = path ? new URL(path, this.#serverUrl)?.href : undefined;
+		const thumbnailPath = path ? new URL(path, this.#serverUrl)?.href : undefined;
 
-		const thumbnail = imgSrc ? { src: imgSrc } : undefined;
+		const thumbnail = thumbnailPath ? { src: thumbnailPath } : undefined;
 
 		clipboardContext.write({
 			icon: this._icon,
