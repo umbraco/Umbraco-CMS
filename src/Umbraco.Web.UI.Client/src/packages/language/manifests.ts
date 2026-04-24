@@ -41,7 +41,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'workspaceContext',
 		name: 'Block Language Access Workspace Context',
 		alias: 'Umb.WorkspaceContext.BlockLanguageAccess',
-		api: () => import('./permissions/block-language-access.workspace.context.js'),
+		api: () => import('./permissions/block-language-access.workspace.controller.js'),
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
