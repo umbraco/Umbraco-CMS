@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_4_0;
@@ -70,19 +71,19 @@ public class FixLabelDataTypeDbTypeFromConfiguration : AsyncMigrationBase
 
         ISqlSyntaxProvider syntax = database.SqlContext.SqlSyntax;
         var sql = $@"
-UPDATE {syntax.GetQuotedTableName("umbracoPropertyData")}
-SET {syntax.GetQuotedColumnName("textValue")} = {syntax.GetQuotedColumnName("varcharValue")}, {syntax.GetQuotedColumnName("varcharValue")} = NULL
-WHERE {syntax.GetQuotedColumnName("propertyTypeId")} IN (
-    SELECT {syntax.GetQuotedColumnName("id")}
-    FROM {syntax.GetQuotedTableName("cmsPropertyType")}
-    WHERE {syntax.GetQuotedColumnName("dataTypeId")} IN (
-        SELECT {syntax.GetQuotedColumnName("nodeId")}
-        FROM {syntax.GetQuotedTableName("umbracoDataType")}
-        WHERE {syntax.GetQuotedColumnName("propertyEditorAlias")} = '{Constants.PropertyEditors.Aliases.Label}'
-        AND {syntax.GetQuotedColumnName("dbType")} = '{nameof(ValueStorageType.Ntext)}'
+UPDATE {syntax.GetQuotedTableName(PropertyDataDto.TableName)}
+SET {syntax.GetQuotedColumnName(PropertyDataDto.TextValueColumnName)} = {syntax.GetQuotedColumnName(PropertyDataDto.VarcharValueColumnName)}, {syntax.GetQuotedColumnName(PropertyDataDto.VarcharValueColumnName)} = NULL
+WHERE {syntax.GetQuotedColumnName(PropertyDataDto.PropertyTypeIdColumnName)} IN (
+    SELECT {syntax.GetQuotedColumnName(PropertyDataDto.PrimaryKeyColumnName)}
+    FROM {syntax.GetQuotedTableName(PropertyTypeDto.TableName)}
+    WHERE {syntax.GetQuotedColumnName(PropertyTypeDto.DataTypeIdColumnName)} IN (
+        SELECT {syntax.GetQuotedColumnName(DataTypeDto.PrimaryKeyColumnName)}
+        FROM {syntax.GetQuotedTableName(DataTypeDto.TableName)}
+        WHERE {syntax.GetQuotedColumnName(DataTypeDto.EditorAliasColumnName)} = '{Constants.PropertyEditors.Aliases.Label}'
+        AND {syntax.GetQuotedColumnName(DataTypeDto.DbTypeColumnName)} = '{nameof(ValueStorageType.Ntext)}'
     )
 )
-AND {syntax.GetQuotedColumnName("varcharValue")} IS NOT NULL";
+AND {syntax.GetQuotedColumnName(PropertyDataDto.VarcharValueColumnName)} IS NOT NULL";
         await database.ExecuteAsync(sql);
     }
 }
