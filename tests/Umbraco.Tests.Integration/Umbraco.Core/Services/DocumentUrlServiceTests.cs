@@ -53,7 +53,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     {
         base.CreateTestData();
 
-        var subSubPage1 = ContentBuilder.CreateSimpleContent(ContentType, "Sub SUb Page 1", Subpage.Id);
+        var subSubPage1 = ContentBuilder.CreateSimpleContent(ContentType, "Sub Sub Page 1", Subpage.Id);
         subSubPage1.Key = new Guid(SubSubPage1Key);
         ContentService.Save(subSubPage1, -1);
     }
