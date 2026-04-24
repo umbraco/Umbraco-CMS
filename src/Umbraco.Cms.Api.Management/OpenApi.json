@@ -36859,6 +36859,9 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/NoopSetupTwoFactorModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TwoFactorAuthInfo"
                     }
                   ]
                 }
@@ -36953,6 +36956,9 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/NoopSetupTwoFactorModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TwoFactorAuthInfo"
                     }
                   ]
                 }
@@ -37346,14 +37352,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/UserPermissionsResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserPermissionsResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -50891,6 +50894,20 @@
           "All"
         ],
         "type": "string"
+      },
+      "TwoFactorAuthInfo": {
+        "type": "object",
+        "properties": {
+          "qrCodeSetupImageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "secret": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "UnknownTypePermissionPresentationModel": {
         "required": [
