@@ -31,8 +31,8 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
 
         var root = new ContentBuilder()
             .WithContentType(contentType)
-            .WithCultureName("en-US", $"Root en-US")
-            .WithCultureName("da-DK", $"Root da-DK")
+            .WithCultureName("en-US", "Root en-US")
+            .WithCultureName("da-DK", "Root da-DK")
             .Build();
         ContentService.Save(root);
         ContentService.Publish(root, ["*"]);
@@ -40,8 +40,8 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
         var child = new ContentBuilder()
             .WithContentType(contentType)
             .WithParent(root)
-            .WithCultureName("en-US", $"Child en-US")
-            .WithCultureName("da-DK", $"Child da-DK")
+            .WithCultureName("en-US", "Child en-US")
+            .WithCultureName("da-DK", "Child da-DK")
             .Build();
         ContentService.Save(child);
         ContentService.Publish(child, ["*"]);
@@ -49,8 +49,8 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
         var grandchild = new ContentBuilder()
             .WithContentType(contentType)
             .WithParent(child)
-            .WithCultureName("en-US", $"Grandchild en-US")
-            .WithCultureName("da-DK", $"Grandchild da-DK")
+            .WithCultureName("en-US", "Grandchild en-US")
+            .WithCultureName("da-DK", "Grandchild da-DK")
             .Build();
         ContentService.Save(grandchild);
         ContentService.Publish(grandchild, ["*"]);
@@ -78,6 +78,67 @@ public class ApiContentRouteBuilderPublishingTests : ApiContentRouteBuilderTestB
         {
             Assert.IsNotNull(route);
             Assert.AreEqual("/child-da-dk/grandchild-da-dk/", route.Path);
+        }
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task Can_Handle_Broken_Invariant_Publish_Path(bool breakPublishedPath)
+    {
+        SetRequestHost("localhost");
+
+        await GetRequiredService<ILanguageService>().CreateAsync(new Language("da-DK", "Danish"), Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias("theContentType")
+            .WithContentVariation(ContentVariation.Nothing)
+            .Build();
+        contentType.AllowedAsRoot = true;
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        contentType.AllowedContentTypes = [new() { Alias = contentType.Alias, Key = contentType.Key }];
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        var root = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Root")
+            .Build();
+        ContentService.Save(root);
+        ContentService.Publish(root, ["*"]);
+
+        var child = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithParent(root)
+            .WithName("Child")
+            .Build();
+        ContentService.Save(child);
+        ContentService.Publish(child, ["*"]);
+
+        var grandchild = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithParent(child)
+            .WithName("Grandchild")
+            .Build();
+        ContentService.Save(grandchild);
+        ContentService.Publish(grandchild, ["*"]);
+
+        if (breakPublishedPath)
+        {
+            ContentService.Unpublish(child);
+        }
+
+        SetVariationContext("en-US");
+
+        if (breakPublishedPath)
+        {
+            var publishedContent = ClearAndEnsureUmbracoContext().Content.GetById(grandchild.Key);
+            Assert.IsNull(publishedContent);
+        }
+        else
+        {
+            var publishedContent = GetPublishedContent(grandchild.Key);
+            var route = ApiContentRouteBuilder.Build(publishedContent);
+            Assert.IsNotNull(route);
+            Assert.AreEqual("/child/grandchild/", route.Path);
         }
     }
 }
