@@ -1,17 +1,18 @@
 import type { UmbTreeItemModel } from '../types.js';
-import { UmbTreeItemOpenEvent } from '../tree-item/events/tree-item-open.event.js';
 import type { ManifestTreeItemCard } from './tree-item-card.extension.js';
 import { UmbDefaultTreeItemCardElement } from './default/default-tree-item-card.element.js';
+import { UmbDefaultTreeItemCardApi } from './default/default-tree-item-card.api.js';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbExtensionsElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbDeselectedEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-tree-item-card')
 export class UmbTreeItemCardElement extends UmbLitElement {
-	#extensionsController?: UmbExtensionsElementInitializer<any>;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	#extensionsController?: any;
 	#item?: UmbTreeItemModel;
+	#fallbackApi?: UmbDefaultTreeItemCardApi;
 
 	@state()
 	protected _component?: any;
@@ -26,6 +27,7 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 
 		if (this._component && value.entityType === oldValue?.entityType) {
 			this._component.item = value;
+			this.#fallbackApi?.setTreeItem(value);
 			return;
 		}
 
@@ -35,87 +37,39 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 		return this.#item;
 	}
 
-	#selectable = false;
-	@property({ type: Boolean, reflect: true })
-	public get selectable() {
-		return this.#selectable;
-	}
-	public set selectable(value) {
-		this.#selectable = value;
-		if (this._component) this._component.selectable = value;
-	}
-
-	#selectOnly = false;
-	@property({ type: Boolean, reflect: true })
-	public get selectOnly() {
-		return this.#selectOnly;
-	}
-	public set selectOnly(value) {
-		this.#selectOnly = value;
-		if (this._component) this._component.selectOnly = value;
-	}
-
-	#selected = false;
-	@property({ type: Boolean, reflect: true })
-	public get selected() {
-		return this.#selected;
-	}
-	public set selected(value) {
-		this.#selected = value;
-		if (this._component) this._component.selected = value;
-	}
-
-	#onSelected(event: UmbSelectedEvent) {
-		event.stopPropagation();
-		if (!this.#item) return;
-		this.dispatchEvent(new UmbSelectedEvent(this.#item.unique));
-	}
-
-	#onDeselected(event: UmbDeselectedEvent) {
-		event.stopPropagation();
-		if (!this.#item) return;
-		this.dispatchEvent(new UmbDeselectedEvent(this.#item.unique));
-	}
-
-	#onOpen(event: UmbTreeItemOpenEvent) {
-		event.stopPropagation();
-		this.dispatchEvent(new UmbTreeItemOpenEvent({ unique: event.unique, entityType: event.entityType }));
-	}
-
-	#boundOnSelected = this.#onSelected.bind(this);
-	#boundOnDeselected = this.#onDeselected.bind(this);
-	#boundOnOpen = this.#onOpen.bind(this);
-
 	#createController(entityType: string) {
 		this.#extensionsController?.destroy();
+		this.#fallbackApi?.destroy();
+		this.#fallbackApi = undefined;
 
-		this.#extensionsController = new UmbExtensionsElementInitializer(
+		this.#extensionsController = new UmbExtensionsElementAndApiInitializer(
 			this,
 			umbExtensionsRegistry,
 			'treeItemCard',
+			undefined,
 			(manifest: ManifestTreeItemCard) => manifest.forEntityTypes.includes(entityType),
 			(extensionControllers) => {
 				if (this._component) {
-					this._component.removeEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
-					this._component.removeEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);
-					this._component.removeEventListener(UmbTreeItemOpenEvent.TYPE, this.#boundOnOpen);
 					this._component.remove();
 				}
 
-				const component = extensionControllers[0]?.component ?? new UmbDefaultTreeItemCardElement();
+				const ctrl = extensionControllers[0];
+
+				const component = ctrl?.component ?? new UmbDefaultTreeItemCardElement();
+				const api: UmbDefaultTreeItemCardApi | undefined = ctrl?.api ?? (() => {
+					const fallback = new UmbDefaultTreeItemCardApi(component);
+					this.#fallbackApi = fallback;
+					return fallback;
+				})();
 
 				component.item = this.#item;
-				component.selectable = this.#selectable;
-				component.selectOnly = this.#selectOnly;
-				component.selected = this.#selected;
-
-				component.addEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
-				component.addEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);
-				component.addEventListener(UmbTreeItemOpenEvent.TYPE, this.#boundOnOpen);
+				component.api = api;
+				api.setTreeItem(this.#item);
 
 				this._component = component;
 				this.requestUpdate('_component');
 			},
+			undefined,
 			undefined,
 			undefined,
 			{ single: true },
@@ -127,10 +81,8 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 	}
 
 	override destroy(): void {
-		this._component?.removeEventListener(UmbSelectedEvent.TYPE, this.#boundOnSelected);
-		this._component?.removeEventListener(UmbDeselectedEvent.TYPE, this.#boundOnDeselected);
-		this._component?.removeEventListener(UmbTreeItemOpenEvent.TYPE, this.#boundOnOpen);
 		this.#extensionsController?.destroy();
+		this.#fallbackApi?.destroy();
 		super.destroy();
 	}
 

@@ -1,6 +1,5 @@
 import type { UmbTreeItemModel } from '../../types.js';
 import { UmbTreeViewElementBase } from '../tree-view-element-base.js';
-import type { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 
 import '../../tree-item-card/tree-item-card.element.js';
@@ -26,21 +25,11 @@ export class UmbCardTreeViewElement extends UmbTreeViewElementBase {
 		if (!this._items.length) return nothing;
 
 		return html`
-			<div
-				id="grid"
-				@selected=${(e: UmbSelectedEvent) => this._selectItem(e.unique)}
-				@deselected=${(e: UmbDeselectedEvent) => this._deselectItem(e.unique)}>
+			<div id="grid">
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item) => html`
-						<umb-tree-item-card
-							.entityType=${item.entityType}
-							.item=${item}
-							.selectable=${this._isSelectableItem(item)}
-							.selectOnly=${this._selectOnly}
-							.selected=${this._isSelectedItem(item.unique)}></umb-tree-item-card>
-					`,
+					(item) => html` <umb-tree-item-card .entityType=${item.entityType} .item=${item}></umb-tree-item-card> `,
 				)}
 			</div>
 		`;

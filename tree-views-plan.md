@@ -483,12 +483,12 @@ Each phase requires review and sign-off before the next begins.
   - [x] 7.2 — `tree-view.manager.test.ts` (10 tests passing)
   - [ ] 7.3 — Manual smoke tests (user sign-off required)
 - [ ] **Phase 8** — View selection persistence (UX enhancement — design TBD)
-- [ ] **Phase 9** — Tree item card api base + default kind
-  - [ ] 9.1 — Extract `UmbTreeItemApiBase` interface + abstract class; `UmbTreeItemContextBase` implements interface
-  - [ ] 9.2 — `UmbDefaultTreeItemCardApi` (concrete default card api)
-  - [ ] 9.3 — `Umb.Kind.TreeItemCard.Default` kind manifest
-  - [ ] 9.4 — Add required `api` field to `ManifestTreeItemCard`
-  - [ ] 9.5 — Update `umb-tree-item-card` for element+api pair wiring
+- [x] **Phase 9** — Tree item card api base + default kind
+  - [x] 9.1 — Extract `UmbTreeItemApiBase` interface + abstract class; `UmbTreeItemContextBase` implements interface
+  - [x] 9.2 — `UmbDefaultTreeItemCardApi` (concrete default card api)
+  - [x] 9.3 — `Umb.Kind.TreeItemCard.Default` kind manifest
+  - [x] 9.4 — Add required `api` field to `ManifestTreeItemCard`
+  - [x] 9.5 — Update `umb-tree-item-card` for element+api pair wiring
 
 ---
 

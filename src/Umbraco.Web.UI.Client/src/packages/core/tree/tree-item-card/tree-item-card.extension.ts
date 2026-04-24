@@ -1,6 +1,6 @@
-import type { ManifestElement } from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestElementAndApi } from '@umbraco-cms/backoffice/extension-api';
 
-export interface ManifestTreeItemCard extends ManifestElement {
+export interface ManifestTreeItemCard extends ManifestElementAndApi {
 	type: 'treeItemCard';
 	forEntityTypes: Array<string>;
 }
