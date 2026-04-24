@@ -1,8 +1,9 @@
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { UMB_BLOCK_MANAGER_CONTEXT, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 const IDENTIFIER_PREFIX = 'UMB_LANGUAGE_PERMISSION_';
 
@@ -11,13 +12,13 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 	#variantId?: UmbVariantId;
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
+	#consumeBlockManager?: UmbContextConsumerController<typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE>;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-
 			this.#workspaceContext?.readOnlyGuard.fallbackToPermitted();
 			this.#workspaceContext?.content.readOnlyGuard.fallbackToPermitted();
 			this.#workspaceContext?.settings.readOnlyGuard.fallbackToPermitted();
@@ -26,6 +27,9 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 				instance?.variantId,
 				(variantId) => {
 					this.#variantId = variantId;
+
+					this.#observeBlockManager(variantId);
+
 					this.#checkForLanguageAccess();
 				},
 				'observeBlockVariantId',
@@ -51,6 +55,46 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 				'observeCurrentUserHasAccessToAllLanguages',
 			);
 		});
+	}
+
+	#observeBlockManager(variantId?: UmbVariantId) {
+		if (variantId?.isCultureInvariant()) {
+			/**
+			 * If the Block Workspace is invariant, the readOnly state from the Block Manager should apply to the invariant fields(all) of this Workspace: [NL]
+			 */
+			this.#consumeBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
+				this.observe(
+					manager?.readOnlyState.permitted,
+					(isReadOnly) => {
+						const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
+
+						if (isReadOnly) {
+							this.#workspaceContext?.readOnlyGuard.removeRule(unique);
+							this.#workspaceContext?.content.readOnlyGuard.removeRule(unique);
+							this.#workspaceContext?.settings.readOnlyGuard.removeRule(unique);
+						} else {
+							const rule = {
+								unique,
+								permitted: false,
+								variantId: UmbVariantId.INVARIANT,
+							};
+
+							this.#workspaceContext?.readOnlyGuard.addRule(rule);
+							this.#workspaceContext?.content.readOnlyGuard.addRule(rule);
+							this.#workspaceContext?.settings.readOnlyGuard.addRule(rule);
+						}
+					},
+					'observeManagerReadOnly',
+				);
+			});
+		} else {
+			this.#workspaceContext?.readOnlyGuard.removeRule('UMB_BLOCK_MANAGER_CONTEXT');
+			this.#workspaceContext?.content.readOnlyGuard.removeRule('UMB_BLOCK_MANAGER_CONTEXT');
+			this.#workspaceContext?.settings.readOnlyGuard.removeRule('UMB_BLOCK_MANAGER_CONTEXT');
+			this.#consumeBlockManager?.destroy();
+			this.#consumeBlockManager = undefined;
+			this.removeUmbControllerByAlias('observeManagerReadOnly');
+		}
 	}
 
 	#checkForLanguageAccess() {
