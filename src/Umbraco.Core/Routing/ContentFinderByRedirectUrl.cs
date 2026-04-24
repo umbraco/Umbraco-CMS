@@ -88,8 +88,8 @@ public class ContentFinderByRedirectUrl : IContentFinder
         }
 
         IPublishedContent? content = umbracoContext.Content?.GetById(redirectUrl.ContentId);
-        var url = content == null ? "#" : content.Url(_publishedUrlProvider, redirectUrl.Culture);
-        if (url.StartsWith("#"))
+        var url = content == null ? Constants.Routing.Unroutable : content.Url(_publishedUrlProvider, redirectUrl.Culture);
+        if (url.StartsWith(Constants.Routing.Unroutable))
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
