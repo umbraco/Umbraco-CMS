@@ -245,7 +245,7 @@ export abstract class UmbBaseExtensionInitializer<
 		if (hasAllConditions === false) return false;
 		// Compare all manifest conditions with the condition controllers configs to be sure we have the right ones, as we might end up in a state where we have the same amount of controllers as conditions, but they are not the right ones. [NL]
 		const allConditionsHaveControllers = (this.#manifest.conditions ?? []).every((condition) =>
-			this.#conditionControllers.some((controller) => controller.config.alias === condition.alias),
+			this.#conditionControllers.some((controller) => controller.config === condition),
 		);
 		if (allConditionsHaveControllers === false) return false;
 		// Only good if all the conditions are permitted:
