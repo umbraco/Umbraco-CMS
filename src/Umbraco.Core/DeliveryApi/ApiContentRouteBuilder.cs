@@ -108,7 +108,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         var contentPath = _apiContentPathProvider.GetContentPath(content, culture);
 
         // in some scenarios the published content is actually routable, but due to the built-in handling of i.e. lacking culture setup
-        // the URL provider resolves the content URL as empty string or Constants.Routing.Unroutable. since the Delivery API handles routing explicitly,
+        // the URL provider resolves the content URL as empty or unrouetable. since the Delivery API handles routing explicitly,
         // we can perform fallback to the content route.
         if (IsInvalidContentPath(contentPath))
         {
