@@ -23,11 +23,10 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 	private _ids?: Array<string>;
 
 	/**
-	 * Optional label of the property being edited. Used to surface label-based
-	 * suggestions in the property editor UI picker.
+	 * Optional query string for suggesting property editors.
 	 */
 	@property({ type: String })
-	propertyLabel?: string;
+	suggestionQuery?: string;
 
 	/**
 	 * @param {string} dataTypeId
@@ -58,7 +57,7 @@ export class UmbInputDataTypeElement extends UmbFormControlMixin(UmbLitElement, 
 		new UmbModalRouteRegistrationController(this, UMB_DATA_TYPE_PICKER_FLOW_MODAL)
 			.onSetup(() => {
 				return {
-					data: { suggestionQuery: this.propertyLabel },
+					data: { suggestionQuery: this.suggestionQuery },
 					value: { selection: this._ids ?? [] },
 				};
 			})
