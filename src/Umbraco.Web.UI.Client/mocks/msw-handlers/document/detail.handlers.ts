@@ -147,8 +147,12 @@ export const detailHandlers = [
 			// Simulate a forbidden response
 			return new HttpResponse(null, { status: 403 });
 		}
-		const response = umbDocumentMockDb.detail.read(id);
-		return HttpResponse.json(response);
+		try {
+			const response = umbDocumentMockDb.detail.read(id);
+			return HttpResponse.json(response);
+		} catch {
+			return new HttpResponse(null, { status: 404 });
+		}
 	}),
 
 	http.put(umbracoPath(`${UMB_SLUG}/:id`), async ({ request, params }) => {
