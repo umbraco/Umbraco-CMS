@@ -2,9 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog;
-using Umbraco.Cms.Core;
+using Core = Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DistributedLocking;
+using Umbraco.Cms.Persistence.EFCore;
 using Umbraco.Cms.Persistence.EFCore.Locking;
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 using Umbraco.Cms.Persistence.EFCore.Scoping;
@@ -131,28 +132,36 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     /// <param name="builder">The DbContext options builder.</param>
     /// <param name="providerName">The database provider name.</param>
     /// <param name="connectionString">The connection string.</param>
+    /// <param name="serviceProvider">The service provider to resolve registered IMigrationProviderSetup instances from.</param>
     /// <exception cref="InvalidDataException">Thrown when the provider is not supported.</exception>
     /// <remarks>
     /// Only supports the databases normally supported in Umbraco.
     /// </remarks>
-    public static void UseDatabaseProvider(this DbContextOptionsBuilder builder, string providerName, string connectionString)
+    public static void UseDatabaseProvider(this DbContextOptionsBuilder builder, string providerName, string connectionString, IServiceProvider serviceProvider)
     {
+        // Try built-in providers first; if not supported, fall back to registered IMigrationProviderSetup
         switch (providerName)
         {
-            case Constants.ProviderNames.SQLServer:
+            case Core.Constants.ProviderNames.SQLServer:
                 builder.UseSqlServer(connectionString);
                 break;
-            case Constants.ProviderNames.SQLLite:
+            case Core.Constants.ProviderNames.SQLLite:
             case "Microsoft.Data.SQLite":
                 builder.UseSqlite(connectionString);
                 break;
             default:
-                throw new InvalidDataException($"The provider {providerName} is not supported. Manually add the add the UseXXX statement to the options. I.E UseNpgsql()");
+                IEnumerable<IMigrationProviderSetup> migrationProviderSetups = serviceProvider.GetServices<IMigrationProviderSetup>();
+                IMigrationProviderSetup? migrationProvider = migrationProviderSetups.FirstOrDefault(x => x.ProviderName.CompareProviderNames(providerName))
+                    ?? throw new InvalidDataException($"No built-in database provider or registered {nameof(IMigrationProviderSetup)} matched the configured provider name '{providerName}'. " +
+                    $"Register an {nameof(IMigrationProviderSetup)} for this provider name or configure the DbContext options explicitly.");
+
+                migrationProvider.Setup(builder, connectionString);
+                break;
         }
     }
 
     /// <summary>
-    /// Sets the database provider to use based on the Umbraco connection string.
+    /// Sets the database provider to use based on the Umbraco connection string.u
     /// </summary>
     /// <param name="builder">The DbContext options builder.</param>
     /// <param name="serviceProvider">The service provider to resolve connection string settings from.</param>
@@ -161,10 +170,10 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
 
         // Replace data directory
-        string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
+        string? dataDirectory = AppDomain.CurrentDomain.GetData(Core.Constants.System.DataDirectoryName)?.ToString();
         if (string.IsNullOrEmpty(dataDirectory) is false)
         {
-            connectionStrings.ConnectionString = connectionStrings.ConnectionString?.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
+            connectionStrings.ConnectionString = connectionStrings.ConnectionString?.Replace(Core.Constants.System.DataDirectoryPlaceholder, dataDirectory);
         }
 
         if (string.IsNullOrEmpty(connectionStrings.ProviderName))
@@ -179,23 +188,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
             return;
         }
 
-        // Try built-in providers first; if not supported, fall back to registered IMigrationProviderSetup
-        try
-        {
-            builder.UseDatabaseProvider(connectionStrings.ProviderName, connectionStrings.ConnectionString);
-        }
-        catch (InvalidDataException)
-        {
-            IEnumerable<IMigrationProviderSetup> migrationProviders = serviceProvider.GetServices<IMigrationProviderSetup>();
-            IMigrationProviderSetup? migrationProvider = migrationProviders.FirstOrDefault(x => string.Equals(x.ProviderName, connectionStrings.ProviderName, StringComparison.OrdinalIgnoreCase));
-
-            if (migrationProvider is null)
-            {
-                throw;
-            }
-
-            migrationProvider.Setup(builder, connectionStrings.ConnectionString);
-        }
+        builder.UseDatabaseProvider(connectionStrings.ProviderName, connectionStrings.ConnectionString, serviceProvider);
     }
 
     private static void SetupDbContext(Action<IServiceProvider, DbContextOptionsBuilder, string?, string?>? optionsAction, IServiceProvider provider, DbContextOptionsBuilder builder)
@@ -210,10 +203,10 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         ConnectionStrings connectionStrings = serviceProvider.GetRequiredService<IOptionsMonitor<ConnectionStrings>>().CurrentValue;
 
         // Replace data directory
-        string? dataDirectory = AppDomain.CurrentDomain.GetData(Constants.System.DataDirectoryName)?.ToString();
+        string? dataDirectory = AppDomain.CurrentDomain.GetData(Core.Constants.System.DataDirectoryName)?.ToString();
         if (string.IsNullOrEmpty(dataDirectory) is false)
         {
-            connectionStrings.ConnectionString = connectionStrings.ConnectionString?.Replace(Constants.System.DataDirectoryPlaceholder, dataDirectory);
+            connectionStrings.ConnectionString = connectionStrings.ConnectionString?.Replace(Core.Constants.System.DataDirectoryPlaceholder, dataDirectory);
         }
 
         return connectionStrings;
