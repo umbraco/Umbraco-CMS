@@ -20,10 +20,10 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	private _documentUnique?: UmbEntityUnique;
 
 	@state()
-	private _popoverOpen = false;
+	private _documentTypeUnique?: string;
 
 	@state()
-	private _documentTypeUnique?: string;
+	private _popoverOpen = false;
 
 	@property({ attribute: false })
 	manifest?: ManifestCollectionAction;
@@ -52,7 +52,8 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 
 	async #retrieveAllowedDocumentTypesOf(unique: string | null, parentContentUnique: string | null) {
 		const { data } = await this.#documentTypeStructureRepository.requestAllowedChildrenOf(unique, parentContentUnique);
-		if (data?.items) {
+
+		if (data && data.items) {
 			this._allowedDocumentTypes = data.items;
 		}
 	}
@@ -75,14 +76,11 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		});
 	}
 
-	/** Returns true for non-primary or modifier-key clicks that should use native link navigation. */
-	#isModifiedClick(event: MouseEvent): boolean {
-		return event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey;
-	}
-
 	#onClick(event: MouseEvent, item: UmbAllowedDocumentTypeModel) {
 		// Let modified/non-primary clicks (open in new tab, new window, etc.) use native link navigation.
-		if (this.#isModifiedClick(event)) return;
+		if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+			return;
+		}
 		// Cancel native anchor navigation and stop the window-level router-slot click handler
 		// (see core/router/router-slot/util/anchor.ts) from SPA-navigating before we can decide
 		// whether to open the blueprint picker.
@@ -126,6 +124,8 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	}
 
 	#renderCreateButton() {
+		if (this._allowedDocumentTypes.length !== 1) return;
+
 		const item = this._allowedDocumentTypes[0];
 		// TODO: Stop appending values to labels, instead we need to parse the name as a argument to the label. [NL]
 		const label =
