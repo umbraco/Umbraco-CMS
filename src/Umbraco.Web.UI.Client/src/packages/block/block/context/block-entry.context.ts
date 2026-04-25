@@ -743,7 +743,7 @@ export abstract class UmbBlockEntryContext<
 		await umbConfirmModal(this, {
 			headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
 			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', blockName),
-			confirmLabel: this.localize.term('general_delete'),
+			confirmLabel: '#general_delete',
 			color: 'danger',
 		});
 		this.delete();

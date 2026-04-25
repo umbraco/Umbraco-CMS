@@ -117,7 +117,7 @@ stages:
   - stage: Integration
     displayName: Integration Tests
     dependsOn: Build
-    condition: ${{ eq(parameters.skipIntegrationTests, false) }}
+    condition: and(succeeded(), ${{ eq(parameters.skipIntegrationTests, false) }})
     jobs:
       # Integration Tests (SQLite)
       - job:
@@ -319,8 +319,8 @@ stages:
 
   - stage: DefaultConfigE2E
     displayName: Default Config E2E Tests
-    dependsOn: Integration
-    condition: always()
+    dependsOn: [Build, Integration]
+    condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       # Enable console logging in Release mode
@@ -500,8 +500,8 @@ stages:
 
   - stage: AdditionalConfigE2E
     displayName: Additional Config E2E Tests
-    dependsOn: DefaultConfigE2E
-    condition: always()
+    dependsOn: [Build, DefaultConfigE2E]
+    condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
       npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       ASPNETCORE_URLS: https://localhost:44331
