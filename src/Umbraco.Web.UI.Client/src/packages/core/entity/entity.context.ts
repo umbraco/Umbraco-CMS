@@ -13,7 +13,7 @@ export class UmbEntityContext extends UmbContextBase {
 	#entityType = new UmbStringState<string | undefined>(undefined);
 	public readonly entityType = this.#entityType.asObservable();
 
-	#unique = new UmbStringState<UmbEntityUnique>(null);
+	#unique = new UmbStringState<UmbEntityUnique | undefined>(undefined);
 	public readonly unique = this.#unique.asObservable();
 
 	/**
