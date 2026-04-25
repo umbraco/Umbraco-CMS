@@ -43,18 +43,20 @@ private _validateName(name: string): boolean {
 **Sanitize HTML**:
 
 ```typescript
-// Use DOMPurify for HTML sanitization
-import DOMPurify from '@umbraco-cms/backoffice/external/dompurify';
+// Use the sanitizeHTML utility, which wraps DOMPurify internally
+import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 
-const cleanHtml = DOMPurify.sanitize(userInput);
+const cleanHtml = sanitizeHTML(userInput);
 
 // In Lit templates, use unsafeHTML directive with sanitized content
 import { unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 
 render() {
-	return html`<div>${unsafeHTML(DOMPurify.sanitize(this.htmlContent))}</div>`;
+	return html`<div>${unsafeHTML(sanitizeHTML(this.htmlContent))}</div>`;
 }
 ```
+
+> **Note**: Do not import or call `DOMPurify` directly. Always use `sanitizeHTML` from `@umbraco-cms/backoffice/utils`.
 
 ### Authentication & Authorization
 
