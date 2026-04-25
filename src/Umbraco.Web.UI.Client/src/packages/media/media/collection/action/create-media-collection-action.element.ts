@@ -11,9 +11,6 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 @customElement('umb-create-media-collection-action')
 export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	@state()
-	private _popoverOpen = false;
-
-	@state()
 	private _allowedMediaTypes: Array<UmbAllowedMediaTypeModel> = [];
 
 	@state()
@@ -22,17 +19,13 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 	@state()
 	private _mediaTypeUnique?: string;
 
+	@state()
+	private _popoverOpen = false;
+
 	@property({ attribute: false })
 	manifest?: ManifestCollectionAction;
 
 	#mediaTypeStructureRepository = new UmbMediaTypeStructureRepository(this);
-
-	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	#onPopoverToggle = (event: ToggleEvent): void => {
-		this._popoverOpen = event.newState === 'open';
-	};
 
 	constructor() {
 		super();
@@ -57,6 +50,13 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 		if (data && data.items) {
 			this._allowedMediaTypes = data.items;
 		}
+	}
+
+	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._popoverOpen = event.newState === 'open';
 	}
 
 	#getCreateUrl(item: UmbAllowedMediaTypeModel) {

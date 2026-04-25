@@ -8,22 +8,15 @@ import type { UmbAllowedMemberTypeModel } from '@umbraco-cms/backoffice/member-t
 @customElement('umb-create-member-collection-action')
 export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
 	@state()
-	private _popoverOpen = false;
+	private _allowedMemberTypes: Array<UmbAllowedMemberTypeModel> = [];
 
 	@state()
-	private _allowedMemberTypes: Array<UmbAllowedMemberTypeModel> = [];
+	private _popoverOpen = false;
 
 	@property({ attribute: false })
 	manifest?: ManifestCollectionAction;
 
 	#memberTypeStructureRepository = new UmbMemberTypeStructureRepository(this);
-
-	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	#onPopoverToggle = (event: ToggleEvent): void => {
-		this._popoverOpen = event.newState === 'open';
-	};
 
 	override async firstUpdated() {
 		this.#retrieveAllowedMemberTypes();
@@ -34,6 +27,13 @@ export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
 		if (data && data.items) {
 			this._allowedMemberTypes = data.items;
 		}
+	}
+
+	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._popoverOpen = event.newState === 'open';
 	}
 
 	#getCreateUrl(item: UmbAllowedMemberTypeModel) {

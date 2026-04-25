@@ -14,13 +14,13 @@ import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 @customElement('umb-create-document-collection-action')
 export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 	@state()
-	private _popoverOpen = false;
-
-	@state()
 	private _allowedDocumentTypes: Array<UmbAllowedDocumentTypeModel> = [];
 
 	@state()
 	private _documentUnique?: UmbEntityUnique;
+
+	@state()
+	private _popoverOpen = false;
 
 	@state()
 	private _documentTypeUnique?: string;
@@ -30,13 +30,6 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 
 	#documentTypeStructureRepository = new UmbDocumentTypeStructureRepository(this);
 	#documentBlueprintItemRepository = new UmbDocumentBlueprintItemRepository(this);
-
-	// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS yet.
-	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-	// @ts-ignore
-	#onPopoverToggle = (event: ToggleEvent): void => {
-		this._popoverOpen = event.newState === 'open';
-	};
 
 	constructor() {
 		super();
@@ -62,6 +55,13 @@ export class UmbCreateDocumentCollectionActionElement extends UmbLitElement {
 		if (data?.items) {
 			this._allowedDocumentTypes = data.items;
 		}
+	}
+
+	#onPopoverToggle(event: ToggleEvent) {
+		// TODO: This ignorer is just needed for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		this._popoverOpen = event.newState === 'open';
 	}
 
 	#getCreateUrl(item: UmbAllowedDocumentTypeModel) {
