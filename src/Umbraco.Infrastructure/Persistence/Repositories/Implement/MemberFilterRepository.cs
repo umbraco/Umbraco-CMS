@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -35,6 +36,13 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
         _scopeAccessor.AmbientScope?.SqlContext
         ?? throw new NotSupportedException("Need to be executed in a scope.");
 
+    private ISqlSyntaxProvider SqlSyntax =>
+        _scopeAccessor.AmbientScope?.SqlContext.SqlSyntax
+        ?? throw new NotSupportedException("Need to be executed in a scope.");
+
+    private string QTab(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
+    private string QCol(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
+    private string QName(string name) => SqlSyntax.GetQuotedName(name);
     /// <inheritdoc />
     public async Task<PagedModel<MemberFilterItem>> GetPagedByFilterAsync(MemberFilter filter, int skip, int take, Ordering ordering)
     {
@@ -81,39 +89,42 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
     {
         Sql<ISqlContext> sql = SqlContext.Sql()
             .Append($@"SELECT
-                n.[uniqueId] AS [Key],
-                m.[Email],
-                m.[LoginName] AS [UserName],
-                n.[text] AS [Name],
-                m.[IsApproved],
-                m.[IsLockedOut],
-                m.[LastLoginDate],
-                m.[LastLockoutDate],
-                m.[LastPasswordChangeDate],
-                CAST(0 AS bit) AS [IsExternalOnly],
-                ctn.[uniqueId] AS [MemberTypeKey],
-                ctn.[text] AS [MemberTypeName],
-                ctd.[icon] AS [MemberTypeIcon]
-            FROM [{Constants.DatabaseSchema.Tables.Member}] m
-            INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] n ON n.[id] = m.[nodeId]
-            INNER JOIN [{Constants.DatabaseSchema.Tables.Content}] ct ON ct.[nodeId] = n.[id]
-            INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] ctn ON ctn.[id] = ct.[contentTypeId]
-            INNER JOIN [cmsContentType] ctd ON ctd.[nodeId] = ctn.[id]");
+                n.{QCol(NodeDto.KeyColumnName)} AS {QName("key")},
+                m.{QCol("Email")},
+                m.{QCol("LoginName")} AS {QName("userName")},
+                n.{QCol(NodeDto.TextColumnName)} AS {QName("name")},
+                m.{QCol("isApproved")},
+                m.{QCol("isLockedOut")},
+                m.{QCol("lastLoginDate")},
+                m.{QCol("lastLockoutDate")},
+                m.{QCol("lastPasswordChangeDate")},
+                CAST(0 AS bit) AS {QName("isExternalOnly")},
+                ctn.{QCol("uniqueId")} AS {QName("memberTypeKey")},
+                ctn.{QCol("text")} AS {QName("memberTypeName")},
+                ctd.{QCol("icon")} AS {QName("memberTypeIcon")}
+            FROM {QTab(MemberDto.TableName)} m
+            INNER JOIN {QTab(NodeDto.TableName)} n ON n.{QCol(NodeDto.PrimaryKeyColumnName)} = m.{QCol(MemberDto.PrimaryKeyColumnName)}
+            INNER JOIN {QTab(ContentDto.TableName)} ct ON ct.{QCol(ContentDto.PrimaryKeyColumnName)} = n.{QCol(NodeDto.PrimaryKeyColumnName)}
+            INNER JOIN {QTab(NodeDto.TableName)} ctn ON ctn.{QCol(NodeDto.PrimaryKeyColumnName)} = ct.{QCol(ContentDto.ContentTypeIdColumnName)}
+            INNER JOIN {QTab(ContentTypeDto.TableName)} ctd ON ctd.{QCol(ContentTypeDto.NodeIdColumnName)} = ctn.{QCol(NodeDto.PrimaryKeyColumnName)}");
 
         // Append optional JOINs before any WHERE clauses.
         if (filter.MemberGroupName.IsNullOrWhiteSpace() is false)
         {
             sql = sql.Append(
-                $@"INNER JOIN [{Constants.DatabaseSchema.Tables.Member2MemberGroup}] m2mg ON m2mg.[{Member2MemberGroupDto.MemberColumnName}] = m.[nodeId]
-                INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] mgn ON mgn.[id] = m2mg.[MemberGroup] AND mgn.[text] = @groupName", new { groupName = filter.MemberGroupName });
+                $@"INNER JOIN {QTab(Member2MemberGroupDto.TableName)} m2mg
+                    ON m2mg.{QCol(Member2MemberGroupDto.MemberColumnName)} = m.{QCol(MemberDto.PrimaryKeyColumnName)}
+                INNER JOIN {QTab(NodeDto.TableName)} mgn
+                    ON mgn.{QCol(NodeDto.PrimaryKeyColumnName)} = m2mg.{QCol(Member2MemberGroupDto.MemberGroupColumnName)}
+                    AND mgn.{QCol(NodeDto.TextColumnName)} = @groupName", new { groupName = filter.MemberGroupName });
         }
 
         if (filter.MemberTypeId.HasValue)
         {
-            sql = sql.Append("WHERE ctn.[uniqueId] = @typeId", new { typeId = filter.MemberTypeId.Value });
+            sql = sql.Append($"WHERE ctn.{QCol("uniqueId")} = @typeId", new { typeId = filter.MemberTypeId.Value });
         }
 
-        AppendWhereFilters(ref sql, filter, "m.[Email]", "m.[LoginName]", "n.[text]", "m.[IsApproved]", "m.[IsLockedOut]", filter.MemberTypeId.HasValue);
+        AppendWhereFilters(ref sql, filter, $"m.{QCol("Email")}", $"m.{QCol("LoginName")}", $"n.{QCol("text")}", $"m.{QCol("isApproved")}", $"m.{QCol("isLockedOut")}", filter.MemberTypeId.HasValue);
 
         return sql;
     }
@@ -122,34 +133,37 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
     {
         Sql<ISqlContext> sql = SqlContext.Sql()
             .Append($@"SELECT
-                em.[key] AS [Key],
-                em.[email] AS [Email],
-                em.[userName] AS [UserName],
-                em.[name] AS [Name],
-                em.[isApproved] AS [IsApproved],
-                em.[isLockedOut] AS [IsLockedOut],
-                em.[lastLoginDate] AS [LastLoginDate],
-                em.[lastLockoutDate] AS [LastLockoutDate],
-                CAST(NULL AS datetime) AS [LastPasswordChangeDate],
-                CAST(1 AS bit) AS [IsExternalOnly],
-                CAST(NULL AS uniqueidentifier) AS [MemberTypeKey],
-                CAST(NULL AS nvarchar(255)) AS [MemberTypeName],
-                CAST(NULL AS nvarchar(255)) AS [MemberTypeIcon]
-            FROM [{Constants.DatabaseSchema.Tables.ExternalMember}] em");
+                em.{QCol("key")},
+                em.{QCol("email")},
+                em.{QCol("userName")},
+                em.{QCol("name")},
+                em.{QCol("isApproved")},
+                em.{QCol("isLockedOut")},
+                em.{QCol("lastLoginDate")},
+                em.{QCol("lastLockoutDate")},
+                NULL AS {QName("lastPasswordChangeDate")},
+                CAST(1 AS bit) AS {QName("isExternalOnly")},
+                NULL AS {QName("memberTypeKey")},
+                NULL AS {QName("memberTypeName")},
+                NULL AS {QName("memberTypeIcon")}
+            FROM {QTab(ExternalMemberDto.TableName)} em");
 
         if (filter.MemberGroupName.IsNullOrWhiteSpace() is false)
         {
             sql = sql.Append(
-                $@"INNER JOIN [{Constants.DatabaseSchema.Tables.ExternalMember2MemberGroup}] em2mg ON em2mg.[externalMemberId] = em.[id]
-                INNER JOIN [{Constants.DatabaseSchema.Tables.Node}] emgn ON emgn.[id] = em2mg.[memberGroupId] AND emgn.[text] = @groupName", new { groupName = filter.MemberGroupName });
+                $@"INNER JOIN {QTab(ExternalMember2MemberGroupDto.TableName)} em2mg
+                    ON em2mg.{QCol(ExternalMember2MemberGroupDto.ExternalMemberColumnName)} = em.{QCol(ExternalMemberDto.PrimaryKeyColumnName)}
+                INNER JOIN {QTab(NodeDto.TableName)} emgn
+                    ON emgn.{QCol(NodeDto.PrimaryKeyColumnName)} = em2mg.{QCol(ExternalMember2MemberGroupDto.MemberGroupColumnName)}
+                    AND emgn.{QCol(NodeDto.TextColumnName)} = @groupName", new { groupName = filter.MemberGroupName });
         }
 
-        AppendWhereFilters(ref sql, filter, "em.[email]", "em.[userName]", "em.[name]", "em.[isApproved]", "em.[isLockedOut]", hasWhereAlready: false);
+        AppendWhereFilters(ref sql, filter, $"em.{QCol("email")}", $"em.{QCol("userName")}", $"em.{QCol("name")}", $"em.{QCol("isApproved")}", $"em.{QCol("isLockedOut")}", hasWhereAlready: false);
 
         return sql;
     }
 
-    private static void AppendWhereFilters(
+    private void AppendWhereFilters(
         ref Sql<ISqlContext> sql,
         MemberFilter filter,
         string emailCol,
@@ -186,15 +200,15 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
         }
     }
 
-    private static string MapOrderByColumn(string? orderBy) =>
+    private string MapOrderByColumn(string? orderBy) =>
         orderBy?.ToLowerInvariant() switch
         {
-            "email" => "[Email]",
-            "name" => "[Name]",
-            "isapproved" => "[IsApproved]",
-            "islockedout" => "[IsLockedOut]",
-            "lastlogindate" => "[LastLoginDate]",
-            _ => "[UserName]",
+            "email" => QCol("email"),
+            "name" => QCol("name"),
+            "isapproved" => QCol("isApproved"),
+            "islockedout" => QCol("isLockedOut"),
+            "lastlogindate" => QCol("lastLoginDate"),
+            _ => QCol("userName"),
         };
 
     private static MemberFilterItem MapToItem(MemberFilterItemDto dto) =>
@@ -222,43 +236,43 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
     [ExplicitColumns]
     private sealed class MemberFilterItemDto
     {
-        [Column("Key")]
+        [Column("key")]
         public Guid Key { get; set; }
 
-        [Column("Email")]
+        [Column("email")]
         public string Email { get; set; } = string.Empty;
 
-        [Column("UserName")]
+        [Column("userName")]
         public string UserName { get; set; } = string.Empty;
 
-        [Column("Name")]
+        [Column("name")]
         public string? Name { get; set; }
 
-        [Column("IsApproved")]
+        [Column("isApproved")]
         public bool IsApproved { get; set; }
 
-        [Column("IsLockedOut")]
+        [Column("isLockedOut")]
         public bool IsLockedOut { get; set; }
 
-        [Column("LastLoginDate")]
+        [Column("lastLoginDate")]
         public DateTime? LastLoginDate { get; set; }
 
-        [Column("LastLockoutDate")]
+        [Column("lastLockoutDate")]
         public DateTime? LastLockoutDate { get; set; }
 
-        [Column("LastPasswordChangeDate")]
+        [Column("lastPasswordChangeDate")]
         public DateTime? LastPasswordChangeDate { get; set; }
 
-        [Column("IsExternalOnly")]
+        [Column("isExternalOnly")]
         public bool IsExternalOnly { get; set; }
 
-        [Column("MemberTypeKey")]
+        [Column("memberTypeKey")]
         public Guid? MemberTypeKey { get; set; }
 
-        [Column("MemberTypeName")]
+        [Column("memberTypeName")]
         public string? MemberTypeName { get; set; }
 
-        [Column("MemberTypeIcon")]
+        [Column("memberTypeIcon")]
         public string? MemberTypeIcon { get; set; }
     }
 }
