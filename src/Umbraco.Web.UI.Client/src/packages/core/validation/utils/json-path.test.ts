@@ -60,9 +60,6 @@ describe('UmbJsonPathFunctions', () => {
 		expect(result).to.eq('bs');
 	});
 
-	// Currently fails: `JsFilterFromJsonPathFilter` strips quotes via `equal.slice(1, -1)`, which turns the
-	// `null` literal into the string `'ul'` and never matches. Once the caller bug above is fixed this will
-	// surface as "no entry found" for any query with `@.x == null`.
 	it('matches the null literal in a filter predicate', () => {
 		const data = [
 			{ alias: 'a', segment: 'foo', value: 'with-segment' },
