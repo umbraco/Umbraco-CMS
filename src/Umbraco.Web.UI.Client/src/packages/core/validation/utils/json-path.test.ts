@@ -49,8 +49,6 @@ describe('UmbJsonPathFunctions', () => {
 		expect(result).to.eq('test');
 	});
 
-	// Currently fails: `_GetNextArrayEntryFromPath` only applies `jsFilter[0]`, so a query with multiple
-	// AND-conditions collapses to a match on the first predicate alone and returns the wrong entry.
 	it('multi-AND filter matches all predicates, not just the first', () => {
 		const data = [
 			{ alias: 'blocks', culture: 'en-US', value: 'en' },
