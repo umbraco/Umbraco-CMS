@@ -68,8 +68,8 @@ function _GetNextArrayEntryFromPath(array: Array<any>, path: string): any {
 		// get the filter from the entryPointer:
 		// get the filter as a function:
 		const jsFilter = JsFilterFromJsonPathFilter(entryPointer);
-		// find the index of the value that matches the filter:
-		const index = array.findIndex(jsFilter[0]);
+		// find the index of the value that matches every predicate of the filter:
+		const index = array.findIndex((item) => jsFilter.every((predicate) => predicate(item)));
 		// if the index is -1, return undefined:
 		if (index === -1) return undefined;
 		// get the value at the index:
