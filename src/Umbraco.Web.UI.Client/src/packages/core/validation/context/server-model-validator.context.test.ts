@@ -74,12 +74,6 @@ describe('UmbServerModelValidatorContext', () => {
 			);
 		});
 
-		// Bare-minimum repro for the multi-AND-filter lookup bug.
-		// Why: the server reports `$.values[1].value.contentData[0].label` for the bs variant.
-		// Outer query is built correctly as `?(@.alias == 'blocks' && @.culture == 'bs' && @.segment == null)`,
-		// but `_GetNextArrayEntryFromPath` (json-path.function.ts) only applies `jsFilter[0]` (i.e. the alias check)
-		// when looking the entry back up for the inner mapper, so it returns the en-US entry and the inner
-		// `contentData[0]` resolves to `EN-KEY` instead of `BS-KEY`.
 		it('resolves the correct inner entry when the outer query has multiple AND-conditions', async () => {
 			const data = {
 				values: [
