@@ -48,4 +48,31 @@ describe('UmbJsonPathFunctions', () => {
 
 		expect(result).to.eq('test');
 	});
+
+	// Currently fails: `_GetNextArrayEntryFromPath` only applies `jsFilter[0]`, so a query with multiple
+	// AND-conditions collapses to a match on the first predicate alone and returns the wrong entry.
+	it('multi-AND filter matches all predicates, not just the first', () => {
+		const data = [
+			{ alias: 'blocks', culture: 'en-US', value: 'en' },
+			{ alias: 'blocks', culture: 'bs', value: 'bs' },
+		];
+
+		const result = GetValueByJsonPath(data, `$[?(@.alias == 'blocks' && @.culture == 'bs')].value`);
+
+		expect(result).to.eq('bs');
+	});
+
+	// Currently fails: `JsFilterFromJsonPathFilter` strips quotes via `equal.slice(1, -1)`, which turns the
+	// `null` literal into the string `'ul'` and never matches. Once the caller bug above is fixed this will
+	// surface as "no entry found" for any query with `@.x == null`.
+	it('matches the null literal in a filter predicate', () => {
+		const data = [
+			{ alias: 'a', segment: 'foo', value: 'with-segment' },
+			{ alias: 'a', segment: null, value: 'no-segment' },
+		];
+
+		const result = GetValueByJsonPath(data, `$[?(@.alias == 'a' && @.segment == null)].value`);
+
+		expect(result).to.eq('no-segment');
+	});
 });
