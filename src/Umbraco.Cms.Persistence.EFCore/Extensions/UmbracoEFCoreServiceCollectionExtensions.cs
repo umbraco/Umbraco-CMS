@@ -132,6 +132,32 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     /// <param name="builder">The DbContext options builder.</param>
     /// <param name="providerName">The database provider name.</param>
     /// <param name="connectionString">The connection string.</param>
+    /// <exception cref="InvalidDataException">Thrown when the provider is not supported.</exception>
+    /// <remarks>
+    /// Only supports the databases normally supported in Umbraco.
+    /// </remarks>
+    public static void UseDatabaseProvider(this DbContextOptionsBuilder builder, string providerName, string connectionString)
+    {
+        switch (providerName)
+        {
+            case Constants.ProviderNames.SQLServer:
+                builder.UseSqlServer(connectionString);
+                break;
+            case Constants.ProviderNames.SQLLite:
+            case "Microsoft.Data.SQLite":
+                builder.UseSqlite(connectionString);
+                break;
+            default:
+                throw new InvalidDataException($"The provider {providerName} is not supported. Manually add the add the UseXXX statement to the options. I.E UseNpgsql()");
+        }
+    }
+
+    /// <summary>
+    /// Sets the database provider. I.E UseSqlite or UseSqlServer based on the provider name.
+    /// </summary>
+    /// <param name="builder">The DbContext options builder.</param>
+    /// <param name="providerName">The database provider name.</param>
+    /// <param name="connectionString">The connection string.</param>
     /// <param name="serviceProvider">The service provider to resolve registered IMigrationProviderSetup instances from.</param>
     /// <exception cref="InvalidDataException">Thrown when the provider is not supported.</exception>
     /// <remarks>
