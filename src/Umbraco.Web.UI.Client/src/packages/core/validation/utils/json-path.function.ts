@@ -109,8 +109,8 @@ function JsFilterFromJsonPathFilter(filter: string): Array<(item: any) => boolea
 		const [path, equal] = part.split(' == ');
 		// remove @.
 		const key = path.slice(2);
-		// remove quotes:
-		const value = equal.slice(1, -1);
+		// `null` is the only unquoted literal currently emitted; everything else is a quoted string.
+		const value = equal === 'null' ? null : equal.slice(1, -1);
 		// return a function that returns true if the key is equal to the value
 		return (item: any) => item[key] === value;
 	});
