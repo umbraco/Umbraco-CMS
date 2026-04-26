@@ -138,18 +138,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     /// </remarks>
     public static void UseDatabaseProvider(this DbContextOptionsBuilder builder, string providerName, string connectionString)
     {
-        switch (providerName)
-        {
-            case Constants.ProviderNames.SQLServer:
-                builder.UseSqlServer(connectionString);
-                break;
-            case Constants.ProviderNames.SQLLite:
-            case "Microsoft.Data.SQLite":
-                builder.UseSqlite(connectionString);
-                break;
-            default:
-                throw new InvalidDataException($"The provider {providerName} is not supported. Manually add the add the UseXXX statement to the options. I.E UseNpgsql()");
-        }
+        builder.UseDatabaseProvider(providerName, connectionString, null);
     }
 
     /// <summary>
@@ -163,7 +152,7 @@ public static class UmbracoEFCoreServiceCollectionExtensions
     /// <remarks>
     /// Only supports the databases normally supported in Umbraco.
     /// </remarks>
-    public static void UseDatabaseProvider(this DbContextOptionsBuilder builder, string providerName, string connectionString, IServiceProvider serviceProvider)
+    public static void UseDatabaseProvider(this DbContextOptionsBuilder builder, string providerName, string connectionString, IServiceProvider? serviceProvider)
     {
         // Try built-in providers first; if not supported, fall back to registered IMigrationProviderSetup
         switch (providerName)
@@ -176,12 +165,19 @@ public static class UmbracoEFCoreServiceCollectionExtensions
                 builder.UseSqlite(connectionString);
                 break;
             default:
-                IEnumerable<IMigrationProviderSetup> migrationProviderSetups = serviceProvider.GetServices<IMigrationProviderSetup>();
-                IMigrationProviderSetup? migrationProvider = migrationProviderSetups.FirstOrDefault(x => x.ProviderName.CompareProviderNames(providerName))
-                    ?? throw new InvalidDataException($"No built-in database provider or registered {nameof(IMigrationProviderSetup)} matched the configured provider name '{providerName}'. " +
-                    $"Register an {nameof(IMigrationProviderSetup)} for this provider name or configure the DbContext options explicitly.");
+                if (serviceProvider == null)
+                {
+                    throw new InvalidDataException($"The provider {providerName} is not supported. Manually add the add the UseXXX statement to the options. I.E UseNpgsql()");
+                }
+                else
+                {
+                    IEnumerable<IMigrationProviderSetup> migrationProviderSetups = serviceProvider.GetServices<IMigrationProviderSetup>();
+                    IMigrationProviderSetup? migrationProvider = migrationProviderSetups.FirstOrDefault(x => x.ProviderName.CompareProviderNames(providerName))
+                        ?? throw new InvalidDataException($"No built-in database provider or registered {nameof(IMigrationProviderSetup)} matched the configured provider name '{providerName}'. " +
+                        $"Register an {nameof(IMigrationProviderSetup)} for this provider name or configure the DbContext options explicitly.");
 
-                migrationProvider.Setup(builder, connectionString);
+                    migrationProvider.Setup(builder, connectionString);
+                }
                 break;
         }
     }
