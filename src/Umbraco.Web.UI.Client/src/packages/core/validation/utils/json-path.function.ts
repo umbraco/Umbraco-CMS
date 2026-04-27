@@ -101,7 +101,7 @@ function _GetNextArrayEntryFromPath(array: Array<any>, path: string): any {
 function JsFilterFromJsonPathFilter(filter: string): Array<(item: any) => boolean> {
 	// strip ?( and ) from the filter
 	const jsFilter = filter.slice(2, -1);
-	// split the filter into parts by splitting at ' && '
+	// split the filter into single conditions by splitting at ' && '
 	const parts = jsFilter.split(' && ');
 	// map each part to a function that returns true if the part is true
 	return parts.map((part) => {

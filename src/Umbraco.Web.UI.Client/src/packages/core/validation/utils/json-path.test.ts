@@ -49,7 +49,7 @@ describe('UmbJsonPathFunctions', () => {
 		expect(result).to.eq('test');
 	});
 
-	it('multi-AND filter matches all predicates, not just the first', () => {
+	it('multi-AND filter matches all conditions, not just the first', () => {
 		const data = [
 			{ alias: 'blocks', culture: 'en-US', value: 'en' },
 			{ alias: 'blocks', culture: 'bs', value: 'bs' },
