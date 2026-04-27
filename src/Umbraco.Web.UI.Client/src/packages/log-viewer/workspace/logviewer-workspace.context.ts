@@ -1,7 +1,7 @@
 import { UmbLogViewerRepository } from '../repository/log-viewer.repository.js';
 import type { UmbLogLevelCounts } from '../types.js';
 import { UMB_APP_LOG_VIEWER_CONTEXT } from './logviewer-workspace.context-token.js';
-import { UmbBasicState, UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBasicState, UmbArrayState, UmbNumberState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type {
 	PagedLoggerResponseModel,
 	PagedLogMessageResponseModel,
@@ -100,7 +100,8 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 
 	#intervalID: number | null = null;
 
-	currentPage = 1;
+	#currentPage = new UmbNumberState<number>(1);
+	currentPage = this.#currentPage.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_APP_LOG_VIEWER_CONTEXT);
@@ -261,7 +262,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	}
 
 	setCurrentPage(page: number) {
-		this.currentPage = page;
+		this.#currentPage.setValue(page);
 	}
 
 	getLogs = async () => {
@@ -273,7 +274,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 
 		if (!isPollingEnabled) this.#isLoadingLogs.setValue(true);
 
-		const skip = (this.currentPage - 1) * 100;
+		const skip = (this.#currentPage.getValue() - 1) * 100;
 		const take = 100;
 
 		const options = {
@@ -303,7 +304,7 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 	#startPolling(interval: UmbPoolingInterval) {
 		this.stopPolling();
 		this.#intervalID = setInterval(() => {
-			this.currentPage = 1;
+			this.#currentPage.setValue(1);
 			this.getLogs();
 		}, interval) as unknown as number;
 	}

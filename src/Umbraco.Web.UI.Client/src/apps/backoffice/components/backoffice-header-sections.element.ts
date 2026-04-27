@@ -77,7 +77,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		if (!section) return;
 		e.preventDefault();
 		e.stopPropagation();
-		window.location.assign(this.#getSectionPath(section));
+		history.pushState(null, '', this.#getSectionPath(section));
 	};
 
 	#getSectionPath(manifest: ManifestSection | undefined) {
@@ -104,25 +104,14 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		}
 
 		const clickedSectionAlias = manifest.alias;
-		const isMobile = this.#mobileQuery.matches;
-		let targetPath: string;
 
-		// If preventUrlRetention is set to true then go to the section root.
-		// Or if the clicked section is the current active one, then navigate to the section root
-		if (manifest?.meta.preventUrlRetention === true || this._currentSectionAlias === clickedSectionAlias) {
-			targetPath = this.#getSectionPath(manifest);
-		} else if (this.#sectionPathMap.has(clickedSectionAlias)) {
-			targetPath = this.#sectionPathMap.get(clickedSectionAlias)!;
-		} else {
-			targetPath = this.#getSectionPath(manifest);
-		}
+		// If preventUrlRetention is set, or the clicked section is already active, always go to the section root.
+		const targetPath =
+			manifest.meta.preventUrlRetention === true || this._currentSectionAlias === clickedSectionAlias
+				? this.#getSectionPath(manifest)
+				: (this.#sectionPathMap.get(clickedSectionAlias) ?? this.#getSectionPath(manifest));
 
-		// On mobile, use a full navigation so overflow-popover tab clicks reliably trigger routing
-		if (isMobile) {
-			window.location.assign(targetPath);
-		} else {
-			history.pushState(null, '', targetPath);
-		}
+		history.pushState(null, '', targetPath);
 	}
 
 	#onCurrentSectionClick(event: PointerEvent) {

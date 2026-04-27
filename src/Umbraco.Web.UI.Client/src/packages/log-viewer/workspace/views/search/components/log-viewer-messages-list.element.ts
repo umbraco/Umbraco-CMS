@@ -57,6 +57,10 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 		// Observe filter expression changes to trigger search
 		// Only observes when this component is mounted (when logs are visible)
+		this.observe(this._logViewerContext?.currentPage, (page) => {
+			this._currentPage = page ?? 1;
+		});
+
 		this.observe(
 			this._logViewerContext?.filterExpression.pipe(
 				skip(1), // Skip initial value to avoid duplicate search on page load
@@ -79,7 +83,6 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 	}
 
 	#goToPage(page: number): void {
-		this._currentPage = page;
 		this._logViewerContext?.setCurrentPage(page);
 		this._logViewerContext?.getLogs();
 		this._logsScrollContainer.scrollTop = 0;
