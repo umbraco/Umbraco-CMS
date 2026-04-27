@@ -1233,7 +1233,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickCreateInModal(headline: string, options?: {waitForClose?: 'target' | 'any'}) {
-    const modalLocator = this.page.locator('[headline="' + headline + '"]');
+    const modalLocator = this.page.getByTestId(`block-workspace:${headline}`);
     await this.click(modalLocator.getByLabel('Create'));
 
     if (options?.waitForClose === 'target') {
@@ -1532,7 +1532,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async doesBlockEditorModalContainEditorSize(editorSize: string, elementName: string) {
-    await this.isVisible(this.backofficeModalContainer.locator(`[size="${editorSize}"]`).locator(`[headline="Add ${elementName}"]`));
+    await this.isVisible(this.backofficeModalContainer.locator(`[size="${editorSize}"]`).getByTestId(`block-workspace:Add ${elementName}`));
   }
 
   async doesBlockEditorModalContainInline(richTextEditorAlias: string, elementName: string) {

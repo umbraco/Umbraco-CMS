@@ -34,6 +34,7 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		return html`<umb-workspace-editor
+			data-mark="block-workspace:${this._headline}"
 			><div slot="header">
 				<h3>${this._headline}</h3>
 				${this._readOnly
