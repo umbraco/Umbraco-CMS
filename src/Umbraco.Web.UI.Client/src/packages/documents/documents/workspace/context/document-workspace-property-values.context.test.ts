@@ -134,7 +134,11 @@ describe('UmbDocumentWorkspaceContext', () => {
 			});
 
 			it('does not create a phantom invariant entry when setting a culture-variant property without a variantId', async () => {
-				await context.setPropertyValue('variantText', 'phantom value');
+				try {
+					await context.setPropertyValue('variantText', 'phantom value');
+				} catch (e) {
+					// expected: culture-variant property requires a variantId
+				}
 				const values = context.getValues();
 				expect(values).to.be.an('array').with.lengthOf(3);
 			});

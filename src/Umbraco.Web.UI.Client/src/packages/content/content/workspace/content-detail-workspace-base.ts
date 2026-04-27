@@ -684,6 +684,13 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				throw new Error(`Property alias "${alias}" not found.`);
 			}
 
+			if (
+				(property.variesByCulture && variantId.isCultureInvariant()) ||
+				(property.variesBySegment && variantId.isSegmentInvariant())
+			) {
+				throw new Error(`Property alias "${alias}" requires a variantId.`);
+			}
+
 			// the getItemByUnique is a async method that first resolves once the item is loaded.
 			const editorAlias = (await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique))
 				.propertyEditorSchemaAlias;
