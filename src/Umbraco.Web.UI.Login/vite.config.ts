@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'node:path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
 	resolve: {
 		tsconfigPaths: true,
+	},
+	server: {
+		fs: {
+			allow: [resolve(import.meta.dirname, '..')],
+		},
 	},
 	build: {
 		lib: {

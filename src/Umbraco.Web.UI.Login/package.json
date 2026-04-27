@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "postinstall": "node devops/tsconfig/index.js",
+    "postinstall": "npm run generate:tsconfig",
     "dev": "vite",
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
