@@ -4,6 +4,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
 import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-workspace-context.test-utils.js';
+import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 
 const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 const INVARIANT_DOCUMENT_TYPE_ID = 'variant-documents-invariant-document-type-id';
@@ -71,7 +72,7 @@ describe('UmbDocumentWorkspaceContext (CRUD)', () => {
 	});
 
 	describe('create (save new document)', () => {
-		let uniqueBeforeSave: string | undefined;
+		let uniqueBeforeSave: UmbEntityUnique | undefined;
 
 		beforeEach(async () => {
 			await context.create(PARENT_ENTITY, INVARIANT_DOCUMENT_TYPE_ID);
