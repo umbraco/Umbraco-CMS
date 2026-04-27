@@ -22,8 +22,14 @@ const clientPkg = JSON.parse(readFileSync(resolve(clientDir, 'package.json'), 'u
 const paths = {};
 
 for (const [subpath, target] of Object.entries(clientPkg.exports ?? {})) {
-	if (typeof target !== 'string') continue;
+	if (target === null) continue; // The `.` self-reference.
 	if (!subpath.startsWith('./')) continue;
+	if (typeof target !== 'string') {
+		throw new Error(
+			`Unsupported exports entry for "${subpath}" in ${clientPkg.name}: expected a string target, got ${typeof target}. ` +
+				`Update the generator to handle conditional exports.`,
+		);
+	}
 
 	const aliasKey = `${clientPkg.name}/${subpath.slice(2)}`;
 	const sourceTarget = target
