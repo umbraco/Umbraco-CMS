@@ -1,44 +1,18 @@
 import { expect } from '@open-wc/testing';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
-import { UmbDocumentDetailStore } from '../../repository/detail/document-detail.store.js';
-import { manifests as documentDetailRepositoryManifests } from '../../repository/detail/manifests.js';
-import { UmbDocumentTypeDetailStore } from '../../../document-types/repository/detail/document-type-detail.store.js';
-import { UmbDataTypeDetailStore } from '../../../../data-type/repository/detail/data-type-detail.store.js';
-import { UmbDataTypeItemStore } from '../../../../data-type/repository/item/data-type-item.store.js';
-import { manifests as userPermissionConditionManifests } from '../../user-permissions/document/conditions/manifests.js';
-import { manifests as dataTypeItemManifests } from '../../../../data-type/repository/item/manifests.js';
+import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-workspace-context.test-utils.js';
 
 const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
 
-const TEST_MANIFESTS = [
-	...documentDetailRepositoryManifests,
-	...userPermissionConditionManifests,
-	...dataTypeItemManifests,
-];
-
-@customElement('umb-test-document-workspace-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
-	constructor() {
-		super();
-		new UmbDocumentDetailStore(this);
-		new UmbDocumentTypeDetailStore(this);
-		new UmbDataTypeDetailStore(this);
-		new UmbDataTypeItemStore(this);
-	}
-}
-
 describe('UmbDocumentWorkspaceContext', () => {
-	let hostElement: UmbTestControllerHostElement;
+	let hostElement: UmbTestDocumentWorkspaceHostElement;
 	let context: UmbDocumentWorkspaceContext;
 
-	before(async () => {
-		await useMockSet('variantDocuments');
+	before(() => {
 		umbExtensionsRegistry.registerMany(TEST_MANIFESTS);
 	});
 
@@ -46,8 +20,9 @@ describe('UmbDocumentWorkspaceContext', () => {
 		umbExtensionsRegistry.unregisterMany(TEST_MANIFESTS.map((m) => m.alias));
 	});
 
-	beforeEach(() => {
-		hostElement = new UmbTestControllerHostElement();
+	beforeEach(async () => {
+		await useMockSet('variantDocuments');
+		hostElement = new UmbTestDocumentWorkspaceHostElement();
 		document.body.appendChild(hostElement);
 		context = new UmbDocumentWorkspaceContext(hostElement);
 	});
@@ -90,6 +65,10 @@ describe('UmbDocumentWorkspaceContext', () => {
 				expect(context.getPropertyValue('variantText', variantId)).to.equal('Dette er den danske varianttekst.');
 			});
 
+			it('returns undefined for a culture-variant property when called without a variantId', () => {
+				expect(context.getPropertyValue('variantText')).to.be.undefined;
+			});
+
 			it('returns undefined for an unknown alias', () => {
 				expect(context.getPropertyValue('nonExistent')).to.be.undefined;
 			});
@@ -116,6 +95,19 @@ describe('UmbDocumentWorkspaceContext', () => {
 				}
 				expect(error?.message).to.equal('Property alias "nonExistent" not found.');
 			});
+
+			it('leaves the values observable functional after throwing for an unknown alias', async () => {
+				try {
+					await context.setPropertyValue('nonExistent', 'value');
+				} catch (e) {
+					// expected throw
+				}
+				const emissions: Array<unknown> = [];
+				const sub = context.values.subscribe((v) => emissions.push(v));
+				await context.setPropertyValue('text', 'probe after error');
+				expect(emissions.length).to.be.greaterThan(1);
+				sub.unsubscribe();
+			});
 		});
 
 		describe('variant document', () => {
@@ -139,6 +131,12 @@ describe('UmbDocumentWorkspaceContext', () => {
 			it('updates the invariant property value without a variantId', async () => {
 				await context.setPropertyValue('text', 'Updated shared text');
 				expect(context.getPropertyValue('text')).to.equal('Updated shared text');
+			});
+
+			it('does not create a phantom invariant entry when setting a culture-variant property without a variantId', async () => {
+				await context.setPropertyValue('variantText', 'phantom value');
+				const values = context.getValues();
+				expect(values).to.be.an('array').with.lengthOf(3);
 			});
 		});
 	});
@@ -192,6 +190,16 @@ describe('UmbDocumentWorkspaceContext', () => {
 	});
 
 	describe('propertyValueByAlias', () => {
+		describe('before load', () => {
+			it('returns an observable that emits undefined when no document is loaded', async () => {
+				const obs = await context.propertyValueByAlias<string>('text');
+				let emitted: string | undefined = 'sentinel';
+				const sub = obs!.subscribe((v) => (emitted = v));
+				expect(emitted).to.be.undefined;
+				sub.unsubscribe();
+			});
+		});
+
 		describe('invariant document', () => {
 			beforeEach(async () => {
 				await context.load(INVARIANT_DOCUMENT_ID);
@@ -230,12 +238,21 @@ describe('UmbDocumentWorkspaceContext', () => {
 				await context.load(VARIANT_DOCUMENT_ID);
 			});
 
-			it('returns an observable filtered by variantId', async () => {
+			it('returns an observable filtered by the en-US variantId', async () => {
 				const variantId = UmbVariantId.Create({ culture: 'en-US', segment: null });
 				const obs = await context.propertyValueByAlias<string>('variantText', variantId);
 				let emitted: string | undefined;
 				const sub = obs!.subscribe((v) => (emitted = v));
 				expect(emitted).to.equal('This is the English variant text.');
+				sub.unsubscribe();
+			});
+
+			it('returns an observable filtered by the da variantId', async () => {
+				const variantId = UmbVariantId.Create({ culture: 'da', segment: null });
+				const obs = await context.propertyValueByAlias<string>('variantText', variantId);
+				let emitted: string | undefined;
+				const sub = obs!.subscribe((v) => (emitted = v));
+				expect(emitted).to.equal('Dette er den danske varianttekst.');
 				sub.unsubscribe();
 			});
 		});
@@ -246,7 +263,7 @@ describe('UmbDocumentWorkspaceContext', () => {
 			await context.load(INVARIANT_DOCUMENT_ID);
 		});
 
-		it('suppresses values emissions while changes are initiated', async () => {
+		it('suppresses values emissions while changes are initiated and flushes on finish', async () => {
 			const emissions: unknown[] = [];
 			const sub = context.values.subscribe((v) => emissions.push(v));
 			const countAtStart = emissions.length;
@@ -257,6 +274,9 @@ describe('UmbDocumentWorkspaceContext', () => {
 			expect(emissions.length).to.equal(countAtStart);
 
 			context.finishPropertyValueChange();
+
+			expect(emissions.length).to.equal(countAtStart + 1);
+			expect(context.getPropertyValue('text')).to.equal('Batched value');
 			sub.unsubscribe();
 		});
 

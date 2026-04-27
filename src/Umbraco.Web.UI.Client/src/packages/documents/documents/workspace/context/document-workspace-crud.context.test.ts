@@ -1,43 +1,18 @@
 import { expect } from '@open-wc/testing';
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
-import { UmbDocumentDetailStore } from '../../repository/detail/document-detail.store.js';
-import { manifests as documentDetailRepositoryManifests } from '../../repository/detail/manifests.js';
-import { UmbDocumentTypeDetailStore } from '../../../document-types/repository/detail/document-type-detail.store.js';
-import { UmbDataTypeDetailStore } from '../../../../data-type/repository/detail/data-type-detail.store.js';
-import { UmbDataTypeItemStore } from '../../../../data-type/repository/item/data-type-item.store.js';
-import { manifests as userPermissionConditionManifests } from '../../user-permissions/document/conditions/manifests.js';
-import { manifests as dataTypeItemManifests } from '../../../../data-type/repository/item/manifests.js';
-import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-workspace-context.test-utils.js';
 
 const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 const INVARIANT_DOCUMENT_TYPE_ID = 'variant-documents-invariant-document-type-id';
+const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
 
 const PARENT_ENTITY = { entityType: 'document', unique: null } as const;
 
-const TEST_MANIFESTS = [
-	...documentDetailRepositoryManifests,
-	...userPermissionConditionManifests,
-	...dataTypeItemManifests,
-];
-
-@customElement('umb-test-document-workspace-crud-host')
-class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {
-	constructor() {
-		super();
-		new UmbDocumentDetailStore(this);
-		new UmbDocumentTypeDetailStore(this);
-		new UmbDataTypeDetailStore(this);
-		new UmbDataTypeItemStore(this);
-		new UmbActionEventContext(this);
-	}
-}
-
 describe('UmbDocumentWorkspaceContext (CRUD)', () => {
-	let hostElement: UmbTestControllerHostElement;
+	let hostElement: UmbTestDocumentWorkspaceHostElement;
 	let context: UmbDocumentWorkspaceContext;
 
 	before(() => {
@@ -50,13 +25,23 @@ describe('UmbDocumentWorkspaceContext (CRUD)', () => {
 
 	beforeEach(async () => {
 		await useMockSet('variantDocuments');
-		hostElement = new UmbTestControllerHostElement();
+		hostElement = new UmbTestDocumentWorkspaceHostElement();
 		document.body.appendChild(hostElement);
 		context = new UmbDocumentWorkspaceContext(hostElement);
 	});
 
 	afterEach(() => {
 		document.body.innerHTML = '';
+	});
+
+	describe('before any load or create', () => {
+		it('getUnique returns undefined', () => {
+			expect(context.getUnique()).to.be.undefined;
+		});
+
+		it('getIsNew returns undefined', () => {
+			expect(context.getIsNew()).to.be.undefined;
+		});
 	});
 
 	describe('createScaffold', () => {
@@ -144,6 +129,50 @@ describe('UmbDocumentWorkspaceContext (CRUD)', () => {
 		});
 	});
 
+	describe('setName', () => {
+		it('sets the name for a specific culture variant', async () => {
+			await context.load(VARIANT_DOCUMENT_ID);
+			const variantId = UmbVariantId.Create({ culture: 'en-US', segment: null });
+			context.setName('Updated English Name', variantId);
+			expect(context.getVariant(variantId)?.name).to.equal('Updated English Name');
+		});
+
+		it('does not affect other culture variants when setting a name for one culture', async () => {
+			await context.load(VARIANT_DOCUMENT_ID);
+			const enUs = UmbVariantId.Create({ culture: 'en-US', segment: null });
+			const da = UmbVariantId.Create({ culture: 'da', segment: null });
+			context.setName('Updated English Name', enUs);
+			expect(context.getVariant(da)?.name).to.equal('Variant Dokument');
+		});
+	});
+
+	describe('multi-variant save', () => {
+		beforeEach(async () => {
+			await context.load(VARIANT_DOCUMENT_ID);
+		});
+
+		it('persists an en-US property change after save', async () => {
+			const enUs = UmbVariantId.Create({ culture: 'en-US', segment: null });
+			await context.setPropertyValue('variantText', 'Updated en-US by test', enUs);
+			await context.requestSave();
+
+			const newContext = new UmbDocumentWorkspaceContext(hostElement);
+			await newContext.load(VARIANT_DOCUMENT_ID);
+			expect(newContext.getPropertyValue('variantText', enUs)).to.equal('Updated en-US by test');
+		});
+
+		it('does not alter the da culture when saving an en-US change', async () => {
+			const enUs = UmbVariantId.Create({ culture: 'en-US', segment: null });
+			const da = UmbVariantId.Create({ culture: 'da', segment: null });
+			await context.setPropertyValue('variantText', 'Updated en-US by test', enUs);
+			await context.requestSave();
+
+			const newContext = new UmbDocumentWorkspaceContext(hostElement);
+			await newContext.load(VARIANT_DOCUMENT_ID);
+			expect(newContext.getPropertyValue('variantText', da)).to.equal('Dette er den danske varianttekst.');
+		});
+	});
+
 	describe('delete', () => {
 		it('removes the document so a subsequent load returns an error', async () => {
 			await context.load(INVARIANT_DOCUMENT_ID);
@@ -152,6 +181,15 @@ describe('UmbDocumentWorkspaceContext (CRUD)', () => {
 			const newContext = new UmbDocumentWorkspaceContext(hostElement);
 			const { error } = await newContext.load(INVARIANT_DOCUMENT_ID);
 			expect(error).to.exist;
+		});
+
+		it('the load error after delete has a 404 status', async () => {
+			await context.load(INVARIANT_DOCUMENT_ID);
+			await context.delete(INVARIANT_DOCUMENT_ID);
+
+			const newContext = new UmbDocumentWorkspaceContext(hostElement);
+			const { error } = await newContext.load(INVARIANT_DOCUMENT_ID);
+			expect((error as { status?: number })?.status).to.equal(404);
 		});
 	});
 });
