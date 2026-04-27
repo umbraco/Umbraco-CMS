@@ -30,6 +30,7 @@ services:
         - ASPNETCORE_URLS=https://+:8081;http://+:8080
         - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetcore.pfx
         - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
+        - Umbraco__CMS__Imaging__HMACSecretKey=${HMAC_SECRET_KEY}
         - ConnectionStrings__umbracoDbDSN=Server=umb_database;Database=umbracoDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=true;
         - ConnectionStrings__umbracoDbDSN_ProviderName=Microsoft.Data.SqlClient
     # These volumes are bind mounts to the host machine's file system.
