@@ -40,10 +40,6 @@ const tsConfigBase = {
 		strict: true,
 		noFallthroughCasesInSwitch: true,
 		noImplicitReturns: true,
-		// Silences the TS 6.0 deprecation warning triggered by the implicit
-		// baseUrl TypeScript assigns when `paths` is declared without an
-		// explicit baseUrl. Remove when we stop using `paths`.
-		ignoreDeprecations: '6.0',
 	},
 	include: [
 		'src/**/*.ts',

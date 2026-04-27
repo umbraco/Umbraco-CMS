@@ -23,13 +23,6 @@ execSync('npx postcss dist-cms/css/**/*.css --replace --use cssnano --verbose', 
 console.log('--- Minifying CSS done ---');
 
 rmSync(outputDir, { recursive: true, force: true });
-// Exclude TypeScript declarations and tsbuildinfo — they are only needed by sibling projects
-// (e.g. Umbraco.Web.UI.Login) consuming dist-cms via a file: dep for types. They must not
-// ship to the CMS runtime under wwwroot/umbraco/backoffice.
-const excludeFromRuntime = /\.(d\.ts|tsbuildinfo)$/;
-cpSync(srcDir, outputDir, {
-	recursive: true,
-	filter: (src) => !excludeFromRuntime.test(src),
-});
+cpSync(srcDir, outputDir, { recursive: true });
 
 console.log('--- Copied build output to CMS successfully. ---');

@@ -3,14 +3,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "predev": "node scripts/ensure-client-built.mjs",
-    "prebuild": "node scripts/ensure-client-built.mjs",
-    "prewatch": "node scripts/ensure-client-built.mjs",
+    "predev": "node devops/tsconfig/index.js",
+    "prebuild": "node devops/tsconfig/index.js",
+    "prewatch": "node devops/tsconfig/index.js",
     "dev": "vite",
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
     "preview": "vite preview",
-    "generate:server-api": "openapi-ts"
+    "generate:server-api": "openapi-ts",
+    "generate:tsconfig": "node devops/tsconfig/index.js"
   },
   "engines": {
     "node": ">=24.13",
@@ -18,7 +19,6 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.85.2",
-    "@umbraco-cms/backoffice": "file:../Umbraco.Web.UI.Client",
     "msw": "^2.13.5",
     "typescript": "^6.0.3",
     "vite": "^8.0.10"
