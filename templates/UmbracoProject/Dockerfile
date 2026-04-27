@@ -36,7 +36,7 @@ RUN mkdir -p /https && \
     openssl pkcs12 -export -out /https/aspnetcore.pfx \
       -inkey /https/aspnetcore.key \
       -in /https/aspnetcore.crt \
-      -password pass:$CERT_PASSWORD && \
+      -password "pass:${CERT_PASSWORD}" && \
     chmod 644 /https/aspnetcore.pfx
 
 # Copy entrypoint script
