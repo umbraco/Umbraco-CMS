@@ -1,18 +1,14 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
+import viteTSConfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	resolve: {
-		tsconfigPaths: true,
-	},
-	optimizeDeps: {
-		// Rolldown's dep pre-bundle drops @umbraco-ui/uui's per-component
-		// `customElements.define()` side-effects regardless of `sideEffects`
-		// in package.json or `treeshake.moduleSideEffects: true`. Skip the
-		// pre-bundle so the package is served as-is.
-		exclude: ['@umbraco-ui/uui'],
-	},
+	plugins: [
+		viteTSConfigPaths({
+			projects: ['./tsconfig.json', '../Umbraco.Web.UI.Client/tsconfig.json'],
+		}),
+	],
 	server: {
 		fs: {
 			allow: [resolve(import.meta.dirname, '..')],
