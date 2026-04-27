@@ -11,7 +11,9 @@ import {
 } from '../../user-permissions/document/constants.js';
 import { of } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbCurrentUserContext } from '@umbraco-cms/backoffice/current-user';
+import type { UmbModalContextClassArgs, UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
@@ -49,8 +51,16 @@ class UmbMockCurrentUserContext extends UmbCurrentUserContext {
 
 // Immediately submits every modal with its initial value so requestSave() works without UI infrastructure.
 class UmbMockModalManagerContext extends UmbModalManagerContext {
-	override open(...args: Parameters<UmbModalManagerContext['open']>) {
-		const modalContext = super.open(...args);
+	override open<
+		ModalData extends { [key: string]: any } = { [key: string]: any },
+		ModalValue = unknown,
+		ModalAliasTypeAsToken extends UmbModalToken = UmbModalToken<ModalData, ModalValue>,
+	>(
+		host: UmbControllerHost,
+		modalAlias: UmbModalToken<ModalData, ModalValue> | string,
+		args?: UmbModalContextClassArgs<ModalAliasTypeAsToken>,
+	) {
+		const modalContext = super.open<ModalData, ModalValue, ModalAliasTypeAsToken>(host, modalAlias, args);
 		modalContext.submit();
 		return modalContext;
 	}
