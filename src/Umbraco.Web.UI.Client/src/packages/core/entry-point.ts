@@ -10,6 +10,7 @@ import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-a
 import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
 import type { UmbEntryPointOnInit } from '@umbraco-cms/backoffice/extension-api';
+import { UmbDrawerManagerContext, UmbBackofficeDrawerElement } from '@umbraco-cms/backoffice/drawer';
 
 // Ensure the load of some package for their global components(Which are exported as part of the import-map, those where it's not have deep imports here):
 import '@umbraco-cms/backoffice/collection';
@@ -38,8 +39,12 @@ export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	const modalContainerElement = new UmbBackofficeModalContainerElement();
 	host.shadowRoot?.appendChild(modalContainerElement);
 
+	const drawerElement = new UmbBackofficeDrawerElement();
+	host.shadowRoot?.appendChild(drawerElement);
+
 	new UmbNotificationContext(host);
 	new UmbModalManagerContext(host);
+	new UmbDrawerManagerContext(host);
 	new UmbActionEventContext(host);
 	new UmbInteractionMemoryContext(host);
 

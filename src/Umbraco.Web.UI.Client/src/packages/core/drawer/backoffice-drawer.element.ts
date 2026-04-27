@@ -6,6 +6,7 @@ import { UMB_DRAWER_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/drawer';
 import type { ManifestDrawerApp } from '@umbraco-cms/backoffice/drawer';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
+import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-backoffice-drawer')
 export class UmbBackofficeDrawerElement extends UmbLitElement {
@@ -23,6 +24,11 @@ export class UmbBackofficeDrawerElement extends UmbLitElement {
 		this.consumeContext(UMB_DRAWER_MANAGER_CONTEXT, (context) => {
 			if (!context) return;
 			this.observe(context.current, (alias) => this.#onCurrentChanged(alias));
+		});
+
+		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (context) => {
+			if (!context) return;
+			this.observe(context.modals, () => this.#repromoteIfOpen());
 		});
 	}
 
@@ -52,6 +58,13 @@ export class UmbBackofficeDrawerElement extends UmbLitElement {
 		if (this.#currentAlias !== alias) return;
 
 		this._activeElement = element;
+		this._drawerEl?.showPopover?.();
+	}
+
+	#repromoteIfOpen() {
+		// Only re-promote if a drawer is actually open
+		if (!this.#currentAlias) return;
+		this._drawerEl?.hidePopover?.();
 		this._drawerEl?.showPopover?.();
 	}
 
