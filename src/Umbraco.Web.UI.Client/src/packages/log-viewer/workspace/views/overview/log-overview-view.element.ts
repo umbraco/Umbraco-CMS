@@ -149,6 +149,21 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 				height: 100%;
 			}
 
+			@media (max-width: 920px) {
+				:host {
+					margin: var(--uui-size-space-4);
+				}
+
+				#logviewer-layout {
+					display: flex;
+					flex-direction: column;
+				}
+
+				#info {
+					align-self: stretch;
+				}
+			}
+
 			uui-label:nth-of-type(2) {
 				display: block;
 				margin-top: var(--uui-size-space-5);

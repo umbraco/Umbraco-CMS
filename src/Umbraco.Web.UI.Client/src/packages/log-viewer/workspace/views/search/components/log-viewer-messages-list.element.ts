@@ -95,11 +95,38 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		return html`<div id="pagination">
 			<uui-pagination
 				.total=${totalPages}
+				.current=${this._currentPage}
 				firstlabel=${this.localize.term('general_first')}
 				previouslabel=${this.localize.term('general_previous')}
 				nextlabel=${this.localize.term('general_next')}
 				lastlabel=${this.localize.term('general_last')}
 				@change="${this.#onPageChange}"></uui-pagination>
+			<div id="mobile-pagination">
+				<uui-button
+					compact
+					look="outline"
+					label=${this.localize.term('general_first')}
+					?disabled=${this._currentPage === 1}
+					@click=${() => this.#goToPage(1)}></uui-button>
+				<uui-button
+					compact
+					look="outline"
+					label=${this.localize.term('general_previous')}
+					?disabled=${this._currentPage === 1}
+					@click=${() => this.#goToPage(this._currentPage - 1)}></uui-button>
+				<uui-button
+					compact
+					look="outline"
+					label=${this.localize.term('general_next')}
+					?disabled=${this._currentPage === totalPages}
+					@click=${() => this.#goToPage(this._currentPage + 1)}></uui-button>
+				<uui-button
+					compact
+					look="outline"
+					label=${this.localize.term('general_last')}
+					?disabled=${this._currentPage === totalPages}
+					@click=${() => this.#goToPage(totalPages)}></uui-button>
+			</div>
 		</div>`;
 	}
 
@@ -211,6 +238,26 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 			#pagination {
 				display: block;
 				margin: var(--uui-size-space-5) 0;
+			}
+
+			#mobile-pagination {
+				display: none;
+			}
+
+			@media (max-width: 920px) {
+				#header {
+					display: none;
+				}
+
+				uui-pagination {
+					display: none;
+				}
+
+				#mobile-pagination {
+					display: flex;
+					justify-content: center;
+					gap: var(--uui-size-space-2);
+				}
 			}
 		`,
 	];

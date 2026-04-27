@@ -76,13 +76,39 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 				</uui-table>
 				${this._total > this.#itemsPerPage
 					? html`<uui-pagination
-							.current=${this.#currentPage}
-							.total=${Math.ceil(this._total / this.#itemsPerPage)}
-							firstlabel=${this.localize.term('general_first')}
-							previouslabel=${this.localize.term('general_previous')}
-							nextlabel=${this.localize.term('general_next')}
-							lastlabel=${this.localize.term('general_last')}
-							@change=${this.#onChangePage}></uui-pagination>`
+								.current=${this._currentPage}
+								.total=${Math.ceil(this._total / this.#itemsPerPage)}
+								firstlabel=${this.localize.term('general_first')}
+								previouslabel=${this.localize.term('general_previous')}
+								nextlabel=${this.localize.term('general_next')}
+								lastlabel=${this.localize.term('general_last')}
+								@change=${this.#onChangePage}></uui-pagination>
+							<div id="mobile-pagination">
+								<uui-button
+									compact
+									look="outline"
+									label=${this.localize.term('general_first')}
+									?disabled=${this._currentPage === 1}
+									@click=${() => this.#goToPage(1)}></uui-button>
+								<uui-button
+									compact
+									look="outline"
+									label=${this.localize.term('general_previous')}
+									?disabled=${this._currentPage === 1}
+									@click=${() => this.#goToPage(this._currentPage - 1)}></uui-button>
+								<uui-button
+									compact
+									look="outline"
+									label=${this.localize.term('general_next')}
+									?disabled=${this._currentPage === Math.ceil(this._total / this.#itemsPerPage)}
+									@click=${() => this.#goToPage(this._currentPage + 1)}></uui-button>
+								<uui-button
+									compact
+									look="outline"
+									label=${this.localize.term('general_last')}
+									?disabled=${this._currentPage === Math.ceil(this._total / this.#itemsPerPage)}
+									@click=${() => this.#goToPage(Math.ceil(this._total / this.#itemsPerPage))}></uui-button>
+							</div>`
 					: nothing}
 			</uui-box>
 		`;
@@ -93,6 +119,35 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 		css`
 			uui-pagination {
 				margin-top: var(--uui-size-layout-1);
+			}
+
+			#mobile-pagination {
+				display: none;
+			}
+
+			@media (max-width: 920px) {
+				uui-pagination {
+					display: none;
+				}
+
+				#mobile-pagination {
+					display: flex;
+					justify-content: center;
+					gap: var(--uui-size-space-2);
+					margin-top: var(--uui-size-layout-1);
+				}
+
+				uui-table-cell {
+					max-width: 0;
+					overflow: hidden;
+				}
+
+				a span:first-child {
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+					min-width: 0;
+				}
 			}
 
 			#show-more-templates-btn {

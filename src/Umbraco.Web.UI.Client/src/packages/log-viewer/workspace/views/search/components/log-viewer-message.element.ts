@@ -305,6 +305,42 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 			.search-item {
 				width: 100%;
 			}
+
+			@media (max-width: 920px) {
+				.property {
+					display: block;
+				}
+
+				.property-value {
+					word-break: break-all;
+				}
+
+				summary {
+					flex-wrap: wrap;
+				}
+
+				#machine {
+					display: none;
+				}
+
+				#timestamp {
+					flex: 1 1 auto;
+					padding-bottom: 4px;
+					font-size: 0.85em;
+					color: var(--uui-color-text-alt);
+				}
+
+				#level {
+					flex: 0 0 auto;
+					padding-bottom: 4px;
+				}
+
+				#message {
+					flex: 1 0 100%;
+					padding-top: 0;
+					padding-bottom: 8px;
+				}
+			}
 		`,
 	];
 }
