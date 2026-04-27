@@ -676,43 +676,45 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 */
 	public async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
 		this.initiatePropertyValueChange();
-		variantId ??= UmbVariantId.CreateInvariant();
-		const property = await this.structure.getPropertyStructureByAlias(alias);
+		try {
+			variantId ??= UmbVariantId.CreateInvariant();
+			const property = await this.structure.getPropertyStructureByAlias(alias);
 
-		if (!property) {
-			throw new Error(`Property alias "${alias}" not found.`);
+			if (!property) {
+				throw new Error(`Property alias "${alias}" not found.`);
+			}
+
+			// the getItemByUnique is a async method that first resolves once the item is loaded.
+			const editorAlias = (await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique))
+				.propertyEditorSchemaAlias;
+			// This means if its not loaded this will never resolve and the error below will never happen.
+			if (!editorAlias) {
+				throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
+			}
+
+			// Notice the order of the properties is important for our JSON String Compare function. [NL]
+			const entry: UmbElementValueModel = {
+				editorAlias,
+				...variantId.toObject(),
+				alias,
+				value,
+			};
+
+			const currentData = this.getData();
+			if (currentData) {
+				const values: DetailModelType['values'] = appendToFrozenArray(
+					currentData.values ?? [],
+					entry,
+					(x) => x.alias === alias && variantId!.compare(x),
+				);
+
+				this.#ensureVariantsExistsForProperty(variantId, entry);
+
+				this._data.updateCurrent({ values } as Partial<DetailModelType>);
+			}
+		} finally {
+			this.finishPropertyValueChange();
 		}
-
-		// the getItemByUnique is a async method that first resolves once the item is loaded.
-		const editorAlias = (await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique))
-			.propertyEditorSchemaAlias;
-		// This means if its not loaded this will never resolve and the error below will never happen.
-		if (!editorAlias) {
-			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
-		}
-
-		// Notice the order of the properties is important for our JSON String Compare function. [NL]
-		const entry: UmbElementValueModel = {
-			editorAlias,
-			...variantId.toObject(),
-			alias,
-			value,
-		};
-
-		const currentData = this.getData();
-		if (currentData) {
-			const values: DetailModelType['values'] = appendToFrozenArray(
-				currentData.values ?? [],
-				entry,
-				(x) => x.alias === alias && variantId!.compare(x),
-			);
-
-			this.#ensureVariantsExistsForProperty(variantId, entry);
-
-			this._data.updateCurrent({ values } as Partial<DetailModelType>);
-		}
-
-		this.finishPropertyValueChange();
 	}
 
 	async #ensureVariantsExistsForProperty(variantId: UmbVariantId, entry: UmbElementValueModel) {
