@@ -60,7 +60,7 @@ describe('UmbJsonPathFunctions', () => {
 		expect(result).to.eq('bs');
 	});
 
-	it('matches the null literal in a filter predicate', () => {
+	it('matches the null literal in a filter condition', () => {
 		const data = [
 			{ alias: 'a', segment: 'foo', value: 'with-segment' },
 			{ alias: 'a', segment: null, value: 'no-segment' },
