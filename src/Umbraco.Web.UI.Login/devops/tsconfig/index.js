@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -33,7 +33,7 @@ for (const [subpath, target] of Object.entries(clientPkg.exports ?? {})) {
 	// Only map subpaths under @umbraco-cms/backoffice/*.
 	if (!subpath.startsWith('./')) continue;
 
-	const aliasKey = `@umbraco-cms/backoffice/${subpath.slice(2)}`;
+	const aliasKey = `${clientPkg.name}/${subpath.slice(2)}`;
 	// Rewrite ./dist-cms/<rest>(.js|.d.ts) → ../Umbraco.Web.UI.Client/src/<rest>.ts
 	const sourceTarget = target
 		.replace(/^\.\/dist-cms\//, '../Umbraco.Web.UI.Client/src/')
@@ -64,6 +64,11 @@ const tsConfig = {
 };
 
 const content = tsconfigComment + JSON.stringify(tsConfig, null, '\t') + '\n';
-writeFileSync(tsconfigPath, content);
+const existing = existsSync(tsconfigPath) ? readFileSync(tsconfigPath, 'utf8') : null;
 
-console.log(`Wrote ${Object.keys(paths).length} path aliases to ${tsconfigPath}`);
+if (existing === content) {
+	console.log(`tsconfig.json already up to date (${Object.keys(paths).length} path aliases)`);
+} else {
+	writeFileSync(tsconfigPath, content);
+	console.log(`Wrote ${Object.keys(paths).length} path aliases to ${tsconfigPath}`);
+}
