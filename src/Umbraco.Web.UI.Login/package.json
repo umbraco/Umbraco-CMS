@@ -3,9 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "predev": "node devops/tsconfig/index.js",
-    "prebuild": "node devops/tsconfig/index.js",
-    "prewatch": "node devops/tsconfig/index.js",
+    "postinstall": "node devops/tsconfig/index.js",
     "dev": "vite",
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",

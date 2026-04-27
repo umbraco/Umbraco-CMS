@@ -48,10 +48,7 @@ export class UmbInputEntityUserPermissionElement extends UmbFormControlMixin(Umb
 					manifests,
 					(manifest: ManifestEntityUserPermission) => manifest.meta.group ?? 'undefined',
 				);
-				this._groupedPermissions = Object.entries(groupedPermissions).map(([group, entries]) => [
-					group,
-					entries ?? [],
-				]);
+				this._groupedPermissions = Object.entries(groupedPermissions).map(([group, entries]) => [group, entries ?? []]);
 			},
 			'umbUserPermissionManifestsObserver',
 		);

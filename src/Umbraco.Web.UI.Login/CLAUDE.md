@@ -21,9 +21,9 @@ Login uses the in-repo Client's TypeScript source for types via **generated `tsc
 | Bundling at `vite` time | `vite.config.ts` externalises `/^@umbraco-cms/` — none of Client's code ends up in `login.js` |
 | JS at runtime | The host page's importmap resolves `@umbraco-cms/backoffice/*` to the served backoffice bundle |
 
-**The generator** (`devops/tsconfig/index.js`) reads Client's `package.json` `exports` and emits a fresh `tsconfig.json` covering every subpath. It runs automatically as `predev` / `prebuild` / `prewatch`, so Client adding a new export entry can't leave Login's paths stale. The generated file is committed (so fresh checkouts work), but **don't edit it by hand** — it has a "DON'T EDIT" header.
+**The generator** (`devops/tsconfig/index.js`) reads Client's `package.json` `exports` and emits a fresh `tsconfig.json` covering every subpath. It runs as a `postinstall` hook, so any `npm install`/`npm ci` regenerates the file (including the install MSBuild triggers via `RestoreLogin`). The output is committed (so fresh checkouts work before any script runs), but **don't edit it by hand** — it has a "DON'T EDIT" header.
 
-You can also run it directly: `npm run generate:tsconfig`.
+If you change Client's `exports` map and want to preview the result without re-installing, run `npm run generate:tsconfig`.
 
 ### Prerequisite: Client must be `npm install`-ed first
 
