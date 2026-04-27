@@ -6,6 +6,9 @@ export default defineConfig({
 	resolve: {
 		tsconfigPaths: true,
 	},
+	optimizeDeps: {
+		exclude: ['@umbraco-ui/uui'],
+	},
 	server: {
 		fs: {
 			allow: [resolve(import.meta.dirname, '..')],

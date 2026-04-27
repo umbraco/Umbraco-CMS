@@ -115,7 +115,7 @@ BackofficeProjectDirectory = ../Umbraco.Web.UI.Client/
 BackofficeAssetsPath = wwwroot/umbraco/backoffice
 ```
 
-**Login Build** (lines 94-148):
+**Login Build** (lines 102-148):
 ```
 LoginProjectDirectory = ../Umbraco.Web.UI.Login/
 LoginAssetsPath = wwwroot/umbraco/login
@@ -125,11 +125,16 @@ LoginAssetsPath = wwwroot/umbraco/login
 
 | Target | Purpose |
 |--------|---------|
-| `BuildStaticAssetsPreconditions` | Checks if build needed (Visual Studio only) |
+| `BuildBackofficeStaticAssetsPreconditions` | Checks if Backoffice build needed (Visual Studio only) |
 | `RestoreBackoffice` | Runs `npm i` if package-lock changed |
 | `BuildBackoffice` | Runs `npm run build:for:cms` |
-| `DefineBackofficeAssets` | Registers assets with StaticWebAssets system |
-| `CleanBackoffice` | Removes built assets on `dotnet clean` |
+| `DefineBackofficeAssets` | Registers Backoffice assets with StaticWebAssets system |
+| `CleanBackoffice` | Removes built Backoffice assets on `dotnet clean` |
+| `BuildLoginStaticAssetsPreconditions` | Checks if Login build needed (Visual Studio only) |
+| `RestoreLogin` | Runs `npm i` if Login's package-lock changed |
+| `BuildLogin` | Runs `npm run build` in Login. Depends on `RestoreBackoffice` because Login's `tsc` walks Client's `src/` via tsconfig path aliases and needs Client's `node_modules` populated for transitive `lit`/`rxjs`/UUI resolution |
+| `DefineLoginAssets` | Registers Login assets with StaticWebAssets system |
+| `CleanLogin` | Removes built Login assets on `dotnet clean` |
 
 ### Build Conditions
 
