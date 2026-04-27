@@ -173,6 +173,12 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 				flex-direction: row-reverse;
 				margin-left: var(--uui-size-layout-1);
 			}
+
+			@media (max-width: 920px) {
+				:host {
+					display: none;
+				}
+			}
 		`,
 	];
 }

@@ -5,7 +5,7 @@ import type {
 	UmbWorkspaceActionArgs,
 	UmbWorkspaceActionDefaultKind,
 } from '../../../types.js';
-import { customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayIntersects } from '@umbraco-cms/backoffice/utils';
 import { UmbActionExecutedEvent } from '@umbraco-cms/backoffice/event';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -81,6 +81,10 @@ export class UmbWorkspaceActionElement<
 	protected _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
 
 	#buttonStateResetTimeoutId: number | null = null;
+
+	#mobileQuery = window.matchMedia('(max-width: 920px)');
+	@state() private _isMobile = this.#mobileQuery.matches;
+	#onMobileChange = (e: MediaQueryListEvent) => { this._isMobile = e.matches; };
 
 	/**
 	 * Create a list of original and overwritten aliases of workspace actions for the action.
@@ -186,7 +190,7 @@ export class UmbWorkspaceActionElement<
 				data-mark="workspace-action:${this.#manifest?.alias}"
 				color=${this.#manifest?.meta.color ?? 'default'}
 				look=${this.#manifest?.meta.look ?? 'default'}
-				label=${this._additionalOptions ? label + '…' : label}
+				label=${this._additionalOptions && !this._isMobile ? label + '…' : label}
 				.disabled=${this._isDisabled}
 				.href=${this._href}
 				.state=${this._buttonState}
@@ -211,9 +215,24 @@ export class UmbWorkspaceActionElement<
 		);
 	}
 
+	static override styles = css`
+		@media (max-width: 920px) {
+			uui-button {
+				--uui-button-padding-left-factor: 2;
+				--uui-button-padding-right-factor: 2;
+			}
+		}
+	`;
+
+	override connectedCallback(): void {
+		super.connectedCallback();
+		this.#mobileQuery.addEventListener('change', this.#onMobileChange);
+	}
+
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
 		this.#clearButtonStateResetTimeout();
+		this.#mobileQuery.removeEventListener('change', this.#onMobileChange);
 	}
 }
 

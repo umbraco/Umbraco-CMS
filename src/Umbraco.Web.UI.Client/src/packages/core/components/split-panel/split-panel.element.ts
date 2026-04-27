@@ -346,10 +346,10 @@ export class UmbSplitPanelElement extends UmbLitElement {
 			::slotted(umb-section-main) {
 				position: absolute !important;
 				left: 0 !important;
-				top: 72px !important;
+				top: 0 !important;
 				width: 100% !important;
 				max-width: 100% !important;
-				height: calc(100% - 72px) !important;
+				height: 100% !important;
 			}
 			#divider {
 				display: none !important;

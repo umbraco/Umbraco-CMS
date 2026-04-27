@@ -36,6 +36,9 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 				#appHeader {
 					padding-left: 5px;
 				}
+				umb-backoffice-header-logo {
+					display: none;
+				}
 			}
 		`,
 	];
