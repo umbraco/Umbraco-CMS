@@ -37,8 +37,10 @@ internal class DocumentUrlAliasRepository : IDocumentUrlAliasRepository
     {
         IEnumerable<Guid> documentKeys = aliases.Select(x => x.DocumentKey).Distinct();
 
+        // DistinctBy guards against any caller passing duplicate (UniqueId, LanguageId, Alias) tuples.
         var dtoDictionary = aliases
             .Select(BuildDto)
+            .DistinctBy(x => (x.UniqueId, x.LanguageId, x.Alias))
             .ToDictionary(x => (x.UniqueId, x.LanguageId, x.Alias));
 
         var toDelete = new List<int>();

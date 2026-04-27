@@ -294,7 +294,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		if (!tab || !tab.ownerId) return;
 		const tabName = tab.name === '' ? this.localize.term('general_unnamed') : tab.name;
 		const modalData: UmbConfirmModalData = {
-			headline: this.localize.term('contentTypeEditor_deleteTab'),
+			headline: '#contentTypeEditor_deleteTab',
 			content: html`<umb-localize key="contentTypeEditor_confirmDeleteTabMessage" .args=${[tabName]}>
 					Are you sure you want to delete the tab <strong>${tabName}</strong>
 				</umb-localize>
@@ -303,8 +303,8 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 						This will delete all items that doesn't belong to a composition.
 					</umb-localize>
 				</div>`,
-			cancelLabel: this.localize.term('general_cancel'),
-			confirmLabel: this.localize.term('actions_delete'),
+			cancelLabel: '#general_cancel',
+			confirmLabel: '#actions_delete',
 			color: 'danger',
 		};
 

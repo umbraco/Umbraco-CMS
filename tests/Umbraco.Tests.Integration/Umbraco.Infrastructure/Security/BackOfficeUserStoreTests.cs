@@ -38,8 +38,9 @@ internal sealed class BackOfficeUserStoreTests : UmbracoIntegrationTest
 
     private IEventMessagesFactory EventMessagesFactory => GetRequiredService<IEventMessagesFactory>();
 
-    private readonly ILogger<BackOfficeUserStore> _logger = NullLogger<BackOfficeUserStore>.Instance;
+    private IBackOfficeUserReader BackOfficeUserReader => GetRequiredService<IBackOfficeUserReader>();
 
+    private readonly ILogger<BackOfficeUserStore> _logger = NullLogger<BackOfficeUserStore>.Instance;
 
     private BackOfficeUserStore GetUserStore()
         => new(
@@ -55,8 +56,8 @@ internal sealed class BackOfficeUserStoreTests : UmbracoIntegrationTest
             UserRepository,
             RuntimeState,
             EventMessagesFactory,
-            _logger
-        );
+            _logger,
+            BackOfficeUserReader);
 
     [Test]
     public async Task Can_Persist_Is_Approved()

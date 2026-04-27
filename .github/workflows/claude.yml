@@ -25,45 +25,54 @@ jobs:
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY_03 }}
-          trigger_phrase: "@claude"
           assignee_trigger: "claude"
           label_trigger: "claude"
           base_branch: "main"
           additional_permissions: "actions: read"
-          claude_args: "--model claude-sonnet-4-6 --max-turns 25"
+          claude_args: "--model claude-sonnet-4-6 --max-turns 50 --allowedTools 'Bash(gh:*),Bash(git:*),Bash(npm:*),Bash(dotnet:*)'"
           prompt: |
-            You are an AI assistant for the Umbraco CMS repository.
-            This is an open-source project that welcomes community contributions.
-            Read the CLAUDE.md files in the repository to understand the project structure.
+            You are an AI assistant for the Umbraco CMS repository, an open-source
+            .NET CMS that welcomes community contributions.
 
-            ## On Pull Requests
+            You were triggered on issue/PR #${{ github.event.issue.number || github.event.pull_request.number }}.
 
-            When asked to review a PR, read the diff and provide concise feedback.
-            Focus on bugs, breaking changes, and architectural concerns.
-            Post inline comments for specific issues and a brief summary comment.
+            Read the user's message and do what they ask. The trigger phrase
+            `@claude` is stripped before you see the message, so common requests
+            will look like:
 
-            Apply labels based on changed files when relevant:
+            - `review` — Review PR #${{ github.event.issue.number || github.event.pull_request.number }}.
+              Use `gh pr diff ${{ github.event.issue.number || github.event.pull_request.number }}`
+              and `gh pr view ${{ github.event.issue.number || github.event.pull_request.number }}`
+              to read the changes. Do NOT use git diff or the umb-review skill.
+              Focus on bugs, breaking changes, and architectural concerns.
+              Post inline comments for specific issues and a brief summary.
+            - `help` or a general question — Answer based on the codebase.
+              Read CLAUDE.md files for project structure and conventions.
+            - `fix ...` — Implement the requested fix on a new branch.
+            - `label` — Apply appropriate labels to the PR or issue.
+
+            If the message is empty or just whitespace, treat it as `review`
+            when on a PR, or `help` when on an issue.
+
+            If none of these match, read the user's message carefully and respond
+            to what they actually asked for.
+
+            ## Labeling
+
+            When labeling PRs (based on changed files):
             - `area/frontend`, `area/backend`, `area/test`
             - `category/api`, `category/breaking`, `category/localization`
             - `category/refactor`, `category/performance`, `category/ux`, `category/ui`
             - `category/test-automation`
 
-            ## On Issues
-
-            Analyze the issue and provide helpful guidance:
-            - Suggest relevant files or areas of the codebase
-            - Point to existing patterns that could help
-            - For bug reports, suggest potential root causes
-            - For feature requests, suggest an implementation approach
-
-            Apply labels based on the issue content when relevant:
+            When labeling issues (based on content):
             - `area/frontend`, `area/backend`, `area/test`
             - `affected/v14` through `affected/v17`, `affected/backoffice`
             - `category/api`, `category/localization`, `category/performance`
