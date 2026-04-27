@@ -24,6 +24,7 @@ describe('UmbDocumentWorkspaceContext', () => {
 		await useMockSet('variantDocuments');
 		hostElement = new UmbTestDocumentWorkspaceHostElement();
 		document.body.appendChild(hostElement);
+		await hostElement.init();
 		context = new UmbDocumentWorkspaceContext(hostElement);
 	});
 
