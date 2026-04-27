@@ -154,6 +154,11 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	 * The selector to define the interactive element within the item, this element will then become the only interactive part, the item can only be dragged by mouse when interacting with this element.
 	 */
 	handleSelector?: string;
+	/**
+	 * Set to false to disable touch/pointer drag on this sorter. Mouse drag is unaffected.
+	 * Useful for editors where touch interaction should be intentionally blocked (e.g. document type designers).
+	 */
+	touchEnabled?: boolean;
 
 	//boundarySelector?: string;
 	dataTransferResolver?: (dataTransfer: DataTransfer | null, currentItem: T) => void;
@@ -293,6 +298,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	#dragX = 0;
 	#dragY = 0;
+
+	// Touch drag state (pointer-events path — desktop drag path above is unchanged)
+	#touchGhost?: HTMLElement;
+	#touchGhostOffsetX = 0;
+	#touchGhostOffsetY = 0;
 
 	#elements = Array<ElementType>();
 
@@ -633,6 +643,10 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			const draggableElement = this.#getDraggableElement(element);
 			const handleElement = this.#getHandleElement(element);
 			handleElement.addEventListener('mousedown', this.#handleHandleMouseDown);
+			handleElement.addEventListener('pointerdown', this.#handleHandleTouchDown, { passive: false });
+			// Prevent the browser from treating a touch on the handle as a scroll gesture,
+			// which would fire pointercancel and abort the drag after ~3px of movement.
+			(handleElement as HTMLElement).style.touchAction = 'none';
 			// Will be set to true by the 'mousedown' event if approved:
 			(draggableElement as HTMLElement).draggable = false;
 			draggableElement.addEventListener('dragstart', this.#handleDragStart);
@@ -665,6 +679,8 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 		const handleElement = this.#getHandleElement(element);
 		handleElement.removeEventListener('mousedown', this.#handleHandleMouseDown);
+		handleElement.removeEventListener('pointerdown', this.#handleHandleTouchDown);
+		(handleElement as HTMLElement).style.touchAction = '';
 
 		(draggableElement as HTMLElement).draggable = false;
 
@@ -745,6 +761,130 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 			target.draggable = false;
 		}
 	};
+
+	// ─── Touch / Pointer path ────────────────────────────────────────────────────
+	// Parallel to the HTML5 Drag API path above. Activates only when pointerType
+	// === 'touch'. Desktop mouse users follow the mousedown → dragstart → dragover
+	// path exclusively and are unaffected by any code in this section.
+
+	#handleHandleTouchDown = (event: PointerEvent) => {
+		if (event.pointerType !== 'touch') return;
+		if (this.#config.touchEnabled === false) return;
+
+		const target = event.target as HTMLElement;
+
+		// For the touch path we only reject on [draggable="false"] in the composed path.
+		// That marker is how nested sorters signal "outer sorter, back off — this touch
+		// belongs to me". We intentionally skip the ignorerSelector (a, img, iframe, …)
+		// check used by the mouse path: links and images inside a block's shadow DOM
+		// should not prevent the block from being dragged on touch.
+		const path = event.composedPath();
+		const index = path.indexOf(target);
+		const below = index !== -1 ? path.slice(0, index) : undefined;
+		if (below?.some((x) => (x as HTMLElement).matches?.('[draggable="false"]'))) return;
+
+		const element = this.#getElement(target);
+		if (!element) return;
+
+		// preventDefault blocks page scroll and suppresses the compat mousedown event.
+		// setPointerCapture pins future pointer events to this element even if the DOM
+		// shifts during re-renders, preventing spurious pointercancel.
+		event.preventDefault();
+		(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+
+		if (UmbSorterController.activeElement && UmbSorterController.activeElement !== element) {
+			this.#endTouchDrag(false);
+		}
+
+		if (!this.#scrollElement) {
+			this.#scrollElement = getParentScrollElement(this.#containerElement, true);
+		}
+
+		const containerRect = this.#containerElement.getBoundingClientRect();
+		this.#containerElement.style.minHeight = containerRect.height + 'px';
+
+		this.#setCurrentElement(element as ElementType);
+
+		UmbSorterController.activeItem = this.getItemOfElement(element as ElementType);
+		if (!UmbSorterController.activeItem) return;
+
+		const activeUnique = this.#config.getUniqueOfModel(UmbSorterController.activeItem);
+		UmbSorterController.originalSorter = this as unknown as UmbSorterController<unknown>;
+		UmbSorterController.originalIndex = this.#model.findIndex((x) => this.#config.getUniqueOfModel(x) === activeUnique);
+		UmbSorterController.activeIndex = UmbSorterController.originalIndex;
+		UmbSorterController.activeSorter = this as unknown as UmbSorterController<unknown>;
+		UmbSorterController.dropSorter = this as unknown as UmbSorterController<unknown>;
+
+		this.#createTouchGhost(element as ElementType, event);
+
+		window.addEventListener('pointermove', this.#handleTouchMove, { passive: false });
+		window.addEventListener('pointerup', this.#handleTouchEnd);
+		window.addEventListener('pointercancel', this.#handleTouchEnd);
+
+		if (this.#config.onStart) {
+			this.#config.onStart({ item: UmbSorterController.activeItem, element: element as ElementType });
+		}
+	};
+
+	#handleTouchMove = (event: PointerEvent) => {
+		if (event.pointerType !== 'touch') return;
+		event.preventDefault();
+
+		this.#moveTouchGhost(event.clientX, event.clientY);
+
+		if ((UmbSorterController.dropSorter as unknown) === this) {
+			// PointerEvent.clientX/Y are defined (inherited from MouseEvent), so casting
+			// to DragEvent is safe here — #handleDragMove only reads clientX/Y from it.
+			this.#handleDragMove(event as unknown as DragEvent);
+		}
+	};
+
+	#handleTouchEnd = (event: PointerEvent) => {
+		if (event.pointerType !== 'touch') return;
+		this.#endTouchDrag(event.type === 'pointercancel');
+	};
+
+	#endTouchDrag(revert: boolean) {
+		if (revert && UmbSorterController.originalSorter) {
+			UmbSorterController.originalSorter.moveItemInModel(
+				UmbSorterController.originalIndex ?? 0,
+				UmbSorterController.activeSorter,
+			);
+		}
+		// #handleMoveEnd → #cleanupMove handles ghost removal and listener teardown
+		this.#handleMoveEnd();
+	}
+
+	#createTouchGhost(element: ElementType, event: PointerEvent): void {
+		const rect = element.getBoundingClientRect();
+		const ghost = document.createElement('div');
+		ghost.style.cssText =
+			`position:fixed;` +
+			`left:${rect.left}px;top:${rect.top}px;` +
+			`width:${rect.width}px;height:${rect.height}px;` +
+			`background:var(--uui-color-surface,#fff);` +
+			`border:2px solid var(--uui-color-focus,#3544b1);` +
+			`border-radius:3px;opacity:0.85;` +
+			`pointer-events:none;z-index:10000;` +
+			`box-shadow:0 4px 16px rgba(0,0,0,0.25);box-sizing:border-box;`;
+		document.body.appendChild(ghost);
+		this.#touchGhost = ghost;
+		this.#touchGhostOffsetX = event.clientX - rect.left;
+		this.#touchGhostOffsetY = event.clientY - rect.top;
+	}
+
+	#moveTouchGhost(clientX: number, clientY: number): void {
+		if (!this.#touchGhost) return;
+		this.#touchGhost.style.left = `${clientX - this.#touchGhostOffsetX}px`;
+		this.#touchGhost.style.top = `${clientY - this.#touchGhostOffsetY}px`;
+	}
+
+	#removeTouchGhost(): void {
+		this.#touchGhost?.remove();
+		this.#touchGhost = undefined;
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────────
 
 	#handleDragStart = (event: DragEvent) => {
 		const element = (event.target as HTMLElement).closest(this.#config.itemSelector) as HTMLElement | null;
@@ -921,6 +1061,11 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 		window.removeEventListener('mousemove', this.#handleMouseMove);
 		window.removeEventListener('dragleave', this.#handleDragLeave);
 		window.removeEventListener('dragenter', this.#handleDragEnter);
+		// Touch path cleanup — safe to call even if touch drag was not active
+		this.#removeTouchGhost();
+		window.removeEventListener('pointermove', this.#handleTouchMove);
+		window.removeEventListener('pointerup', this.#handleTouchEnd);
+		window.removeEventListener('pointercancel', this.#handleTouchEnd);
 	}
 
 	#handleDragMove(event: DragEvent, instant?: boolean) {
