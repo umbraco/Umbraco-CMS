@@ -83,6 +83,7 @@ export abstract class UmbBaseExtensionInitializer<
 					this.#gotManifest(extensionManifest);
 				} else {
 					this.#manifest = undefined;
+					this._isConditionsPositive = undefined;
 					this.#clearPermittedState();
 					this.#overwrites = [];
 					this.#cleanConditions();
