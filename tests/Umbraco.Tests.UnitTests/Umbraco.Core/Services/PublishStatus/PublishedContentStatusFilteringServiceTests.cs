@@ -366,7 +366,7 @@ public partial class PublishedContentStatusFilteringServiceTests
                                                    && idIsPublished(item.Id)
                                                    && (culture == Constants.System.InvariantCulture || item.ContentType.VariesByCulture() is false || item.Cultures.ContainsKey(culture)));
         publishStatusQueryService
-            .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>()))
+            .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns(true);
         return publishStatusQueryService.Object;
     }
