@@ -91,7 +91,7 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
         Sql<ISqlContext> sql = SqlContext.Sql()
             .Append($@"SELECT
                 n.{QCol(NodeDto.KeyColumnName)} AS {QName("key")},
-                m.{QCol("Email")},
+                m.{QCol("Email")} AS {QName("email")},
                 m.{QCol("LoginName")} AS {QName("userName")},
                 n.{QCol(NodeDto.TextColumnName)} AS {QName("name")},
                 m.{QCol("isApproved")},
