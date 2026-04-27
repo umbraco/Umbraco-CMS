@@ -259,10 +259,6 @@
 			"legacy": true
 		},
 		{
-			"name": "icon-ball",
-			"file": "dribbble.svg"
-		},
-		{
 			"name": "icon-bar-chart",
 			"file": "chart-no-axes-column.svg"
 		},
@@ -6613,6 +6609,10 @@
 		}
 	],
 	"simpleIcons": [
+		{
+			"name": "icon-ball",
+			"file": "dribbble.svg"
+		},
 		{
 			"name": "icon-facebook",
 			"file": "facebook.svg"

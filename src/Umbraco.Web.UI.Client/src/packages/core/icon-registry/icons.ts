@@ -152,10 +152,6 @@ keywords: ["cancel","no","stop","forbidden","prohibited","error","incorrect","mi
 groups: ["account"],
 path: () => import("./icons/icon-badge-restricted.js"),
 },{
-name: "icon-ball",
-keywords: ["design","social"],
-path: () => import("./icons/icon-ball.js"),
-},{
 name: "icon-bar-chart",
 keywords: ["statistics","analytics","diagram","graph"],
 groups: ["charts"],
@@ -263,7 +259,7 @@ groups: ["item","text","gaming"],
 path: () => import("./icons/icon-book.js"),
 },{
 name: "icon-bookmark",
-keywords: ["read","clip","marker","tag"],
+keywords: ["save","favorite","mark","label","attachment","file","stick","pin","read","clip","marker","tag"],
 groups: ["account"],
 path: () => import("./icons/icon-bookmark.js"),
 },{
@@ -389,7 +385,6 @@ groups: ["files","mail"],
 path: () => import("./icons/icon-categories.js"),
 },{
 name: "icon-certificate",
-keywords: ["award","achievement","badge","rosette","prize","winner"],
 path: () => import("./icons/icon-certificate.js"),
 },{
 name: "icon-chart-curve",
@@ -497,7 +492,7 @@ groups: ["text","arrows"],
 path: () => import("./icons/icon-clipboard-paste.js"),
 },{
 name: "icon-cloud-drive",
-keywords: ["computer","server","memory","data","ssd","disk","hard disk"],
+keywords: ["computer","server","memory","data","ssd","disk","hard disk","storage","hardware","backup","media"],
 groups: ["development","devices"],
 path: () => import("./icons/icon-cloud-drive.js"),
 },{
@@ -542,7 +537,7 @@ groups: ["food-beverage"],
 path: () => import("./icons/icon-coffee.js"),
 },{
 name: "icon-coin-dollar",
-keywords: ["money","us","usa","paper","cash","currency","payment"],
+keywords: ["money","us","usa","cash","currency","payment"],
 groups: ["finance"],
 path: () => import("./icons/icon-coin-dollar.js"),
 },{
@@ -824,7 +819,7 @@ groups: ["item","technology","devices","multimedia"],
 path: () => import("./icons/icon-disc.js"),
 },{
 name: "icon-disk-image",
-keywords: ["cds","dvds","disk","disc","drive","computer","server","memory","data","ssd","hard disk"],
+keywords: ["cds","dvds","disk","disc","drive","computer","server","memory","data","ssd","hard disk","storage","hardware","backup","media"],
 groups: ["item","technology","hardware","development","devices"],
 path: () => import("./icons/icon-disk-image.js"),
 },{
@@ -990,7 +985,7 @@ groups: ["layout"],
 path: () => import("./icons/icon-filter.js"),
 },{
 name: "icon-fingerprint",
-keywords: ["fingerprints","crimes","criminals","id","identification","biometrics","2fa","authentication","biometric","identity","security"],
+keywords: ["fingerprints","crimes","criminals","id","identification","biometrics"],
 groups: ["item","security"],
 path: () => import("./icons/icon-fingerprint.js"),
 },{
@@ -1021,7 +1016,7 @@ groups: ["connectivity","devices","photography","weather"],
 path: () => import("./icons/icon-flash.js"),
 },{
 name: "icon-flashlight",
-keywords: ["torch"],
+keywords: ["torch","light","beam","emergency","safety","tool","bright"],
 groups: ["photography","devices"],
 path: () => import("./icons/icon-flashlight.js"),
 },{
@@ -1204,13 +1199,13 @@ path: () => import("./icons/icon-handtool.js"),
 },{
 name: "icon-hard-drive-alt",
 hidden: true,
-keywords: ["computer","server","memory","data","ssd","disk","hard disk"],
+keywords: ["computer","server","memory","data","ssd","disk","hard disk","storage","hardware","backup","media"],
 groups: ["development","devices"],
 path: () => import("./icons/icon-hard-drive-alt.js"),
 },{
 name: "icon-hard-drive",
 hidden: true,
-keywords: ["computer","server","memory","data","ssd","disk","hard disk"],
+keywords: ["computer","server","memory","data","ssd","disk","hard disk","storage","hardware","backup","media"],
 groups: ["development","devices"],
 path: () => import("./icons/icon-hard-drive.js"),
 },{
@@ -1334,7 +1329,7 @@ groups: ["multimedia"],
 path: () => import("./icons/icon-infinity.js"),
 },{
 name: "icon-info",
-keywords: ["help"],
+keywords: ["about","advice","clue","details","help","hint","indicator","information","knowledge","notice","status","support","tooltip"],
 groups: ["accessibility","notifications"],
 path: () => import("./icons/icon-info.js"),
 },{
@@ -1418,7 +1413,7 @@ groups: ["action","arrow","arrows","gaming"],
 path: () => import("./icons/icon-left-double-arrow.js"),
 },{
 name: "icon-legal",
-keywords: ["scales","weight","mass","compare","balance","legal","license","right","rule","law"],
+keywords: ["scales","weight","mass","compare","balance","legal","license","right","rule","law","justice","measure","judge","fair","ethics","decision"],
 groups: ["item","household","navigation","science","finance"],
 related: ["icon-weight"],
 path: () => import("./icons/icon-legal.js"),
@@ -1854,7 +1849,7 @@ related: ["icon-indent"],
 path: () => import("./icons/icon-outdent.js"),
 },{
 name: "icon-page-add",
-keywords: ["new","create","documents","pages","add","document"],
+keywords: ["new","create","documents","pages"],
 groups: ["document"],
 path: () => import("./icons/icon-page-add.js"),
 },{
@@ -1865,12 +1860,12 @@ related: ["icon-page-up","icon-navigation-top","icon-navigation-bottom"],
 path: () => import("./icons/icon-page-down.js"),
 },{
 name: "icon-page-remove",
-keywords: ["delete","documents","pages","document"],
+keywords: ["delete","documents","pages"],
 groups: ["document"],
 path: () => import("./icons/icon-page-remove.js"),
 },{
 name: "icon-page-restricted",
-keywords: ["documents","pages","disabled","restricted","lost","delete","remove","document"],
+keywords: ["documents","pages","disabled","restricted"],
 groups: ["document"],
 path: () => import("./icons/icon-page-restricted.js"),
 },{
@@ -2588,7 +2583,7 @@ path: () => import("./icons/icon-squiggly-line.js"),
 },{
 name: "icon-ssd",
 hidden: true,
-keywords: ["disk","hdd","sata","hardware","computer","server","memory","data","ssd","hard disk"],
+keywords: ["disk","hdd","sata","hardware","computer","server","memory","data","ssd","hard disk","storage","backup","media"],
 groups: ["item","technology","hardware","development","devices"],
 related: ["icon-server","icon-disk-image","icon-ssd"],
 path: () => import("./icons/icon-ssd.js"),
@@ -3042,7 +3037,7 @@ groups: ["item","media","devices","communication","connectivity","multimedia"],
 path: () => import("./icons/icon-voice.js"),
 },{
 name: "icon-wall-plug",
-keywords: ["power","electricity","cable","energy","electronics","socket","outlet"],
+keywords: ["power","electricity","cable","energy","electronics","socket","outlet","voltage","current","charger"],
 groups: ["item","technology","devices","development"],
 related: ["icon-power-outlet","icon-dock-connector"],
 path: () => import("./icons/icon-wall-plug.js"),
@@ -3166,7 +3161,6 @@ groups: ["design","files"],
 path: () => import("./icons/icon-document-3d.js"),
 },{
 name: "icon-document-medal",
-keywords: ["award","achievement","badge","rosette","prize","winner"],
 path: () => import("./icons/icon-document-medal.js"),
 },{
 name: "icon-document-chart-bar",
@@ -3185,7 +3179,6 @@ groups: ["files","development"],
 path: () => import("./icons/icon-document-html.js"),
 },{
 name: "icon-document-js",
-keywords: ["code","json","curly braces","curly brackets"],
 path: () => import("./icons/icon-document-js.js"),
 },{
 name: "icon-document-key",
@@ -3194,7 +3187,6 @@ groups: ["files","security"],
 path: () => import("./icons/icon-document-key.js"),
 },{
 name: "icon-document-search",
-keywords: ["lost","document","find","browser","lens"],
 path: () => import("./icons/icon-document-search.js"),
 },{
 name: "icon-document-settings",
@@ -3333,11 +3325,8 @@ keywords: ["area","surface","square metres","allotment","parcel","property","pla
 groups: ["design","tools","math","sports","gaming"],
 path: () => import("./icons/icon-land-plot.js"),
 },{
-name: "icon-true",
-path: () => import("./icons/icon-true.js"),
-},{
-name: "icon-false",
-path: () => import("./icons/icon-false.js"),
+name: "icon-ball",
+path: () => import("./icons/icon-ball.js"),
 },{
 name: "icon-facebook",
 path: () => import("./icons/icon-facebook.js"),
