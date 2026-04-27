@@ -18,26 +18,12 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "UmbracoProject.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
-ARG CERT_PASSWORD
 WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Install gosu for dropping privileges and openssl for certificate generation
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends gosu openssl && rm -rf /var/lib/apt/lists/*
-
-# Generate self-signed certificate for HTTPS
-RUN mkdir -p /https && \
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-      -keyout /https/aspnetcore.key \
-      -out /https/aspnetcore.crt \
-      -subj "/CN=localhost" \
-      -addext "subjectAltName=DNS:localhost" && \
-    openssl pkcs12 -export -out /https/aspnetcore.pfx \
-      -inkey /https/aspnetcore.key \
-      -in /https/aspnetcore.crt \
-      -password "pass:${CERT_PASSWORD}" && \
-    chmod 644 /https/aspnetcore.pfx
 
 # Copy entrypoint script
 COPY UmbracoProject/entrypoint.sh /entrypoint.sh

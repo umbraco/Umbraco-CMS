@@ -63,12 +63,16 @@ services:
           create_host_path: true
       - umb_logs:/app/umbraco/Logs
       - umb_data:/app/umbraco
+      - type: bind
+        source: ./certs
+        target: /https
+        bind:
+          create_host_path: true
     build:
       context: .
       dockerfile: UmbracoProject/Dockerfile
       args:
         - BUILD_CONFIGURATION=Debug
-        - CERT_PASSWORD=${CERT_PASSWORD}
 
     depends_on:
       umb_database:
