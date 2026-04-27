@@ -1,11 +1,11 @@
 import { UmbSectionSidebarContext } from './section-sidebar.context.js';
-import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
+import { UMB_MARK_ATTRIBUTE_NAME, UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 import { css, html, customElement, type PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-section-sidebar')
 export class UmbSectionSidebarElement extends UmbLitElement {
-	readonly #mobileQuery = window.matchMedia('(max-width: 920px)');
+	readonly #mobileQuery = window.matchMedia(`(max-width: ${UMB_MOBILE_BREAKPOINT}px)`);
 
 	constructor() {
 		super();
@@ -81,7 +81,7 @@ export class UmbSectionSidebarElement extends UmbLitElement {
 				background-color: var(--uui-color-surface);
 			}
 
-			@media (max-width: 920px) {
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
 				:host {
 					display: none;
 					border-right: none;

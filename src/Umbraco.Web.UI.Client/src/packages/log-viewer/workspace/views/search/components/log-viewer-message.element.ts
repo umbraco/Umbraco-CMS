@@ -1,6 +1,7 @@
 import { css, customElement, html, property, query, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { query as getQuery, toQueryString } from '@umbraco-cms/backoffice/router';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { LogLevelModel, LogMessagePropertyPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -306,7 +307,7 @@ export class UmbLogViewerMessageElement extends UmbLitElement {
 				width: 100%;
 			}
 
-			@media (max-width: 920px) {
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
 				.property {
 					display: block;
 				}

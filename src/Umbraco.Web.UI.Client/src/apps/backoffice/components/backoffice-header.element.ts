@@ -1,4 +1,5 @@
 import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-backoffice-header')
@@ -32,7 +33,7 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 				flex: 1 1 auto;
 			}
 
-			@media (max-width: 920px) {
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
 				#appHeader {
 					padding-left: 5px;
 				}

@@ -1,4 +1,5 @@
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 import {
 	type PropertyValueMap,
 	css,
@@ -182,7 +183,7 @@ export class UmbSplitPanelElement extends UmbLitElement {
 		this.#hasInitialized = false;
 	}
 
-	readonly #mobileQuery = window.matchMedia('(max-width: 920px)');
+	readonly #mobileQuery = window.matchMedia(`(max-width: ${UMB_MOBILE_BREAKPOINT}px)`);
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -332,7 +333,7 @@ export class UmbSplitPanelElement extends UmbLitElement {
 			width: var(--umb-split-panel-divider-touch-area-width);
 			cursor: col-resize;
 		}
-		@media (max-width: 920px) {
+		@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
 			#main {
 				position: relative;
 			}

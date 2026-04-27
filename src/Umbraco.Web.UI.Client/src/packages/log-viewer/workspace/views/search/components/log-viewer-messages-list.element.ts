@@ -2,6 +2,7 @@ import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context
 import type { UUIScrollContainerElement, UUIPaginationElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 import type { LogMessageResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
@@ -247,7 +248,7 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 				display: none;
 			}
 
-			@media (max-width: 920px) {
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
 				#header {
 					display: none;
 				}

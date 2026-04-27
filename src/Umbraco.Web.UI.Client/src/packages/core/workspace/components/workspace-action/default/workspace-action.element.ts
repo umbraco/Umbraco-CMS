@@ -14,6 +14,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbAction } from '@umbraco-cms/backoffice/action';
 import type { UmbExtensionElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 
 @customElement('umb-workspace-action')
 export class UmbWorkspaceActionElement<
@@ -82,7 +83,7 @@ export class UmbWorkspaceActionElement<
 
 	#buttonStateResetTimeoutId: number | null = null;
 
-	#mobileQuery = window.matchMedia('(max-width: 920px)');
+	#mobileQuery = window.matchMedia(`(max-width: ${UMB_MOBILE_BREAKPOINT}px)`);
 	@state() private _isMobile = this.#mobileQuery.matches;
 	#onMobileChange = (e: MediaQueryListEvent) => { this._isMobile = e.matches; };
 
@@ -216,7 +217,7 @@ export class UmbWorkspaceActionElement<
 	}
 
 	static override styles = css`
-		@media (max-width: 920px) {
+		@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
 			uui-button {
 				--uui-button-padding-left-factor: 2;
 				--uui-button-padding-right-factor: 2;

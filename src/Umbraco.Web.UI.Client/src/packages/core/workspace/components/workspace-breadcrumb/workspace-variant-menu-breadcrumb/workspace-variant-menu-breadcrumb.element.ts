@@ -8,6 +8,7 @@ import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UMB_MENU_VARIANT_STRUCTURE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/menu';
 import type { UmbAppLanguageContext } from '@umbraco-cms/backoffice/language';
 import type { UmbVariantStructureItemModel } from '@umbraco-cms/backoffice/menu';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 
 const observeDefaultLanguageSymbol = Symbol();
 const observeCurrentLanguageSymbol = Symbol();
@@ -174,7 +175,7 @@ export class UmbWorkspaceVariantMenuBreadcrumbElement extends UmbLitElement {
 				margin-left: var(--uui-size-layout-1);
 			}
 
-			@media (max-width: 920px) {
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
 				:host {
 					display: none;
 				}

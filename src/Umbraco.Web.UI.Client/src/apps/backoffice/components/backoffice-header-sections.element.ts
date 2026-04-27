@@ -3,6 +3,7 @@ import type { UmbBackofficeContext } from '../backoffice.context.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
@@ -14,7 +15,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 
 	private _backofficeContext?: UmbBackofficeContext;
 
-	readonly #mobileQuery = window.matchMedia('(max-width: 920px)');
+	readonly #mobileQuery = window.matchMedia(`(max-width: ${UMB_MOBILE_BREAKPOINT}px)`);
 	#sectionPathMap = new Map<string, string>();
 	#tabGroup?: Element;
 
@@ -176,7 +177,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 				--uui-tab-text-active: var(--uui-color-header-contrast-emphasis);
 				--uui-tab-group-dropdown-background: var(--uui-color-header-surface);
 			}
-			@media (max-width: 920px) {
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
 				#current-section-tab {
 					display: flex;
 					height: 60px;
