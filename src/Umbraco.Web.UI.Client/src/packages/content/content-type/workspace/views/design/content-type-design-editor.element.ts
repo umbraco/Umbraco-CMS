@@ -43,6 +43,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		containerSelector: 'uui-tab-group',
 		disabledItemSelector: ':not([sortable])',
 		ignorerSelector: 'uui-input',
+		touchEnabled: false,
 		resolvePlacement: (args) => args.relatedRect.left + args.relatedRect.width * 0.5 > args.pointerX,
 		onChange: ({ model }) => {
 			this._tabs = model;

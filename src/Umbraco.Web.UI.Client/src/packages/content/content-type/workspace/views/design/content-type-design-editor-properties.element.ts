@@ -39,6 +39,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeModel, UmbContentTypeDesignE
 	// Or maybe we do, but we still need to check if the group exists locally, if not, then it needs to be created before we move a property into it.
 	// TODO: Fix bug where a local property turn into an inherited when moved to a new group container.
 	containerSelector: '#property-list',
+	touchEnabled: false,
 };
 
 @customElement('umb-content-type-design-editor-properties')

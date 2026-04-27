@@ -27,6 +27,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbPropertyTypeContainerMergedModel, UmbCon
 		handleSelector: '.drag-handle',
 		disabledItemSelector: ':not([has-owner-container])', // Inherited attribute is set by the umb-content-type-design-editor-group.
 		containerSelector: '.container-list',
+		touchEnabled: false,
 	};
 
 @customElement('umb-content-type-design-editor-tab')
