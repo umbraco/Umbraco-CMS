@@ -35,8 +35,11 @@ export default defineConfig({
 		...defaults.build,
 		rollupOptions: {
 			...defaults.build!.rollupOptions,
-			// Preserves UUI 2.0's per-component `customElements.define()` side effects.
-			treeshake: false,
+			// Preserve UUI 2.0's per-component `customElements.define()` side effects
+			// without disabling tree-shaking for the rest of the bundle.
+			treeshake: {
+				moduleSideEffects: (id) => id.includes('@umbraco-ui/uui'),
+			},
 		},
 	},
 });

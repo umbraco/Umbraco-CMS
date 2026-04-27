@@ -11,7 +11,7 @@ export default defineConfig({
 	],
 	server: {
 		fs: {
-			allow: [resolve(import.meta.dirname, '..')],
+			allow: [import.meta.dirname, resolve(import.meta.dirname, '../Umbraco.Web.UI.Client')],
 		},
 	},
 	build: {
