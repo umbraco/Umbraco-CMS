@@ -18,6 +18,7 @@ ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "UmbracoProject.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
+ARG CERT_PASSWORD
 WORKDIR /app
 COPY --from=publish /app/publish .
 
@@ -35,7 +36,7 @@ RUN mkdir -p /https && \
     openssl pkcs12 -export -out /https/aspnetcore.pfx \
       -inkey /https/aspnetcore.key \
       -in /https/aspnetcore.crt \
-      -password pass:DevOnlyPassword && \
+      -password pass:$CERT_PASSWORD && \
     chmod 644 /https/aspnetcore.pfx
 
 # Copy entrypoint script

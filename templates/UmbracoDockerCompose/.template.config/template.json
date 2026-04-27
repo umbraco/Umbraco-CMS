@@ -44,6 +44,14 @@
         "toLower": true
       },
       "replaces": "umbraco_image"
+    },
+    "CertPassword": {
+      "type": "generated",
+      "generator": "guid",
+      "parameters": {
+        "defaultFormat": "N"
+      },
+      "replaces": "CERT_PASS_FROM_TEMPLATE"
     }
   }
 }
