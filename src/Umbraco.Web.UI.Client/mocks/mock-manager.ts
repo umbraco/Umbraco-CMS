@@ -36,7 +36,7 @@ class UmbMockManager {
 		variantDocuments: {
 			label: 'Variant Documents',
 			loader: () => import('./data/sets/variant-documents/index.js') as Promise<UmbMockDataSet>,
-			visible: true,
+			visible: false,
 		},
 	};
 
