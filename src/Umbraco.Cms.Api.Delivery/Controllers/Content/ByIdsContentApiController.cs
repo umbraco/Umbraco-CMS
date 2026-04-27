@@ -48,6 +48,7 @@ public class ByIdsContentApiController : ContentApiItemControllerBase
             .WhereNotNull()
             .ToArray();
 
+        SetOutputCacheContent(contentItems);
         return Ok(apiContentItems);
     }
 }

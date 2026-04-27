@@ -202,13 +202,22 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
-            if (_mediaNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys))
+            var inMainTree = _mediaNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys);
+            var inBin = inMainTree is false && _mediaNavigationQueryService.TryGetDescendantsKeysInBin(key, out descendantsKeys);
+
+            if (inMainTree || inBin)
             {
                 var branchKeys = descendantsKeys.ToList();
                 branchKeys.Add(key);
 
                 foreach (Guid branchKey in branchKeys)
                 {
+                    if (inBin)
+                    {
+                        _mediaCacheService.RemoveFromMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                        continue;
+                    }
+
                     _mediaCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
                 }
             }

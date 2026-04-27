@@ -2925,6 +2925,10 @@ public class ContentService : RepositoryService, IContentService
                 copy.Published = false;
             }
 
+            // clear any per-culture published state copied from the source - the copy is unpublished,
+            // so no culture variations should be marked as published either (see #22540).
+            copy.ClearPublishInfos();
+
             copy.CreatorId = userId;
             copy.WriterId = userId;
 
@@ -2988,6 +2992,10 @@ public class ContentService : RepositoryService, IContentService
                         {
                             descendantCopy.Published = false;
                         }
+
+                        // clear any per-culture published state copied from the source - the copy is unpublished,
+                        // so no culture variations should be marked as published either (see #22540).
+                        descendantCopy.ClearPublishInfos();
 
                         descendantCopy.CreatorId = userId;
                         descendantCopy.WriterId = userId;
@@ -3892,6 +3900,33 @@ public class ContentService : RepositoryService, IContentService
             Audit(AuditType.Save, userId, content.Id, $"Saved content template: {content.Name}");
 
             scope.Notifications.Publish(new ContentSavedBlueprintNotification(content, createdFromContent, evtMsgs));
+            scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
+
+            scope.Complete();
+        }
+    }
+
+    /// <summary>
+    /// Moves a content blueprint to a different container.
+    /// </summary>
+    /// <param name="content">The blueprint content to move.</param>
+    /// <param name="userId">The optional ID of the user moving the blueprint.</param>
+    public void MoveBlueprint(IContent content, int userId = Constants.Security.SuperUserId)
+    {
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        content.Blueprint = true;
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            scope.WriteLock(Constants.Locks.ContentTree);
+
+            content.WriterId = userId;
+
+            _documentBlueprintRepository.Save(content);
+
+            Audit(AuditType.Move, userId, content.Id);
+
             scope.Notifications.Publish(new ContentTreeChangeNotification(content, TreeChangeTypes.RefreshNode, evtMsgs));
 
             scope.Complete();

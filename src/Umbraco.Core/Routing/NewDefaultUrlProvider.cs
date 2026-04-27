@@ -123,7 +123,7 @@ public class NewDefaultUrlProvider : IUrlProvider
 
             // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
             var route = GetLegacyRouteFormatById(key, culture);
-            if (route == null || route == "#")
+            if (route == null || route == Constants.Routing.Unroutable)
             {
                 continue;
             }
@@ -184,7 +184,7 @@ public class NewDefaultUrlProvider : IUrlProvider
         var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
         if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && content.Cultures.Any() && content.IsInvariantOrHasCulture(culture) is false)
         {
-            route = "#";
+            route = Constants.Routing.Unroutable;
         }
         else
         {
@@ -206,7 +206,7 @@ public class NewDefaultUrlProvider : IUrlProvider
         UrlMode mode,
         string? culture)
     {
-        if (string.IsNullOrWhiteSpace(route) || route.Equals("#"))
+        if (string.IsNullOrWhiteSpace(route) || route.Equals(Constants.Routing.Unroutable))
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {
@@ -217,18 +217,27 @@ public class NewDefaultUrlProvider : IUrlProvider
             return null;
         }
 
-        // extract domainUri and path
-        // route is /<path> or <domainRootId>/<path>
+        // A route of just "<domainRootId>" (no slash) can occur when the path is "/" and was trimmed.
+        // Normalize by appending "/" so the existing parsing logic handles it correctly.
         var pos = route.IndexOf('/', StringComparison.Ordinal);
+        if (pos < 0)
+        {
+            route += "/";
+            pos = route.Length - 1;
+        }
+
         var path = pos == 0 ? route : route[pos..];
-        DomainAndUri? domainUri = pos == 0
-            ? null
-            : DomainUtilities.DomainForNode(
+
+        DomainAndUri? domainUri = null;
+        if (pos > 0 && int.TryParse(route[..pos], NumberStyles.None, CultureInfo.InvariantCulture, out var nodeId))
+        {
+            domainUri = DomainUtilities.DomainForNode(
                 _domainCache,
                 _siteDomainMapper,
-                int.Parse(route[..pos], CultureInfo.InvariantCulture),
+                nodeId,
                 current,
                 culture);
+        }
 
         var defaultCulture = _languageService.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
         if (domainUri is not null ||

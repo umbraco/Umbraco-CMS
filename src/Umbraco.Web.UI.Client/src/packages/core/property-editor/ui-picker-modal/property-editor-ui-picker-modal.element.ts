@@ -132,6 +132,7 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		css`
 			:host {
 				display: block;
+				height: 100%;
 				container-type: inline-size;
 			}
 
@@ -218,8 +219,6 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 			#item-grid .item .label {
 				max-width: 100%;
 				display: -webkit-box;
-				-webkit-line-clamp: 2;
-				-webkit-box-orient: vertical;
 				overflow: hidden;
 			}
 		`,

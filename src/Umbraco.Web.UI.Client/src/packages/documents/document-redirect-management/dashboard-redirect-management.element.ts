@@ -116,10 +116,10 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		}
 
 		await umbConfirmModal(this, {
-			headline: `${this.localize.term('redirectUrls_disableUrlTracker')}`,
-			content: `${this.localize.term('redirectUrls_confirmDisable')}`,
+			headline: '#redirectUrls_disableUrlTracker',
+			content: '#redirectUrls_confirmDisable',
 			color: 'danger',
-			confirmLabel: 'Disable',
+			confirmLabel: '#actions_disable',
 		});
 
 		this.#trackerToggle();

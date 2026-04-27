@@ -96,6 +96,15 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     }
 
     /// <inheritdoc />
+    /// <remarks>
+    /// SQLite does not have the concept of guids / uuid / uniqueidentifier and columns are also
+    /// case sensitive by default.
+    /// Guids are serialized in uppercase by ORMs so we need to ensure they are stored in uppercase to
+    /// avoid case sensitivity issues when comparing values.
+    /// </remarks>
+    public override string FormatGuid(Guid guid) => guid.ToString().ToUpperInvariant();
+
+    /// <inheritdoc />
     public override string Format(TableDefinition table)
     {
         var columns = Format(table.Columns);
@@ -128,13 +137,13 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return foreignKeys.Select(Format).ToList();
     }
 
-    // TODO (V18): Change 'virtual' to 'override' to properly override base class method (currently causes CS0114 warning).
+    // TODO (V18): Change 'new virtual' to 'override' to properly override base class method.
     /// <summary>
     /// Formats a foreign key definition for SQLite inline table constraint syntax.
     /// </summary>
     /// <param name="foreignKey">The foreign key definition to format.</param>
     /// <returns>The formatted foreign key constraint SQL.</returns>
-    public virtual string Format(ForeignKeyDefinition foreignKey)
+    public new virtual string Format(ForeignKeyDefinition foreignKey)
     {
         var constraintName = string.IsNullOrEmpty(foreignKey.Name)
             ? $"FK_{foreignKey.ForeignTable}_{foreignKey.PrimaryTable}_{foreignKey.PrimaryColumns.First()}"
@@ -204,7 +213,7 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
     /// <inheritdoc />
     public override bool DoesPrimaryKeyExist(IDatabase db, string tableName, string primaryKeyName)
     {
-        IEnumerable<string> items = db.Fetch<string>($"select sql from sqlite_master where type = 'table' and name = '{tableName}'")
+        IEnumerable<string> items = db.Fetch<string>("select sql from sqlite_master where type = 'table' and name = @0", tableName)
             .Where(x => x.Contains($"CONSTRAINT {primaryKeyName} PRIMARY KEY"));
 
         return items.Any();
@@ -304,9 +313,9 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
         return sql.Append($"LIMIT {top}");
     }
 
-    // TODO (V18): Change 'virtual' to 'override' to properly override base class method (currently causes CS0114 warning).
+    // TODO (V18): Change 'new virtual' to 'override' to properly override base class method.
     /// <inheritdoc />
-    public virtual string Format(IEnumerable<ColumnDefinition> columns)
+    public new virtual string Format(IEnumerable<ColumnDefinition> columns)
     {
         var sb = new StringBuilder();
         foreach (ColumnDefinition column in columns)
@@ -508,6 +517,10 @@ public class SqliteSyntaxProvider : SqlSyntaxProviderBase<SqliteSyntaxProvider>
 
         public bool IsUnique { get; set; }
     }
+
+    /// <inheritdoc />
+    public override string CreateTempTable(string tableName, string columnDefinitionSql)
+        => $"CREATE TEMP TABLE {tableName} ({columnDefinitionSql})";
 
     /// <inheritdoc />
     public override string Length => "length";

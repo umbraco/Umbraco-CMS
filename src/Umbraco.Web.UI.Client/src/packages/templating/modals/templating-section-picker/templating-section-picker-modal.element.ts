@@ -8,6 +8,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UUIBooleanInputElement, UUIInputElement } from '@umbraco-cms/backoffice/external/uui';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-templating-section-picker-modal')
 export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
@@ -24,11 +25,12 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 	private _renderNamedSectionIsMandatoryCheckbox?: UUIBooleanInputElement;
 
 	@state()
-	private _pickedSection: TemplatingSectionType = TemplatingSectionType.renderChildTemplate;
+	private _pickedSection?: TemplatingSectionType;
 
 	#close() {
 		this.modalContext?.reject();
 	}
+
 
 	#submit() {
 		switch (this._pickedSection) {
@@ -66,6 +68,7 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 						@click=${this.#submit}
 						look="primary"
 						color="positive"
+						?disabled=${this._pickedSection === undefined}
 						label=${this.localize.term('general_submit')}></uui-button>
 				</div>
 			</umb-body-layout>
@@ -73,30 +76,30 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#renderRenderChildTemplate() {
-		return html`<uui-button
+		return html`<uui-card
+			selectable
+			selectOnly
+			.selected=${this._pickedSection === TemplatingSectionType.renderChildTemplate}
 			label=${this.localize.term('template_renderBody')}
-			@click=${() => (this._pickedSection = TemplatingSectionType.renderChildTemplate)}
-			look="placeholder">
-			${this._pickedSection === TemplatingSectionType.renderChildTemplate
-				? html`<uui-badge color="positive"><uui-icon name="icon-check"></uui-icon></uui-badge>`
-				: ''}
+			@selected=${() => this._pickedSection = TemplatingSectionType.renderChildTemplate}
+  			@deselected=${() => this._pickedSection = undefined}>
 			<h3><umb-localize key="template_renderBody">Render Child Template</umb-localize></h3>
 			<p>
 				<umb-localize key="template_renderBodyDesc">
 					Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.
 				</umb-localize>
 			</p>
-		</uui-button>`;
+		</uui-card>`;
 	}
 
 	#renderRenderANamedSection() {
-		return html`<uui-button
+		return html`<uui-card
+			selectable
+			selectOnly
+			.selected=${this._pickedSection === TemplatingSectionType.renderANamedSection}
 			label=${this.localize.term('template_renderSection')}
-			@click=${() => (this._pickedSection = TemplatingSectionType.renderANamedSection)}
-			look="placeholder">
-			${this._pickedSection === TemplatingSectionType.renderANamedSection
-				? html`<uui-badge color="positive"><uui-icon name="icon-check"></uui-icon></uui-badge>`
-				: ''}
+			@selected=${() => this._pickedSection = TemplatingSectionType.renderANamedSection}
+  			@deselected=${() => this._pickedSection = undefined}>
 			<h3><umb-localize key="template_renderSection">Render a named section</umb-localize></h3>
 			<p>
 				<umb-localize key="template_renderSectionDesc">
@@ -110,10 +113,14 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 						<uui-label for="render-named-section-name" required>
 							<umb-localize key="template_sectionName">Section Name</umb-localize>
 						</uui-label>
-						<uui-input id="render-named-section-name" label=${this.localize.term('template_sectionName')}></uui-input>
+						<uui-input ${umbFocus()} id="render-named-section-name" label=${this.localize.term('template_sectionName')}></uui-input>
 						<uui-checkbox
 							id="render-named-section-is-mandatory"
-							label=${this.localize.term('template_sectionMandatory')}></uui-checkbox>
+							label=${this.localize.term('template_sectionMandatory')}
+							@click=${(e: Event) => e.stopPropagation()}
+							@keydown=${(e: KeyboardEvent) => {
+        					if (e.key === 'Enter') {
+            				(e.target as HTMLElement).click();}}}></uui-checkbox>
 						<small>
 							<umb-localize key="template_sectionMandatoryDesc">
 								If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is
@@ -122,17 +129,17 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 						</small>
 					</div>`
 				: ''}
-		</uui-button>`;
+		</uui-card>`;
 	}
 
 	#renderDefineANamedSection() {
-		return html`<uui-button
+		return html`<uui-card
+			selectable
+			selectOnly
+			.selected=${this._pickedSection === TemplatingSectionType.defineANamedSection}
 			label=${this.localize.term('template_defineSection')}
-			@click=${() => (this._pickedSection = TemplatingSectionType.defineANamedSection)}
-			look="placeholder">
-			${this._pickedSection === TemplatingSectionType.defineANamedSection
-				? html`<uui-badge color="positive"><uui-icon name="icon-check"></uui-icon></uui-badge>`
-				: ''}
+			@selected=${() => this._pickedSection = TemplatingSectionType.defineANamedSection}
+  			@deselected=${() => this._pickedSection = undefined}>
 			<h3><umb-localize key="template_defineSection">Define a named section</umb-localize></h3>
 			<p>
 				<umb-localize key="template_defineSectionDesc">
@@ -145,21 +152,15 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 						<uui-label for="define-named-section-name" required>
 							<umb-localize key="template_sectionName">Section Name</umb-localize>
 						</uui-label>
-						<uui-input id="define-named-section-name" label=${this.localize.term('template_sectionName')}></uui-input>
+						<uui-input ${umbFocus()} id="define-named-section-name" label=${this.localize.term('template_sectionName')}></uui-input>
 					</div>`
 				: ''}
-		</uui-button>`;
+		</uui-card>`;
 	}
 
 	static override styles = [
 		UmbTextStyles,
 		css`
-			code {
-				background-color: var(--uui-color-surface-alt);
-				border: 1px solid var(--uui-color-border);
-				border-radius: var(--uui-border-radius);
-			}
-
 			#main {
 				display: grid;
 				grid-gap: var(--uui-size-space-5);
@@ -169,12 +170,10 @@ export class UmbTemplatingSectionPickerModalElement extends UmbModalBaseElement<
 				display: grid;
 			}
 
-			uui-button {
+			uui-card {
 				text-align: left;
-			}
-
-			uui-button p {
-				margin-top: 0;
+				display: block;
+				padding: var(--uui-size-space-4);
 			}
 
 			uui-input,

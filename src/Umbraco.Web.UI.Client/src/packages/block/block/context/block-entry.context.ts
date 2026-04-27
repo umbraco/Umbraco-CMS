@@ -56,7 +56,7 @@ export abstract class UmbBlockEntryContext<
 	#unsupported = new UmbBooleanState(undefined);
 	readonly unsupported = this.#unsupported.asObservable();
 
-	readonly #localize = new UmbLocalizationController(this);
+	protected readonly localize = new UmbLocalizationController(this);
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
@@ -701,7 +701,7 @@ export abstract class UmbBlockEntryContext<
 			this.observe(
 				this.contentElementTypeName,
 				(contentTypeName) => {
-					this.#label.setValue(this.#localize.string(contentTypeName) || 'no name');
+					this.#label.setValue(this.localize.string(contentTypeName) || 'no name');
 				},
 				'observeContentTypeName',
 			);
@@ -741,9 +741,9 @@ export abstract class UmbBlockEntryContext<
 	async requestDelete() {
 		const blockName = this.getName();
 		await umbConfirmModal(this, {
-			headline: this.#localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
-			content: this.#localize.term('blockEditor_confirmDeleteBlockMessage', blockName),
-			confirmLabel: this.#localize.term('general_delete'),
+			headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
+			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', blockName),
+			confirmLabel: '#general_delete',
 			color: 'danger',
 		});
 		this.delete();
