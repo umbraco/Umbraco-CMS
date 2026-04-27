@@ -76,6 +76,11 @@ export class UmbBackofficeContext extends UmbContextBase {
 		this.#activeSectionAlias.setValue(alias);
 	}
 
+	public toggleMobileSidebar(): void {
+		// section-sidebar is a core package component and cannot import from apps/backoffice without creating a circular dependency, so the signal crosses that boundary via a window event.
+		window.dispatchEvent(new CustomEvent('umb-section-sidebar-toggle'));
+	}
+
 	public async serverUpgradeCheck() {
 		const version = await this.observe(this.version)
 			.asPromise()
