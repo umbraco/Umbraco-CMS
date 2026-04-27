@@ -9,7 +9,9 @@ import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 @customElement('umb-log-viewer-message-templates-overview')
 export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	#itemsPerPage = 10;
-	#currentPage = 1;
+
+	@state()
+	private _currentPage = 1;
 
 	@state()
 	private _total = 0;
@@ -37,13 +39,17 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	}
 
 	#getMessageTemplates() {
-		const skip = this.#currentPage * this.#itemsPerPage - this.#itemsPerPage;
+		const skip = this._currentPage * this.#itemsPerPage - this.#itemsPerPage;
 		this._logViewerContext?.getMessageTemplates(skip, this.#itemsPerPage);
 	}
 
-	#onChangePage(event: UUIPaginationEvent) {
-		this.#currentPage = event.target.current;
+	#goToPage(page: number) {
+		this._currentPage = page;
 		this.#getMessageTemplates();
+	}
+
+	#onChangePage(event: UUIPaginationEvent) {
+		this.#goToPage(event.target.current);
 	}
 
 	override render() {

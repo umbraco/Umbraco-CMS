@@ -24,6 +24,9 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 	@state()
 	private _isLoading = true;
 
+	@state()
+	private _currentPage = 1;
+
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
 	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
@@ -72,7 +75,12 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 	#onPageChange(event: Event): void {
 		const current = (event.target as UUIPaginationElement).current;
-		this._logViewerContext?.setCurrentPage(current);
+		this.#goToPage(current);
+	}
+
+	#goToPage(page: number): void {
+		this._currentPage = page;
+		this._logViewerContext?.setCurrentPage(page);
 		this._logViewerContext?.getLogs();
 		this._logsScrollContainer.scrollTop = 0;
 	}
