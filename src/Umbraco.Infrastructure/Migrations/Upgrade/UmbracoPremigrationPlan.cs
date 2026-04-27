@@ -84,5 +84,6 @@ public class UmbracoPremigrationPlan : MigrationPlan
 
         // To 18.0.0
         To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
+        To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
     }
 }
