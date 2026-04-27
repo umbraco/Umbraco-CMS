@@ -1,7 +1,8 @@
+import { UMB_BLOCK_MANAGER_CONTEXT } from '../context/block-manager.context-token.js';
+import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { UMB_BLOCK_MANAGER_CONTEXT, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 

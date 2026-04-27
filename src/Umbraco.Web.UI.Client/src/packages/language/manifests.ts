@@ -11,7 +11,6 @@ import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import * as entryPointModule from './entry-point.js';
 import { UMB_WORKSPACE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/workspace';
-import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...appLanguageSelect,
@@ -34,18 +33,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
 				match: 'Umb.Workspace.Document',
-			},
-		],
-	},
-	{
-		type: 'workspaceContext',
-		name: 'Block Language Access Workspace Context',
-		alias: 'Umb.WorkspaceContext.BlockLanguageAccess',
-		api: () => import('./permissions/block-language-access.workspace.controller.js'),
-		conditions: [
-			{
-				alias: UMB_WORKSPACE_CONDITION_ALIAS,
-				match: UMB_BLOCK_WORKSPACE_ALIAS,
 			},
 		],
 	},

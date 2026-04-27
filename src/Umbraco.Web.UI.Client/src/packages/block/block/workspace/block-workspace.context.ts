@@ -4,6 +4,7 @@ import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element
 import { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
 import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
+import { UmbBlockLanguageAccessWorkspaceController } from './block-workspace-language-access.controller.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -83,6 +84,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#entityType = manifest.meta?.entityType;
 
 		window.addEventListener('willchangestate', this.#onWillNavigate);
+
+		new UmbBlockLanguageAccessWorkspaceController(this);
 
 		this.content.view.inheritFrom(this.view);
 		this.settings.view.inheritFrom(this.view);
