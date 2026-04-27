@@ -7,6 +7,10 @@ export default defineConfig({
 		tsconfigPaths: true,
 	},
 	optimizeDeps: {
+		// Rolldown's dep pre-bundle drops @umbraco-ui/uui's per-component
+		// `customElements.define()` side-effects regardless of `sideEffects`
+		// in package.json or `treeshake.moduleSideEffects: true`. Skip the
+		// pre-bundle so the package is served as-is.
 		exclude: ['@umbraco-ui/uui'],
 	},
 	server: {
