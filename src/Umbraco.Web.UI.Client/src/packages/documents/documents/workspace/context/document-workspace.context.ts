@@ -158,7 +158,7 @@ export class UmbDocumentWorkspaceContext
 		this.routes.setRoutes([
 			{
 				path: UMB_CREATE_FROM_BLUEPRINT_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
-				component: () => import('./document-workspace-editor.element.js'),
+				component: () => import('../document-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.parentEntityType;
 					const parentUnique: string | null =
@@ -181,7 +181,7 @@ export class UmbDocumentWorkspaceContext
 			},
 			{
 				path: UMB_CREATE_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
-				component: () => import('./document-workspace-editor.element.js'),
+				component: () => import('../document-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					const parentEntityType = info.match.params.parentEntityType;
 					const parentUnique = info.match.params.parentUnique === 'null' ? null : info.match.params.parentUnique;
@@ -196,7 +196,7 @@ export class UmbDocumentWorkspaceContext
 			},
 			{
 				path: UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.toString(),
-				component: () => import('./document-workspace-editor.element.js'),
+				component: () => import('../document-workspace-editor.element.js'),
 				setup: async (_component, info) => {
 					this.removeUmbControllerByAlias(UmbWorkspaceIsNewRedirectControllerAlias);
 					const unique = info.match.params.unique;
