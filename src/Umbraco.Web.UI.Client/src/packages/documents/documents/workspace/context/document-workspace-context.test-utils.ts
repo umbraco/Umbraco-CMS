@@ -1,9 +1,3 @@
-import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
-import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
-import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
-import { UmbCurrentUserContext } from '@umbraco-cms/backoffice/current-user';
-import { of } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbDocumentDetailStore } from '../../repository/detail/document-detail.store.js';
 import { manifests as documentDetailRepositoryManifests } from '../../repository/detail/manifests.js';
 import { UmbDocumentTypeDetailStore } from '../../../document-types/repository/detail/document-type-detail.store.js';
@@ -15,6 +9,12 @@ import {
 	UMB_USER_PERMISSION_DOCUMENT_CREATE,
 	UMB_USER_PERMISSION_DOCUMENT_UPDATE,
 } from '../../user-permissions/document/constants.js';
+import { of } from '@umbraco-cms/backoffice/external/rxjs';
+import { UmbCurrentUserContext } from '@umbraco-cms/backoffice/current-user';
+import { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
+import { UmbActionEventContext } from '@umbraco-cms/backoffice/action';
+import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { customElement } from '@umbraco-cms/backoffice/external/lit';
 
 export const TEST_MANIFESTS = [
 	...documentDetailRepositoryManifests,
