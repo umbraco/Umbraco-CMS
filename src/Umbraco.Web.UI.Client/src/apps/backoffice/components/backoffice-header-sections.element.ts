@@ -105,13 +105,20 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 
 		const clickedSectionAlias = manifest.alias;
 
-		// If preventUrlRetention is set, or the clicked section is already active, always go to the section root.
-		const targetPath =
-			manifest.meta.preventUrlRetention === true || this._currentSectionAlias === clickedSectionAlias
-				? this.#getSectionPath(manifest)
-				: (this.#sectionPathMap.get(clickedSectionAlias) ?? this.#getSectionPath(manifest));
+		// If preventUrlRetention is set to true then go to the section root.
+		// Or if the clicked section is the current active one, then navigate to the section root
+		if (manifest.meta.preventUrlRetention === true || this._currentSectionAlias === clickedSectionAlias) {
+			history.pushState(null, '', this.#getSectionPath(manifest));
+			return;
+		}
 
-		history.pushState(null, '', targetPath);
+		// Check if we have a stored path for the clicked section
+		if (this.#sectionPathMap.has(clickedSectionAlias)) {
+			history.pushState(null, '', this.#sectionPathMap.get(clickedSectionAlias)!);
+		} else {
+			// Nothing stored, so we navigate to the regular section path
+			history.pushState(null, '', this.#getSectionPath(manifest));
+		}
 	}
 
 	#onCurrentSectionClick(event: PointerEvent) {
