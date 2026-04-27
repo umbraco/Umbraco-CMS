@@ -277,7 +277,6 @@
 		"typescript-json-schema": "^0.67.1",
 		"vite": "^8.0.10",
 		"vite-plugin-static-copy": "^4.1.0",
-		"vite-tsconfig-paths": "^6.1.1",
 		"web-component-analyzer": "^2.0.0"
 	},
 	"msw": {

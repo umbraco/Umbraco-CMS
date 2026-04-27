@@ -35,11 +35,7 @@ export default defineConfig({
 		...defaults.build,
 		rollupOptions: {
 			...defaults.build!.rollupOptions,
-			// UUI 2.0 registers components via per-component side-effect modules
-			// (e.g. `import "./components/button/button.js"` calling
-			// `defineElement("uui-button", UUIButtonElement)`). Rollup's default
-			// tree-shaker strips these because Vite's lib mode doesn't honour the
-			// `sideEffects` field declared on nested deps — force preservation here.
+			// Preserves UUI 2.0's per-component `customElements.define()` side effects.
 			treeshake: false,
 		},
 	},

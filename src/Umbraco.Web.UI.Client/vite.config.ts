@@ -1,6 +1,5 @@
 import { defineConfig, PluginOption } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import viteTSConfigPaths from 'vite-tsconfig-paths';
 
 export const plugins: PluginOption[] = [
 	viteStaticCopy({
@@ -44,11 +43,13 @@ export const plugins: PluginOption[] = [
 			},
 		],
 	}),
-	viteTSConfigPaths(),
 ];
 
 // https://vitejs.dev/config/
 export default defineConfig({
+	resolve: {
+		tsconfigPaths: true,
+	},
 	build: {
 		sourcemap: true,
 		rollupOptions: {

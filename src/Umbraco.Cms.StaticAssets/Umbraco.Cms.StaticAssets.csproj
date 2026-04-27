@@ -113,10 +113,6 @@
     <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(LoginProjectDirectory)" />
   </Target>
 
-  <!-- BuildLogin runs `tsc` which walks the sibling Client's source via tsconfig path
-       aliases. That walk needs Client's node_modules populated (for transitive deps
-       like lit/rxjs/uui). RestoreBackoffice provides that — without this dependency
-       a fresh local `dotnet build` could run BuildLogin before Client is installed. -->
   <Target Name="BuildLogin" DependsOnTargets="RestoreLogin;RestoreBackoffice">
     <Message Importance="high" Text="Executing Login NPM build script..." />
     <Exec Command="npm run build" WorkingDirectory="$(LoginProjectDirectory)" />

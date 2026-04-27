@@ -10,10 +10,6 @@
 		<meta name="pinterest" content="nopin" />
 		<title>Umbraco</title>
 		<script type="module">
-			// UUI 2.0's theme CSS lives in the sibling Client's node_modules. Login no longer
-			// declares an npm dep on `@umbraco-ui/uui` (the production login.cshtml in the CMS
-			// already serves these CSS bundles). The relative path is stable because the contract
-			// is "Client must be `npm install`-ed before Login" — see CLAUDE.md.
 			import '../Umbraco.Web.UI.Client/node_modules/@umbraco-ui/uui/dist/themes/light.css';
 			const { startMockServiceWorker } = await import('./src/mocks/index.ts');
 			await startMockServiceWorker();
