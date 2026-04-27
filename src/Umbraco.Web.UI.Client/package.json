@@ -172,6 +172,7 @@
 		"./src/external/*"
 	],
 	"scripts": {
+		"postinstall": "npm run generate:tsconfig",
 		"backoffice:test:e2e": "npx playwright test",
 		"build-storybook": "npm run wc-analyze && storybook build",
 		"build:for:cms": "npm run build && npm run build:workspaces && npm run generate:manifest && npm run package:validate && node ./devops/build/copy-to-cms.js",
