@@ -657,8 +657,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	public getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
 		const currentData = this._data.getCurrent();
 		if (currentData) {
+			// No variantId means invariant: match only entries with culture === null and segment === null.
 			const newDataSet = currentData.values?.find(
-				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
+				(x) => x.alias === alias && (variantId ?? UmbVariantId.CreateInvariant()).compare(x),
 			);
 			return newDataSet?.value as ReturnType;
 		}
