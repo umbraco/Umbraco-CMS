@@ -9,12 +9,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs;
 ///     This is just a dummy class that is used to ensure that implementations
 ///     of IMigration is not found if it doesn't have the MigrationAttribute (like this class).
 /// </summary>
-public class Dummy : MigrationBase
+public class Dummy : AsyncMigrationBase
 {
     public Dummy(IMigrationContext context)
         : base(context)
     {
     }
 
-    protected override void Migrate() => throw new NotImplementedException();
+    protected override async Task MigrateAsync() => throw new NotImplementedException();
 }

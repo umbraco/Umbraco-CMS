@@ -253,13 +253,13 @@ public class MigrationPlanTests
         }
     }
 
-    public class DeleteRedirectUrlTable : MigrationBase
+    public class DeleteRedirectUrlTable : AsyncMigrationBase
     {
         public DeleteRedirectUrlTable(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate() => Delete.Table("umbracoRedirectUrl").Do();
+        protected override async Task MigrateAsync() => Delete.Table("umbracoRedirectUrl").Do();
     }
 }

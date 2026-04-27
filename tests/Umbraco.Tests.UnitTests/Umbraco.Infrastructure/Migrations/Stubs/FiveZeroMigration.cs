@@ -5,14 +5,14 @@ using Umbraco.Cms.Infrastructure.Migrations;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs;
 
-public class FiveZeroMigration : MigrationBase
+public class FiveZeroMigration : AsyncMigrationBase
 {
     public FiveZeroMigration(IMigrationContext context)
         : base(context)
     {
     }
 
-    protected override void Migrate()
+    protected override async Task MigrateAsync()
     {
     }
 }

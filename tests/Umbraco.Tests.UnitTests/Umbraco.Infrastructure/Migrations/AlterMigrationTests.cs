@@ -70,14 +70,17 @@ public class AlterMigrationTests
             Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
     }
 
-    public class CreateColumnMigration : MigrationBase
+    public class CreateColumnMigration : AsyncMigrationBase
     {
         public CreateColumnMigration(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate() => Alter.Table("bar").AddColumn("foo").AsGuid().Do();
+        protected override async Task MigrateAsync()
+        {
+            Alter.Table("bar").AddColumn("foo").AsGuid().Do();
+        }
     }
 
     [Test]
@@ -99,14 +102,14 @@ public class AlterMigrationTests
             Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
     }
 
-    public class AlterColumnMigration : MigrationBase
+    public class AlterColumnMigration : AsyncMigrationBase
     {
         public AlterColumnMigration(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate() =>
+        protected override async Task MigrateAsync() =>
 
             // bad/good syntax...
             //// Alter.Column("foo").OnTable("bar").AsGuid().NotNullable();

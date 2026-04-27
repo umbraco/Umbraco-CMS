@@ -5,12 +5,12 @@ using Umbraco.Cms.Infrastructure.Migrations;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs;
 
-public class FourElevenMigration : MigrationBase
+public class FourElevenMigration : AsyncMigrationBase
 {
     public FourElevenMigration(IMigrationContext context)
         : base(context)
     {
     }
 
-    protected override void Migrate() => Alter.Table("umbracoUser").AddColumn("companyPhone").AsString(255);
+    protected override async Task MigrateAsync() => Alter.Table("umbracoUser").AddColumn("companyPhone").AsString(255);
 }
