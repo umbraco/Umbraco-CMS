@@ -25,7 +25,7 @@ describe('UmbDocumentWorkspaceContext (CRUD)', () => {
 	});
 
 	beforeEach(async () => {
-		await useMockSet('variantDocuments');
+		await useMockSet('documents');
 		hostElement = new UmbTestDocumentWorkspaceHostElement();
 		document.body.appendChild(hostElement);
 		await hostElement.init();
