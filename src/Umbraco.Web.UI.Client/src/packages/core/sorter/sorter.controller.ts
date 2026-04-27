@@ -155,8 +155,7 @@ type INTERNAL_UmbSorterConfig<T, ElementType extends HTMLElement> = {
 	 */
 	handleSelector?: string;
 	/**
-	 * Set to false to disable touch/pointer drag on this sorter. Mouse drag is unaffected.
-	 * Useful for editors where touch interaction should be intentionally blocked (e.g. document type designers).
+	 * Set to true to enable touch drag on this sorter. Defaults to false. Mouse drag is unaffected.
 	 */
 	touchEnabled?: boolean;
 
@@ -769,7 +768,7 @@ export class UmbSorterController<T, ElementType extends HTMLElement = HTMLElemen
 
 	#handleHandleTouchDown = (event: PointerEvent) => {
 		if (event.pointerType !== 'touch') return;
-		if (this.#config.touchEnabled === false) return;
+		if (!this.#config.touchEnabled) return;
 
 		const target = event.target as HTMLElement;
 
