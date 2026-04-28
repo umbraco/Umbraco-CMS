@@ -619,7 +619,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
 
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(pt => pt.Alias == "singleLineText").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var valueEditor = await GetValueEditor(singleBlockContentType);
         var toEditorValue = valueEditor.ToEditor(content.Properties["block"]!) as SingleBlockValue;
@@ -702,7 +702,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
 
         elementType.PropertyTypes.First(pt => pt.Alias == "singleLineText").Variations = ContentVariation.Nothing;
         elementType.Variations = ContentVariation.Nothing;
-        await ContentTypeService.SaveAsync(elementType,   Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         var valueEditor = await GetValueEditor(singleBlockContentType);
         var toEditorValue = valueEditor.ToEditor(content.Properties["block"]!) as SingleBlockValue;
@@ -760,7 +760,7 @@ internal sealed class SingleBlockPropertyEditorTests : UmbracoIntegrationTest
             .WithDataTypeId(singleBlockDataType.Id)
             .Done()
             .Build();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         // re-fetch to wire up all key bindings (particularly to the datatype)
         return await ContentTypeService.GetAsync(contentType.Key);
     }

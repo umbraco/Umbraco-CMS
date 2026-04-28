@@ -39,7 +39,7 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
             {
                 DataTypeId = Constants.DataTypes.Tags
             });
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
     }
 
     private IContentService ContentService => GetRequiredService<IContentService>();

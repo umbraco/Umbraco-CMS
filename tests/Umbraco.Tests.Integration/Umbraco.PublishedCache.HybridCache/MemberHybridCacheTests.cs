@@ -49,7 +49,7 @@ internal sealed class MemberHybridCacheTests : UmbracoIntegrationTest
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.SetIsSensitiveProperty("title", titleIsSensitive);
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         MemberService.AddRole("RoleOne");
         var group = MemberGroupService.GetByName("RoleOne");
 

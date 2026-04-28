@@ -12,7 +12,7 @@ public partial class ContentBlueprintEditingServiceTests
     [Test]
     public async Task Can_Create_With_Basic_Model()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         var createModel = new ContentBlueprintCreateModel
         {
@@ -51,7 +51,7 @@ public partial class ContentBlueprintEditingServiceTests
     [Test]
     public async Task Can_Create_At_Root()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         var createModel = new ContentBlueprintCreateModel
         {
@@ -96,7 +96,7 @@ public partial class ContentBlueprintEditingServiceTests
     [Test]
     public async Task Can_Create_With_Explicit_Key()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         var key = Guid.NewGuid();
         var createModel = new ContentBlueprintCreateModel
@@ -135,7 +135,7 @@ public partial class ContentBlueprintEditingServiceTests
     [Test]
     public async Task Cannot_Create_With_Duplicate_Name_For_The_Same_Content_Type()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         var createModel = new ContentBlueprintCreateModel
         {
@@ -172,7 +172,7 @@ public partial class ContentBlueprintEditingServiceTests
     [Test]
     public async Task Can_Create_With_Different_Name()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         var createModel1 = new ContentBlueprintCreateModel
         {
@@ -220,7 +220,7 @@ public partial class ContentBlueprintEditingServiceTests
         var contentType1 = ContentTypeBuilder.CreateContentMetaContentType();
         contentType1.AllowedTemplates = null;
         contentType1.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType1);
+        await ContentTypeService.CreateAsync(contentType1, Constants.Security.SuperUserKey);
 
         var createModel1 = new ContentBlueprintCreateModel
         {
@@ -241,7 +241,7 @@ public partial class ContentBlueprintEditingServiceTests
             Assert.IsNotNull(result1.Result);
         });
 
-        var contentType2 = CreateInvariantContentType();
+        var contentType2 = await CreateInvariantContentType();
 
         var createModel2 = new ContentBlueprintCreateModel
         {

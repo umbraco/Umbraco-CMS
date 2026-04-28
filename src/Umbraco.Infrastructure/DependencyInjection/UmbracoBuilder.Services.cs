@@ -73,7 +73,7 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<ITemplateService>(),
                 factory.GetRequiredService<IDictionaryItemService>(),
                 factory.GetRequiredService<ILanguageService>()));
-        builder.Services.AddSingleton(CreatePackageDataInstallation);
+        builder.Services.AddUnique<IPackageDataInstallation, PackageDataInstallation>();
         builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
         builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
         builder.Services.AddUnique<IUserDataService, UserDataService>();
@@ -112,26 +112,6 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<MediaFileManager>(),
             factory.GetRequiredService<FileSystems>(),
             packageRepoFileName);
-
-    // Factory registration is only required because of ambiguous constructor
-    private static IPackageDataInstallation CreatePackageDataInstallation(IServiceProvider factory)
-        => new PackageDataInstallation(
-            factory.GetRequiredService<IDataValueEditorFactory>(),
-            factory.GetRequiredService<ILogger<PackageDataInstallation>>(),
-            factory.GetRequiredService<IFileService>(),
-            factory.GetRequiredService<ILocalizationService>(),
-            factory.GetRequiredService<IDataTypeService>(),
-            factory.GetRequiredService<IEntityService>(),
-            factory.GetRequiredService<IContentTypeService>(),
-            factory.GetRequiredService<IContentService>(),
-            factory.GetRequiredService<PropertyEditorCollection>(),
-            factory.GetRequiredService<IScopeProvider>(),
-            factory.GetRequiredService<IShortStringHelper>(),
-            factory.GetRequiredService<IConfigurationEditorJsonSerializer>(),
-            factory.GetRequiredService<IMediaService>(),
-            factory.GetRequiredService<IMediaTypeService>(),
-            factory.GetRequiredService<ITemplateContentParserService>(),
-            factory.GetRequiredService<ITemplateService>());
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(
         IServiceProvider container)

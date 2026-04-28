@@ -183,7 +183,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
         memberType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExp = "^\\d*$";
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
 
         var titleValue = addValidProperties ? "The title value" : null;
         var authorValue = addValidProperties ? "12345" : "This is not a number";
@@ -232,7 +232,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
         var memberType = await MemberTypeService.GetAsync(member.ContentType.Key)!;
         memberType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
         memberType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExp = "^\\d*$";
-        await MemberTypeService.SaveAsync(memberType, Constants.Security.SuperUserKey);
+        await MemberTypeService.UpdateAsync(memberType, Constants.Security.SuperUserKey);
 
         var titleValue = addValidProperties ? "The title value" : null;
         var authorValue = addValidProperties ? "12345" : "This is not a number";
@@ -500,7 +500,7 @@ internal sealed class MemberEditingServiceTests : UmbracoIntegrationTest
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
         memberType.SetIsSensitiveProperty("title", titleIsSensitive);
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         MemberService.AddRole("RoleOne");
         var group = MemberGroupService.GetByName("RoleOne");
 

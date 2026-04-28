@@ -2,14 +2,9 @@ using System.Globalization;
 using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Packaging;
@@ -45,28 +40,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
         private readonly IMemberTypeService _memberTypeService;
+        private readonly IUserIdKeyResolver _userIdKeyResolver;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class,
-        /// providing all required services and helpers for package data installation operations.
+        /// Initializes a new instance of the <see cref="PackageDataInstallation"/> class.
         /// </summary>
-        /// <param name="dataValueEditorFactory">Factory for creating data value editors used in property editing.</param>
-        /// <param name="logger">The logger used for logging installation events and errors.</param>
-        /// <param name="fileService">Service for managing files such as templates, stylesheets, and scripts.</param>
-        /// <param name="localizationService">Service for managing localization and dictionary items.</param>
-        /// <param name="dataTypeService">Service for managing data types within Umbraco.</param>
-        /// <param name="entityService">Service for managing Umbraco entities generically.</param>
-        /// <param name="contentTypeService">Service for managing content types (document types, media types, etc.).</param>
-        /// <param name="contentService">Service for managing content items (nodes).</param>
-        /// <param name="propertyEditors">Collection of available property editors.</param>
-        /// <param name="scopeProvider">Provider for managing database transaction scopes.</param>
-        /// <param name="shortStringHelper">Helper for generating and manipulating short strings (e.g., aliases).</param>
-        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
-        /// <param name="mediaService">Service for managing media items.</param>
-        /// <param name="mediaTypeService">Service for managing media types.</param>
-        /// <param name="templateContentParserService">Service for parsing template content.</param>
-        /// <param name="templateService">Service for managing templates.</param>
-        /// <param name="memberTypeService">Service for managing member types.</param>
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
@@ -84,7 +62,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IMediaTypeService mediaTypeService,
             ITemplateContentParserService templateContentParserService,
             ITemplateService templateService,
-            IMemberTypeService memberTypeService)
+            IMemberTypeService memberTypeService,
+            IUserIdKeyResolver userIdKeyResolver)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
@@ -103,121 +82,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _templateContentParserService = templateContentParserService;
             _templateService = templateService;
             _memberTypeService = memberTypeService;
+            _userIdKeyResolver = userIdKeyResolver;
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class,
-        /// providing all required services and helpers for package data installation operations.
-        /// </summary>
-        /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
-        /// <param name="logger">The logger used for logging installation events and errors.</param>
-        /// <param name="fileService">Service for managing files within the CMS.</param>
-        /// <param name="localizationService">Service for handling localization and translations.</param>
-        /// <param name="dataTypeService">Service for managing data types.</param>
-        /// <param name="entityService">Service for managing entities.</param>
-        /// <param name="contentTypeService">Service for managing content types.</param>
-        /// <param name="contentService">Service for managing content items.</param>
-        /// <param name="propertyEditors">A collection of property editors available in the system.</param>
-        /// <param name="scopeProvider">Provider for managing database transaction scopes.</param>
-        /// <param name="shortStringHelper">Helper for handling short string operations.</param>
-        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
-        /// <param name="mediaService">Service for managing media items.</param>
-        /// <param name="mediaTypeService">Service for managing media types.</param>
-        /// <param name="templateContentParserService">Service for parsing template content.</param>
-        /// <param name="templateService">Service for managing templates.</param>
-        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-        public PackageDataInstallation(
-            IDataValueEditorFactory dataValueEditorFactory,
-            ILogger<PackageDataInstallation> logger,
-            IFileService fileService,
-            ILocalizationService localizationService,
-            IDataTypeService dataTypeService,
-            IEntityService entityService,
-            IContentTypeService contentTypeService,
-            IContentService contentService,
-            PropertyEditorCollection propertyEditors,
-            IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper,
-            IConfigurationEditorJsonSerializer serializer,
-            IMediaService mediaService,
-            IMediaTypeService mediaTypeService,
-            ITemplateContentParserService templateContentParserService,
-            ITemplateService templateService)
-            : this(
-                  dataValueEditorFactory,
-                  logger,
-                  fileService,
-                  localizationService,
-                  dataTypeService,
-                  entityService,
-                  contentTypeService,
-                  contentService,
-                  propertyEditors,
-                  scopeProvider,
-                  shortStringHelper,
-                  serializer,
-                  mediaService,
-                  mediaTypeService,
-                  templateContentParserService,
-                  templateService,
-                  StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>())
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class, responsible for handling the installation of package data within Umbraco.
-        /// </summary>
-        /// <param name="dataValueEditorFactory">Factory for creating data value editors used in property editing.</param>
-        /// <param name="logger">The logger used for logging installation operations and errors.</param>
-        /// <param name="fileService">Service for managing files such as templates, stylesheets, and scripts.</param>
-        /// <param name="localizationService">Service for managing language and dictionary items.</param>
-        /// <param name="dataTypeService">Service for managing data types within Umbraco.</param>
-        /// <param name="entityService">Service for accessing and managing Umbraco entities.</param>
-        /// <param name="contentTypeService">Service for managing content types and media types.</param>
-        /// <param name="contentService">Service for managing content items (nodes) in Umbraco.</param>
-        /// <param name="propertyEditors">A collection of property editors available in the system.</param>
-        /// <param name="scopeProvider">Provides database transaction scopes for data operations.</param>
-        /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
-        /// <param name="globalSettings">The global settings options for the Umbraco installation.</param>
-        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
-        /// <param name="mediaService">Service for managing media items (files, images, etc.).</param>
-        /// <param name="mediaTypeService">Service for managing media types.</param>
-        /// <param name="hostingEnvironment">Provides information about the web hosting environment.</param>
-        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-        public PackageDataInstallation(
-            IDataValueEditorFactory dataValueEditorFactory,
-            ILogger<PackageDataInstallation> logger,
-            IFileService fileService,
-            ILocalizationService localizationService,
-            IDataTypeService dataTypeService,
-            IEntityService entityService,
-            IContentTypeService contentTypeService,
-            IContentService contentService,
-            PropertyEditorCollection propertyEditors,
-            Core.Scoping.IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper,
-            IOptions<GlobalSettings> globalSettings,
-            IConfigurationEditorJsonSerializer serializer,
-            IMediaService mediaService,
-            IMediaTypeService mediaTypeService,
-            IHostingEnvironment hostingEnvironment)
-            : this(
-                  dataValueEditorFactory,
-                  logger,
-                  fileService,
-                  localizationService,
-                  dataTypeService,
-                  entityService,
-                  contentTypeService,
-                  contentService,
-                  propertyEditors,
-                  (IScopeProvider)scopeProvider,
-                  shortStringHelper,
-                  serializer,
-                  mediaService,
-                  mediaTypeService,
-                  StaticServiceProvider.Instance.GetRequiredService<ITemplateContentParserService>(),
-                  StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
-        { }
 
         #region Install/Uninstall
 
@@ -820,7 +686,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             //Save the newly created/updated IContentType objects
             var list = importedContentTypes.Select(x => x.Value).ToList();
-            service.Save(list, userId);
+            Guid performingUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+            foreach (T item in list)
+            {
+                service.CreateAsync(item, performingUserKey).GetAwaiter().GetResult();
+            }
 
             //Now we can finish the import by updating the 'structure',
             //which requires the doc types to be saved/available in the db
@@ -849,7 +719,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 //Update ContentTypes with a newly added structure/list of allowed children
                 if (updatedContentTypes.Any())
                 {
-                    service.Save(updatedContentTypes, userId);
+                    foreach (T item in updatedContentTypes)
+                    {
+                        service.UpdateAsync(item, performingUserKey).GetAwaiter().GetResult();
+                    }
                 }
             }
 

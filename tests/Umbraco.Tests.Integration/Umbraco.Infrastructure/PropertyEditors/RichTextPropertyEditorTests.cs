@@ -38,11 +38,11 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Use_Markup_String_As_Value()
+    public async Task Can_Use_Markup_String_As_Value()
     {
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
         var editor = dataType.Editor!;
@@ -62,11 +62,11 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Use_RichTextEditorValue_As_Value()
+    public async Task Can_Use_RichTextEditorValue_As_Value()
     {
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
         var editor = dataType.Editor!;
@@ -87,15 +87,15 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Track_Block_References()
+    public async Task Can_Track_Block_References()
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var pickedContent = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
         ContentService.Save(pickedContent);
@@ -143,15 +143,15 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Track_Block_Tags()
+    public async Task Can_Track_Block_Tags()
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
         var editor = dataType.Editor!;

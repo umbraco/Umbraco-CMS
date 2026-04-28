@@ -61,17 +61,17 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     private ContentTypeRepository ContentTypeRepository =>
         (ContentTypeRepository)GetRequiredService<IContentTypeRepository>();
 
-    public void CreateTestData()
+    public async Task CreateTestData()
     {
         // Create and Save ContentType "umbTextpage" -> (_simpleContentType.Id)
         _simpleContentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: 0);
 
-        ContentTypeService.Save(_simpleContentType);
+        await ContentTypeService.CreateAsync(_simpleContentType, Constants.Security.SuperUserKey);
 
         // Create and Save ContentType "textPage" -> (_textpageContentType.Id)
         _textpageContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: 0);
-        ContentTypeService.Save(_textpageContentType);
+        await ContentTypeService.CreateAsync(_textpageContentType, Constants.Security.SuperUserKey);
     }
 
     // TODO: Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
