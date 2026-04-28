@@ -22,9 +22,6 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 
 	#lookup: Map<string, unknown> = new Map();
 
-	@property({ type: Boolean, reflect: true })
-	readonly = false;
-
 	@property({ attribute: false })
 	editor?: Editor;
 
@@ -107,10 +104,6 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 	}
 
 	static override readonly styles = css`
-		:host([readonly]) {
-			display: none;
-		}
-
 		:host {
 			--uui-button-height: var(--uui-size-layout-2);
 
