@@ -1468,6 +1468,7 @@ export default {
 		diffHelp: '<del>Red text</del> will be removed in the selected version, <ins>green text</ins> will be added.',
 		noDiff: 'There are no differences between the current (draft) version and the selected version.',
 		documentRolledBack: 'Document has been rolled back',
+		elementRolledBack: 'Element has been rolled back',
 		headline: 'Select a version to compare with the current version',
 		htmlHelp:
 			'This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view',

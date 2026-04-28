@@ -21,9 +21,9 @@ export class UmbElementRollbackServerDataSource {
 
 	/**
 	 * Get a list of versions for a element
-	 * @param id
-	 * @param culture
-	 * @returns {*}
+	 * @param {string} id The ID of the element
+	 * @param {string} culture The culture of the element
+	 * @returns {*} The list of versions
 	 * @memberof UmbElementRollbackServerDataSource
 	 */
 	getVersionsByElementId(id: string, culture?: string) {
@@ -32,8 +32,8 @@ export class UmbElementRollbackServerDataSource {
 
 	/**
 	 * Get a specific version by id
-	 * @param versionId
-	 * @returns {*}
+	 * @param {string} versionId  The ID of the version
+	 * @returns {*} The version data
 	 * @memberof UmbElementRollbackServerDataSource
 	 */
 	getVersionById(versionId: string) {
