@@ -63,7 +63,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
     {
         var preview = _previewService.IsInPreview();
-        return candidateKeys.Select(key => _publishedContentCache.GetById(preview, key)).WhereNotNull();
+        return candidateKeys.Select(key => _publishedContentCache.GetById(preview, key)).WhereNotNull().ToArray();
     }
 
     /// <summary>
