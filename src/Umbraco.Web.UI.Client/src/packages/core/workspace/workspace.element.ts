@@ -31,15 +31,11 @@ export class UmbWorkspaceElement extends UmbLitElement {
 		this.#createController(value);
 	}
 
-	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
-		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace');
-	}
-
 	#createController(entityType: string) {
 		if (this.#extensionsController) {
 			this.#extensionsController.destroy();
 		}
+		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace:' + entityType);
 		this.#extensionsController = new UmbExtensionsElementAndApiInitializer(
 			this,
 			umbExtensionsRegistry,
