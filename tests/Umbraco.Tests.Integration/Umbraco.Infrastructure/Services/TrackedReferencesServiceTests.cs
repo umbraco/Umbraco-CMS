@@ -38,7 +38,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
     }
 
     [SetUp]
-    public void Setup() => CreateTestData();
+    public async Task Setup() => await CreateTestData();
 
     protected virtual async Task CreateTestData()
     {
@@ -58,9 +58,12 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
                 .Done()
             .Build();
 
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        var createResult = await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(createResult.Success);
+
         ContentType.AllowedContentTypes = [new ContentTypeSort(ContentType.Key, 0, ContentType.Alias)];
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        var updateResult = await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+        Assert.IsTrue(updateResult.Success);
 
         Root1 = new ContentBuilder()
             .WithContentType(ContentType)

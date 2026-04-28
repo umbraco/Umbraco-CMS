@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetUpData() => CreateTestData();
+    public async Task SetUpData() => await CreateTestData();
 
     private ContentType _simpleContentType;
     private ContentType _textpageContentType;

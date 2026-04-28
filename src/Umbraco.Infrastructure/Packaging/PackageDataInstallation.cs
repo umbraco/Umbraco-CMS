@@ -684,12 +684,21 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
             }
 
-            //Save the newly created/updated IContentType objects
+            //Save the newly created/updated IContentType objects.
+            //Note: this fires one save notification per item, where the legacy bulk Save fired one for the whole batch.
+            //That's acceptable here as package import is an infrequent install-time operation running inside an outer scope.
             var list = importedContentTypes.Select(x => x.Value).ToList();
             Guid performingUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
             foreach (T item in list)
             {
-                service.CreateAsync(item, performingUserKey).GetAwaiter().GetResult();
+                if (item.HasIdentity)
+                {
+                    service.UpdateAsync(item, performingUserKey).GetAwaiter().GetResult();
+                }
+                else
+                {
+                    service.CreateAsync(item, performingUserKey).GetAwaiter().GetResult();
+                }
             }
 
             //Now we can finish the import by updating the 'structure',

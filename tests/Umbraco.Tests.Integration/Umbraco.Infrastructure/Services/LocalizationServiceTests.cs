@@ -27,7 +27,7 @@ internal sealed class LocalizationServiceTests : UmbracoIntegrationTest
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     [SetUp]
-    public void SetUp() => CreateTestData();
+    public async Task SetUp() => await CreateTestData();
 
     private Guid _parentItemGuidId;
     private int _parentItemIntId;
