@@ -13,6 +13,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import {
@@ -126,11 +127,13 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 
 		return html`
 			<umb-workspace-info-app-layout headline="#redirectUrls_redirectUrlManagement">
-				${when(
-					this._loading,
-					() => this.#renderLoading(),
-					() => this.#renderContent(),
-				)}
+				<div id="content">
+					${when(
+						this._loading,
+						() => this.#renderLoading(),
+						() => this.#renderContent(),
+					)}
+				</div>
 			</umb-workspace-info-app-layout>
 		`;
 	}
@@ -178,7 +181,17 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 	}
 
 	static override styles = [
+		UmbTextStyles,
 		css`
+			:host {
+				display: contents;
+			}
+
+			#content {
+				display: block;
+				padding: var(--uui-size-space-3) var(--uui-size-space-4);
+			}
+
 			#loader-container {
 				display: flex;
 				justify-content: center;
@@ -188,7 +201,6 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 
 			.panel-information {
 				display: block;
-				padding: var(--uui-size-space-3) var(--uui-size-space-4);
 				margin: var(--uui-size-space-2);
 			}
 
@@ -198,6 +210,7 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 				align-items: center;
 				gap: var(--uui-size-6);
 				padding: var(--uui-size-space-4) var(--uui-size-space-5);
+				margin: 0 calc(var(--uui-size-space-4) * -1);
 				cursor: pointer;
 				color: inherit;
 				text-decoration: none;
