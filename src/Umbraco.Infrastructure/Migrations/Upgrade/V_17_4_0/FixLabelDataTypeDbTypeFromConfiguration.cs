@@ -74,7 +74,7 @@ public class FixLabelDataTypeDbTypeFromConfiguration : AsyncMigrationBase
 UPDATE {syntax.GetQuotedTableName(PropertyDataDto.TableName)}
 SET {syntax.GetQuotedColumnName(PropertyDataDto.TextValueColumnName)} = {syntax.GetQuotedColumnName(PropertyDataDto.VarcharValueColumnName)}, {syntax.GetQuotedColumnName(PropertyDataDto.VarcharValueColumnName)} = NULL
 WHERE {syntax.GetQuotedColumnName(PropertyDataDto.PropertyTypeIdColumnName)} IN (
-    SELECT {syntax.GetQuotedColumnName(PropertyDataDto.PrimaryKeyColumnName)}
+    SELECT {syntax.GetQuotedColumnName(PropertyTypeDto.PrimaryKeyColumnName)}
     FROM {syntax.GetQuotedTableName(PropertyTypeDto.TableName)}
     WHERE {syntax.GetQuotedColumnName(PropertyTypeDto.DataTypeIdColumnName)} IN (
         SELECT {syntax.GetQuotedColumnName(DataTypeDto.PrimaryKeyColumnName)}
