@@ -2240,6 +2240,9 @@ export default {
 		addUsersToGroupError: 'Could not add users to the group.',
 		removeUsersFromGroupError: 'Could not remove users from the group.',
 		andMore: 'and %0% more',
+		avatarUploadSuccess: 'Avatar uploaded',
+		avatarDeleteSuccess: 'Avatar deleted',
+		unknownFailure: 'Unknown failure',
 		usersNotManagedFromGroup: 'not manageable from this screen.',
 	},
 	validation: {
