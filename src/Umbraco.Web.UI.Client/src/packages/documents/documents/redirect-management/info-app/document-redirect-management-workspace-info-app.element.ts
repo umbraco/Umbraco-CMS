@@ -117,7 +117,6 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 
 	override render() {
 		if (!this._trackerEnabled) return nothing;
-		if (this._isNew) return nothing;
 		if (!this._loading && this._redirects.length === 0) return nothing;
 
 		return html`
