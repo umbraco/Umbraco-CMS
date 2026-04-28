@@ -34,9 +34,8 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 
 	override render() {
 		return html`<umb-workspace-editor
-			data-mark="block-workspace:${this._headline}"
 			><div slot="header">
-				<h3>${this._headline}</h3>
+				<h3 id="headline" title="${this._headline}" data-mark="layout-headline">${this._headline}</h3>
 				${this._readOnly
 					? html`<uui-tag look="secondary">${this.localize.term('general_readOnly')}</uui-tag>`
 					: nothing}
@@ -55,6 +54,13 @@ export class UmbBlockWorkspaceEditorElement extends UmbLitElement {
 				display: flex;
 				align-items: center;
 				gap: var(--uui-size-3);
+			}
+			#headline {
+				display: block;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				min-width: 0;
 			}
 		`,
 	];
