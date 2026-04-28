@@ -42,9 +42,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
         [SetUp]
-        public void SetUp()
+        public async Task SetUp()
         {
-            CreateTestData();
+            await CreateTestData();
         }
 
         private const int MaxThreadCount = 20;
