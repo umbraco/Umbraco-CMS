@@ -11,6 +11,7 @@ import {
 	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
+import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -21,6 +22,7 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
 @customElement('umb-document-redirect-management-workspace-info-app')
 export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLitElement {
 	#repository = new UmbDocumentRedirectManagementRepository(this);
+	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
 	@state()
 	private _isNew = false;
@@ -37,7 +39,6 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 	@state()
 	private _redirects: Array<UmbDocumentRedirectUrlModel> = [];
 
-	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor() {
@@ -58,25 +59,23 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 		});
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
-			this.#documentWorkspaceContext = context;
+			this.#workspaceContext = context;
+			if (context) {
+				this.observe(
+					observeMultiple([context.isNew, context.unique]),
+					([isNew, unique]) => {
+						this._isNew = isNew === true;
 
-			this.observe(
-				context?.isNew,
-				(isNew) => {
-					this._isNew = isNew === true;
-				},
-				'observeIsNew',
-			);
-
-			this.observe(
-				context?.unique,
-				(unique) => {
-					if (!unique || unique === this._unique) return;
-					this._unique = unique;
-					this.#requestRedirects();
-				},
-				'observeUnique',
-			);
+						if (unique && unique !== this._unique) {
+							this._unique = unique;
+							this.#requestRedirects();
+						}
+					},
+					'observeWorkspaceState',
+				);
+			} else {
+				this.removeUmbControllerByAlias('observeWorkspaceState');
+			}
 		});
 
 		this.#requestTrackerStatus();
@@ -104,8 +103,8 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 	#debounceRequestRedirects = debounce(() => this.#requestRedirects(), 50);
 
 	#onReloadRequest = (event: UmbEntityActionEvent) => {
-		if (event.getUnique() !== this.#documentWorkspaceContext?.getUnique()) return;
-		if (event.getEntityType() !== this.#documentWorkspaceContext.getEntityType()) return;
+		if (event.getUnique() !== this.#workspaceContext?.getUnique()) return;
+		if (event.getEntityType() !== this.#workspaceContext.getEntityType()) return;
 		this.#debounceRequestRedirects();
 	};
 
