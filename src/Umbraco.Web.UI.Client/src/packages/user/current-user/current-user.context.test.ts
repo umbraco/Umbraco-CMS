@@ -140,6 +140,20 @@ describe('UmbCurrentUserContext', () => {
 				);
 				expect(loadCount).to.equal(0);
 			});
+
+			it('does not reload when unique is null for a user entity type', () => {
+				hostElement.actionEventContext.dispatchEvent(
+					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: null }),
+				);
+				expect(loadCount).to.equal(0);
+			});
+
+			it('does not reload when unique is null for a user group entity type', () => {
+				hostElement.actionEventContext.dispatchEvent(
+					new UmbEntityUpdatedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: null }),
+				);
+				expect(loadCount).to.equal(0);
+			});
 		});
 
 		describe('entity deleted events', () => {
@@ -171,6 +185,13 @@ describe('UmbCurrentUserContext', () => {
 			it('does not reload for unrelated entity types', () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityDeletedEvent({ entityType: UNRELATED_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
+				);
+				expect(loadCount).to.equal(0);
+			});
+
+			it('does not reload when unique is null for a user group entity type', () => {
+				hostElement.actionEventContext.dispatchEvent(
+					new UmbEntityDeletedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: null }),
 				);
 				expect(loadCount).to.equal(0);
 			});
