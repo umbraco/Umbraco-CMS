@@ -11,16 +11,16 @@ import {
 	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { debounce } from '@umbraco-cms/backoffice/utils';
+import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action';
 
 @customElement('umb-document-redirect-management-workspace-info-app')
 export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLitElement {
+	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#repository = new UmbDocumentRedirectManagementRepository(this);
 	#workspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 
@@ -28,18 +28,16 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 	private _isNew = false;
 
 	@state()
-	private _unique?: string;
-
-	@state()
-	private _trackerEnabled = true;
-
-	@state()
 	private _loading = false;
 
 	@state()
 	private _redirects: Array<UmbDocumentRedirectUrlModel> = [];
 
-	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
+	@state()
+	private _trackerEnabled = true;
+
+	@state()
+	private _unique?: string;
 
 	constructor() {
 		super();
@@ -175,7 +173,6 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			:host {
 				display: contents;

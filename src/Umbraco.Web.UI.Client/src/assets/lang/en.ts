@@ -2364,7 +2364,7 @@ export default {
 			'When a published page gets renamed or moved a redirect will automatically be made to the new page.',
 		redirectRemoved: 'Redirect URL removed.',
 		redirectRemoveError: 'Error removing redirect URL.',
-		redirectRemoveWarning: 'This will remove the redirect',
+		redirectRemoveWarning: 'This will remove the redirect.',
 		confirmDisable: 'Are you sure you want to disable the URL tracker?',
 		disabledConfirm: 'URL tracker has now been disabled.',
 		disableError: 'Error disabling the URL tracker, more information can be found in your log file.',

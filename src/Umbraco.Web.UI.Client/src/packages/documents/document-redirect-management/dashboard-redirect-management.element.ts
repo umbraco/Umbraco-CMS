@@ -1,12 +1,20 @@
-import type { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
-	UmbDocumentRedirectManagementRepository,
-	type UmbDocumentRedirectUrlModel,
-} from '@umbraco-cms/backoffice/document';
+	css,
+	customElement,
+	html,
+	nothing,
+	property,
+	query,
+	repeat,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
+import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { UmbDocumentRedirectManagementRepository } from '@umbraco-cms/backoffice/document';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import type { UmbDocumentRedirectUrlModel } from '@umbraco-cms/backoffice/document';
+import type { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-dashboard-redirect-management')
 export class UmbDashboardRedirectManagementElement extends UmbLitElement {
@@ -74,16 +82,16 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		if (!data.unique) return;
 
 		await umbConfirmModal(this, {
-			headline: 'Delete',
+			headline: '#general_delete',
 			content: html`
-				<div style="width:300px">
-					<p>${this.localize.term('redirectUrls_redirectRemoveWarning')}</p>
+				<p>${this.localize.term('redirectUrls_redirectRemoveWarning')}</p>
+				<p>
 					${this.localize.term('redirectUrls_originalUrl')}: <strong>${data.originalUrl}</strong><br />
 					${this.localize.term('redirectUrls_redirectedTo')}: <strong>${data.destinationUrl}</strong>
-				</div>
+				</p>
 			`,
 			color: 'danger',
-			confirmLabel: 'Delete',
+			confirmLabel: '#general_delete',
 		});
 
 		this.#redirectDelete(data.unique);
@@ -131,124 +139,141 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		this._trackerEnabled = !this._trackerEnabled;
 	}
 
-	// Renders
 	override render() {
-		return html` <div id="redirect-actions">
-				${this._trackerEnabled
-					? html`<div id="search-wrapper">
-								<uui-input
-									id="search"
-									placeholder="${this.localize.term('redirectUrls_originalUrl')}"
-									label="${this.localize.term('redirectUrls_originalUrl')}"
-									@keypress=${this.#onKeypress}></uui-input>
-								<uui-button
-									look="outline"
-									label="${this.localize.term('general_search')}"
-									@click=${this.#onSearch}
-									.state=${this._buttonState}>
-									${this.localize.term('general_search')}
-								</uui-button>
-							</div>
+		return html`
+			<div id="redirect-actions">
+				${when(
+					this._trackerEnabled,
+					() => html`
+						<div id="search-wrapper">
+							<uui-input
+								id="search"
+								label=${this.localize.term('redirectUrls_originalUrl')}
+								placeholder=${this.localize.term('redirectUrls_originalUrl')}
+								@keypress=${this.#onKeypress}></uui-input>
 							<uui-button
 								look="outline"
-								label="${this.localize.term('redirectUrls_disableUrlTracker')}"
-								@click=${this.#onRequestTrackerToggle}>
-								${this.localize.term('redirectUrls_disableUrlTracker')}
-							</uui-button>`
-					: html`<div></div>
-							<uui-button
-								look="outline"
-								color="positive"
-								label="${this.localize.term('redirectUrls_enableUrlTracker')}"
-								@click=${this.#onRequestTrackerToggle}>
-								${this.localize.term('redirectUrls_enableUrlTracker')}
-							</uui-button>`}
+								label=${this.localize.term('general_search')}
+								@click=${this.#onSearch}
+								.state=${this._buttonState}></uui-button>
+						</div>
+						<uui-button
+							look="outline"
+							label=${this.localize.term('redirectUrls_disableUrlTracker')}
+							@click=${this.#onRequestTrackerToggle}></uui-button>
+					`,
+					() => html`
+						<div></div>
+						<uui-button
+							color="positive"
+							look="outline"
+							label=${this.localize.term('redirectUrls_enableUrlTracker')}
+							@click=${this.#onRequestTrackerToggle}></uui-button>
+					`,
+				)}
 			</div>
-			${this._redirectData?.length
-				? html`<uui-box id="redirect-wrapper" style="--uui-box-default-padding:0">
-						${this._trackerEnabled ? '' : html`<div id="grey-out"></div>`} ${this.#renderTable()}
-					</uui-box>`
-				: this._filter !== undefined
-					? this.#renderZeroResults()
-					: this.#renderNoRedirects()}
-			${this.#renderPagination()}`;
+			${when(
+				this._redirectData?.length,
+				() => html`
+					<uui-box id="redirect-wrapper">
+						${when(!this._trackerEnabled, () => html`<div id="grey-out"></div>`)} ${this.#renderTable()}
+					</uui-box>
+				`,
+				() => (this._filter !== undefined ? this.#renderZeroResults() : this.#renderNoRedirects()),
+			)}
+			${this.#renderPagination()}
+		`;
 	}
 
 	#renderZeroResults() {
-		return html`<uui-box>
-			<strong>No redirects matching this search criteria</strong>
-			<p>Double check your search for any error or spelling mistakes.</p>
-		</uui-box>`;
+		return html`
+			<uui-box>
+				<strong>No redirects matching this search criteria</strong>
+				<p>Double check your search for any error or spelling mistakes.</p>
+			</uui-box>
+		`;
 	}
 
 	#renderNoRedirects() {
-		return html`<uui-box>
-			<strong>${this.localize.term('redirectUrls_noRedirects')}</strong>
-			<p>${this.localize.term('redirectUrls_noRedirectsDescription')}</p>
-		</uui-box>`;
+		return html`
+			<uui-box>
+				<strong>${this.localize.term('redirectUrls_noRedirects')}</strong>
+				<p>${this.localize.term('redirectUrls_noRedirectsDescription')}</p>
+			</uui-box>
+		`;
 	}
 
 	#renderTable() {
-		return html`<uui-table>
-			<uui-table-head>
-				<uui-table-head-cell style="width:10%;">${this.localize.term('redirectUrls_culture')}</uui-table-head-cell>
-				<uui-table-head-cell>${this.localize.term('redirectUrls_originalUrl')}</uui-table-head-cell>
-				<uui-table-head-cell style="width:10%;"></uui-table-head-cell>
-				<uui-table-head-cell>${this.localize.term('redirectUrls_redirectedTo')}</uui-table-head-cell>
-				<uui-table-head-cell style="width:10%;">${this.localize.term('general_actions')}</uui-table-head-cell>
-			</uui-table-head>
-			${this.#renderTableData()}
-		</uui-table>`;
+		return html`
+			<uui-table>
+				<uui-table-head>
+					<uui-table-head-cell style="width:10%;">${this.localize.term('redirectUrls_culture')}</uui-table-head-cell>
+					<uui-table-head-cell>${this.localize.term('redirectUrls_originalUrl')}</uui-table-head-cell>
+					<uui-table-head-cell style="width:10%;"></uui-table-head-cell>
+					<uui-table-head-cell>${this.localize.term('redirectUrls_redirectedTo')}</uui-table-head-cell>
+					<uui-table-head-cell style="width:10%;">${this.localize.term('general_actions')}</uui-table-head-cell>
+				</uui-table-head>
+				${this.#renderTableData()}
+			</uui-table>
+		`;
 	}
 
 	#renderTableData() {
-		return html`${this._redirectData?.map((data) => {
-			return html` <uui-table-row>
-				<uui-table-cell> ${data.culture || '*'} </uui-table-cell>
-				<uui-table-cell>
-					<a href="${data.originalUrl || '#'}" target="_blank">
-						<span>${data.originalUrl}</span>
-					</a>
-				</uui-table-cell>
-				<uui-table-cell>
-					<uui-icon name="icon-arrow-right"></uui-icon>
-				</uui-table-cell>
-				<uui-table-cell>
-					<a href="${data.destinationUrl || '#'}" target="_blank">
-						<span>${data.destinationUrl}</span>
-					</a>
-				</uui-table-cell>
-				<uui-table-cell>
-					<uui-action-bar style="justify-self: left;">
-						<uui-button
-							label="Delete"
-							look="secondary"
-							.disabled=${!this._trackerEnabled}
-							@click=${() => this.#onRequestDelete(data)}>
-							<uui-icon name="delete"></uui-icon>
-						</uui-button>
-					</uui-action-bar>
-				</uui-table-cell>
-			</uui-table-row>`;
-		})}`;
+		if (!this._redirectData?.length) return nothing;
+		return html`
+			${repeat(
+				this._redirectData,
+				(data) => data.unique,
+				(data) => html`
+					<uui-table-row>
+						<uui-table-cell>${data.culture || '*'}</uui-table-cell>
+						<uui-table-cell>
+							<a href=${data.originalUrl || '#'} target="_blank">
+								<span>${data.originalUrl}</span>
+							</a>
+						</uui-table-cell>
+						<uui-table-cell>
+							<uui-icon name="icon-arrow-right"></uui-icon>
+						</uui-table-cell>
+						<uui-table-cell>
+							<a href=${data.destinationUrl || '#'} target="_blank">
+								<span>${data.destinationUrl}</span>
+							</a>
+						</uui-table-cell>
+						<uui-table-cell>
+							<uui-action-bar>
+								<uui-button
+									label=${this.localize.term('general_delete')}
+									look="secondary"
+									.disabled=${!this._trackerEnabled}
+									@click=${() => this.#onRequestDelete(data)}>
+									<uui-icon name="delete"></uui-icon>
+								</uui-button>
+							</uui-action-bar>
+						</uui-table-cell>
+					</uui-table-row>
+				`,
+			)}
+		`;
 	}
 
 	#renderPagination() {
 		if (!this._total) return nothing;
 
 		const totalPages = Math.ceil(this._total / this.itemsPerPage);
-
 		if (totalPages <= 1) return nothing;
 
-		return html`<div class="pagination">
-			<uui-pagination
-				.total=${totalPages}
-				firstlabel=${this.localize.term('general_first')}
-				previouslabel=${this.localize.term('general_previous')}
-				nextlabel=${this.localize.term('general_next')}
-				lastlabel=${this.localize.term('general_last')}
-				@change=${this.#onPageChange}></uui-pagination>
-		</div>`;
+		return html`
+			<div class="pagination">
+				<uui-pagination
+					.total=${totalPages}
+					firstlabel=${this.localize.term('general_first')}
+					previouslabel=${this.localize.term('general_previous')}
+					nextlabel=${this.localize.term('general_next')}
+					lastlabel=${this.localize.term('general_last')}
+					@change=${this.#onPageChange}></uui-pagination>
+			</div>
+		`;
 	}
 
 	static override styles = [
@@ -272,15 +297,18 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			}
 
 			#redirect-wrapper {
+				--uui-box-default-padding: 0;
+
 				position: relative;
 				display: block;
-			}
-			#redirect-wrapper #grey-out {
-				position: absolute;
-				inset: 0;
-				background-color: var(--uui-color-surface-alt);
-				opacity: 0.7;
-				z-index: 1;
+
+				#grey-out {
+					position: absolute;
+					inset: 0;
+					background-color: var(--uui-color-surface-alt);
+					opacity: 0.7;
+					z-index: 1;
+				}
 			}
 
 			uui-pagination {
