@@ -3,10 +3,10 @@ import type {
 	UmbDocumentRedirectStatusModel,
 	UmbDocumentRedirectUrlModel,
 } from './types.js';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { RedirectManagementService, RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { RedirectUrlResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
 /**
  * A data source for the Document Redirect Management feature that fetches data from the server.
@@ -52,7 +52,11 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	 */
 	async setStatus(enabled: boolean) {
 		const status = enabled ? RedirectStatusModel.ENABLED : RedirectStatusModel.DISABLED;
-		return tryExecute(this.#host, RedirectManagementService.postRedirectManagementStatus({ query: { status } }));
+		const { error } = await tryExecute(
+			this.#host,
+			RedirectManagementService.postRedirectManagementStatus({ query: { status } }),
+		);
+		return { error };
 	}
 
 	/**
@@ -115,7 +119,11 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
-		return tryExecute(this.#host, RedirectManagementService.deleteRedirectManagementById({ path: { id: unique } }));
+		const { error } = await tryExecute(
+			this.#host,
+			RedirectManagementService.deleteRedirectManagementById({ path: { id: unique } }),
+		);
+		return { error };
 	}
 }
 
