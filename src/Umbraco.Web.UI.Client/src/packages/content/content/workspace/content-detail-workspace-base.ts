@@ -675,8 +675,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
-		this.initiatePropertyValueChange();
 		try {
+			this.initiatePropertyValueChange();
 			variantId ??= UmbVariantId.CreateInvariant();
 			const property = await this.structure.getPropertyStructureByAlias(alias);
 
