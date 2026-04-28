@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Document Redirect Management Workspace Info App',
 		alias: 'Umb.WorkspaceInfoApp.Document.RedirectManagement',
 		element: () => import('./document-redirect-management-workspace-info-app.element.js'),
-		weight: 80,
+		weight: 85,
 		conditions: [
 			{
 				alias: UMB_WORKSPACE_CONDITION_ALIAS,
