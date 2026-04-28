@@ -1,7 +1,6 @@
 import type { UmbMockUserGroupModel } from '../../mock-data-set.types.js';
 
 export const ADMIN_USER_GROUP_ID = 'variant-documents-user-group-administrators-id';
-export const ENGLISH_EDITORS_USER_GROUP_ID = 'variant-documents-user-group-english-editors-id';
 
 export const data: Array<UmbMockUserGroupModel> = [
 	{
@@ -45,33 +44,6 @@ export const data: Array<UmbMockUserGroupModel> = [
 		mediaRootAccess: true,
 		aliasCanBeChanged: false,
 		isDeletable: false,
-		flags: [],
-	},
-	{
-		id: ENGLISH_EDITORS_USER_GROUP_ID,
-		name: 'English Editors',
-		alias: 'englishEditors',
-		description: 'Editors with access to English content only.',
-		icon: 'icon-tools',
-		fallbackPermissions: [
-			'Umb.Document.Read',
-			'Umb.Document.Create',
-			'Umb.Document.Update',
-			'Umb.Document.Delete',
-			'Umb.Document.Publish',
-			'Umb.Document.Unpublish',
-			'Umb.Document.Duplicate',
-			'Umb.Document.Move',
-			'Umb.Document.Sort',
-		],
-		permissions: [],
-		sections: ['Umb.Section.Content'],
-		languages: ['en-US'],
-		hasAccessToAllLanguages: false,
-		documentRootAccess: true,
-		mediaRootAccess: true,
-		aliasCanBeChanged: true,
-		isDeletable: true,
 		flags: [],
 	},
 ];
