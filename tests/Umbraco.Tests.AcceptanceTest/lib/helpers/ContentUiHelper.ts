@@ -39,6 +39,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly chooseMediaPickerBtn: Locator;
   private readonly chooseMemberPickerBtn: Locator;
   private readonly numericTxt: Locator;
+  private readonly decimalTxt: Locator;
   private readonly resetFocalPointBtn: Locator;
   private readonly addMultiURLPickerBtn: Locator;
   private readonly linkTxt: Locator;
@@ -242,6 +243,7 @@ export class ContentUiHelper extends UiBaseLocators {
       "umb-property-editor-ui-member-picker #btn-add",
     );
     this.numericTxt = page.locator("umb-property-editor-ui-number input");
+    this.decimalTxt = page.locator("umb-property-editor-ui-decimal input");
     this.addMultiURLPickerBtn = page.locator(
       "umb-property-editor-ui-multi-url-picker #btn-add",
     );
@@ -1100,6 +1102,11 @@ export class ContentUiHelper extends UiBaseLocators {
   // Numeric
   async enterNumeric(number: number) {
     await this.enterText(this.numericTxt, number.toString());
+  }
+
+  // Decimal
+  async enterDecimal(number: number) {
+    await this.enterText(this.decimalTxt, number.toString());
   }
 
   // Radiobox
