@@ -16,15 +16,11 @@ export class UmbContentRollbackEntityAction extends UmbEntityActionBase<MetaEnti
 			},
 		}).catch(() => undefined);
 
-		if (!result) return;
+		const entityType = result?.entityType || 'document';
+		const message = this.#localize.termOrDefault(`rollback_${entityType}RolledBack`, 'Content has been rolled back');
 
 		const notificationContext = await this.getContext(UMB_NOTIFICATION_CONTEXT);
-		if (!notificationContext) {
-			throw new Error('Notification context not found');
-		}
-		notificationContext.peek('positive', {
-			data: { message: this.#localize.term('rollback_documentRolledBack') },
-		});
+		notificationContext?.peek('positive', { data: { message } });
 	}
 }
 
