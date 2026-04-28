@@ -111,6 +111,7 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 
 	#getTargetUrl(url: string | undefined) {
 		if (!url || url.length === 0) return url;
+		if (url.startsWith('/')) return url;
 		if (url.includes('.') && !url.includes('//')) return '//' + url;
 		return url;
 	}
