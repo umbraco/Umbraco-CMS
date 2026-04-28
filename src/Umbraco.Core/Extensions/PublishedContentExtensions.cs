@@ -2263,8 +2263,7 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         IPublishedStatusFilteringService publishedStatusFilteringService,
         bool orSelf,
-        string? contentTypeAlias = null,
-        string? culture = null)
+        string? contentTypeAlias = null)
     {
         if (orSelf)
         {
