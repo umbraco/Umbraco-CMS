@@ -38,7 +38,6 @@ export class UmbDocumentRedirectManagementServerDataSource {
 
 		const model: UmbDocumentRedirectStatusModel = {
 			enabled: data.status === RedirectStatusModel.ENABLED,
-			userIsAdmin: data.userIsAdmin,
 		};
 
 		return { data: model };
@@ -66,8 +65,6 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
 	async getByDocumentUnique(unique: string) {
-		if (!unique) throw new Error('Unique is missing');
-
 		const { data, error } = await tryExecute(
 			this.#host,
 			RedirectManagementService.getRedirectManagementById({ path: { id: unique } }),
@@ -79,7 +76,7 @@ export class UmbDocumentRedirectManagementServerDataSource {
 
 		return {
 			data: {
-				items: (data.items ?? []).map(mapRedirectUrl),
+				items: data.items.map(mapRedirectUrl),
 				total: data.total,
 			},
 		};
@@ -105,7 +102,7 @@ export class UmbDocumentRedirectManagementServerDataSource {
 
 		return {
 			data: {
-				items: (data.items ?? []).map(mapRedirectUrl),
+				items: data.items.map(mapRedirectUrl),
 				total: data.total,
 			},
 		};
@@ -118,7 +115,6 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	 * @memberof UmbDocumentRedirectManagementServerDataSource
 	 */
 	async delete(unique: string) {
-		if (!unique) throw new Error('Unique is missing');
 		const { error } = await tryExecute(
 			this.#host,
 			RedirectManagementService.deleteRedirectManagementById({ path: { id: unique } }),

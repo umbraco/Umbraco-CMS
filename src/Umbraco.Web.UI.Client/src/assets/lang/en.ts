@@ -2362,6 +2362,8 @@ export default {
 		noRedirects: 'No redirects have been made',
 		noRedirectsDescription:
 			'When a published page gets renamed or moved a redirect will automatically be made to the new page.',
+		noRedirectsForSearch: 'No redirects matching this search criteria',
+		noRedirectsForSearchDescription: 'Double check your search for any error or spelling mistakes.',
 		redirectRemoved: 'Redirect URL removed.',
 		redirectRemoveError: 'Error removing redirect URL.',
 		redirectRemoveWarning: 'This will remove the redirect.',

@@ -18,34 +18,34 @@ import type { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@
 
 @customElement('umb-dashboard-redirect-management')
 export class UmbDashboardRedirectManagementElement extends UmbLitElement {
+	#repository = new UmbDocumentRedirectManagementRepository(this);
+
+	@state()
+	private _buttonState: UUIButtonState;
+
+	@state()
+	private _redirectData?: Array<UmbDocumentRedirectUrlModel>;
+
+	@state()
+	private _total = 0;
+
+	@state()
+	private _trackerEnabled = true;
+
+	@state()
+	private _filter?: string;
+
 	@property({ type: Number, attribute: 'items-per-page' })
 	itemsPerPage = 20;
 
 	@property({ type: Number })
 	page = 1;
 
-	@state()
-	private _trackerEnabled = true;
-
-	@state()
-	private _total = 0;
-
-	@state()
-	private _redirectData?: Array<UmbDocumentRedirectUrlModel>;
-
-	@state()
-	private _buttonState: UUIButtonState;
-
-	@state()
-	private _filter?: string;
-
 	@query('#search')
 	private _search!: HTMLInputElement;
 
 	@query('uui-pagination')
 	private _pagination?: UUIPaginationElement;
-
-	#repository = new UmbDocumentRedirectManagementRepository(this);
 
 	override connectedCallback() {
 		super.connectedCallback();
@@ -58,7 +58,6 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		if (data) this._trackerEnabled = data.enabled;
 	}
 
-	// Fetch data
 	async #getRedirectData(filter: string | undefined = undefined) {
 		const skip = this.page * this.itemsPerPage - this.itemsPerPage;
 		const { data } = await this.#repository.requestRedirects({ filter, take: this.itemsPerPage, skip });
@@ -70,14 +69,12 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		if (filter !== undefined) this._buttonState = 'success';
 	}
 
-	// Pagination
 	#onPageChange(event: UUIPaginationEvent) {
 		if (this.page === event.target.current) return;
 		this.page = event.target.current;
 		this.#getRedirectData();
 	}
 
-	// Delete Redirect Action
 	async #onRequestDelete(data: UmbDocumentRedirectUrlModel) {
 		if (!data.unique) return;
 
@@ -103,10 +100,10 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		this._redirectData = this._redirectData?.filter((x) => x.unique !== unique);
 	}
 
-	// Search action
 	#onKeypress(e: KeyboardEvent) {
 		if (e.key === 'Enter') this.#onSearch();
 	}
+
 	#onSearch() {
 		this._buttonState = 'waiting';
 		this._filter = this._search?.value ?? '';
@@ -116,7 +113,6 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		this.#getRedirectData(this._search.value);
 	}
 
-	// Tracker disable/enable
 	async #onRequestTrackerToggle() {
 		if (!this._trackerEnabled) {
 			this.#trackerToggle();
@@ -188,8 +184,8 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	#renderZeroResults() {
 		return html`
 			<uui-box>
-				<strong>No redirects matching this search criteria</strong>
-				<p>Double check your search for any error or spelling mistakes.</p>
+				<strong>${this.localize.term('redirectUrls_noRedirectsForSearch')}</strong>
+				<p>${this.localize.term('redirectUrls_noRedirectsForSearchDescription')}</p>
 			</uui-box>
 		`;
 	}

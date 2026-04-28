@@ -13,7 +13,6 @@ export interface UmbDocumentRedirectUrlModel {
  */
 export interface UmbDocumentRedirectStatusModel {
 	enabled: boolean;
-	userIsAdmin: boolean;
 }
 
 /**
