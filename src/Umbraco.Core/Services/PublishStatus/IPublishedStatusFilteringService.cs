@@ -21,5 +21,5 @@ public interface IPublishedStatusFilteringService
     /// <param name="candidateKeys">The collection of content keys return.</param>
     /// <returns>A collection of <see cref="IPublishedContent"/> items that are available for display.</returns>
     [Obsolete("This is an intermediate solution to avoid breaking changes. Use the IPublishedContentCache to get published content by key. Scheduled for removal in V19.")]
-    internal IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys);
+    IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys) => throw new NotImplementedException();
 }
