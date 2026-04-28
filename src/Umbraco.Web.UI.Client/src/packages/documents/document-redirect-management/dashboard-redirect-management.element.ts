@@ -2,9 +2,10 @@ import type { UUIButtonState, UUIPaginationElement, UUIPaginationEvent } from '@
 import { css, html, nothing, customElement, state, query, property } from '@umbraco-cms/backoffice/external/lit';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { RedirectUrlResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { RedirectManagementService, RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import {
+	UmbDocumentRedirectManagementRepository,
+	type UmbDocumentRedirectUrlModel,
+} from '@umbraco-cms/backoffice/document';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 
 @customElement('umb-dashboard-redirect-management')
@@ -22,7 +23,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	private _total = 0;
 
 	@state()
-	private _redirectData?: RedirectUrlResponseModel[];
+	private _redirectData?: Array<UmbDocumentRedirectUrlModel>;
 
 	@state()
 	private _buttonState: UUIButtonState;
@@ -36,6 +37,8 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	@query('uui-pagination')
 	private _pagination?: UUIPaginationElement;
 
+	#repository = new UmbDocumentRedirectManagementRepository(this);
+
 	override connectedCallback() {
 		super.connectedCallback();
 		this.#getTrackerStatus();
@@ -43,21 +46,18 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	async #getTrackerStatus() {
-		const { data } = await tryExecute(this, RedirectManagementService.getRedirectManagementStatus());
-		if (data && data.status) this._trackerEnabled = data.status === RedirectStatusModel.ENABLED ? true : false;
+		const { data } = await this.#repository.requestStatus();
+		if (data) this._trackerEnabled = data.enabled;
 	}
 
 	// Fetch data
 	async #getRedirectData(filter: string | undefined = undefined) {
 		const skip = this.page * this.itemsPerPage - this.itemsPerPage;
-		const { data } = await tryExecute(
-			this,
-			RedirectManagementService.getRedirectManagement({ query: { filter, take: this.itemsPerPage, skip } }),
-		);
+		const { data } = await this.#repository.requestRedirects({ filter, take: this.itemsPerPage, skip });
 		if (!data) return;
 
-		this._total = data?.total;
-		this._redirectData = data?.items;
+		this._total = data.total;
+		this._redirectData = data.items;
 
 		if (filter !== undefined) this._buttonState = 'success';
 	}
@@ -70,8 +70,8 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	// Delete Redirect Action
-	async #onRequestDelete(data: RedirectUrlResponseModel) {
-		if (!data.id) return;
+	async #onRequestDelete(data: UmbDocumentRedirectUrlModel) {
+		if (!data.unique) return;
 
 		await umbConfirmModal(this, {
 			headline: 'Delete',
@@ -86,13 +86,13 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			confirmLabel: 'Delete',
 		});
 
-		this.#redirectDelete(data.id!);
+		this.#redirectDelete(data.unique);
 	}
-	async #redirectDelete(id: string) {
-		const { error } = await tryExecute(this, RedirectManagementService.deleteRedirectManagementById({ path: { id } }));
+	async #redirectDelete(unique: string) {
+		const { error } = await this.#repository.delete(unique);
 		if (error) return;
 
-		this._redirectData = this._redirectData?.filter((x) => x.id !== id);
+		this._redirectData = this._redirectData?.filter((x) => x.unique !== unique);
 	}
 
 	// Search action
@@ -126,11 +126,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 	}
 
 	async #trackerToggle() {
-		const status = this._trackerEnabled ? RedirectStatusModel.DISABLED : RedirectStatusModel.ENABLED;
-		const { error } = await tryExecute(
-			this,
-			RedirectManagementService.postRedirectManagementStatus({ query: { status } }),
-		);
+		const { error } = await this.#repository.setStatus(!this._trackerEnabled);
 		if (error) return;
 		this._trackerEnabled = !this._trackerEnabled;
 	}

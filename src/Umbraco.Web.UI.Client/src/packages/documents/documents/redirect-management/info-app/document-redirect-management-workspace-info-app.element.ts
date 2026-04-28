@@ -1,4 +1,6 @@
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
+import { UmbDocumentRedirectManagementRepository } from '../repository/index.js';
+import type { UmbDocumentRedirectUrlModel } from '../repository/index.js';
 import {
 	css,
 	customElement,
@@ -15,15 +17,11 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { debounce } from '@umbraco-cms/backoffice/utils';
-import { tryExecute } from '@umbraco-cms/backoffice/resources';
-import {
-	RedirectManagementService,
-	RedirectStatusModel,
-	type RedirectUrlResponseModel,
-} from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-document-redirect-management-workspace-info-app')
 export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLitElement {
+	#repository = new UmbDocumentRedirectManagementRepository(this);
+
 	@state()
 	private _isNew = false;
 
@@ -37,7 +35,7 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 	private _loading = false;
 
 	@state()
-	private _redirects: Array<RedirectUrlResponseModel> = [];
+	private _redirects: Array<UmbDocumentRedirectUrlModel> = [];
 
 	#documentWorkspaceContext?: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE;
 	#eventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
@@ -85,9 +83,9 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 	}
 
 	async #requestTrackerStatus() {
-		const { data } = await tryExecute(this, RedirectManagementService.getRedirectManagementStatus());
-		if (data?.status) {
-			this._trackerEnabled = data.status === RedirectStatusModel.ENABLED;
+		const { data } = await this.#repository.requestStatus();
+		if (data) {
+			this._trackerEnabled = data.enabled;
 		}
 	}
 
@@ -97,10 +95,7 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 
 		this._loading = true;
 
-		const { data } = await tryExecute(
-			this,
-			RedirectManagementService.getRedirectManagementById({ path: { id: this._unique } }),
-		);
+		const { data } = await this.#repository.requestByDocumentUnique(this._unique);
 
 		this._redirects = data?.items ?? [];
 		this._loading = false;
@@ -149,13 +144,13 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 			</umb-localize>
 			${repeat(
 				this._redirects,
-				(redirect) => redirect.id,
+				(redirect) => redirect.unique,
 				(redirect) => this.#renderRedirect(redirect),
 			)}
 		`;
 	}
 
-	#renderRedirect(redirect: RedirectUrlResponseModel) {
+	#renderRedirect(redirect: UmbDocumentRedirectUrlModel) {
 		return html`
 			<a
 				class="redirect-item"
