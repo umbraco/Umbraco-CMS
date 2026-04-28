@@ -218,6 +218,14 @@ public partial class ContentEditingServiceTests
         {
             CultureInfo.CurrentCulture = new CultureInfo("ar-EG");
 
+            // Sanity-check that the runtime's culture data actually triggers the bug. If a future
+            // ICU/NLS update reverts ar-EG's NegativeSign to a plain ASCII hyphen, this test would
+            // silently pass without exercising anything; skip rather than give false confidence.
+            Assume.That(
+                CultureInfo.CurrentCulture.NumberFormat.NegativeSign,
+                Is.Not.EqualTo("-"),
+                "ar-EG NegativeSign is plain ASCII hyphen on this host; cannot reproduce #22610.");
+
             var result = await ContentEditingService.RestoreAsync(child.Key, root.Key, Constants.Security.SuperUserKey);
 
             Assert.IsTrue(result.Success);
