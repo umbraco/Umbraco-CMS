@@ -297,35 +297,31 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Use_Obsolete_Save()
+    public async Task Cannot_Update_Domains_For_Non_Existent_Content()
     {
-        foreach (var culture in Cultures)
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
         {
-            await SetDomainOnContent(Root, culture, GetDomainUrlFromCultureCode(culture));
-        }
+            Domains = new DomainModel { DomainName = "/domain", IsoCode = Cultures.First() }.Yield()
+        };
 
-        var domains = await GetRequiredService<IDomainService>().GetAssignedDomainsAsync(Root.Key, true);
-        Assert.AreEqual(3, domains.Count());
+        var result = await domainService.UpdateDomainsAsync(Guid.NewGuid(), updateModel);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DomainOperationStatus.ContentNotFound, result.Status);
     }
 
     [Test]
-    public async Task Can_Use_Obsolete_Delete()
+    public async Task Cannot_Update_Domains_With_Unknown_Iso_Code()
     {
-        foreach (var culture in Cultures)
-        {
-            await SetDomainOnContent(Root, culture, GetDomainUrlFromCultureCode(culture));
-        }
-
         var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = new DomainModel { DomainName = "/domain", IsoCode = "xx-XX" }.Yield()
+        };
 
-        var domains = await domainService.GetAssignedDomainsAsync(Root.Key, true);
-        Assert.AreEqual(3, domains.Count());
-
-        var result = domainService.Delete(domains.First());
-        Assert.IsTrue(result.Success);
-
-        domains = await domainService.GetAssignedDomainsAsync(Root.Key, true);
-        Assert.AreEqual(2, domains.Count());
+        var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DomainOperationStatus.LanguageNotFound, result.Status);
     }
 
     [TestCase("/domain")]
@@ -393,19 +389,6 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 
     private static string GetDomainUrlFromCultureCode(string culture) =>
         "/" + culture.Replace("-", string.Empty).ToLower() + "/";
-
-    private async Task SetDomainOnContent(IContent content, string cultureIsoCode, string domain)
-    {
-        var domainService = GetRequiredService<IDomainService>();
-        var langId = await GetRequiredService<ILanguageService>().GetAsync(cultureIsoCode);
-        var domainsUpdateModel = new DomainsUpdateModel
-        {
-            Domains = new DomainModel { DomainName = domain, IsoCode = cultureIsoCode }.Yield(),
-        };
-        domainService.Save(
-            new UmbracoDomain(domain) { RootContentId = content.Id, LanguageId = langId.Id });
-        //await domainService.UpdateDomainsAsync(content.Key, domainsUpdateModel);
-    }
 
     private IEnumerable<UrlInfo> GetContentUrlsAsync(IContent root) =>
         root.GetContentUrlsAsync(
