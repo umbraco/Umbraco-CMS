@@ -165,7 +165,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         string updateSql = $@"
 UPDATE umbracoDataType
 SET propertyEditorAlias = '{Constants.PropertyEditors.Aliases.SingleBlock}',
-    propertyEditorUiAlias = 'Umb.PropertyEditorUi.SingleBlock'
+    propertyEditorUiAlias = 'Umb.PropertyEditorUi.BlockSingle'
 WHERE nodeId IN (@0)";
         await Database.ExecuteAsync(updateSql, singleBlockListDataTypesIds);
 
