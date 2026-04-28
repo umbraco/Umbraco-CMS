@@ -126,6 +126,32 @@ internal sealed class MemberFilterServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("z-content", usernames[2]);
     }
 
+    [TestCase("email", Direction.Ascending)]
+    [TestCase("email", Direction.Descending)]
+    [TestCase("name", Direction.Ascending)]
+    [TestCase("name", Direction.Descending)]
+    [TestCase("isapproved", Direction.Ascending)]
+    [TestCase("isapproved", Direction.Descending)]
+    [TestCase("islockedout", Direction.Ascending)]
+    [TestCase("islockedout", Direction.Descending)]
+    [TestCase("lastlogindate", Direction.Ascending)]
+    [TestCase("lastlogindate", Direction.Descending)]
+    public async Task Filter_Orders_By_Each_Supported_Column(string orderBy, Direction direction)
+    {
+        // Arrange — one of each so both UNION branches contribute to the ordered result.
+        await CreateContentMemberAsync("content@test.com", "content-user");
+        await CreateExternalMemberAsync("external@test.com", "external-user");
+
+        // Act
+        PagedModel<MemberFilterItem> result = await MemberFilterService.FilterAsync(
+            new MemberFilter(), orderBy: orderBy, orderDirection: direction);
+
+        // Assert — query executes for every supported orderBy column and direction,
+        // guarding against typos or casing mismatches in MapOrderByColumn's QCol(...) literals.
+        Assert.AreEqual(2, result.Total);
+        Assert.AreEqual(2, result.Items.Count());
+    }
+
     [Test]
     public async Task Filter_By_MemberTypeId_Excludes_External_Members()
     {
