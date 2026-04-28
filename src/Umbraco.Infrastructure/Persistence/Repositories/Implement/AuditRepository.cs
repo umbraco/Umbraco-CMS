@@ -115,15 +115,11 @@ internal sealed class AuditRepository : AsyncEntityRepositoryBase<int, IAuditIte
 
     /// <inheritdoc />
     /// <remarks>
-    ///     The audit log can be very large; prefer <see cref="GetPagedAsync"/> for any production read path.
-    ///     This override exists to satisfy the <see cref="IAsyncReadRepository{TKey,TEntity}"/> contract.
+    ///     This override exists to satisfy the <see cref="IAsyncReadRepository{TKey,TEntity}"/>.
     /// </remarks>
     protected override async Task<IEnumerable<IAuditItem>?> PerformGetAllAsync()
-        => await AmbientScope.ExecuteWithContextAsync(async db =>
-        {
-            List<LogDto> dtos = await db.Logs.ToListAsync();
-            return AuditItemFactory.BuildEntities(dtos);
-        });
+        => throw new NotSupportedException(
+            "The audit log can be extremely huge. Use the GetPagedAsync method instead.");
 
     /// <inheritdoc />
     protected override async Task<IEnumerable<IAuditItem>?> PerformGetManyAsync(int[]? keys)
