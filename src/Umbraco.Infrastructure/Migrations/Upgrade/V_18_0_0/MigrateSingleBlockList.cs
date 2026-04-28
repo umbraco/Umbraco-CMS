@@ -68,8 +68,8 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         IDataTypeService dataTypeService,
         ILogger<MigrateSingleBlockList> logger,
         ICoreScopeProvider coreScopeProvider,
-        SingleBlockListProcessor  singleBlockListProcessor,
-        IJsonSerializer  jsonSerializer,
+        SingleBlockListProcessor singleBlockListProcessor,
+        IJsonSerializer jsonSerializer,
         SingleBlockListConfigurationCache blockListConfigurationCache,
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
@@ -153,7 +153,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
                 _logger.LogInformation(
                     "No properties have been found to migrate for {propertyEditorAlias}",
                     propertyEditorAlias);
-                return;
+                continue;
             }
 
             updateItemsByPropertyEditorAlias[propertyEditorAlias] = updateItemsByPropertyType;
