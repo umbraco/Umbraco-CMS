@@ -141,11 +141,9 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 
 	#renderContent() {
 		return html`
-			<p id="panel-information">
-				<umb-localize key="redirectUrls_panelInformation">
-					The following URLs redirect to this content item:
-				</umb-localize>
-			</p>
+			<umb-localize class="panel-information" key="redirectUrls_panelInformation">
+				The following URLs redirect to this content item:
+			</umb-localize>
 			${repeat(
 				this._redirects,
 				(redirect) => redirect.id,
@@ -188,10 +186,10 @@ export class UmbDocumentRedirectManagementWorkspaceInfoAppElement extends UmbLit
 				padding: var(--uui-size-space-2);
 			}
 
-			#panel-information {
-				margin: 0;
-				padding: var(--uui-size-space-4) var(--uui-size-space-5);
-				color: var(--uui-color-divider-emphasis);
+			.panel-information {
+				display: block;
+				padding: var(--uui-size-space-3) var(--uui-size-space-4);
+				margin: var(--uui-size-space-2);
 			}
 
 			.redirect-item {
