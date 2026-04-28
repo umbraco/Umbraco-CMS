@@ -30,6 +30,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     private readonly ILanguageService _languageService;
     private readonly IContentTypeService _contentTypeService;
     private readonly IMediaTypeService _mediaTypeService;
+    private readonly IMemberTypeService _memberTypeService;
     private readonly IDataTypeService _dataTypeService;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly SingleBlockListProcessor _singleBlockListProcessor;
@@ -48,6 +49,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     /// <param name="languageService">Service for managing languages in Umbraco.</param>
     /// <param name="contentTypeService">Service for managing content types.</param>
     /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="memberTypeService">Service for managing member types.</param>
     /// <param name="dataTypeService">Service for managing data types.</param>
     /// <param name="logger">The logger used for logging migration operations.</param>
     /// <param name="coreScopeProvider">Provides scope management for database operations.</param>
@@ -65,6 +67,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         ILanguageService languageService,
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
+        IMemberTypeService memberTypeService,
         IDataTypeService dataTypeService,
         ILogger<MigrateSingleBlockList> logger,
         ICoreScopeProvider coreScopeProvider,
@@ -82,6 +85,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         _languageService = languageService;
         _contentTypeService = contentTypeService;
         _mediaTypeService = mediaTypeService;
+        _memberTypeService = memberTypeService;
         _dataTypeService = dataTypeService;
         _logger = logger;
         _coreScopeProvider = coreScopeProvider;
@@ -111,9 +115,13 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         IEnumerable<IPropertyType> mediaPropertyTypes = allMediaTypes
             .SelectMany(ct => ct.PropertyTypes);
 
+        IMemberType[] allMemberTypes = _memberTypeService.GetAll().ToArray();
+        IEnumerable<IPropertyType> memberPropertyTypes = allMemberTypes
+            .SelectMany(mt => mt.PropertyTypes);
+
         // get all relevantPropertyTypes
         var relevantPropertyEditors =
-            contentPropertyTypes.Concat(mediaPropertyTypes).DistinctBy(pt => pt.Id)
+            contentPropertyTypes.Concat(mediaPropertyTypes).Concat(memberPropertyTypes).DistinctBy(pt => pt.Id)
                 .Where(pt => propertyEditorAliases.Contains(pt.PropertyEditorAlias))
                 .GroupBy(pt => pt.PropertyEditorAlias)
                 .ToDictionary(group => group.Key, group => group.ToArray());
