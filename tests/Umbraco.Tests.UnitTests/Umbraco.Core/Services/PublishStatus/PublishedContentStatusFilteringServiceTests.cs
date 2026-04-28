@@ -127,6 +127,91 @@ public partial class PublishedContentStatusFilteringServiceTests
         }
     }
 
+    [TestCase("da-DK", 1)]
+    [TestCase("en-US", 2)]
+    [TestCase("*", 3)]
+    public void FilterAvailable_Variant_ForNonPreview_YieldsOnlyItemsWithPublishedAncestorPath(string culture, int expectedNumberOfChildren)
+    {
+        var (sut, items) = SetupVariant(
+            false,
+            culture == Constants.System.InvariantCulture ? "en-US" : culture,
+            (key, _, allItems) => allItems.Keys.IndexOf(key) > 2);
+
+        var children = sut.FilterAvailable(items.Keys, culture).ToArray();
+        Assert.AreEqual(expectedNumberOfChildren, children.Length);
+
+        // IDs 0 through 3 exist in both en-US and da-DK, but none register as having a published ancestor path
+
+        // IDs 4 through 6 exist only in en-US - only even IDs are published
+        if (culture == "en-US")
+        {
+            Assert.AreEqual(4, children[0].Id);
+            Assert.AreEqual(6, children[1].Id);
+        }
+
+        // IDs 7 through 9 exist only in da-DK - only even IDs are published
+        if (culture == "da-DK")
+        {
+            Assert.AreEqual(8, children[0].Id);
+        }
+
+        if (culture == Constants.System.InvariantCulture)
+        {
+            Assert.AreEqual(4, children[0].Id);
+            Assert.AreEqual(6, children[1].Id);
+            Assert.AreEqual(8, children[2].Id);
+        }
+    }
+
+    [TestCase("da-DK", 7)]
+    [TestCase("en-US", 7)]
+    [TestCase("*", 10)]
+    public void FilterAvailable_Variant_ForPreview_IgnoresMissingPublishedAncestorPath(string culture, int expectedNumberOfChildren)
+    {
+        var (sut, items) = SetupVariant(
+            true,
+            culture == Constants.System.InvariantCulture ? "en-US" : culture,
+            (_, _, _) => false);
+
+        var children = sut.FilterAvailable(items.Keys, culture).ToArray();
+        Assert.AreEqual(expectedNumberOfChildren, children.Length);
+
+        // IDs 0 through 3 exist in both en-US and da-DK
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, children[0].Id);
+            Assert.AreEqual(1, children[1].Id);
+            Assert.AreEqual(2, children[2].Id);
+            Assert.AreEqual(3, children[3].Id);
+        });
+
+        // IDs 4 through 6 exist only in en-US
+        if (culture == "en-US")
+        {
+            Assert.AreEqual(4, children[4].Id);
+            Assert.AreEqual(5, children[5].Id);
+            Assert.AreEqual(6, children[6].Id);
+        }
+
+        // IDs 7 through 9 exist only in da-DK
+        if (culture == "da-DK")
+        {
+            Assert.AreEqual(7, children[4].Id);
+            Assert.AreEqual(8, children[5].Id);
+            Assert.AreEqual(9, children[6].Id);
+        }
+
+        if (culture == Constants.System.InvariantCulture)
+        {
+            Assert.AreEqual(4, children[4].Id);
+            Assert.AreEqual(5, children[5].Id);
+            Assert.AreEqual(6, children[6].Id);
+            Assert.AreEqual(7, children[7].Id);
+            Assert.AreEqual(8, children[8].Id);
+            Assert.AreEqual(9, children[9].Id);
+        }
+    }
+
     [TestCase("da-DK", 4)]
     [TestCase("en-US", 4)]
     [TestCase("*", 5)]
@@ -260,7 +345,7 @@ public partial class PublishedContentStatusFilteringServiceTests
     // - IDs 4 through 6 exist only in en-US
     // - IDs 7 through 9 exist only in da-DK
     // - even IDs (0, 2, ...) are published, odd are unpublished
-    private (PublishedContentStatusFilteringService PublishedContentStatusFilteringService, Dictionary<Guid, IPublishedContent> Items) SetupVariant(bool forPreview, string requestCulture)
+    private (PublishedContentStatusFilteringService PublishedContentStatusFilteringService, Dictionary<Guid, IPublishedContent> Items) SetupVariant(bool forPreview, string requestCulture, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
     {
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Variations).Returns(ContentVariation.Culture);
@@ -287,7 +372,7 @@ public partial class PublishedContentStatusFilteringServiceTests
 
         var publishedContentCache = SetupPublishedContentCache(forPreview, items);
         var previewService = SetupPreviewService(forPreview);
-        var publishStatusQueryService = SetupPublishStatusQueryService(items);
+        var publishStatusQueryService = SetupPublishStatusQueryService(items, hasPublishedAncestorPath);
         var variationContextAccessor = SetupVariantContextAccessor(requestCulture);
 
         return (
@@ -353,10 +438,10 @@ public partial class PublishedContentStatusFilteringServiceTests
             items);
     }
 
-    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items)
-        => SetupPublishStatusQueryService(items, id => id % 2 == 0);
+    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
+        => SetupPublishStatusQueryService(items, id => id % 2 == 0, hasPublishedAncestorPath);
 
-    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<int, bool> idIsPublished)
+    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<int, bool> idIsPublished, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
     {
         var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
         publishStatusQueryService
@@ -367,7 +452,7 @@ public partial class PublishedContentStatusFilteringServiceTests
                                                    && (culture == Constants.System.InvariantCulture || item.ContentType.VariesByCulture() is false || item.Cultures.ContainsKey(culture)));
         publishStatusQueryService
             .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()))
-            .Returns(true);
+            .Returns((Guid key, string culture) => hasPublishedAncestorPath?.Invoke(key, culture, items) ?? true);
         return publishStatusQueryService.Object;
     }
 
