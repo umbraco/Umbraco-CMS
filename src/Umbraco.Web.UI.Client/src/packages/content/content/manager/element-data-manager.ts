@@ -60,6 +60,12 @@ export class UmbElementWorkspaceDataManager<ModelType extends UmbElementDetailMo
 		}
 	}
 
+	override destroy() {
+		// Reset any outstanding lock so the muted state does not leak if a caller left initiate/finish unbalanced.
+		this.#updateLock = 0;
+		super.destroy();
+	}
+
 	setVariesByCulture(vary: boolean | undefined) {
 		this._variesByCulture = vary;
 	}
