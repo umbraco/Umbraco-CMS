@@ -33,5 +33,7 @@ public interface IPublishStatusQueryService
     /// <param name="documentKey">The document's key.</param>
     /// <param name="culture">The culture.</param>
     /// <returns>True if document has a published ancestor path.</returns>
-    bool HasPublishedAncestorPath(Guid documentKey, string culture);
+    // TODO (V18): Remove the default implementation.
+    bool HasPublishedAncestorPath(Guid documentKey, string culture)
+        => HasPublishedAncestorPath(documentKey);
 }
