@@ -3,6 +3,7 @@ import { UmbCurrentUserRepository } from './repository/current-user.repository.j
 import { UMB_CURRENT_USER_CONTEXT } from './current-user.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { debounce } from '@umbraco-cms/backoffice/utils';
 import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
@@ -73,6 +74,8 @@ export class UmbCurrentUserContext extends UmbContextBase {
 				.catch(() => undefined);
 		}
 	}
+
+	#loadDebounced = debounce(() => this.load(), 100);
 
 	/**
 	 * Checks if a user is the current user.
@@ -240,14 +243,14 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 		if (entityType === UMB_USER_GROUP_ENTITY_TYPE) {
 			if (this.#isInGroup(unique)) {
-				this.load();
+				this.#loadDebounced();
 			}
 			return;
 		}
 
 		const isCurrentUser = entityType === UMB_USER_ENTITY_TYPE && unique === this.#currentUser.getValue()?.unique;
 		if (isCurrentUser) {
-			this.load();
+			this.#loadDebounced();
 		}
 	};
 
@@ -256,7 +259,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		const unique = event.getUnique();
 		if (!unique) return;
 		if (this.#isInGroup(unique)) {
-			this.load();
+			this.#loadDebounced();
 		}
 	};
 
@@ -284,6 +287,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 
 	override destroy(): void {
 		this.#removeActionEventListeners();
+		this.#loadDebounced.cancel();
 		super.destroy();
 	}
 

@@ -106,53 +106,76 @@ describe('UmbCurrentUserContext', () => {
 				};
 			});
 
-			it('reloads when the current user entity is updated', () => {
+			const wait = () => new Promise((resolve) => setTimeout(resolve, 200));
+
+			it('reloads when the current user entity is updated', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
 				);
+				await wait();
 				expect(loadCount).to.equal(1);
 			});
 
-			it('does not reload when a different user entity is updated', () => {
+			it('does not reload when a different user entity is updated', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: OTHER_USER_UNIQUE }),
 				);
+				await wait();
 				expect(loadCount).to.equal(0);
 			});
 
-			it('reloads when a user group the current user belongs to is updated', () => {
+			it('reloads when a user group the current user belongs to is updated', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: CURRENT_USER_GROUP_UNIQUE }),
 				);
+				await wait();
 				expect(loadCount).to.equal(1);
 			});
 
-			it('does not reload when a user group the current user does not belong to is updated', () => {
+			it('does not reload when a user group the current user does not belong to is updated', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: OTHER_GROUP_UNIQUE }),
 				);
+				await wait();
 				expect(loadCount).to.equal(0);
 			});
 
-			it('does not reload for unrelated entity types', () => {
+			it('does not reload for unrelated entity types', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UNRELATED_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
 				);
+				await wait();
 				expect(loadCount).to.equal(0);
 			});
 
-			it('does not reload when unique is null for a user entity type', () => {
+			it('does not reload when unique is null for a user entity type', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: null }),
 				);
+				await wait();
 				expect(loadCount).to.equal(0);
 			});
 
-			it('does not reload when unique is null for a user group entity type', () => {
+			it('does not reload when unique is null for a user group entity type', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: null }),
 				);
+				await wait();
 				expect(loadCount).to.equal(0);
+			});
+
+			it('collapses multiple rapid events into a single load', async () => {
+				hostElement.actionEventContext.dispatchEvent(
+					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
+				);
+				hostElement.actionEventContext.dispatchEvent(
+					new UmbEntityUpdatedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: CURRENT_USER_GROUP_UNIQUE }),
+				);
+				hostElement.actionEventContext.dispatchEvent(
+					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
+				);
+				await wait();
+				expect(loadCount).to.equal(1);
 			});
 		});
 
@@ -168,37 +191,43 @@ describe('UmbCurrentUserContext', () => {
 				};
 			});
 
-			it('reloads when a user group the current user belongs to is deleted', () => {
+			const wait = () => new Promise((resolve) => setTimeout(resolve, 200));
+
+			it('reloads when a user group the current user belongs to is deleted', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityDeletedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: CURRENT_USER_GROUP_UNIQUE }),
 				);
+				await wait();
 				expect(loadCount).to.equal(1);
 			});
 
-			it('does not reload when a user group the current user does not belong to is deleted', () => {
+			it('does not reload when a user group the current user does not belong to is deleted', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityDeletedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: OTHER_GROUP_UNIQUE }),
 				);
+				await wait();
 				expect(loadCount).to.equal(0);
 			});
 
-			it('does not reload for unrelated entity types', () => {
+			it('does not reload for unrelated entity types', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityDeletedEvent({ entityType: UNRELATED_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
 				);
+				await wait();
 				expect(loadCount).to.equal(0);
 			});
 
-			it('does not reload when unique is null for a user group entity type', () => {
+			it('does not reload when unique is null for a user group entity type', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityDeletedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: null }),
 				);
+				await wait();
 				expect(loadCount).to.equal(0);
 			});
 		});
 
 		describe('destroy', () => {
-			it('removes event listeners so events no longer trigger a reload', () => {
+			it('removes event listeners so events no longer trigger a reload', async () => {
 				let loadCount = 0;
 				const originalLoad = context.load.bind(context);
 				context.load = async () => {
@@ -215,6 +244,7 @@ describe('UmbCurrentUserContext', () => {
 					new UmbEntityDeletedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: CURRENT_USER_GROUP_UNIQUE }),
 				);
 
+				await new Promise((resolve) => setTimeout(resolve, 200));
 				expect(loadCount).to.equal(0);
 			});
 		});
