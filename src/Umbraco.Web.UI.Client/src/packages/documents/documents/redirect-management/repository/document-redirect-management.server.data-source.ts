@@ -15,10 +15,20 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 export class UmbDocumentRedirectManagementServerDataSource {
 	#host: UmbControllerHost;
 
+	/**
+	 * Creates an instance of UmbDocumentRedirectManagementServerDataSource.
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to.
+	 * @memberof UmbDocumentRedirectManagementServerDataSource
+	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
 
+	/**
+	 * Gets the current redirect URL tracker status.
+	 * @returns {*}
+	 * @memberof UmbDocumentRedirectManagementServerDataSource
+	 */
 	async getStatus() {
 		const { data, error } = await tryExecute(this.#host, RedirectManagementService.getRedirectManagementStatus());
 
@@ -34,11 +44,23 @@ export class UmbDocumentRedirectManagementServerDataSource {
 		return { data: model };
 	}
 
+	/**
+	 * Enables or disables the redirect URL tracker.
+	 * @param {boolean} enabled - Whether the tracker should be enabled.
+	 * @returns {*}
+	 * @memberof UmbDocumentRedirectManagementServerDataSource
+	 */
 	async setStatus(enabled: boolean) {
 		const status = enabled ? RedirectStatusModel.ENABLED : RedirectStatusModel.DISABLED;
 		return tryExecute(this.#host, RedirectManagementService.postRedirectManagementStatus({ query: { status } }));
 	}
 
+	/**
+	 * Gets the redirects pointing to a specific document.
+	 * @param {string} unique - The document unique identifier.
+	 * @returns {*}
+	 * @memberof UmbDocumentRedirectManagementServerDataSource
+	 */
 	async getByDocumentUnique(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
@@ -59,6 +81,12 @@ export class UmbDocumentRedirectManagementServerDataSource {
 		};
 	}
 
+	/**
+	 * Gets a paginated, filtered list of redirects.
+	 * @param {UmbDocumentRedirectFilterArgs} args - Filter, skip and take arguments.
+	 * @returns {*}
+	 * @memberof UmbDocumentRedirectManagementServerDataSource
+	 */
 	async filter(args: UmbDocumentRedirectFilterArgs) {
 		const { data, error } = await tryExecute(
 			this.#host,
@@ -79,6 +107,12 @@ export class UmbDocumentRedirectManagementServerDataSource {
 		};
 	}
 
+	/**
+	 * Deletes a redirect by its unique identifier.
+	 * @param {string} unique - The redirect unique identifier.
+	 * @returns {*}
+	 * @memberof UmbDocumentRedirectManagementServerDataSource
+	 */
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 		return tryExecute(this.#host, RedirectManagementService.deleteRedirectManagementById({ path: { id: unique } }));
