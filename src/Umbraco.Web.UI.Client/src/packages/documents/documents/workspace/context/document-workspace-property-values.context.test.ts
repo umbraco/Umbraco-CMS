@@ -260,6 +260,14 @@ describe('UmbDocumentWorkspaceContext', () => {
 				expect(emitted).to.equal('Dette er den danske varianttekst.');
 				sub.unsubscribe();
 			});
+
+			it('returns undefined for a variant property when no variantId is given (invariant-only fallback)', async () => {
+				const obs = await context.propertyValueByAlias<string>('variantText');
+				let emitted: string | undefined = 'sentinel';
+				const sub = obs!.subscribe((v) => (emitted = v));
+				expect(emitted).to.be.undefined;
+				sub.unsubscribe();
+			});
 		});
 	});
 

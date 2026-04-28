@@ -643,8 +643,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	): Promise<Observable<PropertyValueType | undefined> | undefined> {
 		return this._data.createObservablePartOfCurrent(
 			(data) =>
-				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
-					?.value as PropertyValueType,
+				data?.values?.find(
+					// No variantId means invariant: match only entries with culture === null and segment === null.
+					(x) => x?.alias === propertyAlias && (variantId ?? UmbVariantId.CreateInvariant()).compare(x),
+				)?.value as PropertyValueType,
 		);
 	}
 
