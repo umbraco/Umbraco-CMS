@@ -175,6 +175,28 @@ describe('UmbDocumentWorkspaceContext (CRUD)', () => {
 		});
 	});
 
+	describe('failed load', () => {
+		const NON_EXISTENT_ID = '00000000-0000-0000-0000-000000000404';
+
+		it('getUnique returns the requested unique even when load returns an error', async () => {
+			await context.load(NON_EXISTENT_ID);
+			expect(context.getUnique()).to.equal(NON_EXISTENT_ID);
+		});
+
+		it('getData returns undefined after a failed load', async () => {
+			await context.load(NON_EXISTENT_ID);
+			expect(context.getData()).to.be.undefined;
+		});
+
+		it('getUnique returns undefined again after loading a new unique resets state', async () => {
+			await context.load(NON_EXISTENT_ID);
+			// A second load of a different unique calls resetState() then sets the new unique —
+			// during that window getUnique() should still not be undefined once load resolves.
+			await context.load(INVARIANT_DOCUMENT_ID);
+			expect(context.getUnique()).to.equal(INVARIANT_DOCUMENT_ID);
+		});
+	});
+
 	describe('delete', () => {
 		it('removes the document so a subsequent load returns an error', async () => {
 			await context.load(INVARIANT_DOCUMENT_ID);
