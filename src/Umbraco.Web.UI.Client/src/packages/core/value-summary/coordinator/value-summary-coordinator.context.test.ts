@@ -23,11 +23,9 @@ function makeManifest(
 	} as unknown as ManifestValueSummary;
 
 	if (resolverFn) {
-		(manifest as any).valueResolver = {
-			api: class {
-				resolveValues = resolverFn;
-				destroy() {}
-			},
+		(manifest as any).valueResolver = class {
+			resolveValues = resolverFn;
+			destroy() {}
 		};
 	}
 
@@ -173,14 +171,12 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 			meta: {},
 		} as unknown as ManifestValueSummary;
 
-		(manifest as any).valueResolver = {
-			api: class {
-				constructor() {
-					constructCount++;
-				}
-				resolveValues = async (values: ReadonlyArray<unknown>) => ({ data: values.map((v) => `r:${v}`) });
-				destroy() {}
-			},
+		(manifest as any).valueResolver = class {
+			constructor() {
+				constructCount++;
+			}
+			resolveValues = async (values: ReadonlyArray<unknown>) => ({ data: values.map((v) => `r:${v}`) });
+			destroy() {}
 		};
 
 		umbExtensionsRegistry.register(manifest);

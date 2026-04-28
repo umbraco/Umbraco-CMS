@@ -80,11 +80,9 @@ describe('UmbValueSummaryDefaultApi', () => {
 			meta: {},
 		} as unknown as ManifestValueSummary;
 
-		(manifest as any).valueResolver = {
-			api: class {
-				resolveValues = async (values: ReadonlyArray<unknown>) => ({ data: values.map((v) => `resolved:${v}`) });
-				destroy() {}
-			},
+		(manifest as any).valueResolver = class {
+			resolveValues = async (values: ReadonlyArray<unknown>) => ({ data: values.map((v) => `resolved:${v}`) });
+			destroy() {}
 		};
 
 		umbExtensionsRegistry.register(manifest);
@@ -124,14 +122,12 @@ describe('UmbValueSummaryDefaultApi', () => {
 			meta: {},
 		} as unknown as ManifestValueSummary;
 
-		(manifest as any).valueResolver = {
-			api: class {
-				resolveValues = async (values: ReadonlyArray<unknown>) => {
-					connectCalls++;
-					return { data: values.map((v) => `r:${v}`) };
-				};
-				destroy() {}
-			},
+		(manifest as any).valueResolver = class {
+			resolveValues = async (values: ReadonlyArray<unknown>) => {
+				connectCalls++;
+				return { data: values.map((v) => `r:${v}`) };
+			};
+			destroy() {}
 		};
 
 		umbExtensionsRegistry.register(manifest);
