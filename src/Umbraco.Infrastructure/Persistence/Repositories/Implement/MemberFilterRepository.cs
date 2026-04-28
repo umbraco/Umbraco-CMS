@@ -41,7 +41,9 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
         ?? throw new NotSupportedException("Need to be executed in a scope.");
 
     private string QTab(string tableName) => SqlSyntax.GetQuotedTableName(tableName);
+
     private string QCol(string columnName) => SqlSyntax.GetQuotedColumnName(columnName);
+
     private string QName(string name) => SqlSyntax.GetQuotedName(name);
 
     /// <inheritdoc />
@@ -117,7 +119,8 @@ internal sealed class MemberFilterRepository : IMemberFilterRepository
                     ON m2mg.{QCol(Member2MemberGroupDto.MemberColumnName)} = m.{QCol(MemberDto.PrimaryKeyColumnName)}
                 INNER JOIN {QTab(NodeDto.TableName)} mgn
                     ON mgn.{QCol(NodeDto.PrimaryKeyColumnName)} = m2mg.{QCol(Member2MemberGroupDto.MemberGroupColumnName)}
-                    AND mgn.{QCol(NodeDto.TextColumnName)} = @groupName", new { groupName = filter.MemberGroupName });
+                    AND mgn.{QCol(NodeDto.TextColumnName)} = @groupName",
+                new { groupName = filter.MemberGroupName });
         }
 
         if (filter.MemberTypeId.HasValue)
