@@ -5,8 +5,6 @@ export interface UmbDocumentRedirectUrlModel {
 	unique: string;
 	originalUrl: string;
 	destinationUrl: string;
-	created: string;
-	documentUnique: string;
 	culture: string | null;
 }
 
