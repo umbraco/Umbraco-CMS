@@ -35812,6 +35812,89 @@
       }
     },
     "/umbraco/management/api/v1/user/current/avatar": {
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Clears the current user's avatar.",
+        "description": "Removes the avatar image for the currently authenticated user.",
+        "operationId": "DeleteUserCurrentAvatar",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      },
       "post": {
         "tags": [
           "User"
@@ -36230,6 +36313,101 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/user/current/profile": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Updates current user profile.",
+        "description": "Updates current user profile with the details from the request model.",
+        "operationId": "PutUserCurrentProfile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCurrentUserRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "headers": {
+              "Umb-Notifications": {
+                "description": "The list of notifications produced during the request.",
+                "schema": {
+                  "type": [
+                    "null",
+                    "array"
+                  ],
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationHeaderModel"
+                  }
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -44773,16 +44951,12 @@
         "anyOf": [
           {
             "$ref": "#/components/schemas/ISetupTwoFactorModelNoopSetupTwoFactorModel"
-          },
-          {
-            "$ref": "#/components/schemas/ISetupTwoFactorModelTwoFactorAuthInfo"
           }
         ],
         "discriminator": {
           "propertyName": "$type",
           "mapping": {
-            "NoopSetupTwoFactorModel": "#/components/schemas/ISetupTwoFactorModelNoopSetupTwoFactorModel",
-            "TwoFactorAuthInfo": "#/components/schemas/ISetupTwoFactorModelTwoFactorAuthInfo"
+            "NoopSetupTwoFactorModel": "#/components/schemas/ISetupTwoFactorModelNoopSetupTwoFactorModel"
           }
         }
       },
@@ -44796,31 +44970,6 @@
               "NoopSetupTwoFactorModel"
             ],
             "type": "string"
-          }
-        }
-      },
-      "ISetupTwoFactorModelTwoFactorAuthInfo": {
-        "required": [
-          "$type"
-        ],
-        "properties": {
-          "$type": {
-            "enum": [
-              "TwoFactorAuthInfo"
-            ],
-            "type": "string"
-          },
-          "qrCodeSetupImageUrl": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "secret": {
-            "type": [
-              "null",
-              "string"
-            ]
           }
         }
       },
@@ -50470,6 +50619,17 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "UpdateCurrentUserRequestModel": {
+        "required": [
+          "languageIsoCode"
+        ],
+        "type": "object",
+        "properties": {
+          "languageIsoCode": {
+            "type": "string"
           }
         }
       },

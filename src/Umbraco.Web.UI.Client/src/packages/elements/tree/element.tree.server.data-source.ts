@@ -54,7 +54,6 @@ export class UmbElementTreeServerDataSource
 		return { data: mappedData, error };
 	}
 
-	// TODO: Review the commented out properties. [LK:2026-01-14]
 	#mapItem(item: ElementTreeItemResponseModel): UmbElementTreeItemModel {
 		return {
 			unique: item.id,
