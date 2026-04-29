@@ -4,7 +4,6 @@ import { UmbAppAuthController } from './app-auth.controller.js';
 import { UmbAppAuthElement } from './app-auth.element.js';
 import { UmbAppOauthElement } from './app-oauth.element.js';
 import { UmbNetworkConnectionStatusManager } from './network-connection-status.manager.js';
-import type { UmbBackofficeElement } from '../backoffice/index.js';
 import type { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { UmbServerConnection, UmbServerContext } from '@umbraco-cms/backoffice/server';
@@ -20,7 +19,6 @@ import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
