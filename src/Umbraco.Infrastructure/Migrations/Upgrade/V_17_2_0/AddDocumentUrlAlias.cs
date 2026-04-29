@@ -37,7 +37,7 @@ public class AddDocumentUrlAlias : AsyncMigrationBase
         LockDto? existingLockDto = Database.FirstOrDefault<LockDto>(sql);
         if (existingLockDto is null)
         {
-            // cant use InsertAsync as we can't pass in AutoIncrement = false
+            // Can't use InsertAsync as we can't pass in AutoIncrement = false
             Database.Insert(
                 Constants.DatabaseSchema.Tables.Lock,
                 "id",

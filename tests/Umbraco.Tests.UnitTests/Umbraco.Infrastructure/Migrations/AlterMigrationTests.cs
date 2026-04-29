@@ -115,27 +115,4 @@ public class AlterMigrationTests
             //// Alter.Column("foo").OnTable("bar").AsGuid().NotNullable();
             Alter.Table("bar").AlterColumn("foo").AsGuid().NotNullable().Do();
     }
-
-    [Ignore("this doesn't actually test anything")]
-    [Test]
-    public async Task Can_Get_Up_Migration_From_MigrationStub()
-    {
-        // Arrange
-        var context = GetMigrationContext(out var database);
-        var stub = new AlterUserTableMigrationStub(context);
-
-        // Act
-        await stub.RunAsync().ConfigureAwait(false);
-
-        // Assert
-        Assert.That(database.Operations.Any(), Is.True);
-
-        // Console output
-        Debug.Print("Number of expressions in context: {0}", database.Operations.Count);
-        Debug.Print(string.Empty);
-        foreach (var expression in database.Operations)
-        {
-            Debug.Print(expression.ToString());
-        }
-    }
 }
