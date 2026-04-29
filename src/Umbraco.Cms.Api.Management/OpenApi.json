@@ -41137,6 +41137,9 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/NoopSetupTwoFactorModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TwoFactorAuthInfo"
                     }
                   ]
                 }
@@ -41231,6 +41234,9 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/NoopSetupTwoFactorModel"
+                    },
+                    {
+                      "$ref": "#/components/schemas/TwoFactorAuthInfo"
                     }
                   ]
                 }
@@ -41624,14 +41630,11 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "$ref": "#/components/schemas/UserPermissionsResponseModel"
-                      }
-                    ]
-                  }
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserPermissionsResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -51268,7 +51271,8 @@
       "MemberKindModel": {
         "enum": [
           "Default",
-          "Api"
+          "Api",
+          "ExternalOnly"
         ],
         "type": "string"
       },
@@ -51409,6 +51413,10 @@
           },
           "kind": {
             "$ref": "#/components/schemas/MemberKindModel"
+          },
+          "profileData": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -56277,6 +56285,20 @@
           "All"
         ],
         "type": "string"
+      },
+      "TwoFactorAuthInfo": {
+        "type": "object",
+        "properties": {
+          "qrCodeSetupImageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "secret": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "UnknownTypePermissionPresentationModel": {
         "required": [

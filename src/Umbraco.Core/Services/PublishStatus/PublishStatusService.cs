@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 /// </summary>
 public abstract class PublishStatusService
 {
-    private readonly ConcurrentDictionary<Guid, ISet<string>> _publishedCultures = new();
+    private ConcurrentDictionary<Guid, ISet<string>> _publishedCultures = new();
     private readonly ILogger _logger;
     private readonly string _entityTypeName;
 
@@ -28,6 +28,8 @@ public abstract class PublishStatusService
     {
         _entityTypeName = entityType.ToString();
         _logger = logger;
+
+
     }
 
     /// <summary>
@@ -76,14 +78,20 @@ public abstract class PublishStatusService
     /// <param name="publishStatus">A dictionary mapping item keys to their published culture codes.</param>
     protected void PopulateCache(IDictionary<Guid, ISet<string>> publishStatus)
     {
-        _publishedCultures.Clear();
-        foreach ((Guid key, ISet<string> publishedCultures) in publishStatus)
-        {
-            if (_publishedCultures.TryAdd(key, publishedCultures) is false)
-            {
-                _logger.LogWarning("Failed to add published cultures for {EntityType} {Key}", _entityTypeName, key);
-            }
-        }
+        // On subscriber/CD servers in a load-balanced setup, cache refresh notifications can trigger
+        // re-initialization while other threads are reading _publishedCultures. The previous approach
+        // called _publishedCultures.Clear() then gradually re-added entries, creating a window where
+        // concurrent readers (e.g. HasPublishedAncestorPath) would see an empty dictionary and
+        // incorrectly conclude that content is unpublished.
+        //
+        // Instead, we build a completely new dictionary from the DB, then swap it in with
+        // Interlocked.Exchange. Readers that already hold a reference to the old dictionary continue
+        // to use it safely; new readers pick up the fully populated replacement. There is no window
+        // where the dictionary is empty.
+        //
+        // Verified by: PublishStatusServiceTests.Concurrent_Initialize_Never_Transiently_Loses_Published_Status
+        var newDictionary = new ConcurrentDictionary<Guid, ISet<string>>(publishStatus);
+        Interlocked.Exchange(ref _publishedCultures, newDictionary);
     }
 
     /// <summary>
