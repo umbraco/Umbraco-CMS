@@ -30,16 +30,10 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	readonly unique = this.#currentUser.asObservablePart((user) => user?.unique);
 	readonly userName = this.#currentUser.asObservablePart((user) => user?.userName);
 
-	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#currentUserRepository = new UmbCurrentUserRepository(this);
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CURRENT_USER_CONTEXT);
-
-		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
-			this.#authContext = instance;
-			this.#observeIsAuthorized();
-		});
 
 		this.observe(this.languageIsoCode, (currentLanguageIsoCode) => {
 			if (!currentLanguageIsoCode) return;
@@ -50,7 +44,7 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	/**
 	 * Loads the current user
 	 */
-	async load() {
+	public async load() {
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
 		if (asObservable) {
@@ -216,15 +210,6 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	 */
 	getUserName(): string | undefined {
 		return this.#currentUser.getValue()?.userName;
-	}
-
-	#observeIsAuthorized() {
-		if (!this.#authContext) return;
-		this.observe(this.#authContext.isAuthorized, (isAuthorized) => {
-			if (isAuthorized) {
-				this.load();
-			}
-		});
 	}
 }
 
