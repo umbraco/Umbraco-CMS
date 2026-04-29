@@ -54,7 +54,8 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IUserRepository>(),
                 factory.GetRequiredService<IRuntimeState>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<ILogger<BackOfficeUserStore>>()))
+                factory.GetRequiredService<ILogger<BackOfficeUserStore>>(),
+                factory.GetRequiredService<IBackOfficeUserReader>()))
             .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
             .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
             .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>()

@@ -94,6 +94,7 @@ public static class UmbracoBuilderExtensions
                 }
             });
 
+        builder.Services.AddSingleton(new EFCoreScopeConfiguration<TestUmbracoDbContext>());
         builder.Services.AddUnique<IAmbientEFCoreScopeStack<TestUmbracoDbContext>, AmbientEFCoreScopeStack<TestUmbracoDbContext>>();
         builder.Services.AddUnique<IEFCoreScopeAccessor<TestUmbracoDbContext>, EFCoreScopeAccessor<TestUmbracoDbContext>>();
         builder.Services.AddUnique<IEFCoreScopeProvider<TestUmbracoDbContext>, EFCoreScopeProvider<TestUmbracoDbContext>>();
