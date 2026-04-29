@@ -6,6 +6,7 @@ import {
 	ifDefined,
 	keyed,
 	property,
+	ref,
 	repeat,
 	state,
 	when,
@@ -149,6 +150,9 @@ export class UmbTableElement extends UmbLitElement {
 	 */
 	@property({ type: Array, attribute: false })
 	public selection: Array<string> = [];
+
+	@property({ attribute: false })
+	public onRowRendered?: (element: HTMLElement | undefined, item: UmbTableItem) => void;
 
 	@property({ type: String, attribute: false })
 	public orderingColumn = '';
@@ -365,6 +369,9 @@ export class UmbTableElement extends UmbLitElement {
 		const isItemSelectable = this.#isSelectableItem(item);
 		return html`
 			<uui-table-row
+				${ref((el) => {
+					this.onRowRendered?.(el as HTMLElement | undefined, item);
+				})}
 				data-sortable-id=${item.id}
 				?selectable=${this.config.allowSelection && !this._sortable && isItemSelectable}
 				?select-only=${this._selectionMode || this.config.selectOnly}

@@ -145,6 +145,14 @@ public class HtmlLocalLinkParserTests
         "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
         "<a type=\"custom\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>")]
 
+    // PascalCase type — historic mis-cased values written by the (now fixed) ConvertLocalLinks migration for Umbraco 15 (see #22597).
+    [TestCase(
+        "<a type=\"Document\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a href=\"/my-test-url\" title=\"world\">world</a>")]
+    [TestCase(
+        "<a type=\"Media\" href=\"/{localLink:9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" title=\"world\">world</a>",
+        "<a href=\"/media/1001/my-image.jpg\" title=\"world\">world</a>")]
+
     // legacy
     [TestCase(
         "hello href=\"{localLink:1234}\" world ",
