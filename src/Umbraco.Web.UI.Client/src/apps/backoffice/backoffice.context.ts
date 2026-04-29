@@ -4,13 +4,12 @@ import { ServerService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
-import { UmbExtensionsManifestInitializer, UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
+import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbSysinfoRepository } from '@umbraco-cms/backoffice/sysinfo';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ManifestBase, UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 export class UmbBackofficeContext extends UmbContextBase {
 	#activeSectionAlias = new UmbStringState(undefined);
