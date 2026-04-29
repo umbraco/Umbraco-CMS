@@ -180,8 +180,7 @@ export class UmbAppElement extends UmbLitElement {
 
 		// Register public extensions (login extensions)
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
-		const initializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-		await firstValueFrom(initializer.loaded);
+		new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
