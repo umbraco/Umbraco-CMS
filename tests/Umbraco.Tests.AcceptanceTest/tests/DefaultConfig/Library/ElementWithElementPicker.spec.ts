@@ -143,7 +143,6 @@ test('can not publish a mandatory element picker with an empty value', async ({u
   expect(elementData.values[0].value).toContain(elementPickerId);
 });
 
-// Currently there is no validation message displayed
 test('can validate minimum amount in element picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minAmount = 2;
