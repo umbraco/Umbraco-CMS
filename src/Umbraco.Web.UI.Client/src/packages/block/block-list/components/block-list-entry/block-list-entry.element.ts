@@ -50,12 +50,12 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@property({ attribute: false })
 	public set layout(value: UmbBlockListLayoutModel | undefined) {
 		if (!value) return;
-		const layoutKey = value.key;
+		const key = value.key;
 		const contentKey = value.contentKey;
 
-		if (layoutKey && layoutKey !== this._layoutKey) {
-			this._layoutKey = layoutKey;
-			this.#context.setLayoutKey(layoutKey);
+		if (key && key !== this._key) {
+			this._key = key;
+			this.#context.setKey(key);
 		}
 
 		if (contentKey && contentKey !== this._contentKey) {
@@ -74,10 +74,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		}
 	}
 
-	public get layoutKey(): string | undefined {
-		return this._layoutKey;
+	public get key(): string | undefined {
+		return this._key;
 	}
-	private _layoutKey?: string | undefined;
+	private _key?: string | undefined;
 
 	/**
 	 * @deprecated Use the `layout` property instead. Will be removed in Umbraco 20.
@@ -86,8 +86,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
 		this._contentKey = value;
-		if (!this._layoutKey) {
-			this.#context.setLayoutKey(value);
+		if (!this._key) {
+			this.#context.setKey(value);
 		}
 		this.#context.setContentKey(value);
 

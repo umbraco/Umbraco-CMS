@@ -40,7 +40,7 @@ import '../../components/block-list-entry/index.js';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.layoutKey!;
+		return element.key!;
 	},
 	getUniqueOfModel: (modelEntry) => {
 		return modelEntry.key;

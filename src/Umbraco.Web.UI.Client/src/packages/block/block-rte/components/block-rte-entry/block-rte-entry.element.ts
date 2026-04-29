@@ -24,29 +24,28 @@ import '../ref-rte-block/index.js';
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
 	/**
-	 * The unique layout key for this block entry.
+	 * The unique key of this block layout entry.
 	 */
-	// TODO: [LK] Review the `layoutKey` property, whether it should just be `key` or even `id`?
-	@property({ type: String, attribute: 'data-layout-key', reflect: true })
-	public set layoutKey(value: string | undefined) {
+	@property({ type: String, attribute: 'data-key', reflect: true })
+	public set key(value: string | undefined) {
 		if (!value) return;
-		this._layoutKey = value;
-		this.#context.setLayoutKey(value);
+		this._key = value;
+		this.#context.setKey(value);
 	}
-	public get layoutKey(): string | undefined {
-		return this._layoutKey;
+	public get key(): string | undefined {
+		return this._key;
 	}
-	private _layoutKey?: string | undefined;
+	private _key?: string | undefined;
 
 	/**
-	 * @deprecated Use `layoutKey` instead. Will be removed in Umbraco 20.
+	 * @deprecated Use `key` instead. Will be removed in Umbraco 20.
 	 */
 	@property({ type: String, attribute: 'data-content-key', reflect: true })
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
 		this._contentKey = value;
-		if (!this._layoutKey) {
-			this.#context.setLayoutKey(value);
+		if (!this._key) {
+			this.#context.setKey(value);
 		}
 		this.#context.setContentKey(value);
 

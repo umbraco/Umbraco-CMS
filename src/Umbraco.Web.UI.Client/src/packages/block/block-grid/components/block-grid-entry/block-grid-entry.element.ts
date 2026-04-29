@@ -41,12 +41,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@property({ attribute: false })
 	public set layout(value: UmbBlockGridLayoutModel | undefined) {
 		if (!value) return;
-		const layoutKey = value.key;
+		const key = value.key;
 		const contentKey = value.contentKey;
 
-		if (layoutKey && layoutKey !== this._layoutKey) {
-			this._layoutKey = layoutKey;
-			this.#context.setLayoutKey(layoutKey);
+		if (key && key !== this._key) {
+			this._key = key;
+			this.#context.setKey(key);
 		}
 
 		if (contentKey && contentKey !== this._contentKey) {
@@ -67,10 +67,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		}
 	}
 
-	public get layoutKey(): string | undefined {
-		return this._layoutKey;
+	public get key(): string | undefined {
+		return this._key;
 	}
-	private _layoutKey?: string | undefined;
+	private _key?: string | undefined;
 
 	/**
 	 * @deprecated Use the `layout` property instead. Will be removed in Umbraco 20.
@@ -84,8 +84,8 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this._contentKey = key;
 		this._blockViewProps.contentKey = key;
 		this.setAttribute('data-element-key', key);
-		if (!this._layoutKey) {
-			this.#context.setLayoutKey(key);
+		if (!this._key) {
+			this.#context.setKey(key);
 		}
 		this.#context.setContentKey(key);
 

@@ -112,7 +112,7 @@ function resolvePlacementAsBlockGrid(
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.layoutKey!;
+		return element.key!;
 	},
 	getUniqueOfModel: (modelEntry) => {
 		return modelEntry.key;

@@ -100,7 +100,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		if (!this.data) return;
 
 		this._activeView = this.data.openClipboard ? 'clipboard' : 'create';
-		this._hasLibraryElements = (this.data.allowedLibraryElementTypeKeys?.length ?? 0) > 0;
+		this._hasLibraryElements = (this.data.libraryAllowedElementTypeKeys?.length ?? 0) > 0;
 
 		this.#itemManager.setUniques(this.data.blocks.map((block) => block.contentElementTypeKey));
 	}
@@ -237,7 +237,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	#librarySelectableFilter = (item: any) => {
 		// Only elements (not folders) are selectable, filtered by allowed element type keys
 		if (item.isFolder) return false;
-		const allowedKeys = this.data?.allowedLibraryElementTypeKeys;
+		const allowedKeys = this.data?.libraryAllowedElementTypeKeys;
 		if (!allowedKeys?.length) return true;
 		return allowedKeys.includes(item.documentType?.unique);
 	};

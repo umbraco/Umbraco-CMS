@@ -54,7 +54,7 @@ export abstract class UmbBlockEntryContext<
 	protected _manager?: BlockManagerContextType;
 	protected _entries?: BlockEntriesContextType;
 
-	#layoutKey?: string;
+	#key?: string;
 	#contentKey?: string;
 	#unsupported = new UmbBooleanState(undefined);
 	readonly unsupported = this.#unsupported.asObservable();
@@ -462,16 +462,16 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	/**
-	 * Set the layout key of this entry — the unique identity of the layout item.
-	 * @param {string} layoutKey the layout key.
+	 * Set the key of this entry — the unique identity of the block layout item.
+	 * @param {string} key the block key.
 	 */
-	setLayoutKey(layoutKey: string) {
-		this.#layoutKey = layoutKey;
+	setKey(key: string) {
+		this.#key = key;
 		this.#observeLayout();
 	}
 
-	getLayoutKey() {
-		return this.#layoutKey;
+	getKey() {
+		return this.#key;
 	}
 
 	/**
@@ -479,14 +479,14 @@ export abstract class UmbBlockEntryContext<
 	 * @function setContentKey
 	 * @param {string} contentKey the entry content key.
 	 * @returns {void}
-	 * @deprecated Use `setLayoutKey` instead. Will be removed in Umbraco 20.
+	 * @deprecated Use `setKey` instead. Will be removed in Umbraco 20.
 	 */
 	setContentKey(contentKey: string) {
 		this.#contentKey = contentKey;
 		this._manager?.ensureContentResolved(contentKey);
-		// Backwards compat: if no layoutKey set yet, use contentKey
-		if (!this.#layoutKey) {
-			this.#layoutKey = contentKey;
+		// Backwards compat: if no key set yet, use contentKey
+		if (!this.#key) {
+			this.#key = contentKey;
 			this.#observeLayout();
 		}
 	}
@@ -520,10 +520,10 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	#observeLayout() {
-		if (!this._entries || !this.#layoutKey) return;
+		if (!this._entries || !this.#key) return;
 
 		this.observe(
-			this._entries.layoutByKey(this.#layoutKey),
+			this._entries.byKey(this.#key),
 			(layout) => {
 				this._layout.setValue(layout);
 			},

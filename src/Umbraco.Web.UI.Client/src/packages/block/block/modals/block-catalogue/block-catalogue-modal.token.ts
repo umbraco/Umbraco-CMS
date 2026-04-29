@@ -10,7 +10,7 @@ export interface UmbBlockCatalogueModalData {
 	openClipboard?: boolean;
 	clipboardFilter?: (clipboardDetailEntryModel: UmbClipboardEntryDetailModel) => Promise<boolean>;
 	originData: UmbBlockWorkspaceData['originData'];
-	allowedLibraryElementTypeKeys?: Array<string>;
+	libraryAllowedElementTypeKeys?: Array<string>;
 }
 
 export type UmbBlockCatalogueModalValue =

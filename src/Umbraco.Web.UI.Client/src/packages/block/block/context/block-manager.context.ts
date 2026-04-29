@@ -510,7 +510,7 @@ export abstract class UmbBlockManagerContext<
 	 * Only creates a layout entry — no contentData entry is added.
 	 * Sets the initial block expose once the element content is resolved.
 	 */
-	async insertLibraryElementReference(elementKey: string, _originData?: BlockOriginDataType) {
+	async insertLibraryElement(elementKey: string, _originData?: BlockOriginDataType) {
 		const layout = { key: UmbId.new(), contentKey: elementKey, isSharedContent: true } as BlockLayoutType;
 		this._layouts.appendOne(layout);
 		await this.#fetchLibraryElement(elementKey);
@@ -525,10 +525,10 @@ export abstract class UmbBlockManagerContext<
 	 * Transfer a local block's content to the library.
 	 * Removes the inline content and updates the layout to reference the new element.
 	 */
-	transferToLibrary(layoutKey: string, oldContentKey: string, newElementKey: string) {
+	transferToLibrary(key: string, oldContentKey: string, newElementKey: string) {
 		this.#contents.removeOne(oldContentKey);
 		this.removeExposesOf(oldContentKey);
-		this._layouts.updateOne(layoutKey, {
+		this._layouts.updateOne(key, {
 			contentKey: newElementKey,
 			isSharedContent: true,
 		} as Partial<BlockLayoutType>);
@@ -538,7 +538,7 @@ export abstract class UmbBlockManagerContext<
 	/**
 	 * Disconnect a block from the library, copying element content to local contentData.
 	 */
-	disconnectFromLibrary(layoutKey: string, elementKey: string, values: Array<UmbBlockDataValueModel>, contentTypeKey: string) {
+	disconnectFromLibrary(key: string, elementKey: string, values: Array<UmbBlockDataValueModel>, contentTypeKey: string) {
 		const newKey = UmbId.new();
 		const newContent: UmbBlockDataModel = {
 			key: newKey,
@@ -546,7 +546,7 @@ export abstract class UmbBlockManagerContext<
 			values,
 		};
 		this.#contents.appendOne(newContent);
-		this._layouts.updateOne(layoutKey, { contentKey: newKey, isSharedContent: undefined } as Partial<BlockLayoutType>);
+		this._layouts.updateOne(key, { contentKey: newKey, isSharedContent: undefined } as Partial<BlockLayoutType>);
 		this.#resolvedLibraryElements.removeOne(elementKey);
 		this.#resolvedLibraryElementVariants.removeOne(elementKey);
 		// Only set expose if the content type structure is loaded (it may not be for library elements

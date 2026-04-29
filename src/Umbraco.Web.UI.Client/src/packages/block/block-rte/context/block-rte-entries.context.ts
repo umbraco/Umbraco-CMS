@@ -82,7 +82,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				const blockTypeKeys = new Set(blockTypes.map((bt) => bt.contentElementTypeKey));
 				const elementTypeStructureRepo = new UmbElementTypeStructureRepository(this);
 				const { data: allowedTypes } = await elementTypeStructureRepo.requestAllowedChildrenOf(null, null);
-				const allowedLibraryElementTypeKeys =
+				const libraryAllowedElementTypeKeys =
 					allowedTypes?.items.filter((t) => t.unique && blockTypeKeys.has(t.unique)).map((t) => t.unique!) ?? [];
 
 				return {
@@ -91,7 +91,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 						blocks: blockTypes,
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
-						allowedLibraryElementTypeKeys,
+						libraryAllowedElementTypeKeys,
 						clipboardFilter: async (clipboardEntryDetail) => {
 							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
 								pasteTranslatorManifests,
@@ -140,7 +140,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 						throw new Error('Failed to create block');
 					}
 				} else if (value?.library && data) {
-					await this._manager?.insertLibraryElementReference(
+					await this._manager?.insertLibraryElement(
 						value.library.elementKey,
 						data.originData as UmbBlockRteWorkspaceOriginData,
 					);

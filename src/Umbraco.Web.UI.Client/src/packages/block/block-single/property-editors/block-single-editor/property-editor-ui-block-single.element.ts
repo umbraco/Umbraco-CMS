@@ -41,7 +41,7 @@ import { UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockSingleLayoutModel, UmbBlockSingleEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.layoutKey!;
+		return element.key!;
 	},
 	getUniqueOfModel: (modelEntry) => {
 		return modelEntry.key;
