@@ -24,7 +24,9 @@ import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 type UmbBlockTypeItemWithGroupKey = UmbBlockTypeWithGroupKey & UmbDocumentTypeItemModel;
 
-// TODO: [LK] Consider making as a workspace, then the "library" workspace-view could live in the "library" or "element" workspace instead.
+// TODO: [LK] The Block catalogue is conceptually a Modal/Flow extension point — not a Workspace.
+// We don't yet have a name for this concept, but the Library tab here should ideally be an extensible
+// surface so other content sources (e.g. element library, clipboard) can plug in without forking this modal.
 
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<

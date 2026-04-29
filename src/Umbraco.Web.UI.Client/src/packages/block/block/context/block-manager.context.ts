@@ -378,6 +378,9 @@ export abstract class UmbBlockManagerContext<
 		}
 	}
 
+	// TODO: [@madsrasmussen] Replace per-key fetches here with a batching manager that bundles multiple
+	// element requests into a single round-trip. Today this issues one request per shared block, which
+	// can become N+1 on pages with many references. The batching manager should also cache and dedupe.
 	async #fetchLibraryElement(key: string) {
 		if (this.#pendingElementFetches.has(key)) return;
 		if (this.#resolvedLibraryElements.getValue().some((x) => x.key === key)) return;
