@@ -22,7 +22,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     private readonly IRequestPreviewService _requestPreviewService;
     private readonly IPublishedContentCache _contentCache;
     private readonly IDocumentNavigationQueryService _navigationQueryService;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly IDocumentUrlService _documentUrlService;
     private RequestHandlerSettings _requestSettings;
 
@@ -38,6 +38,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     /// <param name="navigationQueryService">The document navigation query service.</param>
     /// <param name="publishStatusQueryService">The publish status query service.</param>
     /// <param name="documentUrlService">The document URL service.</param>
+    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ApiContentRouteBuilder(
         IApiContentPathProvider apiContentPathProvider,
         IOptions<GlobalSettings> globalSettings,
@@ -47,6 +48,66 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         IPublishedContentCache contentCache,
         IDocumentNavigationQueryService navigationQueryService,
         IPublishStatusQueryService publishStatusQueryService,
+        IDocumentUrlService documentUrlService)
+        : this(
+            apiContentPathProvider,
+            globalSettings,
+            variationContextAccessor,
+            requestPreviewService,
+            requestSettings,
+            contentCache,
+            navigationQueryService,
+            StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusQueryService>(),
+            documentUrlService)
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ApiContentRouteBuilder"/> class.
+    /// </summary>
+    /// <param name="apiContentPathProvider">The API content path provider.</param>
+    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="requestPreviewService">The request preview service.</param>
+    /// <param name="requestSettings">The request handler settings.</param>
+    /// <param name="contentCache">The published content cache.</param>
+    /// <param name="navigationQueryService">The document navigation query service.</param>
+    /// <param name="publishStatusQueryService">The publish status query service.</param>
+    /// <param name="documentUrlService">The document URL service.</param>
+    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
+    public ApiContentRouteBuilder(
+        IApiContentPathProvider apiContentPathProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IVariationContextAccessor variationContextAccessor,
+        IRequestPreviewService requestPreviewService,
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentPublishStatusQueryService documentPublishStatusQueryService,
+        IDocumentUrlService documentUrlService)
+        : this(
+            apiContentPathProvider,
+            globalSettings,
+            variationContextAccessor,
+            requestPreviewService,
+            requestSettings,
+            contentCache,
+            navigationQueryService,
+            documentPublishStatusQueryService,
+            documentUrlService)
+    {
+    }
+
+    public ApiContentRouteBuilder(
+        IApiContentPathProvider apiContentPathProvider,
+        IOptions<GlobalSettings> globalSettings,
+        IVariationContextAccessor variationContextAccessor,
+        IRequestPreviewService requestPreviewService,
+        IOptionsMonitor<RequestHandlerSettings> requestSettings,
+        IPublishedContentCache contentCache,
+        IDocumentNavigationQueryService navigationQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         IDocumentUrlService documentUrlService)
     {
         _apiContentPathProvider = apiContentPathProvider;
@@ -99,7 +160,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
     {
         // entirely unpublished content does not resolve any route, but we need one i.e. for preview to work,
         // so we'll use the content key as path.
-        if (isPreview && _publishStatusQueryService.IsDocumentPublished(content.Key, culture ?? string.Empty) is false)
+        if (isPreview && _publishStatusQueryService.IsPublished(content.Key, culture ?? string.Empty) is false)
         {
             return ContentPreviewPath(content);
         }
@@ -108,7 +169,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         var contentPath = _apiContentPathProvider.GetContentPath(content, culture);
 
         // in some scenarios the published content is actually routable, but due to the built-in handling of i.e. lacking culture setup
-        // the URL provider resolves the content URL as empty string or "#". since the Delivery API handles routing explicitly,
+        // the URL provider resolves the content URL as empty or unrouetable. since the Delivery API handles routing explicitly,
         // we can perform fallback to the content route.
         if (IsInvalidContentPath(contentPath))
         {
@@ -131,7 +192,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
     private string ContentPreviewPath(IPublishedContent content) => $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";
 
-    private static bool IsInvalidContentPath(string? path) => path.IsNullOrWhiteSpace() || "#".Equals(path);
+    private static bool IsInvalidContentPath(string? path) => path.IsNullOrWhiteSpace() || Constants.Routing.Unroutable.Equals(path);
 
     private IPublishedContent? GetRoot(IPublishedContent content, bool isPreview)
     {

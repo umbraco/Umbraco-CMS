@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -41,7 +42,7 @@ internal sealed partial class PublishStatusServiceTests
             }));
         }
 
-        // Readers - IsDocumentPublished
+        // Readers - IsPublished
         for (var i = 0; i < numberOfOperations; i++)
         {
             var key = documentKeys[i % documentKeys.Length];
@@ -49,7 +50,7 @@ internal sealed partial class PublishStatusServiceTests
             {
                 try
                 {
-                    _ = sut.IsDocumentPublished(key, DefaultCulture);
+                    _ = sut.IsPublished(key, DefaultCulture);
                 }
                 catch (Exception ex)
                 {
@@ -63,7 +64,7 @@ internal sealed partial class PublishStatusServiceTests
             }));
         }
 
-        // Readers - IsDocumentPublishedInAnyCulture
+        // Readers - IsPublishedInAnyCulture
         for (var i = 0; i < numberOfOperations; i++)
         {
             var key = documentKeys[i % documentKeys.Length];
@@ -71,7 +72,7 @@ internal sealed partial class PublishStatusServiceTests
             {
                 try
                 {
-                    _ = sut.IsDocumentPublishedInAnyCulture(key);
+                    _ = sut.IsPublishedInAnyCulture(key);
                 }
                 catch (Exception ex)
                 {
@@ -153,8 +154,8 @@ internal sealed partial class PublishStatusServiceTests
             {
                 try
                 {
-                    _ = sut.IsDocumentPublished(Textpage.Key, DefaultCulture);
-                    _ = sut.IsDocumentPublishedInAnyCulture(Subpage.Key);
+                    _ = sut.IsPublished(Textpage.Key, DefaultCulture);
+                    _ = sut.IsPublishedInAnyCulture(Subpage.Key);
                     _ = sut.HasPublishedAncestorPath(Subpage2.Key);
                 }
                 catch (Exception ex)
@@ -173,6 +174,62 @@ internal sealed partial class PublishStatusServiceTests
 
         // Assert
         Assert.IsEmpty(exceptions, $"Expected no exceptions but got {exceptions.Count}: {string.Join(", ", exceptions.Select(e => e.Message))}");
+    }
+
+    [Test]
+    public async Task Concurrent_Initialize_Never_Transiently_Loses_Published_Status()
+    {
+        // Arrange
+        var sut = CreatePublishedStatusService();
+
+        // Publish the Textpage branch so InitializeAsync has data to load.
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        // Initialize once and confirm the baseline.
+        await sut.InitializeAsync(CancellationToken.None);
+        Assert.IsTrue(sut.IsPublishedInAnyCulture(Textpage.Key), "Textpage should be published after initial load");
+
+        var falseCount = 0;
+        var totalReads = 0;
+        using var cts = new CancellationTokenSource();
+
+        // Act - readers loop continuously while initializers run, ensuring reads
+        // overlap with the Clear()-then-rebuild window inside InitializeAsync.
+        var readerTasks = new List<Task>();
+        for (var i = 0; i < 4; i++)
+        {
+            readerTasks.Add(RunWithSuppressedExecutionContext(() =>
+            {
+                while (cts.IsCancellationRequested is false)
+                {
+                    Interlocked.Increment(ref totalReads);
+                    if (sut.IsPublishedInAnyCulture(Textpage.Key) is false)
+                    {
+                        Interlocked.Increment(ref falseCount);
+                    }
+
+                    // Reduce CPU pressure in CI without yielding the thread or losing contention.
+                    Thread.SpinWait(20);
+                }
+
+                return Task.CompletedTask;
+            }));
+        }
+
+        // Run 50 sequential re-initializations (simulates repeated cache rebuilds
+        // on a subscriber server). Readers run throughout, maximizing the chance
+        // of observing the transient empty state.
+        for (var i = 0; i < 50; i++)
+        {
+            await sut.InitializeAsync(CancellationToken.None);
+        }
+
+        cts.Cancel();
+        await Task.WhenAll(readerTasks);
+
+        // Assert - every single read should have returned true; the published status
+        // must never be transiently lost during re-initialization.
+        Assert.IsTrue(falseCount == 0, $"Expected all reads to return true, but {falseCount} out of {totalReads} returned false");
     }
 
     private static Task RunWithSuppressedExecutionContext(Func<Task> action)

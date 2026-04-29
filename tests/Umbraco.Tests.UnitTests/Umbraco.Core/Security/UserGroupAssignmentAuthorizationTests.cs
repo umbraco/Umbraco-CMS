@@ -60,7 +60,7 @@ public class UserGroupAssignmentAuthorizationTests
             existingGroupAliases: []);
 
         Assert.AreEqual(2, result.Count);
-        Assert.That(result, Is.EquivalentTo(new[] { "admin", "sensitiveData" }));
+        CollectionAssert.AreEquivalent(new[] { "admin", "sensitiveData" }, result);
     }
 
     [Test]

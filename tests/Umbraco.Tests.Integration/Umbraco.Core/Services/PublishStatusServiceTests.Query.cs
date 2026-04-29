@@ -15,24 +15,24 @@ internal sealed partial class PublishStatusServiceTests
     {
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage2.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage3.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage2.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage3.Key, DefaultCulture));
 
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Trashed.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Trashed.Key, DefaultCulture));
 
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage2.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage3.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage2.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage3.Key, UnusedCulture));
 
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Trashed.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Trashed.Key, UnusedCulture));
 
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(Textpage.Key));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(Subpage.Key));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(Subpage2.Key));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(Subpage3.Key));
+            Assert.IsFalse(PublishStatusQueryService.IsPublishedInAnyCulture(Textpage.Key));
+            Assert.IsFalse(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage.Key));
+            Assert.IsFalse(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage2.Key));
+            Assert.IsFalse(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage3.Key));
 
         });
     }
@@ -53,17 +53,17 @@ internal sealed partial class PublishStatusServiceTests
         {
             Assert.IsTrue(publishResults.All(x => x.Result == PublishResultType.SuccessPublish));
             Assert.IsTrue(publishResult.Success);
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage2.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(grandchild.Key, DefaultCulture)); // grandchild is still published, but it will not be routable
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage2.Key, DefaultCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(grandchild.Key, DefaultCulture)); // grandchild is still published, but it will not be routable
 
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage2.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(grandchild.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage2.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(grandchild.Key, UnusedCulture));
 
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(Textpage.Key));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(Subpage2.Key));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(grandchild.Key));
+            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Textpage.Key));
+            Assert.IsFalse(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage2.Key));
+            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(grandchild.Key));
         });
     }
 
@@ -74,24 +74,24 @@ internal sealed partial class PublishStatusServiceTests
         Assert.Multiple(() =>
         {
             Assert.IsTrue(publishResults.All(x => x.Result == PublishResultType.SuccessPublish));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Subpage.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Subpage2.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Subpage3.Key, DefaultCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage2.Key, DefaultCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage3.Key, DefaultCulture));
 
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Trashed.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Trashed.Key, DefaultCulture));
 
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage2.Key, UnusedCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage3.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage2.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage3.Key, UnusedCulture));
 
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Trashed.Key, UnusedCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Trashed.Key, UnusedCulture));
 
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(Textpage.Key));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(Subpage.Key));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(Subpage2.Key));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublishedInAnyCulture(Subpage3.Key));
+            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Textpage.Key));
+            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage.Key));
+            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage2.Key));
+            Assert.IsTrue(PublishStatusQueryService.IsPublishedInAnyCulture(Subpage3.Key));
 
             Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(Textpage.Key));
             Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(Subpage.Key));
@@ -103,16 +103,16 @@ internal sealed partial class PublishStatusServiceTests
     {
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, DefaultCulture));
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Subpage.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
         });
 
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
 
         Assert.Multiple(() =>
         {
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Subpage.Key, DefaultCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
         });
 
         ContentService.Unpublish(Textpage);
@@ -120,8 +120,8 @@ internal sealed partial class PublishStatusServiceTests
         // Unpublish the root item - the sub page will still be published but it won't have a published path.
         Assert.Multiple(() =>
         {
-            Assert.IsFalse(PublishStatusQueryService.IsDocumentPublished(Textpage.Key, DefaultCulture));
-            Assert.IsTrue(PublishStatusQueryService.IsDocumentPublished(Subpage.Key, DefaultCulture));
+            Assert.IsFalse(PublishStatusQueryService.IsPublished(Textpage.Key, DefaultCulture));
+            Assert.IsTrue(PublishStatusQueryService.IsPublished(Subpage.Key, DefaultCulture));
 
             Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(Subpage.Key));
         });

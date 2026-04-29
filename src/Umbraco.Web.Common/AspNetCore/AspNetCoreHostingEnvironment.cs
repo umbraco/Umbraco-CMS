@@ -81,9 +81,9 @@ public class AspNetCoreHostingEnvironment : IHostingEnvironment
     private Uri? _applicationMainUrl;
 
     /// <inheritdoc />
-    public Uri ApplicationMainUrl
+    public Uri? ApplicationMainUrl
     {
-        get => _applicationMainUrl!;
+        get => _applicationMainUrl;
         private set => _applicationMainUrl = value;
     }
 
