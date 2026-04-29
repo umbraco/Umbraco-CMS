@@ -539,7 +539,7 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async doesHistoryItemHaveDescription(descriptionText: string, index: number = 0) {
     const description = this.historyItems.nth(index).locator('.log-type span');
-    await this.containsText(description, descriptionText);
+    await this.hasText(description, descriptionText);
   }
 
   async doesHistoryItemHaveUsername(usernameText: string, index: number = 0) {
