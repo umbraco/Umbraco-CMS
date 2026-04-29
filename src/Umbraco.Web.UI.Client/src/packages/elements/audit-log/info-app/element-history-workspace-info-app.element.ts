@@ -1,11 +1,10 @@
 import { UmbElementAuditLogRepository } from '../repository/index.js';
 import { UMB_ELEMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbElementAuditLogModel } from '../types.js';
-//import { TimeOptions } from '../../utils.js';
 import { getElementHistoryTagStyleAndText } from './utils.js';
 import { css, customElement, html, nothing, repeat, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
@@ -13,17 +12,6 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { ManifestEntityAction } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
-
-// TODO: [LK:2026-02-04] Review if `TimeOptions` should be moved to a more shared location.
-// Duplicated from `src\packages\documents\documents\utils.ts`
-export const TimeOptions: Intl.DateTimeFormatOptions = {
-	year: 'numeric',
-	month: 'long',
-	day: 'numeric',
-	hour: 'numeric',
-	minute: 'numeric',
-	second: 'numeric',
-};
 
 @customElement('umb-element-history-workspace-info-app')
 export class UmbElementHistoryWorkspaceInfoAppElement extends UmbLitElement {
@@ -144,7 +132,7 @@ export class UmbElementHistoryWorkspaceInfoAppElement extends UmbLitElement {
 						return html`
 							<umb-history-item
 								.name=${user?.name ?? 'Unknown'}
-								.detail=${this.localize.date(item.timestamp, TimeOptions)}>
+								.detail=${this.localize.date(item.timestamp, UMB_DATE_TIME_FORMAT_OPTIONS)}>
 								<umb-user-avatar
 									slot="avatar"
 									.name=${user?.name}
