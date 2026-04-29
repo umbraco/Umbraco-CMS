@@ -62,4 +62,9 @@ public class LogDto
     /// Used to store additional data parameters for the log.
     /// </summary>
     public string? Parameters { get; set; }
+
+    /// <summary>
+    /// Gets or sets the user that this log entry is associated with, if any.
+    /// </summary>
+    public UserDto? User { get; set; }
 }

@@ -52,5 +52,11 @@ public class LogDtoConfiguration : IEntityTypeConfiguration<LogDto>
         // IX_umbracoLog_datestamp_logheader (compound: Datestamp, logHeader)
         builder.HasIndex(x => new { x.Datestamp, x.Header })
             .HasDatabaseName($"IX_{LogDto.TableName}_datestamp_logheader");
+
+        // FK to umbracoUser.
+        builder.HasOne(x => x.User)
+            .WithMany()
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
