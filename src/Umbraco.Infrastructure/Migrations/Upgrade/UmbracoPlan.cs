@@ -24,9 +24,9 @@ public partial class UmbracoPlan : MigrationPlan
 
     /// <inheritdoc />
     /// <remarks>
-    /// This is set to the final migration state of 9.4, making that the lowest supported version to upgrade from.
+    /// This is set to the final migration state of 16.4, making that the lowest supported version to upgrade from.
     /// </remarks>
-    public override string InitialState => "{DED98755-4059-41BB-ADBD-3FEAB12D1D7B}";
+    public override string InitialState => "{6A7D3B80-8B64-4E41-A7C0-02EC39336E97}";
 
     /// <summary>
     /// Gets the semantic version corresponding to <see cref="InitialState"/>.
