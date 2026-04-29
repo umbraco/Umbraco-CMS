@@ -32,7 +32,7 @@ import {
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
-import { UMB_BLOCK_TRANSFER_TO_LIBRARY_MODAL } from '../modals/index.js';
+import { UMB_BLOCK_TRANSFER_TO_LIBRARY_MODAL } from '../modals/transfer-to-library/transfer-to-library-modal.token.js';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
