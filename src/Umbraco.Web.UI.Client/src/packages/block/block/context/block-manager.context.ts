@@ -32,6 +32,8 @@ import {
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
+import { UMB_BLOCK_TRANSFER_TO_LIBRARY_MODAL } from '../modals/index.js';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -533,6 +535,90 @@ export abstract class UmbBlockManagerContext<
 			isSharedContent: true,
 		} as Partial<BlockLayoutType>);
 		this.ensureContentResolved(newElementKey);
+	}
+
+	/**
+	 * Request to transfer a local block's content to the Element Library.
+	 * Opens the transfer modal for the user to name the new Element and pick a location,
+	 * then creates the Element and updates the block to reference it.
+	 * @param {string} key the block layout key.
+	 */
+	async requestTransferToLibrary(key: string) {
+		const layout = this._layouts.getValue().find((x) => x.key === key);
+		if (!layout) return;
+		const contentKey = layout.contentKey;
+		const content = this.getContentOf(contentKey);
+		if (!content) return;
+
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT).catch(() => undefined);
+		if (!modalManager) return;
+		const result = await modalManager
+			.open(this, UMB_BLOCK_TRANSFER_TO_LIBRARY_MODAL, { data: {} })
+			.onSubmit()
+			.catch(() => undefined);
+		if (!result) return;
+
+		const elementRepository = new UmbElementDetailRepository(this);
+		const { data: scaffold } = await elementRepository.createScaffold({
+			documentType: { unique: content.contentTypeKey, collection: null },
+			values: content.values,
+			variants: [
+				{
+					culture: null,
+					segment: null,
+					state: null,
+					name: result.name,
+					publishDate: null,
+					createDate: null,
+					updateDate: null,
+				},
+			],
+		});
+		if (!scaffold) return;
+
+		const { data: created } = await elementRepository.create(scaffold, result.parentUnique);
+		if (!created) return;
+
+		this.transferToLibrary(key, contentKey, created.unique);
+	}
+
+	/**
+	 * Request to disconnect a block from the Element Library.
+	 * Asks for user confirmation, then copies the element content into local contentData.
+	 * @param {string} key the block layout key.
+	 */
+	async requestDisconnectFromLibrary(key: string) {
+		const layout = this._layouts.getValue().find((x) => x.key === key);
+		if (!layout) return;
+		const elementKey = layout.contentKey;
+
+		try {
+			await umbConfirmModal(this, {
+				headline: '#blockEditor_disconnectFromLibrary',
+				content: '#blockEditor_disconnectFromLibraryConfirm',
+				confirmLabel: '#blockEditor_disconnectFromLibrary',
+				color: 'warning',
+			});
+		} catch {
+			return; // user cancelled
+		}
+
+		const elementRepository = new UmbElementDetailRepository(this);
+		const { data: element } = await elementRepository.requestByUnique(elementKey);
+		if (!element) return;
+
+		this.disconnectFromLibrary(
+			key,
+			elementKey,
+			element.values.map((v) => ({
+				alias: v.alias,
+				editorAlias: v.editorAlias,
+				culture: v.culture,
+				segment: v.segment,
+				value: v.value,
+			})),
+			element.documentType.unique,
+		);
 	}
 
 	/**
