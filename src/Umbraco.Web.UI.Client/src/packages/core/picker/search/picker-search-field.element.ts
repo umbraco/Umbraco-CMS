@@ -51,7 +51,7 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 
 				${this._query
 					? html`
-							<uui-button slot="append" type="button" @click=${() => this.#pickerContext?.search.clear()} compact>
+							<uui-button label=${this.localize.term('actions_delete')} slot="append" type="button" @click=${() => this.#pickerContext?.search.clear()} compact>
 								<uui-icon name="icon-delete"></uui-icon>
 							</uui-button>
 						`
