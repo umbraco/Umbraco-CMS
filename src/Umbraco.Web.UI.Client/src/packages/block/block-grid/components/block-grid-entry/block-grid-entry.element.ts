@@ -4,6 +4,7 @@ import { UmbBlockGridEntryContext } from './block-grid-entry.context.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery, UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
@@ -47,7 +48,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			this._contentKey = contentKey;
 			this._blockViewProps.contentKey = contentKey;
 			this.setAttribute('data-element-key', contentKey);
-			this.#context.setContentKey(contentKey);
 
 			new UmbObserveValidationStateController(
 				this,
@@ -75,6 +75,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 	public set contentKey(key: string | undefined) {
 		if (!key || key === this._contentKey) return;
+		new UmbDeprecation({
+			deprecated: 'umb-block-grid-entry.contentKey property',
+			solution: 'Use the `layout` property instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this._contentKey = key;
 		this._blockViewProps.contentKey = key;
 		this.setAttribute('data-element-key', key);

@@ -7,7 +7,7 @@ import {
 } from '../../constants.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
@@ -54,7 +54,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 
 		if (contentKey && contentKey !== this._contentKey) {
 			this._contentKey = contentKey;
-			this.#context.setContentKey(contentKey);
 
 			new UmbObserveValidationStateController(
 				this,
@@ -82,6 +81,11 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
+		new UmbDeprecation({
+			deprecated: 'umb-block-single-entry.contentKey property',
+			solution: 'Use the `layout` property instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this._contentKey = value;
 		if (!this._key) {
 			this.#context.setKey(value);

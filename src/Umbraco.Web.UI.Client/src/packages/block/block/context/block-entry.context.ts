@@ -17,7 +17,7 @@ import {
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { encodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { encodeFilePath, UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
@@ -482,6 +482,11 @@ export abstract class UmbBlockEntryContext<
 	 * @deprecated Use `setKey` instead. Will be removed in Umbraco 20.
 	 */
 	setContentKey(contentKey: string) {
+		new UmbDeprecation({
+			deprecated: 'UmbBlockEntryContext.setContentKey',
+			solution: 'Use setKey() with the block layout key instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this.#contentKey = contentKey;
 		this._manager?.ensureContentResolved(contentKey);
 		// Backwards compat: if no key set yet, use contentKey

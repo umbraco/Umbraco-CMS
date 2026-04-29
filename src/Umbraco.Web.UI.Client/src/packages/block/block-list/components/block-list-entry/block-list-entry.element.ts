@@ -9,6 +9,7 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery, UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -54,7 +55,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 		if (contentKey && contentKey !== this._contentKey) {
 			this._contentKey = contentKey;
-			this.#context.setContentKey(contentKey);
 
 			new UmbObserveValidationStateController(
 				this,
@@ -79,6 +79,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@property({ attribute: false })
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
+		new UmbDeprecation({
+			deprecated: 'umb-block-list-entry.contentKey property',
+			solution: 'Use the `layout` property instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this._contentKey = value;
 		if (!this._key) {
 			this.#context.setKey(value);
