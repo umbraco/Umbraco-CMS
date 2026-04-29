@@ -400,13 +400,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </remarks>
         private object? GetConfigurationObject(IPropertyType propertyType)
         {
-            Attempt<Guid> keyAttempt = IdKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
-            if (keyAttempt.Success is false)
+            // Prefer DataTypeKey directly when set; fall back to mapping the int DataTypeId via IIdKeyMap.
+            Guid dataTypeKey = propertyType.DataTypeKey;
+            if (dataTypeKey == Guid.Empty)
             {
-                return null;
+                Attempt<Guid> keyAttempt = IdKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
+                if (keyAttempt.Success is false)
+                {
+                    return null;
+                }
+
+                dataTypeKey = keyAttempt.Result;
             }
 
-            return DataTypeService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult()?.ConfigurationObject;
+            return DataTypeService.GetAsync(dataTypeKey).GetAwaiter().GetResult()?.ConfigurationObject;
         }
 
         #endregion

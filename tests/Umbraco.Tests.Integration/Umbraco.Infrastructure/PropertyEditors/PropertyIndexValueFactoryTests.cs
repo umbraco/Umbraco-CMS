@@ -40,8 +40,9 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
-        var dataTypeKey = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType).Result;
-        var dataType = (await DataTypeService.GetAsync(dataTypeKey))!;
+        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
 
         var elementId = Guid.NewGuid();
@@ -110,8 +111,9 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
         ContentTypeService.Save(contentType);
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
-        var dataTypeKey = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType).Result;
-        var dataType = (await DataTypeService.GetAsync(dataTypeKey))!;
+        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);

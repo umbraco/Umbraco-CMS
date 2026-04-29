@@ -312,13 +312,20 @@ public class PropertyValidationService : IPropertyValidationService
 
     private IDataType? GetDataType(IPropertyType propertyType)
     {
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
-        if (keyAttempt.Success is false)
+        // Prefer DataTypeKey directly when set; fall back to mapping the int DataTypeId via IIdKeyMap.
+        Guid dataTypeKey = propertyType.DataTypeKey;
+        if (dataTypeKey == Guid.Empty)
         {
-            return null;
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
+            if (keyAttempt.Success is false)
+            {
+                return null;
+            }
+
+            dataTypeKey = keyAttempt.Result;
         }
 
-        return _dataTypeService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult();
+        return _dataTypeService.GetAsync(dataTypeKey).GetAwaiter().GetResult();
     }
 
     private IDataEditor? GetDataEditor(IPropertyType propertyType)

@@ -1485,6 +1485,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             Dictionary<string, int> importedFolders = CreateDataTypeFolderStructure(dataTypeElements, out entityContainersInstalled);
 
+            // Resolve the performing user key once for the whole import.
+            Guid performingUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+
             foreach (XElement dataTypeElement in dataTypeElements)
             {
                 var dataTypeDefinitionName = dataTypeElement.AttributeValue<string>("Name");
@@ -1538,8 +1541,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 else
                 {
                     definition.ParentId = parentId;
-                    Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
-                    _dataTypeService.UpdateAsync(definition, userKey).GetAwaiter().GetResult();
+                    _dataTypeService.UpdateAsync(definition, performingUserKey).GetAwaiter().GetResult();
                 }
             }
 
@@ -1550,16 +1552,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 // operate on a single entity at a time, so notifications now fire per item instead of as a batch.
                 // This is acceptable here because package installation is a one-off bulk import and existing
                 // notification handlers have been verified to handle per-item events correctly.
-                Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
                 foreach (IDataType dataType in dataTypes)
                 {
                     if (dataType.HasIdentity)
                     {
-                        _dataTypeService.UpdateAsync(dataType, userKey).GetAwaiter().GetResult();
+                        _dataTypeService.UpdateAsync(dataType, performingUserKey).GetAwaiter().GetResult();
                     }
                     else
                     {
-                        _dataTypeService.CreateAsync(dataType, userKey).GetAwaiter().GetResult();
+                        _dataTypeService.CreateAsync(dataType, performingUserKey).GetAwaiter().GetResult();
                     }
                 }
             }
