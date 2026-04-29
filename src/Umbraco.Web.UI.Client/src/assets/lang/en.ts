@@ -2240,6 +2240,9 @@ export default {
 		addUsersToGroupError: 'Could not add users to the group.',
 		removeUsersFromGroupError: 'Could not remove users from the group.',
 		andMore: 'and %0% more',
+		avatarUploadSuccess: 'Avatar uploaded',
+		avatarDeleteSuccess: 'Avatar deleted',
+		unknownFailure: 'Unknown failure',
 		usersNotManagedFromGroup: 'not manageable from this screen.',
 	},
 	validation: {
@@ -2362,9 +2365,11 @@ export default {
 		noRedirects: 'No redirects have been made',
 		noRedirectsDescription:
 			'When a published page gets renamed or moved a redirect will automatically be made to the new page.',
+		noRedirectsForSearch: 'No redirects matching this search criteria',
+		noRedirectsForSearchDescription: 'Double check your search for any error or spelling mistakes.',
 		redirectRemoved: 'Redirect URL removed.',
 		redirectRemoveError: 'Error removing redirect URL.',
-		redirectRemoveWarning: 'This will remove the redirect',
+		redirectRemoveWarning: 'This will remove the redirect.',
 		confirmDisable: 'Are you sure you want to disable the URL tracker?',
 		disabledConfirm: 'URL tracker has now been disabled.',
 		disableError: 'Error disabling the URL tracker, more information can be found in your log file.',
