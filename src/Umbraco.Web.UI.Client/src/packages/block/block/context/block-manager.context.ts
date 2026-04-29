@@ -203,6 +203,19 @@ export abstract class UmbBlockManagerContext<
 			},
 			null,
 		);
+
+		// Auto-resolve content for any layout marked as shared, whenever layouts change.
+		this.observe(
+			this._layouts.asObservable(),
+			(layouts) => {
+				layouts.forEach((layout) => {
+					if (layout.isSharedContent && layout.contentKey) {
+						this.#fetchLibraryElement(layout.contentKey);
+					}
+				});
+			},
+			null,
+		);
 	}
 
 	#ensureContentTypes(blockTypes: Array<BlockType>) {

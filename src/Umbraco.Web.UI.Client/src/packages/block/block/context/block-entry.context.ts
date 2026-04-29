@@ -488,7 +488,6 @@ export abstract class UmbBlockEntryContext<
 			removeInVersion: '20.0.0',
 		}).warn();
 		this.#contentKey = contentKey;
-		this._manager?.ensureContentResolved(contentKey);
 		// Backwards compat: if no key set yet, use contentKey
 		if (!this.#key) {
 			this.#key = contentKey;
@@ -531,6 +530,10 @@ export abstract class UmbBlockEntryContext<
 			this._entries.byKey(this.#key),
 			(layout) => {
 				this._layout.setValue(layout);
+				// Derive contentKey from the layout so internal flows have it without external setters.
+				if (layout?.contentKey) {
+					this.#contentKey = layout.contentKey;
+				}
 			},
 			'observeParentLayout',
 		);
@@ -586,10 +589,6 @@ export abstract class UmbBlockEntryContext<
 	#observeContentData() {
 		const contentKey = this.#contentKey ?? this._layout.value?.contentKey;
 		if (!this._manager || !contentKey) return;
-
-		// Trigger library element fetch if needed (may have been missed when setContentKey
-		// was called before the manager was available)
-		this._manager.ensureContentResolved(contentKey);
 
 		// Observe content and library state together to avoid race conditions.
 		// Both are evaluated in the same tick, preventing the unsupported flag
