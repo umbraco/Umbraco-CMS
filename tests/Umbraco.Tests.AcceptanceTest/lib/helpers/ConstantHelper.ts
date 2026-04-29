@@ -303,7 +303,8 @@
     recycleBinMedia: '/umbraco/management/api/v1/recycle-bin/media',
     domains: '/domains',
     notifications: '/notifications',
-    currentUser: '/umbraco/management/api/v1/user/current'
+    currentUser: '/umbraco/management/api/v1/user/current',
+    revoke: '/umbraco/management/api/v1/security/back-office/revoke'
   }
 
   public static readonly userGroupDescriptionValues = {
@@ -317,5 +318,15 @@
   public static readonly healthCheckMessages = {
     imagingHMACSecretKeyIsNotConfigured: 'No HMAC secret key is configured for image URL signing. It is recommended to set Umbraco:CMS:Imaging:HMACSecretKey to prevent unauthorized image manipulation requests.',
     imagingHMACSecretKeyIsConfigured: 'The HMAC secret key for image URL signing is configured'
+  }
+
+  public static readonly loginErrorMessages = {
+    lockedAccount: 'Your account has been locked out. Please try again later.',
+    invalidCredentials: "Oops! We couldn't log you in. Please check your credentials and try again."
+  }
+
+  public static readonly forgottenPasswordMessages = {
+    confirmation: 'An email with password reset instructions will be sent to the specified address if it matched our records',
+    notFoundUserError: 'The specified user was not found.'
   }
 }
