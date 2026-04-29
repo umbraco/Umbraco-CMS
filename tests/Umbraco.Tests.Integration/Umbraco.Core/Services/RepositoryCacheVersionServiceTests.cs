@@ -66,17 +66,40 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
     [Test]
     public async Task SetCacheUpdatedAsync_Updates_Cache_Version()
     {
+        // Each service call runs in its own implicit root scope so deduplication does not apply.
+        await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
+        string? initialVersion;
+        using (var readScope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            initialVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
+        }
+        Assert.IsNotNull(initialVersion, "Initial cache version should not be null.");
+
+        await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
+        string? updatedVersion;
+        using (var readScope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            updatedVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
+        }
+        Assert.IsNotNull(updatedVersion, "Updated cache version should not be null.");
+
+        Assert.AreNotEqual(initialVersion, updatedVersion, "Cache version should be updated.");
+    }
+
+    [Test]
+    public async Task SetCacheUpdatedAsync_OnlyWritesOncePerScopeForSameEntityType()
+    {
         using var scope = CoreScopeProvider.CreateCoreScope(autoComplete: true);
 
         await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
-        var initialCacheVersion = await RepositoryCacheVersionRepository.GetAsync(GetCacheKey());
-        Assert.IsNotNull(initialCacheVersion, "Initial cache version should not be null.");
+        var firstVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
+        Assert.IsNotNull(firstVersion);
 
+        // Second call within the same scope must be a no-op.
         await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
-        var updatedCacheVersion = await RepositoryCacheVersionRepository.GetAsync(GetCacheKey());
-        Assert.IsNotNull(updatedCacheVersion, "Updated cache version should not be null.");
+        var secondVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
 
-        Assert.AreNotEqual(initialCacheVersion.Version, updatedCacheVersion.Version, "Cache version should be updated.");
+        Assert.AreEqual(firstVersion, secondVersion, "Second call within the same scope must not write a new version.");
     }
 
     [Test]

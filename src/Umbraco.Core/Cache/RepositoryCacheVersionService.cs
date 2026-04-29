@@ -14,6 +14,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     private readonly ILogger<RepositoryCacheVersionService> _logger;
     private readonly IRepositoryCacheVersionAccessor _repositoryCacheVersionAccessor;
     private readonly ConcurrentDictionary<string, Guid> _cacheVersions = new();
+    private readonly ConcurrentDictionary<Guid, HashSet<string>> _writtenKeysByScope = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="RepositoryCacheVersionService" /> class.
@@ -84,14 +85,19 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     public async Task SetCacheUpdatedAsync<TEntity>()
         where TEntity : class
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        string cacheKey = GetCacheKey<TEntity>();
 
-        // We have to take a write lock to ensure the cache is not being read while we update the version.
+        HashSet<string>? writtenKeys = GetOrRegisterScopeWrittenKeys();
+        if (writtenKeys?.Add(cacheKey) is false)
+        {
+            _logger.LogDebug("Cache version for {EntityType} already written in this scope, skipping", typeof(TEntity).Name);
+            return;
+        }
+
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.CacheVersion);
 
-        var cacheKey = GetCacheKey<TEntity>();
         var newVersion = Guid.NewGuid();
-
         _logger.LogDebug("Setting cache for {EntityType} to version {Version}", typeof(TEntity).Name, newVersion);
         await _repositoryCacheVersionRepository.SaveAsync(new RepositoryCacheVersion { Identifier = cacheKey, Version = newVersion.ToString() });
         _cacheVersions[cacheKey] = newVersion;
@@ -131,4 +137,28 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     internal string GetCacheKey<TEntity>()
         where TEntity : class =>
         typeof(TEntity).FullName ?? typeof(TEntity).Name;
+
+    private HashSet<string>? GetOrRegisterScopeWrittenKeys()
+    {
+        IScopeContext? context = _scopeProvider.Context;
+        if (context is null)
+        {
+            return null;
+        }
+
+        Guid contextId = context.InstanceId;
+        if (_writtenKeysByScope.TryGetValue(contextId, out HashSet<string>? writtenKeys))
+        {
+            return writtenKeys;
+        }
+
+        writtenKeys = new HashSet<string>();
+        _writtenKeysByScope[contextId] = writtenKeys;
+
+        context.Enlist(
+            $"RepositoryCacheVersionService_{contextId}",
+            completed => _writtenKeysByScope.TryRemove(contextId, out _));
+
+        return writtenKeys;
+    }
 }
