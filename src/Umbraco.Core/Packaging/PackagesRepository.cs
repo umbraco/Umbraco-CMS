@@ -2,8 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO.Compression;
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -24,6 +26,7 @@ public class PackagesRepository : ICreatedPackagesRepository
     private readonly IContentTypeService _contentTypeService;
     private readonly string _createdPackagesFolderPath;
     private readonly IDataTypeService _dataTypeService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly IFileService _fileService;
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -71,6 +74,7 @@ public class PackagesRepository : ICreatedPackagesRepository
         IMediaTypeService mediaTypeService,
         MediaFileManager mediaFileManager,
         FileSystems fileSystems,
+        IIdKeyMap idKeyMap,
         string packageRepositoryFileName,
         string? tempFolderPath = null,
         string? packagesFolderPath = null,
@@ -84,6 +88,7 @@ public class PackagesRepository : ICreatedPackagesRepository
         _contentService = contentService;
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;
+        _idKeyMap = idKeyMap;
         _fileService = fileService;
         _languageService = languageService;
         _serializer = serializer;
@@ -99,6 +104,48 @@ public class PackagesRepository : ICreatedPackagesRepository
         _mediaTypeService = mediaTypeService;
         _mediaFileManager = mediaFileManager;
         _fileSystems = fileSystems;
+    }
+
+    /// <summary>
+    ///     Constructor (obsolete; delegates to the constructor with all parameters).
+    /// </summary>
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public PackagesRepository(
+        IContentService contentService,
+        IContentTypeService contentTypeService,
+        IDataTypeService dataTypeService,
+        IFileService fileService,
+        ILocalizationService languageService,
+        IHostingEnvironment hostingEnvironment,
+        IEntityXmlSerializer serializer,
+        IOptions<GlobalSettings> globalSettings,
+        IMediaService mediaService,
+        IMediaTypeService mediaTypeService,
+        MediaFileManager mediaFileManager,
+        FileSystems fileSystems,
+        string packageRepositoryFileName,
+        string? tempFolderPath = null,
+        string? packagesFolderPath = null,
+        string? mediaFolderPath = null)
+        : this(
+            contentService,
+            contentTypeService,
+            dataTypeService,
+            fileService,
+            languageService,
+            hostingEnvironment,
+            serializer,
+            globalSettings,
+            mediaService,
+            mediaTypeService,
+            mediaFileManager,
+            fileSystems,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            packageRepositoryFileName,
+            tempFolderPath,
+            packagesFolderPath,
+            mediaFolderPath)
+    {
     }
 
     /// <summary>
@@ -372,7 +419,13 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            IDataType? dataType = _dataTypeService.GetDataType(outInt);
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(outInt, UmbracoObjectTypes.DataType);
+            if (keyAttempt.Success is false)
+            {
+                continue;
+            }
+
+            IDataType? dataType = _dataTypeService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult();
             if (dataType == null)
             {
                 continue;

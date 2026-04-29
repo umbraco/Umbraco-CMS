@@ -111,6 +111,7 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IMediaTypeService>(),
             factory.GetRequiredService<MediaFileManager>(),
             factory.GetRequiredService<FileSystems>(),
+            factory.GetRequiredService<IIdKeyMap>(),
             packageRepoFileName);
 
     // Factory registration is only required because of ambiguous constructor
@@ -131,7 +132,11 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IMediaService>(),
             factory.GetRequiredService<IMediaTypeService>(),
             factory.GetRequiredService<ITemplateContentParserService>(),
-            factory.GetRequiredService<ITemplateService>());
+            factory.GetRequiredService<ITemplateService>(),
+            factory.GetRequiredService<IMemberTypeService>(),
+            factory.GetRequiredService<IDataTypeContainerService>(),
+            factory.GetRequiredService<IIdKeyMap>(),
+            factory.GetRequiredService<IUserIdKeyResolver>());
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(
         IServiceProvider container)

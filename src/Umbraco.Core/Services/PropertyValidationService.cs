@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Core.Services;
 public class PropertyValidationService : IPropertyValidationService
 {
     private readonly IDataTypeService _dataTypeService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly ILocalizedTextService _textService;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IValueEditorCache _valueEditorCache;
@@ -35,6 +36,7 @@ public class PropertyValidationService : IPropertyValidationService
     /// <param name="cultureDictionary">The culture dictionary for translating validation messages.</param>
     /// <param name="languageService">The language service for language operations.</param>
     /// <param name="contentSettings">The content settings options.</param>
+    /// <param name="idKeyMap">The cached id-to-key map used to resolve int data type IDs to GUID keys.</param>
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
@@ -42,7 +44,8 @@ public class PropertyValidationService : IPropertyValidationService
         IValueEditorCache valueEditorCache,
         ICultureDictionary cultureDictionary,
         ILanguageService languageService,
-        IOptions<ContentSettings> contentSettings)
+        IOptions<ContentSettings> contentSettings,
+        IIdKeyMap idKeyMap)
     {
         _propertyEditors = propertyEditors;
         _dataTypeService = dataTypeService;
@@ -51,6 +54,31 @@ public class PropertyValidationService : IPropertyValidationService
         _cultureDictionary = cultureDictionary;
         _languageService = languageService;
         _contentSettings = contentSettings.Value;
+        _idKeyMap = idKeyMap;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PropertyValidationService" /> class.
+    /// </summary>
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public PropertyValidationService(
+        PropertyEditorCollection propertyEditors,
+        IDataTypeService dataTypeService,
+        ILocalizedTextService textService,
+        IValueEditorCache valueEditorCache,
+        ICultureDictionary cultureDictionary,
+        ILanguageService languageService,
+        IOptions<ContentSettings> contentSettings)
+        : this(
+            propertyEditors,
+            dataTypeService,
+            textService,
+            valueEditorCache,
+            cultureDictionary,
+            languageService,
+            contentSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+    {
     }
 
     /// <inheritdoc />
@@ -283,7 +311,15 @@ public class PropertyValidationService : IPropertyValidationService
     }
 
     private IDataType? GetDataType(IPropertyType propertyType)
-        => _dataTypeService.GetDataType(propertyType.DataTypeId);
+    {
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
+        if (keyAttempt.Success is false)
+        {
+            return null;
+        }
+
+        return _dataTypeService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult();
+    }
 
     private IDataEditor? GetDataEditor(IPropertyType propertyType)
         => _propertyEditors[propertyType.PropertyEditorAlias];
