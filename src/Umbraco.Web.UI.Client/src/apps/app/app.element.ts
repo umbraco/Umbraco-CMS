@@ -14,11 +14,7 @@ import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
-import {
-	UmbBundleExtensionInitializer,
-	UmbServerExtensionRegistrator,
-	type ManifestBase,
-} from '@umbraco-cms/backoffice/extension-api';
+import { UmbBundleExtensionInitializer, UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
@@ -30,44 +26,82 @@ import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import './app-logo.element.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
-const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<any> }>> = [
-	import('../../packages/block/umbraco-package.js'),
-	import('../../packages/clipboard/umbraco-package.js'),
-	import('../../packages/code-editor/umbraco-package.js'),
-	import('../../packages/content/umbraco-package.js'),
-	import('../../packages/data-type/umbraco-package.js'),
-	import('../../packages/dictionary/umbraco-package.js'),
-	import('../../packages/documents/umbraco-package.js'),
-	import('../../packages/embedded-media/umbraco-package.js'),
-	import('../../packages/extension-insights/umbraco-package.js'),
-	import('../../packages/health-check/umbraco-package.js'),
-	import('../../packages/help/umbraco-package.js'),
-	import('../../packages/language/umbraco-package.js'),
-	import('../../packages/log-viewer/umbraco-package.js'),
-	import('../../packages/management-api/umbraco-package.js'),
-	import('../../packages/markdown-editor/umbraco-package.js'),
-	import('../../packages/media/umbraco-package.js'),
-	import('../../packages/members/umbraco-package.js'),
-	import('../../packages/models-builder/umbraco-package.js'),
-	import('../../packages/multi-url-picker/umbraco-package.js'),
-	import('../../packages/packages/umbraco-package.js'),
-	import('../../packages/performance-profiling/umbraco-package.js'),
-	import('../../packages/property-editors/umbraco-package.js'),
-	import('../../packages/publish-cache/umbraco-package.js'),
-	import('../../packages/relations/umbraco-package.js'),
-	import('../../packages/rte/umbraco-package.js'),
-	import('../../packages/settings/umbraco-package.js'),
-	import('../../packages/static-file/umbraco-package.js'),
-	import('../../packages/sysinfo/umbraco-package.js'),
-	import('../../packages/tags/umbraco-package.js'),
-	import('../../packages/telemetry/umbraco-package.js'),
-	import('../../packages/templating/umbraco-package.js'),
-	import('../../packages/tiptap/umbraco-package.js'),
-	import('../../packages/translation/umbraco-package.js'),
-	import('../../packages/ufm/umbraco-package.js'),
-	import('../../packages/umbraco-news/umbraco-package.js'),
-	import('../../packages/user/umbraco-package.js'),
-	import('../../packages/webhook/umbraco-package.js'),
+import * as UmbBlockPackage from '../../packages/block/umbraco-package.js';
+import * as UmbClipboardPackage from '../../packages/clipboard/umbraco-package.js';
+import * as UmbCodeEditorPackage from '../../packages/code-editor/umbraco-package.js';
+import * as UmbContentPackage from '../../packages/content/umbraco-package.js';
+import * as UmbDataTypePackage from '../../packages/data-type/umbraco-package.js';
+import * as UmbDictionaryPackage from '../../packages/dictionary/umbraco-package.js';
+import * as UmbDocumentsPackage from '../../packages/documents/umbraco-package.js';
+import * as UmbEmbeddedMediaPackage from '../../packages/embedded-media/umbraco-package.js';
+import * as UmbExtensionInsightsPackage from '../../packages/extension-insights/umbraco-package.js';
+import * as UmbHealthCheckPackage from '../../packages/health-check/umbraco-package.js';
+import * as UmbHelpPackage from '../../packages/help/umbraco-package.js';
+import * as UmbLanguagePackage from '../../packages/language/umbraco-package.js';
+import * as UmbLogViewerPackage from '../../packages/log-viewer/umbraco-package.js';
+import * as UmbManagementApiPackage from '../../packages/management-api/umbraco-package.js';
+import * as UmbMarkdownEditorPackage from '../../packages/markdown-editor/umbraco-package.js';
+import * as UmbMediaPackage from '../../packages/media/umbraco-package.js';
+import * as UmbMembersPackage from '../../packages/members/umbraco-package.js';
+import * as UmbModelsBuilderPackage from '../../packages/models-builder/umbraco-package.js';
+import * as UmbMultiUrlPickerPackage from '../../packages/multi-url-picker/umbraco-package.js';
+import * as UmbPackagesPackage from '../../packages/packages/umbraco-package.js';
+import * as UmbPerformanceProfilingPackage from '../../packages/performance-profiling/umbraco-package.js';
+import * as UmbPropertyEditorsPackage from '../../packages/property-editors/umbraco-package.js';
+import * as UmbPublishCachePackage from '../../packages/publish-cache/umbraco-package.js';
+import * as UmbRelationsPackage from '../../packages/relations/umbraco-package.js';
+import * as UmbRtePackage from '../../packages/rte/umbraco-package.js';
+import * as UmbSettingsPackage from '../../packages/settings/umbraco-package.js';
+import * as UmbStaticFilePackage from '../../packages/static-file/umbraco-package.js';
+import * as UmbSysinfoPackage from '../../packages/sysinfo/umbraco-package.js';
+import * as UmbTagsPackage from '../../packages/tags/umbraco-package.js';
+import * as UmbTelemetryPackage from '../../packages/telemetry/umbraco-package.js';
+import * as UmbTemplatingPackage from '../../packages/templating/umbraco-package.js';
+import * as UmbTiptapPackage from '../../packages/tiptap/umbraco-package.js';
+import * as UmbTranslationPackage from '../../packages/translation/umbraco-package.js';
+import * as UmbUfmPackage from '../../packages/ufm/umbraco-package.js';
+import * as UmbUmbracoNewsPackage from '../../packages/umbraco-news/umbraco-package.js';
+import * as UmbUserPackage from '../../packages/user/umbraco-package.js';
+import * as UmbWebhookPackage from '../../packages/webhook/umbraco-package.js';
+
+const CORE_PACKAGES: Array<{ name: string; extensions: Array<any> }> = [
+	UmbBlockPackage,
+	UmbClipboardPackage,
+	UmbCodeEditorPackage,
+	UmbContentPackage,
+	UmbDataTypePackage,
+	UmbDictionaryPackage,
+	UmbDocumentsPackage,
+	UmbEmbeddedMediaPackage,
+	UmbExtensionInsightsPackage,
+	UmbHealthCheckPackage,
+	UmbHelpPackage,
+	UmbLanguagePackage,
+	UmbLogViewerPackage,
+	UmbManagementApiPackage,
+	UmbMarkdownEditorPackage,
+	UmbMediaPackage,
+	UmbMembersPackage,
+	UmbModelsBuilderPackage,
+	UmbMultiUrlPickerPackage,
+	UmbPackagesPackage,
+	UmbPerformanceProfilingPackage,
+	UmbPropertyEditorsPackage,
+	UmbPublishCachePackage,
+	UmbRelationsPackage,
+	UmbRtePackage,
+	UmbSettingsPackage,
+	UmbStaticFilePackage,
+	UmbSysinfoPackage,
+	UmbTagsPackage,
+	UmbTelemetryPackage,
+	UmbTemplatingPackage,
+	UmbTiptapPackage,
+	UmbTranslationPackage,
+	UmbUfmPackage,
+	UmbUmbracoNewsPackage,
+	UmbUserPackage,
+	UmbWebhookPackage,
 ];
 
 @customElement('umb-app')
@@ -183,7 +217,7 @@ export class UmbAppElement extends UmbLitElement {
 	#bundleInitializer: UmbBundleExtensionInitializer;
 
 	#currentUser?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
-	#packageModules?: Promise<Array<{ name: string; extensions: Array<ManifestBase> }>>;
+	#extensionsRegistered = false;
 
 	constructor() {
 		super();
@@ -307,18 +341,16 @@ export class UmbAppElement extends UmbLitElement {
 		await this.#authContext.setInitialState();
 	}
 
-	async #registerExtensions() {
-		if (this.#packageModules === undefined) {
-			this.#packageModules = Promise.all(CORE_PACKAGES);
-		}
-
-		umbExtensionsRegistry.registerMany((await this.#packageModules).flatMap((modules) => modules.extensions));
+	#registerExtensions() {
+		if (this.#extensionsRegistered) return;
+		this.#extensionsRegistered = true;
+		umbExtensionsRegistry.registerMany(CORE_PACKAGES.flatMap((module) => module.extensions));
 	}
 
 	/*
-		async #unregisterExtensions() {
-			if (!this.#packageModules) return;
-			(await this.#packageModules).forEach((packageModule) => {
+		#unregisterExtensions() {
+			if (!this.#extensionsRegistered) return;
+			CORE_PACKAGES.forEach((packageModule) => {
 				const aliases = packageModule.extensions.map((extension) => extension.alias);
 				umbExtensionsRegistry.unregisterMany(aliases);
 			});
@@ -326,7 +358,7 @@ export class UmbAppElement extends UmbLitElement {
 			*/
 
 	#loadCurrentUser() {
-		if (!this.#currentUser || !this.#packageModules) return;
+		if (!this.#currentUser || !this.#extensionsRegistered) return;
 		this.#currentUser.load();
 	}
 
