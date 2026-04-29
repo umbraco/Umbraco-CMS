@@ -8,7 +8,9 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["UmbracoProject/UmbracoProject.csproj", "UmbracoProject/"]
+#if (UseCPM)
 COPY ["UmbracoProject/Directory.Packages.props", "UmbracoProject/"]
+#endif
 RUN dotnet restore "UmbracoProject/"
 COPY . .
 WORKDIR "/src/UmbracoProject"
