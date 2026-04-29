@@ -82,6 +82,7 @@ export class LoginUiHelper extends UiBaseLocators {
 
   async submitForgotPasswordForEmail(email: string) {
     await this.clickForgottenPasswordButton();
+    await this.page.waitForTimeout(ConstantHelper.wait.short); // Wait for the transition animation to the reset password page to complete before interacting with the email input
     await this.enterResetEmail(email);
     await this.clickResetSubmitButton();
   }
