@@ -26,7 +26,7 @@ export class LoginUiHelper extends UiBaseLocators {
     this.loginBtn = page.getByLabel('Login');
     this.loginErrorMessage = page.locator('umb-login-page .text-error');
     this.logoutBtn = page.locator('umb-current-user-modal uui-button').getByText('Logout');
-    this.forgottenPasswordBtn = page.locator('umb-login-page #forgot-password');
+    this.forgottenPasswordBtn = page.locator('umb-login-page #forgot-password').getByText('Forgotten password?');
     this.resetEmailTxt = page.locator('umb-reset-password-page input[name="email"]');
     this.resetSubmitBtn = page.locator('umb-reset-password-page uui-button[type="submit"]');
     this.resetConfirmation = page.locator('umb-reset-password-page umb-confirmation-layout');
