@@ -6,6 +6,7 @@ export interface ManifestEntityActionContentRollbackKind extends ManifestEntityA
 }
 
 export interface MetaEntityActionContentRollbackKind extends MetaEntityActionDefaultKind {
+	rollbackNotificationMessage?: string;
 	rollbackRepositoryAlias: string;
 	detailRepositoryAlias: string;
 }
