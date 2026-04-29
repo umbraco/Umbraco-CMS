@@ -15,6 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		name: 'Element Audit Log Rollback Action',
 		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
 		meta: {
+			rollbackNotificationMessage: '#rollback_elementRolledBack',
 			rollbackRepositoryAlias: UMB_ELEMENT_ROLLBACK_REPOSITORY_ALIAS,
 			detailRepositoryAlias: UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
 		},
