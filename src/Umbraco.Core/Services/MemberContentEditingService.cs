@@ -115,7 +115,7 @@ internal sealed class MemberContentEditingService
         => await HandleDeleteAsync(key, userKey, false);
 
     /// <inheritdoc />
-    protected override IMember New(string? name, int parentId, IMemberType memberType)
+    protected override IMember New(string name, int parentId, IMemberType memberType)
         => throw new NotSupportedException("Member creation is not supported by this service. This should never be called.");
 
     /// <inheritdoc />

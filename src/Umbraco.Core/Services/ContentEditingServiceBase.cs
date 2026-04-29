@@ -99,7 +99,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     /// <param name="parentId">The parent identifier.</param>
     /// <param name="contentType">The content type.</param>
     /// <returns>A new content entity.</returns>
-    protected abstract TContent New(string? name, int parentId, TContentType contentType);
+    protected abstract TContent New(string name, int parentId, TContentType contentType);
 
     /// <summary>
     /// Moves content to a new parent.
@@ -187,7 +187,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         //       instead, the error state and validation errors will be communicated in the return value.
         Attempt<ContentValidationResult, ContentEditingOperationStatus> validationResult = await ValidatePropertiesAsync(contentCreationModelBase, contentType);
 
-        TContent content = New(null, parent.ParentId ?? Constants.System.Root, contentType);
+        TContent content = New(string.Empty, parent.ParentId ?? Constants.System.Root, contentType);
         if (contentCreationModelBase.Key.HasValue)
         {
             content.Key = contentCreationModelBase.Key.Value;
