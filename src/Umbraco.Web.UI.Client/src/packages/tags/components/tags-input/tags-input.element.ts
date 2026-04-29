@@ -90,16 +90,11 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		const inputLength = (this._tagInput.value as string).trim().length;
 
 		//Prevent tab away if there is a text in the input.
-		if (e.key === 'Tab' && inputLength && !this._matches.length) {
+		if (e.key === 'Tab' && inputLength) {
 			e.preventDefault();
-			this.#createTag();
-			return;
-		}
-
-		//Select the first suggestion on tab if the dropdown is open
-		if (e.key === 'Tab' && inputLength && this._matches.length) {
-			e.preventDefault();
-			this._tagInput.value = this._optionCollection?.item(0)?.value ?? '';
+			if (this._matches.length) {
+				this._tagInput.value = this._optionCollection?.item(0)?.value ?? '';
+			}
 			this.#createTag();
 			return;
 		}
