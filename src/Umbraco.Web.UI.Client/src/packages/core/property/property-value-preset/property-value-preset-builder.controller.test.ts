@@ -14,9 +14,9 @@ import { UmbPropertyValuePresetBuilderController } from './property-value-preset
 @customElement('umb-test-controller-host')
 export class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-// TODO: Write test with config, investigate oppertunity to retrieve Config Object, for an simpler DX. [NL]
+// TODO: Write test with config, investigate opportunity to retrieve Config Object, for an simpler DX. [NL]
 
-// Test with async APIs, espcially where the first one is slower than the last one.
+// Test with async APIs, especially where the first one is slower than the last one.
 export class TestPropertyValuePresetFirstApi implements UmbPropertyValuePreset<string, UmbPropertyEditorConfig> {
 	async processValue(value: undefined | string, config: UmbPropertyEditorConfig) {
 		return value ? value + '_first' : 'first';
