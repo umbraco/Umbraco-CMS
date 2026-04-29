@@ -1,4 +1,4 @@
-import {Page, Locator} from "@playwright/test";
+import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 import {umbracoConfig} from "../umbraco.config";
@@ -26,7 +26,7 @@ export class LoginUiHelper extends UiBaseLocators {
     this.loginBtn = page.getByLabel('Login');
     this.loginErrorMessage = page.locator('umb-login-page .text-error');
     this.logoutBtn = page.locator('umb-current-user-modal uui-button').getByText('Logout');
-    this.forgottenPasswordBtn = page.locator('umb-login-page #forgot-password').getByText('Forgotten password?');
+    this.forgottenPasswordBtn = page.locator('umb-login-page #forgot-password');
     this.resetEmailTxt = page.locator('umb-reset-password-page input[name="email"]');
     this.resetSubmitBtn = page.locator('umb-reset-password-page uui-button[type="submit"]');
     this.resetConfirmation = page.locator('umb-reset-password-page umb-confirmation-layout');
@@ -69,7 +69,15 @@ export class LoginUiHelper extends UiBaseLocators {
   }
 
   async clickForgottenPasswordButton() {
-    await this.click(this.forgottenPasswordBtn);
+    // The button fires a non-bubbling custom event that the umb-auth listener can miss
+    // on slower headless runners (SPA stays on the login page). Retry the click via
+    // expect.poll until the reset-password email input is visible.
+    await expect(async () => {
+      if (!(await this.resetEmailTxt.isVisible())) {
+        await this.click(this.forgottenPasswordBtn);
+      }
+      await expect(this.resetEmailTxt).toBeVisible({timeout: ConstantHelper.timeout.medium});
+    }).toPass({timeout: ConstantHelper.timeout.navigation, intervals: [500, 1000, 2000]});
   }
 
   async enterResetEmail(email: string) {
@@ -82,7 +90,6 @@ export class LoginUiHelper extends UiBaseLocators {
 
   async submitForgotPasswordForEmail(email: string) {
     await this.clickForgottenPasswordButton();
-    await this.page.waitForTimeout(ConstantHelper.wait.short); // Wait for the transition animation to the reset password page to complete before interacting with the email input
     await this.enterResetEmail(email);
     await this.clickResetSubmitButton();
   }
