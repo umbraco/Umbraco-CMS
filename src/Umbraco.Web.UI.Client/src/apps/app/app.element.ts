@@ -231,7 +231,7 @@ export class UmbAppElement extends UmbLitElement {
 						new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions(),
 					]);
 
-					// TODO: Remove dependency on current user context in the app element in future [MR]
+					// TODO: Remove dependency on current user context from the app element in future [MR]
 					this.#loadCurrentUser();
 				} else {
 					// TODO: Unregistering all extensions from v.18 [NL]
