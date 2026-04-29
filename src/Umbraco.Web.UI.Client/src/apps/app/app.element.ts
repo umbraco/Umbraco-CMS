@@ -173,7 +173,7 @@ export class UmbAppElement extends UmbLitElement {
 		{
 			path: '**',
 			component: () => import('../backoffice/backoffice.element.js'),
-			guards: [this.#isAuthorizedGuard(), this.#bundleLoadedGuard()],
+			guards: [this.#isAuthorizedGuard(), this.#loadedGuard()],
 		},
 	];
 
@@ -226,11 +226,6 @@ export class UmbAppElement extends UmbLitElement {
 			async (isAuthorized) => {
 				if (isAuthorized === undefined) return;
 				if (isAuthorized) {
-					await Promise.all([
-						this.#registerExtensions(),
-						new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions(),
-					]);
-
 					// TODO: Remove dependency on current user context from the app element in future [MR]
 					this.#loadCurrentUser();
 				} else {
@@ -389,9 +384,22 @@ export class UmbAppElement extends UmbLitElement {
 		return () => this.#authController.isAuthorized() ?? false;
 	}
 
-	#bundleLoadedGuard(): Guard {
+	#loadedGuard(): Guard {
 		return async () => {
-			const result = await this.observe(this.#bundleInitializer?.loaded).asPromise();
+			const results = await Promise.allSettled([
+				this.observe(this.#bundleInitializer?.loaded).asPromise(),
+				this.#registerExtensions(),
+				new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions(),
+			]);
+
+			const result = results.reduce((acc, curr) => acc && curr.status === 'fulfilled', true);
+			if (result === false) {
+				this.#errorPage(
+					'Extensions failed loading, this might be due to a network issue or a server error. Check that extensions registered on the server are valid.',
+					undefined,
+					{ headline: 'Failed to load extensions' },
+				);
+			}
 			return result;
 		};
 	}
@@ -416,7 +424,9 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
+		return html`<umb-router-slot id="router-slot" .routes=${this._routes}
+			><div id="loader"><uui-loader></uui-loader></div
+		></umb-router-slot>`;
 	}
 
 	static override styles = css`
@@ -430,6 +440,20 @@ export class UmbAppElement extends UmbLitElement {
 			display: block;
 			width: 100%;
 			height: 100vh;
+		}
+
+		#loader {
+			display: flex;
+			height: 100%;
+			justify-content: center;
+			align-items: center;
+			opacity: 0;
+			animation: fadeIn 240ms forwards;
+		}
+		@keyframes fadeIn {
+			to {
+				opacity: 1;
+			}
 		}
 	`;
 }
