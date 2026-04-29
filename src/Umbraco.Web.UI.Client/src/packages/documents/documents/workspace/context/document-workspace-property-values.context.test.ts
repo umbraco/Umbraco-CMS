@@ -141,7 +141,7 @@ describe('UmbDocumentWorkspaceContext', () => {
 					// expected: culture-variant property requires a variantId
 				}
 				const values = context.getValues();
-				expect(values).to.be.an('array').with.lengthOf(3);
+				expect(values).to.be.an('array').with.lengthOf(4);
 			});
 		});
 	});
@@ -161,7 +161,7 @@ describe('UmbDocumentWorkspaceContext', () => {
 		it('returns all values across all variants after loading a variant document', async () => {
 			await context.load(VARIANT_DOCUMENT_ID);
 			const values = context.getValues();
-			expect(values).to.be.an('array').with.lengthOf(3);
+			expect(values).to.be.an('array').with.lengthOf(4);
 		});
 
 		it('reflects updates after setPropertyValue', async () => {

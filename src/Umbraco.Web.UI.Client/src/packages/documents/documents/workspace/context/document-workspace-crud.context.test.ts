@@ -144,7 +144,7 @@ describe('UmbDocumentWorkspaceContext (CRUD)', () => {
 			const enUs = UmbVariantId.Create({ culture: 'en-US', segment: null });
 			const da = UmbVariantId.Create({ culture: 'da', segment: null });
 			context.setName('Updated English Name', enUs);
-			expect(context.getVariant(da)?.name).to.equal('Variant Dokument');
+			expect(context.getVariant(da)?.name).to.equal('Varierende Dokument');
 		});
 	});
 
