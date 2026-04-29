@@ -96,6 +96,14 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			return;
 		}
 
+		//Select the first suggestion on tab if the dropdown is open
+		if (e.key === 'Tab' && inputLength && this._matches.length) {
+			e.preventDefault();
+			this._tagInput.value = this._optionCollection?.item(0)?.value ?? '';
+			this.#createTag();
+			return;
+		}
+
 		//If the input is empty we can navigate out of it using tab
 		if (e.key === 'Tab' && !inputLength) {
 			return;
@@ -104,6 +112,11 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		//Create a new tag when enter to the input
 		if (e.key === 'Enter') {
 			this.#createTag();
+			return;
+		}
+
+		//Close the dropdown on Escape
+		if (e.key === 'Escape') {			this._matches = [];
 			return;
 		}
 
@@ -183,6 +196,17 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		else this.#createTag();
 	}
 
+	#onMainTagFocusOut(e: FocusEvent) {
+		const relatedTarget = e.relatedTarget as Node | null;
+		if (!relatedTarget || !this._mainTag.contains(relatedTarget)) {
+			this._matches = [];
+		}
+	}
+
+	#onMatchlistMouseDown(e: MouseEvent) {
+		e.preventDefault();
+	}
+
 	#createTag() {
 		this.#inputError(false);
 		const newTag = (this._tagInput.value as string).trim();
@@ -232,7 +256,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	#optionKeydown(e: KeyboardEvent, index: number) {
 		if (e.key === 'Enter' || e.key === 'Tab') {
 			e.preventDefault();
-			this._currentInput = this._optionCollection?.item(index)?.value ?? '';
+			this._tagInput.value = this._optionCollection?.item(index)?.value ?? '';
 			this.#createTag();
 			this.focus();
 			return;
@@ -296,7 +320,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		const matchfilter = this._matches.filter((tag) => tag.text !== this.#items.find((x) => x === tag.text));
 		if (!matchfilter.length) return;
 		return html`
-			<div id="matchlist">
+			<div id="matchlist" @mousedown="${this.#onMatchlistMouseDown}">
 				${repeat(
 					matchfilter.slice(0, 5),
 					(tag: TagResponseModel) => tag.id,
@@ -320,7 +344,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	#renderAddButton() {
 		if (this.readonly) return nothing;
 		return html`
-			<uui-tag look="outline" id="main-tag" @click="${this.focus}" slot="trigger">
+			<uui-tag look="outline" id="main-tag" @click="${this.focus}" @focusout="${this.#onMainTagFocusOut}" slot="trigger">
 				<input
 					id="tag-input"
 					aria-label="tag input"
