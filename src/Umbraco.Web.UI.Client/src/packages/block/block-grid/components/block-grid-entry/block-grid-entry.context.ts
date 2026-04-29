@@ -344,15 +344,9 @@ export class UmbBlockGridEntryContext
 			}
 		});
 
-		// Strip isSharedContent from clipboard — pasted blocks should always be local copies
-		const clonedLayout = layout ? structuredClone(layout) : undefined;
-		if (clonedLayout) {
-			delete clonedLayout.isSharedContent;
-		}
-
 		const propertyValue: UmbBlockGridValueModel = {
 			layout: {
-				[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: clonedLayout ? [clonedLayout] : undefined,
+				[UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
 			},
 			contentData,
 			settingsData,

@@ -404,16 +404,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		const settings = this.#context.getSettings();
 		const expose = this.#context.getExpose();
 
-		// Strip isSharedContent from clipboard — pasted blocks should always be local copies
-		const clonedLayout = layout ? structuredClone(layout) : undefined;
-		if (clonedLayout) {
-			delete clonedLayout.isSharedContent;
-		}
-
 		const propertyValue: UmbBlockListValueModel = {
 			contentData: content ? [structuredClone(content)] : [],
 			layout: {
-				[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: clonedLayout ? [clonedLayout] : undefined,
+				[UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined,
 			},
 			settingsData: settings ? [structuredClone(settings)] : [],
 			expose: expose ? [structuredClone(expose)] : [],

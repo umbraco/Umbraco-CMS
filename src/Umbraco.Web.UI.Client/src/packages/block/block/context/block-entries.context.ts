@@ -137,6 +137,12 @@ export abstract class UmbBlockEntriesContext<
 		value: UmbBlockValueType,
 		originData: BlockOriginData,
 	) {
+		// Library-element references have no inline contentData — insert as a reference instead.
+		if (layoutEntry.isSharedContent) {
+			await this._manager?.insertLibraryElement(layoutEntry.contentKey, originData);
+			return;
+		}
+
 		const content = value.contentData.find((x) => x.key === layoutEntry.contentKey);
 		if (!content) {
 			throw new Error('No content found for layout entry');
