@@ -130,10 +130,7 @@ export class UmbAppElement extends UmbLitElement {
 		{
 			path: '**',
 			component: () => import('../backoffice/backoffice.element.js'),
-			setup: (component) => {
-				(component as UmbBackofficeElement).bundleInitializer = this.#bundleInitializer;
-			},
-			guards: [this.#isAuthorizedGuard()],
+			guards: [this.#isAuthorizedGuard(), this.#bundleLoadedGuard()],
 		},
 	];
 
@@ -295,6 +292,13 @@ export class UmbAppElement extends UmbLitElement {
 
 	#isAuthorizedGuard(): Guard {
 		return () => this.#authController.isAuthorized() ?? false;
+	}
+
+	#bundleLoadedGuard(): Guard {
+		return async () => {
+			const result = await this.observe(this.#bundleInitializer?.loaded).asPromise();
+			return result;
+		};
 	}
 
 	#errorPage(errorMsg: string, error?: unknown, options?: { headline?: string; hideBackButton?: boolean }) {

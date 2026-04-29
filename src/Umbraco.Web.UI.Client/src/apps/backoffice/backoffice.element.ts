@@ -8,7 +8,6 @@ import {
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 import './components/index.js';
-import type { UmbBundleExtensionInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 @customElement('umb-backoffice')
 export class UmbBackofficeElement extends UmbLitElement {
@@ -18,13 +17,9 @@ export class UmbBackofficeElement extends UmbLitElement {
 	 */
 	public extensionRegistry = umbExtensionsRegistry;
 
-	set bundleInitializer(bundleInitializer: UmbBundleExtensionInitializer) {
-		new UmbBackofficeContext(this, bundleInitializer);
-	}
-
 	constructor() {
 		super();
-
+		new UmbBackofficeContext(this);
 		new UmbBackofficeEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 	}

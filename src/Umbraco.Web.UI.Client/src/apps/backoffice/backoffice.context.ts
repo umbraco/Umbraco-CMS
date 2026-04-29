@@ -10,11 +10,7 @@ import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type {
-	ManifestBase,
-	UmbBundleExtensionInitializer,
-	UmbExtensionManifestInitializer,
-} from '@umbraco-cms/backoffice/extension-api';
+import type { ManifestBase, UmbExtensionManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 
 const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<any> }>> = [
 	import('../../packages/block/umbraco-package.js'),
@@ -70,7 +66,7 @@ export class UmbBackofficeContext extends UmbContextBase {
 
 	#packageModules?: Promise<Array<{ name: string; extensions: Array<ManifestBase> }>>;
 
-	constructor(host: UmbControllerHost, bundleInitializer?: UmbBundleExtensionInitializer) {
+	constructor(host: UmbControllerHost) {
 		super(host, UMB_BACKOFFICE_CONTEXT);
 
 		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
@@ -85,11 +81,6 @@ export class UmbBackofficeContext extends UmbContextBase {
 							this.#getVersion(),
 							new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions(),
 						]);
-
-						if (bundleInitializer) {
-							// Await all bundles got loaded?
-							await this.observe(bundleInitializer?.loaded).asPromise();
-						}
 
 						this.#loadCurrentUser();
 					} else {
