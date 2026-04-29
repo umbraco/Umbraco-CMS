@@ -103,6 +103,55 @@ internal sealed class RepositoryCacheVersionServiceTests : UmbracoIntegrationTes
     }
 
     [Test]
+    public async Task SetCacheUpdatedAsync_DeduplicationResetsAfterScopeExit()
+    {
+        string? firstScopeVersion;
+        using (var scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
+            firstScopeVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
+        }
+        Assert.IsNotNull(firstScopeVersion);
+
+        // After the scope exits the deduplication state is cleared; a new scope must be able to write.
+        string? secondScopeVersion;
+        using (var scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
+            secondScopeVersion = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
+        }
+
+        Assert.IsNotNull(secondScopeVersion);
+        Assert.AreNotEqual(firstScopeVersion, secondScopeVersion, "A new scope must produce a fresh version after the previous scope exited.");
+    }
+
+    [Test]
+    public async Task SetCacheUpdatedAsync_DifferentEntityTypesDeduplicatedIndependently()
+    {
+        var mediaKey = ((RepositoryCacheVersionService)RepositoryCacheVersionService).GetCacheKey<IMedia>();
+
+        using var scope = CoreScopeProvider.CreateCoreScope(autoComplete: true);
+
+        await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
+        await RepositoryCacheVersionService.SetCacheUpdatedAsync<IMedia>();
+
+        var contentVersionAfterFirst = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
+        var mediaVersionAfterFirst = (await RepositoryCacheVersionRepository.GetAsync(mediaKey))?.Version;
+        Assert.IsNotNull(contentVersionAfterFirst);
+        Assert.IsNotNull(mediaVersionAfterFirst);
+
+        // Second calls — must be no-ops for each type independently.
+        await RepositoryCacheVersionService.SetCacheUpdatedAsync<IContent>();
+        await RepositoryCacheVersionService.SetCacheUpdatedAsync<IMedia>();
+
+        var contentVersionAfterSecond = (await RepositoryCacheVersionRepository.GetAsync(GetCacheKey()))?.Version;
+        var mediaVersionAfterSecond = (await RepositoryCacheVersionRepository.GetAsync(mediaKey))?.Version;
+
+        Assert.AreEqual(contentVersionAfterFirst, contentVersionAfterSecond, "Second IContent call in same scope must not write a new version.");
+        Assert.AreEqual(mediaVersionAfterFirst, mediaVersionAfterSecond, "Second IMedia call in same scope must not write a new version.");
+    }
+
+    [Test]
     public async Task CacheVersion_Is_Unique_Per_Repository_Type()
     {
         using var scope = CoreScopeProvider.CreateCoreScope(autoComplete: true);
