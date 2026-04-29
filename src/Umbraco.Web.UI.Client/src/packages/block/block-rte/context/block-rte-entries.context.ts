@@ -123,7 +123,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				};
 			})
 			.onSubmit(async (value, data) => {
-				if (value?.create && data) {
+				if (value && 'create' in value && data) {
 					const created = await this.create(
 						value.create.contentElementTypeKey,
 						{},
@@ -139,12 +139,12 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 					} else {
 						throw new Error('Failed to create block');
 					}
-				} else if (value?.library && data) {
+				} else if (value && 'library' in value && data) {
 					await this._manager?.insertLibraryElement(
 						value.library.elementKey,
 						data.originData as UmbBlockRteWorkspaceOriginData,
 					);
-				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
+				} else if (value && 'clipboard' in value && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 					if (!clipboardContext) {
 						throw new Error('Clipboard context not found');

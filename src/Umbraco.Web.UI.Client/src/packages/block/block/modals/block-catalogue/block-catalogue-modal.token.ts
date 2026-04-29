@@ -14,17 +14,9 @@ export interface UmbBlockCatalogueModalData {
 }
 
 export type UmbBlockCatalogueModalValue =
-	| {
-			create?: {
-				contentElementTypeKey: string;
-			};
-			clipboard?: {
-				selection: Array<string>;
-			};
-			library?: {
-				elementKey: string;
-			};
-	  }
+	| { create: { contentElementTypeKey: string } }
+	| { clipboard: { selection: Array<string> } }
+	| { library: { elementKey: string } }
 	| undefined;
 
 export const UMB_BLOCK_CATALOGUE_MODAL = new UmbModalToken<UmbBlockCatalogueModalData, UmbBlockCatalogueModalValue>(
