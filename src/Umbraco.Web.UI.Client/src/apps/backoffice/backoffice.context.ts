@@ -123,6 +123,7 @@ export class UmbBackofficeContext extends UmbContextBase {
 		umbExtensionsRegistry.registerMany((await this.#packageModules).flatMap((modules) => modules.extensions));
 	}
 
+	/*
 	async #unregisterExtensions() {
 		if (!this.#packageModules) return;
 		(await this.#packageModules).forEach((packageModule) => {
@@ -130,6 +131,7 @@ export class UmbBackofficeContext extends UmbContextBase {
 			umbExtensionsRegistry.unregisterMany(aliases);
 		});
 	}
+		*/
 
 	#loadCurrentUser() {
 		if (!this.#currentUser || !this.#packageModules) return;
