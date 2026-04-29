@@ -327,7 +327,7 @@
   }
 
   public static readonly forgottenPasswordMessages = {
-    confirmation: 'An email with password reset instructions will be sent to the specified address if it matched our records',
+    confirmation: 'We sent an email with password reset instructions, if the email address matches a registered user.',
     notFoundUserError: 'The specified user was not found.'
   }
 }
