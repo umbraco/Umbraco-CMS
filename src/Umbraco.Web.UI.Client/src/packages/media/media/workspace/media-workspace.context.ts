@@ -78,6 +78,7 @@ export class UmbMediaWorkspaceContext
 
 		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
 
+		// TODO: This is done by the content detail base class, so we can remove it from there and only do it here. [NL]
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
 

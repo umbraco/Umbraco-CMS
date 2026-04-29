@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.PublishedCache;
 /// This service provides access to published media content with caching support,
 /// including operations for cache seeding, refreshing, and rebuilding.
 /// </remarks>
-public interface IMediaCacheService
+public interface IMediaCacheService : IContentCacheService
 {
     /// <summary>
     /// Gets a published media item by its unique key.
@@ -41,78 +41,9 @@ public interface IMediaCacheService
     Task RefreshMediaAsync(IMedia media);
 
     /// <summary>
-    /// Rebuilds the memory cache for media items of the specified media types.
-    /// </summary>
-    /// <param name="mediaTypeIds">The collection of media type identifiers to rebuild in memory cache.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> mediaTypeIds);
-
-    /// <summary>
-    /// Clears all entries from the memory cache.
-    /// </summary>
-    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task ClearMemoryCacheAsync(CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Refreshes the memory cache entry for the media item with the specified key.
-    /// </summary>
-    /// <param name="key">The unique key of the media to refresh.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task RefreshMemoryCacheAsync(Guid key);
-
-    /// <summary>
-    /// Removes the media item with the specified key from the memory cache.
-    /// </summary>
-    /// <param name="key">The unique key of the media to remove.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task RemoveFromMemoryCacheAsync(Guid key);
-
-    /// <summary>
-    /// Removes the specified media item from the cache.
-    /// </summary>
-    /// <param name="media">The media item to remove from the cache.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task DeleteItemAsync(IContentBase media);
-
-    /// <summary>
-    /// Seeds the cache with initial media data.
-    /// </summary>
-    /// <param name="cancellationToken">A cancellation token to observe while waiting for the task to complete.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    Task SeedAsync(CancellationToken cancellationToken);
-
-    /// <summary>
-    /// Rebuilds the cache for media items of the specified media types.
-    /// </summary>
-    /// <param name="contentTypeIds">The collection of media type identifiers to rebuild.</param>
-    void Rebuild(IReadOnlyCollection<int> contentTypeIds);
-
-    /// <summary>
     /// Gets all published media items of the specified content type.
     /// </summary>
     /// <param name="contentType">The published content type to filter by.</param>
     /// <returns>A collection of published media items of the specified type.</returns>
     IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType);
-
-    /// <summary>
-    /// Clears all converted IPublishedContent entries from the in-memory cache,
-    /// without rebuilding the underlying database cache or HybridCache entries.
-    /// </summary>
-    /// <remarks>
-    /// Use this when the published model factory is reset (e.g. InMemoryAuto mode), which
-    /// invalidates all compiled model types and makes cached instances of any type stale.
-    /// </remarks>
-    void ClearConvertedContentCache();
-
-    /// <summary>
-    /// Clears converted IPublishedContent entries for the specified media types from the in-memory cache,
-    /// without rebuilding the underlying database cache or HybridCache entries.
-    /// </summary>
-    /// <remarks>
-    /// Use this when the published model factory is NOT reset (e.g. SourceCodeAuto/SourceCodeManual modes),
-    /// so only the affected media types need their converted cache cleared.
-    /// </remarks>
-    /// <param name="mediaTypeIds">The IDs of the media types whose converted entries should be cleared.</param>
-    void ClearConvertedContentCache(IReadOnlyCollection<int> mediaTypeIds);
 }

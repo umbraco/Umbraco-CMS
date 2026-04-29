@@ -46,6 +46,12 @@ export class UmbPropertyEditorUINumberElement
 	@state()
 	private _placeholder?: string;
 
+	/**
+	 * Default step value used when one is not configured on the data type.
+	 * Subclasses can override to change the default (e.g. decimal uses a sub-integer step).
+	 */
+	protected defaultStep = 1;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 		this._min = this.#parseNumber(config.getValueByAlias('min'));
@@ -109,7 +115,7 @@ export class UmbPropertyEditorUINumberElement
 				label=${ifDefined(this._label)}
 				min=${ifDefined(this._min)}
 				max=${ifDefined(this._max)}
-				step=${ifDefined(this._step)}
+				step=${this._step ?? this.defaultStep}
 				value=${this.value?.toString() ?? ''}
 				.placeholder=${this._placeholder ?? ''}
 				.requiredMessage=${this.mandatoryMessage}

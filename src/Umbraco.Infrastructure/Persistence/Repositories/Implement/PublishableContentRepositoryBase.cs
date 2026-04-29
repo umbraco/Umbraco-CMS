@@ -273,9 +273,21 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
 
             TEntity c = content[i] = BuildEntity(dto, contentType);
 
+            // Defensive check: umbracoDocument.published = 1 but no umbracoDocumentVersion row has published = 1
+            // leaves PublishedVersionDto null.
+            // See https://github.com/umbraco/Umbraco-CMS/issues/22293.
+            // Treat as unpublished here rather than running into a NRE when dereferencing PublishedVersionDto below.
+            var hasPublishedVersion = dto.PublishedVersionDto is not null;
+            if (dto.Published && hasPublishedVersion is false)
+            {
+                Logger.LogWarning(
+                    "Node {NodeKey} appears published but has no published version, indicating an inconsistent database state. Consider republishing the content. Treating as unpublished.",
+                    dto.ContentDto.NodeDto.UniqueId);
+            }
+
             // need temps, for properties, templates and variations
             var versionId = dto.ContentVersionDto.Id;
-            var publishedVersionId = dto.Published ? dto.PublishedVersionDto!.Id : 0;
+            var publishedVersionId = dto.Published && hasPublishedVersion ? dto.PublishedVersionDto!.Id : 0;
             var temp = new TempContent<TEntity>(dto.NodeId, versionId, publishedVersionId, contentType, c);
 
             temps.Add(temp);

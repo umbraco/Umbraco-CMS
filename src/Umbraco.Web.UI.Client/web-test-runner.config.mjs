@@ -1,7 +1,8 @@
+/* eslint-disable local-rules/enforce-umbraco-external-imports */
+import { createImportMap } from './devops/importmap/index.js';
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 import { playwrightLauncher } from '@web/test-runner-playwright';
 import { importMapsPlugin } from '@web/dev-server-import-maps';
-import { createImportMap } from './devops/importmap/index.js';
 
 const mode = process.env.MODE || 'dev';
 if (!['dev', 'prod'].includes(mode)) {
@@ -37,6 +38,7 @@ export default {
 					rootDir: './src',
 					additionalImports: {
 						'@umbraco-cms/internal/test-utils': './utils/test-utils.ts',
+						'@umbraco-cms/internal/mock-manager': './mocks/mock-manager.ts',
 					},
 					replaceModuleExtensions: true,
 				}),

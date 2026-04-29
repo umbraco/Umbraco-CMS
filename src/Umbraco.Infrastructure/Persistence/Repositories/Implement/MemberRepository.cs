@@ -352,18 +352,20 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             sql = sql
                 .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((memberNode, memberContent) => memberContent.NodeId == memberNode.NodeId)
                 .InnerJoin<NodeDto>("mtn").On<ContentDto, NodeDto>((memberContent, memberTypeNode) => memberContent.ContentTypeId == memberTypeNode.NodeId, aliasRight: "mtn");
-
-            if (memberFilter.MemberTypeId.HasValue)
-            {
-                sql = sql.Where<NodeDto>(memberTypeNode => memberTypeNode.UniqueId == memberFilter.MemberTypeId, "mtn");
-            }
         }
 
         if (memberFilter.MemberGroupName.IsNullOrWhiteSpace() is false)
         {
             sql = sql
                 .InnerJoin<Member2MemberGroupDto>().On<MemberDto, Member2MemberGroupDto>((m, memberToGroup) => m.NodeId == memberToGroup.Member)
-                .InnerJoin<NodeDto>("mgn").On<NodeDto, Member2MemberGroupDto>((memberGroupNode, memberToGroup) => memberToGroup.MemberGroup == memberGroupNode.NodeId && memberGroupNode.Text == memberFilter.MemberGroupName, "mgn");
+                .InnerJoin<NodeDto>("mgn").On<Member2MemberGroupDto, NodeDto>((memberToGroup, memberGroupNode) => memberToGroup.MemberGroup == memberGroupNode.NodeId, aliasRight: "mgn");
+
+            sql = sql.Where<NodeDto>(memberGroupNode => memberGroupNode.Text == memberFilter.MemberGroupName, "mgn");
+        }
+
+        if (memberFilter.MemberTypeId.HasValue)
+        {
+            sql = sql.Where<NodeDto>(memberTypeNode => memberTypeNode.UniqueId == memberFilter.MemberTypeId, "mtn");
         }
 
         if (memberFilter.IsApproved is not null)
@@ -1189,17 +1191,13 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             return setExpression;
         }
 
-        member.UpdatingEntity();
-
+        // Login is not considered a member update: neither UpdateDate nor the associated
+        // ContentVersionDto.VersionDate is touched. Any change to actual member data (name, email,
+        // properties, etc.) goes through the full Save path which does bump both.
         Sql<ISqlContext> updateMemberQuery = Sql()
             .Update<MemberDto>(m => GetMemberSetExpression(member, m))
             .Where<MemberDto>(m => m.NodeId == member.Id);
         await Database.ExecuteAsync(updateMemberQuery);
-
-        Sql<ISqlContext> updateContentVersionQuery = Sql()
-            .Update<ContentVersionDto>(m => m.Set(x => x.VersionDate, member.UpdateDate))
-            .Where<ContentVersionDto>(m => m.NodeId == member.Id && m.Current == true);
-        await Database.ExecuteAsync(updateContentVersionQuery);
 
         OnUowRefreshedEntity(new MemberRefreshNotification(member, new EventMessages()));
 

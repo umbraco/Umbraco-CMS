@@ -2,9 +2,9 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Services.PermissionFilter;
 
@@ -13,18 +13,18 @@ namespace Umbraco.Cms.Api.Management.Services.PermissionFilter;
 /// </summary>
 internal sealed class ElementPermissionFilterService : PermissionFilterServiceBase, IElementPermissionFilterService
 {
-    private readonly IUserService _userService;
+    private readonly IElementPermissionService _elementPermissionService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementPermissionFilterService"/> class.
     /// </summary>
     /// <param name="backOfficeSecurityAccessor">Provides access to the current backoffice user's security context.</param>
-    /// <param name="userService">Service used to retrieve user and element permissions.</param>
+    /// <param name="elementPermissionService">Service used to retrieve element permissions.</param>
     public ElementPermissionFilterService(
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IUserService userService)
+        IElementPermissionService elementPermissionService)
         : base(backOfficeSecurityAccessor)
-        => _userService = userService;
+        => _elementPermissionService = elementPermissionService;
 
     /// <inheritdoc/>
     protected override string BrowseActionLetter(IEntitySlim entity)
@@ -33,8 +33,6 @@ internal sealed class ElementPermissionFilterService : PermissionFilterServiceBa
             : ActionElementContainerBrowse.ActionLetter;
 
     /// <inheritdoc/>
-    protected override Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(
-        Guid userKey,
-        HashSet<Guid> entityKeys)
-        => _userService.GetElementPermissionsAsync(userKey, entityKeys);
+    protected override Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> entityKeys)
+        => _elementPermissionService.GetPermissionsAsync(user, entityKeys);
 }

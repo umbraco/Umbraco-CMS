@@ -1,8 +1,7 @@
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Services.PermissionFilter;
 
@@ -33,11 +32,7 @@ internal abstract class PermissionFilterServiceBase
     /// <returns>A tuple containing the filtered entities and the adjusted total items count.</returns>
     public async Task<(IEntitySlim[] Entities, long TotalItems)> FilterAsync(IEntitySlim[] entities, long totalItems)
     {
-        Dictionary<Guid, NodePermissions>? permissionsByNodeKey = await GetPermissionsByNodeKeyAsync(entities);
-        if (permissionsByNodeKey is null)
-        {
-            return (entities, totalItems);
-        }
+        Dictionary<Guid, NodePermissions> permissionsByNodeKey = await GetPermissionsByNodeKeyAsync(entities);
 
         IEntitySlim[] filteredEntities = FilterEntitiesWithBrowsePermission(entities, permissionsByNodeKey);
         var removedCount = entities.Length - filteredEntities.Length;
@@ -59,11 +54,7 @@ internal abstract class PermissionFilterServiceBase
         long totalBefore,
         long totalAfter)
     {
-        Dictionary<Guid, NodePermissions>? permissionsByNodeKey = await GetPermissionsByNodeKeyAsync(entities);
-        if (permissionsByNodeKey is null)
-        {
-            return (entities, totalBefore, totalAfter);
-        }
+        Dictionary<Guid, NodePermissions> permissionsByNodeKey = await GetPermissionsByNodeKeyAsync(entities);
 
         // Find the index of the target entity to determine before/after boundaries
         var targetIndex = Array.FindIndex(entities, e => e.Key == targetKey);
@@ -80,34 +71,40 @@ internal abstract class PermissionFilterServiceBase
     /// <summary>
     /// Retrieves node permissions for the given user and entity keys.
     /// </summary>
-    /// <param name="userKey">The key of the user to retrieve permissions for.</param>
+    /// <param name="user">The current backoffice user to retrieve permissions for.</param>
     /// <param name="entityKeys">The keys of the entities to retrieve permissions for.</param>
-    /// <returns>An attempt containing the node permissions or a failure status.</returns>
-    protected abstract Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(
-        Guid userKey,
-        HashSet<Guid> entityKeys);
+    /// <returns>The effective permissions for each entity. Entries missing from the result are treated as denied (fail-closed).</returns>
+    protected abstract Task<IEnumerable<NodePermissions>> GetPermissionsAsync(
+        IUser user,
+        IEnumerable<Guid> entityKeys);
 
-    private async Task<Dictionary<Guid, NodePermissions>?> GetPermissionsByNodeKeyAsync(IEntitySlim[] entities)
+    private async Task<Dictionary<Guid, NodePermissions>> GetPermissionsByNodeKeyAsync(IEntitySlim[] entities)
     {
-        Guid userKey = CurrentUserKey();
+        IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser
+                            ?? throw new InvalidOperationException("No backoffice user found");
+
         var entityKeys = entities.Select(e => e.Key).ToHashSet();
 
-        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissionsAttempt =
-            await GetPermissionsAsync(userKey, entityKeys);
+        IEnumerable<NodePermissions> permissions = await GetPermissionsAsync(currentUser, entityKeys);
 
-        return permissionsAttempt.Success
-            ? permissionsAttempt.Result.ToDictionary(p => p.NodeKey)
-            : null;
+        // Build dictionary with an entry for every requested key. Keys missing from the result
+        // default to empty permissions so they are treated as denied (fail-closed).
+        var result = entityKeys.ToDictionary(
+            key => key,
+            key => new NodePermissions { NodeKey = key, Permissions = new HashSet<string>() });
+
+        foreach (NodePermissions nodePermissions in permissions)
+        {
+            result[nodePermissions.NodeKey] = nodePermissions;
+        }
+
+        return result;
     }
-
-    private Guid CurrentUserKey()
-        => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser?.Key
-           ?? throw new InvalidOperationException("No backoffice user found");
 
     private IEntitySlim[] FilterEntitiesWithBrowsePermission(IEntitySlim[] entities, Dictionary<Guid, NodePermissions> permissionsByNodeKey)
         => entities.Where(e => HasBrowsePermission(e, permissionsByNodeKey)).ToArray();
 
     private bool HasBrowsePermission(IEntitySlim entity, Dictionary<Guid, NodePermissions> permissionsByNodeKey)
-        => permissionsByNodeKey.TryGetValue(entity.Key, out NodePermissions? nodePermissions) is false
-           || nodePermissions.Permissions.Contains(BrowseActionLetter(entity));
+        => permissionsByNodeKey.TryGetValue(entity.Key, out NodePermissions? nodePermissions)
+           && nodePermissions.Permissions.Contains(BrowseActionLetter(entity));
 }

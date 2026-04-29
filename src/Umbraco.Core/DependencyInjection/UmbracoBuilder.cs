@@ -328,6 +328,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IElementValidationService, ElementValidationService>();
             Services.AddUnique<IContentVersionCleanupPolicy, DefaultContentVersionCleanupPolicy>();
             Services.AddUnique<IMemberService, MemberService>();
+            Services.AddUnique<IExternalMemberService, ExternalMemberService>();
             Services.AddUnique<IMemberValidationService, MemberValidationService>();
             Services.AddUnique<IMediaPermissionService, MediaPermissionService>();
             Services.AddUnique<IMediaService, MediaService>();
@@ -387,10 +388,20 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<MediaNavigationService, MediaNavigationService>();
             Services.AddUnique<IMediaNavigationQueryService>(x => x.GetRequiredService<MediaNavigationService>());
             Services.AddUnique<IMediaNavigationManagementService>(x => x.GetRequiredService<MediaNavigationService>());
+            Services.AddUnique<ElementNavigationService, ElementNavigationService>();
+            Services.AddUnique<IElementNavigationQueryService>(x => x.GetRequiredService<ElementNavigationService>());
+            Services.AddUnique<IElementNavigationManagementService>(x => x.GetRequiredService<ElementNavigationService>());
 
-            Services.AddUnique<PublishStatusService, PublishStatusService>();
-            Services.AddUnique<IPublishStatusManagementService>(x => x.GetRequiredService<PublishStatusService>());
-            Services.AddUnique<IPublishStatusQueryService>(x => x.GetRequiredService<PublishStatusService>());
+            Services.AddUnique<DocumentPublishStatusService, DocumentPublishStatusService>();
+            Services.AddUnique<IDocumentPublishStatusQueryService>(x => x.GetRequiredService<DocumentPublishStatusService>());
+            Services.AddUnique<IDocumentPublishStatusManagementService>(x => x.GetRequiredService<DocumentPublishStatusService>());
+            Services.AddUnique<ElementPublishStatusService, ElementPublishStatusService>();
+            Services.AddUnique<IElementPublishStatusQueryService>(x => x.GetRequiredService<ElementPublishStatusService>());
+            Services.AddUnique<IElementPublishStatusManagementService>(x => x.GetRequiredService<ElementPublishStatusService>());
+#pragma warning disable CS0618 // Type or member is obsolete
+            Services.AddUnique<IPublishStatusManagementService>(x => x.GetRequiredService<DocumentPublishStatusService>());
+            Services.AddUnique<IPublishStatusQueryService>(x => x.GetRequiredService<DocumentPublishStatusService>());
+#pragma warning restore CS0618 // Type or member is obsolete
 
             Services.AddUnique<IPublishedContentStatusFilteringService, PublishedContentStatusFilteringService>();
             Services.AddUnique<IPublishedMediaStatusFilteringService, PublishedMediaStatusFilteringService>();
