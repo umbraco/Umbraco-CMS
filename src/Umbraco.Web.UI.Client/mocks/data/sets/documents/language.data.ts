@@ -14,4 +14,11 @@ export const data: Array<UmbMockLanguageModel> = [
 		isMandatory: false,
 		fallbackIsoCode: 'en-US',
 	},
+	{
+		name: 'Spanish',
+		isoCode: 'es',
+		isDefault: false,
+		isMandatory: false,
+		fallbackIsoCode: 'en-US',
+	},
 ];
