@@ -2858,8 +2858,8 @@ export default {
 		transferToLibrary: 'Transfer to Library',
 		disconnectFromLibrary: 'Disconnect from Library',
 		disconnectFromLibraryConfirm:
-			'This will create a local copy of the element content. The library element will not be affected.',
-		elementUsedByCount: (count: number) => `This element is referenced by ${count} item(s).`,
+			'This will create a local copy of the Element content. The Library Element will not be affected.',
+		elementUsedByCount: (count: number) => `This Element is referenced by ${count} item(s).`,
 		blockVariantConfigurationNotSupported:
 			'One or more Block Types of this Block Editor is using a Element-Type that is configured to Vary By Culture or Vary By Segment. This is not supported on a Content item that does not vary by Culture or Segment.',
 	},
