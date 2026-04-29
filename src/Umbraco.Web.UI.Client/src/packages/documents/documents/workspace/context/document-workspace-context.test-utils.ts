@@ -40,6 +40,7 @@ class UmbMockModalManagerContext extends UmbModalManagerContext {
 @customElement('umb-test-document-workspace-host')
 export class UmbTestDocumentWorkspaceHostElement extends UmbControllerHostElementMixin(HTMLElement) {
 	#currentUserContext = new UmbCurrentUserContext(this);
+	public actionEventContext = new UmbActionEventContext(this);
 
 	constructor() {
 		super();
@@ -47,7 +48,6 @@ export class UmbTestDocumentWorkspaceHostElement extends UmbControllerHostElemen
 		new UmbDocumentTypeDetailStore(this);
 		new UmbDataTypeDetailStore(this);
 		new UmbDataTypeItemStore(this);
-		new UmbActionEventContext(this);
 		new UmbMockModalManagerContext(this);
 		new UmbNotificationContext(this);
 		new UmbCurrentUserStore(this);
