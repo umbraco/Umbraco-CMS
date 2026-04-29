@@ -437,64 +437,6 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.ToTable("umbracoLastSynced", (string)null);
                 });
 
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LogDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(4000)
-                        .HasColumnType("TEXT")
-                        .HasColumnName("logComment")
-                        .UseCollation("NOCASE");
-
-                    b.Property<DateTime>("Datestamp")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("Datestamp");
-
-                    b.Property<string>("EntityType")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT")
-                        .HasColumnName("entityType")
-                        .UseCollation("NOCASE");
-
-                    b.Property<string>("Header")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT")
-                        .HasColumnName("logHeader")
-                        .UseCollation("NOCASE");
-
-                    b.Property<int>("NodeId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("NodeId");
-
-                    b.Property<string>("Parameters")
-                        .HasMaxLength(4000)
-                        .HasColumnType("TEXT")
-                        .HasColumnName("parameters")
-                        .UseCollation("NOCASE");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("userId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NodeId")
-                        .HasDatabaseName("IX_umbracoLog");
-
-                    b.HasIndex("Datestamp", "Header")
-                        .HasDatabaseName("IX_umbracoLog_datestamp_logheader");
-
-                    b.HasIndex("Datestamp", "UserId", "NodeId")
-                        .HasDatabaseName("IX_umbracoLog_datestamp");
-
-                    b.ToTable("umbracoLog", (string)null);
-                });
-
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", b =>
                 {
                     b.Property<int>("NodeId")

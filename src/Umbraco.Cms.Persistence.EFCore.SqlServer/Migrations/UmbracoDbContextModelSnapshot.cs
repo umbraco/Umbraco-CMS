@@ -401,62 +401,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.ToTable("umbracoLastSynced", (string)null);
                 });
 
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LogDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("logComment");
-
-                    b.Property<DateTime>("Datestamp")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("Datestamp");
-
-                    b.Property<string>("EntityType")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("entityType");
-
-                    b.Property<string>("Header")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("logHeader");
-
-                    b.Property<int>("NodeId")
-                        .HasColumnType("int")
-                        .HasColumnName("NodeId");
-
-                    b.Property<string>("Parameters")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("parameters");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("userId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NodeId")
-                        .HasDatabaseName("IX_umbracoLog");
-
-                    b.HasIndex("Datestamp", "Header")
-                        .HasDatabaseName("IX_umbracoLog_datestamp_logheader");
-
-                    b.HasIndex("Datestamp", "UserId", "NodeId")
-                        .HasDatabaseName("IX_umbracoLog_datestamp");
-
-                    b.ToTable("umbracoLog", (string)null);
-                });
-
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", b =>
                 {
                     b.Property<int>("NodeId")
@@ -522,17 +466,27 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_umbracoNode_UniqueId");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("UniqueId"), new[] { "ParentId", "Level", "Path", "SortOrder", "Trashed", "UserId", "Text", "CreateDate" });
+
                     b.HasIndex("NodeObjectType", "Trashed")
                         .HasDatabaseName("IX_umbracoNode_ObjectType");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("NodeObjectType", "Trashed"), new[] { "UniqueId", "ParentId", "Level", "Path", "SortOrder", "UserId", "Text", "CreateDate" });
 
                     b.HasIndex("ParentId", "NodeObjectType")
                         .HasDatabaseName("IX_umbracoNode_parentId_nodeObjectType");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ParentId", "NodeObjectType"), new[] { "Trashed", "UserId", "Level", "Path", "SortOrder", "UniqueId", "Text", "CreateDate" });
+
                     b.HasIndex("NodeObjectType", "Trashed", "SortOrder", "NodeId")
                         .HasDatabaseName("IX_umbracoNode_ObjectType_trashed_sorted");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("NodeObjectType", "Trashed", "SortOrder", "NodeId"), new[] { "UniqueId", "ParentId", "Level", "Path", "UserId", "Text", "CreateDate" });
+
                     b.HasIndex("Level", "ParentId", "SortOrder", "NodeObjectType", "Trashed")
                         .HasDatabaseName("IX_umbracoNode_Level");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Level", "ParentId", "SortOrder", "NodeObjectType", "Trashed"), new[] { "UserId", "Path", "UniqueId", "CreateDate" });
 
                     b.ToTable("umbracoNode", (string)null);
                 });

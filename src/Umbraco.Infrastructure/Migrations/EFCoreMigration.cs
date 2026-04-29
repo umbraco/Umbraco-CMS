@@ -15,5 +15,4 @@ public enum EFCoreMigration
     SqliteCollation = 7,
     AddLanguageDto = 8,
     AddDomainDto = 9,
-    AddLogDto = 10,
 }
