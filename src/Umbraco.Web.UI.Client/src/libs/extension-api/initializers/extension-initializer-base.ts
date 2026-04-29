@@ -4,6 +4,7 @@ import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { debounceTime } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * Base class for extension initializers, which are responsible for loading and unloading extensions.
@@ -23,7 +24,7 @@ export abstract class UmbExtensionInitializerBase<
 		super(host);
 		this.host = host;
 		this.extensionRegistry = extensionRegistry;
-		this.observe(extensionRegistry.byType<Key, T>(manifestType), async (extensions) => {
+		this.observe(extensionRegistry.byType<Key, T>(manifestType).pipe(debounceTime(0)), async (extensions) => {
 			// Use the value `undefined`, as that would not resolve a observation promise. [NL]
 			this.#loaded.setValue(false);
 			this.#extensionMap.forEach((existingExt) => {
@@ -41,7 +42,7 @@ export abstract class UmbExtensionInitializerBase<
 				}),
 			);
 
-			this.#loaded.setValue(true);
+			this.#loaded.setValue(extensions.length > 0);
 		});
 	}
 
