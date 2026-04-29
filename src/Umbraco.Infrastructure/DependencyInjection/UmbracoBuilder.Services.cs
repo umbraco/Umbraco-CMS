@@ -135,7 +135,6 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<ITemplateService>(),
             factory.GetRequiredService<IMemberTypeService>(),
             factory.GetRequiredService<IDataTypeContainerService>(),
-            factory.GetRequiredService<IIdKeyMap>(),
             factory.GetRequiredService<IUserIdKeyResolver>());
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(

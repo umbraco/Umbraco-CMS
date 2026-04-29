@@ -35,7 +35,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly ILocalizationService _localizationService;
         private readonly IDataTypeService _dataTypeService;
         private readonly IDataTypeContainerService _dataTypeContainerService;
-        private readonly IIdKeyMap _idKeyMap;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
@@ -93,7 +92,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             ITemplateService templateService,
             IMemberTypeService memberTypeService,
             IDataTypeContainerService dataTypeContainerService,
-            IIdKeyMap idKeyMap,
             IUserIdKeyResolver userIdKeyResolver)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
@@ -114,7 +112,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _templateService = templateService;
             _memberTypeService = memberTypeService;
             _dataTypeContainerService = dataTypeContainerService;
-            _idKeyMap = idKeyMap;
             _userIdKeyResolver = userIdKeyResolver;
         }
 
@@ -175,7 +172,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                   templateService,
                   StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>(),
                   StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerService>(),
-                  StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
                   StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
         { }
 
@@ -958,11 +954,13 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private EntityContainer? CreateContentTypeChildFolder(string folderName, Guid folderKey, IUmbracoEntity current)
         {
             IEntitySlim[] children = _entityService.GetChildren(current.Id).ToArray();
-            var found = children.Any(x => x.Name.InvariantEquals(folderName) || x.Key.Equals(folderKey));
-            if (found)
+
+            // Match by key first (more reliable when folders have been renamed in the destination), then fall back to name.
+            IEntitySlim? matchingChild = children.FirstOrDefault(x => x.Key == folderKey)
+                                         ?? children.FirstOrDefault(x => x.Name.InvariantEquals(folderName));
+            if (matchingChild is not null)
             {
-                var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
-                return _contentTypeService.GetContainer(containerId);
+                return _contentTypeService.GetContainer(matchingChild.Id);
             }
 
             Attempt<OperationResult<OperationResultType, EntityContainer>?> tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderKey, folderName);
@@ -1635,21 +1633,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private EntityContainer? CreateDataTypeChildFolder(string folderName, Guid folderKey, IUmbracoEntity current)
         {
             IEntitySlim[] children = _entityService.GetChildren(current.Id).ToArray();
-            var found = children.Any(x => x.Name.InvariantEquals(folderName) || x.Key.Equals(folderKey));
-            if (found)
+
+            // Match by key first (more reliable when folders have been renamed in the destination), then fall back to name.
+            IEntitySlim? matchingChild = children.FirstOrDefault(x => x.Key == folderKey)
+                                         ?? children.FirstOrDefault(x => x.Name.InvariantEquals(folderName));
+            if (matchingChild is not null)
             {
-                IEntitySlim child = children.Single(x => x.Name.InvariantEquals(folderName));
-                Attempt<Guid> containerKeyAttempt = _idKeyMap.GetKeyForId(child.Id, UmbracoObjectTypes.DataTypeContainer);
-                return containerKeyAttempt.Success
-                    ? _dataTypeContainerService.GetAsync(containerKeyAttempt.Result).GetAwaiter().GetResult()
-                    : null;
+                return _dataTypeContainerService.GetAsync(matchingChild.Key).GetAwaiter().GetResult();
             }
 
-            Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(current.Id, UmbracoObjectTypes.DataTypeContainer);
-            Guid? parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
-
             Attempt<EntityContainer?, EntityContainerOperationStatus> tryCreateFolder = _dataTypeContainerService
-                .CreateAsync(folderKey, folderName, parentKey, Constants.Security.SuperUserKey)
+                .CreateAsync(folderKey, folderName, current.Key, Constants.Security.SuperUserKey)
                 .GetAwaiter()
                 .GetResult();
             if (tryCreateFolder.Success is false)
