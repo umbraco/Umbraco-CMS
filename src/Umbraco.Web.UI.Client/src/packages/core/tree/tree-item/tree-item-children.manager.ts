@@ -105,8 +105,6 @@ export class UmbTreeItemChildrenManager<
 
     #updateTakeSize() {
         const parent = this.getStartNode() || this.getTreeItem();
-        
-        // In Umbraco, if parent.unique is null or undefined, we are at the very root of the tree.
         const isRoot = !parent?.unique;
 
         if (this.#isSectionWithPartialLoad && !isRoot) {
