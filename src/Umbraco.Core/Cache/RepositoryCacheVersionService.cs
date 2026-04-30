@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -14,7 +15,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     private readonly ILogger<RepositoryCacheVersionService> _logger;
     private readonly IRepositoryCacheVersionAccessor _repositoryCacheVersionAccessor;
     private readonly ConcurrentDictionary<string, Guid> _cacheVersions = new();
-    private readonly ConcurrentDictionary<Guid, HashSet<string>> _writtenKeysByScope = new();
+    private readonly ConcurrentDictionary<Guid, ConcurrentHashSet<string>> _writtenKeysByScope = new();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="RepositoryCacheVersionService" /> class.
@@ -86,8 +87,8 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     {
         string cacheKey = GetCacheKey<TEntity>();
 
-        HashSet<string>? writtenKeys = GetOrRegisterScopeWrittenKeys();
-        if (writtenKeys?.Add(cacheKey) is false)
+        ConcurrentHashSet<string>? writtenKeys = GetOrRegisterScopeWrittenKeys();
+        if (writtenKeys?.TryAdd(cacheKey) is false)
         {
             _logger.LogDebug("Cache version for {EntityType} already written in this scope, skipping", typeof(TEntity).Name);
             return;
@@ -136,7 +137,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
         where TEntity : class =>
         typeof(TEntity).FullName ?? typeof(TEntity).Name;
 
-    private HashSet<string>? GetOrRegisterScopeWrittenKeys()
+    private ConcurrentHashSet<string>? GetOrRegisterScopeWrittenKeys()
     {
         IScopeContext? context = _scopeProvider.Context;
         if (context is null)
@@ -145,13 +146,7 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
         }
 
         Guid contextId = context.InstanceId;
-        if (_writtenKeysByScope.TryGetValue(contextId, out HashSet<string>? writtenKeys))
-        {
-            return writtenKeys;
-        }
-
-        writtenKeys = new HashSet<string>();
-        _writtenKeysByScope[contextId] = writtenKeys;
+        ConcurrentHashSet<string> writtenKeys = _writtenKeysByScope.GetOrAdd(contextId, _ => new ConcurrentHashSet<string>());
 
         context.Enlist(
             $"RepositoryCacheVersionService_{contextId}",
