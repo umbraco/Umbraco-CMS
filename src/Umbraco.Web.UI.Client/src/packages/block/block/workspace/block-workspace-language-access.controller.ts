@@ -8,6 +8,15 @@ import type { UmbContextConsumerController } from '@umbraco-cms/backoffice/conte
 
 const IDENTIFIER_PREFIX = 'UMB_LANGUAGE_PERMISSION_';
 
+/**
+ * Configures the read-only state of a Block Workspace based on the parent Block Manager
+ * and the current user's language access.
+ *
+ * - For invariant blocks, the workspace inherits the read-only state of the parent Block Manager(Host Property).
+ * - For variant blocks (with a culture), the workspace is editable only when the current user
+ *   has access to that culture (either via `hasAccessToAllLanguages` or an entry in their
+ *   allowed languages).
+ */
 export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase {
 	#workspaceContext?: typeof UMB_BLOCK_WORKSPACE_CONTEXT.TYPE;
 	#variantId?: UmbVariantId;
@@ -124,8 +133,8 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 		const rule = {
 			unique,
 			variantId,
-			// The rule semantics match the document workspace version:
-			// permitted: false = the variant is permitted to be edited.
+			// `permitted: false` on a read-only guard means "not permitted to be read-only"
+			// — i.e. editable. Combined with `fallbackToPermitted()` (default = read-only).
 			permitted: false,
 		};
 

@@ -315,6 +315,7 @@ export class UmbAppElement extends UmbLitElement {
 		umbExtensionsRegistry.registerMany((await this.#packageModules).flatMap((modules) => modules.extensions));
 	}
 
+	// TODO (V18): Unregister extensions on sign-out. [NL]
 	/*
 		async #unregisterExtensions() {
 			if (!this.#packageModules) return;
@@ -323,7 +324,7 @@ export class UmbAppElement extends UmbLitElement {
 				umbExtensionsRegistry.unregisterMany(aliases);
 			});
 		}
-			*/
+	*/
 
 	#loadCurrentUser() {
 		if (!this.#currentUser || !this.#packageModules) return;
