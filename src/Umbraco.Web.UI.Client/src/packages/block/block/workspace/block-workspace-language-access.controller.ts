@@ -23,6 +23,7 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 	#currentUserAllowedLanguages?: Array<string>;
 	#currentUserHasAccessToAllLanguages?: boolean;
 	#consumeBlockManager?: UmbContextConsumerController<typeof UMB_BLOCK_MANAGER_CONTEXT.TYPE>;
+	#appliedLanguageUnique?: string;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
@@ -79,6 +80,8 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 				this.observe(
 					manager?.readOnlyState.permitted,
 					(isReadOnly) => {
+						if (isReadOnly === undefined) return;
+
 						const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
 
 						if (isReadOnly) {
@@ -122,17 +125,23 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 				? true
 				: (this.#currentUserAllowedLanguages?.includes(culture) ?? false);
 
-		const unique = IDENTIFIER_PREFIX + culture;
-
-		// Remove any previous rule before potentially adding a new one, so switching
-		// the block's culture does not leave a stale rule from the previous variant.
-		this.#workspaceContext.readOnlyGuard.removeRule(unique);
-		this.#workspaceContext.content.readOnlyGuard.removeRule(unique);
-		this.#workspaceContext.settings.readOnlyGuard.removeRule(unique);
+		// Always remove the previously applied rule (tracked by the actual unique key,
+		// not just the current culture). Without this, switching the workspace's culture
+		// from A → B leaves a stale UMB_LANGUAGE_PERMISSION_<A> rule lingering in the
+		// guard manager — `findRule()` is variant-scoped so it stays harmless, but
+		// `getRules()` accumulates one entry per visited culture over the workspace's
+		// lifetime. [NL]
+		if (this.#appliedLanguageUnique) {
+			this.#workspaceContext.readOnlyGuard.removeRule(this.#appliedLanguageUnique);
+			this.#workspaceContext.content.readOnlyGuard.removeRule(this.#appliedLanguageUnique);
+			this.#workspaceContext.settings.readOnlyGuard.removeRule(this.#appliedLanguageUnique);
+			this.#appliedLanguageUnique = undefined;
+		}
 
 		if (!allowed || !culture || !this.#variantId) return;
 
 		const variantId = this.#variantId;
+		const unique = IDENTIFIER_PREFIX + culture;
 		const rule = {
 			unique,
 			variantId,
@@ -144,6 +153,7 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 		this.#workspaceContext.readOnlyGuard.addRule(rule);
 		this.#workspaceContext.content.readOnlyGuard.addRule(rule);
 		this.#workspaceContext.settings.readOnlyGuard.addRule(rule);
+		this.#appliedLanguageUnique = unique;
 	}
 }
 
