@@ -52,6 +52,7 @@ export class UmbDocumentPublishedPendingChangesManager extends UmbControllerBase
 			// remove template from the comparison (doesn't affect publishable changes, and the published version is coming through as null)
 			mergedDataClone.template = null;
 			publishedDataClone.template = null;
+
 			const hasChanges = jsonStringComparison(mergedDataClone, publishedDataClone) === false;
 
 			if (hasChanges) {

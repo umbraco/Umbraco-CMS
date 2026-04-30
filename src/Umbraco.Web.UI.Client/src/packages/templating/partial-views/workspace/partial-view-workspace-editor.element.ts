@@ -6,6 +6,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_TEMPLATE_QUERY_BUILDER_MODAL } from '@umbraco-cms/backoffice/template';
 import type { UmbCodeEditorElement } from '@umbraco-cms/backoffice/code-editor';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 import '@umbraco-cms/backoffice/code-editor';
 import '../../local-components/insert-menu/index.js';
@@ -18,6 +19,13 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 	@state()
 	private _isNew?: boolean;
 
+	/**
+	 * Whether editing is restricted. True when in production mode OR when runtime mode is still unknown.
+	 * This ensures a safe default (restricted) until we confirm the runtime mode.
+	 */
+	@state()
+	private _isRestricted = true;
+
 	@query('umb-code-editor')
 	private _codeEditor?: UmbCodeEditorElement;
 
@@ -25,6 +33,13 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 
 	constructor() {
 		super();
+
+		this.consumeContext(UMB_SERVER_CONTEXT, (context) => {
+			this.observe(context?.isProductionMode, (isProductionMode) => {
+				// Restricted until we confirm it's NOT production mode (safe default).
+				this._isRestricted = isProductionMode !== false;
+			});
+		});
 
 		this.consumeContext(UMB_PARTIAL_VIEW_WORKSPACE_CONTEXT, (workspaceContext) => {
 			this.#workspaceContext = workspaceContext;
@@ -64,14 +79,18 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 			<umb-entity-detail-workspace-editor>
 				<umb-workspace-header-name-editable
 					slot="header"
-					?readonly=${this._isNew === false}></umb-workspace-header-name-editable>
+					?readonly=${this._isNew === false || this._isRestricted}></umb-workspace-header-name-editable>
 				<uui-box>
 					<div slot="header" id="code-editor-menu-container">
-						<umb-templating-insert-menu @insert=${this.#insertSnippet} hidePartialViews></umb-templating-insert-menu>
+						<umb-templating-insert-menu
+							@insert=${this.#insertSnippet}
+							?disabled=${this._isRestricted}
+							hidePartialViews></umb-templating-insert-menu>
 						<uui-button
 							look="secondary"
 							id="query-builder-button"
 							label=${this.localize.term('template_queryBuilder')}
+							?disabled=${this._isRestricted}
 							@click=${this.#openQueryBuilder}>
 							<uui-icon name="icon-wand"></uui-icon>
 							<umb-localize key="template_queryBuilder">Query builder</umb-localize>
@@ -93,6 +112,7 @@ export class UmbPartialViewWorkspaceEditorElement extends UmbLitElement {
 				id="content"
 				language="razor"
 				.code=${this._content ?? ''}
+				?readonly=${this._isRestricted}
 				@input=${this.#onCodeEditorInput}></umb-code-editor>
 		`;
 	}

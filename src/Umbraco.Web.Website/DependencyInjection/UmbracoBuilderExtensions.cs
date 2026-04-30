@@ -1,20 +1,27 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Cache.PartialViewCacheInvalidators;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Cache.PartialViewCacheInvalidators;
+using Umbraco.Cms.Web.Website.Caching;
 using Umbraco.Cms.Web.Website.Collections;
 using Umbraco.Cms.Web.Website.Models;
 using Umbraco.Cms.Web.Website.Routing;
@@ -29,8 +36,14 @@ namespace Umbraco.Extensions;
 public static partial class UmbracoBuilderExtensions
 {
     /// <summary>
-    ///     Add services for the umbraco front-end website
+    /// Add services for the umbraco front-end website.
     /// </summary>
+    /// <remarks>
+    /// This method assumes that either <c>AddBackOffice()</c> or <c>AddCore()</c> has already been called.
+    /// It registers website-specific services such as Surface controllers, view engines, and routing.
+    /// </remarks>
+    /// <param name="builder">The Umbraco builder.</param>
+    /// <returns>The Umbraco builder.</returns>
     public static IUmbracoBuilder AddWebsite(this IUmbracoBuilder builder)
     {
         builder.WithCollectionBuilder<SurfaceControllerTypeCollectionBuilder>()
@@ -70,6 +83,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<MatcherPolicy, SurfaceControllerMatcherPolicy>();
 
         builder.Services.AddSingleton<FrontEndRoutes>();
+        builder.Services.AddSingleton<BasicAuthLoginRoutes>();
 
         builder.Services.AddSingleton<MemberModelBuilderFactory>();
 
@@ -79,11 +93,46 @@ public static partial class UmbracoBuilderExtensions
         // Partial view cache invalidators
         builder.Services.AddUnique<IMemberPartialViewCacheInvalidator, MemberPartialViewCacheInvalidator>();
 
-        builder
-            .AddDistributedCache()
-            .AddModelsBuilder();
+        builder.AddModelsBuilder();
 
+        // Member identity for public member login
         builder.AddMembersIdentity();
+
+        builder.AddWebsiteOutputCache();
+
+        return builder;
+    }
+
+    private static IUmbracoBuilder AddWebsiteOutputCache(this IUmbracoBuilder builder)
+    {
+        WebsiteSettings.OutputCacheSettings settings = builder.Config
+            .GetSection(Constants.Configuration.ConfigWebsite)
+            .Get<WebsiteSettings>()?.OutputCache
+            ?? new WebsiteSettings.OutputCacheSettings();
+
+        if (settings.Enabled is false)
+        {
+            return builder;
+        }
+
+        // AddOutputCache() is safe to call multiple times (e.g. if the Delivery API also
+        // registers output caching) — each call just adds its policies to the shared options.
+        builder.Services.AddOutputCache(options =>
+        {
+            options.AddPolicy(
+                Constants.Website.OutputCache.ContentCachePolicy,
+                new WebsiteOutputCachePolicy(settings.ContentDuration));
+        });
+
+        // Register eviction handlers and providers.
+        builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, WebsiteDocumentOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, WebsiteMediaOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, WebsiteMemberOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<ElementCacheRefresherNotification, WebsiteElementOutputCacheEvictionHandler>();
+        builder.Services.AddSingleton<IWebsiteOutputCacheTagProvider, WebsiteContentTypeOutputCacheTagProvider>();
+        builder.Services.AddUnique<IWebsiteOutputCacheDurationProvider, DefaultWebsiteOutputCacheDurationProvider>();
+        builder.Services.AddUnique<IWebsiteOutputCacheRequestFilter, DefaultWebsiteOutputCacheRequestFilter>();
+        builder.Services.AddUnique<IWebsiteOutputCacheManager, WebsiteOutputCacheManager>();
 
         return builder;
     }

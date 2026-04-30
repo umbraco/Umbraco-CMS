@@ -1,9 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.BackgroundJobs;
 using Umbraco.Cms.Infrastructure.Models;
@@ -23,24 +21,11 @@ public class DistributedJobService : IDistributedJobService
     /// <summary>
     /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
     /// </summary>
-    [Obsolete("Use the constructor that accepts IOptions<DistributedJobSettings>. Scheduled for removal in Umbraco 18.")]
-    public DistributedJobService(
-        ICoreScopeProvider coreScopeProvider,
-        IDistributedJobRepository distributedJobRepository,
-        IEnumerable<IDistributedBackgroundJob> distributedBackgroundJobs,
-        ILogger<DistributedJobService> logger)
-        : this(
-            coreScopeProvider,
-            distributedJobRepository,
-            distributedBackgroundJobs,
-            logger,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<DistributedJobSettings>>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DistributedJobService"/> class.
-    /// </summary>
+    /// <param name="coreScopeProvider">Provides access to the core scope for database operations.</param>
+    /// <param name="distributedJobRepository">Repository for managing distributed jobs.</param>
+    /// <param name="distributedBackgroundJobs">A collection of distributed background job implementations.</param>
+    /// <param name="logger">The logger used for logging job service operations.</param>
+    /// <param name="settings">The configuration settings for distributed jobs.</param>
     public DistributedJobService(
         ICoreScopeProvider coreScopeProvider,
         IDistributedJobRepository distributedJobRepository,

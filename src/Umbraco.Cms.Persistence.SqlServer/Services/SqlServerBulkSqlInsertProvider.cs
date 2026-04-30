@@ -58,7 +58,7 @@ public class SqlServerBulkSqlInsertProvider : IBulkSqlInsertProvider
                 throw new NotSupportedException("SqlSyntax must be SqlServerSyntaxProvider.");
             }
 
-            using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.Default, tTransaction)
+            using (var copy = new SqlBulkCopy(tConnection, SqlBulkCopyOptions.CheckConstraints, tTransaction)
             {
                 // 0 = no bulk copy timeout. If a timeout occurs it will be an connection/command timeout.
                 BulkCopyTimeout = 0,

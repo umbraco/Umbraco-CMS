@@ -5,6 +5,9 @@ using Umbraco.Cms.Core.Templates;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
+/// <summary>
+/// Handles the processing and migration of local links as part of the upgrade process to Umbraco version 15.0.0.
+/// </summary>
 [Obsolete("Scheduled for removal in Umbraco 18.")]
 public class LocalLinkProcessor
 {
@@ -12,6 +15,12 @@ public class LocalLinkProcessor
     private readonly IIdKeyMap _idKeyMap;
     private readonly IEnumerable<ITypedLocalLinkProcessor> _localLinkProcessors;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LocalLinkProcessor"/> class, which processes and parses local links during migration upgrades.
+    /// </summary>
+    /// <param name="localLinkParser">An instance of <see cref="HtmlLocalLinkParser"/> used to parse local links within HTML content.</param>
+    /// <param name="idKeyMap">An implementation of <see cref="IIdKeyMap"/> that provides mapping between IDs and keys for content references.</param>
+    /// <param name="localLinkProcessors">A collection of <see cref="ITypedLocalLinkProcessor"/> used to handle specific types of local link processing.</param>
     public LocalLinkProcessor(
         HtmlLocalLinkParser localLinkParser,
         IIdKeyMap idKeyMap,
@@ -22,9 +31,18 @@ public class LocalLinkProcessor
         _localLinkProcessors = localLinkProcessors;
     }
 
+    /// <summary>
+    /// Gets all supported property editor aliases by aggregating the aliases from the registered local link processors.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable{T}"/> of strings representing the supported property editor aliases.</returns>
     public IEnumerable<string> GetSupportedPropertyEditorAliases() =>
         _localLinkProcessors.SelectMany(p => p.PropertyEditorAliases);
 
+    /// <summary>
+    /// Attempts to process the specified editor value using a matching local link processor based on the value's type.
+    /// </summary>
+    /// <param name="editorValue">The editor value to process; its runtime type is used to select the appropriate processor.</param>
+    /// <returns><c>true</c> if a suitable processor was found and processing succeeded; otherwise, <c>false</c>.</returns>
     public bool ProcessToEditorValue(object? editorValue)
     {
         ITypedLocalLinkProcessor? processor =
@@ -33,6 +51,14 @@ public class LocalLinkProcessor
         return processor is not null && processor.Process.Invoke(editorValue, ProcessToEditorValue, ProcessStringValue);
     }
 
+    /// <summary>
+    /// Processes the input string by searching for legacy local link tags and replacing them with updated link tags that include GUIDs and entity types.
+    /// If a legacy tag cannot be converted (due to missing information), it is left unchanged in the output.
+    /// </summary>
+    /// <param name="input">The input string potentially containing legacy local link tags to process.</param>
+    /// <returns>
+    /// The input string with all convertible legacy local link tags replaced by updated tags containing GUIDs and entity types; unconvertible tags remain unchanged.
+    /// </returns>
     public string ProcessStringValue(string input)
     {
         // find all legacy tags
@@ -40,11 +66,12 @@ public class LocalLinkProcessor
 
         foreach (HtmlLocalLinkParser.LocalLinkTag tag in tags)
         {
-            string newTagHref;
+            string convertedLocalLink;
+            string entityType;
             if (tag.Udi is not null)
             {
-                newTagHref = tag.TagHref.Replace(tag.Udi.ToString(), tag.Udi.Guid.ToString())
-                             + $"\" type=\"{tag.Udi.EntityType}";
+                convertedLocalLink = tag.TagHref.Replace(tag.Udi.ToString(), tag.Udi.Guid.ToString());
+                entityType = tag.Udi.EntityType;
             }
             else if (tag.IntId is not null)
             {
@@ -55,8 +82,8 @@ public class LocalLinkProcessor
                     continue;
                 }
 
-                newTagHref = tag.TagHref.Replace(tag.IntId.Value.ToString(), conversionResult.Value.Key.ToString())
-                             + $"\" type=\"{conversionResult.Value.EntityType}";
+                convertedLocalLink = tag.TagHref.Replace(tag.IntId.Value.ToString(), conversionResult.Value.Key.ToString());
+                entityType = conversionResult.Value.EntityType;
             }
             else
             {
@@ -64,7 +91,43 @@ public class LocalLinkProcessor
                 continue;
             }
 
-            input = input.Replace(tag.TagHref, newTagHref);
+            // Find where the TagHref occurs in the input, then locate the closing quote of the
+            // href attribute so we can insert the type attribute after it. The href value may
+            // contain trailing content after the localLink closing brace (e.g. #fragment or ?query).
+            var tagHrefIndex = input.IndexOf(tag.TagHref, StringComparison.Ordinal);
+            if (tagHrefIndex < 0)
+            {
+                continue;
+            }
+
+            // Determine the quote character used to open the href attribute. The regex matches
+            // href=['"]..., so the character immediately before the TagHref match is the opening quote.
+            var openingQuoteIndex = tagHrefIndex - 1;
+            if (openingQuoteIndex < 0 || (input[openingQuoteIndex] != '"' && input[openingQuoteIndex] != '\''))
+            {
+                input = input.Replace(tag.TagHref, convertedLocalLink);
+                continue;
+            }
+
+            var quoteChar = input[openingQuoteIndex];
+            var afterTagHref = tagHrefIndex + tag.TagHref.Length;
+            var closingQuoteIndex = input.IndexOf(quoteChar, afterTagHref);
+
+            if (closingQuoteIndex < 0)
+            {
+                // No closing quote found; fall back to simple replacement without type attribute.
+                input = input.Replace(tag.TagHref, convertedLocalLink);
+                continue;
+            }
+
+            // Extract any trailing href content (fragment, query string) between the localLink and closing quote.
+            var trailingHrefContent = input.Substring(afterTagHref, closingQuoteIndex - afterTagHref);
+            var closingQuote = input[closingQuoteIndex];
+
+            // Build the replacement: converted localLink + trailing content + close quote + type attribute
+            var oldSegment = tag.TagHref + trailingHrefContent + closingQuote;
+            var newSegment = convertedLocalLink + trailingHrefContent + closingQuote + $" type=\"{entityType}\"";
+            input = input.Remove(tagHrefIndex, oldSegment.Length).Insert(tagHrefIndex, newSegment);
         }
 
         return input;
@@ -72,17 +135,19 @@ public class LocalLinkProcessor
 
     private (Guid Key, string EntityType)? CreateIntBasedKeyType(int id)
     {
-        // very old data, best effort replacement
+        // very old data, best effort replacement.
+        // entity type must match the lowercase UDI entity type, which is what the tiptap RTE
+        // expects in the "type" attribute (and what the UDI-based branch above produces).
         Attempt<Guid> documentAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
         if (documentAttempt.Success)
         {
-            return (Key: documentAttempt.Result, EntityType: UmbracoObjectTypes.Document.ToString());
+            return (Key: documentAttempt.Result, EntityType: Constants.UdiEntityType.Document);
         }
 
         Attempt<Guid> mediaAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
         if (mediaAttempt.Success)
         {
-            return (Key: mediaAttempt.Result, EntityType: UmbracoObjectTypes.Media.ToString());
+            return (Key: mediaAttempt.Result, EntityType: Constants.UdiEntityType.Media);
         }
 
         return null;

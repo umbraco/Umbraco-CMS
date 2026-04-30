@@ -29,8 +29,20 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     private readonly IFileSystem? _viewsFileSystem;
     private readonly IViewHelper _viewHelper;
     private readonly IOptionsMonitor<RuntimeSettings> _runtimeSettings;
-    private readonly TemplateByGuidReadRepository _templateByGuidReadRepository;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TemplateRepository"/> class, which manages persistence and retrieval of template entities.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing data retrieval.</param>
+    /// <param name="logger">The logger instance for logging repository operations.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="fileSystems">Abstraction for accessing file system resources related to templates.</param>
+    /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
+    /// <param name="viewHelper">Helper for working with template views.</param>
+    /// <param name="runtimeSettings">Monitors and provides access to runtime configuration settings.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning in the repository.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
     public TemplateRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -53,66 +65,77 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         _viewsFileSystem = fileSystems.MvcViewsFileSystem;
         _viewHelper = viewHelper;
         _runtimeSettings = runtimeSettings;
-        _templateByGuidReadRepository = new TemplateByGuidReadRepository(
-            this,
-            scopeAccessor,
-            cache,
-            loggerFactory.CreateLogger<TemplateByGuidReadRepository>(),
-            repositoryCacheVersionService,
-            cacheSyncService);
     }
 
-    [Obsolete("Use constructor with ILoggerFactory parameter. Scheduled for removal in Umbraco 18.")]
-    public TemplateRepository(
-        IScopeAccessor scopeAccessor,
-        AppCaches cache,
-        ILogger<TemplateRepository> logger,
-        FileSystems fileSystems,
-        IShortStringHelper shortStringHelper,
-        IViewHelper viewHelper,
-        IOptionsMonitor<RuntimeSettings> runtimeSettings,
-        IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
-        : this(
-            scopeAccessor,
-            cache,
-            logger,
-            Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance,
-            fileSystems,
-            shortStringHelper,
-            viewHelper,
-            runtimeSettings,
-            repositoryCacheVersionService,
-            cacheSyncService)
+    /// <summary>
+    /// Gets the cache policy as <see cref="FullDataSetRepositoryCachePolicy{TEntity, TId}"/> for predicate-based lookups.
+    /// Returns null when caching is disabled (e.g. <see cref="AppCaches.NoCache"/>).
+    /// </summary>
+    private FullDataSetRepositoryCachePolicy<ITemplate, int>? TypedCachePolicy
+        => CachePolicy as FullDataSetRepositoryCachePolicy<ITemplate, int>;
+
+    /// <summary>
+    /// Gets the template with the specified unique identifier.
+    /// </summary>
+    /// <param name="key">The unique identifier of the template.</param>
+    /// <returns>The template if found; otherwise, null.</returns>
+    public ITemplate? Get(Guid key)
+        => TypedCachePolicy?.FindCached(x => x.Key == key, PerformGetAll)
+           ?? GetMany().FirstOrDefault(x => x.Key == key);
+
+    IEnumerable<ITemplate> IReadRepository<Guid, ITemplate>.GetMany(params Guid[]? keys)
     {
+        if (keys?.Length > 0)
+        {
+            var keySet = keys.ToHashSet();
+            return TypedCachePolicy?.FindAllCached(x => keySet.Contains(x.Key), PerformGetAll)
+                   ?? GetMany().Where(x => keySet.Contains(x.Key)).ToArray();
+        }
+
+        return GetMany();
     }
 
-    public ITemplate? Get(Guid key) => _templateByGuidReadRepository.Get(key);
+    /// <summary>
+    /// Determines whether a template with the specified identifier exists.
+    /// </summary>
+    /// <param name="id">The unique identifier of the template.</param>
+    /// <returns>True if the template exists; otherwise, false.</returns>
+    public bool Exists(Guid id)
+        => TypedCachePolicy?.ExistsCached(x => x.Key == id, PerformGetAll)
+           ?? GetMany().Any(x => x.Key == id);
 
-    IEnumerable<ITemplate> IReadRepository<Guid, ITemplate>.GetMany(params Guid[]? keys) => _templateByGuidReadRepository.GetMany(keys);
-
-    public bool Exists(Guid id) => _templateByGuidReadRepository.Exists(id);
-
+    /// <summary>
+    /// Saves the specified template entity to the repository.
+    /// After saving, this method also ensures that the full dataset cache and the GUID cache are populated
+    /// to optimize subsequent lookups and reduce database access.
+    /// </summary>
+    /// <param name="entity">The template entity to save.</param>
     public override void Save(ITemplate entity)
     {
         base.Save(entity);
 
         // Force population of the full dataset cache so subsequent lookups don't hit the database.
         // TemplateRepository uses FullDataSetRepositoryCachePolicy which caches all templates together.
+        // GUID-based lookups also use this cache via GetMany().
         GetMany();
-
-        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
-        _templateByGuidReadRepository.PopulateCacheByKey(entity);
     }
 
+    /// <summary>
+    /// Deletes the specified template entity and clears the related GUID cache to prevent stale data on subsequent lookups.
+    /// </summary>
+    /// <param name="entity">The template entity to delete.</param>
     public override void Delete(ITemplate entity)
     {
         base.Delete(entity);
-
-        // Also clear the GUID cache so subsequent lookups by GUID don't return stale data.
-        _templateByGuidReadRepository.ClearCacheByKey(entity.Key);
     }
 
+    /// <summary>
+    /// Returns a stream for reading the content of the file at the specified path.
+    /// </summary>
+    /// <param name="filepath">The path of the file to retrieve.</param>
+    /// <returns>
+    /// A <see cref="Stream"/> for the file content, or <see cref="Stream.Null"/> if the file does not exist or cannot be opened.
+    /// </returns>
     public Stream GetFileContentStream(string filepath)
     {
         IFileSystem? fileSystem = GetFileSystem(filepath);
@@ -131,9 +154,24 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         }
     }
 
+    /// <summary>
+    /// Writes the provided content stream to the file at the specified filepath, overwriting any existing content.
+    /// </summary>
+    /// <param name="filepath">The path of the file to which the content will be written.</param>
+    /// <param name="content">A stream containing the content to write to the file.</param>
+    /// <remarks>
+    /// If the file already exists, its content will be replaced.
+    /// </remarks>
     public void SetFileContent(string filepath, Stream content) =>
         GetFileSystem(filepath)?.AddFile(filepath, content, true);
 
+    /// <summary>
+    /// Returns the size of the specified file in bytes.
+    /// </summary>
+    /// <param name="filename">The name of the file whose size is to be retrieved.</param>
+    /// <returns>
+    /// The size of the file in bytes, or -1 if the file does not exist or an error occurs while retrieving the size.
+    /// </returns>
     public long GetFileSize(string filename)
     {
         IFileSystem? fileSystem = GetFileSystem(filename);
@@ -373,19 +411,12 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
     #region Overrides of RepositoryBase<int,ITemplate>
 
+    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
+    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
+    // internally and clones only the matched entity. This override exists only as a required
+    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
     protected override ITemplate? PerformGet(int id)
-    {
-        //use the underlying GetAll which will force cache all templates
-        ITemplate? template = GetMany().FirstOrDefault(x => x.Id == id);
-
-        if (template != null)
-        {
-            // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
-            _templateByGuidReadRepository.PopulateCacheByKey(template);
-        }
-
-        return template;
-    }
+        => GetMany().FirstOrDefault(x => x.Id == id);
 
     protected override IEnumerable<ITemplate> PerformGetAll(params int[]? ids)
     {
@@ -415,9 +446,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             .ToArray();
 
         ITemplate[] templates = dtos.Select(d => MapFromDto(d, childIds)).ToArray();
-
-        // Also populate the GUID cache so subsequent lookups by GUID don't hit the database.
-        _templateByGuidReadRepository.PopulateCacheByKey(templates);
 
         return templates;
     }
@@ -640,8 +668,12 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             Database.Execute(delete, new { id = GetEntityId(entity) });
         }
 
-        var viewName = string.Concat(entity.Alias, ".cshtml");
-        _viewsFileSystem?.DeleteFile(viewName);
+        // Only delete file when not in production runtime mode
+        if (_runtimeSettings.CurrentValue.Mode != RuntimeMode.Production)
+        {
+            var viewName = string.Concat(entity.Alias, ".cshtml");
+            _viewsFileSystem?.DeleteFile(viewName);
+        }
 
         entity.DeleteDate = DateTime.UtcNow;
     }
@@ -650,25 +682,64 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
     #region Implementation of ITemplateRepository
 
-    public ITemplate? Get(string? alias) => GetAll(alias).FirstOrDefault();
+    /// <summary>Retrieves a template by its alias.</summary>
+    /// <param name="alias">The alias of the template to retrieve.</param>
+    /// <returns>The template matching the specified alias, or null if not found.</returns>
+    public ITemplate? Get(string? alias)
+    {
+        if (alias is null)
+        {
+            return null;
+        }
 
+        return TypedCachePolicy?.FindCached(x => x.Alias.InvariantEquals(alias), PerformGetAll)
+               ?? GetMany().FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+    }
+
+    /// <summary>
+    /// Retrieves all templates, or filters them by the specified aliases if provided.
+    /// </summary>
+    /// <param name="aliases">An optional array of template aliases to filter the results. If no aliases are specified, all templates are returned.</param>
+    /// <returns>An enumerable collection of <see cref="Umbraco.Cms.Core.Models.ITemplate"/> instances matching the specified aliases, or all templates if no aliases are given.</returns>
     public IEnumerable<ITemplate> GetAll(params string?[] aliases)
     {
-        //We must call the base (normal) GetAll method
-        // which is cached. This is a specialized method and unfortunately with the params[] it
+        // We must call the base (normal) GetAll method which is cached.
+        // This is a specialized method and unfortunately with the params[] it
         // overlaps with the normal GetAll method.
         if (aliases.Any() == false)
         {
             return GetMany();
         }
 
-        //return from base.GetAll, this is all cached
-        return GetMany().Where(x => aliases.WhereNotNull().InvariantContains(x.Alias));
+        var nonNullAliases = aliases.WhereNotNull().ToArray();
+        return TypedCachePolicy?.FindAllCached(x => nonNullAliases.InvariantContains(x.Alias), PerformGetAll)
+               ?? GetMany().Where(x => nonNullAliases.InvariantContains(x.Alias));
     }
 
+    /// <summary>
+    /// Gets the child templates of the specified layout template.
+    /// </summary>
+    /// <param name="layoutTemplateId">The ID of the layout template to get children for. If less than or equal to zero, returns templates without a layout template.</param>
+    /// <returns>An enumerable collection of child templates. If the specified layout template does not exist, returns an empty collection.</returns>
     public IEnumerable<ITemplate> GetChildren(int layoutTemplateId)
     {
-        //return from base.GetAll, this is all cached
+        if (TypedCachePolicy is { } policy)
+        {
+            if (layoutTemplateId <= 0)
+            {
+                return policy.FindAllCached(x => x.LayoutTemplateAlias.IsNullOrWhiteSpace(), PerformGetAll);
+            }
+
+            ITemplate? parent = policy.FindCached(x => x.Id == layoutTemplateId, PerformGetAll);
+            if (parent == null)
+            {
+                return Enumerable.Empty<ITemplate>();
+            }
+
+            return policy.FindAllCached(x => x.LayoutTemplateAlias.InvariantEquals(parent.Alias), PerformGetAll);
+        }
+
+        // Fallback when caching is disabled.
         ITemplate[] all = GetMany().ToArray();
 
         if (layoutTemplateId <= 0)
@@ -676,16 +747,20 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             return all.Where(x => x.LayoutTemplateAlias.IsNullOrWhiteSpace());
         }
 
-        ITemplate? parent = all.FirstOrDefault(x => x.Id == layoutTemplateId);
-        if (parent == null)
+        ITemplate? fallbackParent = all.FirstOrDefault(x => x.Id == layoutTemplateId);
+        if (fallbackParent == null)
         {
             return Enumerable.Empty<ITemplate>();
         }
 
-        IEnumerable<ITemplate> children = all.Where(x => x.LayoutTemplateAlias.InvariantEquals(parent.Alias));
-        return children;
+        return all.Where(x => x.LayoutTemplateAlias.InvariantEquals(fallbackParent.Alias));
     }
 
+    /// <summary>
+    /// Retrieves all descendant templates of the specified layout template.
+    /// </summary>
+    /// <param name="layoutTemplateId">The ID of the layout template whose descendants will be returned. If less than or equal to zero, all root templates and their descendants are returned.</param>
+    /// <returns>An <see cref="IEnumerable{ITemplate}"/> containing all descendant templates, ordered by their hierarchy level. Returns an empty collection if the specified layout template does not exist.</returns>
     public IEnumerable<ITemplate> GetDescendants(int layoutTemplateId)
     {
         //return from base.GetAll, this is all cached
@@ -731,108 +806,6 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         {
             AddChildren(all, descendants, child.Alias);
         }
-    }
-
-    #endregion
-
-    #region Read Repository implementation for Guid keys
-
-    // Reading repository purely for looking up by GUID.
-    // This leverages the outer repository's GetMany() which uses FullDataSetRepositoryCachePolicy
-    // to cache all templates together, ensuring efficient lookups by both ID and GUID.
-    private sealed class TemplateByGuidReadRepository : EntityRepositoryBase<Guid, ITemplate>
-    {
-        private readonly TemplateRepository _outerRepo;
-
-        public TemplateByGuidReadRepository(
-            TemplateRepository outerRepo,
-            IScopeAccessor scopeAccessor,
-            AppCaches cache,
-            ILogger<TemplateByGuidReadRepository> logger,
-            IRepositoryCacheVersionService repositoryCacheVersionService,
-            ICacheSyncService cacheSyncService)
-            : base(
-                scopeAccessor,
-                cache,
-                logger,
-                repositoryCacheVersionService,
-                cacheSyncService) =>
-            _outerRepo = outerRepo;
-
-        protected override ITemplate? PerformGet(Guid id)
-        {
-            // Use the outer repository's GetMany() which benefits from FullDataSetRepositoryCachePolicy.
-            // This ensures all templates are cached together for efficient lookups.
-            return _outerRepo.GetMany().FirstOrDefault(x => x.Key == id);
-        }
-
-        protected override IEnumerable<ITemplate> PerformGetAll(params Guid[]? ids)
-        {
-            // Use the outer repository's GetMany() which benefits from FullDataSetRepositoryCachePolicy.
-            IEnumerable<ITemplate> all = _outerRepo.GetMany();
-
-            if (ids?.Length > 0)
-            {
-                return all.Where(x => ids.Contains(x.Key)).ToArray();
-            }
-
-            return all;
-        }
-
-        protected override IEnumerable<ITemplate> PerformGetByQuery(IQuery<ITemplate> query) =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
-        protected override IEnumerable<string> GetDeleteClauses() =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
-        protected override void PersistNewItem(ITemplate entity) =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
-        protected override void PersistUpdatedItem(ITemplate entity) =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
-        protected override Sql<ISqlContext> GetBaseQuery(bool isCount) =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
-        protected override string GetBaseWhereClause() =>
-            throw new InvalidOperationException("This method won't be implemented.");
-
-        /// <summary>
-        /// Populates the GUID-keyed cache with the given entity.
-        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
-        /// </summary>
-        public void PopulateCacheByKey(ITemplate entity)
-        {
-            if (entity.HasIdentity)
-            {
-                var cacheKey = GetCacheKey(entity.Key);
-                IsolatedCache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
-            }
-        }
-
-        /// <summary>
-        /// Populates the GUID-keyed cache with the given entities.
-        /// This allows entities retrieved by int ID to also be cached for GUID lookups.
-        /// </summary>
-        public void PopulateCacheByKey(IEnumerable<ITemplate> entities)
-        {
-            foreach (ITemplate entity in entities)
-            {
-                PopulateCacheByKey(entity);
-            }
-        }
-
-        /// <summary>
-        /// Clears the GUID-keyed cache entry for the given key.
-        /// This ensures deleted entities are not returned from the cache.
-        /// </summary>
-        public void ClearCacheByKey(Guid key)
-        {
-            var cacheKey = GetCacheKey(key);
-            IsolatedCache.Clear(cacheKey);
-        }
-
-        private static string GetCacheKey(Guid key) => RepositoryCacheKeys.GetKey<ITemplate>() + key;
     }
 
     #endregion

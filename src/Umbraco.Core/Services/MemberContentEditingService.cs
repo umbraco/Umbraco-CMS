@@ -63,6 +63,13 @@ internal sealed class MemberContentEditingService
     }
 
     /// <inheritdoc />
+    public override Task<IMember?> GetAsync(Guid key)
+    {
+        IMember? content = ContentService.GetById(key);
+        return Task.FromResult(content);
+    }
+
+    /// <inheritdoc />
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateAsync(MemberEditingModelBase editingModel, Guid memberTypeKey)
         => await ValidatePropertiesAsync(editingModel, memberTypeKey);
 
@@ -116,7 +123,7 @@ internal sealed class MemberContentEditingService
         => throw new InvalidOperationException("Move is not supported for members");
 
     /// <inheritdoc />
-    protected override IMember? Copy(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
+    protected override Task<IMember?> CopyAsync(IMember member, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
         => throw new NotSupportedException("Copy is not supported for Member");
 
     /// <inheritdoc />

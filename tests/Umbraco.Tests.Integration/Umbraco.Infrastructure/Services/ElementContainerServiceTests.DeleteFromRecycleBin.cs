@@ -160,4 +160,60 @@ public partial class ElementContainerServiceTests
         Assert.IsNotNull(entityContainer);
         Assert.IsTrue(entityContainer.Trashed);
     }
+
+    [Test]
+    public async Task Deleted_Notifications_Are_Fired_For_Descendant_Items()
+    {
+        var deletedElementKeys = new List<Guid>();
+        var deletedContainerKeys = new List<Guid>();
+
+        var elementType = await CreateElementType();
+
+        // Create a container structure: rootContainer -> childContainer -> elements
+        var rootContainerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(rootContainerKey, "Root Container", null, Constants.Security.SuperUserKey);
+
+        var childContainerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(childContainerKey, "Child Container", rootContainerKey, Constants.Security.SuperUserKey);
+
+        // Create elements in the child container
+        var element1 = await CreateElement(elementType.Key, childContainerKey);
+        var element2 = await CreateElement(elementType.Key, childContainerKey);
+
+        // Move to recycle bin
+        await ElementContainerService.MoveToRecycleBinAsync(rootContainerKey, Constants.Security.SuperUserKey);
+
+        try
+        {
+            ElementNotificationHandler.DeletedElement = notification =>
+            {
+                deletedElementKeys.Add(notification.DeletedEntities.Single().Key);
+            };
+
+            EntityContainerNotificationHandler.DeletedContainer = notification =>
+            {
+                deletedContainerKeys.Add(notification.DeletedEntities.Single().Key);
+            };
+
+            var result = await ElementContainerService.DeleteFromRecycleBinAsync(rootContainerKey, Constants.Security.SuperUserKey);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, result.Status);
+
+            // Verify notifications were fired for descendant elements
+            Assert.AreEqual(2, deletedElementKeys.Count);
+            Assert.Contains(element1.Key, deletedElementKeys);
+            Assert.Contains(element2.Key, deletedElementKeys);
+
+            // Verify notifications were fired for descendant containers (child + root)
+            Assert.AreEqual(2, deletedContainerKeys.Count);
+            Assert.Contains(childContainerKey, deletedContainerKeys);
+            Assert.Contains(rootContainerKey, deletedContainerKeys);
+        }
+        finally
+        {
+            ElementNotificationHandler.DeletedElement = null;
+            EntityContainerNotificationHandler.DeletedContainer = null;
+        }
+    }
 }

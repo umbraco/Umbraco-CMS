@@ -1,5 +1,5 @@
 // To be able to test different databases, we need to set an additional UnattendedInstallConfig up because we would have to start from scratch, otherwise we would be using the same database.
-import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 const name = 'TestName';
 const email = process.env.UMBRACO_USER_LOGIN;

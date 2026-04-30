@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -14,6 +13,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
@@ -61,6 +61,17 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
     private ITemplateRepository CreateRepository(IScopeProvider provider, AppCaches? appCaches = null) =>
         new TemplateRepository((IScopeAccessor)provider, appCaches ?? AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), LoggerFactory, FileSystems, ShortStringHelper, ViewHelper, RuntimeSettings, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+
+    private ITemplateRepository CreateRepository(IScopeProvider provider, IOptionsMonitor<RuntimeSettings> runtimeSettings) =>
+        new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), LoggerFactory, FileSystems, ShortStringHelper, ViewHelper, runtimeSettings, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+
+    private static IOptionsMonitor<RuntimeSettings> CreateRuntimeSettingsMonitor(RuntimeMode mode)
+    {
+        var settings = new RuntimeSettings { Mode = mode };
+        var monitor = new Mock<IOptionsMonitor<RuntimeSettings>>();
+        monitor.Setup(m => m.CurrentValue).Returns(settings);
+        return monitor.Object;
+    }
 
     [Test]
     public void Can_Instantiate_Repository()
@@ -276,6 +287,31 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         Assert.IsNull(retrievedTemplate);
     }
 
+    /// <summary>
+    /// Verifies that retrieving all templates from the GUID-based repository returns all items when the cache is
+    /// populated.
+    /// </summary>
+    /// <remarks>
+    /// Verifies the fix for https://github.com/umbraco/Umbraco-CMS/issues/21756 as this test fails before
+    /// the fix is applied.
+    /// </remarks>
+    [Test]
+    public void GetMany_By_Guid_With_Warm_Cache_Returns_All()
+    {
+        var realCache = CreateAppCaches();
+        var provider = ScopeProvider;
+
+        using var scope = provider.CreateScope();
+        var repository = CreateRepository(provider, realCache);
+
+        CreateTemplate(repository);
+
+        var guidRepo = (IReadRepository<Guid, ITemplate>)repository;
+
+        var result = guidRepo.GetMany().ToArray();
+        Assert.IsNotEmpty(result);
+    }
+
     private static AppCaches CreateAppCaches() =>
         new(
             new ObjectCacheAppCache(),
@@ -465,13 +501,13 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Delete_When_Assigned_To_Doc()
+    public async Task Can_Perform_Delete_When_Assigned_To_Doc()
     {
         // Arrange
         var provider = ScopeProvider;
         var scopeAccessor = (IScopeAccessor)provider;
         var dataTypeService = GetRequiredService<IDataTypeService>();
-        var fileService = GetRequiredService<IFileService>();
+        var templateService = GetRequiredService<ITemplateService>();
 
         using (provider.CreateScope())
         {
@@ -505,10 +541,12 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
                 dataValueReferences,
                 dataTypeService,
                 serializer,
-                Mock.Of<IEventAggregator>());
+                Mock.Of<IEventAggregator>(),
+                Mock.Of<IRepositoryCacheVersionService>(),
+                Mock.Of<ICacheSyncService>());
 
             var template = TemplateBuilder.CreateTextPageTemplate();
-            fileService.SaveTemplate(template); // else, FK violation on contentType!
+            await templateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);
@@ -786,17 +824,138 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    private Stream CreateStream(string contents = null)
+    [Test]
+    public void Save_In_Production_Mode_Does_Not_Write_New_File()
     {
-        if (string.IsNullOrEmpty(contents))
+        // Arrange
+        var provider = ScopeProvider;
+
+        using (provider.CreateScope())
         {
-            contents = "/* test */";
+            var productionRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Production);
+            var repository = CreateRepository(provider, productionRuntimeSettings);
+
+            // Act
+            var template = new Template(ShortStringHelper, "productionTestNew", "productionTestNew") { Content = "mock-content" };
+            repository.Save(template);
+
+            // Assert - database record should be created but file should NOT be created in production mode.
+            Assert.That(repository.Get("productionTestNew"), Is.Not.Null);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestNew.cshtml"), Is.False);
         }
+    }
 
-        var bytes = Encoding.UTF8.GetBytes(contents);
-        var stream = new MemoryStream(bytes);
+    [Test]
+    public void Save_In_Production_Mode_Does_Not_Update_Existing_File()
+    {
+        // Arrange - create template in development mode first.
+        var provider = ScopeProvider;
 
-        return stream;
+        using (provider.CreateScope())
+        {
+            var developmentRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Development);
+            var developmentRepository = CreateRepository(provider, developmentRuntimeSettings);
+
+            var template = new Template(ShortStringHelper, "productionTestUpdate", "productionTestUpdate") { Content = "original-content" };
+            developmentRepository.Save(template);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestUpdate.cshtml"), Is.True);
+
+            // Read original content.
+            using var originalStream = FileSystems.MvcViewsFileSystem.OpenFile("productionTestUpdate.cshtml");
+            using var originalReader = new StreamReader(originalStream);
+            var originalContent = originalReader.ReadToEnd();
+            Assert.That(originalContent, Does.Contain("original-content"));
+
+            // Act - try to update in production mode.
+            var productionRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Production);
+            var productionRepository = CreateRepository(provider, productionRuntimeSettings);
+
+            var updatedTemplate = productionRepository.Get("productionTestUpdate");
+            Assert.IsNotNull(updatedTemplate);
+
+            // Modify and try to save.
+            updatedTemplate.Content = "modified-content";
+            productionRepository.Save(updatedTemplate);
+
+            // Assert - file should still have original content.
+            using var updatedStream = FileSystems.MvcViewsFileSystem.OpenFile("productionTestUpdate.cshtml");
+            using var updatedReader = new StreamReader(updatedStream);
+            var updatedContent = updatedReader.ReadToEnd();
+            Assert.That(updatedContent, Does.Contain("original-content"));
+            Assert.That(updatedContent, Does.Not.Contain("modified-content"));
+        }
+    }
+
+    [Test]
+    public void Delete_In_Production_Mode_Does_Not_Remove_File()
+    {
+        // Arrange - create template in development mode first.
+        var provider = ScopeProvider;
+
+        using (provider.CreateScope())
+        {
+            var developmentRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Development);
+            var developmentRepository = CreateRepository(provider, developmentRuntimeSettings);
+
+            var template = new Template(ShortStringHelper, "productionTestDelete", "productionTestDelete") { Content = "mock-content" };
+            developmentRepository.Save(template);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestDelete.cshtml"), Is.True);
+
+            // Act - try to delete in production mode.
+            var productionRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Production);
+            var productionRepository = CreateRepository(provider, productionRuntimeSettings);
+
+            var existingTemplate = productionRepository.Get("productionTestDelete");
+            Assert.IsNotNull(existingTemplate);
+
+            productionRepository.Delete(existingTemplate);
+
+            // Assert - database record should be removed but file should still exist.
+            Assert.That(productionRepository.Get("productionTestDelete"), Is.Null);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestDelete.cshtml"), Is.True);
+        }
+    }
+
+    [Test]
+    public void Save_In_Development_Mode_Writes_File()
+    {
+        // Arrange
+        var provider = ScopeProvider;
+
+        using (provider.CreateScope())
+        {
+            var developmentRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Development);
+            var repository = CreateRepository(provider, developmentRuntimeSettings);
+
+            // Act
+            var template = new Template(ShortStringHelper, "developmentTest", "developmentTest") { Content = "mock-content" };
+            repository.Save(template);
+
+            // Assert - file should be created in development mode.
+            Assert.That(repository.Get("developmentTest"), Is.Not.Null);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("developmentTest.cshtml"), Is.True);
+        }
+    }
+
+    [Test]
+    public void Save_In_BackofficeDevelopment_Mode_Writes_File()
+    {
+        // Arrange
+        var provider = ScopeProvider;
+
+        using (provider.CreateScope())
+        {
+            var backofficeDevelopmentRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.BackofficeDevelopment);
+            var repository = CreateRepository(provider, backofficeDevelopmentRuntimeSettings);
+
+            // Act
+            var template = new Template(ShortStringHelper, "backofficeDevelopmentTest", "backofficeDevelopmentTest") { Content = "mock-content" };
+            repository.Save(template);
+
+            // Assert - file should be created in backoffice development mode.
+            Assert.That(repository.Get("backofficeDevelopmentTest"), Is.Not.Null);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("backofficeDevelopmentTest.cshtml"), Is.True);
+        }
     }
 
     private IEnumerable<ITemplate> CreateHierarchy(ITemplateRepository repository)
@@ -857,5 +1016,99 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         repository.Save(baby2);
 
         return new[] { parent, child1, child2, toddler1, toddler2, toddler3, toddler4, baby1, baby2 };
+    }
+
+    [Test]
+    public void Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "deepCloneTest", "deepCloneTest");
+            repository.Save(template);
+
+            var first = repository.Get(template.Key);
+            var second = repository.Get(template.Key);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Get_By_Alias_Returns_Correct_Template()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "aliasLookupTest", "aliasLookupTest");
+            repository.Save(template);
+
+            // Case-insensitive alias lookup.
+            var result = repository.Get("ALIASLOOKUPTEST");
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(template.Id, result!.Id);
+        }
+    }
+
+    [Test]
+    public void Get_By_Alias_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "aliasCloneTest", "aliasCloneTest");
+            repository.Save(template);
+
+            var first = repository.Get("aliasCloneTest");
+            var second = repository.Get("aliasCloneTest");
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Exists_By_Guid_Returns_Correct_Result()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "existsTest", "existsTest");
+            repository.Save(template);
+
+            Assert.IsTrue(repository.Exists(template.Key));
+            Assert.IsFalse(repository.Exists(Guid.NewGuid()));
+        }
+    }
+
+    [Test]
+    public void Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "mutationTest", "mutationTest");
+            repository.Save(template);
+
+            var first = repository.Get(template.Key);
+            Assert.IsNotNull(first);
+            var originalName = first!.Name;
+            first.Name = "MUTATED_" + Guid.NewGuid();
+
+            var second = repository.Get(template.Key);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
+        }
     }
 }

@@ -7,8 +7,7 @@ import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 export class UmbElementCollectionRepository extends UmbRepositoryBase implements UmbCollectionRepository {
 	#treeRepository = new UmbElementTreeRepository(this);
 
-	async requestCollection(filter: UmbCollectionFilterModel) {
-		// TODO: get parent from args
+	async requestCollection(filter: UmbCollectionFilterModel = {}) {
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
 		if (!entityContext) throw new Error('Entity context not found');
 
@@ -18,12 +17,18 @@ export class UmbElementCollectionRepository extends UmbRepositoryBase implements
 		if (!entityType) throw new Error('Entity type not found');
 		if (unique === undefined) throw new Error('Unique not found');
 
+		// TODO: get parent from args
 		const parent: UmbEntityModel = { entityType, unique };
 
 		if (parent.unique === null) {
-			return this.#treeRepository.requestTreeRootItems({ skip: filter.skip, take: filter.take });
+			return this.#treeRepository.requestTreeRootItems({
+				paging: { skip: filter.skip ?? 0, take: filter.take ?? 100 },
+			});
 		} else {
-			return this.#treeRepository.requestTreeItemsOf({ parent, skip: filter.skip, take: filter.take });
+			return this.#treeRepository.requestTreeItemsOf({
+				parent,
+				paging: { skip: filter.skip ?? 0, take: filter.take ?? 100 },
+			});
 		}
 	}
 }

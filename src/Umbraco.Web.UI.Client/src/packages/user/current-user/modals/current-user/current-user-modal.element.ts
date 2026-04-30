@@ -19,7 +19,6 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	@state()
 	private _logOutButtonState?: UUIButtonState;
 
-	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#currentUserContext?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
 
 	constructor() {
@@ -28,10 +27,6 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (instance) => {
 			this.#currentUserContext = instance;
 			this._observeCurrentUser();
-		});
-
-		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
-			this.#authContext = instance;
 		});
 	}
 
@@ -52,9 +47,12 @@ export class UmbCurrentUserModalElement extends UmbLitElement {
 	}
 
 	private async _logout() {
-		if (!this.#authContext) return;
+		const authContext = await this.getContext(UMB_AUTH_CONTEXT);
+		if (!authContext) {
+			throw new Error('UMB_AUTH_CONTEXT could not be retrieved, this is required to log out the user.');
+		}
 		this._logOutButtonState = 'waiting';
-		await this.#authContext.signOut();
+		await authContext.signOut();
 		this._logOutButtonState = 'success';
 	}
 

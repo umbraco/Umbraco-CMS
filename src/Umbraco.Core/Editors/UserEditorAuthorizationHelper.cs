@@ -92,45 +92,22 @@ public class UserEditorAuthorizationHelper
             return Attempt<string?>.Succeed();
         }
 
+        // d) a non-admin user can remove any groups but can only add groups they themselves belong to
         if (userGroupAliases != null)
         {
-            var savingGroupAliases = userGroupAliases.ToArray();
-            var existingGroupAliases = savingUser == null
+            IEnumerable<string> requestedGroupAliases = userGroupAliases.ToArray();
+            IEnumerable<string> existingGroupAliases = savingUser == null
                 ? []
-                : savingUser.Groups.Select(x => x.Alias).ToArray();
+                : savingUser.Groups.Select(x => x.Alias);
+            IEnumerable<string> performingUserGroupAliases = currentUser?.Groups.Select(x => x.Alias) ?? Enumerable.Empty<string>();
 
-            IEnumerable<string> addedGroupAliases = savingGroupAliases.Except(existingGroupAliases);
+            IReadOnlyList<string> unauthorized = UserGroupAssignmentAuthorization
+                .GetUnauthorizedGroupAssignments(performingUserGroupAliases, requestedGroupAliases, existingGroupAliases);
 
-            // As we know the current user is not admin, it is only allowed to use groups that the user do have themselves.
-            var savingGroupAliasesNotAllowed = addedGroupAliases
-                .Except(currentUser?.Groups.Select(x => x.Alias) ?? Enumerable.Empty<string>()).ToArray();
-            if (savingGroupAliasesNotAllowed.Any())
+            if (unauthorized.Count > 0)
             {
-                return Attempt.Fail("Cannot assign the group(s) '" + string.Join(", ", savingGroupAliasesNotAllowed) +
+                return Attempt.Fail("Cannot assign the group(s) '" + string.Join(", ", unauthorized) +
                                     "', the current user is not part of them or admin");
-            }
-
-            // only validate any groups that have changed.
-            // a non-admin user can remove groups and add groups that they have access to
-            // but they cannot add a group that they do not have access to or that grants them
-            // path or section access that they don't have access to.
-            var newGroups = savingUser == null
-                ? savingGroupAliases
-                : savingGroupAliases.Except(savingUser.Groups.Select(x => x.Alias)).ToArray();
-
-            var userGroupsChanged = savingUser != null && newGroups.Length > 0;
-
-            if (userGroupsChanged)
-            {
-                // d) A user cannot assign a group to another user that they do not belong to
-                var currentUserGroups = currentUser?.Groups.Select(x => x.Alias).ToArray();
-                foreach (var group in newGroups)
-                {
-                    if (currentUserGroups?.Contains(group) == false)
-                    {
-                        return Attempt.Fail("Cannot assign the group " + group + ", the current user is not a member");
-                    }
-                }
             }
         }
 

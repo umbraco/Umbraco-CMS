@@ -37,8 +37,11 @@ internal sealed class PublishedContentQueryTests : ExamineBaseTest
             _fieldNames = fieldNames;
 
         public bool EnableDefaultEventHandler => throw new NotImplementedException();
+
         public bool PublishedValuesOnly => throw new NotImplementedException();
+
         public bool SupportProtectedContent => throw new NotImplementedException();
+
         public IEnumerable<string> GetFields() => _fieldNames;
     }
 
@@ -68,11 +71,11 @@ internal sealed class PublishedContentQueryTests : ExamineBaseTest
         return index;
     }
 
-    private PublishedContentQuery CreatePublishedContentQuery(IIndex indexer)
+    private PublishedContentQuery CreatePublishedContentQuery(IIndex indexer, string indexName = "TestIndex")
     {
         var examineManager = new Mock<IExamineManager>();
         var outarg = indexer;
-        examineManager.Setup(x => x.TryGetIndex("TestIndex", out outarg)).Returns(true);
+        examineManager.Setup(x => x.TryGetIndex(indexName, out outarg)).Returns(true);
 
         var contentCache = new Mock<IPublishedContentCache>();
         contentCache.Setup(x => x.GetById(It.IsAny<int>()))
@@ -80,7 +83,13 @@ internal sealed class PublishedContentQueryTests : ExamineBaseTest
         var variationContext = new VariationContext();
         var variationContextAccessor = Mock.Of<IVariationContextAccessor>(x => x.VariationContext == variationContext);
 
-        return new PublishedContentQuery(variationContextAccessor, examineManager.Object, contentCache.Object, Mock.Of<IPublishedMediaCache>(), Mock.Of<IDocumentNavigationQueryService>());
+        return new PublishedContentQuery(
+            variationContextAccessor,
+            examineManager.Object,
+            contentCache.Object,
+            Mock.Of<IPublishedMediaCache>(),
+            Mock.Of<IDocumentNavigationQueryService>(),
+            Mock.Of<IMediaNavigationQueryService>());
     }
 
     [TestCase("fr-fr", ExpectedResult = "1, 3", Description = "Search Culture: fr-fr. Must return both fr-fr and invariant results")]
@@ -90,19 +99,17 @@ internal sealed class PublishedContentQueryTests : ExamineBaseTest
     [LongRunning]
     public string Search(string culture)
     {
-        using (var luceneDir = new RandomIdRAMDirectory())
-        {
-            var fields = new[] { (Name: "title", Culture: null), (Name: "title_en-us", Culture: "en-us"), (Name: "title_fr-fr", Culture: "fr-fr") };
-            using (var indexer = CreateTestIndex(luceneDir, fields))
-            {
-                var pcq = CreatePublishedContentQuery(indexer);
+        using var luceneDir = new RandomIdRAMDirectory();
 
-                var results = pcq.Search("Products", culture, "TestIndex");
+        var fields = new[] { (Name: "title", Culture: null), (Name: "title_en-us", Culture: "en-us"), (Name: "title_fr-fr", Culture: "fr-fr") };
 
-                var ids = results.Select(x => x.Content.Id).ToArray();
+        using var indexer = CreateTestIndex(luceneDir, fields);
+        var pcq = CreatePublishedContentQuery(indexer);
 
-                return string.Join(", ", ids);
-            }
-        }
+        var results = pcq.Search("Products", culture, "TestIndex");
+
+        var ids = results.Select(x => x.Content.Id).ToArray();
+
+        return string.Join(", ", ids);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Factories;
 using Umbraco.Cms.Core.Mapping;
@@ -8,12 +8,22 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Factories.Installer;
 
+/// <summary>
+/// Provides a factory for creating and configuring database settings used during the installation process.
+/// </summary>
 public class DatabaseSettingsFactory : IDatabaseSettingsFactory
 {
     private readonly IEnumerable<IDatabaseProviderMetadata> _databaseProviderMetadata;
     private readonly IOptionsMonitor<ConnectionStrings> _connectionStrings;
     private readonly IUmbracoMapper _mapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Factories.Installer.DatabaseSettingsFactory"/> class,
+    /// used to create and configure database settings during the installation process.
+    /// </summary>
+    /// <param name="databaseProviderMetadata">A collection containing metadata for available database providers.</param>
+    /// <param name="connectionStrings">An <see cref="IOptionsMonitor{TOptions}"/> instance for monitoring <see cref="ConnectionStrings"/> options.</param>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used for mapping objects within Umbraco.</param>
     public DatabaseSettingsFactory(
         IEnumerable<IDatabaseProviderMetadata> databaseProviderMetadata,
         IOptionsMonitor<ConnectionStrings> connectionStrings,

@@ -57,7 +57,7 @@ internal sealed class LanguageDto
     ///     Gets or sets the identifier of a fallback language.
     /// </summary>
     [Column("fallbackLanguageId")]
-    [ForeignKey(typeof(LanguageDto), Column = "id")]
+    [ForeignKey(typeof(LanguageDto), Column = PrimaryKeyColumnName)]
     [Index(IndexTypes.NonClustered)]
     [NullSetting(NullSetting = NullSettings.Null)]
     public int? FallbackLanguageId { get; set; }

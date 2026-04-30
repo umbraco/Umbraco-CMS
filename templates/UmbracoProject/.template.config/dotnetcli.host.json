@@ -13,6 +13,10 @@
       "longName": "use-delivery-api",
       "shortName": "da"
     },
+    "PackageManagement": {
+      "longName": "package-management",
+      "shortName": "pm"
+    },
     "Docker": {
       "longName": "add-docker",
       "shortName": ""

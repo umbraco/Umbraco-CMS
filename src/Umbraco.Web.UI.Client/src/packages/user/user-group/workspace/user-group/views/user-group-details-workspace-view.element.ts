@@ -10,6 +10,7 @@ import type { UmbWorkspaceViewElement } from '@umbraco-cms/backoffice/workspace'
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import '../components/user-group-entity-type-permission-groups.element.js';
+import '../components/user-group-workspace-users.element.js';
 
 @customElement('umb-user-group-details-workspace-view')
 export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -199,6 +200,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 
 					${this.#renderPermissionGroups()}
 				</umb-stack>
+				<umb-user-group-workspace-users></umb-user-group-workspace-users>
 			</div>
 		`;
 	}
@@ -270,14 +272,13 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 				${when(
 					this._elementRootAccess === false,
 					() => html`
-						<umb-input-entity-data
+						<umb-input-element
 							slot="editor"
 							max="1"
 							.selection=${this._elementStartNode?.unique ? [this._elementStartNode.unique] : []}
-							.dataSourceAlias=${'Umb.PropertyEditorDataSource.ElementFolder'}
-							.dataSourceConfig=${[]}
+							?folderOnly=${true}
 							@change=${this.#onElementStartNodeChange}>
-						</umb-input-entity-data>
+						</umb-input-element>
 					`,
 				)}
 			</umb-property-layout>
@@ -302,6 +303,7 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 						<umb-input-media
 							slot="editor"
 							max="1"
+							folder-filter="foldersOnly"
 							.selection=${this._mediaStartNode?.unique ? [this._mediaStartNode.unique] : []}
 							@change=${this.#onMediaStartNodeChange}>
 						</umb-input-media>
@@ -324,6 +326,9 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 			}
 
 			#main {
+				display: grid;
+				grid-template-columns: 1fr 350px;
+				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
 			}
 

@@ -1567,6 +1567,7 @@ export default {
 		noLockouts: 'nebyl uzamčen',
 		noPasswordChange: 'Heslo nebylo změněno',
 		confirmNewPassword: 'Potvrdit heslo',
+		confirmPassword: 'Potvrdit heslo',
 		changePasswordDescription:
 			"Můžete změnit své heslo pro přístup do administrace Umbraca vyplněním formuláře níže a kliknutím na tlačítko 'Změnit Heslo'",
 		contentChannel: 'Kanál obsahu',
@@ -1808,7 +1809,8 @@ export default {
 		openBackofficeSearch: 'Otevřít hledání v backoffice',
 		openCloseBackofficeHelp: 'Otevřít/zavřít nápovědu backoffice',
 		openCloseBackofficeProfileOptions: 'Otevřít/zavřít možnosti vašeho profilu',
-		profileOptions: 'Opcije profila',
+		profileOptions: 'Profil uživatele pro %0% (%1%)',
+		profileOptionsDefault: 'Profil uživatele',
 		openContextMenu: 'Otevřít kontextové menu pro',
 		currentLanguage: 'Aktuální jazyk',
 		switchLanguage: 'Přepnout jazyk na',

@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Core.Security;
 
+/// <summary>
+/// Represents authentication credentials for a member client in the system.
+/// </summary>
 public class MemberClientCredentials
 {
     /// <summary>

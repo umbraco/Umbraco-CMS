@@ -10,4 +10,5 @@ export interface UmbLinkPickerLink {
 	type?: UmbLinkPickerLinkType | null;
 	unique?: string | null;
 	url?: string | null;
+	culture?: string | null;
 }

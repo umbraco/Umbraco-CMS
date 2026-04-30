@@ -1,5 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -33,7 +35,8 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         .AddNotificationHandler<EntityContainerMovingToRecycleBinNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<EntityContainerMovedToRecycleBinNotification, EntityContainerNotificationHandler>()
         .AddNotificationHandler<EntityContainerDeletingNotification, EntityContainerNotificationHandler>()
-        .AddNotificationHandler<EntityContainerDeletedNotification, EntityContainerNotificationHandler>();
+        .AddNotificationHandler<EntityContainerDeletedNotification, EntityContainerNotificationHandler>()
+        .AddNotificationHandler<ElementDeletedNotification, ElementNotificationHandler>();
 
     private IEntitySlim[] GetAtRoot()
         => EntityService.GetRootEntities(UmbracoObjectTypes.ElementContainer).Union(EntityService.GetRootEntities(UmbracoObjectTypes.Element)).ToArray();
@@ -48,6 +51,7 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
             .WithName("Test")
             .WithAllowAsRoot(true)
             .WithIsElement(true)
+            .WithAllowedInLibrary(true)
             .Build();
 
         var result = await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
@@ -147,6 +151,14 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(container.Key, recycleBinItems[0].Key);
     }
 
+    public static void ConfigureDisableDeleteWhenReferenced(IUmbracoBuilder builder)
+        => builder.Services.Configure<ContentSettings>(config =>
+            config.DisableDeleteWhenReferenced = true);
+
+    public static void ConfigureDisableUnpublishWhenReferenced(IUmbracoBuilder builder)
+        => builder.Services.Configure<ContentSettings>(config =>
+            config.DisableUnpublishWhenReferenced = true);
+
     private struct FolderWithElementsStructureInfo
     {
         public Guid RootContainerKey { get; init; }
@@ -195,5 +207,12 @@ public partial class ElementContainerServiceTests : UmbracoIntegrationTest
         public void Handle(EntityContainerDeletingNotification notification) => DeletingContainer?.Invoke(notification);
 
         public void Handle(EntityContainerDeletedNotification notification) => DeletedContainer?.Invoke(notification);
+    }
+
+    private sealed class ElementNotificationHandler : INotificationHandler<ElementDeletedNotification>
+    {
+        public static Action<ElementDeletedNotification>? DeletedElement { get; set; }
+
+        public void Handle(ElementDeletedNotification notification) => DeletedElement?.Invoke(notification);
     }
 }

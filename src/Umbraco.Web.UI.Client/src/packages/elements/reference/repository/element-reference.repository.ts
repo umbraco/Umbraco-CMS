@@ -20,11 +20,6 @@ export class UmbElementReferenceRepository extends UmbControllerBase implements 
 		if (!uniques || uniques.length === 0) throw new Error(`uniques is required`);
 		return this.#referenceSource.getAreReferenced(uniques, skip, take);
 	}
-
-	async requestDescendantsWithReferences(unique: string, skip = 0, take = 20) {
-		if (!unique) throw new Error(`unique is required`);
-		return this.#referenceSource.getReferencedDescendants(unique, skip, take);
-	}
 }
 
 export default UmbElementReferenceRepository;

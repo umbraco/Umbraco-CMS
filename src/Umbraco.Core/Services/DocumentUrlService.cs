@@ -2,11 +2,9 @@ using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
@@ -14,6 +12,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -41,16 +40,16 @@ public class DocumentUrlService : IDocumentUrlService
     private readonly IKeyValueService _keyValueService;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly IDomainCacheService _domainCacheService;
     private readonly IDefaultCultureAccessor _defaultCultureAccessor;
+    private readonly IServerRoleAccessor _serverRoleAccessor;
 
     private readonly ConcurrentDictionary<UrlCacheKey, UrlSegmentCache> _documentUrlCache = new();
     private readonly ConcurrentDictionary<string, int> _cultureToLanguageIdMap = new();
-    private bool _isInitialized;
 
     /// <inheritdoc/>
-    public bool IsInitialized => _isInitialized;
+    public bool IsInitialized { get; private set; }
 
     /// <summary>
     /// Struct-based cache key for memory-efficient URL segment caching.
@@ -65,9 +64,9 @@ public class DocumentUrlService : IDocumentUrlService
         public Guid DocumentKey { get; }
 
         /// <summary>
-        /// Gets the language Id.
+        /// Gets the language Id. NULL indicates invariant content (not language-specific).
         /// </summary>
-        public int LanguageId { get; }
+        public int? LanguageId { get; }
 
         /// <summary>
         /// Gets a value indicating whether the URL is for a draft or published version.
@@ -78,9 +77,9 @@ public class DocumentUrlService : IDocumentUrlService
         /// Initializes a new instance of the <see cref="UrlCacheKey"/> struct.
         /// </summary>
         /// <param name="documentKey">The document key.</param>
-        /// <param name="languageId">The language Id.</param>
+        /// <param name="languageId">The language Id. NULL for invariant content.</param>
         /// <param name="isDraft">A value indicating the draft or published value.</param>
-        public UrlCacheKey(Guid documentKey, int languageId, bool isDraft)
+        public UrlCacheKey(Guid documentKey, int? languageId, bool isDraft)
         {
             DocumentKey = documentKey;
             LanguageId = languageId;
@@ -97,7 +96,7 @@ public class DocumentUrlService : IDocumentUrlService
         public override bool Equals(object? obj) => obj is UrlCacheKey other && Equals(other);
 
         /// <inheritdoc/>
-        public override int GetHashCode() => HashCode.Combine(DocumentKey, LanguageId, IsDraft);
+        public override int GetHashCode() => HashCode.Combine(DocumentKey, LanguageId ?? 0, IsDraft);
     }
 
     /// <summary>
@@ -136,45 +135,6 @@ public class DocumentUrlService : IDocumentUrlService
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
     /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public DocumentUrlService(
-        ILogger<DocumentUrlService> logger,
-        IDocumentUrlRepository documentUrlRepository,
-        IDocumentRepository documentRepository,
-        ICoreScopeProvider coreScopeProvider,
-        IOptions<GlobalSettings> globalSettings,
-        UrlSegmentProviderCollection urlSegmentProviderCollection,
-        IContentService contentService,
-        IShortStringHelper shortStringHelper,
-        ILanguageService languageService,
-        IKeyValueService keyValueService,
-        IIdKeyMap idKeyMap,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
-        IDomainCacheService domainCacheService)
-        :this(
-            logger,
-            documentUrlRepository,
-            documentRepository,
-            coreScopeProvider,
-            globalSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>(),
-            urlSegmentProviderCollection,
-            contentService,
-            shortStringHelper,
-            languageService,
-            keyValueService,
-            idKeyMap,
-            documentNavigationQueryService,
-            publishStatusQueryService,
-            domainCacheService,
-            StaticServiceProvider.Instance.GetRequiredService<IDefaultCultureAccessor>())
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentUrlService"/> class.
-    /// </summary>
     public DocumentUrlService(
         ILogger<DocumentUrlService> logger,
         IDocumentUrlRepository documentUrlRepository,
@@ -189,9 +149,10 @@ public class DocumentUrlService : IDocumentUrlService
         IKeyValueService keyValueService,
         IIdKeyMap idKeyMap,
         IDocumentNavigationQueryService documentNavigationQueryService,
-        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         IDomainCacheService domainCacheService,
-        IDefaultCultureAccessor defaultCultureAccessor)
+        IDefaultCultureAccessor defaultCultureAccessor,
+        IServerRoleAccessor serverRoleAccessor)
     {
         _logger = logger;
         _documentUrlRepository = documentUrlRepository;
@@ -209,6 +170,7 @@ public class DocumentUrlService : IDocumentUrlService
         _publishStatusQueryService = publishStatusQueryService;
         _domainCacheService = domainCacheService;
         _defaultCultureAccessor = defaultCultureAccessor;
+        _serverRoleAccessor = serverRoleAccessor;
     }
 
     /// <inheritdoc/>
@@ -217,12 +179,12 @@ public class DocumentUrlService : IDocumentUrlService
         if (forceEmpty)
         {
             // We have this use case when umbraco is installing, we know there is no routes. And we can execute the normal logic because the connection string is missing.
-            _isInitialized = true;
+            IsInitialized = true;
             return;
         }
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        if (ShouldRebuildUrls())
+        if (SkipDatabaseWrites() is false && ShouldRebuildUrls())
         {
             _logger.LogInformation("Rebuilding all document URLs.");
             await RebuildAllUrlsAsync();
@@ -260,7 +222,7 @@ public class DocumentUrlService : IDocumentUrlService
                 estimatedMemoryBytes);
         }
 
-        _isInitialized = true;
+        IsInitialized = true;
         scope.Complete();
     }
 
@@ -279,6 +241,12 @@ public class DocumentUrlService : IDocumentUrlService
     /// <inheritdoc/>
     public async Task RebuildAllUrlsAsync()
     {
+        if (SkipDatabaseWrites())
+        {
+            _logger.LogDebug("Skipping document URL rebuild — the current server role does not persist URL segments.");
+            return;
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
@@ -292,6 +260,17 @@ public class DocumentUrlService : IDocumentUrlService
     }
 
     /// <summary>
+    /// Indicates whether this instance should skip database writes for URL segments.
+    /// </summary>
+    /// <remarks>
+    /// On a <see cref="ServerRole.Subscriber"/> the scheduling publisher has already persisted URL segments to
+    /// the database before issuing the cache-refresh instruction that routed us here. Re-writing them locally is
+    /// redundant at best, and blows up when the subscriber is configured against a read-only database connection.
+    /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
+    /// </remarks>
+    private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
+
+    /// <summary>
     /// Converts a collection of <see cref="PublishedDocumentUrlSegment"/> to cache key-value pairs for caching purposes.
     /// </summary>
     /// <param name="publishedDocumentUrlSegments">The collection of <see cref="PublishedDocumentUrlSegment"/> retrieved from the database on startup.</param>
@@ -300,12 +279,12 @@ public class DocumentUrlService : IDocumentUrlService
     internal static IEnumerable<(UrlCacheKey Key, UrlSegmentCache Cache)> ConvertToCacheModel(IEnumerable<PublishedDocumentUrlSegment> publishedDocumentUrlSegments)
     {
         // Group segments by document/language/draft and collect primary + alternates.
-        var grouped = new Dictionary<(Guid DocumentKey, int LanguageId, bool IsDraft), (string? Primary, List<string> Alternates)>();
+        var grouped = new Dictionary<(Guid DocumentKey, int? LanguageId, bool IsDraft), (string? Primary, List<string> Alternates)>();
 
         foreach (PublishedDocumentUrlSegment model in publishedDocumentUrlSegments)
         {
             // Group using composite key of document/language/draft.
-            (Guid DocumentKey, int LanguageId, bool IsDraft) key = (model.DocumentKey, model.LanguageId, model.IsDraft);
+            (Guid DocumentKey, int? LanguageId, bool IsDraft) key = (model.DocumentKey, model.LanguageId, model.IsDraft);
 
             if (grouped.TryGetValue(key, out (string? Primary, List<string> Alternates) segments) is false)
             {
@@ -325,9 +304,9 @@ public class DocumentUrlService : IDocumentUrlService
         }
 
         // Prepare output as a collection of key value pairs of the cache key (UrlCacheKey struct) and cache entry (UrlSegmentCache object).
-        foreach (KeyValuePair<(Guid DocumentKey, int LanguageId, bool IsDraft), (string? Primary, List<string> Alternates)> kvp in grouped)
+        foreach (KeyValuePair<(Guid DocumentKey, int? LanguageId, bool IsDraft), (string? Primary, List<string> Alternates)> kvp in grouped)
         {
-            (Guid documentKey, int languageId, bool isDraft) = kvp.Key;
+            (Guid documentKey, int? languageId, bool isDraft) = kvp.Key;
             (string? primary, List<string>? alternates) = kvp.Value;
 
             // Use first alternate as primary if no primary was marked.
@@ -354,7 +333,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
     }
 
-    private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, int languageId, bool isDraft)
+    private void RemoveFromCache(IScopeContext scopeContext, Guid documentKey, int? languageId, bool isDraft)
     {
         UrlCacheKey cacheKey = CreateCacheKey(documentKey, languageId, isDraft);
 
@@ -380,7 +359,7 @@ public class DocumentUrlService : IDocumentUrlService
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static UrlCacheKey CreateCacheKey(Guid documentKey, int languageId, bool isDraft) => new(documentKey, languageId, isDraft);
+    private static UrlCacheKey CreateCacheKey(Guid documentKey, int? languageId, bool isDraft) => new(documentKey, languageId, isDraft);
 
     /// <summary>
     /// Calculates the estimated memory usage of the document URL cache.
@@ -443,13 +422,20 @@ public class DocumentUrlService : IDocumentUrlService
     public string? GetUrlSegment(Guid documentKey, string culture, bool isDraft)
     {
         ThrowIfNotInitialized();
-        if (TryGetLanguageIdFromCulture(culture, out int languageId) is false)
+        if (TryGetLanguageIdFromCulture(culture, out int languageId))
         {
-            return null;
+            // Try culture-specific lookup first.
+            UrlCacheKey cacheKey = CreateCacheKey(documentKey, languageId, isDraft);
+            if (_documentUrlCache.TryGetValue(cacheKey, out UrlSegmentCache? cache))
+            {
+                return cache.PrimarySegment;
+            }
         }
 
-        UrlCacheKey cacheKey = CreateCacheKey(documentKey, languageId, isDraft);
-        return _documentUrlCache.TryGetValue(cacheKey, out UrlSegmentCache? cache) ? cache.PrimarySegment : null;
+        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL,
+        // or when the culture couldn't be resolved to a language ID (e.g. empty string for invariant content).
+        UrlCacheKey invariantKey = CreateCacheKey(documentKey, null, isDraft);
+        return _documentUrlCache.TryGetValue(invariantKey, out UrlSegmentCache? invariantCache) ? invariantCache.PrimarySegment : null;
     }
 
     private bool TryGetLanguageIdFromCulture(string culture, out int languageId)
@@ -476,20 +462,27 @@ public class DocumentUrlService : IDocumentUrlService
     public IEnumerable<string> GetUrlSegments(Guid documentKey, string culture, bool isDraft)
     {
         ThrowIfNotInitialized();
-        if (TryGetLanguageIdFromCulture(culture, out int languageId) is false)
+        if (TryGetLanguageIdFromCulture(culture, out int languageId))
         {
-            return Enumerable.Empty<string>();
+            // Try culture-specific lookup first.
+            UrlCacheKey cacheKey = CreateCacheKey(documentKey, languageId, isDraft);
+            if (_documentUrlCache.TryGetValue(cacheKey, out UrlSegmentCache? cache))
+            {
+                return cache.GetAllSegments();
+            }
         }
 
-        UrlCacheKey cacheKey = CreateCacheKey(documentKey, languageId, isDraft);
-        return _documentUrlCache.TryGetValue(cacheKey, out UrlSegmentCache? cache)
-            ? cache.GetAllSegments()
+        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL,
+        // or when the culture couldn't be resolved to a language ID (e.g. empty string for invariant content).
+        UrlCacheKey invariantKey = CreateCacheKey(documentKey, null, isDraft);
+        return _documentUrlCache.TryGetValue(invariantKey, out UrlSegmentCache? invariantCache)
+            ? invariantCache.GetAllSegments()
             : Enumerable.Empty<string>();
     }
 
     private void ThrowIfNotInitialized()
     {
-        if (_isInitialized is false)
+        if (IsInitialized is false)
         {
             throw new InvalidOperationException("The service needs to be initialized before it can be used.");
         }
@@ -552,13 +545,41 @@ public class DocumentUrlService : IDocumentUrlService
                 _logger.LogTrace("Rebuilding urls for document with key {DocumentKey}", document.Key);
             }
 
-            foreach ((string culture, ILanguage language) in languageDictionary)
+            if (document.ContentType.VariesByCulture())
             {
-                HandleCaching(_coreScopeProvider.Context!, document, document.ContentType.VariesByCulture() ? culture : null, language, toSave);
+                // Variant content: process per language.
+                foreach ((string culture, ILanguage language) in languageDictionary)
+                {
+                    HandleCaching(_coreScopeProvider.Context!, document, culture, language.Id, toSave);
+                }
+            }
+            else
+            {
+                // Invariant content: check if segments are identical across all cultures.
+                // In most case we expect them to be, but it's possible custom IUrlSegmentProvider implementations may return
+                // different segments for different cultures.
+                // If invariant segments are identical, we store once with NULL languageId.
+                // If they differ, we store per-language (like variant content) to ensure we correctly reflect what the URL provider
+                // has reported.
+                var useNullLanguageId = ShouldStoreNullLanguageIdForInvariantDocument(document, languageDictionary);
+
+                if (useNullLanguageId)
+                {
+                    // All segments identical (or single language): store once with NULL languageId.
+                    HandleCaching(_coreScopeProvider.Context!, document, null, null, toSave);
+                }
+                else
+                {
+                    // Segments differ by culture: store per-language (like variant content).
+                    foreach ((string culture, ILanguage language) in languageDictionary)
+                    {
+                        HandleCaching(_coreScopeProvider.Context!, document, culture, language.Id, toSave);
+                    }
+                }
             }
         }
 
-        if (toSave.Count > 0)
+        if (toSave.Count > 0 && SkipDatabaseWrites() is false)
         {
             scope.WriteLock(Constants.Locks.DocumentUrls);
             _documentUrlRepository.Save(toSave);
@@ -575,9 +596,94 @@ public class DocumentUrlService : IDocumentUrlService
         }
     }
 
-    private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, ILanguage language, List<PublishedDocumentUrlSegment> toSave)
+    /// <summary>
+    /// Determines if invariant content should use NULL languageId storage.
+    /// Returns true if URL segments are identical across all cultures.
+    /// </summary>
+    /// <remarks>
+    /// Custom <see cref="IUrlSegmentProvider"/> implementations may return different segments for different cultures,
+    /// even for invariant content. This method detects that case and returns false to ensure correct storage.
+    /// </remarks>
+    private bool ShouldStoreNullLanguageIdForInvariantDocument(IContent document, IDictionary<string, ILanguage> languageDictionary)
     {
-        foreach ((UrlCacheKey cacheKey, UrlSegmentCache? cache, bool shouldCache) in GenerateCacheEntries(document, culture, language))
+        if (languageDictionary.Count <= 1)
+        {
+            return true; // 0 or 1 language = use NULL (no comparison needed).
+        }
+
+        // Check published segment consistency (if document is published).
+        if (document.Published && document.Trashed is false)
+        {
+            if (AreSegmentsIdenticalForAllCultures(document, languageDictionary, published: true) is false)
+            {
+                return false;
+            }
+        }
+
+        // Check draft segment consistency.
+        if (document.Trashed is false)
+        {
+            if (AreSegmentsIdenticalForAllCultures(document, languageDictionary, published: false) is false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Checks if URL segments are identical across all cultures for the given document.
+    /// </summary>
+    private bool AreSegmentsIdenticalForAllCultures(
+        IContent document,
+        IDictionary<string, ILanguage> languageDictionary,
+        bool published)
+    {
+        string[]? firstSegments = null;
+
+        foreach ((string culture, _) in languageDictionary)
+        {
+            var segments = document.GetUrlSegments(_shortStringHelper, _urlSegmentProviderCollection, culture, published).ToArray();
+
+            if (firstSegments is null)
+            {
+                firstSegments = segments;
+            }
+            else if (AreSegmentArraysEqual(firstSegments, segments) is false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Compares two segment arrays for equality.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool AreSegmentArraysEqual(string[] first, string[] second)
+    {
+        if (first.Length != second.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < first.Length; i++)
+        {
+            if (string.Equals(first[i], second[i], StringComparison.Ordinal) is false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void HandleCaching(IScopeContext scopeContext, IContent document, string? culture, int? languageId, List<PublishedDocumentUrlSegment> toSave)
+    {
+        foreach ((UrlCacheKey cacheKey, UrlSegmentCache? cache, bool shouldCache) in GenerateCacheEntries(document, culture, languageId))
         {
             if (shouldCache is false || cache is null)
             {
@@ -591,7 +697,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
     }
 
-    private IEnumerable<(UrlCacheKey CacheKey, UrlSegmentCache? Cache, bool ShouldCache)> GenerateCacheEntries(IContent document, string? culture, ILanguage language)
+    private IEnumerable<(UrlCacheKey CacheKey, UrlSegmentCache? Cache, bool ShouldCache)> GenerateCacheEntries(IContent document, string? culture, int? languageId)
     {
         // Published version
         if (document.Trashed is false
@@ -604,7 +710,7 @@ public class DocumentUrlService : IDocumentUrlService
             }
             else
             {
-                var cacheKey = new UrlCacheKey(document.Key, language.Id, isDraft: false);
+                var cacheKey = new UrlCacheKey(document.Key, languageId, isDraft: false);
                 var cache = new UrlSegmentCache
                 {
                     PrimarySegment = publishedUrlSegments[0],
@@ -615,7 +721,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
         else
         {
-            var cacheKey = new UrlCacheKey(document.Key, language.Id, isDraft: false);
+            var cacheKey = new UrlCacheKey(document.Key, languageId, isDraft: false);
             yield return (cacheKey, null, false);
         }
 
@@ -629,7 +735,7 @@ public class DocumentUrlService : IDocumentUrlService
         }
         else
         {
-            var cacheKey = new UrlCacheKey(document.Key, language.Id, isDraft: true);
+            var cacheKey = new UrlCacheKey(document.Key, languageId, isDraft: true);
             var cache = new UrlSegmentCache
             {
                 PrimarySegment = draftUrlSegments[0],
@@ -686,9 +792,14 @@ public class DocumentUrlService : IDocumentUrlService
 
         IEnumerable<Guid> documentKeys = documentKeysEnumerable as Guid[] ?? documentKeysEnumerable.ToArray();
 
-        foreach (ILanguage language in languages)
+        foreach (Guid documentKey in documentKeys)
         {
-            foreach (Guid documentKey in documentKeys)
+            // Remove invariant entries (NULL languageId)
+            RemoveFromCache(_coreScopeProvider.Context!, documentKey, null, true);
+            RemoveFromCache(_coreScopeProvider.Context!, documentKey, null, false);
+
+            // Remove language-specific entries
+            foreach (ILanguage language in languages)
             {
                 RemoveFromCache(_coreScopeProvider.Context!, documentKey, language.Id, true);
                 RemoveFromCache(_coreScopeProvider.Context!, documentKey, language.Id, false);
@@ -851,7 +962,7 @@ public class DocumentUrlService : IDocumentUrlService
         return attempt.Success ? attempt.Result : null;
     }
 
-    private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsDocumentPublished(contentKey, culture);
+    private bool IsContentPublished(Guid contentKey, string culture) => _publishStatusQueryService.IsPublished(contentKey, culture);
 
     /// <summary>
     /// Gets the children based on the latest published version of the content. (No aware of things in this scope).
@@ -941,17 +1052,17 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (documentIdAttempt.Success is false)
         {
-            return "#";
+            return Constants.Routing.Unroutable;
         }
 
         if (_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(documentKey, out IEnumerable<Guid> ancestorsOrSelfKeys) is false)
         {
-            return "#";
+            return Constants.Routing.Unroutable;
         }
 
-        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
+        if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsPublished(documentKey, culture) is false)
         {
-            return "#";
+            return Constants.Routing.Unroutable;
         }
 
         string cultureOrDefault = GetCultureOrDefault(culture);
@@ -979,10 +1090,10 @@ public class DocumentUrlService : IDocumentUrlService
 
         foreach (Guid ancestorOrSelfKey in ancestorsOrSelfKeysArray)
         {
-            IEnumerable<Domain> domains = ancestorOrSelfKeyToDomains[ancestorOrSelfKey].WhereNotNull();
-            if (domains.Any())
+            Domain? domain = ancestorOrSelfKeyToDomains[ancestorOrSelfKey].WhereNotNull().FirstOrDefault();
+            if (domain is not null)
             {
-                foundDomain = domains.First();// What todo here that is better?
+                foundDomain = domain;
                 break;
             }
 
@@ -990,10 +1101,11 @@ public class DocumentUrlService : IDocumentUrlService
             {
                 urlSegments.Add(segment);
             }
-
-            if (foundDomain is not null)
+            else
             {
-                break;
+                // There is no URL segment for this content key in the requested context.
+                // Exit early since the legacy route cannot be resolved.
+                return Constants.Routing.Unroutable;
             }
         }
 
@@ -1077,10 +1189,21 @@ public class DocumentUrlService : IDocumentUrlService
 
     private bool TryGetPrimaryUrlSegment(Guid documentKey, string culture, bool isDraft, [NotNullWhen(true)] out string? segment)
     {
-        if (TryGetLanguageIdFromCulture(culture, out int languageId) &&
-            _documentUrlCache.TryGetValue(CreateCacheKey(documentKey, languageId, isDraft), out UrlSegmentCache? cache))
+        if (TryGetLanguageIdFromCulture(culture, out int languageId))
         {
-            segment = cache.PrimarySegment;
+            // Try culture-specific lookup first.
+            if (_documentUrlCache.TryGetValue(CreateCacheKey(documentKey, languageId, isDraft), out UrlSegmentCache? cache))
+            {
+                segment = cache.PrimarySegment;
+                return true;
+            }
+        }
+
+        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL,
+        // or when the culture couldn't be resolved to a language ID (e.g. empty string for invariant content).
+        if (_documentUrlCache.TryGetValue(CreateCacheKey(documentKey, null, isDraft), out UrlSegmentCache? invariantCache))
+        {
+            segment = invariantCache.PrimarySegment;
             return true;
         }
 

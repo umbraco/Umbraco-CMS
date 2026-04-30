@@ -8,10 +8,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// Serves as the base controller for handling update operations on elements within the Umbraco CMS Management API.
+/// Provides common functionality for derived controllers that manage element updates.
+/// </summary>
 public abstract class UpdateElementControllerBase : ElementControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UpdateElementControllerBase"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize access to element update operations.</param>
     protected UpdateElementControllerBase(IAuthorizationService authorizationService)
         => _authorizationService = authorizationService;
 

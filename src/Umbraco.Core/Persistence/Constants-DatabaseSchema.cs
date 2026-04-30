@@ -96,12 +96,6 @@ public static partial class Constants
             public const string DocumentType = /*TableNamePrefix*/ "cms" + "DocumentType";
 
             /// <summary>
-            ///     The element type tree table name.
-            /// </summary>
-            [Obsolete("Please use ContentTypeTree instead. Scheduled for removal in Umbraco 18.")]
-            public const string ElementTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType";
-
-            /// <summary>
             ///     The content type tree (composition) table name.
             /// </summary>
             public const string ContentTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType";
@@ -312,6 +306,16 @@ public static partial class Constants
             ///     The external login token table name.
             /// </summary>
             public const string ExternalLoginToken = TableNamePrefix + "ExternalLoginToken";
+
+            /// <summary>
+            ///     The external member table name.
+            /// </summary>
+            public const string ExternalMember = TableNamePrefix + "ExternalMember";
+
+            /// <summary>
+            ///     The external member to member group mapping table name.
+            /// </summary>
+            public const string ExternalMember2MemberGroup = TableNamePrefix + "ExternalMember2MemberGroup";
 
             /// <summary>
             ///     The member table name.

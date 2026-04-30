@@ -1,27 +1,14 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 
+namespace Umbraco.Cms.Api.Management.ViewModels.Document;
+
+/// <summary>
+/// Represents the data required to request the publishing of a document in the API.
+/// </summary>
 public class PublishDocumentRequestModel
 {
+    /// <summary>
+    /// Gets or sets the collection of publish schedules for different cultures.
+    /// </summary>
     public required IEnumerable<CultureAndScheduleRequestModel> PublishSchedules { get; set; }
-}
-
-// TODO ELEMENTS: move the following classes to ViewModels.Content
-public class CultureAndScheduleRequestModel
-{
-    /// <summary>
-    /// Gets or sets the culture. Null means invariant.
-    /// </summary>
-    public string? Culture { get; set; }
-
-    /// <summary>
-    /// Gets or sets the schedule of publishing. Null means immediately.
-    /// </summary>
-    public ScheduleRequestModel? Schedule { get; set; }
-}
-
-public class ScheduleRequestModel
-{
-    public DateTimeOffset? PublishTime { get; set; }
-
-    public DateTimeOffset? UnpublishTime { get; set; }
 }

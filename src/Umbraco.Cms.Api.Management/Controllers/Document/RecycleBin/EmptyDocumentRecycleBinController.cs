@@ -13,6 +13,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document.RecycleBin;
 
+/// <summary>
+/// Controller responsible for emptying the document recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class EmptyDocumentRecycleBinController : DocumentRecycleBinControllerBase
 {
@@ -20,6 +23,14 @@ public class EmptyDocumentRecycleBinController : DocumentRecycleBinControllerBas
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IContentService _contentService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EmptyDocumentRecycleBinController"/> class, responsible for handling requests to empty the document recycle bin.
+    /// </summary>
+    /// <param name="entityService">Service for managing and retrieving entities within the system.</param>
+    /// <param name="authorizationService">Service used to authorize user actions and permissions.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office user security context.</param>
+    /// <param name="contentService">Service for managing content items, including deletion and retrieval.</param>
+    /// <param name="documentPresentationFactory">Factory for creating document presentation models for API responses.</param>
     public EmptyDocumentRecycleBinController(
         IEntityService entityService,
         IAuthorizationService authorizationService,
@@ -33,6 +44,12 @@ public class EmptyDocumentRecycleBinController : DocumentRecycleBinControllerBas
         _contentService = contentService;
     }
 
+    /// <summary>
+    /// Permanently deletes all documents from the document recycle bin.
+    /// This action cannot be undone.
+    /// </summary>
+    /// <param name="cancellationToken">A token to observe while waiting for the task to complete.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the operation.</returns>
     [HttpDelete]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

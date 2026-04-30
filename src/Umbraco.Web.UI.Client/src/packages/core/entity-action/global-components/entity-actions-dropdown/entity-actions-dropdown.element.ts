@@ -3,8 +3,6 @@ import { UmbEntityActionListElement } from '../../entity-action-list.element.js'
 import { html, customElement, property, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UUIScrollContainerElement } from '@umbraco-cms/backoffice/external/uui';
-import { UMB_ENTITY_CONTEXT, type UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-entity-actions-dropdown')
 export class UmbEntityActionsDropdownElement extends UmbLitElement {
@@ -19,30 +17,11 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 
 	#scrollContainerElement?: UUIScrollContainerElement;
 	#entityActionListElement?: UmbEntityActionListElement;
-	#entityType?: UmbEntityModel['entityType'];
-	#unique?: UmbEntityModel['unique'];
 
 	// Event handler as arrow function to maintain consistent reference
 	#onActionExecuted = () => {
 		this._dropdownElement?.closeDropdown();
 	};
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
-			if (!context) return;
-
-			this.observe(observeMultiple([context.entityType, context.unique]), ([entityType, unique]) => {
-				this.#entityType = entityType;
-				this.#unique = unique;
-
-				if (this.#entityActionListElement) {
-					this.#entityActionListElement.entityType = entityType;
-					this.#entityActionListElement.unique = unique;
-				}
-			});
-		});
-	}
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
@@ -66,8 +45,6 @@ export class UmbEntityActionsDropdownElement extends UmbLitElement {
 		this.#scrollContainerElement = new UUIScrollContainerElement();
 		this.#entityActionListElement = new UmbEntityActionListElement();
 		this.#entityActionListElement.addEventListener('action-executed', this.#onActionExecuted);
-		this.#entityActionListElement.entityType = this.#entityType;
-		this.#entityActionListElement.unique = this.#unique;
 		this.#entityActionListElement.setAttribute('label', this.label ?? '');
 		this.#scrollContainerElement.appendChild(this.#entityActionListElement);
 		this._dropdownElement?.appendChild(this.#scrollContainerElement);

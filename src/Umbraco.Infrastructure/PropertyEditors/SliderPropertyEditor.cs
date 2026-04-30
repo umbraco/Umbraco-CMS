@@ -23,18 +23,69 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 [DataEditor(
     Constants.PropertyEditors.Aliases.Slider,
     ValueEditorIsReusable = true)]
-public class SliderPropertyEditor : DataEditor
+public class SliderPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="SliderPropertyEditor" /> class.
     /// </summary>
+    /// <param name="dataValueEditorFactory">Factory used to create data value editors for the slider property editor.</param>
+    /// <param name="ioHelper">Helper for IO operations, such as file and path handling.</param>
     public SliderPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
     {
         _ioHelper = ioHelper;
         SupportsReadOnly = true;
+    }
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(SliderPropertyValueEditor.SliderRange);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration)
+    {
+        var schema = new JsonObject
+        {
+            ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+            ["type"] = new JsonArray("object", "null"),
+            ["properties"] = new JsonObject
+            {
+                ["from"] = new JsonObject
+                {
+                    ["type"] = "number",
+                    ["description"] = "Slider range start value",
+                },
+                ["to"] = new JsonObject
+                {
+                    ["type"] = "number",
+                    ["description"] = "Slider range end value (same as 'from' for single-value slider)",
+                },
+            },
+            ["required"] = new JsonArray("from", "to"),
+            ["description"] = "Slider value with from/to range",
+        };
+
+        // Add min/max constraints from configuration if available
+        if (configuration is SliderConfiguration sliderConfig)
+        {
+            var fromSchema = (JsonObject)schema["properties"]!["from"]!;
+            var toSchema = (JsonObject)schema["properties"]!["to"]!;
+
+            if (sliderConfig.MinimumValue != 0)
+            {
+                fromSchema["minimum"] = sliderConfig.MinimumValue;
+                toSchema["minimum"] = sliderConfig.MinimumValue;
+            }
+
+            if (sliderConfig.MaximumValue != 0)
+            {
+                fromSchema["maximum"] = sliderConfig.MaximumValue;
+                toSchema["maximum"] = sliderConfig.MaximumValue;
+            }
+        }
+
+        return schema;
     }
 
     /// <inheritdoc />
@@ -144,6 +195,11 @@ public class SliderPropertyEditor : DataEditor
             protected const string ConfigurationKeyEnableRangeValue = "enableRange";
 
             /// <summary>
+            /// The configuration key for the minimum range value.
+            /// </summary>
+            protected const string ConfigurationKeyMinimumRangeValue = "minimumRange";
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="SliderPropertyConfigurationValidatorBase"/> class.
             /// </summary>
             protected SliderPropertyConfigurationValidatorBase(ILocalizedTextService localizedTextService) => LocalizedTextService = localizedTextService;
@@ -191,8 +247,9 @@ public class SliderPropertyEditor : DataEditor
         internal sealed class RangeValidator : SliderPropertyConfigurationValidatorBase, IValueValidator
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
+            /// Initializes a new instance of the <see cref="RangeValidator"/> class.
             /// </summary>
+            /// <param name="localizedTextService">The localized text service.</param>
             public RangeValidator(ILocalizedTextService localizedTextService)
                 : base(localizedTextService)
             {
@@ -224,6 +281,25 @@ public class SliderPropertyEditor : DataEditor
                         LocalizedTextService.Localize("validation", "invalidRange", [sliderRange.ToString()]),
                         ["value"]);
                 }
+
+                if (IsRangeSpanBelowMinimum(sliderConfiguration, sliderRange, out var effectiveMinimumRange))
+                {
+                    yield return new ValidationResult(
+                        LocalizedTextService.Localize("validation", "minimumRange", [sliderRange.ToString(), effectiveMinimumRange.ToString(CultureInfo.InvariantCulture)]),
+                        ["value"]);
+                }
+            }
+
+            /// <summary>
+            /// Checks whether the span between the range values is below the configured minimum range.
+            /// Negative minimumRange values are clamped to zero (treated as "no minimum range").
+            /// </summary>
+            private static bool IsRangeSpanBelowMinimum(SliderConfiguration configuration, SliderRange range, out decimal effectiveMinimumRange)
+            {
+                effectiveMinimumRange = Math.Max(configuration.MinimumRange, 0);
+                return configuration.EnableRange &&
+                    range.To >= range.From &&
+                    (range.To - range.From) < effectiveMinimumRange;
             }
         }
 
@@ -235,6 +311,7 @@ public class SliderPropertyEditor : DataEditor
             /// <summary>
             /// Initializes a new instance of the <see cref="MinMaxValidator"/> class.
             /// </summary>
+            /// <param name="localizedTextService">Service used to provide localized text for validation messages.</param>
             public MinMaxValidator(ILocalizedTextService localizedTextService)
                 : base(localizedTextService)
             {
@@ -256,14 +333,14 @@ public class SliderPropertyEditor : DataEditor
                 if (sliderRange.From < sliderConfiguration.MinimumValue)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [sliderRange.From.ToString(), sliderConfiguration.MinimumValue.ToString()]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMinimum", [sliderRange.From.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MinimumValue.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
 
                 if (sliderConfiguration.MaximumValue != 0 && sliderRange.To > sliderConfiguration.MaximumValue)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [sliderRange.To.ToString(), sliderConfiguration.MaximumValue.ToString()]),
+                        LocalizedTextService.Localize("validation", "outOfRangeMaximum", [sliderRange.To.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MaximumValue.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
             }
@@ -299,7 +376,7 @@ public class SliderPropertyEditor : DataEditor
                     ValidationHelper.IsValueValidForStep(sliderRange.To, sliderConfiguration.MinimumValue, sliderConfiguration.Step) is false)
                 {
                     yield return new ValidationResult(
-                        LocalizedTextService.Localize("validation", "invalidStep", [sliderRange.ToString(), sliderConfiguration.Step.ToString(), sliderConfiguration.MinimumValue.ToString()]),
+                        LocalizedTextService.Localize("validation", "invalidStep", [sliderRange.ToString(), sliderConfiguration.Step.ToString(CultureInfo.InvariantCulture), sliderConfiguration.MinimumValue.ToString(CultureInfo.InvariantCulture)]),
                         ["value"]);
                 }
             }

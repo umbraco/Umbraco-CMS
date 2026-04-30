@@ -1,5 +1,5 @@
-﻿import { ConstantHelper, test } from "@umbraco/playwright-testhelpers";
-import { expect } from "@playwright/test";
+﻿import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
+import {expect} from "@playwright/test";
 
 const labelTypes = [
   {type: 'Label (bigint)', dataValueType: 'BIGINT'},

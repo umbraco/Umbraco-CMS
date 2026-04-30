@@ -13,6 +13,9 @@ export interface MetaEntityActionRestoreFromRecycleBinKind extends MetaEntityAct
 	itemRepositoryAlias: string;
 	itemDataResolver?: UmbItemDataResolverConstructor;
 	pickerModal: UmbModalToken<UmbPickerModalData<any>, UmbPickerModalValue> | string;
+	destinationItemRepositoryAlias?: string;
+	destinationItemDataResolver?: UmbItemDataResolverConstructor;
+	destinationRootEntityType?: string;
 }
 
 declare global {

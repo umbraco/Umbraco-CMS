@@ -405,6 +405,8 @@ export default {
 			'Træk dine filer ind i dropzonen for, at uploade dem til\n      mediebiblioteket.\n    ',
 		fileSecurityValidationFailure: 'En eller flere fil-sikkerhedsvalideringer er fejlet',
 		uploadNotAllowed: 'Upload er ikke tiladt på denne lokation',
+		uploadValidationFailed: (mediaTypeName: string) =>
+			`Medietypen ${mediaTypeName} har en eller flere påkrævede egenskaber. Det skal uploades individuelt via menuen 'Opret'`,
 	},
 	member: {
 		createNewMember: 'Opret et nyt medlem',
@@ -614,7 +616,7 @@ export default {
 		noMacroParams: 'Der er ingen parametre for denne makro',
 		noMacros: 'Der er ikke tilføjet nogen makroer',
 		externalLoginProviders: 'Eksternt login',
-		exceptionDetail: 'Undtagelsesdetaljer',
+		exceptionDetail: 'Fejldetaljer',
 		stacktrace: 'Stacktrace',
 		innerException: 'Indre undtagelse',
 		linkYour: 'Link din {0} konto',
@@ -634,11 +636,15 @@ export default {
 		deleteLayout: 'You are deleting the layout',
 		deletingALayout:
 			'Modifying layout will result in loss of data for any existing content that is based on this configuration.',
-		seeErrorAction: 'Se fejlen',
+		seeErrorAction: 'Se hele fejlbeskeden',
 		seeErrorDialogHeadline: 'Fejl detaljer',
 		selectEvent: 'Vælg begivenhed',
 		editWebhook: 'Rediger webhook',
+		cannotTrashWhenReferenced: (name: string) =>
+			`<strong>${name}</strong> kan ikke flyttes til papirkurven, fordi det refereres af andre elementer.`,
 		confirmTrash: (name: string) => `Er du sikker på, at du vil flytte <strong>${name}</strong> til papirkurven?`,
+		cannotBulkTrashWhenReferenced: (total: number) =>
+			`De valgte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> kan ikke flyttes til papirkurven, fordi mindst \u00e9t element refereres af andet indhold.`,
 		confirmBulkTrash: (total: number) =>
 			`Er du sikker på, at du vil flytte <strong>${total} ${total === 1 ? 'element' : 'elementer'}</strong> til papirkurven?`,
 		confirmBulkDelete: (total: number) =>
@@ -846,6 +852,7 @@ export default {
 		delete: 'Slet',
 		deleted: 'Slettet',
 		deleting: 'Sletter...',
+		description: 'Beskrivelse',
 		design: 'Design',
 		details: 'Detaljer',
 		dictionary: 'Ordbog',
@@ -1441,6 +1448,7 @@ export default {
 		tabs: 'Faneblade',
 		createMatchingTemplate: 'Opret tilsvarende skabelon',
 		addIcon: 'Tilføj ikon',
+		changeIcon: 'Skift ikon',
 		contentTypeEnabled: 'Master Content Type enabled',
 		contentTypeUses: 'This Content Type uses',
 		noPropertiesDefinedOnTab:
@@ -2018,13 +2026,14 @@ export default {
 		},
 		changePassword: 'Skift dit kodeord',
 		changePhoto: 'Skift billede',
-		configureMfa: 'Konfigurer MFA',
+		configureMfa: 'Konfigurer 2FA',
 		newPassword: 'Nyt kodeord',
 		newPasswordFormatLengthTip: 'Minium %0% karakterer tilbage!',
 		newPasswordFormatNonAlphaTip: 'Der skal som minium være %0% specielle karakterer.',
 		noLockouts: 'er ikke blevet låst ude',
 		noPasswordChange: 'Kodeordet er ikke blevet ændret',
 		confirmNewPassword: 'Gentag dit nye kodeord',
+		confirmPassword: 'Bekræft kodeord',
 		changePasswordDescription:
 			"Du kan ændre dit kodeord, som giver dig adgang til Umbraco backoffice ved at\n      udfylde formularen og klikke på knappen 'Skift dit kodeord'\n    ",
 		contentChannel: 'Indholdskanal',
@@ -2255,6 +2264,10 @@ export default {
 		enableError:
 			'Der opstod en fejl under forsøget på at slå URL trackeren til, der findes mere information\n      i logfilen.\n    ',
 	},
+	embeddedMedia: {
+		dimensionsDescription:
+			'Disse værdier sendes som den maksimale bredde og højde til embed-udbyderen. Udbyderen kan justere de endelige dimensioner for at overholde sine egne begrænsninger.',
+	},
 	emptyStates: {
 		emptyDictionaryTree: 'Ingen ordbog elementer at vælge imellem',
 	},
@@ -2316,7 +2329,8 @@ export default {
 		openBackofficeSearch: 'Åben backoffice søgning',
 		openCloseBackofficeHelp: 'Åben/Luk backoffice hjælp',
 		openCloseBackofficeProfileOptions: 'Åben/Luk dine profil indstillinger',
-		profileOptions: 'Profil indstillinger',
+		profileOptions: 'Brugerprofil for %0% (%1%)',
+		profileOptionsDefault: 'Brugerprofil',
 		assignDomainDescription: 'Tilføj domæne på %0%',
 		createDescription: 'Opret ny node under %0%',
 		protectDescription: 'Opsæt offentlig adgang på %0%',
@@ -2849,6 +2863,8 @@ export default {
 	collection: {
 		noItemsTitle: 'Intet indhold',
 		addCollectionConfiguration: 'Tilføj samling',
+		cardViewLabel: 'Kort',
+		tableViewLabel: 'Tabel',
 	},
 	linkPicker: {
 		modalSource: 'Kilde',
@@ -2859,5 +2875,9 @@ export default {
 		resetUrlHeadline: 'Nulstil URL?',
 		resetUrlMessage: 'Er du sikker på, at du vil nulstille denne URL?',
 		resetUrlLabel: 'Nulstil',
+		selectLanguageHint: 'Vælg sprog for linket',
+		selectLanguageDefault: 'Auto (besøgendes sprog)',
+		configCultureSpecificDocumentLinksLabel: 'Kulturspecifikke dokumentlinks',
+		configCultureSpecificDocumentLinksDescription: 'Tillad brugeren at vælge specifik kultur for dokumenter.',
 	},
 } as UmbLocalizationDictionary;

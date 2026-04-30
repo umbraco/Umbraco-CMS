@@ -16,7 +16,7 @@ import {
 import { loadManifestApi } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import type { CSSResultGroup } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
@@ -110,6 +110,13 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		await this.#loadStylesheetPath();
 		await this.#loadExtensions();
 		await this.#loadEditor();
+	}
+
+	protected override updated(changedProperties: Map<string, unknown>) {
+		super.updated(changedProperties);
+		if (changedProperties.has('readonly')) {
+			this._editor?.setEditable(!this.readonly);
+		}
 	}
 
 	/**
@@ -251,27 +258,26 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	#renderToolbar() {
-		if (!this.#hasToolbar) return;
+		if (!this.#hasToolbar || this.readonly) return;
 		return html`
 			<umb-tiptap-toolbar
 				data-mark="tiptap-toolbar"
 				.toolbar=${this._toolbar}
 				.editor=${this._editor}
-				.configuration=${this.configuration}
-				?readonly=${this.readonly}>
+				.configuration=${this.configuration}>
 			</umb-tiptap-toolbar>
 		`;
 	}
 
 	#renderStatusbar() {
-		if (!this.#hasStatusbar) return;
+		if (!this.#hasStatusbar || this.readonly) return;
 		return html`
 			<umb-tiptap-statusbar
 				data-mark="tiptap-statusbar"
 				.statusbar=${this._statusbar}
 				.editor=${this._editor}
 				.configuration=${this.configuration}
-				?readonly=${this.readonly}>
+				${umbDestroyOnDisconnect()}>
 			</umb-tiptap-statusbar>
 		`;
 	}
@@ -303,8 +309,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			}
 
 			:host([readonly]) {
-				pointer-events: none;
-
 				#editor {
 					background-color: var(--uui-color-surface-alt);
 				}

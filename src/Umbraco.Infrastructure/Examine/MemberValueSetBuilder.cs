@@ -6,10 +6,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
+/// <summary>
+/// Provides functionality to build value sets for member entities, enabling them to be indexed by Examine.
+/// </summary>
 public class MemberValueSetBuilder : BaseValueSetBuilder<IMember>
 {
     private readonly IContentTypeService _contentTypeService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MemberValueSetBuilder"/> class with the specified property editors and content type service.
+    /// </summary>
+    /// <param name="propertyEditors">A <see cref="PropertyEditorCollection"/> representing the collection of property editors to use.</param>
+    /// <param name="contentTypeService">An <see cref="IContentTypeService"/> used to access content type information.</param>
     public MemberValueSetBuilder(PropertyEditorCollection propertyEditors, IContentTypeService contentTypeService)
         : base(propertyEditors, false)
     {

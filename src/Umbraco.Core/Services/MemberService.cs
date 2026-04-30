@@ -25,6 +25,7 @@ namespace Umbraco.Cms.Core.Services
         private readonly IMemberGroupService _memberGroupService;
         private readonly Lazy<IIdKeyMap> _idKeyMap;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
+        private readonly ILogger<MemberService> _logger;
 
         #region Constructor
 
@@ -61,6 +62,7 @@ namespace Umbraco.Cms.Core.Services
             _idKeyMap = idKeyMap;
             _userIdKeyResolver = userIdKeyResolver;
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
+            _logger = loggerFactory.CreateLogger<MemberService>();
         }
 
         /// <summary>
@@ -463,8 +465,11 @@ namespace Umbraco.Cms.Core.Services
             string orderBy,
             Direction orderDirection,
             string? memberTypeAlias = null,
-            string filter = "") =>
-            GetAll(skip, take, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
+            string filter = "")
+        {
+            PaginationHelper.ConvertSkipTakeToPaging(skip, take, out long pageIndex, out int pageSize);
+            return GetAll(pageIndex, pageSize, out totalRecords, orderBy, orderDirection, true, memberTypeAlias, filter);
+        }
 
         /// <inheritdoc />
         public IEnumerable<IMember> GetAll(
@@ -482,7 +487,7 @@ namespace Umbraco.Cms.Core.Services
             IQuery<IMember>? query1 = memberTypeAlias == null ? null : Query<IMember>()?.Where(x => x.ContentTypeAlias == memberTypeAlias);
             int.TryParse(filter, out int filterAsIntId);//considering id,key & name as filter param
             Guid.TryParse(filter, out Guid filterAsGuid);
-            IQuery<IMember>? query2 = filter == null ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key ==  filterAsGuid );
+            IQuery<IMember>? query2 = string.IsNullOrWhiteSpace(filter) ? null : Query<IMember>()?.Where(x => (x.Name != null && x.Name.Contains(filter)) || x.Username.Contains(filter) || x.Email.Contains(filter) || x.Id == filterAsIntId || x.Key ==  filterAsGuid );
             return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, propertyAliases: null, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
         }
 
@@ -989,8 +994,20 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug(
+                    "Content member {MemberKey} login — lightweight update path (UpdateDate unchanged, no re-index).",
+                    member.Key);
+            }
+
+            // Login is not a member update: UpdateDate is intentionally left untouched, and the
+            // IndexableFieldsChanged state flag tells the Examine indexing handler to skip the
+            // re-index since no indexed field has changed.
             var savingNotification = new MemberSavingNotification(member, evtMsgs);
-            savingNotification.State.Add("LoginPropertiesOnly", true);
+            savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
+            savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, false);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();

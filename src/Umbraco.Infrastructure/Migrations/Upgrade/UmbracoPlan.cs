@@ -1,5 +1,7 @@
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -7,8 +9,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 /// Represents the Umbraco CMS migration plan.
 /// </summary>
 /// <seealso cref="Umbraco.Cms.Infrastructure.Migrations.MigrationPlan" />
-public class UmbracoPlan : MigrationPlan
+public partial class UmbracoPlan : MigrationPlan
 {
+    [GeneratedRegex(@"V_(\d+)_(\d+)_(\d+)")]
+    internal static partial Regex MigrationStepVersionRegex();
+
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoPlan" /> class.
     /// </summary>
@@ -22,6 +27,14 @@ public class UmbracoPlan : MigrationPlan
     /// This is set to the final migration state of 9.4, making that the lowest supported version to upgrade from.
     /// </remarks>
     public override string InitialState => "{DED98755-4059-41BB-ADBD-3FEAB12D1D7B}";
+
+    /// <summary>
+    /// Gets the semantic version corresponding to <see cref="InitialState"/>.
+    /// </summary>
+    /// <remarks>
+    /// Keep in sync with <see cref="InitialState"/> whenever the lowest supported upgrade version changes.
+    /// </remarks>
+    private static SemVersion InitialStateVersion { get; } = new(9, 4, 0);
 
     /// <summary>
     /// Defines the plan.
@@ -77,7 +90,15 @@ public class UmbracoPlan : MigrationPlan
         To<V_14_0_0.MigrateDataTypeConfigurations>("{1539A010-2EB5-4163-8518-4AE2AA98AFC6}");
         To<NoopMigration>("{C567DE81-DF92-4B99-BEA8-CD34EF99DA5D}");
         To<V_14_0_0.DeleteMacroTables>("{0D82C836-96DD-480D-A924-7964E458BD34}");
+
+        // MoveDocumentBlueprintsToFolders uses IContentService which loads content through the
+        // repository layer. PropertyDataDto now maps the sortableValue column (added in v17.3),
+        // so the column must exist before NPoco tries to query it. The migration checks whether
+        // the column already exists (via GetColumnsInSchema) before adding it, so the v17.3
+        // instance below will be a no-op.
+        To<V_17_3_0.AddSortableValueToPropertyData>("{A1B2C3D4-E5F6-4A7B-8C9D-0E1F2A3B4C5D}");
         To<V_14_0_0.MoveDocumentBlueprintsToFolders>("{1A0FBC8A-6FC6-456C-805C-B94816B2E570}");
+
         To<NoopMigration>("{302DE171-6D83-4B6B-B3C0-AC8808A16CA1}");
         To<V_14_0_0.MigrateUserGroup2PermissionPermissionColumnType>("{8184E61D-ECBA-4AAA-B61B-D7A82EB82EB7}");
         To<V_14_0_0.MigrateNotificationCharsToStrings>("{E261BF01-2C7F-4544-BAE7-49D545B21D68}");
@@ -153,10 +174,65 @@ public class UmbracoPlan : MigrationPlan
 
         // To 17.3.0
         To<V_17_3_0.IncreaseSizeOfLongRunningOperationTypeColumn>("{B2F4A1C3-8D5E-4F6A-9B7C-3E1D2A4F5B6C}");
+        To<V_17_3_0.RetrustForeignKeyAndCheckConstraints>("{0638E0E0-D914-4ACA-8A4B-9551A3AAB91F}");
+        To<V_17_3_0.RebuildHybridCache>("{E4A7C2D1-5F38-4B96-A1D3-8E2F6C9B0A74}");
+        To<V_17_3_0.OptimizeInvariantUrlRecords>("{B8C9D0E1-F2A3-4B5C-8D7E-9F0A1B2C3D4E}");
+        To<V_17_3_0.AddSortableValueToPropertyData>("{9DBDB5CD-8679-4BB0-BF83-E8D508073CE0}");
+        To<V_17_3_0.PopulateSortableValueForDatePropertyData>("{6748CB56-CC16-49F0-BA91-B8ECE31BF456}");
+
+        // To 17.4.0
+        To<V_17_4_0.AddContentVersionDateIndex>("{D4E5F6A7-B8C9-4D0E-A1F2-3B4C5D6E7F80}");
+        To<V_17_4_0.AddDimensionsToSvg>("{72970B86-59D8-403C-B322-FFF43F9DB199}");
+        To<V_17_4_0.AddExternalMemberTables>("{D7E8F9A0-B1C2-4D3E-A5F6-7890ABCDEF12}");
+        To<V_17_4_0.FixLabelDataTypeDbTypeFromConfiguration>("{3F9B6A1C-7D84-4E2B-9C15-6A2E8F3D5B47}");
 
         // To 18.0.0
-        // TODO (V18): Enable on 18 branch
-        //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
-        To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
+        To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
+    }
+
+    /// <summary>
+    ///     Resolves the semantic version corresponding to a migration state in this plan.
+    /// </summary>
+    /// <remarks>
+    ///     Walks the transition chain from <see cref="MigrationPlan.InitialState"/> and extracts version
+    ///     numbers from migration type namespaces (convention: <c>V_{major}_{minor}_{patch}</c>).
+    /// </remarks>
+    /// <param name="state">The migration state to resolve.</param>
+    /// <returns>The semantic version for the state, or <c>null</c> if the state is not found.</returns>
+    public SemVersion? GetVersionForState(string? state)
+    {
+        if (string.IsNullOrWhiteSpace(state))
+        {
+            return null;
+        }
+
+        SemVersion? trackedVersion = InitialStateVersion;
+        var current = InitialState;
+
+        if (string.Equals(current, state, StringComparison.OrdinalIgnoreCase))
+        {
+            return InitialStateVersion;
+        }
+
+        while (Transitions.TryGetValue(current, out Transition? transition) && transition is not null)
+        {
+            Match match = MigrationStepVersionRegex().Match(transition.MigrationType.Namespace ?? string.Empty);
+            if (match.Success)
+            {
+                trackedVersion = new SemVersion(
+                    int.Parse(match.Groups[1].Value),
+                    int.Parse(match.Groups[2].Value),
+                    int.Parse(match.Groups[3].Value));
+            }
+
+            if (string.Equals(transition.TargetState, state, StringComparison.OrdinalIgnoreCase))
+            {
+                return trackedVersion;
+            }
+
+            current = transition.TargetState;
+        }
+
+        return null;
     }
 }

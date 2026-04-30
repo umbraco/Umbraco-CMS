@@ -20,6 +20,9 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
     [SetUp]
     public void SetUp() => DeleteAllTemplateViewFiles();
 
+    [TearDown]
+    public void TearDownTemplateFiles() => DeleteAllTemplateViewFiles();
+
     [Test]
     public async Task Can_Create_Template_Then_Assign_Child()
     {
@@ -289,6 +292,6 @@ internal sealed class TemplateServiceTests : UmbracoIntegrationTest
             Assert.IsNotNull(template);
             Assert.AreEqual(key, template.Key);
         });
-
     }
+
 }

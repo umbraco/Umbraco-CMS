@@ -34,6 +34,7 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
         var contentType = new ContentTypeBuilder()
             .WithAlias("theElementType")
             .WithIsElement(true)
+            .WithAllowedInLibrary(true)
             .Build();
         contentType.AllowedAsRoot = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);

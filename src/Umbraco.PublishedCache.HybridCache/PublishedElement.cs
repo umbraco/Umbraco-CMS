@@ -1,5 +1,8 @@
-﻿using Umbraco.Cms.Core.Exceptions;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache;
@@ -12,14 +15,17 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
     private readonly IReadOnlyDictionary<string, CultureVariation>? _cultureInfos;
     private readonly string _contentName;
     private readonly bool _published;
+    private readonly bool _isPreviewing;
 
     public PublishedElement(
         ContentNode contentNode,
         bool preview,
         IElementsCache elementsCache,
-        IVariationContextAccessor variationContextAccessor)
+        IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
     {
         VariationContextAccessor = variationContextAccessor;
+        PropertyRenderingContextAccessor = propertyRenderingContextAccessor;
         ContentNode = contentNode;
         ContentData? contentData = preview ? ContentNode.DraftModel : ContentNode.PublishedModel;
         if (contentData is null)
@@ -40,10 +46,12 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
             // add one property per property type - this is required, for the indexing to work
             // if contentData supplies pdatas, use them, else use null
             contentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? propertyDatas); // else will be null
-            properties[i++] = new PublishedProperty(propertyType, this, variationContextAccessor, preview, propertyDatas, elementsCache, propertyType.CacheLevel);
+            properties[i++] = new PublishedProperty(propertyType, this, variationContextAccessor, propertyRenderingContextAccessor, preview, propertyDatas, elementsCache, propertyType.CacheLevel);
         }
 
         _properties = properties;
+
+        _isPreviewing = preview;
 
         Id = contentNode.Id;
         Key = contentNode.Key;
@@ -81,6 +89,8 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
 
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
+
+    internal IPropertyRenderingContextAccessor PropertyRenderingContextAccessor { get; }
 
     /// <inheritdoc />
     public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
@@ -167,6 +177,17 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         // if there is no 'published' published content, no culture can be published
         if (!ContentNode.HasPublished)
         {
+            // In preview mode, the ContentNode only has draft data loaded (published data
+            // is stored in a separate cache entry). Fall back to IDocumentPublishStatusQueryService
+            // which is an in-memory service that tracks actual document publish status.
+            if (_isPreviewing && ItemType == PublishedItemType.Content)
+            {
+                culture ??= VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
+                IDocumentPublishStatusQueryService publishStatusQueryService =
+                    StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusQueryService>();
+                return publishStatusQueryService.IsPublished(Key, culture);
+            }
+
             return false;
         }
 

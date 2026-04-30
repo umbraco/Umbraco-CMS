@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 [DefaultPropertyValueConverter]
 public class MultipleTextStringValueConverter : PropertyValueConverterBase
 {
-    private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
+    private static readonly string[] _newLineDelimiters = { "\r\n", "\r", "\n" };
 
     /// <inheritdoc />
     public override bool IsConverter(IPublishedPropertyType propertyType)
@@ -59,7 +59,7 @@ public class MultipleTextStringValueConverter : PropertyValueConverterBase
 
         // fall back on normal behaviour
         return values.Any() == false
-            ? sourceString.Split(NewLineDelimiters, StringSplitOptions.None)
+            ? sourceString.Split(_newLineDelimiters, StringSplitOptions.None)
             : values.ToArray();
     }
 }

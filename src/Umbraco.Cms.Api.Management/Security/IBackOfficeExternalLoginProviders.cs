@@ -8,20 +8,20 @@ public interface IBackOfficeExternalLoginProviders
     /// <summary>
     ///     Get the <see cref="BackOfficeExternalLoginProvider" /> for the specified scheme
     /// </summary>
-    /// <param name="authenticationType"></param>
-    /// <returns></returns>
+    /// <param name="authenticationType">The authentication scheme name.</param>
+    /// <returns>The external login provider scheme, or null if not found.</returns>
     Task<BackOfficeExternaLoginProviderScheme?> GetAsync(string authenticationType);
 
     /// <summary>
     ///     Get all registered <see cref="BackOfficeExternalLoginProvider" />
     /// </summary>
-    /// <returns></returns>
+    /// <returns>All registered back office external login provider schemes.</returns>
     Task<IEnumerable<BackOfficeExternaLoginProviderScheme>> GetBackOfficeProvidersAsync();
 
     /// <summary>
     ///     Returns true if there is any external provider that has the Deny Local Login option configured
     /// </summary>
-    /// <returns></returns>
+    /// <returns>True if any provider has deny local login configured.</returns>
     bool HasDenyLocalLogin();
 
     /// <summary>

@@ -1,10 +1,9 @@
 import type { UmbMediaTreeItemModel } from '../types.js';
 import type { UmbMediaTreeItemContext } from './media-tree-item.context.js';
-import { css, html, customElement, nothing, classMap } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, nothing, classMap, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTreeItemElementBase } from '@umbraco-cms/backoffice/tree';
 
-const elementName = 'umb-media-tree-item';
-@customElement(elementName)
+@customElement('umb-media-tree-item')
 export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTreeItemModel, UmbMediaTreeItemContext> {
 	public override set api(value: UmbMediaTreeItemContext | undefined) {
 		// Observe noAccess from context and update base class property (_noAccess).
@@ -14,17 +13,16 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 	}
 
 	override renderIconContainer() {
-		const icon = this.item?.mediaType.icon;
-
 		return html`
-			<span id="icon-container" slot="icon">
-				${icon
-					? html`
-							<umb-icon id="icon" slot="icon" name="${this._getIconToRender(icon)}"></umb-icon>
-							${this.#renderStateIcon()}
-						`
-					: nothing}
-			</span>
+			<div id="icon-container" slot="icon">
+				<umb-entity-sign-bundle .entityType=${this._item?.entityType} .entityFlags=${this._flags}>
+					${when(
+						this.item?.mediaType.icon,
+						(icon) => html`<umb-icon id="icon" name=${this._getIconToRender(icon)}></umb-icon>`,
+					)}
+				</umb-entity-sign-bundle>
+				${this.#renderStateIcon()}
+			</div>
 		`;
 	}
 
@@ -68,38 +66,11 @@ export class UmbMediaTreeItemElement extends UmbTreeItemElementBase<UmbMediaTree
 				bottom: -5px;
 				right: -5px;
 				font-size: 10px;
-				background: var(--uui-color-surface);
+				background: var(--umb-sign-bundle-bg, var(--uui-color-surface));
 				width: 14px;
 				height: 14px;
 				border-radius: 100%;
 				line-height: 14px;
-			}
-
-			:hover #state-icon {
-				background: var(--uui-color-surface-emphasis);
-			}
-
-			/** Active */
-			[active] #state-icon {
-				background: var(--uui-color-current);
-			}
-
-			[active]:hover #state-icon {
-				background: var(--uui-color-current-emphasis);
-			}
-
-			/** Selected */
-			[selected] #state-icon {
-				background-color: var(--uui-color-selected);
-			}
-
-			[selected]:hover #state-icon {
-				background-color: var(--uui-color-selected-emphasis);
-			}
-
-			/** Disabled */
-			[disabled] #state-icon {
-				background-color: var(--uui-color-disabled);
 			}
 		`,
 	];
@@ -109,6 +80,6 @@ export { UmbMediaTreeItemElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbMediaTreeItemElement;
+		'umb-media-tree-item': UmbMediaTreeItemElement;
 	}
 }

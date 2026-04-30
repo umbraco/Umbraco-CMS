@@ -5,6 +5,9 @@ using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
+/// <summary>
+/// Handles notifications pertaining to the indexing of language data within the search infrastructure.
+/// </summary>
 public sealed class LanguageIndexingNotificationHandler :
     INotificationHandler<LanguageCacheRefresherNotification>,
     INotificationAsyncHandler<LanguageCacheRefresherNotification>
@@ -12,6 +15,11 @@ public sealed class LanguageIndexingNotificationHandler :
     private readonly IIndexRebuilder _indexRebuilder;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LanguageIndexingNotificationHandler"/> class, which handles notifications related to language indexing in Umbraco.
+    /// </summary>
+    /// <param name="umbracoIndexingHandler">An instance responsible for handling Umbraco-specific indexing operations.</param>
+    /// <param name="indexRebuilder">An instance used to rebuild search indexes as required.</param>
     public LanguageIndexingNotificationHandler(
         IUmbracoIndexingHandler umbracoIndexingHandler,
         IIndexRebuilder indexRebuilder)

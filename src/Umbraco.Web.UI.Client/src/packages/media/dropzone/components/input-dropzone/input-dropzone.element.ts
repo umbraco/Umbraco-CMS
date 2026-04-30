@@ -205,12 +205,15 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 					)}
 					${when(
 						item.status === UmbFileDropzoneItemStatus.ERROR,
-						() => html`<div class="error">An error occured</div>`,
+						() => html`<div class="error">An error occurred</div>`,
 					)}
 					${when(item.status === UmbFileDropzoneItemStatus.CANCELLED, () => html`<div class="error">Cancelled</div>`)}
 					${when(
 						item.status === UmbFileDropzoneItemStatus.NOT_ALLOWED,
-						() => html`<div class="error">File type not allowed</div>`,
+						() =>
+							html`<div class="error">
+								${item.statusMessage ?? this.localize.term('media_disallowedFileType')}.
+							</div>`,
 					)}
 				</div>
 				<div class="fileActions">
@@ -261,8 +264,9 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				display: flex;
 				flex-direction: column;
 				flex-wrap: wrap;
-				place-items: center;
+				place-items: start;
 				cursor: pointer;
+				margin: var(--uui-size-space-5) 0;
 			}
 
 			:host([disabled]) #dropzone {
@@ -298,7 +302,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 
 			#uploader {
 				display: flex;
-				flex-direction: column;
+				flex-direction: row;
 				flex-wrap: wrap;
 				align-items: center;
 				gap: var(--uui-size-space-3);

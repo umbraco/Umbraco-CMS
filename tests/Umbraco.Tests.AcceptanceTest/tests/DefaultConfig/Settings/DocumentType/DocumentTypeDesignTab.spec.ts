@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from "@umbraco/playwright-testhelpers";
+import {ConstantHelper, test} from "@umbraco/acceptance-test-helpers";
 import {expect} from "@playwright/test";
 
 const documentTypeName = 'TestDocumentType';
@@ -191,60 +191,6 @@ test('can create a document type with multiple tabs', {tag: '@release'}, async (
   expect(await umbracoApi.documentType.doesNameExist(documentTypeName)).toBeTruthy();
   expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, dataTypeName, dataTypeData.id, tabName, groupName)).toBeTruthy();
   expect(await umbracoApi.documentType.doesTabContainCorrectPropertyEditorInGroup(documentTypeName, secondDataTypeName, secondDataType.id, secondTabName, secondGroupName)).toBeTruthy();
-});
-
-test('can create a document type with a composition', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const compositionDocumentTypeName = 'CompositionDocumentType';
-  await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
-  await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
-  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
-
-  // Act
-  await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
-  await umbracoUi.documentType.clickCompositionsButton();
-  await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
-  await umbracoUi.documentType.clickSubmitButton();
-  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
-
-  // Assert
-  expect(umbracoUi.documentType.doesGroupHaveValue(groupName)).toBeTruthy();
-  // Checks if the composition in the document type is correct
-  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.compositions[0].documentType.id).toBe(compositionDocumentTypeId);
-
-  // Clean
-  await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
-});
-
-test('can remove a composition from a document type', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const compositionDocumentTypeName = 'CompositionDocumentType';
-  await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const compositionDocumentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(compositionDocumentTypeName, dataTypeName, dataTypeData.id, groupName);
-  await umbracoApi.documentType.createDocumentTypeWithAComposition(documentTypeName, compositionDocumentTypeId);
-  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
-
-  // Act
-  await umbracoUi.documentType.goToDocumentType(documentTypeName);
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
-  await umbracoUi.documentType.clickCompositionsButton();
-  await umbracoUi.documentType.clickModalMenuItemWithName(compositionDocumentTypeName);
-  await umbracoUi.documentType.clickSubmitButton();
-  await umbracoUi.documentType.clickConfirmToSubmitButton();
-  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
-
-  // Assert
-  await umbracoUi.documentType.isGroupVisible(groupName, false);
-  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
-  expect(documentTypeData.compositions).toEqual([]);
-
-  // Clean
-  await umbracoApi.documentType.ensureNameNotExists(compositionDocumentTypeName);
 });
 
 test('can reorder groups in a document type', async ({umbracoApi, umbracoUi}) => {

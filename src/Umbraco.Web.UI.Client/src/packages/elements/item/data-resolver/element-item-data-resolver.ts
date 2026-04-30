@@ -1,3 +1,4 @@
+import type { UmbElementEntityType, UmbElementFolderEntityType } from '../../entity.js';
 import { UmbElementVariantState } from '../../types.js';
 import type { UmbElementItemModel } from '../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -14,7 +15,9 @@ import {
 import { type UmbVariantContext, UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
 
-type UmbElementItemDataResolverModel = Omit<UmbElementItemModel, 'parent' | 'hasChildren'>;
+type UmbElementItemDataResolverModel = Omit<UmbElementItemModel, 'parent' | 'hasChildren' | 'entityType'> & {
+	entityType: UmbElementEntityType | UmbElementFolderEntityType;
+};
 
 /**
  * @param variants
@@ -51,7 +54,6 @@ export class UmbElementItemDataResolver<ElementItemModel extends UmbElementItemD
 	public readonly icon = this.#data.asObservablePart((x) => x?.documentType.icon);
 	public readonly typeUnique = this.#data.asObservablePart((x) => x?.documentType.unique);
 	public readonly isTrashed = this.#data.asObservablePart((x) => x?.isTrashed);
-	public readonly hasCollection = this.#data.asObservablePart((x) => !!x?.documentType.collection);
 
 	#name = new UmbStringState(undefined);
 	public readonly name = this.#name.asObservable();
@@ -213,15 +215,6 @@ export class UmbElementItemDataResolver<ElementItemModel extends UmbElementItemD
 	 */
 	async getUpdateDate(): Promise<Date> {
 		return (await this.observe(this.updateDate).asPromise()) || undefined;
-	}
-
-	/**
-	 * Test if the item has a collection
-	 * @returns {boolean} Boolean of whether the item has a collection.
-	 * @memberof UmbElementItemDataResolver
-	 */
-	getHasCollection(): boolean {
-		return this.getData()?.documentType.collection != undefined;
 	}
 
 	#setVariantAwareValues() {

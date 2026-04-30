@@ -7,12 +7,20 @@ using Umbraco.Cms.Api.Management.ViewModels.Indexer;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Indexer;
 
+/// <summary>
+/// API controller responsible for providing detailed information and operations for a specific indexer in the management system.
+/// </summary>
 [ApiVersion("1.0")]
 public class DetailsIndexerController : IndexerControllerBase
 {
     private readonly IIndexPresentationFactory _indexPresentationFactory;
     private readonly IExamineManager _examineManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DetailsIndexerController"/> class.
+    /// </summary>
+    /// <param name="indexPresentationFactory">Factory used to create index presentation models.</param>
+    /// <param name="examineManager">The <see cref="IExamineManager"/> instance used for managing indexers.</param>
     public DetailsIndexerController(
         IIndexPresentationFactory indexPresentationFactory,
         IExamineManager examineManager)
@@ -37,11 +45,11 @@ public class DetailsIndexerController : IndexerControllerBase
     [ProducesResponseType(typeof(IndexResponseModel), StatusCodes.Status200OK)]
     [EndpointSummary("Gets indexer details.")]
     [EndpointDescription("Gets detailed information about the indexer identified by the provided name.")]
-    public Task<ActionResult<IndexResponseModel?>> Details(CancellationToken cancellationToken, string indexName)
+    public async Task<ActionResult<IndexResponseModel?>> Details(CancellationToken cancellationToken, string indexName)
     {
         if (_examineManager.TryGetIndex(indexName, out IIndex? index))
         {
-            return Task.FromResult<ActionResult<IndexResponseModel?>>(_indexPresentationFactory.Create(index));
+            return await _indexPresentationFactory.CreateAsync(index);
         }
 
         var invalidModelProblem = new ProblemDetails
@@ -52,6 +60,6 @@ public class DetailsIndexerController : IndexerControllerBase
             Type = "Error",
         };
 
-        return Task.FromResult<ActionResult<IndexResponseModel?>>(NotFound(invalidModelProblem));
+        return NotFound(invalidModelProblem);
     }
 }

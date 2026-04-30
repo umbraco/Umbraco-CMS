@@ -10,6 +10,7 @@ public static class MapperContextExtensions
     private const string CultureKey = "Map.Culture";
     private const string SegmentKey = "Map.Segment";
     private const string IncludedPropertiesKey = "Map.IncludedProperties";
+    private const string UserNameDictionaryKey = "Map.UserNameDictionary";
 
     /// <summary>
     ///     Gets the context culture.
@@ -46,4 +47,16 @@ public static class MapperContextExtensions
     /// </summary>
     public static void SetIncludedProperties(this MapperContext context, string[] properties) =>
         context.Items[IncludedPropertiesKey] = properties;
+
+    /// <summary>
+    ///     Gets a pre-resolved dictionary mapping user IDs to display names.
+    /// </summary>
+    public static Dictionary<int, string?>? GetUserNameDictionary(this MapperContext context) =>
+        context.HasItems && context.Items.TryGetValue(UserNameDictionaryKey, out var obj) && obj is Dictionary<int, string?> d ? d : null;
+
+    /// <summary>
+    ///     Sets a pre-resolved dictionary mapping user IDs to display names.
+    /// </summary>
+    public static void SetUserNameDictionary(this MapperContext context, Dictionary<int, string?> userNames) =>
+        context.Items[UserNameDictionaryKey] = userNames;
 }

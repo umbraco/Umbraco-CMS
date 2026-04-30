@@ -18,6 +18,16 @@ public interface IContentTypeFilter
         => Task.FromResult(contentTypes);
 
     /// <summary>
+    /// Filters the content types retrieved for being allowed in the library.
+    /// </summary>
+    /// <typeparam name="TItem">The type of content type, which must implement <see cref="IContentTypeComposition"/>.</typeparam>
+    /// <param name="contentTypes">Retrieved collection of content types.</param>
+    /// <returns>Filtered collection of content types.</returns>
+    Task<IEnumerable<TItem>> FilterAllowedInLibraryAsync<TItem>(IEnumerable<TItem> contentTypes)
+        where TItem : IContentTypeComposition
+        => Task.FromResult(contentTypes);
+
+    /// <summary>
     /// Filters the content types retrieved for being allowed as children of a parent content type.
     /// </summary>
     /// <param name="contentTypes">Retrieved collection of content types.</param>

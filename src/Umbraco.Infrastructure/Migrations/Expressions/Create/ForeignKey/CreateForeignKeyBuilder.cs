@@ -4,6 +4,9 @@ using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ForeignKey;
 
+/// <summary>
+/// Provides a builder for creating a foreign key constraint in a database migration.
+/// </summary>
 public class CreateForeignKeyBuilder : ExpressionBuilderBase<CreateForeignKeyExpression>,
     ICreateForeignKeyFromTableBuilder,
     ICreateForeignKeyForeignColumnBuilder,
@@ -11,6 +14,10 @@ public class CreateForeignKeyBuilder : ExpressionBuilderBase<CreateForeignKeyExp
     ICreateForeignKeyPrimaryColumnBuilder,
     ICreateForeignKeyCascadeBuilder
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ForeignKey.CreateForeignKeyBuilder"/> class.
+    /// </summary>
+    /// <param name="expression">The <see cref="CreateForeignKeyExpression"/> that defines the foreign key to be created.</param>
     public CreateForeignKeyBuilder(CreateForeignKeyExpression expression)
         : base(expression)
     {

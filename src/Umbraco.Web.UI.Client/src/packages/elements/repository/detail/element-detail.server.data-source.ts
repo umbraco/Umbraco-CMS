@@ -1,5 +1,5 @@
 import type { UmbElementDetailModel } from '../../types.js';
-import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_PROPERTY_VALUE_ENTITY_TYPE } from '../../entity.js';
+import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
@@ -12,7 +12,7 @@ import type {
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
- * A data source for the Document that fetches data from the server
+ * A data source for the Element that fetches data from the server
  * @class UmbElementServerDataSource
  * @implements {UmbDetailDataSource}
  */
@@ -29,7 +29,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	}
 
 	/**
-	 * Creates a new Document scaffold
+	 * Creates a new Element scaffold
 	 * @param preset
 	 * @returns { UmbElementDetailModel }
 	 * @memberof UmbElementServerDataSource
@@ -53,26 +53,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	}
 
 	/**
-	 * Creates a new variant scaffold.
-	 * @returns A new variant scaffold.
-	 */
-	/*
-	// TODO: remove if not used
-	createVariantScaffold(): UmbElementVariantModel {
-		return {
-			state: null,
-			culture: null,
-			segment: null,
-			name: '',
-			publishDate: null,
-			createDate: null,
-			updateDate: null,
-		};
-	}
-	*/
-
-	/**
-	 * Fetches a Document with the given id from the server
+	 * Fetches an Element with the given id from the server
 	 * @param {string} unique
 	 * @returns {*}
 	 * @memberof UmbElementServerDataSource
@@ -86,21 +67,21 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 			return { error };
 		}
 
-		const document = this.#createElementDetailModel(data);
+		const element = this.#createElementDetailModel(data);
 
-		return { data: document };
+		return { data: element };
 	}
 
 	/**
-	 * Inserts a new Document on the server
+	 * Inserts a new element on the server
 	 * @param {UmbElementDetailModel} model
 	 * @param parentUnique
 	 * @returns {*}
 	 * @memberof UmbElementServerDataSource
 	 */
 	async create(model: UmbElementDetailModel, parentUnique: string | null = null) {
-		if (!model) throw new Error('Document is missing');
-		if (!model.unique) throw new Error('Document unique is missing');
+		if (!model) throw new Error('Element is missing');
+		if (!model.unique) throw new Error('Element unique is missing');
 
 		// TODO: make data mapper to prevent errors
 		const body: CreateElementRequestModel = {
@@ -126,9 +107,8 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	}
 
 	/**
-	 * Updates a Document on the server
-	 * @param {UmbElementDetailModel} Document
-	 * @param model
+	 * Updates an Element on the server
+	 * @param {UmbElementDetailModel} model
 	 * @returns {*}
 	 * @memberof UmbElementServerDataSource
 	 */
@@ -157,7 +137,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	}
 
 	/**
-	 * Deletes a Document on the server
+	 * Deletes an Element on the server
 	 * @param {string} unique
 	 * @returns {*}
 	 * @memberof UmbElementServerDataSource
@@ -165,7 +145,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecute(this.#host, ElementService.deleteElementById({ path: { id: unique } }));
+		return tryExecute(this.#host, ElementService.deleteRecycleBinElementById({ path: { id: unique } }));
 	}
 
 	#createElementDetailModel(data: ElementResponseModel): UmbElementDetailModel {
@@ -175,7 +155,6 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 			values: data.values.map((value) => {
 				return {
 					editorAlias: value.editorAlias,
-					entityType: UMB_ELEMENT_PROPERTY_VALUE_ENTITY_TYPE,
 					culture: value.culture || null,
 					segment: value.segment || null,
 					alias: value.alias,
@@ -193,12 +172,13 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 					updateDate: variant.updateDate,
 					scheduledPublishDate: variant.scheduledPublishDate || null,
 					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
-					flags: [], //variant.flags,
+					flags: variant.flags,
 				};
 			}),
 			documentType: {
 				unique: data.documentType.id,
 				collection: null,
+				icon: data.documentType.icon,
 			},
 			isTrashed: data.isTrashed,
 			flags: data.flags,

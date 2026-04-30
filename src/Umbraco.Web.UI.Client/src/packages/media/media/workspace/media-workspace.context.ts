@@ -19,10 +19,11 @@ import {
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
+import { UMB_MEDIA_TYPE_ENTITY_TYPE, type UmbMediaTypeDetailModel } from '@umbraco-cms/backoffice/media-type';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 
 type ContentModel = UmbMediaDetailModel;
 type ContentTypeModel = UmbMediaTypeDetailModel;
@@ -39,13 +40,10 @@ export class UmbMediaWorkspaceContext
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
 
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.mediaType.unique);
-	/*
-	 * @deprecated Use `collection.hasCollection` instead, will be removed in v.18
-	 */
-	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent((data) => !!data?.mediaType.collection);
 	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.mediaType.icon);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
+	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
@@ -63,6 +61,8 @@ export class UmbMediaWorkspaceContext
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {
+				this.#entityContentTypeContext.setEntityType(unique ? UMB_MEDIA_TYPE_ENTITY_TYPE : undefined);
+				this.#entityContentTypeContext.setUnique(unique ?? undefined);
 				if (unique) {
 					this.structure.loadType(unique);
 				}
@@ -78,6 +78,7 @@ export class UmbMediaWorkspaceContext
 
 		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
 
+		// TODO: This is done by the content detail base class, so we can remove it from there and only do it here. [NL]
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
 
@@ -127,23 +128,6 @@ export class UmbMediaWorkspaceContext
 			parent,
 			preset: { mediaType: { unique: mediaTypeUnique } },
 		});
-	}
-
-	/*
-	 * @deprecated Use `collection.getCollectionAlias()` instead. Will be removed in v.18
-	 */
-	public getCollectionAlias() {
-		return UMB_MEDIA_COLLECTION_ALIAS;
-	}
-
-	/**
-	 * Gets the unique identifier of the content type.
-	 * @deprecated Use `getContentTypeUnique` instead.
-	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbMediaWorkspaceContext
-	 */
-	getContentTypeId(): string | undefined {
-		return this.getContentTypeUnique();
 	}
 
 	/**

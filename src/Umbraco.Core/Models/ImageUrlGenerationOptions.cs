@@ -42,6 +42,11 @@ public class ImageUrlGenerationOptions : IEquatable<ImageUrlGenerationOptions>
     public int? Quality { get; set; }
 
     /// <summary>
+    ///     Gets or sets the image format to use (for example "webp").
+    /// </summary>
+    public string? Format { get; set; }
+
+    /// <summary>
     ///     Gets or sets the image crop mode to use.
     /// </summary>
     public ImageCropMode? ImageCropMode { get; set; }
@@ -78,6 +83,7 @@ public class ImageUrlGenerationOptions : IEquatable<ImageUrlGenerationOptions>
            Width == other.Width &&
            Height == other.Height &&
            Quality == other.Quality &&
+           Format == other.Format &&
            ImageCropMode == other.ImageCropMode &&
            ImageCropAnchor == other.ImageCropAnchor &&
            EqualityComparer<FocalPointPosition>.Default.Equals(FocalPoint, other.FocalPoint) &&
@@ -97,6 +103,7 @@ public class ImageUrlGenerationOptions : IEquatable<ImageUrlGenerationOptions>
         hash.Add(Width);
         hash.Add(Height);
         hash.Add(Quality);
+        hash.Add(Format);
         hash.Add(ImageCropMode);
         hash.Add(ImageCropAnchor);
         hash.Add(FocalPoint);

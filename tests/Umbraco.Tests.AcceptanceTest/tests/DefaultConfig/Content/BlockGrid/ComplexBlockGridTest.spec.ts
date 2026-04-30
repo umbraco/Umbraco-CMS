@@ -1,5 +1,5 @@
-﻿import {expect} from '@playwright/test';
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {expect} from '@playwright/test';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 
 // DocumentType
 const documentTypeName = 'TestDocumentType';

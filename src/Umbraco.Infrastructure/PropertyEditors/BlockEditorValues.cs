@@ -20,6 +20,12 @@ public class BlockEditorValues<TValue, TLayout>
     private readonly IBlockEditorElementTypeCache _elementTypeCache;
     private readonly ILogger _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.PropertyEditors.BlockEditorValues{TValue, TLayout}"/> class.
+    /// </summary>
+    /// <param name="dataConverter">The <see cref="BlockEditorDataConverter{TValue, TLayout}"/> used to convert block editor data.</param>
+    /// <param name="elementTypeCache">The <see cref="IBlockEditorElementTypeCache"/> used to cache block editor element types.</param>
+    /// <param name="logger">The <see cref="ILogger"/> instance used for logging operations within the block editor values.</param>
     public BlockEditorValues(BlockEditorDataConverter<TValue, TLayout> dataConverter, IBlockEditorElementTypeCache elementTypeCache, ILogger logger)
     {
         _dataConverter = dataConverter;
@@ -27,6 +33,11 @@ public class BlockEditorValues<TValue, TLayout>
         _logger = logger;
     }
 
+    /// <summary>
+    /// Deserializes the specified property value into a <see cref="BlockEditorData{TValue, TLayout}"/> instance and cleans the resulting data.
+    /// </summary>
+    /// <param name="propertyValue">The property value to deserialize and clean. If null or whitespace, the method returns <c>null</c>.</param>
+    /// <returns>The cleaned <see cref="BlockEditorData{TValue, TLayout}"/> instance, or <c>null</c> if the input is null or whitespace.</returns>
     public BlockEditorData<TValue, TLayout>? DeserializeAndClean(object? propertyValue)
     {
         var propertyValueAsString = propertyValue?.ToString();
@@ -39,6 +50,11 @@ public class BlockEditorValues<TValue, TLayout>
         return Clean(blockEditorData);
     }
 
+    /// <summary>
+    /// Converts the specified <paramref name="blockValue"/> to a <see cref="BlockEditorData{TValue, TLayout}"/>, then cleans and returns the result.
+    /// </summary>
+    /// <param name="blockValue">The value to convert and clean.</param>
+    /// <returns>The cleaned <see cref="BlockEditorData{TValue, TLayout}"/>, or <c>null</c> if conversion fails.</returns>
     public BlockEditorData<TValue, TLayout>? ConvertAndClean(TValue blockValue)
     {
         BlockEditorData<TValue, TLayout> blockEditorData = _dataConverter.Convert(blockValue);

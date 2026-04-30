@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
     Database = UmbracoTestOptions.Database.NewSchemaPerTest,
     PublishedRepositoryEvents = true,
     WithApplication = true)]
-public class ElementServiceTests : UmbracoIntegrationTest
+public partial class ElementServiceTests : UmbracoIntegrationTest
 {
     private IElementService ElementService => GetRequiredService<IElementService>();
 

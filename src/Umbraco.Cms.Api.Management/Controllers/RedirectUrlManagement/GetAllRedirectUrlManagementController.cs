@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
@@ -9,12 +9,20 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 
+/// <summary>
+/// Controller for retrieving all redirect URL management entries.
+/// </summary>
 [ApiVersion("1.0")]
 public class GetAllRedirectUrlManagementController : RedirectUrlManagementControllerBase
 {
     private readonly IRedirectUrlService _redirectUrlService;
     private readonly IRedirectUrlPresentationFactory _redirectUrlPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GetAllRedirectUrlManagementController"/> class, which manages retrieval of all redirect URLs.
+    /// </summary>
+    /// <param name="redirectUrlService">Service used to manage and retrieve redirect URLs.</param>
+    /// <param name="redirectUrlPresentationFactory">Factory for creating presentation models for redirect URLs.</param>
     public GetAllRedirectUrlManagementController(
         IRedirectUrlService redirectUrlService,
         IRedirectUrlPresentationFactory redirectUrlPresentationFactory)
@@ -23,6 +31,16 @@ public class GetAllRedirectUrlManagementController : RedirectUrlManagementContro
         _redirectUrlPresentationFactory = redirectUrlPresentationFactory;
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of redirect URLs, optionally filtered by a search string.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="filter">An optional string to filter redirect URLs by matching criteria; if null, all redirect URLs are returned.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set (used for pagination).</param>
+    /// <param name="take">The maximum number of items to return in the result set (used for pagination).</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains an <see cref="ActionResult{T}"/> with a <see cref="PagedViewModel{RedirectUrlResponseModel}"/> holding the filtered and paginated redirect URLs.
+    /// </returns>
     [MapToApiVersion("1.0")]
     [HttpGet]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]

@@ -20,6 +20,7 @@ export type ReadOnlyUserGroupModel = {
     id: number;
     key: string;
     name: string;
+    readonly description?: string | null;
     icon?: string | null;
     startContentId?: number | null;
     startMediaId?: number | null;
@@ -48,6 +49,7 @@ export type UserGroupModel = {
     icon?: string | null;
     alias: string;
     name?: string | null;
+    description?: string | null;
     hasAccessToAllLanguages: boolean;
     permissions: Array<string>;
     granularPermissions: Array<DocumentGranularPermissionModel | DocumentPropertyValueGranularPermissionModel | UnknownTypeGranularPermissionModel>;
@@ -109,6 +111,21 @@ export type DocumentPropertyValueGranularPermissionModelWritable = {
     permission: string;
 };
 
+export type ReadOnlyUserGroupModelWritable = {
+    id: number;
+    key: string;
+    name: string;
+    icon?: string | null;
+    startContentId?: number | null;
+    startMediaId?: number | null;
+    alias: string;
+    hasAccessToAllLanguages: boolean;
+    allowedLanguages: Array<number>;
+    permissions: Array<string>;
+    granularPermissions: Array<DocumentGranularPermissionModelWritable | DocumentPropertyValueGranularPermissionModelWritable | UnknownTypeGranularPermissionModel>;
+    allowedSections: Array<string>;
+};
+
 export type UserGroupModelWritable = {
     id: number;
     key: string;
@@ -120,6 +137,7 @@ export type UserGroupModelWritable = {
     icon?: string | null;
     alias: string;
     name?: string | null;
+    description?: string | null;
     hasAccessToAllLanguages: boolean;
     permissions: Array<string>;
     granularPermissions: Array<DocumentGranularPermissionModelWritable | DocumentPropertyValueGranularPermissionModelWritable | UnknownTypeGranularPermissionModel>;

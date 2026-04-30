@@ -156,7 +156,8 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
             // it *was* done for each pathId but really that does not make sense
             // only need to do it for the current media
             mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
-            mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
+            // GUID-keyed read repository uses a separate "uRepoGuid_" prefix
+            mediaCache.Result.Clear(RepositoryCacheKeys.GetGuidKey<IMedia>(payload.Key.GetValueOrDefault()));
 
             // remove those that are in the branch
             if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
@@ -201,13 +202,22 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
-            if (_mediaNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys))
+            var inMainTree = _mediaNavigationQueryService.TryGetDescendantsKeys(key, out IEnumerable<Guid> descendantsKeys);
+            var inBin = inMainTree is false && _mediaNavigationQueryService.TryGetDescendantsKeysInBin(key, out descendantsKeys);
+
+            if (inMainTree || inBin)
             {
                 var branchKeys = descendantsKeys.ToList();
                 branchKeys.Add(key);
 
                 foreach (Guid branchKey in branchKeys)
                 {
+                    if (inBin)
+                    {
+                        _mediaCacheService.RemoveFromMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
+                        continue;
+                    }
+
                     _mediaCacheService.RefreshMemoryCacheAsync(branchKey).GetAwaiter().GetResult();
                 }
             }

@@ -1,4 +1,4 @@
-import {test} from '@umbraco/playwright-testhelpers';
+import {test} from '@umbraco/acceptance-test-helpers';
 
 // Content
 const contentName = 'Test Content';

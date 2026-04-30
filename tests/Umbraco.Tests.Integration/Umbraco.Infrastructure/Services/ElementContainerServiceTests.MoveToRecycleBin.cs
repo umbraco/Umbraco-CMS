@@ -2,6 +2,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Attributes;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -360,5 +361,62 @@ public partial class ElementContainerServiceTests
         Assert.IsNotNull(firstContainer);
         Assert.IsTrue(firstContainer.Trashed);
         Assert.AreEqual(Constants.System.RecycleBinElement, firstContainer.ParentId);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableUnpublishWhenReferenced))]
+    public async Task Cannot_Move_Container_To_Recycle_Bin_When_Descendant_Is_Referenced_And_Configured_To_Disable_When_Referenced()
+    {
+        var containerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey);
+
+        var elementType = await CreateElementType();
+        var referencingElement = await CreateElement(elementType.Key);
+        var referencedElement = await CreateElement(elementType.Key, containerKey);
+
+        // Set up a relation where referencingElement references referencedElement (inside the container).
+        RelationService.Relate(
+            referencingElement.Id,
+            referencedElement.Id,
+            Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+
+        var moveResult = await ElementContainerService.MoveToRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(moveResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.HasReferencedDescendants, moveResult.Result);
+        });
+
+        // Verify the container was not moved
+        var container = await ElementContainerService.GetAsync(containerKey);
+        Assert.IsNotNull(container);
+        Assert.IsFalse(container.Trashed);
+    }
+
+    [Test]
+    public async Task Can_Move_Container_To_Recycle_Bin_When_Descendant_Is_Referenced_But_Not_Configured_To_Disable()
+    {
+        var containerKey = Guid.NewGuid();
+        await ElementContainerService.CreateAsync(containerKey, "Root Container", null, Constants.Security.SuperUserKey);
+
+        var elementType = await CreateElementType();
+        var referencingElement = await CreateElement(elementType.Key);
+        var referencedElement = await CreateElement(elementType.Key, containerKey);
+
+        // Set up a relation where referencingElement references referencedElement (inside the container).
+        RelationService.Relate(
+            referencingElement.Id,
+            referencedElement.Id,
+            Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+
+        // Without the DisableUnpublishWhenReferenced setting, the move should succeed.
+        var moveResult = await ElementContainerService.MoveToRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(moveResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, moveResult.Result);
+        });
+
+        await AssertContainerIsInRecycleBin(containerKey);
     }
 }

@@ -1,12 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Examine;
+using Examine.Search;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -812,6 +816,28 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Get_All_Members_Paged_With_Non_Zero_Skip()
+    {
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
+        MemberService.Save(members);
+
+        var found = MemberService.GetAll(
+            skip: 2,
+            take: 2,
+            out var totalRecs,
+            "username",
+            Direction.Ascending,
+            memberType.Alias);
+
+        Assert.AreEqual(2, found.Count());
+        Assert.AreEqual(10, totalRecs);
+        Assert.AreEqual("test2", found.First().Username);
+        Assert.AreEqual("test3", found.Last().Username);
+    }
+
+    [Test]
     public async Task Find_By_Name_Starts_With()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
@@ -1520,5 +1546,98 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(3, members.Length);
             CollectionAssert.AreEquivalent(new [] { memberA.Key, memberB.Key, memberC.Key }, members.Select(m => m.Key).ToArray());
         });
+    }
+
+    [Test]
+    public async Task Can_FilterAsync_With_All_Sort_Fields_And_Directions()
+    {
+        // Create two member types with distinct names for sorting.
+        IMemberType alphaType = MemberTypeBuilder.CreateSimpleMemberType("alphaType", "Alpha Type");
+        await MemberTypeService.CreateAsync(alphaType, Constants.Security.SuperUserKey);
+
+        IMemberType betaType = MemberTypeBuilder.CreateSimpleMemberType("betaType", "Beta Type");
+        await MemberTypeService.CreateAsync(betaType, Constants.Security.SuperUserKey);
+
+        // Create 3 members with deliberately different sort orders across fields:
+        // - name: Alice < Bob < Charlie
+        // - username: user_alice (Bob) < user_bob (Charlie) < user_charlie (Alice)
+        // - email: anna (Bob) < mike (Alice) < zara (Charlie)
+        // - memberType: Alpha (Alice, Bob) before Beta (Charlie)
+        IMember member1 = MemberBuilder.CreateSimpleMember(betaType, "Charlie", "zara@test.com", "pass", "user_bob");
+        MemberService.Save(member1);
+
+        IMember member2 = MemberBuilder.CreateSimpleMember(alphaType, "Alice", "mike@test.com", "pass", "user_charlie");
+        MemberService.Save(member2);
+
+        IMember member3 = MemberBuilder.CreateSimpleMember(alphaType, "Bob", "anna@test.com", "pass", "user_alice");
+        MemberService.Save(member3);
+
+        var filter = new MemberFilter();
+
+        // Sort by name ascending: Alice, Bob, Charlie
+        var result = await MemberService.FilterAsync(filter, "name", Direction.Ascending, skip: 0, take: 10);
+        Assert.AreEqual(3, result.Total);
+        Assert.AreEqual(new[] { "Alice", "Bob", "Charlie" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by name descending: Charlie, Bob, Alice
+        result = await MemberService.FilterAsync(filter, "name", Direction.Descending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Charlie", "Bob", "Alice" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by username ascending: user_alice (Bob), user_bob (Charlie), user_charlie (Alice)
+        result = await MemberService.FilterAsync(filter, "username", Direction.Ascending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Bob", "Charlie", "Alice" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by username descending: user_charlie (Alice), user_bob (Charlie), user_alice (Bob)
+        result = await MemberService.FilterAsync(filter, "username", Direction.Descending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Alice", "Charlie", "Bob" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by email ascending: anna (Bob), mike (Alice), zara (Charlie)
+        result = await MemberService.FilterAsync(filter, "email", Direction.Ascending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Bob", "Alice", "Charlie" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by email descending: zara (Charlie), mike (Alice), anna (Bob)
+        result = await MemberService.FilterAsync(filter, "email", Direction.Descending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Charlie", "Alice", "Bob" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by memberType ascending: Alpha (Alice, Bob) before Beta (Charlie), secondary sort by name ascending
+        result = await MemberService.FilterAsync(filter, "memberType", Direction.Ascending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Alice", "Bob", "Charlie" }, result.Items.Select(m => m.Name).ToArray());
+
+        // Sort by memberType descending: Beta (Charlie) before Alpha (Alice, Bob), secondary sort by name descending
+        result = await MemberService.FilterAsync(filter, "memberType", Direction.Descending, skip: 0, take: 10);
+        Assert.AreEqual(new[] { "Charlie", "Bob", "Alice" }, result.Items.Select(m => m.Name).ToArray());
+    }
+
+    [Test]
+    public async Task Can_FilterAsync_With_Combined_MemberType_And_MemberGroup()
+    {
+        // Create a member type.
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        // Create two members of that type.
+        IMember member1 = MemberBuilder.CreateSimpleMember(memberType, "Alice", "alice@test.com", "pass", "alice");
+        MemberService.Save(member1);
+
+        IMember member2 = MemberBuilder.CreateSimpleMember(memberType, "Bob", "bob@test.com", "pass", "bob");
+        MemberService.Save(member2);
+
+        // Create a member group and assign only the first member to it.
+        MemberService.AddRole("Test Group");
+        MemberService.AssignRoles([member1.Id], ["Test Group"]);
+
+        // Filter by both member type ID and member group name — this previously caused
+        // a SQL syntax error ("near INNER: syntax error") because a WHERE clause was
+        // inserted between JOIN blocks.
+        var filter = new MemberFilter
+        {
+            MemberTypeId = memberType.Key,
+            MemberGroupName = "Test Group",
+        };
+
+        var result = await MemberService.FilterAsync(filter, "name", Direction.Ascending, skip: 0, take: 10);
+
+        Assert.AreEqual(1, result.Total);
+        Assert.AreEqual("Alice", result.Items.First().Name);
     }
 }

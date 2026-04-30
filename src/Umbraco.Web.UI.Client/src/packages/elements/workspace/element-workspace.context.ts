@@ -1,27 +1,36 @@
 import { UMB_CREATE_ELEMENT_WORKSPACE_PATH_PATTERN, UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN } from '../paths.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
-import { UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS } from '../repository/detail/constants.js';
 import type { UmbElementDetailRepository } from '../repository/index.js';
 import type { UmbElementDetailModel, UmbElementVariantModel } from '../types.js';
-import { UmbElementWorkspacePropertyDatasetContext } from './property-dataset-context/element-workspace-property-dataset-context.js';
+import { UmbElementValidationRepository } from '../repository/validation/index.js';
+import {
+	UMB_ELEMENT_COLLECTION_ALIAS,
+	UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
+	UMB_ELEMENT_SAVE_MODAL,
+	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_CREATE,
+	UMB_USER_PERMISSION_ELEMENT_UPDATE,
+} from '../constants.js';
 import { UMB_ELEMENT_WORKSPACE_ALIAS } from './constants.js';
+import { UmbElementWorkspacePropertyDatasetContext } from './property-dataset-context/element-workspace-property-dataset-context.js';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
+import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
+import {
+	UmbEntityRestoredFromRecycleBinEvent,
+	UmbEntityTrashedEvent,
+	UmbIsTrashedEntityContext,
+} from '@umbraco-cms/backoffice/recycle-bin';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
-import { UmbDocumentTypeDetailRepository } from '@umbraco-cms/backoffice/document-type';
-import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD } from '@umbraco-cms/backoffice/document';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
-import {
-	UmbEntityRestoredFromRecycleBinEvent,
-	UmbEntityTrashedEvent,
-	UmbIsTrashedEntityContext,
-} from '@umbraco-cms/backoffice/recycle-bin';
 import type { UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
@@ -39,6 +48,8 @@ export class UmbElementWorkspaceContext
 {
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
 
+	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
+
 	readonly isTrashed = this._data.createObservablePartOfCurrent((data) => data?.isTrashed);
 
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
@@ -49,11 +60,15 @@ export class UmbElementWorkspaceContext
 		super(host, {
 			entityType: UMB_ELEMENT_ENTITY_TYPE,
 			workspaceAlias: UMB_ELEMENT_WORKSPACE_ALIAS,
+			collectionAlias: UMB_ELEMENT_COLLECTION_ALIAS,
 			detailRepositoryAlias: UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
 			contentTypeDetailRepository: UmbDocumentTypeDetailRepository,
+			contentValidationRepository: UmbElementValidationRepository,
+			skipValidationOnSubmit: false,
+			ignoreValidationResultOnSubmit: true,
 			contentVariantScaffold: UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD,
 			contentTypePropertyName: 'documentType',
-			ignoreValidationResultOnSubmit: true,
+			saveModalToken: UMB_ELEMENT_SAVE_MODAL,
 		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (actionEventContext) => {
@@ -67,6 +82,25 @@ export class UmbElementWorkspaceContext
 			(unique) => {
 				if (unique) {
 					this.structure.loadType(unique);
+				}
+			},
+			null,
+		);
+
+		this.observe(
+			this.isNew,
+			(isNew) => {
+				if (isNew === undefined) return;
+				if (isNew) {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_ELEMENT_CREATE,
+						'You do not have permission to create elements.',
+					);
+				} else {
+					this.#enforceUserPermission(
+						UMB_USER_PERMISSION_ELEMENT_UPDATE,
+						'You do not have permission to update elements.',
+					);
 				}
 			},
 			null,
@@ -103,6 +137,22 @@ export class UmbElementWorkspaceContext
 		]);
 	}
 
+	#enforceUserPermission(verb: string, message: string) {
+		// We set the initial permission state to false because the condition is false by default and only execute the callback if it changes.
+		this.#handleUserPermissionChange(verb, false, message);
+
+		createExtensionApiByAlias(this, UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					allOf: [verb],
+				},
+				onChange: (permitted: boolean) => {
+					this.#handleUserPermissionChange(verb, permitted, message);
+				},
+			},
+		]);
+	}
+
 	async create(parent: UmbEntityModel, documentTypeUnique: string) {
 		return this.createScaffold({
 			parent,
@@ -131,9 +181,33 @@ export class UmbElementWorkspaceContext
 		return new UmbElementWorkspacePropertyDatasetContext(host, this, variantId);
 	}
 
+	protected override async _handleSave() {
+		const elementStyle = (this.getHostElement() as HTMLElement).style;
+		elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-warning)');
+		elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-warning-emphasis)');
+		elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-warning-standalone)');
+		elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-warning-contrast)');
+		await super._handleSave();
+	}
+
 	override resetState(): void {
 		super.resetState();
 		this.#isTrashedContext.setIsTrashed(false);
+	}
+
+	async #handleUserPermissionChange(identifier: string, permitted: boolean, message: string) {
+		if (permitted) {
+			this.readOnlyGuard?.removeRule(identifier);
+			return;
+		}
+
+		this.readOnlyGuard?.addRule({
+			unique: identifier,
+			message,
+			/* This guard is a bit backwards. The rule is permitted to be read-only.
+			If the user does not have permission, we set it to true = permitted to be read-only. */
+			permitted: true,
+		});
 	}
 
 	#addEventListeners() {

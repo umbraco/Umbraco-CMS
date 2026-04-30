@@ -1,4 +1,4 @@
-import {AliasHelper, test} from '@umbraco/playwright-testhelpers';
+import {test} from '@umbraco/acceptance-test-helpers';
 
 const contentName = 'TestContent';
 const documentTypeName = 'TestDocumentTypeForContent';

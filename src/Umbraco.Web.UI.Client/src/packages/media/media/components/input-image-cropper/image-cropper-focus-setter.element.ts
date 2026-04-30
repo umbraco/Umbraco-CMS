@@ -8,6 +8,7 @@ import {
 	css,
 	customElement,
 	classMap,
+	eventOptions,
 	ifDefined,
 	html,
 	nothing,
@@ -39,14 +40,15 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	@property({ attribute: false })
 	set focalPoint(value) {
 		this.#focalPoint = value;
-		this.#setFocalPointStyle(this.#focalPoint.left, this.#focalPoint.top);
+		const resolved = this.#focalPoint ?? { left: 0.5, top: 0.5 };
+		this.#setFocalPointStyle(resolved.left, resolved.top);
 		this.#onFocalPointUpdated();
 	}
 	get focalPoint() {
 		return this.#focalPoint;
 	}
 
-	#focalPoint: UmbImageCropperFocalPoint = { left: 0.5, top: 0.5 };
+	#focalPoint: UmbImageCropperFocalPoint = null;
 
 	@property({ type: Boolean })
 	hideFocalPoint = false;
@@ -79,7 +81,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		await this.updateComplete; // Wait for the @query to be resolved
 
 		if (!this.hideFocalPoint) {
-			this.#setFocalPointStyle(this.focalPoint.left, this.focalPoint.top);
+			const resolved = this.focalPoint ?? { left: 0.5, top: 0.5 };
+			this.#setFocalPointStyle(resolved.left, resolved.top);
 		}
 
 		this.imageElement.onload = () => {
@@ -125,7 +128,7 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 	}
 
 	#isCentered(focalPoint: UmbImageCropperFocalPoint) {
-		if (!this.focalPoint) return;
+		if (!focalPoint) return true;
 
 		return isCentered(focalPoint);
 	}
@@ -138,7 +141,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		this._coords.y = this.imageElement.clientHeight / 2;
 	}
 
-	#handleGridDrag(event: PointerEvent) {
+	@eventOptions({ passive: false })
+	private _handleGridDrag(event: PointerEvent) {
 		if (this.disabled || this.hideFocalPoint) return;
 		if (event.button !== 0) {
 			// This is not a primary mouse button click, so lets not do anything.
@@ -239,8 +243,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 			<div
 				id="wrapper"
 				@click=${this.#changeFocalPoint}
-				@mousedown=${this.#handleGridDrag}
-				@touchstart=${this.#handleGridDrag}>
+				@mousedown=${this._handleGridDrag}
+				@touchstart=${this._handleGridDrag}>
 				<img id="image" @keydown=${() => nothing} src=${this.src} alt="" />
 				<span
 					id="focal-point"
@@ -279,6 +283,8 @@ export class UmbImageCropperFocusSetterElement extends UmbLitElement {
 		#image {
 			margin: auto;
 			position: relative;
+			max-width: 100%;
+			max-height: 100%;
 		}
 		#focal-point {
 			content: '';

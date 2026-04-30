@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 let documentTypeId = '';
@@ -76,6 +76,14 @@ test('can create content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.values[0].value).toBe(contentText);
+  // Verify audit trail
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.doesHistoryHaveCount(1);
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSaved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can rename content', async ({umbracoApi, umbracoUi}) => {
@@ -95,6 +103,12 @@ test('can rename content', async ({umbracoApi, umbracoUi}) => {
   // Assert
   const updatedContentData = await umbracoApi.document.get(contentId);
   expect(updatedContentData.variants[0].name).toEqual(contentName);
+  // Verify audit trail
+  await umbracoUi.content.doesHistoryHaveCount(2);
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSaved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can update content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -115,6 +129,13 @@ test('can update content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   const updatedContentData = await umbracoApi.document.get(contentId);
   expect(updatedContentData.variants[0].name).toEqual(contentName);
   expect(updatedContentData.values[0].value).toBe(contentText);
+  // Verify audit trail
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.doesHistoryHaveCount(2);
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSaved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can publish invariant content node', async ({umbracoApi, umbracoUi}) => {
@@ -134,6 +155,13 @@ test('can publish invariant content node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Published');
+  // Verify audit trail
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSavedAndPublished);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
@@ -154,6 +182,13 @@ test('can unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
   const contentData = await umbracoApi.document.getByName(contentName);
   expect(contentData.variants[0].state).toBe('Draft');
+  // Verify audit trail
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.unpublish);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentUnpublished);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can publish variant content node', async ({umbracoApi, umbracoUi}) => {
@@ -189,7 +224,7 @@ test('can duplicate a content node to root', async ({umbracoApi, umbracoUi}) => 
   // Duplicate to root
   await umbracoUi.content.clickDuplicateToActionMenuOption();
   await umbracoUi.content.clickLabelWithName('Content');
-  await umbracoUi.content.clickDuplicateButton();
+  await umbracoUi.content.clickCopyModalButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
@@ -200,6 +235,13 @@ test('can duplicate a content node to root', async ({umbracoApi, umbracoUi}) => 
   const contentData = await umbracoApi.document.getByName(contentName);
   const duplicatedContentData = await umbracoApi.document.getByName(duplicatedContentName);
   expect(contentData.values[0].value).toEqual(duplicatedContentData.values[0].value);
+  // Verify audit trail
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.copy);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentCopied);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(duplicatedContentName);
@@ -223,14 +265,14 @@ test('can duplicate a content node to other parent', async ({umbracoApi, umbraco
   await umbracoUi.content.clickActionsMenuForContent(contentName);
   await umbracoUi.content.clickDuplicateToActionMenuOption();
   await umbracoUi.content.clickModalMenuItemWithName(parentContentName);
-  await umbracoUi.content.clickDuplicateButton();
+  await umbracoUi.content.clickCopyModalButton();
 
   // Assert
   await umbracoUi.content.doesSuccessNotificationHaveText(NotificationConstantHelper.success.duplicated);
   await umbracoUi.content.isContentInTreeVisible(contentName);
   await umbracoUi.content.isContentInTreeVisible(parentContentName);
   await umbracoUi.content.goToContentWithName(parentContentName);
-  await umbracoUi.content.isContentWithNameVisibleInList(contentName);
+  await umbracoUi.content.isContentWithNameVisibleInGrid(contentName);
 
   // Clean
   await umbracoApi.document.ensureNameNotExists(parentContentName);
@@ -261,4 +303,12 @@ test('can restore a content item from the recycle bin', {tag: '@release'}, async
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName, false, false);
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeTruthy();
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeFalsy();
+  // Verify audit trail
+  await umbracoUi.reloadPage();
+  await umbracoUi.content.goToContentWithName(contentName);
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });

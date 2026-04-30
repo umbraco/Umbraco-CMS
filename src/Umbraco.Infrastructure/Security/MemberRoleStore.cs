@@ -22,7 +22,12 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
 
     private bool _disposed;
 
-    // private const string genericIdentityErrorCode = "IdentityErrorUserStore";
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.Security.MemberRoleStore"/> class.
+    /// </summary>
+    /// <remarks>private const string genericIdentityErrorCode = "IdentityErrorUserStore";</remarks>
+    /// <param name="memberGroupService">Service used to manage and retrieve member groups.</param>
+    /// <param name="errorDescriber">Provides error messages for identity-related operations.</param>
     public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
     {
         _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
@@ -34,11 +39,12 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     /// </summary>
     public IdentityErrorDescriber ErrorDescriber { get; set; }
 
+    /// <inheritdoc/>
     public IQueryable<UmbracoIdentityRole> Roles =>
-        _memberGroupService.GetAll().Select(MapFromMemberGroup).AsQueryable();
+        _memberGroupService.GetAllAsync().GetAwaiter().GetResult().Select(MapFromMemberGroup).AsQueryable();
 
     /// <inheritdoc />
-    public Task<IdentityResult> CreateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
+    public async Task<IdentityResult> CreateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -50,15 +56,15 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
 
         var memberGroup = new MemberGroup { Name = role.Name };
 
-        _memberGroupService.Save(memberGroup);
+        await _memberGroupService.CreateAsync(memberGroup);
 
         role.Id = memberGroup.Id.ToString();
 
-        return Task.FromResult(IdentityResult.Success);
+        return IdentityResult.Success;
     }
 
     /// <inheritdoc />
-    public Task<IdentityResult> UpdateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
+    public async Task<IdentityResult> UpdateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -70,7 +76,7 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
 
         if (!int.TryParse(role.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var roleId))
         {
-            return Task.FromResult(IdentityResult.Failed(_intParseError));
+            return IdentityResult.Failed(_intParseError);
         }
 
         IMemberGroup? memberGroup = _memberGroupService.GetById(roleId);
@@ -78,13 +84,13 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         {
             if (MapToMemberGroup(role, memberGroup))
             {
-                _memberGroupService.Save(memberGroup);
+                await _memberGroupService.UpdateAsync(memberGroup);
             }
 
-            return Task.FromResult(IdentityResult.Success);
+            return IdentityResult.Success;
         }
 
-        return Task.FromResult(IdentityResult.Failed(_memberGroupNotFoundError));
+        return IdentityResult.Failed(_memberGroupNotFoundError);
     }
 
     /// <inheritdoc />
@@ -176,7 +182,7 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         => SetRoleNameAsync(role, normalizedName, cancellationToken);
 
     /// <inheritdoc />
-    public Task<UmbracoIdentityRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
+    public async Task<UmbracoIdentityRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -190,20 +196,20 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
 
         // member group can be found by int or Guid, so try both
         if (!int.TryParse(roleId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id))
+        {
+            if (!Guid.TryParse(roleId, out Guid guid))
             {
-                if (!Guid.TryParse(roleId, out Guid guid))
-                {
-                    throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Guid");
-                }
+                throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Guid");
+            }
 
-                memberGroup = _memberGroupService.GetById(guid);
+            memberGroup = await _memberGroupService.GetAsync(guid);
         }
         else
         {
             memberGroup = _memberGroupService.GetById(id);
         }
 
-        return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
+        return memberGroup == null ? null : MapFromMemberGroup(memberGroup);
     }
 
     /// <inheritdoc />
@@ -240,8 +246,8 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     /// <summary>
     ///     Maps a member group to an identity role
     /// </summary>
-    /// <param name="memberGroup"></param>
-    /// <returns></returns>
+    /// <param name="memberGroup">The member group to map.</param>
+    /// <returns>The mapped identity role.</returns>
     private UmbracoIdentityRole MapFromMemberGroup(IMemberGroup memberGroup)
     {
         // NOTE: there is a ConcurrencyStamp property but we don't use it. The purpose
@@ -257,9 +263,9 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     /// <summary>
     ///     Map an identity role to a member group
     /// </summary>
-    /// <param name="role"></param>
-    /// <param name="memberGroup"></param>
-    /// <returns></returns>
+    /// <param name="role">The identity role to map.</param>
+    /// <param name="memberGroup">The member group to update.</param>
+    /// <returns>True if any properties were changed.</returns>
     private bool MapToMemberGroup(UmbracoIdentityRole role, IMemberGroup memberGroup)
     {
         var anythingChanged = false;

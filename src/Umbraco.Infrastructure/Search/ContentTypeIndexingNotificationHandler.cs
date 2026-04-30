@@ -1,42 +1,105 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
+/// <summary>
+/// Handles notifications related to the indexing of Umbraco content types.
+/// </summary>
 public sealed class ContentTypeIndexingNotificationHandler : INotificationHandler<ContentTypeCacheRefresherNotification>
 {
     private readonly IContentService _contentService;
     private readonly IMediaService _mediaService;
     private readonly IMemberService _memberService;
     private readonly IMemberTypeService _memberTypeService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
+    private readonly IOptionsMonitor<IndexingSettings> _indexingSettings;
+    private readonly IDeferredSearchReindexService _deferredSearchReindexService;
+    private readonly IOptionsMonitor<CacheSettings> _cacheSettings;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentTypeIndexingNotificationHandler"/> class.
+    /// </summary>
+    /// <param name="umbracoIndexingHandler">The handler responsible for managing Umbraco content indexing operations.</param>
+    /// <param name="contentService">Service used to manage and query content items.</param>
+    /// <param name="memberService">Service used to manage and query member entities.</param>
+    /// <param name="mediaService">Service used to manage and query media items.</param>
+    /// <param name="memberTypeService">Service used to manage and query member types.</param>
+    /// <param name="publishStatusQueryService">Service used to check published status.</param>
+    /// <param name="indexingSettings">The indexing configuration settings.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ContentTypeIndexingNotificationHandler(
         IUmbracoIndexingHandler umbracoIndexingHandler,
         IContentService contentService,
         IMemberService memberService,
         IMediaService mediaService,
-        IMemberTypeService memberTypeService)
+        IMemberTypeService memberTypeService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
+        IOptionsMonitor<IndexingSettings> indexingSettings)
+        : this(
+            umbracoIndexingHandler,
+            contentService,
+            memberService,
+            mediaService,
+            memberTypeService,
+            publishStatusQueryService,
+            indexingSettings,
+            StaticServiceProvider.Instance.GetRequiredService<IDeferredSearchReindexService>(),
+            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<CacheSettings>>())
     {
-        _umbracoIndexingHandler =
-            umbracoIndexingHandler ?? throw new ArgumentNullException(nameof(umbracoIndexingHandler));
-        _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
-        _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
-        _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
-        _memberTypeService = memberTypeService ?? throw new ArgumentNullException(nameof(memberTypeService));
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentTypeIndexingNotificationHandler"/> class.
+    /// </summary>
+    /// <param name="umbracoIndexingHandler">The handler responsible for managing Umbraco content indexing operations.</param>
+    /// <param name="contentService">Service used to manage and query content items.</param>
+    /// <param name="memberService">Service used to manage and query member entities.</param>
+    /// <param name="mediaService">Service used to manage and query media items.</param>
+    /// <param name="memberTypeService">Service used to manage and query member types.</param>
+    /// <param name="publishStatusQueryService">Service used to check published status.</param>
+    /// <param name="indexingSettings">The indexing configuration settings.</param>
+    /// <param name="deferredSearchReindexService">Service for queuing deferred search reindexing.</param>
+    /// <param name="cacheSettings">The cache configuration settings controlling deferred behavior.</param>
+    public ContentTypeIndexingNotificationHandler(
+        IUmbracoIndexingHandler umbracoIndexingHandler,
+        IContentService contentService,
+        IMemberService memberService,
+        IMediaService mediaService,
+        IMemberTypeService memberTypeService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
+        IOptionsMonitor<IndexingSettings> indexingSettings,
+        IDeferredSearchReindexService deferredSearchReindexService,
+        IOptionsMonitor<CacheSettings> cacheSettings)
+    {
+        _umbracoIndexingHandler = umbracoIndexingHandler;
+        _contentService = contentService;
+        _memberService = memberService;
+        _mediaService = mediaService;
+        _memberTypeService = memberTypeService;
+        _publishStatusQueryService = publishStatusQueryService;
+        _indexingSettings = indexingSettings;
+        _deferredSearchReindexService = deferredSearchReindexService;
+        _cacheSettings = cacheSettings;
     }
 
     /// <summary>
     ///     Updates indexes based on content type changes
     /// </summary>
-    /// <param name="args"></param>
+    /// <param name="args">The content type cache refresher notification.</param>
     public void Handle(ContentTypeCacheRefresherNotification args)
     {
         if (!_umbracoIndexingHandler.Enabled)
@@ -54,16 +117,15 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             throw new NotSupportedException();
         }
 
-        var changedIds = new Dictionary<string, (List<int> removedIds, List<int> refreshedIds, List<int> otherIds)>();
+        var changedIds = new Dictionary<string, (List<int> removedIds, List<int> refreshedIds)>();
 
-        foreach (ContentTypeCacheRefresher.JsonPayload payload in (ContentTypeCacheRefresher.JsonPayload[])args
-                     .MessageObject)
+        foreach (ContentTypeCacheRefresher.JsonPayload payload in (ContentTypeCacheRefresher.JsonPayload[])args.MessageObject)
         {
             if (!changedIds.TryGetValue(
                 payload.ItemType,
-                out (List<int> removedIds, List<int> refreshedIds, List<int> otherIds) idLists))
+                out (List<int> removedIds, List<int> refreshedIds) idLists))
             {
-                idLists = (removedIds: new List<int>(), refreshedIds: new List<int>(), otherIds: new List<int>());
+                idLists = (removedIds: new List<int>(), refreshedIds: new List<int>());
                 changedIds.Add(payload.ItemType, idLists);
             }
 
@@ -75,41 +137,57 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             {
                 idLists.refreshedIds.Add(payload.Id);
             }
-            else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther))
-            {
-                idLists.otherIds.Add(payload.Id);
-            }
         }
 
-        foreach (KeyValuePair<string, (List<int> removedIds, List<int> refreshedIds, List<int> otherIds)> ci in
-                 changedIds)
+        var isDeferred = _cacheSettings.CurrentValue.ContentTypeRebuildMode == ContentTypeRebuildMode.Deferred;
+
+        foreach (KeyValuePair<string, (List<int> removedIds, List<int> refreshedIds)> changedId in changedIds)
         {
-            if (ci.Value.refreshedIds.Count > 0 || ci.Value.otherIds.Count > 0)
+            if (changedId.Value.refreshedIds.Count > 0)
             {
-                switch (ci.Key)
+                if (isDeferred)
                 {
-                    case var itemType when itemType == typeof(IContentType).Name:
-                        RefreshContentOfContentTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct()
-                            .ToArray());
-                        break;
-                    case var itemType when itemType == typeof(IMediaType).Name:
-                        RefreshMediaOfMediaTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct().ToArray());
-                        break;
-                    case var itemType when itemType == typeof(IMemberType).Name:
-                        RefreshMemberOfMemberTypes(ci.Value.refreshedIds.Concat(ci.Value.otherIds).Distinct()
-                            .ToArray());
-                        break;
+                    var distinctIds = changedId.Value.refreshedIds.Distinct().ToArray();
+                    switch (changedId.Key)
+                    {
+                        case var itemType when itemType == typeof(IContentType).Name:
+                            _deferredSearchReindexService.QueueContentTypeReindex(distinctIds);
+                            break;
+                        case var itemType when itemType == typeof(IMediaType).Name:
+                            _deferredSearchReindexService.QueueMediaTypeReindex(distinctIds);
+                            break;
+                        case var itemType when itemType == typeof(IMemberType).Name:
+                            _deferredSearchReindexService.QueueMemberTypeReindex(distinctIds);
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (changedId.Key)
+                    {
+                        case var itemType when itemType == typeof(IContentType).Name:
+                            RefreshContentOfContentTypes(changedId.Value.refreshedIds.Distinct()
+                                .ToArray());
+                            break;
+                        case var itemType when itemType == typeof(IMediaType).Name:
+                            RefreshMediaOfMediaTypes(changedId.Value.refreshedIds.Distinct().ToArray());
+                            break;
+                        case var itemType when itemType == typeof(IMemberType).Name:
+                            RefreshMemberOfMemberTypes(changedId.Value.refreshedIds.Distinct()
+                                .ToArray());
+                            break;
+                    }
                 }
             }
 
             // Delete all content of this content/media/member type that is in any content indexer by looking up matched examine docs
-            _umbracoIndexingHandler.DeleteDocumentsForContentTypes(ci.Value.removedIds);
+            _umbracoIndexingHandler.DeleteDocumentsForContentTypes(changedId.Value.removedIds);
         }
     }
 
     private void RefreshMemberOfMemberTypes(int[] memberTypeIds)
     {
-        const int pageSize = 500;
+        var pageSize = _indexingSettings.CurrentValue.BatchSize;
 
         IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(memberTypeIds);
         foreach (IMemberType memberType in memberTypes)
@@ -119,12 +197,14 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
             while (page * pageSize < total)
             {
                 IEnumerable<IMember> memberToRefresh = _memberService.GetAll(
-                    page * pageSize,
+                    page,
                     pageSize,
                     out total,
                     "LoginName",
                     Direction.Ascending,
-                    memberType.Alias);
+                    true,
+                    memberType.Alias,
+                    string.Empty);
 
                 foreach (IMember c in memberToRefresh)
                 {
@@ -138,7 +218,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
     private void RefreshMediaOfMediaTypes(int[] mediaTypeIds)
     {
-        const int pageSize = 500;
+        var pageSize = _indexingSettings.CurrentValue.BatchSize;
         var page = 0;
         var total = long.MaxValue;
         while (page * pageSize < total)
@@ -162,7 +242,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
 
     private void RefreshContentOfContentTypes(int[] contentTypeIds)
     {
-        const int pageSize = 500;
+        var pageSize = _indexingSettings.CurrentValue.BatchSize;
         var page = 0;
         var total = long.MaxValue;
         while (page * pageSize < total)
@@ -190,7 +270,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
                     if (!publishChecked.TryGetValue(c.ParentId, out isPublished))
                     {
                         // nothing by parent id, so query the service and cache the result for the next child to check against
-                        isPublished = _contentService.IsPathPublished(c);
+                        isPublished = _publishStatusQueryService.HasPublishedAncestorPath(c.Key);
                         publishChecked[c.Id] = isPublished;
                     }
                 }

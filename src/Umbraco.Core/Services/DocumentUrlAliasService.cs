@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -14,7 +15,10 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class DocumentUrlAliasService : IDocumentUrlAliasService
 {
-    private const string RebuildKey = "UmbracoUrlAliasGeneration";
+    /// <summary>
+    /// Represents the key used to identify the URL alias generation rebuild operation.
+    /// </summary>
+    public const string RebuildKey = "UmbracoUrlAliasGeneration";
 
     /// <summary>
     /// Represents the current rebuild version value used to track changes in alias parsing logic.
@@ -36,6 +40,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private readonly IKeyValueService _keyValueService;
     private readonly IContentService _contentService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IServerRoleAccessor _serverRoleAccessor;
 
     // Lookup: alias -> list of matching document keys (multiple docs can have same alias).
     private readonly ConcurrentDictionary<AliasCacheKey, List<Guid>> _aliasCache = new();
@@ -57,8 +62,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         /// Initializes a new instance of the <see cref="AliasCacheKey"/> struct.
         /// </summary>
         /// <param name="normalizedAlias">The alias string that has been normalized for consistent comparison.</param>
-        /// <param name="languageId">The identifier of the language associated with the alias.</param>
-        public AliasCacheKey(string normalizedAlias, int languageId)
+        /// <param name="languageId">The identifier of the language associated with the alias. NULL for invariant content.</param>
+        public AliasCacheKey(string normalizedAlias, int? languageId)
         {
             NormalizedAlias = normalizedAlias;
             LanguageId = languageId;
@@ -70,9 +75,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         public string NormalizedAlias { get; }
 
         /// <summary>
-        /// Gets the unique identifier for the language associated with this instance.
+        /// Gets the unique identifier for the language associated with this instance. NULL indicates invariant content.
         /// </summary>
-        public int LanguageId { get; }
+        public int? LanguageId { get; }
 
         /// <inheritdoc/>
         public bool Equals(AliasCacheKey other) =>
@@ -83,7 +88,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         public override bool Equals(object? obj) => obj is AliasCacheKey other && Equals(other);
 
         /// <inheritdoc/>
-        public override int GetHashCode() => HashCode.Combine(NormalizedAlias, LanguageId);
+        public override int GetHashCode() => HashCode.Combine(NormalizedAlias, LanguageId ?? 0);
     }
 
     /// <summary>
@@ -96,7 +101,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         ILanguageService languageService,
         IKeyValueService keyValueService,
         IContentService contentService,
-        IDocumentNavigationQueryService documentNavigationQueryService)
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IServerRoleAccessor serverRoleAccessor)
     {
         _logger = logger;
         _documentUrlAliasRepository = documentUrlAliasRepository;
@@ -105,7 +111,19 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         _keyValueService = keyValueService;
         _contentService = contentService;
         _documentNavigationQueryService = documentNavigationQueryService;
+        _serverRoleAccessor = serverRoleAccessor;
     }
+
+    /// <summary>
+    /// Indicates whether this instance should skip database writes for URL aliases.
+    /// </summary>
+    /// <remarks>
+    /// On a <see cref="ServerRole.Subscriber"/> the scheduling publisher has already persisted URL aliases to
+    /// the database before issuing the cache-refresh instruction that routed us here. Re-writing them locally is
+    /// redundant at best, and blows up when the subscriber is configured against a read-only database connection.
+    /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
+    /// </remarks>
+    private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
 
     /// <inheritdoc/>
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
@@ -118,7 +136,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
-        if (ShouldRebuildAliases())
+        if (SkipDatabaseWrites() is false && ShouldRebuildAliases())
         {
             _logger.LogInformation("Rebuilding all document aliases.");
             await RebuildAllAliasesAsync();
@@ -178,15 +196,21 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return [];
         }
 
+        // Try culture-specific lookup first.
         var cacheKey = new AliasCacheKey(normalizedAlias, languageId.Value);
-
-        if (_aliasCache.TryGetValue(cacheKey, out List<Guid>? documentKeys) is false || documentKeys.Count == 0)
+        if (_aliasCache.TryGetValue(cacheKey, out List<Guid>? documentKeys) && documentKeys.Count > 0)
         {
-            return [];
+            return documentKeys;
         }
 
-        // Return all matching document keys.
-        return documentKeys;
+        // Try invariant lookup (NULL languageId) - for invariant content that stores with NULL.
+        var invariantKey = new AliasCacheKey(normalizedAlias, null);
+        if (_aliasCache.TryGetValue(invariantKey, out documentKeys) && documentKeys.Count > 0)
+        {
+            return documentKeys;
+        }
+
+        return [];
     }
 
     /// <inheritdoc/>
@@ -208,10 +232,11 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             return [];
         }
 
-        // Filter by language and return the alias strings.
+        // Get aliases for requested language OR invariant (NULL languageId).
         return aliasKeys
-            .Where(key => key.LanguageId == languageId.Value)
+            .Where(key => key.LanguageId == languageId.Value || key.LanguageId == null)
             .Select(key => key.NormalizedAlias)
+            .Distinct()
             .ToList();
     }
 
@@ -219,7 +244,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+        if (SkipDatabaseWrites() is false)
+        {
+            scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+        }
 
         await CreateOrUpdateAliasesInternalAsync(documentKey);
 
@@ -230,7 +258,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+        if (SkipDatabaseWrites() is false)
+        {
+            scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+        }
 
         // Get document and all descendants
         var documentKeys = new List<Guid> { documentKey };
@@ -249,7 +280,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
     /// <summary>
     /// Internal implementation that processes a single document without creating its own scope.
-    /// Caller must ensure a scope with write lock is active.
+    /// Caller must ensure a scope is active. A write lock on <see cref="Constants.Locks.DocumentUrlAliases"/>
+    /// is required whenever this method may perform database writes — i.e. on all server roles except
+    /// <see cref="ServerRole.Subscriber"/>, where persistence is skipped and the write lock is not taken.
     /// </summary>
     private async Task CreateOrUpdateAliasesInternalAsync(Guid documentKey)
     {
@@ -266,17 +299,23 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Remove old aliases from cache (deferred until scope completes)
         RemoveFromCacheDeferred(_coreScopeProvider.Context!, documentKey);
 
-        // Save to database (handles insert/update/delete via diff) and add to cache
+        // Save to database (handles insert/update/delete via diff) and add to cache.
+        // On subscribers we skip the persistence — the publisher has already written the aliases — but the
+        // in-memory cache is still refreshed via the deferred enlistments so routing keeps working locally.
+        bool skipDatabaseWrites = SkipDatabaseWrites();
         if (aliases.Count > 0)
         {
-            _documentUrlAliasRepository.Save(aliases);
+            if (skipDatabaseWrites is false)
+            {
+                _documentUrlAliasRepository.Save(aliases);
+            }
 
             foreach (PublishedDocumentUrlAlias alias in aliases)
             {
                 AddToCacheDeferred(_coreScopeProvider.Context!, alias);
             }
         }
-        else
+        else if (skipDatabaseWrites is false)
         {
             // No aliases - delete any existing aliases for this document from the database
             _documentUrlAliasRepository.DeleteByDocumentKey(new[] { documentKey });
@@ -307,6 +346,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public async Task RebuildAllAliasesAsync()
     {
+        if (SkipDatabaseWrites())
+        {
+            _logger.LogDebug("Skipping document URL alias rebuild — the current server role does not persist aliases.");
+            return;
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
@@ -322,21 +367,17 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         foreach (DocumentUrlAliasRaw raw in rawAliases)
         {
-            // Invariant content (LanguageId = null) is stored for ALL languages (like DocumentUrlService)
-            // This avoids cache invalidation when languages change or content varies by culture changes
+            // Invariant content (LanguageId = null) is stored with NULL languageId.
             if (raw.LanguageId is null)
             {
-                foreach (ILanguage language in languages)
+                foreach (var alias in NormalizeAliases(raw.AliasValue))
                 {
-                    foreach (var alias in NormalizeAliases(raw.AliasValue))
+                    toSave.Add(new PublishedDocumentUrlAlias
                     {
-                        toSave.Add(new PublishedDocumentUrlAlias
-                        {
-                            DocumentKey = raw.DocumentKey,
-                            LanguageId = language.Id,
-                            Alias = alias,
-                        });
-                    }
+                        DocumentKey = raw.DocumentKey,
+                        LanguageId = null, // NULL for invariant content
+                        Alias = alias,
+                    });
                 }
             }
             else
@@ -380,7 +421,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private async Task<List<PublishedDocumentUrlAlias>> ExtractAliasesFromDocumentAsync(IContent document)
     {
         var aliases = new List<PublishedDocumentUrlAlias>();
-        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
 
         // Check if the alias property itself varies by culture (not just the content type).
         // A variant content type can have a shared (invariant) alias property.
@@ -389,24 +429,20 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         // Handle invariant content OR variant content with a shared alias property.
         // Store alias for ALL languages (like DocumentUrlService).
-        // This avoids cache invalidation when languages change or content varies by culture changes.
         if (document.ContentType.VariesByCulture() is false || aliasPropertyVariesByCulture is false)
         {
             var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias);
 
             if (!string.IsNullOrWhiteSpace(aliasValue))
             {
-                foreach (ILanguage language in languages)
+                foreach (var alias in NormalizeAliases(aliasValue))
                 {
-                    foreach (var alias in NormalizeAliases(aliasValue))
+                    aliases.Add(new PublishedDocumentUrlAlias
                     {
-                        aliases.Add(new PublishedDocumentUrlAlias
-                        {
-                            DocumentKey = document.Key,
-                            LanguageId = language.Id,
-                            Alias = alias,
-                        });
-                    }
+                        DocumentKey = document.Key,
+                        LanguageId = null, // NULL for invariant content
+                        Alias = alias,
+                    });
                 }
             }
 
@@ -414,6 +450,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         }
 
         // Handle culture-variant content with a culture-variant alias property.
+        IEnumerable<ILanguage> languages = await _languageService.GetAllAsync();
         foreach (ILanguage language in languages)
         {
             var aliasValue = document.GetValue<string>(Constants.Conventions.Content.UrlAlias, language.IsoCode);
@@ -582,10 +619,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             yield break;
         }
 
+        // Collapse duplicates that arise after normalization.
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var alias in rawValue.Split(',', StringSplitOptions.RemoveEmptyEntries))
         {
             var normalized = this.NormalizeAlias(alias);
-            if (!string.IsNullOrEmpty(normalized))
+            if (string.IsNullOrEmpty(normalized) is false && seen.Add(normalized))
             {
                 yield return normalized;
             }

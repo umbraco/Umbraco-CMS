@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
             => _globalSettings = globalSettings.CurrentValue;
 
         /// <inheritdoc />
+        [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 20.")]
         public async Task SendAsync(EmailMessage message)
             => await SendAsync(message, null);
 
@@ -30,7 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
             using var client = new SmtpClient();
 
             await client.ConnectAsync(
-                _globalSettings.Smtp!.Host,
+                _globalSettings.Smtp!.Host!,
                 _globalSettings.Smtp.Port,
                 (SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 

@@ -13,6 +13,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Media',
 			searchProviderAlias: UMB_MEDIA_SEARCH_PROVIDER_ALIAS,
+			sectionAlias: UMB_MEDIA_SECTION_ALIAS,
 		},
 		conditions: [
 			{

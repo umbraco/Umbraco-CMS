@@ -55,7 +55,7 @@ internal sealed class ContentBlueprintEditingService
         => _containerService = containerService;
 
     /// <inheritdoc />
-    public Task<IContent?> GetAsync(Guid key)
+    public override Task<IContent?> GetAsync(Guid key)
     {
         IContent? blueprint = ContentService.GetBlueprintById(key);
         return Task.FromResult(blueprint);
@@ -235,8 +235,8 @@ internal sealed class ContentBlueprintEditingService
         //       structural node data like path, level, sort orders etc.
         toMove.ParentId = parentId;
 
-        // Save blueprint
-        await SaveAsync(toMove, userKey);
+        var userId = await GetUserIdAsync(userKey);
+        ContentService.MoveBlueprint(toMove, userId);
 
         scope.Complete();
 
@@ -282,10 +282,15 @@ internal sealed class ContentBlueprintEditingService
     /// <param name="newParentId">The ID of the new parent.</param>
     /// <param name="relateToOriginal">Whether to relate the copy to the original.</param>
     /// <param name="includeDescendants">Whether to include descendants in the copy.</param>
-    /// <param name="userId">The ID of the user performing the operation.</param>
+    /// <param name="userKey">The key of the user performing the operation.</param>
     /// <returns>Not supported for blueprints.</returns>
     /// <exception cref="NotImplementedException">Always thrown as this operation is not supported for blueprints.</exception>
-    protected override IContent? Copy(IContent content, int newParentId, bool relateToOriginal, bool includeDescendants, int userId) => throw new NotImplementedException();
+    protected override Task<IContent?> CopyAsync(
+        IContent content,
+        int newParentId,
+        bool relateToOriginal,
+        bool includeDescendants,
+        Guid userKey) => throw new NotImplementedException();
 
     /// <summary>
     /// Moves the specified content to the recycle bin. Not supported for blueprints.

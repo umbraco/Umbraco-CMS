@@ -8,6 +8,14 @@
   },
   "symbolInfo": [
     {
+      "id": "PackageManagement",
+      "isVisible": true,
+      "defaultValue": "Central",
+      "description": {
+        "text": "Choose how to manage NuGet package versions"
+      }
+    },
+    {
       "id": "UseHttpsRedirect",
       "isVisible": true,
       "persistenceScope": "templateGroup",

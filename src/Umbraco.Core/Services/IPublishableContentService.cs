@@ -2,10 +2,16 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Services;
 
-// TODO ELEMENTS: fully define this interface
 public interface IPublishableContentService<TContent> : IContentServiceBase<TContent>
     where TContent : class, IPublishableContentBase
 {
+    /// <summary>
+    ///     Gets content.
+    /// </summary>
+    /// <param name="ids">The unique identifiers of the content.</param>
+    /// <returns>The content.</returns>
+    IEnumerable<TContent> GetByIds(IEnumerable<Guid> ids);
+
     /// <summary>
     ///     Saves content.
     /// </summary>
@@ -41,9 +47,23 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     /// <summary>
     ///     Gets publish/unpublish schedule for a content node.
     /// </summary>
+    /// <param name="contentId">The identifier of the content to load schedule for.</param>
+    /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
+    ContentScheduleCollection GetContentScheduleByContentId(int contentId);
+
+    /// <summary>
+    ///     Gets publish/unpublish schedule for a content node.
+    /// </summary>
     /// <param name="contentId">The unique identifier of the content to load schedule for.</param>
     /// <returns>The <see cref="ContentScheduleCollection" />.</returns>
     ContentScheduleCollection GetContentScheduleByContentId(Guid contentId);
+
+    /// <summary>
+    ///     Gets a dictionary of content keys and their matching content schedules.
+    /// </summary>
+    /// <param name="keys">The content keys.</param>
+    /// <returns>A dictionary with a content key and an IEnumerable of matching ContentSchedules.</returns>
+    IDictionary<Guid, IEnumerable<ContentSchedule>> GetContentSchedulesByKeys(Guid[] keys);
 
     /// <summary>
     ///     Persists publish/unpublish schedule for a content node.
@@ -126,4 +146,11 @@ public interface IPublishableContentService<TContent> : IContentServiceBase<TCon
     ///     <para>When no culture is specified, all cultures are rolled back.</para>
     /// </remarks>
     OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId);
+
+    /// <summary>
+    ///     Publishes and unpublishes scheduled content.
+    /// </summary>
+    /// <param name="date">The date to use for determining scheduled actions.</param>
+    /// <returns>The publish results.</returns>
+    IEnumerable<PublishResult> PerformScheduledPublish(DateTime date);
 }

@@ -31,6 +31,7 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     private string? _icon = "icon-folder";
     private Guid? _listView;
     private bool _isElement;
+    private bool _allowedInLibrary;
     private PropertyGroupCollection _propertyGroups;
     private string? _thumbnail = "folder.png";
     private ContentVariation _variations;
@@ -219,6 +220,14 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     {
         get => _isElement;
         set => SetPropertyValueAndDetectChanges(value, ref _isElement, nameof(IsElement));
+    }
+
+    /// <inheritdoc />
+    [DataMember]
+    public bool AllowedInLibrary
+    {
+        get => _allowedInLibrary;
+        set => SetPropertyValueAndDetectChanges(value, ref _allowedInLibrary, nameof(AllowedInLibrary));
     }
 
     /// <summary>
@@ -497,9 +506,11 @@ public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     public IContentTypeBase DeepCloneWithResetIdentities(string alias)
     {
         var clone = (IContentTypeBase)DeepClone();
+
+        // ResetIdentity() must be called before setting the alias, because HasIdentity
+        // is used by system content types to guard against alias changes.
         clone.ResetIdentity();
         clone.Alias = alias;
-
         foreach (PropertyGroup propertyGroup in clone.PropertyGroups)
         {
             propertyGroup.ResetIdentity();

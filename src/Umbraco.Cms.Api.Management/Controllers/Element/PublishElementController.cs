@@ -17,26 +17,43 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// API controller responsible for handling publish operations on elements in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class PublishElementController : ElementControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IElementPublishingService _elementPublishingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
-    private readonly IDocumentPresentationFactory _documentPresentationFactory;
+    private readonly IElementPresentationFactory _elementPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishElementController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize element publish operations.</param>
+    /// <param name="elementPublishingService">Service responsible for publishing elements.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="elementPresentationFactory">Factory used for creating culture publish schedule models.</param>
     public PublishElementController(
         IAuthorizationService authorizationService,
         IElementPublishingService elementPublishingService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IDocumentPresentationFactory documentPresentationFactory)
+        IElementPresentationFactory elementPresentationFactory)
     {
         _authorizationService = authorizationService;
         _elementPublishingService = elementPublishingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
-        _documentPresentationFactory = documentPresentationFactory;
+        _elementPresentationFactory = elementPresentationFactory;
     }
 
+    /// <summary>
+    /// Publishes an element identified by the specified unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the element to publish.</param>
+    /// <param name="requestModel">The model containing the publish schedule configuration.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the outcome of the publish operation.</returns>
     [HttpPut("{id:guid}/publish")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -61,14 +78,11 @@ public class PublishElementController : ElementControllerBase
             return Forbidden();
         }
 
-        // TODO ELEMENTS: IDocumentPresentationFactory carries the implementation of this mapping - it should probably be renamed
-        var tempModel = new PublishDocumentRequestModel { PublishSchedules = requestModel.PublishSchedules };
-        Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> modelResult = _documentPresentationFactory.CreateCulturePublishScheduleModels(tempModel);
+        Attempt<List<CulturePublishScheduleModel>, ContentPublishingOperationStatus> modelResult = _elementPresentationFactory.CreateCulturePublishScheduleModels(requestModel);
 
         if (modelResult.Success is false)
         {
-            // TODO ELEMENTS: use refactored DocumentPublishingOperationStatusResult from DocumentControllerBase once it's ready
-            return BadRequest();
+            return ElementPublishingOperationStatusResult(modelResult.Status);
         }
 
         Attempt<ContentPublishingResult, ContentPublishingOperationStatus> attempt = await _elementPublishingService.PublishAsync(
@@ -77,7 +91,6 @@ public class PublishElementController : ElementControllerBase
             CurrentUserKey(_backOfficeSecurityAccessor));
         return attempt.Success
             ? Ok()
-            // TODO ELEMENTS: use refactored DocumentPublishingOperationStatusResult from DocumentControllerBase once it's ready
-            : BadRequest();
+            : ElementPublishingOperationStatusResult(attempt.Status, attempt.Result.InvalidPropertyAliases);
     }
 }

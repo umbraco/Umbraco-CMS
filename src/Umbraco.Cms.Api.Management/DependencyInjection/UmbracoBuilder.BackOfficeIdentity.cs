@@ -54,7 +54,8 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IUserRepository>(),
                 factory.GetRequiredService<IRuntimeState>(),
                 factory.GetRequiredService<IEventMessagesFactory>(),
-                factory.GetRequiredService<ILogger<BackOfficeUserStore>>()))
+                factory.GetRequiredService<ILogger<BackOfficeUserStore>>(),
+                factory.GetRequiredService<IBackOfficeUserReader>()))
             .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
             .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
             .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>()
@@ -67,7 +68,6 @@ public static partial class UmbracoBuilderExtensions
         services.AddScoped<IInviteUriProvider, InviteUriProvider>();
         services.AddScoped<IForgotPasswordUriProvider, ForgotPasswordUriProvider>();
         services.AddScoped<IBackOfficePasswordChanger, BackOfficePasswordChanger>();
-        services.AddScoped<IBackOfficeUserClientCredentialsManager, BackOfficeUserClientCredentialsManager>();
 
         services.AddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
 
@@ -89,7 +89,8 @@ public static partial class UmbracoBuilderExtensions
         services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
         services.TryAddSingleton<IBackOfficeExternalLoginProviders, BackOfficeExternalLoginProviders>();
         // We need to know in the core services if local logins is denied, so we register the providers with a core friendly interface.
-        services.TryAddSingleton<ILocalLoginSettingProvider, BackOfficeExternalLoginProviders>();
+        // Use AddUnique to replace the default NoopLocalLoginSettingProvider registered in core services.
+        services.AddUnique<ILocalLoginSettingProvider, BackOfficeExternalLoginProviders>();
         services.TryAddSingleton<IBackOfficeTwoFactorOptions, DefaultBackOfficeTwoFactorOptions>();
         services.AddTransient<IDetailedTelemetryProvider, ExternalLoginTelemetryProvider>();
 
@@ -107,6 +108,13 @@ public static partial class UmbracoBuilderExtensions
         return umbracoBuilder;
     }
 
+    /// <summary>
+    /// Registers a two-factor authentication provider for the back office identity system.
+    /// </summary>
+    /// <typeparam name="T">The type of the two-factor provider to register. Must implement <see cref="ITwoFactorProvider"/>.</typeparam>
+    /// <param name="identityBuilder">The <see cref="BackOfficeIdentityBuilder"/> to configure.</param>
+    /// <param name="providerName">The unique name of the two-factor provider.</param>
+    /// <returns>The configured <see cref="BackOfficeIdentityBuilder"/> instance.</returns>
     public static BackOfficeIdentityBuilder AddTwoFactorProvider<T>(
         this BackOfficeIdentityBuilder identityBuilder,
         string providerName) where T : class, ITwoFactorProvider

@@ -1,10 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Extensions;
@@ -264,29 +266,11 @@ public static class DistributedCacheExtensions
     /// </summary>
     /// <param name="dc">The distributed cache.</param>
     /// <param name="members">The members to refresh in cache.</param>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public static void RefreshMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
-        => dc.RefreshMemberCache(members, new Dictionary<string, object?>());
-
-    /// <summary>
-    ///     Refreshes the specified members in the distributed cache.
-    /// </summary>
-    /// <param name="dc">The distributed cache.</param>
-    /// <param name="members">The members to refresh in cache.</param>
     /// <param name="state">The notification state.</param>
     public static void RefreshMemberCache(this DistributedCache dc, IEnumerable<IMember> members, IDictionary<string, object?> state)
         => dc.RefreshByPayload(
             MemberCacheRefresher.UniqueId,
             GetPayloads(members, state, false));
-
-    /// <summary>
-    ///     Removes the specified members from the distributed cache.
-    /// </summary>
-    /// <param name="dc">The distributed cache.</param>
-    /// <param name="members">The members to remove from cache.</param>
-    [Obsolete("Please use the overload taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public static void RemoveMemberCache(this DistributedCache dc, IEnumerable<IMember> members)
-        => dc.RemoveMemberCache(members, new Dictionary<string, object?>());
 
     /// <summary>
     ///     Removes the specified members from the distributed cache.
@@ -308,12 +292,28 @@ public static class DistributedCacheExtensions
     /// <returns>An enumerable of JSON payloads for the member cache refresher.</returns>
     /// <remarks>Internal for unit test.</remarks>
     internal static IEnumerable<MemberCacheRefresher.JsonPayload> GetPayloads(IEnumerable<IMember> members, IDictionary<string, object?> state, bool removed)
-        => members
+    {
+        bool indexableFieldsChanged = GetMemberIndexableFieldsChanged(state);
+        return members
             .DistinctBy(x => (x.Id, x.Username))
-            .Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, removed)
+            .Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, removed, indexableFieldsChanged)
             {
                 PreviousUsername = GetPreviousUsername(x, state)
             });
+    }
+
+    private static bool GetMemberIndexableFieldsChanged(IDictionary<string, object?> state)
+    {
+        // Default to true for backward compatibility — any save that doesn't explicitly signal
+        // "nothing indexable changed" is treated as potentially indexable.
+        if (state.TryGetValue(Constants.Conventions.Member.IndexableFieldsChangedStateKey, out object? value)
+            && value is bool flag)
+        {
+            return flag;
+        }
+
+        return true;
+    }
 
     private static string? GetPreviousUsername(IMember x, IDictionary<string, object?> state)
     {
@@ -330,6 +330,59 @@ public static class DistributedCacheExtensions
         return previousUserNamesDictionary.TryGetValue(x.Key, out string? previousUsername)
             ? previousUsername
             : null;
+    }
+
+    #endregion
+
+    #region ExternalMemberCacheRefresher
+
+    /// <summary>
+    ///     Refreshes the specified external members in the distributed cache.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="externalMembers">The external members to refresh in cache.</param>
+    [Obsolete("Use the overload taking notification state instead. Scheduled for removal in Umbraco 19.")]
+    public static void RefreshExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers)
+        => dc.RefreshExternalMemberCache(externalMembers, new Dictionary<string, object?>());
+
+    /// <summary>
+    ///     Refreshes the specified external members in the distributed cache.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="externalMembers">The external members to refresh in cache.</param>
+    /// <param name="state">The notification state dictionary.</param>
+    public static void RefreshExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers, IDictionary<string, object?> state)
+        => dc.RefreshByPayload(
+            ExternalMemberCacheRefresher.UniqueId,
+            GetPayloads(externalMembers, state, removed: false));
+
+    /// <summary>
+    ///     Removes the specified external members from the distributed cache.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="externalMembers">The external members to remove from cache.</param>
+    public static void RemoveExternalMemberCache(this DistributedCache dc, IEnumerable<ExternalMemberIdentity> externalMembers)
+        => dc.RefreshByPayload(
+            ExternalMemberCacheRefresher.UniqueId,
+            GetPayloads(externalMembers, new Dictionary<string, object?>(), removed: true));
+
+    /// <summary>
+    ///     Gets the JSON payloads for external member cache refresh operations.
+    /// </summary>
+    /// <param name="externalMembers">The external members to create payloads for.</param>
+    /// <param name="state">The notification state dictionary.</param>
+    /// <param name="removed">Whether the external members were removed.</param>
+    /// <returns>An enumerable of JSON payloads for the external member cache refresher.</returns>
+    /// <remarks>Internal for unit test.</remarks>
+    internal static IEnumerable<ExternalMemberCacheRefresher.JsonPayload> GetPayloads(
+        IEnumerable<ExternalMemberIdentity> externalMembers,
+        IDictionary<string, object?> state,
+        bool removed)
+    {
+        bool indexableFieldsChanged = GetMemberIndexableFieldsChanged(state);
+        return externalMembers
+            .DistinctBy(x => x.Key)
+            .Select(x => new ExternalMemberCacheRefresher.JsonPayload(x.Id, x.Key, removed, indexableFieldsChanged));
     }
 
     #endregion
@@ -392,13 +445,25 @@ public static class DistributedCacheExtensions
 
     #region ElementCacheRefresher
 
+    /// <summary>
+    ///     Refreshes all elements in the distributed cache.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
     public static void RefreshAllElementCache(this DistributedCache dc)
         // note: refresh all element cache does refresh content types too
         => dc.RefreshByPayload(ElementCacheRefresher.UniqueId, new ElementCacheRefresher.JsonPayload(0, Guid.Empty, TreeChangeTypes.RefreshAll).Yield());
 
-
+    /// <summary>
+    ///     Refreshes the element cache for the specified element changes.
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="changes">The element changes to refresh.</param>
     public static void RefreshElementCache(this DistributedCache dc, IEnumerable<TreeChange<IElement>> changes)
-        => dc.RefreshByPayload(ElementCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.Item.Key, x.ChangeTypes)).Select(x => new ElementCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes)));
+        => dc.RefreshByPayload(ElementCacheRefresher.UniqueId, changes.DistinctBy(x => (x.Item.Id, x.Item.Key, x.ChangeTypes)).Select(x => new ElementCacheRefresher.JsonPayload(x.Item.Id, x.Item.Key, x.ChangeTypes)
+        {
+            PublishedCultures = x.PublishedCultures?.ToArray(),
+            UnpublishedCultures = x.UnpublishedCultures?.ToArray(),
+        }));
 
     #endregion
 

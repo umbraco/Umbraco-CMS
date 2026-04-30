@@ -972,6 +972,7 @@ export default {
 		changePassword: '更改密碼',
 		newPassword: '更改密碼',
 		confirmNewPassword: '確認新密碼',
+		confirmPassword: '確認密碼',
 		changePasswordDescription: '要改變密碼，請在框中輸入新密碼，然後按一下“更改密碼”。',
 		contentChannel: '內容頻道',
 		descriptionField: '描述欄位',

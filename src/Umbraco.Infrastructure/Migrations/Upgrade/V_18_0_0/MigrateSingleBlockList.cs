@@ -21,12 +21,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
 
+/// <summary>
+/// Handles migration of single block list data structures during the upgrade to Umbraco version 18.0.0.
+/// </summary>
 public class MigrateSingleBlockList : AsyncMigrationBase
 {
     private readonly IUmbracoContextFactory _umbracoContextFactory;
     private readonly ILanguageService _languageService;
     private readonly IContentTypeService _contentTypeService;
     private readonly IMediaTypeService _mediaTypeService;
+    private readonly IMemberTypeService _memberTypeService;
     private readonly IDataTypeService _dataTypeService;
     private readonly ICoreScopeProvider _coreScopeProvider;
     private readonly SingleBlockListProcessor _singleBlockListProcessor;
@@ -37,17 +41,38 @@ public class MigrateSingleBlockList : AsyncMigrationBase
     private readonly ILogger<MigrateSingleBlockList> _logger;
     private readonly IDataValueEditor _dummySingleBlockValueEditor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MigrateSingleBlockList"/> class, responsible for migrating single block list data during the upgrade to version 18.0.0.
+    /// </summary>
+    /// <param name="context">The migration context providing information and services for the migration process.</param>
+    /// <param name="umbracoContextFactory">Factory for creating Umbraco context instances.</param>
+    /// <param name="languageService">Service for managing languages in Umbraco.</param>
+    /// <param name="contentTypeService">Service for managing content types.</param>
+    /// <param name="mediaTypeService">Service for managing media types.</param>
+    /// <param name="memberTypeService">Service for managing member types.</param>
+    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="logger">The logger used for logging migration operations.</param>
+    /// <param name="coreScopeProvider">Provides scope management for database operations.</param>
+    /// <param name="singleBlockListProcessor">Processor for handling single block list migration logic.</param>
+    /// <param name="jsonSerializer">Serializer for handling JSON data during migration.</param>
+    /// <param name="blockListConfigurationCache">Cache for block list configuration data.</param>
+    /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
+    /// <param name="ioHelper">Helper for IO operations, such as file and path management.</param>
+    /// <param name="blockValuePropertyIndexValueFactory">Factory for creating property index values for block values.</param>
+    /// <param name="elementTypeCache">Cache for block editor element types.</param>
+    /// <param name="appCaches">Provides access to application-level caches.</param>
     public MigrateSingleBlockList(
         IMigrationContext context,
         IUmbracoContextFactory umbracoContextFactory,
         ILanguageService languageService,
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
+        IMemberTypeService memberTypeService,
         IDataTypeService dataTypeService,
         ILogger<MigrateSingleBlockList> logger,
         ICoreScopeProvider coreScopeProvider,
-        SingleBlockListProcessor  singleBlockListProcessor,
-        IJsonSerializer  jsonSerializer,
+        SingleBlockListProcessor singleBlockListProcessor,
+        IJsonSerializer jsonSerializer,
         SingleBlockListConfigurationCache blockListConfigurationCache,
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
@@ -60,6 +85,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         _languageService = languageService;
         _contentTypeService = contentTypeService;
         _mediaTypeService = mediaTypeService;
+        _memberTypeService = memberTypeService;
         _dataTypeService = dataTypeService;
         _logger = logger;
         _coreScopeProvider = coreScopeProvider;
@@ -89,9 +115,13 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         IEnumerable<IPropertyType> mediaPropertyTypes = allMediaTypes
             .SelectMany(ct => ct.PropertyTypes);
 
+        IMemberType[] allMemberTypes = _memberTypeService.GetAll().ToArray();
+        IEnumerable<IPropertyType> memberPropertyTypes = allMemberTypes
+            .SelectMany(mt => mt.PropertyTypes);
+
         // get all relevantPropertyTypes
         var relevantPropertyEditors =
-            contentPropertyTypes.Concat(mediaPropertyTypes).DistinctBy(pt => pt.Id)
+            contentPropertyTypes.Concat(mediaPropertyTypes).Concat(memberPropertyTypes).DistinctBy(pt => pt.Id)
                 .Where(pt => propertyEditorAliases.Contains(pt.PropertyEditorAlias))
                 .GroupBy(pt => pt.PropertyEditorAlias)
                 .ToDictionary(group => group.Key, group => group.ToArray());
@@ -131,7 +161,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
                 _logger.LogInformation(
                     "No properties have been found to migrate for {propertyEditorAlias}",
                     propertyEditorAlias);
-                return;
+                continue;
             }
 
             updateItemsByPropertyEditorAlias[propertyEditorAlias] = updateItemsByPropertyType;
@@ -143,7 +173,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         string updateSql = $@"
 UPDATE umbracoDataType
 SET propertyEditorAlias = '{Constants.PropertyEditors.Aliases.SingleBlock}',
-    propertyEditorUiAlias = 'Umb.PropertyEditorUi.SingleBlock'
+    propertyEditorUiAlias = 'Umb.PropertyEditorUi.BlockSingle'
 WHERE nodeId IN (@0)";
         await Database.ExecuteAsync(updateSql, singleBlockListDataTypesIds);
 
@@ -328,22 +358,13 @@ WHERE nodeId IN (@0)";
         IDataValueEditor valueEditor,
         out UpdateItem? updateItem)
     {
-        // NOTE: some old property data DTOs can have variance defined, even if the property type no longer varies
-        var culture = propertyType.VariesByCulture()
-                      && propertyDataDto.LanguageId.HasValue
-                      && languagesById.TryGetValue(propertyDataDto.LanguageId.Value, out ILanguage? language)
-            ? language.IsoCode
-            : null;
-
-        if (culture is null && propertyType.VariesByCulture())
+        var cultureResult = PropertyDataCultureResolver.ResolveCulture(propertyType, propertyDataDto.LanguageId, languagesById);
+        if (cultureResult.ShouldSkip)
         {
-            // if we end up here, the property DTO is bound to a language that no longer exists. this is an error scenario,
-            // and we can't really handle it in any other way than logging; in all likelihood this is an old property version,
-            // and it won't cause any runtime issues
             _logger.LogWarning(
-                "    - property data with id: {propertyDataId} references a language that does not exist - language id: {languageId} (property type: {propertyTypeName}, id: {propertyTypeId}, alias: {propertyTypeAlias})",
+                PropertyDataCultureResolver.OrphanedLanguageWarningTemplate,
                 propertyDataDto.Id,
-                propertyDataDto.LanguageId,
+                cultureResult.OrphanedLanguageId,
                 propertyType.Name,
                 propertyType.Id,
                 propertyType.Alias);
@@ -351,10 +372,11 @@ WHERE nodeId IN (@0)";
             return false;
         }
 
-        // create a fake property to be able to get a typed value and run it trough the processors.
+        var culture = cultureResult.Culture;
+
+        // create a fake property to be able to get a typed value and run it through the processors.
         var segment = propertyType.VariesBySegment() ? propertyDataDto.Segment : null;
-        var property = new Property(propertyType);
-        property.SetValue(propertyDataDto.Value, culture, segment);
+        var property = PropertyDataCultureResolver.CreateMigrationProperty(propertyType, propertyDataDto.Value, culture, segment);
         var toEditorValue = valueEditor.ToEditor(property, culture, segment);
 
         if (TryTransformValue(toEditorValue, property, out var updatedValue) is false)
@@ -420,6 +442,12 @@ WHERE nodeId IN (@0)";
 
     private class UpdateItem
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateItem"/> class with the specified property data, property type, and updated value.
+        /// </summary>
+        /// <param name="propertyDataDto">The <see cref="PropertyDataDto"/> representing the data for the property to be updated.</param>
+        /// <param name="propertyType">The <see cref="IPropertyType"/> that defines the type of the property being updated.</param>
+        /// <param name="updatedValue">The new value to assign to the property.</param>
         public UpdateItem(PropertyDataDto propertyDataDto, IPropertyType propertyType, object? updatedValue)
         {
             PropertyDataDto = propertyDataDto;
@@ -427,10 +455,21 @@ WHERE nodeId IN (@0)";
             UpdatedValue = updatedValue;
         }
 
+        /// <summary>
+        /// Gets or sets the value that has been updated for this item during the migration process.
+        /// This typically represents the new value assigned after migration logic is applied.
+        /// </summary>
         public object? UpdatedValue { get; set; }
 
+        /// <summary>
+        /// Gets or sets the property data transfer object (DTO) associated with this update item.
+        /// This object contains the data for a specific property being migrated in the single block list upgrade process.
+        /// </summary>
         public PropertyDataDto PropertyDataDto { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="IPropertyType"/> that is associated with this update item.
+        /// </summary>
         public IPropertyType PropertyType { get; set; }
     }
 }

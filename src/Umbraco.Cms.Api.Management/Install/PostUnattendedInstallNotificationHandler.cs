@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
@@ -12,12 +13,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Install;
 
+/// <summary>
+/// Handles notifications that are triggered after the completion of an unattended installation process.
+/// </summary>
 public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandler<UnattendedInstallNotification>
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly IOptions<UnattendedSettings> _unattendedSettings;
     private readonly IUserService _userService;
     private readonly IMetricsConsentService _metricsConsentService;
+    private readonly IHmacSecretKeyService _hmacSecretKeyService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PostUnattendedInstallNotificationHandler" /> class.
@@ -26,24 +31,50 @@ public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandle
     /// <param name="userService">The user service.</param>
     /// <param name="serviceScopeFactory">The service scope factory.</param>
     /// <param name="metricsConsentService">The metrics consent service.</param>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public PostUnattendedInstallNotificationHandler(
         IOptions<UnattendedSettings> unattendedSettings,
         IUserService userService,
         IServiceScopeFactory serviceScopeFactory,
         IMetricsConsentService metricsConsentService)
+        : this(
+            unattendedSettings,
+            userService,
+            serviceScopeFactory,
+            metricsConsentService,
+            StaticServiceProvider.Instance.GetRequiredService<IHmacSecretKeyService>())
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PostUnattendedInstallNotificationHandler" /> class.
+    /// </summary>
+    /// <param name="unattendedSettings">The unattended settings.</param>
+    /// <param name="userService">The user service.</param>
+    /// <param name="serviceScopeFactory">The service scope factory.</param>
+    /// <param name="metricsConsentService">The metrics consent service.</param>
+    /// <param name="hmacSecretKeyService">The HMAC secret key service.</param>
+    public PostUnattendedInstallNotificationHandler(
+        IOptions<UnattendedSettings> unattendedSettings,
+        IUserService userService,
+        IServiceScopeFactory serviceScopeFactory,
+        IMetricsConsentService metricsConsentService,
+        IHmacSecretKeyService hmacSecretKeyService)
     {
         _unattendedSettings = unattendedSettings;
         _userService = userService;
         _serviceScopeFactory = serviceScopeFactory;
         _metricsConsentService = metricsConsentService;
+        _hmacSecretKeyService = hmacSecretKeyService;
     }
 
     /// <summary>
-    ///     Listening for when the UnattendedInstallNotification fired after a successful unattended install
-    ///     This creates the user and sets the telemetry level based on the 'Unattended' settings.
+    /// Handles the <see cref="UnattendedInstallNotification"/> event, which is fired after a successful unattended install.
+    /// This method creates the user and sets the telemetry level based on the 'Unattended' settings.
     /// </summary>
-    /// <param name="notification"></param>
-    /// <param name="cancellationToken"></param>
+    /// <param name="notification">The notification containing information about the unattended install.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task HandleAsync(UnattendedInstallNotification notification, CancellationToken cancellationToken)
     {
         UnattendedSettings? unattendedSettings = _unattendedSettings.Value;
@@ -54,6 +85,9 @@ public class PostUnattendedInstallNotificationHandler : INotificationAsyncHandle
         {
             return;
         }
+
+        // Generate an imaging HMAC secret key if one is not already configured.
+        await _hmacSecretKeyService.CreateHmacSecretKeyAsync();
 
         var unattendedName = unattendedSettings.UnattendedUserName;
         var unattendedEmail = unattendedSettings.UnattendedUserEmail;

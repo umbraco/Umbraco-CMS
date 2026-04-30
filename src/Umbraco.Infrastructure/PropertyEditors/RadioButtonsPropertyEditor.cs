@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Validation;
@@ -19,7 +20,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.RadioButtonList,
     ValueType = ValueTypes.String,
     ValueEditorIsReusable = true)]
-public class RadioButtonsPropertyEditor : DataEditor
+public class RadioButtonsPropertyEditor : DataEditor, IValueSchemaProvider
 {
     private readonly IIOHelper _ioHelper;
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
@@ -35,8 +36,18 @@ public class RadioButtonsPropertyEditor : DataEditor
         SupportsReadOnly = true;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(string);
 
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("string", "null"),
+        ["description"] = "Selected value from the radio button list",
+    };
+
+    /// <inheritdoc/>
     protected override IConfigurationEditor CreateConfigurationEditor() =>
         new ValueListConfigurationEditor(_ioHelper, _configurationEditorJsonSerializer);
 

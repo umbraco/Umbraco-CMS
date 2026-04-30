@@ -98,9 +98,17 @@ public sealed class ImageSharpImageUrlGenerator : IImageUrlGenerator
             queryString.Add(ResizeWebProcessor.Height, height.ToString(CultureInfo.InvariantCulture));
         }
 
-        if (furtherOptions.Remove(FormatWebProcessor.Format, out StringValues format))
+        // Determine format: explicit > furtherOptions
+        // Note: Format determination (e.g., converting PDFs to WebP) is handled by the factory layer
+        string? formatValue = options.Format;
+        if (string.IsNullOrWhiteSpace(formatValue) && furtherOptions.Remove(FormatWebProcessor.Format, out StringValues format))
         {
-            queryString.Add(FormatWebProcessor.Format, format.ToString());
+            formatValue = format.ToString();
+        }
+
+        if (!string.IsNullOrWhiteSpace(formatValue))
+        {
+            queryString.Add(FormatWebProcessor.Format, formatValue);
         }
 
         if (options.Quality is int quality)

@@ -43,25 +43,44 @@ private _validateName(name: string): boolean {
 **Sanitize HTML**:
 
 ```typescript
-// Use DOMPurify for HTML sanitization
-import DOMPurify from '@umbraco-cms/backoffice/external/dompurify';
+// Use the sanitizeHTML utility, which wraps DOMPurify internally
+import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 
-const cleanHtml = DOMPurify.sanitize(userInput);
+const cleanHtml = sanitizeHTML(userInput);
 
 // In Lit templates, use unsafeHTML directive with sanitized content
 import { unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 
 render() {
-	return html`<div>${unsafeHTML(DOMPurify.sanitize(this.htmlContent))}</div>`;
+	return html`<div>${unsafeHTML(sanitizeHTML(this.htmlContent))}</div>`;
 }
 ```
 
+> **Note**: Do not import or call `DOMPurify` directly. Always use `sanitizeHTML` from `@umbraco-cms/backoffice/utils`.
+
 ### Authentication & Authorization
 
-**OpenID Connect** via backend:
-- Backoffice uses OpenID Connect for authentication
-- Authentication handled by .NET backend
-- Tokens managed by browser (httpOnly cookies)
+**OpenID Connect with PKCE** (v17+):
+- Backoffice uses PKCE authorization code flow
+- Real tokens are stored exclusively in `__Host-umbAccessToken` / `__Host-umbRefreshToken` httpOnly cookies — JavaScript cannot read them
+- The client-side bearer token value is always the literal string `'[redacted]'` — the server (`HideBackOfficeTokensHandler`) swaps it for the real cookie on each request
+- Never try to read or store real tokens client-side; they are intentionally inaccessible
+
+**Configuring API clients**:
+
+```typescript
+// ✅ One-liner for @hey-api/openapi-ts clients — handles auth + credentials automatically
+authContext.configureClient(myClient);
+
+// ✅ For manual fetch calls
+const config = authContext.getOpenApiConfiguration();
+
+// ❌ getLatestToken() is deprecated (returns '[redacted]' anyway) — scheduled for removal v19
+const token = await authContext.getLatestToken();
+```
+
+**Do NOT call `validateToken()` per request**:
+`validateToken()` forces a `/token` network call and revokes the previous access token as a side effect (OpenIddict reference tokens). Calling it on every API request causes token churn and ID2019 "token no longer valid" errors in concurrent requests. Use `configureClient()` instead — it has a built-in guard that only refreshes when the access token is actually expired.
 
 **Authorization Checks**:
 
@@ -80,9 +99,10 @@ async #handleDelete() {
 ```
 
 **Context Security**:
-- Use Context API for auth state
-- Don't store sensitive tokens in localStorage
-- Backend handles token refresh
+- Use Context API for auth state (`UMB_AUTH_CONTEXT`)
+- Never store tokens in localStorage, sessionStorage, or JS variables
+- Backend handles token refresh via httpOnly cookies
+- All API requests must use `credentials: 'include'` (handled automatically by `configureClient()`)
 
 ### API Security
 

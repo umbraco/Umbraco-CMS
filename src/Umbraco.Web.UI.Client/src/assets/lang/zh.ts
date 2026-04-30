@@ -976,6 +976,7 @@ export default {
 		changePassword: '更改密码',
 		newPassword: '更改密码',
 		confirmNewPassword: '确认新密码',
+		confirmPassword: '确认密码',
 		changePasswordDescription: '要改变密码，请在框中输入新密码，然后单击“更改密码”。',
 		contentChannel: '内容频道',
 		descriptionField: '描述字段',

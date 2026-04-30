@@ -45,6 +45,16 @@ public enum TemplateOperationStatus
     /// </summary>
     LayoutTemplateCannotBeDeleted,
 
+    /// <summary>
+    ///     The operation failed because it is not allowed in production mode.
+    /// </summary>
+    NotAllowedInProductionMode,
+
+    /// <summary>
+    ///     The operation failed because changing template content is not allowed in production mode.
+    /// </summary>
+    ContentChangeNotAllowedInProductionMode,
+
     /// <inheritdoc cref="LayoutTemplateNotFound" />
     [Obsolete("Use LayoutTemplateNotFound instead. Scheduled for removal in Umbraco 20.")]
     MasterTemplateNotFound = LayoutTemplateNotFound,

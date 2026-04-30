@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -2027,12 +2028,12 @@ internal partial class BlockListElementLevelVariationTests
                     new List<BlockPropertyValue>
                     {
                         new() { Alias = "invariantText", Value = "English invariantText content value" },
-                        new() { Alias = "variantText", Value = "English variantText content value" }
+                        new() { Alias = "variantText", Value = "English variantText content value", Culture = elementTypeVariation.VariesByCulture() ? "en-US" : null }
                     },
                     new List<BlockPropertyValue>
                     {
                         new() { Alias = "invariantText", Value = "English invariantText settings value" },
-                        new() { Alias = "variantText", Value = "English variantText settings value" }
+                        new() { Alias = "variantText", Value = "English variantText settings value", Culture = elementTypeVariation.VariesByCulture() ? "en-US" : null }
                     },
                     "en-US",
                     null)
@@ -2077,14 +2078,14 @@ internal partial class BlockListElementLevelVariationTests
             Assert.Multiple(() =>
             {
                 Assert.AreEqual(expectedInvariantContentValue, blockListItem.Content.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText"));
+                Assert.AreEqual(expectedVariantContentValue, blockListItem.Content.Value<string>("variantText", culture: "en-US"));
             });
 
             Assert.AreEqual(2, blockListItem.Settings.Properties.Count());
             Assert.Multiple(() =>
             {
                 Assert.AreEqual(expectedInvariantSettingsValue, blockListItem.Settings.Value<string>("invariantText"));
-                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText"));
+                Assert.AreEqual(expectedVariantSettingsValue, blockListItem.Settings.Value<string>("variantText", culture: "en-US"));
             });
         }
 
@@ -2521,6 +2522,148 @@ internal partial class BlockListElementLevelVariationTests
             Assert.IsFalse(content.Edited, "Content should not be marked as edited after publishing all cultures");
             Assert.IsFalse(content.IsCultureEdited("en-US"), "en-US culture should not be marked as edited");
             Assert.IsFalse(content.IsCultureEdited("da-DK"), "da-DK culture should not be marked as edited");
+        });
+    }
+
+    [Test]
+    public async Task Can_Perform_Language_Fallback_At_Block_Property_Level()
+    {
+        var defaultCulture = GetRequiredService<ILocalizationService>().GetDefaultLanguageIsoCode();
+        Assert.AreEqual("en-US", defaultCulture);
+
+        var elementType = CreateElementType(ContentVariation.Culture);
+        var blockListDataType = await CreateBlockListDataType(elementType);
+        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+
+        var content = CreateContent(contentType, elementType, [], false);
+        var blockListValue = BlockListPropertyValue(
+            elementType,
+            [
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "invariantText", Value = "#1: The invariant content value" },
+                            new() { Alias = "variantText", Value = "#1: The content value in English", Culture = "en-US" },
+                        },
+                        [],
+                        null,
+                        null)
+                ),
+                (
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new BlockProperty(
+                        new List<BlockPropertyValue>
+                        {
+                            new() { Alias = "variantText", Value = "#2: The content value in Danish", Culture = "da-DK" },
+                        },
+                        [],
+                        null,
+                        null)
+                ),
+            ]);
+
+        // make sure all blocks are exposed in both languages (the helper method won't detect some of them due to lacking language values)
+        blockListValue.Expose =
+        [
+            new() { ContentKey = blockListValue.ContentData[0].Key, Culture = "en-US" },
+            new() { ContentKey = blockListValue.ContentData[0].Key, Culture = "da-DK" },
+            new() { ContentKey = blockListValue.ContentData[1].Key, Culture = "en-US" },
+            new() { ContentKey = blockListValue.ContentData[1].Key, Culture = "da-DK" },
+        ];
+
+        content.Properties["blocks"]!.SetValue(JsonSerializer.Serialize(blockListValue));
+        ContentService.Save(content);
+        PublishContent(content, contentType, ["en-US", "da-DK"]);
+
+        SetVariationContext("en-US", null);
+
+        var publishedContent = GetPublishedContent(content.Key);
+        var value = publishedContent.Value<BlockListModel>("blocks");
+        Assert.IsNotNull(value);
+        Assert.AreEqual(2, value.Count);
+
+        // assert property values in the English variation context.
+        Assert.Multiple(() =>
+        {
+            // start block #1
+
+            // "invariantText" has a value, so it won't perform fallback.
+            Assert.AreEqual("#1: The invariant content value", value[0].Content.Value<string>("invariantText"));
+            Assert.AreEqual("#1: The invariant content value", value[0].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+
+            // "variantText" has a value in English (both implicit and explicit), so it won't perform fallback.
+            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText"));
+            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "en-US"));
+            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+
+            // "variantText" has no value in Danish, so it will perform fallback - both to the default language (en-US) and to a default value.
+            Assert.AreEqual(string.Empty, value[0].Content.Value<string>("variantText", culture: "da-DK"));
+            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage));
+            Assert.AreEqual("The default value", value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+
+            // start block #2
+
+            // "invariantText" has no value, so it will perform fallback.
+            Assert.AreEqual(string.Empty, value[1].Content.Value<string>("invariantText"));
+            Assert.AreEqual("The default value", value[1].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+
+            // "variantText" has no value in English (neither implicit nor explicit), so it will perform fallback.
+            Assert.AreEqual(string.Empty, value[1].Content.Value<string>("variantText"));
+            Assert.AreEqual(string.Empty, value[1].Content.Value<string>("variantText", culture: "en-US"));
+            Assert.AreEqual("The default value", value[1].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+
+            // "variantText" has a value in Danish, so it won't perform fallback.
+            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText", culture: "da-DK"));
+            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage));
+        });
+
+        SetVariationContext("da-DK", null);
+
+        publishedContent = GetPublishedContent(content.Key);
+        value = publishedContent.Value<BlockListModel>("blocks");
+        Assert.IsNotNull(value);
+        Assert.AreEqual(2, value.Count);
+
+        // assert property values in the Danish variation context.
+        Assert.Multiple(() =>
+        {
+            // start block #1
+
+            // "invariantText" has a value, so it won't perform fallback.
+            Assert.AreEqual("#1: The invariant content value", value[0].Content.Value<string>("invariantText"));
+            Assert.AreEqual("#1: The invariant content value", value[0].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+
+            // "variantText" has no value in Danish (neither implicit nor explicit), so it will perform fallback - both to the default language (en-US) and to a default value.
+            Assert.AreEqual(string.Empty, value[0].Content.Value<string>("variantText"));
+            Assert.AreEqual(string.Empty, value[0].Content.Value<string>("variantText", culture: "da-DK"));
+            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", fallback: Fallback.ToDefaultLanguage));
+            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage));
+            Assert.AreEqual("The default value", value[0].Content.Value<string>("variantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+            Assert.AreEqual("The default value", value[0].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+
+            // "variantText" has a value in English, so it won't perform fallback.
+            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "en-US"));
+            Assert.AreEqual("#1: The content value in English", value[0].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+
+            // start block #2
+
+            // "invariantText" has no value, so it will perform fallback.
+            Assert.AreEqual(string.Empty, value[1].Content.Value<string>("invariantText"));
+            Assert.AreEqual("The default value", value[1].Content.Value<string>("invariantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+
+            // "variantText" has a value in Danish, so it won't perform fallback.
+            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText"));
+            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText", culture: "da-DK"));
+            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText", culture: "da-DK", fallback: Fallback.ToDefaultLanguage));
+            Assert.AreEqual("#2: The content value in Danish", value[1].Content.Value<string>("variantText", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
+
+            // "variantText" has no value in English, so it will perform fallback.
+            Assert.AreEqual(string.Empty, value[1].Content.Value<string>("variantText", culture: "en-US"));
+            Assert.AreEqual("The default value", value[1].Content.Value<string>("variantText", culture: "en-US", fallback: Fallback.ToDefaultValue, defaultValue: "The default value"));
         });
     }
 }

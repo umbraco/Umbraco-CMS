@@ -3,10 +3,18 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
+/// <summary>
+/// Provides mapping logic between the <see cref="User"/> entity and its database representation.
+/// </summary>
 [MapperFor(typeof(IUser))]
 [MapperFor(typeof(User))]
 public sealed class UserMapper : BaseMapper
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserMapper"/> class.
+    /// </summary>
+    /// <param name="sqlContext">A lazy-loaded SQL context used for database operations.</param>
+    /// <param name="maps">The configuration store containing mapper definitions.</param>
     public UserMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
         : base(sqlContext, maps)
     {

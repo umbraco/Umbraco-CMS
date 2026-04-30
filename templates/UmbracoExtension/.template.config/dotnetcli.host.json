@@ -20,6 +20,10 @@
     "SiteDomain": {
       "longName": "site-domain",
       "shortName": "sd"
+    },
+    "PackageManagement": {
+      "longName": "package-management",
+      "shortName": "pm"
     }
   }
 }

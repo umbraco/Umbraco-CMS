@@ -14,6 +14,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedirectUrl>, IRedirectUrlRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RedirectUrlRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="cache">The application-level caches used for storing and retrieving cached data.</param>
+    /// <param name="logger">The logger used for logging repository events and errors.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
+    /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
     public RedirectUrlRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -29,6 +37,13 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
     {
     }
 
+    /// <summary>
+    /// Retrieves a redirect URL entry that matches the specified URL, content key, and optional culture.
+    /// </summary>
+    /// <param name="url">The URL to match.</param>
+    /// <param name="contentKey">The unique key of the content associated with the redirect URL.</param>
+    /// <param name="culture">The culture associated with the redirect URL, or <c>null</c> to match entries without a culture.</param>
+    /// <returns>The matching <see cref="IRedirectUrl"/> if found; otherwise, <c>null</c>.</returns>
     public IRedirectUrl? Get(string url, Guid contentKey, string? culture)
     {
         var urlHash = url.GenerateHash<SHA1>();
@@ -38,13 +53,30 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
         return dto == null ? null : Map(dto);
     }
 
+    /// <summary>
+    /// Deletes all redirect URLs from the database.
+    /// </summary>
     public void DeleteAll() => Database.Execute($"DELETE FROM {QuoteTableName("umbracoRedirectUrl")}");
 
+    /// <summary>
+    /// Deletes all redirect URLs associated with the specified content key.
+    /// </summary>
+    /// <param name="contentKey">The unique identifier of the content whose redirect URLs should be deleted.</param>
     public void DeleteContentUrls(Guid contentKey) =>
         Database.Execute($"DELETE FROM {QuoteTableName("umbracoRedirectUrl")} WHERE {QuoteColumnName("contentKey")}=@contentKey", new { contentKey });
 
+    /// <summary>
+    /// Deletes the redirect URL entry identified by the specified unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier (GUID) of the redirect URL entry to delete.</param>
+
     public void Delete(Guid id) => Database.Delete<RedirectUrlDto>(id);
 
+    /// <summary>
+    /// Gets the most recent redirect URL matching the specified URL.
+    /// </summary>
+    /// <param name="url">The URL to find the most recent redirect for.</param>
+    /// <returns>The most recent <see cref="Umbraco.Cms.Core.Models.IRedirectUrl"/> if found; otherwise, null.</returns>
     public IRedirectUrl? GetMostRecentUrl(string url)
     {
         Sql<ISqlContext> sql = GetMostRecentSql(url);
@@ -53,6 +85,11 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
         return dto == null ? null : Map(dto);
     }
 
+    /// <summary>
+    /// Asynchronously retrieves the most recent redirect URL that matches the specified URL.
+    /// </summary>
+    /// <param name="url">The URL for which to find the most recent redirect.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the most recent <see cref="Umbraco.Cms.Core.Models.IRedirectUrl"/> if found; otherwise, <c>null</c>.</returns>
     public async Task<IRedirectUrl?> GetMostRecentUrlAsync(string url)
     {
         Sql<ISqlContext> sql = GetMostRecentSql(url);
@@ -121,6 +158,11 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
         return dto == null ? null : Map(dto);
     }
 
+    /// <summary>
+    /// Retrieves all redirect URLs that are associated with the specified content item.
+    /// </summary>
+    /// <param name="contentKey">The unique key (GUID) identifying the content item.</param>
+    /// <returns>An enumerable collection of <see cref="IRedirectUrl"/> instances representing the redirect URLs for the specified content.</returns>
     public IEnumerable<IRedirectUrl> GetContentUrls(Guid contentKey)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
@@ -130,6 +172,15 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
         return dtos.Select(Map).WhereNotNull();
     }
 
+    /// <summary>
+    /// Retrieves a paged collection of redirect URLs, ordered by creation date descending.
+    /// </summary>
+    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+    /// <param name="pageSize">The maximum number of redirect URLs to return in the page.</param>
+    /// <param name="total">When this method returns, contains the total number of redirect URLs available across all pages.</param>
+    /// <returns>
+    /// An enumerable collection of <see cref="Umbraco.Cms.Core.Models.IRedirectUrl"/> instances representing the redirect URLs for the specified page.
+    /// </returns>
     public IEnumerable<IRedirectUrl> GetAllUrls(long pageIndex, int pageSize, out long total)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
@@ -139,6 +190,13 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
         return result.Items.Select(Map).WhereNotNull();
     }
 
+    /// <summary>
+    /// Retrieves a paged collection of all redirect URLs, ordered by creation date descending.
+    /// </summary>
+    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
+    /// <param name="pageSize">The number of items per page.</param>
+    /// <param name="total">Outputs the total number of redirect URLs available.</param>
+    /// <returns>An enumerable collection of redirect URLs for the specified page.</returns
     public IEnumerable<IRedirectUrl> GetAllUrls(int rootContentId, long pageIndex, int pageSize, out long total)
     {
         Sql<ISqlContext> sql = GetBaseQuery(false)
@@ -156,6 +214,14 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
         return rules;
     }
 
+    /// <summary>
+    /// Searches for redirect URLs whose URL contains the specified search term, with results paged according to the given page index and size.
+    /// </summary>
+    /// <param name="searchTerm">The term to search for within redirect URLs. The search is case-insensitive and matches any part of the URL.</param>
+    /// <param name="pageIndex">The zero-based index of the page of results to retrieve.</param>
+    /// <param name="pageSize">The number of redirect URLs to include in a single page of results.</param>
+    /// <param name="total">When this method returns, contains the total number of redirect URLs matching the search term.</param>
+    /// <returns>An enumerable collection of <see cref="IRedirectUrl"/> objects that match the search criteria for the specified page.</returns>
     public IEnumerable<IRedirectUrl> SearchUrls(string searchTerm, long pageIndex, int pageSize, out long total)
     {
         var wcPlaceholder = SqlSyntax.GetWildcardPlaceholder();

@@ -16,6 +16,9 @@ public static class WebhookEventCollectionBuilderCmsExtensions
         typeof(ContentUnpublishedWebhookEvent),
         typeof(MediaDeletedWebhookEvent),
         typeof(MediaSavedWebhookEvent),
+        typeof(ElementDeletedWebhookEvent),
+        typeof(ElementPublishedWebhookEvent),
+        typeof(ElementUnpublishedWebhookEvent),
     ];
 
     private static readonly Type[] _extendedDefaultTypes =
@@ -25,6 +28,9 @@ public static class WebhookEventCollectionBuilderCmsExtensions
         typeof(ContentUnpublishedWebhookEvent),
         typeof(MediaDeletedWebhookEvent),
         typeof(ExtendedMediaSavedWebhookEvent),
+        typeof(ElementDeletedWebhookEvent),
+        typeof(ExtendedElementPublishedWebhookEvent),
+        typeof(ElementUnpublishedWebhookEvent),
     ];
 
     private static readonly Type[] _legacyDefaultTypes =
@@ -161,6 +167,41 @@ public static class WebhookEventCollectionBuilderCmsExtensions
     public static WebhookEventCollectionBuilderCms AddContentType(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsContentType> contentTypeBuilder)
     {
         contentTypeBuilder(new WebhookEventCollectionBuilderCmsContentType(builder.Builder));
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds all available element (including version) webhook events.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="onlyDefault">If set to <c>true</c> only adds the default webhook events instead of all available.</param>
+    /// <param name="payloadType">The webhook payload type.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static WebhookEventCollectionBuilderCms AddElement(this WebhookEventCollectionBuilderCms builder, bool onlyDefault = false, WebhookPayloadType payloadType = WebhookPayloadType.Legacy)
+        => builder.AddElement(builder =>
+        {
+            builder.AddDefault(payloadType);
+
+            if (onlyDefault is false)
+            {
+                builder.AddVersion();
+            }
+        });
+
+    /// <summary>
+    /// Adds element webhook events specified in the <paramref name="elementBuilder" /> action.
+    /// </summary>
+    /// <param name="builder">The builder.</param>
+    /// <param name="elementBuilder">The element builder.</param>
+    /// <returns>
+    /// The builder.
+    /// </returns>
+    public static WebhookEventCollectionBuilderCms AddElement(this WebhookEventCollectionBuilderCms builder, Action<WebhookEventCollectionBuilderCmsElement> elementBuilder)
+    {
+        elementBuilder(new WebhookEventCollectionBuilderCmsElement(builder.Builder));
 
         return builder;
     }
@@ -575,6 +616,24 @@ public static class WebhookEventCollectionBuilderCmsExtensions
         /// </summary>
         /// <param name="builder">The webhook event collection builder.</param>
         internal WebhookEventCollectionBuilderCmsContent(WebhookEventCollectionBuilder builder)
+            => Builder = builder;
+
+        /// <summary>
+        ///     Gets the underlying webhook event collection builder.
+        /// </summary>
+        internal WebhookEventCollectionBuilder Builder { get; }
+    }
+
+    /// <summary>
+    /// Fluent <see cref="WebhookEventCollectionBuilder" /> for adding CMS element specific webhook events.
+    /// </summary>
+    public sealed class WebhookEventCollectionBuilderCmsElement
+    {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="WebhookEventCollectionBuilderCmsElement" /> class.
+        /// </summary>
+        /// <param name="builder">The webhook event collection builder.</param>
+        internal WebhookEventCollectionBuilderCmsElement(WebhookEventCollectionBuilder builder)
             => Builder = builder;
 
         /// <summary>

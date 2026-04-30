@@ -47,4 +47,13 @@ public interface IConfigManipulator
     /// <param name="id">The ID to save.</param>
     /// <returns></returns>
     Task SetGlobalIdAsync(string id);
+
+    /// <summary>
+    /// Sets the imaging HMAC secret key in the configuration file.
+    /// <remarks>
+    /// Will create the node if it does not already exist.
+    /// </remarks>
+    /// </summary>
+    /// <param name="base64Key">The base64-encoded key to save.</param>
+    Task SetImagingHmacSecretKeyAsync(string base64Key);
 }

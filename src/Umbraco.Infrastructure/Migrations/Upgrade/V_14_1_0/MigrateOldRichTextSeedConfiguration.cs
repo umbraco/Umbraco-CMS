@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -6,6 +6,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_14_1_0;
 
+/// <summary>
+/// Performs a migration that updates the seed configuration of the old rich text editor to the new format introduced in version 14.1.0.
+/// </summary>
 public class MigrateOldRichTextSeedConfiguration : MigrationBase
 {
     private const string OldSeedValue =
@@ -13,6 +16,11 @@ public class MigrateOldRichTextSeedConfiguration : MigrationBase
 
     private const string NewDefaultValue =
         "{\"toolbar\":[\"styles\",\"bold\",\"italic\",\"alignleft\",\"aligncenter\",\"alignright\",\"bullist\",\"numlist\",\"outdent\",\"indent\",\"sourcecode\",\"link\",\"umbmediapicker\",\"umbembeddialog\"],\"mode\":\"Classic\",\"maxImageSize\":500}";
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="MigrateOldRichTextSeedConfiguration"/> with the specified migration context.
+    /// </summary>
+    /// <param name="context">The <see cref="IMigrationContext"/> to use for the migration.</param>
     public MigrateOldRichTextSeedConfiguration(IMigrationContext context) : base(context)
     {
     }

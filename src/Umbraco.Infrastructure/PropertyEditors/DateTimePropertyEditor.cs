@@ -4,6 +4,7 @@
 using System.Data.SqlTypes;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.Json.Nodes;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -21,7 +22,7 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     Constants.PropertyEditors.Aliases.DateTime,
     ValueType = ValueTypes.DateTime,
     ValueEditorIsReusable = true)]
-public class DateTimePropertyEditor : DataEditor
+public class DateTimePropertyEditor : DataEditor, IValueSchemaProvider
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="DateTimePropertyEditor" /> class.
@@ -29,6 +30,18 @@ public class DateTimePropertyEditor : DataEditor
     public DateTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
         : base(dataValueEditorFactory)
         => SupportsReadOnly = true;
+
+    /// <inheritdoc />
+    public Type? GetValueType(object? configuration) => typeof(DateTime?);
+
+    /// <inheritdoc />
+    public JsonObject? GetValueSchema(object? configuration) => new()
+    {
+        ["$schema"] = "https://json-schema.org/draft/2020-12/schema",
+        ["type"] = new JsonArray("string", "null"),
+        ["format"] = "date-time",
+        ["description"] = "ISO 8601 date-time string",
+    };
 
     /// <inheritdoc />
     protected override IDataValueEditor CreateValueEditor()

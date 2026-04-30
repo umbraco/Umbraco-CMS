@@ -179,7 +179,7 @@ internal abstract class EntityTypeContainerService<TTreeEntity, TEntityContainer
 
                 return EntityContainerOperationStatus.Success;
             },
-            AuditType.New);
+            AuditType.Save);
     }
 
     /// <inheritdoc />

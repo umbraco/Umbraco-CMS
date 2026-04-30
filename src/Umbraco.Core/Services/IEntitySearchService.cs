@@ -17,4 +17,17 @@ public interface IEntitySearchService
     /// <param name="take">The maximum number of results to return.</param>
     /// <returns>A paged model containing the matching entities.</returns>
     PagedModel<IEntitySlim> Search(UmbracoObjectTypes objectType, string query, int skip = 0, int take = 100);
+
+    /// <summary>
+    /// Searches entities of multiple object types by query string.
+    /// </summary>
+    /// <remarks>
+    /// This method has a no-op default implementation.
+    /// </remarks>
+    PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, string query, int skip = 0, int take = 100);
+
+    /// <summary>
+    /// Gets all entities of multiple object types with pagination.
+    /// </summary>
+    PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, int skip = 0, int take = 100);
 }

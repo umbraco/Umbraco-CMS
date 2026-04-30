@@ -32,6 +32,7 @@ export default defineConfig({
 			'entity/index': './entity/index.ts',
 			'entry-point': 'entry-point.ts',
 			'event/index': './event/index.ts',
+			'extension/index': './extension/index.ts',
 			'extension-registry/index': './extension-registry/index.ts',
 			'hint/index': './hint/index.ts',
 			'http-client/index': './http-client/index.ts',

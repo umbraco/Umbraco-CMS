@@ -56,6 +56,14 @@ public interface ISimpleContentType
     bool IsElement { get; }
 
     /// <summary>
+    ///     Gets a value indicating whether this content type is allowed in the library.
+    /// </summary>
+    /// <remarks>
+    ///     This is only meaningful for element types (where <see cref="IsElement"/> is <c>true</c>).
+    /// </remarks>
+    bool AllowedInLibrary { get; }
+
+    /// <summary>
     ///     Validates that a combination of culture and segment is valid for the content type properties.
     /// </summary>
     /// <param name="culture">The culture.</param>

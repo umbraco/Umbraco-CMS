@@ -7,10 +7,17 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <summary>
+/// Repository responsible for managing and retrieving publish status information for content items.
+/// </summary>
 public class PublishStatusRepository : IPublishStatusRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishStatusRepository"/> class with the specified scope accessor.
+    /// </summary>
+    /// <param name="scopeAccessor">An accessor for managing the database scope within which repository operations are performed.</param>
     public PublishStatusRepository(IScopeAccessor scopeAccessor)
         => _scopeAccessor = scopeAccessor;
 
@@ -48,6 +55,13 @@ public class PublishStatusRepository : IPublishStatusRepository
     }
 
 
+    /// <summary>
+    /// Asynchronously retrieves all publish statuses for content items.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a dictionary where each key is the GUID of a content item, and each value is a set of publish status strings associated with that item.
+    /// </returns>
     public async Task<IDictionary<Guid, ISet<string>>> GetAllPublishStatusAsync(CancellationToken cancellationToken)
     {
         Sql<ISqlContext> sql = GetBaseQuery();
@@ -68,6 +82,14 @@ public class PublishStatusRepository : IPublishStatusRepository
         return result.TryGetValue(documentKey, out ISet<string>? value) ? value : new HashSet<string>();
     }
 
+    /// <summary>
+    /// Asynchronously retrieves the publish status for the specified root document and all its descendants.
+    /// </summary>
+    /// <param name="rootDocumentKey">The unique identifier (GUID) of the root document whose publish status and that of its descendants will be retrieved.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The result is a dictionary mapping each document's unique identifier to a set of publish status values (as strings) for that document.
+    /// </returns>
     public async Task<IDictionary<Guid, ISet<string>>> GetDescendantsOrSelfPublishStatusAsync(Guid rootDocumentKey, CancellationToken cancellationToken)
     {
         var pathSql = Database.SqlContext.Sql()
@@ -89,6 +111,44 @@ public class PublishStatusRepository : IPublishStatusRepository
         IDictionary<Guid, ISet<string>> result = Map(databaseRecords);
 
         return result;
+    }
+
+    public async Task<IDictionary<Guid, ISet<string>>> GetAllElementPublishStatusAsync(CancellationToken cancellationToken)
+    {
+        Sql<ISqlContext> sql = GetElementBaseQuery();
+        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(sql);
+        return Map(databaseRecords);
+    }
+
+    public async Task<ISet<string>> GetElementPublishStatusAsync(Guid elementKey, CancellationToken cancellationToken)
+    {
+        Sql<ISqlContext> sql = GetElementBaseQuery();
+        sql = sql.Where<NodeDto>(n => n.UniqueId == elementKey, "n");
+
+        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(sql);
+
+        IDictionary<Guid, ISet<string>> result = Map(databaseRecords);
+        return result.TryGetValue(elementKey, out ISet<string>? value) ? value : new HashSet<string>();
+    }
+
+    private Sql<ISqlContext> GetElementBaseQuery()
+    {
+        SqlSyntax.ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
+        Sql<ISqlContext> sql = Database.SqlContext.Sql()
+            .Select(
+                $"n.{syntax.GetQuotedColumnName(NodeDto.KeyColumnName)}",
+                $"l.{syntax.GetQuotedColumnName(LanguageDto.IsoCodeColumnName)}",
+                $"ct.{syntax.GetQuotedColumnName(ContentTypeDto.VariationsColumnName)}",
+                $"e.{syntax.GetQuotedColumnName(IPublishableContentDto<ElementVersionDto>.Columns.Published)}",
+                $"ecv.{syntax.GetQuotedColumnName(ICultureVariationDto.Columns.Published)} as {syntax.GetQuotedColumnName(PublishStatusDto.DocumentVariantPublishStatusColumnName)}")
+            .From<ElementDto>("e")
+            .InnerJoin<ContentDto>("c").On<ElementDto, ContentDto>((e, c) => e.NodeId == c.NodeId, "c", "e")
+            .InnerJoin<ContentTypeDto>("ct").On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
+            .CrossJoin<LanguageDto>("l")
+            .LeftJoin<ElementCultureVariationDto>("ecv").On<LanguageDto, ElementCultureVariationDto, ElementDto>((l, ecv, e) => l.Id == ecv.LanguageId && e.NodeId == ecv.NodeId, "l", "ecv", "e")
+            .InnerJoin<NodeDto>("n").On<ElementDto, NodeDto>((e, n) => n.NodeId == e.NodeId, "e", "n");
+
+        return sql;
     }
 
     private IDictionary<Guid, ISet<string>> Map(List<PublishStatusDto> databaseRecords)
@@ -120,18 +180,33 @@ public class PublishStatusRepository : IPublishStatusRepository
         public const string DocumentVariantPublishStatusColumnName = "variantPublished";
 
 
+        /// <summary>
+        /// Gets or sets the unique key that identifies the publish status.
+        /// </summary>
         [Column(NodeDto.KeyColumnName)]
         public Guid Key { get; set; }
 
+        /// <summary>
+        /// Gets or sets the ISO code representing the language.
+        /// </summary>
         [Column(LanguageDto.IsoCodeColumnName)]
         public string IsoCode { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Gets or sets the content type variation, stored as a byte value representing the variation flags or mode for the content type.
+        /// </summary>
         [Column(ContentTypeDto.VariationsColumnName)]
         public byte ContentTypeVariation { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the document is published for all cultures (invariantly).
+        /// </summary>
         [Column(IPublishableContentDto<DocumentVersionDto>.Columns.Published)]
         public bool DocumentInvariantPublished { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the document variant is published.
+        /// </summary>
         [Column(DocumentVariantPublishStatusColumnName)]
         public bool DocumentVariantPublishStatus { get; set; }
     }

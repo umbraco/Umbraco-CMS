@@ -1,11 +1,9 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -48,76 +46,6 @@ public class TemplateService : RepositoryService, ITemplateService
         _templateRepository = templateRepository;
         _auditService = auditService;
         _templateContentParserService = templateContentParserService;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="TemplateService" /> class.
-    /// </summary>
-    /// <param name="provider">The scope provider for unit of work operations.</param>
-    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
-    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
-    /// <param name="shortStringHelper">The helper for short string operations.</param>
-    /// <param name="templateRepository">The repository for template data access.</param>
-    /// <param name="auditRepository">The audit repository (unused, kept for backward compatibility).</param>
-    /// <param name="templateContentParserService">The service for parsing template content.</param>
-    /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys (unused, kept for backward compatibility).</param>
-    /// <param name="defaultViewContentProvider">The provider for default view content (unused, kept for backward compatibility).</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public TemplateService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IShortStringHelper shortStringHelper,
-        ITemplateRepository templateRepository,
-        IAuditRepository auditRepository,
-        ITemplateContentParserService templateContentParserService,
-        IUserIdKeyResolver userIdKeyResolver,
-        IDefaultViewContentProvider defaultViewContentProvider)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            shortStringHelper,
-            templateRepository,
-            StaticServiceProvider.Instance.GetRequiredService<IAuditService>(),
-            templateContentParserService)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="TemplateService" /> class.
-    /// </summary>
-    /// <param name="provider">The scope provider for unit of work operations.</param>
-    /// <param name="loggerFactory">The logger factory for creating loggers.</param>
-    /// <param name="eventMessagesFactory">The factory for creating event messages.</param>
-    /// <param name="shortStringHelper">The helper for short string operations.</param>
-    /// <param name="templateRepository">The repository for template data access.</param>
-    /// <param name="auditService">The audit service for recording audit entries.</param>
-    /// <param name="auditRepository">The audit repository (unused, kept for backward compatibility).</param>
-    /// <param name="templateContentParserService">The service for parsing template content.</param>
-    /// <param name="userIdKeyResolver">The resolver for converting user IDs to keys (unused, kept for backward compatibility).</param>
-    /// <param name="defaultViewContentProvider">The provider for default view content (unused, kept for backward compatibility).</param>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public TemplateService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IShortStringHelper shortStringHelper,
-        ITemplateRepository templateRepository,
-        IAuditService auditService,
-        IAuditRepository auditRepository,
-        ITemplateContentParserService templateContentParserService,
-        IUserIdKeyResolver userIdKeyResolver,
-        IDefaultViewContentProvider defaultViewContentProvider)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            shortStringHelper,
-            templateRepository,
-            auditService,
-            templateContentParserService)
-    {
     }
 
     /// <inheritdoc />
@@ -205,9 +133,9 @@ public class TemplateService : RepositoryService, ITemplateService
     /// </summary>
     /// <param name="templateToCreate">The template to validate.</param>
     /// <returns>The operation status indicating the result of the validation.</returns>
-    private TemplateOperationStatus ValidateCreate(ITemplate templateToCreate)
+    private async Task<TemplateOperationStatus> ValidateCreateAsync(ITemplate templateToCreate)
     {
-        ITemplate? existingTemplate = GetAsync(templateToCreate.Alias).GetAwaiter().GetResult();
+        ITemplate? existingTemplate = await GetAsync(templateToCreate.Alias);
         if (existingTemplate is not null)
         {
             return TemplateOperationStatus.DuplicateAlias;
@@ -283,17 +211,16 @@ public class TemplateService : RepositoryService, ITemplateService
             template,
             AuditType.Save,
             userKey,
-            // fail the attempt if the template does not exist within the scope
-            () => ValidateUpdate(template));
+            () => ValidateUpdateAsync(template));
 
     /// <summary>
     ///     Validates that a template can be updated.
     /// </summary>
     /// <param name="templateToUpdate">The template to validate.</param>
     /// <returns>The operation status indicating the result of the validation.</returns>
-    private TemplateOperationStatus ValidateUpdate(ITemplate templateToUpdate)
+    private async Task<TemplateOperationStatus> ValidateUpdateAsync(ITemplate templateToUpdate)
     {
-        ITemplate? existingTemplate = GetAsync(templateToUpdate.Alias).GetAwaiter().GetResult();
+        ITemplate? existingTemplate = await GetAsync(templateToUpdate.Alias);
         if (existingTemplate is not null && existingTemplate.Key != templateToUpdate.Key)
         {
             return TemplateOperationStatus.DuplicateAlias;
@@ -317,11 +244,11 @@ public class TemplateService : RepositoryService, ITemplateService
     /// <param name="contentTypeAlias">The optional content type alias for the saving notification.</param>
     /// <returns>An attempt result containing the template and operation status.</returns>
     private async Task<Attempt<ITemplate, TemplateOperationStatus>> SaveAsync(
-            ITemplate template,
-            AuditType auditType,
-            Guid userKey,
-            Func<TemplateOperationStatus>? scopeValidator = null,
-            string? contentTypeAlias = null)
+        ITemplate template,
+        AuditType auditType,
+        Guid userKey,
+        Func<Task<TemplateOperationStatus>>? scopeValidatorAsync = null,
+        string? contentTypeAlias = null)
     {
         if (IsValidAlias(template.Alias) == false)
         {
@@ -330,7 +257,9 @@ public class TemplateService : RepositoryService, ITemplateService
 
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            TemplateOperationStatus scopeValidatorStatus = scopeValidator?.Invoke() ?? TemplateOperationStatus.Success;
+            TemplateOperationStatus scopeValidatorStatus = scopeValidatorAsync is not null
+                ? await scopeValidatorAsync()
+                : TemplateOperationStatus.Success;
             if (scopeValidatorStatus != TemplateOperationStatus.Success)
             {
                 return Attempt.FailWithStatus(scopeValidatorStatus, template);
@@ -538,7 +467,7 @@ public class TemplateService : RepositoryService, ITemplateService
         {
             // file might already be on disk, if so grab the content to avoid overwriting
             template.Content = GetViewContent(template.Alias) ?? template.Content;
-            return await SaveAsync(template, AuditType.New, userKey, () => ValidateCreate(template), contentTypeAlias);
+            return await SaveAsync(template, AuditType.New, userKey, () => ValidateCreateAsync(template), contentTypeAlias);
         }
         catch (PathTooLongException ex)
         {

@@ -22,6 +22,8 @@ import { umbPeekError } from '@umbraco-cms/backoffice/notification';
 import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
 import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
+import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import {
 	UmbEntityRestoredFromRecycleBinEvent,
 	UmbEntityTrashedEvent,
@@ -55,18 +57,12 @@ export class UmbDocumentWorkspaceContext
 
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.documentType.unique);
 
-	/*
-	 * @deprecated Use `collection.hasCollection` instead, will be removed in v.18
-	 */
-	readonly contentTypeHasCollection = this._data.createObservablePartOfCurrent(
-		(data) => !!data?.documentType.collection,
-	);
-
 	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.documentType.icon || null);
 
 	readonly templateId = this._data.createObservablePartOfCurrent((data) => data?.template?.unique || null);
 
 	#isTrashedContext = new UmbIsTrashedEntityContext(this);
+	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	#documentSegmentRepository = new UmbDocumentSegmentRepository(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 	#localize = new UmbLocalizationController(this);
@@ -122,6 +118,8 @@ export class UmbDocumentWorkspaceContext
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {
+				this.#entityContentTypeContext.setEntityType(unique ? UMB_DOCUMENT_TYPE_ENTITY_TYPE : undefined);
+				this.#entityContentTypeContext.setUnique(unique ?? undefined);
 				if (unique) {
 					this.structure.loadType(unique);
 				}
@@ -261,21 +259,6 @@ export class UmbDocumentWorkspaceContext
 		});
 	}
 
-	/** @deprecated will be removed in v.18 */
-	getCollectionAlias() {
-		return UMB_DOCUMENT_COLLECTION_ALIAS;
-	}
-
-	/**
-	 * Gets the unique identifier of the content type.
-	 * @deprecated Use `getContentTypeUnique` instead.
-	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbDocumentWorkspaceContext
-	 */
-	getContentTypeId(): string | undefined {
-		return this.getContentTypeUnique();
-	}
-
 	/**
 	 * Gets the unique identifier of the content type.
 	 * @returns { string | undefined} The unique identifier of the content type.
@@ -287,11 +270,11 @@ export class UmbDocumentWorkspaceContext
 
 	/**
 	 * Set the template
-	 * @param {string} templateUnique The unique identifier of the template.
+	 * @param {string | null} templateUnique The unique identifier of the template, or null to clear the template.
 	 * @memberof UmbDocumentWorkspaceContext
 	 */
-	setTemplate(templateUnique: string) {
-		this._data.updateCurrent({ template: { unique: templateUnique } });
+	setTemplate(templateUnique: string | null) {
+		this._data.updateCurrent({ template: templateUnique ? { unique: templateUnique } : null });
 	}
 
 	protected override async _handleSave() {

@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security;
 using Microsoft.Extensions.Logging;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Composing;
 
@@ -86,7 +87,7 @@ internal sealed class ReferenceResolver
         // for Umbraco dependencies/transitive dependencies
         foreach (var dir in CollectionsMarshal.AsSpan(assemblyLocations))
         {
-            foreach (var dll in Directory.EnumerateFiles(dir ?? string.Empty, "*.dll"))
+            foreach (var dll in Directory.EnumerateFiles(dir, "*.dll"))
             {
                 AssemblyName? assemblyName = null;
                 try
@@ -167,8 +168,23 @@ internal sealed class ReferenceResolver
         }
     }
 
-    private static IEnumerable<string?> GetAssemblyFolders(IEnumerable<Assembly> assemblies) =>
-        assemblies.Select(x => Path.GetDirectoryName(GetAssemblyLocation(x))).Distinct();
+    private static IEnumerable<string> GetAssemblyFolders(IEnumerable<Assembly> assemblies) =>
+        GetNonNullAssemblyFolders(assemblies)
+            .Distinct();
+
+    private static IEnumerable<string> GetNonNullAssemblyFolders(IEnumerable<Assembly> assemblies)
+    {
+        foreach (Assembly assembly in assemblies)
+        {
+            var path = Path.GetDirectoryName(GetAssemblyLocation(assembly));
+            if (path.IsNullOrWhiteSpace())
+            {
+                yield break;
+            }
+
+            yield return path;
+        }
+    }
 
     // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Core/src/ApplicationParts/RelatedAssemblyAttribute.cs
     private static string GetAssemblyLocation(Assembly assembly)

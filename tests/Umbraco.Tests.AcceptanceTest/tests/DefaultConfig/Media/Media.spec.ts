@@ -1,4 +1,4 @@
-import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, NotificationConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from '@playwright/test';
 
 const mediaFileName = 'TestMediaFile';
@@ -72,7 +72,7 @@ for (const mediaFileType of mediaFileTypes) {
     if (mediaFileType.fileName === 'Image') {
       await umbracoUi.media.isImageCropperFieldVisible();
     } else {
-      await umbracoUi.media.isInputUploadFieldVisible();
+      await umbracoUi.media.doesInputUploadFileHaveName(mediaFileType.filePath);
     }
     const mediaId = await umbracoUi.media.clickSaveButtonAndWaitForMediaToBeCreated();
 
@@ -320,4 +320,44 @@ test('can bulk trash media nodes with a relation', async ({umbracoApi, umbracoUi
   await umbracoApi.document.ensureNameNotExists(documentPickerName2[0]);
   await umbracoApi.documentType.ensureNameNotExists(documentPickerName2[1]);
   await umbracoApi.media.emptyRecycleBin();
+});
+
+test('can move a media item to a folder', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
+  const mediaFolderId = await umbracoApi.media.createDefaultMediaFolder(folderName);
+  await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+
+  // Act
+  await umbracoUi.media.clickActionsMenuForName(mediaFileName);
+  await umbracoUi.media.clickMoveToActionMenuOption();
+  await umbracoUi.media.openCaretButtonForName('Media', true);
+  await umbracoUi.media.clickModalTextByName(folderName);
+  await umbracoUi.media.clickChooseModalButtonAndWaitForMediaItemsToBeMoved(1);
+
+  // Assert
+  await umbracoUi.media.doesSuccessNotificationHaveText(NotificationConstantHelper.success.moved);
+  expect(await umbracoApi.media.doesMediaItemHaveChildName(mediaFolderId, mediaFileName)).toBeTruthy();
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(folderName);
+});
+
+test('cannot move a media item to another media item', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const secondMediaFileName = 'SecondMediaFile';
+  await umbracoApi.media.createDefaultMediaFile(mediaFileName);
+  await umbracoApi.media.createDefaultMediaFile(secondMediaFileName);
+  await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+
+  // Act
+  await umbracoUi.media.clickActionsMenuForName(mediaFileName);
+  await umbracoUi.media.clickMoveToActionMenuOption();
+  await umbracoUi.media.openCaretButtonForName('Media', true);
+
+  // Assert
+  await umbracoUi.media.isModalMenuItemWithNameDisabled(secondMediaFileName);
+
+  // Clean
+  await umbracoApi.media.ensureNameNotExists(secondMediaFileName);
 });

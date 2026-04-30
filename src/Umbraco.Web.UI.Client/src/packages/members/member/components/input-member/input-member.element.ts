@@ -85,7 +85,7 @@ export class UmbInputMemberElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	@property({ type: Array })
-	allowedContentTypeIds?: string[] | undefined;
+	allowedContentTypeIds?: string[];
 
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {

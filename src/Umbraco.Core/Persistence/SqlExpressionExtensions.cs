@@ -93,4 +93,24 @@ public static class SqlExpressionExtensions
     public static bool SqlEndsWith(this string str, string txt, TextColumnType columnType) =>
         str.InvariantEndsWith(txt);
 #pragma warning restore IDE0060 // Remove unused parameter
+
+    /// <summary>
+    ///     Determines whether a string is less than another string using ordinal comparison.
+    /// </summary>
+    /// <param name="str">The string to compare.</param>
+    /// <param name="other">The string to compare to.</param>
+    /// <returns>true if <paramref name="str"/> is less than <paramref name="other"/>; otherwise, false.</returns>
+    /// <remarks>Do not use outside of Sql expressions.</remarks>
+    public static bool SqlLessThan(this string str, string other) =>
+        string.Compare(str, other, StringComparison.Ordinal) < 0;
+
+    /// <summary>
+    ///     Determines whether a string is greater than another string using ordinal comparison.
+    /// </summary>
+    /// <param name="str">The string to compare.</param>
+    /// <param name="other">The string to compare to.</param>
+    /// <returns>true if <paramref name="str"/> is greater than <paramref name="other"/>; otherwise, false.</returns>
+    /// <remarks>Do not use outside of Sql expressions.</remarks>
+    public static bool SqlGreaterThan(this string str, string other) =>
+        string.Compare(str, other, StringComparison.Ordinal) > 0;
 }

@@ -2,6 +2,7 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Tests.Integration.Attributes;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -92,6 +93,62 @@ public partial class ElementEditingServiceTests
 
         Assert.AreEqual(3, total);
         Assert.IsEmpty(entities);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableUnpublishWhenReferenced))]
+    public async Task Cannot_Move_To_Recycle_Bin_When_Element_Is_Referenced_And_Configured_To_Disable_When_Referenced()
+    {
+        var elementType = await CreateInvariantElementType();
+        var referencingElement = await CreateInvariantElement(contentTypeKey: elementType.Key);
+        var referencedElement = await CreateInvariantElement(contentTypeKey: elementType.Key);
+
+        // Set up a relation where referencingElement references referencedElement.
+        RelationService.Relate(
+            referencingElement.Id,
+            referencedElement.Id,
+            Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+
+        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(
+            referencedElement.Key,
+            Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsFalse(moveResult.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced, moveResult.Result);
+        });
+
+        // Verify element was not moved
+        var element = await ElementEditingService.GetAsync(referencedElement.Key);
+        Assert.IsNotNull(element);
+        Assert.IsFalse(element!.Trashed);
+    }
+
+    [Test]
+    [ConfigureBuilder(ActionName = nameof(ConfigureDisableUnpublishWhenReferenced))]
+    public async Task Can_Move_To_Recycle_Bin_When_Element_Is_Referencing_And_Configured_To_Disable_When_Referenced()
+    {
+        var elementType = await CreateInvariantElementType();
+        var referencingElement = await CreateInvariantElement(contentTypeKey: elementType.Key);
+        var referencedElement = await CreateInvariantElement(contentTypeKey: elementType.Key);
+
+        // Set up a relation where referencingElement references referencedElement.
+        RelationService.Relate(
+            referencingElement.Id,
+            referencedElement.Id,
+            Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+
+        // The referencing element (parent in the relation) should still be moveable.
+        var moveResult = await ElementEditingService.MoveToRecycleBinAsync(
+            referencingElement.Key,
+            Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(moveResult.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, moveResult.Result);
+        });
+
+        await AssertElementIsInRecycleBin(referencingElement.Key);
     }
 
     private async Task AssertElementIsInRecycleBin(Guid elementKey)

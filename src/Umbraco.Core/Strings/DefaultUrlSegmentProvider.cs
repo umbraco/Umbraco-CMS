@@ -43,13 +43,26 @@ public class DefaultUrlSegmentProvider : IUrlSegmentProvider
         if (content.HasProperty(Constants.Conventions.Content.UrlName))
         {
             source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture, published: published) ?? string.Empty).Trim();
+
+            // When a culture is requested but the umbracoUrlName property is invariant,
+            // Property.GetValue return null because it rejects non-null culture values.
+            // Fall back to reading the invariant value.
+            if (string.IsNullOrWhiteSpace(source) && culture is not null
+                && content.Properties.TryGetValue(Constants.Conventions.Content.UrlName, out IProperty? urlNameProperty)
+                && urlNameProperty.PropertyType.VariesByCulture() is false)
+            {
+                source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture: null, published: published) ?? string.Empty).Trim();
+            }
         }
 
         if (string.IsNullOrWhiteSpace(source))
         {
-            // If the name of a node has been updated, but it has not been published, the url should use the published name, not the current node name
-            // If this node has never been published (GetPublishName is null), use the unpublished name
-            source = content is IContent document && document.Edited && document.GetPublishName(culture) != null
+            // When the published segment is requested and the name has been updated but not yet published,
+            // use the published name so that the current live URL is returned (not the pending draft name).
+            // When the draft segment is requested (published: false), use the current name so callers
+            // (e.g. redirect tracking) can determine what the segment *will* be after publishing.
+            // If this node has never been published (GetPublishName is null), use the unpublished name.
+            source = content is IContent document && published && document.Edited && document.GetPublishName(culture) != null
                 ? document.GetPublishName(culture)
                 : content.GetCultureName(culture);
         }

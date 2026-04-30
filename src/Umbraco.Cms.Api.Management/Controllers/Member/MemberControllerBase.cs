@@ -12,11 +12,17 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
 
+/// <summary>
+/// Serves as the base controller for API endpoints that manage member entities in Umbraco CMS.
+/// Provides common functionality for derived member management controllers.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Member)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Member))]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMembers)]
 public class MemberControllerBase : ContentControllerBase
 {
+    protected override string EntityName => "member";
+
     protected IActionResult MemberNotFound() => OperationStatusResult(MemberEditingOperationStatus.MemberNotFound, MemberNotFound);
 
     protected IActionResult MemberEditingStatusResult(MemberEditingStatus status)
@@ -91,6 +97,15 @@ public class MemberControllerBase : ContentControllerBase
         ContentValidationResult validationResult)
         where TContentModelBase : ContentModelBase<MemberValueModel, MemberVariantRequestModel>
         => ContentEditingOperationStatusResult<TContentModelBase, MemberValueModel, MemberVariantRequestModel>(status, requestModel, validationResult);
+
+    /// <summary>
+    ///     Returns a 400 Bad Request indicating that external-only members cannot be modified through the Management API.
+    /// </summary>
+    protected IActionResult ExternalMemberCannotBeModified()
+        => BadRequest(new ProblemDetailsBuilder()
+            .WithTitle("External member cannot be modified")
+            .WithDetail("This member is managed by an external provider. Content operations such as create, update, and property editing are not available for external-only members.")
+            .Build());
 
     private IActionResult MemberNotFound(ProblemDetailsBuilder problemDetailsBuilder) => NotFound(problemDetailsBuilder
         .WithTitle("The requested member could not be found")

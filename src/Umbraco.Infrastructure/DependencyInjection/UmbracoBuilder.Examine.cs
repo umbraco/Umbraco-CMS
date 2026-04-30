@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -20,6 +21,12 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection;
 /// </summary>
 public static partial class UmbracoBuilderExtensions
 {
+    /// <summary>
+    /// Registers all Examine search and indexing services, including index populators, index rebuilders, value set builders, and notification handlers, with the Umbraco builder.
+    /// This enables full-text search and indexing capabilities within an Umbraco application.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to configure with Examine services.</param>
+    /// <returns>The configured <see cref="IUmbracoBuilder"/> instance.</returns>
     public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)
     {
         builder.Services.AddUnique<IExamineManager, ExamineManager>();
@@ -31,6 +38,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, DeliveryApiContentIndexPopulator>();
+        builder.Services.AddSingleton<IIndexPopulator, ExternalMemberIndexPopulator>();
 
         builder.Services.AddSingleton<IIndexRebuilder, ExamineIndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
@@ -65,14 +73,14 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<ILanguageService>()));
         builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
         builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
+        builder.Services.AddUnique<IValueSetBuilder<ExternalMemberIdentity>, ExternalMemberValueSetBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexValueSetBuilder, DeliveryApiContentIndexValueSetBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
         builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
+        builder.Services.AddSingleton<IDeferredSearchReindexService, DeferredSearchReindexService>();
 
         builder.Services.AddUnique<IDeliveryApiCompositeIdHandler, DeliveryApiCompositeIdHandler>();
-
-        builder.Services.AddTransient<IIndexRebuilder, ExamineIndexRebuilder>();
 
         builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, ContentIndexingNotificationHandler>();
@@ -82,6 +90,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<MediaCacheRefresherNotification, MediaIndexingNotificationHandler>();
         builder.AddNotificationHandler<MemberCacheRefresherNotification, MemberIndexingNotificationHandler>();
+        builder.AddNotificationHandler<ExternalMemberCacheRefresherNotification, ExternalMemberIndexingNotificationHandler>();
         builder.AddNotificationAsyncHandler<LanguageCacheRefresherNotification, LanguageIndexingNotificationHandler>();
 
         builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>();

@@ -1068,6 +1068,7 @@ export default {
 		changePassword: 'Bytt passord',
 		newPassword: 'Nytt passord',
 		confirmNewPassword: 'Bekreft nytt passord',
+		confirmPassword: 'Bekreft passord',
 		changePasswordDescription:
 			'Du kan endre passordet til Umbraco ved å fylle ut skjemaet under og klikke "Bytt passord" knappen.',
 		contentChannel: 'Innholdskanal',

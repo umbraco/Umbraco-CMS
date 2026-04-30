@@ -20,10 +20,7 @@ public interface IReadOnlyUserGroup
     /// <summary>
     ///     Gets the description of the user group.
     /// </summary>
-    /// <remarks>
-    ///     TODO (V18): Remove the default implementations.
-    /// </remarks>
-    string? Description { get { return null; } }
+    string? Description { get; }
 
     /// <summary>
     ///     Gets the icon for the user group.

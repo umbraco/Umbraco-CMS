@@ -21,6 +21,12 @@ internal sealed class PasswordChanger<TUser> : IPasswordChanger<TUser> where TUs
     /// <param name="logger">Logger for this class</param>
     public PasswordChanger(ILogger<PasswordChanger<TUser>> logger) => _logger = logger;
 
+    /// <summary>
+    /// Asynchronously changes the password for a user using the specified user manager.
+    /// </summary>
+    /// <param name="passwordModel">The model containing the current and new password.</param>
+    /// <param name="userMgr">The user manager responsible for identity operations.</param>
+    /// <returns>A task representing the asynchronous operation, with an <see cref="Attempt{PasswordChangedModel}"/> indicating success or failure.</returns>
     public Task<Attempt<PasswordChangedModel?>> ChangePasswordWithIdentityAsync(ChangingPasswordModel passwordModel, IUmbracoUserManager<TUser> userMgr) => ChangePasswordWithIdentityAsync(passwordModel, userMgr, null);
 
     /// <summary>

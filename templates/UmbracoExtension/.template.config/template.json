@@ -30,6 +30,29 @@
       "defaultValue": "*",
       "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
     },
+    "PackageManagement": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Central",
+      "displayName": "Package Version Management",
+      "description": "Choose how to manage NuGet package versions",
+      "choices": [
+        {
+          "choice": "Central",
+          "displayName": "Central package management",
+          "description": "Use Directory.Packages.props (recommended for new standalone projects)"
+        },
+        {
+          "choice": "PerProject",
+          "displayName": "Per project",
+          "description": "Use versions in .csproj (recommended when adding to existing projects)"
+        }
+      ]
+    },
+    "UseCPM": {
+      "type": "computed",
+      "value": "(PackageManagement == \"Central\")"
+    },
     "SkipRestore": {
       "displayName": "Skip restore",
       "description": "If specified, skips the automatic restore of the project on create.",
@@ -130,6 +153,12 @@
           "condition": "(!IncludeExample)",
           "exclude": [
             "[Cc]lient/src/dashboards/**"
+          ]
+        },
+        {
+          "condition": "(!UseCPM)",
+          "exclude": [
+            "Directory.Packages.props"
           ]
         }
       ]

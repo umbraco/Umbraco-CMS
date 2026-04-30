@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Routing;
@@ -84,44 +85,20 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
         _urlService = urlService;
     }
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbracoRouteValueTransformer" /> class.
-    /// </summary>
-    [Obsolete("Scheduled for removal in Umbraco 18.")]
-    public UmbracoRouteValueTransformer(
-        ILogger<UmbracoRouteValueTransformer> logger,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IPublishedRouter publishedRouter,
-        IRuntimeState runtime,
-        IUmbracoRouteValuesFactory routeValuesFactory,
-        IRoutableDocumentFilter routableDocumentFilter,
-        IDataProtectionProvider dataProtectionProvider,
-        IControllerActionSearcher controllerActionSearcher,
-        IPublicAccessRequestHandler publicAccessRequestHandler,
-        IUmbracoVirtualPageRoute umbracoVirtualPageRoute,
-        IOptionsMonitor<GlobalSettings> globalSettings)
-    : this(
-        logger,
-        umbracoContextAccessor,
-        publishedRouter,
-        runtime,
-        routeValuesFactory,
-        routableDocumentFilter,
-        dataProtectionProvider,
-        controllerActionSearcher,
-        publicAccessRequestHandler,
-        umbracoVirtualPageRoute,
-        globalSettings,
-        StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>())
-    {
-    }
-
     /// <inheritdoc />
     public override async ValueTask<RouteValueDictionary> TransformAsync(
         HttpContext httpContext, RouteValueDictionary values)
     {
         // will be null for any client side requests like JS, etc...
         if (!_umbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
+        {
+            return null!;
+        }
+
+        // During a background unattended upgrade, content services are not yet initialized.
+        // Return null so the dynamic route is removed from candidates, leaving any static routes
+        // (e.g. surface controllers) to be matched and handled by their own action filters.
+        if (_runtime.Level == RuntimeLevel.Upgrading)
         {
             return null!;
         }
@@ -194,9 +171,9 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
     }
 
     /// <summary>
-    ///     Check whether dynamic routing is currently active in an request where no exception has occured.
+    ///     Check whether dynamic routing is currently active in an request where no exception has occurred.
     /// </summary>
-    /// <returns>[true] if dynamic routing is active, [false] if inactive or an exception has occured.</returns>
+    /// <returns>[true] if dynamic routing is active, [false] if inactive or an exception has occurred.</returns>
     private static bool CheckActiveDynamicRoutingAndNoException(HttpContext httpContext)
     {
         // Don't execute if there are already UmbracoRouteValues assigned.
@@ -210,7 +187,7 @@ public class UmbracoRouteValueTransformer : DynamicRouteValueTransformer
             return false;
         }
 
-        // There is dynamic routing active so we have to check whether an exception occured in the current request.
+        // There is dynamic routing active so we have to check whether an exception occurred in the current request.
         // If this is the case we do want dynamic routing since it might be an Umbraco content page which is used as an error page.
         IExceptionHandlerFeature? exceptionHandlerFeature = httpContext.Features.Get<IExceptionHandlerFeature>();
 

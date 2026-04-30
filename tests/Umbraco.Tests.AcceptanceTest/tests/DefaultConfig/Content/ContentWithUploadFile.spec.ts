@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -76,7 +76,7 @@ for (const uploadFile of uploadFiles) {
     await umbracoUi.content.uploadFile(uploadFilePath + uploadFile.fileName);
     // Wait for the upload to complete
     await umbracoUi.content.isInputDropzoneVisible(false);
-    await umbracoUi.content.isInputUploadFieldVisible();
+    await umbracoUi.content.doesInputUploadFileHaveName(uploadFile.fileName);
     await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
     // Assert

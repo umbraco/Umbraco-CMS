@@ -86,9 +86,6 @@ export class UmbInputMemberGroupElement extends UmbFormControlMixin<string, type
 		return this.#pickerContext.getSelection();
 	}
 
-	@property({ type: Array })
-	allowedContentTypeIds?: string[] | undefined;
-
 	@property({ type: String })
 	public override set value(selectionString: string | undefined) {
 		this.selection = splitStringToArray(selectionString);

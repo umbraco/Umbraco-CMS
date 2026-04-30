@@ -751,6 +751,27 @@ public class EntityService : RepositoryService, IEntityService
         }
     }
 
+    public IEnumerable<IEntitySlim> GetPagedDescendants(
+        IEnumerable<UmbracoObjectTypes> objectTypes,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null,
+        bool includeTrashed = true)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            IQuery<IUmbracoEntity> query = Query<IUmbracoEntity>();
+            if (includeTrashed == false)
+            {
+                query.Where(x => x.Trashed == false);
+            }
+
+            return _entityRepository.GetPagedResultsByQuery(query, objectTypes.Select(ot => ot.GetGuid()).ToHashSet(), pageIndex, pageSize, out totalRecords, filter, ordering);
+        }
+    }
+
     /// <inheritdoc />
     public virtual UmbracoObjectTypes GetObjectType(int id)
     {
@@ -807,6 +828,15 @@ public class EntityService : RepositoryService, IEntityService
         using (ScopeProvider.CreateCoreScope(autoComplete: true))
         {
             return _entityRepository.GetAllPaths(objectType.GetGuid(), keys);
+        }
+    }
+
+    /// <inheritdoc />
+    public virtual IEnumerable<TreeEntityPath> GetAllPaths(IEnumerable<UmbracoObjectTypes> objectTypes, params Guid[] keys)
+    {
+        using (ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _entityRepository.GetAllPaths(objectTypes.Select(objectType => objectType.GetGuid()).ToArray(), keys);
         }
     }
 

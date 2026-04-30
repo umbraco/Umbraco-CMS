@@ -35,6 +35,7 @@ const entityCreateOptionActions: Array<UmbExtensionManifest> = [
 		meta: {
 			icon: 'icon-palette',
 			label: '#create_newStyleSheetFile',
+			additionalOptions: true,
 		},
 	},
 	{

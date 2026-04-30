@@ -6,6 +6,7 @@ using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Controllers.Element.Tree;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
@@ -63,6 +64,7 @@ public class SiblingsElementTreeControllerTests : ManagementApiUserGroupTestBase
             .WithAlias(Guid.NewGuid().ToString("N"))
             .WithName("Test Group With Element Start Node")
             .WithAllowedSections(["library"])
+            .WithPermissions(new HashSet<string> { ActionElementBrowse.ActionLetter })
             .WithStartElementId(_folder1Id)
             .Build();
 

@@ -1,5 +1,8 @@
 namespace Umbraco.Cms.Infrastructure.Persistence;
 
+/// <summary>
+/// Provides functionality to map scalar values of type <typeparamref name="T"/> between the application and the database.
+/// </summary>
 public abstract class ScalarMapper<T> : IScalarMapper
 {
     /// <inheritdoc />

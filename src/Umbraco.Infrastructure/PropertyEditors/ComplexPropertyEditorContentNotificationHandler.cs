@@ -17,16 +17,29 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 public abstract class ComplexPropertyEditorContentNotificationHandler :
     INotificationHandler<ContentSavingNotification>,
     INotificationHandler<ContentCopyingNotification>,
-    INotificationHandler<ContentScaffoldedNotification>
+    INotificationHandler<ContentScaffoldedNotification>,
+    INotificationHandler<ElementSavingNotification>,
+    INotificationHandler<ElementCopyingNotification>
 {
     protected abstract string EditorAlias { get; }
 
+    /// <summary>
+    /// Handles a <see cref="ContentCopyingNotification"/> by updating property values for all properties
+    /// that use the configured editor alias on the copied content.
+    /// </summary>
+    /// <param name="notification">The notification containing information about the content being copied.</param>
     public void Handle(ContentCopyingNotification notification)
     {
         IEnumerable<IProperty> props = notification.Copy.GetPropertiesByEditor(EditorAlias);
         UpdatePropertyValues(props, false);
     }
 
+    /// <summary>
+    /// Handles a <see cref="ContentSavingNotification"/> by updating property values for all properties
+    /// that use the configured editor alias on the content being saved.
+    /// </summary>
+    /// <param name="notification">The notification containing information about the content being saved.</param>
+    /// <remarks>This ensures that property values are updated appropriately before the content is persisted.</remarks>
     public void Handle(ContentSavingNotification notification)
     {
         foreach (IContent entity in notification.SavedEntities)
@@ -36,10 +49,30 @@ public abstract class ComplexPropertyEditorContentNotificationHandler :
         }
     }
 
+    /// <summary>
+    /// Handles a <see cref="ContentScaffoldedNotification"/> by updating property values for properties
+    /// that use the complex property editor.
+    /// </summary>
+    /// <param name="notification">The <see cref="ContentScaffoldedNotification"/> containing event data for the content scaffolded operation.</param>
     public void Handle(ContentScaffoldedNotification notification)
     {
         IEnumerable<IProperty> props = notification.Scaffold.GetPropertiesByEditor(EditorAlias);
         UpdatePropertyValues(props, false);
+    }
+
+    public void Handle(ElementCopyingNotification notification)
+    {
+        IEnumerable<IProperty> props = notification.Copy.GetPropertiesByEditor(EditorAlias);
+        UpdatePropertyValues(props, false);
+    }
+
+    public void Handle(ElementSavingNotification notification)
+    {
+        foreach (IElement entity in notification.SavedEntities)
+        {
+            IEnumerable<IProperty> props = entity.GetPropertiesByEditor(EditorAlias);
+            UpdatePropertyValues(props, true);
+        }
     }
 
     protected abstract string FormatPropertyValue(string rawJson, bool onlyMissingKeys);

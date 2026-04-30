@@ -1,20 +1,20 @@
 import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT, UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
 import type { UmbDocumentVariantModel } from '../../../types.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../../publishing/index.js';
-import { TimeOptions } from '../../../utils.js';
 import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
-import { UMB_TEMPLATE_PICKER_MODAL, UmbTemplateItemRepository } from '@umbraco-cms/backoffice/template';
-import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
-import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
+import { UmbTemplateItemRepository, UMB_TEMPLATE_PICKER_MODAL } from '@umbraco-cms/backoffice/template';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_DATE_TIME_FORMAT_OPTIONS } from '@umbraco-cms/backoffice/utils';
+import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
 import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
-import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
+import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
 
 @customElement('umb-document-workspace-view-info')
 export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
@@ -74,7 +74,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 		this.consumeContext(UMB_DOCUMENT_WORKSPACE_CONTEXT, (context) => {
 			this.#workspaceContext = context;
-			this._documentTypeUnique = this.#workspaceContext?.getContentTypeId();
+			this._documentTypeUnique = this.#workspaceContext?.getContentTypeUnique();
 			this.#observeContent();
 		});
 
@@ -236,7 +236,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 	}
 
 	#renderTemplateInput() {
-		if (this._allowedTemplates?.length === 0) return nothing;
+		if (this._allowedTemplates?.length === 0 && !this._templateUnique) return nothing;
 
 		const editTemplatePath = this._routeBuilder?.({ entityType: 'template' }) ?? '';
 
@@ -251,13 +251,20 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 								href=${ifDefined(
 									this._hasSettingsAccess ? editTemplatePath + 'edit/' + this._templateUnique : undefined,
 								)}
-								?readonly=${!this._hasSettingsAccess || this._isTrashed}>
-								<uui-icon slot="icon" name="icon-document-html"></uui-icon>
+								?readonly=${!this._hasSettingsAccess || this._isTrashed}
+								style=${ifDefined(!this.#isTemplateAllowed ? 'color: var(--uui-color-danger)' : undefined)}
+								title=${ifDefined(!this.#isTemplateAllowed ? this.localize.term('template_notAllowed') : undefined)}>
+								<uui-icon slot="icon" name=${!this.#isTemplateAllowed ? 'icon-alert' : 'icon-document-html'}></uui-icon>
 								${!this._isTrashed
 									? html` <uui-action-bar slot="actions">
+											${this._allowedTemplates?.length
+												? html`<uui-button
+														label=${this.localize.term('general_choose')}
+														@click=${this.#openTemplatePicker}></uui-button>`
+												: nothing}
 											<uui-button
-												label=${this.localize.term('general_choose')}
-												@click=${this.#openTemplatePicker}></uui-button>
+												label=${this.localize.term('general_remove')}
+												@click=${this.#removeTemplate}></uui-button>
 										</uui-action-bar>`
 									: nothing}
 							</uui-ref-node>
@@ -302,10 +309,20 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 			<div class="general-item">
 				<strong><umb-localize .key=${labelKey}>${labelText}</umb-localize></strong>
 				<span>
-					<umb-localize-date .date=${date} .options=${TimeOptions}></umb-localize-date>
+					<umb-localize-date .date=${date} .options=${UMB_DATE_TIME_FORMAT_OPTIONS}></umb-localize-date>
 				</span>
 			</div>
 		`;
+	}
+
+	get #isTemplateAllowed(): boolean {
+		if (!this._templateUnique) return true;
+		if (!this._allowedTemplates || this._allowedTemplates.length === 0) return false;
+		return this._allowedTemplates.some((t) => t.id === this._templateUnique);
+	}
+
+	#removeTemplate() {
+		this.#workspaceContext?.setTemplate(null);
 	}
 
 	async #openTemplatePicker() {

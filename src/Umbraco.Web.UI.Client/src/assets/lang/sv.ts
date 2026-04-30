@@ -279,7 +279,8 @@ export default {
 		openBackofficeSearch: 'Öppna sökfunktion (backoffice)',
 		openCloseBackofficeHelp: 'Öppna/stäng hjälpfunktion',
 		openCloseBackofficeProfileOptions: 'Öppna/stäng personliga inställningar',
-		profileOptions: 'Personliga inställningar',
+		profileOptions: 'Användarprofil för %0% (%1%)',
+		profileOptionsDefault: 'Användarprofil',
 		assignDomainDescription: 'Redigera språk och värdnamn för %0%',
 		createDescription: 'Skapa en ny nod under %0%',
 		protectDescription: 'Ändra behörigheter för %0%',
@@ -354,6 +355,8 @@ export default {
 		nodeNameLinkPicker: 'Länktitel',
 		urlLinkPicker: 'Länk',
 		anchorInsert: 'Namn',
+		anchorLinkPicker: 'Ankare eller frågesträng',
+		addLink: 'Lägg till länk',
 		assignDomain: 'Hantera domännamn',
 		closeThisWindow: 'Stäng fönstret',
 		confirmdelete: 'Är du säker på att du vill ta bort',
@@ -767,9 +770,11 @@ export default {
 		nameentity: 'Namnge %0%...',
 		password: 'Fyll i ditt lösenord',
 		search: 'Skriv för att söka...',
+		anchor: 'Ange ett ankare eller en frågesträng, #value eller ?key=value',
 		username: 'Fyll i ditt lösenord',
 		enterAlias: 'Välj alias...',
 		enterTags: 'Skriv för att lägga till taggar (och tryck enter efter varje tagg)...',
+		enterUrl: 'Ange en webbadress...',
 	},
 	publicAccess: {
 		paAdvanced: 'Rollbaserat lösenordsskydd',
@@ -1075,6 +1080,7 @@ export default {
 		changePassword: 'Ändra lösenord',
 		changePhoto: 'Ändra bild',
 		confirmNewPassword: 'Bekräfta det nya lösenordet',
+		confirmPassword: 'Bekräfta lösenord',
 		changePasswordDescription:
 			'Du kan byta ditt lösenord för Umbraco backoffice genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".',
 		contentChannel: 'Innehållskanal',
@@ -1162,5 +1168,19 @@ export default {
 	logViewer: {
 		selectAllLogLevelFilters: 'Välj alla',
 		deselectAllLogLevelFilters: 'Avmarkera alla',
+	},
+	linkPicker: {
+		modalSource: 'Källa',
+		modalManual: 'URL',
+		modalAnchorValidationMessage:
+			'Ange ett ankare eller en frågesträng, välj ett dokument eller mediaobjekt, eller ange URL manuellt.',
+		modalUrlOrAnchorValidationMessage: 'Ange en URL eller ett ankare.',
+		resetUrlHeadline: 'Återställ URL?',
+		resetUrlMessage: 'Är du säker på att du vill återställa denna URL?',
+		resetUrlLabel: 'Återställ',
+		selectLanguageHint: 'Välj ett språk för länken',
+		selectLanguageDefault: 'Auto (besökarens språk)',
+		configCultureSpecificDocumentLinksLabel: 'Kulturspecifika dokumentlänkar',
+		configCultureSpecificDocumentLinksDescription: 'Aktivera möjligheten att ange en kultur vid länkning till dokument.',
 	},
 } as UmbLocalizationDictionary;

@@ -56,7 +56,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
-    public async Task RefreshContentAsync(ContentCacheNode contentCacheNode, PublishedState publishedState)
+    public async Task RefreshDocumentAsync(ContentCacheNode contentCacheNode, PublishedState publishedState)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
@@ -91,28 +91,159 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
-    public void Rebuild(
-        IReadOnlyCollection<int>? contentTypeIds = null,
-        IReadOnlyCollection<int>? mediaTypeIds = null,
-        IReadOnlyCollection<int>? memberTypeIds = null)
+    public async Task<ContentCacheNode?> GetElementSourceAsync(Guid key, bool preview = false)
     {
+        ContentSourceDto? dto = await GetElementSourceDto(key);
+
+        if (dto is null)
+        {
+            return null;
+        }
+
+        if (preview is false && dto.PubDataRaw is null && dto.PubData is null)
+        {
+            return null;
+        }
+
+        if (preview is false && dto.Published && dto.PubName is null)
+        {
+            _logger.LogWarning(
+                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
+                key);
+            return null;
+        }
+
+        return CreateElementNodeKit(preview, dto);
+    }
+
+    /// <inheritdoc/>
+    public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetElementSourceForPublishStatesAsync(Guid key)
+    {
+        ContentSourceDto? dto = await GetElementSourceDto(key);
+
+        if (dto is null)
+        {
+            return (null, null);
+        }
+
+        ContentCacheNode? draftNode = CreateElementNodeKit(true, dto);
+
+        ContentCacheNode? publishedNode;
+        if (dto.PubDataRaw is null && dto.PubData is null)
+        {
+            publishedNode = null;
+        }
+        else if (dto.Published && dto.PubName is null)
+        {
+            _logger.LogWarning(
+                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
+                key);
+            publishedNode = null;
+        }
+        else
+        {
+            publishedNode = CreateElementNodeKit(false, dto);
+        }
+
+        return (draftNode, publishedNode);
+    }
+
+    private async Task<ContentSourceDto?> GetElementSourceDto(Guid key)
+    {
+        Sql<ISqlContext>? sql = SqlElementSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Element))
+            .Append(SqlWhereNodeKey(SqlContext, key))
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+        return await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
+    }
+
+    private ContentCacheNode? CreateElementNodeKit(bool preview, ContentSourceDto dto)
+    {
+        IContentCacheDataSerializer serializer =
+            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
+        return CreateContentNodeKit(dto, serializer, preview);
+    }
+
+    /// <inheritdoc/>
+    public async Task<IEnumerable<ContentCacheNode>> GetElementSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
+    {
+        Sql<ISqlContext>? sql = SqlElementSourcesSelect()
+            .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Element))
+            .WhereIn<NodeDto>(x => x.UniqueId, keys)
+            .Append(SqlOrderByLevelIdSortOrder(SqlContext));
+
+        List<ContentSourceDto> dtos = await Database.FetchAsync<ContentSourceDto>(sql);
+
+        dtos = dtos
+            .Where(x => x is not null)
+            .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
+            .ToList();
+
+        IContentCacheDataSerializer serializer =
+            _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
+        return dtos
+            .Select(x => CreateContentNodeKit(x, serializer, preview))
+            .OfType<ContentCacheNode>();
+    }
+
+    /// <inheritdoc/>
+    public async Task RefreshElementAsync(ContentCacheNode contentCacheNode, PublishedState publishedState)
+    {
+        IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
+
+        if (contentCacheNode.IsDraft)
+        {
+            await OnRepositoryRefreshed(serializer, contentCacheNode, true);
+            return;
+        }
+
+        switch (publishedState)
+        {
+            case PublishedState.Publishing:
+                await OnRepositoryRefreshed(serializer, contentCacheNode, false);
+                break;
+            case PublishedState.Unpublishing:
+                Sql<ISqlContext> sql = Sql()
+                    .Delete<ContentNuDto>()
+                    .Where<ContentNuDto>(x => x.NodeId == contentCacheNode.Id && x.Published);
+                await Database.ExecuteAsync(sql);
+                break;
+        }
+    }
+
+
+    /// <inheritdoc/>
+    public void Rebuild(
+        IReadOnlyCollection<int>? contentTypeIds,
+        IReadOnlyCollection<int>? mediaTypeIds,
+        IReadOnlyCollection<int>? memberTypeIds,
+        IReadOnlyCollection<int>? elementTypeIds,
+        Action<Action>? executeStep)
+    {
+        // When no executeStep delegate is provided, execute directly against the ambient scope.
+        executeStep ??= static action => action();
+
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(
             ContentCacheDataSerializerEntityType.Document
             | ContentCacheDataSerializerEntityType.Media
-            | ContentCacheDataSerializerEntityType.Member);
+            | ContentCacheDataSerializerEntityType.Member
+            | ContentCacheDataSerializerEntityType.Element);
 
-        // If contentTypeIds, mediaTypeIds and memberTypeIds are all non-null but empty,
-        // truncate the table as all records will be deleted (as these 3 are the only types in the table).
+        // If all type ID collections are non-null but empty,
+        // truncate the table as all records will be deleted.
         if (contentTypeIds is not null && contentTypeIds.Count == 0 &&
             mediaTypeIds is not null && mediaTypeIds.Count == 0 &&
-            memberTypeIds is not null && memberTypeIds.Count == 0)
+            memberTypeIds is not null && memberTypeIds.Count == 0 &&
+            elementTypeIds is not null && elementTypeIds.Count == 0)
         {
             TruncateContent();
         }
 
-        RebuildContentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds);
-        RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds);
-        RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds);
+        RebuildDocumentDbCache(serializer, _nucacheSettings.Value.SqlPageSize, contentTypeIds, executeStep);
+        RebuildMediaDbCache(serializer, _nucacheSettings.Value.SqlPageSize, mediaTypeIds, executeStep);
+        RebuildMemberDbCache(serializer, _nucacheSettings.Value.SqlPageSize, memberTypeIds, executeStep);
+        RebuildElementDbCache(serializer, _nucacheSettings.Value.SqlPageSize, elementTypeIds, executeStep);
     }
 
     private void TruncateContent()
@@ -129,9 +260,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
-    public async Task<ContentCacheNode?> GetContentSourceAsync(Guid key, bool preview = false)
+    public async Task<ContentCacheNode?> GetDocumentSourceAsync(Guid key, bool preview = false)
     {
-        ContentSourceDto? dto = await GetContentSourceDto(key);
+        ContentSourceDto? dto = await GetDocumentSourceDto(key);
 
         if (dto is null)
         {
@@ -143,28 +274,51 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             return null;
         }
 
-        return CreateContentNodeKit(preview, dto);
+        if (preview is false && dto.Published && dto.PubName is null)
+        {
+            _logger.LogWarning(
+                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
+                key);
+            return null;
+        }
+
+        return CreateDocumentNodeKit(preview, dto);
+
     }
 
     /// <inheritdoc/>
-    public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetContentSourceForPublishStatesAsync(Guid key)
+    public async Task<(ContentCacheNode? Draft, ContentCacheNode? Published)> GetDocumentSourceForPublishStatesAsync(Guid key)
     {
-        ContentSourceDto? dto = await GetContentSourceDto(key);
+        ContentSourceDto? dto = await GetDocumentSourceDto(key);
 
         if (dto is null)
         {
             return (null, null);
         }
 
-        ContentCacheNode draftNode = CreateContentNodeKit(true, dto);
-        ContentCacheNode? publishedNode = dto.PubDataRaw is null && dto.PubData is null
-            ? null
-            : CreateContentNodeKit(false, dto);
+        ContentCacheNode? draftNode = CreateDocumentNodeKit(true, dto);
+
+        ContentCacheNode? publishedNode;
+        if (dto.PubDataRaw is null && dto.PubData is null)
+        {
+            publishedNode = null;
+        }
+        else if (dto.Published && dto.PubName is null)
+        {
+            _logger.LogWarning(
+                "Node {NodeKey} appears published but has no published version name, indicating an inconsistent database state. Consider republishing the content. Skipping node.",
+                key);
+            publishedNode = null;
+        }
+        else
+        {
+            publishedNode = CreateDocumentNodeKit(false, dto);
+        }
 
         return (draftNode, publishedNode);
     }
 
-    private async Task<ContentSourceDto?> GetContentSourceDto(Guid key)
+    private async Task<ContentSourceDto?> GetDocumentSourceDto(Guid key)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
@@ -174,7 +328,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return await Database.FirstOrDefaultAsync<ContentSourceDto>(sql);
     }
 
-    private ContentCacheNode CreateContentNodeKit(bool preview, ContentSourceDto dto)
+    private ContentCacheNode? CreateDocumentNodeKit(bool preview, ContentSourceDto dto)
     {
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
@@ -182,7 +336,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
-    public async Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
+    public async Task<IEnumerable<ContentCacheNode>> GetDocumentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
     {
         Sql<ISqlContext>? sql = SqlContentSourcesSelect()
             .Append(SqlObjectTypeNotTrashed(SqlContext, Constants.ObjectTypes.Document))
@@ -193,13 +347,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         dtos = dtos
             .Where(x => x is not null)
-            .Where(x => preview || x.PubDataRaw is not null || x.PubData is not null)
+            .Where(x => preview || ((x.PubDataRaw is not null || x.PubData is not null) && (!x.Published || x.PubName is not null)))
             .ToList();
 
         IContentCacheDataSerializer serializer =
             _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
         return dtos
-            .Select(x => CreateContentNodeKit(x, serializer, preview));
+            .Select(x => CreateContentNodeKit(x, serializer, preview))
+            .OfType<ContentCacheNode>();
     }
 
     private IEnumerable<ContentSourceDto> GetContentSourceByDocumentTypeKey(IEnumerable<Guid> documentTypeKeys, Guid objectType)
@@ -214,7 +369,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             ? SqlContentSourcesSelect()
             : objectType == Constants.ObjectTypes.Media
                 ? SqlMediaSourcesSelect()
-                : throw new ArgumentOutOfRangeException(nameof(objectType), objectType, null);
+                : objectType == Constants.ObjectTypes.Element
+                    ? SqlElementSourcesSelect()
+                    : throw new ArgumentOutOfRangeException(nameof(objectType), objectType, null);
 
         sql.InnerJoin<NodeDto>("n")
             .On<NodeDto, ContentDto>((n, c) => n.NodeId == c.ContentTypeId, "n", "umbracoContent")
@@ -232,6 +389,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         {
             ContentCacheDataSerializerEntityType.Document => Constants.ObjectTypes.Document,
             ContentCacheDataSerializerEntityType.Media => Constants.ObjectTypes.Media,
+            ContentCacheDataSerializerEntityType.Element => Constants.ObjectTypes.Element,
             _ => throw new ArgumentOutOfRangeException(nameof(entityType), entityType, null),
         };
 
@@ -242,21 +400,29 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         foreach (ContentSourceDto row in dtos)
         {
-            if (entityType == ContentCacheDataSerializerEntityType.Document)
-            {
-                yield return CreateContentNodeKit(row, serializer, row.Published is false);
-            }
-            else
+            // Documents and elements support draft/published; media does not.
+            if (entityType == ContentCacheDataSerializerEntityType.Media)
             {
                 yield return CreateMediaNodeKit(row, serializer);
             }
-
+            else
+            {
+                ContentCacheNode? node = CreateContentNodeKit(row, serializer, row.Published is false);
+                if (node is not null)
+                {
+                    yield return node;
+                }
+            }
         }
     }
 
     /// <inheritdoc />
     public IEnumerable<Guid> GetDocumentKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
         => GetContentSourceByDocumentTypeKey(keys, Constants.ObjectTypes.Document).Where(x => x.Published == published).Select(x => x.Key);
+
+    /// <inheritdoc />
+    public IEnumerable<Guid> GetElementKeysByContentTypeKeys(IEnumerable<Guid> keys, bool published = false)
+        => GetContentSourceByDocumentTypeKey(keys, Constants.ObjectTypes.Element).Where(x => x.Published == published).Select(x => x.Key);
 
     /// <inheritdoc />
     public IEnumerable<(Guid Key, bool IsDraft)> GetDocumentKeysWithPublishedStatus(IEnumerable<Guid> contentTypeKeys)
@@ -386,92 +552,143 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             });
     }
 
+    private void RebuildDocumentDbCache(
+        IContentCacheDataSerializer serializer,
+        int groupSize,
+        IReadOnlyCollection<int>? contentTypeIds,
+        Action<Action> executeStep)
+        => RebuildPublishableDbCache(
+            serializer,
+            groupSize,
+            contentTypeIds,
+            Constants.ObjectTypes.Document,
+            GetDocumentMetadataForNodes,
+            GetDocumentCultureDataForNodes,
+            executeStep);
+
+    private void RebuildElementDbCache(
+        IContentCacheDataSerializer serializer,
+        int groupSize,
+        IReadOnlyCollection<int>? contentTypeIds,
+        Action<Action> executeStep)
+        => RebuildPublishableDbCache(
+            serializer,
+            groupSize,
+            contentTypeIds,
+            Constants.ObjectTypes.Element,
+            GetElementMetadataForNodes,
+            GetElementCultureDataForNodes,
+            executeStep);
+
     /// <summary>
-    /// Rebuilds the content database cache for documents by clearing and repopulating the cache with the latest document data.
+    /// Rebuilds the database cache for publishable content (documents or elements) by clearing and repopulating
+    /// the cache with the latest data.
     /// </summary>
     /// <remarks>
     /// Assumes content tree lock.
-    /// Uses an optimized query approach that bypasses IContent entity hydration for better performance (uses JOINs instead of
+    /// Uses an optimized query approach that bypasses entity hydration for better performance (uses JOINs instead of
     /// WHERE IN clauses for better SQL Server query plan efficiency).
     /// </remarks>
-    private void RebuildContentDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildPublishableDbCache(
+        IContentCacheDataSerializer serializer,
+        int groupSize,
+        IReadOnlyCollection<int>? contentTypeIds,
+        Guid objectType,
+        Func<List<int>, List<CacheRebuildPublishableContentDto>> getMetadata,
+        Func<List<int>, List<CacheRebuildPublishableCultureDto>> getCultureData,
+        Action<Action> executeStep)
     {
         if (contentTypeIds is null)
         {
             return;
         }
 
-        Guid contentObjectType = Constants.ObjectTypes.Document;
+        long total = 0;
+        Dictionary<int, byte>? contentTypeVariations = null;
+        Dictionary<short, string>? languageMap = null;
+        Dictionary<int, List<PropertyTypeInfo>>? propertyInfoByContentType = null;
 
-        // Remove all - if anything fails the transaction will rollback.
-        RemoveByObjectType(contentObjectType, contentTypeIds);
-
-        // Get total count for paging
-        Sql<ISqlContext> countSql = Sql()
-            .SelectCount()
-            .From<NodeDto>()
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-            .Where<NodeDto>(x => x.NodeObjectType == contentObjectType);
-
-        if (contentTypeIds.Count > 0)
+        // Delete and pre-fetch in one step, then release locks before the paging loop.
+        executeStep(() =>
         {
-            countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-        }
+            RemoveByObjectType(objectType, contentTypeIds);
 
-        var total = Database.ExecuteScalar<long>(countSql);
+            Sql<ISqlContext> countSql = Sql()
+                .SelectCount()
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == objectType);
+
+            if (contentTypeIds.Count > 0)
+            {
+                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+            }
+
+            total = Database.ExecuteScalar<long>(countSql);
+
+            if (total == 0)
+            {
+                return;
+            }
+
+            contentTypeVariations = GetContentTypeVariations(contentTypeIds);
+            languageMap = GetLanguageMap();
+            propertyInfoByContentType = GetPropertyInfoByContentType(contentTypeIds);
+        });
 
         if (total == 0)
         {
             return;
         }
 
-        // Pre-fetch content type variations for all relevant content types.
-        Dictionary<int, byte> contentTypeVariations = GetContentTypeVariations(contentTypeIds);
-
-        // Pre-fetch all languages for culture code lookup.
-        Dictionary<short, string> languageMap = GetLanguageMap();
-
-        // Pre-fetch property info (aliases and variations) for all relevant content types (including compositions).
-        Dictionary<int, List<PropertyTypeInfo>> propertyInfoByContentType = GetPropertyInfoByContentType(contentTypeIds);
-
         long processed = 0;
         long pageIndex = 0;
 
         while (processed < total)
         {
-            // Get paged content node IDs.
-            List<int> nodeIds = GetPagedContentNodeIds(contentObjectType, contentTypeIds, pageIndex, groupSize);
-            if (nodeIds.Count == 0)
+            var pageComplete = false;
+
+            executeStep(() =>
+            {
+                List<int> nodeIds = GetPagedContentNodeIds(objectType, contentTypeIds, pageIndex, groupSize);
+                if (nodeIds.Count == 0)
+                {
+                    return;
+                }
+
+                List<CacheRebuildPublishableContentDto> contentDtos = getMetadata(nodeIds);
+                List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
+                List<CacheRebuildCultureDto> cultureDtos = GetCultureDataForNodes(nodeIds);
+                List<CacheRebuildPublishableCultureDto> publishableCultureDtos = getCultureData(nodeIds);
+
+                var items = contentDtos
+                    .AsParallel()
+                    .WithDegreeOfParallelism(Environment.ProcessorCount)
+                    .SelectMany(content => BuildCacheDtosForPublishableContent(
+                        content,
+                        propertyDtos,
+                        cultureDtos,
+                        publishableCultureDtos,
+                        contentTypeVariations!,
+                        languageMap!,
+                        propertyInfoByContentType!,
+                        serializer))
+                    .ToList();
+
+                // Use "insert where not exists" to skip rows that a foreground content save
+                // may have written between the initial bulk delete and this page. This ensures
+                // the foreground's fresher data is preserved rather than overwritten.
+                BulkInsertSkipExisting(items);
+
+                processed += nodeIds.Count;
+                pageComplete = true;
+            });
+
+            if (!pageComplete)
             {
                 break;
             }
 
-            // Fetch all data for these specific nodes (using more efficient JOINs than the WHERE IN approach used in ContentRepositoryBase).
-            List<CacheRebuildDocumentDto> contentDtos = GetDocumentMetadataForNodes(nodeIds);
-            List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
-            List<CacheRebuildCultureDto> cultureDtos = GetCultureDataForNodes(nodeIds);
-            List<CacheRebuildDocumentCultureDto> documentCultureDtos = GetDocumentCultureDataForNodes(nodeIds);
-
-            // Build cache DTOs (without IContent entity hydration).
-            // Parallelize the serialization for better performance on multi-core systems (saw 5-10% improvement doing this with a large test site).
-            var items = contentDtos
-                .AsParallel()
-                .WithDegreeOfParallelism(Environment.ProcessorCount)
-                .SelectMany(content => BuildCacheDtosForDocument(
-                    content,
-                    propertyDtos,
-                    cultureDtos,
-                    documentCultureDtos,
-                    contentTypeVariations,
-                    languageMap,
-                    propertyInfoByContentType,
-                    serializer))
-                .ToList();
-
-            // Bulk insert the DTOs.
-            Database.BulkInsertRecords(items);
-
-            processed += nodeIds.Count;
             pageIndex++;
         }
     }
@@ -529,9 +746,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <summary>
-    /// Gets document metadata for the specified node IDs using efficient JOIN.
+    /// Gets document metadata for the specified node IDs using efficient JOIN. Used for documents.
     /// </summary>
-    private List<CacheRebuildDocumentDto> GetDocumentMetadataForNodes(List<int> nodeIds)
+    private List<CacheRebuildPublishableContentDto> GetDocumentMetadataForNodes(List<int> nodeIds)
     {
         // Query content metadata with both edit and published version info
         // Uses nested join pattern to ensure we only get the published ContentVersion
@@ -576,7 +793,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId, aliasRight: "pcv")
             .WhereIn<NodeDto>(x => x.NodeId, nodeIds);
 
-        return Database.Fetch<CacheRebuildDocumentDto>(sql);
+        return Database.Fetch<CacheRebuildPublishableContentDto>(sql);
     }
 
     /// <summary>
@@ -622,9 +839,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <summary>
-    /// Gets document culture variation data (edited status per culture) for the specified node IDs.
+    /// Gets document culture variation data (edited status per culture) for the specified node IDs. Used for documents.
     /// </summary>
-    private List<CacheRebuildDocumentCultureDto> GetDocumentCultureDataForNodes(List<int> nodeIds)
+    private List<CacheRebuildPublishableCultureDto> GetDocumentCultureDataForNodes(List<int> nodeIds)
     {
         Sql<ISqlContext> sql = Sql()
             .Select<DocumentCultureVariationDto>(x => x.NodeId, x => x.Edited)
@@ -633,17 +850,17 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .InnerJoin<LanguageDto>().On<DocumentCultureVariationDto, LanguageDto>((dcv, l) => dcv.LanguageId == l.Id)
             .WhereIn<DocumentCultureVariationDto>(x => x.NodeId, nodeIds);
 
-        return Database.Fetch<CacheRebuildDocumentCultureDto>(sql);
+        return Database.Fetch<CacheRebuildPublishableCultureDto>(sql);
     }
 
     /// <summary>
-    /// Builds ContentNuDto entries for a single content item (both draft and published if applicable).
+    /// Builds ContentNuDto entries for a single publishable content item (both draft and published if applicable). Used for documents and elements.
     /// </summary>
-    private IEnumerable<ContentNuDto> BuildCacheDtosForDocument(
-        CacheRebuildDocumentDto content,
+    private IEnumerable<ContentNuDto> BuildCacheDtosForPublishableContent(
+        CacheRebuildPublishableContentDto content,
         List<CacheRebuildPropertyDto> allPropertyDtos,
         List<CacheRebuildCultureDto> allCultureDtos,
-        List<CacheRebuildDocumentCultureDto> allDocumentCultureDtos,
+        List<CacheRebuildPublishableCultureDto> allDocumentCultureDtos,
         Dictionary<int, byte> contentTypeVariations,
         Dictionary<short, string> languageMap,
         Dictionary<int, List<PropertyTypeInfo>> propertyInfoByContentType,
@@ -689,7 +906,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         };
 
         ContentCacheDataSerializationResult editSerialized = serializer.Serialize(
-            new CacheRebuildDocumentAdapter(content, false),
+            new CacheRebuildPublishableContentAdapter(content, false),
             editCacheData,
             published: false);
 
@@ -726,7 +943,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             };
 
             ContentCacheDataSerializationResult pubSerialized = serializer.Serialize(
-                new CacheRebuildDocumentAdapter(content, true),
+                new CacheRebuildPublishableContentAdapter(content, true),
                 pubCacheData,
                 published: true);
 
@@ -830,7 +1047,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// </summary>
     private Dictionary<string, CultureVariation> BuildCultureDataDictionary(
         IEnumerable<CacheRebuildCultureDto> cultureDtos,
-        IEnumerable<CacheRebuildDocumentCultureDto>? documentCultureDtos,
+        IEnumerable<CacheRebuildPublishableCultureDto>? documentCultureDtos,
         bool published)
     {
         var cultureList = cultureDtos.ToList();
@@ -927,7 +1144,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// Assumes content tree lock.
     /// Uses an optimized query approach that bypasses IMedia entity hydration for better performance.
     /// </remarks>
-    private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildMediaDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds, Action<Action> executeStep)
     {
         if (contentTypeIds is null)
         {
@@ -936,58 +1153,74 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         Guid mediaObjectType = Constants.ObjectTypes.Media;
 
-        // Remove all - if anything fails the transaction will rollback.
-        RemoveByObjectType(mediaObjectType, contentTypeIds);
+        long total = 0;
+        Dictionary<int, List<string>>? propertyAliasesByContentType = null;
 
-        // Get total count for paging.
-        Sql<ISqlContext> countSql = Sql()
-            .SelectCount()
-            .From<NodeDto>()
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-            .Where<NodeDto>(x => x.NodeObjectType == mediaObjectType);
-
-        if (contentTypeIds.Count > 0)
+        executeStep(() =>
         {
-            countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-        }
+            RemoveByObjectType(mediaObjectType, contentTypeIds);
 
-        var total = Database.ExecuteScalar<long>(countSql);
+            Sql<ISqlContext> countSql = Sql()
+                .SelectCount()
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == mediaObjectType);
+
+            if (contentTypeIds.Count > 0)
+            {
+                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+            }
+
+            total = Database.ExecuteScalar<long>(countSql);
+
+            if (total == 0)
+            {
+                return;
+            }
+
+            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
+        });
 
         if (total == 0)
         {
             return;
         }
 
-        // Pre-fetch property aliases for all content types to include empty arrays for properties without values.
-        Dictionary<int, List<string>> propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
-
         long processed = 0;
         long pageIndex = 0;
 
         while (processed < total)
         {
-            // Get paged media node IDs.
-            List<int> nodeIds = GetPagedContentNodeIds(mediaObjectType, contentTypeIds, pageIndex, groupSize);
-            if (nodeIds.Count == 0)
+            var pageComplete = false;
+
+            executeStep(() =>
+            {
+                List<int> nodeIds = GetPagedContentNodeIds(mediaObjectType, contentTypeIds, pageIndex, groupSize);
+                if (nodeIds.Count == 0)
+                {
+                    return;
+                }
+
+                List<CacheRebuildContentDto> mediaDtos = GetContentMetadataForNodes(nodeIds);
+                List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
+
+                var items = mediaDtos
+                    .AsParallel()
+                    .WithDegreeOfParallelism(Environment.ProcessorCount)
+                    .Select(media => BuildCacheDtoForContent(media, propertyDtos, propertyAliasesByContentType!, serializer))
+                    .ToList();
+
+                BulkInsertSkipExisting(items);
+
+                processed += nodeIds.Count;
+                pageComplete = true;
+            });
+
+            if (!pageComplete)
             {
                 break;
             }
 
-            // Fetch all data for these specific nodes.
-            List<CacheRebuildContentDto> mediaDtos = GetContentMetadataForNodes(nodeIds);
-            List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
-
-            // Build cache DTOs (without IMedia entity hydration).
-            var items = mediaDtos
-                .AsParallel()
-                .WithDegreeOfParallelism(Environment.ProcessorCount)
-                .Select(media => BuildCacheDtoForContent(media, propertyDtos, propertyAliasesByContentType, serializer))
-                .ToList();
-
-            // Bulk insert the DTOs.
-            Database.BulkInsertRecords(items);
-
-            processed += nodeIds.Count;
             pageIndex++;
         }
     }
@@ -997,17 +1230,28 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// </summary>
     private Dictionary<int, List<PropertyTypeInfo>> GetPropertyInfoByContentType(IReadOnlyCollection<int> contentTypeIds)
     {
+        // When contentTypeIds is empty (full rebuild), we need to fetch ALL content type IDs
+        // so that property variation info and compositions are correctly resolved.
+        IReadOnlyCollection<int> effectiveContentTypeIds = contentTypeIds;
         if (contentTypeIds.Count == 0)
         {
-            return new Dictionary<int, List<PropertyTypeInfo>>();
+            Sql<ISqlContext> allTypesSql = Sql()
+                .Select<ContentTypeDto>(x => x.NodeId)
+                .From<ContentTypeDto>();
+            effectiveContentTypeIds = Database.Fetch<int>(allTypesSql);
+
+            if (effectiveContentTypeIds.Count == 0)
+            {
+                return new Dictionary<int, List<PropertyTypeInfo>>();
+            }
         }
 
         // Get the composition hierarchy: which content types compose which other content types.
         // The cmsContentType2ContentType table stores: ParentId = composed type, ChildId = composing type.
-        Dictionary<int, HashSet<int>> compositionsByChild = GetCompositionHierarchy(contentTypeIds);
+        Dictionary<int, HashSet<int>> compositionsByChild = GetCompositionHierarchy(effectiveContentTypeIds);
 
         // Build set of all content type IDs we need properties for (including all compositions).
-        var allContentTypeIds = new HashSet<int>(contentTypeIds);
+        var allContentTypeIds = new HashSet<int>(effectiveContentTypeIds);
         foreach (HashSet<int> compositions in compositionsByChild.Values)
         {
             allContentTypeIds.UnionWith(compositions);
@@ -1033,7 +1277,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         // Build the final result: for each requested content type, include its own properties
         // plus all properties from its compositions.
         var result = new Dictionary<int, List<PropertyTypeInfo>>();
-        foreach (var contentTypeId in contentTypeIds)
+        foreach (var contentTypeId in effectiveContentTypeIds)
         {
             var allProperties = new Dictionary<string, PropertyTypeInfo>(StringComparer.OrdinalIgnoreCase);
 
@@ -1099,8 +1343,10 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             .ToDictionary(g => g.Key, g => g.Select(x => x.ParentId).ToHashSet());
 
         // For each requested content type, recursively resolve all compositions.
+        // When contentTypeIds is empty (full rebuild), resolve for all child IDs in the composition table.
+        IEnumerable<int> idsToResolve = contentTypeIds.Count > 0 ? contentTypeIds : directParents.Keys;
         var result = new Dictionary<int, HashSet<int>>();
-        foreach (var contentTypeId in contentTypeIds)
+        foreach (var contentTypeId in idsToResolve)
         {
             result[contentTypeId] = GetAllCompositionsRecursive(contentTypeId, directParents);
         }
@@ -1212,7 +1458,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// Assumes content tree lock.
     /// Uses an optimized query approach that bypasses IMember entity hydration for better performance.
     /// </remarks>
-    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds)
+    private void RebuildMemberDbCache(IContentCacheDataSerializer serializer, int groupSize, IReadOnlyCollection<int>? contentTypeIds, Action<Action> executeStep)
     {
         if (contentTypeIds is null)
         {
@@ -1221,59 +1467,134 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
 
         Guid memberObjectType = Constants.ObjectTypes.Member;
 
-        // Remove all - if anything fails the transaction will rollback.
-        RemoveByObjectType(memberObjectType, contentTypeIds);
+        long total = 0;
+        Dictionary<int, List<string>>? propertyAliasesByContentType = null;
 
-        // Get total count for paging.
-        Sql<ISqlContext> countSql = Sql()
-            .SelectCount()
-            .From<NodeDto>()
-            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
-            .Where<NodeDto>(x => x.NodeObjectType == memberObjectType);
-
-        if (contentTypeIds.Count > 0)
+        executeStep(() =>
         {
-            countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
-        }
+            RemoveByObjectType(memberObjectType, contentTypeIds);
 
-        var total = Database.ExecuteScalar<long>(countSql);
+            Sql<ISqlContext> countSql = Sql()
+                .SelectCount()
+                .From<NodeDto>()
+                .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType);
+
+            if (contentTypeIds.Count > 0)
+            {
+                countSql = countSql.WhereIn<ContentDto>(x => x.ContentTypeId, contentTypeIds);
+            }
+
+            total = Database.ExecuteScalar<long>(countSql);
+            if (total == 0)
+            {
+                return;
+            }
+
+            propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
+        });
+
         if (total == 0)
         {
             return;
         }
-
-        // Pre-fetch property aliases for all content types to include empty arrays for properties without values.
-        Dictionary<int, List<string>> propertyAliasesByContentType = GetPropertyAliasesByContentType(contentTypeIds);
 
         long processed = 0;
         long pageIndex = 0;
 
         while (processed < total)
         {
-            // Get paged member node IDs.
-            List<int> nodeIds = GetPagedContentNodeIds(memberObjectType, contentTypeIds, pageIndex, groupSize);
-            if (nodeIds.Count == 0)
+            var pageComplete = false;
+
+            executeStep(() =>
+            {
+                List<int> nodeIds = GetPagedContentNodeIds(memberObjectType, contentTypeIds, pageIndex, groupSize);
+                if (nodeIds.Count == 0)
+                {
+                    return;
+                }
+
+                List<CacheRebuildContentDto> memberDtos = GetContentMetadataForNodes(nodeIds);
+                List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
+
+                var items = memberDtos
+                    .AsParallel()
+                    .WithDegreeOfParallelism(Environment.ProcessorCount)
+                    .Select(member => BuildCacheDtoForContent(member, propertyDtos, propertyAliasesByContentType!, serializer))
+                    .ToList();
+
+                BulkInsertSkipExisting(items);
+
+                processed += nodeIds.Count;
+                pageComplete = true;
+            });
+
+            if (!pageComplete)
             {
                 break;
             }
 
-            // Fetch all data for these specific nodes - reuse the content metadata method since structure is identical.
-            List<CacheRebuildContentDto> memberDtos = GetContentMetadataForNodes(nodeIds);
-            List<CacheRebuildPropertyDto> propertyDtos = GetPropertyDataForNodes(nodeIds);
-
-            // Build cache DTOs (without IMember entity hydration) - reuse the content builder since structure is identical.
-            var items = memberDtos
-                .AsParallel()
-                .WithDegreeOfParallelism(Environment.ProcessorCount)
-                .Select(member => BuildCacheDtoForContent(member, propertyDtos, propertyAliasesByContentType, serializer))
-                .ToList();
-
-            // Bulk insert the DTOs.
-            Database.BulkInsertRecords(items);
-
-            processed += nodeIds.Count;
             pageIndex++;
         }
+    }
+
+    /// <summary>
+    /// Gets element metadata for the specified node IDs using ElementDto/ElementVersionDto.
+    /// </summary>
+    private List<CacheRebuildPublishableContentDto> GetElementMetadataForNodes(List<int> nodeIds)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<NodeDto>(
+                x => x.NodeId,
+                x => x.UniqueId,
+                x => x.Text,
+                x => x.Path,
+                x => x.Level,
+                x => x.ParentId,
+                x => x.SortOrder,
+                x => x.CreateDate,
+                x => Alias(x.UserId, "CreatorId"))
+            .AndSelect<ContentDto>(x => x.ContentTypeId)
+            .AndSelect<ElementDto>(x => Alias(x.Published, "Published"))
+            .AndSelect<ContentVersionDto>(
+                x => Alias(x.Id, "EditVersionId"),
+                x => Alias(x.Text, "EditName"),
+                x => Alias(x.VersionDate, "EditVersionDate"),
+                x => Alias(x.UserId, "EditWriterId"))
+            .AndSelect<ContentVersionDto>(
+                "pcv",
+                x => Alias(x.Id, "PublishedVersionId"),
+                x => Alias(x.Text, "PublishedName"),
+                x => Alias(x.VersionDate, "PublishedVersionDate"),
+                x => Alias(x.UserId, "PublishedWriterId"))
+            .From<NodeDto>()
+            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId)
+            .InnerJoin<ElementDto>().On<NodeDto, ElementDto>((n, d) => n.NodeId == d.NodeId)
+            .InnerJoin<ContentVersionDto>().On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId && cv.Current)
+            .LeftJoin<ContentVersionDto>(
+                j => j.InnerJoin<ElementVersionDto>("pdv")
+                      .On<ContentVersionDto, ElementVersionDto>(
+                          (left, right) => left.Id == right.Id && right.Published == true, "pcv", "pdv"),
+                "pcv")
+            .On<NodeDto, ContentVersionDto>((n, cv) => n.NodeId == cv.NodeId, aliasRight: "pcv")
+            .WhereIn<NodeDto>(x => x.NodeId, nodeIds);
+
+        return Database.Fetch<CacheRebuildPublishableContentDto>(sql);
+    }
+
+    /// <summary>
+    /// Gets element culture variation data (edited status per culture) for the specified node IDs.
+    /// </summary>
+    private List<CacheRebuildPublishableCultureDto> GetElementCultureDataForNodes(List<int> nodeIds)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Select<ElementCultureVariationDto>(x => x.NodeId, x => x.Edited)
+            .AndSelect<LanguageDto>(x => Alias(x.IsoCode, "IsoCode"))
+            .From<ElementCultureVariationDto>()
+            .InnerJoin<LanguageDto>().On<ElementCultureVariationDto, LanguageDto>((dcv, l) => dcv.LanguageId == l.Id)
+            .WhereIn<ElementCultureVariationDto>(x => x.NodeId, nodeIds);
+
+        return Database.Fetch<CacheRebuildPublishableCultureDto>(sql);
     }
 
     private void RemoveByObjectType(Guid objectType, IReadOnlyCollection<int> contentTypeIds)
@@ -1308,6 +1629,80 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                         contentTypeIds.Contains(c.ContentTypeId)));
             Database.Execute(sql);
         }
+    }
+
+    /// <summary>
+    ///     Inserts <c>cmsContentNu</c> rows, preserving any that already exist. A foreground content
+    ///     save may insert a row between the initial bulk delete and this page's insert; that row
+    ///     contains fresher data and must not be overwritten by the background rebuild.
+    /// </summary>
+    /// <remarks>
+    ///     Attempts a fast bulk insert first (common case — no conflicts). If a primary key violation
+    ///     occurs (rare — a foreground save raced with this page), falls back to individual
+    ///     <c>INSERT ... WHERE NOT EXISTS</c> statements that skip existing rows.
+    /// </remarks>
+    private void BulkInsertSkipExisting(List<ContentNuDto> items)
+    {
+        if (items.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            Database.BulkInsertRecords(items);
+        }
+        catch (Exception ex) when (IsPrimaryKeyViolation(ex))
+        {
+            _logger.LogDebug(
+                ex,
+                "Bulk insert hit a primary key conflict (foreground save raced with rebuild); falling back to row-by-row insert for {Count} items",
+                items.Count);
+
+            InsertNewRows(items);
+        }
+    }
+
+    private void InsertNewRows(List<ContentNuDto> items)
+    {
+        string C(string s) => SqlSyntax.GetQuotedColumnName(s);
+        var tableName = ContentNuDto.TableName;
+        var nodeId = C(ContentNuDto.NodeIdColumnName);
+        var published = C("published");
+
+        foreach (ContentNuDto dto in items)
+        {
+            Database.Execute($@"
+                INSERT INTO [{tableName}] ({nodeId}, {published}, {C("data")}, {C("dataRaw")}, {C("rv")})
+                SELECT @0, @1, @2, @3, @4
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM [{tableName}]
+                    WHERE {nodeId} = @0 AND {published} = @1
+                )", dto.NodeId, dto.Published, (object?)dto.Data ?? DBNull.Value, (object?)dto.RawData ?? DBNull.Value, dto.Rv);
+        }
+    }
+
+    private static bool IsPrimaryKeyViolation(Exception ex)
+    {
+        // Walk the exception chain — the PK violation may be wrapped (e.g. in an AggregateException).
+        for (Exception? current = ex; current is not null; current = current.InnerException)
+        {
+            var message = current.Message;
+
+            // SQL Server: "Violation of PRIMARY KEY constraint 'PK_cmsContentNu'."
+            if (message.Contains("PRIMARY KEY constraint", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // SQLite: "UNIQUE constraint failed: cmsContentNu.nodeId, cmsContentNu.published"
+            if (message.Contains("UNIQUE constraint", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private ContentNuDto GetDtoFromCacheNode(ContentCacheNode cacheNode, bool published, IContentCacheDataSerializer serializer)
@@ -1431,7 +1826,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <summary>
-    /// Returns a slightly more optimized query to use for the document counting when paging over the content sources.
+    /// Returns a slightly more optimized query to use for the document counting when paging over the document sources.
     /// </summary>
     private Sql<ISqlContext> SqlContentSourcesCount(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
     {
@@ -1510,7 +1905,69 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
         return sql;
     }
 
-    private ContentCacheNode CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer, bool preview)
+    private Sql<ISqlContext> SqlElementSourcesSelect(Func<ISqlContext, Sql<ISqlContext>>? joins = null)
+    {
+        SqlTemplate sqlTemplate = SqlContext.Templates.Get(
+            Constants.SqlTemplates.NuCacheDatabaseDataSource.ElementSourcesSelect,
+            tsql =>
+                tsql.Select<NodeDto>(
+                        x => Alias(x.NodeId, "Id"),
+                        x => Alias(x.UniqueId, "Key"),
+                        x => Alias(x.Level, "Level"),
+                        x => Alias(x.Path, "Path"),
+                        x => Alias(x.SortOrder, "SortOrder"),
+                        x => Alias(x.ParentId, "ParentId"),
+                        x => Alias(x.CreateDate, "CreateDate"),
+                        x => Alias(x.UserId, "CreatorId"))
+                    .AndSelect<ContentDto>(x => Alias(x.ContentTypeId, "ContentTypeId"))
+                    .AndSelect<ElementDto>(x => Alias(x.Published, "Published"), x => Alias(x.Edited, "Edited"))
+                    .AndSelect<ContentVersionDto>(
+                        x => Alias(x.Id, "VersionId"),
+                        x => Alias(x.Text, "EditName"),
+                        x => Alias(x.VersionDate, "EditVersionDate"),
+                        x => Alias(x.UserId, "EditWriterId"))
+                    .AndSelect<ContentVersionDto>(
+                        "pcver",
+                        x => Alias(x.Id, "PublishedVersionId"),
+                        x => Alias(x.Text, "PubName"),
+                        x => Alias(x.VersionDate, "PubVersionDate"),
+                        x => Alias(x.UserId, "PubWriterId"))
+                    .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.Data, "EditData"))
+                    .AndSelect<ContentNuDto>("nuPub", x => Alias(x.Data, "PubData"))
+                    .AndSelect<ContentNuDto>("nuEdit", x => Alias(x.RawData, "EditDataRaw"))
+                    .AndSelect<ContentNuDto>("nuPub", x => Alias(x.RawData, "PubDataRaw"))
+                    .From<NodeDto>());
+
+        Sql<ISqlContext>? sql = sqlTemplate.Sql();
+
+        if (joins != null)
+        {
+            sql = sql.Append(joins(sql.SqlContext));
+        }
+
+        sql = sql
+            .InnerJoin<ContentDto>().On<NodeDto, ContentDto>((left, right) => left.NodeId == right.NodeId)
+            .InnerJoin<ElementDto>().On<NodeDto, ElementDto>((left, right) => left.NodeId == right.NodeId)
+            .InnerJoin<ContentVersionDto>()
+            .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId && right.Current)
+            .InnerJoin<ElementVersionDto>()
+            .On<ContentVersionDto, ElementVersionDto>((left, right) => left.Id == right.Id)
+            .LeftJoin<ContentVersionDto>(
+                j =>
+                    j.InnerJoin<ElementVersionDto>("pdver")
+                        .On<ContentVersionDto, ElementVersionDto>(
+                            (left, right) => left.Id == right.Id && right.Published == true, "pcver", "pdver"),
+                "pcver")
+            .On<NodeDto, ContentVersionDto>((left, right) => left.NodeId == right.NodeId, aliasRight: "pcver")
+            .LeftJoin<ContentNuDto>("nuEdit").On<NodeDto, ContentNuDto>(
+                (left, right) => left.NodeId == right.NodeId && right.Published == false, aliasRight: "nuEdit")
+            .LeftJoin<ContentNuDto>("nuPub").On<NodeDto, ContentNuDto>(
+                (left, right) => left.NodeId == right.NodeId && right.Published == true, aliasRight: "nuPub");
+
+        return sql;
+    }
+
+    private ContentCacheNode? CreateContentNodeKit(ContentSourceDto dto, IContentCacheDataSerializer serializer, bool preview)
     {
         if (preview)
         {
@@ -1525,35 +1982,42 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
                 _logger.LogWarning(
                     "Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.",
                     dto.Id);
+                return null;
             }
-            else
-            {
-                bool published = false;
-                ContentCacheDataModel? deserializedDraftContent =
-                    serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
-                var draftContentData = new ContentData(
-                    dto.EditName,
-                    deserializedDraftContent?.UrlSegment,
-                    dto.VersionId,
-                    dto.EditVersionDate,
-                    dto.CreatorId,
-                    dto.EditTemplateId == 0 ? null : dto.EditTemplateId,
-                    published,
-                    deserializedDraftContent?.PropertyData,
-                    deserializedDraftContent?.CultureData);
 
-                return new ContentCacheNode
-                {
-                    Id = dto.Id,
-                    Key = dto.Key,
-                    SortOrder = dto.SortOrder,
-                    CreateDate = dto.CreateDate,
-                    CreatorId = dto.CreatorId,
-                    ContentTypeId = dto.ContentTypeId,
-                    Data = draftContentData,
-                    IsDraft = true,
-                };
+            if (dto.EditName is null)
+            {
+                _logger.LogError(
+                    "Node {NodeId} has edited data but EditName is null, indicating an inconsistent database state. Skipping node.",
+                    dto.Id);
+                return null;
             }
+
+            bool published = false;
+            ContentCacheDataModel? deserializedDraftContent =
+                serializer.Deserialize(dto, dto.EditData, dto.EditDataRaw, published);
+            var draftContentData = new ContentData(
+                dto.EditName,
+                deserializedDraftContent?.UrlSegment,
+                dto.VersionId,
+                dto.EditVersionDate,
+                dto.CreatorId,
+                dto.EditTemplateId == 0 ? null : dto.EditTemplateId,
+                published,
+                deserializedDraftContent?.PropertyData,
+                deserializedDraftContent?.CultureData);
+
+            return new ContentCacheNode
+            {
+                Id = dto.Id,
+                Key = dto.Key,
+                SortOrder = dto.SortOrder,
+                CreateDate = dto.CreateDate,
+                CreatorId = dto.CreatorId,
+                ContentTypeId = dto.ContentTypeId,
+                Data = draftContentData,
+                IsDraft = true,
+            };
         }
 
         if (dto.PubData == null && dto.PubDataRaw == null)
@@ -1567,6 +2031,15 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
             _logger.LogWarning(
                 "Missing cmsContentNu published content for node {NodeId}, consider rebuilding.",
                 dto.Id);
+            return null;
+        }
+
+        if (dto.PubName is null)
+        {
+            _logger.LogError(
+                "Node {NodeId} has published data but PubName is null, indicating an inconsistent database state. Consider republishing or rebuilding the cache. Skipping node.",
+                dto.Id);
+            return null;
         }
 
         ContentCacheDataModel? deserializedContent = serializer.Deserialize(dto, dto.PubData, dto.PubDataRaw, true);
@@ -1669,7 +2142,7 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <summary>
     /// Lightweight DTO for content metadata during cache rebuild.
     /// </summary>
-    private sealed class CacheRebuildDocumentDto
+    private sealed class CacheRebuildPublishableContentDto
     {
         [Column("nodeId")]
         public int NodeId { get; set; }
@@ -1781,9 +2254,9 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <summary>
-    /// Lightweight DTO for document culture variation (edited status per culture).
+    /// Lightweight DTO for publishable content culture variation (edited status per culture). Used for documents and elements.
     /// </summary>
-    private sealed class CacheRebuildDocumentCultureDto
+    private sealed class CacheRebuildPublishableCultureDto
     {
         [Column("nodeId")]
         public int NodeId { get; set; }
@@ -1821,14 +2294,14 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <summary>
-    /// Minimal adapter for IReadOnlyContentBase to satisfy serializer requirements for documents.
+    /// Minimal adapter for IReadOnlyContentBase to satisfy serializer requirements for publishable content (documents and elements).
     /// </summary>
-    private sealed class CacheRebuildDocumentAdapter : IReadOnlyContentBase
+    private sealed class CacheRebuildPublishableContentAdapter : IReadOnlyContentBase
     {
-        private readonly CacheRebuildDocumentDto _content;
+        private readonly CacheRebuildPublishableContentDto _content;
         private readonly bool _published;
 
-        public CacheRebuildDocumentAdapter(CacheRebuildDocumentDto content, bool published)
+        public CacheRebuildPublishableContentAdapter(CacheRebuildPublishableContentDto content, bool published)
         {
             _content = content;
             _published = published;

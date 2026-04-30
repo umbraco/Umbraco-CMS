@@ -14,6 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element;
 
+/// <summary>
+/// Controller for managing elements in Umbraco that are identified by their unique key.
+/// </summary>
 [ApiVersion("1.0")]
 public class ByKeyElementController : ElementControllerBase
 {
@@ -21,6 +24,12 @@ public class ByKeyElementController : ElementControllerBase
     private readonly IElementService _elementService;
     private readonly IElementPresentationFactory _elementPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ByKeyElementController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize access to element resources.</param>
+    /// <param name="elementService">Service for retrieving element data within the CMS.</param>
+    /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
     public ByKeyElementController(
         IAuthorizationService authorizationService,
         IElementService elementService,
@@ -31,6 +40,15 @@ public class ByKeyElementController : ElementControllerBase
         _elementPresentationFactory = elementPresentationFactory;
     }
 
+    /// <summary>
+    /// Retrieves an element by its unique identifier.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique <see cref="Guid"/> of the element to retrieve.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> containing an <see cref="ElementResponseModel"/> if the element is found;
+    /// otherwise, a 404 Not Found or 403 Forbidden error response.
+    /// </returns>
     [HttpGet("{id:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(ElementResponseModel), StatusCodes.Status200OK)]

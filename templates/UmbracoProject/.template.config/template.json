@@ -35,6 +35,12 @@
             ".dockerignore",
             "entrypoint.sh"
           ]
+        },
+        {
+          "condition": "(!UseCPM)",
+          "exclude": [
+            "Directory.Packages.props"
+          ]
         }
       ]
     }
@@ -79,6 +85,29 @@
           }
         ]
       }
+    },
+    "PackageManagement": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "Central",
+      "displayName": "Package Version Management",
+      "description": "Choose how to manage NuGet package versions",
+      "choices": [
+        {
+          "choice": "Central",
+          "displayName": "Central package management",
+          "description": "Use Directory.Packages.props (recommended for new standalone projects)"
+        },
+        {
+          "choice": "PerProject",
+          "displayName": "Per project",
+          "description": "Use versions in .csproj (recommended when adding to existing projects)"
+        }
+      ]
+    },
+    "UseCPM": {
+      "type": "computed",
+      "value": "(PackageManagement == \"Central\")"
     },
     "DotnetVersion": {
       "type": "generated",

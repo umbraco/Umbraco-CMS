@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const blockListEditorName = 'TestBlockListEditor';
@@ -179,7 +179,7 @@ test('can add a background color to a block', async ({umbracoApi, umbracoUi}) =>
 test('can update a background color for a block', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const backgroundColor = '#ff0000';
-  const newBackgroundColor = '#ff4444';
+  const newBackgroundColor = '#ff4242';
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, backgroundColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].backgroundColor).toEqual(backgroundColor);
@@ -235,7 +235,7 @@ test('can add a icon color to a block', {tag: '@smoke'}, async ({umbracoApi, umb
 test('can update a icon color for a block', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const iconColor = '#ff0000';
-  const newIconColor = '#ff4444';
+  const newIconColor = '#ff4242';
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', iconColor);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);
   expect(blockData.values[0].value[0].iconColor).toEqual(iconColor);
@@ -284,7 +284,6 @@ test.skip('can update a custom stylesheet for a block', async ({umbracoApi, umbr
   await umbracoApi.stylesheet.ensureNameNotExists(secondStylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(stylesheetName);
   await umbracoApi.stylesheet.createDefaultStylesheet(secondStylesheetName);
-  
 
   await umbracoApi.dataType.createBlockListWithBlockWithCatalogueAppearance(blockListEditorName, elementTypeId, '', '', encodedStylesheetPath);
   let blockData = await umbracoApi.dataType.getByName(blockListEditorName);

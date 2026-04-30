@@ -506,6 +506,11 @@ public interface IEntityService
     IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params Guid[] keys);
 
     /// <summary>
+    ///     Gets paths for entities.
+    /// </summary>
+    IEnumerable<TreeEntityPath> GetAllPaths(IEnumerable<UmbracoObjectTypes> objectTypes, params Guid[] keys);
+
+    /// <summary>
     ///     Reserves an identifier for a key.
     /// </summary>
     /// <param name="key">They key.</param>
@@ -520,4 +525,16 @@ public interface IEntityService
     /// <param name="omitSelf">A value indicating whether to omit the entity's own key from the result.</param>
     /// <returns>The path with each ID converted to a GUID.</returns>
     Guid[] GetPathKeys(ITreeEntity entity, bool omitSelf = false) => [];
+
+    /// <summary>
+    /// Gets descendants of root for multiple object types.
+    /// </summary>
+    IEnumerable<IEntitySlim> GetPagedDescendants(
+        IEnumerable<UmbracoObjectTypes> objectTypes,
+        long pageIndex,
+        int pageSize,
+        out long totalRecords,
+        IQuery<IUmbracoEntity>? filter = null,
+        Ordering? ordering = null,
+        bool includeTrashed = true);
 }

@@ -22,9 +22,6 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 
 	#lookup: Map<string, unknown> = new Map();
 
-	@property({ type: Boolean, reflect: true })
-	readonly = false;
-
 	@property({ attribute: false })
 	editor?: Editor;
 
@@ -40,6 +37,7 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 		}
 
 		this.#statusbar = value;
+		this.#reinitializeExtensions();
 	}
 	public get statusbar(): UmbTiptapStatusbarValue {
 		return this.#statusbar;
@@ -54,14 +52,18 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 
 	override disconnectedCallback() {
 		this.#attached = false;
-		this.#extensionsController?.destroy();
-		this.#extensionsController = undefined;
 		super.disconnectedCallback();
 	}
 
+	#reinitializeExtensions() {
+		this.#extensionsController?.destroy();
+		this.#extensionsController = undefined;
+		this.#lookup.clear();
+		this.#observeExtensions();
+	}
 	#observeExtensions() {
 		if (!this.#attached) return;
-		this.#extensionsController?.destroy();
+		if (this.#extensionsController) return;
 
 		this.#extensionsController = new UmbExtensionsElementInitializer(
 			this,
@@ -95,11 +97,13 @@ export class UmbTiptapStatusbarElement extends UmbLitElement {
 		return repeat(aliases, (alias) => this.#lookup?.get(alias) ?? nothing);
 	}
 
-	static override readonly styles = css`
-		:host([readonly]) {
-			display: none;
-		}
+	override destroy(): void {
+		super.destroy();
+		this.#extensionsController?.destroy();
+		this.#extensionsController = undefined;
+	}
 
+	static override readonly styles = css`
 		:host {
 			--uui-button-height: var(--uui-size-layout-2);
 

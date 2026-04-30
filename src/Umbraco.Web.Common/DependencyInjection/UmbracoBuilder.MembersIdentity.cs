@@ -47,7 +47,8 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IdentityErrorDescriber>(),
                 factory.GetRequiredService<IExternalLoginWithKeyService>(),
                 factory.GetRequiredService<ITwoFactorLoginService>(),
-                factory.GetRequiredService<IPublishedMemberCache>()))
+                factory.GetRequiredService<IPublishedMemberCache>(),
+                factory.GetRequiredService<IExternalMemberService>()))
             .AddRoleStore<MemberRoleStore>()
             .AddRoleManager<IMemberRoleManager, MemberRoleManager>()
             .AddMemberManager<IMemberManager, MemberManager>()
@@ -63,7 +64,7 @@ public static partial class UmbracoBuilderExtensions
         services.AddScoped(x => (IMemberUserStore)x.GetRequiredService<IUserStore<MemberIdentityUser>>());
         services.AddScoped<IPasswordHasher<MemberIdentityUser>, MemberPasswordHasher>();
 
-        services.ConfigureOptions<ConfigureSecurityStampOptions>();
+        services.ConfigureOptions<ConfigureMemberSecurityStampValidatorOptions>();
         services.ConfigureOptions<ConfigureMemberCookieOptions>();
         services.AddScoped<MemberSecurityStampValidator>();
 

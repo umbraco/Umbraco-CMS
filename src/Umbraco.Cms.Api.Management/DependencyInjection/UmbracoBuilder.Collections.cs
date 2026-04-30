@@ -11,7 +11,8 @@ namespace Umbraco.Extensions
         internal static void AddCollectionBuilders(this IUmbracoBuilder builder)
         {
             builder.FlagProviders()
-                .Append<HasScheduleFlagProvider>()
+                .Append<HasDocumentScheduleFlagProvider>()
+                .Append<HasElementScheduleFlagProvider>()
                 .Append<IsProtectedFlagProvider>()
                 .Append<HasPendingChangesFlagProvider>()
                 .Append<HasCollectionFlagProvider>();
@@ -27,7 +28,8 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Gets the sign providers collection builder.
         /// </summary>
-        /// <param name="builder">The builder.</param>
+        /// <param name="builder">The Umbraco builder instance.</param>
+        /// <returns>The <see cref="FlagProviderCollectionBuilder"/> instance.</returns>
         [Obsolete("Please use the correctly named FlagProviders. Scheduled for removal in Umbraco 19.")]
         public static FlagProviderCollectionBuilder SignProviders(this IUmbracoBuilder builder)
             => builder.FlagProviders();

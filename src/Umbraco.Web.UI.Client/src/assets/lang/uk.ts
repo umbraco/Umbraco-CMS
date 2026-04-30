@@ -1265,7 +1265,8 @@ export default {
 		withTime: 'Дата і час',
 	},
 	textbox: {
-		characters_left: 'символів залишилося',
+		characters_left: 'Залишилося <strong>%0%</strong> символів.',
+		characters_exceed: 'Максимум %0% символів, <strong>%1%</strong> зайвих.',
 	},
 	translation: {
 		details: 'Подробиці перекладу',
@@ -1344,6 +1345,7 @@ export default {
 			"Ви можете змінити свій пароль для доступу до адміністративної панелі Umbraco, заповнивши нижченаведені поля та натиснувши кнопку 'Змінити пароль'",
 		changePhoto: 'Змінити аватар',
 		confirmNewPassword: 'Підтвердження нового пароля',
+		confirmPassword: 'Підтвердіть пароль',
 		contentChannel: 'Канал вмісту',
 		createAnotherUser: 'Створити ще одного користувача',
 		createDate: 'Створено',

@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models.ServerEvents;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.ServerEvents;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.ServerEvents;
 
@@ -1376,6 +1377,154 @@ internal sealed class ServerEventSenderTests
 
         // Assert
         AssertPrimaryRoutedEvent(recordingRouter, entityKey, Constants.ServerEvents.EventType.Trashed, Constants.ServerEvents.EventSource.Media);
+    }
+
+    [Test]
+    public async Task HandleAsync_ContentTypeChangedNotification_RoutesUpdatedEventForComposingTypes()
+    {
+        // Arrange
+        var deletedTypeKey = Guid.NewGuid();
+        var composingTypeKey = Guid.NewGuid();
+
+        var deletedType = Mock.Of<IContentType>(t => t.Key == deletedTypeKey);
+        var composingType = Mock.Of<IContentType>(t => t.Key == composingTypeKey);
+
+        var changes = new[]
+        {
+            new ContentTypeChange<IContentType>(deletedType, ContentTypeChangeTypes.Remove),
+            new ContentTypeChange<IContentType>(composingType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther),
+        };
+
+        var notification = new ContentTypeChangedNotification(changes, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert - only the composing type should be routed (removed types are skipped).
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(1));
+        var serverEvent = recordingRouter.RoutedEvents[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(serverEvent.EventType, Is.EqualTo(Constants.ServerEvents.EventType.Updated));
+            Assert.That(serverEvent.EventSource, Is.EqualTo(Constants.ServerEvents.EventSource.DocumentType));
+            Assert.That(serverEvent.Key, Is.EqualTo(composingTypeKey));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_ContentTypeChangedNotification_SkipsRemovedTypes()
+    {
+        // Arrange
+        var removedTypeKey = Guid.NewGuid();
+        var removedType = Mock.Of<IContentType>(t => t.Key == removedTypeKey);
+
+        var changes = new[]
+        {
+            new ContentTypeChange<IContentType>(removedType, ContentTypeChangeTypes.Remove),
+        };
+
+        var notification = new ContentTypeChangedNotification(changes, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert - no events should be routed for removed types.
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(0));
+    }
+
+    [Test]
+    public async Task HandleAsync_ContentTypeChangedNotification_SkipsCreatedTypes()
+    {
+        // Arrange
+        var createdTypeKey = Guid.NewGuid();
+        var createdType = Mock.Of<IContentType>(t => t.Key == createdTypeKey);
+
+        var changes = new[]
+        {
+            new ContentTypeChange<IContentType>(createdType, ContentTypeChangeTypes.Create),
+        };
+
+        var notification = new ContentTypeChangedNotification(changes, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert - no events should be routed for created types (already handled by Saved notification).
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(0));
+    }
+
+    [Test]
+    public async Task HandleAsync_MediaTypeChangedNotification_RoutesUpdatedEventForComposingTypes()
+    {
+        // Arrange
+        var deletedTypeKey = Guid.NewGuid();
+        var composingTypeKey = Guid.NewGuid();
+
+        var deletedType = Mock.Of<IMediaType>(t => t.Key == deletedTypeKey);
+        var composingType = Mock.Of<IMediaType>(t => t.Key == composingTypeKey);
+
+        var changes = new[]
+        {
+            new ContentTypeChange<IMediaType>(deletedType, ContentTypeChangeTypes.Remove),
+            new ContentTypeChange<IMediaType>(composingType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther),
+        };
+
+        var notification = new MediaTypeChangedNotification(changes, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert - only the composing type should be routed.
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(1));
+        var serverEvent = recordingRouter.RoutedEvents[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(serverEvent.EventType, Is.EqualTo(Constants.ServerEvents.EventType.Updated));
+            Assert.That(serverEvent.EventSource, Is.EqualTo(Constants.ServerEvents.EventSource.MediaType));
+            Assert.That(serverEvent.Key, Is.EqualTo(composingTypeKey));
+        });
+    }
+
+    [Test]
+    public async Task HandleAsync_MemberTypeChangedNotification_RoutesUpdatedEventForComposingTypes()
+    {
+        // Arrange
+        var deletedTypeKey = Guid.NewGuid();
+        var composingTypeKey = Guid.NewGuid();
+
+        var deletedType = Mock.Of<IMemberType>(t => t.Key == deletedTypeKey);
+        var composingType = Mock.Of<IMemberType>(t => t.Key == composingTypeKey);
+
+        var changes = new[]
+        {
+            new ContentTypeChange<IMemberType>(deletedType, ContentTypeChangeTypes.Remove),
+            new ContentTypeChange<IMemberType>(composingType, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther),
+        };
+
+        var notification = new MemberTypeChangedNotification(changes, new EventMessages());
+        var recordingRouter = new RecordingServerEventRouter();
+        var serverEventSender = CreateServerEventSender(recordingRouter);
+
+        // Act
+        await serverEventSender.HandleAsync(notification, CancellationToken.None);
+
+        // Assert - only the composing type should be routed.
+        Assert.That(recordingRouter.RoutedEvents, Has.Count.EqualTo(1));
+        var serverEvent = recordingRouter.RoutedEvents[0];
+        Assert.Multiple(() =>
+        {
+            Assert.That(serverEvent.EventType, Is.EqualTo(Constants.ServerEvents.EventType.Updated));
+            Assert.That(serverEvent.EventSource, Is.EqualTo(Constants.ServerEvents.EventSource.MemberType));
+            Assert.That(serverEvent.Key, Is.EqualTo(composingTypeKey));
+        });
     }
 
     private static ServerEventSender CreateServerEventSender(RecordingServerEventRouter recordingRouter) => new(recordingRouter, Mock.Of<IIdKeyMap>());

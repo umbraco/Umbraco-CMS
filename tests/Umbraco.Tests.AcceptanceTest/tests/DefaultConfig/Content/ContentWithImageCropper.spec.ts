@@ -1,4 +1,4 @@
-﻿import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
@@ -6,10 +6,7 @@ const documentTypeName = 'TestDocumentTypeForContent';
 const dataTypeName = 'Image Cropper';
 const imageFileName = 'Umbraco.png';
 const imageFilePath = './fixtures/mediaLibrary/' + imageFileName;
-const defaultFocalPoint = {
-  left: 0.5,
-  top: 0.5,
-};
+ const defaultFocalPoint = null;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);

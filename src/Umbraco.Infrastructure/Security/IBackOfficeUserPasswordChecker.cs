@@ -7,14 +7,16 @@ namespace Umbraco.Cms.Core.Security;
 public interface IBackOfficeUserPasswordChecker
 {
     /// <summary>
-    ///     Checks a password for a user
+    ///     Checks whether the specified password is valid for the given back office user.
     /// </summary>
     /// <remarks>
-    ///     This will allow a developer to auto-link a local account which is required if the user queried doesn't exist
-    ///     locally.
-    ///     The user parameter will always contain the username, if the user doesn't exist locally, the other properties will
-    ///     not be filled in.
-    ///     A developer can then create a local account by filling in the properties and using UserManager.CreateAsync
+    ///     This method allows a developer to auto-link a local account, which is required if the queried user does not exist
+    ///     locally. The <paramref name="user"/> parameter will always contain the username; if the user does not exist locally,
+    ///     the other properties will not be populated. A developer can then create a local account by filling in the properties
+    ///     and using <c>UserManager.CreateAsync</c>.
     /// </remarks>
+    /// <param name="user">The back office identity user whose password is being validated. The username will always be set; other properties may be null if the user does not exist locally.</param>
+    /// <param name="password">The password to validate against the user's credentials.</param>
+    /// <returns>A task representing the asynchronous operation. The result contains the outcome of the password check.</returns>
     Task<BackOfficeUserPasswordCheckerResult> CheckPasswordAsync(BackOfficeIdentityUser user, string password);
 }

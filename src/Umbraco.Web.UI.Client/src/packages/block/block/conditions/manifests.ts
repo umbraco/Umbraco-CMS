@@ -1,6 +1,7 @@
 import UmbBlockEntryShowContentEditCondition from './block-entry-show-content-edit.condition.js';
 import UmbBlockWorkspaceHasSettingsCondition from './block-workspace-has-settings.condition.js';
 import UmbBlockEntryIsExposedCondition from './block-workspace-is-exposed.condition.js';
+import UmbBlockWorkspaceIsReadOnlyCondition from './block-workspace-is-readonly.condition.js';
 import type { ManifestCondition } from '@umbraco-cms/backoffice/extension-api';
 
 export const manifests: Array<ManifestCondition> = [
@@ -21,5 +22,11 @@ export const manifests: Array<ManifestCondition> = [
 		name: 'Block Workspace Is Exposed Condition',
 		alias: 'Umb.Condition.BlockWorkspaceIsExposed',
 		api: UmbBlockEntryIsExposedCondition,
+	},
+	{
+		type: 'condition',
+		name: 'Block Workspace Is ReadOnly Condition',
+		alias: 'Umb.Condition.BlockWorkspaceIsReadOnly',
+		api: UmbBlockWorkspaceIsReadOnlyCondition,
 	},
 ];

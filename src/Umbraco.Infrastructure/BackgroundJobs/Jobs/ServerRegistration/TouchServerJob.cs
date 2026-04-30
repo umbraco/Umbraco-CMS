@@ -17,13 +17,28 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 /// </summary>
 public class TouchServerJob : IRecurringBackgroundJob
 {
+    /// <summary>
+    /// Gets the period that defines how often the server should be touched.
+    /// </summary>
     public TimeSpan Period { get; private set; }
+
+    /// <summary>
+    /// Gets the fixed delay interval of 15 seconds between executions of the touch server job.
+    /// This interval determines how often the server registration is updated.
+    /// </summary>
     public TimeSpan Delay { get => TimeSpan.FromSeconds(15); }
 
-    // Runs on all servers
+    /// <summary>
+    /// Gets all server roles on which this job runs. This property returns every possible <see cref="ServerRole"/> value, indicating the job runs on all server roles.
+    /// </summary>
+    /// <remarks>Runs on all servers</remarks>
     public ServerRole[] ServerRoles { get => Enum.GetValues<ServerRole>(); }
 
     private event EventHandler? _periodChanged;
+
+    /// <summary>
+    /// Occurs when the period of the TouchServerJob changes.
+    /// </summary>
     public event EventHandler PeriodChanged
     {
         add { _periodChanged += value; }
@@ -69,6 +84,11 @@ public class TouchServerJob : IRecurringBackgroundJob
         });
     }
 
+    /// <summary>
+    /// Executes the job that updates the server registration by touching the server record in the database.
+    /// This keeps the server's registration active and ensures its status remains current.
+    /// </summary>
+    /// <returns>A completed task when the job has finished running.</returns>
     public Task RunJobAsync()
     {
 

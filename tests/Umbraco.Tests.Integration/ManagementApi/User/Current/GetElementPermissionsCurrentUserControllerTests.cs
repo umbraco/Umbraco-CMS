@@ -25,6 +25,7 @@ public class GetElementPermissionsCurrentUserControllerTests : ManagementApiUser
             name: Guid.NewGuid().ToString(),
             alias: Guid.NewGuid().ToString());
         contentType.IsElement = true;
+        contentType.AllowedInLibrary = true;
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Content

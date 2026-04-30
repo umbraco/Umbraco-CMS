@@ -1,4 +1,4 @@
-import {ConstantHelper, test, AliasHelper} from '@umbraco/playwright-testhelpers';
+import {ConstantHelper, test, AliasHelper} from '@umbraco/acceptance-test-helpers';
 
 // Content
 const englishContentName = 'English Content';

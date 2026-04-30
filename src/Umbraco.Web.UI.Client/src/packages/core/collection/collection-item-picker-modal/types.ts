@@ -10,6 +10,7 @@ export interface UmbCollectionItemPickerModalCollectionConfig<FilterArgsType = R
 	alias?: string;
 	menuAlias?: string;
 	filterArgs?: FilterArgsType;
+	views?: Array<{ alias: string }>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

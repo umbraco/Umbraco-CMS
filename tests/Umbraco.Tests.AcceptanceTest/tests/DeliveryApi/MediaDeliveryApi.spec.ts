@@ -1,5 +1,5 @@
 import {expect} from '@playwright/test';
-import {test, AliasHelper} from '@umbraco/playwright-testhelpers';
+import {test, AliasHelper} from '@umbraco/acceptance-test-helpers';
 
 // Media Folders
 const rootMediaFolderName = 'RootMediaFolder';

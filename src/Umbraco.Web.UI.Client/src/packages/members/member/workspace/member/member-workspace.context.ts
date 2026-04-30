@@ -2,6 +2,7 @@ import { UmbMemberValidationRepository, type UmbMemberDetailRepository } from '.
 import type { UmbMemberDetailModel, UmbMemberVariantModel } from '../../types.js';
 import { UmbMemberPropertyDatasetContext } from '../../property-dataset-context/member-property-dataset.context.js';
 import { UMB_MEMBER_ENTITY_TYPE, UMB_MEMBER_ROOT_ENTITY_TYPE } from '../../entity.js';
+import { UmbMemberKind } from '../../utils/index.js';
 import { UMB_MEMBER_DETAIL_REPOSITORY_ALIAS } from '../../repository/detail/manifests.js';
 import { UMB_CREATE_MEMBER_WORKSPACE_PATH_PATTERN, UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import {
@@ -9,7 +10,11 @@ import {
 	UMB_MEMBER_WORKSPACE_VIEW_MEMBER_ALIAS,
 	UMB_MEMBER_DETAIL_MODEL_VARIANT_SCAFFOLD,
 } from './constants.js';
-import { UmbMemberTypeDetailRepository, type UmbMemberTypeDetailModel } from '@umbraco-cms/backoffice/member-type';
+import {
+	UMB_MEMBER_TYPE_ENTITY_TYPE,
+	UmbMemberTypeDetailRepository,
+	type UmbMemberTypeDetailModel,
+} from '@umbraco-cms/backoffice/member-type';
 import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
@@ -20,6 +25,7 @@ import { UmbContentDetailWorkspaceContextBase, type UmbContentWorkspaceContext }
 import { ensurePathEndsWithSlash } from '@umbraco-cms/backoffice/utils';
 import { UmbValueValidator } from '@umbraco-cms/backoffice/validation';
 import type { UmbValueValidatorArgs } from '@umbraco-cms/backoffice/validation';
+import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 
 type ContentModel = UmbMemberDetailModel;
 type ContentTypeModel = UmbMemberTypeDetailModel;
@@ -36,8 +42,11 @@ export class UmbMemberWorkspaceContext
 	readonly contentTypeUnique = this._data.createObservablePartOfCurrent((data) => data?.memberType.unique);
 	readonly contentTypeIcon = this._data.createObservablePartOfCurrent((data) => data?.memberType.icon);
 	readonly kind = this._data.createObservablePartOfCurrent((data) => data?.kind);
+
+	#entityContentTypeContext = new UmbEntityContentTypeEntityContext(this);
 	readonly createDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].createDate);
 	readonly updateDate = this._data.createObservablePartOfCurrent((data) => data?.variants[0].updateDate);
+	readonly profileData = this._data.createObservablePartOfCurrent((data) => data?.profileData);
 
 	constructor(host: UmbControllerHost) {
 		super(host, {
@@ -53,13 +62,18 @@ export class UmbMemberWorkspaceContext
 		this.observe(
 			this.contentTypeUnique,
 			(unique) => {
-				if (unique) {
+				// External-only members have no content type (empty Guid).
+				const hasContentType = unique && unique !== '00000000-0000-0000-0000-000000000000';
+				this.#entityContentTypeContext.setEntityType(hasContentType ? UMB_MEMBER_TYPE_ENTITY_TYPE : undefined);
+				this.#entityContentTypeContext.setUnique(hasContentType ? unique : undefined);
+				if (hasContentType) {
 					this.structure.loadType(unique);
 				}
 			},
 			null,
 		);
 
+		// TODO: This is done by the content detail base class, so we can remove it from there and only do it here. [NL]
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
 
@@ -174,20 +188,29 @@ export class UmbMemberWorkspaceContext
 			preset: {
 				memberType: {
 					unique: memberTypeUnique,
-					icon: 'icon-user',
 				},
 			},
 		});
 	}
 
-	/**
-	 * Gets the unique identifier of the content type.
-	 * @deprecated Use `getContentTypeUnique` instead.
-	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbMemberWorkspaceContext
-	 */
-	getContentTypeId(): string | undefined {
-		return this.getContentTypeUnique();
+	protected override async _processIncomingData(data: ContentModel): Promise<ContentModel> {
+		// External-only members have no content type — skip the base class's
+		// content type loading which would 404 on the empty Guid.
+		if (data.kind === UmbMemberKind.EXTERNAL_ONLY) {
+			return data;
+		}
+
+		return super._processIncomingData(data);
+	}
+
+	override async submit() {
+		// External-only members cannot be saved through the backoffice.
+		const data = this.getData();
+		if (data?.kind === UmbMemberKind.EXTERNAL_ONLY) {
+			throw new Error('External-only members cannot be modified through the backoffice.');
+		}
+
+		return super.submit();
 	}
 
 	/**

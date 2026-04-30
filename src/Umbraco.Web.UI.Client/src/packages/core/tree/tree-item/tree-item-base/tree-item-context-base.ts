@@ -10,8 +10,8 @@ import { ensureSlash } from '@umbraco-cms/backoffice/router';
 import { map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
-import { UmbDeprecation, debounce } from '@umbraco-cms/backoffice/utils';
-import { UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
+import { debounce } from '@umbraco-cms/backoffice/utils';
+import { UmbEntityContext, UmbParentEntityContext } from '@umbraco-cms/backoffice/entity';
 import { UMB_SECTION_CONTEXT } from '@umbraco-cms/backoffice/section';
 import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -72,6 +72,7 @@ export abstract class UmbTreeItemContextBase<
 
 	#sectionContext?: typeof UMB_SECTION_CONTEXT.TYPE;
 
+	#entityContext = new UmbEntityContext(this);
 	#parentContext = new UmbParentEntityContext(this);
 
 	#hasActiveDescendant = new UmbBooleanState(undefined);
@@ -125,24 +126,11 @@ export abstract class UmbTreeItemContextBase<
 		return (this._treeItem.getValue() as any)?.ancestors;
 	}
 
-	/**
-	 * Returns the manifest.
-	 * @returns {ManifestCollection}
-	 * @memberof UmbTreeItemContextBase
-	 * @deprecated Use the `.manifest` property instead.
-	 */
-	public getManifest() {
-		new UmbDeprecation({
-			removeInVersion: '18.0.0',
-			deprecated: 'getManifest',
-			solution: 'Use .manifest property instead',
-		}).warn();
-		return this.#manifest;
-	}
-
 	public setTreeItem(treeItem: TreeItemType | undefined) {
 		if (!treeItem) {
 			this._treeItem.setValue(undefined);
+			this.#entityContext.setEntityType(undefined);
+			this.#entityContext.setUnique(null);
 			return;
 		}
 
@@ -152,6 +140,9 @@ export abstract class UmbTreeItemContextBase<
 
 		if (!treeItem.entityType) throw new Error('Could not create tree item context, tree item type is missing');
 		this.entityType = treeItem.entityType;
+
+		this.#entityContext.setEntityType(treeItem.entityType);
+		this.#entityContext.setUnique(treeItem.unique);
 
 		this._treeItemChildrenManager.setTreeItem(treeItem);
 		this.#treeItemExpansionManager.setTreeItem(treeItem);
@@ -180,14 +171,6 @@ export abstract class UmbTreeItemContextBase<
 	public loadChildren = (): Promise<void> => this._treeItemChildrenManager.loadChildren();
 
 	public reloadChildren = (): Promise<void> => this._treeItemChildrenManager.reloadChildren();
-
-	/**
-	 * Load more children of the tree item
-	 * @deprecated Use `loadNextItems` instead. Will be removed in v18.0.0.
-	 * @memberof UmbTreeItemContextBase
-	 * @returns {Promise<void>}
-	 */
-	public loadMore = (): Promise<void> => this._treeItemChildrenManager.loadNextChildren();
 
 	/**
 	 * Load previous items of the tree item
@@ -266,6 +249,7 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeFoldersOnly();
+			this.#observeAdditionalRequestArgs();
 			this.#observeActive();
 		}).asPromise();
 	}
@@ -293,7 +277,7 @@ export abstract class UmbTreeItemContextBase<
 	}
 
 	#observeIsSelected() {
-		if (!this.treeContext || !this.unique) return;
+		if (!this.treeContext || this.unique === undefined) return;
 
 		this.observe(
 			this.treeContext.selection.selection.pipe(map((selection) => selection.includes(this.unique!))),
@@ -313,6 +297,19 @@ export abstract class UmbTreeItemContextBase<
 				this._treeItemChildrenManager.setFoldersOnly(foldersOnly ?? false);
 			},
 			'observeFoldersOnly',
+		);
+	}
+
+	#observeAdditionalRequestArgs() {
+		if (this.unique === undefined) return;
+
+		this.observe(
+			this.treeContext?.additionalRequestArgs,
+			(additionalRequestArgs) => {
+				if (!additionalRequestArgs) return;
+				this._treeItemChildrenManager.setAdditionalRequestArgs(additionalRequestArgs);
+			},
+			'observeAdditionalRequestArgs',
 		);
 	}
 

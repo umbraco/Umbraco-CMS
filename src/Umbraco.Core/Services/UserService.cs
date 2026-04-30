@@ -51,6 +51,7 @@ internal partial class UserService : RepositoryService, IUserService
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
+    private readonly IBackOfficeUserReader _backOfficeUserReader;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserService" /> class.
@@ -74,6 +75,7 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="isoCodeValidator">The validator for ISO codes.</param>
     /// <param name="forgotPasswordSender">The sender for forgot password emails.</param>
     /// <param name="userIdKeyResolver">The resolver for user ID to key mappings.</param>
+    /// <param name="backOfficeUserReader">The shared reader used for back office user lookups.</param>
     public UserService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -93,7 +95,8 @@ internal partial class UserService : RepositoryService, IUserService
         IOptions<ContentSettings> contentSettings,
         IIsoCodeValidator isoCodeValidator,
         IUserForgotPasswordSender forgotPasswordSender,
-        IUserIdKeyResolver userIdKeyResolver)
+        IUserIdKeyResolver userIdKeyResolver,
+        IBackOfficeUserReader backOfficeUserReader)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -109,6 +112,7 @@ internal partial class UserService : RepositoryService, IUserService
         _isoCodeValidator = isoCodeValidator;
         _forgotPasswordSender = forgotPasswordSender;
         _userIdKeyResolver = userIdKeyResolver;
+        _backOfficeUserReader = backOfficeUserReader;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
@@ -905,6 +909,14 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.MediaStartNodeNotFound, existingUser);
         }
 
+        List<int>? startElementIds = GetIdsFromKeys(model.ElementStartNodeKeys, UmbracoObjectTypes.ElementContainer);
+
+        if (startElementIds is null || startElementIds.Count != model.ElementStartNodeKeys.Count)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.ElementStartNodeNotFound, existingUser);
+        }
+
         if (model.HasContentRootAccess)
         {
             startContentIds.Add(Constants.System.Root);
@@ -913,6 +925,11 @@ internal partial class UserService : RepositoryService, IUserService
         if (model.HasMediaRootAccess)
         {
             startMediaIds.Add(Constants.System.Root);
+        }
+
+        if (model.HasElementRootAccess)
+        {
+            startElementIds.Add(Constants.System.Root);
         }
 
         Attempt<string?> isAuthorized = _userEditorAuthorizationHelper.IsAuthorized(
@@ -939,7 +956,7 @@ internal partial class UserService : RepositoryService, IUserService
         // TODO: This probably shouldn't live here, once we have user content start nodes as keys this can be moved to a mapper
         // Alternatively it should be a map definition, but then we need to use entity service to resolve the IDs
         // TODO: Add auditing
-        IUser updated = MapUserUpdate(model, userGroups, existingUser, startContentIds, startMediaIds);
+        IUser updated = MapUserUpdate(model, userGroups, existingUser, startContentIds, startMediaIds, startElementIds);
         UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
 
         if (saveStatus is not UserOperationStatus.Success)
@@ -949,7 +966,39 @@ internal partial class UserService : RepositoryService, IUserService
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Success, updated);
+    }
 
+    /// <inheritdoc/>
+    public async Task<Attempt<IUser?, UserOperationStatus>> UpdateProfileAsync(Guid userKey, UserUpdateProfileModel model)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        IUser? existingUser = await userStore.GetAsync(userKey);
+
+        if (existingUser is null)
+        {
+            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, existingUser);
+        }
+
+        UserOperationStatus validationStatus = ValidateUserProfileUpdateModel(model);
+        if (validationStatus is not UserOperationStatus.Success)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(validationStatus, existingUser);
+        }
+
+        IUser updated = MapUserProfileUpdate(model, existingUser);
+        UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
+
+        if (saveStatus is not UserOperationStatus.Success)
+        {
+            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(saveStatus, existingUser);
+        }
+
+        scope.Complete();
+        return Attempt.SucceedWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Success, updated);
     }
 
     /// <inheritdoc/>
@@ -1005,13 +1054,15 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="target">The target user to update.</param>
     /// <param name="startContentIds">The content start node IDs.</param>
     /// <param name="startMediaIds">The media start node IDs.</param>
+    /// <param name="startElementIds">The element start node IDs.</param>
     /// <returns>The updated <see cref="IUser" />.</returns>
     private IUser MapUserUpdate(
         UserUpdateModel source,
         ISet<IUserGroup> sourceUserGroups,
         IUser target,
         List<int> startContentIds,
-        List<int> startMediaIds)
+        List<int> startMediaIds,
+        List<int> startElementIds)
     {
         target.Name = source.Name;
         target.Language = source.LanguageIsoCode;
@@ -1019,6 +1070,7 @@ internal partial class UserService : RepositoryService, IUserService
         target.Username = source.UserName;
         target.StartContentIds = startContentIds.ToArray();
         target.StartMediaIds = startMediaIds.ToArray();
+        target.StartElementIds = startElementIds.ToArray();
 
         target.ClearGroups();
         foreach (IUserGroup group in sourceUserGroups)
@@ -1079,6 +1131,35 @@ internal partial class UserService : RepositoryService, IUserService
         }
 
         return UserOperationStatus.Success;
+    }
+
+    /// <summary>
+    ///     Validates a user profile update model.
+    /// </summary>
+    /// <param name="model">The profile update model to validate.</param>
+    /// <returns>The <see cref="UserOperationStatus" /> indicating validation result.</returns>
+    private UserOperationStatus ValidateUserProfileUpdateModel(UserUpdateProfileModel model)
+    {
+        if (_isoCodeValidator.IsValid(model.LanguageIsoCode) is false)
+        {
+            return UserOperationStatus.InvalidIsoCode;
+        }
+
+        return UserOperationStatus.Success;
+    }
+
+    /// <summary>
+    ///     Maps user profile update model properties to an existing user.
+    /// </summary>
+    /// <param name="source">The source update profile model.</param>
+    /// <param name="target">The target user to update.</param>
+    /// <returns>The updated <see cref="IUser" />.</returns>
+    private IUser MapUserProfileUpdate(
+        UserUpdateProfileModel source,
+        IUser target)
+    {
+        target.Language = source.LanguageIsoCode;
+        return target;
     }
 
     /// <summary>
@@ -1695,10 +1776,7 @@ internal partial class UserService : RepositoryService, IUserService
             return Array.Empty<IUser>();
         }
 
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
+        return _backOfficeUserReader.GetAllInGroup(groupId.Value);
     }
 
     /// <inheritdoc/>
@@ -1739,30 +1817,15 @@ internal partial class UserService : RepositoryService, IUserService
 
     /// <inheritdoc/>
     public IUser? GetUserById(int id)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAsync(id).GetAwaiter().GetResult();
-    }
+        => _backOfficeUserReader.GetById(id);
 
     /// <inheritdoc/>
     public Task<IUser?> GetAsync(Guid key)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetAsync(key);
-    }
+        => Task.FromResult(_backOfficeUserReader.GetByKey(key));
 
     /// <inheritdoc/>
     public Task<IEnumerable<IUser>> GetAsync(IEnumerable<Guid> keys)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetUsersAsync(keys.ToArray());
-    }
+        => Task.FromResult(_backOfficeUserReader.GetManyByKey(keys));
 
     /// <inheritdoc/>
     public async Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLinkedLoginsAsync(Guid userKey)
@@ -1787,12 +1850,7 @@ internal partial class UserService : RepositoryService, IUserService
 
     /// <inheritdoc/>
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
-    {
-        using IServiceScope scope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        return backOfficeUserStore.GetUsersAsync(ids).GetAwaiter().GetResult();
-    }
+        => ids is null ? Enumerable.Empty<IUser>() : _backOfficeUserReader.GetManyById(ids);
 
     /// <inheritdoc/>
     public void ReplaceUserGroupPermissions(int groupId, ISet<string> permissions, params int[] entityIds)
@@ -2052,7 +2110,8 @@ internal partial class UserService : RepositoryService, IUserService
             return Attempt.FailWithStatus(failedOperationStatus, Enumerable.Empty<NodePermissions>());
         }
 
-        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions = await GetPermissionsAsync(userKey, idAttempt.Result);
+        Attempt<IEnumerable<NodePermissions>, UserOperationStatus> permissions =
+            await GetPermissionsAsync(userKey, idAttempt.Result, objectTypes);
         scope.Complete();
 
         return permissions;
@@ -2063,29 +2122,65 @@ internal partial class UserService : RepositoryService, IUserService
     /// </summary>
     /// <param name="userKey">The key of the user to get permissions for.</param>
     /// <param name="nodes">A dictionary mapping node keys to node IDs.</param>
+    /// <param name="objectTypes">The object types of the nodes.</param>
     /// <returns>An attempt containing the permissions or an error status.</returns>
-    private async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(Guid userKey, Dictionary<Guid, int> nodes)
+    private async Task<Attempt<IEnumerable<NodePermissions>, UserOperationStatus>> GetPermissionsAsync(
+        Guid userKey,
+        Dictionary<Guid, int> nodes,
+        IEnumerable<UmbracoObjectTypes> objectTypes)
     {
-        IUser? user = await GetAsync(userKey);
+        if (nodes.Count == 0)
+        {
+            return Attempt.SucceedWithStatus(UserOperationStatus.Success, Enumerable.Empty<NodePermissions>());
+        }
 
+        IUser? user = await GetAsync(userKey);
         if (user is null)
         {
             return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, Enumerable.Empty<NodePermissions>());
         }
 
-        EntityPermissionCollection permissionsCollection = _userGroupRepository.GetPermissions(
-            user.Groups.ToArray(),
-            true,
-            nodes.Select(x => x.Value).ToArray());
+        var nodeIds = nodes.Values.ToArray();
 
-        var results = new List<NodePermissions>();
-        foreach (KeyValuePair<Guid, int> node in nodes)
+        // Use GetAllPaths (lighter query returning only Id, Path, Key) instead of GetAll (full IEntitySlim).
+        TreeEntityPath[] entityPaths = objectTypes
+            .SelectMany(objectType => _entityService.GetAllPaths(objectType, nodeIds))
+            .DistinctBy(entity => entity.Key)
+            .ToArray();
+
+        if (entityPaths.Length == 0)
         {
-            ISet<string> permissions = permissionsCollection.GetAllPermissions(node.Value);
-            results.Add(new NodePermissions { NodeKey = node.Key, Permissions = permissions });
+            return Attempt.SucceedWithStatus(UserOperationStatus.Success, Enumerable.Empty<NodePermissions>());
         }
 
-        return Attempt.SucceedWithStatus<IEnumerable<NodePermissions>, UserOperationStatus>(UserOperationStatus.Success, results);
+        // Collect all unique node IDs from all entity paths for a single batch query.
+        var pathDataByKey = new Dictionary<Guid, int[]>();
+        var allUniqueNodeIds = new HashSet<int>();
+        foreach (TreeEntityPath entityPath in entityPaths)
+        {
+            int[] pathIds = entityPath.Path.GetIdsFromPathReversed();
+            pathDataByKey[entityPath.Key] = pathIds;
+            allUniqueNodeIds.UnionWith(pathIds);
+        }
+
+        // Single batch permission query for all unique node IDs.
+        EntityPermissionCollection allPermissions = GetPermissions(user, [.. allUniqueNodeIds]);
+
+        // Per-entity in-memory resolution using the batch results.
+        var results = new NodePermissions[entityPaths.Length];
+        for (var i = 0; i < entityPaths.Length; i++)
+        {
+            int[] pathIds = pathDataByKey[entityPaths[i].Key];
+            var pathNodeIdSet = new HashSet<int>(pathIds);
+            EntityPermission[] relevantPermissions = allPermissions
+                .Where(p => pathNodeIdSet.Contains(p.EntityId))
+                .ToArray();
+
+            EntityPermissionSet permissionSet = CalculatePermissionsForPathForUser(relevantPermissions, pathIds);
+            results[i] = new NodePermissions { NodeKey = entityPaths[i].Key, Permissions = permissionSet.GetAllPermissions() };
+        }
+
+        return Attempt.SucceedWithStatus(UserOperationStatus.Success, results.AsEnumerable());
     }
 
     /// <summary>
@@ -2229,10 +2324,10 @@ internal partial class UserService : RepositoryService, IUserService
         }
 
         // collect all permissions structures for all nodes for all groups belonging to the user
-        EntityPermission[] groupPermissions = GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
+        EntityPermission[] groupPermissions =
+            GetPermissionsForPath(user.Groups.ToArray(), nodeIds, true).ToArray();
 
         return CalculatePermissionsForPathForUser(groupPermissions, nodeIds);
-
     }
 
     /// <inheritdoc/>

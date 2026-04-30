@@ -12,12 +12,20 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Api.Management.Controllers.LogViewer;
 
+/// <summary>
+/// Provides API endpoints for viewing logs that use all message templates.
+/// </summary>
 [ApiVersion("1.0")]
 public class AllMessageTemplateLogViewerController : LogViewerControllerBase
 {
     private readonly ILogViewerService _logViewerService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllMessageTemplateLogViewerController"/> class.
+    /// </summary>
+    /// <param name="logViewerService">An instance of <see cref="ILogViewerService"/> used to interact with log data.</param>
+    /// <param name="umbracoMapper">An instance of <see cref="IUmbracoMapper"/> used for mapping between models.</param>
     public AllMessageTemplateLogViewerController(ILogViewerService logViewerService, IUmbracoMapper umbracoMapper)
     {
         _logViewerService = logViewerService;

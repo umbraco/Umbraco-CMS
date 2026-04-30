@@ -69,15 +69,6 @@ public interface IDomainService : IService
     Attempt<OperationResult?> Save(IDomain domainEntity);
 
     /// <summary>
-    ///     Sorts a collection of domains.
-    /// </summary>
-    /// <param name="items">The domains to sort.</param>
-    /// <returns>An attempt containing the operation result.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult?> Sort(IEnumerable<IDomain> items)
-        => Attempt.Fail(new OperationResult(OperationResultType.Failed, new EventMessages())); // TODO Remove default implmentation in a future version
-
-    /// <summary>
     ///     Gets all assigned domains for a content item.
     /// </summary>
     /// <param name="contentKey">The unique identifier of the content item.</param>

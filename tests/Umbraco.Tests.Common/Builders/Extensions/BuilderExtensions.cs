@@ -300,6 +300,13 @@ public static class BuilderExtensions
         return builder;
     }
 
+    public static T WithAllowedInLibrary<T>(this T builder, bool allowedInLibrary)
+        where T : IWithAllowedInLibraryBuilder
+    {
+        builder.AllowedInLibrary = allowedInLibrary;
+        return builder;
+    }
+
     public static T WithSegment<T>(this T builder, string segment)
         where T : IWithSegmentBuilder
     {

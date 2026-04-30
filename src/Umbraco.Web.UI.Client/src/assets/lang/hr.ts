@@ -1762,6 +1762,7 @@ export default {
 		noLockouts: 'nije zaključan',
 		noPasswordChange: 'Lozinka nije promijenjena',
 		confirmNewPassword: 'Potvrdite novu lozinku',
+		confirmPassword: 'Potvrdi lozinku',
 		changePasswordDescription:
 			'Možete promijeniti svoju lozinku za pristup Umbraco Back Officeu tako da ispunite donji obrazac i kliknete gumb "Promjeni lozinku"',
 		contentChannel: 'Kanal sadržaja',
@@ -2044,7 +2045,8 @@ export default {
 		openBackofficeSearch: 'Otvorite backoffice pretragu',
 		openCloseBackofficeHelp: 'Otvori/Zatvori pomoć za backoffice',
 		openCloseBackofficeProfileOptions: 'Opcije otvaranja/zatvaranja profila',
-		profileOptions: 'Opcije profila',
+		profileOptions: 'Korisnički profil za %0% (%1%)',
+		profileOptionsDefault: 'Korisnički profil',
 		assignDomainDescription: 'Postavite kulturu i imena hostova za %0%',
 		createDescription: 'Kreirajte novi čvor ispod %0%',
 		protectDescription: 'Postavite ograničenja pristupa uključena %0%',

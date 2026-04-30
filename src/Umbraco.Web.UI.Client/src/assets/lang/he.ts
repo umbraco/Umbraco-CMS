@@ -761,6 +761,8 @@ export default {
 		categoryField: 'שדה קטגוריה',
 		changePassword: 'שנה את הסיסמה שלך',
 		changePasswordDescription: "בעמוד זה ניתן לשנות את הסיסמה שלך ולאחר מכן ללחוץ על הכפתור 'שנה סיסמה'\t למטה",
+		confirmNewPassword: 'אשר סיסמה חדשה',
+		confirmPassword: 'אשר סיסמה',
 		contentChannel: 'ערוץ תוכן',
 		descriptionField: 'שדה תיאור',
 		disabled: 'נטרל משתמש',
