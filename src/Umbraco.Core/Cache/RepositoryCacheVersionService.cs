@@ -45,7 +45,6 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
 
         var cacheKey = GetCacheKey<TEntity>();
 
-        // The cache version accessor will take a read lock if the version is not in request cache, so we don't need to take one here.
         RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionAccessor.GetAsync(cacheKey);
 
         if (databaseVersion?.Version is null)
@@ -110,7 +109,6 @@ internal class RepositoryCacheVersionService : IRepositoryCacheVersionService
     public async Task SetCachesSyncedAsync()
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        scope.ReadLock(Constants.Locks.CacheVersion);
 
         // We always sync all caches versions, so it's safe to assume all caches are synced at this point.
         IEnumerable<RepositoryCacheVersion> cacheVersions = await _repositoryCacheVersionRepository.GetAllAsync();
