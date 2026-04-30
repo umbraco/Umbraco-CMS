@@ -147,13 +147,7 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
         }
 
         Guid contextId = context.InstanceId;
-        if (_scopeVersionCaches.TryGetValue(contextId, out ConcurrentDictionary<string, Guid>? cache))
-        {
-            return cache;
-        }
-
-        cache = new ConcurrentDictionary<string, Guid>();
-        _scopeVersionCaches[contextId] = cache;
+        ConcurrentDictionary<string, Guid> cache = _scopeVersionCaches.GetOrAdd(contextId, _ => new ConcurrentDictionary<string, Guid>());
 
         // Enlist is used here for its intended purpose: lifecycle cleanup on scope exit.
         context.Enlist(
