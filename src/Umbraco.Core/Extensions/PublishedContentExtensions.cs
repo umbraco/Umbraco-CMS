@@ -75,41 +75,29 @@ public static class PublishedContentExtensions
     [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 18.")]
     public static string? UrlSegment(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
     {
-        if (content == null)
+        ArgumentNullException.ThrowIfNull(content);
+
+        // The obsolete accessor only meaningfully applies to documents — the documented replacement is
+        // IDocumentUrlService, and media/members never had user-facing URL segments.
+        if (content.ItemType != PublishedItemType.Content)
         {
-            throw new ArgumentNullException(nameof(content));
+            return null;
         }
 
         string effectiveCulture = content.ContentType.VariesByCulture() is false
             ? string.Empty
             : culture ?? variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
 
-        // Delegate to IDocumentUrlService so this obsolete accessor agrees with IPublishedContent.Url(),
-        // which routes through the same service. Skip for variant content with no resolved culture —
-        // the service would do a fruitless ILanguageService.GetAsync("") lookup before falling through
-        // to a null result, which is the same answer the legacy Cultures lookup below produces.
-        if (content.ItemType == PublishedItemType.Content
-            && (content.ContentType.VariesByCulture() is false || effectiveCulture.Length != 0))
+        // Variant content with no resolved culture has no associated segment; avoid an unnecessary
+        // ILanguageService.GetAsync("") lookup inside the service.
+        if (content.ContentType.VariesByCulture() && effectiveCulture.Length == 0)
         {
-            IDocumentUrlService? documentUrlService = StaticServiceProvider.Instance?.GetService<IDocumentUrlService>();
-            if (documentUrlService is not null && documentUrlService.IsInitialized)
-            {
-                var isDraft = content.IsDraft(effectiveCulture.Length == 0 ? null : effectiveCulture);
-                return documentUrlService.GetUrlSegment(content.Key, effectiveCulture, isDraft);
-            }
+            return null;
         }
 
-        // Fallback for media/members or when the service is not available (e.g. during boot).
-        if (content.ContentType.VariesByCulture() is false)
-        {
-            return content.Cultures.TryGetValue(string.Empty, out PublishedCultureInfo? invariantInfos)
-                ? invariantInfos.UrlSegment
-                : null;
-        }
-
-        return effectiveCulture.Length != 0 && content.Cultures.TryGetValue(effectiveCulture, out PublishedCultureInfo? infos)
-            ? infos.UrlSegment
-            : null;
+        IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
+        var isDraft = content.IsDraft(effectiveCulture.Length == 0 ? null : effectiveCulture);
+        return documentUrlService.GetUrlSegment(content.Key, effectiveCulture, isDraft);
     }
 
     #endregion
