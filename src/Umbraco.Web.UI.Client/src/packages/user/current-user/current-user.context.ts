@@ -40,16 +40,23 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		});
 	}
 
+	#loadWasCalled = false;
 	/**
 	 * Loads the current user
 	 */
 	public async load() {
+		if (this.#loadWasCalled) return;
+		this.#loadWasCalled = true;
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
 		if (asObservable) {
-			await this.observe(asObservable(), (currentUser) => {
-				this.#currentUser?.setValue(currentUser);
-			})
+			await this.observe(
+				asObservable(),
+				(currentUser) => {
+					this.#currentUser?.setValue(currentUser);
+				},
+				'observeUser',
+			)
 				.asPromise()
 				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
 				.catch(() => undefined);
