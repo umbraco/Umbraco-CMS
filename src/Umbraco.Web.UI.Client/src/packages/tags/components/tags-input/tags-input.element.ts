@@ -87,42 +87,48 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	#onInputKeydown(e: KeyboardEvent) {
+		const keyHandlers: Record<string, () => void> = {
+			Tab: () => this.#handleTabKey(e),
+			Enter: () => this.#handleEnterKey(),
+			Escape: () => this.#handleEscapeKey(),
+			ArrowDown: () => this.#handleArrowDownKey(e),
+		};
+
+		const handler = keyHandlers[e.key];
+		if (handler) {
+			handler();
+		} else {
+			this.#inputError(false);
+		}
+	}
+
+	#handleTabKey(e: KeyboardEvent) {
 		const inputLength = (this._tagInput.value as string).trim().length;
+		if (!inputLength) return;
 
-		//Prevent tab away if there is a text in the input.
-		if (e.key === 'Tab' && inputLength) {
+		// If the dropdown is open, Tab navigates into it rather than creating a tag
+		if (this._matches.length) {
 			e.preventDefault();
-			if (this._matches.length) {
-				this._tagInput.value = this._optionCollection?.item(0)?.value ?? '';
-			}
-			this.#createTag();
-			return;
-		}
-
-		//If the input is empty we can navigate out of it using tab
-		if (e.key === 'Tab' && !inputLength) {
-			return;
-		}
-
-		//Create a new tag when enter to the input
-		if (e.key === 'Enter') {
-			this.#createTag();
-			return;
-		}
-
-		//Close the dropdown on Escape
-		if (e.key === 'Escape') {			this._matches = [];
-			return;
-		}
-
-		//This one to show option collection if there is any
-		if (e.key === 'ArrowDown') {
-			e.preventDefault();
-			this._currentInput = this._optionCollection?.item(0)?.value ?? this._currentInput;
 			this._optionCollection?.item(0)?.focus();
 			return;
 		}
-		this.#inputError(false);
+
+		e.preventDefault();
+		this.#createTag();
+	}
+
+	#handleEnterKey() {
+		this.#createTag();
+	}
+
+	#handleEscapeKey() {
+		this._matches = [];
+	}
+
+	#handleArrowDownKey(e: KeyboardEvent) {
+		e.preventDefault();
+		this._currentInput = this._optionCollection?.item(0)?.value ?? this._currentInput;
+		this._optionCollection?.item(0)?.focus();
 	}
 
 	#focusTag(index: number) {
@@ -249,11 +255,24 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	#optionKeydown(e: KeyboardEvent, index: number) {
-		if (e.key === 'Enter' || e.key === 'Tab') {
+		if (e.key === 'Enter') {
 			e.preventDefault();
 			this._tagInput.value = this._optionCollection?.item(index)?.value ?? '';
 			this.#createTag();
 			this.focus();
+			return;
+		}
+
+		if (e.key === 'Tab') {
+			e.preventDefault();
+			const next = this._optionCollection?.item(index + 1);
+			if (next) {
+				next.focus();
+				this._currentInput = next.value;
+			} else {
+				// Wrap back to input when past the last option
+				this.focus();
+			}
 			return;
 		}
 
