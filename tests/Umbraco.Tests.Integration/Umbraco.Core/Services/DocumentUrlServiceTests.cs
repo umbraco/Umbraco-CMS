@@ -187,7 +187,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
         var serviceSegment = DocumentUrlService.GetUrlSegment(page.Key, isoCode, isDraft: false);
 
-        var published = await PublishedContentCache.GetByIdAsync(page.Key);
+        var published = await PublishedContentCache.GetByIdAsync(page.Key, preview: false);
         Assert.IsNotNull(published);
 #pragma warning disable CS0618 // Type or member is obsolete
         var publishedSegment = published!.UrlSegment;

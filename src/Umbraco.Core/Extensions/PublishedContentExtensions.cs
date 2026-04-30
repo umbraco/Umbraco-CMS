@@ -85,8 +85,11 @@ public static class PublishedContentExtensions
             : culture ?? variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
 
         // Delegate to IDocumentUrlService so this obsolete accessor agrees with IPublishedContent.Url(),
-        // which routes through the same service.
-        if (content.ItemType == PublishedItemType.Content)
+        // which routes through the same service. Skip for variant content with no resolved culture —
+        // the service would do a fruitless ILanguageService.GetAsync("") lookup before falling through
+        // to a null result, which is the same answer the legacy Cultures lookup below produces.
+        if (content.ItemType == PublishedItemType.Content
+            && (content.ContentType.VariesByCulture() is false || effectiveCulture.Length != 0))
         {
             IDocumentUrlService? documentUrlService = StaticServiceProvider.Instance?.GetService<IDocumentUrlService>();
             if (documentUrlService is not null && documentUrlService.IsInitialized)
