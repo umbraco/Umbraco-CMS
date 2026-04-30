@@ -155,7 +155,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             .WithSupportsPublishing(true)
             .Build();
         ContentType.AddPropertyType(urlNameProperty);
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         var page = ContentBuilder.CreateSimpleContent(ContentType, "Find a Park", Textpage.Id);
         page.SetValue(Constants.Conventions.Content.UrlName, "park");
@@ -177,7 +177,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             .WithSupportsPublishing(true)
             .Build();
         ContentType.AddPropertyType(urlNameProperty);
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
 
         var page = ContentBuilder.CreateSimpleContent(ContentType, "Find a Park", Textpage.Id);
         page.SetValue(Constants.Conventions.Content.UrlName, "park");
