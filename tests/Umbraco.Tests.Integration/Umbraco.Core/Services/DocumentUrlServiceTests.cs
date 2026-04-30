@@ -149,21 +149,19 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     [Test]
     public async Task GetUrlSegment_Respects_UmbracoUrlName_Property()
     {
-        var urlNameProperty = new PropertyTypeBuilder()
-            .WithAlias(Constants.Conventions.Content.UrlName)
-            .WithName("Url Name")
-            .WithSupportsPublishing(true)
-            .Build();
-        ContentType.AddPropertyType(urlNameProperty);
-        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+        var contentType = await CreateInvariantContentTypeWithUrlNameAsync("invariantWithUrlName");
 
-        var page = ContentBuilder.CreateSimpleContent(ContentType, "Find a Park", Textpage.Id);
-        page.SetValue(Constants.Conventions.Content.UrlName, "park");
-        ContentService.Save(page);
-        ContentService.Publish(page, ["*"]);
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Find a Park")
+            .Build();
+        content.SetValue(Constants.Conventions.Content.UrlName, "park");
+        ContentService.Save(content);
+        var publishResult = ContentService.Publish(content, ["*"]);
+        Assert.IsTrue(publishResult.Success, $"Publish failed: {publishResult.Result}");
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
-        var actual = DocumentUrlService.GetUrlSegment(page.Key, isoCode, isDraft: false);
+        var actual = DocumentUrlService.GetUrlSegment(content.Key, isoCode, isDraft: false);
 
         Assert.AreEqual("park", actual);
     }
@@ -171,23 +169,21 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     [Test]
     public async Task PublishedContent_UrlSegment_Agrees_With_DocumentUrlService_When_UmbracoUrlName_Set()
     {
-        var urlNameProperty = new PropertyTypeBuilder()
-            .WithAlias(Constants.Conventions.Content.UrlName)
-            .WithName("Url Name")
-            .WithSupportsPublishing(true)
-            .Build();
-        ContentType.AddPropertyType(urlNameProperty);
-        await ContentTypeService.UpdateAsync(ContentType, Constants.Security.SuperUserKey);
+        var contentType = await CreateInvariantContentTypeWithUrlNameAsync("invariantWithUrlNameAgree");
 
-        var page = ContentBuilder.CreateSimpleContent(ContentType, "Find a Park", Textpage.Id);
-        page.SetValue(Constants.Conventions.Content.UrlName, "park");
-        ContentService.Save(page);
-        ContentService.Publish(page, ["*"]);
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Find a Park")
+            .Build();
+        content.SetValue(Constants.Conventions.Content.UrlName, "park");
+        ContentService.Save(content);
+        var publishResult = ContentService.Publish(content, ["*"]);
+        Assert.IsTrue(publishResult.Success, $"Publish failed: {publishResult.Result}");
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
-        var serviceSegment = DocumentUrlService.GetUrlSegment(page.Key, isoCode, isDraft: false);
+        var serviceSegment = DocumentUrlService.GetUrlSegment(content.Key, isoCode, isDraft: false);
 
-        var published = await PublishedContentCache.GetByIdAsync(page.Key, preview: false);
+        var published = await PublishedContentCache.GetByIdAsync(content.Key, preview: false);
         Assert.IsNotNull(published);
 #pragma warning disable CS0618 // Type or member is obsolete
         var publishedSegment = published!.UrlSegment;
@@ -195,6 +191,33 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         Assert.AreEqual("park", serviceSegment);
         Assert.AreEqual(serviceSegment, publishedSegment);
+    }
+
+    private async Task<IContentType> CreateInvariantContentTypeWithUrlNameAsync(string alias)
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate($"{alias}Template", $"{alias} Template");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias(alias)
+            .WithName(alias)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlName)
+                    .WithName("Url Name")
+                    .WithVariations(ContentVariation.Nothing)
+                    .WithSortOrder(1)
+                    .Done()
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        return contentType;
     }
 
     [Test]
