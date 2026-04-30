@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -27,6 +28,8 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     private const string SubSubPage3Key = "AACF2979-3F53-4184-B071-BA34D3338497";
 
     private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+
+    private IPublishedContentCache PublishedContentCache => GetRequiredService<IPublishedContentCache>();
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
@@ -143,7 +146,56 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
     }
 
-    //TODO test with the urlsegment property value!
+    [Test]
+    public async Task GetUrlSegment_Respects_UmbracoUrlName_Property()
+    {
+        var urlNameProperty = new PropertyTypeBuilder()
+            .WithAlias(Constants.Conventions.Content.UrlName)
+            .WithName("Url Name")
+            .WithSupportsPublishing(true)
+            .Build();
+        ContentType.AddPropertyType(urlNameProperty);
+        ContentTypeService.Save(ContentType);
+
+        var page = ContentBuilder.CreateSimpleContent(ContentType, "Find a Park", Textpage.Id);
+        page.SetValue(Constants.Conventions.Content.UrlName, "park");
+        ContentService.Save(page);
+        ContentService.Publish(page, ["*"]);
+
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var actual = DocumentUrlService.GetUrlSegment(page.Key, isoCode, isDraft: false);
+
+        Assert.AreEqual("park", actual);
+    }
+
+    [Test]
+    public async Task PublishedContent_UrlSegment_Agrees_With_DocumentUrlService_When_UmbracoUrlName_Set()
+    {
+        var urlNameProperty = new PropertyTypeBuilder()
+            .WithAlias(Constants.Conventions.Content.UrlName)
+            .WithName("Url Name")
+            .WithSupportsPublishing(true)
+            .Build();
+        ContentType.AddPropertyType(urlNameProperty);
+        ContentTypeService.Save(ContentType);
+
+        var page = ContentBuilder.CreateSimpleContent(ContentType, "Find a Park", Textpage.Id);
+        page.SetValue(Constants.Conventions.Content.UrlName, "park");
+        ContentService.Save(page);
+        ContentService.Publish(page, ["*"]);
+
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var serviceSegment = DocumentUrlService.GetUrlSegment(page.Key, isoCode, isDraft: false);
+
+        var published = await PublishedContentCache.GetByIdAsync(page.Key);
+        Assert.IsNotNull(published);
+#pragma warning disable CS0618 // Type or member is obsolete
+        var publishedSegment = published!.UrlSegment;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        Assert.AreEqual("park", serviceSegment);
+        Assert.AreEqual(serviceSegment, publishedSegment);
+    }
 
     [Test]
     public async Task GetUrlSegment_For_Document_With_Parent_Deleted_Does_Not_Have_Url_Segment()

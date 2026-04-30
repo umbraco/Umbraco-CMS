@@ -80,22 +80,31 @@ public static class PublishedContentExtensions
             throw new ArgumentNullException(nameof(content));
         }
 
-        // invariant has invariant value (whatever the requested culture)
-        if (!content.ContentType.VariesByCulture())
+        string effectiveCulture = content.ContentType.VariesByCulture() is false
+            ? string.Empty
+            : culture ?? variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
+
+        // Delegate to IDocumentUrlService so this obsolete accessor agrees with IPublishedContent.Url(),
+        // which routes through the same service.
+        if (content.ItemType == PublishedItemType.Content)
+        {
+            IDocumentUrlService? documentUrlService = StaticServiceProvider.Instance?.GetService<IDocumentUrlService>();
+            if (documentUrlService is not null && documentUrlService.IsInitialized)
+            {
+                var isDraft = content.IsDraft(effectiveCulture.Length == 0 ? null : effectiveCulture);
+                return documentUrlService.GetUrlSegment(content.Key, effectiveCulture, isDraft);
+            }
+        }
+
+        // Fallback for media/members or when the service is not available (e.g. during boot).
+        if (content.ContentType.VariesByCulture() is false)
         {
             return content.Cultures.TryGetValue(string.Empty, out PublishedCultureInfo? invariantInfos)
                 ? invariantInfos.UrlSegment
                 : null;
         }
 
-        // handle context culture for variant
-        if (culture == null)
-        {
-            culture = variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
-        }
-
-        // get
-        return culture != string.Empty && content.Cultures.TryGetValue(culture, out PublishedCultureInfo? infos)
+        return effectiveCulture.Length != 0 && content.Cultures.TryGetValue(effectiveCulture, out PublishedCultureInfo? infos)
             ? infos.UrlSegment
             : null;
     }
