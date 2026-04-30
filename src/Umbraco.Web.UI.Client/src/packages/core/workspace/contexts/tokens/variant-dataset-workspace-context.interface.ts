@@ -6,6 +6,7 @@ import type { UmbVariantId, UmbEntityVariantModel, UmbEntityVariantOptionModel }
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbValidationController } from '@umbraco-cms/backoffice/validation';
 import type { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import type { UmbVariantNameWriteGuardManager } from '../../namable/variant-name-write-guard.manager.js';
 
 export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbEntityVariantModel = UmbEntityVariantModel>
 	extends UmbSubmittableWorkspaceContext {
@@ -20,6 +21,7 @@ export interface UmbVariantDatasetWorkspaceContext<VariantType extends UmbEntity
 	splitView: UmbWorkspaceSplitViewManager;
 	getVariant(variantId: UmbVariantId): VariantType | undefined;
 	readonly readOnlyGuard: UmbReadOnlyVariantGuardManager;
+	readonly nameWriteGuard?: UmbVariantNameWriteGuardManager;
 	varies: Observable<boolean | undefined>;
 	variesByCulture: Observable<boolean | undefined>;
 	variesBySegment: Observable<boolean | undefined>;

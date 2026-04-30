@@ -21,7 +21,11 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
-import { UmbEntityDetailWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
+import {
+	UmbEntityDetailWorkspaceContextBase,
+	UmbVariantNameWriteGuardManager,
+	UmbWorkspaceSplitViewManager,
+} from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -111,6 +115,8 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
+	public readonly nameWriteGuard = new UmbVariantNameWriteGuardManager(this);
+
 	public readonly propertyViewGuard = new UmbVariantPropertyGuardManager(this);
 	public readonly propertyWriteGuard = new UmbVariantPropertyGuardManager(this);
 
@@ -197,6 +203,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	) {
 		super(host, args);
 
+		this.nameWriteGuard.fallbackToPermitted();
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
 
@@ -1170,9 +1177,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		super.resetState();
 		this.structure.clear();
 		this.readOnlyGuard.clearRules();
+		this.nameWriteGuard.clearRules();
 		this.propertyViewGuard.clearRules();
 		this.propertyWriteGuard.clearRules();
 		// default:
+		this.nameWriteGuard.fallbackToPermitted();
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
 	}

@@ -5,6 +5,7 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbVariantId, UmbEntityVariantModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbRoutableWorkspaceContext, UmbVariantDatasetWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
 import type { UmbVariantPropertyGuardManager } from '@umbraco-cms/backoffice/property';
+import type { UmbVariantNameWriteGuardManager } from '@umbraco-cms/backoffice/workspace';
 
 export interface UmbContentWorkspaceContext<
 	ContentModel extends UmbContentDetailModel = UmbContentDetailModel,
@@ -19,6 +20,7 @@ export interface UmbContentWorkspaceContext<
 	isLoaded(): Promise<unknown> | undefined;
 	variantById(variantId: UmbVariantId): Observable<VariantModelType | undefined>;
 
+	readonly nameWriteGuard: UmbVariantNameWriteGuardManager;
 	readonly propertyViewGuard: UmbVariantPropertyGuardManager;
 	readonly propertyWriteGuard: UmbVariantPropertyGuardManager;
 }

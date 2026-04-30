@@ -50,6 +50,9 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	private _readOnlyCultures: Array<string | null> = [];
 
 	@state()
+	private _isWritableVariantName = true;
+
+	@state()
 	private _variesByCulture = false;
 
 	@state()
@@ -195,6 +198,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		if (!workspaceContext) return;
 
 		this._variantId = this.#datasetContext.getVariantId();
+		this.#observeNameWriteGuard(workspaceContext, this._variantId);
 
 		this.observe(
 			workspaceContext.variantOptions,
@@ -213,6 +217,25 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			workspaceContext?.readOnlyGuard.rules,
 			() => this.#setReadOnlyCultures(workspaceContext),
 			'umbObserveReadOnlyGuardRules',
+		);
+		this.observe(
+			workspaceContext?.nameWriteGuard?.rules,
+			() => this.#setReadOnlyCultures(workspaceContext),
+			'umbObserveNameWriteGuardRulesForIndicator',
+		);
+	}
+
+	#observeNameWriteGuard(workspaceContext?: UmbVariantDatasetWorkspaceContext, variantId?: UmbVariantId) {
+		if (!workspaceContext?.nameWriteGuard || !variantId) {
+			this._isWritableVariantName = true;
+			return;
+		}
+		this.observe(
+			workspaceContext.nameWriteGuard.isPermittedForVariantName(variantId),
+			(isPermitted) => {
+				this._isWritableVariantName = isPermitted;
+			},
+			'umbObserveNameWriteGuard',
 		);
 	}
 
@@ -265,7 +288,13 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	#setReadOnlyCultures(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
 		if (workspaceContext) {
 			this._readOnlyCultures = this._variantOptions
-				.filter((variant) => workspaceContext.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(variant)))
+				.filter((variant) => {
+					const variantId = UmbVariantId.Create(variant);
+					return (
+						workspaceContext.readOnlyGuard.getIsPermittedForVariant(variantId) ||
+						workspaceContext.nameWriteGuard?.getIsPermittedForVariantName(variantId) === false
+					);
+				})
 				.map((variant) => variant.culture);
 		} else {
 			this._readOnlyCultures = [];
@@ -378,7 +407,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 				@input=${this.#handleInput}
 				required
 				?readonly=${this.#isReadOnlyCulture(this._activeVariant?.culture ?? null) ||
-				this.#isSegmentVariantOption(this._activeVariant)}
+				this.#isSegmentVariantOption(this._activeVariant) ||
+				!this._isWritableVariantName}
 				${umbBindToValidation(this, `$.variants[${UmbDataPathVariantQuery(this._variantId)}].name`, this._name ?? '')}
 				${ref(this.#focusInput)}>
 				${this.#selectorIsEnabled()
