@@ -72,6 +72,9 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 			/**
 			 * If the Block Workspace is invariant, the readOnly state from the Block Manager should apply to the invariant fields(all) of this Workspace: [NL]
 			 */
+			// Destroy any prior consumer before reassigning, so a re-emit of an invariant
+			// variantId does not leak the previous context consumer. [NL]
+			this.#consumeBlockManager?.destroy();
 			this.#consumeBlockManager = this.consumeContext(UMB_BLOCK_MANAGER_CONTEXT, (manager) => {
 				this.observe(
 					manager?.readOnlyState.permitted,
