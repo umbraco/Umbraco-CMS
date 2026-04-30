@@ -310,6 +310,9 @@ export class UmbAppElement extends UmbLitElement {
 	async #registerExtensions() {
 		if (this.#packageModules === undefined) {
 			this.#packageModules = Promise.all(CORE_PACKAGES);
+			this.#packageModules.then(() => {
+				this.#loadCurrentUser();
+			});
 		}
 
 		umbExtensionsRegistry.registerMany((await this.#packageModules).flatMap((modules) => modules.extensions));
