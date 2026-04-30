@@ -91,6 +91,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly sortChildrenBtn: Locator;
   private readonly rollbackBtn: Locator;
   private readonly rollbackContainerBtn: Locator;
+  private readonly rollbackCancelBtn: Locator;
   private readonly publicAccessBtn: Locator;
   private readonly uuiCheckbox: Locator;
   private readonly sortBtn: Locator;
@@ -301,6 +302,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
     this.rollbackBtn = this.documentWorkspace.getByRole('button', { name: /^Rollback(…)?$/ });
     this.rollbackContainerBtn = this.container.getByLabel('Rollback');
+    this.rollbackCancelBtn = page.locator('umb-content-rollback-modal').getByRole('button', {name: 'Cancel', exact: true});
     this.publicAccessBtn = page.getByRole('button', {name: 'Public Access'});
     this.uuiCheckbox = page.locator('uui-checkbox');
     this.sortBtn = page.getByLabel('Sort', {exact: true});
@@ -1167,6 +1169,10 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickLatestRollBackItem() {
     await this.click(this.rollbackItem.last());
+  }
+
+  async clickRollbackCancelButton() {
+    await this.click(this.rollbackCancelBtn);
   }
 
   async clickPublicAccessButton() {
