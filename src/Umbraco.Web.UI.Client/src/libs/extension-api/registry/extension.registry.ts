@@ -244,6 +244,7 @@ export class UmbExtensionRegistry<
 				continue;
 			}
 
+			// TODO: Revisit this, it could use the isExtensionApproved, but this code also checks alias duplication against the toAdd array. [NL]
 			if (!this.#acceptExtension(manifest as ManifestTypes)) continue;
 
 			const alias = (manifest as ManifestTypes).alias;
