@@ -10,7 +10,7 @@ import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 @customElement('umb-backoffice-main')
 export class UmbBackofficeMainElement extends UmbLitElement {
 	@state()
-	private _routes: Array<UmbRoute> = [];
+	private _routes?: Array<UmbRoute>;
 
 	@state()
 	private _sections: Array<ManifestSection> = [];
@@ -82,7 +82,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this._routes.length) {
+		if (!this._routes || !this._routes.length) {
 			return html`<div id="loader"><uui-loader></uui-loader></div>`;
 		}
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
