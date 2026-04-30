@@ -89,7 +89,7 @@ export abstract class UmbTreeItemContextBase<
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_TREE_ITEM_CONTEXT);
 		// TODO: Get take size from Tree context
-		this._treeItemChildrenManager.setTakeSize(50);
+		this._treeItemChildrenManager.setTakeSize(5); // set load more amount
 		this.#consumeContexts();
 		window.addEventListener('navigationend', this.#debouncedCheckIsActive);
 	}
@@ -205,7 +205,6 @@ export abstract class UmbTreeItemContextBase<
 	/**
 	 * Load next items of the tree item
 	 * @memberof UmbTreeItemContextBase
-	 * @returns {Promise<void>}
 	 */
 	public loadNextItems = (): Promise<void> => this._treeItemChildrenManager.loadNextChildren();
 

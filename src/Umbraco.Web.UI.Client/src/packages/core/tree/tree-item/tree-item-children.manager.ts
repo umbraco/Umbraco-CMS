@@ -205,15 +205,16 @@ export class UmbTreeItemChildrenManager<
 	 * @memberof UmbTreeItemChildrenManager
 	 */
 	public async reloadChildren(): Promise<void> {
-		this.#loadChildren(true);
+	this.clear();
+	await this.#loadChildren(true);
 	}
 
 	public async loadPrevChildren(): Promise<void> {
 		return this.#loadPrevItemsFromTarget();
 	}
 
-	public async loadNextChildren(): Promise<void> {
-		return this.#loadNextItemsFromTarget();
+	public async loadNextChildren(takeOverride?: number): Promise<void> {
+		return this.#loadNextItemsFromTarget(takeOverride);
 	}
 
 	#loadChildrenRetries = 0;
@@ -407,9 +408,9 @@ export class UmbTreeItemChildrenManager<
 	}
 
 	#loadNextItemsRetries = 0;
-	async #loadNextItemsFromTarget() {
+	async #loadNextItemsFromTarget(takeOverride?: number) {
 		if (this.#loadNextItemsRetries > this.#requestMaxRetries) {
-			// If we have exceeded the maximum number of retries, we need to reset the base target and load from the top
+		// If we have exceeded the maximum number of retries, we need to reset the base target and load from the top
 			this.#loadNextItemsRetries = 0;
 			this.#resetChildren('error');
 			return;
@@ -426,15 +427,17 @@ export class UmbTreeItemChildrenManager<
 		const additionalArgs = this.getAdditionalRequestArgs();
 		const endTarget = this.targetPagination.getEndTarget();
 
+		const requestedTake = takeOverride && takeOverride > 0 ? takeOverride : undefined;
+
 		const targetPaging: UmbTargetPaginationRequestModel | undefined = {
 			target: endTarget,
 			takeBefore: 0,
-			takeAfter: this.targetPagination.getTakeSize(),
+			takeAfter: requestedTake ?? this.targetPagination.getTakeSize(),
 		};
 
 		const offsetPaging: UmbOffsetPaginationRequestModel = {
 			skip: this.offsetPagination.getSkip(),
-			take: this.offsetPagination.getPageSize(),
+			take: requestedTake ?? this.offsetPagination.getPageSize(),
 		};
 
 		const { data, error } = parent?.unique
@@ -463,7 +466,7 @@ export class UmbTreeItemChildrenManager<
 			this.targetPagination.removeFromCurrentItems(endTarget);
 
 			if (newEndTarget) {
-				this.#loadNextItemsFromTarget();
+				this.#loadNextItemsFromTarget(takeOverride);
 			} else {
 				/*
 					If we can't find a new end target we reload the children from the top.
@@ -599,7 +602,19 @@ export class UmbTreeItemChildrenManager<
 		}
 	}
 
-	#onPageChange = () => this.loadNextChildren();
+	#onPageChange = () => {
+		const totalItems = this.offsetPagination.getTotalItems();
+		const loadedItems = this.#children.getValue().length;
+		const remaining = Math.max(0, totalItems - loadedItems);
+
+		if (remaining > 0) {
+			// Load all remaining items
+			this.loadNextChildren(remaining);
+		} else {
+			//Default behavior: load next page amount
+			this.loadNextChildren();
+		}
+	};
 
 	#listenForActionEvents() {
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (instance) => {
