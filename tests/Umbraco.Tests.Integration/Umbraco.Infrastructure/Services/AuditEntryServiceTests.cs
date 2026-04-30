@@ -35,7 +35,7 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
 
         var actual = result;
 
-        var entries = sut.GetAll().ToArray();
+        var entries = (await sut.GetAllAsync()).ToArray();
 
         Assert.Multiple(() =>
         {
@@ -72,7 +72,7 @@ internal sealed class AuditEntryServiceTests : UmbracoIntegrationTest
 
         var actual = result;
 
-        var entries = sut.GetAll().ToArray();
+        var entries = (await sut.GetAllAsync()).ToArray();
 
         Assert.Multiple(() =>
         {
