@@ -37,3 +37,27 @@ Covers all combinations across 4 dimensions for a document with a block list pro
 | **16** | Full per-culture control — different blocks, different text, everything can be different |
 
 The most practically useful ones are **#1**, **#12**, and **#16** — fully invariant, shared layout + translated text, and fully variant respectively.
+
+---
+
+## Language permission matrix
+
+**Rule:** If a user does not have access to a language, they must not be able to edit any values when viewing from that restricted language context — regardless of whether individual property values are invariant or variant.
+
+This mock set has three languages (en-US, da, es) and a user group with access to en-US and da only. The scenarios below describe what happens when a user without 'es' access opens a block while the document is in the 'es' culture context.
+
+**V/I** follows the same convention as the matrix above.  
+**Culture context from** — the first level in the chain (below Document) where a V establishes culture ownership. Once this fires, all contained values are effectively bound to that culture regardless of their own V/I setting.  
+**UI restricted** — should the block workspace be readonly when the document is in 'es' context?  
+Rows where Culture context from is blank or below Block List Prop but UI restricted = Yes are the cases requiring attention: the UI must restrict editing even though no culture-specific container owns the data.
+
+| # | Document | Block List Prop | Block Element Type | Can open block from 'es' context? | Culture context from | UI restricted |
+|---|----------|-----------------|--------------------|-----------------------------------|----------------------|---------------|
+| **1** | I | I | I | No | — | No |
+| **9** | V | I | I | Yes | — | Yes |
+| **11** | V | I | V | Yes | Block Element Type | Yes |
+| **12** | V | I | V | Yes | Block Element Type | Yes |
+| **13** | V | V | I | No | Block List Prop | Yes |
+| **15** | V | V | V | No | Block List Prop | Yes |
+| **16** | V | V | V | No | Block List Prop | Yes |
+
