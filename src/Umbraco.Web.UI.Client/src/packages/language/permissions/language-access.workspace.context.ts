@@ -55,23 +55,28 @@ export class UmbLanguageAccessWorkspaceContext extends UmbContextBase {
 		// create a list of variantIds for the disallowed languages
 		const variantIds = disallowedLanguages?.map((variant) => new UmbVariantId(variant.culture, variant.segment)) || [];
 
-		// create a list of states for the disallowed languages
 		const identifier = 'UMB_LANGUAGE_PERMISSION_';
-		const readOnlyRules = variantIds.map((variantId) => {
-			return {
-				unique: identifier + variantId.culture,
-				variantId,
-				message: 'You do not have permission to edit to this culture',
-			};
-		});
+		const nameRules = variantIds.map((variantId) => ({
+			unique: identifier + variantId.culture,
+			variantId,
+			message: 'You do not have permission to edit this culture',
+			permitted: false,
+		}));
+		const propertyRules = variantIds.map((variantId) => ({
+			unique: identifier + variantId.culture,
+			datasetVariantId: variantId,
+			message: 'You do not have permission to edit this culture',
+			permitted: false,
+		}));
 
-		// remove all previous states before adding new ones
-		// TODO: But maybe options that was added previously is not there any longer? [NL]
+		// remove all previous rules before adding new ones
 		const uniques = this.#variantOptions?.map((variant) => identifier + variant.culture) || [];
-		this.#workspaceContext.readOnlyGuard?.removeRules(uniques);
+		this.#workspaceContext.propertyWriteGuard.removeRules(uniques);
+		this.#workspaceContext.nameWriteGuard.removeRules(uniques);
 
-		// add new states
-		this.#workspaceContext.readOnlyGuard?.addRules(readOnlyRules);
+		// add new rules
+		this.#workspaceContext.propertyWriteGuard.addRules(propertyRules);
+		this.#workspaceContext.nameWriteGuard.addRules(nameRules);
 	}
 }
 
