@@ -255,45 +255,49 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	#optionKeydown(e: KeyboardEvent, index: number) {
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			this._tagInput.value = this._optionCollection?.item(index)?.value ?? '';
-			this.#createTag();
-			this.focus();
-			return;
-		}
+		const keyHandlers: Record<string, () => void> = {
+			Enter: () => this.#handleOptionEnter(index),
+			Tab: () => this.#handleOptionTab(e, index),
+			ArrowDown: () => this.#handleOptionArrowDown(e, index),
+			ArrowUp: () => this.#handleOptionArrowUp(e, index),
+			Backspace: () => this.focus(),
+		};
 
-		if (e.key === 'Tab') {
-			e.preventDefault();
-			const next = this._optionCollection?.item(index + 1);
-			if (next) {
-				next.focus();
-				this._currentInput = next.value;
-			} else {
-				// Wrap back to input when past the last option
-				this.focus();
-			}
-			return;
-		}
+		keyHandlers[e.key]?.();
+	}
 
-		if (e.key === 'ArrowDown') {
-			e.preventDefault();
-			if (!this._optionCollection?.item(index + 1)) return;
-			this._optionCollection?.item(index + 1)?.focus();
-			this._currentInput = this._optionCollection?.item(index + 1)?.value ?? '';
-			return;
-		}
+	#handleOptionEnter(index: number) {
+		this._tagInput.value = this._optionCollection?.item(index)?.value ?? '';
+		this.#createTag();
+		this.focus();
+	}
 
-		if (e.key === 'ArrowUp') {
-			e.preventDefault();
-			if (!this._optionCollection?.item(index - 1)) return;
-			this._optionCollection?.item(index - 1)?.focus();
-			this._currentInput = this._optionCollection?.item(index - 1)?.value ?? '';
-		}
-
-		if (e.key === 'Backspace') {
+	#handleOptionTab(e: KeyboardEvent, index: number) {
+		e.preventDefault();
+		const next = this._optionCollection?.item(index + 1);
+		if (next) {
+			next.focus();
+			this._currentInput = next.value;
+		} else {
+			// Wrap back to input when past the last option
 			this.focus();
 		}
+	}
+
+	#handleOptionArrowDown(e: KeyboardEvent, index: number) {
+		e.preventDefault();
+		const next = this._optionCollection?.item(index + 1);
+		if (!next) return;
+		next.focus();
+		this._currentInput = next.value;
+	}
+
+	#handleOptionArrowUp(e: KeyboardEvent, index: number) {
+		e.preventDefault();
+		const prev = this._optionCollection?.item(index - 1);
+		if (!prev) return;
+		prev.focus();
+		this._currentInput = prev.value;
 	}
 
 	/** Render */
