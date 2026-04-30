@@ -320,7 +320,7 @@ internal sealed class RedirectTracker : IRedirectTracker
 
     private static bool IsValidRoute([NotNullWhen(true)] string? route) =>
         route is not null
-        && route != Constants.Routing.Unroutable
+        && !route.StartsWith(Constants.Routing.Unroutable)
         && !route.StartsWith("err/");
 
     private void RemoveSelfReferencingRedirect(Guid contentKey, string route)

@@ -126,20 +126,22 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     }
 
     /// <summary>
-    /// Verifies that no redirect is created when the stored "old route" is the unroutable
-    /// indicator (<see cref="Constants.Routing.Unroutable"/>, "#"). This guards against the
+    /// Verifies that no redirect is created when the stored "old route" is one of the URL provider's
+    /// "could not resolve URL" indicators — <see cref="Constants.Routing.Unroutable"/> ("#") or
+    /// <see cref="Constants.Routing.UrlProviderException"/> ("#ex"). This guards against the
     /// scenario where content is previewed before being published for the first time: the
-    /// preview cookie causes the URL provider to return "#" for the not-yet-published content,
-    /// which would otherwise be tracked as a (bogus) redirect to the eventual published URL.
-    /// See https://github.com/umbraco/Umbraco-CMS/issues/22652.
+    /// preview cookie causes the URL provider to return one of these indicators for the
+    /// not-yet-published content, which would otherwise be tracked as a (bogus) redirect to the
+    /// eventual published URL. See https://github.com/umbraco/Umbraco-CMS/issues/22652.
     /// </summary>
-    [Test]
-    public void Does_Not_Create_Redirect_For_Unroutable_Old_Route()
+    [TestCase(Constants.Routing.Unroutable)]
+    [TestCase(Constants.Routing.UrlProviderException)]
+    public void Does_Not_Create_Redirect_For_Unroutable_Old_Route(string oldRoute)
     {
         IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
             new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
             {
-                [(_testPage.Id, "en")] = (_testPage.Key, Constants.Routing.Unroutable),
+                [(_testPage.Id, "en")] = (_testPage.Key, oldRoute),
             };
 
         var redirectTracker = CreateRedirectTracker();
