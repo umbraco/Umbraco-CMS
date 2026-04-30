@@ -1971,8 +1971,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     dependencies.Add(layoutTemplate);
                 }
-                else
+                else if (layoutTemplate is not null)
                 {
+                    // Only log when a non-null Layout was referenced but couldn't be resolved in the import.
+                    // A null Layout is legitimate (e.g. a root layout file with `Layout = null;`) and not worth logging.
                     _logger.LogInformation(
                         "Template '{TemplateAlias}' has an invalid Layout '{TemplateLayout}', so the reference has been ignored.",
                         (string?)elementCopy.Element("Alias"),
