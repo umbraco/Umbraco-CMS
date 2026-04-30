@@ -1,25 +1,23 @@
-using System.Data.Common;
-using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <summary>
-///     Represents the NPoco implementation of <see cref="IAuditEntryRepository" />.
+///     Represents the EFCore implementation of <see cref="IAuditEntryRepository" />.
 /// </summary>
-internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEntry>, IAuditEntryRepository
+internal sealed class AuditEntryRepository : AsyncEntityRepositoryBase<int, IAuditEntry>, IAuditEntryRepository
 {
     private readonly IRuntimeState _runtimeState;
 
@@ -28,7 +26,7 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
     /// </summary>
     public AuditEntryRepository(
         IRuntimeState runtimeState,
-        IScopeAccessor scopeAccessor,
+        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches cache,
         ILogger<AuditEntryRepository> logger,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -44,135 +42,77 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
     }
 
     /// <inheritdoc />
-    public IEnumerable<IAuditEntry> GetPage(long pageIndex, int pageCount, out long records)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Select<AuditEntryDto>()
-            .From<AuditEntryDto>()
-            .OrderByDescending<AuditEntryDto>(x => x.EventDate);
-
-        Page<AuditEntryDto> page = Database.Page<AuditEntryDto>(pageIndex + 1, pageCount, sql);
-        records = page.TotalItems;
-        return page.Items.Select(AuditEntryFactory.BuildEntity);
-    }
-
-    /// <inheritdoc />
-    protected override IAuditEntry? PerformGet(int id)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Select<AuditEntryDto>()
-            .From<AuditEntryDto>()
-            .Where<AuditEntryDto>(x => x.Id == id);
-
-        AuditEntryDto? dto = Database.FirstOrDefault<AuditEntryDto>(sql);
-        return dto == null ? null : AuditEntryFactory.BuildEntity(dto);
-    }
-
-    /// <inheritdoc />
-    protected override IEnumerable<IAuditEntry> PerformGetAll(params int[]? ids)
-    {
-        if (ids?.Length == 0)
+    public Task<PagedModel<IAuditEntry>> GetPageAsync(long pageIndex, int pageCount)
+        => AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            Sql<ISqlContext> sql = Sql()
-                .Select<AuditEntryDto>()
-                .From<AuditEntryDto>();
+            long total = await db.AuditEntries.LongCountAsync();
 
-            return Database.Fetch<AuditEntryDto>(sql).Select(AuditEntryFactory.BuildEntity);
-        }
+            List<AuditEntryDto> dtos = await db.AuditEntries
+                .Skip((int)(pageIndex * pageCount))
+                .Take(pageCount)
+                .OrderByDescending(x => x.EventDate)
+                .ToListAsync();
 
+            return new PagedModel<IAuditEntry>(total, dtos.Select(AuditEntryFactory.BuildEntity));
+        });
+
+    /// <inheritdoc />
+    protected override async Task<IAuditEntry?> PerformGetAsync(int id) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            AuditEntryDto? entry = await db.AuditEntries
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            return entry == null ? null : AuditEntryFactory.BuildEntity(entry);
+        });
+
+    /// <inheritdoc/>
+    protected override async Task<IEnumerable<IAuditEntry>?> PerformGetAllAsync() =>
+        await AmbientScope.ExecuteWithContextAsync<IEnumerable<IAuditEntry>>(async db =>
+        {
+            List<AuditEntryDto> entries = await db.AuditEntries
+                .ToListAsync();
+
+            return AuditEntryFactory.BuildEntities(entries);
+        });
+
+    /// <inheritdoc />
+    protected override async Task<IEnumerable<IAuditEntry>?> PerformGetManyAsync(params int[]? ids)
+    {
         var entries = new List<IAuditEntry>();
 
         foreach (IEnumerable<int> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
         {
-            Sql<ISqlContext> sql = Sql()
-                .Select<AuditEntryDto>()
-                .From<AuditEntryDto>()
-                .WhereIn<AuditEntryDto>(x => x.Id, group);
+            await AmbientScope.ExecuteWithContextAsync<AuditEntryDto>(async db =>
+            {
+                List<AuditEntryDto> fetchedEntries = await db.AuditEntries
+                    .Where(x => group.Contains(x.Id))
+                    .ToListAsync();
 
-            entries.AddRange(Database.Fetch<AuditEntryDto>(sql).Select(AuditEntryFactory.BuildEntity));
+                entries.AddRange(fetchedEntries.Select(AuditEntryFactory.BuildEntity));
+            });
         }
 
         return entries;
     }
 
     /// <inheritdoc />
-    protected override IEnumerable<IAuditEntry> PerformGetByQuery(IQuery<IAuditEntry> query)
-    {
-        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
-        var translator = new SqlTranslator<IAuditEntry>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate();
-        return Database.Fetch<AuditEntryDto>(sql).Select(AuditEntryFactory.BuildEntity);
-    }
-
-    /// <inheritdoc />
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
-    {
-        Sql<ISqlContext> sql = Sql();
-        sql = isCount ? sql.SelectCount() : sql.Select<AuditEntryDto>();
-        sql = sql.From<AuditEntryDto>();
-        return sql;
-    }
-
-    /// <inheritdoc />
-    protected override string GetBaseWhereClause() => $"{QuoteTableName(AuditEntryDto.TableName)}.id = @id";
-
-    /// <inheritdoc />
-    protected override IEnumerable<string> GetDeleteClauses() =>
-        throw new NotSupportedException("Audit entries cannot be deleted.");
-
-    /// <inheritdoc />
-    protected override void PersistNewItem(IAuditEntry entity)
+    protected override async Task PersistNewItemAsync(IAuditEntry entity)
     {
         entity.AddingEntity();
-
         AuditEntryDto dto = AuditEntryFactory.BuildDto(entity);
+
         try
         {
-            Database.Insert(dto);
-        }
-        catch (DbException) when (_runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading)
-        {
-            // This can happen when in upgrade state, before the migration to add user keys runs.
-            // In this case, we will try to insert the audit entry without the user keys.
-            // TODO (V22): Remove this catch clause when 'V_17_0_0.AddGuidsToAuditEntries' is removed.
-            Expression<Func<AuditEntryDto, object?>>[] fields =
-            [
-                x => x.PerformingUserId,
-                x => x.PerformingDetails,
-                x => x.PerformingIp,
-                x => x.EventDate,
-                x => x.AffectedUserId,
-                x => x.AffectedDetails,
-                x => x.EventType,
-                x => x.EventDetails
-            ];
-
-            var cols = Sql().ColumnsForInsert(fields);
-            IEnumerable<object?> values = fields.Select(f => f.Compile().Invoke(dto));
-
-            Sql<ISqlContext> sqlValues = Sql();
-            foreach (var (value, index) in values.Select((v, i) => (v, i)))
+            await AmbientScope.ExecuteWithContextAsync<AuditEntryDto>(async db =>
             {
-                switch (value)
-                {
-                    case null:
-                        sqlValues.Append((index == 0 ? string.Empty : ",") + "NULL");
-                        break;
-                    case "":
-                        sqlValues.Append((index == 0 ? string.Empty : ",") + "''");
-                        break;
-                    default:
-                        sqlValues.Append((index == 0 ? string.Empty : ",") + "@0", value);
-                        break;
-                }
-            }
-
-            Sql<ISqlContext> sqlInsert = Sql($"INSERT INTO {QuoteTableName(AuditEntryDto.TableName)} ({cols})")
-                .Append("VALUES (")
-                .Append(sqlValues)
-                .Append(")");
-
-            Database.Execute(sqlInsert);
+                db.AuditEntries.Add(dto);
+                await db.SaveChangesAsync();
+            });
+        }
+        catch (DbUpdateException) when (_runtimeState.Level is RuntimeLevel.Upgrade or RuntimeLevel.Upgrading)
+        {
+            await InsertWithoutUserKeysAsync(dto);
         }
 
         entity.Id = dto.Id;
@@ -180,6 +120,44 @@ internal sealed class AuditEntryRepository : EntityRepositoryBase<int, IAuditEnt
     }
 
     /// <inheritdoc />
-    protected override void PersistUpdatedItem(IAuditEntry entity) =>
+    protected override Task PersistUpdatedItemAsync(IAuditEntry entity) =>
         throw new NotSupportedException("Audit entries cannot be updated.");
+
+    /// <summary>
+    ///     Pre-migration the *UserKey columns don't exist on the table, so audit entries written
+    ///     during the upgrade window must omit them.
+    ///
+    ///     It's not pretty. But it preserves the logic that was there before EF Core migration.
+    /// </summary>
+    // TODO (V22): Remove this method when 'V_17_0_0.AddGuidsToAuditEntries' is removed.
+    private Task InsertWithoutUserKeysAsync(AuditEntryDto dto) =>
+        AmbientScope.ExecuteWithContextAsync<AuditEntryDto>(async db =>
+        {
+            // Detach so EF Core doesn't retry the failed insert on a subsequent SaveChanges.
+            db.Entry(dto).State = EntityState.Detached;
+
+            const string sql = $$"""
+                INSERT INTO {{AuditEntryDto.TableName}} (
+                    {{AuditEntryDto.PerformingUserIdColumnName}},
+                    {{AuditEntryDto.PerformingDetailsColumnName}},
+                    {{AuditEntryDto.PerformingIpColumnName}},
+                    {{AuditEntryDto.EventDateColumnName}},
+                    {{AuditEntryDto.AffectedUserIdColumnName}},
+                    {{AuditEntryDto.AffectedDetailsColumnName}},
+                    {{AuditEntryDto.EventTypeColumnName}},
+                    {{AuditEntryDto.EventDetailsColumnName}})
+                VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})
+                """;
+
+            await db.Database.ExecuteSqlRawAsync(
+                sql,
+                dto.PerformingUserId,
+                (object?)dto.PerformingDetails ?? DBNull.Value,
+                (object?)dto.PerformingIp ?? DBNull.Value,
+                dto.EventDate,
+                dto.AffectedUserId,
+                (object?)dto.AffectedDetails ?? DBNull.Value,
+                (object?)dto.EventType ?? DBNull.Value,
+                (object?)dto.EventDetails ?? DBNull.Value);
+        });
 }

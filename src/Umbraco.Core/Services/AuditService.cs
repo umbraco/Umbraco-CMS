@@ -282,7 +282,7 @@ public sealed class AuditService : AsyncRepositoryService, IAuditService
         var auditEntryService =
             (AuditEntryService)StaticServiceProvider.Instance.GetRequiredService<IAuditEntryService>();
 
-        return auditEntryService.WriteInner(
+        return auditEntryService.WriteInnerAsync(
             performingUserId,
             perfomingDetails,
             performingIp,

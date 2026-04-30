@@ -3,11 +3,12 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Scoping.EFCore;
 
 namespace Umbraco.Cms.Core.Services;
 
 /// <inheritdoc cref="IAuditEntryService"/>
-public class AuditEntryService : RepositoryService, IAuditEntryService
+public class AuditEntryService : AsyncRepositoryService, IAuditEntryService
 {
     private readonly IAuditEntryRepository _auditEntryRepository;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
@@ -17,13 +18,13 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     /// </summary>
     /// <param name="auditEntryRepository">The audit entry repository.</param>
     /// <param name="userIdKeyResolver">The user ID key resolver.</param>
-    /// <param name="provider">The core scope provider.</param>
+    /// <param name="provider">The scope provider.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="eventMessagesFactory">The event messages factory.</param>
     public AuditEntryService(
         IAuditEntryRepository auditEntryRepository,
         IUserIdKeyResolver userIdKeyResolver,
-        ICoreScopeProvider provider,
+        IScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory)
         : base(provider, loggerFactory, eventMessagesFactory)
@@ -46,7 +47,7 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
         var performingUserId = await GetUserId(performingUserKey);
         var affectedUserId = await GetUserId(affectedUserKey);
 
-        return WriteInner(
+        return await WriteInnerAsync(
             performingUserId,
             performingUserKey,
             performingDetails,
@@ -72,7 +73,7 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     /// <param name="eventDetails">Details about the event.</param>
     /// <returns>The created audit entry.</returns>
     /// <remarks>This method is used by the AuditService while the AuditService.Write() method is not removed.</remarks>
-    internal async Task<IAuditEntry> WriteInner(
+    internal async Task<IAuditEntry> WriteInnerAsync(
         int? performingUserId,
         string performingDetails,
         string performingIp,
@@ -85,7 +86,7 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
         Guid? performingUserKey = await GetUserKey(performingUserId);
         Guid? affectedUserKey = await GetUserKey(affectedUserId);
 
-        return WriteInner(
+        return await WriteInnerAsync(
             performingUserId,
             performingUserKey,
             performingDetails,
@@ -112,7 +113,7 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     /// <param name="eventType">The type of event.</param>
     /// <param name="eventDetails">Details about the event.</param>
     /// <returns>The created audit entry.</returns>
-    private IAuditEntry WriteInner(
+    private async Task<IAuditEntry> WriteInnerAsync(
         int? performingUserId,
         Guid? performingUserKey,
         string performingDetails,
@@ -182,11 +183,9 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
             EventDetails = eventDetails,
         };
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            _auditEntryRepository.Save(entry);
-            scope.Complete();
-        }
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        await _auditEntryRepository.SaveAsync(entry, CancellationToken.None);
+        scope.Complete();
 
         return entry;
     }
@@ -216,11 +215,12 @@ public class AuditEntryService : RepositoryService, IAuditEntryService
     /// </summary>
     /// <returns>A collection of all audit entries.</returns>
     /// <remarks>Currently used in testing only. This is not part of the interface; queryable methods should be added to the interface instead.</remarks>
-    internal IEnumerable<IAuditEntry> GetAll()
+    internal async Task<IEnumerable<IAuditEntry>> GetAllAsync()
     {
-        using (ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _auditEntryRepository.GetMany();
-        }
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IEnumerable<IAuditEntry> entries = await _auditEntryRepository.GetAllAsync(CancellationToken.None);
+        scope.Complete();
+
+        return entries;
     }
 }
