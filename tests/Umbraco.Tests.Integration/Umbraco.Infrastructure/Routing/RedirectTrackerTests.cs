@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -122,6 +123,30 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         Assert.AreEqual(1, redirects.Count());
         var redirect = redirects.First();
         Assert.AreEqual("/old-route", redirect.Url);
+    }
+
+    /// <summary>
+    /// Verifies that no redirect is created when the stored "old route" is the unroutable
+    /// indicator (<see cref="Constants.Routing.Unroutable"/>, "#"). This guards against the
+    /// scenario where content is previewed before being published for the first time: the
+    /// preview cookie causes the URL provider to return "#" for the not-yet-published content,
+    /// which would otherwise be tracked as a (bogus) redirect to the eventual published URL.
+    /// See https://github.com/umbraco/Umbraco-CMS/issues/22652.
+    /// </summary>
+    [Test]
+    public void Does_Not_Create_Redirect_For_Unroutable_Old_Route()
+    {
+        IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
+            new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
+            {
+                [(_testPage.Id, "en")] = (_testPage.Key, Constants.Routing.Unroutable),
+            };
+
+        var redirectTracker = CreateRedirectTracker();
+
+        redirectTracker.CreateRedirects(dict);
+
+        Assert.IsEmpty(RedirectUrlService.GetContentRedirectUrls(_testPage.Key));
     }
 
     /// <summary>

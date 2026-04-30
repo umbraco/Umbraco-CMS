@@ -300,7 +300,7 @@ internal sealed class RedirectTracker : IRedirectTracker
                     newRoute = domainRootId + newRoute;
                 }
 
-                if (!IsValidRoute(newRoute) || oldRoute == newRoute)
+                if (!IsValidRoute(oldRoute) || !IsValidRoute(newRoute) || oldRoute == newRoute)
                 {
                     continue;
                 }
@@ -318,7 +318,10 @@ internal sealed class RedirectTracker : IRedirectTracker
         }
     }
 
-    private static bool IsValidRoute([NotNullWhen(true)] string? route) => route is not null && !route.StartsWith("err/");
+    private static bool IsValidRoute([NotNullWhen(true)] string? route) =>
+        route is not null
+        && route != Constants.Routing.Unroutable
+        && !route.StartsWith("err/");
 
     private void RemoveSelfReferencingRedirect(Guid contentKey, string route)
     {
