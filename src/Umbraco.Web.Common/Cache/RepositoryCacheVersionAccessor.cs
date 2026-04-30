@@ -77,7 +77,6 @@ public class RepositoryCacheVersionAccessor : IRepositoryCacheVersionAccessor
         }
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
-        scope.ReadLock(Core.Constants.Locks.CacheVersion);
 
         RepositoryCacheVersion? databaseVersion = await _repositoryCacheVersionRepository.GetAsync(cacheKey);
 
