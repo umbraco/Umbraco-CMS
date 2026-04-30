@@ -247,57 +247,65 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	/** Dropdown */
 
-	#optionClick(index: number) {
-		this._tagInput.value = this._optionCollection?.item(index)?.value ?? '';
+	#optionClick(option: HTMLInputElement) {
+		this._tagInput.value = option.value;
 		this.#createTag();
 		this.focus();
-		return;
 	}
 
-	#optionKeydown(e: KeyboardEvent, index: number) {
+	#optionKeydown(e: KeyboardEvent, option: HTMLInputElement) {
 		const keyHandlers: Record<string, () => void> = {
-			Enter: () => this.#handleOptionEnter(index),
-			Tab: () => this.#handleOptionTab(e, index),
-			ArrowDown: () => this.#handleOptionArrowDown(e, index),
-			ArrowUp: () => this.#handleOptionArrowUp(e, index),
+			Enter: () => this.#handleOptionEnter(option),
+			Tab: () => this.#handleOptionTab(e, option),
+			ArrowDown: () => this.#handleOptionArrowDown(e, option),
+			ArrowUp: () => this.#handleOptionArrowUp(e, option),
 			Backspace: () => this.focus(),
 		};
 
 		keyHandlers[e.key]?.();
 	}
 
-	#handleOptionEnter(index: number) {
-		this._tagInput.value = this._optionCollection?.item(index)?.value ?? '';
+	#handleOptionEnter(option: HTMLInputElement) {
+		this._tagInput.value = option.value;
 		this.#createTag();
 		this.focus();
 	}
 
-	#handleOptionTab(e: KeyboardEvent, index: number) {
+	#handleOptionTab(e: KeyboardEvent, option: HTMLInputElement) {
 		e.preventDefault();
-		const next = this._optionCollection?.item(index + 1);
+		const next = this.#nextOption(option);
 		if (next) {
 			next.focus();
 			this._currentInput = next.value;
 		} else {
-			// Wrap back to input when past the last option
 			this.focus();
 		}
 	}
 
-	#handleOptionArrowDown(e: KeyboardEvent, index: number) {
+	#handleOptionArrowDown(e: KeyboardEvent, option: HTMLInputElement) {
 		e.preventDefault();
-		const next = this._optionCollection?.item(index + 1);
+		const next = this.#nextOption(option);
 		if (!next) return;
 		next.focus();
 		this._currentInput = next.value;
 	}
 
-	#handleOptionArrowUp(e: KeyboardEvent, index: number) {
+	#handleOptionArrowUp(e: KeyboardEvent, option: HTMLInputElement) {
 		e.preventDefault();
-		const prev = this._optionCollection?.item(index - 1);
+		const prev = this.#prevOption(option);
 		if (!prev) return;
 		prev.focus();
 		this._currentInput = prev.value;
+	}
+
+	#nextOption(option: HTMLInputElement): HTMLInputElement | undefined {
+		const options = Array.from(this._optionCollection ?? []);
+		return options[options.indexOf(option) + 1];
+	}
+
+	#prevOption(option: HTMLInputElement): HTMLInputElement | undefined {
+		const options = Array.from(this._optionCollection ?? []);
+		return options[options.indexOf(option) - 1];
 	}
 
 	/** Render */
@@ -342,14 +350,14 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				${repeat(
 					matchfilter.slice(0, 5),
 					(tag: TagResponseModel) => tag.id,
-					(tag: TagResponseModel, index: number) => {
+					(tag: TagResponseModel) => {
 						return html`<input
 								class="options"
 								id="tag-${tag.id}"
 								type="radio"
 								name="${tag.group ?? ''}"
-								@click="${() => this.#optionClick(index)}"
-								@keydown="${(e: KeyboardEvent) => this.#optionKeydown(e, index)}"
+								@click="${(e: MouseEvent) => this.#optionClick(e.currentTarget as HTMLInputElement)}"
+								@keydown="${(e: KeyboardEvent) => this.#optionKeydown(e, e.currentTarget as HTMLInputElement)}"
 								value="${tag.text ?? ''}"
 								?readonly=${this.readonly} />
 							<label for="tag-${tag.id}"> ${tag.text} </label>`;
