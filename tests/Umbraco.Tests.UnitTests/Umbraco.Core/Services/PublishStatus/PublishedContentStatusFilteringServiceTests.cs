@@ -140,7 +140,7 @@ public partial class PublishedContentStatusFilteringServiceTests
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
         Assert.AreEqual(expectedNumberOfChildren, children.Length);
 
-        // IDs 0 through 3 exist in both en-US and da-DK, but none register as having a published ancestor path
+        // IDs 0 through 3 exist in both en-US and da-DK, but none pass both the published and ancestor-path checks
 
         // IDs 4 through 6 exist only in en-US - only even IDs are published
         if (culture == "en-US")
