@@ -1590,15 +1590,19 @@ export class UiBaseLocators extends BasePage {
   }
 
   async selectMediaWithName(mediaName: string) {
-    const mediaLocator = this.mediaCardItems.filter({ hasText: mediaName });
+    const mediaLocator = this.mediaCardItems.filter({hasText: mediaName});
     await this.waitForVisible(mediaLocator);
-    await this.click(mediaLocator.locator("#select-checkbox"), { force: true });
+    const mediaCheckbox = mediaLocator.locator("#select-checkbox");
+    await this.hover(mediaCheckbox);
+    await this.click(mediaCheckbox, {force: true});
   }
 
   async selectMediaWithTestId(mediaKey: string) {
     const mediaLocator = this.page.getByTestId("media:" + mediaKey);
     await this.waitForVisible(mediaLocator);
-    await this.click(mediaLocator.locator("#select-checkbox"), { force: true });
+    const mediaCheckbox = mediaLocator.locator("#select-checkbox");
+    await this.hover(mediaCheckbox);
+    await this.click(mediaCheckbox, {force: true});
   }
 
   async clickMediaPickerModalSubmitButton() {
