@@ -231,7 +231,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.selectAVariantBtn = page.getByRole('button', {name: 'Open version selector'});
     this.variantAddModeBtn = page.locator('.switch-button.add-mode').locator('.variant-name');
     this.saveAndCloseBtn = page.getByLabel('Save and close');
-    this.elementTreeItem = page.locator('umb-element-tree-item');
+    this.elementTreeItem = page.locator('umb-tree-item');
     this.elementLanguageSelect = page.locator('umb-app-language-select');
     this.elementLanguageSelectPopover = page.locator('umb-popover-layout');
     this.elementReadOnly = this.elementWorkspace.locator('#name-input').getByText('Read-only');
@@ -374,7 +374,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.collectionMenu = page.locator('umb-collection-menu');
     this.entityPickerTree = page.locator('umb-tree[alias="Umb.Tree.EntityDataPicker"]');
     this.languageToggle = page.getByTestId('input:entity-name').locator('#toggle');
-    this.elementVariantDropdown = page.locator('umb-workspace-split-view-variant-selector uui-popover-container #dropdown');
+    this.elementVariantDropdown = page.locator('umb-element-workspace-split-view-variant-selector uui-popover-container #dropdown');
     this.blockProperty = page.locator('umb-block-workspace-view-edit-property');
     // Multi URL Picker
     this.linkPickerAddBtn = this.linkPickerModal.getByRole('button', {name: 'Add', exact: true});

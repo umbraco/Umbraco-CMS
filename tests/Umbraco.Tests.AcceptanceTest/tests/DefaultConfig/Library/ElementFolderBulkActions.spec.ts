@@ -37,6 +37,7 @@ test('can bulk publish elements in a folder', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.library.clickConfirmToPublishButtonAndWaitForElementToBePublished();
 
   // Assert
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the publish process to complete
   expect(await umbracoApi.element.isElementPublished(firstElementId)).toBeTruthy();
   expect(await umbracoApi.element.isElementPublished(secondElementId)).toBeTruthy();
 });

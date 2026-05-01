@@ -4,7 +4,6 @@ using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
-using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Features;
@@ -72,13 +71,6 @@ public class ConfigurationPresentationFactory : IConfigurationPresentationFactor
             UseSegments = _segmentSettings.Enabled,
             ReservedFieldNames = _reservedFieldNamesService.GetDocumentReservedFieldNames(),
         };
-
-    /// <summary>
-    /// Instantiates and returns a new <see cref="MemberConfigurationResponseModel"/>.
-    /// </summary>
-    /// <returns>A new <see cref="MemberConfigurationResponseModel"/>.</returns>
-    public MemberConfigurationResponseModel CreateMemberConfigurationResponseModel() =>
-        new();
 
     /// <summary>
     /// Creates a <see cref="Umbraco.Cms.Api.Management.Models.MemberTypeConfigurationResponseModel"/> containing the reserved member field names.

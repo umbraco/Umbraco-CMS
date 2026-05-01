@@ -852,6 +852,7 @@ export default {
 		delete: 'Slet',
 		deleted: 'Slettet',
 		deleting: 'Sletter...',
+		description: 'Beskrivelse',
 		design: 'Design',
 		details: 'Detaljer',
 		dictionary: 'Ordbog',
