@@ -1743,10 +1743,6 @@ export type MediaVariantResponseModel = {
     name: string;
 };
 
-export type MemberConfigurationResponseModel = {
-    [key: string]: unknown;
-};
-
 export type MemberGroupItemResponseModel = {
     name: string;
     id: string;
@@ -2241,6 +2237,11 @@ export type PagedModelDocumentItemResponseModel = {
 
 export type PagedModelDocumentTypeItemResponseModel = {
     items: Array<DocumentTypeItemResponseModel>;
+    total: number;
+};
+
+export type PagedModelElementItemResponseModel = {
+    items: Array<ElementItemResponseModel>;
     total: number;
 };
 
@@ -9061,6 +9062,33 @@ export type GetItemElementFolderResponses = {
 
 export type GetItemElementFolderResponse = GetItemElementFolderResponses[keyof GetItemElementFolderResponses];
 
+export type GetItemElementSearchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        query?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/item/element/search';
+};
+
+export type GetItemElementSearchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemElementSearchResponses = {
+    /**
+     * OK
+     */
+    200: PagedModelElementItemResponseModel;
+};
+
+export type GetItemElementSearchResponse = GetItemElementSearchResponses[keyof GetItemElementSearchResponses];
+
 export type DeleteRecycleBinElementData = {
     body?: never;
     path?: never;
@@ -13138,33 +13166,6 @@ export type GetMemberAreReferencedResponses = {
 };
 
 export type GetMemberAreReferencedResponse = GetMemberAreReferencedResponses[keyof GetMemberAreReferencedResponses];
-
-export type GetMemberConfigurationData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/management/api/v1/member/configuration';
-};
-
-export type GetMemberConfigurationErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-};
-
-export type GetMemberConfigurationResponses = {
-    /**
-     * OK
-     */
-    200: MemberConfigurationResponseModel;
-};
-
-export type GetMemberConfigurationResponse = GetMemberConfigurationResponses[keyof GetMemberConfigurationResponses];
 
 export type PostMemberValidateData = {
     body: CreateMemberRequestModel;

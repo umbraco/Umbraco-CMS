@@ -13829,6 +13829,63 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/element/search": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "summary": "Searches element items.",
+        "description": "Searches element items by the provided query with pagination support.",
+        "operationId": "GetItemElementSearch",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelElementItemResponseModel"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/recycle-bin/element": {
       "delete": {
         "tags": [
@@ -48052,6 +48109,25 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/DocumentTypeItemResponseModel"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "PagedModelElementItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ElementItemResponseModel"
             }
           },
           "total": {
