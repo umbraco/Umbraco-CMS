@@ -5,7 +5,6 @@ import type { MemoizationFunction } from '../types/memoization-function.type.js'
 import { jsonStringComparison } from '../utils/json-string-comparison.function.js';
 import { UmbBasicState } from './basic-state.js';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * @class UmbDeepState
