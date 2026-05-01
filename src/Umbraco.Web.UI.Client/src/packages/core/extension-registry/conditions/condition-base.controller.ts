@@ -26,7 +26,7 @@ export class UmbConditionBase<ConditionConfigType extends UmbConditionConfigBase
 
 	override destroy() {
 		// Clear `#onChange` before `super.destroy()`. [NL]
-		(this.#onChange as unknown) = undefined;
+		this.#onChange = undefined;
 		super.destroy();
 		(this.config as unknown) = undefined;
 	}
