@@ -1699,7 +1699,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         public IReadOnlyList<IScript> ImportScripts(IEnumerable<XElement> scriptElements, int userId)
         {
             var result = new List<IScript>();
-            Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+            Guid userKey = ResolveUserKey(userId);
 
             foreach (XElement scriptXml in scriptElements)
             {
@@ -1733,6 +1733,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     {
                         result.Add(createAttempt.Result);
                     }
+                    else
+                    {
+                        _logger.LogWarning("Skipping script '{Path}' during package install: {Status}", path, createAttempt.Status);
+                    }
                 }
             }
 
@@ -1748,7 +1752,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         public IReadOnlyList<IPartialView> ImportPartialViews(IEnumerable<XElement> partialViewElements, int userId)
         {
             var result = new List<IPartialView>();
-            Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+            Guid userKey = ResolveUserKey(userId);
 
             foreach (XElement partialViewXml in partialViewElements)
             {
@@ -1775,6 +1779,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     {
                         result.Add(createAttempt.Result);
                     }
+                    else
+                    {
+                        _logger.LogWarning("Skipping partial view '{Path}' during package install: {Status}", path, createAttempt.Status);
+                    }
                 }
             }
 
@@ -1795,7 +1803,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         public IReadOnlyList<IFile> ImportStylesheets(IEnumerable<XElement> stylesheetElements, int userId)
         {
             var result = new List<IFile>();
-            Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+            Guid userKey = ResolveUserKey(userId);
 
             foreach (XElement n in stylesheetElements)
             {
@@ -1825,6 +1833,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     Attempt<IStylesheet?, StylesheetOperationStatus> createAttempt = _stylesheetService.CreateAsync(createModel, userKey).GetAwaiter().GetResult();
                     if (createAttempt.Success is false || createAttempt.Result is null)
                     {
+                        _logger.LogWarning("Skipping stylesheet '{Path}' during package install: {Status}", stylesheetPath, createAttempt.Status);
                         continue;
                     }
 
@@ -1862,7 +1871,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     Content = s.Content ?? string.Empty,
                 };
-                _stylesheetService.UpdateAsync(s.Path, updateModel, userKey).GetAwaiter().GetResult();
+                Attempt<IStylesheet?, StylesheetOperationStatus> updateAttempt = _stylesheetService.UpdateAsync(s.Path, updateModel, userKey).GetAwaiter().GetResult();
+                if (updateAttempt.Success is false)
+                {
+                    _logger.LogWarning("Failed to update stylesheet '{Path}' during package install: {Status}", s.Path, updateAttempt.Status);
+                }
+
                 result.Add(s);
             }
 
@@ -1982,6 +1996,13 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             var parent = path[..lastSlash];
             return (path[(lastSlash + 1)..], string.IsNullOrEmpty(parent) ? null : parent);
+        }
+
+        // Resolves an int user id to its Guid key, falling back to SuperUserKey for unknown ids.
+        private Guid ResolveUserKey(int userId)
+        {
+            Attempt<Guid> attempt = _userIdKeyResolver.TryGetAsync(userId).GetAwaiter().GetResult();
+            return attempt.Success ? attempt.Result : Constants.Security.SuperUserKey;
         }
     }
 }
