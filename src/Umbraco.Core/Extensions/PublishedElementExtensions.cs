@@ -95,7 +95,11 @@ public static class PublishedElementExtensions
     /// <param name="segment">The variation segment.</param>
     /// <param name="fallback">Optional fallback strategy.</param>
     /// <returns>A value indicating whether the content has a value for the property identified by the alias.</returns>
-    /// <remarks>Returns true if HasValue is true, or a fallback strategy can provide a value.</remarks>
+    /// <remarks>
+    ///     Returns true if HasValue is true, or a fallback strategy can provide a value.
+    ///     <see cref="Fallback.ToAncestors"/> is not supported at the element level and will throw
+    ///     a <see cref="NotSupportedException"/>.
+    /// </remarks>
     public static bool HasValue(
         this IPublishedElement content,
         IPublishedValueFallback publishedValueFallback,
