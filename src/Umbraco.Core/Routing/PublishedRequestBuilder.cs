@@ -188,7 +188,7 @@ public class PublishedRequestBuilder : IPublishedRequestBuilder
     }
 
     /// <inheritdoc />
-    public bool TrySetTemplate(string alias)
+    public async Task<bool> TrySetTemplateAsync(string alias)
     {
         if (string.IsNullOrWhiteSpace(alias))
         {
@@ -199,7 +199,7 @@ public class PublishedRequestBuilder : IPublishedRequestBuilder
         // NOTE - can we still get it with whitespaces in it due to old legacy bugs?
         alias = alias.Replace(" ", string.Empty);
 
-        ITemplate? model = _templateService.GetAsync(alias).GetAwaiter().GetResult();
+        ITemplate? model = await _templateService.GetAsync(alias);
         if (model == null)
         {
             return false;
