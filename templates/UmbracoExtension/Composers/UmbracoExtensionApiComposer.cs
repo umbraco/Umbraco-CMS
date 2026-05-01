@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
+using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.Composing;
@@ -39,6 +40,12 @@ public class UmbracoExtensionApiComposer : IComposer
                     };
                     return Task.CompletedTask;
                 });
+
+                // Only include endpoints decorated with the `MapToApi` attribute for our own API.
+                options.ShouldInclude = apiDescription =>
+                    apiDescription.ActionDescriptor.EndpointMetadata
+                        .OfType<MapToApiAttribute>()
+                        .Any(attribute => attribute.ApiName == Constants.ApiName);
 
                 // Enable Umbraco authentication for the "Example" OpenAPI document
                 options.AddBackofficeSecurityRequirements();
