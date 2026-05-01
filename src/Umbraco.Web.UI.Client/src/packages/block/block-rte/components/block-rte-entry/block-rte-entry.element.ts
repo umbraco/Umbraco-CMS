@@ -373,7 +373,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderEditAction() {
-		if (this._isReadOnly) return nothing;
 		return this._showContentEdit && this._workspaceEditContentPath
 			? html`<uui-button
 					label="edit"
@@ -396,7 +395,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
 		return html`
 			${this._hasSettings && this._workspaceEditSettingsPath
 				? html`<uui-button
