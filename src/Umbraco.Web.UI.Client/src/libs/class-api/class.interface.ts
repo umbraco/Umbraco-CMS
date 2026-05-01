@@ -55,7 +55,7 @@ export interface UmbClassInterface extends UmbControllerHost {
 	): UmbContextProviderController<R>;
 
 	/**
-	 * @description Setup a subscription for a context. The callback is called when the context is resolved.
+	 * @description Subscribe to a context. The callback fires when the context resolves and again if the context is replaced. Use this whenever a controller or element needs the context at setup time — both for ongoing observation and for reading values immediately on resolve. This is the default choice; prefer it over `getContext` unless the context is only needed inside a later user action.
 	 * @param {string} alias
 	 * @param {ObserverCallback} callback Callback method called when context is resolved.
 	 * @returns {UmbContextConsumerController} Reference to the created Context Consumer Controller instance
@@ -67,7 +67,7 @@ export interface UmbClassInterface extends UmbControllerHost {
 	): UmbContextConsumerController<BaseType, ResultType>;
 
 	/**
-	 * @description Retrieve a context. Notice this is a one time retrieving of a context, meaning if you expect this to be up to date with reality you should instead use the consumeContext method.
+	 * @description Retrieve a context once as a Promise. Use this only when the context is first needed inside a user action or event handler that runs later (for example a button click, a property action, or an entity action `execute()`). For setup-time access — including a single immediate read — use `consumeContext` instead so the controller lifecycle handles resolution and cleanup.
 	 * @param {string} alias
 	 * @returns {Promise<unknown>} A Promise with the reference to the Context Api Instance
 	 * @memberof UmbClassInterface
