@@ -95,7 +95,17 @@ public static class PublishedContentExtensions
             return null;
         }
 
-        IDocumentUrlService documentUrlService = StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
+        // Use IDocumentUrlService to get the URL segment, aligning with the non-obsolete recommended approach.
+        // Fall back to in-memory lookup if the static service provider isn't initialised (e.g. unit tests that
+        // don't bootstrap DI). In production it is always populated.
+        IDocumentUrlService? documentUrlService = StaticServiceProvider.Instance?.GetService<IDocumentUrlService>();
+        if (documentUrlService is null)
+        {
+            return content.Cultures.TryGetValue(effectiveCulture, out PublishedCultureInfo? infos)
+                ? infos.UrlSegment
+                : null;
+        }
+
         var isDraft = content.IsDraft(effectiveCulture.Length == 0 ? null : effectiveCulture);
         return documentUrlService.GetUrlSegment(content.Key, effectiveCulture, isDraft);
     }
