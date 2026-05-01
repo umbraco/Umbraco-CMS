@@ -40,13 +40,20 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		});
 	}
 
-	#loadWasCalled = false;
+	#loadPromise?: Promise<void>;
 	/**
-	 * Loads the current user
+	 * Loads the current user. Concurrent callers share the same in-flight promise,
+	 * so awaiting `load()` always waits for `#currentUser` to be populated.
+	 * @returns {Promise<void>} Resolves once the current user observable has emitted.
 	 */
-	public async load() {
-		if (this.#loadWasCalled) return;
-		this.#loadWasCalled = true;
+	public async load(): Promise<void> {
+		if (!this.#loadPromise) {
+			this.#loadPromise = this.#doLoad();
+		}
+		return this.#loadPromise;
+	}
+
+	async #doLoad(): Promise<void> {
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
 		if (asObservable) {
