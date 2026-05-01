@@ -597,8 +597,10 @@ export class UiBaseLocators extends BasePage {
     // Editor
     this.monacoEditor = page.locator(".monaco-editor");
 
-    // Loader
-    this.uiLoader = page.locator("uui-loader");
+    // Loader (excludes the global app-level loader at #loader)
+    this.uiLoader = page.locator(
+      "uui-loader:not([data-mark='app-router-loader'])",
+    );
 
     // Block
     this.blockTypeCard = page.locator("uui-card-block-type");

@@ -430,7 +430,7 @@ export class UmbAppElement extends UmbLitElement {
 
 	override render() {
 		return html`<umb-router-slot id="router-slot" .routes=${this._routes}
-			><div id="loader"><uui-loader></uui-loader></div
+			><div id="loader"><uui-loader data-mark="app-router-loader"></uui-loader></div
 		></umb-router-slot>`;
 	}
 
