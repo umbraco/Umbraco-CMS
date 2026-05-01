@@ -11,9 +11,6 @@ import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbArrayState, UmbBasicState, UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 
-const LANGUAGE_PERMISSION_PREFIX = 'UMB_LANGUAGE_PERMISSION_';
-const BLOCK_MANAGER_RULE_UNIQUE = 'UMB_BLOCK_MANAGER_CONTEXT';
-
 class UmbBlockWorkspaceContextStub extends UmbContextBase {
 	public readonly IS_BLOCK_WORKSPACE_CONTEXT = true;
 	readonly #variantId = new UmbBasicState<UmbVariantId | undefined>(undefined);
@@ -80,22 +77,6 @@ class UmbTestBlockLanguageAccessHostElement extends UmbControllerHostElementMixi
 const enUS = UmbVariantId.Create({ culture: 'en-US', segment: null });
 const daDK = UmbVariantId.Create({ culture: 'da-DK', segment: null });
 
-function findRule(manager: UmbReadOnlyVariantGuardManager, unique: string) {
-	return manager.getRules().find((r) => r.unique === unique);
-}
-
-function expectRuleOnAllGuards(host: UmbTestBlockLanguageAccessHostElement, unique: string) {
-	expect(findRule(host.workspaceContext.readOnlyGuard, unique), `workspace.readOnlyGuard rule "${unique}"`).to.exist;
-	expect(findRule(host.workspaceContext.content.readOnlyGuard, unique), `content.readOnlyGuard rule "${unique}"`).to.exist;
-	expect(findRule(host.workspaceContext.settings.readOnlyGuard, unique), `settings.readOnlyGuard rule "${unique}"`).to.exist;
-}
-
-function expectRuleAbsentFromAllGuards(host: UmbTestBlockLanguageAccessHostElement, unique: string) {
-	expect(findRule(host.workspaceContext.readOnlyGuard, unique), `workspace.readOnlyGuard rule "${unique}"`).to.be.undefined;
-	expect(findRule(host.workspaceContext.content.readOnlyGuard, unique), `content.readOnlyGuard rule "${unique}"`).to.be.undefined;
-	expect(findRule(host.workspaceContext.settings.readOnlyGuard, unique), `settings.readOnlyGuard rule "${unique}"`).to.be.undefined;
-}
-
 async function flushMicrotasks() {
 	// Two ticks: one for context-consumer resolution, one for the inner observe to fire.
 	await Promise.resolve();
@@ -114,71 +95,74 @@ describe('UmbBlockLanguageAccessWorkspaceController', () => {
 		host.remove();
 	});
 
-	describe('Initial state', () => {
-		it('sets fallbackToPermitted on all three guards before any rules are added', async () => {
-			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
-			await flushMicrotasks();
+	function expectReadOnly(variantId: UmbVariantId) {
+		expect(host.workspaceContext.readOnlyGuard.getIsPermittedForVariant(variantId), 'workspace.readOnlyGuard').to.be
+			.true;
+		expect(host.workspaceContext.content.readOnlyGuard.getIsPermittedForVariant(variantId), 'content.readOnlyGuard').to
+			.be.true;
+		expect(host.workspaceContext.settings.readOnlyGuard.getIsPermittedForVariant(variantId), 'settings.readOnlyGuard')
+			.to.be.true;
+	}
 
-			// With no rules and fallbackToPermitted, getIsPermittedForVariant returns true for any variant.
-			expect(host.workspaceContext.readOnlyGuard.getIsPermittedForVariant(enUS)).to.be.true;
-			expect(host.workspaceContext.content.readOnlyGuard.getIsPermittedForVariant(enUS)).to.be.true;
-			expect(host.workspaceContext.settings.readOnlyGuard.getIsPermittedForVariant(enUS)).to.be.true;
-		});
-	});
+	function expectEditable(variantId: UmbVariantId) {
+		expect(host.workspaceContext.readOnlyGuard.getIsPermittedForVariant(variantId), 'workspace.readOnlyGuard').to.be
+			.false;
+		expect(host.workspaceContext.content.readOnlyGuard.getIsPermittedForVariant(variantId), 'content.readOnlyGuard').to
+			.be.false;
+		expect(host.workspaceContext.settings.readOnlyGuard.getIsPermittedForVariant(variantId), 'settings.readOnlyGuard')
+			.to.be.false;
+	}
 
-	describe('Invariant variantId — block manager state', () => {
-		it('does not add the block-manager rule while manager.permitted is true (block is read-only)', async () => {
+	describe('Invariant block — block manager state', () => {
+		it('is read-only when the block manager is read-only', async () => {
 			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
 			host.blockManagerContext.setPermitted(true);
 
 			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
 			await flushMicrotasks();
 
-			expectRuleAbsentFromAllGuards(host, BLOCK_MANAGER_RULE_UNIQUE);
+			expectReadOnly(UmbVariantId.CreateInvariant());
 		});
 
-		it('adds a permitted:false rule on all three guards when manager.permitted is false (block is editable)', async () => {
+		it('is editable when the block manager is not read-only', async () => {
 			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
 			host.blockManagerContext.setPermitted(false);
 
 			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
 			await flushMicrotasks();
 
-			expectRuleOnAllGuards(host, BLOCK_MANAGER_RULE_UNIQUE);
-			const rule = findRule(host.workspaceContext.readOnlyGuard, BLOCK_MANAGER_RULE_UNIQUE)!;
-			expect(rule.permitted).to.equal(false);
-			expect(rule.variantId?.compare(UmbVariantId.INVARIANT)).to.be.true;
+			expectEditable(UmbVariantId.CreateInvariant());
 		});
 
-		it('removes the block-manager rule when manager flips back to permitted:true', async () => {
-			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
-			host.blockManagerContext.setPermitted(false);
-
-			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
-			await flushMicrotasks();
-			expectRuleOnAllGuards(host, BLOCK_MANAGER_RULE_UNIQUE);
-
-			host.blockManagerContext.setPermitted(true);
-			await flushMicrotasks();
-			expectRuleAbsentFromAllGuards(host, BLOCK_MANAGER_RULE_UNIQUE);
-		});
-
-		it('re-adds the rule when manager flips permitted:true → false', async () => {
+		it('flips to editable when the block manager flips from read-only to not read-only', async () => {
 			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
 			host.blockManagerContext.setPermitted(true);
 
 			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
 			await flushMicrotasks();
-			expectRuleAbsentFromAllGuards(host, BLOCK_MANAGER_RULE_UNIQUE);
+			expectReadOnly(UmbVariantId.CreateInvariant());
 
 			host.blockManagerContext.setPermitted(false);
 			await flushMicrotasks();
-			expectRuleOnAllGuards(host, BLOCK_MANAGER_RULE_UNIQUE);
+			expectEditable(UmbVariantId.CreateInvariant());
+		});
+
+		it('flips to read-only when the block manager flips from not read-only to read-only', async () => {
+			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
+			host.blockManagerContext.setPermitted(false);
+
+			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
+			await flushMicrotasks();
+			expectEditable(UmbVariantId.CreateInvariant());
+
+			host.blockManagerContext.setPermitted(true);
+			await flushMicrotasks();
+			expectReadOnly(UmbVariantId.CreateInvariant());
 		});
 	});
 
 	describe('Variant block — language access', () => {
-		it('adds permitted:false rule when hasAccessToAllLanguages is true', async () => {
+		it('is editable when the user has access to all languages', async () => {
 			host.workspaceContext.setVariantId(enUS);
 			host.currentUserContext.setHasAccessToAllLanguages(true);
 			host.currentUserContext.setLanguages([]);
@@ -186,14 +170,10 @@ describe('UmbBlockLanguageAccessWorkspaceController', () => {
 			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
 			await flushMicrotasks();
 
-			const unique = LANGUAGE_PERMISSION_PREFIX + 'en-US';
-			expectRuleOnAllGuards(host, unique);
-			const rule = findRule(host.workspaceContext.readOnlyGuard, unique)!;
-			expect(rule.permitted).to.equal(false);
-			expect(rule.variantId?.compare(enUS)).to.be.true;
+			expectEditable(enUS);
 		});
 
-		it('adds permitted:false rule when culture is in user allowedLanguages', async () => {
+		it('is editable when the culture is in the user allowed languages', async () => {
 			host.workspaceContext.setVariantId(enUS);
 			host.currentUserContext.setHasAccessToAllLanguages(false);
 			host.currentUserContext.setLanguages(['en-US']);
@@ -201,10 +181,10 @@ describe('UmbBlockLanguageAccessWorkspaceController', () => {
 			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
 			await flushMicrotasks();
 
-			expectRuleOnAllGuards(host, LANGUAGE_PERMISSION_PREFIX + 'en-US');
+			expectEditable(enUS);
 		});
 
-		it('does not add a rule when culture is not in user allowedLanguages', async () => {
+		it('is read-only when the culture is not in the user allowed languages', async () => {
 			host.workspaceContext.setVariantId(enUS);
 			host.currentUserContext.setHasAccessToAllLanguages(false);
 			host.currentUserContext.setLanguages(['da-DK']);
@@ -212,11 +192,10 @@ describe('UmbBlockLanguageAccessWorkspaceController', () => {
 			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
 			await flushMicrotasks();
 
-			expectRuleAbsentFromAllGuards(host, LANGUAGE_PERMISSION_PREFIX + 'en-US');
-			expectRuleAbsentFromAllGuards(host, LANGUAGE_PERMISSION_PREFIX + 'da-DK');
+			expectReadOnly(enUS);
 		});
 
-		it('does not add a rule when user has neither global access nor a matching language', async () => {
+		it('is read-only when the user has neither global access nor a matching language', async () => {
 			host.workspaceContext.setVariantId(enUS);
 			host.currentUserContext.setHasAccessToAllLanguages(false);
 			host.currentUserContext.setLanguages([]);
@@ -224,79 +203,65 @@ describe('UmbBlockLanguageAccessWorkspaceController', () => {
 			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
 			await flushMicrotasks();
 
-			expectRuleAbsentFromAllGuards(host, LANGUAGE_PERMISSION_PREFIX + 'en-US');
+			expectReadOnly(enUS);
 		});
 	});
 
-	describe('Cleanup transitions', () => {
-		it('removes the prior culture rule when the variantId switches culture (en-US → da-DK)', async () => {
+	describe('Transitions', () => {
+		it('updates correctly when the variantId switches culture (en-US → da-DK)', async () => {
 			host.workspaceContext.setVariantId(enUS);
-			host.currentUserContext.setHasAccessToAllLanguages(true);
-			host.currentUserContext.setLanguages([]);
+			host.currentUserContext.setHasAccessToAllLanguages(false);
+			host.currentUserContext.setLanguages(['da-DK']);
 
 			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
 			await flushMicrotasks();
-			expectRuleOnAllGuards(host, LANGUAGE_PERMISSION_PREFIX + 'en-US');
+			expectReadOnly(enUS);
 
 			host.workspaceContext.setVariantId(daDK);
 			await flushMicrotasks();
-
-			// The stale en-US rule must be cleaned up; only the da-DK rule should remain.
-			expectRuleAbsentFromAllGuards(host, LANGUAGE_PERMISSION_PREFIX + 'en-US');
-			expectRuleOnAllGuards(host, LANGUAGE_PERMISSION_PREFIX + 'da-DK');
+			expectEditable(daDK);
 		});
 
-		it('clears the block-manager rule and observer when variantId switches from invariant → variant', async () => {
+		it('drops the block-manager read-only state when switching from invariant to variant', async () => {
 			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
-			host.blockManagerContext.setPermitted(false);
-
-			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
-			await flushMicrotasks();
-			expectRuleOnAllGuards(host, BLOCK_MANAGER_RULE_UNIQUE);
-
-			host.workspaceContext.setVariantId(enUS);
-			await flushMicrotasks();
-			expectRuleAbsentFromAllGuards(host, BLOCK_MANAGER_RULE_UNIQUE);
-		});
-
-		it('does not duplicate the block-manager rule when an invariant variantId re-emits (Phase 2 leak fix)', async () => {
-			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
-			host.blockManagerContext.setPermitted(false);
-
-			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
-			await flushMicrotasks();
-
-			// Force a re-emit by going variant → invariant. Each invariant emission would
-			// previously leak a context consumer because the prior #consumeBlockManager
-			// reference was overwritten without being destroyed.
-			host.workspaceContext.setVariantId(enUS);
-			await flushMicrotasks();
-			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
-			await flushMicrotasks();
-			host.workspaceContext.setVariantId(enUS);
-			await flushMicrotasks();
-			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
-			await flushMicrotasks();
-
-			// Exactly one block-manager rule should be present (deduped by unique key).
-			const rules = host.workspaceContext.readOnlyGuard
-				.getRules()
-				.filter((r) => r.unique === BLOCK_MANAGER_RULE_UNIQUE);
-			expect(rules.length).to.equal(1);
-		});
-
-		it('removes the language rule when culture becomes invariant', async () => {
-			host.workspaceContext.setVariantId(enUS);
+			host.blockManagerContext.setPermitted(true);
 			host.currentUserContext.setHasAccessToAllLanguages(true);
 			host.currentUserContext.setLanguages([]);
 
 			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
 			await flushMicrotasks();
-			expectRuleOnAllGuards(host, LANGUAGE_PERMISSION_PREFIX + 'en-US');
+			expectReadOnly(UmbVariantId.CreateInvariant());
+
+			host.workspaceContext.setVariantId(enUS);
+			await flushMicrotasks();
+			expectEditable(enUS);
+		});
+
+		it('stays correct after multiple invariant ↔ variant transitions', async () => {
+			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
+			host.blockManagerContext.setPermitted(true);
+			host.currentUserContext.setHasAccessToAllLanguages(true);
+			host.currentUserContext.setLanguages([]);
+
+			new UmbBlockLanguageAccessWorkspaceController(host as unknown as UmbControllerHost);
+			await flushMicrotasks();
+			expectReadOnly(UmbVariantId.CreateInvariant());
+
+			host.workspaceContext.setVariantId(enUS);
+			await flushMicrotasks();
+			expectEditable(enUS);
 
 			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
 			await flushMicrotasks();
-			expectRuleAbsentFromAllGuards(host, LANGUAGE_PERMISSION_PREFIX + 'en-US');
+			expectReadOnly(UmbVariantId.CreateInvariant());
+
+			host.workspaceContext.setVariantId(enUS);
+			await flushMicrotasks();
+			expectEditable(enUS);
+
+			host.workspaceContext.setVariantId(UmbVariantId.CreateInvariant());
+			await flushMicrotasks();
+			expectReadOnly(UmbVariantId.CreateInvariant());
 		});
 	});
 });
