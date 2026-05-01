@@ -127,6 +127,7 @@ public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<Conten
         if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
         {
             ClearAllIsolatedCacheByEntityType<IContent>();
+            ClearAllIsolatedCacheByEntityType<IElement>();
             ClearAllIsolatedCacheByEntityType<IContentType>();
         }
 
