@@ -32,7 +32,7 @@ internal sealed class ElementStartNodeTreeFilterService : UserStartNodeTreeFilte
     protected override UmbracoObjectTypes TreeObjectType => UmbracoObjectTypes.Element;
 
     /// <inheritdoc />
-    protected override UmbracoObjectTypes[] TreeObjectTypes => [UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer];
+    protected override UmbracoObjectTypes[] TreeObjectTypes => field ??= [UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer];
 
     /// <inheritdoc />
     protected override int[] CalculateUserStartNodeIds()

@@ -43,7 +43,7 @@ internal abstract class UserStartNodeTreeFilterService : IUserStartNodeTreeFilte
     /// containing <see cref="TreeObjectType"/>. Override in subclasses that need multiple
     /// object types (e.g. items and folders).
     /// </summary>
-    protected virtual UmbracoObjectTypes[] TreeObjectTypes => [TreeObjectType];
+    protected virtual UmbracoObjectTypes[] TreeObjectTypes => field ??= [TreeObjectType];
 
     private int[] UserStartNodeIds => field ??= CalculateUserStartNodeIds();
 
