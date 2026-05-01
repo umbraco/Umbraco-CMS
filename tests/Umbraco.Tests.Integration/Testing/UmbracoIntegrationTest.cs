@@ -74,6 +74,8 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     public void Setup()
     {
         InMemoryConfiguration[Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
+        InMemoryConfiguration[Constants.Configuration.ConfigModelsMode] = "Nothing";
+
         var hostBuilder = CreateHostBuilder();
 
         _host = hostBuilder.Build();
@@ -168,7 +170,8 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
         builder.AddConfiguration()
             .AddUmbracoCore()
             .AddWebComponents()
-            .AddBackOfficeAuthentication()
+            .AddBackOfficeCookieAuthentication()
+            .AddBackOfficeOpenIddictServices()
             .AddBackOfficeIdentity()
             .AddMembersIdentity()
             .AddExamine()

@@ -10,15 +10,15 @@
     "generate:server-api": "openapi-ts"
   },
   "engines": {
-    "node": ">=22",
+    "node": ">=24",
     "npm": ">=10.9"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.85.0",
-    "@umbraco-cms/backoffice": "^17.2.0",
+    "@hey-api/openapi-ts": "0.85.2",
+    "@umbraco-cms/backoffice": "^17.3.4",
     "msw": "^2.12.7",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.2"
   },
   "msw": {
     "workerDirectory": [

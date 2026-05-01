@@ -104,9 +104,7 @@ export class UmbPublishElementEntityAction extends UmbEntityActionBase<never> {
 					},
 				});
 			} else {
-				const elementVariants = elementData.variants.filter((variant) =>
-					result.selection.includes(variant.culture!),
-				);
+				const elementVariants = elementData.variants.filter((variant) => result.selection.includes(variant.culture!));
 				notificationContext?.peek('positive', {
 					data: {
 						headline: localize.term('speechBubbles_editContentPublishedHeader'),

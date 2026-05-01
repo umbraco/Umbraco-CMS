@@ -104,9 +104,17 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 	}
 
 	/**
-	 * Filters variant options based on property type args (variesByCulture/variesBySegment).
-	 * @param {UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel} propertyType - Property type model
-	 * @returns {Array<UmbVariantId>} Filtered array of UmbVariantId instances
+	 * Derives the variant ids to generate values for, from the variant options supplied via
+	 * {@link setVariantOptions}. Those options describe the document's variants (driven by the
+	 * content type's variance: e.g. one entry per culture, or per culture × segment), which
+	 * may not match how the property itself varies.
+	 *
+	 * Each option is projected onto the property's variance — the dimensions the property
+	 * varies on (culture and/or segment) are kept, the rest are collapsed to null — and the
+	 * projected ids are deduped. A culture-invariant option is dropped when the property
+	 * varies by culture, because there is no culture to hoist it to.
+	 * @param {UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel} propertyType - Property type model, whose variance drives the projection
+	 * @returns {Array<UmbVariantId>} The variant ids to generate values for
 	 */
 	#getFilteredVariantOptions(
 		propertyType: UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel,
@@ -115,30 +123,29 @@ export class UmbPropertyValuePresetVariantBuilderController extends UmbPropertyV
 			return [];
 		}
 
-		const variesByCulture = propertyType.typeArgs.variesByCulture;
-		const variesBySegment = propertyType.typeArgs.variesBySegment;
+		const variesByCulture = propertyType.typeArgs.variesByCulture ?? false;
+		const variesBySegment = propertyType.typeArgs.variesBySegment ?? false;
 
-		// Validate that cultures are available when property varies by culture
 		if (variesByCulture && !this.#variantOptions.some((v) => v.culture !== null)) {
 			throw new Error('Cultures must be set when varying by culture.');
 		}
 
-		// Filter options based on property variation settings
-		return this.#variantOptions.filter((variantId) => {
-			// If property doesn't vary by culture, only use culture-invariant options
-			if (!variesByCulture && variantId.culture !== null) {
-				return false;
-			}
-			// If property does vary by culture, exclude culture-invariant options
+		const seen = new Set<string>();
+		const result: Array<UmbVariantId> = [];
+		for (const variantId of this.#variantOptions) {
 			if (variesByCulture && variantId.culture === null) {
-				return false;
+				continue;
 			}
-			// If property doesn't vary by segment, only use segment-invariant options
-			if (!variesBySegment && variantId.segment !== null) {
-				return false;
+			const projected = variantId.toVariant(variesByCulture, variesBySegment);
+			const key = projected.toString();
+			if (seen.has(key)) {
+				continue;
 			}
-			return true;
-		});
+			seen.add(key);
+			result.push(projected);
+		}
+
+		return result;
 	}
 
 	/**

@@ -1,4 +1,6 @@
-import '@umbraco-ui/uui-css/dist/uui-css.css';
+import lightCss from '@umbraco-ui/uui/themes/light.css?inline';
+import darkCss from '@umbraco-ui/uui/themes/dark.css?inline';
+import highContrastCss from '@umbraco-ui/uui/themes/high-contrast.css?inline';
 import '../src/css/umb-css.css';
 
 import 'element-internals-polyfill';
@@ -7,7 +9,7 @@ import '@umbraco-ui/uui';
 import { html } from 'lit';
 import { setCustomElements } from '@storybook/web-components-vite';
 
-import { startMockServiceWorker } from '../src/mocks';
+import { startMockServiceWorker } from '../mocks';
 
 import '../src/libs/controller-api/controller-host-provider.element';
 import { UmbExtensionsApiInitializer } from '../src/libs/extension-api/index';
@@ -70,6 +72,39 @@ import { UMB_APP_LANGUAGE_CONTEXT } from '../src/packages/language/constants';
 // MSW
 startMockServiceWorker({ serviceWorker: { url: (import.meta.env.VITE_BASE_PATH ?? '/') + 'mockServiceWorker.js' } });
 
+const themes = {
+	light: lightCss,
+	dark: darkCss,
+	'high-contrast': highContrastCss,
+};
+
+let themeStyleEl = null;
+
+export const globalTypes = {
+	theme: {
+		name: 'Theme',
+		defaultValue: 'light',
+		toolbar: {
+			icon: 'paintbrush',
+			items: [
+				{ value: 'light', title: 'Light' },
+				{ value: 'dark', title: 'Dark' },
+				{ value: 'high-contrast', title: 'High Contrast' },
+			],
+			dynamicTitle: true,
+		},
+	},
+};
+
+function applyTheme(theme) {
+	if (!themeStyleEl) {
+		themeStyleEl = document.createElement('style');
+		themeStyleEl.id = 'uui-theme';
+		document.head.appendChild(themeStyleEl);
+	}
+	themeStyleEl.textContent = themes[theme] ?? lightCss;
+}
+
 class UmbStoryBookAuthContext extends UmbContextBase {
 	#isAuthorized = new UmbBooleanState(true);
 	isAuthorized = this.#isAuthorized.asObservable();
@@ -128,8 +163,6 @@ class UmbStoryBookElement extends UmbLitElement {
 		super();
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'globalContext', [this]);
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'store', [this]);
-		// TODO: Remove this in Umbraco 18, use the repository instead
-		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'treeStore', [this]);
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'itemStore', [this]);
 
 		this._umbIconRegistry.setIcons(icons);
@@ -163,10 +196,15 @@ class UmbStoryBookElement extends UmbLitElement {
 
 customElements.define('umb-storybook', UmbStoryBookElement);
 
+
+const themeProvider = (story, context) => {
+	applyTheme(context.globals['theme'] ?? 'light');
+	return story();
+};
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
 // Provide the MSW addon decorator globally
-export const decorators = [storybookProvider];
+export const decorators = [themeProvider, storybookProvider];
 
 export const parameters = {
 	docs: {
@@ -190,25 +228,25 @@ export const parameters = {
 		},
 	},
 	backgrounds: {
-        options: {
-            greyish: {
+		options: {
+			greyish: {
 				name: 'Greyish',
 				value: '#F3F3F5',
 			},
 
-            white: {
+			white: {
 				name: 'White',
 				value: '#ffffff',
 			}
-        }
-    },
+		}
+	},
 };
 
 setCustomElements(customElementManifests);
 export const tags = ['autodocs'];
 
 export const initialGlobals = {
-    backgrounds: {
-        value: 'greyish'
-    }
+	backgrounds: {
+		value: 'greyish'
+	}
 };

@@ -1,8 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -11,7 +9,6 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -25,6 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
 internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 {
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
@@ -79,10 +77,10 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
-    public override void CreateTestData()
+    public override async Task CreateTestDataAsync()
     {
         DeleteAllTemplateViewFiles();
-        base.CreateTestData();
+        await base.CreateTestDataAsync();
     }
 
     [Test]
@@ -209,12 +207,12 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         var xml = XElement.Parse(strXml);
         var element = xml.Descendants("Templates").First();
 
-        var init = FileService.GetTemplates().Count();
+        var init = (await TemplateService.GetAllAsync()).Count();
 
         // Act
         var templates = await PackageDataInstallation.ImportTemplatesAsync(element.Elements("Template").ToList(), -1);
         var numberOfTemplates = (from doc in element.Elements("Template") select doc).Count();
-        var allTemplates = FileService.GetTemplates();
+        var allTemplates = await TemplateService.GetAllAsync();
 
         // Assert
         Assert.That(templates, Is.Not.Null);
@@ -552,17 +550,15 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         var templateElement = newPackageXml.Descendants("Templates").First();
         var templateElementUpdated = updatedPackageXml.Descendants("Templates").First();
 
-        var fileService = FileService;
-
         // kill default test data
-        fileService.DeleteTemplate("defaultTemplate");
+        await TemplateService.DeleteAsync("defaultTemplate", Constants.Security.SuperUserKey);
 
         // Act
         var numberOfTemplates = (from doc in templateElement.Elements("Template") select doc).Count();
         var templates = await PackageDataInstallation.ImportTemplatesAsync(templateElement.Elements("Template").ToList(), -1);
         var templatesAfterUpdate =
             await PackageDataInstallation.ImportTemplatesAsync(templateElementUpdated.Elements("Template").ToList(), -1);
-        var allTemplates = fileService.GetTemplates();
+        var allTemplates = await TemplateService.GetAllAsync();
 
         // Assert
         Assert.That(templates.Any(), Is.True);

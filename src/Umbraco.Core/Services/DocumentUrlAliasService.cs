@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -39,6 +40,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     private readonly IKeyValueService _keyValueService;
     private readonly IContentService _contentService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
+    private readonly IServerRoleAccessor _serverRoleAccessor;
 
     // Lookup: alias -> list of matching document keys (multiple docs can have same alias).
     private readonly ConcurrentDictionary<AliasCacheKey, List<Guid>> _aliasCache = new();
@@ -99,7 +101,8 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         ILanguageService languageService,
         IKeyValueService keyValueService,
         IContentService contentService,
-        IDocumentNavigationQueryService documentNavigationQueryService)
+        IDocumentNavigationQueryService documentNavigationQueryService,
+        IServerRoleAccessor serverRoleAccessor)
     {
         _logger = logger;
         _documentUrlAliasRepository = documentUrlAliasRepository;
@@ -108,7 +111,19 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         _keyValueService = keyValueService;
         _contentService = contentService;
         _documentNavigationQueryService = documentNavigationQueryService;
+        _serverRoleAccessor = serverRoleAccessor;
     }
+
+    /// <summary>
+    /// Indicates whether this instance should skip database writes for URL aliases.
+    /// </summary>
+    /// <remarks>
+    /// On a <see cref="ServerRole.Subscriber"/> the scheduling publisher has already persisted URL aliases to
+    /// the database before issuing the cache-refresh instruction that routed us here. Re-writing them locally is
+    /// redundant at best, and blows up when the subscriber is configured against a read-only database connection.
+    /// The in-memory cache is updated via deferred scope-context enlistments regardless of this flag.
+    /// </remarks>
+    private bool SkipDatabaseWrites() => _serverRoleAccessor.CurrentServerRole is ServerRole.Subscriber;
 
     /// <inheritdoc/>
     public async Task InitAsync(bool forceEmpty, CancellationToken cancellationToken)
@@ -121,7 +136,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
 
-        if (ShouldRebuildAliases())
+        if (SkipDatabaseWrites() is false && ShouldRebuildAliases())
         {
             _logger.LogInformation("Rebuilding all document aliases.");
             await RebuildAllAliasesAsync();
@@ -229,7 +244,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+        if (SkipDatabaseWrites() is false)
+        {
+            scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+        }
 
         await CreateOrUpdateAliasesInternalAsync(documentKey);
 
@@ -240,7 +258,10 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     public async Task CreateOrUpdateAliasesWithDescendantsAsync(Guid documentKey)
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+        if (SkipDatabaseWrites() is false)
+        {
+            scope.WriteLock(Constants.Locks.DocumentUrlAliases);
+        }
 
         // Get document and all descendants
         var documentKeys = new List<Guid> { documentKey };
@@ -259,7 +280,9 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
     /// <summary>
     /// Internal implementation that processes a single document without creating its own scope.
-    /// Caller must ensure a scope with write lock is active.
+    /// Caller must ensure a scope is active. A write lock on <see cref="Constants.Locks.DocumentUrlAliases"/>
+    /// is required whenever this method may perform database writes — i.e. on all server roles except
+    /// <see cref="ServerRole.Subscriber"/>, where persistence is skipped and the write lock is not taken.
     /// </summary>
     private async Task CreateOrUpdateAliasesInternalAsync(Guid documentKey)
     {
@@ -276,17 +299,23 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
         // Remove old aliases from cache (deferred until scope completes)
         RemoveFromCacheDeferred(_coreScopeProvider.Context!, documentKey);
 
-        // Save to database (handles insert/update/delete via diff) and add to cache
+        // Save to database (handles insert/update/delete via diff) and add to cache.
+        // On subscribers we skip the persistence — the publisher has already written the aliases — but the
+        // in-memory cache is still refreshed via the deferred enlistments so routing keeps working locally.
+        bool skipDatabaseWrites = SkipDatabaseWrites();
         if (aliases.Count > 0)
         {
-            _documentUrlAliasRepository.Save(aliases);
+            if (skipDatabaseWrites is false)
+            {
+                _documentUrlAliasRepository.Save(aliases);
+            }
 
             foreach (PublishedDocumentUrlAlias alias in aliases)
             {
                 AddToCacheDeferred(_coreScopeProvider.Context!, alias);
             }
         }
-        else
+        else if (skipDatabaseWrites is false)
         {
             // No aliases - delete any existing aliases for this document from the database
             _documentUrlAliasRepository.DeleteByDocumentKey(new[] { documentKey });
@@ -317,6 +346,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// <inheritdoc/>
     public async Task RebuildAllAliasesAsync()
     {
+        if (SkipDatabaseWrites())
+        {
+            _logger.LogDebug("Skipping document URL alias rebuild — the current server role does not persist aliases.");
+            return;
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
@@ -584,10 +619,12 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
             yield break;
         }
 
+        // Collapse duplicates that arise after normalization.
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var alias in rawValue.Split(',', StringSplitOptions.RemoveEmptyEntries))
         {
             var normalized = this.NormalizeAlias(alias);
-            if (!string.IsNullOrEmpty(normalized))
+            if (string.IsNullOrEmpty(normalized) is false && seen.Add(normalized))
             {
                 yield return normalized;
             }

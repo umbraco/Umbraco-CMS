@@ -125,13 +125,13 @@ public class EnumerableExtensionsTests
 
         Assert.That(groupsOfTwo.Length, Is.EqualTo(5));
         Assert.That(flattened.Length, Is.EqualTo(integers.Length));
-        Assert.That(flattened, Is.EquivalentTo(integers));
+        CollectionAssert.AreEquivalent(integers, flattened);
 
         var groupsOfMassive = integers.InGroupsOf(100).ToArray();
         Assert.That(groupsOfMassive.Length, Is.EqualTo(1));
         flattened = groupsOfMassive.SelectMany(x => x).ToArray();
         Assert.That(flattened.Length, Is.EqualTo(integers.Length));
-        Assert.That(flattened, Is.EquivalentTo(integers));
+        CollectionAssert.AreEquivalent(integers, flattened);
     }
 
     [Test]

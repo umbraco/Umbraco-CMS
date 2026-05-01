@@ -1,5 +1,7 @@
+using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Semver;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 
@@ -7,8 +9,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 /// Represents the Umbraco CMS migration plan.
 /// </summary>
 /// <seealso cref="Umbraco.Cms.Infrastructure.Migrations.MigrationPlan" />
-public class UmbracoPlan : MigrationPlan
+public partial class UmbracoPlan : MigrationPlan
 {
+    [GeneratedRegex(@"V_(\d+)_(\d+)_(\d+)")]
+    internal static partial Regex MigrationStepVersionRegex();
+
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoPlan" /> class.
     /// </summary>
@@ -22,6 +27,14 @@ public class UmbracoPlan : MigrationPlan
     /// This is set to the final migration state of 9.4, making that the lowest supported version to upgrade from.
     /// </remarks>
     public override string InitialState => "{DED98755-4059-41BB-ADBD-3FEAB12D1D7B}";
+
+    /// <summary>
+    /// Gets the semantic version corresponding to <see cref="InitialState"/>.
+    /// </summary>
+    /// <remarks>
+    /// Keep in sync with <see cref="InitialState"/> whenever the lowest supported upgrade version changes.
+    /// </remarks>
+    private static SemVersion InitialStateVersion { get; } = new(9, 4, 0);
 
     /// <summary>
     /// Defines the plan.
@@ -170,11 +183,56 @@ public class UmbracoPlan : MigrationPlan
         // To 17.4.0
         To<V_17_4_0.AddContentVersionDateIndex>("{D4E5F6A7-B8C9-4D0E-A1F2-3B4C5D6E7F80}");
         To<V_17_4_0.AddDimensionsToSvg>("{72970B86-59D8-403C-B322-FFF43F9DB199}");
+        To<V_17_4_0.AddExternalMemberTables>("{D7E8F9A0-B1C2-4D3E-A5F6-7890ABCDEF12}");
+        To<V_17_4_0.FixLabelDataTypeDbTypeFromConfiguration>("{3F9B6A1C-7D84-4E2B-9C15-6A2E8F3D5B47}");
 
         // To 18.0.0
-        // TODO (V18): Enable on 18 branch
-        //// To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
-        To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
-        To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
+        To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
+    }
+
+    /// <summary>
+    ///     Resolves the semantic version corresponding to a migration state in this plan.
+    /// </summary>
+    /// <remarks>
+    ///     Walks the transition chain from <see cref="MigrationPlan.InitialState"/> and extracts version
+    ///     numbers from migration type namespaces (convention: <c>V_{major}_{minor}_{patch}</c>).
+    /// </remarks>
+    /// <param name="state">The migration state to resolve.</param>
+    /// <returns>The semantic version for the state, or <c>null</c> if the state is not found.</returns>
+    public SemVersion? GetVersionForState(string? state)
+    {
+        if (string.IsNullOrWhiteSpace(state))
+        {
+            return null;
+        }
+
+        SemVersion? trackedVersion = InitialStateVersion;
+        var current = InitialState;
+
+        if (string.Equals(current, state, StringComparison.OrdinalIgnoreCase))
+        {
+            return InitialStateVersion;
+        }
+
+        while (Transitions.TryGetValue(current, out Transition? transition) && transition is not null)
+        {
+            Match match = MigrationStepVersionRegex().Match(transition.MigrationType.Namespace ?? string.Empty);
+            if (match.Success)
+            {
+                trackedVersion = new SemVersion(
+                    int.Parse(match.Groups[1].Value),
+                    int.Parse(match.Groups[2].Value),
+                    int.Parse(match.Groups[3].Value));
+            }
+
+            if (string.Equals(transition.TargetState, state, StringComparison.OrdinalIgnoreCase))
+            {
+                return trackedVersion;
+            }
+
+            current = transition.TargetState;
+        }
+
+        return null;
     }
 }

@@ -163,9 +163,11 @@
     4: ['Dimensions', 'Sets the fixed width and height of the editor. This excludes the toolbar and statusbar heights.'],
     5: ['Maximum size for inserted images', 'Maximum width or height - enter 0 to disable resizing.'],
     6: ['Overlay size', 'Select the width of the overlay (link picker).'],
-    7: ['Available Blocks', 'Define the available blocks.'],
-    8: ['Image Upload Folder', 'Choose the upload location of pasted images.'],
-    9: ['Ignore User Start Nodes', ''],
+    7: ['Create modal size', ''],
+    8: ['Available Blocks', 'Define the available blocks.'],
+    9: ['Image Upload Folder', 'Choose the upload location of pasted images.'],
+    10: ['Accepted media types', 'Limit to specific media types for the media picker toolbar and drag-and-drop uploads.'],
+    11: ['Ignore User Start Nodes', ''],
   }
 
   public static readonly tinyMCESettings = {
@@ -297,6 +299,7 @@
     media: '/umbraco/management/api/v1/media',
     mediaType: '/umbraco/management/api/v1/media-type',
     memberType: '/umbraco/management/api/v1/member-type',
+    memberTypeFolder: '/umbraco/management/api/v1/member-type/folder',
     mediaTypeFolder: '/umbraco/management/api/v1/media-type/folder',
     member: '/umbraco/management/api/v1/member',
     memberGroup: '/umbraco/management/api/v1/member-group',
@@ -345,5 +348,27 @@
   public static readonly healthCheckMessages = {
     imagingHMACSecretKeyIsNotConfigured: 'No HMAC secret key is configured for image URL signing. It is recommended to set Umbraco:CMS:Imaging:HMACSecretKey to prevent unauthorized image manipulation requests.',
     imagingHMACSecretKeyIsConfigured: 'The HMAC secret key for image URL signing is configured'
+  }
+
+  public static readonly auditTrailMessages = {
+    contentSaved: 'Content saved',
+    contentSavedAndPublished: 'Content saved and Published',
+    contentUnpublished: 'Content unpublished',
+    contentMoved: 'Content moved',
+    contentCopied: 'Content copied',
+    contentDeleted: 'Content deleted',
+    contentRolledBack: 'Content rolled back',
+    contentSorted: 'Sort child items performed by user'
+  }
+
+  public static readonly auditTrailTypes = {
+    save: 'Save',
+    delete: 'Delete',
+    move: 'Move',
+    sort: 'Sort',
+    publish: 'Publish',
+    rollback: 'Rollback',
+    copy: 'Copy',
+    unpublish: 'Unpublish'
   }
 }

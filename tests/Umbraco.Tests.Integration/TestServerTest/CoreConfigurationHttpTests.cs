@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,7 +17,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest;
@@ -54,14 +54,14 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
         var directory = new DirectoryInfo(Path.GetDirectoryName(assemblyLocation)
             ?? throw new InvalidOperationException("Could not determine assembly directory."));
 
-        // Walk up parent directories until we're no longer in a bin or obj folder.
+        // Walk up parent directories until we're no longer in a bin or obj folder
         while (directory.Parent is not null)
         {
             var name = directory.Name;
             if (name.Equals("bin", StringComparison.OrdinalIgnoreCase) ||
                 name.Equals("obj", StringComparison.OrdinalIgnoreCase))
             {
-                // Found bin/obj folder, return its parent (the project directory).
+                // Found bin/obj folder, return its parent (the project directory)
                 return directory.Parent.FullName;
             }
 
@@ -73,19 +73,21 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
             ?? throw new InvalidOperationException("Could not determine content root directory.");
     }
 
-    private UmbracoWebApplicationFactory<CoreConfigurationHttpTests> CreateFactory(
+    private WebApplicationFactory<CoreConfigurationHttpTests> CreateFactory(
         Action<IUmbracoBuilder> configureUmbraco,
         Action<IApplicationBuilder> configureApp)
     {
-        // Disable ModelsBuilder to avoid BootFailedException requiring Umbraco.Cms.DevelopmentMode.Backoffice package.
-        InMemoryConfiguration["Umbraco:CMS:ModelsBuilder:ModelsMode"] = "Nothing";
+        var contentRoot = GetTestContentRoot();
 
-        return new UmbracoWebApplicationFactory<CoreConfigurationHttpTests>(
-            () => CreateHostBuilder(configureUmbraco, configureApp))
-
-        {
-            ContentRoot = GetTestContentRoot(),
-        };
+        return new UmbracoWebApplicationFactory<CoreConfigurationHttpTests>(() => CreateHostBuilder(configureUmbraco, configureApp))
+            .WithWebHostBuilder(builder =>
+            {
+                builder.UseContentRoot(contentRoot);
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
+                });
+            });
     }
 
     private IHostBuilder CreateHostBuilder(
@@ -110,7 +112,6 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
                     context.HostingEnvironment = TestHelper.GetWebHostEnvironment();
                     ConfigureServices(services, configureUmbraco);
                     services.AddUnique(CreateLoggerFactory());
-                    services.AddSingleton<IWebProfilerRepository, TestWebProfilerRepository>();
                 });
 
                 builder.Configure(app => configureApp(app));
@@ -149,11 +150,6 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
         // Let the test configure Umbraco
         configureUmbraco(builder);
 
-        // Provide test doubles for infrastructure services (MainDom, ServerMessenger, etc.)
-        // that would otherwise hang or fail in test contexts. This matches what
-        // UmbracoTestServerTestBase does via AddTestServices.
-        builder.AddTestServices(TestHelper);
-
         builder.Build();
     }
 
@@ -164,7 +160,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     public async Task FullConfiguration_BootsSuccessfully()
     {
         // Arrange
-        await using var factory = CreateFactory(
+        using var factory = CreateFactory(
             configureUmbraco: builder =>
             {
                 builder
@@ -212,7 +208,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     public async Task CoreWithWebsite_BootsSuccessfully()
     {
         // Arrange
-        await using var factory = CreateFactory(
+        using var factory = CreateFactory(
             configureUmbraco: builder =>
             {
                 builder
@@ -260,7 +256,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     public async Task CoreWithDeliveryApi_BootsSuccessfully()
     {
         // Arrange
-        await using var factory = CreateFactory(
+        using var factory = CreateFactory(
             configureUmbraco: builder =>
             {
                 builder
@@ -275,7 +271,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
                 app.UseUmbraco()
                     .WithMiddleware(u =>
                     {
-                        // Delivery API doesn't need special middleware
+                        // Delivery API doesn't need special middleware.
                     })
                     .WithEndpoints(u =>
                     {
@@ -302,13 +298,67 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     }
 
     /// <summary>
+    /// Verifies that IUserService read operations work in a delivery-only scenario (no backoffice).
+    /// Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22404 where
+    /// these methods used service location to resolve IBackOfficeUserStore, which isn't
+    /// registered without AddBackOffice(). This crashed Examine indexing via ContentValueSetBuilder.
+    /// </summary>
+    [Test]
+    public async Task CoreWithDeliveryApi_UserServiceReadMethodsDoNotThrow()
+    {
+        // Arrange
+        using var factory = CreateFactory(
+            configureUmbraco: builder =>
+            {
+                builder
+                    .AddCore()
+                    .AddDeliveryApi()
+                    .AddUmbracoSqlServerSupport()
+                    .AddUmbracoSqliteSupport()
+                    .AddComposers();
+            },
+            configureApp: app =>
+            {
+                app.UseUmbraco()
+                    .WithMiddleware(u =>
+                    {
+                        // Delivery API doesn't need special middleware.
+                    })
+                    .WithEndpoints(u =>
+                    {
+                        u.UseDeliveryApiEndpoints();
+                    });
+            });
+
+        // Boot the application
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false,
+            BaseAddress = new Uri("https://localhost/", UriKind.Absolute),
+        });
+        await client.GetAsync("/");
+
+        // Act & Assert - all read methods must work without IBackOfficeUserStore.
+        using var scope = factory.Services.CreateScope();
+        var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+
+        // Use non-empty arguments so the repository-backed code paths are exercised,
+        // not just the early-return guards for null/empty input.
+        Assert.DoesNotThrow(() => userService.GetUsersById(-1));
+        Assert.DoesNotThrow(() => userService.GetUserById(-1));
+        Assert.DoesNotThrow(() => userService.GetAsync(Guid.Empty).GetAwaiter().GetResult());
+        Assert.DoesNotThrow(() => userService.GetAsync(new[] { Guid.Empty }).GetAwaiter().GetResult());
+        Assert.DoesNotThrow(() => userService.GetAllInGroup(-1));
+    }
+
+    /// <summary>
     /// Verifies that the delivery-only scenario (core + website + delivery API, no backoffice) boots successfully.
     /// </summary>
     [Test]
     public async Task DeliveryOnlyScenario_BootsSuccessfully()
     {
         // Arrange
-        await using var factory = CreateFactory(
+        using var factory = CreateFactory(
             configureUmbraco: builder =>
             {
                 builder
@@ -358,7 +408,7 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     public async Task BackOfficeWithWebsite_BootsSuccessfully()
     {
         // Arrange
-        await using var factory = CreateFactory(
+        using var factory = CreateFactory(
             configureUmbraco: builder =>
             {
                 builder

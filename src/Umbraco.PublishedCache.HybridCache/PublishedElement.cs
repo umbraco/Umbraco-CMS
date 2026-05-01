@@ -21,9 +21,11 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         ContentNode contentNode,
         bool preview,
         IElementsCache elementsCache,
-        IVariationContextAccessor variationContextAccessor)
+        IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
     {
         VariationContextAccessor = variationContextAccessor;
+        PropertyRenderingContextAccessor = propertyRenderingContextAccessor;
         ContentNode = contentNode;
         ContentData? contentData = preview ? ContentNode.DraftModel : ContentNode.PublishedModel;
         if (contentData is null)
@@ -44,7 +46,7 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
             // add one property per property type - this is required, for the indexing to work
             // if contentData supplies pdatas, use them, else use null
             contentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? propertyDatas); // else will be null
-            properties[i++] = new PublishedProperty(propertyType, this, variationContextAccessor, preview, propertyDatas, elementsCache, propertyType.CacheLevel);
+            properties[i++] = new PublishedProperty(propertyType, this, variationContextAccessor, propertyRenderingContextAccessor, preview, propertyDatas, elementsCache, propertyType.CacheLevel);
         }
 
         _properties = properties;
@@ -87,6 +89,8 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
 
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
+
+    internal IPropertyRenderingContextAccessor PropertyRenderingContextAccessor { get; }
 
     /// <inheritdoc />
     public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
@@ -174,14 +178,14 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         if (!ContentNode.HasPublished)
         {
             // In preview mode, the ContentNode only has draft data loaded (published data
-            // is stored in a separate cache entry). Fall back to IPublishStatusQueryService
+            // is stored in a separate cache entry). Fall back to IDocumentPublishStatusQueryService
             // which is an in-memory service that tracks actual document publish status.
             if (_isPreviewing && ItemType == PublishedItemType.Content)
             {
                 culture ??= VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
-                IPublishStatusQueryService publishStatusQueryService =
-                    StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>();
-                return publishStatusQueryService.IsDocumentPublished(Key, culture);
+                IDocumentPublishStatusQueryService publishStatusQueryService =
+                    StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusQueryService>();
+                return publishStatusQueryService.IsPublished(Key, culture);
             }
 
             return false;

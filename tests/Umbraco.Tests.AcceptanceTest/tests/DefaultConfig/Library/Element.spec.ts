@@ -28,9 +28,7 @@ test('can create empty element', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(elementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(elementTypeName);
   await umbracoUi.library.enterElementName(elementName);
   await umbracoUi.library.clickSaveButtonAndWaitForElementToBeCreated();
 
@@ -41,7 +39,7 @@ test('can create empty element', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.library.isElementInTreeVisible(elementName);
 });
 
-test('can save and publish empty element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can save and publish empty element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   await umbracoUi.goToBackOffice();
@@ -50,9 +48,7 @@ test('can save and publish empty element', {tag: '@smoke'}, async ({umbracoApi, 
   // Act
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(elementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(elementTypeName);
   await umbracoUi.library.enterElementName(elementName);
   await umbracoUi.library.clickSaveAndPublishButtonAndWaitForElementToBeCreated();
 
@@ -62,7 +58,7 @@ test('can save and publish empty element', {tag: '@smoke'}, async ({umbracoApi, 
   expect(elementData.variants[0].state).toBe(expectedState);
 });
 
-test.skip('can create element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can create element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
@@ -70,9 +66,7 @@ test.skip('can create element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi})
   // Act
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(elementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(elementTypeName);
   await umbracoUi.library.enterElementName(elementName);
   await umbracoUi.library.enterTextstring(elementText);
   await umbracoUi.library.clickSaveButtonAndWaitForElementToBeCreated();
@@ -101,7 +95,7 @@ test('can rename element', async ({umbracoApi, umbracoUi}) => {
   expect(updatedElementData.variants[0].name).toEqual(elementName);
 });
 
-test('can update element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can update element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongElementText = 'This is wrong test element text';
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, wrongElementText, dataTypeName);
@@ -118,7 +112,7 @@ test('can update element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   expect(updatedElementData.values[0].value).toBe(elementText);
 });
 
-test('can unpublish element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can unpublish element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, elementText, dataTypeName);
   await umbracoApi.element.publish(elementId);

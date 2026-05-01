@@ -58,7 +58,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
             PagedModel<IMedia> collectionItemsResult = result.Result.Items;
 
             Assert.AreEqual(10, collectionItemsResult.Total);
-            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
         });
     }
 
@@ -121,7 +121,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
             PagedModel<IMedia> collectionItemsResult = result.Result.Items;
 
             Assert.AreEqual(5, collectionItemsResult.Total);
-            Assert.That(collectionItemsResult.Items, Is.EquivalentTo(descendants));
+            CollectionAssert.AreEquivalent(descendants, collectionItemsResult.Items);
         });
     }
 

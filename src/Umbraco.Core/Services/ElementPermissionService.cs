@@ -2,6 +2,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 using Umbraco.Extensions;
 
@@ -39,25 +40,26 @@ internal sealed class ElementPermissionService : IElementPermissionService
             return Task.FromResult(ElementAuthorizationStatus.NotFound);
         }
 
-        // Fetch both Elements and ElementContainers (folders)
-        IEntitySlim[] entities = _entityService.GetAll(
-            new[] { UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer },
-            keys).ToArray();
-
-        if (entities.Length == 0)
+        // Use GetAllPaths instead of loading full content items - we only need paths for authorization
+        TreeEntityPath[] entityPaths = _entityService.GetAllPaths([UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer], keys).ToArray();
+        if (entityPaths.Length == 0)
         {
             return Task.FromResult(ElementAuthorizationStatus.NotFound);
         }
 
-        if (entities.Any(entity => user.HasElementPathAccess(entity, _entityService, _appCaches) == false))
+        // Check path access using the paths directly
+        int[]? startNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
+        foreach (TreeEntityPath entityPath in entityPaths)
         {
-            return Task.FromResult(ElementAuthorizationStatus.UnauthorizedMissingPathAccess);
+            if (ContentPermissions.HasPathAccess(entityPath.Path, startNodeIds, Constants.System.RecycleBinElement) == false)
+            {
+                return Task.FromResult(ElementAuthorizationStatus.UnauthorizedMissingPathAccess);
+            }
         }
 
-        return Task.FromResult(
-            HasPermissionAccess(user, entities.Select(e => e.Path), permissionsToCheck)
-                ? ElementAuthorizationStatus.Success
-                : ElementAuthorizationStatus.UnauthorizedMissingPermissionAccess);
+        return Task.FromResult(HasPermissionAccess(user, entityPaths.Select(p => p.Path), permissionsToCheck)
+            ? ElementAuthorizationStatus.Success
+            : ElementAuthorizationStatus.UnauthorizedMissingPermissionAccess);
     }
 
     /// <inheritdoc/>
@@ -162,6 +164,53 @@ internal sealed class ElementPermissionService : IElementPermissionService
         return culturesToCheck.All(culture => allowedLanguageIsoCodes.InvariantContains(culture))
             ? ElementAuthorizationStatus.Success
             : ElementAuthorizationStatus.UnauthorizedMissingCulture;
+    }
+
+    /// <inheritdoc/>
+    public Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> elementKeys)
+    {
+        Guid[] keysArray = [.. elementKeys];
+
+        if (keysArray.Length == 0)
+        {
+            return Task.FromResult(Enumerable.Empty<NodePermissions>());
+        }
+
+        TreeEntityPath[] entityPaths = [.. _entityService.GetAllPaths([UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer], keysArray)];
+
+        if (entityPaths.Length == 0)
+        {
+            return Task.FromResult(Enumerable.Empty<NodePermissions>());
+        }
+
+        // Collect all unique node IDs from all entity paths for a single batch query.
+        var pathDataByKey = new Dictionary<Guid, int[]>();
+        var allUniqueNodeIds = new HashSet<int>();
+        foreach (TreeEntityPath entityPath in entityPaths)
+        {
+            int[] pathIds = entityPath.Path.GetIdsFromPathReversed();
+            pathDataByKey[entityPath.Key] = pathIds;
+            allUniqueNodeIds.UnionWith(pathIds);
+        }
+
+        // Single batch permission query for all unique node IDs.
+        EntityPermissionCollection allPermissions = _userService.GetPermissions(user, [.. allUniqueNodeIds]);
+
+        // Per-entity in-memory resolution using the batch results.
+        var results = new NodePermissions[entityPaths.Length];
+        for (var i = 0; i < entityPaths.Length; i++)
+        {
+            int[] pathIds = pathDataByKey[entityPaths[i].Key];
+            var pathNodeIdSet = new HashSet<int>(pathIds);
+            EntityPermission[] relevantPermissions = allPermissions
+                .Where(p => pathNodeIdSet.Contains(p.EntityId))
+                .ToArray();
+
+            EntityPermissionSet permissionSet = UserService.CalculatePermissionsForPathForUser(relevantPermissions, pathIds);
+            results[i] = new NodePermissions { NodeKey = entityPaths[i].Key, Permissions = permissionSet.GetAllPermissions() };
+        }
+
+        return Task.FromResult(results.AsEnumerable());
     }
 
     /// <summary>

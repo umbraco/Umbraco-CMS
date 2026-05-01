@@ -39,6 +39,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly chooseMediaPickerBtn: Locator;
   private readonly chooseMemberPickerBtn: Locator;
   private readonly numericTxt: Locator;
+  private readonly decimalTxt: Locator;
   private readonly resetFocalPointBtn: Locator;
   private readonly addMultiURLPickerBtn: Locator;
   private readonly linkTxt: Locator;
@@ -194,6 +195,8 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly containerEditBtn: Locator;
   private readonly loginPageSelectedItem: Locator;
   private readonly errorPageSelectedItem: Locator;
+  private readonly publishModalBtn: Locator;
+  private readonly unpublishModalBtn: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -226,6 +229,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.plusIconBtn = page.locator("#icon-add svg");
     this.enterTagTxt = page.getByPlaceholder("Enter tag");
     this.menuItemTree = page.locator("umb-menu-item-tree-default");
+    this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
     this.confirmToUnpublishBtn = page
       .locator("umb-document-unpublish-modal")
       .getByLabel("Unpublish");
@@ -239,6 +243,7 @@ export class ContentUiHelper extends UiBaseLocators {
       "umb-property-editor-ui-member-picker #btn-add",
     );
     this.numericTxt = page.locator("umb-property-editor-ui-number input");
+    this.decimalTxt = page.locator("umb-property-editor-ui-decimal input");
     this.addMultiURLPickerBtn = page.locator(
       "umb-property-editor-ui-multi-url-picker #btn-add",
     );
@@ -378,6 +383,8 @@ export class ContentUiHelper extends UiBaseLocators {
     this.rollbackBtn = this.documentWorkspace.getByRole("button", {
       name: /^Rollback(…)?$/,
     });
+    this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
+    this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     this.rollbackContainerBtn = this.container.getByLabel("Rollback");
     this.publicAccessBtn = page.getByRole("button", { name: "Public Access" });
     this.uuiCheckbox = page.locator("uui-checkbox");
@@ -743,6 +750,25 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.hasText(this.historyItems, text);
   }
 
+  async doesHistoryItemHaveTag(tagText: string, index: number = 0) {
+    const tag = this.historyItems.nth(index).locator('.log-type uui-tag');
+    await this.containsText(tag, tagText);
+  }
+
+  async doesHistoryItemHaveDescription(descriptionText: string, index: number = 0) {
+    const description = this.historyItems.nth(index).locator('.log-type span');
+    await this.hasText(description, descriptionText);
+  }
+
+  async doesHistoryItemHaveUsername(usernameText: string, index: number = 0) {
+    const username = this.historyItems.nth(index).locator('.user-info .name');
+    await this.containsText(username, usernameText);
+  }
+
+  async doesHistoryHaveCount(count: number) {
+    await this.hasCount(this.historyItems, count);
+  }
+
   async doesDocumentStateHaveText(text: string) {
     await this.hasText(this.documentState, text);
   }
@@ -1095,6 +1121,11 @@ export class ContentUiHelper extends UiBaseLocators {
   // Numeric
   async enterNumeric(number: number) {
     await this.enterText(this.numericTxt, number.toString());
+  }
+
+  // Decimal
+  async enterDecimal(number: number) {
+    await this.enterText(this.decimalTxt, number.toString());
   }
 
   // Radiobox
@@ -1592,6 +1623,14 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickManualLinkRemoveButton() {
     await this.click(this.manualLinkRemoveBtn);
+  }
+
+  async clickPublishModalButton() {
+    await this.click(this.publishModalBtn);
+  }
+
+  async clickUnpublishModalButton() {
+    await this.click(this.unpublishModalBtn);
   }
 
   // Block Grid - Block List
@@ -2820,6 +2859,15 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(contentLocator.locator("#select-checkbox"), {
       force: true,
     });
+  }
+
+  async isContentCardWithNameSelected(contentName: string, isSelected: boolean = true) {
+    const contentLocator = this.cardContentNode.filter({hasText: contentName});
+    if (isSelected) {
+      await expect(contentLocator).toHaveAttribute('selected');
+    } else {
+      await expect(contentLocator).not.toHaveAttribute('selected');
+    }
   }
 
   async addGroupBasedPublicAccessWithPrefilledPages(memberGroupName: string) {

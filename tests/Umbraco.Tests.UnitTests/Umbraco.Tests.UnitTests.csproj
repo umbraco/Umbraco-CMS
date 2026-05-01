@@ -2,6 +2,9 @@
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Umbraco.Cms.Tests.UnitTests</RootNamespace>
+    <!-- Required for Microsoft.AspNetCore.OpenApi source generators that propagate through ProjectReferences.
+         Web SDK projects get this automatically, but test (Microsoft.NET.Sdk) projects do not. -->
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.AspNetCore.OpenApi.Generated</InterceptorsNamespaces>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -47,6 +50,9 @@
       <DependentUpon>StringExtensionsTests.cs</DependentUpon>
     </Compile>
     <Compile Update="Umbraco.Core\Extensions\StringExtensionsTests.Manipulation.cs">
+      <DependentUpon>StringExtensionsTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Umbraco.Core\Extensions\StringExtensionsTests.Sanitization.cs">
       <DependentUpon>StringExtensionsTests.cs</DependentUpon>
     </Compile>
   </ItemGroup>

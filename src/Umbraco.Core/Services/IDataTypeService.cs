@@ -164,18 +164,6 @@ public interface IDataTypeService : IService
     ///     Please note that deleting a <see cref="IDataType" /> will remove
     ///     all the <see cref="IPropertyType" /> data that references this <see cref="IDataType" />.
     /// </remarks>
-    /// <param name="dataType"><see cref="IDataType" /> to delete</param>
-    /// <param name="userId">Id of the user issuing the deletion</param>
-    [Obsolete("Please use DeleteAsync. Scheduled for removal in Umbraco 18.")]
-    void Delete(IDataType dataType, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Deletes an <see cref="IDataType" />
-    /// </summary>
-    /// <remarks>
-    ///     Please note that deleting a <see cref="IDataType" /> will remove
-    ///     all the <see cref="IPropertyType" /> data that references this <see cref="IDataType" />.
-    /// </remarks>
     /// <param name="id">The guid Id of the <see cref="IDataType" /> to delete</param>
     /// <param name="userKey">Key of the user issuing the deletion</param>
     Task<Attempt<IDataType?, DataTypeOperationStatus>> DeleteAsync(Guid id, Guid userKey);
@@ -210,19 +198,6 @@ public interface IDataTypeService : IService
     /// <param name="userKey">The user that did the Move action</param>
     /// <returns>An attempt result with the moved data type and operation status.</returns>
     Task<Attempt<IDataType, DataTypeOperationStatus>> MoveAsync(IDataType toMove, Guid? containerKey, Guid userKey);
-
-    /// <summary>
-    ///     Copies a <see cref="IDataType" /> to a given container.
-    /// </summary>
-    /// <param name="copying">The data type to copy.</param>
-    /// <param name="containerId">The ID of the target container.</param>
-    /// <param name="userId">The ID of the user performing the action.</param>
-    /// <returns>An operation result containing the copied data type.</returns>
-    [Obsolete("Please use CopyAsync instead. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult<MoveOperationStatusType, IDataType>?> Copy(
-        IDataType copying,
-        int containerId,
-        int userId = Constants.Security.SuperUserId) => throw new NotImplementedException();
 
     /// <summary>
     /// Copies a <see cref="IDataType"/> to a given container

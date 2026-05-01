@@ -113,6 +113,44 @@ public class PublishStatusRepository : IPublishStatusRepository
         return result;
     }
 
+    public async Task<IDictionary<Guid, ISet<string>>> GetAllElementPublishStatusAsync(CancellationToken cancellationToken)
+    {
+        Sql<ISqlContext> sql = GetElementBaseQuery();
+        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(sql);
+        return Map(databaseRecords);
+    }
+
+    public async Task<ISet<string>> GetElementPublishStatusAsync(Guid elementKey, CancellationToken cancellationToken)
+    {
+        Sql<ISqlContext> sql = GetElementBaseQuery();
+        sql = sql.Where<NodeDto>(n => n.UniqueId == elementKey, "n");
+
+        List<PublishStatusDto>? databaseRecords = await Database.FetchAsync<PublishStatusDto>(sql);
+
+        IDictionary<Guid, ISet<string>> result = Map(databaseRecords);
+        return result.TryGetValue(elementKey, out ISet<string>? value) ? value : new HashSet<string>();
+    }
+
+    private Sql<ISqlContext> GetElementBaseQuery()
+    {
+        SqlSyntax.ISqlSyntaxProvider syntax = Database.SqlContext.SqlSyntax;
+        Sql<ISqlContext> sql = Database.SqlContext.Sql()
+            .Select(
+                $"n.{syntax.GetQuotedColumnName(NodeDto.KeyColumnName)}",
+                $"l.{syntax.GetQuotedColumnName(LanguageDto.IsoCodeColumnName)}",
+                $"ct.{syntax.GetQuotedColumnName(ContentTypeDto.VariationsColumnName)}",
+                $"e.{syntax.GetQuotedColumnName(IPublishableContentDto<ElementVersionDto>.Columns.Published)}",
+                $"ecv.{syntax.GetQuotedColumnName(ICultureVariationDto.Columns.Published)} as {syntax.GetQuotedColumnName(PublishStatusDto.DocumentVariantPublishStatusColumnName)}")
+            .From<ElementDto>("e")
+            .InnerJoin<ContentDto>("c").On<ElementDto, ContentDto>((e, c) => e.NodeId == c.NodeId, "c", "e")
+            .InnerJoin<ContentTypeDto>("ct").On<ContentDto, ContentTypeDto>((c, ct) => c.ContentTypeId == ct.NodeId, "c", "ct")
+            .CrossJoin<LanguageDto>("l")
+            .LeftJoin<ElementCultureVariationDto>("ecv").On<LanguageDto, ElementCultureVariationDto, ElementDto>((l, ecv, e) => l.Id == ecv.LanguageId && e.NodeId == ecv.NodeId, "l", "ecv", "e")
+            .InnerJoin<NodeDto>("n").On<ElementDto, NodeDto>((e, n) => n.NodeId == e.NodeId, "e", "n");
+
+        return sql;
+    }
+
     private IDictionary<Guid, ISet<string>> Map(List<PublishStatusDto> databaseRecords)
     {
         return databaseRecords
