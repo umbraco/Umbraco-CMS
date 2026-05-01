@@ -22,6 +22,7 @@ import {
 import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
+	type UmbExtensionManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
@@ -30,7 +31,7 @@ import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 import './app-logo.element.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
-const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<any> }>> = [
+const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>> = [
 	import('../../packages/block/umbraco-package.js'),
 	import('../../packages/clipboard/umbraco-package.js'),
 	import('../../packages/code-editor/umbraco-package.js'),
@@ -183,7 +184,7 @@ export class UmbAppElement extends UmbLitElement {
 	#bundleInitializer: UmbBundleExtensionInitializer;
 
 	#currentUser?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
-	#packageModules?: Promise<Array<{ name: string; extensions: Array<ManifestBase> }>>;
+	#packageModules?: Promise<Array<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>>;
 
 	constructor() {
 		super();
