@@ -242,7 +242,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		);
 		this.observe(
 			this.#context.readOnlyGuard.permitted,
-			(isReadOnly) => (this._isReadOnly = isReadOnly),
+			(isReadOnly) => {
+				this._isReadOnly = isReadOnly;
+				this.#updateBlockViewProps({ readonly: isReadOnly });
+			},
 			'umbReadOnlyObserver',
 		);
 	}
@@ -377,6 +380,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
+				.readOnly=${this._isReadOnly}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
@@ -391,6 +395,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.icon=${this._icon}
 			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
+			.readOnly=${this._isReadOnly}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}
