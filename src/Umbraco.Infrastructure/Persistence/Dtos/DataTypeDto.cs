@@ -14,6 +14,8 @@ public class DataTypeDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DataType;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
+    public const string EditorAliasColumnName = "propertyEditorAlias";
+    public const string DbTypeColumnName = "dbType";
 
     /// <summary>
     /// Gets or sets the identifier of the associated node.
@@ -28,7 +30,7 @@ public class DataTypeDto
     /// Gets or sets the alias of the property editor associated with this data type.
     /// </summary>
     /// <remarks>TODO: should this have a length</remarks>
-    [Column("propertyEditorAlias")]
+    [Column(EditorAliasColumnName)]
     public string EditorAlias { get; set; } = null!;
 
     /// <summary>
@@ -41,7 +43,7 @@ public class DataTypeDto
     /// <summary>
     /// Gets or sets the type of the database column used to store values for this data type.
     /// </summary>
-    [Column("dbType")]
+    [Column(DbTypeColumnName)]
     [Length(50)]
     public string DbType { get; set; } = null!;
 
