@@ -51,9 +51,10 @@ this.observe(
 ```
 
 **Alias behavior:**
-- If omitted and callback exists: auto-generated hash of the callback function
-- If `null`: no alias (controller cannot be replaced by alias)
-- If provided: explicit string/symbol for later reference
+
+- If omitted and callback exists: auto-generated hash of the callback function — guards against accidental duplicate subscriptions when the same `observe(...)` line runs more than once
+- If `null`: no alias — use this when the call site is one-shot (e.g., set up once in a constructor and never invoked again). Intentional; not a missing-alias smell.
+- If provided: explicit string/symbol — re-running the same `observe(...)` line replaces the existing controller with the same alias, and you can remove it actively via `removeUmbControllerByAlias('_observeItems')`
 
 ### Retrieve a Context
 
