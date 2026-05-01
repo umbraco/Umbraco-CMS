@@ -14,7 +14,6 @@ public class ServiceContext
     private readonly Lazy<IDomainService>? _domainService;
     private readonly Lazy<IEntityService>? _entityService;
     private readonly Lazy<IExternalLoginWithKeyService>? _externalLoginService;
-    private readonly Lazy<IFileService>? _fileService;
     private readonly Lazy<IKeyValueService>? _keyValueService;
     private readonly Lazy<ILocalizationService>? _localizationService;
     private readonly Lazy<ILocalizedTextService>? _localizedTextService;
@@ -25,11 +24,15 @@ public class ServiceContext
     private readonly Lazy<IMemberTypeService>? _memberTypeService;
     private readonly Lazy<INotificationService>? _notificationService;
     private readonly Lazy<IPackagingService>? _packagingService;
+    private readonly Lazy<IPartialViewService>? _partialViewService;
     private readonly Lazy<IPublicAccessService>? _publicAccessService;
     private readonly Lazy<IRedirectUrlService>? _redirectUrlService;
     private readonly Lazy<IRelationService>? _relationService;
+    private readonly Lazy<IScriptService>? _scriptService;
     private readonly Lazy<IServerRegistrationService>? _serverRegistrationService;
+    private readonly Lazy<IStylesheetService>? _stylesheetService;
     private readonly Lazy<ITagService>? _tagService;
+    private readonly Lazy<ITemplateService>? _templateService;
     private readonly Lazy<IUserService>? _userService;
     private readonly Lazy<IWebhookService>? _webhookService;
 
@@ -48,7 +51,6 @@ public class ServiceContext
     /// <param name="contentTypeService">The content type service.</param>
     /// <param name="mediaTypeService">The media type service.</param>
     /// <param name="dataTypeService">The data type service.</param>
-    /// <param name="fileService">The file service.</param>
     /// <param name="localizationService">The localization service.</param>
     /// <param name="packagingService">The packaging service.</param>
     /// <param name="serverRegistrationService">The server registration service.</param>
@@ -63,6 +65,10 @@ public class ServiceContext
     /// <param name="keyValueService">The key-value service.</param>
     /// <param name="contentTypeBaseServiceProvider">The content type base service provider.</param>
     /// <param name="webhookService">The webhook service.</param>
+    /// <param name="templateService">The template service.</param>
+    /// <param name="partialViewService">The partial view service.</param>
+    /// <param name="stylesheetService">The stylesheet service.</param>
+    /// <param name="scriptService">The script service.</param>
     public ServiceContext(
         Lazy<IPublicAccessService>? publicAccessService,
         Lazy<IDomainService>? domainService,
@@ -76,7 +82,6 @@ public class ServiceContext
         Lazy<IContentTypeService>? contentTypeService,
         Lazy<IMediaTypeService>? mediaTypeService,
         Lazy<IDataTypeService>? dataTypeService,
-        Lazy<IFileService>? fileService,
         Lazy<ILocalizationService>? localizationService,
         Lazy<IPackagingService>? packagingService,
         Lazy<IServerRegistrationService>? serverRegistrationService,
@@ -90,7 +95,11 @@ public class ServiceContext
         Lazy<IConsentService>? consentService,
         Lazy<IKeyValueService>? keyValueService,
         Lazy<IContentTypeBaseServiceProvider>? contentTypeBaseServiceProvider,
-        Lazy<IWebhookService>? webhookService)
+        Lazy<IWebhookService>? webhookService,
+        Lazy<ITemplateService>? templateService,
+        Lazy<IPartialViewService>? partialViewService,
+        Lazy<IStylesheetService>? stylesheetService,
+        Lazy<IScriptService>? scriptService)
     {
         _publicAccessService = publicAccessService;
         _domainService = domainService;
@@ -104,7 +113,6 @@ public class ServiceContext
         _contentTypeService = contentTypeService;
         _mediaTypeService = mediaTypeService;
         _dataTypeService = dataTypeService;
-        _fileService = fileService;
         _localizationService = localizationService;
         _packagingService = packagingService;
         _serverRegistrationService = serverRegistrationService;
@@ -119,6 +127,10 @@ public class ServiceContext
         _keyValueService = keyValueService;
         _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
         _webhookService = webhookService;
+        _templateService = templateService;
+        _partialViewService = partialViewService;
+        _stylesheetService = stylesheetService;
+        _scriptService = scriptService;
     }
 
     /// <summary>
@@ -187,11 +199,6 @@ public class ServiceContext
     public IDataTypeService? DataTypeService => _dataTypeService?.Value;
 
     /// <summary>
-    ///     Gets the <see cref="IFileService" />
-    /// </summary>
-    public IFileService? FileService => _fileService?.Value;
-
-    /// <summary>
     ///     Gets the <see cref="ILocalizationService" />
     /// </summary>
     public ILocalizationService? LocalizationService => _localizationService?.Value;
@@ -257,6 +264,26 @@ public class ServiceContext
     public IWebhookService? WebhookService => _webhookService?.Value;
 
     /// <summary>
+    ///     Gets the <see cref="ITemplateService" />.
+    /// </summary>
+    public ITemplateService? TemplateService => _templateService?.Value;
+
+    /// <summary>
+    ///     Gets the <see cref="IPartialViewService" />.
+    /// </summary>
+    public IPartialViewService? PartialViewService => _partialViewService?.Value;
+
+    /// <summary>
+    ///     Gets the <see cref="IStylesheetService" />.
+    /// </summary>
+    public IStylesheetService? StylesheetService => _stylesheetService?.Value;
+
+    /// <summary>
+    ///     Gets the <see cref="IScriptService" />.
+    /// </summary>
+    public IScriptService? ScriptService => _scriptService?.Value;
+
+    /// <summary>
     /// Creates a partial service context with only some services (for tests).
     /// </summary>
     /// <param name="contentService">The content service.</param>
@@ -264,7 +291,6 @@ public class ServiceContext
     /// <param name="contentTypeService">The content type service.</param>
     /// <param name="mediaTypeService">The media type service.</param>
     /// <param name="dataTypeService">The data type service.</param>
-    /// <param name="fileService">The file service.</param>
     /// <param name="localizationService">The localization service.</param>
     /// <param name="packagingService">The packaging service.</param>
     /// <param name="entityService">The entity service.</param>
@@ -286,6 +312,10 @@ public class ServiceContext
     /// <param name="keyValueService">The key-value service.</param>
     /// <param name="contentTypeBaseServiceProvider">The content type base service provider.</param>
     /// <param name="webhookService">The webhook service.</param>
+    /// <param name="templateService">The template service.</param>
+    /// <param name="partialViewService">The partial view service.</param>
+    /// <param name="stylesheetService">The stylesheet service.</param>
+    /// <param name="scriptService">The script service.</param>
     /// <returns>A new <see cref="ServiceContext"/> instance with the specified services.</returns>
     /// <remarks>
     /// <para>Using a true constructor for this confuses DI containers.</para>
@@ -296,7 +326,6 @@ public class ServiceContext
         IContentTypeService? contentTypeService = null,
         IMediaTypeService? mediaTypeService = null,
         IDataTypeService? dataTypeService = null,
-        IFileService? fileService = null,
         ILocalizationService? localizationService = null,
         IPackagingService? packagingService = null,
         IEntityService? entityService = null,
@@ -317,7 +346,11 @@ public class ServiceContext
         IConsentService? consentService = null,
         IKeyValueService? keyValueService = null,
         IContentTypeBaseServiceProvider? contentTypeBaseServiceProvider = null,
-        IWebhookService? webhookService = null)
+        IWebhookService? webhookService = null,
+        ITemplateService? templateService = null,
+        IPartialViewService? partialViewService = null,
+        IStylesheetService? stylesheetService = null,
+        IScriptService? scriptService = null)
     {
         Lazy<T>? Lazy<T>(T? service)
         {
@@ -337,7 +370,6 @@ public class ServiceContext
             Lazy(contentTypeService),
             Lazy(mediaTypeService),
             Lazy(dataTypeService),
-            Lazy(fileService),
             Lazy(localizationService),
             Lazy(packagingService),
             Lazy(serverRegistrationService),
@@ -351,6 +383,10 @@ public class ServiceContext
             Lazy(consentService),
             Lazy(keyValueService),
             Lazy(contentTypeBaseServiceProvider),
-            Lazy(webhookService));
+            Lazy(webhookService),
+            Lazy(templateService),
+            Lazy(partialViewService),
+            Lazy(stylesheetService),
+            Lazy(scriptService));
     }
 }
