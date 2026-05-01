@@ -1,5 +1,5 @@
 import type { ManifestWorkspace } from './extensions/types.js';
-import { customElement, property, type PropertyValueMap, state, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UmbExtensionsApiInitializer,
