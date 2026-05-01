@@ -2734,6 +2734,10 @@ export type UnpublishDocumentRequestModel = {
     cultures?: Array<string> | null;
 };
 
+export type UpdateCurrentUserRequestModel = {
+    languageIsoCode: string;
+};
+
 export type UpdateDataTypeRequestModel = {
     name: string;
     editorAlias: string;
@@ -17337,6 +17341,37 @@ export type PostUserCurrent2FaByProviderNameResponses = {
 
 export type PostUserCurrent2FaByProviderNameResponse = PostUserCurrent2FaByProviderNameResponses[keyof PostUserCurrent2FaByProviderNameResponses];
 
+export type DeleteUserCurrentAvatarData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/user/current/avatar';
+};
+
+export type DeleteUserCurrentAvatarErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type DeleteUserCurrentAvatarError = DeleteUserCurrentAvatarErrors[keyof DeleteUserCurrentAvatarErrors];
+
+export type DeleteUserCurrentAvatarResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type PostUserCurrentAvatarData = {
     body?: SetAvatarRequestModel;
     path?: never;
@@ -17533,6 +17568,37 @@ export type GetUserCurrentPermissionsMediaResponses = {
 };
 
 export type GetUserCurrentPermissionsMediaResponse = GetUserCurrentPermissionsMediaResponses[keyof GetUserCurrentPermissionsMediaResponses];
+
+export type PutUserCurrentProfileData = {
+    body?: UpdateCurrentUserRequestModel;
+    path?: never;
+    query?: never;
+    url: '/umbraco/management/api/v1/user/current/profile';
+};
+
+export type PutUserCurrentProfileErrors = {
+    /**
+     * Bad Request
+     */
+    400: ProblemDetails;
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutUserCurrentProfileError = PutUserCurrentProfileErrors[keyof PutUserCurrentProfileErrors];
+
+export type PutUserCurrentProfileResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type PostUserDisableData = {
     body?: DisableUserRequestModel;
