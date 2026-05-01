@@ -4,6 +4,7 @@ import type { MappingFunction } from '../types/mapping-function.type.js';
 import type { MemoizationFunction } from '../types/memoization-function.type.js';
 import { jsonStringComparison } from '../utils/json-string-comparison.function.js';
 import { UmbBasicState } from './basic-state.js';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * @class UmbDeepState
@@ -27,10 +28,10 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	 * @returns {Observable<R>}
 	 * @description - Creates an Observable from this State.
 	 */
-	asObservablePart<ReturnType>(
+	override asObservablePart<ReturnType>(
 		mappingFunction: MappingFunction<T, ReturnType>,
 		memoizationFunction?: MemoizationFunction<ReturnType>,
-	) {
+	): Observable<ReturnType> {
 		return createObservablePart(this._subject, mappingFunction, memoizationFunction ?? jsonStringComparison);
 	}
 
@@ -80,24 +81,24 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	 * @description - Check if the state is muted.
 	 * @returns {boolean} - Returns true if the state is muted.
 	 */
-	isMuted() {
-		return this.#mute;
+	isMuted(): boolean {
+		return this.#mute ?? false;
 	}
 
 	/**
 	 * @function getMutePromise
 	 * @description - Get a promise which resolves when the mute is unset.
-	 * @returns {Promise<void>}
+	 * @returns {Promise<boolean>} - Returns a promise which resolves to true if the state was muted and is now unmuted, or false if the state was not muted.
 	 */
-	getMutePromise() {
-		return new Promise<void>((resolve) => {
+	getMutePromise(): Promise<boolean> {
+		return new Promise<boolean>((resolve) => {
 			if (!this.#mute) {
-				resolve();
+				resolve(false);
 				return;
 			}
 			const subscription = this._subject.subscribe(() => {
 				subscription.unsubscribe();
-				resolve();
+				resolve(true);
 			});
 		});
 	}

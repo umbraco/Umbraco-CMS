@@ -1,3 +1,4 @@
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { MappingFunction } from '../types/mapping-function.type.js';
 import type { MemoizationFunction } from '../types/memoization-function.type.js';
 import type { UmbClassStateData } from '../utils/class-equal-memoization.function.js';
@@ -21,10 +22,10 @@ export class UmbClassState<T extends UmbClassStateData | undefined> extends UmbB
 	 * @returns {Observable<unknown>} - an observable.
 	 * @description - Creates an Observable from this State.
 	 */
-	asObservablePart<ReturnType>(
+	override asObservablePart<ReturnType>(
 		mappingFunction: MappingFunction<T, ReturnType>,
 		memoizationFunction?: MemoizationFunction<ReturnType>,
-	) {
+	): Observable<ReturnType> {
 		return createObservablePart(this._subject, mappingFunction, memoizationFunction);
 	}
 
