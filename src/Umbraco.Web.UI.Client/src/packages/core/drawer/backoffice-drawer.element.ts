@@ -33,16 +33,30 @@ export class UmbBackofficeDrawerElement extends UmbLitElement {
 	}
 
 	async #onCurrentChanged(alias: string | undefined) {
+		this._drawerEl?.classList.remove('is-closing');
 		// Closed
 		if (!alias) {
-			this.#currentAlias = undefined;
-			this._activeElement = undefined;
-			this._drawerEl?.hidePopover?.();
+			if (!this._drawerEl) return;
+			this._drawerEl.classList.add('is-closing');
+			this._drawerEl.addEventListener(
+				'transitionend',
+				() => {
+					if (!this._drawerEl?.classList.contains('is-closing')) return;
+					this._drawerEl.classList.remove('is-closing');
+					this._drawerEl.hidePopover?.();
+				},
+				{ once: true },
+			);
 			return;
 		}
 
-		// Same drawer already shown — nothing to do
-		if (alias === this.#currentAlias) return;
+		// Same alias with existing element — just re-show (preserves state)
+		if (alias === this.#currentAlias && this._activeElement) {
+			if (!this._drawerEl?.matches(':popover-open')) {
+				this._drawerEl?.showPopover?.();
+			}
+			return;
+		}
 
 		this.#currentAlias = alias;
 
@@ -58,7 +72,10 @@ export class UmbBackofficeDrawerElement extends UmbLitElement {
 		if (this.#currentAlias !== alias) return;
 
 		this._activeElement = element;
-		this._drawerEl?.showPopover?.();
+		await this.updateComplete;
+		if (!this._drawerEl?.matches(':popover-open')) {
+			this._drawerEl?.showPopover?.();
+		}
 	}
 
 	#repromoteIfOpen() {
@@ -90,6 +107,26 @@ export class UmbBackofficeDrawerElement extends UmbLitElement {
 				position: fixed;
 				inset: 0 0 0 auto;
 				width: min(480px, 100vw);
+				height: 100vh;
+				transform: translateX(0);
+				transition: transform 300ms ease-in-out;
+			}
+
+			@keyframes umb-drawer-slide-in {
+				from {
+					transform: translateX(100%);
+				}
+				to {
+					transform: translateX(0);
+				}
+			}
+
+			#drawer:popover-open {
+				animation: umb-drawer-slide-in 300ms ease-in-out;
+			}
+
+			#drawer.is-closing {
+				transform: translateX(100%);
 			}
 		`,
 	];

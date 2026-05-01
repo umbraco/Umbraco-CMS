@@ -1,5 +1,5 @@
 import { UmbBackofficeContext } from './backoffice.context.js';
-import { css, html, customElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import {
 	UmbBackofficeEntryPointExtensionInitializer,
 	UmbEntryPointExtensionInitializer,
@@ -8,6 +8,7 @@ import {
 import { UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
+import { UMB_DRAWER_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/drawer';
 
 import './components/index.js';
 
@@ -59,6 +60,9 @@ export class UmbBackofficeElement extends UmbLitElement {
 	 */
 	public extensionRegistry = umbExtensionsRegistry;
 
+	@state()
+	private _drawerOpen = false;
+
 	constructor() {
 		super();
 
@@ -66,6 +70,14 @@ export class UmbBackofficeElement extends UmbLitElement {
 
 		new UmbBackofficeEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 		new UmbEntryPointExtensionInitializer(this, umbExtensionsRegistry);
+
+		this.consumeContext(UMB_DRAWER_MANAGER_CONTEXT, (ctx) => {
+			if (!ctx) return;
+			this.observe(ctx.current, (alias) => {
+				this._drawerOpen = !!alias;
+				this.toggleAttribute('drawer-open', this._drawerOpen);
+			});
+		});
 	}
 
 	override async firstUpdated() {
@@ -106,6 +118,10 @@ export class UmbBackofficeElement extends UmbLitElement {
 				color: var(--uui-color-text);
 				font-size: 14px;
 				box-sizing: border-box;
+				transition: padding-right 300ms ease-in-out;
+			}
+			:host([drawer-open]) {
+				padding-right: 480px;
 			}
 		`,
 	];
