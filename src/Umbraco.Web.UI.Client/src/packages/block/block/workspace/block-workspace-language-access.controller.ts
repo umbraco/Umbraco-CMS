@@ -3,7 +3,7 @@ import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js'
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbContextConsumerController } from '@umbraco-cms/backoffice/context-api';
 
 const IDENTIFIER_PREFIX = 'UMB_LANGUAGE_PERMISSION_';
@@ -30,9 +30,9 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.#workspaceContext?.readOnlyGuard.fallbackToPermitted();
-			this.#workspaceContext?.content.readOnlyGuard.fallbackToPermitted();
-			this.#workspaceContext?.settings.readOnlyGuard.fallbackToPermitted();
+			this.#workspaceContext?.readOnlyGuard.fallbackToNotPermitted();
+			this.#workspaceContext?.content.readOnlyGuard.fallbackToNotPermitted();
+			this.#workspaceContext?.settings.readOnlyGuard.fallbackToNotPermitted();
 
 			this.observe(
 				instance?.variantId,
@@ -69,6 +69,7 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 	}
 
 	#observeBlockManager(variantId?: UmbVariantId) {
+		const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
 		if (variantId?.isCultureInvariant()) {
 			/**
 			 * If the Block Workspace is invariant, the readOnly state from the Block Manager should apply to the invariant fields(all) of this Workspace: [NL]
@@ -82,31 +83,28 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 					(isReadOnly) => {
 						if (isReadOnly === undefined) return;
 
-						const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
-
 						if (isReadOnly) {
-							this.#workspaceContext?.readOnlyGuard.removeRule(unique);
-							this.#workspaceContext?.content.readOnlyGuard.removeRule(unique);
-							this.#workspaceContext?.settings.readOnlyGuard.removeRule(unique);
-						} else {
 							const rule = {
 								unique,
-								permitted: false,
-								variantId: UmbVariantId.INVARIANT,
+								permitted: true,
 							};
 
 							this.#workspaceContext?.readOnlyGuard.addRule(rule);
 							this.#workspaceContext?.content.readOnlyGuard.addRule(rule);
 							this.#workspaceContext?.settings.readOnlyGuard.addRule(rule);
+						} else {
+							this.#workspaceContext?.readOnlyGuard.removeRule(unique);
+							this.#workspaceContext?.content.readOnlyGuard.removeRule(unique);
+							this.#workspaceContext?.settings.readOnlyGuard.removeRule(unique);
 						}
 					},
 					'observeManagerReadOnly',
 				);
 			});
 		} else {
-			this.#workspaceContext?.readOnlyGuard.removeRule('UMB_BLOCK_MANAGER_CONTEXT');
-			this.#workspaceContext?.content.readOnlyGuard.removeRule('UMB_BLOCK_MANAGER_CONTEXT');
-			this.#workspaceContext?.settings.readOnlyGuard.removeRule('UMB_BLOCK_MANAGER_CONTEXT');
+			this.#workspaceContext?.readOnlyGuard.removeRule(unique);
+			this.#workspaceContext?.content.readOnlyGuard.removeRule(unique);
+			this.#workspaceContext?.settings.readOnlyGuard.removeRule(unique);
 			this.#consumeBlockManager?.destroy();
 			this.#consumeBlockManager = undefined;
 			this.removeUmbControllerByAlias('observeManagerReadOnly');
@@ -114,7 +112,13 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 	}
 
 	#checkForLanguageAccess() {
-		if (!this.#workspaceContext) return;
+		if (
+			!this.#workspaceContext ||
+			this.#currentUserHasAccessToAllLanguages == undefined ||
+			this.#currentUserAllowedLanguages == undefined
+		) {
+			return;
+		}
 
 		const culture = this.#variantId?.culture ?? undefined;
 
@@ -138,16 +142,16 @@ export class UmbBlockLanguageAccessWorkspaceController extends UmbControllerBase
 			this.#appliedLanguageUnique = undefined;
 		}
 
-		if (!allowed || !culture || !this.#variantId) return;
+		if (allowed || !culture || !this.#variantId) return;
 
 		const variantId = this.#variantId;
 		const unique = IDENTIFIER_PREFIX + culture;
 		const rule = {
 			unique,
 			variantId,
-			// `permitted: false` on a read-only guard means "not permitted to be read-only"
-			// — i.e. editable. Combined with `fallbackToPermitted()` (default = read-only).
-			permitted: false,
+			// `permitted: true` on a read-only guard means "to be read-only"
+			// — i.e. not editable. Combined with `fallbackToPermitted()` (default = read-only).
+			permitted: true,
 		};
 
 		this.#workspaceContext.readOnlyGuard.addRule(rule);
