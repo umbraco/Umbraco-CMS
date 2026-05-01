@@ -78,7 +78,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	readonly exposed = this.#exposed.asObservable();
 
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
-	#trashedContext = new UmbIsTrashedEntityContext(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
@@ -114,7 +113,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.observe(
 				context?.isTrashed,
 				(isTrashed) => {
-					this.#trashedContext.setIsTrashed(isTrashed ?? false);
 					const trashed = isTrashed === true;
 					const unique = 'UMB_PREVENT_EDIT_TRASHED_ITEM';
 					if (trashed) {
