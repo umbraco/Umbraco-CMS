@@ -40,7 +40,7 @@ export class UmbClassState<T extends UmbClassStateData | undefined> extends UmbB
 
 		// Do a strict compare first, to avoid reacting on the same instance or going from undefined to undefined.
 		if (data === oldValue) return;
-		// Then if the new data has an equal method, use it to compare with the old value.
+		// Then if the current value has an equal method, use it to compare with the incoming value.
 		if (data && oldValue?.equal(data)) return;
 		this._subject.next(data);
 	}
