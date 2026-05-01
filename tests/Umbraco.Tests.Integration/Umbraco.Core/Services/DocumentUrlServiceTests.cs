@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -21,6 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Mock)]
 internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithContent
 {
+    private const string SubSubPage1Key = "09376F1F-AF4E-4E5E-8DCF-074A5C8A81E7";
     private const string SubSubPage2Key = "48AE405E-5142-4EBE-929F-55EB616F51F2";
     private const string SubSubPage3Key = "AACF2979-3F53-4184-B071-BA34D3338497";
 
@@ -45,6 +47,15 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         builder.UrlSegmentProviders().Insert<CustomUrlSegmentProvider1>();
         builder.UrlSegmentProviders().Insert<CustomUrlSegmentProvider2>();
+    }
+
+    public override void CreateTestData()
+    {
+        base.CreateTestData();
+
+        var subSubPage1 = ContentBuilder.CreateSimpleContent(ContentType, "Sub Sub Page 1", Subpage.Id);
+        subSubPage1.Key = new Guid(SubSubPage1Key);
+        ContentService.Save(subSubPage1, -1);
     }
 
     private abstract class CustomUrlSegmentProviderBase
@@ -239,7 +250,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
-        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
+        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
     }
 
     [Test]
@@ -264,7 +275,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         });
 
         // Act
-        ContentService.Unpublish(Textpage );
+        ContentService.Unpublish(Textpage);
 
         Assert.Multiple(() =>
         {
@@ -329,7 +340,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
-        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
+        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
     }
 
     [TestCase("/child-of-second-root", "en-US", true, ExpectedResult = "FF6654FB-BC68-4A65-8C6C-135567F50BD6")]
@@ -353,19 +364,39 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             ContentService.PublishBranch(secondRoot, PublishBranchFilter.IncludeUnpublished, ["*"]);
         }
 
-        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode,  null, loadDraft)?.ToString()?.ToUpper();
+        return DocumentUrlService.GetDocumentKeyByRoute(route, isoCode, null, loadDraft)?.ToString()?.ToUpper();
     }
 
     [TestCase(TextpageKey, "en-US", ExpectedResult = "/")]
     [TestCase(SubPageKey, "en-US", ExpectedResult = "/text-page-1-custom")]  // Has non-terminating custom URL segment provider.
     [TestCase(SubPage2Key, "en-US", ExpectedResult = "/text-page-2-custom")] // Has terminating custom URL segment provider.
     [TestCase(SubPage3Key, "en-US", ExpectedResult = "/text-page-3")]
+    [TestCase(SubSubPage1Key, "en-US", ExpectedResult = "/text-page-1-custom/sub-sub-page-1")]
     public string? GetLegacyRouteFormat_Returns_Expected_Route(string documentKey, string culture)
     {
         ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
         return DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
     }
 
+    [TestCase(TextpageKey, "en-US", "/")]
+    [TestCase(SubPageKey, "en-US", "/text-page-1-custom")]  // Has non-terminating custom URL segment provider.
+    [TestCase(SubPage2Key, "en-US", "/text-page-2-custom")] // Has terminating custom URL segment provider.
+    [TestCase(SubPage3Key, "en-US", "/text-page-3")]
+    [TestCase(SubSubPage1Key, "en-US", "/text-page-1-custom/sub-sub-page-1")]
+    public async Task GetLegacyRouteFormat_WithDomainBinding_Returns_Expected_Route(string documentKey, string culture, string expectedPath)
+    {
+        await DomainService.UpdateDomainsAsync(
+            Textpage.Key,
+            new()
+            {
+                Domains = [new() { DomainName = "/test", IsoCode = "en-US" }],
+                DefaultIsoCode = "en-US"
+            });
+
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+        var route = DocumentUrlService.GetLegacyRouteFormat(Guid.Parse(documentKey), culture, false);
+        Assert.AreEqual($"{Textpage.Id}{expectedPath}", route);
+    }
 
     [Test]
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync_Does_Not_Throw_When_Content_Does_Not_Exist()
@@ -725,4 +756,163 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
     }
 
     #endregion
+
+    #region Parameter Count Batching Tests
+
+    [Test]
+    [Explicit("Slow test that requires LocalDb to reproduce the SQL Server 2100 parameter limit. Run manually to verify the batching fix.")]
+    public async Task Save_With_Many_Stale_Rows_Does_Not_Exceed_Sql_Parameter_Limit()
+    {
+        // Arrange
+        // This test simulates the upgrade scenario where invariant documents previously had
+        // URL rows stored per-language (non-null languageId). After the v17.3 optimization,
+        // invariant documents store with NULL languageId. On rebuild, all old per-language rows
+        // become deletes. If the delete is not batched with InGroupsOf, sites with many documents
+        // and languages exceed SQL Server's 2100 parameter limit (SqlException error 8003).
+        //
+        // NOTE: SQLite does not enforce a parameter limit, so this test verifies functional
+        // correctness on SQLite and will catch the SQL Server regression when run with LocalDb.
+
+        // Create languages via the service (simulating a typical multi-language site).
+        string[] cultureCodes = ["da-DK", "de-DE", "fr-FR", "es-ES", "it-IT", "nl-NL", "pt-PT", "sv-SE", "nb-NO", "fi-FI"];
+        var languageIds = new List<int>();
+        foreach (var cultureCode in cultureCodes)
+        {
+            var language = new LanguageBuilder().WithCultureInfo(cultureCode).Build();
+            var result = await LanguageService.CreateAsync(language, Constants.Security.SuperUserKey);
+            Assert.IsTrue(result.Success, $"Failed to create language {cultureCode}");
+            languageIds.Add(result.Result!.Id);
+        }
+
+        // Each document produces (languageCount × 2) stale rows (draft + published per language).
+        // Compute the required document count dynamically to exceed SQL Server's hard limit of 2100
+        // parameters (not just Constants.Sql.MaxParameterCount which is 2000).
+        const int draftPublishedMultiplier = 2;
+        const int sqlServerParameterLimit = 2100;
+        var staleRowsPerDocument = languageIds.Count * draftPublishedMultiplier;
+        var requiredDocumentCount = (sqlServerParameterLimit / staleRowsPerDocument) + 1;
+
+        // Start with the documents already created by the base class.
+        var documentKeys = new List<Guid> { Textpage.Key, Subpage.Key, Subpage2.Key, Subpage3.Key };
+
+        // Create additional content nodes to reach the required count.
+        for (var i = documentKeys.Count; i < requiredDocumentCount; i++)
+        {
+            var content = ContentBuilder.CreateSimpleContent(ContentType, $"Bulk Page {i}", Textpage.Id);
+            ContentService.Save(content, -1);
+            documentKeys.Add(content.Key);
+        }
+
+        using ICoreScope scope = CoreScopeProvider.CreateCoreScope();
+        scope.WriteLock(Constants.Locks.DocumentUrls);
+
+        var database = ScopeAccessor.AmbientScope!.Database;
+
+        // Delete any existing URL rows to start clean.
+        database.Execute(database.SqlContext.Sql().Delete<DocumentUrlDto>());
+
+        // Insert stale rows: one per (document × language × draft/published).
+        // These simulate pre-v17.3 data where invariant documents had per-language rows.
+        var staleRowCount = 0;
+        var syntax = database.SqlContext.SqlSyntax;
+        foreach (var documentKey in documentKeys)
+        {
+            foreach (var languageId in languageIds)
+            {
+                foreach (var isDraft in new[] { true, false })
+                {
+                    database.Execute(
+                        $"INSERT INTO {syntax.GetQuotedTableName(DocumentUrlDto.TableName)}" +
+                        $" ({syntax.GetQuotedColumnName(DocumentUrlDto.UniqueIdColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.LanguageIdColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.IsDraftColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.UrlSegmentColumnName)}" +
+                        $", {syntax.GetQuotedColumnName(DocumentUrlDto.IsPrimaryColumnName)})" +
+                        " VALUES (@0, @1, @2, @3, @4)",
+                        documentKey,
+                        languageId,
+                        isDraft,
+                        "test-segment",
+                        true);
+                    staleRowCount++;
+                }
+            }
+        }
+
+        Assert.That(
+            staleRowCount,
+            Is.GreaterThan(sqlServerParameterLimit),
+            $"Test setup should create more than {sqlServerParameterLimit} stale rows to exceed SQL Server's parameter limit");
+
+        // Act - Save new-format data with NULL languageId (invariant).
+        // Every stale row should be deleted because the keys won't match (null vs non-null languageId).
+        var newSegments = documentKeys.SelectMany(key => new[]
+        {
+            new PublishedDocumentUrlSegment
+            {
+                DocumentKey = key,
+                NullableLanguageId = null,
+                IsDraft = true,
+                UrlSegment = "test-segment",
+                IsPrimary = true,
+            },
+            new PublishedDocumentUrlSegment
+            {
+                DocumentKey = key,
+                NullableLanguageId = null,
+                IsDraft = false,
+                UrlSegment = "test-segment",
+                IsPrimary = true,
+            },
+        }).ToList();
+
+        // This should not throw SqlException "too many parameters".
+        Assert.DoesNotThrow(() => DocumentUrlRepository.Save(newSegments));
+
+        // Verify: old rows deleted, new rows inserted.
+        var remainingRows = database.ExecuteScalar<int>(database.SqlContext.Sql().SelectCount().From<DocumentUrlDto>());
+        Assert.That(
+            remainingRows,
+            Is.EqualTo(newSegments.Count),
+            "Should have exactly the new invariant rows after save");
+
+        scope.Complete();
+    }
+
+    #endregion
+
+    // Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22293.
+    // An inconsistent database state (umbracoDocument.published = 1 but no matching
+    // umbracoDocumentVersion with published = 1) previously caused RebuildAllUrlsAsync
+    // to NRE in DocumentRepository.MapDtosToContent when dereferencing PublishedVersionDto.
+    [Test]
+    public async Task RebuildAllUrlsAsync_Handles_Node_With_Inconsistent_Published_State()
+    {
+        ContentService.PublishBranch(Textpage, PublishBranchFilter.IncludeUnpublished, ["*"]);
+
+        using (var scope = CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            var db = ScopeAccessor.AmbientScope!.Database;
+            var updateSql = ScopeAccessor.AmbientScope.SqlContext.Sql()
+                .Update<DocumentVersionDto>(u => u.Set(x => x.Published, false))
+                .WhereIn<DocumentVersionDto>(
+                    x => x.Id,
+                    ScopeAccessor.AmbientScope.SqlContext.Sql()
+                        .Select<DocumentVersionDto>(x => x.Id)
+                        .From<DocumentVersionDto>()
+                        .InnerJoin<ContentVersionDto>()
+                        .On<DocumentVersionDto, ContentVersionDto>((dv, cv) => dv.Id == cv.Id)
+                        .Where<ContentVersionDto>(x => x.NodeId == Subpage.Id)
+                        .Where<DocumentVersionDto>(x => x.Published == true));
+            db.Execute(updateSql);
+        }
+
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+
+        Assert.DoesNotThrowAsync(() => DocumentUrlService.RebuildAllUrlsAsync());
+        Assert.That(
+            DocumentUrlService.GetUrlSegment(Textpage.Key, isoCode, false),
+            Is.Not.Null,
+            "Healthy sibling should still have a published URL segment after rebuild.");
+    }
 }

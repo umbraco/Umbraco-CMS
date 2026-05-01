@@ -15,9 +15,9 @@ public class ContentVersionDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.ContentVersion;
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    public const string VersionDateColumnName = "versionDate";
 
     private const string UserIdColumnName = "userId";
-    private const string VersionDateColumnName = "versionDate";
     private const string CurrentColumnName = "current";
     private const string TextColumnName = "text";
     private const string NodeIdColumnName = Constants.DatabaseSchema.Columns.NodeIdName;

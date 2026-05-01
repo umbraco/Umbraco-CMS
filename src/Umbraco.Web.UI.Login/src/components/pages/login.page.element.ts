@@ -148,18 +148,19 @@ export default class UmbLoginPageElement extends UmbLitElement {
 			<div id="secondary-actions">
 				${when(
 					this.supportPersistLogin,
-					() => html` <uui-form-layout-item>
-						<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
-							<umb-localize key="auth_rememberMe">Remember me</umb-localize>
-						</uui-checkbox>
-					</uui-form-layout-item>`
+					() =>
+						html` <uui-form-layout-item>
+							<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
+								<umb-localize key="auth_rememberMe">Remember me</umb-localize>
+							</uui-checkbox>
+						</uui-form-layout-item>`,
 				)}
 				${when(
 					this.allowPasswordReset,
 					() =>
-						html` <button type="button" id="forgot-password" @click=${this.#handleForgottenPassword}>
+						html` <uui-button type="button" id="forgot-password" @click=${this.#handleForgottenPassword} compact>
 							<umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
-						</button>`
+						</uui-button>`,
 				)}
 			</div>
 			<uui-button
@@ -205,7 +206,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 			}
 
 			#greeting {
-				color: var(--uui-color-interactive);
+				color: var(--uui-color-default);
 				text-align: center;
 				font-weight: 400;
 				font-size: var(--header-font-size);
@@ -219,18 +220,9 @@ export default class UmbLoginPageElement extends UmbLitElement {
 			}
 
 			#forgot-password {
-				cursor: pointer;
-				background: none;
-				border: 0;
-				height: 1rem;
-				color: var(--uui-color-text-alt); /* TODO Change to uui color when uui gets a muted text variable */
-				gap: var(--uui-size-space-1);
-				align-self: center;
-				text-decoration: none;
-				display: inline-flex;
-				line-height: 1;
-				font-size: 14px;
-				font-family: var(--uui-font-family), sans-serif;
+				--uui-button-height: 100%;
+				--uui-button-background-color-hover: transparent;
+				margin-top: calc(-0.5 * var(--uui-size-space-2));
 				margin-left: auto;
 				margin-bottom: var(--uui-size-space-3);
 			}

@@ -23,7 +23,7 @@ internal static class WebApplicationExtensions
                 $"default-src 'self'; " +
                 $"script-src 'self' 'nonce-{nonce}'; " +
                 $"style-src 'self' 'unsafe-inline'; " +
-                $"img-src 'self' data: {Constants.NewsDashboard.Url}; " +
+                $"img-src 'self' data: blob: {Constants.NewsDashboard.Url}; " +
                 $"connect-src 'self'; " +
                 $"font-src 'self'; " +
                 $"frame-src 'self' {Constants.Marketplace.Url}");

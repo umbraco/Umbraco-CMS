@@ -153,7 +153,9 @@ public static class PublishedContentExtensions
 
         // parent key is null if content is at root
         return parentKey.HasValue
-            ? publishedStatusFilteringService.FilterAvailable([parentKey.Value], null).FirstOrDefault()
+#pragma warning disable CS0618 // Type or member is obsolete (justification: temporary means to avoid breaking changes in the PublishedContentExtensions)
+            ? publishedStatusFilteringService.Unfiltered([parentKey.Value]).FirstOrDefault()
+#pragma warning restore CS0618 // Type or member is obsolete
             : null;
     }
 
@@ -423,7 +425,7 @@ public static class PublishedContentExtensions
         // if we have a property, and it has a value, return that value
         if (property != null && property.HasValue(culture, segment))
         {
-            return property.Value<T>(publishedValueFallback, culture, segment);
+            return property.Value<T>(publishedValueFallback, culture, segment, fallback);
         }
 
         // else let fallback try to get a value
@@ -434,7 +436,7 @@ public static class PublishedContentExtensions
 
         // else... if we have a property, at least let the converter return its own
         // vision of 'no value' (could be an empty enumerable) - otherwise, default
-        return property == null ? default : property.Value<T>(publishedValueFallback, culture, segment);
+        return property == null ? default : property.Value<T>(publishedValueFallback, culture, segment, fallback);
     }
 
     #endregion
@@ -2261,8 +2263,7 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         IPublishedStatusFilteringService publishedStatusFilteringService,
         bool orSelf,
-        string? contentTypeAlias = null,
-        string? culture = null)
+        string? contentTypeAlias = null)
     {
         if (orSelf)
         {
@@ -2281,7 +2282,9 @@ public static class PublishedContentExtensions
             yield break;
         }
 
-        IEnumerable<IPublishedContent> ancestors = publishedStatusFilteringService.FilterAvailable(ancestorsKeys, culture);
+#pragma warning disable CS0618 // Type or member is obsolete (justification: temporary means to avoid breaking changes in the PublishedContentExtensions)
+        IEnumerable<IPublishedContent> ancestors = publishedStatusFilteringService.Unfiltered(ancestorsKeys);
+#pragma warning restore CS0618 // Type or member is obsolete
         foreach (IPublishedContent ancestor in ancestors)
         {
             yield return ancestor;

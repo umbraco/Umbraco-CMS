@@ -19,7 +19,7 @@ import {
 	UmbDocumentUrlsDataResolver,
 	type UmbDocumentItemModel,
 } from '@umbraco-cms/backoffice/document';
-import { UmbMediaItemRepository, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
+import { UmbMediaItemRepository, UmbMediaPickerFolderFilter, UmbMediaUrlRepository } from '@umbraco-cms/backoffice/media';
 import type { UmbInputMediaElement } from '@umbraco-cms/backoffice/media';
 import type { UUIBooleanInputEvent, UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -252,9 +252,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		if (this.value.link.url) {
 			await umbConfirmModal(this, {
 				color: 'danger',
-				headline: this.localize.term('linkPicker_resetUrlHeadline'),
-				content: this.localize.term('linkPicker_resetUrlMessage'),
-				confirmLabel: this.localize.term('linkPicker_resetUrlLabel'),
+				headline: '#linkPicker_resetUrlHeadline',
+				content: '#linkPicker_resetUrlMessage',
+				confirmLabel: '#linkPicker_resetUrlLabel',
 			});
 		}
 
@@ -406,6 +406,7 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				<umb-input-media
 					slot="editor"
 					.max=${1}
+					folder-filter=${UmbMediaPickerFolderFilter.FILES_ONLY}
 					.value=${this.value.link.unique && this.value.link.type === 'media' ? this.value.link.unique : ''}
 					@change=${(e: UmbInputPickerEvent) => this.#onPickerSelection(e, 'media')}></umb-input-media>
 			</umb-property-layout>

@@ -39,6 +39,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly chooseMediaPickerBtn: Locator;
   private readonly chooseMemberPickerBtn: Locator;
   private readonly numericTxt: Locator;
+  private readonly decimalTxt: Locator;
   private readonly resetFocalPointBtn: Locator;
   private readonly addMultiURLPickerBtn: Locator;
   private readonly linkTxt: Locator;
@@ -195,6 +196,8 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly containerEditBtn: Locator;
   private readonly loginPageSelectedItem: Locator;
   private readonly errorPageSelectedItem: Locator;
+  private readonly publishModalBtn: Locator;
+  private readonly unpublishModalBtn: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -216,12 +219,14 @@ export class ContentUiHelper extends UiBaseLocators {
     this.enterTagTxt = page.getByPlaceholder('Enter tag');
     this.menuItemTree = page.locator('umb-menu-item-tree-default');
     this.confirmToUnpublishBtn = page.locator('umb-document-unpublish-modal').getByLabel('Unpublish');
+    this.confirmToPublishBtn = page.locator('umb-document-publish-modal').getByLabel('Publish');
     this.dropdown = page.locator('select#native');
     this.splitView = page.locator('#splitViews');
     this.setADateTxt = page.getByLabel('Set a date…');
     this.chooseMediaPickerBtn = page.locator('umb-property-editor-ui-media-picker #btn-add');
     this.chooseMemberPickerBtn = page.locator('umb-property-editor-ui-member-picker #btn-add');
     this.numericTxt = page.locator('umb-property-editor-ui-number input');
+    this.decimalTxt = page.locator('umb-property-editor-ui-decimal input');
     this.addMultiURLPickerBtn = page.locator('umb-property-editor-ui-multi-url-picker #btn-add');
     this.linkTxt = page.getByTestId('input:url').locator('#input');
     this.anchorQuerystringTxt = page.getByLabel('#value or ?key=value');
@@ -311,6 +316,9 @@ export class ContentUiHelper extends UiBaseLocators {
     this.linkToManualBtn = this.linkPickerModal.getByTestId('action:external').locator('#button');
     this.umbDocumentCollection = page.locator('umb-document-collection');
     this.documentTableColumnName = this.listView.locator('umb-document-table-column-name');
+    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
+    this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
+    this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     //Block Grid - Block List
     this.addBlockElementBtn = page.locator('uui-button-group > uui-button').first().filter({has: page.locator('#button')});
     this.formValidationMessage = page.locator('#splitViews umb-form-validation-message #messages');
@@ -343,7 +351,6 @@ export class ContentUiHelper extends UiBaseLocators {
     this.blockWorkspace = page.locator('umb-block-workspace-editor');
     this.tiptapInput = page.locator('umb-input-tiptap');
     this.rteBlockInline = page.locator('umb-rte-block-inline');
-    this.backofficeModalContainer = page.locator('umb-backoffice-modal-container');
     this.modalCreateBtn = this.backofficeModalContainer.getByLabel('Create', {exact: true});
     this.modalUpdateBtn = this.backofficeModalContainer.getByLabel('Update', {exact: true});
     this.rteBlock = page.locator('umb-rte-block');
@@ -523,6 +530,25 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async doesHistoryHaveText(text: string) {
     await this.hasText(this.historyItems, text);
+  }
+
+  async doesHistoryItemHaveTag(tagText: string, index: number = 0) {
+    const tag = this.historyItems.nth(index).locator('.log-type uui-tag');
+    await this.containsText(tag, tagText);
+  }
+
+  async doesHistoryItemHaveDescription(descriptionText: string, index: number = 0) {
+    const description = this.historyItems.nth(index).locator('.log-type span');
+    await this.hasText(description, descriptionText);
+  }
+
+  async doesHistoryItemHaveUsername(usernameText: string, index: number = 0) {
+    const username = this.historyItems.nth(index).locator('.user-info .name');
+    await this.containsText(username, usernameText);
+  }
+
+  async doesHistoryHaveCount(count: number) {
+    await this.hasCount(this.historyItems, count);
   }
 
   async doesDocumentStateHaveText(text: string) {
@@ -782,6 +808,11 @@ export class ContentUiHelper extends UiBaseLocators {
   // Numeric
   async enterNumeric(number: number) {
     await this.enterText(this.numericTxt, number.toString());
+  }
+
+  // Decimal
+  async enterDecimal(number: number) {
+    await this.enterText(this.decimalTxt, number.toString());
   }
 
   // Radiobox
@@ -1208,6 +1239,14 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickManualLinkRemoveButton() {
     await this.click(this.manualLinkRemoveBtn);
+  }
+
+  async clickPublishModalButton() {
+    await this.click(this.publishModalBtn);
+  }
+
+  async clickUnpublishModalButton() {
+    await this.click(this.unpublishModalBtn);
   }
 
   // Block Grid - Block List
@@ -1909,6 +1948,15 @@ export class ContentUiHelper extends UiBaseLocators {
     const contentLocator = this.cardContentNode.filter({hasText: contentName});
     await this.waitForVisible(contentLocator);
     await this.click(contentLocator.locator('#select-checkbox'), {force: true});
+  }
+
+  async isContentCardWithNameSelected(contentName: string, isSelected: boolean = true) {
+    const contentLocator = this.cardContentNode.filter({hasText: contentName});
+    if (isSelected) {
+      await expect(contentLocator).toHaveAttribute('selected');
+    } else {
+      await expect(contentLocator).not.toHaveAttribute('selected');
+    }
   }
 
   async addGroupBasedPublicAccessWithPrefilledPages(memberGroupName: string) {

@@ -270,8 +270,9 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			throw new Error('Could not get required contexts to copy.');
 		}
 
-		const workspaceName = propertyDatasetContext?.getName();
-		const propertyLabel = propertyContext?.getLabel();
+		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
+		const propertyLabel = this.localize.string(propertyContext?.getLabel());
+
 		const blockLabel = this.#context.getName();
 		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
 		const content = this.#context.getContent();
@@ -346,7 +347,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		if (!this._showActions) return nothing;
 		return html`
 			<uui-action-bar>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}${this.#renderDeleteAction()}
+				${this.#renderEditAction()} ${this.#renderEditSettingsAction()}
+				${this.#renderCopyToClipboardAction()}${this.#renderDeleteAction()}
 			</uui-action-bar>
 		`;
 	}
@@ -371,7 +373,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderEditAction() {
-		if (this._isReadOnly) return nothing;
 		return this._showContentEdit && this._workspaceEditContentPath
 			? html`<uui-button
 					label="edit"
@@ -394,7 +395,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	}
 
 	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
 		return html`
 			${this._hasSettings && this._workspaceEditSettingsPath
 				? html`<uui-button

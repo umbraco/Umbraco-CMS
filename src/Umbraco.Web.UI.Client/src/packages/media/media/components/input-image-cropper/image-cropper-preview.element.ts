@@ -43,12 +43,12 @@ export class UmbImageCropperPreviewElement extends UmbLitElement {
 		const cropAspectRatio = this.crop.width / this.crop.height;
 		const imageAspectRatio = this.imageElement.naturalWidth / this.imageElement.naturalHeight;
 
-		let imageContainerWidth = 0,
-			imageContainerHeight = 0,
-			imageWidth = 0,
-			imageHeight = 0,
-			imageLeft = 0,
-			imageTop = 0;
+		let imageContainerWidth: number,
+			imageContainerHeight: number,
+			imageWidth: number,
+			imageHeight: number,
+			imageLeft: number,
+			imageTop: number;
 
 		if (cropAspectRatio > 1) {
 			imageContainerWidth = container.width;
