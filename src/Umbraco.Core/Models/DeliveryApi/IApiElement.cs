@@ -5,6 +5,7 @@ namespace Umbraco.Cms.Core.Models.DeliveryApi;
 /// <summary>
 ///     Represents a generic element in the Delivery API.
 /// </summary>
+[JsonDerivedType(typeof(ApiElement), nameof(ApiElement))]
 public interface IApiElement
 {
     /// <summary>
