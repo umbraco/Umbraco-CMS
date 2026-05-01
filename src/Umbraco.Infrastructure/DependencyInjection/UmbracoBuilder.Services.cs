@@ -63,7 +63,7 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<FileSystems>(),
                 factory.GetRequiredService<IEntityXmlSerializer>(),
                 factory.GetRequiredService<IDataTypeService>(),
-                factory.GetRequiredService<IFileService>(),
+                factory.GetRequiredService<IStylesheetService>(),
                 factory.GetRequiredService<IMediaService>(),
                 factory.GetRequiredService<IMediaTypeService>(),
                 factory.GetRequiredService<IContentService>(),
@@ -102,7 +102,8 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IContentService>(),
             factory.GetRequiredService<IContentTypeService>(),
             factory.GetRequiredService<IDataTypeService>(),
-            factory.GetRequiredService<IFileService>(),
+            factory.GetRequiredService<ITemplateService>(),
+            factory.GetRequiredService<IStylesheetService>(),
             factory.GetRequiredService<ILocalizationService>(),
             factory.GetRequiredService<IHostingEnvironment>(),
             factory.GetRequiredService<IEntityXmlSerializer>(),
@@ -113,12 +114,14 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<FileSystems>(),
             packageRepoFileName);
 
-    // Factory registration is only required because of ambiguous constructor
     private static IPackageDataInstallation CreatePackageDataInstallation(IServiceProvider factory)
         => new PackageDataInstallation(
             factory.GetRequiredService<IDataValueEditorFactory>(),
             factory.GetRequiredService<ILogger<PackageDataInstallation>>(),
-            factory.GetRequiredService<IFileService>(),
+            factory.GetRequiredService<IPartialViewService>(),
+            factory.GetRequiredService<IStylesheetService>(),
+            factory.GetRequiredService<IScriptService>(),
+            factory.GetRequiredService<IUserIdKeyResolver>(),
             factory.GetRequiredService<ILocalizationService>(),
             factory.GetRequiredService<IDataTypeService>(),
             factory.GetRequiredService<IEntityService>(),
@@ -131,7 +134,8 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IMediaService>(),
             factory.GetRequiredService<IMediaTypeService>(),
             factory.GetRequiredService<ITemplateContentParserService>(),
-            factory.GetRequiredService<ITemplateService>());
+            factory.GetRequiredService<ITemplateService>(),
+            factory.GetRequiredService<IMemberTypeService>());
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(
         IServiceProvider container)

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Notifications;
 /// </summary>
 /// <remarks>
 ///     This notification is cancelable, allowing handlers to prevent the save operation.
-///     The notification is published by the <see cref="Services.IFileService"/> before the stylesheet is persisted.
+///     The notification is published by the <see cref="Services.IStylesheetService"/> before the stylesheet is persisted.
 /// </remarks>
 public class StylesheetSavingNotification : SavingNotification<IStylesheet>
 {

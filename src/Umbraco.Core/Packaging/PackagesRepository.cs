@@ -24,7 +24,8 @@ public class PackagesRepository : ICreatedPackagesRepository
     private readonly IContentTypeService _contentTypeService;
     private readonly string _createdPackagesFolderPath;
     private readonly IDataTypeService _dataTypeService;
-    private readonly IFileService _fileService;
+    private readonly ITemplateService _templateService;
+    private readonly IStylesheetService _stylesheetService;
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILocalizationService _languageService;
@@ -43,7 +44,8 @@ public class PackagesRepository : ICreatedPackagesRepository
     /// <param name="contentService"></param>
     /// <param name="contentTypeService"></param>
     /// <param name="dataTypeService"></param>
-    /// <param name="fileService"></param>
+    /// <param name="templateService"></param>
+    /// <param name="stylesheetService"></param>
     /// <param name="languageService"></param>
     /// <param name="hostingEnvironment"></param>
     /// <param name="serializer"></param>
@@ -62,7 +64,8 @@ public class PackagesRepository : ICreatedPackagesRepository
         IContentService contentService,
         IContentTypeService contentTypeService,
         IDataTypeService dataTypeService,
-        IFileService fileService,
+        ITemplateService templateService,
+        IStylesheetService stylesheetService,
         ILocalizationService languageService,
         IHostingEnvironment hostingEnvironment,
         IEntityXmlSerializer serializer,
@@ -84,7 +87,8 @@ public class PackagesRepository : ICreatedPackagesRepository
         _contentService = contentService;
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;
-        _fileService = fileService;
+        _templateService = templateService;
+        _stylesheetService = stylesheetService;
         _languageService = languageService;
         _serializer = serializer;
         _hostingEnvironment = hostingEnvironment;
@@ -583,7 +587,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            ITemplate? template = _fileService.GetTemplate(outInt);
+            ITemplate? template = _templateService.GetAsync(outInt).GetAwaiter().GetResult();
             if (template == null)
             {
                 continue;
@@ -811,7 +815,7 @@ public class PackagesRepository : ICreatedPackagesRepository
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
         }
 
-        IStylesheet? stylesheet = _fileService.GetStylesheet(path);
+        IStylesheet? stylesheet = _stylesheetService.GetAsync(path).GetAwaiter().GetResult();
         if (stylesheet == null)
         {
             return null;

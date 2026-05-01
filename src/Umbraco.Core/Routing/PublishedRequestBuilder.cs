@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Routing;
 /// </summary>
 public class PublishedRequestBuilder : IPublishedRequestBuilder
 {
-    private readonly IFileService _fileService;
+    private readonly ITemplateService _templateService;
     private bool _cacheability;
     private IReadOnlyList<string>? _cacheExtensions;
     private IReadOnlyDictionary<string, string>? _headers;
@@ -23,11 +23,11 @@ public class PublishedRequestBuilder : IPublishedRequestBuilder
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedRequestBuilder" /> class.
     /// </summary>
-    public PublishedRequestBuilder(Uri uri, IFileService fileService)
+    public PublishedRequestBuilder(Uri uri, ITemplateService templateService)
     {
         Uri = uri;
         AbsolutePathDecoded = uri.GetAbsolutePathDecoded();
-        _fileService = fileService;
+        _templateService = templateService;
     }
 
     /// <inheritdoc />
@@ -199,7 +199,7 @@ public class PublishedRequestBuilder : IPublishedRequestBuilder
         // NOTE - can we still get it with whitespaces in it due to old legacy bugs?
         alias = alias.Replace(" ", string.Empty);
 
-        ITemplate? model = _fileService.GetTemplate(alias);
+        ITemplate? model = _templateService.GetAsync(alias).GetAwaiter().GetResult();
         if (model == null)
         {
             return false;

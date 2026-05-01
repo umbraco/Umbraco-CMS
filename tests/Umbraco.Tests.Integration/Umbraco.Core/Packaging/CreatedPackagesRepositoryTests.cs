@@ -43,7 +43,7 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private IStylesheetService StylesheetService => GetRequiredService<IStylesheetService>();
 
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 
@@ -67,7 +67,8 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         ContentService,
         ContentTypeService,
         DataTypeService,
-        FileService,
+        TemplateService,
+        StylesheetService,
         LocalizationService,
         HostingEnvironment,
         EntityXmlSerializer,

@@ -9,15 +9,15 @@ namespace Umbraco.Cms.Infrastructure.Templates.PartialViews;
 /// <inheritdoc />
 internal sealed class PartialViewPopulator : IPartialViewPopulator
 {
-    private readonly IFileService _fileService;
+    private readonly IPartialViewService _partialViewService;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PartialViewPopulator"/> class with the specified file service.
+    /// Initializes a new instance of the <see cref="PartialViewPopulator"/> class with the specified partial view service.
     /// </summary>
-    /// <param name="fileService">The <see cref="IFileService"/> used to perform file operations for partial views.</param>
-    public PartialViewPopulator(IFileService fileService)
+    /// <param name="partialViewService">The <see cref="IPartialViewService"/> used to perform file operations for partial views.</param>
+    public PartialViewPopulator(IPartialViewService partialViewService)
     {
-        _fileService = fileService;
+        _partialViewService = partialViewService;
     }
 
     /// <summary>
@@ -35,22 +35,33 @@ internal sealed class PartialViewPopulator : IPartialViewPopulator
     public void CopyPartialViewIfNotExists(Assembly assembly, string embeddedPath, string fileSystemPath)
     {
         Stream? content = assembly.GetManifestResourceStream(embeddedPath);
-        if (content is not null)
+        if (content is null)
         {
-
-            // We have to ensure that this is idempotent, so only save the view if it does not already exist
-            // We don't want to overwrite any changes made.
-            IPartialView? existingView = _fileService.GetPartialView(fileSystemPath);
-            if (existingView is null)
-            {
-                var view = new PartialView(fileSystemPath)
-                {
-                    Content = GetTextFromStream(content)
-                };
-
-                _fileService.SavePartialView(view);
-            }
+            return;
         }
+
+        // We have to ensure that this is idempotent, so only save the view if it does not already exist
+        // We don't want to overwrite any changes made.
+        IPartialView? existingView = _partialViewService.GetAsync(fileSystemPath).GetAwaiter().GetResult();
+        if (existingView is not null)
+        {
+            return;
+        }
+
+        // Split on '/' to keep separators consistent with the Umbraco file-system convention;
+        // Path.GetDirectoryName converts to backslashes on Windows which would break round-tripping.
+        var lastSlash = fileSystemPath.LastIndexOf('/');
+        var name = lastSlash >= 0 ? fileSystemPath[(lastSlash + 1)..] : fileSystemPath;
+        var parentPath = lastSlash >= 0 ? fileSystemPath[..lastSlash] : null;
+
+        var createModel = new PartialViewCreateModel
+        {
+            Name = name,
+            ParentPath = string.IsNullOrEmpty(parentPath) ? null : parentPath,
+            Content = GetTextFromStream(content),
+        };
+
+        _partialViewService.CreateAsync(createModel, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
     }
 
     private string GetTextFromStream(Stream stream)

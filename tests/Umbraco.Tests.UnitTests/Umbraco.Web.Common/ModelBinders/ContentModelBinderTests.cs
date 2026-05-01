@@ -201,7 +201,7 @@ public class ContentModelBinderTests
         Type modelType,
         IPublishedContent publishedContent)
     {
-        var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<IFileService>());
+        var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<ITemplateService>());
         builder.SetPublishedContent(publishedContent);
         var publishedRequest = builder.Build();
 

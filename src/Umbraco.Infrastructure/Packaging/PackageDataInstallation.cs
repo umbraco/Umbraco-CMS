@@ -2,14 +2,9 @@ using System.Globalization;
 using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Packaging;
@@ -17,6 +12,7 @@ using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -30,7 +26,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
     {
         private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly ILogger<PackageDataInstallation> _logger;
-        private readonly IFileService _fileService;
+        private readonly IPartialViewService _partialViewService;
+        private readonly IStylesheetService _stylesheetService;
+        private readonly IScriptService _scriptService;
+        private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly ILocalizationService _localizationService;
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
@@ -52,7 +51,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// </summary>
         /// <param name="dataValueEditorFactory">Factory for creating data value editors used in property editing.</param>
         /// <param name="logger">The logger used for logging installation events and errors.</param>
-        /// <param name="fileService">Service for managing files such as templates, stylesheets, and scripts.</param>
+        /// <param name="partialViewService">Service for managing partial views.</param>
+        /// <param name="stylesheetService">Service for managing stylesheets.</param>
+        /// <param name="scriptService">Service for managing scripts.</param>
+        /// <param name="userIdKeyResolver">Resolver for translating between user ids and user keys.</param>
         /// <param name="localizationService">Service for managing localization and dictionary items.</param>
         /// <param name="dataTypeService">Service for managing data types within Umbraco.</param>
         /// <param name="entityService">Service for managing Umbraco entities generically.</param>
@@ -70,7 +72,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
-            IFileService fileService,
+            IPartialViewService partialViewService,
+            IStylesheetService stylesheetService,
+            IScriptService scriptService,
+            IUserIdKeyResolver userIdKeyResolver,
             ILocalizationService localizationService,
             IDataTypeService dataTypeService,
             IEntityService entityService,
@@ -88,7 +93,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
-            _fileService = fileService;
+            _partialViewService = partialViewService;
+            _stylesheetService = stylesheetService;
+            _scriptService = scriptService;
+            _userIdKeyResolver = userIdKeyResolver;
             _localizationService = localizationService;
             _dataTypeService = dataTypeService;
             _entityService = entityService;
@@ -104,120 +112,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _templateService = templateService;
             _memberTypeService = memberTypeService;
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class,
-        /// providing all required services and helpers for package data installation operations.
-        /// </summary>
-        /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
-        /// <param name="logger">The logger used for logging installation events and errors.</param>
-        /// <param name="fileService">Service for managing files within the CMS.</param>
-        /// <param name="localizationService">Service for handling localization and translations.</param>
-        /// <param name="dataTypeService">Service for managing data types.</param>
-        /// <param name="entityService">Service for managing entities.</param>
-        /// <param name="contentTypeService">Service for managing content types.</param>
-        /// <param name="contentService">Service for managing content items.</param>
-        /// <param name="propertyEditors">A collection of property editors available in the system.</param>
-        /// <param name="scopeProvider">Provider for managing database transaction scopes.</param>
-        /// <param name="shortStringHelper">Helper for handling short string operations.</param>
-        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
-        /// <param name="mediaService">Service for managing media items.</param>
-        /// <param name="mediaTypeService">Service for managing media types.</param>
-        /// <param name="templateContentParserService">Service for parsing template content.</param>
-        /// <param name="templateService">Service for managing templates.</param>
-        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-        public PackageDataInstallation(
-            IDataValueEditorFactory dataValueEditorFactory,
-            ILogger<PackageDataInstallation> logger,
-            IFileService fileService,
-            ILocalizationService localizationService,
-            IDataTypeService dataTypeService,
-            IEntityService entityService,
-            IContentTypeService contentTypeService,
-            IContentService contentService,
-            PropertyEditorCollection propertyEditors,
-            IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper,
-            IConfigurationEditorJsonSerializer serializer,
-            IMediaService mediaService,
-            IMediaTypeService mediaTypeService,
-            ITemplateContentParserService templateContentParserService,
-            ITemplateService templateService)
-            : this(
-                  dataValueEditorFactory,
-                  logger,
-                  fileService,
-                  localizationService,
-                  dataTypeService,
-                  entityService,
-                  contentTypeService,
-                  contentService,
-                  propertyEditors,
-                  scopeProvider,
-                  shortStringHelper,
-                  serializer,
-                  mediaService,
-                  mediaTypeService,
-                  templateContentParserService,
-                  templateService,
-                  StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>())
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class, responsible for handling the installation of package data within Umbraco.
-        /// </summary>
-        /// <param name="dataValueEditorFactory">Factory for creating data value editors used in property editing.</param>
-        /// <param name="logger">The logger used for logging installation operations and errors.</param>
-        /// <param name="fileService">Service for managing files such as templates, stylesheets, and scripts.</param>
-        /// <param name="localizationService">Service for managing language and dictionary items.</param>
-        /// <param name="dataTypeService">Service for managing data types within Umbraco.</param>
-        /// <param name="entityService">Service for accessing and managing Umbraco entities.</param>
-        /// <param name="contentTypeService">Service for managing content types and media types.</param>
-        /// <param name="contentService">Service for managing content items (nodes) in Umbraco.</param>
-        /// <param name="propertyEditors">A collection of property editors available in the system.</param>
-        /// <param name="scopeProvider">Provides database transaction scopes for data operations.</param>
-        /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
-        /// <param name="globalSettings">The global settings options for the Umbraco installation.</param>
-        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
-        /// <param name="mediaService">Service for managing media items (files, images, etc.).</param>
-        /// <param name="mediaTypeService">Service for managing media types.</param>
-        /// <param name="hostingEnvironment">Provides information about the web hosting environment.</param>
-        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-        public PackageDataInstallation(
-            IDataValueEditorFactory dataValueEditorFactory,
-            ILogger<PackageDataInstallation> logger,
-            IFileService fileService,
-            ILocalizationService localizationService,
-            IDataTypeService dataTypeService,
-            IEntityService entityService,
-            IContentTypeService contentTypeService,
-            IContentService contentService,
-            PropertyEditorCollection propertyEditors,
-            Core.Scoping.IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper,
-            IOptions<GlobalSettings> globalSettings,
-            IConfigurationEditorJsonSerializer serializer,
-            IMediaService mediaService,
-            IMediaTypeService mediaTypeService,
-            IHostingEnvironment hostingEnvironment)
-            : this(
-                  dataValueEditorFactory,
-                  logger,
-                  fileService,
-                  localizationService,
-                  dataTypeService,
-                  entityService,
-                  contentTypeService,
-                  contentService,
-                  propertyEditors,
-                  (IScopeProvider)scopeProvider,
-                  shortStringHelper,
-                  serializer,
-                  mediaService,
-                  mediaTypeService,
-                  StaticServiceProvider.Instance.GetRequiredService<ITemplateContentParserService>(),
-                  StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
-        { }
 
         #region Install/Uninstall
 
@@ -526,7 +420,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             //TODO: This will almost never work, we can't reference a template by an INT Id within a package manifest, we need to change the
             // packager to package templates by UDI and resolve by the same, in 98% of cases, this isn't going to work, or it will resolve the wrong template.
-            ITemplate? template = templateId.HasValue ? _fileService.GetTemplate(templateId.Value) : null;
+            ITemplate? template = templateId.HasValue ? _templateService.GetAsync(templateId.Value).GetAwaiter().GetResult() : null;
 
             //now double check this is correct since its an INT it could very well be pointing to an invalid template :/
             if (template != null && contentType is IContentType contentTypex)
@@ -1181,7 +1075,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 foreach (XElement templateElement in allowedTemplatesElement.Elements("Template"))
                 {
                     var alias = templateElement.Value;
-                    ITemplate? template = _fileService.GetTemplate(alias.ToSafeAlias(_shortStringHelper));
+                    ITemplate? template = _templateService.GetAsync(alias.ToSafeAlias(_shortStringHelper)).GetAwaiter().GetResult();
                     if (template != null)
                     {
                         if (allowedTemplates?.Any(x => x.Id == template.Id) ?? true)
@@ -1205,7 +1099,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             if (string.IsNullOrEmpty((string?)defaultTemplateElement) == false)
             {
                 ITemplate? defaultTemplate =
-                    _fileService.GetTemplate(defaultTemplateElement.Value.ToSafeAlias(_shortStringHelper));
+                    _templateService.GetAsync(defaultTemplateElement.Value.ToSafeAlias(_shortStringHelper)).GetAwaiter().GetResult();
                 if (defaultTemplate != null)
                 {
                     contentType.SetDefaultTemplate(defaultTemplate);
@@ -1805,6 +1699,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         public IReadOnlyList<IScript> ImportScripts(IEnumerable<XElement> scriptElements, int userId)
         {
             var result = new List<IScript>();
+            Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
 
             foreach (XElement scriptXml in scriptElements)
             {
@@ -1814,7 +1709,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     continue;
                 }
 
-                IScript? script = _fileService.GetScript(path!);
+                IScript? script = _scriptService.GetAsync(path!).GetAwaiter().GetResult();
 
                 // only update if it doesn't exist
                 if (script == null)
@@ -1825,9 +1720,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    script = new Script(path!) { Content = content };
-                    _fileService.SaveScript(script, userId);
-                    result.Add(script);
+                    (var name, var parentPath) = SplitPath(path!);
+                    var createModel = new ScriptCreateModel
+                    {
+                        Name = name,
+                        ParentPath = parentPath,
+                        Content = content,
+                    };
+
+                    Attempt<IScript?, ScriptOperationStatus> createAttempt = _scriptService.CreateAsync(createModel, userKey).GetAwaiter().GetResult();
+                    if (createAttempt.Success && createAttempt.Result is not null)
+                    {
+                        result.Add(createAttempt.Result);
+                    }
                 }
             }
 
@@ -1843,22 +1748,33 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         public IReadOnlyList<IPartialView> ImportPartialViews(IEnumerable<XElement> partialViewElements, int userId)
         {
             var result = new List<IPartialView>();
+            Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
 
             foreach (XElement partialViewXml in partialViewElements)
             {
                 var path = partialViewXml.AttributeValue<string>("path")
                     ?? throw new InvalidOperationException("No path attribute found");
 
-                IPartialView? partialView = _fileService.GetPartialView(path);
+                IPartialView? partialView = _partialViewService.GetAsync(path).GetAwaiter().GetResult();
 
                 // only update if it doesn't exist
                 if (partialView == null)
                 {
                     var content = partialViewXml.Value ?? string.Empty;
 
-                    partialView = new PartialView(path) { Content = content };
-                    _fileService.SavePartialView(partialView, userId);
-                    result.Add(partialView);
+                    (var name, var parentPath) = SplitPath(path);
+                    var createModel = new PartialViewCreateModel
+                    {
+                        Name = name,
+                        ParentPath = parentPath,
+                        Content = content,
+                    };
+
+                    Attempt<IPartialView?, PartialViewOperationStatus> createAttempt = _partialViewService.CreateAsync(createModel, userKey).GetAwaiter().GetResult();
+                    if (createAttempt.Success && createAttempt.Result is not null)
+                    {
+                        result.Add(createAttempt.Result);
+                    }
                 }
             }
 
@@ -1879,6 +1795,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         public IReadOnlyList<IFile> ImportStylesheets(IEnumerable<XElement> stylesheetElements, int userId)
         {
             var result = new List<IFile>();
+            Guid userKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
 
             foreach (XElement n in stylesheetElements)
             {
@@ -1888,7 +1805,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     continue;
                 }
 
-                IStylesheet? s = _fileService.GetStylesheet(stylesheetPath!);
+                IStylesheet? s = _stylesheetService.GetAsync(stylesheetPath!).GetAwaiter().GetResult();
                 if (s == null)
                 {
                     var content = n.Element("Content")?.Value;
@@ -1897,8 +1814,21 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    s = new Stylesheet(stylesheetPath!) { Content = content };
-                    _fileService.SaveStylesheet(s, userId);
+                    (var name, var parentPath) = SplitPath(stylesheetPath!);
+                    var createModel = new StylesheetCreateModel
+                    {
+                        Name = name,
+                        ParentPath = parentPath,
+                        Content = content,
+                    };
+
+                    Attempt<IStylesheet?, StylesheetOperationStatus> createAttempt = _stylesheetService.CreateAsync(createModel, userKey).GetAwaiter().GetResult();
+                    if (createAttempt.Success is false || createAttempt.Result is null)
+                    {
+                        continue;
+                    }
+
+                    s = createAttempt.Result;
                 }
 
                 foreach (XElement prop in n.XPathSelectElements("Properties/Property"))
@@ -1928,7 +1858,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     sp.Value = prop.Element("Value")!.Value;
                 }
 
-                _fileService.SaveStylesheet(s, userId);
+                var updateModel = new StylesheetUpdateModel
+                {
+                    Content = s.Content ?? string.Empty,
+                };
+                _stylesheetService.UpdateAsync(s.Path, updateModel, userKey).GetAwaiter().GetResult();
                 result.Add(s);
             }
 
@@ -2034,5 +1968,20 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         }
 
         #endregion
+
+        // Split on '/' to keep separators consistent with the Umbraco file-system convention;
+        // Path.GetDirectoryName converts to backslashes on Windows which would break round-tripping
+        // through the new Create/Get APIs.
+        private static (string name, string? parentPath) SplitPath(string path)
+        {
+            var lastSlash = path.LastIndexOf('/');
+            if (lastSlash < 0)
+            {
+                return (path, null);
+            }
+
+            var parent = path[..lastSlash];
+            return (path[(lastSlash + 1)..], string.IsNullOrEmpty(parent) ? null : parent);
+        }
     }
 }

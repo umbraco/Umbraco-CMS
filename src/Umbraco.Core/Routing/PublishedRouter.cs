@@ -25,7 +25,7 @@ public class PublishedRouter : IPublishedRouter
     private readonly IContentTypeService _contentTypeService;
     private readonly IEventAggregator _eventAggregator;
     private readonly IDomainCache _domainCache;
-    private readonly IFileService _fileService;
+    private readonly ITemplateService _templateService;
     private readonly ILogger<PublishedRouter> _logger;
     private readonly IProfilingLogger _profilingLogger;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
@@ -48,7 +48,7 @@ public class PublishedRouter : IPublishedRouter
         IPublishedUrlProvider publishedUrlProvider,
         IRequestAccessor requestAccessor,
         IPublishedValueFallback publishedValueFallback,
-        IFileService fileService,
+        ITemplateService templateService,
         IContentTypeService contentTypeService,
         IUmbracoContextAccessor umbracoContextAccessor,
         IEventAggregator eventAggregator,
@@ -66,7 +66,7 @@ public class PublishedRouter : IPublishedRouter
         _publishedUrlProvider = publishedUrlProvider;
         _requestAccessor = requestAccessor;
         _publishedValueFallback = publishedValueFallback;
-        _fileService = fileService;
+        _templateService = templateService;
         _contentTypeService = contentTypeService;
         _umbracoContextAccessor = umbracoContextAccessor;
         _eventAggregator = eventAggregator;
@@ -93,7 +93,7 @@ public class PublishedRouter : IPublishedRouter
         var creatingRequest = new CreatingRequestNotification(uri);
         await _eventAggregator.PublishAsync(creatingRequest);
 
-        var publishedRequestBuilder = new PublishedRequestBuilder(creatingRequest.Url, _fileService);
+        var publishedRequestBuilder = new PublishedRequestBuilder(creatingRequest.Url, _templateService);
         return publishedRequestBuilder;
     }
 
@@ -128,7 +128,7 @@ public class PublishedRouter : IPublishedRouter
         // store the original (if any)
         IPublishedContent? content = request.PublishedContent;
 
-        IPublishedRequestBuilder builder = new PublishedRequestBuilder(request.Uri, _fileService);
+        IPublishedRequestBuilder builder = new PublishedRequestBuilder(request.Uri, _templateService);
 
         // ensure we keep the previous domain and culture
         if (request.Domain is not null)
@@ -789,14 +789,14 @@ public class PublishedRouter : IPublishedRouter
 
             // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
             if (request.PublishedContent.IsAllowedTemplate(
-                    _fileService,
+                    _templateService,
                     _contentTypeService,
                     _webRoutingSettings.DisableAlternativeTemplates,
                     _webRoutingSettings.ValidateAlternativeTemplates,
                     altTemplate))
             {
                 // allowed, use
-                ITemplate? template = _fileService.GetTemplate(altTemplate);
+                ITemplate? template = _templateService.GetAsync(altTemplate).GetAwaiter().GetResult();
 
                 if (template != null)
                 {
@@ -880,7 +880,7 @@ public class PublishedRouter : IPublishedRouter
             throw new InvalidOperationException("The template is not set, the page cannot render.");
         }
 
-        ITemplate? template = _fileService.GetTemplate(templateId.Value);
+        ITemplate? template = _templateService.GetAsync(templateId.Value).GetAwaiter().GetResult();
         if (template == null)
         {
             throw new InvalidOperationException("The template with Id " + templateId +

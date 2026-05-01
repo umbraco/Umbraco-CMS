@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Web.Common.Templates;
 /// </remarks>
 internal sealed class TemplateRenderer : ITemplateRenderer
 {
-    private readonly IFileService _fileService;
+    private readonly ITemplateService _templateService;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IModelMetadataProvider _modelMetadataProvider;
     private readonly IPublishedRouter _publishedRouter;
@@ -43,7 +43,7 @@ internal sealed class TemplateRenderer : ITemplateRenderer
     /// </summary>
     /// <param name="umbracoContextAccessor">Provides access to the current Umbraco context.</param>
     /// <param name="publishedRouter">The published router</param>
-    /// <param name="fileService"></param>
+    /// <param name="templateService"></param>
     /// <param name="textService"></param>
     /// <param name="webRoutingSettings"></param>
     /// <param name="httpContextAccessor"></param>
@@ -55,7 +55,7 @@ internal sealed class TemplateRenderer : ITemplateRenderer
     public TemplateRenderer(
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedRouter publishedRouter,
-        IFileService fileService,
+        ITemplateService templateService,
         ILocalizationService textService,
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
         IHttpContextAccessor httpContextAccessor,
@@ -67,7 +67,7 @@ internal sealed class TemplateRenderer : ITemplateRenderer
         _umbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
         _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
-        _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+        _templateService = templateService ?? throw new ArgumentNullException(nameof(templateService));
         _webRoutingSettings = webRoutingSettings.CurrentValue ??
                               throw new ArgumentNullException(nameof(webRoutingSettings));
         _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -129,7 +129,7 @@ internal sealed class TemplateRenderer : ITemplateRenderer
 
         if (templateId.HasValue)
         {
-            requestBuilder.SetTemplate(_fileService.GetTemplate(templateId.Value));
+            requestBuilder.SetTemplate(await _templateService.GetAsync(templateId.Value));
         }
 
         // if there is not template then exit
