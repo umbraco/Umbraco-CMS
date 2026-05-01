@@ -26,6 +26,7 @@ import { decodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/bac
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import { UMB_IS_TRASHED_ENTITY_CONTEXT, UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 
@@ -77,6 +78,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	readonly exposed = this.#exposed.asObservable();
 
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
+	#trashedContext = new UmbIsTrashedEntityContext(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
 		super(host, workspaceArgs.manifest.alias);
@@ -107,6 +109,31 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
 		}).asPromise({ preventTimeout: true });
+
+		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
+			this.observe(
+				context?.isTrashed,
+				(isTrashed) => {
+					this.#trashedContext.setIsTrashed(isTrashed ?? false);
+					const trashed = isTrashed === true;
+					const unique = 'UMB_PREVENT_EDIT_TRASHED_ITEM';
+					if (trashed) {
+						const rule = {
+							unique,
+							permitted: true,
+						};
+						this.readOnlyGuard.addRule(rule);
+						this.content.readOnlyGuard.addRule(rule);
+						this.settings.readOnlyGuard.addRule(rule);
+					} else {
+						this.readOnlyGuard.removeRule(unique);
+						this.content.readOnlyGuard.removeRule(unique);
+						this.settings.readOnlyGuard.removeRule(unique);
+					}
+				},
+				'observeIsTrashed',
+			);
+		}).skipHost();
 
 		this.observe(
 			this.variantId,
