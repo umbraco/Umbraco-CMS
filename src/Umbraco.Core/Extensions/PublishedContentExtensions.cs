@@ -96,10 +96,11 @@ public static class PublishedContentExtensions
         }
 
         // Use IDocumentUrlService to get the URL segment, aligning with the non-obsolete recommended approach.
-        // Fall back to in-memory lookup if the static service provider isn't initialised (e.g. unit tests that
-        // don't bootstrap DI). In production it is always populated.
+        // Fall back to in-memory lookup when the service isn't usable — either DI hasn't been bootstrapped
+        // (unit tests) or the service hasn't been initialised (integration tests not running full Umbraco
+        // startup). In production both hold.
         IDocumentUrlService? documentUrlService = StaticServiceProvider.Instance?.GetService<IDocumentUrlService>();
-        if (documentUrlService is null)
+        if (documentUrlService is null || documentUrlService.IsInitialized is false)
         {
             return content.Cultures.TryGetValue(effectiveCulture, out PublishedCultureInfo? infos)
                 ? infos.UrlSegment
