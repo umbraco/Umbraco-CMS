@@ -250,7 +250,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddSingleton<LegacyPasswordSecurity>();
             Services.AddSingleton<UserEditorAuthorizationHelper>();
             Services.AddSingleton<ContentPermissions>();
-            Services.AddSingleton<MediaPermissions>();
 
             Services.AddSingleton<PropertyEditorCollection>();
 
