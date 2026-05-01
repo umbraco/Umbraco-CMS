@@ -1025,6 +1025,7 @@ export type ElementConfigurationResponseModel = {
 };
 
 export type ElementItemResponseModel = {
+    isTrashed: boolean;
     parent?: null | ReferenceByIdModel;
     hasChildren: boolean;
     documentType: DocumentTypeReferenceResponseModel;
@@ -9036,6 +9037,31 @@ export type GetItemElementResponses = {
 };
 
 export type GetItemElementResponse = GetItemElementResponses[keyof GetItemElementResponses];
+
+export type GetItemElementAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/element/ancestors';
+};
+
+export type GetItemElementAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemElementAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelNamedItemResponseModel>;
+};
+
+export type GetItemElementAncestorsResponse = GetItemElementAncestorsResponses[keyof GetItemElementAncestorsResponses];
 
 export type GetItemElementFolderData = {
     body?: never;

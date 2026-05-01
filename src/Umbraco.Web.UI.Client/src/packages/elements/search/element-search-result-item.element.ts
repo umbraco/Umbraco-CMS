@@ -1,6 +1,16 @@
 import type { UmbElementItemVariantModel } from '../item/repository/types.js';
 import type { UmbElementSearchItemModel } from './types.js';
-import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import {
+	classMap,
+	css,
+	customElement,
+	html,
+	nothing,
+	property,
+	state,
+	when,
+} from '@umbraco-cms/backoffice/external/lit';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
@@ -20,12 +30,20 @@ export class UmbElementSearchResultItemElement extends UmbLitElement {
 		super();
 
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
-			this.observe(instance?.appLanguageCulture, (value) => {
-				this._variant = this.#getVariant(value);
-			});
-			this.observe(instance?.appDefaultLanguage, (value) => {
-				this._defaultCulture = value?.unique;
-			});
+			this.#observeAppCulture(instance);
+			this.#observeDefaultCulture(instance);
+		});
+	}
+
+	#observeAppCulture(context: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE | undefined) {
+		this.observe(context?.appLanguageCulture, (value) => {
+			this._variant = this.#getVariant(value);
+		});
+	}
+
+	#observeDefaultCulture(context: typeof UMB_APP_LANGUAGE_CONTEXT.TYPE | undefined) {
+		this.observe(context?.appDefaultLanguage, (value) => {
+			this._defaultCulture = value?.unique;
 		});
 	}
 
@@ -42,16 +60,50 @@ export class UmbElementSearchResultItemElement extends UmbLitElement {
 		return this._variant?.name ?? `(${fallbackName})`;
 	}
 
+	#getDraftState(): boolean {
+		if (this.item?.isTrashed) return false;
+		return (
+			this._variant?.state === DocumentVariantStateModel.DRAFT ||
+			this.item?.variants[0]?.state === DocumentVariantStateModel.DRAFT
+		);
+	}
+
+	#getAncestorPath() {
+		return this.item?.ancestors?.map((a) => a.name).join(' / ');
+	}
+
 	override render() {
 		if (!this.item) return nothing;
 
+		const label = this.#getLabel();
+		const isDraft = this.#getDraftState();
+
+		const classes = {
+			trashed: this.item.isTrashed,
+			hasState: this.item.isTrashed || isDraft,
+		};
+
 		return html`
 			${when(
-				this.item.documentType.icon,
+				this.item.documentType.icon ?? this.item.icon,
 				(icon) => html`<umb-icon name=${icon}></umb-icon>`,
 				() => html`<uui-icon name="icon-document"></uui-icon>`,
 			)}
-			<span>${this.#getLabel()}</span>
+			<span class=${classMap(classes)}>
+				${label}
+				${when(this.item.ancestors?.length, () => html`<small class="ancestors">${this.#getAncestorPath()}</small>`)}
+			</span>
+			<div class="extra">
+				${when(
+					this.item.isTrashed,
+					() => html`
+						<uui-tag look="secondary">
+							<umb-localize key="mediaPicker_trashed">Trashed</umb-localize>
+						</uui-tag>
+					`,
+				)}
+				${when(!this.item.isTrashed && isDraft, () => html`<uui-tag look="secondary">Draft</uui-tag>`)}
+			</div>
 		`;
 	}
 
@@ -70,6 +122,20 @@ export class UmbElementSearchResultItemElement extends UmbLitElement {
 
 				> span {
 					flex: 1;
+
+					&.hasState {
+						opacity: 0.6;
+					}
+
+					&.trashed {
+						text-decoration: line-through;
+					}
+					> .ancestors {
+						display: block;
+						opacity: 0.6;
+						font-size: 0.7rem;
+						font-weight: 400;
+					}
 				}
 			}
 		`,

@@ -13783,6 +13783,52 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/element/ancestors": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "summary": "Gets ancestors for a collection of element items.",
+        "description": "Gets the ancestor chains for element items identified by the provided Ids.",
+        "operationId": "GetItemElementAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemAncestorsResponseModelNamedItemResponseModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/element/folder": {
       "get": {
         "tags": [
@@ -23439,39 +23485,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PagedReferenceByIdModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
-    "/umbraco/management/api/v1/member/configuration": {
-      "get": {
-        "tags": [
-          "Member"
-        ],
-        "summary": "Gets the member configuration.",
-        "description": "Gets the configuration settings for members.",
-        "operationId": "GetMemberConfiguration",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MemberConfigurationResponseModel"
                 }
               }
             }
@@ -43440,6 +43453,7 @@
       },
       "ElementItemResponseModel": {
         "required": [
+          "isTrashed",
           "hasChildren",
           "documentType",
           "variants",
@@ -43448,6 +43462,9 @@
         ],
         "type": "object",
         "properties": {
+          "isTrashed": {
+            "type": "boolean"
+          },
           "parent": {
             "oneOf": [
               {
@@ -46199,9 +46216,6 @@
             "type": "string"
           }
         }
-      },
-      "MemberConfigurationResponseModel": {
-        "type": "object"
       },
       "MemberGroupItemResponseModel": {
         "required": [
