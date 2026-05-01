@@ -26,7 +26,7 @@ import { decodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/bac
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
-import { UMB_IS_TRASHED_ENTITY_CONTEXT, UmbIsTrashedEntityContext } from '@umbraco-cms/backoffice/recycle-bin';
+import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 
