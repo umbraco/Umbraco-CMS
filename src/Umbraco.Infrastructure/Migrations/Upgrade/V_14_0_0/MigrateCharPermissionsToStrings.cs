@@ -82,7 +82,7 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
 
         Create.Table<UserGroup2GranularPermissionDto>().Do();
 
-        // This whole migration Will be being removed in a separate PR for Umbraco 18.
+        // This migration will be removed in a separate PR for Umbraco 18.
 
         //List<UserGroup2NodePermissionDto>? userGroup2NodePermissionDtos = Database.Fetch<UserGroup2NodePermissionDto>();
 
