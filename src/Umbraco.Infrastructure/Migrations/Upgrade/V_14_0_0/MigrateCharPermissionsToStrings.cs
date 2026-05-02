@@ -82,38 +82,38 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
 
         Create.Table<UserGroup2GranularPermissionDto>().Do();
 
-
-        List<UserGroup2NodePermissionDto>? userGroup2NodePermissionDtos = Database.Fetch<UserGroup2NodePermissionDto>();
-
-        var userGroupIdToKeys = userGroups.ToDictionary(x => x.Id, x => x.Key);
-        IEnumerable<UserGroup2GranularPermissionDto> userGroup2GranularPermissionDtos = userGroup2NodePermissionDtos.SelectMany(userGroup2NodePermissionDto =>
-        {
-            HashSet<string> permissions = userGroup2NodePermissionDto.Permission?.SelectMany(ReplacePermissionValue).ToHashSet() ?? new HashSet<string>();
-
-            return permissions.Select(permission =>
-            {
-                var uniqueIdAttempt =
-                    _idKeyMap.GetKeyForId(userGroup2NodePermissionDto.NodeId, UmbracoObjectTypes.Document);
-
-                if (uniqueIdAttempt.Success is false)
-                {
-                    throw new InvalidOperationException("Did not find a key for the document id: " +
-                                                        userGroup2NodePermissionDto.NodeId);
-                }
-
-                return new UserGroup2GranularPermissionDto()
-                {
-                    Permission = permission,
-                    UserGroupKey = userGroupIdToKeys[userGroup2NodePermissionDto.UserGroupId],
-                    UniqueId = uniqueIdAttempt.Result,
-                    Context = DocumentGranularPermission.ContextType
-                };
-            });
-        });
-
-        Database.InsertBulk(userGroup2GranularPermissionDtos);
-
         // This whole migration Will be being removed in a separate PR for Umbraco 18.
+
+        //List<UserGroup2NodePermissionDto>? userGroup2NodePermissionDtos = Database.Fetch<UserGroup2NodePermissionDto>();
+
+        //var userGroupIdToKeys = userGroups.ToDictionary(x => x.Id, x => x.Key);
+        //IEnumerable<UserGroup2GranularPermissionDto> userGroup2GranularPermissionDtos = userGroup2NodePermissionDtos.SelectMany(userGroup2NodePermissionDto =>
+        //{
+        //    HashSet<string> permissions = userGroup2NodePermissionDto.Permission?.SelectMany(ReplacePermissionValue).ToHashSet() ?? new HashSet<string>();
+
+        //    return permissions.Select(permission =>
+        //    {
+        //        var uniqueIdAttempt =
+        //            _idKeyMap.GetKeyForId(userGroup2NodePermissionDto.NodeId, UmbracoObjectTypes.Document);
+
+        //        if (uniqueIdAttempt.Success is false)
+        //        {
+        //            throw new InvalidOperationException("Did not find a key for the document id: " +
+        //                                                userGroup2NodePermissionDto.NodeId);
+        //        }
+
+        //        return new UserGroup2GranularPermissionDto()
+        //        {
+        //            Permission = permission,
+        //            UserGroupKey = userGroupIdToKeys[userGroup2NodePermissionDto.UserGroupId],
+        //            UniqueId = uniqueIdAttempt.Result,
+        //            Context = DocumentGranularPermission.ContextType
+        //        };
+        //    });
+        //});
+
+        //Database.InsertBulk(userGroup2GranularPermissionDtos);
+
         //Delete.Table(Constants.DatabaseSchema.Tables.UserGroup2NodePermission).Do();
         //Delete.Table(Constants.DatabaseSchema.Tables.UserGroup2Node).Do();
     }
