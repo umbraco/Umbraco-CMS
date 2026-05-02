@@ -113,8 +113,9 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
 
         Database.InsertBulk(userGroup2GranularPermissionDtos);
 
-        Delete.Table(Constants.DatabaseSchema.Tables.UserGroup2NodePermission).Do();
-        Delete.Table(Constants.DatabaseSchema.Tables.UserGroup2Node).Do();
+        // This whole migration Will be being removed in a separate PR for Umbraco 18.
+        //Delete.Table(Constants.DatabaseSchema.Tables.UserGroup2NodePermission).Do();
+        //Delete.Table(Constants.DatabaseSchema.Tables.UserGroup2Node).Do();
     }
 
     private IEnumerable<string> ReplacePermissionValue(char oldPermission) => CharToStringPermissionDictionary.TryGetValue(oldPermission, out IEnumerable<string>? newPermission) ? newPermission : oldPermission.ToString().Yield();
