@@ -140,32 +140,6 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Outputs a .txt format log at /App_Data/Logs/ in a format similar to the older Log4Net output.
-        /// </summary>
-        /// <param name="logConfig">The Serilog LoggerConfiguration to configure.</param>
-        /// <param name="hostingEnvironment">The hosting environment used to resolve the log file path.</param>
-        /// <param name="minimumLevel">The minimum log level to write to the text file; default is Verbose (logs all events).</param>
-        /// <returns>The updated LoggerConfiguration.</returns>
-        [Obsolete("Scheduled for removal from Umbraco 13.")]
-        public static LoggerConfiguration OutputDefaultTextFile(
-            this LoggerConfiguration logConfig,
-            Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
-            LogEventLevel minimumLevel = LogEventLevel.Verbose)
-        {
-            //Main .txt logfile - in similar format to older Log4Net output
-            //Ends with ..txt as Date is inserted before file extension substring
-            logConfig.WriteTo.File(
-                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles), $"UmbracoTraceLog.{Environment.MachineName}..txt"),
-                shared: true,
-                rollingInterval: RollingInterval.Day,
-                restrictedToMinimumLevel: minimumLevel,
-                retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
-                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Log4NetLevel}  {SourceContext} - {Message:lj}{NewLine}{Exception}");
-
-            return logConfig;
-        }
-
-        /// <summary>
         /// Outputs a .txt format log at /App_Data/Logs/
         /// </summary>
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
@@ -245,36 +219,6 @@ namespace Umbraco.Extensions
                         retainedFileCountLimit,
                         encoding,
                         null));
-        }
-
-        /// <summary>
-        /// Configures the logger to output a CLEF (Compact Log Event Format) JSON log file to the <c>/App_Data/Logs/</c> directory.
-        /// </summary>
-        /// <param name="logConfig">The Serilog <see cref="LoggerConfiguration"/> to configure.</param>
-        /// <param name="hostingEnvironment">The current Umbraco hosting environment, used to resolve the log file path.</param>
-        /// <param name="loggingConfiguration">The logging configuration settings.</param>
-        /// <param name="minimumLevel">The minimum <see cref="Serilog.Events.LogEventLevel"/> to log. Defaults to <c>Verbose</c> (logs all events).</param>
-        /// <param name="retainedFileCount">The number of days to retain log files. If <c>null</c>, all log files are kept indefinitely.</param>
-        /// <returns>The configured <see cref="LoggerConfiguration"/> instance.</returns>
-        [Obsolete("Scheduled for removal from Umbraco 13.")]
-        public static LoggerConfiguration OutputDefaultJsonFile(
-            this LoggerConfiguration logConfig,
-            Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
-            ILoggingConfiguration loggingConfiguration,
-            LogEventLevel minimumLevel = LogEventLevel.Verbose,
-            int? retainedFileCount = null)
-        {
-            // .clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
-            // Ends with ..txt as Date is inserted before file extension substring
-            logConfig.WriteTo.File(
-                new CompactJsonFormatter(),
-                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles), $"UmbracoTraceLog.{Environment.MachineName}..json"),
-                shared: true,
-                rollingInterval: RollingInterval.Day, // Create a new JSON file every day
-                retainedFileCountLimit: retainedFileCount, // Setting to null means we keep all files - default is 31 days
-                restrictedToMinimumLevel: minimumLevel);
-
-            return logConfig;
         }
 
         /// <summary>
