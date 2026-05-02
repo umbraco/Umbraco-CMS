@@ -1840,43 +1840,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     s = createAttempt.Result;
                 }
 
-                foreach (XElement prop in n.XPathSelectElements("Properties/Property"))
-                {
-                    var alias = prop.Element("Alias")!.Value;
-                    IStylesheetProperty? sp = s.Properties?.SingleOrDefault(p => p != null && p.Alias == alias);
-                    var name = prop.Element("Name")!.Value;
-                    if (sp == null)
-                    {
-                        sp = new StylesheetProperty(name, "#" + name.ToSafeAlias(_shortStringHelper), string.Empty);
-                        s.AddProperty(sp);
-                    }
-                    else
-                    {
-                        //sp.Text = name;
-                        //Changing the name requires removing the current property and then adding another new one
-                        if (sp.Name != name)
-                        {
-                            s.RemoveProperty(sp.Name);
-                            var newProp = new StylesheetProperty(name, sp.Alias, sp.Value);
-                            s.AddProperty(newProp);
-                            sp = newProp;
-                        }
-                    }
-
-                    sp.Alias = alias;
-                    sp.Value = prop.Element("Value")!.Value;
-                }
-
-                var updateModel = new StylesheetUpdateModel
-                {
-                    Content = s.Content ?? string.Empty,
-                };
-                Attempt<IStylesheet?, StylesheetOperationStatus> updateAttempt = _stylesheetService.UpdateAsync(s.Path, updateModel, userKey).GetAwaiter().GetResult();
-                if (updateAttempt.Success is false)
-                {
-                    _logger.LogWarning("Failed to update stylesheet '{Path}' during package install: {Status}", s.Path, updateAttempt.Status);
-                }
-
+                // Existing stylesheets are reported in the install summary but are not overwritten,
+                // so user customisations to the file are preserved across package re-installs.
                 result.Add(s);
             }
 

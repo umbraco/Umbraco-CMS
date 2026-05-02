@@ -18,10 +18,10 @@ internal sealed class ScriptServiceTests : UmbracoIntegrationTest
     private IScriptService ScriptService => GetRequiredService<IScriptService>();
 
     [SetUp]
-    public void SetUp() => DeleteAllScriptFiles();
+    public Task SetUp() => DeleteAllScriptFilesAsync();
 
     [TearDown]
-    public void TearDownScriptFiles() => DeleteAllScriptFiles();
+    public Task TearDownScriptFiles() => DeleteAllScriptFilesAsync();
 
     [Test]
     public async Task Can_Create_Script()
@@ -107,13 +107,14 @@ internal sealed class ScriptServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("RenamedScript.js", result.Result.Name);
     }
 
-    private void DeleteAllScriptFiles()
+    // Cleans up via the service so DeleteAsync is exercised between tests; any deletion regression
+    // (notification handlers, audit, repository) surfaces as a teardown failure.
+    private async Task DeleteAllScriptFilesAsync()
     {
-        var fileSystems = GetRequiredService<Cms.Core.IO.FileSystems>();
-        var scriptFileSystem = fileSystems.ScriptsFileSystem!;
-        foreach (var file in scriptFileSystem.GetFiles(string.Empty).ToArray())
+        IEnumerable<IScript> scripts = await ScriptService.GetAllAsync();
+        foreach (IScript script in scripts)
         {
-            scriptFileSystem.DeleteFile(file);
+            await ScriptService.DeleteAsync(script.Path, Constants.Security.SuperUserKey);
         }
     }
 }

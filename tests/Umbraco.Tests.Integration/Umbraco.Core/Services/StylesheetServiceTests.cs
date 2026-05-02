@@ -18,10 +18,10 @@ internal sealed class StylesheetServiceTests : UmbracoIntegrationTest
     private IStylesheetService StylesheetService => GetRequiredService<IStylesheetService>();
 
     [SetUp]
-    public void SetUp() => DeleteAllStylesheetFiles();
+    public Task SetUp() => DeleteAllStylesheetFilesAsync();
 
     [TearDown]
-    public void TearDownStylesheetFiles() => DeleteAllStylesheetFiles();
+    public Task TearDownStylesheetFiles() => DeleteAllStylesheetFilesAsync();
 
     [Test]
     public async Task Can_Create_Stylesheet()
@@ -107,13 +107,14 @@ internal sealed class StylesheetServiceTests : UmbracoIntegrationTest
         Assert.AreEqual("RenamedStylesheet.css", result.Result.Name);
     }
 
-    private void DeleteAllStylesheetFiles()
+    // Cleans up via the service so DeleteAsync is exercised between tests; any deletion regression
+    // (notification handlers, audit, repository) surfaces as a teardown failure.
+    private async Task DeleteAllStylesheetFilesAsync()
     {
-        var fileSystems = GetRequiredService<Cms.Core.IO.FileSystems>();
-        var stylesheetFileSystem = fileSystems.StylesheetsFileSystem!;
-        foreach (var file in stylesheetFileSystem.GetFiles(string.Empty).ToArray())
+        IEnumerable<IStylesheet> stylesheets = await StylesheetService.GetAllAsync();
+        foreach (IStylesheet stylesheet in stylesheets)
         {
-            stylesheetFileSystem.DeleteFile(file);
+            await StylesheetService.DeleteAsync(stylesheet.Path, Constants.Security.SuperUserKey);
         }
     }
 }

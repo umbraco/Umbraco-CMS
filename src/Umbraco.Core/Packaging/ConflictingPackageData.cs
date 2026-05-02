@@ -58,7 +58,7 @@ public class ConflictingPackageData
                 XElement? xElement = n.Element("Alias") ?? n.Element("alias");
                 if (xElement == null)
                 {
-                    throw new FormatException("missing a \"Alias\" element");
+                    throw new FormatException("Missing \"Alias\" element");
                 }
 
                 return _templateService.GetAsync(xElement.Value).GetAwaiter().GetResult();

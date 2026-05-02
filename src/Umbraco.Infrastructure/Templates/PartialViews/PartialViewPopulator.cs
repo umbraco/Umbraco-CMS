@@ -34,8 +34,8 @@ internal sealed class PartialViewPopulator : IPartialViewPopulator
     /// <inheritdoc/>
     public void CopyPartialViewIfNotExists(Assembly assembly, string embeddedPath, string fileSystemPath)
     {
-        Stream? content = assembly.GetManifestResourceStream(embeddedPath);
-        if (content is null)
+        using Stream? resourceStream = assembly.GetManifestResourceStream(embeddedPath);
+        if (resourceStream is null)
         {
             return;
         }
@@ -48,6 +48,10 @@ internal sealed class PartialViewPopulator : IPartialViewPopulator
             return;
         }
 
+        resourceStream.Seek(0, SeekOrigin.Begin);
+        using var reader = new StreamReader(resourceStream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: -1, leaveOpen: true);
+        var content = reader.ReadToEnd();
+
         // Split on '/' to keep separators consistent with the Umbraco file-system convention;
         // Path.GetDirectoryName converts to backslashes on Windows which would break round-tripping.
         var lastSlash = fileSystemPath.LastIndexOf('/');
@@ -58,16 +62,9 @@ internal sealed class PartialViewPopulator : IPartialViewPopulator
         {
             Name = name,
             ParentPath = string.IsNullOrEmpty(parentPath) ? null : parentPath,
-            Content = GetTextFromStream(content),
+            Content = content,
         };
 
         _partialViewService.CreateAsync(createModel, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
-    }
-
-    private string GetTextFromStream(Stream stream)
-    {
-        stream.Seek(0, SeekOrigin.Begin);
-        var streamReader = new StreamReader(stream, Encoding.UTF8);
-        return streamReader.ReadToEnd();
     }
 }
