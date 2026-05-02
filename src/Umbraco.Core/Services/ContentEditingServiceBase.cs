@@ -37,7 +37,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
     private readonly ContentTypeFilterCollection _contentTypeFilters;
     private readonly ILanguageService _languageService;
     private readonly IUserService _userService;
-    private readonly ILocalizationService _localizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentEditingServiceBase{TContent, TContentType, TContentService, TContentTypeService}"/> class.
@@ -66,8 +65,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         IRelationService relationService,
         ContentTypeFilterCollection contentTypeFilters,
         ILanguageService languageService,
-        IUserService userService,
-        ILocalizationService localizationService)
+        IUserService userService)
     {
         _propertyEditorCollection = propertyEditorCollection;
         _dataTypeService = dataTypeService;
@@ -87,7 +85,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         _contentTypeFilters = contentTypeFilters;
         _languageService = languageService;
         _userService = userService;
-        _localizationService = localizationService;
     }
 
     public abstract Task<TContent?> GetAsync(Guid key);
@@ -780,7 +777,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         IUser user = await _userService.GetAsync(userKey)
                       ?? throw new InvalidOperationException($"Could not find user by key {userKey} when editing or validating content.");
 
-        var allowedLanguageIds = user.CalculateAllowedLanguageIds(_localizationService)!;
+        var allowedLanguageIds = (await user.CalculateAllowedLanguageIdsAsync(_languageService))!;
 
         return (await _languageService.GetIsoCodesByIdsAsync(allowedLanguageIds)).ToHashSet();
     }

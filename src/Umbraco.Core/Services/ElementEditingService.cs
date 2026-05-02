@@ -45,7 +45,6 @@ internal sealed class ElementEditingService
         IIdKeyMap idKeyMap,
         ILanguageService languageService,
         IUserService userService,
-        ILocalizationService localizationService,
         IAuditService auditService)
         : base(
             elementService,
@@ -60,8 +59,7 @@ internal sealed class ElementEditingService
             relationService,
             contentTypeFilters,
             languageService,
-            userService,
-            localizationService)
+            userService)
     {
         _elementService = elementService;
         _logger = logger;

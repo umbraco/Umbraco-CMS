@@ -12,7 +12,9 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -103,7 +105,9 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IContentTypeService>(),
             factory.GetRequiredService<IDataTypeService>(),
             factory.GetRequiredService<IFileService>(),
-            factory.GetRequiredService<ILocalizationService>(),
+            factory.GetRequiredService<ILanguageRepository>(),
+            factory.GetRequiredService<IDictionaryRepository>(),
+            factory.GetRequiredService<ICoreScopeProvider>(),
             factory.GetRequiredService<IHostingEnvironment>(),
             factory.GetRequiredService<IEntityXmlSerializer>(),
             factory.GetRequiredService<IOptions<GlobalSettings>>(),
@@ -119,19 +123,22 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IDataValueEditorFactory>(),
             factory.GetRequiredService<ILogger<PackageDataInstallation>>(),
             factory.GetRequiredService<IFileService>(),
-            factory.GetRequiredService<ILocalizationService>(),
+            factory.GetRequiredService<ILanguageService>(),
+            factory.GetRequiredService<IDictionaryItemService>(),
+            factory.GetRequiredService<IUserIdKeyResolver>(),
             factory.GetRequiredService<IDataTypeService>(),
             factory.GetRequiredService<IEntityService>(),
             factory.GetRequiredService<IContentTypeService>(),
             factory.GetRequiredService<IContentService>(),
             factory.GetRequiredService<PropertyEditorCollection>(),
-            factory.GetRequiredService<IScopeProvider>(),
+            factory.GetRequiredService<global::Umbraco.Cms.Infrastructure.Scoping.IScopeProvider>(),
             factory.GetRequiredService<IShortStringHelper>(),
             factory.GetRequiredService<IConfigurationEditorJsonSerializer>(),
             factory.GetRequiredService<IMediaService>(),
             factory.GetRequiredService<IMediaTypeService>(),
             factory.GetRequiredService<ITemplateContentParserService>(),
-            factory.GetRequiredService<ITemplateService>());
+            factory.GetRequiredService<ITemplateService>(),
+            factory.GetRequiredService<IMemberTypeService>());
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(
         IServiceProvider container)

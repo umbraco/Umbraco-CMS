@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -31,7 +32,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly ILogger<PackageDataInstallation> _logger;
         private readonly IFileService _fileService;
-        private readonly ILocalizationService _localizationService;
+        private readonly ILanguageService _languageService;
+        private readonly IDictionaryItemService _dictionaryItemService;
+        private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
@@ -53,7 +56,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="dataValueEditorFactory">Factory for creating data value editors used in property editing.</param>
         /// <param name="logger">The logger used for logging installation events and errors.</param>
         /// <param name="fileService">Service for managing files such as templates, stylesheets, and scripts.</param>
-        /// <param name="localizationService">Service for managing localization and dictionary items.</param>
+        /// <param name="languageService">Service for managing languages.</param>
+        /// <param name="dictionaryItemService">Service for managing dictionary items.</param>
+        /// <param name="userIdKeyResolver">Resolver for converting user IDs to user keys.</param>
         /// <param name="dataTypeService">Service for managing data types within Umbraco.</param>
         /// <param name="entityService">Service for managing Umbraco entities generically.</param>
         /// <param name="contentTypeService">Service for managing content types (document types, media types, etc.).</param>
@@ -71,7 +76,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
             IFileService fileService,
-            ILocalizationService localizationService,
+            ILanguageService languageService,
+            IDictionaryItemService dictionaryItemService,
+            IUserIdKeyResolver userIdKeyResolver,
             IDataTypeService dataTypeService,
             IEntityService entityService,
             IContentTypeService contentTypeService,
@@ -89,7 +96,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
             _fileService = fileService;
-            _localizationService = localizationService;
+            _languageService = languageService;
+            _dictionaryItemService = dictionaryItemService;
+            _userIdKeyResolver = userIdKeyResolver;
             _dataTypeService = dataTypeService;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
@@ -104,120 +113,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _templateService = templateService;
             _memberTypeService = memberTypeService;
         }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class,
-        /// providing all required services and helpers for package data installation operations.
-        /// </summary>
-        /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
-        /// <param name="logger">The logger used for logging installation events and errors.</param>
-        /// <param name="fileService">Service for managing files within the CMS.</param>
-        /// <param name="localizationService">Service for handling localization and translations.</param>
-        /// <param name="dataTypeService">Service for managing data types.</param>
-        /// <param name="entityService">Service for managing entities.</param>
-        /// <param name="contentTypeService">Service for managing content types.</param>
-        /// <param name="contentService">Service for managing content items.</param>
-        /// <param name="propertyEditors">A collection of property editors available in the system.</param>
-        /// <param name="scopeProvider">Provider for managing database transaction scopes.</param>
-        /// <param name="shortStringHelper">Helper for handling short string operations.</param>
-        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
-        /// <param name="mediaService">Service for managing media items.</param>
-        /// <param name="mediaTypeService">Service for managing media types.</param>
-        /// <param name="templateContentParserService">Service for parsing template content.</param>
-        /// <param name="templateService">Service for managing templates.</param>
-        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-        public PackageDataInstallation(
-            IDataValueEditorFactory dataValueEditorFactory,
-            ILogger<PackageDataInstallation> logger,
-            IFileService fileService,
-            ILocalizationService localizationService,
-            IDataTypeService dataTypeService,
-            IEntityService entityService,
-            IContentTypeService contentTypeService,
-            IContentService contentService,
-            PropertyEditorCollection propertyEditors,
-            IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper,
-            IConfigurationEditorJsonSerializer serializer,
-            IMediaService mediaService,
-            IMediaTypeService mediaTypeService,
-            ITemplateContentParserService templateContentParserService,
-            ITemplateService templateService)
-            : this(
-                  dataValueEditorFactory,
-                  logger,
-                  fileService,
-                  localizationService,
-                  dataTypeService,
-                  entityService,
-                  contentTypeService,
-                  contentService,
-                  propertyEditors,
-                  scopeProvider,
-                  shortStringHelper,
-                  serializer,
-                  mediaService,
-                  mediaTypeService,
-                  templateContentParserService,
-                  templateService,
-                  StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>())
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class, responsible for handling the installation of package data within Umbraco.
-        /// </summary>
-        /// <param name="dataValueEditorFactory">Factory for creating data value editors used in property editing.</param>
-        /// <param name="logger">The logger used for logging installation operations and errors.</param>
-        /// <param name="fileService">Service for managing files such as templates, stylesheets, and scripts.</param>
-        /// <param name="localizationService">Service for managing language and dictionary items.</param>
-        /// <param name="dataTypeService">Service for managing data types within Umbraco.</param>
-        /// <param name="entityService">Service for accessing and managing Umbraco entities.</param>
-        /// <param name="contentTypeService">Service for managing content types and media types.</param>
-        /// <param name="contentService">Service for managing content items (nodes) in Umbraco.</param>
-        /// <param name="propertyEditors">A collection of property editors available in the system.</param>
-        /// <param name="scopeProvider">Provides database transaction scopes for data operations.</param>
-        /// <param name="shortStringHelper">Helper for generating and manipulating short strings, such as aliases.</param>
-        /// <param name="globalSettings">The global settings options for the Umbraco installation.</param>
-        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
-        /// <param name="mediaService">Service for managing media items (files, images, etc.).</param>
-        /// <param name="mediaTypeService">Service for managing media types.</param>
-        /// <param name="hostingEnvironment">Provides information about the web hosting environment.</param>
-        [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
-        public PackageDataInstallation(
-            IDataValueEditorFactory dataValueEditorFactory,
-            ILogger<PackageDataInstallation> logger,
-            IFileService fileService,
-            ILocalizationService localizationService,
-            IDataTypeService dataTypeService,
-            IEntityService entityService,
-            IContentTypeService contentTypeService,
-            IContentService contentService,
-            PropertyEditorCollection propertyEditors,
-            Core.Scoping.IScopeProvider scopeProvider,
-            IShortStringHelper shortStringHelper,
-            IOptions<GlobalSettings> globalSettings,
-            IConfigurationEditorJsonSerializer serializer,
-            IMediaService mediaService,
-            IMediaTypeService mediaTypeService,
-            IHostingEnvironment hostingEnvironment)
-            : this(
-                  dataValueEditorFactory,
-                  logger,
-                  fileService,
-                  localizationService,
-                  dataTypeService,
-                  entityService,
-                  contentTypeService,
-                  contentService,
-                  propertyEditors,
-                  (IScopeProvider)scopeProvider,
-                  shortStringHelper,
-                  serializer,
-                  mediaService,
-                  mediaTypeService,
-                  StaticServiceProvider.Instance.GetRequiredService<ITemplateContentParserService>(),
-                  StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
-        { }
 
         #region Install/Uninstall
 
@@ -553,7 +448,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             const string nodeNamePrefix = "nodeName-";
             // Get the installed culture iso names, we create a localized content node with a culture that does not exist in the project
             // We have to use Invariant comparisons, because when we get them from ContentBase in EntityXmlSerializer they're all lowercase.
-            var installedLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode).ToArray();
+            var installedLanguages = _languageService.GetAllAsync().GetAwaiter().GetResult().Select(l => l.IsoCode).ToArray();
             foreach (XAttribute localizedNodeName in element.Attributes()
                          .Where(a => a.Name.LocalName.InvariantStartsWith(nodeNamePrefix)))
             {
@@ -1627,7 +1522,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IEnumerable<XElement> dictionaryItemElementList,
             int userId)
         {
-            var languages = _localizationService.GetAllLanguages().ToList();
+            var languages = _languageService.GetAllAsync().GetAwaiter().GetResult().ToList();
             return ImportDictionaryItems(dictionaryItemElementList, languages, null, userId);
         }
 
@@ -1640,7 +1535,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <returns>An <see cref="IEnumerable{IDictionaryItem}"/> containing the imported dictionary item(s), including any nested child items.</returns>
         public IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, int userId, Guid? parentId)
         {
-            var languages = _localizationService.GetAllLanguages().ToList();
+            var languages = _languageService.GetAllAsync().GetAwaiter().GetResult().ToList();
             return ImportDictionaryItem(dictionaryItemElement, languages, parentId, userId);
         }
 
@@ -1671,18 +1566,32 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var itemName = dictionaryItemElement.Attribute("Name")?.Value;
             Guid key = dictionaryItemElement.RequiredAttributeValue<Guid>("Key");
 
-            dictionaryItem = _localizationService.GetDictionaryItemById(key);
-            if (dictionaryItem != null)
+            dictionaryItem = _dictionaryItemService.GetAsync(key).GetAwaiter().GetResult();
+            var isUpdate = dictionaryItem != null;
+            if (isUpdate)
             {
-                dictionaryItem = UpdateDictionaryItem(dictionaryItem, dictionaryItemElement, languages);
+                dictionaryItem = UpdateDictionaryItem(dictionaryItem!, dictionaryItemElement, languages);
             }
             else
             {
                 dictionaryItem = CreateNewDictionaryItem(key, itemName!, dictionaryItemElement, languages, parentId);
             }
 
-            _localizationService.Save(dictionaryItem, userId);
-            items.Add(dictionaryItem);
+            Guid currentUserKey = ResolveUserKey(userId);
+            Attempt<IDictionaryItem, DictionaryItemOperationStatus> saveResult = isUpdate
+                ? _dictionaryItemService.UpdateAsync(dictionaryItem!, currentUserKey).GetAwaiter().GetResult()
+                : _dictionaryItemService.CreateAsync(dictionaryItem!, currentUserKey).GetAwaiter().GetResult();
+
+            if (saveResult.Success is false)
+            {
+                _logger.LogWarning(
+                    "Failed to {Operation} dictionary item {Key} during package import: {Status}",
+                    isUpdate ? "update" : "create",
+                    key,
+                    saveResult.Status);
+            }
+
+            items.Add(dictionaryItem!);
 
             items.AddRange(ImportDictionaryItems(
                 dictionaryItemElement.Elements("DictionaryItem"),
@@ -1755,6 +1664,13 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             translations.Add(translation);
         }
 
+        // Resolves an int user id to its Guid key, falling back to SuperUserKey for unknown ids.
+        private Guid ResolveUserKey(int userId)
+        {
+            Attempt<Guid> attempt = _userIdKeyResolver.TryGetAsync(userId).GetAwaiter().GetResult();
+            return attempt.Success ? attempt.Result : Constants.Security.SuperUserKey;
+        }
+
         #endregion
 
         #region Languages
@@ -1776,7 +1692,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     continue;
                 }
 
-                ILanguage? existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
+                ILanguage? existingLanguage = _languageService.GetAsync(isoCode).GetAwaiter().GetResult();
                 if (existingLanguage != null)
                 {
                     continue;
@@ -1785,7 +1701,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var cultureName = languageElement.AttributeValue<string>("FriendlyName") ?? isoCode;
 
                 var langauge = new Language(isoCode, cultureName);
-                _localizationService.Save(langauge, userId);
+                Attempt<ILanguage, LanguageOperationStatus> saveResult = _languageService.CreateAsync(langauge, ResolveUserKey(userId)).GetAwaiter().GetResult();
+                if (saveResult.Success is false)
+                {
+                    _logger.LogWarning(
+                        "Failed to create language {IsoCode} during package import: {Status}",
+                        isoCode,
+                        saveResult.Status);
+                    continue;
+                }
 
                 list.Add(langauge);
             }

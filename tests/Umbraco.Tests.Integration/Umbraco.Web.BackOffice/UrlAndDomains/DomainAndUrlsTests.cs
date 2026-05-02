@@ -37,7 +37,7 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 
         var cultures = new List<string>
         {
-            GetRequiredService<ILocalizationService>().GetDefaultLanguageIsoCode()
+            GetRequiredService<ILanguageService>().GetDefaultIsoCodeAsync().GetAwaiter().GetResult()
         };
 
         foreach (var language in InstallationSummary.LanguagesInstalled)
