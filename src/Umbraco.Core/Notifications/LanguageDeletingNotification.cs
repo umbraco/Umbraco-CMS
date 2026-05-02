@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
 /// <summary>
-///  A notification that is used to trigger the ILanguageService when the Delete (ILanguage overload) method is called in the API.
+///  A notification that is used to trigger the ILanguageService when a language is deleted via the API.
 /// </summary>
 public class LanguageDeletingNotification : DeletingNotification<ILanguage>
 {

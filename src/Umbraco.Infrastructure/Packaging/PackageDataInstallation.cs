@@ -1589,14 +1589,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     isUpdate ? "update" : "create",
                     key,
                     saveResult.Status);
+                return items;
             }
 
-            items.Add(dictionaryItem!);
+            IDictionaryItem savedItem = saveResult.Result;
+            items.Add(savedItem);
 
             items.AddRange(ImportDictionaryItems(
                 dictionaryItemElement.Elements("DictionaryItem"),
                 languages,
-                dictionaryItem.Key,
+                savedItem.Key,
                 userId));
             return items;
         }
@@ -1700,8 +1702,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                 var cultureName = languageElement.AttributeValue<string>("FriendlyName") ?? isoCode;
 
-                var langauge = new Language(isoCode, cultureName);
-                Attempt<ILanguage, LanguageOperationStatus> saveResult = _languageService.CreateAsync(langauge, ResolveUserKey(userId)).GetAwaiter().GetResult();
+                var language = new Language(isoCode, cultureName);
+                Attempt<ILanguage, LanguageOperationStatus> saveResult = _languageService.CreateAsync(language, ResolveUserKey(userId)).GetAwaiter().GetResult();
                 if (saveResult.Success is false)
                 {
                     _logger.LogWarning(
@@ -1711,7 +1713,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     continue;
                 }
 
-                list.Add(langauge);
+                list.Add(saveResult.Result);
             }
 
             return list;

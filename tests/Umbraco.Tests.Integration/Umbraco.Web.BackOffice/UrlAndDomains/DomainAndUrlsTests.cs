@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.UrlAndDomains;
 internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void Setup()
+    public async Task Setup()
     {
         var xml = PackageMigrationResource.GetEmbeddedPackageDataManifest(GetType());
         var packagingService = GetRequiredService<IPackagingService>();
@@ -37,7 +37,7 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
 
         var cultures = new List<string>
         {
-            GetRequiredService<ILanguageService>().GetDefaultIsoCodeAsync().GetAwaiter().GetResult()
+            await GetRequiredService<ILanguageService>().GetDefaultIsoCodeAsync()
         };
 
         foreach (var language in InstallationSummary.LanguagesInstalled)

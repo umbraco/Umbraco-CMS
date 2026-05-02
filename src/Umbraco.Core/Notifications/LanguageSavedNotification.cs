@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
 /// <summary>
-///  A notification that is used to trigger the ILanguageService when the Save (ILanguage overload) method is called in the API, after data has been persisted.
+///  A notification that is used to trigger the ILanguageService when a language is created or updated via the API, after data has been persisted.
 /// </summary>
 public class LanguageSavedNotification : SavedNotification<ILanguage>
 {

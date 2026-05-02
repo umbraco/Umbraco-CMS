@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
 /// <summary>
-///  A notification that is used to trigger the IDictionaryItemService when the Delete (IDictionaryItem overload) method is called in the API, after the dictionary items has been deleted.
+///  A notification that is used to trigger the IDictionaryItemService when a dictionary item is deleted via the API, after the dictionary item has been deleted.
 /// </summary>
 public class DictionaryItemDeletedNotification : DeletedNotification<IDictionaryItem>
 {
