@@ -1,5 +1,4 @@
 using System.Text;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Configuration;
@@ -21,85 +20,13 @@ namespace Umbraco.Extensions
     public static class LoggerConfigExtensions
     {
         /// <summary>
-        /// Configures Serilog with recommended default enrichers and settings for Umbraco applications.
-        /// This includes adding enrichers such as ProcessID, Thread, AppDomain, and others.
-        /// It is highly recommended to retain or use this default configuration when customizing logging in your application.
-        /// </summary>
-        /// <param name="logConfig">The <see cref="LoggerConfiguration"/> instance to configure.</param>
-        /// <param name="hostingEnvironment">The current Umbraco hosting environment.</param>
-        /// <param name="loggingConfiguration">The logging configuration settings.</param>
-        /// <param name="configuration">The application configuration instance.</param>
-        /// <returns>The configured <see cref="LoggerConfiguration"/> instance with Umbraco defaults applied.</returns>
-        [Obsolete("Please use an alternative method. Scheduled for removal from Umbraco 13.")]
-        public static LoggerConfiguration MinimalConfiguration(
-            this LoggerConfiguration logConfig,
-            Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
-            ILoggingConfiguration loggingConfiguration,
-            IConfiguration configuration)
-        {
-            return MinimalConfiguration(logConfig, hostingEnvironment, loggingConfiguration, configuration, out _);
-        }
-
-        /// <summary>
-        /// Configures Serilog with recommended default enrichers and settings, such as adding ProcessID, Thread, and AppDomain information.
-        /// It is highly recommended to retain this default configuration when customizing logging in your application.
-        /// </summary>
-        /// <param name="logConfig">The <see cref="LoggerConfiguration"/> instance to configure.</param>
-        /// <param name="hostingEnvironment">Provides information about the hosting environment.</param>
-        /// <param name="loggingConfiguration">The logging configuration settings.</param>
-        /// <param name="configuration">The application configuration.</param>
-        /// <param name="umbFileConfiguration">When this method returns, contains the Umbraco file configuration.</param>
-        /// <returns>The configured <see cref="LoggerConfiguration"/> instance.</returns>
-        [Obsolete("Please use an alternative method. Scheduled for removal from Umbraco 13.")]
-        public static LoggerConfiguration MinimalConfiguration(
-            this LoggerConfiguration logConfig,
-            Umbraco.Cms.Core.Hosting.IHostingEnvironment hostingEnvironment,
-            ILoggingConfiguration loggingConfiguration,
-            IConfiguration configuration,
-            out UmbracoFileConfiguration umbFileConfiguration)
-        {
-            Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
-
-            //Set this environment variable - so that it can be used in external config file
-            //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
-            Environment.SetEnvironmentVariable("BASEDIR", hostingEnvironment.MapPathContentRoot("/").TrimEnd(Path.DirectorySeparatorChar), EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("UMBLOGDIR", loggingConfiguration.LogDirectory, EnvironmentVariableTarget.Process);
-            Environment.SetEnvironmentVariable("MACHINENAME", Environment.MachineName, EnvironmentVariableTarget.Process);
-
-            logConfig.MinimumLevel.Verbose() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
-                .Enrich.WithProcessId()
-                .Enrich.WithProcessName()
-                .Enrich.WithThreadId()
-                .Enrich.WithProperty("ApplicationId", hostingEnvironment.ApplicationId) // Updated later by ApplicationIdEnricher
-                .Enrich.WithProperty("MachineName", Environment.MachineName)
-                .Enrich.With<Log4NetLevelMapperEnricher>()
-                .Enrich.FromLogContext(); // allows us to dynamically enrich
-
-            //This is not optimal, but seems to be the only way if we do not make an Serilog.Sink.UmbracoFile sink all the way.
-            var umbracoFileConfiguration = new UmbracoFileConfiguration(configuration);
-
-            umbFileConfiguration = umbracoFileConfiguration;
-
-            logConfig.WriteTo.UmbracoFile(
-                path: umbracoFileConfiguration.GetPath(loggingConfiguration.LogDirectory),
-                fileSizeLimitBytes: umbracoFileConfiguration.FileSizeLimitBytes,
-                restrictedToMinimumLevel: umbracoFileConfiguration.RestrictedToMinimumLevel,
-                rollingInterval: umbracoFileConfiguration.RollingInterval,
-                flushToDiskInterval: umbracoFileConfiguration.FlushToDiskInterval,
-                rollOnFileSizeLimit: umbracoFileConfiguration.RollOnFileSizeLimit,
-                retainedFileCountLimit: umbracoFileConfiguration.RetainedFileCountLimit);
-
-            return logConfig;
-        }
-
-        /// <summary>
         /// Configures Serilog with recommended default enrichers and settings, such as adding ProcessID, Thread, and AppDomain information.
         /// It is highly recommended to retain this default configuration when customizing your own logging setup.
         /// </summary>
         /// <param name="logConfig">The <see cref="LoggerConfiguration"/> instance to configure.</param>
-        /// <param name="hostingEnvironment">The Umbraco hosting environment.</param>
+        /// <param name="hostEnvironment">The Umbraco hosting environment.</param>
         /// <param name="loggingConfiguration">The logging configuration settings.</param>
-        /// <param name="configuration">The application configuration.</param>
+        /// <param name="umbracoFileConfiguration">The Umbraco file configuration settings.</param>
         /// <returns>The configured <see cref="LoggerConfiguration"/> instance.</returns>
         public static LoggerConfiguration MinimalConfiguration(
             this LoggerConfiguration logConfig,
