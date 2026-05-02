@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Controllers.Security;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
@@ -15,12 +19,16 @@ namespace Umbraco.Cms.Api.Management.Routing;
 public sealed class BackOfficeAreaRoutes : IAreaRoutes
 {
     private readonly IRuntimeState _runtimeState;
+    private readonly SignalRSettings _signalRSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
     /// </summary>
-    public BackOfficeAreaRoutes(IRuntimeState runtimeState)
-        => _runtimeState = runtimeState;
+    public BackOfficeAreaRoutes(IRuntimeState runtimeState, IOptions<SignalRSettings> signalRSettings)
+    {
+        _runtimeState = runtimeState;
+        _signalRSettings = signalRSettings.Value;
+    }
 
 
     /// <inheritdoc />
@@ -30,8 +38,16 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
         {
             MapMinimalBackOffice(endpoints);
 
-            endpoints.MapHub<BackofficeHub>(Constants.System.UmbracoPathSegment + Constants.Web.BackofficeSignalRHub);
-            endpoints.MapHub<ServerEventHub>(Constants.System.UmbracoPathSegment + Constants.Web.ServerEventSignalRHub);
+            endpoints.MapHub<BackofficeHub>(Constants.System.UmbracoPathSegment + Constants.Web.BackofficeSignalRHub, ConfigureHubEndpoint);
+            endpoints.MapHub<ServerEventHub>(Constants.System.UmbracoPathSegment + Constants.Web.ServerEventSignalRHub, ConfigureHubEndpoint);
+        }
+    }
+
+    private void ConfigureHubEndpoint(HttpConnectionDispatcherOptions options)
+    {
+        if (_signalRSettings.Transports.HasValue)
+        {
+            options.Transports = _signalRSettings.Transports.Value.ToHttpTransportType();
         }
     }
 

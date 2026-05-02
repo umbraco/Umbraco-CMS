@@ -23,9 +23,20 @@ export class UmbServerConnection extends UmbControllerBase {
 	#umbracoCssPath = new UmbStringState(undefined);
 	umbracoCssPath = this.#umbracoCssPath.asObservable();
 
+	#signalRSkipNegotiation = false;
+
 	constructor(host: UmbControllerHost, serverUrl: string) {
 		super(host);
 		this.#url = serverUrl;
+	}
+
+	/**
+	 * Gets whether the server has configured SignalR to skip the negotiate round-trip.
+	 * @returns {boolean}
+	 * @memberof UmbServerConnection
+	 */
+	getSignalRSkipNegotiation() {
+		return this.#signalRSkipNegotiation;
 	}
 
 	/**
@@ -90,5 +101,8 @@ export class UmbServerConnection extends UmbControllerBase {
 		this.#allowLocalLogin.setValue(data?.allowLocalLogin ?? false);
 		this.#allowPasswordReset.setValue(data?.allowPasswordReset ?? false);
 		this.#umbracoCssPath.setValue(data?.umbracoCssPath);
+		// TODO: Remove the type assertion once the generated types include the signalR property.
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		this.#signalRSkipNegotiation = (data as any)?.signalR?.skipNegotiation === true;
 	}
 }

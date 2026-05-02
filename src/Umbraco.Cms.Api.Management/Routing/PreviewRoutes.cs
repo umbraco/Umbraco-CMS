@@ -1,7 +1,11 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.Preview;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Routing;
 
@@ -13,13 +17,18 @@ namespace Umbraco.Cms.Api.Management.Routing;
 public sealed class PreviewRoutes : IAreaRoutes
 {
     private readonly IRuntimeState _runtimeState;
+    private readonly SignalRSettings _signalRSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Routing.PreviewRoutes"/> class, configuring preview routing based on the application's runtime state.
     /// </summary>
     /// <param name="runtimeState">An instance representing the current runtime state of the Umbraco application.</param>
-    public PreviewRoutes(IRuntimeState runtimeState)
-        => _runtimeState = runtimeState;
+    /// <param name="signalRSettings">The SignalR settings options.</param>
+    public PreviewRoutes(IRuntimeState runtimeState, IOptions<SignalRSettings> signalRSettings)
+    {
+        _runtimeState = runtimeState;
+        _signalRSettings = signalRSettings.Value;
+    }
 
     /// <summary>
     /// Creates the preview routes on the specified endpoint route builder.
@@ -29,7 +38,15 @@ public sealed class PreviewRoutes : IAreaRoutes
     {
         if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Upgrading or RuntimeLevel.Run)
         {
-            endpoints.MapHub<PreviewHub>(GetPreviewHubRoute());
+            endpoints.MapHub<PreviewHub>(GetPreviewHubRoute(), ConfigureHubEndpoint);
+        }
+    }
+
+    private void ConfigureHubEndpoint(HttpConnectionDispatcherOptions options)
+    {
+        if (_signalRSettings.Transports.HasValue)
+        {
+            options.Transports = _signalRSettings.Transports.Value.ToHttpTransportType();
         }
     }
 

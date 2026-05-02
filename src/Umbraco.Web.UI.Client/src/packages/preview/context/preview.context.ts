@@ -1,12 +1,12 @@
 import { UmbPreviewRepository } from '../repository/index.js';
 import { UMB_PREVIEW_CONTEXT } from './preview.context-token.js';
-import { HubConnectionBuilder } from '@umbraco-cms/backoffice/external/signalr';
+import { HubConnectionBuilder, HttpTransportType } from '@umbraco-cms/backoffice/external/signalr';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
-import type { HubConnection } from '@umbraco-cms/backoffice/external/signalr';
+import type { HubConnection, IHttpConnectionOptions } from '@umbraco-cms/backoffice/external/signalr';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 interface UmbPreviewIframeArgs {
@@ -80,7 +80,8 @@ export class UmbPreviewContext extends UmbContextBase {
 
 			this.#setPreviewUrl({ serverUrl });
 
-			this.#initHubConnection(serverUrl);
+			const skipNegotiation = serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
+			this.#initHubConnection(serverUrl, skipNegotiation);
 		});
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
@@ -101,7 +102,7 @@ export class UmbPreviewContext extends UmbContextBase {
 		}
 	}
 
-	async #initHubConnection(serverUrl: string) {
+	async #initHubConnection(serverUrl: string, skipNegotiation: boolean = false) {
 		const previewHubUrl = `${serverUrl}/umbraco/PreviewHub`;
 
 		// Make sure that no previous connection exists.
@@ -110,7 +111,14 @@ export class UmbPreviewContext extends UmbContextBase {
 			this.#connection = undefined;
 		}
 
-		this.#connection = new HubConnectionBuilder().withUrl(previewHubUrl).build();
+		const hubOptions: IHttpConnectionOptions = {};
+
+		if (skipNegotiation) {
+			hubOptions.skipNegotiation = true;
+			hubOptions.transport = HttpTransportType.WebSockets;
+		}
+
+		this.#connection = new HubConnectionBuilder().withUrl(previewHubUrl, hubOptions).build();
 
 		this.#connection.on('refreshed', (payload) => {
 			if (payload === this.#unique.getValue()) {
