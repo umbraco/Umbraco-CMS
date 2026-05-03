@@ -32,7 +32,7 @@ export class UmbElementFolderWorkspaceContext
 
 		this.observe(this.isTrashed, (isTrashed) => this.#onTrashStateChange(isTrashed));
 
-		this.#enforceUpdatePermission();
+		this.#setupNameWritePermissions();
 
 		this.routes.setRoutes([
 			{
@@ -46,15 +46,11 @@ export class UmbElementFolderWorkspaceContext
 		]);
 	}
 
-	#enforceUpdatePermission() {
-		const guardUnique = 'UMB_PREVENT_FOLDER_RENAME_WITHOUT_PERMISSION';
+	#setupNameWritePermissions() {
+		const guardUnique = 'UMB_ALLOW_FOLDER_RENAME_WITH_PERMISSION';
 
-		// Block by default until the condition confirms permission.
-		this.nameWriteGuard.addRule({
-			unique: guardUnique,
-			permitted: false,
-			message: 'You do not have permission to rename this folder.',
-		});
+		// Default to not permitted until the condition confirms permission.
+		this.nameWriteGuard.fallbackToNotPermitted();
 
 		createExtensionApiByAlias(this, UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS, [
 			{
@@ -63,13 +59,12 @@ export class UmbElementFolderWorkspaceContext
 				},
 				onChange: (permitted: boolean) => {
 					if (permitted) {
-						this.nameWriteGuard.removeRule(guardUnique);
-					} else {
 						this.nameWriteGuard.addRule({
 							unique: guardUnique,
-							permitted: false,
-							message: 'You do not have permission to rename this folder.',
+							permitted: true,
 						});
+					} else {
+						this.nameWriteGuard.removeRule(guardUnique);
 					}
 				},
 			},

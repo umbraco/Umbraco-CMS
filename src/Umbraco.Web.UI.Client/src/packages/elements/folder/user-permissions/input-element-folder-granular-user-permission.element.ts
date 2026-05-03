@@ -11,7 +11,6 @@ import { UMB_ENTITY_USER_PERMISSION_MODAL } from '@umbraco-cms/backoffice/user-p
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
 import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/user-permission';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-input-element-folder-granular-user-permission')
 export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
@@ -32,15 +31,8 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 	private _items?: Array<UmbElementFolderItemModel>;
 
 	#folderItemRepository = new UmbElementFolderItemRepository(this);
-	#modalManagerContext?: UmbModalManagerContext;
 	#folderPickerModalContext?: any;
 	#entityUserPermissionModalContext?: any;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => (this.#modalManagerContext = instance));
-	}
 
 	protected override getFormElement() {
 		return undefined;
@@ -78,7 +70,8 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 	}
 
 	async #addGranularPermission() {
-		this.#folderPickerModalContext = this.#modalManagerContext?.open(this, UMB_ELEMENT_PICKER_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		this.#folderPickerModalContext = modalManager?.open(this, UMB_ELEMENT_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
 				foldersOnly: true,
@@ -128,7 +121,8 @@ export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormC
 		const headline = item.name ? `Permissions for ${item.name}` : 'Permissions';
 		const fallbackVerbs = this.#getFallbackPermissionVerbsForEntityType(item.entityType);
 		const value = allowedVerbs.length > 0 ? { allowedVerbs } : undefined;
-		this.#entityUserPermissionModalContext = this.#modalManagerContext?.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		this.#entityUserPermissionModalContext = modalManager?.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
 			data: {
 				entityType: item.entityType,
 				headline,
