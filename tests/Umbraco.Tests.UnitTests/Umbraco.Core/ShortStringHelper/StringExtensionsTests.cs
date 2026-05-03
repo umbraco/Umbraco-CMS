@@ -438,6 +438,31 @@ public class StringExtensionsTests
         }
     }
 
+    [TestCase("#")]
+    [TestCase("")]
+    [TestCase("123")]
+    [TestCase("abc")]
+    [TestCase("-")]
+    [TestCase("+")]
+    [TestCase("؜-")] // ar-EG's NegativeSign under ICU (U+061C ARABIC LETTER MARK + ASCII hyphen)
+    public void GetIdsFromPath_And_Reversed_Parse_Root_Marker_Under_Culture_With_Different_Negative_Sign(string negativeSign)
+    {
+        var savedCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            var culture = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+            culture.NumberFormat.NegativeSign = negativeSign;
+            CultureInfo.CurrentCulture = culture;
+
+            CollectionAssert.AreEqual(new[] { -1, 1234, 5678 }, "-1,1234,5678".GetIdsFromPath());
+            CollectionAssert.AreEqual(new[] { 5678, 1234, -1 }, "-1,1234,5678".GetIdsFromPathReversed());
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = savedCulture;
+        }
+    }
+
     [TestCase(null, null)]
     [TestCase("", "")]
     [TestCase("*", "*")]
