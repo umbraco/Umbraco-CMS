@@ -223,7 +223,7 @@ internal sealed class RedirectTracker : IRedirectTracker
     }
 
     private int GetNodeIdWithAssignedDomain(IPublishedContent entityContent) =>
-        entityContent.Path.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).Reverse()
+        entityContent.Path.GetIdsFromPathReversed()
             .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true));
 
     private string GetUrl(Guid contentKey, string languageIsoCode) =>
