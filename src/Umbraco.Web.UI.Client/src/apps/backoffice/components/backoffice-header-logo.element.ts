@@ -62,6 +62,12 @@ export class UmbBackofficeHeaderLogoElement extends UmbLitElement {
 	}
 
 	async #openSystemInformation() {
+		// WebKit/Safari Fix: Programmatically close the popover before opening the modal.
+		// This prevents Safari's light-dismiss logic from permanently locking the UI state.
+		const popover = this.shadowRoot?.querySelector('#logo-popover') as HTMLElement;
+		if (popover && typeof popover.hidePopover === 'function') {
+			popover.hidePopover();
+		}
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
 		if (!modalManager) {
 			throw new Error('Modal manager not found');
