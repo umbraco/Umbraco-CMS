@@ -332,4 +332,26 @@
     confirmation: 'We sent an email with password reset instructions, if the email address matches a registered user.',
     notFoundUserError: 'The specified user was not found.'
   }
+  
+  public static readonly auditTrailMessages = {
+    contentSaved: 'Content saved',
+    contentSavedAndPublished: 'Content saved and Published',
+    contentUnpublished: 'Content unpublished',
+    contentMoved: 'Content moved',
+    contentCopied: 'Content copied',
+    contentDeleted: 'Content deleted',
+    contentRolledBack: 'Content rolled back',
+    contentSorted: 'Sort child items performed by user'
+  }
+
+  public static readonly auditTrailTypes = {
+    save: 'Save',
+    delete: 'Delete',
+    move: 'Move',
+    sort: 'Sort',
+    publish: 'Publish',
+    rollback: 'Rollback',
+    copy: 'Copy',
+    unpublish: 'Unpublish'
+  }
 }

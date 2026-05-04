@@ -21,11 +21,16 @@ public static partial class StringExtensions
 #pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
-    /// Converts a path string to an array of node IDs in reverse order (deepest to shallowest).
+    /// Converts a path string to an array of node IDs, in path order (shallowest to deepest).
     /// </summary>
     /// <param name="path">The path string, expected as a comma-delimited collection of integers.</param>
-    /// <returns>An array of integers matching the provided path, in reverse order.</returns>
-    public static int[] GetIdsFromPathReversed(this string path)
+    /// <returns>An array of integers matching the provided path.</returns>
+    /// <remarks>
+    /// Parsing uses <see cref="CultureInfo.InvariantCulture"/> because paths persist the root
+    /// marker as ASCII "-1", which fails to parse under cultures whose
+    /// <see cref="NumberFormatInfo.NegativeSign"/> is not the ASCII hyphen-minus.
+    /// </remarks>
+    public static int[] GetIdsFromPath(this string path)
     {
         ReadOnlySpan<char> pathSpan = path.AsSpan();
 
@@ -44,14 +49,22 @@ public static partial class StringExtensions
             }
         }
 
-        var result = new int[nodeIds.Count];
-        var resultIndex = 0;
-        for (int i = nodeIds.Count - 1; i >= 0; i--)
-        {
-            result[resultIndex++] = nodeIds[i];
-        }
+        return [.. nodeIds];
+    }
 
-        return result;
+    /// <summary>
+    /// Converts a path string to an array of node IDs in reverse order (deepest to shallowest).
+    /// </summary>
+    /// <param name="path">The path string, expected as a comma-delimited collection of integers.</param>
+    /// <returns>An array of integers matching the provided path, in reverse order.</returns>
+    /// <remarks>
+    /// See <see cref="GetIdsFromPath"/> for parsing semantics.
+    /// </remarks>
+    public static int[] GetIdsFromPathReversed(this string path)
+    {
+        int[] ids = path.GetIdsFromPath();
+        Array.Reverse(ids);
+        return ids;
     }
 
     /// <summary>

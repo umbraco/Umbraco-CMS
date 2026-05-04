@@ -1,8 +1,10 @@
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 
@@ -125,5 +127,58 @@ internal sealed partial class PublishStatusServiceTests
 
             Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(Subpage.Key));
         });
+    }
+
+    [TestCase("en-US")]
+    [TestCase("da-DK")]
+    public async Task Unpublished_Document_Culture_Yields_Correct_Published_Ancestor_Path(string cultureToUnpublish)
+    {
+        await GetRequiredService<ILanguageService>()
+            .CreateAsync(new Language("da-DK", "Danish"), Constants.Security.SuperUserKey);
+
+        var contentTypeKey = Guid.NewGuid();
+        var contentType = new ContentTypeBuilder()
+            .WithKey(contentTypeKey)
+            .WithAlias("variant")
+            .WithContentVariation(ContentVariation.Culture)
+            .WithAllowAsRoot(true)
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        contentType.AllowedContentTypes = [new ContentTypeSort(contentTypeKey, 1, "variant")];
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
+
+        IContent root = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "Root EN")
+            .WithCultureName("da-DK", "Root DA")
+            .Build();
+        ContentService.Save(root);
+
+        IContent child = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "Child EN")
+            .WithCultureName("da-DK", "Child DA")
+            .WithParent(root)
+            .Build();
+        ContentService.Save(child);
+
+        IContent grandchild = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithCultureName("en-US", "Grandchild EN")
+            .WithCultureName("da-DK", "Grandchild DA")
+            .WithParent(child)
+            .Build();
+        ContentService.Save(grandchild);
+
+        ContentService.PublishBranch(root, PublishBranchFilter.IncludeUnpublished, ["en-US", "da-DK"]);
+
+        // must refresh the child instance before unpublishing it, to reflect the state changes from the branch publish above
+        child = ContentService.GetById(child.Key)!;
+        ContentService.Unpublish(child, cultureToUnpublish);
+
+        var publishedCulture = cultureToUnpublish is "en-US" ? "da-DK" : "en-US";
+        Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, publishedCulture));
+        Assert.IsFalse(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, cultureToUnpublish));
+        Assert.IsTrue(PublishStatusQueryService.HasPublishedAncestorPath(grandchild.Key, Constants.System.InvariantCulture));
     }
 }
