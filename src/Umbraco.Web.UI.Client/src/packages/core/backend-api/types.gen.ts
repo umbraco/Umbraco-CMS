@@ -2904,6 +2904,8 @@ export type TemplateResponseModel = {
     name: string;
     alias: string;
     content?: null | string;
+    layoutTemplate?: ReferenceByIdModel | null;
+    /** @deprecated Use layoutTemplate instead. Scheduled for removal in Umbraco 20. */
 };
 
 export type TemporaryFileConfigurationResponseModel = {

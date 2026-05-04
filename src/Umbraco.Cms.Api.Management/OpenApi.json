@@ -50495,7 +50495,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "masterTemplate": {
+          "layoutTemplate": {
             "oneOf": [
               {
                 "type": "null"
@@ -50504,6 +50504,15 @@
                 "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ]
+          },
+          "masterTemplate": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ReferenceByIdModel"
+              }
+            ],
+            "nullable": true,
+            "deprecated": true
           },
           "name": {
             "type": "string"
