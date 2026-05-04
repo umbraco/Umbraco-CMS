@@ -897,9 +897,10 @@ stages:
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn: Deploy_MyGet
-    # Run on MyGet success or failure (but not when MyGet was skipped — i.e. only in a release context).
+    # Run only when Deploy_MyGet actually ran (succeeded or failed) — not when it was skipped due to an upstream test failure.
+    # Inspect Deploy_MyGet's direct result rather than succeeded()/failed(), which are transitive across the full ancestor graph.
     # Approval is required every run via the WaitForApproval job below.
-    condition: and(or(succeeded(), failed()), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
+    condition: and(in(dependencies.Deploy_MyGet.result, 'Succeeded', 'SucceededWithIssues', 'Failed'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
       - job: WaitForApproval
         displayName: Wait for manual approval
