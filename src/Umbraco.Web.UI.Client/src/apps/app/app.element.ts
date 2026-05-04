@@ -14,17 +14,62 @@ import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
-import { UmbBundleExtensionInitializer, UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbBundleExtensionInitializer,
+	UmbServerExtensionRegistrator,
+	type ManifestBase,
+} from '@umbraco-cms/backoffice/extension-api';
 import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
+	type UmbExtensionManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
 
 import './app-logo.element.js';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+
+const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>> = [
+	import('../../packages/block/umbraco-package.js'),
+	import('../../packages/clipboard/umbraco-package.js'),
+	import('../../packages/code-editor/umbraco-package.js'),
+	import('../../packages/content/umbraco-package.js'),
+	import('../../packages/data-type/umbraco-package.js'),
+	import('../../packages/dictionary/umbraco-package.js'),
+	import('../../packages/documents/umbraco-package.js'),
+	import('../../packages/embedded-media/umbraco-package.js'),
+	import('../../packages/extension-insights/umbraco-package.js'),
+	import('../../packages/health-check/umbraco-package.js'),
+	import('../../packages/help/umbraco-package.js'),
+	import('../../packages/language/umbraco-package.js'),
+	import('../../packages/log-viewer/umbraco-package.js'),
+	import('../../packages/management-api/umbraco-package.js'),
+	import('../../packages/markdown-editor/umbraco-package.js'),
+	import('../../packages/media/umbraco-package.js'),
+	import('../../packages/members/umbraco-package.js'),
+	import('../../packages/models-builder/umbraco-package.js'),
+	import('../../packages/multi-url-picker/umbraco-package.js'),
+	import('../../packages/packages/umbraco-package.js'),
+	import('../../packages/performance-profiling/umbraco-package.js'),
+	import('../../packages/property-editors/umbraco-package.js'),
+	import('../../packages/publish-cache/umbraco-package.js'),
+	import('../../packages/relations/umbraco-package.js'),
+	import('../../packages/rte/umbraco-package.js'),
+	import('../../packages/settings/umbraco-package.js'),
+	import('../../packages/static-file/umbraco-package.js'),
+	import('../../packages/sysinfo/umbraco-package.js'),
+	import('../../packages/tags/umbraco-package.js'),
+	import('../../packages/telemetry/umbraco-package.js'),
+	import('../../packages/templating/umbraco-package.js'),
+	import('../../packages/tiptap/umbraco-package.js'),
+	import('../../packages/translation/umbraco-package.js'),
+	import('../../packages/ufm/umbraco-package.js'),
+	import('../../packages/umbraco-news/umbraco-package.js'),
+	import('../../packages/user/umbraco-package.js'),
+	import('../../packages/webhook/umbraco-package.js'),
+];
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -129,18 +174,22 @@ export class UmbAppElement extends UmbLitElement {
 		{
 			path: '**',
 			component: () => import('../backoffice/backoffice.element.js'),
-			guards: [this.#isAuthorizedGuard()],
+			guards: [this.#isAuthorizedGuard(), this.#loadedGuard()],
 		},
 	];
 
 	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#serverConnection?: UmbServerConnection;
 	#authController = new UmbAppAuthController(this);
+	#bundleInitializer: UmbBundleExtensionInitializer;
+
+	#currentUser?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
+	#packageModules?: Promise<Array<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>>;
 
 	constructor() {
 		super();
 
-		new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
+		this.#bundleInitializer = new UmbBundleExtensionInitializer(this, umbExtensionsRegistry);
 
 		new UUIIconRegistryEssential().attach(this);
 
@@ -149,6 +198,13 @@ export class UmbAppElement extends UmbLitElement {
 		new UmbNetworkConnectionStatusManager(this);
 
 		new UmbViewContext(this, null);
+
+		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (userContext) => {
+			this.#currentUser = userContext;
+			if (userContext) {
+				this.#loadCurrentUser();
+			}
+		});
 	}
 
 	override connectedCallback(): void {
@@ -166,6 +222,21 @@ export class UmbAppElement extends UmbLitElement {
 		);
 		this.#authContext.configureClient(umbHttpClient);
 
+		this.observe(
+			this.#authContext.isAuthorized,
+			async (isAuthorized) => {
+				if (isAuthorized === undefined) return;
+				if (isAuthorized) {
+					// TODO: Remove dependency on current user context from the app element in future [MR]
+					this.#loadCurrentUser();
+				} else {
+					// TODO: Unregistering all extensions from v.18 [NL]
+					//void this.#unregisterExtensions();
+				}
+			},
+			null,
+		);
+
 		this.#serverConnection = await new UmbServerConnection(this, this.serverUrl).connect();
 		new UmbServerContext(this, {
 			backofficePath: this.backofficePath,
@@ -178,8 +249,7 @@ export class UmbAppElement extends UmbLitElement {
 
 		// Register public extensions (login extensions)
 		await new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPublicExtensions();
-		const initializer = new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
-		await firstValueFrom(initializer.loaded);
+		new UmbAppEntryPointExtensionInitializer(this, umbExtensionsRegistry);
 
 		// Try to initialise the auth flow and get the runtime status
 		try {
@@ -238,6 +308,33 @@ export class UmbAppElement extends UmbLitElement {
 		await this.#authContext.setInitialState();
 	}
 
+	async #registerExtensions() {
+		if (this.#packageModules === undefined) {
+			this.#packageModules = Promise.all(CORE_PACKAGES);
+			this.#packageModules.then(() => {
+				this.#loadCurrentUser();
+			});
+		}
+
+		umbExtensionsRegistry.registerMany((await this.#packageModules).flatMap((modules) => modules.extensions));
+	}
+
+	// TODO (V18): Unregister extensions on sign-out. [NL]
+	/*
+		async #unregisterExtensions() {
+			if (!this.#packageModules) return;
+			(await this.#packageModules).forEach((packageModule) => {
+				const aliases = packageModule.extensions.map((extension) => extension.alias);
+				umbExtensionsRegistry.unregisterMany(aliases);
+			});
+		}
+	*/
+
+	#loadCurrentUser() {
+		if (!this.#currentUser || !this.#packageModules) return;
+		this.#currentUser.load();
+	}
+
 	#redirect() {
 		const pathname = pathWithoutBasePath({ start: true, end: false });
 
@@ -292,6 +389,26 @@ export class UmbAppElement extends UmbLitElement {
 		return () => this.#authController.isAuthorized() ?? false;
 	}
 
+	#loadedGuard(): Guard {
+		return async () => {
+			const results = await Promise.allSettled([
+				this.observe(this.#bundleInitializer?.loaded).asPromise(),
+				this.#registerExtensions(),
+				new UmbServerExtensionRegistrator(this, umbExtensionsRegistry).registerPrivateExtensions(),
+			]);
+
+			const result = results.reduce((acc, curr) => acc && curr.status === 'fulfilled', true);
+			if (result === false) {
+				this.#errorPage(
+					'Extensions failed loading, this might be due to a network issue or a server error. Check that extensions registered on the server are valid.',
+					undefined,
+					{ headline: 'Failed to load extensions' },
+				);
+			}
+			return result;
+		};
+	}
+
 	#errorPage(errorMsg: string, error?: unknown, options?: { headline?: string; hideBackButton?: boolean }) {
 		// Redirect to the error page
 		this._routes = [
@@ -312,7 +429,9 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	override render() {
-		return html`<umb-router-slot id="router-slot" .routes=${this._routes}></umb-router-slot>`;
+		return html`<umb-router-slot id="router-slot" .routes=${this._routes}
+			><div id="loader"><uui-loader data-mark="app-router-loader"></uui-loader></div
+		></umb-router-slot>`;
 	}
 
 	static override styles = css`
@@ -326,6 +445,20 @@ export class UmbAppElement extends UmbLitElement {
 			display: block;
 			width: 100%;
 			height: 100vh;
+		}
+
+		#loader {
+			display: flex;
+			height: 100%;
+			justify-content: center;
+			align-items: center;
+			opacity: 0;
+			animation: fadeIn 240ms forwards;
+		}
+		@keyframes fadeIn {
+			to {
+				opacity: 1;
+			}
 		}
 	`;
 }
