@@ -247,36 +247,6 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     #endregion
 
-    /// <summary>
-    /// Rolls back an <see cref="IContent"/> item to a previous version.
-    /// </summary>
-    /// <param name="id">The ID of the content to roll back.</param>
-    /// <param name="versionId">The version ID to roll back to.</param>
-    /// <param name="culture">The culture to roll back, or "*" for all cultures.</param>
-    /// <param name="userId">The optional ID of the user performing the rollback.</param>
-    /// <returns>An <see cref="OperationResult"/> indicating the result of the operation.</returns>
-    /// <summary>
-    /// Gets the count of published <see cref="IContent"/> items.
-    /// </summary>
-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
-    /// <returns>The count of published content items.</returns>
-    /// <summary>
-    /// Gets the count of all <see cref="IContent"/> items.
-    /// </summary>
-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
-    /// <returns>The count of content items.</returns>
-    /// <summary>
-    /// Gets the count of child <see cref="IContent"/> items under a specified parent.
-    /// </summary>
-    /// <param name="parentId">The ID of the parent content.</param>
-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
-    /// <returns>The count of child content items.</returns>
-    /// <summary>
-    /// Gets the count of descendant <see cref="IContent"/> items under a specified parent.
-    /// </summary>
-    /// <param name="parentId">The ID of the parent content.</param>
-    /// <param name="contentTypeAlias">The optional content type alias to filter by.</param>
-    /// <returns>The count of descendant content items.</returns>
     #region Permissions
 
     /// <summary>
