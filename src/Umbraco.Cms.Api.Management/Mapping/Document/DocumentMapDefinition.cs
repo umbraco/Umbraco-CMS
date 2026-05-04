@@ -1,4 +1,5 @@
 using Umbraco.Cms.Api.Management.Mapping.Content;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint;
@@ -57,7 +58,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             source,
             (culture, _, documentVariantViewModel) =>
             {
-                documentVariantViewModel.State = DocumentVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.State = PublishableVariantStateHelper.GetState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
                     : source.GetPublishDate(culture);
@@ -76,9 +77,9 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             (culture, _, documentVariantViewModel) =>
             {
                 documentVariantViewModel.Name = source.GetPublishName(culture) ?? documentVariantViewModel.Name;
-                DocumentVariantState variantState = DocumentVariantStateHelper.GetState(source, culture);
-                documentVariantViewModel.State = variantState == DocumentVariantState.PublishedPendingChanges
-                        ? DocumentVariantState.Published
+                PublishableVariantState variantState = PublishableVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.State = variantState == PublishableVariantState.PublishedPendingChanges
+                        ? PublishableVariantState.Published
                         : variantState;
                 documentVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
@@ -113,7 +114,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             source,
             (culture, _, documentVariantViewModel) =>
             {
-                documentVariantViewModel.State = DocumentVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.State = PublishableVariantStateHelper.GetState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
                     : source.GetPublishDate(culture);
@@ -131,7 +132,7 @@ public class DocumentMapDefinition : ContentMapDefinition<IContent, DocumentValu
             source,
             (culture, _, documentVariantViewModel) =>
             {
-                documentVariantViewModel.State = DocumentVariantState.Draft;
+                documentVariantViewModel.State = PublishableVariantState.Draft;
             });
     }
 
