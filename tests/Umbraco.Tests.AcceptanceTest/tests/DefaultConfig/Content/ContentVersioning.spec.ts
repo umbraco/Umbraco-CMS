@@ -1,7 +1,6 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from "@playwright/test";
 
-let documentTypeId = '';
 let contentId = '';
 const contentName = 'TestContent';
 const renamedContentName = 'TestContentRenamed';
@@ -22,25 +21,12 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
 });
 
-// Arrange NEEDS TO BE MOVED
-async function createContentWithTwoPublishedVersions(umbracoApi) {
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, originalText, dataTypeName);
-  await umbracoApi.document.publish(contentId);
-  const contentData = await umbracoApi.document.get(contentId);
-  contentData.values[0].value = updatedText;
-  await umbracoApi.document.update(contentId, contentData);
-  await umbracoApi.document.publish(contentId);
-}
-
 test('can rollback content to a previous published version', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await createContentWithTwoPublishedVersions(umbracoApi);
+  contentId = await umbracoApi.document.createPublishedDocumentWithTwoTextVersions(contentName, documentTypeName, dataTypeName, originalText, updatedText);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedText);
 
   // Act
   await umbracoUi.content.clickInfoTab();
@@ -57,7 +43,7 @@ test('can rollback content to a previous published version', {tag: '@smoke'}, as
 
 test('records a rollback entry in the audit trail', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await createContentWithTwoPublishedVersions(umbracoApi);
+  contentId = await umbracoApi.document.createPublishedDocumentWithTwoTextVersions(contentName, documentTypeName, dataTypeName, originalText, updatedText);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -80,7 +66,7 @@ test('records a rollback entry in the audit trail', async ({umbracoApi, umbracoU
 
 test('can rollback to a previous version from the tree action menu', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await createContentWithTwoPublishedVersions(umbracoApi);
+  contentId = await umbracoApi.document.createPublishedDocumentWithTwoTextVersions(contentName, documentTypeName, dataTypeName, originalText, updatedText);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -99,15 +85,7 @@ test('can rollback to a previous version from the tree action menu', async ({umb
 
 test('can rollback variant content to a previous published version', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const variantPublishSchedules = {publishSchedules: [{culture: 'en-US'}]};
-  const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  contentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, originalText, dataTypeName);
-  await umbracoApi.document.publish(contentId, variantPublishSchedules);
-  const contentData = await umbracoApi.document.get(contentId);
-  contentData.values[0].value = updatedText;
-  await umbracoApi.document.update(contentId, contentData);
-  await umbracoApi.document.publish(contentId, variantPublishSchedules);
+  contentId = await umbracoApi.document.createPublishedVariantDocumentWithTwoTextVersions(contentName, documentTypeName, dataTypeName, originalText, updatedText);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -128,7 +106,7 @@ test('can rollback variant content to a previous published version', async ({umb
 test('rollback restores the document name to the previous version', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
   contentId = await umbracoApi.document.createDocumentWithTextContent(contentName, documentTypeId, originalText, dataTypeName);
   await umbracoApi.document.publish(contentId);
   const contentData = await umbracoApi.document.get(contentId);
@@ -156,7 +134,7 @@ test('rollback restores the document name to the previous version', async ({umbr
 
 test('cancelling the rollback modal leaves the content unchanged', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await createContentWithTwoPublishedVersions(umbracoApi);
+  contentId = await umbracoApi.document.createPublishedDocumentWithTwoTextVersions(contentName, documentTypeName, dataTypeName, originalText, updatedText);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);

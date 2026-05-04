@@ -241,6 +241,31 @@ export class DocumentApiHelper {
     return documentId;
   }
 
+  async createPublishedDocumentWithTwoTextVersions(documentName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string): Promise<string> {
+    const dataTypeData = await this.api.dataType.getByName(dataTypeName);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+    const contentId = await this.createDocumentWithTextContent(documentName, documentTypeId, originalText, dataTypeName);
+    await this.publish(contentId);
+    const contentData = await this.get(contentId);
+    contentData.values[0].value = updatedText;
+    await this.update(contentId, contentData);
+    await this.publish(contentId);
+    return contentId;
+  }
+
+  async createPublishedVariantDocumentWithTwoTextVersions(documentName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string, isoCode: string = 'en-US'): Promise<string> {
+    const variantPublishSchedules = {publishSchedules: [{culture: isoCode}]};
+    const dataTypeData = await this.api.dataType.getByName(dataTypeName);
+    const documentTypeId = await this.api.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+    const contentId = await this.createDocumentWithEnglishCultureAndTextContent(documentName, documentTypeId, originalText, dataTypeName);
+    await this.publish(contentId, variantPublishSchedules);
+    const contentData = await this.get(contentId);
+    contentData.values[0].value = updatedText;
+    await this.update(contentId, contentData);
+    await this.publish(contentId, variantPublishSchedules);
+    return contentId;
+  }
+
   async createDocumentWithContentPicker(documentName: string, documentTypeId: string, contentPickerId: string) {
     await this.ensureNameNotExists(documentName);
 
