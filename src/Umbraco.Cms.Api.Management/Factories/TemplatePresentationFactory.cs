@@ -29,7 +29,7 @@ public class TemplatePresentationFactory : ITemplatePresentationFactory
 
     /// <summary>
     /// Asynchronously creates a <see cref="Umbraco.Cms.Api.Management.Models.TemplateResponseModel" /> from the specified <see cref="Umbraco.Cms.Core.Models.ITemplate" />.
-    /// If the template has a master template, its reference will be included in the response model.
+    /// If the template has a layout template, its reference will be included in the response model.
     /// </summary>
     /// <param name="template">The template from which to create the response model.</param>
     /// <returns>

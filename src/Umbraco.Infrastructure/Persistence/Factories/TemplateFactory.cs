@@ -34,7 +34,7 @@ internal static class TemplateFactory
     /// </summary>
     /// <param name="shortStringHelper">The helper used for short string manipulation within the template.</param>
     /// <param name="dto">The <see cref="TemplateDto"/> containing the template's persisted data.</param>
-    /// <param name="childDefinitions">A collection of child entities used to determine master template relationships.</param>
+    /// <param name="childDefinitions">A collection of child entities used to determine layout template relationships.</param>
     /// <param name="getFileContent">A function that retrieves the content of a <see cref="Umbraco.Cms.Core.Models.File"/> associated with the template, or <c>null</c> if unavailable.</param>
     /// <returns>A fully constructed <see cref="Umbraco.Cms.Core.Models.Template"/> entity with properties populated from the DTO and related data.</returns>
     public static Template BuildEntity(

@@ -438,7 +438,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             return Enumerable.Empty<ITemplate>();
         }
 
-        //look up the simple template definitions that have a master template assigned, this is used
+        //look up the simple template definitions that have a layout template assigned, this is used
         // later to populate the template item's properties
         IUmbracoEntity[] childIds = (ids?.Any() ?? false
                 ? GetAxisDefinitions(dtos.ToArray())
@@ -463,7 +463,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             return Enumerable.Empty<ITemplate>();
         }
 
-        //look up the simple template definitions that have a master template assigned, this is used
+        //look up the simple template definitions that have a layout template assigned, this is used
         // later to populate the template item's properties
         IUmbracoEntity[] childIds = GetAxisDefinitions(dtos.ToArray()).ToArray();
 
