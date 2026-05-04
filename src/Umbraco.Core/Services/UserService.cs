@@ -1508,7 +1508,7 @@ internal partial class UserService : RepositoryService, IUserService
             // the Id is associated with audit trails, versions etc. and can't be removed.
             if (user.LastLoginDate is not null && user.LastLoginDate != default(DateTime))
             {
-                return UserOperationStatus.CannotDeleteUserHasLoggedIn;
+                return UserOperationStatus.CannotDeleteUserWithLoginHistory;
             }
 
             user.IsApproved = false;

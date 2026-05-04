@@ -198,7 +198,7 @@ public enum UserOperationStatus
     ApplicationUrlNotConfigured,
 
     /// <summary>
-    ///     The operation failed because the user has logged in before, and therefore might be referenced in audit logs etc.
+    ///     The operation failed because the user has login history, and therefore might be referenced in audit logs etc.
     /// </summary>
-    CannotDeleteUserHasLoggedIn,
+    CannotDeleteUserWithLoginHistory,
 }

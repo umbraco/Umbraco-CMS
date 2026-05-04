@@ -63,7 +63,7 @@ public abstract class UserOrCurrentUserControllerBase : ManagementApiControllerB
                 .WithTitle("Cannot delete user")
                 .WithDetail("The user cannot be deleted.")
                 .Build()),
-            UserOperationStatus.CannotDeleteUserHasLoggedIn => BadRequest(problemDetailsBuilder
+            UserOperationStatus.CannotDeleteUserWithLoginHistory => BadRequest(problemDetailsBuilder
                 .WithTitle("Cannot delete user")
                 .WithDetail("This user has logged in and may be referenced by audit logs or content history. Disable the user instead of deleting them.")
                 .Build()),
