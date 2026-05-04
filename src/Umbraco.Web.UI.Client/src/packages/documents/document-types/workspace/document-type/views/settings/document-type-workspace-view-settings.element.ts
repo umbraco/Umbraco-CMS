@@ -187,6 +187,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 													id="versions-newer-than-days"
 													min="0"
 													placeholder="7"
+													label=${this.localize.term('contentTypeEditor_historyCleanupKeepAllVersionsNewerThanDays')}
 													.value=${this._keepAllVersionsNewerThanDays?.toString() ?? ''}
 													@change=${this.#onChangeKeepAllVersionsNewerThanDays}></uui-input>
 											</uui-form-layout-item>
@@ -202,6 +203,7 @@ export class UmbDocumentTypeWorkspaceViewSettingsElement extends UmbLitElement i
 													id="latest-version-per-day-days"
 													min="0"
 													placeholder="90"
+													label=${this.localize.term('contentTypeEditor_historyCleanupKeepLatestVersionPerDayForDays')}
 													.value=${this._keepLatestVersionPerDayForDays?.toString() ?? ''}
 													@change=${this.#onChangeKeepLatestVersionPerDayForDays}></uui-input>
 											</uui-form-layout-item>

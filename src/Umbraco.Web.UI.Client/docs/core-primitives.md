@@ -17,9 +17,9 @@ export class UmbMyElement extends UmbLitElement {
 }
 ```
 
-UmbLitElement extends Lit's `LitElement` with four core capabilities:
+UmbLitElement extends Lit's `LitElement` with core capabilities:
 
-### observe(source, callback?, controllerAlias?)
+### Observe a State
 
 Lifecycle-managed observable subscription. Automatically unsubscribes when the element disconnects from the DOM — no manual cleanup needed.
 
@@ -55,7 +55,13 @@ this.observe(
 - If `null`: no alias (controller cannot be replaced by alias)
 - If provided: explicit string/symbol for later reference
 
-### consumeContext(alias, callback)
+### Retrieve a Context
+
+The choice between consumeContext and getContext depends on how the code uses the context.
+If you only need a context during user interactions or events, use getContext.
+Use consumeContext when the context is a primary dependency that must stay up to date.
+
+#### consumeContext(alias, callback)
 
 Subscribe to a context provided by an ancestor element. The callback fires when the context becomes available (and re-fires if the context changes).
 
@@ -74,7 +80,7 @@ constructor() {
 }
 ```
 
-### getContext(alias, options?)
+#### getContext(alias, options?)
 
 Promise-based one-time context retrieval. Use for user-triggered actions where you don't need continuous observation.
 
@@ -85,18 +91,19 @@ async #handleClick() {
 }
 ```
 
-### provideContext(alias, instance)
+### Provide a Context
 
-Make a context instance available to all descendant elements.
+Make a context instance available to all descendant elements by extending UmbContextBase.
 
 ```typescript
-constructor() {
-	super();
-	this.provideContext(UMB_MY_CONTEXT, new UmbMyContext(this));
+class UmbMyContext extends UmbContextBase {
+	constructor(host: UmbControllerHost) {
+		super(host, UMB_MY_CONTEXT);
+	}
 }
 ```
 
-### this.localize
+### Localization
 
 Built-in localization controller. Available on every UmbLitElement.
 

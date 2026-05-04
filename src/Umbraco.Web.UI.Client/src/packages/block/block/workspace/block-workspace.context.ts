@@ -212,12 +212,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 					};
 
 					this.readOnlyGuard?.addRule(rule);
-					this.content.propertyWriteGuard.addRule({ unique, permitted: false });
-					this.settings.propertyWriteGuard.addRule({ unique, permitted: false });
 				} else {
 					this.readOnlyGuard?.removeRule(unique);
-					this.content.propertyWriteGuard.removeRule(unique);
-					this.settings.propertyWriteGuard.removeRule(unique);
 				}
 			},
 			'observeIsReadOnly',
