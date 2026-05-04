@@ -9,10 +9,12 @@ using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Delivery.OpenApi.Extensions;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 
@@ -68,6 +70,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
     private const string PropertiesModelSuffix = "PropertiesModel";
 
     private readonly IContentTypeSchemaService _contentTypeSchemaService;
+    private readonly IOptionsMonitor<DeliveryApiSettings> _deliveryApiSettings;
     private readonly ILogger<ContentTypeSchemaTransformer> _logger;
     private readonly IJsonTypeInfoResolver _jsonTypeInfoResolver;
 
@@ -83,13 +86,16 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
     /// </summary>
     /// <param name="contentTypeSchemaService">The content type info service.</param>
     /// <param name="jsonOptionsMonitor">The JSON options monitor.</param>
+    /// <param name="deliveryApiSettings">The Delivery API settings, used to honour the allow/deny content type list.</param>
     /// <param name="logger">The logger.</param>
     public ContentTypeSchemaTransformer(
         IContentTypeSchemaService contentTypeSchemaService,
         IOptionsMonitor<JsonOptions> jsonOptionsMonitor,
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
         ILogger<ContentTypeSchemaTransformer> logger)
     {
         _contentTypeSchemaService = contentTypeSchemaService;
+        _deliveryApiSettings = deliveryApiSettings;
         _logger = logger;
         _serializerOptions = jsonOptionsMonitor
             .Get(Constants.JsonOptionsNames.DeliveryApi)
@@ -99,7 +105,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
     }
 
     private IReadOnlyCollection<ContentTypeSchemaInfo> DocumentTypes
-        => field ??= _contentTypeSchemaService.GetDocumentTypes();
+        => field ??= FilterAllowedDocumentTypes(_contentTypeSchemaService.GetDocumentTypes());
 
     private IReadOnlyCollection<ContentTypeSchemaInfo> MediaTypes
         => field ??= _contentTypeSchemaService.GetMediaTypes();
@@ -581,5 +587,13 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
 
         replaced = false;
         return schema;
+    }
+
+    private IReadOnlyCollection<ContentTypeSchemaInfo> FilterAllowedDocumentTypes(IReadOnlyCollection<ContentTypeSchemaInfo> documentTypes)
+    {
+        DeliveryApiSettings settings = _deliveryApiSettings.CurrentValue;
+        return documentTypes
+            .Where(c => settings.IsAllowedContentType(c.Alias))
+            .ToList();
     }
 }

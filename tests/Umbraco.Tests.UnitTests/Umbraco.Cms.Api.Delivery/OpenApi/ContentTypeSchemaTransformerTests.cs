@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Services;
@@ -21,6 +22,7 @@ public class ContentTypeSchemaTransformerTests
 {
     private Mock<IContentTypeSchemaService> _contentTypeSchemaServiceMock = null!;
     private Mock<IOptionsMonitor<JsonOptions>> _jsonOptionsMonitorMock = null!;
+    private Mock<IOptionsMonitor<DeliveryApiSettings>> _deliveryApiSettingsMonitorMock = null!;
     private Mock<ILogger<ContentTypeSchemaTransformer>> _loggerMock = null!;
     private JsonSerializerOptions _jsonSerializerOptions = null!;
     private IServiceProvider _services = null!;
@@ -31,6 +33,8 @@ public class ContentTypeSchemaTransformerTests
         _contentTypeSchemaServiceMock = new Mock<IContentTypeSchemaService>(MockBehavior.Strict);
         _loggerMock = new Mock<ILogger<ContentTypeSchemaTransformer>>();
         _jsonOptionsMonitorMock = new Mock<IOptionsMonitor<JsonOptions>>(MockBehavior.Strict);
+        _deliveryApiSettingsMonitorMock = new Mock<IOptionsMonitor<DeliveryApiSettings>>();
+        _deliveryApiSettingsMonitorMock.Setup(x => x.CurrentValue).Returns(new DeliveryApiSettings());
 
         _jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -504,10 +508,85 @@ public class ContentTypeSchemaTransformerTests
         Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("image"));
     }
 
+    [Test]
+    public async Task SchemaTransformAsync_Excludes_DocumentTypes_On_Deny_List()
+    {
+        // Arrange
+        var documentTypes = new List<ContentTypeSchemaInfo>
+        {
+            CreateContentTypeSchemaInfo("publicArticle", "PublicArticle", isElement: false),
+            CreateContentTypeSchemaInfo("hiddenArticle", "HiddenArticle", isElement: false),
+        };
+
+        _contentTypeSchemaServiceMock
+            .Setup(x => x.GetDocumentTypes())
+            .Returns(documentTypes);
+
+        _deliveryApiSettingsMonitorMock
+            .Setup(x => x.CurrentValue)
+            .Returns(new DeliveryApiSettings
+            {
+                DisallowedContentTypeAliases = new HashSet<string> { "hiddenArticle" },
+            });
+
+        var transformer = CreateTransformer();
+        var schema = new OpenApiSchema();
+        OpenApiSchemaTransformerContext context = CreateSchemaContext(CreatePolymorphicJsonTypeInfo<IApiContentResponse>());
+
+        // Act
+        await transformer.TransformAsync(schema, context, CancellationToken.None);
+
+        // Assert - the disallowed alias is filtered out before being emitted to the polymorphic union
+        Assert.IsNotNull(schema.Discriminator);
+        Assert.IsNotNull(schema.Discriminator.Mapping);
+        Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("publicArticle"));
+        Assert.IsFalse(schema.Discriminator.Mapping.ContainsKey("hiddenArticle"));
+        Assert.AreEqual(1, schema.OneOf?.Count);
+    }
+
+    [Test]
+    public async Task SchemaTransformAsync_Excludes_DocumentTypes_Not_On_Allow_List()
+    {
+        // Arrange
+        var documentTypes = new List<ContentTypeSchemaInfo>
+        {
+            CreateContentTypeSchemaInfo("articleA", "ArticleA", isElement: false),
+            CreateContentTypeSchemaInfo("articleB", "ArticleB", isElement: false),
+            CreateContentTypeSchemaInfo("articleC", "ArticleC", isElement: false),
+        };
+
+        _contentTypeSchemaServiceMock
+            .Setup(x => x.GetDocumentTypes())
+            .Returns(documentTypes);
+
+        _deliveryApiSettingsMonitorMock
+            .Setup(x => x.CurrentValue)
+            .Returns(new DeliveryApiSettings
+            {
+                AllowedContentTypeAliases = new HashSet<string> { "articleA", "articleC" },
+            });
+
+        var transformer = CreateTransformer();
+        var schema = new OpenApiSchema();
+        OpenApiSchemaTransformerContext context = CreateSchemaContext(CreatePolymorphicJsonTypeInfo<IApiContentResponse>());
+
+        // Act
+        await transformer.TransformAsync(schema, context, CancellationToken.None);
+
+        // Assert - only the explicitly allowed aliases are emitted
+        Assert.IsNotNull(schema.Discriminator);
+        Assert.IsNotNull(schema.Discriminator.Mapping);
+        Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("articleA"));
+        Assert.IsFalse(schema.Discriminator.Mapping.ContainsKey("articleB"));
+        Assert.IsTrue(schema.Discriminator.Mapping.ContainsKey("articleC"));
+        Assert.AreEqual(2, schema.OneOf?.Count);
+    }
+
     private ContentTypeSchemaTransformer CreateTransformer() =>
         new(
             _contentTypeSchemaServiceMock.Object,
             _jsonOptionsMonitorMock.Object,
+            _deliveryApiSettingsMonitorMock.Object,
             _loggerMock.Object);
 
     private OpenApiSchemaTransformerContext CreateSchemaContext(JsonTypeInfo jsonTypeInfo) =>
