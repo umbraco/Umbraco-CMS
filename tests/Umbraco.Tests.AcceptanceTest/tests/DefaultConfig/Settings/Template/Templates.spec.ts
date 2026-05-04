@@ -81,7 +81,7 @@ test('can delete a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false, false);
 });
 
-test('can set a template as master template', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can set a template as layout template', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childTemplateName = 'ChildTemplate';
   await umbracoApi.template.ensureNameNotExists(childTemplateName);
@@ -97,16 +97,16 @@ test('can set a template as master template', {tag: '@release'}, async ({umbraco
 
   // Assert
   await umbracoUi.template.isMasterTemplateNameVisible(templateName);
-  // Checks if the childTemplate has the masterTemplate set
+  // Checks if the childTemplate has the layoutTemplate set
   const childTemplateData = await umbracoApi.template.getByName(childTemplateName);
-  const masterTemplateData = await umbracoApi.template.getByName(templateName);
-  expect(childTemplateData.masterTemplate.id).toBe(masterTemplateData.id);
+  const layoutTemplateData = await umbracoApi.template.getByName(templateName);
+  expect(childTemplateData.layoutTemplate.id).toBe(layoutTemplateData.id);
 
   // Clean
   await umbracoApi.template.ensureNameNotExists(childTemplateName);
 });
 
-test('can remove a master template', async ({umbracoApi, umbracoUi}) => {
+test('can remove a layout template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childTemplateName = 'ChildTemplate';
   const templateAlias = AliasHelper.toAlias(templateName);
@@ -122,9 +122,9 @@ test('can remove a master template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.clickSaveButtonAndWaitForTemplateToBeUpdated();
 
   // Assert
-  await umbracoUi.template.isMasterTemplateNameVisible('No master');
+  await umbracoUi.template.isMasterTemplateNameVisible('No layout');
   const childTemplate = await umbracoApi.template.getByName(childTemplateName);
-  expect(childTemplate.masterTemplate).toBe(null);
+  expect(childTemplate.layoutTemplate).toBe(null);
 
   // Clean
   await umbracoApi.template.ensureNameNotExists(childTemplateName);

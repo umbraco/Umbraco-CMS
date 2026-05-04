@@ -9,41 +9,11 @@ namespace Umbraco.Cms.Core.Services;
 public interface IMemberGroupService : IService
 {
     /// <summary>
-    ///     Gets all member groups.
-    /// </summary>
-    /// <returns>An enumerable collection of all <see cref="IMemberGroup"/> objects.</returns>
-    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IMemberGroup> GetAll();
-
-    /// <summary>
-    ///     Gets a member group by its integer id.
-    /// </summary>
-    /// <param name="id">The integer id of the member group.</param>
-    /// <returns>The <see cref="IMemberGroup"/> if found; otherwise, <c>null</c>.</returns>
-    [Obsolete("Please use Guid instead of Int id. Scheduled for removal in Umbraco 18.")]
-    IMemberGroup? GetById(int id);
-
-    /// <summary>
-    ///     Gets multiple member groups by their integer ids.
-    /// </summary>
-    /// <param name="ids">An enumerable collection of integer ids.</param>
-    /// <returns>An enumerable collection of <see cref="IMemberGroup"/> objects.</returns>
-    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IMemberGroup> GetByIds(IEnumerable<int> ids);
-
-    /// <summary>
     ///     Gets a member group by its name.
     /// </summary>
     /// <param name="name">The name of the member group.</param>
     /// <returns>The <see cref="IMemberGroup"/> if found; otherwise, <c>null</c>.</returns>
     IMemberGroup? GetByName(string? name);
-
-    /// <summary>
-    ///     Deletes a member group.
-    /// </summary>
-    /// <param name="memberGroup">The <see cref="IMemberGroup"/> to delete.</param>
-    [Obsolete("Please use the asynchronous counterpart. Scheduled for removal in Umbraco 18.")]
-    void Delete(IMemberGroup memberGroup);
 
     /// <summary>
     ///     Get a member group by name.
@@ -68,18 +38,7 @@ public interface IMemberGroupService : IService
     ///     The default implementation fetches all groups and filters in-memory. Implementations
     ///     backed by a query-capable store may provide a more efficient override.
     /// </remarks>
-    // TODO (V19): Remove default implementation.
-    async Task<IEnumerable<IMemberGroup>> GetAsync(IEnumerable<Guid> keys)
-    {
-        ICollection<Guid> keySet = keys as ICollection<Guid> ?? keys.ToArray();
-        if (keySet.Count == 0)
-        {
-            return [];
-        }
-
-        IEnumerable<IMemberGroup> all = await GetAllAsync();
-        return all.Where(x => keySet.Contains(x.Key));
-    }
+    Task<IEnumerable<IMemberGroup>> GetAsync(IEnumerable<Guid> keys);
 
     /// <summary>
     ///     Gets all member groups

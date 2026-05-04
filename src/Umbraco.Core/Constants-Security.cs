@@ -12,7 +12,7 @@ public static partial class Constants
         /// <summary>
         ///     Gets the identifier of the 'super' user.
         /// </summary>
-        [Obsolete("Use SuperUserKey instead. Scheduled for removal in Umbraco 18.")]
+        [Obsolete("Use SuperUserKey instead. Scheduled for removal in Umbraco 19.")]
         public const int SuperUserId = -1;
 
         /// <summary>
@@ -23,7 +23,7 @@ public static partial class Constants
         /// <summary>
         ///     Gets the identifier of the 'super' user as a string.
         /// </summary>
-        [Obsolete("Use SuperUserKey instead. Scheduled for removal in Umbraco 18.")]
+        [Obsolete("Use SuperUserKey instead. Scheduled for removal in Umbraco 19.")]
         public const string SuperUserIdAsString = "-1";
 
         /// <summary>
