@@ -6,7 +6,7 @@ import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbra
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 
 export interface UmbCollectionViewManagerConfig {
 	defaultViewAlias?: string;
@@ -87,7 +87,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 		);
 	}
 
-	#setupViewComponent(component: Element, view: ManifestCollectionView) {
+	#setupViewComponent(component: PageComponent, view: ManifestCollectionView) {
 		(component as HTMLElement).setAttribute('data-mark', `collection-view:${view.alias}`);
 		(component as UmbCollectionViewElementBase).manifest = view;
 		this.setCurrentView(view);
