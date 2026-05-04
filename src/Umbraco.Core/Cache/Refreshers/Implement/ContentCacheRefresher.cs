@@ -74,6 +74,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // TODO: Ideally we should inject IElementsCache
         // this interface is in infrastructure, and changing this is very breaking
         // so as long as we have the cache manager, which casts the IElementsCache to a simple AppCache we might as well use that.
+        // see also ElementCacheRefresher.
         _cacheManager = cacheManager;
     }
 
