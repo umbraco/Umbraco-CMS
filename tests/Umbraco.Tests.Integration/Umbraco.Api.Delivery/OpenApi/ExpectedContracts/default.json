@@ -1268,44 +1268,22 @@
       },
       "IApiMediaWithCropsResponseModel": {
         "required": [
-          "$type"
-        ],
-        "type": "object",
-        "anyOf": [
-          {
-            "$ref": "#/components/schemas/IApiMediaWithCropsResponseModelApiMediaWithCropsResponseModel"
-          }
-        ],
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "ApiMediaWithCropsResponse": "#/components/schemas/IApiMediaWithCropsResponseModelApiMediaWithCropsResponseModel"
-          }
-        }
-      },
-      "IApiMediaWithCropsResponseModelApiMediaWithCropsResponseModel": {
-        "required": [
           "path",
           "createDate",
           "updateDate",
-          "focalPoint",
-          "crops",
-          "$type",
           "id",
           "name",
           "mediaType",
           "url",
           "properties"
         ],
+        "type": "object",
         "properties": {
-          "$type": {
-            "enum": [
-              "ApiMediaWithCropsResponse"
-            ],
-            "type": "string"
-          },
           "path": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "createDate": {
             "type": "string",
@@ -1314,6 +1292,18 @@
           "updateDate": {
             "type": "string",
             "format": "date-time"
+          },
+          "focalPoint": {
+            "$ref": "#/components/schemas/ImageFocalPointModel"
+          },
+          "crops": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ImageCropModel"
+            }
           },
           "id": {
             "type": "string",
@@ -1369,18 +1359,6 @@
               "null",
               "object"
             ]
-          },
-          "focalPoint": {
-            "$ref": "#/components/schemas/ImageFocalPointModel"
-          },
-          "crops": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "$ref": "#/components/schemas/ImageCropModel"
-            }
           }
         }
       },

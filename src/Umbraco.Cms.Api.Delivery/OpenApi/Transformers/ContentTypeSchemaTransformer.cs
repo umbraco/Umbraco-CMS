@@ -251,15 +251,10 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         Func<ContentTypeSchemaInfo, List<IOpenApiSchema>, Task<OpenApiSchema>> contentTypeSchemaFactory,
         CancellationToken cancellationToken)
     {
-        List<IOpenApiSchema> derivedTypeSchemas = [];
-        foreach (JsonDerivedType derivedType in context.JsonTypeInfo.PolymorphismOptions?.DerivedTypes ?? [])
-        {
-            IOpenApiSchema derivedTypeSchema = await CreateSchema(
-                GetJsonTypeInfo(derivedType.DerivedType),
-                context,
-                cancellationToken);
-            derivedTypeSchemas.Add(derivedTypeSchema);
-        }
+        List<IOpenApiSchema> derivedTypeSchemas = await ResolveDerivedTypeSchemas(
+            schema,
+            context,
+            cancellationToken);
 
         OpenApiDocument document = context.GetRequiredDocument();
         var typePropertyName = GetTypePropertyName(itemType);
@@ -280,6 +275,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
 
         // Remove all schema properties that are now handled by the derived types
         schema.AnyOf = null;
+        schema.Properties = null;
         schema.Required = new HashSet<string> { typePropertyName };
     }
 
@@ -595,5 +591,61 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         return documentTypes
             .Where(c => settings.IsAllowedContentType(c.Alias))
             .ToList();
+    }
+
+    /// <summary>
+    /// Returns the schemas to use as the <c>allOf</c> bases for each typed content type
+    /// schema in a polymorphic union. Prefers concrete derived types declared on the
+    /// interface via <c>[JsonDerivedType]</c>; when none are advertised, falls back to a
+    /// schema built from the interface's own properties.
+    /// </summary>
+    /// <remarks>
+    /// The fallback exists for media interfaces, whose concrete classes are internal in
+    /// Umbraco.Infrastructure and therefore cannot be referenced via <c>[JsonDerivedType]</c>
+    /// from Umbraco.Core.
+    /// </remarks>
+    private async Task<List<IOpenApiSchema>> ResolveDerivedTypeSchemas(
+        OpenApiSchema interfaceSchema,
+        OpenApiSchemaTransformerContext context,
+        CancellationToken cancellationToken)
+    {
+        List<IOpenApiSchema> derivedTypeSchemas = [];
+        foreach (JsonDerivedType derivedType in context.JsonTypeInfo.PolymorphismOptions?.DerivedTypes ?? [])
+        {
+            IOpenApiSchema derivedTypeSchema = await CreateSchema(
+                GetJsonTypeInfo(derivedType.DerivedType),
+                context,
+                cancellationToken);
+            derivedTypeSchemas.Add(derivedTypeSchema);
+        }
+
+        if (derivedTypeSchemas.Count == 0)
+        {
+            derivedTypeSchemas.Add(CreateBaseSchemaFromInterface(interfaceSchema, context));
+        }
+
+        return derivedTypeSchemas;
+    }
+
+    private static IOpenApiSchema CreateBaseSchemaFromInterface(
+        OpenApiSchema interfaceSchema,
+        OpenApiSchemaTransformerContext context)
+    {
+        // Append a "Base" marker so this schema stays distinct from the polymorphic union
+        // schema for the same interface (e.g. IApiMediaWithCropsResponseBaseModel vs.
+        // IApiMediaWithCropsResponseModel).
+        var baseSchemaId = $"{context.JsonTypeInfo.Type.Name}Base{ModelSuffix}";
+        OpenApiDocument document = context.GetRequiredDocument();
+        var baseSchema = new OpenApiSchema
+        {
+            Type = interfaceSchema.Type,
+            Properties = interfaceSchema.Properties,
+            Required = interfaceSchema.Required,
+            AdditionalPropertiesAllowed = interfaceSchema.AdditionalPropertiesAllowed,
+            Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = baseSchemaId },
+        };
+
+        document.AddComponent(baseSchemaId, baseSchema);
+        return new OpenApiSchemaReference(baseSchemaId, document);
     }
 }

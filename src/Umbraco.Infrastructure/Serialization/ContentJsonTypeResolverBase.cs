@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using Umbraco.Cms.Core.Models.DeliveryApi;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
@@ -38,13 +37,7 @@ public abstract class ContentJsonTypeResolverBase : DefaultJsonTypeInfoResolver
     /// An array of <see cref="System.Type" /> objects representing the known derived types for the given JSON type info.
     /// Returns an empty array if there are no known derived types.
     /// </returns>
-    public virtual Type[] GetDerivedTypes(JsonTypeInfo jsonTypeInfo) =>
-        jsonTypeInfo.Type switch
-        {
-            _ when jsonTypeInfo.Type == typeof(IApiMediaWithCropsResponse) => [typeof(ApiMediaWithCropsResponse)],
-            _ when jsonTypeInfo.Type == typeof(IApiMediaWithCrops) => [typeof(ApiMediaWithCrops)],
-            _ => [],
-        };
+    public virtual Type[] GetDerivedTypes(JsonTypeInfo jsonTypeInfo) => [];
 
     /// <summary>
     /// Configures polymorphic serialization options for the specified <see cref="JsonTypeInfo" />.
