@@ -743,7 +743,7 @@ export abstract class UmbBlockEntryContext<
 		await umbConfirmModal(this, {
 			headline: this.localize.term('blockEditor_confirmDeleteBlockTitle', blockName),
 			content: this.localize.term('blockEditor_confirmDeleteBlockMessage', blockName),
-			confirmLabel: this.localize.term('general_delete'),
+			confirmLabel: '#general_delete',
 			color: 'danger',
 		});
 		this.delete();
@@ -769,5 +769,13 @@ export abstract class UmbBlockEntryContext<
 	public getExpose(): UmbBlockExposeModel | undefined {
 		const exposes = this._manager?.getExposes();
 		return exposes?.find((x) => x.contentKey === this.#contentKey);
+	}
+
+	/**
+	 * Copy the block entry to the clipboard.
+	 * Subclasses must override this method with editor-specific clipboard logic.
+	 */
+	public async copyToClipboard(): Promise<void> {
+		throw new Error('copyToClipboard() is not implemented for this block entry context.');
 	}
 }
