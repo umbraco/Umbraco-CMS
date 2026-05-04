@@ -1187,146 +1187,6 @@
           }
         }
       },
-      "ApiContentModel": {
-        "required": [
-          "contentType",
-          "name",
-          "createDate",
-          "updateDate",
-          "route",
-          "id",
-          "properties"
-        ],
-        "type": "object",
-        "properties": {
-          "contentType": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "createDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updateDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "route": {
-            "$ref": "#/components/schemas/IApiContentRouteModel"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "properties": {
-            "type": "object"
-          }
-        }
-      },
-      "ApiContentResponseModel": {
-        "required": [
-          "contentType",
-          "name",
-          "createDate",
-          "updateDate",
-          "route",
-          "id",
-          "properties",
-          "cultures"
-        ],
-        "type": "object",
-        "properties": {
-          "contentType": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "createDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updateDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "route": {
-            "$ref": "#/components/schemas/IApiContentRouteModel"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "properties": {
-            "type": "object"
-          },
-          "cultures": {
-            "type": "object",
-            "additionalProperties": {
-              "required": [
-                "path",
-                "startItem"
-              ],
-              "type": "object",
-              "properties": {
-                "path": {
-                  "type": [
-                    "null",
-                    "string"
-                  ]
-                },
-                "queryString": {
-                  "type": [
-                    "null",
-                    "string"
-                  ]
-                },
-                "startItem": {
-                  "required": [
-                    "id",
-                    "path"
-                  ],
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "format": "uuid"
-                    },
-                    "path": {
-                      "type": [
-                        "null",
-                        "string"
-                      ]
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "ApiElementModel": {
-        "required": [
-          "contentType",
-          "id",
-          "properties"
-        ],
-        "type": "object",
-        "properties": {
-          "contentType": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "properties": {
-            "type": "object"
-          }
-        }
-      },
       "ApiImageCropperValueModel": {
         "required": [
           "url",
@@ -1362,7 +1222,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ApiContentModel"
+            "$ref": "#/components/schemas/IApiContentBaseModel"
           }
         ],
         "properties": {
@@ -1379,7 +1239,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ApiContentResponseModel"
+            "$ref": "#/components/schemas/IApiContentResponseBaseModel"
           },
           {
             "$ref": "#/components/schemas/ArticlePageContentModel"
@@ -1510,6 +1370,89 @@
         "type": "object",
         "additionalProperties": false
       },
+      "IApiContentBaseModel": {
+        "required": [
+          "contentType",
+          "createDate",
+          "updateDate",
+          "route",
+          "id",
+          "properties"
+        ],
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "route": {
+            "required": [
+              "path",
+              "startItem"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "queryString": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "startItem": {
+                "required": [
+                  "id",
+                  "path"
+                ],
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "path": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "properties": {
+            "type": [
+              "null",
+              "object"
+            ]
+          }
+        }
+      },
       "IApiContentModel": {
         "required": [
           "contentType"
@@ -1532,6 +1475,136 @@
             "seoMetadata": "#/components/schemas/SeoMetadataContentModel",
             "articlePage": "#/components/schemas/ArticlePageContentModel",
             "landingPage": "#/components/schemas/LandingPageContentModel"
+          }
+        }
+      },
+      "IApiContentResponseBaseModel": {
+        "required": [
+          "contentType",
+          "cultures",
+          "createDate",
+          "updateDate",
+          "route",
+          "id",
+          "properties"
+        ],
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cultures": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "additionalProperties": {
+              "required": [
+                "path",
+                "startItem"
+              ],
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "queryString": {
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "startItem": {
+                  "required": [
+                    "id",
+                    "path"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "path": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "route": {
+            "required": [
+              "path",
+              "startItem"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "queryString": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "startItem": {
+                "required": [
+                  "id",
+                  "path"
+                ],
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "path": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "properties": {
+            "type": [
+              "null",
+              "object"
+            ]
           }
         }
       },
@@ -1560,45 +1633,28 @@
           }
         }
       },
-      "IApiContentRouteModel": {
+      "IApiElementBaseModel": {
         "required": [
-          "path",
-          "startItem"
-        ],
-        "type": "object",
-        "properties": {
-          "path": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "queryString": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "startItem": {
-            "$ref": "#/components/schemas/IApiContentStartItemModel"
-          }
-        }
-      },
-      "IApiContentStartItemModel": {
-        "required": [
+          "contentType",
           "id",
-          "path"
+          "properties"
         ],
         "type": "object",
         "properties": {
+          "contentType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "id": {
             "type": "string",
             "format": "uuid"
           },
-          "path": {
+          "properties": {
             "type": [
               "null",
-              "string"
+              "object"
             ]
           }
         }
@@ -2032,7 +2088,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ApiContentModel"
+            "$ref": "#/components/schemas/IApiContentBaseModel"
           }
         ],
         "properties": {
@@ -2049,7 +2105,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ApiContentResponseModel"
+            "$ref": "#/components/schemas/IApiContentResponseBaseModel"
           },
           {
             "$ref": "#/components/schemas/LandingPageContentModel"
@@ -2177,7 +2233,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ApiContentModel"
+            "$ref": "#/components/schemas/IApiContentBaseModel"
           }
         ],
         "properties": {
@@ -2194,7 +2250,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ApiContentResponseModel"
+            "$ref": "#/components/schemas/IApiContentResponseBaseModel"
           },
           {
             "$ref": "#/components/schemas/SeoMetadataContentModel"
@@ -2227,7 +2283,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ApiElementModel"
+            "$ref": "#/components/schemas/IApiElementBaseModel"
           }
         ],
         "properties": {

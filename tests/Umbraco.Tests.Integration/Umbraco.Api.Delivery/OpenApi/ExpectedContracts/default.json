@@ -1157,45 +1157,36 @@
     "schemas": {
       "IApiContentResponseModel": {
         "required": [
-          "$type"
-        ],
-        "type": "object",
-        "anyOf": [
-          {
-            "$ref": "#/components/schemas/IApiContentResponseModelApiContentResponseModel"
-          }
-        ],
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "ApiContentResponse": "#/components/schemas/IApiContentResponseModelApiContentResponseModel"
-          }
-        }
-      },
-      "IApiContentResponseModelApiContentResponseModel": {
-        "required": [
           "contentType",
-          "name",
+          "cultures",
           "createDate",
           "updateDate",
           "route",
           "id",
-          "properties",
-          "cultures",
-          "$type"
+          "properties"
         ],
+        "type": "object",
         "properties": {
-          "$type": {
-            "enum": [
-              "ApiContentResponse"
-            ],
-            "type": "string"
-          },
           "contentType": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cultures": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "additionalProperties": {
+              "$ref": "#/components/schemas/IApiContentRouteModel"
+            }
           },
           "name": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "createDate": {
             "type": "string",
@@ -1213,13 +1204,10 @@
             "format": "uuid"
           },
           "properties": {
-            "type": "object"
-          },
-          "cultures": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/IApiContentRouteModel"
-            }
+            "type": [
+              "null",
+              "object"
+            ]
           }
         }
       },
