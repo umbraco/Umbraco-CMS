@@ -14,81 +14,12 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Web.Mvc;
-using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Extensions;
 
 public static class UrlHelperExtensions
 {
-    /// <summary>
-    ///     Return the Url for a Web Api service
-    /// </summary>
-    /// <param name="url"></param>
-    /// <param name="actionName"></param>
-    /// <param name="controllerName"></param>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public static string? GetUmbracoApiService(this IUrlHelper url, string actionName, string controllerName, object? id = null) => url.GetUmbracoApiService(actionName, controllerName, string.Empty, id);
-
-    /// <summary>
-    ///     Return the Url for a Web Api service
-    /// </summary>
-    /// <param name="url"></param>
-    /// <param name="actionName"></param>
-    /// <param name="controllerName"></param>
-    /// <param name="area"></param>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public static string? GetUmbracoApiService(
-        this IUrlHelper url,
-        string actionName,
-        string controllerName,
-        string area,
-        object? id = null)
-    {
-        if (actionName == null)
-        {
-            throw new ArgumentNullException(nameof(actionName));
-        }
-
-        if (string.IsNullOrWhiteSpace(actionName))
-        {
-            throw new ArgumentException(
-                "Value can't be empty or consist only of white-space characters.",
-                nameof(actionName));
-        }
-
-        if (controllerName == null)
-        {
-            throw new ArgumentNullException(nameof(controllerName));
-        }
-
-        if (string.IsNullOrWhiteSpace(controllerName))
-        {
-            throw new ArgumentException(
-                "Value can't be empty or consist only of white-space characters.",
-                nameof(controllerName));
-        }
-
-        if (area.IsNullOrWhiteSpace())
-        {
-            if (id == null)
-            {
-                return url.Action(actionName, controllerName);
-            }
-
-            return url.Action(actionName, controllerName, new { id });
-        }
-
-        if (id == null)
-        {
-            return url.Action(actionName, controllerName, new { area });
-        }
-
-        return url.Action(actionName, controllerName, new { area, id });
-    }
-
     /// <summary>
     ///     Return the Url for an action with a cache-busting hash appended
     /// </summary>

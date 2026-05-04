@@ -1068,7 +1068,7 @@ namespace Umbraco.Cms.Core.Services
             {
                 foreach (IMemberGroup memberGroup in found)
                 {
-                    _memberGroupService.Delete(memberGroup);
+                    _memberGroupService.DeleteAsync(memberGroup.Key).GetAwaiter().GetResult();
                 }
             }
 

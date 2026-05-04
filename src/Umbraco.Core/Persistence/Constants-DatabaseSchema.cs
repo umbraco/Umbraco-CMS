@@ -266,18 +266,6 @@ public static partial class Constants
             public const string UserData = TableNamePrefix + "UserData";
 
             /// <summary>
-            ///     The user group to node mapping table name.
-            /// </summary>
-            [Obsolete("Scheduled for removal in Umbraco 18 as this table hasn't existed since Umbraco 14.")]
-            public const string UserGroup2Node = TableNamePrefix + "UserGroup2Node";
-
-            /// <summary>
-            ///     The user group to node permission mapping table name.
-            /// </summary>
-            [Obsolete("Scheduled for removal in Umbraco 18 as this table hasn't existed since Umbraco 14.")]
-            public const string UserGroup2NodePermission = TableNamePrefix + "UserGroup2NodePermission";
-
-            /// <summary>
             ///     The user group to permission mapping table name.
             /// </summary>
             public const string UserGroup2Permission = TableNamePrefix + "UserGroup2Permission";
