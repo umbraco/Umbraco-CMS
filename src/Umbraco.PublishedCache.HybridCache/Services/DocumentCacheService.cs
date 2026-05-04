@@ -343,19 +343,18 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
         var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
+        await _databaseCacheRepository.RefreshDocumentAsync(draftCacheNode);
 
-        await _databaseCacheRepository.RefreshDocumentAsync(draftCacheNode, content.PublishedState);
 
-        if (content.PublishedState is PublishedState.Publishing or PublishedState.Unpublishing)
+        if (content.PublishedState is PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
-
-            await _databaseCacheRepository.RefreshDocumentAsync(publishedCacheNode, content.PublishedState);
-
-            if (content.PublishedState == PublishedState.Unpublishing)
-            {
-                await ClearPublishedCacheAsync(publishedCacheNode.Key);
-            }
+            await _databaseCacheRepository.RefreshDocumentAsync(publishedCacheNode);
+        }
+        else if (content.PublishedState is PublishedState.Unpublishing)
+        {
+            await _databaseCacheRepository.RemovePublishedDocumentAsync(content.Id);
+            await ClearPublishedCacheAsync(content.Key);
         }
 
         scope.Complete();

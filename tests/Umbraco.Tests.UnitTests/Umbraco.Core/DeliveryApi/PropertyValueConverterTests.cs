@@ -126,8 +126,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
     protected Mock<IPublishedContent> SetupPublishedContent(string name, Guid key, PublishedItemType itemType, IPublishedContentType contentType)
     {
         var content = new Mock<IPublishedContent>();
-        var urlSegment = "url-segment";
-        ConfigurePublishedContentMock(content, key, name, urlSegment, contentType, Array.Empty<PublishedPropertyBase>());
+        ConfigurePublishedContentMock(content, key, name, contentType, Array.Empty<PublishedPropertyBase>());
         content.SetupGet(c => c.ItemType).Returns(itemType);
         return content;
     }
@@ -139,11 +138,11 @@ public class PropertyValueConverterTests : DeliveryApiTests
         return element;
     }
 
-    protected void RegisterContentWithProviders(IPublishedContent content, bool preview)
+    protected void RegisterContentWithProviders(IPublishedContent content, bool preview, string url = "url-segment")
     {
         PublishedUrlProviderMock
             .Setup(p => p.GetUrl(content, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
-            .Returns(content.UrlSegment);
+            .Returns(url);
         PublishedContentCacheMock
             .Setup(pcc => pcc.GetById(preview, content.Key))
             .Returns(content);
@@ -155,11 +154,11 @@ public class PropertyValueConverterTests : DeliveryApiTests
         }
     }
 
-    protected void RegisterMediaWithProviders(IPublishedContent media)
+    protected void RegisterMediaWithProviders(IPublishedContent media, string url = "url-segment")
     {
         PublishedUrlProviderMock
             .Setup(p => p.GetUrl(media, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
-            .Returns(media.UrlSegment);
+            .Returns(url);
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(media.Key))
             .Returns(media);

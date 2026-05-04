@@ -1469,6 +1469,7 @@ export default {
 		noDiff: 'There are no differences between the current (draft) version and the selected version.',
 		contentRolledBack: 'Content has been rolled back',
 		documentRolledBack: 'Document has been rolled back',
+		elementRolledBack: 'Element has been rolled back',
 		headline: 'Select a version to compare with the current version',
 		htmlHelp:
 			'This displays the selected version as HTML, if you wish to see the difference between 2 versions at the same time, use the diff view',
@@ -1695,8 +1696,10 @@ export default {
 		insertPartialViewDesc:
 			"A partial view is a separate template file which can be rendered inside another template, it's great for reusing markup or for separating complex templates into separate files.",
 		mastertemplate: 'Master template',
+		layouttemplate: 'Layout template',
 		quickGuide: 'Quick guide to template tags',
 		noMaster: 'No master',
+		noLayout: 'No layout',
 		renderBody: 'Render child template',
 		renderBodyDesc: 'Renders the contents of a child template, by inserting a <code>@RenderBody()</code> placeholder.',
 		defineSection: 'Define a named section',
