@@ -14,7 +14,7 @@ test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.user.ensureNameNotExists(testUserName);
   await umbracoApi.resetAuthState();
   await umbracoUi.goToBackOffice();
-  await umbracoUi.login.isOnLoginPage();
+  await umbracoUi.login.isLoginPageVisible();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -35,7 +35,7 @@ test('cannot log in with invalid password', async ({umbracoUi}) => {
   await umbracoUi.login.loginWithCredentials(adminEmail, wrongPassword);
 
   // Assert
-  await umbracoUi.login.isOnLoginPage();
+  await umbracoUi.login.isLoginPageVisible();
   await umbracoUi.login.doesLoginErrorMessageHaveText(ConstantHelper.loginErrorMessages.invalidCredentials);
 });
 
@@ -44,7 +44,7 @@ test('cannot log in with unknown email', async ({umbracoUi}) => {
   await umbracoUi.login.loginWithCredentials(unknownEmail, adminPassword);
 
   // Assert
-  await umbracoUi.login.isOnLoginPage();
+  await umbracoUi.login.isLoginPageVisible();
   await umbracoUi.login.doesLoginErrorMessageHaveText(ConstantHelper.loginErrorMessages.invalidCredentials);
 });
 
@@ -53,8 +53,9 @@ test('cannot login with with empty account details', async ({umbracoUi}) => {
   await umbracoUi.login.clickLoginButton();
 
   // Assert
-  await umbracoUi.login.isOnLoginPage();
-  await umbracoUi.login.isBackOfficeMainVisible(false);
+  await umbracoUi.login.isLoginPageVisible();
+  await umbracoUi.login.doesUsernameInputErrorHaveText(ConstantHelper.loginErrorMessages.emptyEmail);
+  await umbracoUi.login.doesPasswordInputErrorHaveText(ConstantHelper.loginErrorMessages.emptyPassword);
 });
 
 test('cannot log in with disabled account', async ({umbracoApi, umbracoUi}) => {
@@ -71,7 +72,7 @@ test('cannot log in with disabled account', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.login.loginWithCredentials(testUserEmail, testUserPassword);
 
   // Assert
-  await umbracoUi.login.isOnLoginPage();
+  await umbracoUi.login.isLoginPageVisible();
   await umbracoUi.login.doesLoginErrorMessageHaveText(ConstantHelper.loginErrorMessages.lockedAccount);
 });
 
@@ -89,6 +90,6 @@ test('cannot log in with locked-out account', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.login.loginWithCredentials(testUserEmail, testUserPassword);
 
   // Assert
-  await umbracoUi.login.isOnLoginPage();
+  await umbracoUi.login.isLoginPageVisible();
   await umbracoUi.login.doesLoginErrorMessageHaveText(ConstantHelper.loginErrorMessages.lockedAccount);
 });

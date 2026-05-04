@@ -323,7 +323,9 @@
 
   public static readonly loginErrorMessages = {
     lockedAccount: 'Your account has been locked out. Please try again later.',
-    invalidCredentials: "Oops! We couldn't log you in. Please check your credentials and try again."
+    invalidCredentials: "Oops! We couldn't log you in. Please check your credentials and try again.",
+    emptyEmail: 'Please fill in an email',
+    emptyPassword: 'Please fill in a password'
   }
 
   public static readonly forgottenPasswordMessages = {

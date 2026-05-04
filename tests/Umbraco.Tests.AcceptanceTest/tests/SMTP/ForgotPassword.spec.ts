@@ -12,14 +12,14 @@ let testUserEmail: string;
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   const random = crypto.randomUUID();
   testUserName = `Test Forgot Password ${random}`;
-  testUserEmail =  `testforgot${random}@acceptance.test`;
+  testUserEmail = `testforgot${random}@acceptance.test`;
   const userGroup = await umbracoApi.userGroup.getByName(userGroupName);
   const userId = await umbracoApi.user.createDefaultUser(testUserName, testUserEmail, [userGroup.id]);
   await umbracoApi.user.updatePassword(userId, initialPassword);
   await umbracoApi.smtp.deleteAllEmails();
   await umbracoApi.resetAuthState();
   await umbracoUi.goToBackOffice();
-  await umbracoUi.login.isOnLoginPage();
+  await umbracoUi.login.isLoginPageVisible();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -28,7 +28,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.smtp.deleteAllEmails();
 });
 
-test('user can request a password reset email', async ({umbracoApi, umbracoUi}) => {
+test('can user request a password reset by email', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.login.submitForgotPasswordForEmail(testUserEmail);
 
@@ -39,7 +39,7 @@ test('user can request a password reset email', async ({umbracoApi, umbracoUi}) 
   expect(email.subject).toBe(resetEmailSubject);
 });
 
-test('user can reset password using link from email and log in with new password', async ({umbracoApi, umbracoUi}) => {
+test('can user reset password using link from email and log in with new password', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.login.submitForgotPasswordForEmail(testUserEmail);
   await umbracoUi.login.doesResetConfirmationHaveText(ConstantHelper.forgottenPasswordMessages.confirmation);
@@ -48,13 +48,13 @@ test('user can reset password using link from email and log in with new password
   const emailUrl = await umbracoApi.smtp.extractPasswordResetUrlForRecipient(testUserEmail);
   expect(emailUrl).not.toBeNull();
   await umbracoUi.login.goToResetPasswordFromEmailUrl(emailUrl!);
-  await umbracoUi.login.submitNewPassword(newPassword);
+  await umbracoUi.login.submitNewPassword(newPassword)
 
   // Assert 
   await umbracoUi.login.isNewPasswordSuccessVisible();
   await umbracoApi.resetAuthState();
   await umbracoUi.goToBackOffice();
-  await umbracoUi.login.isOnLoginPage();
+  await umbracoUi.login.isLoginPageVisible();
   await umbracoUi.login.loginWithCredentials(testUserEmail, newPassword);
   await umbracoUi.login.isBackOfficeMainVisible(true);
 });

@@ -18,6 +18,8 @@ export class LoginUiHelper extends UiBaseLocators {
   private readonly newPasswordContinueBtn: Locator;
   private readonly newPasswordSuccess: Locator;
   private readonly newPasswordErrorLayout: Locator;
+  private readonly usernameInputError: Locator;
+  private readonly passwordInputError: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -35,6 +37,8 @@ export class LoginUiHelper extends UiBaseLocators {
     this.newPasswordContinueBtn = page.locator('umb-new-password-layout uui-button[type="submit"]');
     this.newPasswordSuccess = page.locator('umb-new-password-page umb-confirmation-layout');
     this.newPasswordErrorLayout = page.locator('umb-new-password-page umb-error-layout');
+    this.usernameInputError = page.locator('#username-input-error');
+    this.passwordInputError = page.locator('#password-input-error');
   }
 
   async enterEmail(email: string) {
@@ -55,7 +59,7 @@ export class LoginUiHelper extends UiBaseLocators {
     await this.clickLoginButton();
   }
 
-  async isOnLoginPage(isVisible: boolean = true) {
+  async isLoginPageVisible(isVisible: boolean = true) {
     await this.isVisible(this.emailTxt, isVisible);
     await this.isVisible(this.passwordTxt, isVisible);
   }
@@ -69,9 +73,6 @@ export class LoginUiHelper extends UiBaseLocators {
   }
 
   async clickForgottenPasswordButton() {
-    // The button fires a non-bubbling custom event that the umb-auth listener can miss
-    // on slower headless runners (SPA stays on the login page). Retry the click via
-    // expect.poll until the reset-password email input is visible.
     await expect(async () => {
       if (!(await this.resetEmailTxt.isVisible())) {
         await this.click(this.forgottenPasswordBtn);
@@ -136,5 +137,13 @@ export class LoginUiHelper extends UiBaseLocators {
   async goToResetPasswordFromEmailUrl(emailUrl: string) {
     const search = new URL(emailUrl).search;
     await this.page.goto(umbracoConfig.environment.baseUrl + '/umbraco/login' + search);
+  }
+
+  async doesUsernameInputErrorHaveText(message: string) {
+    await this.containsText(this.usernameInputError, message);
+  }
+
+  async doesPasswordInputErrorHaveText(message: string) {
+    await this.containsText(this.passwordInputError, message);
   }
 }
