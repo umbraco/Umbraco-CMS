@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -57,58 +56,6 @@ public static class PublishedContentExtensions
         return culture != string.Empty && content.Cultures.TryGetValue(culture, out PublishedCultureInfo? infos)
             ? infos.Name
             : string.Empty;
-    }
-
-    #endregion
-
-    #region Url segment
-
-    /// <summary>
-    ///     Gets the URL segment of the content item.
-    /// </summary>
-    /// <param name="content">The content item.</param>
-    /// <param name="variationContextAccessor"></param>
-    /// <param name="culture">
-    ///     The specific culture to get the URL segment for. If null is used the current culture is used
-    ///     (Default is null).
-    /// </param>
-    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 18.")]
-    public static string? UrlSegment(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
-    {
-        ArgumentNullException.ThrowIfNull(content);
-
-        // The obsolete accessor only meaningfully applies to documents — the documented replacement is
-        // IDocumentUrlService, and media/members never had user-facing URL segments.
-        if (content.ItemType != PublishedItemType.Content)
-        {
-            return null;
-        }
-
-        string effectiveCulture = content.ContentType.VariesByCulture() is false
-            ? string.Empty
-            : culture ?? variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
-
-        // Variant content with no resolved culture has no associated segment; avoid an unnecessary
-        // ILanguageService.GetAsync("") lookup inside the service.
-        if (content.ContentType.VariesByCulture() && effectiveCulture.Length == 0)
-        {
-            return null;
-        }
-
-        // Use IDocumentUrlService to get the URL segment, aligning with the non-obsolete recommended approach.
-        // Fall back to in-memory lookup when the service isn't usable — either DI hasn't been bootstrapped
-        // (unit tests) or the service hasn't been initialised (integration tests not running full Umbraco
-        // startup). In production both hold.
-        IDocumentUrlService? documentUrlService = StaticServiceProvider.Instance?.GetService<IDocumentUrlService>();
-        if (documentUrlService is null || documentUrlService.IsInitialized is false)
-        {
-            return content.Cultures.TryGetValue(effectiveCulture, out PublishedCultureInfo? infos)
-                ? infos.UrlSegment
-                : null;
-        }
-
-        var isDraft = content.IsDraft(effectiveCulture.Length == 0 ? null : effectiveCulture);
-        return documentUrlService.GetUrlSegment(content.Key, effectiveCulture, isDraft);
     }
 
     #endregion
