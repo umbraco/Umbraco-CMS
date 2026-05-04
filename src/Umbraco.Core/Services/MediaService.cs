@@ -1280,7 +1280,7 @@ namespace Umbraco.Cms.Core.Services
             //media.Path = (parent == null ? "-1" : parent.Path) + "," + media.Id;
             //media.SortOrder = ((MediaRepository) repository).NextChildSortOrder(parentId);
             //media.Level += levelDelta;
-            PerformMoveMediaLocked(media, trash);
+            PerformMoveMediaLocked(media, userId, trash);
 
             // if uow is not immediate, content.Path will be updated only when the UOW commits,
             // and because we want it now, we have to calculate it by ourselves
@@ -1302,7 +1302,7 @@ namespace Umbraco.Cms.Core.Services
                     // update path and level since we do not update parentId
                     descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
                     descendant.Level += levelDelta;
-                    PerformMoveMediaLocked(descendant, trash);
+                    PerformMoveMediaLocked(descendant, userId, trash);
                 }
 
             }
@@ -1313,16 +1313,21 @@ namespace Umbraco.Cms.Core.Services
         ///     Performs the actual save of a media item during a move operation while holding a write lock.
         /// </summary>
         /// <param name="media">The media item to save.</param>
+        /// <param name="userId">The identifier of the user performing the move.</param>
         /// <param name="trash">
         ///     If <c>true</c>, marks the item as trashed; if <c>false</c>, marks the item as not trashed;
         ///     if <c>null</c>, leaves the trashed status unchanged.
         /// </param>
-        private void PerformMoveMediaLocked(IMedia media, bool? trash)
+        private void PerformMoveMediaLocked(IMedia media, int userId, bool? trash)
         {
             if (trash.HasValue)
             {
                 ((ContentBase)media).Trashed = trash.Value;
             }
+
+            // Track who moved/trashed the item so the audit trail (and any consumer of WriterId)
+            // reflects the acting user, not the original creator. Mirrors PerformMoveContentLocked.
+            media.WriterId = userId;
 
             _mediaRepository.Save(media);
         }
