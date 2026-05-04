@@ -2,7 +2,6 @@ using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Umbraco.Cms.Core;
 
 namespace Umbraco.Extensions;
 
@@ -74,50 +73,6 @@ public static class EndpointRouteBuilderExtensions
         object? constraints = null)
         where T : ControllerBase
         => endpoints.MapUmbracoRoute(typeof(T), rootSegment, areaName, prefixPathSegment, defaultAction, includeControllerNameInRoute, constraints);
-
-    /// <summary>
-    ///     Used to map controllers as Umbraco API routes consistently
-    /// </summary>
-    /// <typeparam name="T">The <see cref="ControllerBase" /> type to route</typeparam>
-    public static void MapUmbracoApiRoute<T>(
-        this IEndpointRouteBuilder endpoints,
-        string rootSegment,
-        string areaName,
-        bool isBackOffice,
-        string defaultAction = "Index",
-        object? constraints = null)
-        where T : ControllerBase
-        => endpoints.MapUmbracoApiRoute(typeof(T), rootSegment, areaName, isBackOffice, defaultAction, constraints);
-
-    /// <summary>
-    ///     Used to map controllers as Umbraco API routes consistently
-    /// </summary>
-    public static void MapUmbracoApiRoute(
-        this IEndpointRouteBuilder endpoints,
-        Type controllerType,
-        string rootSegment,
-        string? areaName,
-        bool isBackOffice,
-        string defaultAction = "Index",
-        object? constraints = null)
-    {
-        var prefixPathSegment = isBackOffice
-            ? areaName.IsNullOrWhiteSpace()
-                ? $"{Constants.Web.Mvc.BackOfficePathSegment}/Api"
-                : $"{Constants.Web.Mvc.BackOfficePathSegment}/{areaName}"
-            : areaName.IsNullOrWhiteSpace()
-                ? "Api"
-                : areaName;
-
-        endpoints.MapUmbracoRoute(
-            controllerType,
-            rootSegment,
-            areaName,
-            prefixPathSegment,
-            defaultAction,
-            true,
-            constraints);
-    }
 
     public static void MapUmbracoSurfaceRoute(
         this IEndpointRouteBuilder endpoints,

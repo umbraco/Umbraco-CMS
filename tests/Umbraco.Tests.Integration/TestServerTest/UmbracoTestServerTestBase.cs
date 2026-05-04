@@ -161,18 +161,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             _factoryCache.Clear();
         }
 
-        /// <summary>
-        /// Prepare a url before using <see cref="Client"/>.
-        /// This returns the url but also sets the HttpContext.request into to use this url.
-        /// </summary>
-        /// <returns>The string URL of the controller action.</returns>
-        protected string PrepareApiControllerUrl<T>(Expression<Func<T, object>> methodSelector)
-            where T : UmbracoApiController
-        {
-            var url = LinkGenerator.GetUmbracoApiService(methodSelector);
-            return PrepareUrl(url);
-        }
-
         protected string GetManagementApiUrl<T>(Expression<Func<T, object>> methodSelector)
             where T : ManagementApiControllerBase
         {
