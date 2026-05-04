@@ -69,6 +69,13 @@ public class DocumentPublishStatusService :
 
     /// <inheritdoc/>
     public bool HasPublishedAncestorPath(Guid contentKey)
+        => HasPublishedAncestorPathInternal(contentKey, culture: null);
+
+    /// <inheritdoc/>
+    public bool HasPublishedAncestorPath(Guid contentKey, string culture)
+        => HasPublishedAncestorPathInternal(contentKey, culture);
+
+    private bool HasPublishedAncestorPathInternal(Guid contentKey, string? culture)
     {
         var success = _documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out IEnumerable<Guid> keys);
         if (success is false)
@@ -81,7 +88,11 @@ public class DocumentPublishStatusService :
 
         foreach (Guid key in keys)
         {
-            if (IsPublishedInAnyCulture(key) is false)
+            var isPublished = culture is null
+                ? IsPublishedInAnyCulture(key)
+                : IsPublished(key, culture);
+
+            if (isPublished is false)
             {
                 return false;
             }
