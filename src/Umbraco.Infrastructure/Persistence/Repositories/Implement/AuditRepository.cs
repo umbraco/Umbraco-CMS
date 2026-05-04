@@ -61,7 +61,7 @@ internal sealed class AuditRepository : AsyncEntityRepositoryBase<int, IAuditIte
         AuditType[]? auditTypeFilter = null,
         CancellationToken cancellationToken = default)
         => GetPagedInternalAsync(
-            q => q,
+            query => query,
             skip,
             take,
             orderDirection,
@@ -79,7 +79,7 @@ internal sealed class AuditRepository : AsyncEntityRepositoryBase<int, IAuditIte
         AuditType[]? auditTypeFilter = null,
         CancellationToken cancellationToken = default)
         => GetPagedInternalAsync(
-            q => q.Where(x => x.NodeId == entityId),
+            query => query.Where(x => x.NodeId == entityId),
             skip,
             take,
             orderDirection,
@@ -97,7 +97,7 @@ internal sealed class AuditRepository : AsyncEntityRepositoryBase<int, IAuditIte
         AuditType[]? auditTypeFilter = null,
         CancellationToken cancellationToken = default)
         => GetPagedInternalAsync(
-            q => q.Where(x => x.UserId == userId),
+            query => query.Where(x => x.UserId == userId),
             skip,
             take,
             orderDirection,

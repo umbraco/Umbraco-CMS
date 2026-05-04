@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
@@ -48,9 +49,9 @@ internal sealed class AuditEntryRepository : AsyncEntityRepositoryBase<int, IAud
             long total = await db.AuditEntries.LongCountAsync();
 
             List<AuditEntryDto> dtos = await db.AuditEntries
-                .Skip((int)(pageIndex * pageCount))
-                .Take(pageCount)
                 .OrderByDescending(x => x.EventDate)
+                .BigSkip(pageIndex * pageCount)
+                .Take(pageCount)
                 .ToListAsync();
 
             return new PagedModel<IAuditEntry>(total, dtos.Select(AuditEntryFactory.BuildEntity));
