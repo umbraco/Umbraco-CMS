@@ -198,24 +198,7 @@ public class TagsPropertyEditor : DataEditor, IValueSchemaProvider
                 return null;
             }
 
-            // Prefer DataTypeKey directly when set; fall back to mapping the int DataTypeId via IIdKeyMap.
-            // Either branch may yield no key, in which case dataType stays null and a default TagConfiguration is used below.
-            IDataType? dataType = null;
-            Guid dataTypeKey = property.PropertyType.DataTypeKey;
-            if (dataTypeKey == Guid.Empty)
-            {
-                Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(property.PropertyType.DataTypeId, UmbracoObjectTypes.DataType);
-                if (keyAttempt.Success)
-                {
-                    dataTypeKey = keyAttempt.Result;
-                }
-            }
-
-            if (dataTypeKey != Guid.Empty)
-            {
-                dataType = _dataTypeService.GetAsync(dataTypeKey).GetAwaiter().GetResult();
-            }
-
+            IDataType? dataType = property.PropertyType.GetDataType(_dataTypeService, _idKeyMap);
             TagConfiguration configuration = dataType?.ConfigurationObject as TagConfiguration ?? new TagConfiguration();
             var tags = ParseTags(val, configuration);
 

@@ -92,7 +92,7 @@ public class PropertyValidationService : IPropertyValidationService
             throw new ArgumentNullException(nameof(propertyType));
         }
 
-        IDataType? dataType = GetDataType(propertyType);
+        IDataType? dataType = propertyType.GetDataType(_dataTypeService, _idKeyMap);
         if (dataType == null)
         {
             throw new InvalidOperationException("No data type found by id " + propertyType.DataTypeId);
@@ -304,28 +304,10 @@ public class PropertyValidationService : IPropertyValidationService
             return true;
         }
 
-        var configuration = GetDataType(propertyType)?.ConfigurationObject;
+        var configuration = propertyType.GetDataType(_dataTypeService, _idKeyMap)?.ConfigurationObject;
         IDataValueEditor valueEditor = editor.GetValueEditor(configuration);
 
         return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp, validationContext).Any();
-    }
-
-    private IDataType? GetDataType(IPropertyType propertyType)
-    {
-        // Prefer DataTypeKey directly when set; fall back to mapping the int DataTypeId via IIdKeyMap.
-        Guid dataTypeKey = propertyType.DataTypeKey;
-        if (dataTypeKey == Guid.Empty)
-        {
-            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
-            if (keyAttempt.Success is false)
-            {
-                return null;
-            }
-
-            dataTypeKey = keyAttempt.Result;
-        }
-
-        return _dataTypeService.GetAsync(dataTypeKey).GetAwaiter().GetResult();
     }
 
     private IDataEditor? GetDataEditor(IPropertyType propertyType)

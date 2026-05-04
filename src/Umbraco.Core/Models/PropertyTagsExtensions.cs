@@ -32,7 +32,7 @@ public static class PropertyTagsExtensions
         IDataEditor? editor = propertyEditors[property.PropertyType?.PropertyEditorAlias];
         TagsPropertyEditorAttribute? tagAttribute = GetTagAttribute(editor);
 
-        var configurationObject = GetDataType(property.PropertyType, dataTypeService, idKeyMap)?.ConfigurationObject;
+        var configurationObject = property.PropertyType?.GetDataType(dataTypeService, idKeyMap)?.ConfigurationObject;
         TagConfiguration? configuration = configurationObject as TagConfiguration;
 
         if (configuration is not null && configuration.Delimiter == default)
@@ -52,29 +52,6 @@ public static class PropertyTagsExtensions
             propertyEditors,
             dataTypeService,
             StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>());
-
-    private static IDataType? GetDataType(IPropertyType? propertyType, IDataTypeService dataTypeService, IIdKeyMap idKeyMap)
-    {
-        if (propertyType is null)
-        {
-            return null;
-        }
-
-        // Prefer DataTypeKey directly when set; fall back to mapping the int DataTypeId via IIdKeyMap.
-        Guid dataTypeKey = propertyType.DataTypeKey;
-        if (dataTypeKey == Guid.Empty)
-        {
-            Attempt<Guid> keyAttempt = idKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
-            if (keyAttempt.Success is false)
-            {
-                return null;
-            }
-
-            dataTypeKey = keyAttempt.Result;
-        }
-
-        return dataTypeService.GetAsync(dataTypeKey).GetAwaiter().GetResult();
-    }
 
     /// <summary>
     ///     Gets the tags property editor attribute from the data editor.

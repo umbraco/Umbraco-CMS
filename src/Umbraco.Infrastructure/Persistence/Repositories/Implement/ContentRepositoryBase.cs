@@ -359,7 +359,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue; // not implementing IDataValueTags, continue
                 }
 
-                object? configurationObject = GetConfigurationObject(property.PropertyType);
+                object? configurationObject = property.PropertyType.GetDataType(DataTypeService, IdKeyMap)?.ConfigurationObject;
 
                 if (property.PropertyType.VariesByCulture())
                 {
@@ -388,32 +388,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected void ClearEntityTags(IContentBase entity, ITagRepository tagRepo)
         {
             tagRepo.RemoveAll(entity.Id);
-        }
-
-        /// <summary>
-        /// Gets the configuration object for the data type referenced by the given property type.
-        /// </summary>
-        /// <remarks>
-        /// Resolves the int data type ID via <see cref="IIdKeyMap"/> to a GUID key, then loads the
-        /// data type via <see cref="IDataTypeService.GetAsync(Guid)"/>. Returns <c>null</c> if the
-        /// id-to-key lookup fails or the data type cannot be found.
-        /// </remarks>
-        private object? GetConfigurationObject(IPropertyType propertyType)
-        {
-            // Prefer DataTypeKey directly when set; fall back to mapping the int DataTypeId via IIdKeyMap.
-            Guid dataTypeKey = propertyType.DataTypeKey;
-            if (dataTypeKey == Guid.Empty)
-            {
-                Attempt<Guid> keyAttempt = IdKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
-                if (keyAttempt.Success is false)
-                {
-                    return null;
-                }
-
-                dataTypeKey = keyAttempt.Result;
-            }
-
-            return DataTypeService.GetAsync(dataTypeKey).GetAwaiter().GetResult()?.ConfigurationObject;
         }
 
         #endregion
@@ -449,7 +423,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue;
                 }
 
-                object? configurationObject = GetConfigurationObject(property.PropertyType);
+                object? configurationObject = property.PropertyType.GetDataType(DataTypeService, IdKeyMap)?.ConfigurationObject;
 
                 // Set sortable values for each matching DTO
                 foreach (PropertyDataDto dto in dtos)
