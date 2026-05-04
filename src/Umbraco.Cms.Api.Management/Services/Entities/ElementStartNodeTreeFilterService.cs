@@ -6,18 +6,18 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Api.Management.Services.Entities;
 
 /// <summary>
-/// User start node tree filter service for document (content) trees.
-/// Resolves the current user's content start nodes.
+/// User start node tree filter service for element trees.
+/// Resolves the current user's element start nodes.
 /// </summary>
-internal sealed class DocumentStartNodeTreeFilterService : UserStartNodeTreeFilterService, IDocumentStartNodeTreeFilterService
+internal sealed class ElementStartNodeTreeFilterService : UserStartNodeTreeFilterService, IElementStartNodeTreeFilterService
 {
-    private static readonly UmbracoObjectTypes[] _treeObjectTypes = [UmbracoObjectTypes.Document];
+    private static readonly UmbracoObjectTypes[] _treeObjectTypes = [UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer];
 
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
 
-    public DocumentStartNodeTreeFilterService(
+    public ElementStartNodeTreeFilterService(
         IUserStartNodeEntitiesService userStartNodeEntitiesService,
         IDataTypeService dataTypeService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
@@ -38,7 +38,7 @@ internal sealed class DocumentStartNodeTreeFilterService : UserStartNodeTreeFilt
         => _backOfficeSecurityAccessor
                .BackOfficeSecurity?
                .CurrentUser?
-               .CalculateContentStartNodeIds(_entityService, _appCaches)
+               .CalculateElementStartNodeIds(_entityService, _appCaches)
            ?? [];
 
     /// <inheritdoc />
@@ -46,6 +46,6 @@ internal sealed class DocumentStartNodeTreeFilterService : UserStartNodeTreeFilt
         => _backOfficeSecurityAccessor
                .BackOfficeSecurity?
                .CurrentUser?
-               .GetContentStartNodePaths(_entityService, _appCaches)
+               .GetElementStartNodePaths(_entityService, _appCaches)
            ?? [];
 }
