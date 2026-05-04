@@ -33,6 +33,7 @@ public static class FriendlyPublishedContentExtensions
     private static IPublishedValueFallback? _publishedValueFallback;
     private static IMediaTypeService? _mediaTypeService;
     private static IMemberTypeService? _memberTypeService;
+    private static IDocumentUrlService? _documentUrlService;
 
     private static IVariationContextAccessor VariationContextAccessor
     {
@@ -187,6 +188,15 @@ public static class FriendlyPublishedContentExtensions
         }
     }
 
+    private static IDocumentUrlService DocumentUrlService
+    {
+        get
+        {
+            _documentUrlService ??= StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
+            return _documentUrlService;
+        }
+    }
+
     internal static void Reset()
     {
         _variationContextAccessor = null;
@@ -206,6 +216,7 @@ public static class FriendlyPublishedContentExtensions
         _publishedValueFallback = null;
         _mediaTypeService = null;
         _memberTypeService = null;
+        _documentUrlService = null;
     }
 
     private static INavigationQueryService GetNavigationQueryService(IPublishedContent content)
@@ -264,13 +275,21 @@ public static class FriendlyPublishedContentExtensions
     ///     The specific culture to get the URL segment for. If null is used the current culture is used
     ///     (Default is null).
     /// </param>
-    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 20.")]
+    /// <remarks>
+    ///     Convenience wrapper around <see cref="IDocumentUrlService.GetUrlSegment"/> for use in Razor templates
+    ///     where injecting the service directly is awkward. Preview state is detected via the ambient
+    ///     <see cref="IUmbracoContext"/>.
+    /// </remarks>
     public static string? UrlSegment(
         this IPublishedContent content,
         string? culture = null)
-#pragma warning disable CS0618 // Type or member is obsolete
-        => PublishedContentUrlSegmentResolver.Resolve(content, VariationContextAccessor, culture);
-#pragma warning restore CS0618 // Type or member is obsolete
+    {
+        ArgumentNullException.ThrowIfNull(content);
+
+        var resolvedCulture = culture ?? VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
+        var isDraft = UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext) && umbracoContext.InPreviewMode;
+        return DocumentUrlService.GetUrlSegment(content.Key, resolvedCulture, isDraft);
+    }
 
     /// <summary>
     ///     Gets the culture date of the content item.
