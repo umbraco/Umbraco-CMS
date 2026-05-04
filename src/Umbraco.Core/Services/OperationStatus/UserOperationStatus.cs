@@ -91,6 +91,11 @@ public enum UserOperationStatus
     CannotDelete,
 
     /// <summary>
+    ///     The operation failed because the user has logged in before, and therefore might be referenced in audit logs etc.
+    /// </summary>
+    CannotDeleteUserHasLoggedIn,
+
+    /// <summary>
     ///     The operation failed because the current user cannot disable themselves.
     /// </summary>
     CannotDisableSelf,
