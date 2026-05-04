@@ -19,13 +19,13 @@ public class ChildrenTemplateTreeControllerTests : ManagementApiUserGroupTestBas
     {
         // Parent Template
         var parentTemplate = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
-        parentTemplate.IsMasterTemplate = true;
+        parentTemplate.IsLayoutTemplate = true;
         var responseParent = await TemplateService.CreateAsync(parentTemplate, Constants.Security.SuperUserKey);
         _parentTemplateKey = responseParent.Result.Key;
 
         // Child Template
         var childTemplate = TemplateBuilder.CreateTextPageTemplate(Guid.NewGuid().ToString());
-        childTemplate.MasterTemplateAlias = parentTemplate.Alias;
+        childTemplate.LayoutTemplateAlias = parentTemplate.Alias;
         await TemplateService.CreateAsync(childTemplate, Constants.Security.SuperUserKey);
     }
 
