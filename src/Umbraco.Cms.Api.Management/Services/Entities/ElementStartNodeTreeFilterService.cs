@@ -11,6 +11,8 @@ namespace Umbraco.Cms.Api.Management.Services.Entities;
 /// </summary>
 internal sealed class ElementStartNodeTreeFilterService : UserStartNodeTreeFilterService, IElementStartNodeTreeFilterService
 {
+    private static readonly UmbracoObjectTypes[] _treeObjectTypes = [UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer];
+
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
@@ -29,10 +31,7 @@ internal sealed class ElementStartNodeTreeFilterService : UserStartNodeTreeFilte
     }
 
     /// <inheritdoc />
-    protected override UmbracoObjectTypes TreeObjectType => UmbracoObjectTypes.Element;
-
-    /// <inheritdoc />
-    protected override UmbracoObjectTypes[] TreeObjectTypes => field ??= [UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer];
+    protected override UmbracoObjectTypes[] TreeObjectTypes => _treeObjectTypes;
 
     /// <inheritdoc />
     protected override int[] CalculateUserStartNodeIds()
