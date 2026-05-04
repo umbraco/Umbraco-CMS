@@ -187,7 +187,7 @@ test('can publish element with publish permission enabled', async ({umbracoApi, 
   await umbracoUi.library.clickConfirmToPublishButton();
 
   // Assert
-  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.elementPublished);
   expect(await umbracoApi.element.isElementPublished(elementId)).toBeTruthy();
 });
 
@@ -220,7 +220,7 @@ test('can unpublish element with unpublish permission enabled', async ({umbracoA
   await umbracoUi.library.clickConfirmToUnpublishButton();
 
   // Assert
-  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.elementUnpublished);
   expect(await umbracoApi.element.isElementPublished(elementId)).toBeFalsy();
 });
 
