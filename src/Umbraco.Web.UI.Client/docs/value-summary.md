@@ -13,7 +13,7 @@ Defines the `valueSummary` extension type and provides base classes, a batching 
 
 ```typescript
 interface ManifestValueSummary
-  extends ManifestElementAndApi<UmbValueSummaryElement, UmbValueSummaryApi> {
+  extends ManifestElementAndApi<UmbValueSummaryElement, UmbValueSummaryApi<unknown>> {
   type: 'valueSummary';
   forValueType: keyof UmbValueTypeMap;
   valueResolver?: UmbValueSummaryResolverLoaderProperty;

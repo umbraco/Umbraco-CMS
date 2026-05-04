@@ -29,13 +29,13 @@ describe('UmbValueSummaryDefaultApi', () => {
 	});
 
 	it('should expose a value observable', () => {
-		const api = new UmbValueSummaryDefaultApi(host);
+		const api = new UmbValueSummaryDefaultApi<string>(host);
 		expect(api).to.have.property('value').that.is.instanceOf(Observable);
 		api.destroy();
 	});
 
 	it('should pass raw value through when no coordinator is available', async () => {
-		const api = new UmbValueSummaryDefaultApi(host);
+		const api = new UmbValueSummaryDefaultApi<string>(host);
 		api.valueType = 'Umb.Test.NoCoordinator';
 		api.rawValue = 'hello';
 
@@ -52,7 +52,7 @@ describe('UmbValueSummaryDefaultApi', () => {
 	});
 
 	it('should not connect until valueType is set', async () => {
-		const api = new UmbValueSummaryDefaultApi(host);
+		const api = new UmbValueSummaryDefaultApi<string>(host);
 		api.rawValue = 'test';
 
 		// Wait for microtask
@@ -93,7 +93,7 @@ describe('UmbValueSummaryDefaultApi', () => {
 		const child = document.createElement('test-api-base-host') as TestHostElement;
 		host.appendChild(child);
 
-		const api = new UmbValueSummaryDefaultApi(child);
+		const api = new UmbValueSummaryDefaultApi<string>(child);
 		api.valueType = valueType;
 		api.rawValue = 'test';
 
@@ -135,7 +135,7 @@ describe('UmbValueSummaryDefaultApi', () => {
 		const child = document.createElement('test-api-base-host') as TestHostElement;
 		host.appendChild(child);
 
-		const api = new UmbValueSummaryDefaultApi(child);
+		const api = new UmbValueSummaryDefaultApi<string>(child);
 
 		// Set both properties in same tick
 		api.valueType = valueType;

@@ -4,6 +4,6 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 /**
  * Element API for value summary extensions.
  */
-export interface UmbValueSummaryApi extends UmbApi {
-	readonly value: Observable<unknown>;
+export interface UmbValueSummaryApi<ValueType> extends UmbApi {
+	readonly value: Observable<ValueType | undefined>;
 }

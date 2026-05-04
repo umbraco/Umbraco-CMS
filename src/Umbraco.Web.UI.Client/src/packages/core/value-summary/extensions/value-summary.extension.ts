@@ -11,7 +11,10 @@ export type UmbValueSummaryResolverLoaderProperty =
 	| (() => Promise<UmbValueSummaryResolverModule>)
 	| ClassConstructor<UmbValueSummaryResolver>;
 
-export interface ManifestValueSummary extends ManifestElementAndApi<UmbValueSummaryElement, UmbValueSummaryApi> {
+export interface ManifestValueSummary extends ManifestElementAndApi<
+	UmbValueSummaryElement,
+	UmbValueSummaryApi<unknown>
+> {
 	type: 'valueSummary';
 	/**
 	 * The value type this summary is registered for.

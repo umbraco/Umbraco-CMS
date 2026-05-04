@@ -13,13 +13,16 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
  *
  * Extend this class to create custom value summary APIs.
  */
-export abstract class UmbValueSummaryApiBase extends UmbControllerBase implements UmbValueSummaryApi {
-	#value = new UmbObjectState<unknown>(undefined);
-	readonly value: Observable<unknown> = this.#value.asObservable();
+export abstract class UmbValueSummaryApiBase<ValueType>
+	extends UmbControllerBase
+	implements UmbValueSummaryApi<ValueType>
+{
+	#value = new UmbObjectState<ValueType | undefined>(undefined);
+	readonly value: Observable<ValueType | undefined> = this.#value.asObservable();
 
 	#coordinator?: typeof UMB_VALUE_SUMMARY_COORDINATOR_CONTEXT.TYPE;
 	#valueType?: string;
-	#rawValue?: unknown;
+	#rawValue?: ValueType;
 	#connectPending = false;
 
 	constructor(host: UmbControllerHost) {
@@ -35,7 +38,7 @@ export abstract class UmbValueSummaryApiBase extends UmbControllerBase implement
 		this.#scheduleConnect();
 	}
 
-	set rawValue(v: unknown) {
+	set rawValue(v: ValueType | undefined) {
 		this.#rawValue = v;
 		this.#scheduleConnect();
 	}
@@ -56,7 +59,7 @@ export abstract class UmbValueSummaryApiBase extends UmbControllerBase implement
 			this.#coordinator.register(this.#valueType, this.#rawValue);
 			this.observe(
 				this.#coordinator.observeResolvedValue(this.#valueType, this.#rawValue),
-				(v) => this.#value.setValue(v),
+				(v) => this.#value.setValue(v as ValueType | undefined),
 				'value',
 			);
 		} else {
