@@ -44,6 +44,11 @@ public class BackOfficeLoginController : Controller
     /// </returns>
     public async Task<IActionResult> Index(CancellationToken cancellationToken, BackOfficeLoginModel model)
     {
+        if (ModelState.IsValid is false)
+        {
+            return BadRequest(ModelState);
+        }
+
         AuthenticateResult cookieAuthResult = await HttpContext.AuthenticateAsync(Constants.Security.BackOfficeAuthenticationType);
         if (cookieAuthResult.Succeeded)
         {
