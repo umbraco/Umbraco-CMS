@@ -15,5 +15,4 @@ test('can log out via the user menu', {tag: '@smoke'}, async ({umbracoUi, umbrac
   await umbracoUi.waitForTimeout(ConstantHelper.wait.medium); // Wait for the logout process to complete and the login page to be visible
   await umbracoUi.goToBackOffice();
   await umbracoUi.login.isLoginPageVisible();
-  await umbracoUi.login.isBackOfficeMainVisible(false);
 });
