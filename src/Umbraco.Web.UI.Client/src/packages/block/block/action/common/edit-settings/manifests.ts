@@ -1,7 +1,4 @@
-import {
-	UMB_BLOCK_ENTRY_HAS_SETTINGS_CONDITION_ALIAS,
-	UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS,
-} from '../../../conditions/constants.js';
+import { UMB_BLOCK_ENTRY_HAS_SETTINGS_CONDITION_ALIAS } from '../../../conditions/constants.js';
 import { UMB_BLOCK_ACTION_EDIT_SETTINGS_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -16,9 +13,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			icon: 'icon-settings',
 			label: '#general_settings',
 		},
-		conditions: [
-			{ alias: UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS, match: false },
-			{ alias: UMB_BLOCK_ENTRY_HAS_SETTINGS_CONDITION_ALIAS },
-		],
+		conditions: [{ alias: UMB_BLOCK_ENTRY_HAS_SETTINGS_CONDITION_ALIAS }],
 	},
 ];
