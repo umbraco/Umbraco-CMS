@@ -6,9 +6,19 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { ElementService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 
+/**
+ * A data source that fetches element search results from the server.
+ * @class UmbElementSearchServerDataSource
+ * @implements {UmbSearchDataSource<UmbElementSearchItemModel>}
+ */
 export class UmbElementSearchServerDataSource implements UmbSearchDataSource<UmbElementSearchItemModel> {
 	#host: UmbControllerHost;
 
+	/**
+	 * Creates an instance of UmbElementSearchServerDataSource.
+	 * @param {UmbControllerHost} host - The controller host for this controller to be appended to
+	 * @memberof UmbElementSearchServerDataSource
+	 */
 	constructor(host: UmbControllerHost) {
 		this.#host = host;
 	}
@@ -34,6 +44,12 @@ export class UmbElementSearchServerDataSource implements UmbSearchDataSource<Umb
 		return { data: ancestorsByItemId };
 	}
 
+	/**
+	 * Search for elements matching the given query, including ancestor chains for breadcrumb rendering.
+	 * @param {UmbSearchRequestArgs} args - The arguments for the search
+	 * @returns {*}
+	 * @memberof UmbElementSearchServerDataSource
+	 */
 	async search(args: UmbSearchRequestArgs) {
 		const { data, error } = await tryExecute(
 			this.#host,
@@ -54,7 +70,7 @@ export class UmbElementSearchServerDataSource implements UmbSearchDataSource<Umb
 			const mappedItems: Array<UmbElementSearchItemModel> = data.items.map((item) => ({
 				entityType: UMB_ELEMENT_ENTITY_TYPE,
 				unique: item.id,
-				name: item.variants[0]?.name ?? '',
+				name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
 				href: UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateAbsolute({ unique: item.id }),
 				documentType: {
 					unique: item.documentType.id,
