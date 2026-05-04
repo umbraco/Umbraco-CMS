@@ -13,8 +13,8 @@ export class UmbElementFolderUserPermissionCondition
 {
 	#entityType: string | undefined;
 	#unique: string | null | undefined;
-	#elementFolderPermissions: Array<ElementContainerPermissionPresentationModel> = [];
-	#fallbackPermissions: string[] = [];
+	#elementFolderPermissions?: Array<ElementContainerPermissionPresentationModel>;
+	#fallbackPermissions?: Array<string>;
 	#ancestors: Array<UmbEntityUnique> = [];
 
 	constructor(
@@ -27,8 +27,8 @@ export class UmbElementFolderUserPermissionCondition
 			this.observe(
 				context?.currentUser,
 				(currentUser) => {
-					this.#elementFolderPermissions = currentUser?.permissions?.filter(this.#isElementFolderUserPermission) || [];
-					this.#fallbackPermissions = currentUser?.fallbackPermissions || [];
+					this.#elementFolderPermissions = currentUser?.permissions?.filter(this.#isElementFolderUserPermission);
+					this.#fallbackPermissions = currentUser?.fallbackPermissions;
 					this.#checkPermissions();
 				},
 				'umbUserPermissionConditionObserver',
@@ -67,6 +67,11 @@ export class UmbElementFolderUserPermissionCondition
 	#checkPermissions() {
 		if (!this.#entityType) return;
 		if (this.#unique === undefined) return;
+
+		// Wait until the current user's permissions have loaded before evaluating,
+		// so we don't permit/deny based on incomplete data.
+		if (this.#elementFolderPermissions === undefined) return;
+		if (this.#fallbackPermissions === undefined) return;
 
 		const hasElementFolderPermissions = this.#elementFolderPermissions.length > 0;
 
