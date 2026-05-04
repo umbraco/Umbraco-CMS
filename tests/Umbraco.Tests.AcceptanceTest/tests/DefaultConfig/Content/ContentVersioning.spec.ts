@@ -85,7 +85,7 @@ test('can rollback to a previous version from the tree action menu', async ({umb
 
 test('can rollback variant content to a previous published version', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  contentId = await umbracoApi.document.createPublishedVariantDocumentWithTwoTextVersions(contentName, documentTypeName, dataTypeName, originalText, updatedText);
+  contentId = await umbracoApi.document.createPublishedEnglishCultureDocumentWithTwoTextVersions(contentName, documentTypeName, dataTypeName, originalText, updatedText);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
