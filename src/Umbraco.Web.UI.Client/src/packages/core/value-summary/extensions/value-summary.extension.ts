@@ -22,7 +22,7 @@ export interface ManifestValueSummary extends ManifestElementAndApi<UmbValueSumm
 	 * Used by the coordinator for efficient batching across multiple elements.
 	 */
 	valueResolver?: UmbValueSummaryResolverLoaderProperty;
-	meta: MetaValueSummary;
+	meta?: MetaValueSummary;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
