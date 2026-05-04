@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Security;
@@ -77,11 +76,15 @@ public sealed class ConfigureMemberCookieOptions : IConfigureNamedOptions<Cookie
             },
             OnRedirectToAccessDenied = context =>
             {
-                // TODO: rewrite this to match OnRedirectToLogin (with a 403 status code) when UmbracoApiController is removed
-                // When the controller is an UmbracoAPIController, or if the request is an XHR, we want to return a
-                // StatusCode instead of a redirect.
-                // All other cases should use the default Redirect of the CookieAuthenticationEvent.
-                if (IsXhr(context.Request) is false && IsUmbracoApiControllerRequest(context.HttpContext) is false)
+                // For XHR/API callers, return a 403 (with the access-denied URL in Location) instead of
+                // a 302 redirect — Ajax/JSON callers can't follow a redirect to a Razor access-denied page.
+                // Browser navigations fall through to the framework default, which redirects to AccessDeniedPath.
+                if (IsXhr(context.Request) || IsApiRequest(context.HttpContext))
+                {
+                    context.Response.Headers.Location = context.RedirectUri;
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                }
+                else
                 {
                     new CookieAuthenticationEvents().OnRedirectToAccessDenied(context);
                 }
@@ -91,15 +94,10 @@ public sealed class ConfigureMemberCookieOptions : IConfigureNamedOptions<Cookie
         };
         return;
 
-        bool IsUmbracoApiControllerRequest(HttpContext context)
-            => context.GetEndpoint()
-                ?.Metadata
-                .OfType<ControllerActionDescriptor>()
-                .FirstOrDefault()
-                ?.ControllerTypeInfo
-                .IsSubclassOf(typeof(UmbracoApiController)) is true;
+        static bool IsApiRequest(HttpContext context)
+            => context.GetEndpoint()?.Metadata.GetMetadata<ApiControllerAttribute>() is not null;
 
-        bool IsXhr(HttpRequest request) =>
+        static bool IsXhr(HttpRequest request) =>
             string.Equals(request.Query[HeaderNames.XRequestedWith], "XMLHttpRequest", StringComparison.Ordinal) ||
             string.Equals(request.Headers.XRequestedWith, "XMLHttpRequest", StringComparison.Ordinal);
     }
