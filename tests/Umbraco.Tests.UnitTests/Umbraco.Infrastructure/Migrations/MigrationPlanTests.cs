@@ -260,6 +260,10 @@ public class MigrationPlanTests
         {
         }
 
-        protected override async Task MigrateAsync() => Delete.Table("umbracoRedirectUrl").Do();
+        protected override Task MigrateAsync()
+        {
+            Delete.Table("umbracoRedirectUrl").Do();
+            return Task.CompletedTask;
+        }
     }
 }

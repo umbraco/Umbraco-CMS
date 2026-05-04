@@ -264,8 +264,9 @@ internal sealed class PartialMigrationsTests : UmbracoIntegrationTest
         {
         }
 
-        protected override async Task MigrateAsync()
+        protected override Task MigrateAsync()
         {
+            return Task.CompletedTask;
         }
     }
 
@@ -285,12 +286,14 @@ internal class ErrorMigration : AsyncMigrationBase
     {
     }
 
-    protected override async Task MigrateAsync()
+    protected override Task MigrateAsync()
     {
         if (ShouldExplode)
         {
             throw new PanicException();
         }
+
+        return Task.CompletedTask;
     }
 }
 
@@ -300,7 +303,11 @@ internal class CreateTableMigration : AsyncMigrationBase
     {
     }
 
-    protected override async Task MigrateAsync() => Create.Table<TestDto>().Do();
+    protected override Task MigrateAsync()
+    {
+        Create.Table<TestDto>().Do();
+        return Task.CompletedTask;
+    }
 }
 
 internal class AddColumnMigration : AsyncMigrationBase
@@ -358,13 +365,15 @@ internal class AsserScopeScopedTestMigration : AsyncMigrationBase
         _scopeAccessor = scopeAccessor;
     }
 
-    protected override async Task MigrateAsync()
+    protected override Task MigrateAsync()
     {
         Assert.IsNotNull(_scopeAccessor.AmbientScope);
 
         using var scope = _scopeProvider.CreateScope();
 
         Assert.IsNotNull(((Scope)scope).ParentScope);
+
+        return Task.CompletedTask;
     }
 }
 
@@ -432,5 +441,9 @@ internal class SimpleMigrationStep : AsyncMigrationBase
         ILogger<SimpleMigrationStep> logger)
         : base(context) => _logger = logger;
 
-    protected override async Task MigrateAsync() => _logger.LogDebug("Here be migration");
+    protected override Task MigrateAsync()
+    {
+        _logger.LogDebug("Here be migration");
+        return Task.CompletedTask;
+    }
 }

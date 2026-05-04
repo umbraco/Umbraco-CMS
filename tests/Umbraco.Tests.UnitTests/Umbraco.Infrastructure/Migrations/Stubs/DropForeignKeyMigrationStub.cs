@@ -12,6 +12,10 @@ public class DropForeignKeyMigrationStub : AsyncMigrationBase
     {
     }
 
-    protected override async Task MigrateAsync() => Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("user")
-        .ToTable("umbracoUser").PrimaryColumn("id").Do();
+    protected override Task MigrateAsync()
+    {
+        Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("user")
+            .ToTable("umbracoUser").PrimaryColumn("id").Do();
+        return Task.CompletedTask;
+    }
 }

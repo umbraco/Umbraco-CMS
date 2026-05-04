@@ -251,10 +251,12 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
         {
         }
 
-        protected override async Task MigrateAsync() =>
-
+        protected override Task MigrateAsync()
+        {
             // Create User table with keys, indexes, etc.
             Create.Table<UserDto>().Do();
+            return Task.CompletedTask;
+        }
     }
 
     public class DeleteKeysAndIndexesMigration : AsyncMigrationBase
@@ -264,7 +266,7 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
         {
         }
 
-        protected override async Task MigrateAsync()
+        protected override Task MigrateAsync()
         {
             // drops User table keys and indexes
             // Execute.DropKeysAndIndexes("umbracoUser");
@@ -280,6 +282,8 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
             {
                 Delete.KeysAndIndexes(table, true, false).Do();
             }
+
+            return Task.CompletedTask;
         }
     }
 
@@ -290,10 +294,12 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
         {
         }
 
-        protected override async Task MigrateAsync() =>
-
+        protected override Task MigrateAsync()
+        {
             // Create User table keys and indexes.
             Create.KeysAndIndexes<UserDto>().Do();
+            return Task.CompletedTask;
+        }
     }
 
     public class CreateKeysAndIndexesMigration : AsyncMigrationBase
@@ -303,7 +309,7 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
         {
         }
 
-        protected override async Task MigrateAsync()
+        protected override Task MigrateAsync()
         {
             // Creates *all* tables keys and indexes
             foreach (var x in DatabaseSchemaCreator._orderedTables)
@@ -316,6 +322,7 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
 
                 Create.KeysAndIndexes(x).Do();
             }
+            return Task.CompletedTask;
         }
     }
 

@@ -107,7 +107,11 @@ public class MigrationTests
         {
         }
 
-        protected override async Task MigrateAsync() => Execute.Sql(string.Empty).Do();
+        protected override Task MigrateAsync()
+        {
+            Execute.Sql(string.Empty).Do();
+            return Task.CompletedTask;
+        }
     }
 
     public class BadMigration1 : AsyncMigrationBase
@@ -117,7 +121,12 @@ public class MigrationTests
         {
         }
 
-        protected override async Task MigrateAsync() => Alter.Table("foo"); // stop here, don't Do it
+        protected override Task MigrateAsync()
+        {
+            Alter.Table("foo");
+            // stop here, don't Do it
+            return Task.CompletedTask;
+        }
     }
 
     public class BadMigration2 : AsyncMigrationBase
@@ -127,12 +136,14 @@ public class MigrationTests
         {
         }
 
-        protected override async Task MigrateAsync()
+        protected override Task MigrateAsync()
         {
             Alter.Table("foo"); // stop here, don't Do it
 
             // and try to start another one
             Alter.Table("bar");
+
+            return Task.CompletedTask;
         }
     }
 }

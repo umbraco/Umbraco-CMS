@@ -109,10 +109,12 @@ public class AlterMigrationTests
         {
         }
 
-        protected override async Task MigrateAsync() =>
-
+        protected override Task MigrateAsync()
+        {
             // bad/good syntax...
             //// Alter.Column("foo").OnTable("bar").AsGuid().NotNullable();
             Alter.Table("bar").AlterColumn("foo").AsGuid().NotNullable().Do();
+            return Task.CompletedTask;
+        }
     }
 }
