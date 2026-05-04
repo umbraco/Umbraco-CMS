@@ -13,14 +13,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Upgrade;
 public class UmbracoPlanTests
 {
     [Test]
-    public void GetVersionForState_InitialState_Returns_9_4_0()
+    public void GetVersionForState_InitialState_Returns_16_4_0()
     {
         UmbracoPlan plan = CreateUmbracoPlan();
 
         // InitialState is documented as the final migration state of 9.4.
         SemVersion? result = plan.GetVersionForState(plan.InitialState);
 
-        Assert.AreEqual(new SemVersion(9, 4, 0), result);
+        Assert.AreEqual(new SemVersion(16, 4, 0), result);
     }
 
     [Test]

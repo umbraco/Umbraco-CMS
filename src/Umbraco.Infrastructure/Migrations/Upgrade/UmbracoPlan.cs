@@ -34,7 +34,7 @@ public partial class UmbracoPlan : MigrationPlan
     /// <remarks>
     /// Keep in sync with <see cref="InitialState"/> whenever the lowest supported upgrade version changes.
     /// </remarks>
-    private static SemVersion InitialStateVersion { get; } = new(9, 4, 0);
+    private static SemVersion InitialStateVersion { get; } = new(16, 4, 0);
 
     /// <summary>
     /// Defines the plan.
