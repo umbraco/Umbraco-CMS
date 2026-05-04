@@ -7,7 +7,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { pathFolderName } from '@umbraco-cms/backoffice/utils';
-import { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import { UmbViewController } from '@umbraco-cms/backoffice/view';
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 
@@ -37,9 +37,9 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	@state()
 	private _hintMap: Map<string, UmbVariantHint> = new Map();
 
-	#viewContexts = new Map<string, UmbViewContext>();
+	#viewContexts = new Map<string, UmbViewController>();
 	#hintObservers: Array<UmbObserverController> = [];
-	#currentProvidedView?: UmbViewContext;
+	#currentProvidedView?: UmbViewController;
 
 	constructor() {
 		super();
@@ -55,10 +55,10 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 		});
 	}
 
-	#getOrCreateViewContext(alias: string): UmbViewContext {
+	#getOrCreateViewContext(alias: string): UmbViewController {
 		let context = this.#viewContexts.get(alias);
 		if (!context) {
-			context = new UmbViewContext(this, alias);
+			context = new UmbViewController(this, alias);
 			context.inherit();
 			this.#viewContexts.set(alias, context);
 		}
@@ -81,7 +81,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 		this._hintMap = new Map();
 		this.#hintObservers = [...this.#viewContexts.entries()].map(([alias, context], index) =>
 			this.observe(
-				context.firstHintOfVariant,
+				context.hints.firstHint,
 				(hint) => {
 					if (hint) {
 						this._hintMap.set(alias, hint);
@@ -139,7 +139,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			return {
 				path: this.#constructViewPath(manifest),
 				component: () => createExtensionElement(manifest),
-				setup: (component?: any) => {
+				setup: async (component?: any) => {
 					if (this.#currentProvidedView !== context) {
 						this.#currentProvidedView?.unprovide();
 					}
@@ -208,8 +208,11 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							return html`
 								<uui-tab href="${this._routerPath}/${dashboardPath}" label=${dashboardName} ?active="${isActive}">
 									${dashboardName}
-									${hint && !isActive
-										? html`<umb-badge .color=${hint.color ?? 'default'} ?attention=${hint.color === 'invalid'}
+									${hint /*&& !isActive*/
+										? html`<umb-badge
+												slot="extra"
+												.color=${hint.color ?? 'default'}
+												?attention=${hint.color === 'invalid'}
 												>${hint.text}</umb-badge
 											>`
 										: nothing}
@@ -275,8 +278,8 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 			}
 
 			umb-badge {
-				font-size: var(--uui-type-small-size);
-				right: -1.5em;
+				top: var(--uui-size-2);
+				right: calc(var(--uui-size-2) * -1);
 			}
 		`,
 	];
