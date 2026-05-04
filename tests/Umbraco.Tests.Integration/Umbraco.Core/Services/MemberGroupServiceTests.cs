@@ -129,6 +129,27 @@ internal sealed class MemberGroupServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public async Task Can_Get_MemberGroups_By_Keys()
+    {
+        var groupOne = new MemberGroup { Name = "GroupOne" };
+        var groupTwo = new MemberGroup { Name = "GroupTwo" };
+        var groupThree = new MemberGroup { Name = "GroupThree" };
+        await MemberGroupService.CreateAsync(groupOne);
+        await MemberGroupService.CreateAsync(groupTwo);
+        await MemberGroupService.CreateAsync(groupThree);
+
+        IMemberGroup[] result = (await MemberGroupService.GetAsync([groupOne.Key, groupThree.Key])).ToArray();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(2, result.Length);
+            Assert.IsTrue(result.Any(x => x.Key == groupOne.Key));
+            Assert.IsTrue(result.Any(x => x.Key == groupThree.Key));
+            Assert.IsFalse(result.Any(x => x.Key == groupTwo.Key));
+        });
+    }
+
+    [Test]
     public async Task Cannot_Update_MemberGroup_With_Duplicate_Name()
     {
         const string name = "TestGroup";

@@ -51,28 +51,8 @@ public class RetrustForeignKeyAndCheckConstraints : AsyncMigrationBase
 
     private void RetrustConstraints()
     {
-        // Only target Umbraco tables (prefixed "umbraco" or "cms") to avoid touching
-        // custom or third-party tables that share the same database.
-        List<UntrustedConstraintDto> untrustedConstraints = Database.Fetch<UntrustedConstraintDto>(
-            @"SELECT
-                s.name AS SchemaName,
-                OBJECT_NAME(fk.parent_object_id) AS TableName,
-                fk.name AS ConstraintName
-            FROM sys.foreign_keys fk
-            INNER JOIN sys.schemas s ON fk.schema_id = s.schema_id
-            WHERE fk.is_not_trusted = 1
-              AND (OBJECT_NAME(fk.parent_object_id) LIKE 'umbraco%' OR OBJECT_NAME(fk.parent_object_id) LIKE 'cms%')
-
-            UNION ALL
-
-            SELECT
-                s.name AS SchemaName,
-                OBJECT_NAME(cc.parent_object_id) AS TableName,
-                cc.name AS ConstraintName
-            FROM sys.check_constraints cc
-            INNER JOIN sys.schemas s ON cc.schema_id = s.schema_id
-            WHERE cc.is_not_trusted = 1
-              AND (OBJECT_NAME(cc.parent_object_id) LIKE 'umbraco%' OR OBJECT_NAME(cc.parent_object_id) LIKE 'cms%')");
+        List<UntrustedConstraintsQuery.UntrustedConstraintDto> untrustedConstraints =
+            Database.Fetch<UntrustedConstraintsQuery.UntrustedConstraintDto>(UntrustedConstraintsQuery.Sql);
 
         if (untrustedConstraints.Count == 0)
         {
@@ -95,7 +75,7 @@ public class RetrustForeignKeyAndCheckConstraints : AsyncMigrationBase
         using IUmbracoDatabase db = _databaseFactory.CreateDatabase();
         EnsureLongCommandTimeout(db);
 
-        foreach (UntrustedConstraintDto constraint in untrustedConstraints)
+        foreach (UntrustedConstraintsQuery.UntrustedConstraintDto constraint in untrustedConstraints)
         {
             // Leading semicolon prevents NPoco's auto-select from prepending
             // "SELECT ... FROM []" based on the empty [TableName("")] attribute.
@@ -138,19 +118,6 @@ END CATCH";
             retrusted,
             failed,
             untrustedConstraints.Count);
-    }
-
-    [TableName("")]
-    private class UntrustedConstraintDto
-    {
-        [Column("SchemaName")]
-        public string SchemaName { get; set; } = null!;
-
-        [Column("TableName")]
-        public string TableName { get; set; } = null!;
-
-        [Column("ConstraintName")]
-        public string ConstraintName { get; set; } = null!;
     }
 
     [TableName("")]

@@ -211,6 +211,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 				max-width: 100%;
 				display: -webkit-box;
 				overflow: hidden;
+				padding-bottom: 0.1em;
 			}
 		`,
 	];
