@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
@@ -112,7 +111,9 @@ public static class PublishedContentExtensions
 
         // parent key is null if content is at root
         return parentKey.HasValue
-            ? publishedStatusFilteringService.FilterAvailable([parentKey.Value], null).FirstOrDefault()
+#pragma warning disable CS0618 // Type or member is obsolete (justification: temporary means to avoid breaking changes in the PublishedContentExtensions)
+            ? publishedStatusFilteringService.Unfiltered([parentKey.Value]).FirstOrDefault()
+#pragma warning restore CS0618 // Type or member is obsolete
             : null;
     }
 
@@ -2220,8 +2221,7 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         IPublishedStatusFilteringService publishedStatusFilteringService,
         bool orSelf,
-        string? contentTypeAlias = null,
-        string? culture = null)
+        string? contentTypeAlias = null)
     {
         if (orSelf)
         {
@@ -2240,7 +2240,9 @@ public static class PublishedContentExtensions
             yield break;
         }
 
-        IEnumerable<IPublishedContent> ancestors = publishedStatusFilteringService.FilterAvailable(ancestorsKeys, culture);
+#pragma warning disable CS0618 // Type or member is obsolete (justification: temporary means to avoid breaking changes in the PublishedContentExtensions)
+        IEnumerable<IPublishedContent> ancestors = publishedStatusFilteringService.Unfiltered(ancestorsKeys);
+#pragma warning restore CS0618 // Type or member is obsolete
         foreach (IPublishedContent ancestor in ancestors)
         {
             yield return ancestor;
