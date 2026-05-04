@@ -91,11 +91,6 @@ public enum UserOperationStatus
     CannotDelete,
 
     /// <summary>
-    ///     The operation failed because the user has logged in before, and therefore might be referenced in audit logs etc.
-    /// </summary>
-    CannotDeleteUserHasLoggedIn,
-
-    /// <summary>
     ///     The operation failed because the current user cannot disable themselves.
     /// </summary>
     CannotDisableSelf,
@@ -201,4 +196,9 @@ public enum UserOperationStatus
     ///     <c>ApplicationUrlDetection</c> to <c>FirstRequest</c> or <c>EveryRequest</c>.
     /// </summary>
     ApplicationUrlNotConfigured,
+
+    /// <summary>
+    ///     The operation failed because the user has logged in before, and therefore might be referenced in audit logs etc.
+    /// </summary>
+    CannotDeleteUserHasLoggedIn,
 }
