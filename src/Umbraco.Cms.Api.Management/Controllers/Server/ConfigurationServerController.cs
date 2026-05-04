@@ -60,7 +60,7 @@ public class ConfigurationServerController : ServerControllerBase
     /// <param name="globalSettings">The <see cref="GlobalSettings"/> options.</param>
     /// <param name="externalLoginProviders">The external login providers used for back office authentication.</param>
     /// <param name="hostingEnvironment">The hosting environment.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public ConfigurationServerController(IOptions<SecuritySettings> securitySettings, IOptions<GlobalSettings> globalSettings, IBackOfficeExternalLoginProviders externalLoginProviders, IHostingEnvironment hostingEnvironment)
         : this(
             securitySettings,
