@@ -89,7 +89,7 @@ export class UmbUnpublishElementEntityAction extends UmbEntityActionBase<never> 
 
 		notificationContext?.peek('positive', {
 			data: {
-				message: localize.term('speechBubbles_editContentUnpublishedHeader'),
+				message: localize.term('speechBubbles_editElementUnpublishedHeader'),
 			},
 		});
 

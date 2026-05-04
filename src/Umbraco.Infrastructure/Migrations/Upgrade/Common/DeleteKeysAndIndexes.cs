@@ -66,7 +66,6 @@ public class DeleteKeysAndIndexes : AsyncMigrationBase
             "umbracoUser2UserGroup",
             "umbracoUserGroup",
             "umbracoUserGroup2App",
-            "umbracoUserGroup2NodePermission",
             "umbracoUserLogin",
             "umbracoUserStartNode",
         };
