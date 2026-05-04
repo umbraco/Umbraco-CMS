@@ -527,7 +527,7 @@ Write a comment only when **removing it would leave a future reader confused**. 
 
 ### TODOs
 
-Allowed, but cheap to write and cheaper to leave behind. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have a no author or a version trigger.
+Allowed, but cheap to write and cheaper to leave behind. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
 
 ---
 
