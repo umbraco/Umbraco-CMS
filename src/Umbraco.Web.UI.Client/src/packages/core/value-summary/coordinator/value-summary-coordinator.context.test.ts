@@ -19,7 +19,6 @@ function makeManifest(
 		name: `Test Value Summary ${valueType}`,
 		forValueType: valueType,
 		element: () => import('../value-types/boolean/boolean-value-summary.element.js'),
-		meta: {},
 	} as unknown as ManifestValueSummary;
 
 	if (resolverFn) {
@@ -168,7 +167,6 @@ describe('UmbValueSummaryCoordinatorContext', () => {
 			name: `Test Value Summary ${valueType}`,
 			forValueType: valueType,
 			element: () => import('../value-types/boolean/boolean-value-summary.element.js'),
-			meta: {},
 		} as unknown as ManifestValueSummary;
 
 		(manifest as any).valueResolver = class {

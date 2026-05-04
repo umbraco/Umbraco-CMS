@@ -11,7 +11,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			kind: 'default',
 			element: () => import('./default-value-summary.js'),
 			api: () => import('./default-value-summary.js'),
-			meta: {},
 		},
 	},
 ];
