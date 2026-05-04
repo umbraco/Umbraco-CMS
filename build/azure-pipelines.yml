@@ -935,12 +935,27 @@ stages:
 
   - stage: Deploy_Npm
     displayName: Npm release
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
+    # Run when Deploy_NuGet actually ran — Succeeded, SucceededWithIssues or Failed (e.g. duplicate-version rerun
+    # or downstream MyGet outage). Inspect Deploy_NuGet.result directly to avoid transitive succeeded()/failed()
+    # which look at the full ancestor graph and would cascade-skip this stage on a MyGet failure.
+    condition: and(in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues', 'Failed'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
     dependsOn:
       - Deploy_NuGet
     jobs:
+      - job: WaitForApproval
+        displayName: Wait for manual approval
+        pool: server
+        timeoutInMinutes: 4320 # 3 days
+        steps:
+          - task: ManualValidation@0
+            displayName: Manual approval to push to npm
+            inputs:
+              notifyUsers: ''
+              instructions: 'Approve to push the npm release.'
+              onTimeout: 'reject'
       - job: Publish
         displayName: Push to NPM
+        dependsOn: WaitForApproval
         steps:
           - checkout: none
           - download: current
@@ -964,6 +979,7 @@ stages:
             workingDirectory: $(Pipeline.Workspace)/npm
       - job: PublishTestHelpers
         displayName: Push Test Helpers to NPM
+        dependsOn: WaitForApproval
         steps:
           - checkout: none
           - download: current
@@ -996,10 +1012,25 @@ stages:
       - Build
       - Build_Docs
       - Deploy_NuGet
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
+    # Build_Docs must have produced artifacts (we won't upload anything otherwise). Deploy_NuGet may have
+    # Failed (e.g. duplicate-version rerun or MyGet outage) and we still want to publish the docs.
+    # Direct result checks avoid transitive succeeded()/failed() which would cascade-skip on a MyGet failure.
+    condition: and(in(dependencies.Build_Docs.result, 'Succeeded', 'SucceededWithIssues'), in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues', 'Failed'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
+      - job: WaitForApproval
+        displayName: Wait for manual approval
+        pool: server
+        timeoutInMinutes: 4320 # 3 days
+        steps:
+          - task: ManualValidation@0
+            displayName: Manual approval to upload API documentation
+            inputs:
+              notifyUsers: ''
+              instructions: 'Approve to upload the API documentation.'
+              onTimeout: 'reject'
       - job:
         displayName: Upload C# Docs
+        dependsOn: WaitForApproval
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
@@ -1024,6 +1055,7 @@ stages:
               CleanTargetBeforeCopy: true
       - job:
         displayName: Upload Storybook
+        dependsOn: WaitForApproval
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
@@ -1048,6 +1080,7 @@ stages:
               CleanTargetBeforeCopy: true
       - job:
         displayName: Upload UI API Docs
+        dependsOn: WaitForApproval
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
