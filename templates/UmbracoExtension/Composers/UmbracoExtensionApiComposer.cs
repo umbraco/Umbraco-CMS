@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
+using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.Composing;
@@ -21,9 +22,9 @@ public class UmbracoExtensionApiComposer : IComposer
                 // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/versioning-your-api
                 // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/access-policies
 
-                // Configure the Swagger generation options
-                // Add in a new Swagger API document solely for our own package that can be browsed via Swagger UI
-                // Along with having a generated swagger JSON file that we can use to auto generate a TypeScript client
+                // Configure the OpenAPI generation options
+                // Add in a new OpenAPI document solely for our own package that can be browsed via the OpenAPI UI
+                // Along with having a generated OpenAPI JSON file that we can use to auto generate a TypeScript client
                 options.AddDocumentTransformer((document, _, _) =>
                 {
                     document.Info = new OpenApiInfo
@@ -40,7 +41,13 @@ public class UmbracoExtensionApiComposer : IComposer
                     return Task.CompletedTask;
                 });
 
-                // Enable Umbraco authentication for the "Example" Swagger document
+                // Only include endpoints decorated with the `MapToApi` attribute for our own API.
+                options.ShouldInclude = apiDescription =>
+                    apiDescription.ActionDescriptor.EndpointMetadata
+                        .OfType<MapToApiAttribute>()
+                        .Any(attribute => attribute.ApiName == Constants.ApiName);
+
+                // Enable Umbraco authentication for the "Example" OpenAPI document
                 options.AddBackofficeSecurityRequirements();
 
                 // This is used to generate operation IDs in our OpenAPI JSON file so that the generated 
