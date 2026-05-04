@@ -10,8 +10,6 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
  * Bridges the coordinator to the element.
  *
  * Receives `valueType` and `rawValue` via apiProps from the wrapper element.
- * Consumes the coordinator context to register for batch resolution and
- * exposes the result via the `value` observable.
  *
  * Extend this class to create custom value summary APIs.
  */
