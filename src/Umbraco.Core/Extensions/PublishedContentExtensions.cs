@@ -116,7 +116,7 @@ public static class PublishedContentExtensions
     #region IsComposedOf
 
     /// <summary>
-    ///     Gets a value indicating whether the content is of a content type composed of the given alias
+    ///     Gets a value indicating whether the content is of a content type composed of the given alias.
     /// </summary>
     /// <param name="content">The content.</param>
     /// <param name="alias">The content type alias.</param>
@@ -125,7 +125,7 @@ public static class PublishedContentExtensions
     ///     alias.
     /// </returns>
     public static bool IsComposedOf(this IPublishedContent content, string alias) =>
-        content.ContentType.CompositionAliases.InvariantContains(alias);
+        content.AsPublishedElement().IsComposedOf(alias);
 
     #endregion
 
@@ -220,50 +220,26 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <remarks>Culture is case-insensitive.</remarks>
     public static bool HasCulture(this IPublishedContent content, string? culture)
-    {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
-
-        return content.Cultures.ContainsKey(culture ?? string.Empty);
-    }
+        => content.AsPublishedElement().HasCulture(culture);
 
     /// <summary>
     ///     Determines whether the content is invariant, or has a culture.
     /// </summary>
     /// <remarks>Culture is case-insensitive.</remarks>
     public static bool IsInvariantOrHasCulture(this IPublishedContent content, string culture)
-        => !content.ContentType.VariesByCulture() || content.Cultures.ContainsKey(culture ?? string.Empty);
+        => content.AsPublishedElement().IsInvariantOrHasCulture(culture);
 
     /// <summary>
     ///     Gets the culture date of the content item.
     /// </summary>
     /// <param name="content">The content item.</param>
-    /// <param name="variationContextAccessor"></param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
     /// <param name="culture">
     ///     The specific culture to get the name for. If null is used the current culture is used (Default is
     ///     null).
     /// </param>
     public static DateTime CultureDate(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
-    {
-        // invariant has invariant value (whatever the requested culture)
-        if (!content.ContentType.VariesByCulture())
-        {
-            return content.UpdateDate;
-        }
-
-        // handle context culture for variant
-        if (culture == null)
-        {
-            culture = variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
-        }
-
-        // get
-        return culture != string.Empty && content.Cultures.TryGetValue(culture, out PublishedCultureInfo? infos)
-            ? infos.Date
-            : DateTime.MinValue;
-    }
+        => content.AsPublishedElement().CultureDate(variationContextAccessor, culture);
 
     #endregion
 
@@ -461,10 +437,10 @@ public static class PublishedContentExtensions
     /// <param name="docTypeAlias">The alias of the content type to test against.</param>
     /// <returns>True if the content is of the specified content type; otherwise false.</returns>
     public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias) =>
-        content.ContentType.Alias.InvariantEquals(docTypeAlias);
+        content.AsPublishedElement().IsDocumentType(docTypeAlias);
 
     /// <summary>
-    ///     Determines whether the specified content is a specified content type or it's derived types.
+    ///     Determines whether the specified content is a specified content type or its derived types.
     /// </summary>
     /// <param name="content">The content to determine content type of.</param>
     /// <param name="docTypeAlias">The alias of the content type to test against.</param>
@@ -473,36 +449,30 @@ public static class PublishedContentExtensions
     ///     IsDocumentType(this IPublishedContent content, string docTypeAlias).
     /// </param>
     /// <returns>True if the content is of the specified content type or a derived content type; otherwise false.</returns>
-    public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias, bool recursive)
-    {
-        if (content.IsDocumentType(docTypeAlias))
-        {
-            return true;
-        }
-
-        return recursive && content.IsComposedOf(docTypeAlias);
-    }
+    public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias, bool recursive) =>
+        content.AsPublishedElement().IsDocumentType(docTypeAlias, recursive);
 
     #endregion
 
     #region IsSomething: equality
 
     /// <summary>
-    /// Determines whether this content item is equal to another content item by comparing their IDs.
+    ///     Determines whether this content item is equal to another content item by comparing their IDs.
     /// </summary>
     /// <param name="content">The content item.</param>
     /// <param name="other">The other content item to compare.</param>
     /// <returns><c>true</c> if both content items have the same ID; otherwise, <c>false</c>.</returns>
-    public static bool IsEqual(this IPublishedContent content, IPublishedContent other) => content.Id == other.Id;
+    public static bool IsEqual(this IPublishedContent content, IPublishedContent other) =>
+        content.AsPublishedElement().IsEqual(other);
 
     /// <summary>
-    /// Determines whether this content item is not equal to another content item by comparing their IDs.
+    ///     Determines whether this content item is not equal to another content item by comparing their IDs.
     /// </summary>
     /// <param name="content">The content item.</param>
     /// <param name="other">The other content item to compare.</param>
     /// <returns><c>true</c> if the content items have different IDs; otherwise, <c>false</c>.</returns>
     public static bool IsNotEqual(this IPublishedContent content, IPublishedContent other) =>
-        content.IsEqual(other) == false;
+        content.AsPublishedElement().IsNotEqual(other);
 
     #endregion
 
@@ -1892,28 +1862,22 @@ public static class PublishedContentExtensions
     #region Writer and creator
 
     /// <summary>
-    /// Gets the name of the user who created the content item.
+    ///     Gets the name of the user who created the content item.
     /// </summary>
     /// <param name="content">The content item.</param>
     /// <param name="userService">The user service.</param>
     /// <returns>The name of the creator, or an empty string if not found.</returns>
     public static string GetCreatorName(this IPublishedContent content, IUserService userService)
-    {
-        IProfile? user = userService.GetProfileById(content.CreatorId);
-        return user?.Name ?? string.Empty;
-    }
+        => content.AsPublishedElement().GetCreatorName(userService);
 
     /// <summary>
-    /// Gets the name of the user who last updated the content item.
+    ///     Gets the name of the user who last updated the content item.
     /// </summary>
     /// <param name="content">The content item.</param>
     /// <param name="userService">The user service.</param>
     /// <returns>The name of the writer, or an empty string if not found.</returns>
     public static string GetWriterName(this IPublishedContent content, IUserService userService)
-    {
-        IProfile? user = userService.GetProfileById(content.WriterId);
-        return user?.Name ?? string.Empty;
-    }
+        => content.AsPublishedElement().GetWriterName(userService);
 
     #endregion
 
@@ -2333,4 +2297,8 @@ public static class PublishedContentExtensions
             ? publishedStatusFilteringService.FilterAvailable(rootKeys, culture)
             : [];
     }
+
+    // There is a lot of overlap between published content and published element extensions. To avoid duplicate code,
+    // we delegate to the published element extensions with this.
+    private static IPublishedElement AsPublishedElement(this IPublishedContent content) => content;
 }
