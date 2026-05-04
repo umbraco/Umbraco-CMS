@@ -1,6 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.PermissionFilter;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
