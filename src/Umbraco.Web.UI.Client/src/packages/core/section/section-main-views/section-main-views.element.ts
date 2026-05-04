@@ -79,7 +79,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 	#observeHints() {
 		this.#hintObservers.forEach((observer) => observer.destroy());
 		this._hintMap = new Map();
-		this.#hintObservers = [...this.#viewContexts.entries()].map(([alias, context], index) =>
+		this.#hintObservers = [...this.#viewContexts.entries()].map(([alias, context]) =>
 			this.observe(
 				context.hints.firstHint,
 				(hint) => {
@@ -90,7 +90,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 					}
 					this.requestUpdate('_hintMap');
 				},
-				'umbObserveHint_' + index,
+				'umbObserveHint_' + alias,
 			),
 		);
 	}
