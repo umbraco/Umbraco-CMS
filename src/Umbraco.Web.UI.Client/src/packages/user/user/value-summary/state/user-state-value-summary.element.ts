@@ -10,7 +10,7 @@ export class UmbUserStateValueSummaryElement extends UmbValueSummaryElementBase<
 		const displayState = getDisplayStateFromUserStatus(this._value);
 		if (!displayState) return nothing;
 		return html`<uui-tag size="s" look="${displayState.look}" color="${displayState.color}">
-			${this._value}
+			<umb-localize key=${'user_' + displayState?.key}></umb-localize>
 		</uui-tag>`;
 	}
 }
