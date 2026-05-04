@@ -264,10 +264,13 @@ public static class FriendlyPublishedContentExtensions
     ///     The specific culture to get the URL segment for. If null is used the current culture is used
     ///     (Default is null).
     /// </param>
+    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 19.")]
     public static string? UrlSegment(
         this IPublishedContent content,
         string? culture = null)
-        => content.UrlSegment(VariationContextAccessor, culture);
+#pragma warning disable CS0618 // Type or member is obsolete
+        => PublishedContentUrlSegmentResolver.Resolve(content, VariationContextAccessor, culture);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     ///     Gets the culture date of the content item.

@@ -32,7 +32,16 @@ public abstract class PublishedContentWrapped : PublishedElementWrapped<IPublish
         => _content = content;
 
     /// <inheritdoc />
-    public virtual string? UrlSegment => _content.UrlSegment;
+    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 19.")]
+    public virtual string? UrlSegment
+    {
+        get
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            return _content.UrlSegment;
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+    }
 
     /// <inheritdoc />
     public virtual int Level => _content.Level;

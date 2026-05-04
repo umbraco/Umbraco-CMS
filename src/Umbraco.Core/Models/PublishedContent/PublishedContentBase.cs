@@ -23,8 +23,16 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual string Name => this.Name(_variationContextAccessor);
 
         /// <inheritdoc />
-        [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 18.")]
-        public virtual string? UrlSegment => this.UrlSegment(_variationContextAccessor);
+        [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 19.")]
+        public virtual string? UrlSegment
+        {
+            get
+            {
+#pragma warning disable CS0618 // Type or member is obsolete
+                return PublishedContentUrlSegmentResolver.Resolve(this, _variationContextAccessor);
+#pragma warning restore CS0618 // Type or member is obsolete
+            }
+        }
 
         /// <inheritdoc />
         [Obsolete("Not supported for members. Scheduled for removal in Umbraco 18.")]

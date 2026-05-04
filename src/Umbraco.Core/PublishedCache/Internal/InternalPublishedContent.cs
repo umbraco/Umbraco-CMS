@@ -86,6 +86,7 @@ public sealed class InternalPublishedContent : IPublishedContent
     public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ??= GetCultures();
 
     /// <inheritdoc />
+    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 19.")]
     public string? UrlSegment { get; set; }
 
     /// <inheritdoc />
