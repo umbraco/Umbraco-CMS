@@ -55,9 +55,9 @@ export interface UmbClassInterface extends UmbControllerHost {
 	): UmbContextProviderController<R>;
 
 	/**
-	 * @description Subscribe to a context. The callback fires when the context resolves and again if the context is replaced. Use this whenever a controller or element needs the context at setup time — both for ongoing observation and for reading values immediately on resolve. This is the default choice; prefer it over `getContext` unless the context is only needed inside a later user action.
+	 * @description Subscribe to a context. The callback fires when the context resolves, again if the context is replaced, and can also be invoked with `undefined` if the context is unprovided or the host disconnects. Use this whenever a controller or element needs the context at setup time — both for ongoing observation and for reading values immediately on resolve. This is the default choice; prefer it over `getContext` unless the context is only needed inside a later user action.
 	 * @param {string} alias
-	 * @param {ObserverCallback} callback Callback method called when context is resolved.
+	 * @param {UmbContextCallback} callback Callback method called with the resolved context instance or `undefined`.
 	 * @returns {UmbContextConsumerController} Reference to the created Context Consumer Controller instance
 	 * @memberof UmbClassInterface
 	 */
