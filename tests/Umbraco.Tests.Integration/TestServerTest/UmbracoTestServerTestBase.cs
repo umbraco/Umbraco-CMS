@@ -31,6 +31,7 @@ using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Website.Controllers;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
@@ -77,6 +78,8 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         [SetUp]
         public virtual void Setup()
         {
+            InMemoryConfiguration[Constants.Configuration.ConfigModelsMode] = "Nothing";
+
             // Don't cache factory if using NewSchemaPerTest
             if (TestOptions.Database == UmbracoTestOptions.Database.NewSchemaPerTest ||
                 TestOptions.Database == UmbracoTestOptions.Database.NewEmptyPerTest)
