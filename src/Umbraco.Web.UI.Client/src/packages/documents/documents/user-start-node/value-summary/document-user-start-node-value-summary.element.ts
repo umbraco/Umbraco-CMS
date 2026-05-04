@@ -1,6 +1,6 @@
 import { UmbDocumentItemDataResolver } from '../../item/document-item-data-resolver.js';
 import type { UmbDocumentItemModel } from '../../item/repository/types.js';
-import { customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
@@ -24,6 +24,7 @@ export class UmbDocumentUserStartNodeValueSummaryElement extends UmbValueSummary
 	}
 
 	override render() {
+		if (this._value === undefined) return nothing;
 		if (!this._value) {
 			return html`<span>${this.localize.term('content_contentRoot')}</span>`;
 		}
