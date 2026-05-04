@@ -87,6 +87,12 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 		);
 	}
 
+	#setupViewComponent(component: Element, view: ManifestCollectionView) {
+		(component as HTMLElement).setAttribute('data-mark', `collection-view:${view.alias}`);
+		(component as UmbCollectionViewElementBase).manifest = view;
+		this.setCurrentView(view);
+	}
+
 	#createRoutes(views: ManifestCollectionView[] | null) {
 		let routes: Array<UmbRoute> = [];
 
@@ -102,10 +108,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 				return {
 					path: `${view.meta.pathName}`,
 					component: () => createExtensionElement(view),
-					setup: (component) => {
-						(component as UmbCollectionViewElementBase).manifest = view;
-						this.setCurrentView(view);
-					},
+					setup: (component) => this.#setupViewComponent(component, view),
 				};
 			});
 
@@ -114,10 +117,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 					unique: fallbackView.alias,
 					path: '',
 					component: () => createExtensionElement(fallbackView),
-					setup: (component) => {
-						(component as UmbCollectionViewElementBase).manifest = fallbackView;
-						this.setCurrentView(fallbackView);
-					},
+					setup: (component) => this.#setupViewComponent(component, fallbackView),
 				});
 
 				routes.push({
