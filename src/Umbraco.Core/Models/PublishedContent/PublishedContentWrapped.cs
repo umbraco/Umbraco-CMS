@@ -32,7 +32,7 @@ public abstract class PublishedContentWrapped : PublishedElementWrapped<IPublish
         => _content = content;
 
     /// <inheritdoc />
-    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 20.")]
     public virtual string? UrlSegment
     {
         get

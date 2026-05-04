@@ -91,7 +91,7 @@ public sealed class PublishedExternalMember : IPublishedMember
     public string Name => _identity.Name ?? _identity.UserName;
 
     /// <inheritdoc />
-    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("This property is unused for external members and always returns null. Scheduled for removal in Umbraco 20.")]
     public string? UrlSegment => null;
 
     /// <inheritdoc />

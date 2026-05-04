@@ -264,7 +264,7 @@ public static class FriendlyPublishedContentExtensions
     ///     The specific culture to get the URL segment for. If null is used the current culture is used
     ///     (Default is null).
     /// </param>
-    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 20.")]
     public static string? UrlSegment(
         this IPublishedContent content,
         string? culture = null)

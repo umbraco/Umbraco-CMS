@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         public virtual string Name => this.Name(_variationContextAccessor);
 
         /// <inheritdoc />
-        [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 19.")]
+        [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 20.")]
         public virtual string? UrlSegment
         {
             get

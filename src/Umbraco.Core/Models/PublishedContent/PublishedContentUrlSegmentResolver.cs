@@ -8,10 +8,10 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 /// </summary>
 /// <remarks>
 /// Internal helper used to satisfy the obsolete <see cref="IPublishedContent.UrlSegment"/> contract during the v18
-/// deprecation period. Scheduled for removal in Umbraco 19 alongside the property itself. New code should use
+/// deprecation period. Scheduled for removal in Umbraco 20 alongside the property itself. New code should use
 /// <c>IDocumentUrlService.GetUrlSegment()</c>.
 /// </remarks>
-[Obsolete("Helper for IPublishedContent.UrlSegment during the v18 deprecation period. Use IDocumentUrlService.GetUrlSegment() instead. Scheduled for removal in Umbraco 19.")]
+[Obsolete("Helper for IPublishedContent.UrlSegment during the v18 deprecation period. Use IDocumentUrlService.GetUrlSegment() instead. Scheduled for removal in Umbraco 20.")]
 public static class PublishedContentUrlSegmentResolver
 {
     /// <summary>

@@ -12,7 +12,7 @@ public interface IPublishedContent : IPublishedElement
     /// <summary>
     ///     Gets the URL segment of the content item for the current culture.
     /// </summary>
-    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 20.")]
     string? UrlSegment { get; }
 
     /// <summary>
