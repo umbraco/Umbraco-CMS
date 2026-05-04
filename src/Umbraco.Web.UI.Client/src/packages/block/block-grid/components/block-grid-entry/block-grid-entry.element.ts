@@ -582,7 +582,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderEditAction() {
-		if (this._isReadOnly) return nothing;
 		return html`
 			${when(
 				this._showContentEdit && this._workspaceEditContentPath,
@@ -616,7 +615,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
 		return html`
 			${this._hasSettings && this._workspaceEditSettingsPath
 				? html`
