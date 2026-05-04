@@ -30,9 +30,14 @@ export class UmbSectionAliasesValueSummaryResolver
 		items: ReadonlyArray<UmbExtensionItemModel>,
 	): ReadonlyArray<ReadonlyArray<UmbExtensionItemModel>> {
 		const itemByAlias = new Map(items.map((s) => [s.unique, s]));
-		return values.map(
-			(aliases) => aliases.map((alias) => itemByAlias.get(alias)).filter(Boolean) as UmbExtensionItemModel[],
-		);
+
+		return values.map((aliases) => {
+			const result: UmbExtensionItemModel[] = [];
+			for (const alias of aliases) {
+				const item = itemByAlias.get(alias);
+				if (item) result.push(item);
+			}
+			return result;
+		});
 	}
 }
-
