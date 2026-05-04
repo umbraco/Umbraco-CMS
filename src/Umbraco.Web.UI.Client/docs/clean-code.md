@@ -430,8 +430,6 @@ type ReadonlyContent = Readonly<UmbContentModel>;
 - Restating what the code does. If the comment is a paraphrase of the next two lines, delete it.
 - Narrating a sequence of calls. The order is already in the code.
 - Pointing at the current task, fix, callers, or PR (`// Used by X`, `// Added for the Y flow`, `// Fix for issue Z`). That metadata belongs in the commit message and PR description, not in source — it rots.
-- Commented-out code. Delete it; Git history preserves it.
-- Multi-paragraph block comments on internal members. One short line is the ceiling.
 
 **When a comment IS justified** — only when removing it would leave a future reader confused:
 - A non-obvious **WHY**: a hidden constraint, ordering requirement, or business rule that is not visible from the code.
@@ -439,28 +437,6 @@ type ReadonlyContent = Readonly<UmbContentModel>;
 - A subtle **invariant** the type system does not enforce.
 - An **edge case** the code intentionally handles that would surprise a reader.
 - **Public API docs** — JSDoc on exported symbols and Lit components (required for web-component-analyzer).
-
-**Worked example — too much vs. right size**:
-
-```typescript
-// ❌ Too much — the comment restates what `resetState()` and `addState` already say.
-// Reset state and set loading immediately, before the async blueprint data fetch.
-// This ensures the workspace shows a loading indicator while the data is being fetched,
-// preventing the previous workspace editor's inner router from firing history.replaceState
-// (via the default-variant redirect route) which would cancel the outer navigation. (#21996)
-this.resetState();
-this.loading.addState({ unique: 'blueprint-fetch' });
-```
-
-```typescript
-// ✅ Right size — only the non-obvious WHY remains, anchored to an issue.
-// Must set loading before the await — otherwise the previous workspace's redirect route
-// fires history.replaceState and cancels our navigation. (#21996)
-this.resetState();
-this.loading.addState({ unique: 'blueprint-fetch' });
-```
-
-The fact that the code resets state and starts a load is already in the method names. The remaining comment exists *only* because the ordering is load-bearing in a way the reader cannot infer from the code itself.
 
 **JSDoc for Web Components** (still required — this is the public contract):
 
@@ -487,14 +463,13 @@ export class UmbDocumentActionButton extends LitElement {
 
 ```typescript
 // TODO: Implement pagination [NL]
-// FIXME: Memory leak in subscription [JOV]
-// HACK: Temporary workaround for API bug [LK]
+// TODO: Memory leak in subscription [JOV]
+// TODO: Temporary workaround for API bug [LK]
 ```
 
-A TODO with no owner and no trigger is dead text — delete it.
+A TODO with no author or no trigger is dead text — require one of them.
 
 **Remove Dead Code**:
-- Don't comment out code, delete it (Git history preserves it)
 - Remove unused imports, functions, variables
 - Clean up `console.log` calls before committing
 

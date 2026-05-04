@@ -514,8 +514,6 @@ Labels are only added, never removed. Claude applies only labels it is confident
 - **Don't restate what the code does.** A line calling `resetState()` does not need `// Reset state`. A method named `validateInput` does not need `// Validate input`.
 - **Don't narrate a sequence of calls.** If three lines run in order, the order is in the code — don't paraphrase it above.
 - **Don't reference the current task, fix, callers, or PR.** No `// Fix for X`, `// Used by Y`, `// Added for the Z flow`, `// See PR #1234`. That belongs in commit messages and PR descriptions; in source it rots as the codebase evolves.
-- **Don't leave commented-out code.** Delete it — Git history preserves it.
-- **Don't write multi-paragraph block comments or docstrings** for internal members. One short line is the ceiling.
 
 ### When a comment IS justified
 
@@ -525,35 +523,11 @@ Write a comment only when **removing it would leave a future reader confused**. 
 - **A workaround for a specific bug or platform quirk.** Link the issue (`(#21996)`, `https://...`) so the comment can be deleted once the upstream fix lands.
 - **A subtle invariant** that the type system or method names do not enforce.
 - **An edge case the code intentionally handles** that would surprise a reader (e.g. "must run before X because Y").
-- **Public API documentation** — XML doc comments on C# public members, JSDoc on exported TypeScript symbols. Required for the public contract; still keep them concise.
-
-### Worked example
-
-**Too much (comment restates the code):**
-
-```ts
-// Reset state and set loading immediately, before the async blueprint data fetch.
-// This ensures the workspace shows a loading indicator while the data is being fetched,
-// preventing the previous workspace editor's inner router from firing history.replaceState
-// (via the default-variant redirect route) which would cancel the outer navigation. (#21996)
-this.resetState();
-this.loading.addState({ unique: 'blueprint-fetch' });
-```
-
-**Right size (only the non-obvious WHY remains, anchored to an issue):**
-
-```ts
-// Must set loading before the await — otherwise the previous workspace's redirect route
-// fires history.replaceState and cancels our navigation. (#21996)
-this.resetState();
-this.loading.addState({ unique: 'blueprint-fetch' });
-```
-
-The code itself already says "reset state, then mark loading." The comment exists only because the *ordering* is load-bearing in a way the reader cannot infer.
+- **API documentation** — XML doc comments on C# members, JSDoc on exported TypeScript symbols. Required for the public contract; still keep them concise.
 
 ### TODOs
 
-Allowed, but cheap to write and cheaper to leave behind. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. If a TODO has no owner and no trigger, it is dead text — delete it.
+Allowed, but cheap to write and cheaper to leave behind. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have a no author or a version trigger.
 
 ---
 
