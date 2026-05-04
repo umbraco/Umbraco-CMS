@@ -42,10 +42,6 @@ export abstract class UmbValueSummaryApiBase extends UmbControllerBase implement
 		this.#scheduleConnect();
 	}
 
-	/**
-	 * Debounce via microtask so that when apiProps assigns valueType and value
-	 * in sequence, we only call #connect() once with both values set.
-	 */
 	#scheduleConnect() {
 		if (this.#connectPending) return;
 		this.#connectPending = true;
