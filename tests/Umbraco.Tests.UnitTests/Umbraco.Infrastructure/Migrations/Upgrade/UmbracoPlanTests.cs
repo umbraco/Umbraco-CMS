@@ -70,6 +70,7 @@ public class UmbracoPlanTests
     }
 
     [Test]
+    [Ignore("Current plan has no no-op migrations, enable and update state-id/version when one exists.")]
     public void GetVersionForState_NoopMigration_Carries_Forward_Previous_Version()
     {
         UmbracoPlan plan = CreateUmbracoPlan();
@@ -82,7 +83,7 @@ public class UmbracoPlanTests
     }
 
     [Test]
-    [Ignore("Current plan has no no-op migrations, enable and update state-id/version when one exists.")]
+
     public void GetVersionForState_V17_0_0_Returns_Correct_Version()
     {
         UmbracoPlan plan = CreateUmbracoPlan();
