@@ -67,9 +67,10 @@ export interface UmbClassInterface extends UmbControllerHost {
 	): UmbContextConsumerController<BaseType, ResultType>;
 
 	/**
-	 * @description Retrieve a context once as a Promise. Use this only when the context is first needed inside a user action or event handler that runs later (for example a button click, a property action, or an entity action `execute()`). For setup-time access — including a single immediate read — use `consumeContext` instead so the controller lifecycle handles resolution and cleanup.
+	 * @description Retrieve a context once as a Promise. Use this only when the context is first needed inside a user action or event handler that runs later (for example a button click, a property action, or an entity action `execute()`). For setup-time access — including a single immediate read — use `consumeContext` instead so the controller lifecycle handles resolution and cleanup. The returned Promise may reject if the context is not found before the default timeout; callers should handle rejection and/or pass `preventTimeout` in the options when waiting longer is expected.
 	 * @param {string} alias
-	 * @returns {Promise<unknown>} A Promise with the reference to the Context Api Instance
+	 * @param {UmbClassGetContextOptions} [options] Options for resolving the context once, including timeout-related behavior such as `preventTimeout`.
+	 * @returns {Promise<ResultType | undefined>} A Promise resolving to the Context API instance when available, or `undefined` when applicable.
 	 * @memberof UmbClassInterface
 	 */
 	getContext<BaseType extends UmbContextMinimal = UmbContextMinimal, ResultType extends BaseType = BaseType>(
