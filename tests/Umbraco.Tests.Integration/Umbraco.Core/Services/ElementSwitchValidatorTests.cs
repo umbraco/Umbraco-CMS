@@ -283,7 +283,7 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
 
         for (int i = 0; i < amountOfElementsCreated; i++)
         {
-            var element = ElementService.Create($"Element {i}", contentType.Alias);
+            var element = new Element($"Element {i}", contentType);
             ElementService.Save(element);
         }
 
