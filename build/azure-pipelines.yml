@@ -897,12 +897,27 @@ stages:
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn: Deploy_MyGet
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
+    # Run only when Deploy_MyGet actually ran (succeeded or failed) — not when it was skipped due to an upstream test failure.
+    # Inspect Deploy_MyGet's direct result rather than succeeded()/failed(), which are transitive across the full ancestor graph.
+    # Approval is required every run via the WaitForApproval job below.
+    condition: and(in(dependencies.Deploy_MyGet.result, 'Succeeded', 'SucceededWithIssues', 'Failed'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
-      - job:
+      - job: WaitForApproval
+        displayName: Wait for manual approval
+        pool: server
+        timeoutInMinutes: 4320 # 3 days
+        steps:
+          - task: ManualValidation@0
+            displayName: Manual approval to push to NuGet
+            inputs:
+              notifyUsers: ''
+              instructions: 'Approve to push the NuGet release.'
+              onTimeout: 'reject'
+      - job: Push
+        displayName: Push to NuGet
+        dependsOn: WaitForApproval
         pool:
           vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
-        displayName: Push to NuGet
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
