@@ -25,6 +25,8 @@ function toValueKey(v: unknown): string {
 
 export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
 	#pending = new Map<string, Set<unknown>>();
+
+	// TODO: Introduce a Umb Map State for better performance with large datasets and more frequent updates/lookups. [NL]
 	#state = new UmbArrayState<ResolvedEntry>([], (x) => x.key);
 	#resolvers = new Map<string, UmbValueSummaryResolver>();
 
