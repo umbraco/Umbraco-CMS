@@ -1,5 +1,5 @@
 import type { UmbElementEntityType, UmbElementRootEntityType, UmbElementFolderEntityType } from '../entity.js';
-import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbEntityFlag, UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity-flag';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type {
@@ -32,7 +32,7 @@ export interface UmbElementTreeItemVariantModel {
 	name: string;
 	culture: string | null;
 	segment: string | null;
-	state: DocumentVariantStateModel;
+	state: PublishableVariantStateModel;
 	flags: Array<UmbEntityFlag>;
 }
 

@@ -5,7 +5,7 @@ import type {
 	UmbElementTreeRootItemsRequestArgs,
 } from '../types.js';
 import { UmbManagementApiElementTreeDataRequestManager } from './element-tree.server.request-manager.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { ElementTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbTreeAncestorsOfRequestArgs, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
@@ -75,7 +75,7 @@ export class UmbElementTreeServerDataSource
 			flags: item.flags,
 			createDate: item.createDate,
 			variants: item.isFolder
-				? [{ name: item.name, culture: null, segment: null, state: DocumentVariantStateModel.PUBLISHED, flags: [] }]
+				? [{ name: item.name, culture: null, segment: null, state: PublishableVariantStateModel.PUBLISHED, flags: [] }]
 				: item.variants.map((variant) => ({
 						name: variant.name,
 						culture: variant.culture || null,

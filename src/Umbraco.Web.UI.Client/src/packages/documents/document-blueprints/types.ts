@@ -1,7 +1,7 @@
 import type { UmbDocumentBlueprintEntityType } from './entity.js';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import { DocumentVariantStateModel as UmbDocumentBlueprintVariantState } from '@umbraco-cms/backoffice/external/backend-api';
+import { PublishableVariantStateModel as UmbDocumentBlueprintVariantState } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbContentDetailModel, UmbElementValueModel } from '@umbraco-cms/backoffice/content';
 
 export { UmbDocumentBlueprintVariantState };

@@ -14,7 +14,7 @@ import { UMB_ELEMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -458,8 +458,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		return (
 			variants?.some(
 				(variant) =>
-					variant.state === DocumentVariantStateModel.PUBLISHED ||
-					variant.state === DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
+					variant.state === PublishableVariantStateModel.PUBLISHED ||
+					variant.state === PublishableVariantStateModel.PUBLISHED_PENDING_CHANGES,
 			) ?? false
 		);
 	}
