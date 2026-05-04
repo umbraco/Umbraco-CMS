@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
@@ -20,6 +22,12 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
 {
     private readonly IRuntimeState _runtimeState;
     private readonly SignalRSettings _signalRSettings;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
+    /// </summary>
+    [Obsolete("Use the non obsoleted constructor instead. Scheduled for removal in v19")]
+    public BackOfficeAreaRoutes(IRuntimeState runtimeState): this(runtimeState, StaticServiceProvider.Instance.GetRequiredService<IOptions<SignalRSettings>>()){}
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
