@@ -53,25 +53,6 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	}
 
 	/**
-	 * Creates a new variant scaffold.
-	 * @returns A new variant scaffold.
-	 */
-	/*
-	// TODO: remove if not used
-	createVariantScaffold(): UmbElementVariantModel {
-		return {
-			state: null,
-			culture: null,
-			segment: null,
-			name: '',
-			publishDate: null,
-			createDate: null,
-			updateDate: null,
-		};
-	}
-	*/
-
-	/**
 	 * Fetches an Element with the given id from the server
 	 * @param {string} unique
 	 * @returns {*}
