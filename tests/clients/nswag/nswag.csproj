@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>UmbracoDeliveryClient</RootNamespace>
+    <AssemblyName>UmbracoDeliveryClient</AssemblyName>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NSwag.ApiDescription.Client" Version="14.6.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <OpenApiReference Include="spec\delivery.json" CodeGenerator="NSwagCSharp">
+      <OutputPath>$(ProjectDir)UmbracoApi.g.cs</OutputPath>
+      <ClassName>UmbracoApi</ClassName>
+      <Namespace>UmbracoDeliveryClient</Namespace>
+      <Options>/JsonLibrary:SystemTextJson /GenerateClientInterfaces:true /GenerateNullableReferenceTypes:true /GenerateOptionalPropertiesAsNullable:true /GenerateOptionalParameters:true</Options>
+    </OpenApiReference>
+  </ItemGroup>
+
+  <Target Name="DownloadDeliveryApiSpec" BeforeTargets="GenerateNSwagCSharp;BeforeBuild" Condition="!Exists('$(ProjectDir)spec\delivery.json')">
+    <MakeDir Directories="$(ProjectDir)spec" />
+    <Exec Command="curl -sk https://localhost:44339/umbraco/openapi/delivery.json -o &quot;$(ProjectDir)spec/delivery.json&quot;" />
+  </Target>
+
+</Project>

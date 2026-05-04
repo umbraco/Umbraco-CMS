@@ -1,0 +1,4 @@
+node_modules/
+dist/
+**/api/*.gen.ts
+**/api/umbraco-delivery.ts

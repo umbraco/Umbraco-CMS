@@ -1,5 +1,6 @@
 wwwroot/
-umbraco/[Dd]ata/
+umbraco/[Dd]ata/*
+!umbraco/[Dd]ata/Umbraco.Sample.sqlite.db
 umbraco/[Ll]ogs/
 umbraco/[Mm]odels/
 App_Plugins/

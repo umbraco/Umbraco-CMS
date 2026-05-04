@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "outDir": "dist",
+    "rootDir": ".",
+    "resolveJsonModule": true
+  },
+  "include": ["app.ts", "api/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

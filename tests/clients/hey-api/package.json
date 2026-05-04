@@ -1,0 +1,21 @@
+{
+  "name": "delivery-api-hey-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "@hey-api/openapi-ts client to verify the Delivery API OpenAPI document.",
+  "main": "dist/app.js",
+  "scripts": {
+    "generate": "NODE_TLS_REJECT_UNAUTHORIZED=0 openapi-ts -f openapi-ts.config.ts",
+    "build": "npm run generate && tsc --build",
+    "clean": "tsc --build --clean",
+    "start": "npm run build && NODE_TLS_REJECT_UNAUTHORIZED=0 node dist/app.js"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.97.1",
+    "@types/node": "^22.19.1",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

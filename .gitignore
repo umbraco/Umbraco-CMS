@@ -80,7 +80,8 @@ tools/docfx/
 /src/Umbraco.Web.UI/wwwroot/[Mm]edia/
 /src/Umbraco.Web.UI/App_Code/
 /src/Umbraco.Web.UI/App_Plugins/
-/src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/
+/src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/*
+!/src/Umbraco.Web.UI/[Uu]mbraco/[Dd]ata/Umbraco.Sample.sqlite.db
 /src/Umbraco.Web.UI/[Uu]mbraco/[Ll]ogs/
 /src/Umbraco.Web.UI/[Uu]mbraco/[Mm]odels/
 /src/Umbraco.Web.UI/Views/

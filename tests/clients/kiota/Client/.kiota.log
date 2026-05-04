@@ -1,0 +1,3 @@
+Warning: KiotaBuilder No server url found in the OpenAPI document. The base url will need to be set when using the client.
+Warning: KiotaBuilder Duplicate operation GET in path default
+Warning: KiotaBuilder Duplicate operation GET in path default

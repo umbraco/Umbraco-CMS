@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>UmbracoDeliveryClient</RootNamespace>
+    <AssemblyName>UmbracoDeliveryKiotaClient</AssemblyName>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Kiota.Bundle" Version="1.22.1" />
+  </ItemGroup>
+
+  <Target Name="DownloadDeliveryApiSpec" BeforeTargets="GenerateKiotaClient;BeforeBuild" Condition="!Exists('$(ProjectDir)spec\delivery.json')">
+    <MakeDir Directories="$(ProjectDir)spec" />
+    <Exec Command="curl -sk https://localhost:44339/umbraco/openapi/delivery.json -o &quot;$(ProjectDir)spec/delivery.json&quot;" />
+  </Target>
+
+  <Target Name="GenerateKiotaClient" BeforeTargets="BeforeBuild" DependsOnTargets="DownloadDeliveryApiSpec">
+    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet tool restore" />
+    <Exec WorkingDirectory="$(ProjectDir)" Command="dotnet kiota generate -l csharp -d spec/delivery.json -c UmbracoApi -n UmbracoDeliveryClient.Generated -o Client --clean-output --clear-cache --disable-validation-rules all" />
+  </Target>
+
+</Project>

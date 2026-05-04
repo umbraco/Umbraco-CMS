@@ -1,0 +1,24 @@
+{
+  "name": "delivery-api-orval",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Orval-generated client to verify the Delivery API OpenAPI document.",
+  "main": "dist/app.js",
+  "scripts": {
+    "generate": "NODE_TLS_REJECT_UNAUTHORIZED=0 orval --config orval.config.ts",
+    "build": "npm run generate && tsc --build",
+    "clean": "tsc --build --clean",
+    "start": "npm run build && NODE_TLS_REJECT_UNAUTHORIZED=0 node dist/app.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.1",
+    "orval": "^8.9.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "axios": "^1.16.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
