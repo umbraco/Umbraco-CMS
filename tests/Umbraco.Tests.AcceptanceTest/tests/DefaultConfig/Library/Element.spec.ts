@@ -125,7 +125,7 @@ test('can unpublish element', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.library.clickConfirmToUnpublishButton();
 
   // Assert
-  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.elementUnpublished);
   const elementData = await umbracoApi.element.getByName(elementName);
   expect(elementData.variants[0].state).toBe('Draft');
 });
