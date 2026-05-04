@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
+using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing;
@@ -14,7 +15,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing;
 internal sealed class FrontEndApiControllerTests : UmbracoTestServerTestBase
 {
     [Test]
-    public async Task Plain_ApiController_With_Umbraco_Api_Route_Returns_Json()
+    [LongRunning]
+    public async Task Can_Reach_Plain_ApiController_Via_Umbraco_Api_Route()
     {
         var url = PrepareUrl("/umbraco/api/test-front-end/ping");
 
