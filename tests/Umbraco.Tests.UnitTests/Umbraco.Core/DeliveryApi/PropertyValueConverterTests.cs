@@ -37,8 +37,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
 
     protected Mock<IPublishedMediaCache> PublishedMediaCacheMock { get; private set; }
 
-    // TODO ELEMENTS: this needs replacing with IPublishedElementCache when #22369 is merged
-    protected Mock<IElementCacheService> ElementCacheServiceMock { get; private set; }
+    protected Mock<IPublishedElementCache> PublishedElementCacheMock { get; private set; }
 
     protected Mock<IPublishedUrlProvider> PublishedUrlProviderMock { get; private set; }
 
@@ -96,9 +95,9 @@ public class PropertyValueConverterTests : DeliveryApiTests
             .Setup(pcc => pcc.GetById(mediaKey))
             .Returns(publishedMedia.Object);
 
-        ElementCacheServiceMock = new Mock<IElementCacheService>();
-        ElementCacheServiceMock
-            .Setup(ecc => ecc.GetByKeyAsync(elementKey, false))
+        PublishedElementCacheMock = new Mock<IPublishedElementCache>();
+        PublishedElementCacheMock
+            .Setup(ecc => ecc.GetByIdAsync(elementKey, false))
             .Returns(Task.FromResult(publishedElement.Object));
 
         var cacheMock = new Mock<ICacheManager>();
