@@ -62,14 +62,4 @@ public class BlockItemData
     ///     The property values.
     /// </value>
     public IList<BlockPropertyValue> Values { get; set; } = new List<BlockPropertyValue>();
-
-    /// <summary>
-    ///     Gets or sets the raw property values.
-    /// </summary>
-    /// <value>
-    ///     The raw property values.
-    /// </value>
-    [Obsolete("Use Properties instead. Scheduled for removal in Umbraco 18.")]
-    [JsonExtensionData]
-    public Dictionary<string, object?> RawPropertyValues { get; set; } = new();
 }
