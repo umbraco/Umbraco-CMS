@@ -50151,28 +50151,15 @@
       },
       "SignalRClientSettingsResponseModel": {
         "required": [
-          "skipNegotiation",
-          "transports"
+          "skipNegotiation"
         ],
         "type": "object",
         "properties": {
           "skipNegotiation": {
             "type": "boolean"
-          },
-          "transports": {
-            "$ref": "#/components/schemas/SignalRTransportTypeModel"
           }
         },
         "additionalProperties": false
-      },
-      "SignalRTransportTypeModel": {
-        "enum": [
-          "None",
-          "WebSockets",
-          "ServerSentEvents",
-          "LongPolling"
-        ],
-        "type": "string"
       },
       "SortingRequestModel": {
         "required": [

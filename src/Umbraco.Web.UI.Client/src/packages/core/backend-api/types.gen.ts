@@ -2480,15 +2480,7 @@ export type SetAvatarRequestModel = {
 
 export type SignalRClientSettingsResponseModel = {
     skipNegotiation: boolean;
-    transports: SignalRTransportTypeModel;
 };
-
-export enum SignalRTransportTypeModel {
-    NONE = 'None',
-    WEB_SOCKETS = 'WebSockets',
-    SERVER_SENT_EVENTS = 'ServerSentEvents',
-    LONG_POLLING = 'LongPolling'
-}
 
 export type SortingRequestModel = {
     parent?: ReferenceByIdModel | null;

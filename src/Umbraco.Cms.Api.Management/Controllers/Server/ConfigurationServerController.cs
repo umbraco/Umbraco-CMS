@@ -107,7 +107,6 @@ public class ConfigurationServerController : ServerControllerBase
             SignalR = new SignalRClientSettingsResponseModel
             {
                 SkipNegotiation = _signalRSettings.ClientShouldSkipNegotiation,
-                Transports = _signalRSettings.Transports,
             },
         };
 

@@ -3,7 +3,12 @@ import type { UmbManagementApiServerEventModel } from './types.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
-import { HubConnectionBuilder, type HubConnection, type IHttpConnectionOptions } from '@umbraco-cms/backoffice/external/signalr';
+import {
+	HubConnectionBuilder,
+	HttpTransportType,
+	type HubConnection,
+	type IHttpConnectionOptions,
+} from '@umbraco-cms/backoffice/external/signalr';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { filter, Subject } from '@umbraco-cms/backoffice/external/rxjs';
@@ -86,19 +91,15 @@ export class UmbManagementApiServerEventContext extends UmbContextBase {
 		// TODO: get the url from a server config?
 		const serverEventHubUrl = `${serverURL}/umbraco/serverEventHub`;
 
-		const serverConnection = this.#serverContext?.getServerConnection();
+		const skipNegotiation = this.#serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
 
 		const hubOptions: IHttpConnectionOptions = {
 			accessTokenFactory: () => token,
 		};
 
-		const transports = serverConnection?.getSignalRTransports();
-		if (transports !== undefined) {
-			hubOptions.transport = transports;
-		}
-
-		if (serverConnection?.getSignalRSkipNegotiation()) {
+		if (skipNegotiation) {
 			hubOptions.skipNegotiation = true;
+			hubOptions.transport = HttpTransportType.WebSockets;
 		}
 
 		this.#connection = new HubConnectionBuilder().withUrl(serverEventHubUrl, hubOptions).build();

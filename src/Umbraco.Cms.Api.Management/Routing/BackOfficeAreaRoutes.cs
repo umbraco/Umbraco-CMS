@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Management.Controllers.Security;
-using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ServerEvents;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -53,9 +52,9 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
 
     private void ConfigureHubEndpoint(HttpConnectionDispatcherOptions options)
     {
-        if (_signalRSettings.Transports.HasValue)
+        if (_signalRSettings.ClientShouldSkipNegotiation)
         {
-            options.Transports = _signalRSettings.Transports.Value.ToHttpTransportType();
+            options.Transports = HttpTransportType.WebSockets;
         }
     }
 
