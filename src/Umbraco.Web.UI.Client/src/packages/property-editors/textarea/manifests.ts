@@ -26,7 +26,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 				'review',
 				'address',
 				'quote',
-				'comment',
 			],
 			supportsReadOnly: true,
 			settings: {
