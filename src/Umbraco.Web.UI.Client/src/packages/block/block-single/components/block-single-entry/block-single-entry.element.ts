@@ -243,7 +243,10 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		);
 		this.observe(
 			this.#context.readOnlyGuard.permitted,
-			(isReadOnly) => (this._isReadOnly = isReadOnly),
+			(isReadOnly) => {
+				this._isReadOnly = isReadOnly;
+				this.#updateBlockViewProps({ readonly: isReadOnly });
+			},
 			'umbReadOnlyObserver',
 		);
 	}
@@ -441,7 +444,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderEditContentAction() {
-		if (this._isReadOnly) return nothing;
 		return this._showContentEdit && this._workspaceEditContentPath
 			? html`<uui-button
 					label="edit"
@@ -464,7 +466,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
 		return html`
 			${this._hasSettings && this._workspaceEditSettingsPath
 				? html`<uui-button
