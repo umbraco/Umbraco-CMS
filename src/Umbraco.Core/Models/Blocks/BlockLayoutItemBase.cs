@@ -6,10 +6,16 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 public abstract class BlockLayoutItemBase : IBlockLayoutItem
 {
     /// <inheritdoc />
+    public Guid Key { get; set; }
+
+    /// <inheritdoc />
     public Guid ContentKey { get; set; }
 
     /// <inheritdoc />
     public Guid? SettingsKey { get; set; }
+
+    /// <inheritdoc />
+    public bool IsSharedContent { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="BlockLayoutItemBase" /> class.
@@ -44,4 +50,7 @@ public abstract class BlockLayoutItemBase : IBlockLayoutItem
     /// <inheritdoc />
     public virtual bool ReferencesSetting(Guid key)
         => SettingsKey == key;
+
+    /// <inheritdoc />
+    public virtual IEnumerable<IBlockLayoutItem> GetContainedLayouts() => [];
 }

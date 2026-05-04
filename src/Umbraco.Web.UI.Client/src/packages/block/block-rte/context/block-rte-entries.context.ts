@@ -10,6 +10,7 @@ import {
 } from '@umbraco-cms/backoffice/clipboard';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UmbElementTypeStructureRepository } from '@umbraco-cms/backoffice/element';
 import type { UmbPropertyEditorRteValueType } from '@umbraco-cms/backoffice/rte';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -77,12 +78,20 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				const config = propertyContext.getConfig();
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
+				// Fetch element types allowed in the library, filtered to those matching block types
+				const blockTypeKeys = new Set(blockTypes.map((bt) => bt.contentElementTypeKey));
+				const elementTypeStructureRepo = new UmbElementTypeStructureRepository(this);
+				const { data: allowedTypes } = await elementTypeStructureRepo.requestAllowedChildrenOf(null, null);
+				const libraryAllowedElementTypeKeys =
+					allowedTypes?.items.filter((t) => t.unique && blockTypeKeys.has(t.unique)).map((t) => t.unique!) ?? [];
+
 				return {
 					modal: { size: modalSize },
 					data: {
 						blocks: blockTypes,
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
+						libraryAllowedElementTypeKeys,
 						clipboardFilter: async (clipboardEntryDetail) => {
 							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
 								pasteTranslatorManifests,
@@ -114,7 +123,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				};
 			})
 			.onSubmit(async (value, data) => {
-				if (value?.create && data) {
+				if (value && 'create' in value && data) {
 					const created = await this.create(
 						value.create.contentElementTypeKey,
 						{},
@@ -130,7 +139,12 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 					} else {
 						throw new Error('Failed to create block');
 					}
-				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
+				} else if (value && 'library' in value && data) {
+					await this._manager?.insertLibraryElement(
+						value.library.elementKey,
+						data.originData as UmbBlockRteWorkspaceOriginData,
+					);
+				} else if (value && 'clipboard' in value && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 					if (!clipboardContext) {
 						throw new Error('Clipboard context not found');
@@ -193,7 +207,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 
 	async create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentKey'>,
+		partialLayoutEntry?: Omit<UmbBlockRteLayoutModel, 'contentKey' | 'key'>,
 		originData?: UmbBlockRteWorkspaceOriginData,
 	) {
 		await this._retrieveManager;

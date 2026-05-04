@@ -30,7 +30,7 @@ export abstract class UmbBlockEntriesContext<
 
 	public abstract readonly canCreate: Observable<boolean>;
 
-	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.contentKey);
+	protected _layoutEntries = new UmbArrayState<BlockLayoutType>([], (x) => x.key);
 	readonly layoutEntries = this._layoutEntries.asObservable();
 	readonly layoutEntriesLength = this._layoutEntries.asObservablePart((x) => x.length);
 
@@ -64,8 +64,14 @@ export abstract class UmbBlockEntriesContext<
 	layoutOf(contentKey: string) {
 		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}
+	byKey(key: string) {
+		return this._layoutEntries.asObservablePart((source) => source.find((x) => x.key === key));
+	}
 	getLayoutOf(contentKey: string) {
 		return this._layoutEntries.getValue().find((x) => x.contentKey === contentKey);
+	}
+	getByKey(key: string) {
+		return this._layoutEntries.getValue().find((x) => x.key === key);
 	}
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		return this._layoutEntries.setValue(layouts);
@@ -79,7 +85,7 @@ export abstract class UmbBlockEntriesContext<
 
 	public abstract create(
 		contentElementTypeKey: string,
-		layoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		layoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 		originData?: BlockOriginData,
 	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
@@ -90,19 +96,25 @@ export abstract class UmbBlockEntriesContext<
 		originData: BlockOriginData,
 	): Promise<boolean>;
 
-	public async delete(contentKey: string) {
+	public async delete(key: string) {
 		await this._retrieveManager;
-		const layout = this._layoutEntries.value.find((x) => x.contentKey === contentKey);
+		const layout = this._layoutEntries.value.find((x) => x.key === key);
 		if (!layout) {
-			throw new Error(`Cannot delete block, missing layout for ${contentKey}`);
+			throw new Error(`Cannot delete block, missing layout for ${key}`);
 		}
-		this._layoutEntries.removeOne(contentKey);
+		this._layoutEntries.removeOne(key);
 
-		this._manager!.removeOneContent(contentKey);
-		if (layout.settingsKey) {
-			this._manager!.removeOneSettings(layout.settingsKey);
+		// Only remove content/settings/exposes if no other layout references the same contentKey
+		const hasOtherReference = this._layoutEntries.value.some(
+			(x) => x.key !== key && x.contentKey === layout.contentKey,
+		);
+		if (!hasOtherReference) {
+			this._manager!.removeOneContent(layout.contentKey);
+			if (layout.settingsKey) {
+				this._manager!.removeOneSettings(layout.settingsKey);
+			}
+			this._manager!.removeExposesOf(layout.contentKey);
 		}
-		this._manager!.removeExposesOf(contentKey);
 	}
 
 	// insert/paste from property value methods:
@@ -125,6 +137,12 @@ export abstract class UmbBlockEntriesContext<
 		value: UmbBlockValueType,
 		originData: BlockOriginData,
 	) {
+		// Library-element references have no inline contentData — insert as a reference instead.
+		if (layoutEntry.isSharedContent) {
+			await this._manager?.insertLibraryElement(layoutEntry.contentKey, originData);
+			return;
+		}
+
 		const content = value.contentData.find((x) => x.key === layoutEntry.contentKey);
 		if (!content) {
 			throw new Error('No content found for layout entry');

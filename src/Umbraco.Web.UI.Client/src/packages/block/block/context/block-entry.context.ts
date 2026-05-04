@@ -17,12 +17,14 @@ import {
 	mergeObservables,
 	observeMultiple,
 } from '@umbraco-cms/backoffice/observable-api';
-import { encodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
+import { encodeFilePath, UmbDeprecation, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
+import { UmbModalRouteRegistrationController, UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import { UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN, UMB_ELEMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/element';
+import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBlockTypeBaseModel } from '@umbraco-cms/backoffice/block-type';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
@@ -52,11 +54,20 @@ export abstract class UmbBlockEntryContext<
 	protected _manager?: BlockManagerContextType;
 	protected _entries?: BlockEntriesContextType;
 
+	#key?: string;
 	#contentKey?: string;
 	#unsupported = new UmbBooleanState(undefined);
 	readonly unsupported = this.#unsupported.asObservable();
 
 	protected readonly localize = new UmbLocalizationController(this);
+
+	#isLibraryElement = new UmbBooleanState(false);
+	/** Observable that emits true when this block references shared content from the Element Library. */
+	readonly isLibraryElement = this.#isLibraryElement.asObservable();
+
+	#sharedContentVariantState = new UmbStringState(undefined);
+	/** Observable of the shared element's variant state (e.g. 'Published', 'Draft'), resolved for the active culture/segment. */
+	readonly sharedContentVariantState = this.#sharedContentVariantState.asObservable();
 
 	#pathAddendum = new UmbRoutePathAddendumContext(this);
 	#variantId = new UmbClassState<UmbVariantId | undefined>(undefined);
@@ -140,7 +151,7 @@ export abstract class UmbBlockEntryContext<
 	public readonly layout = this._layout.asObservable();
 	public readonly contentKey = this._layout.asObservablePart((x) => x?.contentKey);
 	public readonly settingsKey = this._layout.asObservablePart((x) => (x ? (x.settingsKey ?? null) : undefined));
-	public readonly unique = this._layout.asObservablePart((x) => x?.contentKey);
+	public readonly unique = this._layout.asObservablePart((x) => x?.key);
 
 	/**
 	 * Get the layout of the block.
@@ -166,9 +177,18 @@ export abstract class UmbBlockEntryContext<
 
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
+
+	#libraryElementWorkspacePath = new UmbStringState(undefined);
+
 	public readonly workspaceEditContentPath = mergeObservables(
-		[this.contentKey, this.workspacePath],
-		([contentKey, path]) => this.#generateWorkspaceEditContentPath(path, contentKey),
+		[this.contentKey, this.workspacePath, this.isLibraryElement, this.#libraryElementWorkspacePath.asObservable()],
+		([contentKey, path, isLibrary, libraryPath]) => {
+			if (!contentKey) return '';
+			if (isLibrary && libraryPath) {
+				return libraryPath + UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: contentKey });
+			}
+			return this.#generateWorkspaceEditContentPath(path, contentKey);
+		},
 	);
 	public readonly workspaceEditSettingsPath = mergeObservables(
 		[this.contentKey, this.workspacePath],
@@ -442,14 +462,37 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	/**
+	 * Set the key of this entry — the unique identity of the block layout item.
+	 * @param {string} key the block key.
+	 */
+	setKey(key: string) {
+		this.#key = key;
+		this.#observeLayout();
+	}
+
+	getKey() {
+		return this.#key;
+	}
+
+	/**
 	 * Set the contentKey of this entry.
 	 * @function setContentKey
 	 * @param {string} contentKey the entry content key.
 	 * @returns {void}
+	 * @deprecated Use `setKey` instead. Will be removed in Umbraco 20.
 	 */
 	setContentKey(contentKey: string) {
+		new UmbDeprecation({
+			deprecated: 'UmbBlockEntryContext.setContentKey',
+			solution: 'Use setKey() with the block layout key instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this.#contentKey = contentKey;
-		this.#observeLayout();
+		// Backwards compat: if no key set yet, use contentKey
+		if (!this.#key) {
+			this.#key = contentKey;
+			this.#observeLayout();
+		}
 	}
 
 	/**
@@ -481,12 +524,16 @@ export abstract class UmbBlockEntryContext<
 	}
 
 	#observeLayout() {
-		if (!this._entries || !this.#contentKey) return;
+		if (!this._entries || !this.#key) return;
 
 		this.observe(
-			this._entries.layoutOf(this.#contentKey),
+			this._entries.byKey(this.#key),
 			(layout) => {
 				this._layout.setValue(layout);
+				// Derive contentKey from the layout so internal flows have it without external setters.
+				if (layout?.contentKey) {
+					this.#contentKey = layout.contentKey;
+				}
 			},
 			'observeParentLayout',
 		);
@@ -522,24 +569,52 @@ export abstract class UmbBlockEntryContext<
 			},
 			'observeWorkspacePath',
 		);
+
+		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
+			.addAdditionalPath('library-element')
+			.addUniquePaths(['unique'])
+			.onSetup(() => {
+				return {
+					data: { entityType: UMB_ELEMENT_ENTITY_TYPE, preset: {} },
+					modal: { size: 'large' },
+				};
+			})
+			.observeRouteBuilder((routeBuilder) => {
+				this.#libraryElementWorkspacePath.setValue(routeBuilder({ entityType: UMB_ELEMENT_ENTITY_TYPE }));
+			});
 	}
 
 	protected abstract _gotEntries(): void;
 
 	#observeContentData() {
-		if (!this._manager || !this.#contentKey) return;
+		const contentKey = this.#contentKey ?? this._layout.value?.contentKey;
+		if (!this._manager || !contentKey) return;
 
-		// observe content:
+		// Observe content and library state together to avoid race conditions.
+		// Both are evaluated in the same tick, preventing the unsupported flag
+		// from flashing true while library element content is being fetched.
 		this.observe(
-			this._manager.contentOf(this.#contentKey),
-			(content) => {
+			mergeObservables(
+				[this._manager.contentOf(contentKey), this._manager.isSharedContentOf(contentKey)],
+				([content, isLibrary]) => ({ content, isLibrary: isLibrary ?? false }),
+			),
+			({ content, isLibrary }) => {
+				this.#isLibraryElement.setValue(isLibrary);
 				if (this.#unsupported.getValue() !== true) {
-					// If we could not find content, then we do not know the contentTypeKey and then the content is broken. [NL]
-					this.#unsupported.setValue(!content);
+					this.#unsupported.setValue(!content && !isLibrary);
 				}
 				this.#content.setValue(content);
 			},
 			'observeContent',
+		);
+
+		// Observe the variant state of shared content (published, draft, etc.)
+		this.observe(
+			this._manager.sharedContentVariantStateOf(contentKey),
+			(state) => {
+				this.#sharedContentVariantState.setValue(state ?? undefined);
+			},
+			'observeSharedContentVariantState',
 		);
 	}
 	#observeSettingsData() {

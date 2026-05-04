@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
 
@@ -12,14 +13,17 @@ namespace Umbraco.Cms.Core.PropertyEditors;
 internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : JsonPropertyIndexValueFactoryBase<TSerialized>
 {
     private readonly PropertyEditorCollection _propertyEditorCollection;
+    private readonly IElementService _elementService;
 
     protected BlockValuePropertyIndexValueFactoryBase(
         PropertyEditorCollection propertyEditorCollection,
+        IElementService elementService,
         IJsonSerializer jsonSerializer,
         IOptionsMonitor<IndexingSettings> indexingSettings)
         : base(jsonSerializer, indexingSettings)
     {
         _propertyEditorCollection = propertyEditorCollection;
+        _elementService = elementService;
     }
 
     protected override IEnumerable<IndexValue> Handle(
@@ -106,37 +110,70 @@ internal abstract class BlockValuePropertyIndexValueFactoryBase<TSerialized> : J
     /// <summary>
     /// Unwraps block item data as data items.
     /// </summary>
-    protected IEnumerable<RawDataItem> GetDataItems(IList<BlockItemData> contentData, IList<BlockItemVariation> expose, bool published)
+    protected IEnumerable<RawDataItem> GetDataItems(IEnumerable<IBlockLayoutItem> layouts, IList<BlockItemData> contentData, IList<BlockItemVariation> expose, bool published)
     {
+        List<RawDataItem> indexData;
         if (published is false)
         {
-            return contentData.Select(ToRawData);
+            indexData = contentData.Select(ToRawData).ToList();
+        }
+        else
+        {
+            indexData = new();
+            foreach (BlockItemData blockItemData in contentData)
+            {
+                var exposedCultures = expose
+                    .Where(e => e.ContentKey == blockItemData.Key)
+                    .Select(e => e.Culture)
+                    .ToArray();
+
+                if (exposedCultures.Any() is false)
+                {
+                    continue;
+                }
+
+                if (exposedCultures.Contains(null)
+                    || exposedCultures.ContainsAll(blockItemData.Values.Select(v => v.Culture)))
+                {
+                    indexData.Add(ToRawData(blockItemData));
+                    continue;
+                }
+
+                indexData.Add(
+                    ToRawData(
+                        blockItemData.ContentTypeKey,
+                        blockItemData.Values.Where(value => value.Culture is null || exposedCultures.Contains(value.Culture))));
+            }
         }
 
-        var indexData = new List<RawDataItem>();
-        foreach (BlockItemData blockItemData in contentData)
+        IBlockLayoutItem[] layoutsAsArray = layouts as IBlockLayoutItem[] ?? layouts.ToArray();
+        Guid[] sharedElementKeys = layoutsAsArray
+            .Union(layoutsAsArray.SelectMany(l => l.GetContainedLayouts()))
+            .Where(l => l.IsSharedContent)
+            .Select(l => l.ContentKey)
+            .ToArray();
+
+        if (sharedElementKeys.Length > 0)
         {
-            var exposedCultures = expose
-                .Where(e => e.ContentKey == blockItemData.Key)
-                .Select(e => e.Culture)
-                .ToArray();
-
-            if (exposedCultures.Any() is false)
-            {
-                continue;
-            }
-
-            if (exposedCultures.Contains(null)
-                || exposedCultures.ContainsAll(blockItemData.Values.Select(v => v.Culture)))
-            {
-                indexData.Add(ToRawData(blockItemData));
-                continue;
-            }
-
-            indexData.Add(
-                ToRawData(
-                    blockItemData.ContentTypeKey,
-                    blockItemData.Values.Where(value => value.Culture is null || exposedCultures.Contains(value.Culture))));
+            IEnumerable<IElement> elements = _elementService.GetByIds(sharedElementKeys);
+            indexData.AddRange(
+                elements.Select(element => new RawDataItem
+                {
+                    ContentTypeKey = element.ContentType.Key,
+                    Properties = element
+                        .Properties
+                        .SelectMany(property => property
+                            .Values
+                            .Select(value => new RawPropertyData
+                            {
+                                Alias = property.Alias,
+                                Culture = value.Culture,
+                                Value = published
+                                    ? value.PublishedValue
+                                    : value.EditedValue,
+                            }))
+                        .ToArray(),
+                }));
         }
 
         return indexData;

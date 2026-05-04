@@ -2,7 +2,7 @@ import type { UmbBlockRteLayoutModel, UmbBlockRteValueModel } from '../../types.
 import { UMB_BLOCK_RTE, UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
@@ -23,10 +23,35 @@ import '../ref-rte-block/index.js';
  */
 @customElement('umb-rte-block')
 export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropertyEditorUiElement {
+	/**
+	 * The unique key of this block layout entry.
+	 */
+	@property({ type: String, attribute: 'data-key', reflect: true })
+	public set key(value: string | undefined) {
+		if (!value) return;
+		this._key = value;
+		this.#context.setKey(value);
+	}
+	public get key(): string | undefined {
+		return this._key;
+	}
+	private _key?: string | undefined;
+
+	/**
+	 * @deprecated Use `key` instead. Will be removed in Umbraco 20.
+	 */
 	@property({ type: String, attribute: 'data-content-key', reflect: true })
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
+		new UmbDeprecation({
+			deprecated: 'umb-rte-block.contentKey property',
+			solution: 'Use the `key` property instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this._contentKey = value;
+		if (!this._key) {
+			this.#context.setKey(value);
+		}
 		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(

@@ -7,7 +7,7 @@ import {
 } from '../../constants.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
@@ -38,13 +38,58 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.#context.setIndex(value);
 	}
 
+	/**
+	 * Set the layout entry for this block.
+	 */
+	@property({ attribute: false })
+	public set layout(value: UmbBlockSingleLayoutModel | undefined) {
+		if (!value) return;
+		const key = value.key;
+		const contentKey = value.contentKey;
+
+		if (key && key !== this._key) {
+			this._key = key;
+			this.#context.setKey(key);
+		}
+
+		if (contentKey && contentKey !== this._contentKey) {
+			this._contentKey = contentKey;
+
+			new UmbObserveValidationStateController(
+				this,
+				`$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]`,
+				(hasMessages) => {
+					this._contentInvalid = hasMessages;
+					this._blockViewProps.contentInvalid = hasMessages;
+				},
+				'observeMessagesForContent',
+			);
+		}
+	}
+
+	public get key(): string | undefined {
+		return this._key;
+	}
+	private _key?: string | undefined;
+
+	/**
+	 * @deprecated Use the `layout` property instead. Will be removed in Umbraco 20.
+	 */
 	@property({ attribute: false })
 	public get contentKey(): string | undefined {
 		return this._contentKey;
 	}
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
+		new UmbDeprecation({
+			deprecated: 'umb-block-single-entry.contentKey property',
+			solution: 'Use the `layout` property instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this._contentKey = value;
+		if (!this._key) {
+			this.#context.setKey(value);
+		}
 		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(

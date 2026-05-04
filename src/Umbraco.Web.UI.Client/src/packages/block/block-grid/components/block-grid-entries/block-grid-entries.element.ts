@@ -112,10 +112,10 @@ function resolvePlacementAsBlockGrid(
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentKey!;
+		return element.key!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentKey;
+		return modelEntry.key;
 	},
 	resolvePlacement: resolvePlacementAsBlockGrid,
 	identifier: 'block-grid-editor',
@@ -400,12 +400,11 @@ export class UmbBlockGridEntriesElement extends UmbFormControlMixin(UmbLitElemen
 			<div class="umb-block-grid__layout-container" data-area-length=${this._layoutEntries.length}>
 				${repeat(
 					this._layoutEntries,
-					(layout) => layout.contentKey,
+					(layout) => layout.key,
 					(layout, index) =>
 						html`<umb-block-grid-entry
 							class="umb-block-grid__layout-item"
 							index=${index}
-							.contentKey=${layout.contentKey}
 							.layout=${layout}>
 						</umb-block-grid-entry>
 					`,

@@ -40,10 +40,10 @@ import '../../components/block-list-entry/index.js';
 
 const SORTER_CONFIG: UmbSorterConfig<UmbBlockListLayoutModel, UmbBlockListEntryElement> = {
 	getUniqueOfElement: (element) => {
-		return element.contentKey!;
+		return element.key!;
 	},
 	getUniqueOfModel: (modelEntry) => {
-		return modelEntry.contentKey;
+		return modelEntry.key;
 	},
 	//identifier: 'block-list-editor',
 	itemSelector: 'umb-block-list-entry',
@@ -406,15 +406,10 @@ export class UmbPropertyEditorUIBlockListElement
 			${this.#renderSortModeToolbar()}
 			${repeat(
 				this._layouts,
-				(layout) => layout.contentKey,
+				(layout) => layout.key,
 				(layout, index) => html`
 					${this.#renderInlineCreateButton(index)}
-					<umb-block-list-entry
-						index=${index}
-						.contentKey=${layout.contentKey}
-						.layout=${layout}
-						${umbDestroyOnDisconnect()}>
-					</umb-block-list-entry>
+					<umb-block-list-entry index=${index} .layout=${layout} ${umbDestroyOnDisconnect()}></umb-block-list-entry>
 				`,
 			)}
 			${this.#renderCreateButtonGroup()}

@@ -76,7 +76,7 @@ public class MigrateSingleBlockList : AsyncMigrationBase
         SingleBlockListConfigurationCache blockListConfigurationCache,
         IDataValueEditorFactory dataValueEditorFactory,
         IIOHelper ioHelper,
-        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory,
+        ISingleBlockPropertyIndexValueFactory blockValuePropertyIndexValueFactory,
         IBlockEditorElementTypeCache elementTypeCache,
         AppCaches appCaches)
         : base(context)

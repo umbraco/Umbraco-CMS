@@ -6,6 +6,7 @@ export const UMB_ELEMENT_PUBLISH_MODAL_ALIAS = 'Umb.Modal.ElementPublish';
 export interface UmbElementPublishModalData extends UmbElementVariantPickerData {
 	headline?: string;
 	confirmLabel?: string;
+	unique?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

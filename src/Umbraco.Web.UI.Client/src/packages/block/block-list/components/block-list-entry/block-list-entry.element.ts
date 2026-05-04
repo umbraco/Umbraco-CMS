@@ -8,9 +8,11 @@ import {
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
-import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { UmbDataPathBlockElementDataQuery, UMB_BLOCK_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/block';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type {
@@ -37,10 +39,55 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		return this.#context.getIndex();
 	}
 
+	/**
+	 * Set the layout entry for this block.
+	 */
+	@property({ attribute: false })
+	public set layout(value: UmbBlockListLayoutModel | undefined) {
+		if (!value) return;
+		const key = value.key;
+		const contentKey = value.contentKey;
+
+		if (key && key !== this._key) {
+			this._key = key;
+			this.#context.setKey(key);
+		}
+
+		if (contentKey && contentKey !== this._contentKey) {
+			this._contentKey = contentKey;
+
+			new UmbObserveValidationStateController(
+				this,
+				`$.contentData[${UmbDataPathBlockElementDataQuery({ key: contentKey })}]`,
+				(hasMessages) => {
+					this._contentInvalid = hasMessages;
+					this._blockViewProps.contentInvalid = hasMessages;
+				},
+				'observeMessagesForContent',
+			);
+		}
+	}
+
+	public get key(): string | undefined {
+		return this._key;
+	}
+	private _key?: string | undefined;
+
+	/**
+	 * @deprecated Use the `layout` property instead. Will be removed in Umbraco 20.
+	 */
 	@property({ attribute: false })
 	public set contentKey(value: string | undefined) {
 		if (!value) return;
+		new UmbDeprecation({
+			deprecated: 'umb-block-list-entry.contentKey property',
+			solution: 'Use the `layout` property instead.',
+			removeInVersion: '20.0.0',
+		}).warn();
 		this._contentKey = value;
+		if (!this._key) {
+			this.#context.setKey(value);
+		}
 		this.#context.setContentKey(value);
 
 		new UmbObserveValidationStateController(
@@ -81,6 +128,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _exposed?: boolean;
 
+	private _hasExpose?: boolean;
+
 	@state()
 	private _unsupported?: boolean;
 
@@ -117,6 +166,15 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this._blockViewProps = { ...this._blockViewProps, ...incoming };
 		this.requestUpdate('_blockViewProps');
 	}
+
+	@state()
+	private _isLibraryElement = false;
+
+	@state()
+	private _sharedContentVariantState: string | null | undefined;
+
+	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
+	private _isReferenceAttr = false;
 
 	@state()
 	private _isReadOnly = false;
@@ -170,8 +228,8 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(
 			this.#context.hasExpose,
 			(exposed) => {
-				this.#updateBlockViewProps({ unpublished: !exposed });
-				this._exposed = exposed;
+				this._hasExpose = exposed;
+				this.#updateExposedState();
 			},
 			null,
 		);
@@ -194,6 +252,23 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
+		this.observe(
+			this.#context.isLibraryElement,
+			(isLibrary) => {
+				this._isLibraryElement = isLibrary;
+				this._isReferenceAttr = isLibrary;
+				this.#updateExposedState();
+			},
+			null,
+		);
+		this.observe(
+			this.#context.sharedContentVariantState,
+			(state) => {
+				this._sharedContentVariantState = state;
+				this.#updateExposedState();
+			},
+			null,
+		);
 
 		// Data props:
 		this.observe(
@@ -298,6 +373,15 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#expose = () => {
 		this.#context.expose();
 	};
+
+	#updateExposedState() {
+		// Shared content blocks use the element's variant state; local blocks use the expose entry
+		const isExposed = this._isLibraryElement
+			? this._sharedContentVariantState !== DocumentVariantStateModel.DRAFT
+			: this._hasExpose;
+		this.#updateBlockViewProps({ unpublished: !isExposed });
+		this._exposed = isExposed;
+	}
 
 	async #copyToClipboard() {
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
@@ -448,11 +532,46 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		if (!this._showActions) return nothing;
 		return html`
 			<uui-action-bar>
-				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderCopyToClipboardAction()}
+				${this.#renderEditContentAction()} ${this.#renderEditSettingsAction()} ${this.#renderTransferToLibraryAction()}
+				${this.#renderDisconnectFromLibraryAction()} ${this.#renderCopyToClipboardAction()}
 				${this.#renderDeleteAction()}
 			</uui-action-bar>
 		`;
 	}
+
+	#renderTransferToLibraryAction() {
+		if (this._isReadOnly || this._isLibraryElement) return nothing;
+		const label = this.localize.term('blockEditor_transferToLibrary');
+		return html`
+			<uui-button look="secondary" label=${label} title=${label} @click=${this.#onTransferToLibrary}>
+				<uui-icon name="icon-link"></uui-icon>
+			</uui-button>
+		`;
+	}
+
+	#renderDisconnectFromLibraryAction() {
+		if (this._isReadOnly || !this._isLibraryElement) return nothing;
+		const label = this.localize.term('blockEditor_disconnectFromLibrary');
+		return html`
+			<uui-button look="secondary" label=${label} title=${label} @click=${this.#onDisconnectFromLibrary}>
+				<uui-icon name="icon-unlink"></uui-icon>
+			</uui-button>
+		`;
+	}
+
+	#onTransferToLibrary = async () => {
+		const key = this._key;
+		if (!key) return;
+		const manager = await this.getContext(UMB_BLOCK_MANAGER_CONTEXT).catch(() => undefined);
+		manager?.requestTransferToLibrary(key);
+	};
+
+	#onDisconnectFromLibrary = async () => {
+		const key = this._key;
+		if (!key) return;
+		const manager = await this.getContext(UMB_BLOCK_MANAGER_CONTEXT).catch(() => undefined);
+		manager?.requestDisconnectFromLibrary(key);
+	};
 
 	#renderEditContentAction() {
 		if (this._isReadOnly) return nothing;
@@ -499,9 +618,15 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#renderDeleteAction() {
 		if (this._isReadOnly) return nothing;
-		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()} title=${this.localize.term('general_delete')}>
-			<uui-icon name="icon-remove"></uui-icon>
-		</uui-button>`;
+		return html`
+			<uui-button
+				label="delete"
+				look="secondary"
+				@click=${() => this.#context.requestDelete()}
+				title=${this.localize.term('general_delete')}>
+				<uui-icon name="icon-remove"></uui-icon>
+			</uui-button>
+		`;
 	}
 
 	#renderCopyToClipboardAction() {
@@ -607,6 +732,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			:host([drag-placeholder]) .umb-block-list__block {
 				transition: opacity 50ms 16ms;
 				opacity: 0;
+			}
+
+			:host([is-reference]:hover)::after {
+				border-color: var(--uui-color-violet);
 			}
 		`,
 	];

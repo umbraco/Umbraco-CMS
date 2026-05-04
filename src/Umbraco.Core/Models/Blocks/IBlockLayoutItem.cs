@@ -9,6 +9,18 @@ namespace Umbraco.Cms.Core.Models.Blocks;
 public interface IBlockLayoutItem
 {
     /// <summary>
+    ///     Gets or sets the layout item key.
+    /// </summary>
+    /// <value>
+    ///     The layout item key.
+    /// </value>
+    /// <remarks>
+    ///     Uniquely identifies a layout item. Previously the <see cref="ContentKey"/> could be used for this, but
+    ///     with reusable elements, the same <see cref="ContentKey"/> can appear multiple times in one layout.
+    /// </remarks>
+    public Guid Key { get; set; }
+
+    /// <summary>
     ///     Gets or sets the content key.
     /// </summary>
     /// <value>
@@ -23,6 +35,12 @@ public interface IBlockLayoutItem
     ///     The settings key.
     /// </value>
     public Guid? SettingsKey { get; set; }
+
+    /// <summary>
+    ///     Indicates if the content source is local or originates from the element service.
+    /// </summary>
+    // TODO KJA: We need a proper name for this.
+    public bool IsSharedContent { get; set; }
 
     /// <summary>
     ///     Determines whether this layout item references the specified content key.
@@ -41,4 +59,10 @@ public interface IBlockLayoutItem
     ///     <c>true</c> if this layout item references the specified settings key; otherwise, <c>false</c>.
     /// </returns>
     public bool ReferencesSetting(Guid key) => SettingsKey == key;
+
+    /// <summary>
+    ///     Returns any nested layouts for this layout (e.g. area layouts for the Block Grid).
+    /// </summary>
+    /// <returns>The nested layouts.</returns>
+    public IEnumerable<IBlockLayoutItem> GetContainedLayouts();
 }

@@ -1,5 +1,10 @@
 import type { UmbBlockWorkspaceOriginData } from '../workspace/index.js';
-import type { UmbBlockLayoutBaseModel, UmbBlockDataModel, UmbBlockExposeModel } from '../types.js';
+import type {
+	UmbBlockDataModel,
+	UmbBlockDataValueModel,
+	UmbBlockExposeModel,
+	UmbBlockLayoutBaseModel,
+} from '../types.js';
 import { UmbBlockInsertedEvent } from '../events/block-inserted.event.js';
 import { UMB_BLOCK_MANAGER_CONTEXT } from './block-manager.context-token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
@@ -26,6 +31,9 @@ import {
 } from '@umbraco-cms/backoffice/property';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
+import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
+import { UMB_BLOCK_TRANSFER_TO_LIBRARY_MODAL } from '../modals/transfer-to-library/transfer-to-library-modal.token.js';
+import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
 	layout: LayoutEntryType;
@@ -69,11 +77,21 @@ export abstract class UmbBlockManagerContext<
 	protected _liveEditingMode = new UmbBooleanState(undefined);
 	public readonly liveEditingMode = this._liveEditingMode.asObservable();
 
-	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.contentKey);
+	protected _layouts = new UmbArrayState(<Array<BlockLayoutType>>[], (x) => x.key);
 	public readonly layouts = this._layouts.asObservable();
 
 	readonly #contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly contents = this.#contents.asObservable();
+
+	readonly #resolvedLibraryElements = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
+	readonly #resolvedLibraryElementVariants = new UmbArrayState(
+		<
+			Array<{ key: string; variants: Array<{ culture: string | null; segment: string | null; state: string | null }> }>
+		>[],
+		(x) => x.key,
+	);
+	#elementRepository = new UmbElementDetailRepository(this);
+	#pendingElementFetches = new Set<string>();
 
 	readonly #settings = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly settings = this.#settings.asObservable();
@@ -112,6 +130,10 @@ export abstract class UmbBlockManagerContext<
 	 * @param {Array<BlockLayoutType>} layouts - All layouts.
 	 */
 	setLayouts(layouts: Array<BlockLayoutType>) {
+		// Backwards compatibility: ensure all layouts have a key (persisted data may not have one)
+		layouts.forEach((l) => {
+			l.key ??= l.contentKey;
+		});
 		this._layouts.setValue(layouts);
 	}
 
@@ -178,6 +200,19 @@ export abstract class UmbBlockManagerContext<
 			this.blockTypes,
 			(blockTypes) => {
 				this.#ensureContentTypes(blockTypes);
+			},
+			null,
+		);
+
+		// Auto-resolve content for any layout marked as shared, whenever layouts change.
+		this.observe(
+			this._layouts.asObservable(),
+			(layouts) => {
+				layouts.forEach((layout) => {
+					if (layout.isSharedContent && layout.contentKey) {
+						this.#fetchLibraryElement(layout.contentKey);
+					}
+				});
 			},
 			null,
 		);
@@ -293,8 +328,94 @@ export abstract class UmbBlockManagerContext<
 		return this._layouts.asObservablePart((source) => source.find((x) => x.contentKey === contentKey));
 	}
 	contentOf(key: string) {
-		return this.#contents.asObservablePart((source) => source.find((x) => x.key === key));
+		return mergeObservables(
+			[
+				this.#contents.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.#resolvedLibraryElements.asObservablePart((source) => source.find((x) => x.key === key)),
+			],
+			([localContent, libraryContent]) => localContent ?? libraryContent ?? undefined,
+		);
 	}
+
+	/**
+	 * Returns an observable that emits true when the layout for the given contentKey
+	 * has `isSharedContent` set (i.e., the block references a library element).
+	 */
+	isSharedContentOf(key: string) {
+		return this._layouts.asObservablePart(
+			(source) => source.find((x) => x.contentKey === key)?.isSharedContent === true,
+		);
+	}
+
+	/**
+	 * Returns an observable of the variant state for a shared/library element,
+	 * resolved against the manager's active variantId (culture/segment).
+	 * Emits the state string (e.g., 'Published', 'Draft') or null if not resolved yet.
+	 */
+	sharedContentVariantStateOf(key: string) {
+		return mergeObservables(
+			[
+				this.#resolvedLibraryElementVariants.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.variantId,
+			],
+			([entry, variantId]) => {
+				if (!entry?.variants.length) return null;
+				if (!variantId) return entry.variants[0]?.state ?? null;
+				const match = entry.variants.find((v) => v.culture === variantId.culture && v.segment === variantId.segment);
+				return match?.state ?? entry.variants[0]?.state ?? null;
+			},
+		);
+	}
+
+	/**
+	 * Imperatively triggers a fetch for a library element if the layout has isSharedContent set.
+	 * Called by block entry contexts when setContentKey() is invoked.
+	 */
+	ensureContentResolved(key: string) {
+		const layout = this._layouts.getValue().find((x) => x.contentKey === key);
+		if (layout?.isSharedContent) {
+			this.#fetchLibraryElement(key);
+		}
+	}
+
+	// TODO: [@madsrasmussen] Replace per-key fetches here with a batching manager that bundles multiple
+	// element requests into a single round-trip. Today this issues one request per shared block, which
+	// can become N+1 on pages with many references. The batching manager should also cache and dedupe.
+	async #fetchLibraryElement(key: string) {
+		if (this.#pendingElementFetches.has(key)) return;
+		if (this.#resolvedLibraryElements.getValue().some((x) => x.key === key)) return;
+		this.#pendingElementFetches.add(key);
+		try {
+			const { data } = await this.#elementRepository.requestByUnique(key);
+			if (data) {
+				const blockData: UmbBlockDataModel = {
+					key: data.unique,
+					contentTypeKey: data.documentType.unique,
+					values: data.values.map(
+						(v): UmbBlockDataValueModel => ({
+							alias: v.alias,
+							editorAlias: v.editorAlias,
+							culture: v.culture,
+							segment: v.segment,
+							value: v.value,
+						}),
+					),
+				};
+				this.#resolvedLibraryElements.appendOne(blockData);
+				this.#resolvedLibraryElementVariants.appendOne({
+					key: data.unique,
+					variants: data.variants.map((v) => ({
+						culture: v.culture ?? null,
+						segment: v.segment ?? null,
+						state: v.state ?? null,
+					})),
+				});
+			}
+		} finally {
+			this.#pendingElementFetches.delete(key);
+		}
+	}
+
 	settingsOf(key: string) {
 		return this.#settings.asObservablePart((source) => source.find((x) => x.key === key));
 	}
@@ -355,7 +476,10 @@ export abstract class UmbBlockManagerContext<
 		return this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentTypeKey);
 	}
 	getContentOf(contentKey: string) {
-		return this.#contents.value.find((x) => x.key === contentKey);
+		return (
+			this.#contents.value.find((x) => x.key === contentKey) ??
+			this.#resolvedLibraryElements.value.find((x) => x.key === contentKey)
+		);
 	}
 	getSettingsOf(settingsKey: string) {
 		return this.#settings.value.find((x) => x.key === settingsKey);
@@ -399,6 +523,141 @@ export abstract class UmbBlockManagerContext<
 		this.#exposes.filter((x) => !(x.contentKey === contentKey && variantId.compare(x)));
 	}
 
+	/**
+	 * Insert a block whose content is a library element reference.
+	 * Only creates a layout entry — no contentData entry is added.
+	 * Sets the initial block expose once the element content is resolved.
+	 */
+	async insertLibraryElement(elementKey: string, _originData?: BlockOriginDataType) {
+		const layout = { key: UmbId.new(), contentKey: elementKey, isSharedContent: true } as BlockLayoutType;
+		this._layouts.appendOne(layout);
+		await this.#fetchLibraryElement(elementKey);
+
+		const content = this.#resolvedLibraryElements.getValue().find((x) => x.key === elementKey);
+		if (content) {
+			this.#setInitialBlockExpose(content);
+		}
+	}
+
+	/**
+	 * Transfer a local block's content to the library.
+	 * Removes the inline content and updates the layout to reference the new element.
+	 */
+	transferToLibrary(key: string, oldContentKey: string, newElementKey: string) {
+		this.#contents.removeOne(oldContentKey);
+		this.removeExposesOf(oldContentKey);
+		this._layouts.updateOne(key, {
+			contentKey: newElementKey,
+			isSharedContent: true,
+		} as Partial<BlockLayoutType>);
+		this.ensureContentResolved(newElementKey);
+	}
+
+	/**
+	 * Request to transfer a local block's content to the Element Library.
+	 * Opens the transfer modal for the user to name the new Element and pick a location,
+	 * then creates the Element and updates the block to reference it.
+	 * @param {string} key the block layout key.
+	 */
+	async requestTransferToLibrary(key: string) {
+		const layout = this._layouts.getValue().find((x) => x.key === key);
+		if (!layout) return;
+		const contentKey = layout.contentKey;
+		const content = this.getContentOf(contentKey);
+		if (!content) return;
+
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT).catch(() => undefined);
+		if (!modalManager) return;
+		const result = await modalManager
+			.open(this, UMB_BLOCK_TRANSFER_TO_LIBRARY_MODAL, { data: {} })
+			.onSubmit()
+			.catch(() => undefined);
+		if (!result) return;
+
+		const elementRepository = new UmbElementDetailRepository(this);
+		const { data: scaffold } = await elementRepository.createScaffold({
+			documentType: { unique: content.contentTypeKey, collection: null },
+			values: content.values,
+			variants: [
+				{
+					culture: null,
+					segment: null,
+					state: null,
+					name: result.name,
+					publishDate: null,
+					createDate: null,
+					updateDate: null,
+				},
+			],
+		});
+		if (!scaffold) return;
+
+		const { data: created } = await elementRepository.create(scaffold, result.parentUnique);
+		if (!created) return;
+
+		this.transferToLibrary(key, contentKey, created.unique);
+	}
+
+	/**
+	 * Request to disconnect a block from the Element Library.
+	 * Asks for user confirmation, then copies the element content into local contentData.
+	 * @param {string} key the block layout key.
+	 */
+	async requestDisconnectFromLibrary(key: string) {
+		const layout = this._layouts.getValue().find((x) => x.key === key);
+		if (!layout) return;
+		const elementKey = layout.contentKey;
+
+		try {
+			await umbConfirmModal(this, {
+				headline: '#blockEditor_disconnectFromLibrary',
+				content: '#blockEditor_disconnectFromLibraryConfirm',
+				confirmLabel: '#blockEditor_disconnectFromLibrary',
+				color: 'warning',
+			});
+		} catch {
+			return; // user cancelled
+		}
+
+		const elementRepository = new UmbElementDetailRepository(this);
+		const { data: element } = await elementRepository.requestByUnique(elementKey);
+		if (!element) return;
+
+		this.disconnectFromLibrary(
+			key,
+			elementKey,
+			element.values.map((v) => ({
+				alias: v.alias,
+				editorAlias: v.editorAlias,
+				culture: v.culture,
+				segment: v.segment,
+				value: v.value,
+			})),
+			element.documentType.unique,
+		);
+	}
+
+	/**
+	 * Disconnect a block from the library, copying element content to local contentData.
+	 */
+	disconnectFromLibrary(key: string, elementKey: string, values: Array<UmbBlockDataValueModel>, contentTypeKey: string) {
+		const newKey = UmbId.new();
+		const newContent: UmbBlockDataModel = {
+			key: newKey,
+			contentTypeKey,
+			values,
+		};
+		this.#contents.appendOne(newContent);
+		this._layouts.updateOne(key, { contentKey: newKey, isSharedContent: undefined } as Partial<BlockLayoutType>);
+		this.#resolvedLibraryElements.removeOne(elementKey);
+		this.#resolvedLibraryElementVariants.removeOne(elementKey);
+		// Only set expose if the content type structure is loaded (it may not be for library elements
+		// whose type was not in the block type list)
+		if (this.getStructure(contentTypeKey)) {
+			this.#setInitialBlockExpose(newContent);
+		}
+	}
+
 	setOneContentProperty(key: string, propertyAlias: string, value: unknown) {
 		this.#contents.updateOne(key, { [propertyAlias]: value });
 	}
@@ -419,7 +678,7 @@ export abstract class UmbBlockManagerContext<
 
 	abstract createWithPresets(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 		originData?: BlockOriginDataType,
 	): Promise<UmbBlockDataObjectModel<BlockLayoutType> | undefined>;
 
@@ -520,7 +779,7 @@ export abstract class UmbBlockManagerContext<
 
 	protected async _createBlockData(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 	) {
 		// Find block type.
 		const blockType = this.#blockTypes.value.find((x) => x.contentElementTypeKey === contentElementTypeKey);
@@ -528,9 +787,12 @@ export abstract class UmbBlockManagerContext<
 			throw new Error(`Cannot create block, missing block type for ${contentElementTypeKey}`);
 		}
 
+		const contentKey = UmbId.new();
+
 		// Create layout entry:
 		const layout: BlockLayoutType = {
-			contentKey: UmbId.new(),
+			key: contentKey,
+			contentKey,
 			...(partialLayoutEntry as Partial<BlockLayoutType>),
 		} as BlockLayoutType;
 
