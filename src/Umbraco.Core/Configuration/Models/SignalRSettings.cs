@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace Umbraco.Cms.Core.Configuration.Models;
 
 /// <summary>
@@ -6,8 +8,8 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 /// <remarks>
 /// <para>
 /// Server-side transport restrictions are applied to every Umbraco SignalR hub endpoint
-/// via <c>HttpConnectionDispatcherOptions.Transports</c>. Client-side settings in
-/// <see cref="Client"/> are forwarded to the backoffice frontend through the
+/// via <c>HttpConnectionDispatcherOptions.Transports</c>. These settings are also forwarded to the
+/// client via the server configuration endpoint, which is accessible via the
 /// <c>/umbraco/management/api/v1/server/configuration</c> endpoint.
 /// </para>
 /// <para>
@@ -19,18 +21,22 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 [UmbracoOptions(Constants.Configuration.ConfigSignalR)]
 public class SignalRSettings
 {
+    internal const bool StaticClientShouldSkipNegotiation = false;
+
     /// <summary>
     /// Gets or sets the transport protocols the server will accept for SignalR connections.
     /// </summary>
     /// <remarks>
-    /// When <c>null</c> (the default), all transports are accepted (framework default behaviour).
+    /// When <c>null</c> (the default), all transports are accepted (framework default behavior).
     /// Set to <see cref="SignalRTransportType.WebSockets"/> to restrict connections to WebSockets
     /// only, which is required for load-balanced deployments without sticky sessions.
     /// </remarks>
     public SignalRTransportType? Transports { get; set; }
 
     /// <summary>
-    /// Gets or sets the client-side SignalR settings forwarded to the backoffice frontend.
+    /// Gets or sets a value indicating whether the client should skip the SignalR negotiate
+    /// round-trip and connect directly on one of the configured <see cref="Transports"/>.
     /// </summary>
-    public SignalRClientSettings Client { get; set; } = new();
+    [DefaultValue(StaticClientShouldSkipNegotiation)]
+    public bool ClientShouldSkipNegotiation { get; set; } = StaticClientShouldSkipNegotiation;
 }

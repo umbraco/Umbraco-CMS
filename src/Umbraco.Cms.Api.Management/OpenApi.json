@@ -36859,9 +36859,6 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/NoopSetupTwoFactorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TwoFactorAuthInfo"
                     }
                   ]
                 }
@@ -36956,9 +36953,6 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/NoopSetupTwoFactorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TwoFactorAuthInfo"
                     }
                   ]
                 }
@@ -50055,6 +50049,7 @@
         "required": [
           "allowLocalLogin",
           "allowPasswordReset",
+          "signalR",
           "umbracoCssPath",
           "versionCheckPeriod"
         ],
@@ -50072,6 +50067,13 @@
           },
           "umbracoCssPath": {
             "type": "string"
+          },
+          "signalR": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SignalRClientSettingsResponseModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -50146,6 +50148,31 @@
           }
         },
         "additionalProperties": false
+      },
+      "SignalRClientSettingsResponseModel": {
+        "required": [
+          "skipNegotiation",
+          "transports"
+        ],
+        "type": "object",
+        "properties": {
+          "skipNegotiation": {
+            "type": "boolean"
+          },
+          "transports": {
+            "$ref": "#/components/schemas/SignalRTransportTypeModel"
+          }
+        },
+        "additionalProperties": false
+      },
+      "SignalRTransportTypeModel": {
+        "enum": [
+          "None",
+          "WebSockets",
+          "ServerSentEvents",
+          "LongPolling"
+        ],
+        "type": "string"
       },
       "SortingRequestModel": {
         "required": [
@@ -51097,20 +51124,6 @@
           "All"
         ],
         "type": "string"
-      },
-      "TwoFactorAuthInfo": {
-        "type": "object",
-        "properties": {
-          "qrCodeSetupImageUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "secret": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
       },
       "UnknownTypePermissionPresentationModel": {
         "required": [

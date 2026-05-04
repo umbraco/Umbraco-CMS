@@ -1,6 +1,6 @@
 import { UmbPreviewRepository } from '../repository/index.js';
 import { UMB_PREVIEW_CONTEXT } from './preview.context-token.js';
-import { HubConnectionBuilder, HttpTransportType } from '@umbraco-cms/backoffice/external/signalr';
+import { HubConnectionBuilder } from '@umbraco-cms/backoffice/external/signalr';
 import { UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
@@ -80,8 +80,7 @@ export class UmbPreviewContext extends UmbContextBase {
 
 			this.#setPreviewUrl({ serverUrl });
 
-			const skipNegotiation = serverContext?.getServerConnection()?.getSignalRSkipNegotiation() ?? false;
-			this.#initHubConnection(serverUrl, skipNegotiation);
+			this.#initHubConnection(serverUrl, serverContext);
 		});
 
 		this.consumeContext(UMB_NOTIFICATION_CONTEXT, (notificationContext) => {
@@ -102,7 +101,7 @@ export class UmbPreviewContext extends UmbContextBase {
 		}
 	}
 
-	async #initHubConnection(serverUrl: string, skipNegotiation: boolean = false) {
+	async #initHubConnection(serverUrl: string, serverContext?: typeof UMB_SERVER_CONTEXT.TYPE) {
 		const previewHubUrl = `${serverUrl}/umbraco/PreviewHub`;
 
 		// Make sure that no previous connection exists.
@@ -111,11 +110,17 @@ export class UmbPreviewContext extends UmbContextBase {
 			this.#connection = undefined;
 		}
 
+		const serverConnection = serverContext?.getServerConnection();
+
 		const hubOptions: IHttpConnectionOptions = {};
 
-		if (skipNegotiation) {
+		const transports = serverConnection?.getSignalRTransports();
+		if (transports !== undefined) {
+			hubOptions.transport = transports;
+		}
+
+		if (serverConnection?.getSignalRSkipNegotiation()) {
 			hubOptions.skipNegotiation = true;
-			hubOptions.transport = HttpTransportType.WebSockets;
 		}
 
 		this.#connection = new HubConnectionBuilder().withUrl(previewHubUrl, hubOptions).build();

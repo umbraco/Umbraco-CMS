@@ -1,8 +1,9 @@
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { RuntimeLevelModel, ServerService } from '@umbraco-cms/backoffice/external/backend-api';
+import { RuntimeLevelModel, ServerService, SignalRTransportTypeModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbBooleanState, UmbNumberState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { HttpTransportType } from '@umbraco-cms/backoffice/external/signalr';
 
 export class UmbServerConnection extends UmbControllerBase {
 	#url: string;
@@ -24,6 +25,7 @@ export class UmbServerConnection extends UmbControllerBase {
 	umbracoCssPath = this.#umbracoCssPath.asObservable();
 
 	#signalRSkipNegotiation = false;
+	#signalRTransports: HttpTransportType | undefined;
 
 	constructor(host: UmbControllerHost, serverUrl: string) {
 		super(host);
@@ -37,6 +39,15 @@ export class UmbServerConnection extends UmbControllerBase {
 	 */
 	getSignalRSkipNegotiation() {
 		return this.#signalRSkipNegotiation;
+	}
+
+	/**
+	 * Gets the SignalR transport types configured by the server, or undefined if all transports are allowed.
+	 * @returns {HttpTransportType | undefined}
+	 * @memberof UmbServerConnection
+	 */
+	getSignalRTransports() {
+		return this.#signalRTransports;
 	}
 
 	/**
@@ -101,8 +112,22 @@ export class UmbServerConnection extends UmbControllerBase {
 		this.#allowLocalLogin.setValue(data?.allowLocalLogin ?? false);
 		this.#allowPasswordReset.setValue(data?.allowPasswordReset ?? false);
 		this.#umbracoCssPath.setValue(data?.umbracoCssPath);
-		// TODO: Remove the type assertion once the generated types include the signalR property.
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		this.#signalRSkipNegotiation = (data as any)?.signalR?.skipNegotiation === true;
+		this.#signalRSkipNegotiation = data?.signalR?.skipNegotiation === true;
+		this.#signalRTransports = this.#mapTransportType(data?.signalR?.transports);
+	}
+
+	#mapTransportType(transport?: SignalRTransportTypeModel): HttpTransportType | undefined {
+		switch (transport) {
+			case SignalRTransportTypeModel.WEB_SOCKETS:
+				return HttpTransportType.WebSockets;
+			case SignalRTransportTypeModel.SERVER_SENT_EVENTS:
+				return HttpTransportType.ServerSentEvents;
+			case SignalRTransportTypeModel.LONG_POLLING:
+				return HttpTransportType.LongPolling;
+			case SignalRTransportTypeModel.NONE:
+				return HttpTransportType.None;
+			default:
+				return undefined;
+		}
 	}
 }

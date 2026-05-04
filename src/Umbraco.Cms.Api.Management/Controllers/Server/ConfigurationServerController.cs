@@ -106,7 +106,8 @@ public class ConfigurationServerController : ServerControllerBase
             UmbracoCssPath = _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoCssPath),
             SignalR = new SignalRClientSettingsResponseModel
             {
-                SkipNegotiation = _signalRSettings.Client.SkipNegotiation,
+                SkipNegotiation = _signalRSettings.ClientShouldSkipNegotiation,
+                Transports = _signalRSettings.Transports,
             },
         };
 
