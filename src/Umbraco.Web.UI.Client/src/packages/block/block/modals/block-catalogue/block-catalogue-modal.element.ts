@@ -21,6 +21,7 @@ import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/b
 import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UmbEntityOpenedEvent } from '@umbraco-cms/backoffice/entity';
 
 type UmbBlockTypeItemWithGroupKey = UmbBlockTypeWithGroupKey & UmbDocumentTypeItemModel;
 
@@ -176,17 +177,31 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		};
 	}
 
+	async #onClipboardPickerCardEntityOpened(event: UmbEntityOpenedEvent) {
+		const selected = event.unique;
+		this.value = {
+			clipboard: {
+				selection: [selected],
+			},
+		};
+		this.modalContext?.submit();
+	}
+
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('blockEditor_addBlock')}>
 				${this.#renderViews()}${this.#renderMain()}
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
-					<uui-button
-						label=${this.localize.term('general_submit')}
-						look="primary"
-						color="positive"
-						@click=${this._submitModal}></uui-button>
+					${this.value?.clipboard?.selection &&
+					this.value?.clipboard?.selection?.length > 0 &&
+					this._openClipboard === true
+						? html`<uui-button
+								label=${this.localize.term('general_submit')}
+								look="primary"
+								color="positive"
+								@click=${this._submitModal}></uui-button>`
+						: nothing}
 				</div>
 			</umb-body-layout>
 		`;
@@ -200,12 +215,14 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		return html`
 			<umb-clipboard-entry-picker
 				.config=${{ multiple: true, asyncFilter: this.data?.clipboardFilter }}
-				@selection-change=${this.#onClipboardPickerSelectionChange}></umb-clipboard-entry-picker>
+				@selection-change=${this.#onClipboardPickerSelectionChange}
+				@entity-opened=${this.#onClipboardPickerCardEntityOpened}></umb-clipboard-entry-picker>
 		`;
 	}
 
 	#renderCreateEmpty() {
 		if (this._loading) return html`<div id="loader"><uui-loader></uui-loader></div>`;
+
 		return html`
 			${when(
 				this.data?.blocks && this.data?.blocks.length > 8,
