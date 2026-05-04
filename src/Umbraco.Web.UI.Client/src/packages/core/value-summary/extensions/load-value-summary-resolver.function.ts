@@ -2,6 +2,11 @@ import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbValueSummaryResolver } from './value-summary-resolver.interface.js';
 import type { UmbValueSummaryResolverLoaderProperty } from './value-summary.extension.js';
 
+/**
+ * @internal
+ * @param {UmbValueSummaryResolverLoaderProperty} property - The property from which to load the resolver.
+ * @returns {Promise<ClassConstructor<UmbValueSummaryResolver> | undefined>} - A promise that resolves to the class constructor.
+ */
 export async function loadValueSummaryResolver(
 	property: UmbValueSummaryResolverLoaderProperty,
 ): Promise<ClassConstructor<UmbValueSummaryResolver> | undefined> {
