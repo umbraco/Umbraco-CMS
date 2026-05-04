@@ -910,7 +910,7 @@ stages:
             displayName: Manual approval to push to NuGet
             inputs:
               notifyUsers: ''
-              instructions: 'Approve to push the NuGet release. Use this to override a MyGet pre-release failure caused by an upstream issue.'
+              instructions: 'Approve to push the NuGet release.'
               onTimeout: 'reject'
       - job: Push
         displayName: Push to NuGet
