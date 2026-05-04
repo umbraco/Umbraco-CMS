@@ -114,7 +114,7 @@ public static class PublishedContentExtensions
     ///     alias.
     /// </returns>
     public static bool IsComposedOf(this IPublishedContent content, string alias) =>
-        ((IPublishedElement)content).IsComposedOf(alias);
+        content.AsPublishedElement().IsComposedOf(alias);
 
     #endregion
 
@@ -207,14 +207,14 @@ public static class PublishedContentExtensions
     /// </summary>
     /// <remarks>Culture is case-insensitive.</remarks>
     public static bool HasCulture(this IPublishedContent content, string? culture)
-        => ((IPublishedElement)content).HasCulture(culture);
+        => content.AsPublishedElement().HasCulture(culture);
 
     /// <summary>
     ///     Determines whether the content is invariant, or has a culture.
     /// </summary>
     /// <remarks>Culture is case-insensitive.</remarks>
     public static bool IsInvariantOrHasCulture(this IPublishedContent content, string culture)
-        => ((IPublishedElement)content).IsInvariantOrHasCulture(culture);
+        => content.AsPublishedElement().IsInvariantOrHasCulture(culture);
 
     /// <summary>
     ///     Gets the culture date of the content item.
@@ -226,7 +226,7 @@ public static class PublishedContentExtensions
     ///     null).
     /// </param>
     public static DateTime CultureDate(this IPublishedContent content, IVariationContextAccessor variationContextAccessor, string? culture = null)
-        => ((IPublishedElement)content).CultureDate(variationContextAccessor, culture);
+        => content.AsPublishedElement().CultureDate(variationContextAccessor, culture);
 
     #endregion
 
@@ -424,7 +424,7 @@ public static class PublishedContentExtensions
     /// <param name="docTypeAlias">The alias of the content type to test against.</param>
     /// <returns>True if the content is of the specified content type; otherwise false.</returns>
     public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias) =>
-        ((IPublishedElement)content).IsDocumentType(docTypeAlias);
+        content.AsPublishedElement().IsDocumentType(docTypeAlias);
 
     /// <summary>
     ///     Determines whether the specified content is a specified content type or its derived types.
@@ -437,7 +437,7 @@ public static class PublishedContentExtensions
     /// </param>
     /// <returns>True if the content is of the specified content type or a derived content type; otherwise false.</returns>
     public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias, bool recursive) =>
-        ((IPublishedElement)content).IsDocumentType(docTypeAlias, recursive);
+        content.AsPublishedElement().IsDocumentType(docTypeAlias, recursive);
 
     #endregion
 
@@ -450,7 +450,7 @@ public static class PublishedContentExtensions
     /// <param name="other">The other content item to compare.</param>
     /// <returns><c>true</c> if both content items have the same ID; otherwise, <c>false</c>.</returns>
     public static bool IsEqual(this IPublishedContent content, IPublishedContent other) =>
-        ((IPublishedElement)content).IsEqual(other);
+        content.AsPublishedElement().IsEqual(other);
 
     /// <summary>
     ///     Determines whether this content item is not equal to another content item by comparing their IDs.
@@ -459,7 +459,7 @@ public static class PublishedContentExtensions
     /// <param name="other">The other content item to compare.</param>
     /// <returns><c>true</c> if the content items have different IDs; otherwise, <c>false</c>.</returns>
     public static bool IsNotEqual(this IPublishedContent content, IPublishedContent other) =>
-        ((IPublishedElement)content).IsNotEqual(other);
+        content.AsPublishedElement().IsNotEqual(other);
 
     #endregion
 
@@ -1855,7 +1855,7 @@ public static class PublishedContentExtensions
     /// <param name="userService">The user service.</param>
     /// <returns>The name of the creator, or an empty string if not found.</returns>
     public static string GetCreatorName(this IPublishedContent content, IUserService userService)
-        => ((IPublishedElement)content).GetCreatorName(userService);
+        => content.AsPublishedElement().GetCreatorName(userService);
 
     /// <summary>
     ///     Gets the name of the user who last updated the content item.
@@ -1864,7 +1864,7 @@ public static class PublishedContentExtensions
     /// <param name="userService">The user service.</param>
     /// <returns>The name of the writer, or an empty string if not found.</returns>
     public static string GetWriterName(this IPublishedContent content, IUserService userService)
-        => ((IPublishedElement)content).GetWriterName(userService);
+        => content.AsPublishedElement().GetWriterName(userService);
 
     #endregion
 
@@ -2283,4 +2283,8 @@ public static class PublishedContentExtensions
             ? publishedStatusFilteringService.FilterAvailable(rootKeys, culture)
             : [];
     }
+
+    // There is a lot of overlap between published content and published element extensions. To avoid duplicate code,
+    // we delegate to the published element extensions with this.
+    private static IPublishedElement AsPublishedElement(this IPublishedContent content) => content;
 }
