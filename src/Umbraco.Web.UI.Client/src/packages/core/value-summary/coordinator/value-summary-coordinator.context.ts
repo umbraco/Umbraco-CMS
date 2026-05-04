@@ -41,7 +41,7 @@ export class UmbValueSummaryCoordinatorContext extends UmbContextBase {
 	 * @param {string} valueType - The value type key identifying the resolver manifest.
 	 * @param {unknown} value - The raw value to resolve.
 	 */
-	preRegister(valueType: string, value: unknown): void {
+	register(valueType: string, value: unknown): void {
 		const manifest = this.#getManifest(valueType);
 
 		if (!manifest?.valueResolver) {
