@@ -91,7 +91,7 @@ test('can publish a specific element with publish permission enabled', async ({u
   await umbracoUi.library.clickConfirmToPublishButton();
 
   // Assert
-  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.published);
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.elementPublished);
   expect(await umbracoApi.element.isElementPublished(firstElementId)).toBeTruthy();
   await umbracoUi.library.isEntityActionForElementWithNameHidden(secondElementName);
 });
@@ -113,7 +113,7 @@ test('can unpublish a specific element with unpublish permission enabled', async
   await umbracoUi.library.clickConfirmToUnpublishButton();
 
   // Assert
-  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.elementUnpublished);
   expect(await umbracoApi.element.isElementPublished(firstElementId)).toBeFalsy();
   await umbracoUi.library.isEntityActionForElementWithNameHidden(secondElementName);
 });

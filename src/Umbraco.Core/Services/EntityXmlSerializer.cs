@@ -23,6 +23,8 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
     private readonly IDataTypeService _dataTypeService;
+    private readonly IDataTypeContainerService _dataTypeContainerService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IMediaService _mediaService;
     private readonly PropertyEditorCollection _propertyEditors;
@@ -43,6 +45,8 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     /// <param name="shortStringHelper">The helper for string operations.</param>
     /// <param name="propertyEditors">The collection of property editors.</param>
     /// <param name="configurationEditorJsonSerializer">The serializer for configuration data.</param>
+    /// <param name="dataTypeContainerService">The data type container service for resolving ancestor folders.</param>
+    /// <param name="idKeyMap">The cached id-to-key map used to resolve int data type IDs to GUID keys.</param>
     public EntityXmlSerializer(
         IContentService contentService,
         IMediaService mediaService,
@@ -53,7 +57,9 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         UrlSegmentProviderCollection urlSegmentProviders,
         IShortStringHelper shortStringHelper,
         PropertyEditorCollection propertyEditors,
-        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
+        IDataTypeContainerService dataTypeContainerService,
+        IIdKeyMap idKeyMap)
     {
         _contentTypeService = contentTypeService;
         _mediaService = mediaService;
@@ -65,6 +71,8 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         _shortStringHelper = shortStringHelper;
         _propertyEditors = propertyEditors;
         _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
+        _dataTypeContainerService = dataTypeContainerService;
+        _idKeyMap = idKeyMap;
     }
 
     /// <inheritdoc />
@@ -229,7 +237,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         if (dataType.Level != 1)
         {
             // get URL encoded folder names
-            IOrderedEnumerable<EntityContainer> folders = _dataTypeService.GetContainers(dataType)
+            IOrderedEnumerable<EntityContainer> folders = GetAncestorContainers(dataType)
                 .OrderBy(x => x.Level);
 
             folderNames = string.Join("/", folders.Select(x => WebUtility.UrlEncode(x.Name)).ToArray());
@@ -341,16 +349,6 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         xml.Add(new XElement("Key", template.Key));
         xml.Add(new XElement("Alias", template.Alias));
         xml.Add(new XElement("Design", new XCData(template.Content!)));
-
-        if (template is Template concreteTemplate && concreteTemplate.MasterTemplateId != null)
-        {
-            if (concreteTemplate.MasterTemplateId.IsValueCreated &&
-                concreteTemplate.MasterTemplateId.Value != default)
-            {
-                xml.Add(new XElement("Master", concreteTemplate.MasterTemplateId.ToString()));
-                xml.Add(new XElement("MasterAlias", concreteTemplate.MasterTemplateAlias));
-            }
-        }
 
         return xml;
     }
@@ -563,7 +561,12 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     {
         foreach (IPropertyType propertyType in propertyTypes)
         {
-            IDataType? definition = _dataTypeService.GetDataType(propertyType.DataTypeId);
+            IDataType? definition = null;
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
+            if (keyAttempt.Success)
+            {
+                definition = _dataTypeService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult();
+            }
 
             PropertyGroup? propertyGroup = propertyType.PropertyGroupId == null // true generic property
                 ? null
@@ -777,4 +780,25 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     /// </remarks>
     private string SerializeDataTypeConfiguration(IDataType dataType) =>
         _configurationEditorJsonSerializer.Serialize(dataType.ConfigurationData);
+
+    /// <summary>
+    ///     Gets all ancestor containers of a given data type by walking up the container tree
+    ///     using <see cref="IDataTypeContainerService"/>.
+    /// </summary>
+    /// <param name="dataType">The data type whose ancestor containers to retrieve.</param>
+    /// <returns>The ancestor containers of the data type, ordered from root to nearest parent.</returns>
+    private IEnumerable<EntityContainer> GetAncestorContainers(IDataType dataType)
+    {
+        var ancestors = new List<EntityContainer>();
+        EntityContainer? parent = _dataTypeContainerService.GetParentAsync(dataType).GetAwaiter().GetResult();
+        while (parent is not null)
+        {
+            ancestors.Add(parent);
+            parent = _dataTypeContainerService.GetParentAsync(parent).GetAwaiter().GetResult();
+        }
+
+        // Reverse to go from root to closest ancestor (matches the previous ordering by Level).
+        ancestors.Reverse();
+        return ancestors;
+    }
 }

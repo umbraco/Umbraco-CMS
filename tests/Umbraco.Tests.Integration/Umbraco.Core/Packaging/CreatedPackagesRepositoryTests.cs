@@ -87,6 +87,7 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         MediaTypeService,
         MediaFileManager,
         FileSystems,
+        GetRequiredService<IIdKeyMap>(),
         "createdPackages.config",
 
         // temp paths

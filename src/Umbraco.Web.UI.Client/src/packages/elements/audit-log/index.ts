@@ -1,1 +1,1 @@
-export { UmbElementAuditLogRepository } from './repository/index.js';
+export * from './repository/index.js';

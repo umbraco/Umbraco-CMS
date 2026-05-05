@@ -432,7 +432,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             // at this point the parent MUST exist - unless someone starts using this move method
             // e.g. for blueprints (which should be handled elsewhere).
             TContent parentContent = ContentService.GetById(parentKey.Value) ?? throw new InvalidOperationException("The content parent ID was validated, but the parent was not found");
-            if (parentContent.Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Contains(content.Id) is true)
+            if (parentContent.Path.GetIdsFromPath().Contains(content.Id))
             {
                 return Attempt.FailWithStatus<TContent?, ContentEditingOperationStatus>(ContentEditingOperationStatus.ParentInvalid, content);
             }

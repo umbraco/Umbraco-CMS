@@ -12,6 +12,7 @@ const propertyEditorUi: UmbExtensionManifest = {
 		propertyEditorSchemaAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_SCHEMA_ALIAS,
 		icon: 'icon-layout',
 		group: 'richContent',
+		keywords: ['component', 'layout', 'grid', 'modules', 'widgets', 'page', 'builder', 'canvas'],
 		supportsReadOnly: true,
 		settings: {
 			properties: [

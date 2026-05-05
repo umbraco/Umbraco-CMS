@@ -23,10 +23,10 @@ public class TemplateBuilder
     private string _content;
     private DateTime? _createDate;
     private int? _id;
-    private bool? _isMasterTemplate;
+    private bool? _isLayoutTemplate;
     private Guid? _key;
-    private string _masterTemplateAlias;
-    private Lazy<int> _masterTemplateId;
+    private string _layoutTemplateAlias;
+    private Lazy<int> _layoutTemplateId;
     private string _name;
     private string _path;
     private DateTime? _updateDate;
@@ -89,13 +89,17 @@ public class TemplateBuilder
         return this;
     }
 
-    public TemplateBuilder AsMasterTemplate(string masterTemplateAlias, int masterTemplateId)
+    public TemplateBuilder AsLayoutTemplate(string layoutTemplateAlias, int layoutTemplateId)
     {
-        _isMasterTemplate = true;
-        _masterTemplateAlias = masterTemplateAlias;
-        _masterTemplateId = new Lazy<int>(() => masterTemplateId);
+        _isLayoutTemplate = true;
+        _layoutTemplateAlias = layoutTemplateAlias;
+        _layoutTemplateId = new Lazy<int>(() => layoutTemplateId);
         return this;
     }
+
+    [Obsolete("Use AsLayoutTemplate instead. Scheduled for removal in Umbraco 20.")]
+    public TemplateBuilder AsMasterTemplate(string masterTemplateAlias, int masterTemplateId)
+        => AsLayoutTemplate(masterTemplateAlias, masterTemplateId);
 
     public override ITemplate Build()
     {
@@ -107,9 +111,9 @@ public class TemplateBuilder
         var updateDate = _updateDate ?? DateTime.UtcNow;
         var path = _path ?? $"-1,{id}";
         var content = _content;
-        var isMasterTemplate = _isMasterTemplate ?? false;
-        var masterTemplateAlias = _masterTemplateAlias ?? string.Empty;
-        var masterTemplateId = _masterTemplateId ?? new Lazy<int>(() => -1);
+        var isLayoutTemplate = _isLayoutTemplate ?? false;
+        var layoutTemplateAlias = _layoutTemplateAlias ?? string.Empty;
+        var layoutTemplateId = _layoutTemplateId ?? new Lazy<int>(() => -1);
 
         var shortStringHelper = new DefaultShortStringHelper(new DefaultShortStringHelperConfig());
 
@@ -121,9 +125,9 @@ public class TemplateBuilder
             UpdateDate = updateDate,
             Path = path,
             Content = content,
-            IsMasterTemplate = isMasterTemplate,
-            MasterTemplateAlias = masterTemplateAlias,
-            MasterTemplateId = masterTemplateId
+            IsLayoutTemplate = isLayoutTemplate,
+            LayoutTemplateAlias = layoutTemplateAlias,
+            LayoutTemplateId = layoutTemplateId
         };
 
         return template;

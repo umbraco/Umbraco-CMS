@@ -2,8 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO.Compression;
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -26,6 +28,7 @@ public class PackagesRepository : ICreatedPackagesRepository
     private readonly IContentTypeService _contentTypeService;
     private readonly string _createdPackagesFolderPath;
     private readonly IDataTypeService _dataTypeService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly IFileService _fileService;
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -79,6 +82,7 @@ public class PackagesRepository : ICreatedPackagesRepository
         IMediaTypeService mediaTypeService,
         MediaFileManager mediaFileManager,
         FileSystems fileSystems,
+        IIdKeyMap idKeyMap,
         string packageRepositoryFileName,
         string? tempFolderPath = null,
         string? packagesFolderPath = null,
@@ -92,6 +96,7 @@ public class PackagesRepository : ICreatedPackagesRepository
         _contentService = contentService;
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;
+        _idKeyMap = idKeyMap;
         _fileService = fileService;
         _languageRepository = languageRepository;
         _dictionaryRepository = dictionaryRepository;
@@ -382,7 +387,13 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            IDataType? dataType = _dataTypeService.GetDataType(outInt);
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(outInt, UmbracoObjectTypes.DataType);
+            if (keyAttempt.Success is false)
+            {
+                continue;
+            }
+
+            IDataType? dataType = _dataTypeService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult();
             if (dataType == null)
             {
                 continue;

@@ -1,24 +1,27 @@
+import {
+	UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
+	UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
+	UMB_ELEMENT_ROLLBACK_REPOSITORY_ALIAS,
+	UMB_USER_PERMISSION_ELEMENT_ROLLBACK,
+} from '../../constants.js';
 import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
-import { UMB_USER_PERMISSION_ELEMENT_ROLLBACK } from '../../user-permissions/constants.js';
 import { UMB_ENTITY_IS_NOT_TRASHED_CONDITION_ALIAS } from '@umbraco-cms/backoffice/recycle-bin';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'entityAction',
-		kind: 'default',
+		kind: 'contentRollback',
 		alias: 'Umb.EntityAction.Element.Rollback',
-		name: 'Element Rollback Entity Action',
-		weight: 450,
-		api: () => import('./rollback.action.js'),
+		name: 'Rollback Element Entity Action',
 		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
 		meta: {
-			icon: 'icon-history',
-			label: '#actions_rollback',
-			additionalOptions: true,
+			rollbackNotificationMessage: '#rollback_elementRolledBack',
+			rollbackRepositoryAlias: UMB_ELEMENT_ROLLBACK_REPOSITORY_ALIAS,
+			detailRepositoryAlias: UMB_ELEMENT_DETAIL_REPOSITORY_ALIAS,
 		},
 		conditions: [
 			{
-				alias: 'Umb.Condition.UserPermission.Element',
+				alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS,
 				allOf: [UMB_USER_PERMISSION_ELEMENT_ROLLBACK],
 			},
 			{

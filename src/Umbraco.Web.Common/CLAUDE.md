@@ -39,10 +39,9 @@ Umbraco.Web.Common/
 ├── Controllers/
 │   ├── IRenderController.cs                   # Frontend controller marker
 │   ├── IVirtualPageController.cs              # Virtual page support
-│   ├── PluginController.cs                    # Plugin controller base (104 lines)
-│   ├── UmbracoApiController.cs                # Legacy API controller (obsolete)
+│   ├── PluginController.cs                    # Plugin controller base
 │   ├── UmbracoAuthorizedController.cs         # Backoffice authorized base
-│   └── UmbracoController.cs                   # Base MVC controller (13 lines)
+│   └── UmbracoController.cs                   # Base MVC controller
 ├── DependencyInjection/
 │   └── UmbracoBuilderExtensions.cs            # AddUmbraco(), AddUmbracoCore() (338 lines)
 ├── Extensions/
@@ -224,13 +223,14 @@ Template helper for Razor views (scoped lifetime).
 | `UmbracoController` | Base MVC controller | Simple base, debug InstanceId |
 | `UmbracoAuthorizedController` | Backoffice controllers | `[Authorize(BackOfficeAccess)]`, `[DisableBrowserCache]` |
 | `PluginController` | Plugin/package controllers | UmbracoContext, Services, AppCaches, ProfilingLogger |
-| `UmbracoApiController` | Legacy API controller | **Obsolete** - Use ASP.NET Core ApiController |
 | `IRenderController` | Frontend rendering marker | Route hijacking support |
 
-**PluginController** (lines 18-104):
+For new front-end HTTP APIs use a plain `ControllerBase` with `[ApiController]` and an explicit `[Route]` (e.g. `[Route("umbraco/api/<your-prefix>")]`). The legacy `UmbracoApiController` and its convention-based discovery were removed in v18.
+
+**PluginController**:
 - Provides `UmbracoContext`, `DatabaseFactory`, `Services`, `AppCaches`
 - Static metadata caching with `ConcurrentDictionary<Type, PluginControllerMetadata>`
-- Auto-discovers `[PluginController]` and `[IsBackOffice]` attributes
+- Auto-discovers `[PluginController]` for plugin area routing
 
 ### Member Sign-In (Security/MemberSignInManager.cs)
 
