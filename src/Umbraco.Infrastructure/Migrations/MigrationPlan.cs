@@ -182,7 +182,7 @@ public class MigrationPlan
     ///     Adds a transition to a target state through a migration.
     /// </summary>
     /// <param name="targetState">The target state to transition to.</param>
-    /// <param name="migration">The type of migration to apply during the transition. This should be a <see cref="Type"/> derived from <c>MigrationBase</c>, or <c>null</c> for no migration.</param>
+    /// <param name="migration">The type of migration to apply during the transition. This should be a <see cref="Type"/> derived from <c>AsyncMigrationBase</c>, or <c>null</c> for no migration.</param>
     /// <returns>The updated <see cref="MigrationPlan"/> instance.</returns>
     public MigrationPlan To(string targetState, Type? migration)
         => Add(_prevState, targetState, migration);

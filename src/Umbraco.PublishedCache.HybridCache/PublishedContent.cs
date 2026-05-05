@@ -97,6 +97,14 @@ internal class PublishedContent : PublishedElement, IPublishedContent
     }
 
     /// <inheritdoc />
-    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in V16.")]
-    public virtual string? UrlSegment => this.UrlSegment(VariationContextAccessor);
+    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 20.")]
+    public virtual string? UrlSegment
+    {
+        get
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            return PublishedContentUrlSegmentResolver.Resolve(this, VariationContextAccessor);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+    }
 }
