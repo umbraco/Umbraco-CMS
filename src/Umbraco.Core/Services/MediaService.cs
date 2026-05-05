@@ -185,8 +185,10 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMedia(string? name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
+        public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
+            ArgumentNullException.ThrowIfNull(name);
+
             IMediaType? mediaType = GetMediaType(mediaTypeAlias);
             if (mediaType == null)
             {
@@ -199,7 +201,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media with that id.", nameof(parentId));
             }
 
-            if (name != null && name.Length > 255)
+            if (name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
@@ -225,6 +227,8 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>The media object.</returns>
         public IMedia CreateMedia(string name, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
+            ArgumentNullException.ThrowIfNull(name);
+
             // not locking since not saving anything
 
             IMediaType? mediaType = GetMediaType(mediaTypeAlias);
@@ -233,7 +237,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias));
             }
 
-            if (name != null && name.Length > 255)
+            if (name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
@@ -260,6 +264,8 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>The media object.</returns>
         public IMedia CreateMedia(string name, IMedia? parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
+            ArgumentNullException.ThrowIfNull(name);
+
             if (parent == null)
             {
                 throw new ArgumentNullException(nameof(parent));
@@ -274,7 +280,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
             }
 
-            if (name != null && name.Length > 255)
+            if (name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }

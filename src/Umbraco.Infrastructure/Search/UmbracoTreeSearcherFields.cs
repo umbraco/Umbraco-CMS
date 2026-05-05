@@ -28,7 +28,7 @@ public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
         new HashSet<string> { UmbracoExamineFieldNames.UmbracoFileFieldName };
 
     private readonly ISet<string> _backOfficeMembersFieldsToLoad = new HashSet<string> { "email", "loginName" };
-    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
 
     private readonly IReadOnlyList<string> _backOfficeFields = new List<string>
     {
@@ -43,9 +43,9 @@ public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
     /// <summary>
     /// Initializes a new instance of the <see cref="UmbracoTreeSearcherFields"/> class.
     /// </summary>
-    /// <param name="localizationService">The localization service used for localizing field names and values.</param>
-    public UmbracoTreeSearcherFields(ILocalizationService localizationService) =>
-        _localizationService = localizationService;
+    /// <param name="languageService">The language service used for retrieving configured languages.</param>
+    public UmbracoTreeSearcherFields(ILanguageService languageService) =>
+        _languageService = languageService;
 
     /// <inheritdoc />
     public virtual IEnumerable<string> GetBackOfficeFields() => _backOfficeFields;
@@ -75,7 +75,7 @@ public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
 
         // We need to load all nodeName_* fields but we won't know those up front so need to get
         // all langs (this is cached)
-        foreach (var field in _localizationService.GetAllLanguages()
+        foreach (var field in _languageService.GetAllAsync().GetAwaiter().GetResult()
                      .Select(x => "nodeName_" + x.IsoCode.ToLowerInvariant()))
         {
             fields.Add(field);

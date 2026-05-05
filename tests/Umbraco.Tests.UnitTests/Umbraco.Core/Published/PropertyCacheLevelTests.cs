@@ -33,9 +33,9 @@ public class PropertyCacheLevelTests
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), configurationEditorJsonSerializer)
         { Id = 1 };
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(dataType.Yield());
 
-        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
+        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
         {
@@ -79,9 +79,9 @@ public class PropertyCacheLevelTests
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory()))
         { Id = 1 };
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(dataType.Yield());
 
-        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
+        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
         {
@@ -138,9 +138,9 @@ public class PropertyCacheLevelTests
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory()))
         { Id = 1 };
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(dataType.Yield());
 
-        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
+        var publishedContentTypeFactory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
         {

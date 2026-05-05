@@ -28,7 +28,7 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
         IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions,
         IHostingEnvironment hostingEnvironment,
         IRuntimeState runtimeState,
-        ILocalizationService? languageService = null)
+        ILanguageService? languageService = null)
         : base(loggerFactory, name, indexOptions, hostingEnvironment, runtimeState)
     {
         LanguageService = languageService;
@@ -45,9 +45,9 @@ public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
     }
 
     /// <summary>
-    /// Gets the <see cref="ILocalizationService"/>.
+    /// Gets the <see cref="ILanguageService"/>.
     /// </summary>
-    protected ILocalizationService? LanguageService { get; }
+    protected ILanguageService? LanguageService { get; }
 
     /// <summary>
     ///     Explicitly override because we need to do validation differently than the underlying logic

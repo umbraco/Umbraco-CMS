@@ -93,7 +93,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
         blueprint.SetValue("title", "blueprint 1");
@@ -118,7 +118,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
         blueprint.SetValue("title", "blueprint 1");
@@ -143,7 +143,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
             var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-            ContentTypeService.Save(contentType);
+            await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
             var originalPage = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
             originalPage.SetValue("title", "blueprint 1");
@@ -172,10 +172,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var ct1 = ContentTypeBuilder.CreateTextPageContentType("ct1", defaultTemplateId: template.Id);
         await TemplateService.CreateAsync(ct1.DefaultTemplate, Constants.Security.SuperUserKey);
-        ContentTypeService.Save(ct1);
+        await ContentTypeService.CreateAsync(ct1, Constants.Security.SuperUserKey);
         var ct2 = ContentTypeBuilder.CreateTextPageContentType("ct2", defaultTemplateId: template.Id);
         await TemplateService.CreateAsync(ct2.DefaultTemplate, Constants.Security.SuperUserKey);
-        ContentTypeService.Save(ct2);
+        await ContentTypeService.CreateAsync(ct2, Constants.Security.SuperUserKey);
 
         for (var i = 0; i < 10; i++)
         {
@@ -210,11 +210,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await LanguageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
 
         var ctInvariant = ContentTypeBuilder.CreateBasicContentType("invariantPage");
-        ContentTypeService.Save(ctInvariant);
+        await ContentTypeService.CreateAsync(ctInvariant, Constants.Security.SuperUserKey);
 
         var ctVariant = ContentTypeBuilder.CreateBasicContentType("variantPage");
         ctVariant.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(ctVariant);
+        await ContentTypeService.CreateAsync(ctVariant, Constants.Security.SuperUserKey);
 
         var now = DateTime.UtcNow;
 
@@ -411,7 +411,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbBlah", "test Doc Type", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Act
         for (var i = 0; i < 20; i++)
@@ -432,7 +432,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbBlah", "test Doc Type", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var parent = ContentService.CreateAndSave("Test", Constants.System.Root, "umbBlah");
 
         // Act
@@ -454,7 +454,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbBlah", "test Doc Type", defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var parent = ContentService.CreateAndSave("Test", Constants.System.Root, "umbBlah");
 
         // Act
@@ -785,9 +785,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Unpublish_Content_Variation()
+    public async Task Can_Unpublish_Content_Variation()
     {
-        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr, out var contentType);
+        var (content, langUk, langFr, contentType) = await CreateEnglishAndFrenchDocument();
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
@@ -815,12 +815,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
-    public void Can_Publish_Culture_After_Last_Culture_Unpublished()
+    public async Task Can_Publish_Culture_After_Last_Culture_Unpublished()
     {
-        var content = CreateEnglishAndFrenchDocument(
-            out var langUk,
-            out var langFr,
-            out var contentType);
+        var (content, langUk, langFr, contentType) = await CreateEnglishAndFrenchDocument();
 
         ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
@@ -857,12 +854,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Unpublish_All_Cultures_Has_Unpublished_State()
+    public async Task Unpublish_All_Cultures_Has_Unpublished_State()
     {
-        var content = CreateEnglishAndFrenchDocument(
-            out var langUk,
-            out var langFr,
-            out var contentType);
+        var (content, langUk, langFr, contentType) = await CreateEnglishAndFrenchDocument();
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
@@ -922,7 +916,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content = new Content("content", Constants.System.Root, contentType);
         content.SetCultureName("content-fr", langFr.IsoCode);
@@ -948,12 +942,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Unpublishing_Already_Unpublished_Culture()
+    public async Task Unpublishing_Already_Unpublished_Culture()
     {
-        var content = CreateEnglishAndFrenchDocument(
-            out var langUk,
-            out var langFr,
-            out var contentType);
+        var (content, langUk, langFr, contentType) = await CreateEnglishAndFrenchDocument();
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
@@ -988,12 +979,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Publishing_No_Cultures_Still_Saves()
+    public async Task Publishing_No_Cultures_Still_Saves()
     {
-        var content = CreateEnglishAndFrenchDocument(
-            out var langUk,
-            out var langFr,
-            out var contentType);
+        var (content, langUk, langFr, contentType) = await CreateEnglishAndFrenchDocument();
 
         var saved = ContentService.Save(content);
         var published = ContentService.Publish(content, new[] { langFr.IsoCode, langUk.IsoCode });
@@ -1046,7 +1034,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         var keywordsProp = contentType.PropertyTypes.Single(x => x.Alias == "metakeywords");
         keywordsProp.Variations = ContentVariation.Nothing; // this one is invariant
 
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content = new Content("content", Constants.System.Root, contentType);
         content.SetCultureName("content-en", langGb.IsoCode);
@@ -1079,7 +1067,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     [Test]
     public async Task Can_Publish_Content_Variation_And_Detect_Changed_Cultures()
     {
-        CreateEnglishAndFrenchDocumentType(out var langUk, out var langFr, out var contentType);
+        var (langUk, langFr, contentType) = await CreateEnglishAndFrenchDocumentType();
 
         IContent content = new Content("content", Constants.System.Root, contentType);
         content.SetCultureName("content-fr", langFr.IsoCode);
@@ -1119,7 +1107,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content = new Content("content", Constants.System.Root, contentType);
         content.SetCultureName("content-fr", langFr.IsoCode);
@@ -1248,11 +1236,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Not_Publish_Invalid_Cultures_For_Variant_Content()
+    public async Task Can_Not_Publish_Invalid_Cultures_For_Variant_Content()
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateBasicContent(contentType);
         content.SetCultureName("Name for en-US", "en-US");
@@ -1266,10 +1254,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Not_Publish_Invalid_Cultures_For_Invariant_Content()
+    public async Task Can_Not_Publish_Invalid_Cultures_For_Invariant_Content()
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateBasicContent(contentType);
         content.Name = "Content name";
@@ -1293,7 +1281,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             "Mandatory Doc Type",
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parentId = Textpage.Id;
 
@@ -1348,7 +1336,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var ct = ContentTypeBuilder.CreateBasicContentType();
         ct.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(ct);
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
         IContent content = ContentBuilder.CreateBasicContent(ct);
         content.SetCultureName("name-fr", langFr.IsoCode);
@@ -1475,11 +1463,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Cannot_Publish_Expired_Culture()
+    public async Task Cannot_Publish_Expired_Culture()
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateBasicContent(contentType);
         content.SetCultureName("Hello", "en-US");
@@ -1521,7 +1509,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
     [Test]
     [LongRunning]
-    public void Failed_Publish_Should_Not_Update_Edited_State_When_Edited_True()
+    public async Task Failed_Publish_Should_Not_Update_Edited_State_When_Edited_True()
     {
         // Arrange
         var contentService = GetRequiredService<IContentService>();
@@ -1538,7 +1526,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             .WithContentVariation(ContentVariation.Nothing)
             .Build();
 
-        contentTypeService.Save(contentType);
+        await contentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = new ContentBuilder()
             .WithId(0)
@@ -1575,7 +1563,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     // V9 - Tests.Integration
     [Test]
     [LongRunning]
-    public void Failed_Publish_Should_Not_Update_Edited_State_When_Edited_False()
+    public async Task Failed_Publish_Should_Not_Update_Edited_State_When_Edited_False()
     {
         // Arrange
         var contentService = GetRequiredService<IContentService>();
@@ -1592,7 +1580,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             .WithContentVariation(ContentVariation.Nothing)
             .Build();
 
-        contentTypeService.Save(contentType);
+        await contentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = new ContentBuilder()
             .WithId(0)
@@ -1627,11 +1615,11 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
 
     [Test]
-    public void Cannot_Publish_Culture_Awaiting_Release()
+    public async Task Cannot_Publish_Culture_Awaiting_Release()
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateBasicContent(contentType);
         content.SetCultureName("Hello", "en-US");
@@ -1800,7 +1788,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         IContentType contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         IContent content = ContentBuilder.CreateSimpleContent(contentType, "hello");
         content.SetValue("title", "title of mine");
         content.SetValue("bodyText", "hello world");
@@ -1995,7 +1983,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         {
             new(contentType.Key, 0, contentType.Alias)
         };
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parentPage = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parentPage);
@@ -2110,7 +2098,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         // * published & preview data
         // * multiple versions
         var contentType = ContentTypeBuilder.CreateAllTypesContentType("test", "test");
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         object obj =
             new { tags = "[\"Hello\",\"World\"]" };
@@ -2219,10 +2207,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     /// Provides a regression test for https://github.com/umbraco/Umbraco-CMS/issues/22540.
     /// </summary>
     [Test]
-    public void Can_Copy_Culture_Variant_Document_Without_Per_Culture_Published_Flags()
+    public async Task Can_Copy_Culture_Variant_Document_Without_Per_Culture_Published_Flags()
     {
         // Arrange
-        var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr, out _);
+        var (content, langUk, langFr, _) = await CreateEnglishAndFrenchDocument();
 
         Assert.IsTrue(ContentService.Save(content).Success);
         Assert.IsTrue(ContentService.Publish(content, [langFr.IsoCode, langUk.IsoCode]).Success);
@@ -2243,10 +2231,10 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     /// recursive descendant path).
     /// </summary>
     [Test]
-    public void Can_Copy_Recursive_Culture_Variant_Document_Without_Per_Culture_Published_Flags_On_Descendants()
+    public async Task Can_Copy_Recursive_Culture_Variant_Document_Without_Per_Culture_Published_Flags_On_Descendants()
     {
         // Arrange
-        CreateEnglishAndFrenchDocumentType(out var langUk, out var langFr, out var contentType);
+        var (langUk, langFr, contentType) = await CreateEnglishAndFrenchDocumentType();
 
         IContent parent = new Content("parent", Constants.System.Root, contentType);
         parent.SetCultureName("parent-fr", langFr.IsoCode);
@@ -2340,7 +2328,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
             var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-            ContentTypeService.Save(contentType);
+            await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
             var content = ContentBuilder.CreateSimpleContent(contentType);
             content.SetValue("title", "New Value");
             ContentService.Save(content);
@@ -2417,12 +2405,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
                 "TagsPage",
                 defaultTemplateId: template.Id);
         contentType.Key = new Guid("78D96D30-1354-4A1E-8450-377764200C58");
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Simple Tags Page");
         content.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             propAlias,
             new[] { "hello", "world" });
@@ -2611,7 +2600,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         contentType.Variations = ContentVariation.Culture;
         var p1 = contentType.PropertyTypes.First();
         p1.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var page = new Content("Page", Constants.System.Root, contentType)
         {
@@ -2853,12 +2842,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
     }
 
     [Test]
-    public void Can_Verify_Property_Types_On_Content()
+    public async Task Can_Verify_Property_Types_On_Content()
     {
         // Arrange
         var contentTypeService = ContentTypeService;
         var contentType = ContentTypeBuilder.CreateAllTypesContentType("allDataTypes", "All DataTypes");
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var content =
             ContentBuilder.CreateAllTypesContent(contentType, "Random Content", Constants.System.Root);
         ContentService.Save(content);
@@ -2929,7 +2918,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         for (var i = 0; i < 10; i++)
         {
             var c1 = ContentBuilder.CreateSimpleContent(contentType);
@@ -2956,7 +2945,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Only add 9 as we also add a content with children
         for (var i = 0; i < 9; i++)
@@ -3117,7 +3106,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var parent = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(parent);
@@ -3173,7 +3162,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         contentType.SetDefaultTemplate(new Template(ShortStringHelper, "Textpage", "textpage"));
         await TemplateService.CreateAsync(contentType.DefaultTemplate, Constants.Security.SuperUserKey); // else, FK violation on contentType!
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentService.Create("foo", Constants.System.Root, "foo");
         ContentService.Save(content);
@@ -3311,9 +3300,9 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             ValueStorageType.Nvarchar,
             "prop")
         { Variations = ContentVariation.Culture });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        var content = new Content(null, Constants.System.Root, contentType);
+        var content = new Content(string.Empty, Constants.System.Root, contentType);
 
         content.SetCultureName("name-us", langUk.IsoCode);
         content.SetCultureName("name-fr", langFr.IsoCode);
@@ -3349,15 +3338,15 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentType = ContentTypeService.Get("umbTextpage");
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
-        var content = new Content(null, Constants.System.Root, contentType);
+        var content = new Content(string.Empty, Constants.System.Root, contentType);
         content.SetCultureName("root", langUk.IsoCode);
         ContentService.Save(content);
 
         for (var i = 0; i < 5; i++)
         {
-            var child = new Content(null, content, contentType);
+            var child = new Content(string.Empty, content, contentType);
             child.SetCultureName("child", langUk.IsoCode);
             ContentService.Save(child);
 
@@ -3414,16 +3403,16 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         contentType.Variations = ContentVariation.Culture;
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
-        var parent = new Content(null, Constants.System.Root, contentType);
+        var parent = new Content(string.Empty, Constants.System.Root, contentType);
         parent.SetCultureName("root", langUk.IsoCode);
         ContentService.Save(parent);
 
-        var child1 = new Content(null, parent, contentType);
+        var child1 = new Content(string.Empty, parent, contentType);
         child1.SetCultureName("Title", langUk.IsoCode);
         ContentService.Save(child1);
         Assert.AreEqual("Title", child1.GetCultureName(langUk.IsoCode));
 
-        var child2 = new Content(null, parent, contentType);
+        var child2 = new Content(string.Empty, parent, contentType);
         child2.SetCultureName("Title.", langUk.IsoCode);
         ContentService.Save(child2);
         Assert.AreEqual("Title. (1)", child2.GetCultureName(langUk.IsoCode));
@@ -3459,18 +3448,18 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
 
         var contentType = ContentTypeService.Get("umbTextpage");
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         int[] o = { 2, 1, 3, 0, 4 }; // randomly different
         for (var i = 0; i < 5; i++)
         {
-            var contentA = new Content(null, Constants.System.Root, contentType);
+            var contentA = new Content(string.Empty, Constants.System.Root, contentType);
             contentA.SetCultureName("contentA" + i + "uk", langUk.IsoCode);
             contentA.SetCultureName("contentA" + o[i] + "fr", langFr.IsoCode);
             contentA.SetCultureName("contentX" + i + "da", langDa.IsoCode);
             ContentService.Save(contentA);
 
-            var contentB = new Content(null, Constants.System.Root, contentType);
+            var contentB = new Content(string.Empty, Constants.System.Root, contentType);
             contentB.SetCultureName("contentB" + i + "uk", langUk.IsoCode);
             contentB.SetCultureName("contentB" + o[i] + "fr", langFr.IsoCode);
             contentB.SetCultureName("contentX" + i + "da", langDa.IsoCode);
@@ -3611,7 +3600,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         { Variations = ContentVariation.Culture });
 
         // TODO: add test w/ an invariant prop
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentService.Create("Home US", Constants.System.Root, "umbTextpage");
 
@@ -4155,38 +4144,33 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         return list;
     }
 
-    private void CreateEnglishAndFrenchDocumentType(
-        out Language langUk,
-        out Language langFr,
-        out ContentType contentType)
+    private async Task<(Language LangUk, Language LangFr, ContentType ContentType)> CreateEnglishAndFrenchDocumentType()
     {
-        langUk = (Language)new LanguageBuilder()
+        var langUk = (Language)new LanguageBuilder()
             .WithCultureInfo("en-GB")
             .WithIsDefault(true)
             .Build();
-        langFr = (Language)new LanguageBuilder()
+        var langFr = (Language)new LanguageBuilder()
             .WithCultureInfo("fr-FR")
             .Build();
-        LanguageService.CreateAsync(langFr, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
-        LanguageService.CreateAsync(langUk, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+        await LanguageService.CreateAsync(langFr, Constants.Security.SuperUserKey);
+        await LanguageService.CreateAsync(langUk, Constants.Security.SuperUserKey);
 
-        contentType = ContentTypeBuilder.CreateBasicContentType();
+        var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        return (langUk, langFr, contentType);
     }
 
-    private IContent CreateEnglishAndFrenchDocument(
-        out Language langUk,
-        out Language langFr,
-        out ContentType contentType)
+    private async Task<(IContent Content, Language LangUk, Language LangFr, ContentType ContentType)> CreateEnglishAndFrenchDocument()
     {
-        CreateEnglishAndFrenchDocumentType(out langUk, out langFr, out contentType);
+        var (langUk, langFr, contentType) = await CreateEnglishAndFrenchDocumentType();
 
         IContent content = new Content("content", Constants.System.Root, contentType);
         content.SetCultureName("content-fr", langFr.IsoCode);
         content.SetCultureName("content-en", langUk.IsoCode);
 
-        return content;
+        return (content, langUk, langFr, contentType);
     }
 
     public class ContentNotificationHandler :
@@ -4240,7 +4224,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             .Build();
 
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return (langEn, langDa, contentType);
     }

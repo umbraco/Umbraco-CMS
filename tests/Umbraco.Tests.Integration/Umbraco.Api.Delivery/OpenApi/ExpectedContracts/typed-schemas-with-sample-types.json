@@ -1481,12 +1481,12 @@
       "IApiContentResponseBaseModel": {
         "required": [
           "contentType",
-          "cultures",
           "createDate",
           "updateDate",
           "route",
           "id",
-          "properties"
+          "properties",
+          "cultures"
         ],
         "type": "object",
         "properties": {
@@ -1495,52 +1495,6 @@
               "null",
               "string"
             ]
-          },
-          "cultures": {
-            "type": [
-              "null",
-              "object"
-            ],
-            "additionalProperties": {
-              "required": [
-                "path",
-                "startItem"
-              ],
-              "type": "object",
-              "properties": {
-                "path": {
-                  "type": [
-                    "null",
-                    "string"
-                  ]
-                },
-                "queryString": {
-                  "type": [
-                    "null",
-                    "string"
-                  ]
-                },
-                "startItem": {
-                  "required": [
-                    "id",
-                    "path"
-                  ],
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "format": "uuid"
-                    },
-                    "path": {
-                      "type": [
-                        "null",
-                        "string"
-                      ]
-                    }
-                  }
-                }
-              }
-            }
           },
           "name": {
             "type": [
@@ -1605,6 +1559,52 @@
               "null",
               "object"
             ]
+          },
+          "cultures": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "additionalProperties": {
+              "required": [
+                "path",
+                "startItem"
+              ],
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "queryString": {
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "startItem": {
+                  "required": [
+                    "id",
+                    "path"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "path": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       },

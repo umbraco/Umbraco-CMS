@@ -1158,12 +1158,12 @@
       "IApiContentResponseModel": {
         "required": [
           "contentType",
-          "cultures",
           "createDate",
           "updateDate",
           "route",
           "id",
-          "properties"
+          "properties",
+          "cultures"
         ],
         "type": "object",
         "properties": {
@@ -1172,15 +1172,6 @@
               "null",
               "string"
             ]
-          },
-          "cultures": {
-            "type": [
-              "null",
-              "object"
-            ],
-            "additionalProperties": {
-              "$ref": "#/components/schemas/IApiContentRouteModel"
-            }
           },
           "name": {
             "type": [
@@ -1208,6 +1199,15 @@
               "null",
               "object"
             ]
+          },
+          "cultures": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "additionalProperties": {
+              "$ref": "#/components/schemas/IApiContentRouteModel"
+            }
           }
         }
       },

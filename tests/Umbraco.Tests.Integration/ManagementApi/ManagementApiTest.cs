@@ -63,7 +63,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
     [SetUp]
     public override void SetUp_Logging() =>
-        TestContext.Out.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.FullName}");
+        TestContext.Out.Write($"Start test {GetNextTestCount()}: {TestContext.CurrentContext.Test.FullName}");
 
     [OneTimeTearDown]
     public void ClearCache() => _tokenCache.Clear();
