@@ -1758,6 +1758,7 @@ export default {
 		editorSettings: 'Input indstillinger',
 		searchResultSettings: 'Tilgængelige indstillinger',
 		searchResultEditors: 'Opret ny indstilling',
+		suggestedEditors: 'Forslag',
 		configuration: 'Konfiguration',
 		yesDelete: 'Ja, slet',
 		movedUnderneath: 'blev flyttet til',
