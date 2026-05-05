@@ -47,16 +47,6 @@ public abstract class BlockValue
     /// The property editor alias of the current layout.
     /// </value>
     public abstract string PropertyEditorAlias { get; }
-
-    /// <summary>
-    ///     Determines whether the specified block layout alias is supported.
-    /// </summary>
-    /// <param name="alias">The block layout alias.</param>
-    /// <returns>
-    ///     <c>true</c> if the specified block layout alias is supported; otherwise, <c>false</c>.
-    /// </returns>
-    [Obsolete("Scheduled for removal in Umbraco 18.")]
-    public virtual bool SupportsBlockLayoutAlias(string alias) => alias.Equals(PropertyEditorAlias);
 }
 
 /// <summary>

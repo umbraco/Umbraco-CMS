@@ -262,7 +262,7 @@ public class JsonBlockValueConverter : JsonConverter<BlockValue>
                 }
 
                 // did we encounter the concrete block value?
-                if (blockValue.SupportsBlockLayoutAlias(blockEditorAlias))
+                if (blockValue.PropertyEditorAlias.Equals(blockEditorAlias))
                 {
                     // yes, deserialize the block layout items as their concrete type (list of layoutItemType)
                     var layoutItems = JsonSerializer.Deserialize(ref reader, layoutItemsType, options);
