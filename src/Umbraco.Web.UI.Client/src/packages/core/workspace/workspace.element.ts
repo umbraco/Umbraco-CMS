@@ -1,5 +1,5 @@
 import type { ManifestWorkspace } from './extensions/types.js';
-import { customElement, property, type PropertyValueMap, state, html } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
 	UmbExtensionsApiInitializer,
@@ -30,15 +30,11 @@ export class UmbWorkspaceElement extends UmbLitElement {
 		this.#createController(value);
 	}
 
-	protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-		super.firstUpdated(_changedProperties);
-		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace');
-	}
-
 	#createController(entityType: string) {
 		if (this.#extensionsController) {
 			this.#extensionsController.destroy();
 		}
+		this.setAttribute(UMB_MARK_ATTRIBUTE_NAME, 'workspace:' + entityType);
 		this.#extensionsController = new UmbExtensionsElementAndApiInitializer(
 			this,
 			umbExtensionsRegistry,
