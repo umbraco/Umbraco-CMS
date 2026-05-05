@@ -155,6 +155,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             propertyEditors,
             dataValueReferences,
             DataTypeService,
+            IdKeyMap,
             ConfigurationEditorJsonSerializer,
             Mock.Of<IEventAggregator>(),
             Mock.Of<IRepositoryCacheVersionService>(),

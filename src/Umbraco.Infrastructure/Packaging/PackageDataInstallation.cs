@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
@@ -33,6 +34,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IFileService _fileService;
         private readonly ILocalizationService _localizationService;
         private readonly IDataTypeService _dataTypeService;
+        private readonly IDataTypeContainerService _dataTypeContainerService;
+        private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
         private readonly IShortStringHelper _shortStringHelper;
@@ -67,6 +70,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <param name="templateContentParserService">Service for parsing template content.</param>
         /// <param name="templateService">Service for managing templates.</param>
         /// <param name="memberTypeService">Service for managing member types.</param>
+        /// <param name="dataTypeContainerService">Service for managing data type containers (folders).</param>
+        /// <param name="idKeyMap">The cached id-to-key map used to resolve int IDs to GUID keys.</param>
+        /// <param name="userIdKeyResolver">Resolver between int user IDs and GUID user keys.</param>
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
@@ -84,7 +90,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IMediaTypeService mediaTypeService,
             ITemplateContentParserService templateContentParserService,
             ITemplateService templateService,
-            IMemberTypeService memberTypeService)
+            IMemberTypeService memberTypeService,
+            IDataTypeContainerService dataTypeContainerService,
+            IUserIdKeyResolver userIdKeyResolver)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
@@ -103,6 +111,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _templateContentParserService = templateContentParserService;
             _templateService = templateService;
             _memberTypeService = memberTypeService;
+            _dataTypeContainerService = dataTypeContainerService;
+            _userIdKeyResolver = userIdKeyResolver;
         }
 
         /// <summary>
@@ -160,7 +170,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                   mediaTypeService,
                   templateContentParserService,
                   templateService,
-                  StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>())
+                  StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>(),
+                  StaticServiceProvider.Instance.GetRequiredService<IDataTypeContainerService>(),
+                  StaticServiceProvider.Instance.GetRequiredService<IUserIdKeyResolver>())
         { }
 
         /// <summary>
@@ -200,6 +212,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IMediaService mediaService,
             IMediaTypeService mediaTypeService,
             IHostingEnvironment hostingEnvironment)
+#pragma warning disable CS0618 // Type or member is obsolete
             : this(
                   dataValueEditorFactory,
                   logger,
@@ -217,6 +230,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                   mediaTypeService,
                   StaticServiceProvider.Instance.GetRequiredService<ITemplateContentParserService>(),
                   StaticServiceProvider.Instance.GetRequiredService<ITemplateService>())
+#pragma warning restore CS0618 // Type or member is obsolete
         { }
 
         #region Install/Uninstall
@@ -940,11 +954,13 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private EntityContainer? CreateContentTypeChildFolder(string folderName, Guid folderKey, IUmbracoEntity current)
         {
             IEntitySlim[] children = _entityService.GetChildren(current.Id).ToArray();
-            var found = children.Any(x => x.Name.InvariantEquals(folderName) || x.Key.Equals(folderKey));
-            if (found)
+
+            // Match by key first (more reliable when folders have been renamed in the destination), then fall back to name.
+            IEntitySlim? matchingChild = children.FirstOrDefault(x => x.Key == folderKey)
+                                         ?? children.FirstOrDefault(x => x.Name.InvariantEquals(folderName));
+            if (matchingChild is not null)
             {
-                var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
-                return _contentTypeService.GetContainer(containerId);
+                return _contentTypeService.GetContainer(matchingChild.Id);
             }
 
             Attempt<OperationResult<OperationResultType, EntityContainer>?> tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderKey, folderName);
@@ -1293,7 +1309,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                 if (dataTypeDefinition == null)
                 {
-                    IDataType[]? dataTypeDefinitions = _dataTypeService.GetByEditorAlias(propertyEditorAlias).ToArray();
+                    IDataType[]? dataTypeDefinitions = _dataTypeService.GetByEditorAliasAsync(propertyEditorAlias).GetAwaiter().GetResult().ToArray();
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
                         dataTypeDefinition = dataTypeDefinitions.FirstOrDefault();
@@ -1301,7 +1317,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
                 else if (dataTypeDefinition.EditorAlias != propertyEditorAlias)
                 {
-                    IDataType[]? dataTypeDefinitions = _dataTypeService.GetByEditorAlias(propertyEditorAlias).ToArray();
+                    IDataType[]? dataTypeDefinitions = _dataTypeService.GetByEditorAliasAsync(propertyEditorAlias).GetAwaiter().GetResult().ToArray();
                     if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
                         dataTypeDefinition = dataTypeDefinitions.FirstOrDefault();
@@ -1320,7 +1336,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         property.Element("Type")?.Value.Trim());
 
                     //convert to a label!
-                    dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.Label)?
+                    dataTypeDefinition = _dataTypeService.GetByEditorAliasAsync(Constants.PropertyEditors.Aliases.Label).GetAwaiter().GetResult()?
                         .FirstOrDefault();
                     //if for some odd reason this isn't there then ignore
                     if (dataTypeDefinition == null)
@@ -1467,6 +1483,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             Dictionary<string, int> importedFolders = CreateDataTypeFolderStructure(dataTypeElements, out entityContainersInstalled);
 
+            // Resolve the performing user key once for the whole import.
+            Guid performingUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+
             foreach (XElement dataTypeElement in dataTypeElements)
             {
                 var dataTypeDefinitionName = dataTypeElement.AttributeValue<string>("Name");
@@ -1520,13 +1539,28 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 else
                 {
                     definition.ParentId = parentId;
-                    _dataTypeService.Save(definition, userId);
+                    _dataTypeService.UpdateAsync(definition, performingUserKey).GetAwaiter().GetResult();
                 }
             }
 
             if (dataTypes.Count > 0)
             {
-                _dataTypeService.Save(dataTypes, userId);
+                // Note: the obsolete IDataTypeService.Save(IEnumerable<IDataType>) was a single batch operation
+                // that fired one combined notification for all entities. The new CreateAsync/UpdateAsync methods
+                // operate on a single entity at a time, so notifications now fire per item instead of as a batch.
+                // This is acceptable here because package installation is a one-off bulk import and existing
+                // notification handlers have been verified to handle per-item events correctly.
+                foreach (IDataType dataType in dataTypes)
+                {
+                    if (dataType.HasIdentity)
+                    {
+                        _dataTypeService.UpdateAsync(dataType, performingUserKey).GetAwaiter().GetResult();
+                    }
+                    else
+                    {
+                        _dataTypeService.CreateAsync(dataType, performingUserKey).GetAwaiter().GetResult();
+                    }
+                }
             }
 
             return dataTypes;
@@ -1558,21 +1592,24 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     var rootFolder = WebUtility.UrlDecode(folders[0]);
                     Guid rootFolderKey = folderKeys.Length > 0 ? folderKeys[0] : Guid.NewGuid();
                     //there will only be a single result by name for level 1 (root) containers
-                    EntityContainer? current = _dataTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
+                    EntityContainer? current = _dataTypeContainerService.GetAsync(rootFolder, 1).GetAwaiter().GetResult().FirstOrDefault();
 
                     if (current == null)
                     {
-                        Attempt<OperationResult<OperationResultType, EntityContainer>?> tryCreateFolder = _dataTypeService.CreateContainer(-1, rootFolderKey, rootFolder);
-                        if (tryCreateFolder == false)
+                        Attempt<EntityContainer?, EntityContainerOperationStatus> tryCreateFolder = _dataTypeContainerService
+                            .CreateAsync(rootFolderKey, rootFolder, parentKey: null, Constants.Security.SuperUserKey)
+                            .GetAwaiter()
+                            .GetResult();
+                        if (tryCreateFolder.Success is false)
                         {
                             _logger.LogError(
-                                tryCreateFolder.Exception,
-                                "Could not create folder: {FolderName}",
-                                rootFolder);
-                            throw tryCreateFolder.Exception!;
+                                "Could not create folder: {FolderName}. Status: {Status}",
+                                rootFolder,
+                                tryCreateFolder.Status);
+                            throw new InvalidOperationException($"Could not create folder '{rootFolder}'. Status: {tryCreateFolder.Status}");
                         }
 
-                        current = _dataTypeService.GetContainer(tryCreateFolder.Result!.Entity!.Id);
+                        current = tryCreateFolder.Result;
                         trackEntityContainersInstalled.Add(current!);
                     }
 
@@ -1596,21 +1633,26 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private EntityContainer? CreateDataTypeChildFolder(string folderName, Guid folderKey, IUmbracoEntity current)
         {
             IEntitySlim[] children = _entityService.GetChildren(current.Id).ToArray();
-            var found = children.Any(x => x.Name.InvariantEquals(folderName) || x.Key.Equals(folderKey));
-            if (found)
+
+            // Match by key first (more reliable when folders have been renamed in the destination), then fall back to name.
+            IEntitySlim? matchingChild = children.FirstOrDefault(x => x.Key == folderKey)
+                                         ?? children.FirstOrDefault(x => x.Name.InvariantEquals(folderName));
+            if (matchingChild is not null)
             {
-                var containerId = children.Single(x => x.Name.InvariantEquals(folderName)).Id;
-                return _dataTypeService.GetContainer(containerId);
+                return _dataTypeContainerService.GetAsync(matchingChild.Key).GetAwaiter().GetResult();
             }
 
-            Attempt<OperationResult<OperationResultType, EntityContainer>?> tryCreateFolder = _dataTypeService.CreateContainer(current.Id, folderKey, folderName);
-            if (tryCreateFolder == false)
+            Attempt<EntityContainer?, EntityContainerOperationStatus> tryCreateFolder = _dataTypeContainerService
+                .CreateAsync(folderKey, folderName, current.Key, Constants.Security.SuperUserKey)
+                .GetAwaiter()
+                .GetResult();
+            if (tryCreateFolder.Success is false)
             {
-                _logger.LogError(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
-                throw tryCreateFolder.Exception!;
+                _logger.LogError("Could not create folder: {FolderName}. Status: {Status}", folderName, tryCreateFolder.Status);
+                throw new InvalidOperationException($"Could not create folder '{folderName}'. Status: {tryCreateFolder.Status}");
             }
 
-            return _dataTypeService.GetContainer(tryCreateFolder.Result!.Entity!.Id);
+            return tryCreateFolder.Result;
         }
 
         #endregion

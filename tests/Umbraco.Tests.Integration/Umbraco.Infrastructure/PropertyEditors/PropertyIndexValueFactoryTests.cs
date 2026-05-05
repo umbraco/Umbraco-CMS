@@ -29,7 +29,7 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
 
     [Test]
-    public void Can_Get_Index_Values_From_RichText_With_Blocks()
+    public async Task Can_Get_Index_Values_From_RichText_With_Blocks()
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
@@ -39,7 +39,10 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
         ContentTypeService.Save(contentType);
 
-        var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
+        var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
+        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
 
         var elementId = Guid.NewGuid();
@@ -101,13 +104,16 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_Index_Values_From_RichText_Without_Blocks()
+    public async Task Can_Get_Index_Values_From_RichText_Without_Blocks()
     {
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
         ContentTypeService.Save(contentType);
 
-        var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
+        var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
+        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);

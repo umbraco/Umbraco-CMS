@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 /// <summary>
 /// Represents a migration step that creates database keys and indexes during an upgrade.
 /// </summary>
-public class CreateKeysAndIndexes : MigrationBase
+public class CreateKeysAndIndexes : AsyncMigrationBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="CreateKeysAndIndexes"/> class using the specified migration context.
@@ -18,7 +18,8 @@ public class CreateKeysAndIndexes : MigrationBase
     {
     }
 
-    protected override void Migrate()
+    /// <inheritdoc />
+    protected override Task MigrateAsync()
     {
         // remove those that may already have keys
         Delete.KeysAndIndexes(Constants.DatabaseSchema.Tables.KeyValue).Do();
@@ -29,5 +30,7 @@ public class CreateKeysAndIndexes : MigrationBase
         {
             Create.KeysAndIndexes(x).Do();
         }
+
+        return Task.CompletedTask;
     }
 }

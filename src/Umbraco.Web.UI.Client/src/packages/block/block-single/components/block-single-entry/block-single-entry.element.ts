@@ -220,7 +220,10 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		);
 		this.observe(
 			this.#context.readOnlyGuard.permitted,
-			(isReadOnly) => (this._isReadOnly = isReadOnly),
+			(isReadOnly) => {
+				this._isReadOnly = isReadOnly;
+				this.#updateBlockViewProps({ readonly: isReadOnly });
+			},
 			'umbReadOnlyObserver',
 		);
 	}
