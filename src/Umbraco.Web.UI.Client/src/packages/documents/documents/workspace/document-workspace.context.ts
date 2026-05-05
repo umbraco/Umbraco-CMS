@@ -234,11 +234,18 @@ export class UmbDocumentWorkspaceContext
 
 	async create(parent: UmbEntityModel, documentTypeUnique: string, blueprintUnique?: string) {
 		if (blueprintUnique) {
+			this.resetState();
+			this.loading.addState({ unique: 'blueprint-fetch' });
+
 			const blueprintRepository = new UmbDocumentBlueprintDetailRepository(this);
 			const { data } = await blueprintRepository.scaffoldByUnique(blueprintUnique);
 
-			if (!data) throw new Error('Blueprint data is missing');
+			if (!data) {
+				this.loading.removeState('blueprint-fetch');
+				throw new Error('Blueprint data is missing');
+			}
 
+			this.loading.removeState('blueprint-fetch');
 			return this.createScaffold({
 				parent,
 				preset: {

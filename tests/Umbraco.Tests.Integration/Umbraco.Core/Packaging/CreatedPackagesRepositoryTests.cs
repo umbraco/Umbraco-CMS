@@ -72,11 +72,11 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         LocalizationService,
         HostingEnvironment,
         EntityXmlSerializer,
-        Options.Create(new GlobalSettings()),
         MediaService,
         MediaTypeService,
         MediaFileManager,
         FileSystems,
+        GetRequiredService<IIdKeyMap>(),
         "createdPackages.config",
 
         // temp paths

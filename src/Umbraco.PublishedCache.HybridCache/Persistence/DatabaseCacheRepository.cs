@@ -56,31 +56,11 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
-    public async Task RefreshDocumentAsync(ContentCacheNode contentCacheNode, PublishedState publishedState)
+    public async Task RefreshDocumentAsync(ContentCacheNode contentCacheNode)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Document);
 
-        // We always cache draft and published separately, so we only want to cache drafts if the node is a draft type.
-        if (contentCacheNode.IsDraft)
-        {
-            await OnRepositoryRefreshed(serializer, contentCacheNode, true);
-
-            // If it's a draft node we don't need to worry about the published state.
-            return;
-        }
-
-        switch (publishedState)
-        {
-            case PublishedState.Publishing:
-                await OnRepositoryRefreshed(serializer, contentCacheNode, false);
-                break;
-            case PublishedState.Unpublishing:
-                Sql<ISqlContext> sql = Sql()
-                    .Delete<ContentNuDto>()
-                    .Where<ContentNuDto>(x => x.NodeId == contentCacheNode.Id && x.Published);
-                await Database.ExecuteAsync(sql);
-                break;
-        }
+        await OnRepositoryRefreshed(serializer, contentCacheNode, contentCacheNode.IsDraft);
     }
 
     /// <inheritdoc/>
@@ -88,6 +68,18 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Media);
         await OnRepositoryRefreshed(serializer, contentCacheNode, true);
+    }
+
+    /// <inheritdoc/>
+    public Task RemovePublishedDocumentAsync(int id)
+        => RemovePublishedAsync(id);
+
+    private Task RemovePublishedAsync(int id)
+    {
+        Sql<ISqlContext> sql = Sql()
+            .Delete<ContentNuDto>()
+            .Where<ContentNuDto>(x => x.NodeId == id && x.Published);
+        return Database.ExecuteAsync(sql);
     }
 
     /// <inheritdoc/>
@@ -188,29 +180,16 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     }
 
     /// <inheritdoc/>
-    public async Task RefreshElementAsync(ContentCacheNode contentCacheNode, PublishedState publishedState)
+    public async Task RefreshElementAsync(ContentCacheNode contentCacheNode)
     {
         IContentCacheDataSerializer serializer = _contentCacheDataSerializerFactory.Create(ContentCacheDataSerializerEntityType.Element);
 
-        if (contentCacheNode.IsDraft)
-        {
-            await OnRepositoryRefreshed(serializer, contentCacheNode, true);
-            return;
-        }
-
-        switch (publishedState)
-        {
-            case PublishedState.Publishing:
-                await OnRepositoryRefreshed(serializer, contentCacheNode, false);
-                break;
-            case PublishedState.Unpublishing:
-                Sql<ISqlContext> sql = Sql()
-                    .Delete<ContentNuDto>()
-                    .Where<ContentNuDto>(x => x.NodeId == contentCacheNode.Id && x.Published);
-                await Database.ExecuteAsync(sql);
-                break;
-        }
+        await OnRepositoryRefreshed(serializer, contentCacheNode, contentCacheNode.IsDraft);
     }
+
+    /// <inheritdoc/>
+    public Task RemovePublishedElementAsync(int id)
+        => RemovePublishedAsync(id);
 
 
     /// <inheritdoc/>

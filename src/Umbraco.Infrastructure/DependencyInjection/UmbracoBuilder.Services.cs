@@ -107,11 +107,11 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<ILocalizationService>(),
             factory.GetRequiredService<IHostingEnvironment>(),
             factory.GetRequiredService<IEntityXmlSerializer>(),
-            factory.GetRequiredService<IOptions<GlobalSettings>>(),
             factory.GetRequiredService<IMediaService>(),
             factory.GetRequiredService<IMediaTypeService>(),
             factory.GetRequiredService<MediaFileManager>(),
             factory.GetRequiredService<FileSystems>(),
+            factory.GetRequiredService<IIdKeyMap>(),
             packageRepoFileName);
 
     private static IPackageDataInstallation CreatePackageDataInstallation(IServiceProvider factory)
@@ -135,7 +135,8 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IMediaTypeService>(),
             factory.GetRequiredService<ITemplateContentParserService>(),
             factory.GetRequiredService<ITemplateService>(),
-            factory.GetRequiredService<IMemberTypeService>());
+            factory.GetRequiredService<IMemberTypeService>(),
+            factory.GetRequiredService<IDataTypeContainerService>());
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(
         IServiceProvider container)

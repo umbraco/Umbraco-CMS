@@ -2,8 +2,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO.Compression;
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -25,6 +27,7 @@ public class PackagesRepository : ICreatedPackagesRepository
     private readonly string _createdPackagesFolderPath;
     private readonly IDataTypeService _dataTypeService;
     private readonly ITemplateService _templateService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly IStylesheetService _stylesheetService;
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
@@ -39,27 +42,8 @@ public class PackagesRepository : ICreatedPackagesRepository
     private readonly string _tempFolderPath;
 
     /// <summary>
-    ///     Constructor
+    /// Initializes a new instance of the <see cref="PackagesRepository"/> class.
     /// </summary>
-    /// <param name="contentService"></param>
-    /// <param name="contentTypeService"></param>
-    /// <param name="dataTypeService"></param>
-    /// <param name="templateService"></param>
-    /// <param name="stylesheetService"></param>
-    /// <param name="languageService"></param>
-    /// <param name="hostingEnvironment"></param>
-    /// <param name="serializer"></param>
-    /// <param name="globalSettings"></param>
-    /// <param name="packageRepositoryFileName">
-    ///     The file name for storing the package definitions (i.e. "createdPackages.config")
-    /// </param>
-    /// <param name="tempFolderPath"></param>
-    /// <param name="packagesFolderPath"></param>
-    /// <param name="mediaFolderPath"></param>
-    /// <param name="mediaService"></param>
-    /// <param name="mediaTypeService"></param>
-    /// <param name="mediaFileManager"></param>
-    /// <param name="fileSystems"></param>
     public PackagesRepository(
         IContentService contentService,
         IContentTypeService contentTypeService,
@@ -69,11 +53,11 @@ public class PackagesRepository : ICreatedPackagesRepository
         ILocalizationService languageService,
         IHostingEnvironment hostingEnvironment,
         IEntityXmlSerializer serializer,
-        IOptions<GlobalSettings> globalSettings,
         IMediaService mediaService,
         IMediaTypeService mediaTypeService,
         MediaFileManager mediaFileManager,
         FileSystems fileSystems,
+        IIdKeyMap idKeyMap,
         string packageRepositoryFileName,
         string? tempFolderPath = null,
         string? packagesFolderPath = null,
@@ -88,6 +72,7 @@ public class PackagesRepository : ICreatedPackagesRepository
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;
         _templateService = templateService;
+        _idKeyMap = idKeyMap;
         _stylesheetService = stylesheetService;
         _languageService = languageService;
         _serializer = serializer;
@@ -376,7 +361,13 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            IDataType? dataType = _dataTypeService.GetDataType(outInt);
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(outInt, UmbracoObjectTypes.DataType);
+            if (keyAttempt.Success is false)
+            {
+                continue;
+            }
+
+            IDataType? dataType = _dataTypeService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult();
             if (dataType == null)
             {
                 continue;

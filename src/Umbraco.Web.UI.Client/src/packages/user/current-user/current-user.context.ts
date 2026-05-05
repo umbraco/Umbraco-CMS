@@ -5,7 +5,6 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
@@ -37,17 +36,11 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	readonly unique = this.#currentUser.asObservablePart((user) => user?.unique);
 	readonly userName = this.#currentUser.asObservablePart((user) => user?.userName);
 
-	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#currentUserRepository = new UmbCurrentUserRepository(this);
 	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CURRENT_USER_CONTEXT);
-
-		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
-			this.#authContext = instance;
-			this.#observeIsAuthorized();
-		});
 
 		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
 			this.#removeActionEventListeners();
@@ -61,16 +54,30 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		});
 	}
 
+	#loadPromise?: Promise<void>;
 	/**
-	 * Loads the current user
+	 * Loads the current user. Concurrent callers share the same in-flight promise,
+	 * so awaiting `load()` always waits for `#currentUser` to be populated.
+	 * @returns {Promise<void>} Resolves once the current user observable has emitted.
 	 */
-	async load() {
+	public async load(): Promise<void> {
+		if (!this.#loadPromise) {
+			this.#loadPromise = this.#doLoad();
+		}
+		return this.#loadPromise;
+	}
+
+	async #doLoad(): Promise<void> {
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
 		if (asObservable) {
-			await this.observe(asObservable(), (currentUser) => {
-				this.#currentUser?.setValue(currentUser);
-			})
+			await this.observe(
+				asObservable(),
+				(currentUser) => {
+					this.#currentUser?.setValue(currentUser);
+				},
+				'observeUser',
+			)
 				.asPromise()
 				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
 				.catch(() => undefined);
@@ -291,15 +298,6 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		this.#removeActionEventListeners();
 		this.#loadDebounced.cancel();
 		super.destroy();
-	}
-
-	#observeIsAuthorized() {
-		if (!this.#authContext) return;
-		this.observe(this.#authContext.isAuthorized, (isAuthorized) => {
-			if (isAuthorized) {
-				this.load();
-			}
-		});
 	}
 }
 
