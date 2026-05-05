@@ -70,14 +70,16 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 	}
 
 	getHasAccessToAllLanguages(userGroupIds: Array<{ id: string }>): boolean {
+		const ids = new Set(userGroupIds.map((reference) => reference.id));
 		return this.data
-			.filter((userGroup) => userGroupIds.map((reference) => reference.id).includes(userGroup.id))
+			.filter((userGroup) => ids.has(userGroup.id))
 			.some((userGroup) => userGroup.hasAccessToAllLanguages);
 	}
 
 	getAllowedLanguages(userGroupIds: Array<{ id: string }>): string[] {
+		const ids = new Set(userGroupIds.map((reference) => reference.id));
 		const languages = this.data
-			.filter((userGroup) => userGroupIds.map((reference) => reference.id).includes(userGroup.id))
+			.filter((userGroup) => ids.has(userGroup.id))
 			.map((userGroup) => (userGroup.languages?.length ? userGroup.languages : []))
 			.flat();
 
