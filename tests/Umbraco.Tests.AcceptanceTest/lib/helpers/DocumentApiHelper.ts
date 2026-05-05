@@ -254,15 +254,14 @@ export class DocumentApiHelper {
   }
 
   async createPublishedEnglishCultureDocumentWithTwoTextVersions(documentName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string) {
-    const publishData = {publishSchedules: [{culture: 'en-US'}]};
     const dataTypeData = await this.api.dataType.getByName(dataTypeName);
     const documentTypeId = await this.api.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
     const documentId = await this.createDocumentWithEnglishCultureAndTextContent(documentName, documentTypeId, originalText, dataTypeName);
-    await this.publish(documentId, publishData);
+    await this.publishDocumentWithCulture(documentId, 'en-US');
     const documentData = await this.get(documentId);
     documentData.values[0].value = updatedText;
     await this.update(documentId, documentData);
-    await this.publish(documentId, publishData);
+    await this.publishDocumentWithCulture(documentId, 'en-US');
     return documentId;
   }
 
