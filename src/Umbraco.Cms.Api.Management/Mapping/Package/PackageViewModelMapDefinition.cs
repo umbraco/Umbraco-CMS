@@ -22,8 +22,6 @@ public class PackageViewModelMapDefinition : IMapDefinition
         mapper.Define<PackageDefinition, PackageDefinitionResponseModel>(
             (_, _) => new PackageDefinitionResponseModel { Name = string.Empty, PackagePath = string.Empty },
             Map);
-        mapper.Define<InstalledPackage, PackageMigrationStatusResponseModel>(
-            (_, _) => new PackageMigrationStatusResponseModel { PackageName = string.Empty }, Map);
     }
 
     // Umbraco.Code.MapAll -Id -PackageId -PackagePath
@@ -64,17 +62,5 @@ public class PackageViewModelMapDefinition : IMapDefinition
         target.Scripts = source.Scripts;
         target.Languages = source.Languages;
         target.DictionaryItems = source.DictionaryItems;
-    }
-
-    // Umbraco.Code.MapAll
-    [Obsolete("Please use the IPackagePresentationFactory instead. Scheduled for removal in Umbraco 18.")]
-    private static void Map(InstalledPackage source, PackageMigrationStatusResponseModel target, MapperContext context)
-    {
-        if (source.PackageName is not null)
-        {
-            target.PackageName = source.PackageName;
-        }
-
-        target.HasPendingMigrations = source.HasPendingMigrations;
     }
 }
