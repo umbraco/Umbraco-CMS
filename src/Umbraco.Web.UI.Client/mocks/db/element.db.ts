@@ -176,6 +176,7 @@ const itemMapper = (model: UmbMockElementModel): ElementItemResponseModel => {
 		documentType: model.documentType!,
 		hasChildren: model.hasChildren,
 		id: model.id,
+		isTrashed: model.isTrashed,
 		parent: model.parent,
 		variants: model.variants,
 		flags: model.flags,
