@@ -435,10 +435,10 @@ export class ContentUiHelper extends UiBaseLocators {
     this.addBlockSettingsTabBtn = page
       .locator("umb-body-layout")
       .getByRole("tab", { name: "Settings" });
-    this.editBlockEntryBtn = page.locator('[label="edit"] svg');
+    this.editBlockEntryBtn = page.getByTestId('block-action:Umb.BlockAction.EditContent').locator('svg');
     this.copyBlockEntryBtn = page.getByLabel("Copy to clipboard");
     this.exactCopyBtn = page.getByRole("button", { name: "Copy", exact: true });
-    this.deleteBlockEntryBtn = page.locator('[label="delete"] svg');
+    this.deleteBlockEntryBtn = page.getByTestId('block-action:Umb.BlockAction.Delete');
     this.blockGridEntry = page.locator("umb-block-grid-entry");
     this.blockGridBlock = page.locator("umb-block-grid-block");
     this.blockListEntry = page.locator("umb-block-list-entry");
