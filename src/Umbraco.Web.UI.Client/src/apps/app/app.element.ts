@@ -45,6 +45,7 @@ const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<ManifestBas
 	import('../../packages/health-check/umbraco-package.js'),
 	import('../../packages/help/umbraco-package.js'),
 	import('../../packages/language/umbraco-package.js'),
+	import('../../packages/library/umbraco-package.js'),
 	import('../../packages/log-viewer/umbraco-package.js'),
 	import('../../packages/management-api/umbraco-package.js'),
 	import('../../packages/markdown-editor/umbraco-package.js'),
