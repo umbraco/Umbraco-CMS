@@ -87,7 +87,8 @@ export class UmbBasicState<T> {
 	 * // myState.value is equal 'Goodnight'.
 	 */
 	setValue(data: T): void {
-		if (this._subject && data !== this._subject.getValue()) {
+		if (!this._subject) throw new Error('_subject is undefined');
+		if (data !== this._subject.getValue()) {
 			this._subject.next(data);
 		}
 	}

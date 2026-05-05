@@ -33,11 +33,11 @@ describe('UmbValidationMessagesManager', () => {
 	});
 
 	describe('destroy', () => {
-		it('does not throw when finishChange is called after destroy', () => {
+		it('throws when finishChange is called after destroy', () => {
 			messages.initiateChange();
 			messages.destroy();
 
-			expect(() => messages.finishChange()).to.not.throw();
+			expect(() => messages.finishChange()).to.throw();
 		});
 	});
 });
