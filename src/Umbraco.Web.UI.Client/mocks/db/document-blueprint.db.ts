@@ -4,7 +4,7 @@ import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js'
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { umbDocumentTypeMockDb } from './document-type.db.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDocumentBlueprintVariantState } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	CreateDocumentBlueprintRequestModel,
@@ -74,7 +74,7 @@ const createMockDocumentBlueprintMapper = (
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
-				state: DocumentVariantStateModel.DRAFT,
+				state: UmbDocumentBlueprintVariantState.DRAFT,
 				publishDate: null,
 				id: UmbId.new(),
 				flags: [],

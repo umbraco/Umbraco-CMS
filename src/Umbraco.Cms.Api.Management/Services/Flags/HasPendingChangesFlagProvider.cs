@@ -1,4 +1,5 @@
 using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Core;
@@ -26,7 +27,7 @@ public class HasPendingChangesFlagProvider : IFlagProvider
     {
         foreach (TItem item in items)
         {
-            DocumentVariantState? state = item switch
+            PublishableVariantState? state = item switch
             {
                 DocumentVariantItemResponseModel variant => variant.State,
                 DocumentVariantResponseModel variant => variant.State,
@@ -35,7 +36,7 @@ public class HasPendingChangesFlagProvider : IFlagProvider
                 _ => null,
             };
 
-            if (state == DocumentVariantState.PublishedPendingChanges)
+            if (state == PublishableVariantState.PublishedPendingChanges)
             {
                 item.AddFlag(Alias);
             }

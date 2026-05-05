@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Flags;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 
@@ -45,13 +46,13 @@ internal class HasPendingChangesFlagProviderTests
         {
             new()
             {
-                State = DocumentVariantState.PublishedPendingChanges,
+                State = PublishableVariantState.PublishedPendingChanges,
                 Culture = null,
                 Name = "Test",
             },
             new()
             {
-                State = DocumentVariantState.Published,
+                State = PublishableVariantState.Published,
                 Culture = null,
                 Name = "Test2",
             },
@@ -75,13 +76,13 @@ internal class HasPendingChangesFlagProviderTests
         {
             new()
             {
-                State = DocumentVariantState.PublishedPendingChanges,
+                State = PublishableVariantState.PublishedPendingChanges,
                 Culture = null,
                 Name = "Test",
             },
             new()
             {
-                State = DocumentVariantState.Published,
+                State = PublishableVariantState.Published,
                 Culture = null,
                 Name = "Test2",
             },
@@ -105,13 +106,13 @@ internal class HasPendingChangesFlagProviderTests
         {
             new()
             {
-                State = DocumentVariantState.PublishedPendingChanges,
+                State = PublishableVariantState.PublishedPendingChanges,
                 Culture = null,
                 Name = "Test",
             },
             new()
             {
-                State = DocumentVariantState.Published,
+                State = PublishableVariantState.Published,
                 Culture = null,
                 Name = "Test2",
             },
@@ -135,13 +136,13 @@ internal class HasPendingChangesFlagProviderTests
         {
             new()
             {
-                State = DocumentVariantState.PublishedPendingChanges,
+                State = PublishableVariantState.PublishedPendingChanges,
                 Culture = null,
                 Name = "Test",
             },
             new()
             {
-                State = DocumentVariantState.Published,
+                State = PublishableVariantState.Published,
                 Culture = null,
                 Name = "Test2",
             },

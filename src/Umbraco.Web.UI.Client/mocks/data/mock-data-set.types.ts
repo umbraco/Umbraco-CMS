@@ -94,10 +94,10 @@ import type {
 	PagedIndexResponseModel,
 	SearchResultResponseModel,
 	// Tracked Reference
-	DefaultReferenceResponseModel,
-	DocumentReferenceResponseModel,
-	MediaReferenceResponseModel,
-	MemberReferenceResponseModel,
+	IReferenceResponseModelDefaultReferenceResponseModel,
+	IReferenceResponseModelDocumentReferenceResponseModel,
+	IReferenceResponseModelMediaReferenceResponseModel,
+	IReferenceResponseModelMemberReferenceResponseModel,
 	// News
 	NewsDashboardItemResponseModel,
 	// Webhook
@@ -187,10 +187,10 @@ export type UmbMockWebhookDeliveryModel = WebhookLogResponseModel;
 export type UmbMockAuditLogModel = AuditLogResponseModel;
 
 export type UmbMockTrackedReferenceItemModel =
-	| DefaultReferenceResponseModel
-	| DocumentReferenceResponseModel
-	| MediaReferenceResponseModel
-	| MemberReferenceResponseModel;
+	| IReferenceResponseModelDefaultReferenceResponseModel
+	| IReferenceResponseModelDocumentReferenceResponseModel
+	| IReferenceResponseModelMediaReferenceResponseModel
+	| IReferenceResponseModelMemberReferenceResponseModel;
 
 // ============================================================================
 // Log Levels Type (matches the structure in log-viewer.data.ts)

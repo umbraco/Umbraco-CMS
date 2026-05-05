@@ -43075,7 +43075,7 @@
             }
           },
           "state": {
-            "$ref": "#/components/schemas/DocumentVariantStateModel"
+            "$ref": "#/components/schemas/PublishableVariantStateModel"
           },
           "name": {
             "type": "string"
@@ -43133,7 +43133,7 @@
             }
           },
           "state": {
-            "$ref": "#/components/schemas/DocumentVariantStateModel"
+            "$ref": "#/components/schemas/PublishableVariantStateModel"
           },
           "publishDate": {
             "type": [
@@ -43180,15 +43180,6 @@
             "type": "string"
           }
         }
-      },
-      "DocumentVariantStateModel": {
-        "enum": [
-          "NotCreated",
-          "Draft",
-          "Published",
-          "PublishedPendingChanges",
-          "Trashed"
-        ]
       },
       "DocumentVersionItemResponseModel": {
         "required": [
@@ -43735,7 +43726,7 @@
             }
           },
           "state": {
-            "$ref": "#/components/schemas/DocumentVariantStateModel"
+            "$ref": "#/components/schemas/PublishableVariantStateModel"
           },
           "name": {
             "type": "string"
@@ -43793,7 +43784,7 @@
             }
           },
           "state": {
-            "$ref": "#/components/schemas/DocumentVariantStateModel"
+            "$ref": "#/components/schemas/PublishableVariantStateModel"
           },
           "publishDate": {
             "type": [
@@ -49001,6 +48992,15 @@
             "$ref": "#/components/schemas/ReferenceByIdModel"
           }
         }
+      },
+      "PublishableVariantStateModel": {
+        "enum": [
+          "NotCreated",
+          "Draft",
+          "Published",
+          "PublishedPendingChanges",
+          "Trashed"
+        ]
       },
       "PublishDocumentRequestModel": {
         "required": [
