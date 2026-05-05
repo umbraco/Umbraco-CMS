@@ -37,7 +37,7 @@ export class UmbServerConnection extends UmbControllerBase {
 	 * @memberof UmbServerConnection
 	 */
 	getSignalRSkipNegotiation() {
-		return this.#signalRSkipNegotiation;
+		return this.#signalRSkipNegotiation.getValue();
 	}
 
 	/**
@@ -102,6 +102,6 @@ export class UmbServerConnection extends UmbControllerBase {
 		this.#allowLocalLogin.setValue(data?.allowLocalLogin ?? false);
 		this.#allowPasswordReset.setValue(data?.allowPasswordReset ?? false);
 		this.#umbracoCssPath.setValue(data?.umbracoCssPath);
-		this.#signalRSkipNegotiation = data?.signalR?.skipNegotiation === true;
+		this.#signalRSkipNegotiation.setValue(data?.signalR?.skipNegotiation ?? false);
 	}
 }
