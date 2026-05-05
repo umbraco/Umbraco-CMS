@@ -65,7 +65,6 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 		query: { descendantId: args.treeItem.unique },
 	});
 
-// TODO: Review the commented out properties. [LK:2026-01-06]
 const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinTreeItemModel => {
 	return {
 		unique: item.id,
@@ -81,7 +80,6 @@ const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinT
 		icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
 		isTrashed: true,
 		hasChildren: item.hasChildren,
-		//isProtected: false,
 		documentType: {
 			unique: item.documentType?.id ?? '',
 			icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),

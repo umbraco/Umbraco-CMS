@@ -646,9 +646,13 @@ public class VariationTests
 
         var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
 
-        var mockDataTypeService = new Mock<IDataTypeService>();
-        Mock.Get(dataTypeService).Setup(x => x.GetDataType(It.Is<int>(y => y == Constants.DataTypes.Textbox)))
-            .Returns(new DataType(textBoxEditor, serializer));
+        var textboxKey = Guid.NewGuid();
+        Mock.Get(dataTypeService).Setup(x => x.GetAsync(textboxKey))
+            .ReturnsAsync(new DataType(textBoxEditor, serializer));
+
+        var idKeyMap = new Mock<IIdKeyMap>();
+        idKeyMap.Setup(x => x.GetKeyForId(Constants.DataTypes.Textbox, UmbracoObjectTypes.DataType))
+            .Returns(Attempt.Succeed(textboxKey));
 
         var propertyEditorCollection =
             new PropertyEditorCollection(new DataEditorCollection(() => new[] { textBoxEditor }));
@@ -659,6 +663,7 @@ public class VariationTests
             new ValueEditorCache(),
             Mock.Of<ICultureDictionary>(),
             Mock.Of<ILanguageService>(),
-            Mock.Of<IOptions<ContentSettings>>());
+            Mock.Of<IOptions<ContentSettings>>(),
+            idKeyMap.Object);
     }
 }

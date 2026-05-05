@@ -8,10 +8,8 @@ using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.Services.PermissionFilter;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
 
@@ -26,8 +24,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Element.Tree;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessForElementTree)]
 public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<ElementTreeItemResponseModel>
 {
-    private readonly AppCaches _appCaches;
-    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IElementPresentationFactory _elementPresentationFactory;
     private readonly IElementPermissionFilterService _elementPermissionFilterService;
 
@@ -36,25 +32,17 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
     /// </summary>
     /// <param name="entityService">Service for retrieving entity data.</param>
     /// <param name="flagProviders">Collection of flag providers for tree item flags.</param>
-    /// <param name="userStartNodeEntitiesService">Service for user start node entity resolution.</param>
-    /// <param name="dataTypeService">Service for data type operations.</param>
-    /// <param name="appCaches">Application caches for performance optimization.</param>
-    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
+    /// <param name="treeFilterService">Service for filtering element tree entities based on user start nodes.</param>
     /// <param name="elementPresentationFactory">Factory responsible for creating element presentation models.</param>
     /// <param name="elementPermissionFilterService">Service for filtering tree entities based on element permissions.</param>
     public ElementTreeControllerBase(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IElementStartNodeTreeFilterService treeFilterService,
         IElementPresentationFactory elementPresentationFactory,
         IElementPermissionFilterService elementPermissionFilterService)
-        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService)
+        : base(entityService, flagProviders, treeFilterService)
     {
-        _appCaches = appCaches;
-        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
         _elementPresentationFactory = elementPresentationFactory;
         _elementPermissionFilterService = elementPermissionFilterService;
     }
@@ -62,20 +50,6 @@ public class ElementTreeControllerBase : UserStartNodeFolderTreeControllerBase<E
     protected override UmbracoObjectTypes ItemObjectType => UmbracoObjectTypes.Element;
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.ElementContainer;
-
-    protected override int[] GetUserStartNodeIds()
-        => _backOfficeSecurityAccessor
-               .BackOfficeSecurity?
-               .CurrentUser?
-               .CalculateElementStartNodeIds(EntityService, _appCaches)
-           ?? [];
-
-    protected override string[] GetUserStartNodePaths()
-        => _backOfficeSecurityAccessor
-               .BackOfficeSecurity?
-               .CurrentUser?
-               .GetElementStartNodePaths(EntityService, _appCaches)
-           ?? [];
 
     protected override async Task<ElementTreeItemResponseModel> MapTreeItemViewModelAsync(Guid? parentKey, IEntitySlim entity)
     {

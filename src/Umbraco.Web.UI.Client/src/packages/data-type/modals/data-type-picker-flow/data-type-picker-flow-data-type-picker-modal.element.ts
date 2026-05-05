@@ -95,7 +95,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 
 	#renderCreate() {
 		return html`
-			<uui-button id="create-button" look="placeholder" @click=${this.#handleCreate}>
+			<uui-button id="create-button" look="placeholder" label=${this.localize.term('contentTypeEditor_availableEditors')} @click=${this.#handleCreate}>
 				<div class="content">
 					<uui-icon name="icon-add" class="icon"></uui-icon>
 					<umb-localize key="contentTypeEditor_availableEditors">Create new</umb-localize>
@@ -211,6 +211,7 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 				max-width: 100%;
 				display: -webkit-box;
 				overflow: hidden;
+				padding-bottom: 0.1em;
 			}
 		`,
 	];

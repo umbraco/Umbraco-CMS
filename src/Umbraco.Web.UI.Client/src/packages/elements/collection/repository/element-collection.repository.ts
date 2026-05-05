@@ -8,7 +8,6 @@ export class UmbElementCollectionRepository extends UmbRepositoryBase implements
 	#treeRepository = new UmbElementTreeRepository(this);
 
 	async requestCollection(filter: UmbCollectionFilterModel = {}) {
-		// TODO: get parent from args
 		const entityContext = await this.getContext(UMB_ENTITY_CONTEXT);
 		if (!entityContext) throw new Error('Entity context not found');
 
@@ -18,6 +17,7 @@ export class UmbElementCollectionRepository extends UmbRepositoryBase implements
 		if (!entityType) throw new Error('Entity type not found');
 		if (unique === undefined) throw new Error('Unique not found');
 
+		// TODO: get parent from args
 		const parent: UmbEntityModel = { entityType, unique };
 
 		if (parent.unique === null) {

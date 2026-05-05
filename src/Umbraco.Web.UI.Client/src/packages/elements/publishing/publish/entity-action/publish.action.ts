@@ -99,8 +99,7 @@ export class UmbPublishElementEntityAction extends UmbEntityActionBase<never> {
 			if (isInvariant) {
 				notificationContext?.peek('positive', {
 					data: {
-						headline: localize.term('speechBubbles_editContentPublishedHeader'),
-						message: localize.term('speechBubbles_editContentPublishedText'),
+						message: localize.term('speechBubbles_editElementPublishedHeader'),
 					},
 				});
 			} else {
@@ -109,7 +108,7 @@ export class UmbPublishElementEntityAction extends UmbEntityActionBase<never> {
 					data: {
 						headline: localize.term('speechBubbles_editContentPublishedHeader'),
 						message: localize.term(
-							'speechBubbles_editVariantPublishedText',
+							'speechBubbles_editVariantElementPublishedText',
 							localize.list(elementVariants.map((v) => UmbVariantId.Create(v).toString() ?? v.name)),
 						),
 					},
