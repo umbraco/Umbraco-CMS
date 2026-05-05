@@ -1,5 +1,5 @@
 import { UmbDocumentPublishingRepository } from '../../index.js';
-import { UmbDocumentVariantState } from '../../../index.js';
+import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import type { UmbDocumentItemModel } from '../../../item/types.js';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../../constants.js';

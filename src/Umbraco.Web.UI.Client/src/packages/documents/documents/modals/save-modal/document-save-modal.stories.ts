@@ -1,6 +1,6 @@
 import './document-save-modal.element.js';
 
-import { UmbDocumentVariantState } from '../../index.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import type { UmbDocumentSaveModalData, UmbDocumentSaveModalValue } from './document-save-modal.token.js';
 import type { UmbDocumentSaveModalElement } from './document-save-modal.element.js';
 import type { Meta, StoryObj } from '@storybook/web-components-vite';

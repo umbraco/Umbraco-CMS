@@ -1,4 +1,4 @@
-import { UmbElementVariantState } from './index.js';
+import { UmbElementVariantState } from './variant-state.js';
 import type { UmbElementVariantOptionModel } from './types.js';
 
 type VariantType = UmbElementVariantOptionModel;

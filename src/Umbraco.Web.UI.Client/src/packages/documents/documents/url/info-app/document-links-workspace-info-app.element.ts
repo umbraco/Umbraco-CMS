@@ -3,7 +3,7 @@ import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbDocumentUrlModel } from '../repository/types.js';
 import { UmbDocumentUrlsDataResolver } from '../document-urls-data-resolver.js';
-import { UmbDocumentVariantState } from '../../index.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import {
 	css,
 	customElement,

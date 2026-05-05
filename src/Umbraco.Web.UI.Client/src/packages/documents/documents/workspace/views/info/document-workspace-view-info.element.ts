@@ -1,4 +1,4 @@
-import { UmbDocumentVariantState } from '../../../index.js';
+import { UmbDocumentVariantState } from '../../../variant-state.js';
 import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT, UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../../constants.js';
 import type { UmbDocumentVariantModel } from '../../../types.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../../publishing/index.js';

@@ -1,6 +1,6 @@
 import { UMB_ELEMENT_WORKSPACE_CONTEXT } from '../../workspace/element-workspace.context-token.js';
 import type { UmbElementDetailModel, UmbElementVariantOptionModel } from '../../types.js';
-import { UmbElementVariantState } from '../../index.js';
+import { UmbElementVariantState } from '../../variant-state.js';
 import { UmbElementPublishingRepository } from '../repository/index.js';
 import { UmbElementPublishedPendingChangesManager } from '../pending-changes/index.js';
 import type { UmbElementVariantPublishModel } from '../types.js';

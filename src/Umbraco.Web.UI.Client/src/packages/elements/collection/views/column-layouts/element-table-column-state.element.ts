@@ -1,4 +1,4 @@
-import { UmbElementVariantState } from '../../../index.js';
+import { UmbElementVariantState } from '../../../variant-state.js';
 import { UmbElementItemDataResolver } from '../../../item/data-resolver/element-item-data-resolver.js';
 import type { UmbElementItemModel } from '../../../types.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';

@@ -3,7 +3,7 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDocumentPublishedPendingChangesManager } from './document-published-pending-changes.manager.js';
-import { UmbDocumentVariantState } from '../../index.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import { type UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 

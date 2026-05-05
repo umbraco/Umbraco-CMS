@@ -1,4 +1,4 @@
-import { UmbElementVariantState } from '../index.js';
+import { UmbElementVariantState } from '../variant-state.js';
 import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../entity.js';
 import type {
 	UmbElementTreeChildrenOfRequestArgs,

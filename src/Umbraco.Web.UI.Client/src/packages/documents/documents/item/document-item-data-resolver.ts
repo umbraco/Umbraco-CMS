@@ -1,4 +1,4 @@
-import { UmbDocumentVariantState } from '../index.js';
+import { UmbDocumentVariantState } from '../variant-state.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

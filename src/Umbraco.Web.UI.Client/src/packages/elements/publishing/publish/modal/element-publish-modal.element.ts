@@ -1,4 +1,4 @@
-import { UmbElementVariantState } from '../../../index.js';
+import { UmbElementVariantState } from '../../../variant-state.js';
 import type { UmbElementVariantOptionModel } from '../../../types.js';
 import type { UmbElementPublishModalData, UmbElementPublishModalValue } from './element-publish-modal.token.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';

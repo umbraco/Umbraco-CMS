@@ -1,6 +1,6 @@
 import { UMB_ELEMENT_WORKSPACE_CONTEXT } from '../../constants.js';
 import { UMB_ELEMENT_WORKSPACE_PROPERTY_DATASET_CONTEXT } from '../../property-dataset-context/element-workspace-property-dataset-context.token.js';
-import { UmbElementVariantState } from '../../../index.js';
+import { UmbElementVariantState } from '../../../variant-state.js';
 import type { UmbElementVariantModel } from '../../../types.js';
 import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

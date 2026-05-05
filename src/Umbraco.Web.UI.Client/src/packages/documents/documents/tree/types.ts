@@ -1,5 +1,5 @@
 import type { UmbDocumentEntityType, UmbDocumentRootEntityType } from '../entity.js';
-import type { UmbDocumentVariantState } from '../index.js';
+import type { UmbDocumentVariantState } from '../variant-state.js';
 import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeItemModel,

@@ -20,7 +20,7 @@ import type {
 	UmbDefaultCollectionContext,
 	UmbEntityCollectionItemElement,
 } from '@umbraco-cms/backoffice/collection';
-import { UmbDocumentVariantState } from '../../index.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';

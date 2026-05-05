@@ -3,7 +3,8 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbElementPublishedPendingChangesManager } from './element-published-pending-changes.manager.js';
-import { UmbElementVariantState, UMB_ELEMENT_ENTITY_TYPE } from '../../index.js';
+import { UmbElementVariantState } from '../../variant-state.js';
+import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
 import type { UmbElementDetailModel } from '../../types.js';
 
 @customElement('test-my-controller-host')

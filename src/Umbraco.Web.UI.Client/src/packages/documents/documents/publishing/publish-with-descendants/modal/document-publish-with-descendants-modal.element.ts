@@ -1,4 +1,4 @@
-import { UmbDocumentVariantState } from '../../../index.js';
+import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import { isNotPublishedMandatory } from '../../utils.js';
 import type {

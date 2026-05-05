@@ -1,7 +1,5 @@
 import './components/index.js';
 
-export { PublishableVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
-
 export * from './audit-log/index.js';
 export * from './components/index.js';
 export * from './constants.js';
@@ -20,6 +18,7 @@ export * from './search/index.js';
 export * from './tree/index.js';
 export * from './url/index.js';
 export * from './user-permissions/index.js';
+export * from './variant-state.js';
 
 export { UMB_CONTENT_MENU_ALIAS } from './menu/manifests.js';
 export { UMB_DOCUMENT_COLLECTION_ALIAS } from './collection/constants.js';

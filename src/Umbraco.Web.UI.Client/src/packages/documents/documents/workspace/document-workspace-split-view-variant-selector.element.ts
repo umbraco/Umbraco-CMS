@@ -1,4 +1,4 @@
-import { UmbDocumentVariantState } from '../index.js';
+import { UmbDocumentVariantState } from '../variant-state.js';
 import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { sortVariants } from '../utils.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../publishing/index.js';

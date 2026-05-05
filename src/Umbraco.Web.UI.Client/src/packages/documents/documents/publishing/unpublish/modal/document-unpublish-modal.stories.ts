@@ -1,6 +1,6 @@
 import './document-unpublish-modal.element.js';
 
-import { UmbDocumentVariantState } from '../../../index.js';
+import { UmbDocumentVariantState } from '../../../variant-state.js';
 import type {
 	UmbDocumentUnpublishModalData,
 	UmbDocumentUnpublishModalValue,

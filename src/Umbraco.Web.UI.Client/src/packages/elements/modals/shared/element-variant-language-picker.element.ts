@@ -1,5 +1,5 @@
-import { UmbElementVariantState } from '../../index.js';
 import type { UmbElementVariantOptionModel } from '../../types.js';
+import { UmbElementVariantState } from '../../variant-state.js';
 import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
 import {
 	css,

@@ -1,5 +1,5 @@
 import type { UmbElementEntityType } from './entity.js';
-import type { PublishableVariantStateModel as UmbElementVariantState } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbElementVariantState } from './variant-state.js';
 import type { UmbContentDetailModel, UmbContentValueModel } from '@umbraco-cms/backoffice/content';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 

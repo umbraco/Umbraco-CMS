@@ -1,5 +1,5 @@
 import type { UmbDocumentEntityType } from './entity.js';
-import type { PublishableVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDocumentVariantState } from './variant-state.js';
 import type {
 	UmbEntityVariantModel,
 	UmbEntityVariantOptionModel,

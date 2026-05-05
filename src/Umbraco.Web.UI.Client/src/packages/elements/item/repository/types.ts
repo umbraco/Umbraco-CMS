@@ -1,5 +1,5 @@
 import type { UmbElementEntityType } from '../../entity.js';
-import type { UmbElementVariantState } from '../../index.js';
+import type { UmbElementVariantState } from '../../variant-state.js';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbEntityFlag, UmbEntityWithFlags } from '@umbraco-cms/backoffice/entity-flag';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
