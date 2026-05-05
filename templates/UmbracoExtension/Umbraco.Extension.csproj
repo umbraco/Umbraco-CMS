@@ -64,7 +64,7 @@
       their types directly - only Microsoft.AspNetCore.OpenApi / Microsoft.OpenApi types are
       referenced in the composer.
     -->
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
   </ItemGroup>
   <!--#endif -->
 

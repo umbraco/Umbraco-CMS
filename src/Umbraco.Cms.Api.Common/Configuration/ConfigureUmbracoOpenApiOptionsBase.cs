@@ -120,7 +120,7 @@ internal abstract class ConfigureUmbracoOpenApiOptionsBase : IConfigureNamedOpti
             return true;
         }
 
-        ApiVersionMetadata apiVersionMetadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();
+        ApiVersionMetadata apiVersionMetadata = apiDescription.ActionDescriptor.ApiVersionMetadata;
         return apiVersionMetadata.Name == ApiName;
     }
 }
