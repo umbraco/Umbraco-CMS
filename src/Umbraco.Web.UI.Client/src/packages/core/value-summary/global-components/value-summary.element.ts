@@ -21,12 +21,12 @@ export class UmbValueSummaryExtensionElement extends UmbLitElement {
 	#filter: (m: ManifestValueSummary) => boolean = () => false;
 
 	override render() {
-		if (!this.#valueType) return nothing;
+		if (!this.valueType) return nothing;
 		return html`<umb-extension-with-api-slot
 			type="valueSummary"
 			single
 			.filter=${this.#filter}
-			.apiProps=${{ valueType: this.#valueType, rawValue: this.value }}
+			.apiProps=${{ valueType: this.valueType, rawValue: this.value }}
 			.fallbackRenderMethod=${() => html`${this.value}`}>
 		</umb-extension-with-api-slot>`;
 	}
