@@ -12,9 +12,13 @@ export class UmbDelayCondition extends UmbConditionBase<DelayConditionConfig> im
 
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<DelayConditionConfig>) {
 		super(host, args);
+		const offset = parseInt(this.config.offset);
+		if (isNaN(offset) || offset <= 0) {
+			throw new Error(`Offset must be a positive number (offset: ${this.config.offset})`);
+		}
 		this.#timer = setTimeout(() => {
 			this.permitted = true;
-		}, parseInt(this.config.offset));
+		}, offset);
 	}
 
 	override destroy() {
