@@ -100,7 +100,6 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_17_4_0.FixLabelDataTypeDbTypeFromConfiguration>("{3F9B6A1C-7D84-4E2B-9C15-6A2E8F3D5B47}");
 
         // To 18.0.0
-        To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
         To<V_18_0_0.AddElementContainerPermissions>("{D00BB11A-DDF8-47C4-B58E-150C123BB3BB}");
         To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
     }
