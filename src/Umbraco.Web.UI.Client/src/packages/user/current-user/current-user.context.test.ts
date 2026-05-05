@@ -235,6 +235,8 @@ describe('UmbCurrentUserContext', () => {
 
 				const userGroupRepo = new UmbUserGroupDetailRepository(hostElement);
 				const { data: userGroup } = await userGroupRepo.requestByUnique(CURRENT_USER_GROUP_UNIQUE);
+				expect(userGroup).to.exist;
+
 				await userGroupRepo.save({
 					...userGroup!,
 					sections: userGroup!.sections.filter((s) => s !== 'Umb.Section.Users'),
