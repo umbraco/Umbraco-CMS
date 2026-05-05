@@ -23,6 +23,7 @@ export function fuzzyTokenize(text: string): Array<string> {
  * @returns {number} Average similarity (0–1) or 0 if any token is below threshold.
  */
 export function fuzzyMatchScore(queryTokens: Array<string>, searchableTokens: Array<string>, threshold = 0.6): number {
+	if (queryTokens.length === 0) return 0;
 	let totalSimilarity = 0;
 	for (const qt of queryTokens) {
 		let bestSimilarity = 0;

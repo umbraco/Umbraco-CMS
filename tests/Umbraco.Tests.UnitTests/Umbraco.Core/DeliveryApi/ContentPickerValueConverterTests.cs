@@ -89,11 +89,11 @@ public class ContentPickerValueConverterTests : PropertyValueConverterTests
         var key = Guid.NewGuid();
         var urlSegment = "page-url-segment";
         var name = "The page";
-        ConfigurePublishedContentMock(content, key, name, urlSegment, PublishedContentType, new[] { prop1, prop2 });
+        ConfigurePublishedContentMock(content, key, name, PublishedContentType, new[] { prop1, prop2 });
 
         PublishedUrlProviderMock
             .Setup(p => p.GetUrl(content.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
-            .Returns(content.Object.UrlSegment);
+            .Returns(urlSegment);
         PublishedContentCacheMock
             .Setup(pcc => pcc.GetById(false, key))
             .Returns(content.Object);

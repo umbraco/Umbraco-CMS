@@ -41,7 +41,7 @@ internal class ConfigureDefaultApiOptions : ConfigureUmbracoOpenApiOptionsBase
         }
 
         // Include endpoints not explicitly assigned to another document
-        ApiVersionMetadata apiVersionMetadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();
+        ApiVersionMetadata apiVersionMetadata = apiDescription.ActionDescriptor.ApiVersionMetadata;
         return string.IsNullOrEmpty(apiVersionMetadata.Name);
     }
 }
