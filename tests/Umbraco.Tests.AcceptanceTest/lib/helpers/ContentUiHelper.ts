@@ -186,6 +186,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly linkPickerTargetToggle: Locator;
   private readonly confirmToResetBtn: Locator;
   private readonly saveModal: Locator;
+  private readonly blockModal: Locator
   private readonly expandSegmentBtn: Locator;
   private readonly saveAndPreviewBtn: Locator;
   private readonly manualLinkRemoveBtn: Locator;
@@ -322,6 +323,7 @@ export class ContentUiHelper extends UiBaseLocators {
       .locator("uui-combobox-list-option");
     this.saveModal = page.locator("umb-document-save-modal");
     this.saveModalBtn = this.saveModal.getByLabel("Save", { exact: true });
+    this.blockModal = page.getByTestId('workspace:block');
     this.resetFocalPointBtn = page.getByLabel("Reset focal point");
     this.addNewHostnameBtn = page
       .locator('umb-property-layout[label="Hostnames"]')
@@ -1646,8 +1648,8 @@ export class ContentUiHelper extends UiBaseLocators {
     headline: string,
     options?: { waitForClose?: "target" | "any" },
   ) {
-    const modalLocator = this.page.locator('[headline="' + headline + '"]');
-    await this.click(modalLocator.getByLabel("Create"));
+    const modalLocator = this.blockModal.filter({has: this.page.getByTestId('layout-headline').filter({hasText: headline}),});
+    await this.click(modalLocator.getByTestId('workspace-action:Umb.WorkspaceAction.Block.SubmitCreate'));
 
     if (options?.waitForClose === "target") {
       await this.waitForHidden(modalLocator);
@@ -2290,11 +2292,7 @@ export class ContentUiHelper extends UiBaseLocators {
     editorSize: string,
     elementName: string,
   ) {
-    await this.isVisible(
-      this.backofficeModalContainer
-        .locator(`[size="${editorSize}"]`)
-        .locator(`[headline="Add ${elementName}"]`),
-    );
+    await this.isVisible(this.backofficeModalContainer.locator(`[size="${editorSize}"]`).getByTestId(`block-workspace:Add ${elementName}`));
   }
 
   async doesBlockEditorModalContainInline(
@@ -2890,7 +2888,7 @@ export class ContentUiHelper extends UiBaseLocators {
   async isMemberGroupSelected(memberGroupName: string) {
     return await this.isVisible(this.page.locator('umb-input-member-group uui-ref-node[name="' + memberGroupName + '"]'));
   }
-  
+
   async clickRemoveProtectionButton() {
     await this.click(this.container.getByLabel('Remove protection'));
   }
