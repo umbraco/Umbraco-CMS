@@ -9,6 +9,7 @@ import type {
 	UmbTableDeselectedEvent,
 	UmbTableItem,
 	UmbTableColumn,
+	UmbTableConfig,
 } from '@umbraco-cms/backoffice/components';
 import type { UmbWithOptionalDescriptionModel } from '@umbraco-cms/backoffice/models';
 import { UmbElementControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -31,6 +32,8 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 
 	@state()
 	private _tableRows: Array<UmbTableItem> = [];
+
+	#tableConfig: UmbTableConfig = { allowSelection: false, allowSelectAll: false, selectOnly: false };
 
 	get #manifestColumns(): Array<MetaCollectionViewTableKindColumn> {
 		return this.manifest?.meta?.columns ?? [];
@@ -98,7 +101,15 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 		];
 	}
 
-	override updated(changedProperties: PropertyValues) {
+	override willUpdate(changedProperties: PropertyValues) {
+		super.willUpdate(changedProperties);
+		if (changedProperties.has('_selectable') || changedProperties.has('_multiple') || changedProperties.has('_selectOnly')) {
+			this.#tableConfig = {
+				allowSelection: this._selectable,
+				allowSelectAll: this._multiple,
+				selectOnly: this._selectOnly,
+			};
+		}
 		if (changedProperties.has('_items') || changedProperties.has('_itemHrefs') || changedProperties.has('manifest')) {
 			this.#createTableRows();
 		}
@@ -113,10 +124,21 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 		this._tableRows = this._items.map((item) => {
 			const href = item.unique ? this._itemHrefs.get(item.unique) : undefined;
 
-			const manifestColumnData = this.#manifestColumns.map((col) => ({
-				columnAlias: col.field,
-				value: (item as unknown as Record<string, unknown>)[col.field],
-			}));
+			const manifestColumnData = this.#manifestColumns.map((col) => {
+				const rawValue = (item as unknown as Record<string, unknown>)[col.field];
+				if (col.valueType) {
+					return {
+						columnAlias: col.field,
+						value: html`<umb-value-summary-extension
+							.valueType=${col.valueType}
+							.value=${rawValue}></umb-value-summary-extension>`,
+					};
+				}
+				return {
+					columnAlias: col.field,
+					value: rawValue,
+				};
+			});
 
 			return {
 				id: item.unique,
@@ -193,11 +215,7 @@ export class UmbTableCollectionViewElement extends UmbCollectionViewElementBase<
 		if (this._loading) return nothing;
 		return html`
 			<umb-table
-				.config=${{
-					allowSelection: this._selectable,
-					allowSelectAll: this._multiple,
-					selectOnly: this._selectOnly,
-				}}
+				.config=${this.#tableConfig}
 				.columns=${this._tableColumns}
 				.items=${this._tableRows}
 				.selection=${this._selection}
