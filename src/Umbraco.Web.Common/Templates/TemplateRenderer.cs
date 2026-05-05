@@ -44,7 +44,6 @@ internal sealed class TemplateRenderer : ITemplateRenderer
     /// <param name="umbracoContextAccessor">Provides access to the current Umbraco context.</param>
     /// <param name="publishedRouter">The published router</param>
     /// <param name="fileService"></param>
-    /// <param name="textService"></param>
     /// <param name="webRoutingSettings"></param>
     /// <param name="httpContextAccessor"></param>
     /// <param name="viewEngine"></param>
@@ -56,7 +55,6 @@ internal sealed class TemplateRenderer : ITemplateRenderer
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedRouter publishedRouter,
         IFileService fileService,
-        ILocalizationService textService,
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
         IHttpContextAccessor httpContextAccessor,
         ICompositeViewEngine viewEngine,

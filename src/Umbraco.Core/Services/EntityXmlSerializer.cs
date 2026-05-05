@@ -25,7 +25,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     private readonly IDataTypeService _dataTypeService;
     private readonly IDataTypeContainerService _dataTypeContainerService;
     private readonly IIdKeyMap _idKeyMap;
-    private readonly ILocalizationService _localizationService;
+    private readonly IDictionaryItemService _dictionaryItemService;
     private readonly IMediaService _mediaService;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IShortStringHelper _shortStringHelper;
@@ -39,7 +39,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
     /// <param name="mediaService">The media service for media operations.</param>
     /// <param name="dataTypeService">The data type service for data type operations.</param>
     /// <param name="userService">The user service for user lookups.</param>
-    /// <param name="localizationService">The localization service for dictionary items.</param>
+    /// <param name="dictionaryItemService">The dictionary item service for dictionary item operations.</param>
     /// <param name="contentTypeService">The content type service for content type operations.</param>
     /// <param name="urlSegmentProviders">The collection of URL segment providers.</param>
     /// <param name="shortStringHelper">The helper for string operations.</param>
@@ -52,7 +52,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         IMediaService mediaService,
         IDataTypeService dataTypeService,
         IUserService userService,
-        ILocalizationService localizationService,
+        IDictionaryItemService dictionaryItemService,
         IContentTypeService contentTypeService,
         UrlSegmentProviderCollection urlSegmentProviders,
         IShortStringHelper shortStringHelper,
@@ -66,7 +66,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         _contentService = contentService;
         _dataTypeService = dataTypeService;
         _userService = userService;
-        _localizationService = localizationService;
+        _dictionaryItemService = dictionaryItemService;
         _urlSegmentProviders = urlSegmentProviders;
         _shortStringHelper = shortStringHelper;
         _propertyEditors = propertyEditors;
@@ -140,9 +140,9 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
             throw new ArgumentNullException(nameof(_userService));
         }
 
-        if (_localizationService == null)
+        if (_dictionaryItemService == null)
         {
-            throw new ArgumentNullException(nameof(_localizationService));
+            throw new ArgumentNullException(nameof(_dictionaryItemService));
         }
 
         if (media == null)
@@ -272,7 +272,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
 
         if (includeChildren)
         {
-            IEnumerable<IDictionaryItem>? children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
+            IEnumerable<IDictionaryItem>? children = _dictionaryItemService.GetChildrenAsync(dictionaryItem.Key).GetAwaiter().GetResult();
             if (children is not null)
             {
                 foreach (IDictionaryItem child in children)

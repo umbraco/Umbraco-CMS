@@ -87,7 +87,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         // Modify the alias in-place on the existing property type object
         var existingProperty = contentType.PropertyTypes.Single();
         existingProperty.Alias = "titleRenamed";
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         Assert.IsNotNull(refreshedPayloads);
         Assert.AreEqual(1, refreshedPayloads!.Length);
