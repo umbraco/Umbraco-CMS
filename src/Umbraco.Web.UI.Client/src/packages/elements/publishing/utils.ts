@@ -1,4 +1,5 @@
-import { UmbElementVariantState, type UmbElementVariantOptionModel } from '../types.js';
+import { UmbElementVariantState } from '../index.js';
+import type { UmbElementVariantOptionModel } from '../types.js';
 
 /**
  * @function isNotPublishedMandatory

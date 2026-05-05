@@ -1,4 +1,5 @@
-import { UmbElementVariantState, type UmbElementVariantOptionModel } from '../../../types.js';
+import { UmbElementVariantState } from '../../../index.js';
+import type { UmbElementVariantOptionModel } from '../../../types.js';
 import type { UmbElementUnpublishModalData, UmbElementUnpublishModalValue } from './element-unpublish-modal.token.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';

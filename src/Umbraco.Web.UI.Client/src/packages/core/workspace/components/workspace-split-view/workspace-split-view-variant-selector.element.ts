@@ -9,7 +9,7 @@ import { UMB_PROPERTY_DATASET_CONTEXT, isNameablePropertyDatasetContext } from '
 import { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbEntityVariantModel, UmbEntityVariantOptionModel } from '@umbraco-cms/backoffice/variant';
 import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/backoffice/external/uui';
-import type { PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { PublishableVariantStateModel as UmbPublishableVariantState } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_HINT_CONTEXT } from '@umbraco-cms/backoffice/hint';
 import type { UmbHint, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
 import { createObservablePart, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
@@ -497,7 +497,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 	#isCreated(variantOption: VariantOptionModelType) {
 		return (
 			variantOption.variant?.state &&
-			variantOption.variant?.state !== ('NotCreated' as PublishableVariantStateModel.NOT_CREATED)
+			variantOption.variant?.state !== ('NotCreated' as UmbPublishableVariantState.NOT_CREATED)
 		);
 	}
 

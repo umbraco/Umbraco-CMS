@@ -4,7 +4,7 @@ import type {
 	PublishElementRequestModel,
 	UnpublishElementRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 
 export class UmbMockElementPublishingManager {
 	#elementDb: UmbElementMockDB;
@@ -34,7 +34,7 @@ export class UmbMockElementPublishingManager {
 
 			const variant = element.variants.find((x) => x.culture === culture.culture);
 			if (variant) {
-				variant.state = DocumentVariantStateModel.PUBLISHED;
+				variant.state = UmbElementVariantState.PUBLISHED;
 			}
 		});
 
@@ -49,12 +49,12 @@ export class UmbMockElementPublishingManager {
 				const variant = element.variants.find((x) => x.culture === culture);
 
 				if (variant) {
-					variant.state = DocumentVariantStateModel.DRAFT;
+					variant.state = UmbElementVariantState.DRAFT;
 				}
 			});
 		} else {
 			element.variants.forEach((variant) => {
-				variant.state = DocumentVariantStateModel.DRAFT;
+				variant.state = UmbElementVariantState.DRAFT;
 			});
 		}
 

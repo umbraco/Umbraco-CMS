@@ -1,5 +1,7 @@
 import './components/index.js';
 
+export { PublishableVariantStateModel as UmbDocumentVariantState } from '@umbraco-cms/backoffice/external/backend-api';
+
 export * from './audit-log/index.js';
 export * from './components/index.js';
 export * from './constants.js';

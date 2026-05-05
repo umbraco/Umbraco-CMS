@@ -1,3 +1,4 @@
+import { UmbDocumentVariantState } from '../index.js';
 import type { UmbDocumentItemVariantModel } from '../item/repository/types.js';
 import type { UmbDocumentSearchItemModel } from './types.js';
 import {
@@ -10,7 +11,6 @@ import {
 	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
-import { PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
@@ -67,8 +67,8 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 	#getDraftState(): boolean {
 		if (this.item?.isTrashed) return false;
 		return (
-			this._variant?.state === PublishableVariantStateModel.DRAFT ||
-			this.item?.variants[0]?.state === PublishableVariantStateModel.DRAFT
+			this._variant?.state === UmbDocumentVariantState.DRAFT ||
+			this.item?.variants[0]?.state === UmbDocumentVariantState.DRAFT
 		);
 	}
 

@@ -3,9 +3,8 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbElementPublishedPendingChangesManager } from './element-published-pending-changes.manager.js';
-import { PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { type UmbElementDetailModel } from '../../types.js';
-import { UMB_ELEMENT_ENTITY_TYPE } from '../../entity.js';
+import { UmbElementVariantState, UMB_ELEMENT_ENTITY_TYPE } from '../../index.js';
+import type { UmbElementDetailModel } from '../../types.js';
 
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -57,7 +56,7 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 				flags: [],
 				variants: [
 					{
-						state: PublishableVariantStateModel.PUBLISHED,
+						state: UmbElementVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: null,
 						segment: null,
@@ -122,7 +121,7 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 				flags: [],
 				variants: [
 					{
-						state: PublishableVariantStateModel.PUBLISHED,
+						state: UmbElementVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: 'en-US',
 						segment: null,
@@ -134,7 +133,7 @@ describe('UmbElementPublishedPendingChangesManager', () => {
 						flags: [],
 					},
 					{
-						state: PublishableVariantStateModel.PUBLISHED,
+						state: UmbElementVariantState.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: 'da-DK',
 						segment: null,

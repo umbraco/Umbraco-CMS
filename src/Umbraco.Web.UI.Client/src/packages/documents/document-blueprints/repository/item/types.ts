@@ -1,5 +1,5 @@
 import type { UmbDocumentBlueprintEntityType } from '../../entity.js';
-import type { PublishableVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { UmbDocumentBlueprintVariantState } from '../../index.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbDocumentBlueprintItemModel extends UmbDocumentBlueprintItemBaseModel {
@@ -19,5 +19,5 @@ export interface UmbDocumentBlueprintItemBaseModel {
 export interface UmbDocumentBlueprintItemVariantModel {
 	name: string;
 	culture: string | null;
-	state: PublishableVariantStateModel | null;
+	state: UmbDocumentBlueprintVariantState | null;
 }

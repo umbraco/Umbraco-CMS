@@ -1,4 +1,5 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../types.js';
+import { UmbDocumentVariantState } from '../index.js';
+import type { UmbDocumentVariantOptionModel } from '../types.js';
 
 /**
  * @function isNotPublishedMandatory

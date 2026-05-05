@@ -6,7 +6,7 @@ import { UmbMockEntityFolderManager } from './utils/entity/entity-folder.manager
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbEntityRecycleBin } from './utils/entity/entity-recycle-bin.js';
 import { UmbMockElementPublishingManager } from './element-publishing.manager.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	CreateElementRequestModel,
@@ -106,7 +106,7 @@ const createMockElementMapper = (request: CreateElementRequestModel): UmbMockEle
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
-				state: DocumentVariantStateModel.DRAFT,
+				state: UmbElementVariantState.DRAFT,
 				publishDate: null,
 				id: UmbId.new(),
 				flags: [],

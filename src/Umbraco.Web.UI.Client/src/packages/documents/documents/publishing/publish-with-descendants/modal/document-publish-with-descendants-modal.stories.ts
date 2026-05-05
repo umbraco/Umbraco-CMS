@@ -1,4 +1,4 @@
-import { UmbDocumentVariantState } from '../../../types.js';
+import { UmbDocumentVariantState } from '../../../index.js';
 import type {
 	UmbDocumentPublishWithDescendantsModalData,
 	UmbDocumentPublishWithDescendantsModalValue,
