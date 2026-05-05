@@ -13,12 +13,10 @@ export class UmbBlockWorkspaceIsReadOnlyCondition
 
 		this.consumeContext(UMB_BLOCK_WORKSPACE_CONTEXT, (context) => {
 			this.observe(
-				context?.readOnlyGuard.isPermittedForObservableVariant(context.variantId),
+				context?.readOnlyGuard.permitted,
 				(isReadOnly) => {
-					// Only react to positives or negatives:
 					if (isReadOnly !== undefined) {
-						const match = args.config.match ?? true;
-						this.permitted = isReadOnly === match;
+						this.permitted = isReadOnly === (this.config.match !== undefined ? this.config.match : true);
 					}
 				},
 				'observeIsReadOnly',

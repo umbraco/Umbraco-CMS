@@ -6,6 +6,7 @@ import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbSysinfoRepository } from '@umbraco-cms/backoffice/sysinfo';
+import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -25,7 +26,13 @@ export class UmbBackofficeContext extends UmbContextBase {
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BACKOFFICE_CONTEXT);
 
-		this.#getVersion();
+		// TODO: We need to ensure this request is called every time the user logs in, but this should be done somewhere across the app and not here [JOV]
+		this.consumeContext(UMB_AUTH_CONTEXT, (authContext) => {
+			this.observe(authContext?.isAuthorized, (isAuthorized) => {
+				if (!isAuthorized) return;
+				this.#getVersion();
+			});
+		});
 
 		this.consumeContext(UMB_CURRENT_USER_CONTEXT, (userContext) => {
 			this.observe(

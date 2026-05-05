@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -38,7 +37,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
         builder.Services.AddSingleton<IIndexPopulator, DeliveryApiContentIndexPopulator>();
-        builder.Services.AddSingleton<IIndexPopulator, ExternalMemberIndexPopulator>();
 
         builder.Services.AddSingleton<IIndexRebuilder, ExamineIndexRebuilder>();
         builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
@@ -73,12 +71,10 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<ILanguageService>()));
         builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
         builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
-        builder.Services.AddUnique<IValueSetBuilder<ExternalMemberIdentity>, ExternalMemberValueSetBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexValueSetBuilder, DeliveryApiContentIndexValueSetBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
         builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
-        builder.Services.AddSingleton<IDeferredSearchReindexService, DeferredSearchReindexService>();
 
         builder.Services.AddUnique<IDeliveryApiCompositeIdHandler, DeliveryApiCompositeIdHandler>();
 
@@ -90,7 +86,6 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationHandler<PublicAccessCacheRefresherNotification, DeliveryApiContentIndexingNotificationHandler>();
         builder.AddNotificationHandler<MediaCacheRefresherNotification, MediaIndexingNotificationHandler>();
         builder.AddNotificationHandler<MemberCacheRefresherNotification, MemberIndexingNotificationHandler>();
-        builder.AddNotificationHandler<ExternalMemberCacheRefresherNotification, ExternalMemberIndexingNotificationHandler>();
         builder.AddNotificationAsyncHandler<LanguageCacheRefresherNotification, LanguageIndexingNotificationHandler>();
 
         builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>();

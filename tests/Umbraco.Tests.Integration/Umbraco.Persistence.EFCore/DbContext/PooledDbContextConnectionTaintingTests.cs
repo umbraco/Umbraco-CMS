@@ -22,8 +22,7 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) =>
         builder.Services.AddUmbracoDbContext<PooledTestDbContext>(
-            (serviceProvider, options, connectionString, providerName) => options.UseUmbracoDatabaseProvider(serviceProvider),
-            shareUmbracoConnection: true);
+            (serviceProvider, options, connectionString, providerName) => options.UseUmbracoDatabaseProvider(serviceProvider));
 
     /// <summary>
     /// Verifies that a pooled DbContext obtained from IDbContextFactory has a valid connection string

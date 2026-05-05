@@ -2,7 +2,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -47,11 +46,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     {
         Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
 
-        // CurrentPublishedSegment represents content that has been previously published.
-        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
-        {
-            CurrentPublishedSegment = "test-page",
-        });
+        var redirectTracker = CreateRedirectTracker();
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
 
@@ -70,11 +65,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     {
         Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
 
-        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
-        {
-            AssignDomain = true,
-            CurrentPublishedSegment = "test-page",
-        });
+        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions { AssignDomain = true });
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
 
@@ -134,71 +125,6 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
     }
 
     /// <summary>
-    /// Verifies that no redirect is created when the stored "old route" is one of the URL provider's
-    /// "could not resolve URL" indicators — <see cref="Constants.Routing.Unroutable"/> ("#") or
-    /// <see cref="Constants.Routing.UrlProviderException"/> ("#ex"). This guards against the
-    /// scenario where content is previewed before being published for the first time: the
-    /// preview cookie causes the URL provider to return one of these indicators for the
-    /// not-yet-published content, which would otherwise be tracked as a (bogus) redirect to the
-    /// eventual published URL. See https://github.com/umbraco/Umbraco-CMS/issues/22652.
-    /// </summary>
-    [TestCase(Constants.Routing.Unroutable)]
-    [TestCase(Constants.Routing.UrlProviderException)]
-    public void Does_Not_Create_Redirect_For_Unroutable_Old_Route(string oldRoute)
-    {
-        IDictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict =
-            new Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)>
-            {
-                [(_testPage.Id, "en")] = (_testPage.Key, oldRoute),
-            };
-
-        var redirectTracker = CreateRedirectTracker();
-
-        redirectTracker.CreateRedirects(dict);
-
-        Assert.IsEmpty(RedirectUrlService.GetContentRedirectUrls(_testPage.Key));
-    }
-
-    /// <summary>
-    /// Reproduces the scenario from <see href="https://github.com/umbraco/Umbraco-CMS/issues/22256">#22256</see>
-    /// (comment <c>4352606187</c>): when the preview cookie is active from a prior preview, a brand-new
-    /// sibling that is created and published causes a bogus redirect from its parent's URL to the
-    /// newly-published URL.
-    /// <para>
-    /// Mechanism: with the preview cookie active, the URL provider resolves URLs in draft mode via
-    /// <see cref="IDocumentUrlService.GetLegacyRouteFormat"/>. For never-published content, the
-    /// navigation query's ancestors-or-self lookup may return only the (published) ancestors, so
-    /// the route returned is actually the parent's URL — a real-looking value that passes
-    /// <c>IsValidRoute</c>. This is then captured as the "old route" for the new content, and on
-    /// publish a redirect is registered from <c>parent → child</c>.
-    /// </para>
-    /// <para>
-    /// We simulate this by mocking <see cref="IPublishedUrlProvider.GetUrl"/> to return the
-    /// parent's URL and leaving <see cref="IDocumentUrlService.GetUrlSegment"/>(<c>isDraft: false</c>)
-    /// returning <c>null</c>, which represents content that has never been published.
-    /// </para>
-    /// </summary>
-    [Test]
-    public void Does_Not_Store_Old_Route_For_Never_Published_Content_When_Url_Resolves_To_Ancestor()
-    {
-        Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
-
-        // The URL provider returns the parent's URL ("/parent") because in draft mode (preview
-        // cookie active) the never-published draft isn't in the navigation tree, so ancestor
-        // resolution stops at the parent. CurrentPublishedSegment is intentionally not set, so
-        // the document URL service confirms there is no published segment for this content.
-        var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
-        {
-            RelativeUrl = "/parent",
-            DocumentUrlServiceInitialized = true,
-        });
-
-        redirectTracker.StoreOldRoute(_testPage, dict, isMove: false);
-
-        Assert.AreEqual(0, dict.Count, "Old route should not be stored for content that has no published URL.");
-    }
-
-    /// <summary>
     /// Verifies that when a domain includes a path prefix (e.g. "example.com/en/"), the stored
     /// route strips that prefix to avoid duplicating the culture segment.
     /// </summary>
@@ -210,10 +136,7 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         // Domain configured as "example.com/en/" — GetUrl returns "/en/new-route".
         var redirectTracker = CreateRedirectTracker(new RedirectTrackerSetupOptions
         {
-            AssignDomain = true,
-            DomainName = "example.com/en/",
-            RelativeUrl = "/en/new-route",
-            CurrentPublishedSegment = "test-page",
+            AssignDomain = true, DomainName = "example.com/en/", RelativeUrl = "/en/new-route",
         });
 
         redirectTracker.StoreOldRoute(_testPage, dict, isMove: true);
@@ -342,7 +265,6 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
             ChildKey = childKey,
             ChildId = childId,
             OnGetUrlForChild = () => getUrlForChildCallCount++,
-            CurrentPublishedSegment = "test-page",
         });
 
         Dictionary<(int ContentId, string Culture), (Guid ContentKey, string OldRoute)> dict = [];
@@ -620,11 +542,8 @@ public class RedirectTrackerTests : UmbracoIntegrationTestWithContent
         documentUrlService.SetupGet(x => x.IsInitialized).Returns(options.DocumentUrlServiceInitialized);
         if (options.CurrentPublishedSegment is not null)
         {
-            // Return the segment for any content key — represents content that has been
-            // previously published and therefore has a published URL segment. The redirect
-            // tracker uses GetUrlSegment(..., isDraft: false) as its "has been published" gate.
             documentUrlService
-                .Setup(x => x.GetUrlSegment(It.IsAny<Guid>(), It.IsAny<string>(), false))
+                .Setup(x => x.GetUrlSegment(_testPage.Key, It.IsAny<string>(), false))
                 .Returns(options.CurrentPublishedSegment);
         }
 

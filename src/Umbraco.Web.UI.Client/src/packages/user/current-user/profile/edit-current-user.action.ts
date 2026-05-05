@@ -1,50 +1,41 @@
 import { UMB_CURRENT_USER_CONTEXT } from '../current-user.context.token.js';
-import { UMB_CURRENT_USER_ENTITY_TYPE } from '../entity.js';
-import { UMB_USER_MANAGEMENT_SECTION_ALIAS } from '../../section/constants.js';
 import type { UmbCurrentUserAction, UmbCurrentUserActionArgs } from '../current-user-action.extension.js';
-import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 import { UMB_USER_WORKSPACE_PATH } from '@umbraco-cms/backoffice/user';
-import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
+import { UmbActionBase } from '@umbraco-cms/backoffice/action';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
-export class UmbEditProfileCurrentUserAction<ArgsMetaType = never>
+export class UmbEditCurrentUserAction<ArgsMetaType = never>
 	extends UmbActionBase<UmbCurrentUserActionArgs<ArgsMetaType>>
 	implements UmbCurrentUserAction<ArgsMetaType>
 {
-	#hasAccessToUserSection? = false;
-	#init: Promise<typeof UMB_CURRENT_USER_CONTEXT.TYPE | undefined>;
+	#init;
 	#unique?: string;
 
 	constructor(host: UmbControllerHost, args: UmbCurrentUserActionArgs<ArgsMetaType>) {
 		super(host, args);
 
-		this.#init = this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
-			this.observe(
-				context?.currentUser,
-				(currentUser) => {
-					this.#unique = currentUser?.unique;
-					this.#hasAccessToUserSection = currentUser?.allowedSections?.includes(UMB_USER_MANAGEMENT_SECTION_ALIAS);
-				},
-				'umbEditProfileCurrentUserActionObserver',
-			);
-		}).asPromise();
+		this.#init = new Promise<void>((res) => {
+			this.consumeContext(UMB_CURRENT_USER_CONTEXT, (context) => {
+				this.observe(
+					context?.unique,
+					(unique) => {
+						this.#unique = unique;
+						res();
+					},
+					'umbEditCurrentUserActionObserver',
+				);
+			});
+		});
 	}
 
 	async getHref() {
 		await this.#init;
-		if (!this.#hasAccessToUserSection) return;
-		return `${UMB_USER_WORKSPACE_PATH}/edit/${this.#unique}`;
+		return UMB_USER_WORKSPACE_PATH + '/edit/' + this.#unique;
 	}
 
 	async execute() {
-		await this.#init;
-		if (this.#hasAccessToUserSection) return;
-		await umbOpenModal(this, UMB_WORKSPACE_MODAL, {
-			data: { entityType: UMB_CURRENT_USER_ENTITY_TYPE, preset: {} },
-			modal: { size: 'small' },
-		});
+		return;
 	}
 }
 
-export { UmbEditProfileCurrentUserAction as api };
+export { UmbEditCurrentUserAction as api };

@@ -21,9 +21,4 @@ public class ServerConfigurationResponseModel
     /// Gets or sets the relative or absolute path to the Umbraco CSS file used by the application.
     /// </summary>
     public string UmbracoCssPath { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the client-side SignalR settings.
-    /// </summary>
-    public SignalRClientSettingsResponseModel SignalR { get; set; } = new();
 }

@@ -208,10 +208,9 @@ Use the correct capitalization for third-party libraries:
 
 ### Documentation
 
-- **Default to no comment.** Self-descriptive code (good names, small functions) is the primary documentation. See [Code Comment Policy](../../../CLAUDE.md#8-code-comment-policy) and [Clean Code → Comments and Documentation](./clean-code.md#comments-and-documentation) for the full rules and worked examples.
 - **Public APIs**: JSDoc comments with `@description`, `@param`, `@returns`, `@example`
 - **Web Components**: JSDoc with web-component-analyzer tags
-- **Inline comments**: only for the non-obvious WHY (hidden constraints, ordering, workarounds, edge cases). Never restate what the code does.
+- **Complex logic**: Inline comments explaining "why" not "what"
 - **TODOs**: Format as `// TODO: description [initials]`
 - **Deprecated**: Use `@deprecated` tag with migration instructions
 

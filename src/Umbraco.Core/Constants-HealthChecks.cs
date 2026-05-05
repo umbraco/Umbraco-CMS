@@ -48,17 +48,6 @@ public static partial class Constants
             }
 
             /// <summary>
-            ///     Contains documentation links for data health checks.
-            /// </summary>
-            public static class Data
-            {
-                /// <summary>
-                ///     The documentation link for untrusted database constraints check.
-                /// </summary>
-                public const string UntrustedConstraintsCheck = "https://umbra.co/healthchecks-untrusted-constraints";
-            }
-
-            /// <summary>
             ///     Contains documentation links for configuration health checks.
             /// </summary>
             public static class Configuration

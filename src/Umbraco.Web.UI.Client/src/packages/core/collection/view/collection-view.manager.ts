@@ -1,12 +1,11 @@
 import type { UmbCollectionLayoutConfiguration } from '../types.js';
 import type { ManifestCollectionView } from './collection-view.extension.js';
-import type { UmbCollectionViewElementBase } from './umb-collection-view-element-base.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 
 export interface UmbCollectionViewManagerConfig {
 	defaultViewAlias?: string;
@@ -87,12 +86,6 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 		);
 	}
 
-	#setupViewComponent(component: PageComponent, view: ManifestCollectionView) {
-		(component as HTMLElement).setAttribute('data-mark', `collection-view:${view.alias}`);
-		(component as UmbCollectionViewElementBase).manifest = view;
-		this.setCurrentView(view);
-	}
-
 	#createRoutes(views: ManifestCollectionView[] | null) {
 		let routes: Array<UmbRoute> = [];
 
@@ -108,7 +101,9 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 				return {
 					path: `${view.meta.pathName}`,
 					component: () => createExtensionElement(view),
-					setup: (component) => this.#setupViewComponent(component, view),
+					setup: () => {
+						this.setCurrentView(view);
+					},
 				};
 			});
 
@@ -117,7 +112,9 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 					unique: fallbackView.alias,
 					path: '',
 					component: () => createExtensionElement(fallbackView),
-					setup: (component) => this.#setupViewComponent(component, fallbackView),
+					setup: () => {
+						this.setCurrentView(fallbackView);
+					},
 				});
 
 				routes.push({

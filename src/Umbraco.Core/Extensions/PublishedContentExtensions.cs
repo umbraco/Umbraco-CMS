@@ -75,40 +75,29 @@ public static class PublishedContentExtensions
     [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 18.")]
     public static string? UrlSegment(this IPublishedContent content, IVariationContextAccessor? variationContextAccessor, string? culture = null)
     {
-        ArgumentNullException.ThrowIfNull(content);
-
-        // The obsolete accessor only meaningfully applies to documents — the documented replacement is
-        // IDocumentUrlService, and media/members never had user-facing URL segments.
-        if (content.ItemType != PublishedItemType.Content)
+        if (content == null)
         {
-            return null;
+            throw new ArgumentNullException(nameof(content));
         }
 
-        string effectiveCulture = content.ContentType.VariesByCulture() is false
-            ? string.Empty
-            : culture ?? variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
-
-        // Variant content with no resolved culture has no associated segment; avoid an unnecessary
-        // ILanguageService.GetAsync("") lookup inside the service.
-        if (content.ContentType.VariesByCulture() && effectiveCulture.Length == 0)
+        // invariant has invariant value (whatever the requested culture)
+        if (!content.ContentType.VariesByCulture())
         {
-            return null;
-        }
-
-        // Use IDocumentUrlService to get the URL segment, aligning with the non-obsolete recommended approach.
-        // Fall back to in-memory lookup when the service isn't usable — either DI hasn't been bootstrapped
-        // (unit tests) or the service hasn't been initialised (integration tests not running full Umbraco
-        // startup). In production both hold.
-        IDocumentUrlService? documentUrlService = StaticServiceProvider.Instance?.GetService<IDocumentUrlService>();
-        if (documentUrlService is null || documentUrlService.IsInitialized is false)
-        {
-            return content.Cultures.TryGetValue(effectiveCulture, out PublishedCultureInfo? infos)
-                ? infos.UrlSegment
+            return content.Cultures.TryGetValue(string.Empty, out PublishedCultureInfo? invariantInfos)
+                ? invariantInfos.UrlSegment
                 : null;
         }
 
-        var isDraft = content.IsDraft(effectiveCulture.Length == 0 ? null : effectiveCulture);
-        return documentUrlService.GetUrlSegment(content.Key, effectiveCulture, isDraft);
+        // handle context culture for variant
+        if (culture == null)
+        {
+            culture = variationContextAccessor?.VariationContext?.Culture ?? string.Empty;
+        }
+
+        // get
+        return culture != string.Empty && content.Cultures.TryGetValue(culture, out PublishedCultureInfo? infos)
+            ? infos.UrlSegment
+            : null;
     }
 
     #endregion
@@ -164,9 +153,7 @@ public static class PublishedContentExtensions
 
         // parent key is null if content is at root
         return parentKey.HasValue
-#pragma warning disable CS0618 // Type or member is obsolete (justification: temporary means to avoid breaking changes in the PublishedContentExtensions)
-            ? publishedStatusFilteringService.Unfiltered([parentKey.Value]).FirstOrDefault()
-#pragma warning restore CS0618 // Type or member is obsolete
+            ? publishedStatusFilteringService.FilterAvailable([parentKey.Value], null).FirstOrDefault()
             : null;
     }
 
@@ -2274,7 +2261,8 @@ public static class PublishedContentExtensions
         INavigationQueryService navigationQueryService,
         IPublishedStatusFilteringService publishedStatusFilteringService,
         bool orSelf,
-        string? contentTypeAlias = null)
+        string? contentTypeAlias = null,
+        string? culture = null)
     {
         if (orSelf)
         {
@@ -2293,9 +2281,7 @@ public static class PublishedContentExtensions
             yield break;
         }
 
-#pragma warning disable CS0618 // Type or member is obsolete (justification: temporary means to avoid breaking changes in the PublishedContentExtensions)
-        IEnumerable<IPublishedContent> ancestors = publishedStatusFilteringService.Unfiltered(ancestorsKeys);
-#pragma warning restore CS0618 // Type or member is obsolete
+        IEnumerable<IPublishedContent> ancestors = publishedStatusFilteringService.FilterAvailable(ancestorsKeys, culture);
         foreach (IPublishedContent ancestor in ancestors)
         {
             yield return ancestor;

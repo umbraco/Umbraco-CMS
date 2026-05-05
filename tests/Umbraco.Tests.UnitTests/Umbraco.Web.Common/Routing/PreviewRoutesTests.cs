@@ -52,7 +52,5 @@ public class PreviewRoutesTests
     }
 
     private PreviewRoutes GetRoutes(RuntimeLevel level)
-        => new PreviewRoutes(
-            Mock.Of<IRuntimeState>(x => x.Level == level),
-            Options.Create(new SignalRSettings()));
+        => new PreviewRoutes(Mock.Of<IRuntimeState>(x => x.Level == level));
 }

@@ -47,8 +47,7 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IdentityErrorDescriber>(),
                 factory.GetRequiredService<IExternalLoginWithKeyService>(),
                 factory.GetRequiredService<ITwoFactorLoginService>(),
-                factory.GetRequiredService<IPublishedMemberCache>(),
-                factory.GetRequiredService<IExternalMemberService>()))
+                factory.GetRequiredService<IPublishedMemberCache>()))
             .AddRoleStore<MemberRoleStore>()
             .AddRoleManager<IMemberRoleManager, MemberRoleManager>()
             .AddMemberManager<IMemberManager, MemberManager>()

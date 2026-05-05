@@ -25,7 +25,6 @@ namespace Umbraco.Cms.Core.Services
         private readonly IMemberGroupService _memberGroupService;
         private readonly Lazy<IIdKeyMap> _idKeyMap;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
-        private readonly ILogger<MemberService> _logger;
 
         #region Constructor
 
@@ -62,7 +61,6 @@ namespace Umbraco.Cms.Core.Services
             _idKeyMap = idKeyMap;
             _userIdKeyResolver = userIdKeyResolver;
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
-            _logger = loggerFactory.CreateLogger<MemberService>();
         }
 
         /// <summary>
@@ -994,20 +992,8 @@ namespace Umbraco.Cms.Core.Services
             EventMessages evtMsgs = EventMessagesFactory.Get();
 
             using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug(
-                    "Content member {MemberKey} login — lightweight update path (UpdateDate unchanged, no re-index).",
-                    member.Key);
-            }
-
-            // Login is not a member update: UpdateDate is intentionally left untouched, and the
-            // IndexableFieldsChanged state flag tells the Examine indexing handler to skip the
-            // re-index since no indexed field has changed.
             var savingNotification = new MemberSavingNotification(member, evtMsgs);
-            savingNotification.State.Add(Constants.Conventions.Member.LoginPropertiesOnlyStateKey, true);
-            savingNotification.State.Add(Constants.Conventions.Member.IndexableFieldsChangedStateKey, false);
+            savingNotification.State.Add("LoginPropertiesOnly", true);
             if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 scope.Complete();

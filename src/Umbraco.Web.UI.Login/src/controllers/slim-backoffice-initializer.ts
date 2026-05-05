@@ -49,6 +49,7 @@ export class UmbSlimBackofficeController extends UmbControllerBase {
 			console.error(`Failed to register public extensions for the slim backoffice.`, error);
 		});
 
-		new UmbAppEntryPointExtensionInitializer(host, umbExtensionsRegistry);
+		const initializer = new UmbAppEntryPointExtensionInitializer(host, umbExtensionsRegistry);
+		await firstValueFrom(initializer.loaded);
 	}
 }

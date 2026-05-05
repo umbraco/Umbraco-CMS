@@ -1,4 +1,3 @@
-import { UMB_BLOCK_WORKSPACE_CONTEXT } from './block-workspace.context-token.js';
 import {
 	UMB_BLOCK_WORKSPACE_ALIAS,
 	UMB_BLOCK_WORKSPACE_VIEW_CONTENT,
@@ -17,7 +16,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#general_create',
 			look: 'primary',
 			color: 'positive',
-			workspaceContextToken: UMB_BLOCK_WORKSPACE_CONTEXT,
 		},
 		conditions: [
 			{
@@ -26,6 +24,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 			{
 				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
+				match: false,
+			},
+			{
+				alias: 'Umb.Condition.BlockWorkspaceIsReadOnly',
 				match: false,
 			},
 		],
@@ -40,7 +42,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: '#general_update',
 			look: 'primary',
 			color: 'positive',
-			workspaceContextToken: UMB_BLOCK_WORKSPACE_CONTEXT,
 		},
 		conditions: [
 			{
@@ -49,6 +50,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 			{
 				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
+			},
+			{
+				alias: 'Umb.Condition.BlockWorkspaceIsReadOnly',
+				match: false,
 			},
 		],
 	},

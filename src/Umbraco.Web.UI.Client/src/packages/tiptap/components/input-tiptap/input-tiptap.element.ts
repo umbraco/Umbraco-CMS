@@ -112,13 +112,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		await this.#loadEditor();
 	}
 
-	protected override updated(changedProperties: Map<string, unknown>) {
-		super.updated(changedProperties);
-		if (changedProperties.has('readonly')) {
-			this._editor?.setEditable(!this.readonly);
-		}
-	}
-
 	/**
 	 * Checks if the editor is empty.
 	 * @returns {boolean} returns true if the editor contains no markup
@@ -258,25 +251,27 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	#renderToolbar() {
-		if (!this.#hasToolbar || this.readonly) return;
+		if (!this.#hasToolbar) return;
 		return html`
 			<umb-tiptap-toolbar
 				data-mark="tiptap-toolbar"
 				.toolbar=${this._toolbar}
 				.editor=${this._editor}
-				.configuration=${this.configuration}>
+				.configuration=${this.configuration}
+				?readonly=${this.readonly}>
 			</umb-tiptap-toolbar>
 		`;
 	}
 
 	#renderStatusbar() {
-		if (!this.#hasStatusbar || this.readonly) return;
+		if (!this.#hasStatusbar) return;
 		return html`
 			<umb-tiptap-statusbar
 				data-mark="tiptap-statusbar"
 				.statusbar=${this._statusbar}
 				.editor=${this._editor}
 				.configuration=${this.configuration}
+				?readonly=${this.readonly}
 				${umbDestroyOnDisconnect()}>
 			</umb-tiptap-statusbar>
 		`;
@@ -309,6 +304,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			}
 
 			:host([readonly]) {
+				pointer-events: none;
+
 				#editor {
 					background-color: var(--uui-color-surface-alt);
 				}

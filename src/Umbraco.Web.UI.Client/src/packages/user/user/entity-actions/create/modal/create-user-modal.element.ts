@@ -1,6 +1,5 @@
 import { UmbUserDetailRepository } from '../../../repository/index.js';
 import { UmbUserKind } from '../../../utils/index.js';
-import type { UmbUserKindType } from '../../../utils/index.js';
 import { UMB_CREATE_USER_SUCCESS_MODAL } from './create-user-success-modal.token.js';
 import type { UmbCreateUserModalData } from './create-user-modal.token.js';
 import type { UmbUserGroupInputElement } from '@umbraco-cms/backoffice/user-group';
@@ -48,16 +47,19 @@ export class UmbCreateUserModalElement extends UmbModalBaseElement<UmbCreateUser
 		const { data } = await this.#userDetailRepository.create(userScaffold);
 
 		if (data) {
-			this.#openSuccessModal(data.unique, data.kind);
+			if (data.kind === UmbUserKind.DEFAULT) {
+				this.#openSuccessModal(data.unique);
+			} else {
+				this._submitModal();
+			}
 		}
 	}
 
-	async #openSuccessModal(userUnique: string, userKind: UmbUserKindType) {
+	async #openSuccessModal(userUnique: string) {
 		await umbOpenModal(this, UMB_CREATE_USER_SUCCESS_MODAL, {
 			data: {
 				user: {
 					unique: userUnique,
-					kind: userKind,
 				},
 			},
 		})

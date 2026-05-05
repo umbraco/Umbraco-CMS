@@ -3,9 +3,8 @@ import type {
 	UmbPropertyEditorUIPickerModalData,
 	UmbPropertyEditorUIPickerModalValue,
 } from './property-editor-ui-picker-modal.token.js';
-import { UmbPropertyEditorUISearchController } from './property-editor-ui-search.controller.js';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { debounce, fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -19,11 +18,8 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	@state()
 	private _groupedPropertyEditorUIs: Array<{ key: string; items: Array<ManifestPropertyEditorUi> }> = [];
 
-	#propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
-
-	#searchController = new UmbPropertyEditorUISearchController(this);
-
-	#currentFilterQuery = '';
+	@state()
+	private _propertyEditorUIs: Array<ManifestPropertyEditorUi> = [];
 
 	override connectedCallback(): void {
 		super.connectedCallback();
@@ -31,20 +27,14 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		this.#usePropertyEditorUIs();
 	}
 
-	override disconnectedCallback(): void {
-		super.disconnectedCallback();
-		this.#debouncedFilter.cancel();
-	}
-
 	#usePropertyEditorUIs() {
 		this.observe(umbExtensionsRegistry.byType('propertyEditorUi'), (propertyEditorUIs) => {
 			// Only include Property Editor UIs which has Property Editor Schema Alias
-			this.#propertyEditorUIs = propertyEditorUIs
+			this._propertyEditorUIs = propertyEditorUIs
 				.filter((propertyEditorUi) => !!propertyEditorUi.meta.propertyEditorSchemaAlias)
 				.sort((a, b) => a.meta.label.localeCompare(b.meta.label));
 
-			this.#searchController.setPropertyEditorUIs(this.#propertyEditorUIs);
-			this.#performFiltering();
+			this.#groupPropertyEditorUIs(this._propertyEditorUIs);
 		});
 	}
 
@@ -54,31 +44,16 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 	}
 
 	#handleFilterInput(event: UUIInputEvent) {
-		this.#currentFilterQuery = (event.target.value as string) || '';
-		this.#debouncedFilter();
-	}
+		const query = ((event.target.value as string) || '').toLowerCase();
 
-	#debouncedFilter = debounce(() => {
-		void this.#performFiltering().catch((error) => {
-			if ((error as DOMException)?.name !== 'AbortError') {
-				console.error(error);
-			}
-		});
-	}, 250);
+		const result = !query
+			? this._propertyEditorUIs
+			: this._propertyEditorUIs.filter(
+					(propertyEditorUI) =>
+						propertyEditorUI.name.toLowerCase().includes(query) || propertyEditorUI.alias.toLowerCase().includes(query),
+				);
 
-	async #performFiltering() {
-		const query = this.#currentFilterQuery.trim();
-		if (!query) {
-			this.#groupPropertyEditorUIs(this.#propertyEditorUIs);
-			return;
-		}
-
-		try {
-			const results = await this.#searchController.search(query);
-			this.#groupPropertyEditorUIs(results);
-		} catch (error) {
-			if ((error as DOMException)?.name !== 'AbortError') throw error;
-		}
+		this.#groupPropertyEditorUIs(result);
 	}
 
 	#groupPropertyEditorUIs(items: Array<ManifestPropertyEditorUi>) {
@@ -244,8 +219,9 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 			#item-grid .item .label {
 				max-width: 100%;
 				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
 				overflow: hidden;
-				padding-bottom: 0.1em;
 			}
 		`,
 	];

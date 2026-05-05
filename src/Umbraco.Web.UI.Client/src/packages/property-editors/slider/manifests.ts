@@ -1,5 +1,4 @@
 import { manifest as sliderSchemaManifest } from './Umbraco.Slider.js';
-import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -19,19 +18,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.Slider',
 			icon: 'icon-navigation-horizontal',
 			group: 'common',
-			keywords: [
-				'number',
-				'range',
-				'percentage',
-				'rating',
-				'level',
-				'opacity',
-				'scale',
-				'volume',
-				'score',
-				'progress',
-				'zoom',
-			],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -62,14 +48,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 						config: [{ alias: 'step', value: '0.00001' }],
 					},
-					{
-						alias: 'minimumRange',
-						label: 'Minimum range',
-						description:
-							'Minimum difference between the low and high values when range is enabled. Set to 0 to allow equal values.',
-						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
-						config: [{ alias: 'step', value: '0.00001' }],
-					},
 				],
 				defaultData: [
 					{
@@ -84,14 +62,9 @@ export const manifests: Array<UmbExtensionManifest> = [
 						alias: 'step',
 						value: 1.0,
 					},
-					{
-						alias: 'minimumRange',
-						value: 0.0,
-					},
 				],
 			},
 		},
 	},
 	sliderSchemaManifest,
-	...valueSummaryManifests,
 ];

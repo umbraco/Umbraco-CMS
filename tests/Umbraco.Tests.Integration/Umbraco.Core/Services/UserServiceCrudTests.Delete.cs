@@ -37,7 +37,7 @@ internal sealed partial class UserServiceCrudTests
         userService.Save(createdUser);
 
         var result = await userService.DeleteAsync(Constants.Security.SuperUserKey, createdUser.Key);
-        Assert.AreEqual(UserOperationStatus.CannotDeleteUserWithLoginHistory, result);
+        Assert.AreEqual(UserOperationStatus.CannotDelete, result);
 
         // Asset that it is in fact not deleted
         var postDeletedUser = await userService.GetAsync(createdUser.Key);

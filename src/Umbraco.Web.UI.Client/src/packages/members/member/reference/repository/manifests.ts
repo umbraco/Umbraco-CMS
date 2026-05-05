@@ -1,5 +1,4 @@
 import { UMB_MEMBER_REFERENCE_REPOSITORY_ALIAS } from './constants.js';
-import { UmbMemberReferenceResponseManagementApiDataMapping } from './member-reference-response.management-api.mapping.js';
 import { UMB_MANAGEMENT_API_DATA_SOURCE_ALIAS } from '@umbraco-cms/backoffice/repository';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -13,7 +12,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'dataSourceDataMapping',
 		alias: 'Umb.DataSourceDataMapping.ManagementApi.MemberReferenceResponse',
 		name: 'Member Reference Response Management Api Data Mapping',
-		api: UmbMemberReferenceResponseManagementApiDataMapping,
+		api: () => import('./member-reference-response.management-api.mapping.js'),
 		forDataSource: UMB_MANAGEMENT_API_DATA_SOURCE_ALIAS,
 		forDataModel: 'MemberReferenceResponseModel',
 	},

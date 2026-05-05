@@ -2,13 +2,11 @@
 // See LICENSE for more details.
 
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Controllers;
@@ -58,9 +56,7 @@ public class BackOfficeAreaRoutesTests
     }
 
     private BackOfficeAreaRoutes GetBackOfficeAreaRoutes(RuntimeLevel level)
-        => new BackOfficeAreaRoutes(
-            Mock.Of<IRuntimeState>(x => x.Level == level),
-            Options.Create(new SignalRSettings()));
+        => new BackOfficeAreaRoutes(Mock.Of<IRuntimeState>(x => x.Level == level));
 
     [IsBackOffice]
     private class Testing1Controller : UmbracoApiController

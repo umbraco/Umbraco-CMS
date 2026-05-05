@@ -92,9 +92,7 @@ export class UmbBodyLayoutElement extends LitElement {
 				this._navigationSlotHasChildren
 					? ''
 					: 'none'}">
-				${this.headline
-					? html`<h3 id="headline" title=${this.headline} data-mark="layout-headline">${this.headline}</h3>`
-					: nothing}
+				${this.headline ? html`<h3 id="headline" title=${this.headline}>${this.headline}</h3>` : nothing}
 
 				<slot
 					id="header-slot"

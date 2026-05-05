@@ -7,7 +7,6 @@ import type {
 } from '@umbraco-cms/backoffice/extension-api';
 import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 
-const s = Symbol();
 export class UmbEntityIsTrashedCondition
 	extends UmbConditionBase<UmbConditionConfigBase>
 	implements UmbExtensionCondition
@@ -16,13 +15,9 @@ export class UmbEntityIsTrashedCondition
 		super(host, args);
 
 		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
-			this.observe(
-				context?.isTrashed,
-				(isTrashed) => {
-					this.permitted = isTrashed === true;
-				},
-				s,
-			);
+			this.observe(context?.isTrashed, (isTrashed) => {
+				this.permitted = isTrashed === true;
+			});
 		});
 	}
 }

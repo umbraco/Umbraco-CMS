@@ -23,21 +23,9 @@ export class UmbServerConnection extends UmbControllerBase {
 	#umbracoCssPath = new UmbStringState(undefined);
 	umbracoCssPath = this.#umbracoCssPath.asObservable();
 
-	#signalRSkipNegotiation = new UmbBooleanState(false);
-	signalRSkipNegotiation = this.#signalRSkipNegotiation.asObservable();
-
 	constructor(host: UmbControllerHost, serverUrl: string) {
 		super(host);
 		this.#url = serverUrl;
-	}
-
-	/**
-	 * Gets whether the server has configured SignalR to skip the negotiate round-trip.
-	 * @returns {boolean}
-	 * @memberof UmbServerConnection
-	 */
-	getSignalRSkipNegotiation() {
-		return this.#signalRSkipNegotiation.getValue();
 	}
 
 	/**
@@ -102,6 +90,5 @@ export class UmbServerConnection extends UmbControllerBase {
 		this.#allowLocalLogin.setValue(data?.allowLocalLogin ?? false);
 		this.#allowPasswordReset.setValue(data?.allowPasswordReset ?? false);
 		this.#umbracoCssPath.setValue(data?.umbracoCssPath);
-		this.#signalRSkipNegotiation.setValue(data?.signalR?.skipNegotiation ?? false);
 	}
 }

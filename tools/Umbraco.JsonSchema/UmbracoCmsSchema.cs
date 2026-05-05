@@ -79,8 +79,6 @@ internal sealed class UmbracoCmsSchema
         public required DistributedJobSettings DistributedJobSettings { get; set; }
 
         public required WebsiteSettings Website { get; set; }
-
-        public required SignalRSettings SignalR { get; set; }
     }
 
     public class InstallDefaultDataNamedOptions

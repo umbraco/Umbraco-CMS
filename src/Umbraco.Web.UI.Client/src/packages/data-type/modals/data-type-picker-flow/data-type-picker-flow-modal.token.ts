@@ -1,8 +1,6 @@
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
-export type UmbDataTypePickerFlowModalData = {
-	suggestionQuery?: string;
-};
+export type UmbDataTypePickerFlowModalData = object;
 
 export type UmbDataTypePickerFlowModalValue = {
 	selection: Array<string>;
