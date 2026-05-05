@@ -1,7 +1,7 @@
-namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Extensions;
+namespace Umbraco.Extensions;
 
 /// <summary>
-///     Introduces Queryable extensions to EFCore. This is where our custom queries live.
+///     Extensions for <see cref="IQueryable{T}"/>.
 /// </summary>
 public static class QueryableExtensions
 {
