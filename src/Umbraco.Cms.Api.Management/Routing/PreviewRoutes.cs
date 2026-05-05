@@ -15,10 +15,9 @@ namespace Umbraco.Cms.Api.Management.Routing;
 /// <summary>
 ///     Creates routes for the preview hub
 /// </summary>
-public sealed class PreviewRoutes : IAreaRoutes
+public sealed class PreviewRoutes : SignalRRoutesBase, IAreaRoutes
 {
     private readonly IRuntimeState _runtimeState;
-    private readonly SignalRSettings _signalRSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Routing.PreviewRoutes"/> class, configuring preview routing based on the application's runtime state.
@@ -38,9 +37,9 @@ public sealed class PreviewRoutes : IAreaRoutes
     /// <param name="runtimeState">An instance representing the current runtime state of the Umbraco application.</param>
     /// <param name="signalRSettings">The SignalR settings options.</param>
     public PreviewRoutes(IRuntimeState runtimeState, IOptions<SignalRSettings> signalRSettings)
+        : base(signalRSettings)
     {
         _runtimeState = runtimeState;
-        _signalRSettings = signalRSettings.Value;
     }
 
     /// <summary>
@@ -52,14 +51,6 @@ public sealed class PreviewRoutes : IAreaRoutes
         if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Upgrading or RuntimeLevel.Run)
         {
             endpoints.MapHub<PreviewHub>(GetPreviewHubRoute(), ConfigureHubEndpoint);
-        }
-    }
-
-    private void ConfigureHubEndpoint(HttpConnectionDispatcherOptions options)
-    {
-        if (_signalRSettings.ClientShouldSkipNegotiation)
-        {
-            options.Transports = HttpTransportType.WebSockets;
         }
     }
 

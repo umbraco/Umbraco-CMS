@@ -17,10 +17,9 @@ namespace Umbraco.Cms.Api.Management.Routing;
 /// <summary>
 /// Creates routes for the back office area.
 /// </summary>
-public sealed class BackOfficeAreaRoutes : IAreaRoutes
+public sealed class BackOfficeAreaRoutes : SignalRRoutesBase, IAreaRoutes
 {
     private readonly IRuntimeState _runtimeState;
-    private readonly SignalRSettings _signalRSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
@@ -37,9 +36,9 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
     /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
     /// </summary>
     public BackOfficeAreaRoutes(IRuntimeState runtimeState, IOptions<SignalRSettings> signalRSettings)
+        : base(signalRSettings)
     {
         _runtimeState = runtimeState;
-        _signalRSettings = signalRSettings.Value;
     }
 
 
@@ -52,14 +51,6 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
 
             endpoints.MapHub<BackofficeHub>(Constants.System.UmbracoPathSegment + Constants.Web.BackofficeSignalRHub, ConfigureHubEndpoint);
             endpoints.MapHub<ServerEventHub>(Constants.System.UmbracoPathSegment + Constants.Web.ServerEventSignalRHub, ConfigureHubEndpoint);
-        }
-    }
-
-    private void ConfigureHubEndpoint(HttpConnectionDispatcherOptions options)
-    {
-        if (_signalRSettings.ClientShouldSkipNegotiation)
-        {
-            options.Transports = HttpTransportType.WebSockets;
         }
     }
 
