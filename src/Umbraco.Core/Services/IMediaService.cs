@@ -86,7 +86,7 @@ public interface IMediaService : IContentServiceBase<IMedia>
     /// <returns>
     ///     <see cref="IMedia" />
     /// </returns>
-    IMedia CreateMedia(string? name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
+    IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId);
 
     /// <summary>
     ///     Creates an <see cref="IMedia" /> object using the alias of the <see cref="IMediaType" />

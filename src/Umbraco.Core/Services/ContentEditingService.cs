@@ -240,7 +240,7 @@ internal sealed class ContentEditingService
     }
 
     /// <inheritdoc />
-    protected override IContent New(string? name, int parentId, IContentType contentType)
+    protected override IContent New(string name, int parentId, IContentType contentType)
         => new Content(name, parentId, contentType);
 
     /// <inheritdoc />

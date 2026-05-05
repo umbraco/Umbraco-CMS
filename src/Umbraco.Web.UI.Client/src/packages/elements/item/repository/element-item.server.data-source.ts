@@ -45,7 +45,7 @@ const mapper = (item: ElementItemResponseModel): UmbElementItemModel => {
 		},
 		entityType: UMB_ELEMENT_ENTITY_TYPE,
 		hasChildren: item.hasChildren,
-		isTrashed: false, //item.isTrashed,
+		isTrashed: item.isTrashed,
 		parent: item.parent ? { unique: item.parent.id } : null,
 		unique: item.id,
 		variants: item.variants.map((variant) => {

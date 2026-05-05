@@ -1025,6 +1025,7 @@ export type ElementConfigurationResponseModel = {
 };
 
 export type ElementItemResponseModel = {
+    isTrashed: boolean;
     parent?: null | ReferenceByIdModel;
     hasChildren: boolean;
     documentType: DocumentTypeReferenceResponseModel;
@@ -1743,10 +1744,6 @@ export type MediaVariantResponseModel = {
     name: string;
 };
 
-export type MemberConfigurationResponseModel = {
-    [key: string]: unknown;
-};
-
 export type MemberGroupItemResponseModel = {
     name: string;
     id: string;
@@ -2241,6 +2238,11 @@ export type PagedModelDocumentItemResponseModel = {
 
 export type PagedModelDocumentTypeItemResponseModel = {
     items: Array<DocumentTypeItemResponseModel>;
+    total: number;
+};
+
+export type PagedModelElementItemResponseModel = {
+    items: Array<ElementItemResponseModel>;
     total: number;
 };
 
@@ -9038,6 +9040,31 @@ export type GetItemElementResponses = {
 
 export type GetItemElementResponse = GetItemElementResponses[keyof GetItemElementResponses];
 
+export type GetItemElementAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/element/ancestors';
+};
+
+export type GetItemElementAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemElementAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelNamedItemResponseModel>;
+};
+
+export type GetItemElementAncestorsResponse = GetItemElementAncestorsResponses[keyof GetItemElementAncestorsResponses];
+
 export type GetItemElementFolderData = {
     body?: never;
     path?: never;
@@ -9062,6 +9089,33 @@ export type GetItemElementFolderResponses = {
 };
 
 export type GetItemElementFolderResponse = GetItemElementFolderResponses[keyof GetItemElementFolderResponses];
+
+export type GetItemElementSearchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        query?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/item/element/search';
+};
+
+export type GetItemElementSearchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemElementSearchResponses = {
+    /**
+     * OK
+     */
+    200: PagedModelElementItemResponseModel;
+};
+
+export type GetItemElementSearchResponse = GetItemElementSearchResponses[keyof GetItemElementSearchResponses];
 
 export type DeleteRecycleBinElementData = {
     body?: never;
@@ -13140,33 +13194,6 @@ export type GetMemberAreReferencedResponses = {
 };
 
 export type GetMemberAreReferencedResponse = GetMemberAreReferencedResponses[keyof GetMemberAreReferencedResponses];
-
-export type GetMemberConfigurationData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/management/api/v1/member/configuration';
-};
-
-export type GetMemberConfigurationErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-};
-
-export type GetMemberConfigurationResponses = {
-    /**
-     * OK
-     */
-    200: MemberConfigurationResponseModel;
-};
-
-export type GetMemberConfigurationResponse = GetMemberConfigurationResponses[keyof GetMemberConfigurationResponses];
 
 export type PostMemberValidateData = {
     body: CreateMemberRequestModel;

@@ -48,32 +48,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IMemberTypeService _memberTypeService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class,
-        /// providing all required services and helpers for package data installation operations.
+        /// Initializes a new instance of the <see cref="PackageDataInstallation"/> class.
         /// </summary>
-        /// <param name="dataValueEditorFactory">Factory for creating data value editors used in property editing.</param>
-        /// <param name="logger">The logger used for logging installation events and errors.</param>
-        /// <param name="partialViewService">Service for managing partial views.</param>
-        /// <param name="stylesheetService">Service for managing stylesheets.</param>
-        /// <param name="scriptService">Service for managing scripts.</param>
-        /// <param name="userIdKeyResolver">Resolver for translating between user ids and user keys.</param>
-        /// <param name="localizationService">Service for managing localization and dictionary items.</param>
-        /// <param name="dataTypeService">Service for managing data types within Umbraco.</param>
-        /// <param name="entityService">Service for managing Umbraco entities generically.</param>
-        /// <param name="contentTypeService">Service for managing content types (document types, media types, etc.).</param>
-        /// <param name="contentService">Service for managing content items (nodes).</param>
-        /// <param name="propertyEditors">Collection of available property editors.</param>
-        /// <param name="scopeProvider">Provider for managing database transaction scopes.</param>
-        /// <param name="shortStringHelper">Helper for generating and manipulating short strings (e.g., aliases).</param>
-        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
-        /// <param name="mediaService">Service for managing media items.</param>
-        /// <param name="mediaTypeService">Service for managing media types.</param>
-        /// <param name="templateContentParserService">Service for parsing template content.</param>
-        /// <param name="templateService">Service for managing templates.</param>
-        /// <param name="memberTypeService">Service for managing member types.</param>
-        /// <param name="dataTypeContainerService">Service for managing data type containers (folders).</param>
-        /// <param name="idKeyMap">The cached id-to-key map used to resolve int IDs to GUID keys.</param>
-        /// <param name="userIdKeyResolver">Resolver between int user IDs and GUID user keys.</param>
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
@@ -719,9 +695,22 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
             }
 
-            //Save the newly created/updated IContentType objects
+            //Save the newly created/updated IContentType objects.
+            //Note: this fires one save notification per item, where the legacy bulk Save fired one for the whole batch.
+            //That's acceptable here as package import is an infrequent install-time operation running inside an outer scope.
             var list = importedContentTypes.Select(x => x.Value).ToList();
-            service.Save(list, userId);
+            Guid performingUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+            foreach (T item in list)
+            {
+                if (item.HasIdentity)
+                {
+                    service.UpdateAsync(item, performingUserKey).GetAwaiter().GetResult();
+                }
+                else
+                {
+                    service.CreateAsync(item, performingUserKey).GetAwaiter().GetResult();
+                }
+            }
 
             //Now we can finish the import by updating the 'structure',
             //which requires the doc types to be saved/available in the db
@@ -750,7 +739,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 //Update ContentTypes with a newly added structure/list of allowed children
                 if (updatedContentTypes.Any())
                 {
-                    service.Save(updatedContentTypes, userId);
+                    foreach (T item in updatedContentTypes)
+                    {
+                        service.UpdateAsync(item, performingUserKey).GetAwaiter().GetResult();
+                    }
                 }
             }
 

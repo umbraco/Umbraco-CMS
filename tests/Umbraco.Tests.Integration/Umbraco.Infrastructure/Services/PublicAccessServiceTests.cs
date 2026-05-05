@@ -23,7 +23,7 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
         var ct = ContentTypeBuilder.CreateSimpleContentType("blah", "Blah", defaultTemplateId: template.Id);
-        ContentTypeService.Save(ct);
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
         _content = ContentBuilder.CreateSimpleContent(ct, "Test");
         ContentService.Save(_content);

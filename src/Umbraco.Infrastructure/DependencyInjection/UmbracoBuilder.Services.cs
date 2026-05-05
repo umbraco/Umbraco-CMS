@@ -2,19 +2,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Packaging;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
@@ -73,7 +69,7 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<ITemplateService>(),
                 factory.GetRequiredService<IDictionaryItemService>(),
                 factory.GetRequiredService<ILanguageService>()));
-        builder.Services.AddSingleton(CreatePackageDataInstallation);
+        builder.Services.AddUnique<IPackageDataInstallation, PackageDataInstallation>();
         builder.Services.AddUnique<IPackageInstallation, PackageInstallation>();
         builder.Services.AddTransient<IExamineIndexCountService, ExamineIndexCountService>();
         builder.Services.AddUnique<IUserDataService, UserDataService>();
@@ -113,30 +109,6 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<FileSystems>(),
             factory.GetRequiredService<IIdKeyMap>(),
             packageRepoFileName);
-
-    private static IPackageDataInstallation CreatePackageDataInstallation(IServiceProvider factory)
-        => new PackageDataInstallation(
-            factory.GetRequiredService<IDataValueEditorFactory>(),
-            factory.GetRequiredService<ILogger<PackageDataInstallation>>(),
-            factory.GetRequiredService<IPartialViewService>(),
-            factory.GetRequiredService<IStylesheetService>(),
-            factory.GetRequiredService<IScriptService>(),
-            factory.GetRequiredService<IUserIdKeyResolver>(),
-            factory.GetRequiredService<ILocalizationService>(),
-            factory.GetRequiredService<IDataTypeService>(),
-            factory.GetRequiredService<IEntityService>(),
-            factory.GetRequiredService<IContentTypeService>(),
-            factory.GetRequiredService<IContentService>(),
-            factory.GetRequiredService<PropertyEditorCollection>(),
-            factory.GetRequiredService<IScopeProvider>(),
-            factory.GetRequiredService<IShortStringHelper>(),
-            factory.GetRequiredService<IConfigurationEditorJsonSerializer>(),
-            factory.GetRequiredService<IMediaService>(),
-            factory.GetRequiredService<IMediaTypeService>(),
-            factory.GetRequiredService<ITemplateContentParserService>(),
-            factory.GetRequiredService<ITemplateService>(),
-            factory.GetRequiredService<IMemberTypeService>(),
-            factory.GetRequiredService<IDataTypeContainerService>());
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(
         IServiceProvider container)

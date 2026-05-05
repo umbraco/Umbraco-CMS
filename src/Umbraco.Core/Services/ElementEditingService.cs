@@ -184,7 +184,7 @@ internal sealed class ElementEditingService
     public async Task<Attempt<IElement?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
         => await HandleDeleteAsync(key, userKey, true);
 
-    protected override IElement New(string? name, int parentId, IContentType contentType)
+    protected override IElement New(string name, int parentId, IContentType contentType)
         => new Element(name, parentId, contentType);
 
     protected override IContentType? TryGetAndValidateContentType(
