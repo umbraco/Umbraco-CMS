@@ -56,8 +56,6 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     [SetUp]
     public override void Setup()
     {
-        InMemoryConfiguration["Umbraco:CMS:ModelsBuilder:ModelsMode"] = "Nothing";
-
         base.Setup();
         Client.DefaultRequestHeaders.Accept.Clear();
         Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));

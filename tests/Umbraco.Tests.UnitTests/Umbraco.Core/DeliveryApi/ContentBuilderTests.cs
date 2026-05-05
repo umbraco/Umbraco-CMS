@@ -32,14 +32,14 @@ public class ContentBuilderTests : DeliveryApiTests
         var key = Guid.NewGuid();
         var urlSegment = "url-segment";
         var name = "The page";
-        ConfigurePublishedContentMock(content, key, name, urlSegment, contentType.Object, new[] { prop1, prop2 });
+        ConfigurePublishedContentMock(content, key, name, contentType.Object, new[] { prop1, prop2 });
         content.SetupGet(c => c.CreateDate).Returns(new DateTime(2023, 06, 01));
         content.SetupGet(c => c.UpdateDate).Returns(new DateTime(2023, 07, 12));
 
         var apiContentRouteProvider = new Mock<IApiContentPathProvider>();
         apiContentRouteProvider
             .Setup(p => p.GetContentPath(It.IsAny<IPublishedContent>(), It.IsAny<string?>()))
-            .Returns((IPublishedContent c, string? culture) => $"url:{c.UrlSegment}");
+            .Returns((IPublishedContent c, string? culture) => $"url:{urlSegment}");
 
         var navigationQueryServiceMock = new Mock<IDocumentNavigationQueryService>();
         IEnumerable<Guid> ancestorsKeys = [];
@@ -76,7 +76,7 @@ public class ContentBuilderTests : DeliveryApiTests
         var key = Guid.NewGuid();
         var urlSegment = "url-segment";
         var name = "The page";
-        ConfigurePublishedContentMock(content, key, name, urlSegment, contentType.Object, []);
+        ConfigurePublishedContentMock(content, key, name, contentType.Object, []);
         content.SetupGet(c => c.CreateDate).Returns(new DateTime(2023, 07, 02));
         content
             .SetupGet(c => c.Cultures)
@@ -89,7 +89,7 @@ public class ContentBuilderTests : DeliveryApiTests
         var routeBuilder = new Mock<IApiContentRouteBuilder>();
         routeBuilder
             .Setup(r => r.Build(content.Object, It.IsAny<string?>()))
-            .Returns(new ApiContentRoute(content.Object.UrlSegment!, new ApiContentStartItem(Guid.NewGuid(), "/")));
+            .Returns(new ApiContentRoute(urlSegment, new ApiContentStartItem(Guid.NewGuid(), "/")));
 
         var variationContextAccessor = new TestVariationContextAccessor { VariationContext = new VariationContext(culture) };
 
@@ -109,7 +109,7 @@ public class ContentBuilderTests : DeliveryApiTests
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Alias).Returns("thePageType");
 
-        ConfigurePublishedContentMock(content, Guid.NewGuid(), "The page", "the-page", contentType.Object, Array.Empty<PublishedPropertyBase>());
+        ConfigurePublishedContentMock(content, Guid.NewGuid(), "The page", contentType.Object, Array.Empty<PublishedPropertyBase>());
 
         var customNameProvider = new Mock<IApiContentNameProvider>();
         customNameProvider.Setup(n => n.GetName(content.Object)).Returns($"Custom name for: {content.Object.Name}");
@@ -117,7 +117,7 @@ public class ContentBuilderTests : DeliveryApiTests
         var routeBuilder = new Mock<IApiContentRouteBuilder>();
         routeBuilder
             .Setup(r => r.Build(content.Object, It.IsAny<string?>()))
-            .Returns(new ApiContentRoute(content.Object.UrlSegment!, new ApiContentStartItem(Guid.NewGuid(), "/")));
+            .Returns(new ApiContentRoute("the-page", new ApiContentStartItem(Guid.NewGuid(), "/")));
 
         var builder = new ApiContentBuilder(customNameProvider.Object, routeBuilder.Object, CreateOutputExpansionStrategyAccessor(), CreateVariationContextAccessor());
         var result = builder.Build(content.Object);
@@ -134,7 +134,7 @@ public class ContentBuilderTests : DeliveryApiTests
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Alias).Returns("thePageType");
 
-        ConfigurePublishedContentMock(content, Guid.NewGuid(), "The page", "the-page", contentType.Object, Array.Empty<PublishedPropertyBase>());
+        ConfigurePublishedContentMock(content, Guid.NewGuid(), "The page", contentType.Object, Array.Empty<PublishedPropertyBase>());
 
         var routeBuilder = new Mock<IApiContentRouteBuilder>();
         routeBuilder

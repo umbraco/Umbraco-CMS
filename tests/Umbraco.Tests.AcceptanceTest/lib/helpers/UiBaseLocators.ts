@@ -574,13 +574,6 @@ export class UiBaseLocators extends BasePage {
       )
       .locator("#reference-headline")
       .first();
-    this.entityItemRef = page
-      .locator(
-        "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
-      )
-      .locator("uui-ref-list")
-      .first()
-      .getByTestId("entity-item-ref");
     this.entityItem = page.locator("umb-entity-item-ref");
 
     // Workspace & Action
@@ -606,8 +599,10 @@ export class UiBaseLocators extends BasePage {
     // Editor
     this.monacoEditor = page.locator(".monaco-editor");
 
-    // Loader
-    this.uiLoader = page.locator("uui-loader");
+    // Loader (excludes the global app-level loader at #loader)
+    this.uiLoader = page.locator(
+      "uui-loader:not([data-mark='app-router-loader'])",
+    );
 
     // Block
     this.blockTypeCard = page.locator("uui-card-block-type");
@@ -1603,15 +1598,17 @@ export class UiBaseLocators extends BasePage {
   }
 
   async selectMediaWithName(mediaName: string) {
-    const mediaLocator = this.mediaCardItems.filter({ hasText: mediaName });
+    const mediaLocator = this.mediaCardItems.filter({hasText: mediaName});
     await this.waitForVisible(mediaLocator);
-    await this.click(mediaLocator.locator("#select-checkbox"), { force: true });
+    await this.hover(mediaLocator);
+    await this.click(mediaLocator.locator("#select-checkbox"), {force: true});
   }
 
   async selectMediaWithTestId(mediaKey: string) {
     const mediaLocator = this.page.getByTestId("media:" + mediaKey);
     await this.waitForVisible(mediaLocator);
-    await this.click(mediaLocator.locator("#select-checkbox"), { force: true });
+    await this.hover(mediaLocator);
+    await this.click(mediaLocator.locator("#select-checkbox"), {force: true});
   }
 
   async clickMediaPickerModalSubmitButton() {

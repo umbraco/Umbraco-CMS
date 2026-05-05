@@ -3,7 +3,6 @@ using Umbraco.Cms.Api.Management.ViewModels.DocumentType;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Api.Management.ViewModels.Media;
 using Umbraco.Cms.Api.Management.ViewModels.MediaType;
-using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Api.Management.ViewModels.MemberType;
 
 namespace Umbraco.Cms.Api.Management.Factories;
@@ -25,12 +24,6 @@ public interface IConfigurationPresentationFactory
     /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.DocumentTypeConfigurationResponseModel"/> representing the document type configuration.</returns>
     DocumentTypeConfigurationResponseModel CreateDocumentTypeConfigurationResponseModel()
         => throw new NotImplementedException();
-
-    /// <summary>
-    /// Creates a response model representing the member configuration.
-    /// </summary>
-    /// <returns>A <see cref="Umbraco.Cms.Api.Management.Models.MemberConfigurationResponseModel"/> instance.</returns>
-    MemberConfigurationResponseModel CreateMemberConfigurationResponseModel();
 
     /// <summary>
     /// Creates and returns a new <see cref="Umbraco.Cms.Api.Management.Models.MemberTypeConfigurationResponseModel"/> instance.

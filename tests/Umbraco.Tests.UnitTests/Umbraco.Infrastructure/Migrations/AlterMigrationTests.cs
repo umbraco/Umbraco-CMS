@@ -70,14 +70,17 @@ public class AlterMigrationTests
             Is.EqualTo("ALTER TABLE [bar] ADD [foo] UniqueIdentifier NOT NULL"));
     }
 
-    public class CreateColumnMigration : MigrationBase
+    public class CreateColumnMigration : AsyncMigrationBase
     {
         public CreateColumnMigration(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate() => Alter.Table("bar").AddColumn("foo").AsGuid().Do();
+        protected override async Task MigrateAsync()
+        {
+            Alter.Table("bar").AddColumn("foo").AsGuid().Do();
+        }
     }
 
     [Test]
@@ -99,40 +102,19 @@ public class AlterMigrationTests
             Is.EqualTo("ALTER TABLE [bar] ALTER COLUMN [foo] UniqueIdentifier NOT NULL"));
     }
 
-    public class AlterColumnMigration : MigrationBase
+    public class AlterColumnMigration : AsyncMigrationBase
     {
         public AlterColumnMigration(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate() =>
-
+        protected override Task MigrateAsync()
+        {
             // bad/good syntax...
             //// Alter.Column("foo").OnTable("bar").AsGuid().NotNullable();
             Alter.Table("bar").AlterColumn("foo").AsGuid().NotNullable().Do();
-    }
-
-    [Ignore("this doesn't actually test anything")]
-    [Test]
-    public async Task Can_Get_Up_Migration_From_MigrationStub()
-    {
-        // Arrange
-        var context = GetMigrationContext(out var database);
-        var stub = new AlterUserTableMigrationStub(context);
-
-        // Act
-        await stub.RunAsync().ConfigureAwait(false);
-
-        // Assert
-        Assert.That(database.Operations.Any(), Is.True);
-
-        // Console output
-        Debug.Print("Number of expressions in context: {0}", database.Operations.Count);
-        Debug.Print(string.Empty);
-        foreach (var expression in database.Operations)
-        {
-            Debug.Print(expression.ToString());
+            return Task.CompletedTask;
         }
     }
 }

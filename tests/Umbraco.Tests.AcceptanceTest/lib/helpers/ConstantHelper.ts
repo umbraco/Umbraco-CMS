@@ -55,7 +55,7 @@
   public static readonly access = {
     denied: 'Access denied'
   }
-  
+
   public static readonly approvedColorSettings = {
     0: ['Include labels?', 'Displays colored field and a label for each color in the color picker, rather than just a colored field.'],
     1: ['Colors', 'Add, remove or sort colors (and labels).'],
@@ -323,6 +323,7 @@
     elementFolder: '/umbraco/management/api/v1/element/folder',
     treeElementRoot: '/umbraco/management/api/v1/tree/element/root',
     treeElementChildren: '/umbraco/management/api/v1/tree/element/children',
+    revoke: '/umbraco/management/api/v1/security/back-office/revoke'
   }
 
   public static readonly userGroupDescriptionValues = {
@@ -348,5 +349,39 @@
   public static readonly healthCheckMessages = {
     imagingHMACSecretKeyIsNotConfigured: 'No HMAC secret key is configured for image URL signing. It is recommended to set Umbraco:CMS:Imaging:HMACSecretKey to prevent unauthorized image manipulation requests.',
     imagingHMACSecretKeyIsConfigured: 'The HMAC secret key for image URL signing is configured'
+  }
+
+  public static readonly loginErrorMessages = {
+    lockedAccount: 'Your account has been locked out. Please try again later.',
+    invalidCredentials: "Oops! We couldn't log you in. Please check your credentials and try again.",
+    emptyEmail: 'Please fill in an email',
+    emptyPassword: 'Please fill in a password'
+  }
+
+  public static readonly forgottenPasswordMessages = {
+    confirmation: 'We sent an email with password reset instructions, if the email address matches a registered user.',
+    notFoundUserError: 'The specified user was not found.'
+  }
+
+  public static readonly auditTrailMessages = {
+    contentSaved: 'Content saved',
+    contentSavedAndPublished: 'Content saved and Published',
+    contentUnpublished: 'Content unpublished',
+    contentMoved: 'Content moved',
+    contentCopied: 'Content copied',
+    contentDeleted: 'Content deleted',
+    contentRolledBack: 'Content rolled back',
+    contentSorted: 'Sort child items performed by user'
+  }
+
+  public static readonly auditTrailTypes = {
+    save: 'Save',
+    delete: 'Delete',
+    move: 'Move',
+    sort: 'Sort',
+    publish: 'Publish',
+    rollback: 'Rollback',
+    copy: 'Copy',
+    unpublish: 'Unpublish'
   }
 }

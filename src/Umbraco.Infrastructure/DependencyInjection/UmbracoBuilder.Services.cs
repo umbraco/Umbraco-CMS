@@ -111,7 +111,9 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IMediaTypeService>(),
             factory.GetRequiredService<MediaFileManager>(),
             factory.GetRequiredService<FileSystems>(),
+            factory.GetRequiredService<IIdKeyMap>(),
             packageRepoFileName);
+
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(
         IServiceProvider container)
