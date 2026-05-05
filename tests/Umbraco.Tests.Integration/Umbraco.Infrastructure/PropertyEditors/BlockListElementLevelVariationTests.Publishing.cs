@@ -30,9 +30,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_Cultures_Independently_Invariant_Blocks()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -134,9 +134,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_Cultures_Independently_Variant_Blocks()
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
         var content = CreateContent(
             contentType,
@@ -260,7 +260,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_Cultures_Independently_Nested_Invariant_Blocks()
     {
-        var nestedElementType = CreateElementType(ContentVariation.Culture);
+        var nestedElementType = await CreateElementType(ContentVariation.Culture);
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
 
         var rootElementType = new ContentTypeBuilder()
@@ -293,9 +293,9 @@ internal partial class BlockListElementLevelVariationTests
             .WithVariations(ContentVariation.Nothing)
             .Done()
             .Build();
-        ContentTypeService.Save(rootElementType);
+        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
-        var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, rootBlockListDataType);
 
         var nestedElementContentKey = Guid.NewGuid();
         var nestedElementSettingsKey = Guid.NewGuid();
@@ -461,7 +461,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_Cultures_Independently_Nested_Variant_Blocks()
     {
-        var nestedElementType = CreateElementType(ContentVariation.Nothing);
+        var nestedElementType = await CreateElementType(ContentVariation.Nothing);
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
 
         var rootElementType = new ContentTypeBuilder()
@@ -494,9 +494,9 @@ internal partial class BlockListElementLevelVariationTests
             .WithVariations(ContentVariation.Culture)
             .Done()
             .Build();
-        ContentTypeService.Save(rootElementType);
+        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
         var rootBlockListDataType = await CreateBlockListDataType(rootElementType);
-        var contentType = CreateContentType(ContentVariation.Culture, rootBlockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, rootBlockListDataType);
 
         var nestedElementContentKeyEnUs = Guid.NewGuid();
         var nestedElementSettingsKeyEnUs = Guid.NewGuid();
@@ -700,9 +700,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_Cultures_Independently_With_Segments()
     {
-        var elementType = CreateElementType(ContentVariation.CultureAndSegment);
+        var elementType = await CreateElementType(ContentVariation.CultureAndSegment);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.CultureAndSegment, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -851,9 +851,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_With_Segments()
     {
-        var elementType = CreateElementType(ContentVariation.Segment);
+        var elementType = await CreateElementType(ContentVariation.Segment);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Segment, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Segment, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -912,9 +912,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_With_Blocks_Removed()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1058,9 +1058,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_With_Blocks_In_One_Language()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var firstBlockContentElementKey = Guid.NewGuid();
@@ -1177,9 +1177,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_With_Blocks_Exposed()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1278,9 +1278,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Expose_Invariant_Blocks_Across_Cultures()
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1372,8 +1372,8 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Expose_Both_Variant_And_Invariant_Blocks()
     {
-        var invariantElementType = CreateElementType(ContentVariation.Nothing);
-        var variantElementType = CreateElementType(ContentVariation.Culture, "myVariantElementType");
+        var invariantElementType = await CreateElementType(ContentVariation.Nothing);
+        var variantElementType = await CreateElementType(ContentVariation.Culture, "myVariantElementType");
         var blockListDataType = await CreateBlockEditorDataType(
             Constants.PropertyEditors.Aliases.BlockList,
             new BlockListConfiguration.BlockConfiguration[]
@@ -1381,7 +1381,7 @@ internal partial class BlockListElementLevelVariationTests
                 new() { ContentElementTypeKey = invariantElementType.Key },
                 new() { ContentElementTypeKey = variantElementType.Key }
             });
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, invariantElementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1479,9 +1479,9 @@ internal partial class BlockListElementLevelVariationTests
     [ConfigureBuilder(ActionName = nameof(ConfigureAllowEditInvariantFromNonDefaultTrue))]
     public async Task Can_Publish_Invariant_Properties_Without_Default_Culture_With_AllowEditInvariantFromNonDefault()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1567,9 +1567,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Cannot_Publish_Invariant_Properties_Without_Default_Culture_Without_AllowEditInvariantFromNonDefault()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1633,9 +1633,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_Valid_Properties()
     {
-        var elementType = CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidation();
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1673,9 +1673,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_Valid_Properties_Specific_Culture_Only()
     {
-        var elementType = CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidation();
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1713,9 +1713,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Publish_Valid_Properties_With_Wildcard_Culture()
     {
-        var elementType = CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidation();
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1754,9 +1754,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase(false)]
     public async Task Cannot_Publish_Invalid_Invariant_Properties(bool invalidSettingsValue)
     {
-        var elementType = CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidation();
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1798,9 +1798,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Cannot_Publish_Missing_Invariant_Properties()
     {
-        var elementType = CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidation();
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1841,9 +1841,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase(false)]
     public async Task Cannot_Publish_Invalid_Variant_Properties(bool invalidSettingsValue)
     {
-        var elementType = CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidation();
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1888,9 +1888,9 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Cannot_Publish_Missing_Variant_Properties()
     {
-        var elementType = CreateElementTypeWithValidation();
+        var elementType = await CreateElementTypeWithValidation();
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(
@@ -1954,9 +1954,9 @@ internal partial class BlockListElementLevelVariationTests
             .WithVariations(ContentVariation.Culture)
             .Done()
             .Build();
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var pickedContent1 = CreateContent(contentType, elementType, [], true);
         var pickedContent2 = CreateContent(contentType, elementType, [], true);
@@ -2015,9 +2015,9 @@ internal partial class BlockListElementLevelVariationTests
         daDkLanguage = await LanguageService.GetAsync("da-DK");
         Assert.AreEqual("en-US", daDkLanguage?.FallbackIsoCode);
 
-        var elementType = CreateElementType(elementTypeVariation);
+        var elementType = await CreateElementType(elementTypeVariation);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
         var content = CreateContent(
             contentType,
@@ -2106,9 +2106,9 @@ internal partial class BlockListElementLevelVariationTests
     public async Task Publishing_After_Changing_Element_Property_From_Variant_To_Invariant_Does_Not_Keep_Old_Culture_Specific_Values(bool republishEnglish, bool republishDanish)
     {
         // 1. Create element type WITH culture variation
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         // 2. Create content with variant values and publish all cultures
         var content = CreateContent(
@@ -2149,7 +2149,7 @@ internal partial class BlockListElementLevelVariationTests
             propertyType.Variations = ContentVariation.Nothing;
         }
 
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
         // RefreshContentTypeCache(elementType, contentType);
 
         // Verify element type properties are now invariant
@@ -2273,11 +2273,11 @@ internal partial class BlockListElementLevelVariationTests
     public async Task Publishing_After_Changing_Element_Property_From_Invariant_To_Variant_Does_Not_Keep_Old_Invariant_Values(bool republishEnglish, bool republishDanish)
     {
         // 1. Create variant element type WITHOUT variant properties
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         elementType.PropertyTypes.First(p => p.Alias == "variantText").Variations = ContentVariation.Nothing;
         await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         // 2. Create content with invariant values and publish
         var content = CreateContent(contentType, elementType, [], false);
@@ -2331,7 +2331,7 @@ internal partial class BlockListElementLevelVariationTests
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         // Verify element type properties are now variant
         var refreshedElementType = ContentTypeService.Get(elementType.Key);
@@ -2464,9 +2464,9 @@ internal partial class BlockListElementLevelVariationTests
     {
         // Arrange: Create culture-variant content type with INVARIANT BlockList property
         // containing culture-variant element type.
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         // Create content without publishing first.
         var content = CreateContent(
@@ -2531,9 +2531,9 @@ internal partial class BlockListElementLevelVariationTests
         var defaultCulture = GetRequiredService<ILocalizationService>().GetDefaultLanguageIsoCode();
         Assert.AreEqual("en-US", defaultCulture);
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(contentType, elementType, [], false);
         var blockListValue = BlockListPropertyValue(

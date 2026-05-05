@@ -214,10 +214,10 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Export_Zip()
+    public async Task Export_Zip()
     {
         var mt = MediaTypeBuilder.CreateImageMediaType("testImage");
-        MediaTypeService.Save(mt);
+        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var m1 = MediaBuilder.CreateMediaFile(mt, -1);
         MediaService.Save(m1);
 
