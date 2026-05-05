@@ -54,7 +54,7 @@ public class Element : PublishableContentBase, IElement
     /// <param name="parentId">Id of the Parent folder</param>
     /// <param name="contentType">ContentType for the current Element object</param>
     /// <param name="culture">An optional culture.</param>
-    public Element(string? name, int parentId, IContentType? contentType, string? culture = null)
+    public Element(string name, int parentId, IContentType? contentType, string? culture = null)
         : this(name, parentId, contentType, new PropertyCollection(), culture)
     {
     }
@@ -82,7 +82,7 @@ public class Element : PublishableContentBase, IElement
     /// <param name="contentType">ContentType for the current Element object</param>
     /// <param name="properties">Collection of properties</param>
     /// <param name="culture">An optional culture.</param>
-    public Element(string? name, int parentId, IContentType? contentType, PropertyCollection properties, string? culture = null)
+    public Element(string name, int parentId, IContentType? contentType, PropertyCollection properties, string? culture = null)
         : base(name, parentId, contentType, properties, culture)
     {
     }
