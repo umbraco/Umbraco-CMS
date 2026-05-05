@@ -80,7 +80,7 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
         }
 
         // While the obsolete overload is still supported, let's use it.
-        // TODO (V18): Remove the obsolete overload and move its logic here.
+        // TODO (V19): Remove the obsolete overload and move its logic here.
 #pragma warning disable CS0618 // Type or member is obsolete
         Attempt<PublicAccessResponseModel?, PublicAccessOperationStatus> baseResponseAttempt = CreatePublicAccessResponseModel(entry);
 #pragma warning restore CS0618 // Type or member is obsolete

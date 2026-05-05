@@ -101,6 +101,7 @@ public partial class UmbracoPlan : MigrationPlan
 
         // To 18.0.0
         To<V_18_0_0.MigrateSingleBlockList>("{74332C49-B279-4945-8943-F8F00B1F5949}");
+        To<V_18_0_0.AddElementSectionForAdmins>("{6FE4656E-8B8D-452F-AE2A-438A615B61BC}");
     }
 
     /// <summary>

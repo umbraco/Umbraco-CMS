@@ -52,6 +52,7 @@ internal sealed class ElementPresentationFactory
         var responseModel = new ElementItemResponseModel
         {
             Id = entity.Key,
+            IsTrashed = entity.Trashed,
             Parent = parentKeyAttempt.Success ? new ReferenceByIdModel { Id = parentKeyAttempt.Result } : null,
             HasChildren = entity.HasChildren,
             DocumentType = CreateDocumentTypeReferenceResponseModel(entity),
