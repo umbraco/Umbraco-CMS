@@ -1,5 +1,7 @@
 ﻿using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.DeliveryApi.Request;
@@ -8,13 +10,28 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.DeliveryApi.Request;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
 public abstract class ApiContentRouteBuilderTestBase : ApiContentRequestTestBase
 {
+    protected IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+
+    [SetUp]
+    public async Task EnsureDocumentUrlServiceInitialized()
+    {
+        if (DocumentUrlService.IsInitialized is false)
+        {
+            await DocumentUrlService.InitAsync(forceEmpty: true, CancellationToken.None);
+        }
+    }
+
     protected IPublishedContent GetPublishedContent(Guid key)
     {
-        UmbracoContextAccessor.Clear();
-        var umbracoContext = UmbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
-        var publishedContent = umbracoContext.Content?.GetById(key);
+        var publishedContent = ClearAndEnsureUmbracoContext().Content.GetById(key);
         Assert.IsNotNull(publishedContent);
 
         return publishedContent;
+    }
+
+    protected IUmbracoContext ClearAndEnsureUmbracoContext()
+    {
+        UmbracoContextAccessor.Clear();
+        return UmbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
     }
 }

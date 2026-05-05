@@ -146,7 +146,8 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
             return null;
         }
 
-        var rootPath = root.UrlSegment(_variationContextAccessor, culture) ?? string.Empty;
+        var resolvedCulture = culture ?? _variationContextAccessor.VariationContext?.Culture ?? string.Empty;
+        var rootPath = _documentUrlService.GetUrlSegment(root.Key, resolvedCulture, isPreview) ?? string.Empty;
 
         if (_globalSettings.HideTopLevelNodeFromPath == false)
         {
@@ -169,7 +170,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
         var contentPath = _apiContentPathProvider.GetContentPath(content, culture);
 
         // in some scenarios the published content is actually routable, but due to the built-in handling of i.e. lacking culture setup
-        // the URL provider resolves the content URL as empty string or "#". since the Delivery API handles routing explicitly,
+        // the URL provider resolves the content URL as empty or unrouetable. since the Delivery API handles routing explicitly,
         // we can perform fallback to the content route.
         if (IsInvalidContentPath(contentPath))
         {
@@ -192,7 +193,7 @@ public sealed class ApiContentRouteBuilder : IApiContentRouteBuilder
 
     private string ContentPreviewPath(IPublishedContent content) => $"{Constants.DeliveryApi.Routing.PreviewContentPathPrefix}{content.Key:D}{(_requestSettings.AddTrailingSlash ? "/" : string.Empty)}";
 
-    private static bool IsInvalidContentPath(string? path) => path.IsNullOrWhiteSpace() || "#".Equals(path);
+    private static bool IsInvalidContentPath(string? path) => path.IsNullOrWhiteSpace() || Constants.Routing.Unroutable.Equals(path);
 
     private IPublishedContent? GetRoot(IPublishedContent content, bool isPreview)
     {

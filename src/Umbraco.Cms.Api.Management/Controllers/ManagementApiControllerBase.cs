@@ -29,15 +29,14 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 [AppendEventMessages]
 [DisableBrowserCache]
-[Produces("application/json")]
 [MaintenanceModeActionFilter]
 public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
     protected IActionResult CreatedAtId<T>(Expression<Func<T, string>> action, Guid id)
-        => CreatedAtAction(action, new { id = id }, id.ToString());
+        => CreatedAtAction(action, new { id }, id.ToString());
 
     protected IActionResult CreatedAtPath<T>(Expression<Func<T, string>> action, string path)
-        => CreatedAtAction(action, new { path = path }, path);
+        => CreatedAtAction(action, new { path }, path);
 
     protected IActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, object routeValues, string resourceIdentifier)
     {

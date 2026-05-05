@@ -39,6 +39,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly chooseMediaPickerBtn: Locator;
   private readonly chooseMemberPickerBtn: Locator;
   private readonly numericTxt: Locator;
+  private readonly decimalTxt: Locator;
   private readonly resetFocalPointBtn: Locator;
   private readonly addMultiURLPickerBtn: Locator;
   private readonly linkTxt: Locator;
@@ -242,6 +243,7 @@ export class ContentUiHelper extends UiBaseLocators {
       "umb-property-editor-ui-member-picker #btn-add",
     );
     this.numericTxt = page.locator("umb-property-editor-ui-number input");
+    this.decimalTxt = page.locator("umb-property-editor-ui-decimal input");
     this.addMultiURLPickerBtn = page.locator(
       "umb-property-editor-ui-multi-url-picker #btn-add",
     );
@@ -748,6 +750,25 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.hasText(this.historyItems, text);
   }
 
+  async doesHistoryItemHaveTag(tagText: string, index: number = 0) {
+    const tag = this.historyItems.nth(index).locator('.log-type uui-tag');
+    await this.containsText(tag, tagText);
+  }
+
+  async doesHistoryItemHaveDescription(descriptionText: string, index: number = 0) {
+    const description = this.historyItems.nth(index).locator('.log-type span');
+    await this.hasText(description, descriptionText);
+  }
+
+  async doesHistoryItemHaveUsername(usernameText: string, index: number = 0) {
+    const username = this.historyItems.nth(index).locator('.user-info .name');
+    await this.containsText(username, usernameText);
+  }
+
+  async doesHistoryHaveCount(count: number) {
+    await this.hasCount(this.historyItems, count);
+  }
+
   async doesDocumentStateHaveText(text: string) {
     await this.hasText(this.documentState, text);
   }
@@ -1100,6 +1121,11 @@ export class ContentUiHelper extends UiBaseLocators {
   // Numeric
   async enterNumeric(number: number) {
     await this.enterText(this.numericTxt, number.toString());
+  }
+
+  // Decimal
+  async enterDecimal(number: number) {
+    await this.enterText(this.decimalTxt, number.toString());
   }
 
   // Radiobox
