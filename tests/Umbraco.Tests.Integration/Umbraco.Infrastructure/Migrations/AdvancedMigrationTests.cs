@@ -244,27 +244,29 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
         }
     }
 
-    public class CreateTableOfTDtoMigration : MigrationBase
+    public class CreateTableOfTDtoMigration : AsyncMigrationBase
     {
         public CreateTableOfTDtoMigration(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate() =>
-
+        protected override Task MigrateAsync()
+        {
             // Create User table with keys, indexes, etc.
             Create.Table<UserDto>().Do();
+            return Task.CompletedTask;
+        }
     }
 
-    public class DeleteKeysAndIndexesMigration : MigrationBase
+    public class DeleteKeysAndIndexesMigration : AsyncMigrationBase
     {
         public DeleteKeysAndIndexesMigration(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate()
+        protected override Task MigrateAsync()
         {
             // drops User table keys and indexes
             // Execute.DropKeysAndIndexes("umbracoUser");
@@ -280,30 +282,34 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
             {
                 Delete.KeysAndIndexes(table, true, false).Do();
             }
+
+            return Task.CompletedTask;
         }
     }
 
-    public class CreateKeysAndIndexesOfTDtoMigration : MigrationBase
+    public class CreateKeysAndIndexesOfTDtoMigration : AsyncMigrationBase
     {
         public CreateKeysAndIndexesOfTDtoMigration(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate() =>
-
+        protected override Task MigrateAsync()
+        {
             // Create User table keys and indexes.
             Create.KeysAndIndexes<UserDto>().Do();
+            return Task.CompletedTask;
+        }
     }
 
-    public class CreateKeysAndIndexesMigration : MigrationBase
+    public class CreateKeysAndIndexesMigration : AsyncMigrationBase
     {
         public CreateKeysAndIndexesMigration(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate()
+        protected override Task MigrateAsync()
         {
             // Creates *all* tables keys and indexes
             foreach (var x in DatabaseSchemaCreator._orderedTables)
@@ -316,17 +322,18 @@ internal sealed class AdvancedMigrationTests : UmbracoIntegrationTest
 
                 Create.KeysAndIndexes(x).Do();
             }
+            return Task.CompletedTask;
         }
     }
 
-    public class AddColumnMigration : MigrationBase
+    public class AddColumnMigration : AsyncMigrationBase
     {
         public AddColumnMigration(IMigrationContext context)
             : base(context)
         {
         }
 
-        protected override void Migrate() =>
-            Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD Foo nvarchar(255)");
+        protected override async Task MigrateAsync() =>
+            await Database.ExecuteAsync($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD Foo nvarchar(255)");
     }
 }
