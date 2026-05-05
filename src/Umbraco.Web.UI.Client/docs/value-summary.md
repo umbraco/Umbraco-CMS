@@ -38,16 +38,8 @@ Falls back to rendering the raw value as text when no summary is registered.
 ## Base classes
 
 All implementations **must** extend these. Never implement the interfaces from scratch.
-
-**`UmbValueSummaryApiBase`** (`src/packages/core/value-summary/base/value-summary-api.base.ts`)
-- Connects to the coordinator context automatically.
-- Exposes `value` as an observable (resolved or raw).
-- Falls back gracefully when no coordinator is present (e.g., outside a collection).
-
-**`UmbValueSummaryElementBase<T>`** (`src/packages/core/value-summary/base/value-summary-element.base.ts`)
-- Generic — pass the value type as `T` so `_value` is correctly typed in `render()`.
-- Subscribes to `api.value` and stores the result in `_value` (protected Lit state).
-- Subclasses only implement `render()`.
+* **`UmbValueSummaryApiBase`**
+* **`UmbValueSummaryElementBase<T>`**
 
 ## Simple summary (no API resolution)
 
@@ -116,9 +108,7 @@ Provide `asObservable` only when the resolved data can change after initial load
 
 ## Coordinator (automatic — do not configure)
 
-`UmbValueSummaryCoordinatorContext` is instantiated on the collection default context automatically. It batches all `preRegister()` calls within the same microtask queue into a single `resolveValues()` call per value type, deduplicating values before the resolver is called.
-
-Value summary implementations do not interact with it directly — the base API class handles coordinator discovery and fallback.
+`UmbValueSummaryCoordinatorContext` is instantiated on the collection default context automatically. It batches all calls and passes the values to a resolver.
 
 ## Collection integration
 
