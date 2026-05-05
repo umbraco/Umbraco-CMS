@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -17,10 +16,8 @@ namespace Umbraco.Cms.Api.Management.Routing;
 /// </summary>
 public sealed class PreviewRoutes : SignalRRoutesBase, IAreaRoutes
 {
-    private readonly IRuntimeState _runtimeState;
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Routing.PreviewRoutes"/> class, configuring preview routing based on the application's runtime state.
+    /// Initializes a new instance of the <see cref="PreviewRoutes"/> class, configuring preview routing based on the application's runtime state.
     /// </summary>
     /// <param name="runtimeState">An instance representing the current runtime state of the Umbraco application.</param>
     [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
@@ -32,14 +29,13 @@ public sealed class PreviewRoutes : SignalRRoutesBase, IAreaRoutes
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Routing.PreviewRoutes"/> class, configuring preview routing based on the application's runtime state.
+    /// Initializes a new instance of the <see cref="PreviewRoutes"/> class, configuring preview routing based on the application's runtime state.
     /// </summary>
     /// <param name="runtimeState">An instance representing the current runtime state of the Umbraco application.</param>
     /// <param name="signalRSettings">The SignalR settings options.</param>
     public PreviewRoutes(IRuntimeState runtimeState, IOptions<SignalRSettings> signalRSettings)
-        : base(signalRSettings)
+        : base(runtimeState, signalRSettings)
     {
-        _runtimeState = runtimeState;
     }
 
     /// <summary>
@@ -48,7 +44,7 @@ public sealed class PreviewRoutes : SignalRRoutesBase, IAreaRoutes
     /// <param name="endpoints">The endpoint route builder to add routes to.</param>
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {
-        if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Upgrading or RuntimeLevel.Run)
+        if (RuntimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Upgrading or RuntimeLevel.Run)
         {
             endpoints.MapHub<PreviewHub>(GetPreviewHubRoute(), ConfigureHubEndpoint);
         }

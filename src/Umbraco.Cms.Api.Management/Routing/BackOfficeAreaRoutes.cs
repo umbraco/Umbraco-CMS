@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -19,8 +18,6 @@ namespace Umbraco.Cms.Api.Management.Routing;
 /// </summary>
 public sealed class BackOfficeAreaRoutes : SignalRRoutesBase, IAreaRoutes
 {
-    private readonly IRuntimeState _runtimeState;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
     /// </summary>
@@ -36,16 +33,14 @@ public sealed class BackOfficeAreaRoutes : SignalRRoutesBase, IAreaRoutes
     /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
     /// </summary>
     public BackOfficeAreaRoutes(IRuntimeState runtimeState, IOptions<SignalRSettings> signalRSettings)
-        : base(signalRSettings)
+        : base(runtimeState, signalRSettings)
     {
-        _runtimeState = runtimeState;
     }
-
 
     /// <inheritdoc />
     public void CreateRoutes(IEndpointRouteBuilder endpoints)
     {
-        if (_runtimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Upgrading or RuntimeLevel.Run)
+        if (RuntimeState.Level is RuntimeLevel.Install or RuntimeLevel.Upgrade or RuntimeLevel.Upgrading or RuntimeLevel.Run)
         {
             MapMinimalBackOffice(endpoints);
 
