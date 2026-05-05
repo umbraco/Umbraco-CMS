@@ -16271,7 +16271,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/install/setup": {
@@ -16334,7 +16335,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/install/validate-database": {
@@ -16397,7 +16399,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/item/language": {
@@ -17658,7 +17661,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/collection/media": {
@@ -28426,7 +28430,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/profiling/status": {
@@ -30749,7 +30754,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/segment": {
@@ -30831,7 +30837,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/server/information": {
@@ -30893,7 +30900,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/server/troubleshooting": {
@@ -36932,7 +36940,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/user/invite/resend": {
@@ -37138,7 +37147,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/user/set-user-groups": {
