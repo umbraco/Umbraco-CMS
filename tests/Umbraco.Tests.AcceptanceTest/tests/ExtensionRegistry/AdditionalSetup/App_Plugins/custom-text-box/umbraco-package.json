@@ -6,7 +6,7 @@
       "type": "propertyEditorUi",
       "alias": "Custom.TextEditor",
       "name": "Custom Text Editor",
-      "element": "/App_Plugins/custom-property-editor/dist/customtexteditor.js",
+      "element": "/App_Plugins/custom-text-box/custompropertyeditors.js",
       "meta": {
         "label": "Custom Text Editor",
         "propertyEditorSchemaAlias": "Umbraco.TextBox",
