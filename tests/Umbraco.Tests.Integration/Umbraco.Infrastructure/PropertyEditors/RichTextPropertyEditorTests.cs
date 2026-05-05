@@ -38,13 +38,16 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Use_Markup_String_As_Value()
+    public async Task Can_Use_Markup_String_As_Value()
     {
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
         ContentTypeService.Save(contentType);
 
-        var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
+        var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
+        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
         var valueEditor = editor.GetValueEditor();
 
@@ -62,13 +65,16 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Use_RichTextEditorValue_As_Value()
+    public async Task Can_Use_RichTextEditorValue_As_Value()
     {
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
         ContentTypeService.Save(contentType);
 
-        var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
+        var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
+        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
         var valueEditor = editor.GetValueEditor();
 
@@ -87,7 +93,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Track_Block_References()
+    public async Task Can_Track_Block_References()
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
@@ -100,7 +106,10 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         var pickedContent = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
         ContentService.Save(pickedContent);
 
-        var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
+        var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
+        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
         var valueEditor = (BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>)editor.GetValueEditor();
 
@@ -143,7 +152,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Track_Block_Tags()
+    public async Task Can_Track_Block_Tags()
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
@@ -153,7 +162,10 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
         ContentTypeService.Save(contentType);
 
-        var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
+        var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
+        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
+        var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
         var valueEditor = (BlockValuePropertyValueEditorBase<RichTextBlockValue, RichTextBlockLayoutItem>)editor.GetValueEditor();
 
