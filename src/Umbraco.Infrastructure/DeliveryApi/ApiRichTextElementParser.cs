@@ -156,6 +156,10 @@ internal sealed class ApiRichTextElementParser : ApiRichTextParserBase, IApiRich
             type = "unknown";
         }
 
+        // Normalize the type to lower case to tolerate historic mis-cased values written by the (now fixed)
+        // ConvertLocalLinks migration for Umbraco 15 (see #22597). Constants.UdiEntityType.* values are lower case.
+        type = type.ToLowerInvariant();
+
         // Extract culture from attributes if present
         var culture = attributes.TryGetValue("data-culture", out object? cultureAttribute)
             ? cultureAttribute?.ToString()
