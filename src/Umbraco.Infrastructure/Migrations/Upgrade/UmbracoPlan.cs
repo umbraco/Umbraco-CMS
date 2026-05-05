@@ -185,6 +185,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_17_4_0.AddDimensionsToSvg>("{72970B86-59D8-403C-B322-FFF43F9DB199}");
         To<V_17_4_0.AddExternalMemberTables>("{D7E8F9A0-B1C2-4D3E-A5F6-7890ABCDEF12}");
         To<V_17_4_0.FixLabelDataTypeDbTypeFromConfiguration>("{3F9B6A1C-7D84-4E2B-9C15-6A2E8F3D5B47}");
+        To<V_17_4_0.AddAuditLogTriggerAndTypeAlias>("{A3B7C1D9-E4F5-4A6B-8C2D-9E0F1A2B3C4D}");
 
         // To 18.0.0
         // TODO (V18): Enable on 18 branch

@@ -39,6 +39,9 @@ export type AuditLogResponseModel = {
     logType: AuditTypeModel;
     comment?: string | null;
     parameters?: string | null;
+    triggerSource?: string | null;
+    triggerOperation?: string | null;
+    typeAlias?: string | null;
 };
 
 export enum AuditTypeModel {
