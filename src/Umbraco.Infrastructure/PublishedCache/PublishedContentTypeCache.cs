@@ -63,6 +63,7 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
 
             _typesByAlias.Clear();
             _typesById.Clear();
+            _keyToIdMap.Clear();
         }
         finally
         {
