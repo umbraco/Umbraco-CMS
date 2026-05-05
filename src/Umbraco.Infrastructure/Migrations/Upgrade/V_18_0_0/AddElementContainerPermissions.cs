@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
 /// <summary>
 /// Migration that adds dedicated element container permissions to the admin user group.
 /// </summary>
-public class AddElementContainerPermissions : MigrationBase
+public class AddElementContainerPermissions : AsyncMigrationBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="AddElementContainerPermissions"/> class.
@@ -22,7 +22,7 @@ public class AddElementContainerPermissions : MigrationBase
     }
 
     /// <inheritdoc />
-    protected override void Migrate()
+    protected override Task MigrateAsync()
     {
         // Check if admin group already has any element container permissions
         Sql<ISqlContext> existingPermissionsSql = Database.SqlContext.Sql()
@@ -34,7 +34,7 @@ public class AddElementContainerPermissions : MigrationBase
 
         if (Database.Fetch<UserGroup2PermissionDto>(existingPermissionsSql).Count != 0)
         {
-            return;
+            return Task.CompletedTask;
         }
 
         // Add all element container permissions for admin group
@@ -56,5 +56,6 @@ public class AddElementContainerPermissions : MigrationBase
             .ToArray();
 
         Database.InsertBulk(permissionDtos);
+        return Task.CompletedTask;
     }
 }
