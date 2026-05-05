@@ -3314,7 +3314,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         { Variations = ContentVariation.Culture });
         ContentTypeService.Save(contentType);
 
-        var content = new Content(null, Constants.System.Root, contentType);
+        var content = new Content(string.Empty, Constants.System.Root, contentType);
 
         content.SetCultureName("name-us", langUk.IsoCode);
         content.SetCultureName("name-fr", langFr.IsoCode);
@@ -3352,13 +3352,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         contentType.Variations = ContentVariation.Culture;
         ContentTypeService.Save(contentType);
 
-        var content = new Content(null, Constants.System.Root, contentType);
+        var content = new Content(string.Empty, Constants.System.Root, contentType);
         content.SetCultureName("root", langUk.IsoCode);
         ContentService.Save(content);
 
         for (var i = 0; i < 5; i++)
         {
-            var child = new Content(null, content, contentType);
+            var child = new Content(string.Empty, content, contentType);
             child.SetCultureName("child", langUk.IsoCode);
             ContentService.Save(child);
 
@@ -3415,16 +3415,16 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         contentType.Variations = ContentVariation.Culture;
         await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
-        var parent = new Content(null, Constants.System.Root, contentType);
+        var parent = new Content(string.Empty, Constants.System.Root, contentType);
         parent.SetCultureName("root", langUk.IsoCode);
         ContentService.Save(parent);
 
-        var child1 = new Content(null, parent, contentType);
+        var child1 = new Content(string.Empty, parent, contentType);
         child1.SetCultureName("Title", langUk.IsoCode);
         ContentService.Save(child1);
         Assert.AreEqual("Title", child1.GetCultureName(langUk.IsoCode));
 
-        var child2 = new Content(null, parent, contentType);
+        var child2 = new Content(string.Empty, parent, contentType);
         child2.SetCultureName("Title.", langUk.IsoCode);
         ContentService.Save(child2);
         Assert.AreEqual("Title. (1)", child2.GetCultureName(langUk.IsoCode));
@@ -3465,13 +3465,13 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         int[] o = { 2, 1, 3, 0, 4 }; // randomly different
         for (var i = 0; i < 5; i++)
         {
-            var contentA = new Content(null, Constants.System.Root, contentType);
+            var contentA = new Content(string.Empty, Constants.System.Root, contentType);
             contentA.SetCultureName("contentA" + i + "uk", langUk.IsoCode);
             contentA.SetCultureName("contentA" + o[i] + "fr", langFr.IsoCode);
             contentA.SetCultureName("contentX" + i + "da", langDa.IsoCode);
             ContentService.Save(contentA);
 
-            var contentB = new Content(null, Constants.System.Root, contentType);
+            var contentB = new Content(string.Empty, Constants.System.Root, contentType);
             contentB.SetCultureName("contentB" + i + "uk", langUk.IsoCode);
             contentB.SetCultureName("contentB" + o[i] + "fr", langFr.IsoCode);
             contentB.SetCultureName("contentX" + i + "da", langDa.IsoCode);
