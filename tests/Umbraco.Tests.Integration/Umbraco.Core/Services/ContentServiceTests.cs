@@ -2423,6 +2423,7 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         content.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             propAlias,
             new[] { "hello", "world" });

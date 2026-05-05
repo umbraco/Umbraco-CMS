@@ -317,11 +317,11 @@ public class FileService : RepositoryService, IFileService
     /// <summary>
     ///     Gets the template descendants
     /// </summary>
-    /// <param name="masterTemplateId"></param>
+    /// <param name="layoutTemplateId"></param>
     /// <returns></returns>
     [Obsolete("Please use ITemplateService for template operations. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId)
-        => _templateService.GetDescendantsAsync(masterTemplateId).GetAwaiter().GetResult();
+    public IEnumerable<ITemplate> GetTemplateDescendants(int layoutTemplateId)
+        => _templateService.GetDescendantsAsync(layoutTemplateId).GetAwaiter().GetResult();
     #endregion
 
     #region Partial Views

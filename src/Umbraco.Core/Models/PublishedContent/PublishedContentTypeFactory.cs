@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 
@@ -9,6 +11,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 public class PublishedContentTypeFactory : IPublishedContentTypeFactory
 {
     private readonly IDataTypeService _dataTypeService;
+    private readonly IIdKeyMap _idKeyMap;
     private readonly PropertyValueConverterCollection _propertyValueConverters;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private object _publishedDataTypesLocker = new();
@@ -20,14 +23,33 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
     /// <param name="publishedModelFactory">The published model factory.</param>
     /// <param name="propertyValueConverters">The property value converters.</param>
     /// <param name="dataTypeService">The data type service.</param>
+    /// <param name="idKeyMap">The cached id-to-key map used to resolve int data type IDs to GUID keys.</param>
     public PublishedContentTypeFactory(
         IPublishedModelFactory publishedModelFactory,
         PropertyValueConverterCollection propertyValueConverters,
-        IDataTypeService dataTypeService)
+        IDataTypeService dataTypeService,
+        IIdKeyMap idKeyMap)
     {
         _publishedModelFactory = publishedModelFactory;
         _propertyValueConverters = propertyValueConverters;
         _dataTypeService = dataTypeService;
+        _idKeyMap = idKeyMap;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublishedContentTypeFactory"/> class.
+    /// </summary>
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public PublishedContentTypeFactory(
+        IPublishedModelFactory publishedModelFactory,
+        PropertyValueConverterCollection propertyValueConverters,
+        IDataTypeService dataTypeService)
+        : this(
+            publishedModelFactory,
+            propertyValueConverters,
+            dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+    {
     }
 
     /// <inheritdoc />
@@ -61,7 +83,7 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
         Dictionary<int, PublishedDataType> publishedDataTypes = LazyInitializer.EnsureInitialized(
             ref _publishedDataTypes,
             ref _publishedDataTypesLocker,
-            () => _dataTypeService.GetAll().ToDictionary(x => x.Id, CreatePublishedDataType));
+            () => _dataTypeService.GetAllAsync().GetAwaiter().GetResult().ToDictionary(x => x.Id, CreatePublishedDataType));
 
         if (!publishedDataTypes.TryGetValue(id, out PublishedDataType? dataType))
         {
@@ -111,8 +133,15 @@ public class PublishedContentTypeFactory : IPublishedContentTypeFactory
                     _publishedDataTypes.Remove(id);
                 }
 
+                // Convert int IDs to Guid keys via IIdKeyMap (filter out failed lookups), then load by keys.
+                Guid[] keys = ids
+                    .Select(id => _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.DataType))
+                    .Where(attempt => attempt.Success)
+                    .Select(attempt => attempt.Result)
+                    .ToArray();
+
                 // Update cacheB
-                foreach (IDataType dataType in _dataTypeService.GetAll(ids))
+                foreach (IDataType dataType in _dataTypeService.GetAllAsync(keys).GetAwaiter().GetResult())
                 {
                     _publishedDataTypes[dataType.Id] = CreatePublishedDataType(dataType);
                 }
