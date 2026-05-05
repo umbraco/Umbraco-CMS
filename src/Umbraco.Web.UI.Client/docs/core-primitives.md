@@ -57,9 +57,9 @@ this.observe(
 
 ### Retrieve a Context
 
-The choice between consumeContext and getContext depends on how the code uses the context.
-If you only need a context during user interactions or events, use getContext.
-Use consumeContext when the context is a primary dependency that must stay up to date.
+**Default to `consumeContext`.** Use it whenever a controller or element needs the context at setup time — both for ongoing observation of values and for one-time reads on resolve. The callback runs as soon as the context is available and re-runs if the context is replaced; cleanup is tied to the controller lifecycle.
+
+**Use `getContext` only when the context is not needed until a user action runs.** Typical cases: an event handler, a property action's `execute()`, an entity action's `execute()`, a modal-open handler. Inside these, awaiting `getContext` keeps the call site flat and avoids registering a long-lived consumer for a one-off operation.
 
 #### consumeContext(alias, callback)
 
