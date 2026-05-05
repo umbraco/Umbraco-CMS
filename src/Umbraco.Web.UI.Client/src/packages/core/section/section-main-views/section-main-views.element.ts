@@ -208,7 +208,7 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 							return html`
 								<uui-tab href="${this._routerPath}/${dashboardPath}" label=${dashboardName} ?active="${isActive}">
 									${dashboardName}
-									${hint /*&& !isActive*/
+									${hint && !isActive
 										? html`<umb-badge
 												slot="extra"
 												.color=${hint.color ?? 'default'}
