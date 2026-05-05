@@ -5,8 +5,8 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0;
 
 /// <summary>
-/// Migration that adds the Element content type infrastructure to the database,
-/// including tables, recycle bin, user group permissions, and relation types.
+/// Migration that ensures the admin user group has access to the Library section
+/// after upgrading to V18.
 /// </summary>
 public class AddElementSectionForAdmins : AsyncMigrationBase
 {
