@@ -11,6 +11,6 @@
     <PackageVersion Include="Umbraco.Cms.Api.Management" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
     <PackageVersion Include="Umbraco.Cms.Web.Common" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
     <PackageVersion Include="Umbraco.Cms.Web.Website" Version="UMBRACO_VERSION_FROM_TEMPLATE" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.6" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
   </ItemGroup>
 </Project>
