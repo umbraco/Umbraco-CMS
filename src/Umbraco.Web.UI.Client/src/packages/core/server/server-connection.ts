@@ -23,7 +23,8 @@ export class UmbServerConnection extends UmbControllerBase {
 	#umbracoCssPath = new UmbStringState(undefined);
 	umbracoCssPath = this.#umbracoCssPath.asObservable();
 
-	#signalRSkipNegotiation = false;
+	#signalRSkipNegotiation = new UmbBooleanState(false);
+	signalRSkipNegotiation = this.#signalRSkipNegotiation.asObservable();
 
 	constructor(host: UmbControllerHost, serverUrl: string) {
 		super(host);

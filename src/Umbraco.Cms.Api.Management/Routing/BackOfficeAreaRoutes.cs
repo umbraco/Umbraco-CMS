@@ -25,8 +25,13 @@ public sealed class BackOfficeAreaRoutes : IAreaRoutes
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.
     /// </summary>
-    [Obsolete("Use the non obsoleted constructor instead. Scheduled for removal in v19")]
-    public BackOfficeAreaRoutes(IRuntimeState runtimeState): this(runtimeState, StaticServiceProvider.Instance.GetRequiredService<IOptions<SignalRSettings>>()){}
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public BackOfficeAreaRoutes(IRuntimeState runtimeState)
+        : this(
+            runtimeState,
+            StaticServiceProvider.Instance.GetRequiredService<IOptions<SignalRSettings>>())
+    {
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BackOfficeAreaRoutes" /> class.

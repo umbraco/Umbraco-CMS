@@ -24,7 +24,7 @@ public sealed class PreviewRoutes : IAreaRoutes
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Routing.PreviewRoutes"/> class, configuring preview routing based on the application's runtime state.
     /// </summary>
     /// <param name="runtimeState">An instance representing the current runtime state of the Umbraco application.</param>
-    [Obsolete("Use the non obsoleted constructor instead. Scheduled for removal in v19")]
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public PreviewRoutes(IRuntimeState runtimeState)
         : this(
             runtimeState,
