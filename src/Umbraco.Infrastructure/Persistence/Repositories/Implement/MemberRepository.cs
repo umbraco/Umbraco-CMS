@@ -77,6 +77,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeService dataTypeService,
+        IIdKeyMap idKeyMap,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -92,6 +93,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             propertyEditors,
             dataValueReferenceFactories,
             dataTypeService,
+            idKeyMap,
             eventAggregator,
             repositoryCacheVersionService,
             cacheSyncService)
@@ -162,6 +164,7 @@ public class MemberRepository : ContentRepositoryBase<int, IMember, MemberReposi
             propertyEditors,
             dataValueReferenceFactories,
             dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
             serializer,
             eventAggregator,
             repositoryCacheVersionService,
