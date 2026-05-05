@@ -15,7 +15,8 @@ public class ServiceContext
     private readonly Lazy<IEntityService>? _entityService;
     private readonly Lazy<IExternalLoginWithKeyService>? _externalLoginService;
     private readonly Lazy<IKeyValueService>? _keyValueService;
-    private readonly Lazy<ILocalizationService>? _localizationService;
+    private readonly Lazy<ILanguageService>? _languageService;
+    private readonly Lazy<IDictionaryItemService>? _dictionaryItemService;
     private readonly Lazy<ILocalizedTextService>? _localizedTextService;
     private readonly Lazy<IMediaService>? _mediaService;
     private readonly Lazy<IMediaTypeService>? _mediaTypeService;
@@ -51,7 +52,8 @@ public class ServiceContext
     /// <param name="contentTypeService">The content type service.</param>
     /// <param name="mediaTypeService">The media type service.</param>
     /// <param name="dataTypeService">The data type service.</param>
-    /// <param name="localizationService">The localization service.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="dictionaryItemService">The dictionary item service.</param>
     /// <param name="packagingService">The packaging service.</param>
     /// <param name="serverRegistrationService">The server registration service.</param>
     /// <param name="entityService">The entity service.</param>
@@ -82,7 +84,8 @@ public class ServiceContext
         Lazy<IContentTypeService>? contentTypeService,
         Lazy<IMediaTypeService>? mediaTypeService,
         Lazy<IDataTypeService>? dataTypeService,
-        Lazy<ILocalizationService>? localizationService,
+        Lazy<ILanguageService>? languageService,
+        Lazy<IDictionaryItemService>? dictionaryItemService,
         Lazy<IPackagingService>? packagingService,
         Lazy<IServerRegistrationService>? serverRegistrationService,
         Lazy<IEntityService>? entityService,
@@ -113,7 +116,8 @@ public class ServiceContext
         _contentTypeService = contentTypeService;
         _mediaTypeService = mediaTypeService;
         _dataTypeService = dataTypeService;
-        _localizationService = localizationService;
+        _languageService = languageService;
+        _dictionaryItemService = dictionaryItemService;
         _packagingService = packagingService;
         _serverRegistrationService = serverRegistrationService;
         _entityService = entityService;
@@ -199,9 +203,14 @@ public class ServiceContext
     public IDataTypeService? DataTypeService => _dataTypeService?.Value;
 
     /// <summary>
-    ///     Gets the <see cref="ILocalizationService" />
+    ///     Gets the <see cref="ILanguageService" />.
     /// </summary>
-    public ILocalizationService? LocalizationService => _localizationService?.Value;
+    public ILanguageService? LanguageService => _languageService?.Value;
+
+    /// <summary>
+    ///     Gets the <see cref="IDictionaryItemService" />.
+    /// </summary>
+    public IDictionaryItemService? DictionaryItemService => _dictionaryItemService?.Value;
 
     /// <summary>
     ///     Gets the <see cref="IMediaService" />
@@ -291,7 +300,8 @@ public class ServiceContext
     /// <param name="contentTypeService">The content type service.</param>
     /// <param name="mediaTypeService">The media type service.</param>
     /// <param name="dataTypeService">The data type service.</param>
-    /// <param name="localizationService">The localization service.</param>
+    /// <param name="languageService">The language service.</param>
+    /// <param name="dictionaryItemService">The dictionary item service.</param>
     /// <param name="packagingService">The packaging service.</param>
     /// <param name="entityService">The entity service.</param>
     /// <param name="relationService">The relation service.</param>
@@ -326,7 +336,8 @@ public class ServiceContext
         IContentTypeService? contentTypeService = null,
         IMediaTypeService? mediaTypeService = null,
         IDataTypeService? dataTypeService = null,
-        ILocalizationService? localizationService = null,
+        ILanguageService? languageService = null,
+        IDictionaryItemService? dictionaryItemService = null,
         IPackagingService? packagingService = null,
         IEntityService? entityService = null,
         IRelationService? relationService = null,
@@ -370,7 +381,8 @@ public class ServiceContext
             Lazy(contentTypeService),
             Lazy(mediaTypeService),
             Lazy(dataTypeService),
-            Lazy(localizationService),
+            Lazy(languageService),
+            Lazy(dictionaryItemService),
             Lazy(packagingService),
             Lazy(serverRegistrationService),
             Lazy(entityService),

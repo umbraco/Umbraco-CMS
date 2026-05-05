@@ -54,9 +54,8 @@ internal sealed class MemberContentEditingService
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
         ContentTypeFilterCollection contentTypeFilters,
-        ILanguageService languageService,
-        ILocalizationService localizationService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService, optionsMonitor, relationService, contentTypeFilters, languageService, userService, localizationService)
+        ILanguageService languageService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService, optionsMonitor, relationService, contentTypeFilters, languageService, userService)
     {
         _logger = logger;
         _userService = userService;

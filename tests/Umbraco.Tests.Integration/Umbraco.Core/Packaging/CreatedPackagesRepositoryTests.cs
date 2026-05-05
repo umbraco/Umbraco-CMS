@@ -14,6 +14,8 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -47,8 +49,6 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
-
     private IEntityXmlSerializer EntityXmlSerializer => GetRequiredService<IEntityXmlSerializer>();
 
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
@@ -69,7 +69,9 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         DataTypeService,
         TemplateService,
         StylesheetService,
-        LocalizationService,
+        GetRequiredService<ILanguageRepository>(),
+        GetRequiredService<IDictionaryRepository>(),
+        GetRequiredService<IScopeProvider>(),
         HostingEnvironment,
         EntityXmlSerializer,
         MediaService,

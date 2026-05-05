@@ -28,10 +28,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly ILogger<PackageDataInstallation> _logger;
         private readonly IPartialViewService _partialViewService;
+        private readonly ILanguageService _languageService;
+        private readonly IDictionaryItemService _dictionaryItemService;
         private readonly IStylesheetService _stylesheetService;
         private readonly IScriptService _scriptService;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
-        private readonly ILocalizationService _localizationService;
         private readonly IDataTypeService _dataTypeService;
         private readonly IDataTypeContainerService _dataTypeContainerService;
         private readonly PropertyEditorCollection _propertyEditors;
@@ -54,10 +55,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
             IPartialViewService partialViewService,
-            IStylesheetService stylesheetService,
-            IScriptService scriptService,
+            ILanguageService languageService,
+            IDictionaryItemService dictionaryItemService,
             IUserIdKeyResolver userIdKeyResolver,
-            ILocalizationService localizationService,
             IDataTypeService dataTypeService,
             IEntityService entityService,
             IContentTypeService contentTypeService,
@@ -70,15 +70,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IMediaTypeService mediaTypeService,
             ITemplateContentParserService templateContentParserService,
             ITemplateService templateService,
+            IStylesheetService stylesheetService,
+            IScriptService scriptService,
             IMemberTypeService memberTypeService,
             IDataTypeContainerService dataTypeContainerService)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
             _partialViewService = partialViewService;
-            _stylesheetService = stylesheetService;
-            _scriptService = scriptService;
-            _localizationService = localizationService;
+            _languageService = languageService;
+            _dictionaryItemService = dictionaryItemService;
             _dataTypeService = dataTypeService;
             _entityService = entityService;
             _contentTypeService = contentTypeService;
@@ -91,6 +92,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _mediaTypeService = mediaTypeService;
             _templateContentParserService = templateContentParserService;
             _templateService = templateService;
+            _stylesheetService = stylesheetService;
+            _scriptService = scriptService;
             _memberTypeService = memberTypeService;
             _dataTypeContainerService = dataTypeContainerService;
             _userIdKeyResolver = userIdKeyResolver;
@@ -430,7 +433,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             const string nodeNamePrefix = "nodeName-";
             // Get the installed culture iso names, we create a localized content node with a culture that does not exist in the project
             // We have to use Invariant comparisons, because when we get them from ContentBase in EntityXmlSerializer they're all lowercase.
-            var installedLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode).ToArray();
+            var installedLanguages = _languageService.GetAllAsync().GetAwaiter().GetResult().Select(l => l.IsoCode).ToArray();
             foreach (XAttribute localizedNodeName in element.Attributes()
                          .Where(a => a.Name.LocalName.InvariantStartsWith(nodeNamePrefix)))
             {
@@ -1548,7 +1551,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IEnumerable<XElement> dictionaryItemElementList,
             int userId)
         {
-            var languages = _localizationService.GetAllLanguages().ToList();
+            var languages = _languageService.GetAllAsync().GetAwaiter().GetResult().ToList();
             return ImportDictionaryItems(dictionaryItemElementList, languages, null, userId);
         }
 
@@ -1561,7 +1564,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <returns>An <see cref="IEnumerable{IDictionaryItem}"/> containing the imported dictionary item(s), including any nested child items.</returns>
         public IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, int userId, Guid? parentId)
         {
-            var languages = _localizationService.GetAllLanguages().ToList();
+            var languages = _languageService.GetAllAsync().GetAwaiter().GetResult().ToList();
             return ImportDictionaryItem(dictionaryItemElement, languages, parentId, userId);
         }
 
@@ -1592,23 +1595,39 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var itemName = dictionaryItemElement.Attribute("Name")?.Value;
             Guid key = dictionaryItemElement.RequiredAttributeValue<Guid>("Key");
 
-            dictionaryItem = _localizationService.GetDictionaryItemById(key);
-            if (dictionaryItem != null)
+            dictionaryItem = _dictionaryItemService.GetAsync(key).GetAwaiter().GetResult();
+            var isUpdate = dictionaryItem != null;
+            if (isUpdate)
             {
-                dictionaryItem = UpdateDictionaryItem(dictionaryItem, dictionaryItemElement, languages);
+                dictionaryItem = UpdateDictionaryItem(dictionaryItem!, dictionaryItemElement, languages);
             }
             else
             {
                 dictionaryItem = CreateNewDictionaryItem(key, itemName!, dictionaryItemElement, languages, parentId);
             }
 
-            _localizationService.Save(dictionaryItem, userId);
-            items.Add(dictionaryItem);
+            Guid currentUserKey = ResolveUserKey(userId);
+            Attempt<IDictionaryItem, DictionaryItemOperationStatus> saveResult = isUpdate
+                ? _dictionaryItemService.UpdateAsync(dictionaryItem!, currentUserKey).GetAwaiter().GetResult()
+                : _dictionaryItemService.CreateAsync(dictionaryItem!, currentUserKey).GetAwaiter().GetResult();
+
+            if (saveResult.Success is false)
+            {
+                _logger.LogWarning(
+                    "Failed to {Operation} dictionary item {Key} during package import: {Status}",
+                    isUpdate ? "update" : "create",
+                    key,
+                    saveResult.Status);
+                return items;
+            }
+
+            IDictionaryItem savedItem = saveResult.Result;
+            items.Add(savedItem);
 
             items.AddRange(ImportDictionaryItems(
                 dictionaryItemElement.Elements("DictionaryItem"),
                 languages,
-                dictionaryItem.Key,
+                savedItem.Key,
                 userId));
             return items;
         }
@@ -1697,7 +1716,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     continue;
                 }
 
-                ILanguage? existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
+                ILanguage? existingLanguage = _languageService.GetAsync(isoCode).GetAwaiter().GetResult();
                 if (existingLanguage != null)
                 {
                     continue;
@@ -1705,10 +1724,18 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                 var cultureName = languageElement.AttributeValue<string>("FriendlyName") ?? isoCode;
 
-                var langauge = new Language(isoCode, cultureName);
-                _localizationService.Save(langauge, userId);
+                var language = new Language(isoCode, cultureName);
+                Attempt<ILanguage, LanguageOperationStatus> saveResult = _languageService.CreateAsync(language, ResolveUserKey(userId)).GetAwaiter().GetResult();
+                if (saveResult.Success is false)
+                {
+                    _logger.LogWarning(
+                        "Failed to create language {IsoCode} during package import: {Status}",
+                        isoCode,
+                        saveResult.Status);
+                    continue;
+                }
 
-                list.Add(langauge);
+                list.Add(saveResult.Result);
             }
 
             return list;

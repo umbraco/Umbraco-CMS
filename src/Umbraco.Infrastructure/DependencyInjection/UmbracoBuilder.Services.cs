@@ -9,7 +9,9 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
@@ -100,7 +102,9 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IDataTypeService>(),
             factory.GetRequiredService<ITemplateService>(),
             factory.GetRequiredService<IStylesheetService>(),
-            factory.GetRequiredService<ILocalizationService>(),
+            factory.GetRequiredService<ILanguageRepository>(),
+            factory.GetRequiredService<IDictionaryRepository>(),
+            factory.GetRequiredService<ICoreScopeProvider>(),
             factory.GetRequiredService<IHostingEnvironment>(),
             factory.GetRequiredService<IEntityXmlSerializer>(),
             factory.GetRequiredService<IMediaService>(),

@@ -2,13 +2,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO.Compression;
 using System.Xml.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using File = System.IO.File;
@@ -24,33 +22,39 @@ public class PackagesRepository : ICreatedPackagesRepository
 {
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
-    private readonly string _createdPackagesFolderPath;
     private readonly IDataTypeService _dataTypeService;
     private readonly ITemplateService _templateService;
     private readonly IIdKeyMap _idKeyMap;
     private readonly IStylesheetService _stylesheetService;
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly ILocalizationService _languageService;
+    private readonly ILanguageRepository _languageRepository;
+    private readonly IDictionaryRepository _dictionaryRepository;
+    private readonly ICoreScopeProvider _scopeProvider;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IMediaService _mediaService;
     private readonly IMediaTypeService _mediaTypeService;
-    private readonly string _packageRepositoryFileName;
-    private readonly string _packagesFolderPath;
     private readonly PackageDefinitionXmlParser _parser;
     private readonly IEntityXmlSerializer _serializer;
+
+    private readonly string _createdPackagesFolderPath;
+    private readonly string _packageRepositoryFileName;
+    private readonly string _packagesFolderPath;
     private readonly string _tempFolderPath;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PackagesRepository"/> class.
     /// </summary>
+
     public PackagesRepository(
         IContentService contentService,
         IContentTypeService contentTypeService,
         IDataTypeService dataTypeService,
         ITemplateService templateService,
         IStylesheetService stylesheetService,
-        ILocalizationService languageService,
+        ILanguageRepository languageRepository,
+        IDictionaryRepository dictionaryRepository,
+        ICoreScopeProvider scopeProvider,
         IHostingEnvironment hostingEnvironment,
         IEntityXmlSerializer serializer,
         IMediaService mediaService,
@@ -74,7 +78,9 @@ public class PackagesRepository : ICreatedPackagesRepository
         _templateService = templateService;
         _idKeyMap = idKeyMap;
         _stylesheetService = stylesheetService;
-        _languageService = languageService;
+        _languageRepository = languageRepository;
+        _dictionaryRepository = dictionaryRepository;
+        _scopeProvider = scopeProvider;
         _serializer = serializer;
         _hostingEnvironment = hostingEnvironment;
         _packageRepositoryFileName = packageRepositoryFileName;
@@ -387,20 +393,23 @@ public class PackagesRepository : ICreatedPackagesRepository
     private void PackageLanguages(PackageDefinition definition, XContainer root)
     {
         var languages = new XElement("Languages");
-        foreach (var langId in definition.Languages)
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
         {
-            if (!int.TryParse(langId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+            foreach (var langId in definition.Languages)
             {
-                continue;
-            }
+                if (!int.TryParse(langId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+                {
+                    continue;
+                }
 
-            ILanguage? lang = _languageService.GetLanguageById(outInt);
-            if (lang == null)
-            {
-                continue;
-            }
+                ILanguage? lang = _languageRepository.Get(outInt);
+                if (lang == null)
+                {
+                    continue;
+                }
 
-            languages.Add(_serializer.Serialize(lang));
+                languages.Add(_serializer.Serialize(lang));
+            }
         }
 
         root.Add(languages);
@@ -416,21 +425,23 @@ public class PackagesRepository : ICreatedPackagesRepository
         var rootDictionaryItems = new XElement("DictionaryItems");
         var items = new Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)>();
 
-        foreach (var dictionaryId in definition.DictionaryItems)
+        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
         {
-            if (!int.TryParse(dictionaryId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+            foreach (var dictionaryId in definition.DictionaryItems)
             {
-                continue;
+                if (!int.TryParse(dictionaryId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
+                {
+                    continue;
+                }
+
+                IDictionaryItem? di = _dictionaryRepository.Get(outInt);
+                if (di == null)
+                {
+                    continue;
+                }
+
+                items[di.Key] = (di, _serializer.Serialize(di, false));
             }
-
-            IDictionaryItem? di = _languageService.GetDictionaryItemById(outInt);
-
-            if (di == null)
-            {
-                continue;
-            }
-
-            items[di.Key] = (di, _serializer.Serialize(di, false));
         }
 
         // organize them in hierarchy ...

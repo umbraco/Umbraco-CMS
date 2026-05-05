@@ -2528,7 +2528,7 @@ internal partial class BlockListElementLevelVariationTests
     [Test]
     public async Task Can_Perform_Language_Fallback_At_Block_Property_Level()
     {
-        var defaultCulture = GetRequiredService<ILocalizationService>().GetDefaultLanguageIsoCode();
+        var defaultCulture = await GetRequiredService<ILanguageService>().GetDefaultIsoCodeAsync();
         Assert.AreEqual("en-US", defaultCulture);
 
         var elementType = await CreateElementType(ContentVariation.Culture);
