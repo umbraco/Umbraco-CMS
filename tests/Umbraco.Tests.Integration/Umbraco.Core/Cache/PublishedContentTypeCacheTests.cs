@@ -39,6 +39,7 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         var contentType = PublishedContentTypeCache.Get(PublishedItemType.Content, Textpage.ContentTypeKey);
         Assert.IsNotNull(contentType);
         Assert.AreEqual(1, ContentType.PropertyTypes.Count());
+
         // Update the content type
         var updateModel = ContentTypeUpdateHelper.CreateContentTypeUpdateModel(ContentType);
         updateModel.Properties = new List<ContentTypePropertyTypeModel>();
@@ -63,39 +64,76 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
     }
 
     [Test]
-    public async Task Can_Get_Updated_Published_ElementType_By_Alias_Via_Content()
+    public async Task Can_Get_Updated_Published_ElementType_By_Alias_When_Looked_Up_As_Content()
     {
-        // Arrange — create an element type, prime the cache via Get(Content, alias).
+        // Arrange — create an element type and prime the cache via Get(Content, alias),
+        // exercising the case where the requested itemType differs from the type's actual ItemType.
         IContentType element = await CreateElementTypeAsync("myElementContent");
 
         IPublishedContentType initial = PublishedContentTypeCache.Get(PublishedItemType.Content, element.Alias);
         Assert.AreEqual(1, initial.PropertyTypes.Count());
 
-        // Act — add another property and save.
+        // Act — add a property and save; the save should invalidate the primed cache entry.
         await AddPropertyAndSaveAsync(element, "extra");
-
         IPublishedContentType updated = PublishedContentTypeCache.Get(PublishedItemType.Content, element.Alias);
 
-        // Assert — element types looked up via Content must invalidate on save.
+        // Assert
         Assert.AreEqual(2, updated.PropertyTypes.Count());
     }
 
     [Test]
-    public async Task Can_Get_Updated_Published_ElementType_By_Alias_Via_Element()
+    public async Task Can_Get_Updated_Published_ElementType_By_Alias_When_Looked_Up_As_Element()
     {
-        // Arrange — create an element type, prime the cache via Get(Element, alias).
+        // Arrange — create an element type and prime the cache via Get(Element, alias),
+        // the natural lookup shape for an element type.
         IContentType element = await CreateElementTypeAsync("myElementElement");
 
         IPublishedContentType initial = PublishedContentTypeCache.Get(PublishedItemType.Element, element.Alias);
         Assert.AreEqual(1, initial.PropertyTypes.Count());
 
-        // Act — add another property and save (also exercises CreatePublishedContentType(string)
-        // for PublishedItemType.Element on the post-clear cache miss).
+        // Act — add a property and save; the save should invalidate the primed cache entry, and
+        // the next Get must successfully resolve an element type via the alias overload.
         await AddPropertyAndSaveAsync(element, "extra");
-
         IPublishedContentType updated = PublishedContentTypeCache.Get(PublishedItemType.Element, element.Alias);
 
+        // Assert
         Assert.AreEqual(2, updated.PropertyTypes.Count());
+    }
+
+    [Test]
+    public async Task Can_Get_Published_ElementType_By_Id_When_Looked_Up_As_Element()
+    {
+        // Arrange — element type fetched on a cold cache via the int overload, exercising
+        // Element handling in Get(PublishedItemType, int).
+        IContentType element = await CreateElementTypeAsync("myElementById");
+
+        // Act
+        IPublishedContentType byId = PublishedContentTypeCache.Get(PublishedItemType.Element, element.Id);
+
+        // Assert
+        Assert.IsNotNull(byId);
+        Assert.AreEqual(PublishedItemType.Element, byId.ItemType);
+        Assert.AreEqual(element.Alias, byId.Alias);
+    }
+
+    [Test]
+    public async Task ClearByDataTypeId_Removes_Element_Type_Looked_Up_As_Content()
+    {
+        // Arrange — element type whose property uses a data type, primed via Get(Content, alias)
+        // so the alias-keyed entry uses the requested itemType prefix rather than the type's own.
+        IContentType element = await CreateElementTypeAsync("myDataTypeElement");
+        int dataTypeId = element.PropertyTypes.First().DataTypeId;
+
+        IPublishedContentType primed = PublishedContentTypeCache.Get(PublishedItemType.Content, element.Alias);
+        Assert.IsNotNull(primed);
+
+        // Act — clearing by data-type id must remove every alias-keyed entry pointing at the
+        // affected content type, regardless of which itemType prefix was used to insert it.
+        PublishedContentTypeCache.ClearByDataTypeId(dataTypeId);
+        IPublishedContentType after = PublishedContentTypeCache.Get(PublishedItemType.Content, element.Alias);
+
+        // Assert — a fresh instance signals the cache was invalidated rather than re-served.
+        Assert.IsFalse(ReferenceEquals(primed, after));
     }
 
     private async Task<IContentType> CreateElementTypeAsync(string alias)
