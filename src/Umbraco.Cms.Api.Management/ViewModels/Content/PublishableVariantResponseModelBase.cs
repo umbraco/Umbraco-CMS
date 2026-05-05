@@ -32,7 +32,7 @@ public abstract class PublishableVariantResponseModelBase : VariantResponseModel
     /// <summary>
     /// Gets or sets the publish state of the variant.
     /// </summary>
-    public DocumentVariantState State { get; set; }
+    public PublishableVariantState State { get; set; }
 
     /// <summary>
     /// Gets or sets the date the variant was published.

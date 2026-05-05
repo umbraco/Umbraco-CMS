@@ -32,5 +32,5 @@ public abstract class PublishableVariantItemResponseModelBase : VariantItemRespo
     /// <summary>
     /// Gets or sets the publish state of the variant.
     /// </summary>
-    public required DocumentVariantState State { get; set; }
+    public required PublishableVariantState State { get; set; }
 }

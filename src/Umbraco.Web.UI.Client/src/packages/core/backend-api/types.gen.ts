@@ -923,7 +923,7 @@ export type DocumentValueResponseModel = {
 export type DocumentVariantItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     name: string;
     culture?: null | string;
 };
@@ -937,7 +937,7 @@ export type DocumentVariantRequestModel = {
 export type DocumentVariantResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     publishDate?: null | string;
     scheduledPublishDate?: null | string;
     scheduledUnpublishDate?: null | string;
@@ -947,14 +947,6 @@ export type DocumentVariantResponseModel = {
     segment?: null | string;
     name: string;
 };
-
-export enum DocumentVariantStateModel {
-    NOT_CREATED = 'NotCreated',
-    DRAFT = 'Draft',
-    PUBLISHED = 'Published',
-    PUBLISHED_PENDING_CHANGES = 'PublishedPendingChanges',
-    TRASHED = 'Trashed'
-}
 
 export type DocumentVersionItemResponseModel = {
     id: string;
@@ -1085,7 +1077,7 @@ export type ElementValueResponseModel = {
 export type ElementVariantItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     name: string;
     culture?: null | string;
 };
@@ -1099,7 +1091,7 @@ export type ElementVariantRequestModel = {
 export type ElementVariantResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     publishDate?: null | string;
     scheduledPublishDate?: null | string;
     scheduledUnpublishDate?: null | string;
@@ -2475,6 +2467,14 @@ export type PublicAccessResponseModel = {
     loginDocument: ReferenceByIdModel;
     errorDocument: ReferenceByIdModel;
 };
+
+export enum PublishableVariantStateModel {
+    NOT_CREATED = 'NotCreated',
+    DRAFT = 'Draft',
+    PUBLISHED = 'Published',
+    PUBLISHED_PENDING_CHANGES = 'PublishedPendingChanges',
+    TRASHED = 'Trashed'
+}
 
 export type PublishDocumentRequestModel = {
     publishSchedules: Array<CultureAndScheduleRequestModel>;

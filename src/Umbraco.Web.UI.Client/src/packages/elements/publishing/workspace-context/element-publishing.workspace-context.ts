@@ -1,6 +1,6 @@
 import { UMB_ELEMENT_WORKSPACE_CONTEXT } from '../../workspace/element-workspace.context-token.js';
 import type { UmbElementDetailModel, UmbElementVariantOptionModel } from '../../types.js';
-import { UmbElementVariantState } from '../../types.js';
+import { UmbElementVariantState } from '../../variant-state.js';
 import { UmbElementPublishingRepository } from '../repository/index.js';
 import { UmbElementPublishedPendingChangesManager } from '../pending-changes/index.js';
 import type { UmbElementVariantPublishModel } from '../types.js';
@@ -14,7 +14,6 @@ import { UMB_ELEMENT_PUBLISHING_SHORTCUT_UNIQUE } from './constants.js';
 import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -458,8 +457,8 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		return (
 			variants?.some(
 				(variant) =>
-					variant.state === DocumentVariantStateModel.PUBLISHED ||
-					variant.state === DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
+					variant.state === UmbElementVariantState.PUBLISHED ||
+					variant.state === UmbElementVariantState.PUBLISHED_PENDING_CHANGES,
 			) ?? false
 		);
 	}

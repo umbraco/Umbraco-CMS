@@ -4,7 +4,7 @@ import { umbElementMockDb } from '../../db/element.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateElementRequestModel,
-	DefaultReferenceResponseModel,
+	IReferenceResponseModel,
 	PagedIReferenceResponseModel,
 	PagedReferenceByIdModel,
 	UpdateElementRequestModel,
@@ -57,7 +57,7 @@ export const detailHandlers = [
 		const skip = query.get('skip') ? parseInt(query.get('skip') as string, 10) : 0;
 		const take = query.get('take') ? parseInt(query.get('take') as string, 10) : 100;
 
-		let data: Array<DefaultReferenceResponseModel> = [];
+		let data: Array<IReferenceResponseModel> = [];
 
 		if (id === 'simple-element-id') {
 			data = getReferenceData();

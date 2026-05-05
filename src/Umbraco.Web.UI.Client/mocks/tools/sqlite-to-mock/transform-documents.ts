@@ -313,16 +313,16 @@ export function transformDocuments(): void {
 	// Generate TypeScript content
 	// Note: variants.state needs to be converted to enum values
 	const content = `import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDocumentVariantState } from '@umbraco-cms/backoffice/document';
 
 // Map string state to enum
-function mapState(state: string): DocumentVariantStateModel {
+function mapState(state: string): UmbDocumentVariantState {
 	switch (state) {
-		case 'Published': return DocumentVariantStateModel.PUBLISHED;
-		case 'Draft': return DocumentVariantStateModel.DRAFT;
-		case 'NotCreated': return DocumentVariantStateModel.NOT_CREATED;
-		case 'PublishedPendingChanges': return DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES;
-		default: return DocumentVariantStateModel.DRAFT;
+		case 'Published': return UmbDocumentVariantState.PUBLISHED;
+		case 'Draft': return UmbDocumentVariantState.DRAFT;
+		case 'NotCreated': return UmbDocumentVariantState.NOT_CREATED;
+		case 'PublishedPendingChanges': return UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES;
+		default: return UmbDocumentVariantState.DRAFT;
 	}
 }
 
