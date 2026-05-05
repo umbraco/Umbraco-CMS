@@ -1,11 +1,19 @@
 import type { UmbElementFolderUserPermissionConditionConfig } from './types.js';
-import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
-import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_ENTITY_CONTEXT, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_ANCESTORS_ENTITY_CONTEXT, UMB_ENTITY_CONTEXT, type UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+import type { ReferenceByIdModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { ElementContainerPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
+
+// TODO: Once `IPermissionPresentationModelElementContainerPermissionPresentationModel` is available from the backend API,
+// we should import it from there instead of defining it here. [LK]
+type IPermissionPresentationModelElementContainerPermissionPresentationModel = {
+	$type: string;
+	elementContainer: ReferenceByIdModel;
+	verbs: Array<string>;
+};
 
 export class UmbElementFolderUserPermissionCondition
 	extends UmbConditionBase<UmbElementFolderUserPermissionConditionConfig>
@@ -13,7 +21,7 @@ export class UmbElementFolderUserPermissionCondition
 {
 	#entityType: string | undefined;
 	#unique: string | null | undefined;
-	#elementFolderPermissions?: Array<ElementContainerPermissionPresentationModel>;
+	#elementFolderPermissions?: Array<IPermissionPresentationModelElementContainerPermissionPresentationModel>;
 	#fallbackPermissions?: Array<string>;
 	#ancestors: Array<UmbEntityUnique> = [];
 
@@ -136,9 +144,11 @@ export class UmbElementFolderUserPermissionCondition
 		this.permitted = allOfPermitted && oneOfPermitted;
 	}
 
-	#isElementFolderUserPermission(permission: unknown): permission is ElementContainerPermissionPresentationModel {
+	#isElementFolderUserPermission(
+		permission: unknown,
+	): permission is IPermissionPresentationModelElementContainerPermissionPresentationModel {
 		return (
-			(permission as ElementContainerPermissionPresentationModel).$type ===
+			(permission as IPermissionPresentationModelElementContainerPermissionPresentationModel).$type ===
 			'ElementContainerPermissionPresentationModel'
 		);
 	}
