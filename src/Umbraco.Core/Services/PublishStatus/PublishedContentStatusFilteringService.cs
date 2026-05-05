@@ -54,9 +54,16 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
             ? candidateKeysAsArray
             : candidateKeysAsArray.Where(key =>
                 _publishStatusQueryService.IsDocumentPublished(key, culture)
-                && _publishStatusQueryService.HasPublishedAncestorPath(key));
+                && _publishStatusQueryService.HasPublishedAncestorPath(key, culture));
 
         return WhereIsInvariantOrHasCultureOrRequestedAllCultures(candidateKeys, culture, preview).ToArray();
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
+    {
+        var preview = _previewService.IsInPreview();
+        return candidateKeys.Select(key => _publishedContentCache.GetById(preview, key)).WhereNotNull().ToArray();
     }
 
     /// <summary>
