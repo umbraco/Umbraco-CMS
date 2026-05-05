@@ -72,7 +72,7 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 		if (!this.#mute) return;
 		this.#mute = false;
 		// Only update data if it is different than current data. [NL]
-		if (!jsonStringComparison(this.#value, this._subject.getValue())) {
+		if (!jsonStringComparison(this.#value, this._subject?.getValue())) {
 			this._subject?.next(this.#value);
 		}
 		// Resolve any pending mute promises — independent of whether an emission occurred. [NL]

@@ -9,6 +9,7 @@ import { strictEqualityMemoization } from '../utils/strict-equality-memoization.
  * @description - State ensures the data is unique, not updating any Observes unless there is an actual change of the value using `===`.
  */
 export class UmbBasicState<T> {
+	// TODO (V19): Change type to BehaviorSubject<T> | undefined — destroy() sets this to undefined via `as unknown` cast, but the type does not reflect it. Fixing the type will make all existing guards (?.  and if checks) correct and remove the need for the cast.
 	protected _subject: BehaviorSubject<T>;
 
 	constructor(initialData: T) {
