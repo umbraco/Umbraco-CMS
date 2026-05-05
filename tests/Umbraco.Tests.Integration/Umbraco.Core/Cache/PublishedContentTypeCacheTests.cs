@@ -132,8 +132,10 @@ internal sealed class PublishedContentTypeCacheTests : UmbracoIntegrationTestWit
         PublishedContentTypeCache.ClearByDataTypeId(dataTypeId);
         IPublishedContentType after = PublishedContentTypeCache.Get(PublishedItemType.Content, element.Alias);
 
-        // Assert — a fresh instance signals the cache was invalidated rather than re-served.
+        // Assert — a fresh instance signals the cache was invalidated rather than re-served,
+        // and the freshly loaded type should be structurally equivalent to the one that was cached.
         Assert.IsFalse(ReferenceEquals(primed, after));
+        Assert.AreEqual(primed.PropertyTypes.Count(), after.PropertyTypes.Count());
     }
 
     private async Task<IContentType> CreateElementTypeAsync(string alias)

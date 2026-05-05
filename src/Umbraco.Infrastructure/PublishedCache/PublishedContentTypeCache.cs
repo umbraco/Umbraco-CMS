@@ -268,8 +268,22 @@ public class PublishedContentTypeCache : IPublishedContentTypeCache
             try
             {
                 _lock.EnterWriteLock();
+
+                // If a previous lookup under a different itemType prefix already cached this
+                // content type by id, reuse that instance so _typesById and every alias entry
+                // point at the same object.
+                if (_typesById.TryGetValue(type.Id, out IPublishedContentType? existing))
+                {
+                    type = existing;
+                }
+                else
+                {
+                    _typesById[type.Id] = type;
+                }
+
                 _keyToIdMap[type.Key] = type.Id;
-                return _typesByAlias[aliasKey] = _typesById[type.Id] = type;
+                _typesByAlias[aliasKey] = type;
+                return type;
             }
             finally
             {
