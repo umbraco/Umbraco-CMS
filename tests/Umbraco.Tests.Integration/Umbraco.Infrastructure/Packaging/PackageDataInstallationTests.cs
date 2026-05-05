@@ -22,10 +22,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]
 internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithContent
 {
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
+
+    private IPackageDataInstallation PackageDataInstallation => GetRequiredService<IPackageDataInstallation>();
+
+    private IMediaService MediaService => GetRequiredService<IMediaService>();
+
+    private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
     [HideFromTypeFinder]
     [DataEditor("7e062c13-7c41-4ad9-b389-41d88aeef87c")]
@@ -46,36 +51,6 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         {
         }
     }
-
-    //// protected override void Compose()
-    //// {
-    ////     base.Compose();
-    ////
-    ////     // the packages that are used by these tests reference totally bogus property
-    ////     // editors that must exist - so they are defined here - and in order not to
-    ////     // pollute everything, they are ignored by the type finder and explicitely
-    ////     // added to the editors collection
-    ////
-    ////     Builder.WithCollectionBuilder<DataEditorCollectionBuilder>()
-    ////         .Add<Editor1>()
-    ////         .Add<Editor2>();
-    //// }
-    ////
-    //// protected override void ComposeApplication(bool withApplication)
-    //// {
-    ////     base.ComposeApplication(withApplication);
-    ////
-    ////     if (!withApplication) return;
-    ////
-    ////     // re-register with actual media fs
-    ////     Builder.ComposeFileSystems();
-    //// }
-
-    private IPackageDataInstallation PackageDataInstallation => GetRequiredService<IPackageDataInstallation>();
-
-    private IMediaService MediaService => GetRequiredService<IMediaService>();
-
-    private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
     public override async Task CreateTestDataAsync()
     {
@@ -810,6 +785,76 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
             Assert.AreEqual(1, contentTypes.Single().HistoryCleanup.KeepAllVersionsNewerThanDays);
             Assert.AreEqual(2, contentTypes.Single().HistoryCleanup.KeepLatestVersionPerDayForDays);
         });
+    }
+
+    [Test]
+    public async Task Can_Import_Stylesheet_With_Nested_Folder_Path_From_Backslash_Source()
+    {
+        // Regression test for three issues that arose when migrating package install off IFileService:
+        //  1) FileSystemPath.Split must accept '\'-separated paths, since the backoffice serialises
+        //     stylesheet paths into <FileName> using the host platform's separator.
+        //  2) PackageDataInstallation.EnsureFolderHierarchy must materialise missing parent folders
+        //     up-front; the per-domain services no longer auto-create directories the way the legacy
+        //     file system did, so a nested-path create otherwise fails with ParentNotFound.
+        //  3) The folder/file service base classes must complete their child scopes on every path
+        //     (read-misses, validation failures, cancellations). An uncompleted child scope
+        //     propagates Completed=false up to its parent and silently rolls the parent back, which
+        //     would lose the migration's keyvalue write even though the file itself ends up on disk.
+        var packageXml = XDocument.Parse(
+            """
+            <?xml version="1.0" encoding="utf-8"?>
+            <umbPackage>
+              <info><package><name>NestedStylesheetTestPackage</name></package></info>
+              <DocumentTypes />
+              <MediaTypes />
+              <Templates />
+              <Stylesheets>
+                <Stylesheet>
+                  <Name>nested</Name>
+                  <FileName>folder1\folder2\nested.css</FileName>
+                  <Content><![CDATA[body { color: red; }]]></Content>
+                  <Properties />
+                </Stylesheet>
+              </Stylesheets>
+              <Scripts />
+              <PartialViews />
+              <DictionaryItems />
+              <Languages />
+              <DataTypes />
+              <MediaItems />
+            </umbPackage>
+            """);
+
+        var packagingService = GetRequiredService<IPackagingService>();
+        var stylesheetService = GetRequiredService<IStylesheetService>();
+        var keyValueService = GetRequiredService<IKeyValueService>();
+
+        // Run the install inside an outer scope (mirroring the migration scope) and write a
+        // key-value canary alongside it. If any child scope inside the install pipeline disposes
+        // without Complete(), the outer scope rolls back and the canary disappears.
+        const string canaryKey = "Tests.NestedStylesheet.Canary";
+        using (var scope = ScopeProvider.CreateCoreScope())
+        {
+            packagingService.InstallCompiledPackageData(packageXml);
+            keyValueService.SetValue(canaryKey, "ok");
+            scope.Complete();
+        }
+
+        // Stylesheet must be reachable at the '/'-normalised path - covers (1) and (2).
+        var stylesheet = await stylesheetService.GetAsync("folder1/folder2/nested.css");
+
+        // Canary must have survived the outer scope - covers (3).
+        var canary = keyValueService.GetValue(canaryKey);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(stylesheet, Is.Not.Null);
+            Assert.That(stylesheet?.Content, Is.EqualTo("body { color: red; }"));
+            Assert.That(canary, Is.EqualTo("ok"));
+        });
+
+        // Cleanup so adjacent tests don't see the file/folder hierarchy.
+        await stylesheetService.DeleteAsync("folder1/folder2/nested.css", Constants.Security.SuperUserKey);
     }
 
     private async Task AddLanguages()
