@@ -18,7 +18,7 @@ export class UmbClassState<T extends UmbClassStateData | undefined> extends UmbB
 	/**
 	 * @function createObservablePart
 	 * @param {(mappable: UmbClassStateData | undefined) => unknown} mappingFunction - Method to return the part for this Observable to return.
-	 * @param {(previousResult: unknown, currentResult: unknown) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
+	 * @param {(previousResult: unknown, currentResult: unknown) => boolean} [memoizationFunction] - Method to compare two results. Should return true when data is the same (unchanged), preventing unnecessary emissions.
 	 * @returns {Observable<unknown>} - an observable.
 	 * @description - Creates an Observable from this State.
 	 */
