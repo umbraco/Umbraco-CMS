@@ -69,6 +69,22 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 		return Array.from(new Set(sections));
 	}
 
+	getHasAccessToAllLanguages(userGroupIds: Array<{ id: string }>): boolean {
+		return this.data
+			.filter((userGroup) => userGroupIds.map((reference) => reference.id).includes(userGroup.id))
+			.some((userGroup) => userGroup.hasAccessToAllLanguages);
+	}
+
+	getAllowedLanguages(userGroupIds: Array<{ id: string }>): string[] {
+		const languages = this.data
+			.filter((userGroup) => userGroupIds.map((reference) => reference.id).includes(userGroup.id))
+			.map((userGroup) => (userGroup.languages?.length ? userGroup.languages : []))
+			.flat();
+
+		// Remove duplicates
+		return Array.from(new Set(languages));
+	}
+
 	filter(options: UserGroupFilterOptions): PagedUserGroupResponseModel {
 		const allItems = this.getAll();
 
