@@ -2,7 +2,9 @@ using System.Reflection;
 using System.Text;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.FileSystem;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Infrastructure.IO;
 
 namespace Umbraco.Cms.Infrastructure.Templates.PartialViews;
@@ -11,14 +13,19 @@ namespace Umbraco.Cms.Infrastructure.Templates.PartialViews;
 internal sealed class PartialViewPopulator : IPartialViewPopulator
 {
     private readonly IPartialViewService _partialViewService;
+    private readonly IPartialViewFolderService _partialViewFolderService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PartialViewPopulator"/> class with the specified partial view service.
     /// </summary>
     /// <param name="partialViewService">The <see cref="IPartialViewService"/> used to perform file operations for partial views.</param>
-    public PartialViewPopulator(IPartialViewService partialViewService)
+    /// <param name="partialViewFolderService">The <see cref="IPartialViewFolderService"/> used to ensure parent folders exist before creating partial views.</param>
+    public PartialViewPopulator(
+        IPartialViewService partialViewService,
+        IPartialViewFolderService partialViewFolderService)
     {
         _partialViewService = partialViewService;
+        _partialViewFolderService = partialViewFolderService;
     }
 
     /// <summary>
@@ -53,7 +60,8 @@ internal sealed class PartialViewPopulator : IPartialViewPopulator
         using var reader = new StreamReader(resourceStream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: -1, leaveOpen: true);
         var content = reader.ReadToEnd();
 
-        (var name, var parentPath) = ForwardSlashPath.Split(fileSystemPath);
+        (var name, var parentPath) = FileSystemPath.Split(fileSystemPath);
+        EnsureParentFolderHierarchy(parentPath);
 
         var createModel = new PartialViewCreateModel
         {
@@ -63,5 +71,30 @@ internal sealed class PartialViewPopulator : IPartialViewPopulator
         };
 
         _partialViewService.CreateAsync(createModel, Constants.Security.SuperUserKey).GetAwaiter().GetResult();
+    }
+
+    private void EnsureParentFolderHierarchy(string? parentPath)
+    {
+        if (string.IsNullOrEmpty(parentPath))
+        {
+            return;
+        }
+
+        var segments = parentPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        string? accumulated = null;
+        foreach (var segment in segments)
+        {
+            var fullPath = accumulated is null ? segment : $"{accumulated}/{segment}";
+            if (_partialViewFolderService.GetAsync(fullPath).GetAwaiter().GetResult() is null)
+            {
+                _partialViewFolderService.CreateAsync(new PartialViewFolderCreateModel
+                {
+                    Name = segment,
+                    ParentPath = accumulated,
+                }).GetAwaiter().GetResult();
+            }
+
+            accumulated = fullPath;
+        }
     }
 }

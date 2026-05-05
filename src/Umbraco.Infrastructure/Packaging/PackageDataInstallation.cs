@@ -7,11 +7,13 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.FileSystem;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.IO;
@@ -28,10 +30,13 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly ILogger<PackageDataInstallation> _logger;
         private readonly IPartialViewService _partialViewService;
+        private readonly IPartialViewFolderService _partialViewFolderService;
         private readonly ILanguageService _languageService;
         private readonly IDictionaryItemService _dictionaryItemService;
         private readonly IStylesheetService _stylesheetService;
+        private readonly IStylesheetFolderService _stylesheetFolderService;
         private readonly IScriptService _scriptService;
+        private readonly IScriptFolderService _scriptFolderService;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly IDataTypeService _dataTypeService;
         private readonly IDataTypeContainerService _dataTypeContainerService;
@@ -55,6 +60,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
             IPartialViewService partialViewService,
+            IPartialViewFolderService partialViewFolderService,
             ILanguageService languageService,
             IDictionaryItemService dictionaryItemService,
             IUserIdKeyResolver userIdKeyResolver,
@@ -71,13 +77,16 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             ITemplateContentParserService templateContentParserService,
             ITemplateService templateService,
             IStylesheetService stylesheetService,
+            IStylesheetFolderService stylesheetFolderService,
             IScriptService scriptService,
+            IScriptFolderService scriptFolderService,
             IMemberTypeService memberTypeService,
             IDataTypeContainerService dataTypeContainerService)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
             _partialViewService = partialViewService;
+            _partialViewFolderService = partialViewFolderService;
             _languageService = languageService;
             _dictionaryItemService = dictionaryItemService;
             _dataTypeService = dataTypeService;
@@ -93,7 +102,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _templateContentParserService = templateContentParserService;
             _templateService = templateService;
             _stylesheetService = stylesheetService;
+            _stylesheetFolderService = stylesheetFolderService;
             _scriptService = scriptService;
+            _scriptFolderService = scriptFolderService;
             _memberTypeService = memberTypeService;
             _dataTypeContainerService = dataTypeContainerService;
             _userIdKeyResolver = userIdKeyResolver;
@@ -1774,7 +1785,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    (var name, var parentPath) = ForwardSlashPath.Split(path!);
+                    (var name, var parentPath) = FileSystemPath.Split(path!);
+                    EnsureFolderHierarchy(
+                        parentPath,
+                        path!,
+                        p => _scriptFolderService.GetAsync(p).GetAwaiter().GetResult() is not null,
+                        (folderName, folderParent) => _scriptFolderService
+                            .CreateAsync(new ScriptFolderCreateModel { Name = folderName, ParentPath = folderParent })
+                            .GetAwaiter().GetResult().Success);
+
                     var createModel = new ScriptCreateModel
                     {
                         Name = name,
@@ -1820,7 +1839,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     var content = partialViewXml.Value ?? string.Empty;
 
-                    (var name, var parentPath) = ForwardSlashPath.Split(path);
+                    (var name, var parentPath) = FileSystemPath.Split(path);
+                    EnsureFolderHierarchy(
+                        parentPath,
+                        path,
+                        p => _partialViewFolderService.GetAsync(p).GetAwaiter().GetResult() is not null,
+                        (folderName, folderParent) => _partialViewFolderService
+                            .CreateAsync(new PartialViewFolderCreateModel { Name = folderName, ParentPath = folderParent })
+                            .GetAwaiter().GetResult().Success);
+
                     var createModel = new PartialViewCreateModel
                     {
                         Name = name,
@@ -1876,7 +1903,15 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    (var name, var parentPath) = ForwardSlashPath.Split(stylesheetPath!);
+                    (var name, var parentPath) = FileSystemPath.Split(stylesheetPath!);
+                    EnsureFolderHierarchy(
+                        parentPath,
+                        stylesheetPath!,
+                        p => _stylesheetFolderService.GetAsync(p).GetAwaiter().GetResult() is not null,
+                        (folderName, folderParent) => _stylesheetFolderService
+                            .CreateAsync(new StylesheetFolderCreateModel { Name = folderName, ParentPath = folderParent })
+                            .GetAwaiter().GetResult().Success);
+
                     var createModel = new StylesheetCreateModel
                     {
                         Name = name,
@@ -2028,6 +2063,39 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         {
             Attempt<Guid> attempt = _userIdKeyResolver.TryGetAsync(userId).GetAwaiter().GetResult();
             return attempt.Success ? attempt.Result : Constants.Security.SuperUserKey;
+        }
+
+        // Walks a '/'-separated parent path and creates each missing folder via the supplied folder service callbacks.
+        // The legacy IFileService.Save* methods relied on the underlying file system to auto-create directories;
+        // the per-domain services validate that the parent already exists, so packages with nested files need the
+        // hierarchy materialised up-front.
+        private void EnsureFolderHierarchy(
+            string? parentPath,
+            string filePath,
+            Func<string, bool> folderExists,
+            Func<string, string?, bool> tryCreateFolder)
+        {
+            if (string.IsNullOrEmpty(parentPath))
+            {
+                return;
+            }
+
+            var segments = parentPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            string? accumulated = null;
+            foreach (var segment in segments)
+            {
+                var fullPath = accumulated is null ? segment : $"{accumulated}/{segment}";
+                if (folderExists(fullPath) is false && tryCreateFolder(segment, accumulated) is false)
+                {
+                    _logger.LogWarning(
+                        "Could not create parent folder '{FolderPath}' for package file '{FilePath}'.",
+                        fullPath,
+                        filePath);
+                    return;
+                }
+
+                accumulated = fullPath;
+            }
         }
     }
 }

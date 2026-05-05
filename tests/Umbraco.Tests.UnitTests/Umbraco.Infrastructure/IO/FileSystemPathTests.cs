@@ -7,12 +7,12 @@ using Umbraco.Cms.Infrastructure.IO;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.IO;
 
 [TestFixture]
-public class ForwardSlashPathTests
+public class FileSystemPathTests
 {
     [Test]
     public void Split_File_At_Root_Returns_Name_And_Null_Parent()
     {
-        (var name, var parentPath) = ForwardSlashPath.Split("Bar.css");
+        (var name, var parentPath) = FileSystemPath.Split("Bar.css");
 
         Assert.Multiple(() =>
         {
@@ -24,7 +24,7 @@ public class ForwardSlashPathTests
     [Test]
     public void Split_File_With_Single_Parent_Returns_Name_And_Parent()
     {
-        (var name, var parentPath) = ForwardSlashPath.Split("Foo/Bar.css");
+        (var name, var parentPath) = FileSystemPath.Split("Foo/Bar.css");
 
         Assert.Multiple(() =>
         {
@@ -36,7 +36,7 @@ public class ForwardSlashPathTests
     [Test]
     public void Split_File_With_Nested_Parent_Returns_Name_And_Full_Parent_Path()
     {
-        (var name, var parentPath) = ForwardSlashPath.Split("Foo/Bar/Baz.css");
+        (var name, var parentPath) = FileSystemPath.Split("Foo/Bar/Baz.css");
 
         Assert.Multiple(() =>
         {
@@ -48,7 +48,7 @@ public class ForwardSlashPathTests
     [Test]
     public void Split_File_With_Leading_Slash_Returns_Name_And_Null_Parent()
     {
-        (var name, var parentPath) = ForwardSlashPath.Split("/Bar.css");
+        (var name, var parentPath) = FileSystemPath.Split("/Bar.css");
 
         Assert.Multiple(() =>
         {
@@ -63,7 +63,7 @@ public class ForwardSlashPathTests
         // Verifies the implementation does not rely on Path.GetDirectoryName / Path.GetFileName,
         // which on Windows normalise '/' to '\' and would break round-tripping through the
         // file-system services that store and look up files using the '/'-convention.
-        (var name, var parentPath) = ForwardSlashPath.Split("Foo/Bar/Baz.css");
+        (var name, var parentPath) = FileSystemPath.Split("Foo/Bar/Baz.css");
 
         Assert.Multiple(() =>
         {
@@ -73,15 +73,35 @@ public class ForwardSlashPathTests
         });
     }
 
+    [Test]
+    public void Split_Normalises_Backslash_Input_To_Forward_Slash_Parent()
+    {
+        // The Umbraco backoffice serialises file paths into package.xml using the host-platform
+        // separator, so packages built on Windows contain '\' in <FileName>/<path> values.
+        (var name, var parentPath) = FileSystemPath.Split(@"Foo\Bar\Baz.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(name, Is.EqualTo("Baz.css"));
+            Assert.That(parentPath, Is.EqualTo("Foo/Bar"));
+        });
+    }
+
     [TestCase("Foo/Bar.css", "Bar.css", "Foo")]
     [TestCase("Foo/Bar/Baz.css", "Baz.css", "Foo/Bar")]
     [TestCase("Foo/Bar/Baz/Qux.css", "Qux.css", "Foo/Bar/Baz")]
     [TestCase("Bar.css", "Bar.css", null)]
     [TestCase("/Bar.css", "Bar.css", null)]
     [TestCase("/Foo/Bar.css", "Bar.css", "/Foo")]
+    [TestCase(@"Foo\Bar.css", "Bar.css", "Foo")]
+    [TestCase(@"Foo\Bar\Baz.css", "Baz.css", "Foo/Bar")]
+    [TestCase(@"\Bar.css", "Bar.css", null)]
+    [TestCase(@"\Foo\Bar.css", "Bar.css", "/Foo")]
+    [TestCase(@"Foo/Bar\Baz.css", "Baz.css", "Foo/Bar")]
+    [TestCase(@"Foo\Bar/Baz.css", "Baz.css", "Foo/Bar")]
     public void Split_TestCases(string input, string expectedName, string? expectedParentPath)
     {
-        (var name, var parentPath) = ForwardSlashPath.Split(input);
+        (var name, var parentPath) = FileSystemPath.Split(input);
 
         Assert.Multiple(() =>
         {
