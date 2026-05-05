@@ -220,6 +220,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		this.items = [...this.items, newTag];
 		this._tagInput.value = '';
 		this._currentInput = '';
+		this._matches = [];
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -260,6 +261,10 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 			ArrowDown: () => this.#handleOptionArrowDown(e, option),
 			ArrowUp: () => this.#handleOptionArrowUp(e, option),
 			Backspace: () => this.focus(),
+			Escape: () => {
+				this._matches = [];
+				this.focus();
+			},
 		};
 
 		keyHandlers[e.key]?.();
@@ -526,10 +531,6 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				background-color: transparent;
 				/* Not removed via appearance */
 				margin: 0;
-			}
-
-			uui-tag:focus-within #matchlist {
-				display: flex;
 			}
 
 			#matchlist {
