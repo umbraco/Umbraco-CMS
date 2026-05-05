@@ -2,14 +2,9 @@ using System.Globalization;
 using System.Net;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Packaging;
@@ -51,8 +46,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private readonly IMemberTypeService _memberTypeService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Packaging.PackageDataInstallation"/> class,
-        /// providing all required services and helpers for package data installation operations.
+        /// Initializes a new instance of the <see cref="PackageDataInstallation"/> class.
         /// </summary>
         /// <param name="dataValueEditorFactory">Factory for creating data value editors used in property editing.</param>
         /// <param name="logger">The logger used for logging installation events and errors.</param>
@@ -718,9 +712,22 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
             }
 
-            //Save the newly created/updated IContentType objects
+            //Save the newly created/updated IContentType objects.
+            //Note: this fires one save notification per item, where the legacy bulk Save fired one for the whole batch.
+            //That's acceptable here as package import is an infrequent install-time operation running inside an outer scope.
             var list = importedContentTypes.Select(x => x.Value).ToList();
-            service.Save(list, userId);
+            Guid performingUserKey = _userIdKeyResolver.GetAsync(userId).GetAwaiter().GetResult();
+            foreach (T item in list)
+            {
+                if (item.HasIdentity)
+                {
+                    service.UpdateAsync(item, performingUserKey).GetAwaiter().GetResult();
+                }
+                else
+                {
+                    service.CreateAsync(item, performingUserKey).GetAwaiter().GetResult();
+                }
+            }
 
             //Now we can finish the import by updating the 'structure',
             //which requires the doc types to be saved/available in the db
@@ -749,7 +756,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 //Update ContentTypes with a newly added structure/list of allowed children
                 if (updatedContentTypes.Any())
                 {
-                    service.Save(updatedContentTypes, userId);
+                    foreach (T item in updatedContentTypes)
+                    {
+                        service.UpdateAsync(item, performingUserKey).GetAwaiter().GetResult();
+                    }
                 }
             }
 

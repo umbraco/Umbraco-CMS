@@ -169,7 +169,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
     [TestCase(false)]
     public async Task Can_Validate_RegEx_For_Simple_Property_On_Document(bool valid)
     {
-        var contentType = SetupSimpleTest();
+        var contentType = await SetupSimpleTest();
 
         var validationResult = await ContentValidationService.ValidatePropertiesAsync(
             new ContentCreateModel
@@ -207,7 +207,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
     [TestCase(false)]
     public async Task Can_Validate_Mandatory_For_Simple_Property_On_Document(bool valid)
     {
-        var contentType = SetupSimpleTest();
+        var contentType = await SetupSimpleTest();
 
         var validationResult = await ContentValidationService.ValidatePropertiesAsync(
             new ContentCreateModel
@@ -244,7 +244,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
     [Test]
     public async Task Can_Validate_Mandatory_For_Property_Not_Present_In_Document()
     {
-        var contentType = SetupSimpleTest();
+        var contentType = await SetupSimpleTest();
 
         var validationResult = await ContentValidationService.ValidatePropertiesAsync(
             new ContentCreateModel
@@ -269,7 +269,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
     [Test]
     public async Task Uses_Localizaton_Keys_For_Validation_Error_Messages()
     {
-        var contentType = SetupSimpleTest();
+        var contentType = await SetupSimpleTest();
 
         var validationResult = await ContentValidationService.ValidatePropertiesAsync(
             new ContentCreateModel
@@ -301,10 +301,10 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
     [Test]
     public async Task Custom_Validation_Error_Messages_Replaces_Localizaton_Keys()
     {
-        var contentType = SetupSimpleTest();
+        var contentType = await SetupSimpleTest();
         contentType.PropertyTypes.First(pt => pt.Alias == "title").MandatoryMessage = "Custom mandatory message";
         contentType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExpMessage = "Custom regex message";
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var validationResult = await ContentValidationService.ValidatePropertiesAsync(
             new ContentCreateModel
@@ -539,7 +539,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
         {
             Name = "Test Element Type", Alias = "testElementType", IsElement = true
         };
-        await ContentTypeService.SaveAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
         Assert.IsTrue(elementType.HasIdentity, "Could not create the element type");
 
         var configurationEditorJsonSerializer = GetRequiredService<IConfigurationEditorJsonSerializer>();
@@ -588,7 +588,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
         {
             ValidationRegExp = "^Valid.*$"
         });
-        await ContentTypeService.SaveAsync(elementType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         // create a document type with the block list and a regex validated text box
         var documentType = new ContentType(ShortStringHelper, Constants.System.Root)
@@ -596,19 +596,19 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
             Name = "Test Document Type", Alias = "testDocumentType", IsElement = false, AllowedAsRoot = true
         };
         documentType.AddPropertyType(new PropertyType(ShortStringHelper, blockListDataType, "blocks"));
-        await ContentTypeService.SaveAsync(documentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.CreateAsync(documentType, Constants.Security.SuperUserKey);
         Assert.IsTrue(documentType.HasIdentity, "Could not create the document type");
 
         return (documentType, elementType);
     }
 
-    private IContentType SetupSimpleTest()
+    private async Task<IContentType> SetupSimpleTest()
     {
         var contentType = ContentTypeBuilder.CreateSimpleContentType("umbMandatory", "Mandatory Doc Type");
         contentType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
         contentType.PropertyTypes.First(pt => pt.Alias == "author").ValidationRegExp = "^Valid.*$";
         contentType.AllowedAsRoot = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         return contentType;
     }

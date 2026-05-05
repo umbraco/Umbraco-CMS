@@ -352,7 +352,7 @@ public partial class ContentEditingServiceTests
         var contentType = await ContentTypeService.GetAsync(content.ContentType.Key)!;
         contentType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
         contentType.PropertyTypes.First(pt => pt.Alias == "text").ValidationRegExp = "^\\d*$";
-        await ContentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var titleValue = addValidProperties ? "The title value" : null;
         var textValue = addValidProperties ? "12345" : "This is not a number";

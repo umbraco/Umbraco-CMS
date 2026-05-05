@@ -88,7 +88,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
         var contentType = ContentTypeBuilder.CreateTextPageContentType(
             defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Root Home", -1);
         ContentService.Save(content, Constants.Security.SuperUserId);
@@ -133,12 +133,12 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Generate_Xml_Representation_Of_Media()
+    public async Task Can_Generate_Xml_Representation_Of_Media()
     {
         // Arrange
         var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
 
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         // reference, so static ctor runs, so event handlers register
         // and then, this will reset the width, height... because the file does not exist, of course ;-(
@@ -219,7 +219,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
             KeepLatestVersionPerDayForDays = 2
         };
 
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Act
         var element = Serializer.Serialize(contentType);
@@ -247,7 +247,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
 
         contentType.HistoryCleanup = null;
 
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var element = Serializer.Serialize(contentType);
 
