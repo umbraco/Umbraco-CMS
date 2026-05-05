@@ -63,7 +63,7 @@ internal sealed class MediaEditingServiceTests : UmbracoIntegrationTest
     public async Task Can_Create_Media_With_Optional_File_Property_Without_Providing_File()
     {
         ImageMediaType.PropertyTypes.First(x => x.Alias == Constants.Conventions.Media.File).Mandatory = false;
-        MediaTypeService.Save(ImageMediaType);
+        await MediaTypeService.CreateAsync(ImageMediaType, Constants.Security.SuperUserKey);
         var imageModel = CreateMediaCreateModel("Image", Guid.NewGuid(), ImageMediaType.Key);
         var imageCreateAttempt = await MediaEditingService.CreateAsync(imageModel, Constants.Security.SuperUserKey);
 

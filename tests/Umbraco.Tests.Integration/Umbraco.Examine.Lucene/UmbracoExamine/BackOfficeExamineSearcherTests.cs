@@ -98,7 +98,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithId(0)
             .Build();
         await ExecuteAndWaitForIndexing(
-            () => ContentTypeService.Save(contentType),
+            async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey),
             Constants.UmbracoIndexes.InternalIndexName);
 
         var content = new ContentBuilder()
@@ -136,7 +136,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithContentVariation(ContentVariation.Culture)
             .Build();
         await ExecuteAndWaitForIndexing(
-            () => ContentTypeService.Save(contentType),
+            async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey),
             Constants.UmbracoIndexes.InternalIndexName);
 
         var content = new ContentBuilder()
@@ -254,7 +254,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey), Constants.UmbracoIndexes.InternalIndexName);
 
         var firstContent = new ContentBuilder()
             .WithId(0)
@@ -315,7 +315,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithName("Document")
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey), Constants.UmbracoIndexes.InternalIndexName);
 
         var content = new ContentBuilder()
             .WithName(contentName)
@@ -379,7 +379,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithName("Document")
             .Build();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = new ContentBuilder()
             .WithName(contentName)
@@ -490,7 +490,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithId(0)
             .WithContentVariation(ContentVariation.Culture)
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey), Constants.UmbracoIndexes.InternalIndexName);
 
         var content = new ContentBuilder()
             .WithId(0)
@@ -614,7 +614,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         var contentType = new ContentTypeBuilder()
             .WithId(0)
             .Build();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var contentNode = new ContentBuilder()
             .WithId(0)
@@ -687,7 +687,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithAlias("testBox")
             .Done()
             .Build();
-        await ExecuteAndWaitForIndexing(() => ContentTypeService.Save(contentType), Constants.UmbracoIndexes.InternalIndexName);
+        await ExecuteAndWaitForIndexing(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey), Constants.UmbracoIndexes.InternalIndexName);
 
         var contentNode = new ContentBuilder()
             .WithId(0)

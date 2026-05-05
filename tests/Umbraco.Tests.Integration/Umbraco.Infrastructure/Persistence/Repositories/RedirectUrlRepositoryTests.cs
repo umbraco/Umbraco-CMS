@@ -369,7 +369,7 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
         contentType.Key = Guid.NewGuid();
-        contentTypeService.Save(contentType);
+        await contentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
         _textpage = ContentBuilder.CreateSimpleContent(contentType);

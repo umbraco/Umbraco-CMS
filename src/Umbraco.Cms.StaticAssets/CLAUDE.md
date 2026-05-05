@@ -71,23 +71,25 @@ Umbraco.Cms.StaticAssets/
 
 ### Razor Views
 
-| View | Purpose | Line Count |
-|------|---------|------------|
-| `UmbracoBackOffice/Index.cshtml` | Backoffice SPA entry point with `<umb-app>` web component | 69 |
-| `UmbracoLogin/Index.cshtml` | Login page with `<umb-auth>` web component | 99 |
-| `UmbracoWebsite/NoNodes.cshtml` | Welcome page when no content published | 59 |
-| `UmbracoWebsite/NotFound.cshtml` | 404 error page (debug info in debug mode) | 79 |
-| `UmbracoWebsite/Maintenance.cshtml` | Maintenance mode during upgrades | 65 |
+| View                                | Purpose                                                   | Line Count |
+| ----------------------------------- | --------------------------------------------------------- | ---------- |
+| `UmbracoBackOffice/Index.cshtml`    | Backoffice SPA entry point with `<umb-app>` web component | 69         |
+| `UmbracoLogin/Index.cshtml`         | Login page with `<umb-auth>` web component                | 99         |
+| `UmbracoWebsite/NoNodes.cshtml`     | Welcome page when no content published                    | 59         |
+| `UmbracoWebsite/NotFound.cshtml`    | 404 error page (debug info in debug mode)                 | 79         |
+| `UmbracoWebsite/Maintenance.cshtml` | Maintenance mode during upgrades                          | 65         |
 
 ### Backoffice Index View (umbraco/UmbracoBackOffice/Index.cshtml)
 
 Key injected services:
+
 - `IBackOfficePathGenerator` - Generates backoffice URL paths
 - `IPackageManifestService` - Package manifest discovery
 - `IJsonSerializer` - JSON serialization for import maps
 - `IProfilerHtml` - MiniProfiler integration
 
 Key features:
+
 - **Import Maps** (line 35): `Html.BackOfficeImportMapScriptAsync()` generates JavaScript module import maps
 - **Debug Mode** (line 16, 63-66): `?umbDebug=true` query param enables profiler
 - **NoScript Fallback** (lines 40-60): Displays message if JavaScript disabled
@@ -95,6 +97,7 @@ Key features:
 ### Login View (umbraco/UmbracoLogin/Index.cshtml)
 
 Configures `<umb-auth>` web component with attributes:
+
 - `return-url` - Redirect after login
 - `logo-image` / `background-image` - Branding URLs from `BackOfficeGraphicsController`
 - `username-is-email` - From `SecuritySettings`
@@ -110,6 +113,7 @@ Configures `<umb-auth>` web component with attributes:
 The `.csproj` contains MSBuild targets that automatically build frontend projects when assets are missing.
 
 **Backoffice Build** (lines 36-90):
+
 ```
 BackofficeProjectDirectory = ../Umbraco.Web.UI.Client/
 BackofficeAssetsPath = wwwroot/umbraco/backoffice
@@ -148,28 +152,29 @@ LoginAssetsPath = wwwroot/umbraco/login
 
 ### Asset Categories
 
-| Directory | Contents | Served At |
-|-----------|----------|-----------|
-| `wwwroot/umbraco/assets/` | Branding logos | Via `BackOfficeGraphicsController` API |
-| `wwwroot/umbraco/backoffice/` | Built backoffice SPA | `/umbraco/backoffice/*` |
-| `wwwroot/umbraco/login/` | Built login SPA | `/umbraco/login/*` |
-| `wwwroot/umbraco/website/` | Website assets (fonts, CSS) | `/umbraco/website/*` |
-| `wwwroot/App_Plugins/` | Block editor demo views | `/App_Plugins/*` |
+| Directory                     | Contents                    | Served At                              |
+| ----------------------------- | --------------------------- | -------------------------------------- |
+| `wwwroot/umbraco/assets/`     | Branding logos              | Via `BackOfficeGraphicsController` API |
+| `wwwroot/umbraco/backoffice/` | Built backoffice SPA        | `/umbraco/backoffice/*`                |
+| `wwwroot/umbraco/login/`      | Built login SPA             | `/umbraco/login/*`                     |
+| `wwwroot/umbraco/website/`    | Website assets (fonts, CSS) | `/umbraco/website/*`                   |
+| `wwwroot/App_Plugins/`        | Block editor demo views     | `/App_Plugins/*`                       |
 
 ### Logo Assets (wwwroot/umbraco/assets/)
 
 Documented in `wwwroot/umbraco/assets/README.md` (16 lines):
 
-| File | Usage | API Endpoint |
-|------|-------|--------------|
-| `logo.svg` | Backoffice and public sites | `/umbraco/management/api/v1/security/back-office/graphics/logo` |
-| `logo_dark.svg` | Login screen (dark mode) | `.../graphics/login-logo-alternative` |
-| `logo_light.svg` | Login screen (light mode) | `.../graphics/login-logo` |
-| `logo_blue.svg` | Alternative branding | N/A |
+| File             | Usage                       | API Endpoint                                                    |
+| ---------------- | --------------------------- | --------------------------------------------------------------- |
+| `logo.svg`       | Backoffice and public sites | `/umbraco/management/api/v1/security/back-office/graphics/logo` |
+| `logo_dark.svg`  | Login screen (dark mode)    | `.../graphics/login-logo-alternative`                           |
+| `logo_light.svg` | Login screen (light mode)   | `.../graphics/login-logo`                                       |
+| `logo_blue.svg`  | Alternative branding        | N/A                                                             |
 
 ### Block Grid Demo Views (wwwroot/App_Plugins/Umbraco.BlockGridEditor.DefaultCustomViews/)
 
 Pre-built AngularJS templates for block grid editor demos:
+
 - `umbBlockGridDemoHeadlineBlock.html`
 - `umbBlockGridDemoImageBlock.html`
 - `umbBlockGridDemoRichTextBlock.html`
@@ -204,6 +209,7 @@ Comment notes `MapStaticAssets()` is not used (yet).
 ### Backoffice Localization
 
 The backoffice includes language files for 25+ languages in `wwwroot/umbraco/backoffice/assets/lang/`:
+
 - ar, bs, cs, cy, da, de, en, en-us, es, fr, he, hr, it, ja, ko, nb, nl, pl, pt, pt-br, ro, ru, sv, tr, uk, zh, zh-tw
 
 ### Monaco Editor
@@ -213,10 +219,11 @@ Full Monaco code editor included at `wwwroot/umbraco/backoffice/monaco-editor/` 
 ### Theming
 
 CSS themes in `wwwroot/umbraco/backoffice/css/`:
+
 - `umb-css.css` - Main styles
-- `uui-css.css` - UI library styles
-- `dark.theme.css` - Dark theme
-- `high-contrast.theme.css` - Accessibility theme
+- `light.css` - UI library styles default styles (Light theme)
+- `dark.css` - UUI Dark theme
+- `high-contrast.css` - UUI Accessibility theme
 - `umbraco-blockgridlayout.css` - Block grid styles
 - `rte-content.css` - Rich text editor content styles
 
@@ -226,21 +233,21 @@ CSS themes in `wwwroot/umbraco/backoffice/css/`:
 
 ### Essential Files
 
-| File | Purpose |
-|------|---------|
-| `umbraco/UmbracoBackOffice/Index.cshtml` | Backoffice entry point |
-| `umbraco/UmbracoLogin/Index.cshtml` | Login page |
-| `wwwroot/umbraco/assets/README.md` | Asset documentation |
-| `Umbraco.Cms.StaticAssets.csproj` | Build targets for frontend |
+| File                                     | Purpose                    |
+| ---------------------------------------- | -------------------------- |
+| `umbraco/UmbracoBackOffice/Index.cshtml` | Backoffice entry point     |
+| `umbraco/UmbracoLogin/Index.cshtml`      | Login page                 |
+| `wwwroot/umbraco/assets/README.md`       | Asset documentation        |
+| `Umbraco.Cms.StaticAssets.csproj`        | Build targets for frontend |
 
 ### Related Projects
 
-| Project | Relationship |
-|---------|--------------|
-| `Umbraco.Web.UI.Client` | Source for backoffice assets (npm build) |
-| `Umbraco.Web.UI.Login` | Source for login assets (npm build) |
-| `Umbraco.Cms.Api.Management` | Razor view dependencies |
-| `Umbraco.Web.Website` | Razor view dependencies |
+| Project                      | Relationship                             |
+| ---------------------------- | ---------------------------------------- |
+| `Umbraco.Web.UI.Client`      | Source for backoffice assets (npm build) |
+| `Umbraco.Web.UI.Login`       | Source for login assets (npm build)      |
+| `Umbraco.Cms.Api.Management` | Razor view dependencies                  |
+| `Umbraco.Web.Website`        | Razor view dependencies                  |
 
 ### Build Commands (Manual)
 
@@ -259,6 +266,7 @@ npm run build
 ### Preserve Assets During Clean
 
 Create marker file to prevent asset deletion:
+
 ```bash
 touch preserve.backoffice  # In solution root
 touch preserve.login       # In solution root

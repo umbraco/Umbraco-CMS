@@ -62,7 +62,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
         _contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
     }
 
     [Test]
@@ -76,7 +76,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
@@ -250,7 +250,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
@@ -403,11 +403,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Publishing_Set_Mandatory_Value()
+    public async Task Publishing_Set_Mandatory_Value()
     {
         var titleProperty = _contentType.PropertyTypes.First(x => x.Alias == "title");
         titleProperty.Mandatory = true; // make this required!
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
 
@@ -459,7 +459,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
