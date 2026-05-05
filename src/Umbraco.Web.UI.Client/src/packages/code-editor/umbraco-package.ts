@@ -1,3 +1,4 @@
+export const name = 'Umbraco.CodeEditor';
 export const extensions = [
 	{
 		name: 'Umbraco Code Editor Bundle',

@@ -127,6 +127,8 @@
 		"./user-permission": "./dist-cms/packages/user/user-permission/index.js",
 		"./user": "./dist-cms/packages/user/user/index.js",
 		"./utils": "./dist-cms/packages/core/utils/index.js",
+		"./value-summary": "./dist-cms/packages/core/value-summary/index.js",
+		"./value-type": "./dist-cms/packages/core/value-type/index.js",
 		"./validation": "./dist-cms/packages/core/validation/index.js",
 		"./variant": "./dist-cms/packages/core/variant/index.js",
 		"./view": "./dist-cms/packages/core/view/index.js",
