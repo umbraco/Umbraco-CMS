@@ -1171,6 +1171,10 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.rollbackItem.last());
   }
 
+  async waitForRollbackItems() {
+    await expect(this.rollbackItem).not.toHaveCount(0);
+  }
+
   async clickRollbackCancelButton() {
     await this.click(this.rollbackCancelBtn);
   }
