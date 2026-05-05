@@ -2456,6 +2456,7 @@ export type ServerConfigurationResponseModel = {
     versionCheckPeriod: number;
     allowLocalLogin: boolean;
     umbracoCssPath: string;
+    signalR: SignalRClientSettingsResponseModel;
 };
 
 export type ServerInformationResponseModel = {
@@ -2475,6 +2476,10 @@ export type ServerTroubleshootingResponseModel = {
 
 export type SetAvatarRequestModel = {
     file: ReferenceByIdModel;
+};
+
+export type SignalRClientSettingsResponseModel = {
+    skipNegotiation: boolean;
 };
 
 export type SortingRequestModel = {
@@ -2714,11 +2719,6 @@ export enum TreeItemKindModel {
     FOLDER = 'Folder',
     ALL = 'All'
 }
-
-export type TwoFactorAuthInfo = {
-    qrCodeSetupImageUrl?: string | null;
-    secret?: string | null;
-};
 
 export type UnknownTypePermissionPresentationModel = {
     $type: string;
@@ -17301,7 +17301,7 @@ export type GetUserCurrent2FaByProviderNameResponses = {
     /**
      * OK
      */
-    200: NoopSetupTwoFactorModel | TwoFactorAuthInfo;
+    200: NoopSetupTwoFactorModel;
 };
 
 export type GetUserCurrent2FaByProviderNameResponse = GetUserCurrent2FaByProviderNameResponses[keyof GetUserCurrent2FaByProviderNameResponses];
@@ -17336,7 +17336,7 @@ export type PostUserCurrent2FaByProviderNameResponses = {
     /**
      * OK
      */
-    200: NoopSetupTwoFactorModel | TwoFactorAuthInfo;
+    200: NoopSetupTwoFactorModel;
 };
 
 export type PostUserCurrent2FaByProviderNameResponse = PostUserCurrent2FaByProviderNameResponses[keyof PostUserCurrent2FaByProviderNameResponses];

@@ -36859,9 +36859,6 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/NoopSetupTwoFactorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TwoFactorAuthInfo"
                     }
                   ]
                 }
@@ -36956,9 +36953,6 @@
                   "oneOf": [
                     {
                       "$ref": "#/components/schemas/NoopSetupTwoFactorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/TwoFactorAuthInfo"
                     }
                   ]
                 }
@@ -50055,6 +50049,7 @@
         "required": [
           "allowLocalLogin",
           "allowPasswordReset",
+          "signalR",
           "umbracoCssPath",
           "versionCheckPeriod"
         ],
@@ -50072,6 +50067,13 @@
           },
           "umbracoCssPath": {
             "type": "string"
+          },
+          "signalR": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SignalRClientSettingsResponseModel"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -50143,6 +50145,18 @@
                 "$ref": "#/components/schemas/ReferenceByIdModel"
               }
             ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "SignalRClientSettingsResponseModel": {
+        "required": [
+          "skipNegotiation"
+        ],
+        "type": "object",
+        "properties": {
+          "skipNegotiation": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false
@@ -51097,20 +51111,6 @@
           "All"
         ],
         "type": "string"
-      },
-      "TwoFactorAuthInfo": {
-        "type": "object",
-        "properties": {
-          "qrCodeSetupImageUrl": {
-            "type": "string",
-            "nullable": true
-          },
-          "secret": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
       },
       "UnknownTypePermissionPresentationModel": {
         "required": [
