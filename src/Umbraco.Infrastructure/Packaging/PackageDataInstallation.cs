@@ -1874,8 +1874,37 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     s = createAttempt.Result;
                 }
 
-                // Existing stylesheets are reported in the install summary but are not overwritten,
-                // so user customisations to the file are preserved across package re-installs.
+                foreach (XElement prop in n.XPathSelectElements("Properties/Property"))
+                {
+                    var alias = prop.Element("Alias")!.Value;
+                    IStylesheetProperty? sp = s.Properties?.SingleOrDefault(p => p != null && p.Alias == alias);
+                    var name = prop.Element("Name")!.Value;
+                    if (sp == null)
+                    {
+                        sp = new StylesheetProperty(name, "#" + name.ToSafeAlias(_shortStringHelper), string.Empty);
+                        s.AddProperty(sp);
+                    }
+                    else
+                    {
+                        // Changing the name requires removing the current property and then adding another new one
+                        if (sp.Name != name)
+                        {
+                            s.RemoveProperty(sp.Name);
+                            var newProp = new StylesheetProperty(name, sp.Alias, sp.Value);
+                            s.AddProperty(newProp);
+                            sp = newProp;
+                        }
+                    }
+
+                    sp.Alias = alias;
+                    sp.Value = prop.Element("Value")!.Value;
+                }
+
+                var updateModel = new StylesheetUpdateModel
+                {
+                    Content = s.Content ?? string.Empty,
+                };
+                _stylesheetService.UpdateAsync(s.Path, updateModel, userKey).GetAwaiter().GetResult();
                 result.Add(s);
             }
 
