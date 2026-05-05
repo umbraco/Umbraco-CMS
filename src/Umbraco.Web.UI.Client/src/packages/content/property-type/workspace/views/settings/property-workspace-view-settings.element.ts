@@ -211,6 +211,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					<uui-textarea
 						id="description-input"
 						data-mark="input:entity-description"
+						label="${this.localize.term('general_description')}"
 						slot="editor"
 						name="description"
 						@input=${this.#onDescriptionChange}
@@ -222,7 +223,9 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					<umb-data-type-flow-input
 						slot="editor"
 						id="data-type-input"
+						label="${this.localize.term('general_propertyEditor')}"
 						.value=${this._data?.dataType?.unique ?? ''}
+						.suggestionQuery=${this._data?.name}
 						@change=${this.#onDataTypeIdChange}
 						required
 						${umbBindToValidation(this, '$.dataType.unique')}></umb-data-type-flow-input>
@@ -334,6 +337,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 					id="mandatory"
 					.checked=${this._data?.validation?.mandatory ?? false}
 					slot="editor"
+					label=${this.localize.term('validation_fieldIsMandatory')}
 					><umb-localize key="validation_fieldIsMandatory">Field is mandatory</umb-localize></uui-toggle
 				></umb-property-layout
 			>
@@ -357,6 +361,7 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		return html`<umb-property-layout orientation="vertical" label=${this.localize.term('validation_customValidation')}
 				><uui-select
 					slot="editor"
+					label=${this.localize.term('validation_customValidation')}
 					@change=${this.#onCustomValidationChange}
 					.options=${this._customValidationOptions}></uui-select
 			></umb-property-layout>
