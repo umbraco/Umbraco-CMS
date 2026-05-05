@@ -66,6 +66,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "another", "one" });
@@ -74,7 +75,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         content1 = ContentService.GetById(content1.Id);
 
-        var enTags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var enTags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
         Assert.AreEqual(4, enTags.Length);
         Assert.Contains("one", enTags);
@@ -119,6 +120,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags", "plus" },
@@ -126,6 +128,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "another", "one" },
@@ -136,13 +139,13 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1 = ContentService.GetById(content1.Id);
 
         var frTags = content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "fr-FR").ToArray();
+            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "fr-FR").ToArray();
         Assert.AreEqual(5, frTags.Length);
         Assert.Contains("plus", frTags);
         Assert.AreEqual(-1, frTags.IndexOf("one"));
 
         var enTags = content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "en-US").ToArray();
+            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "en-US").ToArray();
         Assert.AreEqual(4, enTags.Length);
         Assert.Contains("one", enTags);
         Assert.AreEqual(-1, enTags.IndexOf("plus"));
@@ -186,6 +189,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "another", "one" });
@@ -198,7 +202,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         // no changes
         content1 = ContentService.GetById(content1.Id);
 
-        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
         Assert.AreEqual(4, tags.Length);
         Assert.Contains("one", tags);
@@ -224,11 +228,11 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1 = ContentService.GetById(content1.Id);
 
         // property value has been moved from invariant to en-US
-        tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
         Assert.IsEmpty(tags);
 
-        tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "en-US")
+        tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "en-US")
             .ToArray();
         Assert.AreEqual(4, tags.Length);
         Assert.Contains("one", tags);
@@ -275,6 +279,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags", "plus" },
@@ -282,6 +287,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "another", "one" },
@@ -297,11 +303,11 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // property value has been moved from en-US to invariant, fr-FR tags are gone
         Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "fr-FR"));
+            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "fr-FR"));
         Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "en-US"));
+            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "en-US"));
 
-        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
         Assert.AreEqual(4, tags.Length);
         Assert.Contains("one", tags);
@@ -348,6 +354,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags", "plus" },
@@ -355,6 +362,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "another", "one" },
@@ -368,6 +376,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content2.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags", "plus" },
@@ -375,6 +384,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content2.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "another", "one" },
@@ -418,6 +428,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags", "plus" },
@@ -425,6 +436,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "another", "one" },
@@ -440,11 +452,11 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // property value has been moved from en-US to invariant, fr-FR tags are gone
         Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "fr-FR"));
+            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "fr-FR"));
         Assert.IsEmpty(content1.Properties["tags"]
-            .GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer, "en-US"));
+            .GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "en-US"));
 
-        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var tags = content1.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
         Assert.AreEqual(4, tags.Length);
         Assert.Contains("one", tags);
@@ -494,6 +506,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             frValue,
@@ -501,6 +514,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             enValue,
@@ -537,6 +551,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags", "plus" });
@@ -547,6 +562,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content2.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags" });
@@ -580,6 +596,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags", "bam" });
@@ -590,6 +607,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content2.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags" });
@@ -625,6 +643,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags", "plus" });
@@ -635,6 +654,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content2.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags" });
@@ -713,6 +733,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags", "bam" });
@@ -723,6 +744,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content2.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags" });
@@ -752,6 +774,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags", "bam" });
@@ -762,6 +785,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content2.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags" });
@@ -794,14 +818,15 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     {
         // Arrange
         // set configuration
-        var dataType = DataTypeService.GetDataType(1041);
+        var dataTypeKey = IdKeyMap.GetKeyForId(1041, UmbracoObjectTypes.DataType).Result;
+        var dataType = await DataTypeService.GetAsync(dataTypeKey);
         dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
             .FromConfigurationObject(
                 new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv },
                 ConfigurationEditorJsonSerializer);
 
         // updating the data type with the new configuration
-        DataTypeService.Save(dataType);
+        await DataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -820,6 +845,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags" });
@@ -829,13 +855,14 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         child1.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello1", "world1", "some1" });
         ContentService.Save(child1);
 
         var child2 = ContentBuilder.CreateSimpleContent(contentType, "child 2 content", content.Id);
-        child2.AssignTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "hello2", "world2" });
+        child2.AssignTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "hello2", "world2" });
         ContentService.Save(child2);
 
         // Act
@@ -882,6 +909,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags" });
@@ -892,6 +920,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "another", "world" },
@@ -933,6 +962,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags" });
@@ -970,6 +1000,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags" });
@@ -980,6 +1011,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "another", "world" },
@@ -1018,6 +1050,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello", "world", "some", "tags" });
@@ -1025,7 +1058,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Publish(content, Array.Empty<string>());
 
         // Act
-        content.RemoveTags(PropertyEditorCollection, DataTypeService, Serializer, "tags", new[] { "some", "world" });
+        content.RemoveTags(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer, "tags", new[] { "some", "world" });
         ContentService.Save(content);
         ContentService.Publish(content, Array.Empty<string>());
 
@@ -1047,14 +1080,15 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     {
         // Arrange
         // set configuration
-        var dataType = DataTypeService.GetDataType(1041);
+        var dataTypeKey = IdKeyMap.GetKeyForId(1041, UmbracoObjectTypes.DataType).Result;
+        var dataType = await DataTypeService.GetAsync(dataTypeKey);
         dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
             .FromConfigurationObject(
                 new TagConfiguration { Group = "test", StorageType = TagsStorageType.Csv },
                 ConfigurationEditorJsonSerializer);
 
         // updating the data type with the new configuration
-        DataTypeService.Save(dataType);
+        await DataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -1072,6 +1106,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello,world,tags", "new" });
@@ -1081,7 +1116,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // Act
         content = ContentService.GetById(content.Id);
-        var savedTags = content.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var savedTags = content.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
 
         // Assert
@@ -1093,7 +1128,8 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
     {
         // Arrange
         // set configuration
-        var dataType = DataTypeService.GetDataType(1041);
+        var dataTypeKey = IdKeyMap.GetKeyForId(1041, UmbracoObjectTypes.DataType).Result;
+        var dataType = await DataTypeService.GetAsync(dataTypeKey);
         dataType.ConfigurationData = dataType.Editor!.GetConfigurationEditor()
             .FromConfigurationObject(
                 new TagConfiguration { Group = "test", StorageType = TagsStorageType.Json },
@@ -1105,7 +1141,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         Assert.AreEqual(TagsStorageType.Json, configuration.StorageType);
 
         // updating the data type with the new configuration
-        DataTypeService.Save(dataType);
+        await DataTypeService.UpdateAsync(dataType, Constants.Security.SuperUserKey);
 
         var template = TemplateBuilder.CreateTextPageTemplate();
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
@@ -1123,6 +1159,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         content.AssignTags(
             PropertyEditorCollection,
             DataTypeService,
+            IdKeyMap,
             Serializer,
             "tags",
             new[] { "hello,world,tags", "new" });
@@ -1132,7 +1169,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // Act
         content = ContentService.GetById(content.Id);
-        var savedTags = content.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, Serializer)
+        var savedTags = content.Properties["tags"].GetTagsValue(PropertyEditorCollection, DataTypeService, IdKeyMap, Serializer)
             .ToArray();
 
         // Assert

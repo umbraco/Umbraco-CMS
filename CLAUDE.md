@@ -367,7 +367,16 @@ public interface IMyService
 
 ### Centralized Package Management
 
-**All NuGet package versions** are centralized in `Directory.Packages.props`. Individual projects do NOT specify versions.
+**NuGet package versions** are centralized in `Directory.Packages.props`. There are two `Directory.Packages.props` files in the source tree, with multi-level merging enabled so the test file inherits from the root:
+
+| File | Scope |
+|------|-------|
+| `Directory.Packages.props` (root) | Production source code packages — referenced by all `src/**` projects |
+| `tests/Directory.Packages.props` | Test-only packages (NUnit, Moq, Bogus, BenchmarkDotNet, etc.) — adds entries on top of the inherited root file |
+
+When updating dependencies, decide which file the package belongs in:
+- A package used only by test projects → `tests/Directory.Packages.props`
+- A package used by any production project (or by both production and tests) → root `Directory.Packages.props`
 
 ```xml
 <!-- Individual projects reference WITHOUT version -->
@@ -376,6 +385,8 @@ public interface IMyService
 <!-- Versions defined in Directory.Packages.props -->
 <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
 ```
+
+**Opt-out**: `src/Umbraco.Web.UI/Umbraco.Web.UI.csproj` sets `<ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>` and specifies versions inline (for `Microsoft.EntityFrameworkCore.Design`, `Microsoft.Build.Tasks.Core`, `Microsoft.ICU.ICU4C.Runtime`, etc.). Update those versions directly in that csproj when bumping. Two further `Directory.Packages.props` files exist under `templates/` for the project/extension templates and have their own version sets — keep `Microsoft.AspNetCore.OpenApi` aligned between the root file and `templates/UmbracoExtension/`.
 
 ### Build Configuration
 
@@ -504,6 +515,32 @@ Labels are only added, never removed. Claude applies only labels it is confident
 - **`id-token: write` permission** — required for OIDC token exchange with the Claude GitHub App.
 - **Trigger phrase stripping** — the action strips `@claude` from comments before passing to Claude. Prompts must reference commands without the prefix (e.g., `review` not `@claude review`).
 - **PR number injection** — the interactive workflow injects the PR/issue number into the prompt via `${{ github.event.issue.number }}` since Claude can't discover it from `gh pr view` when checked out on `main`.
+
+---
+
+## 8. Code Comment Policy
+
+**Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Well-named identifiers and small functions are the primary form of self-documentation; comments are a fallback for the rare cases where the code itself cannot carry the meaning.
+
+### When NOT to comment
+
+- **Don't restate what the code does.** A line calling `resetState()` does not need `// Reset state`. A method named `validateInput` does not need `// Validate input`.
+- **Don't narrate a sequence of calls.** If three lines run in order, the order is in the code — don't paraphrase it above.
+- **Don't reference the current task, fix, callers, or PR.** No `// Fix for X`, `// Used by Y`, `// Added for the Z flow`, `// See PR #1234`. That belongs in commit messages and PR descriptions; in source it rots as the codebase evolves.
+
+### When a comment IS justified
+
+Write a comment only when **removing it would leave a future reader confused**. Concretely:
+
+- **A non-obvious WHY.** A hidden constraint, business rule, or ordering requirement that is not visible from the code.
+- **A workaround for a specific bug or platform quirk.** Link the issue (`(#21996)`, `https://...`) so the comment can be deleted once the upstream fix lands.
+- **A subtle invariant** that the type system or method names do not enforce.
+- **An edge case the code intentionally handles** that would surprise a reader (e.g. "must run before X because Y").
+- **API documentation** — XML doc comments on C# members, JSDoc on exported TypeScript symbols. Required for the public contract; still keep them concise.
+
+### TODOs
+
+Allowed, but cheap to write and cheaper to leave behind. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
 
 ---
 
