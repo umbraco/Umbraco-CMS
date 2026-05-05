@@ -1,5 +1,4 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
-import {expect} from "@playwright/test";
 
 const contentName = 'TestContent';
 const renamedContentName = 'TestContentRenamed';
@@ -82,9 +81,9 @@ test('can rollback to a previous version from the tree action menu', async ({umb
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, originalText);
 });
 
-test('can rollback variant content to a previous published version', async ({umbracoApi, umbracoUi}) => {
+test('can rollback content with a culture variant to a previous published version', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  await umbracoApi.document.createPublishedEnglishCultureDocumentWithTwoTextVersions(contentName, documentTypeName, dataTypeName, originalText, updatedText);
+  const contentId = await umbracoApi.document.createPublishedEnglishCultureDocumentWithTwoTextVersions(contentName, documentTypeName, dataTypeName, originalText, updatedText);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
   await umbracoUi.content.goToContentWithName(contentName);
@@ -100,6 +99,7 @@ test('can rollback variant content to a previous published version', async ({umb
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.clickContentTab();
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, originalText);
+  await umbracoApi.document.verifyDocumentValueForCulture(contentId, originalText);
 });
 
 test('rollback restores the document name to the previous version', async ({umbracoApi, umbracoUi}) => {
@@ -126,9 +126,8 @@ test('rollback restores the document name to the previous version', async ({umbr
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
-  const rolledBackData = await umbracoApi.document.get(contentId);
-  expect(rolledBackData.variants[0].name).toBe(contentName);
-  expect(rolledBackData.values[0].value).toBe(originalText);
+  await umbracoApi.document.verifyDocumentNameForCulture(contentId, contentName);
+  await umbracoApi.document.verifyDocumentValueForCulture(contentId, originalText);
 });
 
 test('cancelling the rollback modal leaves the content unchanged', async ({umbracoApi, umbracoUi}) => {
@@ -148,6 +147,5 @@ test('cancelling the rollback modal leaves the content unchanged', async ({umbra
   // Assert
   await umbracoUi.content.clickContentTab();
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedText);
-  const currentData = await umbracoApi.document.get(contentId);
-  expect(currentData.values[0].value).toBe(updatedText);
+  await umbracoApi.document.verifyDocumentValueForCulture(contentId, updatedText);
 });

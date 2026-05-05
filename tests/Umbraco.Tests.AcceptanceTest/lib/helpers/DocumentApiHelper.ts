@@ -1814,4 +1814,16 @@ export class DocumentApiHelper {
       documentData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
     );
   }
+
+  async verifyDocumentValueForCulture(documentId: string, expectedValue: string, culture: string | null = null) {
+    const documentData = await this.get(documentId);
+    const valueEntry = documentData.values.find(v => v.culture === culture);
+    expect(valueEntry?.value).toBe(expectedValue);
+  }
+
+  async verifyDocumentNameForCulture(documentId: string, expectedName: string, culture: string | null = null) {
+    const documentData = await this.get(documentId);
+    const variantEntry = documentData.variants.find(v => v.culture === culture);
+    expect(variantEntry?.name).toBe(expectedName);
+  }
 }
