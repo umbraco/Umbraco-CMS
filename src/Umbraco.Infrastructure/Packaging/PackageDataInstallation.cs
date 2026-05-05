@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.IO;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -1754,7 +1755,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    (var name, var parentPath) = SplitPath(path!);
+                    (var name, var parentPath) = ForwardSlashPath.Split(path!);
                     var createModel = new ScriptCreateModel
                     {
                         Name = name,
@@ -1800,7 +1801,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 {
                     var content = partialViewXml.Value ?? string.Empty;
 
-                    (var name, var parentPath) = SplitPath(path);
+                    (var name, var parentPath) = ForwardSlashPath.Split(path);
                     var createModel = new PartialViewCreateModel
                     {
                         Name = name,
@@ -1856,7 +1857,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    (var name, var parentPath) = SplitPath(stylesheetPath!);
+                    (var name, var parentPath) = ForwardSlashPath.Split(stylesheetPath!);
                     var createModel = new StylesheetCreateModel
                     {
                         Name = name,
@@ -2002,21 +2003,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
 
         #endregion
-
-        // Split on '/' to keep separators consistent with the Umbraco file-system convention;
-        // Path.GetDirectoryName converts to backslashes on Windows which would break round-tripping
-        // through the new Create/Get APIs.
-        private static (string name, string? parentPath) SplitPath(string path)
-        {
-            var lastSlash = path.LastIndexOf('/');
-            if (lastSlash < 0)
-            {
-                return (path, null);
-            }
-
-            var parent = path[..lastSlash];
-            return (path[(lastSlash + 1)..], string.IsNullOrEmpty(parent) ? null : parent);
-        }
 
         // Resolves an int user id to its Guid key, falling back to SuperUserKey for unknown ids.
         private Guid ResolveUserKey(int userId)

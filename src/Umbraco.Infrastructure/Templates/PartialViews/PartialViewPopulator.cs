@@ -3,6 +3,7 @@ using System.Text;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.IO;
 
 namespace Umbraco.Cms.Infrastructure.Templates.PartialViews;
 
@@ -52,16 +53,12 @@ internal sealed class PartialViewPopulator : IPartialViewPopulator
         using var reader = new StreamReader(resourceStream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: -1, leaveOpen: true);
         var content = reader.ReadToEnd();
 
-        // Split on '/' to keep separators consistent with the Umbraco file-system convention;
-        // Path.GetDirectoryName converts to backslashes on Windows which would break round-tripping.
-        var lastSlash = fileSystemPath.LastIndexOf('/');
-        var name = lastSlash >= 0 ? fileSystemPath[(lastSlash + 1)..] : fileSystemPath;
-        var parentPath = lastSlash >= 0 ? fileSystemPath[..lastSlash] : null;
+        (var name, var parentPath) = ForwardSlashPath.Split(fileSystemPath);
 
         var createModel = new PartialViewCreateModel
         {
             Name = name,
-            ParentPath = string.IsNullOrEmpty(parentPath) ? null : parentPath,
+            ParentPath = parentPath,
             Content = content,
         };
 
