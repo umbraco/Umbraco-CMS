@@ -281,6 +281,11 @@ export class UmbSectionMainViewElement extends UmbLitElement {
 				top: var(--uui-size-2);
 				right: calc(var(--uui-size-2) * -1);
 			}
+
+			div[slot='icon'] umb-badge {
+				right: -1em;
+				top: -0.5em;
+			}
 		`,
 	];
 }
