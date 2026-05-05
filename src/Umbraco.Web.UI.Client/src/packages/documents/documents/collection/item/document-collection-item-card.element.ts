@@ -22,7 +22,7 @@ import type {
 } from '@umbraco-cms/backoffice/collection';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 
@@ -132,7 +132,7 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 			case 'state':
 				return { value: this._state ? fromCamelCase(this._state) : '' };
 			case 'published':
-				return { value: this._state !== DocumentVariantStateModel.DRAFT ? 'True' : 'False' };
+				return { value: this._state !== UmbDocumentVariantState.DRAFT ? 'True' : 'False' };
 			case 'sortOrder':
 				return { value: this.item.sortOrder };
 			case 'updateDate':
@@ -150,13 +150,13 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	#getStateTagConfig(): { color: UUIInterfaceColor; label: string } | undefined {
 		if (!this._state) return;
 		switch (this._state) {
-			case DocumentVariantStateModel.PUBLISHED:
+			case UmbDocumentVariantState.PUBLISHED:
 				return { color: 'positive', label: this.localize.term('content_published') };
-			case DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES:
+			case UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES:
 				return { color: 'warning', label: this.localize.term('content_publishedPendingChanges') };
-			case DocumentVariantStateModel.DRAFT:
+			case UmbDocumentVariantState.DRAFT:
 				return { color: 'default', label: this.localize.term('content_unpublished') };
-			case DocumentVariantStateModel.NOT_CREATED:
+			case UmbDocumentVariantState.NOT_CREATED:
 				return { color: 'danger', label: this.localize.term('content_notCreated') };
 			default:
 				return { color: 'danger', label: fromCamelCase(this._state) };

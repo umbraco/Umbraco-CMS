@@ -2,7 +2,7 @@ import { UMB_DOCUMENT_PROPERTY_DATASET_CONTEXT, UMB_DOCUMENT_WORKSPACE_CONTEXT }
 import type { UmbDocumentVariantModel } from '../../../types.js';
 import { UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT } from '../../../publishing/index.js';
 import { css, customElement, html, ifDefined, nothing, state } from '@umbraco-cms/backoffice/external/lit';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDocumentVariantState } from '../../../variant-state.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
@@ -162,7 +162,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 
 	#renderStateTag() {
 		switch (this._variant?.state) {
-			case DocumentVariantStateModel.DRAFT:
+			case UmbDocumentVariantState.DRAFT:
 				return html`
 					<uui-tag look="secondary" label=${this.localize.term('content_unpublished')}>
 						${this.localize.term('content_unpublished')}
@@ -170,8 +170,8 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 				`;
 			// TODO: The pending changes state can be removed once the management Api removes this state
 			// We should also make our own state model for this
-			case DocumentVariantStateModel.PUBLISHED:
-			case DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES: {
+			case UmbDocumentVariantState.PUBLISHED:
+			case UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES: {
 				const term = this.#hasPendingChanges(this._variant) ? 'content_publishedPendingChanges' : 'content_published';
 				return html`
 					<uui-tag color="positive" look="primary" label=${this.localize.term(term)}>
@@ -179,7 +179,7 @@ export class UmbDocumentWorkspaceViewInfoElement extends UmbLitElement {
 					</uui-tag>
 				`;
 			}
-			case DocumentVariantStateModel.TRASHED:
+			case UmbDocumentVariantState.TRASHED:
 				return html`
 					<uui-tag color="danger" look="primary" label=${this.localize.term('content_trashed')}>
 						${this.localize.term('content_trashed')}
