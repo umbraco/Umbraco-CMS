@@ -35,9 +35,12 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         Root = InstallationSummary.ContentInstalled.First();
         ContentService.Publish(Root, Root.AvailableCultures.ToArray());
 
+        // Note: this SetUp must remain synchronous. EnsureUmbracoContext() below writes to an AsyncLocal
+        // (via HybridUmbracoContextAccessor) and AsyncLocal mutations made inside an awaited Task do not
+        // flow back to the test method's execution context.
         var cultures = new List<string>
         {
-            GetRequiredService<ILocalizationService>().GetDefaultLanguageIsoCode()
+            GetRequiredService<ILanguageService>().GetDefaultIsoCodeAsync().GetAwaiter().GetResult(),
         };
 
         foreach (var language in InstallationSummary.LanguagesInstalled)

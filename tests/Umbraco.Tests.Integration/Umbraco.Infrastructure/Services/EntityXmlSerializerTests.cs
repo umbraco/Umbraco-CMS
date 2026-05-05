@@ -40,8 +40,8 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     {
         // Arrange
         await CreateDictionaryData();
-        var localizationService = GetRequiredService<ILocalizationService>();
-        var dictionaryItem = localizationService.GetDictionaryItemByKey("Parent");
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+        var dictionaryItem = await dictionaryItemService.GetAsync("Parent");
 
         var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
         var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();

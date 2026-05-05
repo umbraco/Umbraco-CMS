@@ -33,7 +33,6 @@ internal sealed class ContentEditingService
     /// <param name="treeEntitySortingService">The tree entity sorting service.</param>
     /// <param name="contentValidationService">The content validation service.</param>
     /// <param name="userService">The user service.</param>
-    /// <param name="localizationService">The localization service.</param>
     /// <param name="languageService">The language service.</param>
     /// <param name="optionsMonitor">The content settings options monitor.</param>
     /// <param name="relationService">The relation service.</param>
@@ -50,7 +49,6 @@ internal sealed class ContentEditingService
         ITreeEntitySortingService treeEntitySortingService,
         IContentValidationService contentValidationService,
         IUserService userService,
-        ILocalizationService localizationService,
         ILanguageService languageService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
@@ -69,8 +67,7 @@ internal sealed class ContentEditingService
             relationService,
             contentTypeFilters,
             languageService,
-            userService,
-            localizationService)
+            userService)
     {
         _templateService = templateService;
         _logger = logger;

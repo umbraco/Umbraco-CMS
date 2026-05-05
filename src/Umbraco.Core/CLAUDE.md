@@ -263,7 +263,8 @@ public class MyEntityCacheRefresher : CacheRefresherBase<MyEntityCacheRefresher>
 - `IMediaService` - Media operations
 - `IDataTypeService` - Data type configuration
 - `IUserService` - User management
-- `ILocalizationService` - Languages and dictionary
+- `ILanguageService` - Languages
+- `IDictionaryItemService` - Dictionary items
 - `IRelationService` - Entity relationships
 
 #### Content Models

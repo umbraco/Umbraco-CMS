@@ -14,9 +14,12 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
@@ -47,7 +50,11 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
 
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
+    private ILanguageRepository LanguageRepository => GetRequiredService<ILanguageRepository>();
+
+    private IDictionaryRepository DictionaryRepository => GetRequiredService<IDictionaryRepository>();
+
+    private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
 
     private IEntityXmlSerializer EntityXmlSerializer => GetRequiredService<IEntityXmlSerializer>();
 
@@ -63,12 +70,16 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
+    private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
+
     public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
         ContentService,
         ContentTypeService,
         DataTypeService,
         FileService,
-        LocalizationService,
+        LanguageRepository,
+        DictionaryRepository,
+        CoreScopeProvider,
         HostingEnvironment,
         EntityXmlSerializer,
         Options.Create(new GlobalSettings()),
@@ -209,6 +220,36 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
             children = children[0].Elements("DictionaryItem").ToList();
             Assert.AreEqual(1, children.Count);
             Assert.AreEqual("Child2", children[0].AttributeValue<string>("Name"));
+        }
+    }
+
+    [Test]
+    public async Task GivenLanguages_WhenPackageExported_ThenTheXmlContainsThem()
+    {
+        var daDk = new LanguageBuilder().WithCultureInfo("da-DK").Build();
+        await LanguageService.CreateAsync(daDk, Constants.Security.SuperUserKey);
+        var nbNo = new LanguageBuilder().WithCultureInfo("nb-NO").Build();
+        await LanguageService.CreateAsync(nbNo, Constants.Security.SuperUserKey);
+
+        var def = new PackageDefinition
+        {
+            Name = "test",
+            Languages = new List<string> { daDk.Id.ToString(), nbNo.Id.ToString() }
+        };
+        PackageBuilder.SavePackage(def);
+
+        var packageXmlPath = PackageBuilder.ExportPackage(def);
+
+        using (var packageXmlStream = File.OpenRead(packageXmlPath))
+        {
+            var packageXml = XDocument.Load(packageXmlStream);
+            var languages = packageXml.Root.Element("Languages");
+            Assert.IsNotNull(languages);
+            var languageElements = languages.Elements("Language").ToList();
+            Assert.AreEqual(2, languageElements.Count);
+            Assert.That(
+                languageElements.Select(l => l.AttributeValue<string>("CultureAlias")),
+                Is.EquivalentTo(new[] { "da-DK", "nb-NO" }));
         }
     }
 
