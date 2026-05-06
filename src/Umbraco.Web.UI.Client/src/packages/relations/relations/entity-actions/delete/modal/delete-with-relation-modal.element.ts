@@ -17,6 +17,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-delete-with-relation-confirm-modal')
 export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElement<
@@ -59,7 +60,8 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 
 	override render() {
 		const headline = this.localize.string('#actions_delete');
-		const content = this.localize.string('#defaultdialogs_confirmdelete', this._name);
+		const escapedName = escapeHTML(this._name ?? '');
+		const content = this.localize.string('#defaultdialogs_confirmdelete', escapedName);
 
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${headline}>
