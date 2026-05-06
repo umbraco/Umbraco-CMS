@@ -101,7 +101,8 @@ export class UmbCreateMemberCollectionActionElement extends UmbLitElement {
 	static override styles = [
 		css`
 			uui-scroll-container {
-				max-height: 500px;
+				max-height: var(--uui-popover-container-available-height, 70vh);
+				overflow-y: auto;
 			}
 		`,
 	];

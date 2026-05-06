@@ -1,7 +1,7 @@
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../../constants.js';
 import { UMB_CREATE_MEDIA_WORKSPACE_PATH_PATTERN } from '../../paths.js';
 import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../../entity.js';
-import { html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
+import { css, html, customElement, property, state, repeat } from '@umbraco-cms/backoffice/external/lit';
 import { UmbMediaTypeStructureRepository } from '@umbraco-cms/backoffice/media-type';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestCollectionAction } from '@umbraco-cms/backoffice/collection';
@@ -124,6 +124,15 @@ export class UmbCreateMediaCollectionActionElement extends UmbLitElement {
 			</uui-popover-container>
 		`;
 	}
+
+	static override styles = [
+		css`
+			uui-scroll-container {
+				max-height: var(--uui-popover-container-available-height, 70vh);
+				overflow-y: auto;
+			}
+		`,
+	];
 }
 
 export default UmbCreateMediaCollectionActionElement;

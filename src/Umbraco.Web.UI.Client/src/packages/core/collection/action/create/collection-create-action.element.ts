@@ -1,4 +1,4 @@
-import { customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -150,6 +150,15 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 			</uui-menu-item>
 		`;
 	}
+
+	static override styles = [
+		css`
+			uui-scroll-container {
+				max-height: var(--uui-popover-container-available-height, 70vh);
+				overflow-y: auto;
+			}
+		`,
+	];
 }
 
 export { UmbCollectionCreateActionButtonElement as element };
