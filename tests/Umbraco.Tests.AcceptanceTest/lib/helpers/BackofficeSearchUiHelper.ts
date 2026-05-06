@@ -61,8 +61,6 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   }
 
   async clickSearchProvider(providerName: string) {
-    // Provider labels share prefixes (e.g. "Media" / "Media Types"), so match
-    // the button text exactly rather than as a substring.
     await this.click(this.searchModal.getByRole('button', {name: providerName, exact: true}));
   }
 
@@ -91,8 +89,6 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   }
 
   async pressArrowDown() {
-    // Use the page keyboard so we do not refocus the input on subsequent arrow
-    // presses (focus moves to the active result link as we navigate).
     await this.page.keyboard.press('ArrowDown');
   }
 
@@ -101,8 +97,6 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   }
 
   async getActiveSearchResultIndex() {
-    // Arrow-key handling toggles the .active class synchronously, but we still
-    // wait briefly so a stale read (before Lit re-renders) doesn't cause flake.
     await this.hasCount(this.activeResult, 1, ConstantHelper.timeout.short);
     const index = await this.activeResult.getAttribute('data-item-index');
     return index ? parseInt(index, 10) : -1;
