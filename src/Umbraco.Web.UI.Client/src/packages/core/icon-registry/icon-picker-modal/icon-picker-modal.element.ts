@@ -1,6 +1,7 @@
 import type { UmbIconDefinition } from '../types.js';
 import { UMB_ICON_REGISTRY_CONTEXT } from '../icon-registry.context-token.js';
 import type { UmbIconPickerModalData, UmbIconPickerModalValue } from './icon-picker-modal.token.js';
+import { UmbIconSearchController } from './icon-search.controller.js';
 import {
 	css,
 	customElement,
@@ -16,11 +17,21 @@ import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIColorSwatchesEvent } from '@umbraco-cms/backoffice/external/uui';
-import { toCamelCase } from '@umbraco-cms/backoffice/utils';
+import { debounce, toCamelCase } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-icon-picker-modal')
 export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPickerModalData, UmbIconPickerModalValue> {
 	#icons?: Array<UmbIconDefinition>;
+
+	#searchController = new UmbIconSearchController(this);
+
+	#debouncedFilterIcons = debounce(() => {
+		void this.#filterIcons().catch((error) => {
+			if ((error as DOMException)?.name !== 'AbortError') {
+				console.error(error);
+			}
+		});
+	}, 250);
 
 	@query('#search')
 	private _searchInput?: HTMLInputElement;
@@ -39,17 +50,36 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 		this.consumeContext(UMB_ICON_REGISTRY_CONTEXT, (context) => {
 			this.observe(context?.approvedIcons, (icons) => {
 				this.#icons = icons;
-				this.#filterIcons();
+				this.#searchController.setIcons(icons ?? []);
+				this.#filterIcons().catch((error) => {
+					if ((error as DOMException)?.name !== 'AbortError') {
+						console.error(error);
+					}
+				});
 			});
 		});
 	}
 
-	#filterIcons() {
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		this.#debouncedFilterIcons.cancel();
+	}
+
+	#onSearchInput() {
+		this.#debouncedFilterIcons();
+	}
+
+	async #filterIcons() {
 		if (!this.#icons) return;
-		const value = this._searchInput?.value;
-		if (value) {
-			this._isSearching = value.length > 0;
-			this._iconsFiltered = this.#icons.filter((icon) => icon.name.toLowerCase().includes(value.toLowerCase()));
+		const value = this._searchInput?.value?.trim();
+		if (value && value.length > 0) {
+			this._isSearching = true;
+			try {
+				this._iconsFiltered = await this.#searchController.search(value);
+			} catch (error) {
+				// Ignore aborted searches — a newer search (or teardown) superseded this one.
+				if ((error as DOMException)?.name !== 'AbortError') throw error;
+			}
 		} else {
 			this._isSearching = false;
 			this._iconsFiltered = this.#icons;
@@ -121,7 +151,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 				placeholder=${this.localize.term('placeholders_filter')}
 				label=${this.localize.term('placeholders_filter')}
 				id="search"
-				@keyup=${this.#filterIcons}
+				@input=${this.#onSearchInput}
 				${umbFocus()}>
 				<uui-icon name="search" slot="prepend" id="search_icon"></uui-icon>
 			</uui-input>

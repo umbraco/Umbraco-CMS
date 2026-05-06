@@ -1,4 +1,8 @@
+import type { MappingFunction } from '../types/mapping-function.type.js';
+import type { MemoizationFunction } from '../types/memoization-function.type.js';
+import { createObservablePart } from '../utils/create-observable-part.function.js';
 import { BehaviorSubject, type Observable } from '@umbraco-cms/backoffice/external/rxjs';
+import { strictEqualityMemoization } from '../utils/strict-equality-memoization.function.js';
 
 /**
  * @class UmbBasicState
@@ -23,6 +27,20 @@ export class UmbBasicState<T> {
 	 */
 	public asObservable(): Observable<T> {
 		return this._subject.asObservable();
+	}
+
+	/**
+	 * @function asObservablePart
+	 * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
+	 * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to compare if the data has changed. Should return true when data is identical.
+	 * @returns {Observable<R>}
+	 * @description - Creates an Observable from this State that emits a derived value, deduplicated against its previous emission.
+	 */
+	public asObservablePart<ReturnType>(
+		mappingFunction: MappingFunction<T, ReturnType>,
+		memoizationFunction?: MemoizationFunction<ReturnType>,
+	): Observable<ReturnType> {
+		return createObservablePart(this._subject, mappingFunction, memoizationFunction ?? strictEqualityMemoization);
 	}
 
 	/**
