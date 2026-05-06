@@ -13,7 +13,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-// TODO ELEMENTS: looks like a lot of methods here are only used for the IContentService; check all (public) methods and move them accordingly
+/// <summary>
+/// Base class for publishable content services.
+/// </summary>
+/// <typeparam name="TContent">The type of content managed by the concrete implementation.</typeparam>
+/// <remarks>
+/// A few methods here are currently only used by the <see cref="ContentService"/>, not by the <see cref="ElementService"/>.
+/// We will keep them here all the same for two reasons:
+///
+/// 1. As the Elements feature evolves, they might be needed eventually.
+/// 2. The more this base class aligns with the previous versions of the <see cref="ContentService"/>, the easier forward merging will be.
+///
+/// The service interfaces do not expose these methods unless they're needed, so they're only visible on the concrete implementations.
+/// </remarks>
 public abstract class PublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
     where TContent : class, IPublishableContentBase
 {

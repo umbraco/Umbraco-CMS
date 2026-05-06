@@ -60,7 +60,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.AssignTags(
@@ -112,7 +112,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType, ContentVariation.Culture);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.SetCultureName("name-fr", "fr-FR");
@@ -183,7 +183,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         var propertyType = CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.AssignTags(
@@ -197,7 +197,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // no changes
         content1 = ContentService.GetById(content1.Id);
@@ -222,7 +222,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         Assert.IsFalse(enTagGroup.Any(x => x.Text == "plus"));
 
         propertyType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // changes
         content1 = ContentService.GetById(content1.Id);
@@ -271,7 +271,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType, ContentVariation.Culture);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.SetCultureName("name-fr", "fr-FR");
@@ -296,7 +296,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
         contentType.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // changes
         content1 = ContentService.GetById(content1.Id);
@@ -346,7 +346,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         var propertyType = CreateAndAddTagsPropertyType(contentType, ContentVariation.Culture);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.SetCultureName("name-fr", "fr-FR");
@@ -400,7 +400,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
 
         // this should work
         propertyType.Variations = ContentVariation.Nothing;
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey));
     }
 
     [Test]
@@ -420,7 +420,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         var propertyType = CreateAndAddTagsPropertyType(contentType, ContentVariation.Culture);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.SetCultureName("name-fr", "fr-FR");
@@ -445,7 +445,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
         propertyType.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // changes
         content1 = ContentService.GetById(content1.Id);
@@ -498,7 +498,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         var propertyType = CreateAndAddTagsPropertyType(contentType, ContentVariation.Culture);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.SetCultureName("name-fr", "fr-FR");
@@ -523,11 +523,11 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
         ContentService.Publish(content1, content1.AvailableCultures.ToArray());
 
         propertyType.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // TODO: This throws due to index violations
         propertyType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         Assert.AreEqual(frValue, Serializer.Deserialize<string[]>(content1.GetValue<string>("tags", "fr-FR")));
         Assert.AreEqual(enValue, Serializer.Deserialize<string[]>(content1.GetValue<string>("tags", "en-US")));
@@ -545,7 +545,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.AssignTags(
@@ -590,7 +590,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.AssignTags(
@@ -637,7 +637,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.AssignTags(
@@ -727,7 +727,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.AssignTags(
@@ -768,7 +768,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content1 = ContentBuilder.CreateSimpleContent(contentType, "Tagged content 1");
         content1.AssignTags(
@@ -837,7 +837,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         contentType.AllowedContentTypes =
             new[] { new ContentTypeSort(contentType.Key, 0, contentType.Alias) };
 
@@ -902,7 +902,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // create a content with tags and publish
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
@@ -954,7 +954,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
 
@@ -995,7 +995,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
         content.AssignTags(
             PropertyEditorCollection,
@@ -1045,7 +1045,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             mandatoryProperties: true,
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
         content.AssignTags(
             PropertyEditorCollection,
@@ -1100,7 +1100,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
 
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
         content.AssignTags(
@@ -1153,7 +1153,7 @@ internal sealed class ContentServiceTagsTests : UmbracoIntegrationTest
             defaultTemplateId: template.Id);
         CreateAndAddTagsPropertyType(contentType);
 
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent content = ContentBuilder.CreateSimpleContent(contentType, "Tagged content");
         content.AssignTags(

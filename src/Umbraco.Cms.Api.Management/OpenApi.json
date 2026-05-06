@@ -13783,6 +13783,52 @@
         ]
       }
     },
+    "/umbraco/management/api/v1/item/element/ancestors": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "summary": "Gets ancestors for a collection of element items.",
+        "description": "Gets the ancestor chains for element items identified by the provided Ids.",
+        "operationId": "GetItemElementAncestors",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "uuid"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ItemAncestorsResponseModelNamedItemResponseModel"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
     "/umbraco/management/api/v1/item/element/folder": {
       "get": {
         "tags": [
@@ -13814,6 +13860,63 @@
                   "items": {
                     "$ref": "#/components/schemas/FolderItemResponseModel"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The resource is protected and requires an authentication token"
+          }
+        },
+        "security": [
+          {
+            "Backoffice-User": [ ]
+          }
+        ]
+      }
+    },
+    "/umbraco/management/api/v1/item/element/search": {
+      "get": {
+        "tags": [
+          "Element"
+        ],
+        "summary": "Searches element items.",
+        "description": "Searches element items by the provided query with pagination support.",
+        "operationId": "GetItemElementSearch",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedModelElementItemResponseModel"
                 }
               }
             }
@@ -16168,7 +16271,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/install/setup": {
@@ -16231,7 +16335,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/install/validate-database": {
@@ -16294,7 +16399,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/item/language": {
@@ -17555,7 +17661,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/collection/media": {
@@ -23400,39 +23507,6 @@
         ]
       }
     },
-    "/umbraco/management/api/v1/member/configuration": {
-      "get": {
-        "tags": [
-          "Member"
-        ],
-        "summary": "Gets the member configuration.",
-        "description": "Gets the configuration settings for members.",
-        "operationId": "GetMemberConfiguration",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MemberConfigurationResponseModel"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "The resource is protected and requires an authentication token"
-          },
-          "403": {
-            "description": "The authenticated user does not have access to this resource"
-          }
-        },
-        "security": [
-          {
-            "Backoffice-User": [ ]
-          }
-        ]
-      }
-    },
     "/umbraco/management/api/v1/member/validate": {
       "post": {
         "tags": [
@@ -28356,7 +28430,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/profiling/status": {
@@ -30679,7 +30754,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/segment": {
@@ -30761,7 +30837,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/server/information": {
@@ -30823,7 +30900,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/server/troubleshooting": {
@@ -36862,7 +36940,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/user/invite/resend": {
@@ -37068,7 +37147,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/umbraco/management/api/v1/user/set-user-groups": {
@@ -43005,7 +43085,7 @@
             }
           },
           "state": {
-            "$ref": "#/components/schemas/DocumentVariantStateModel"
+            "$ref": "#/components/schemas/PublishableVariantStateModel"
           },
           "name": {
             "type": "string"
@@ -43063,7 +43143,7 @@
             }
           },
           "state": {
-            "$ref": "#/components/schemas/DocumentVariantStateModel"
+            "$ref": "#/components/schemas/PublishableVariantStateModel"
           },
           "publishDate": {
             "type": [
@@ -43110,15 +43190,6 @@
             "type": "string"
           }
         }
-      },
-      "DocumentVariantStateModel": {
-        "enum": [
-          "NotCreated",
-          "Draft",
-          "Published",
-          "PublishedPendingChanges",
-          "Trashed"
-        ]
       },
       "DocumentVersionItemResponseModel": {
         "required": [
@@ -43383,6 +43454,7 @@
       },
       "ElementItemResponseModel": {
         "required": [
+          "isTrashed",
           "hasChildren",
           "documentType",
           "variants",
@@ -43391,6 +43463,9 @@
         ],
         "type": "object",
         "properties": {
+          "isTrashed": {
+            "type": "boolean"
+          },
           "parent": {
             "oneOf": [
               {
@@ -43661,7 +43736,7 @@
             }
           },
           "state": {
-            "$ref": "#/components/schemas/DocumentVariantStateModel"
+            "$ref": "#/components/schemas/PublishableVariantStateModel"
           },
           "name": {
             "type": "string"
@@ -43719,7 +43794,7 @@
             }
           },
           "state": {
-            "$ref": "#/components/schemas/DocumentVariantStateModel"
+            "$ref": "#/components/schemas/PublishableVariantStateModel"
           },
           "publishDate": {
             "type": [
@@ -46143,9 +46218,6 @@
           }
         }
       },
-      "MemberConfigurationResponseModel": {
-        "type": "object"
-      },
       "MemberGroupItemResponseModel": {
         "required": [
           "name",
@@ -48060,6 +48132,25 @@
           }
         }
       },
+      "PagedModelElementItemResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ElementItemResponseModel"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "PagedModelMediaItemResponseModel": {
         "required": [
           "items",
@@ -48911,6 +49002,15 @@
             "$ref": "#/components/schemas/ReferenceByIdModel"
           }
         }
+      },
+      "PublishableVariantStateModel": {
+        "enum": [
+          "NotCreated",
+          "Draft",
+          "Published",
+          "PublishedPendingChanges",
+          "Trashed"
+        ]
       },
       "PublishDocumentRequestModel": {
         "required": [

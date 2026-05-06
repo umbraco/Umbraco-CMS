@@ -1,10 +1,9 @@
-﻿namespace Umbraco.Cms.Api.Management.ViewModels.Document;
+﻿namespace Umbraco.Cms.Api.Management.ViewModels.Content;
 
 /// <summary>
 ///     The saved state of a content item
 /// </summary>
-// TODO ELEMENTS: move this to ViewModels.Content and rename it to VariantState or ContentVariantState (shared between document and element variants)
-public enum DocumentVariantState
+public enum PublishableVariantState
 {
     /// <summary>
     ///     The item isn't created yet

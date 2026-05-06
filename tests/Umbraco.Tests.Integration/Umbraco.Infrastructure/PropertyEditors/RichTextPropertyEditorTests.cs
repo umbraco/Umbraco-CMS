@@ -42,7 +42,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     {
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
         var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
@@ -69,7 +69,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     {
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
         var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
@@ -97,11 +97,11 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var pickedContent = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
         ContentService.Save(pickedContent);
@@ -156,11 +156,11 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
         var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);

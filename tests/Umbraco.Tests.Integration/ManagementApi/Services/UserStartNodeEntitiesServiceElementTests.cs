@@ -69,8 +69,10 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
                 foreach (var grandChildNumber in Enumerable.Range(1, 5))
                 {
                     // Level 3: Elements (leaf nodes)
-                    var element = ElementService.Create($"C{rootNumber}-C{childNumber}-E{grandChildNumber}", contentType.Alias);
-                    element.ParentId = childContainer.Id;
+                    var element = new Core.Models.Element($"C{rootNumber}-C{childNumber}-E{grandChildNumber}", contentType)
+                    {
+                        ParentId = childContainer.Id
+                    };
                     var saveElementResult = ElementService.Save([element]);
                     Assert.IsTrue(saveElementResult.Success);
                     ItemsByName[element.Name!] = (element.Id, element.Key);
@@ -80,8 +82,10 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
             // Level 2: Elements alongside child containers (mixed level)
             foreach (var elementNumber in Enumerable.Range(1, 2))
             {
-                var element = ElementService.Create($"C{rootNumber}-E{elementNumber}", contentType.Alias);
-                element.ParentId = rootContainer.Id;
+                var element = new Core.Models.Element($"C{rootNumber}-E{elementNumber}", contentType)
+                {
+                    ParentId = rootContainer.Id
+                };
                 var saveElementResult = ElementService.Save([element]);
                 Assert.IsTrue(saveElementResult.Success);
                 ItemsByName[element.Name!] = (element.Id, element.Key);
@@ -91,7 +95,7 @@ public partial class UserStartNodeEntitiesServiceElementTests : UserStartNodeEnt
         // Level 1: Root elements alongside root containers (mixed level)
         foreach (var elementNumber in Enumerable.Range(1, 3))
         {
-            var element = ElementService.Create($"E{elementNumber}", contentType.Alias);
+            var element = new Core.Models.Element($"E{elementNumber}", contentType);
             var saveElementResult = ElementService.Save([element]);
             Assert.IsTrue(saveElementResult.Success);
             ItemsByName[element.Name!] = (element.Id, element.Key);

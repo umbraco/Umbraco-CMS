@@ -175,9 +175,9 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_Paged_Parent_Entities_By_Child_Id()
+    public async Task Get_Paged_Parent_Entities_By_Child_Id()
     {
-        CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out var createdMedia);
+        var (createdContent, createdMembers, createdMedia) = await CreateTestDataForPagingTests();
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -245,11 +245,11 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_Paged_Parent_Child_Entities_With_Same_Entity_Relation()
+    public async Task Get_Paged_Parent_Child_Entities_With_Same_Entity_Relation()
     {
         // Create a media item and create a relationship between itself (parent -> child)
         var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
-        MediaTypeService.Save(imageType);
+        await MediaTypeService.CreateAsync(imageType, Constants.Security.SuperUserKey);
         var media = MediaBuilder.CreateMediaImage(imageType, -1);
         MediaService.Save(media);
         var relType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
@@ -272,9 +272,9 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_Paged_Child_Entities_By_Parent_Id()
+    public async Task Get_Paged_Child_Entities_By_Parent_Id()
     {
-        CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out _);
+        var (createdContent, createdMembers, _) = await CreateTestDataForPagingTests();
 
         using (var scope = ScopeProvider.CreateScope())
         {
@@ -327,12 +327,14 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    private void CreateTestDataForPagingTests(out List<IContent> createdContent, out List<IMember> createdMembers, out List<IMedia> createdMedia)
+    private async Task<(List<IContent> Content, List<IMember> Members, List<IMedia> Media)> CreateTestDataForPagingTests()
     {
         // Create content
-        createdContent = new List<IContent>();
+        var createdContent = new List<IContent>();
+        var createdMembers = new List<IMember>();
+        var createdMedia = new List<IMedia>();
         var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         for (var i = 0; i < 3; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
@@ -350,9 +352,8 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         }
 
         // Create media
-        createdMedia = new List<IMedia>();
         var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
-        MediaTypeService.Save(imageType);
+        await MediaTypeService.CreateAsync(imageType, Constants.Security.SuperUserKey);
         for (var i = 0; i < 3; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageType, -1);
@@ -362,8 +363,8 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 
         // Create members
         var memberType = MemberTypeBuilder.CreateSimpleMemberType("simple");
-        MemberTypeService.Save(memberType);
-        createdMembers = MemberBuilder.CreateSimpleMembers(memberType, 3).ToList();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        createdMembers.AddRange(MemberBuilder.CreateSimpleMembers(memberType, 3));
         GetMemberService().Save(createdMembers);
 
         var relatedMediaRelType =
@@ -473,6 +474,8 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
                 RelationService.Relate(trMedia.Id, media.Id, trashedMediaRelType);
             }
         }
+
+        return (createdContent, createdMembers, createdMedia);
     }
 
     [Test]
@@ -587,7 +590,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             _contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
 
-            ContentTypeService.Save(_contentType);
+            await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
 
             // Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
             _textpage = ContentBuilder.CreateSimpleContent(_contentType);

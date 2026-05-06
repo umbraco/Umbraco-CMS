@@ -74,6 +74,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         // TODO: Ideally we should inject IElementsCache
         // this interface is in infrastructure, and changing this is very breaking
         // so as long as we have the cache manager, which casts the IElementsCache to a simple AppCache we might as well use that.
+        // see also ElementCacheRefresher.
         _cacheManager = cacheManager;
     }
 
@@ -597,11 +598,9 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             return;
         }
 
-#pragma warning disable CS0618 // Type or member is obsolete
-        var assignedDomains = _domainService.GetAll(true)
+        var assignedDomains = _domainService.GetAllAsync(true).GetAwaiter().GetResult()
             .Where(x => x.RootContentId.HasValue && idsRemoved.Contains(x.RootContentId.Value))
             .ToList();
-#pragma warning restore CS0618 // Type or member is obsolete
         if (assignedDomains.Count <= 0)
         {
             return;

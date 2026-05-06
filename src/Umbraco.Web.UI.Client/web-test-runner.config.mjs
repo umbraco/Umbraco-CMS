@@ -66,7 +66,7 @@ export default {
 					window.__UMBRACO_TEST_RUN_A11Y_TEST = ${(!devMode).toString()};
 				</script>
 				<script src="/node_modules/msw/lib/iife/index.js"></script>
-				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui-css/dist/uui-css.css">
+				<link rel="stylesheet" href="node_modules/@umbraco-ui/uui/dist/themes/light.css">
 				<link rel="stylesheet" href="src/css/umb-css.css">
 				<script type="module">
 					// Initialize MSW first and wait for it to be ready before loading tests
