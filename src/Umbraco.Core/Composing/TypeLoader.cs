@@ -58,14 +58,14 @@ public sealed class TypeLoader
     ///         assemblies
     ///         for example.
     ///     </para>
-///     <para>Marked as internal as used only for unit tests.</para>
-/// </remarks>
+    ///     <para>Marked as internal as used only for unit tests.</para>
+    /// </remarks>
     internal IEnumerable<Assembly> AssembliesToScan => _assemblies ??= TypeFinder.AssembliesToScan;
 
     /// <summary>
     ///     Gets the type lists.
     /// </summary>
-/// <remarks>Marked as internal as used only for unit tests.</remarks>
+    /// <remarks>Marked as internal as used only for unit tests.</remarks>
     internal IEnumerable<TypeList> TypeLists => _types.Values;
 
     #region Get Assembly Attributes
