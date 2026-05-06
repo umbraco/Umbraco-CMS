@@ -236,59 +236,6 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	getUserName(): string | undefined {
 		return this.#currentUser.getValue()?.userName;
 	}
-	#onEntityUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
-		const entityType = event.getEntityType();
-		const unique = event.getUnique();
-		if (!unique) return;
-
-		if (entityType === UMB_USER_GROUP_ENTITY_TYPE) {
-			if (this.#isInGroup(unique)) {
-				this.#loadDebounced();
-			}
-			return;
-		}
-
-		const isCurrentUser = entityType === UMB_USER_ENTITY_TYPE && unique === this.#currentUser.getValue()?.unique;
-		if (isCurrentUser) {
-			this.#loadDebounced();
-		}
-	};
-
-	#onEntityDeletedEvent = (event: UmbEntityDeletedEvent) => {
-		if (event.getEntityType() !== UMB_USER_GROUP_ENTITY_TYPE) return;
-		const unique = event.getUnique();
-		if (!unique) return;
-		if (this.#isInGroup(unique)) {
-			this.#loadDebounced();
-		}
-	};
-
-	#addActionEventListeners(): void {
-		this.#actionEventContext?.addEventListener(
-			UmbEntityUpdatedEvent.TYPE,
-			this.#onEntityUpdatedEvent as unknown as EventListener,
-		);
-		this.#actionEventContext?.addEventListener(
-			UmbEntityDeletedEvent.TYPE,
-			this.#onEntityDeletedEvent as unknown as EventListener,
-		);
-	}
-
-	#removeActionEventListeners(): void {
-		this.#actionEventContext?.removeEventListener(
-			UmbEntityUpdatedEvent.TYPE,
-			this.#onEntityUpdatedEvent as unknown as EventListener,
-		);
-		this.#actionEventContext?.removeEventListener(
-			UmbEntityDeletedEvent.TYPE,
-			this.#onEntityDeletedEvent as unknown as EventListener,
-		);
-	}
-
-	override destroy(): void {
-		this.#removeActionEventListeners();
-		this.#loadDebounced.cancel();
-		super.destroy();
 }
 
 export default UmbCurrentUserContext;
