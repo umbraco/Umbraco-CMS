@@ -2,6 +2,7 @@ import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context
 import type { UUIScrollContainerElement, UUIPaginationElement } from '@umbraco-cms/backoffice/external/uui';
 import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 import type { LogMessageResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
@@ -23,6 +24,9 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 	@state()
 	private _isLoading = true;
+
+	@state()
+	private _currentPage = 1;
 
 	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
@@ -54,6 +58,10 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 		// Observe filter expression changes to trigger search
 		// Only observes when this component is mounted (when logs are visible)
+		this.observe(this._logViewerContext?.currentPage, (page) => {
+			this._currentPage = page ?? 1;
+		});
+
 		this.observe(
 			this._logViewerContext?.filterExpression.pipe(
 				skip(1), // Skip initial value to avoid duplicate search on page load
@@ -72,7 +80,11 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 
 	#onPageChange(event: Event): void {
 		const current = (event.target as UUIPaginationElement).current;
-		this._logViewerContext?.setCurrentPage(current);
+		this.#goToPage(current);
+	}
+
+	#goToPage(page: number): void {
+		this._logViewerContext?.setCurrentPage(page);
 		this._logViewerContext?.getLogs();
 		this._logsScrollContainer.scrollTop = 0;
 	}
@@ -87,11 +99,38 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 		return html`<div id="pagination">
 			<uui-pagination
 				.total=${totalPages}
+				.current=${this._currentPage}
 				firstlabel=${this.localize.term('general_first')}
 				previouslabel=${this.localize.term('general_previous')}
 				nextlabel=${this.localize.term('general_next')}
 				lastlabel=${this.localize.term('general_last')}
 				@change="${this.#onPageChange}"></uui-pagination>
+			<div id="mobile-pagination">
+				<uui-button
+					compact
+					look="outline"
+					label=${this.localize.term('general_first')}
+					?disabled=${this._currentPage === 1}
+					@click=${() => this.#goToPage(1)}></uui-button>
+				<uui-button
+					compact
+					look="outline"
+					label=${this.localize.term('general_previous')}
+					?disabled=${this._currentPage === 1}
+					@click=${() => this.#goToPage(this._currentPage - 1)}></uui-button>
+				<uui-button
+					compact
+					look="outline"
+					label=${this.localize.term('general_next')}
+					?disabled=${this._currentPage === totalPages}
+					@click=${() => this.#goToPage(this._currentPage + 1)}></uui-button>
+				<uui-button
+					compact
+					look="outline"
+					label=${this.localize.term('general_last')}
+					?disabled=${this._currentPage === totalPages}
+					@click=${() => this.#goToPage(totalPages)}></uui-button>
+			</div>
 		</div>`;
 	}
 
@@ -203,6 +242,26 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 			#pagination {
 				display: block;
 				margin: var(--uui-size-space-5) 0;
+			}
+
+			#mobile-pagination {
+				display: none;
+			}
+
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
+				#header {
+					display: none;
+				}
+
+				uui-pagination {
+					display: none;
+				}
+
+				#mobile-pagination {
+					display: flex;
+					justify-content: center;
+					gap: var(--uui-size-space-2);
+				}
 			}
 		`,
 	];

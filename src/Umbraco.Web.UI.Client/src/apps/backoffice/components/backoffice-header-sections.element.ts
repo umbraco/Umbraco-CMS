@@ -3,6 +3,7 @@ import type { UmbBackofficeContext } from '../backoffice.context.js';
 import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
@@ -14,7 +15,9 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 
 	private _backofficeContext?: UmbBackofficeContext;
 
+	readonly #mobileQuery = window.matchMedia(`(max-width: ${UMB_MOBILE_BREAKPOINT}px)`);
 	#sectionPathMap = new Map<string, string>();
+	#tabGroup?: Element;
 
 	constructor() {
 		super();
@@ -52,6 +55,32 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		);
 	}
 
+	protected override firstUpdated(): void {
+		// Overflow proxy tabs are cloneNode copies without Lit event handlers; delegate to the host
+		// and identify the clicked tab via data-mark. #onSectionClick stops propagation for visible tabs.
+		this.#tabGroup = this.renderRoot.querySelector('#tabs') ?? undefined;
+		this.#tabGroup?.addEventListener('click', this.#onTabGroupClick);
+	}
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		this.#tabGroup?.removeEventListener('click', this.#onTabGroupClick);
+	}
+
+	#onTabGroupClick = (e: Event) => {
+		if (!this.#mobileQuery.matches) return;
+		const path = e.composedPath() as HTMLElement[];
+		const tab = path.find((el) => el.getAttribute?.('data-mark')?.startsWith('section-link:')) as HTMLElement | null;
+		if (!tab) return;
+		const alias = tab.getAttribute('data-mark')?.replace('section-link:', '');
+		if (!alias) return;
+		const section = this._sections.find((s) => s.alias === alias);
+		if (!section) return;
+		e.preventDefault();
+		e.stopPropagation();
+		history.pushState(null, '', this.#getSectionPath(section));
+	};
+
 	#getSectionPath(manifest: ManifestSection | undefined) {
 		return `section/${manifest?.meta.pathname}`;
 	}
@@ -79,25 +108,37 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 
 		// If preventUrlRetention is set to true then go to the section root.
 		// Or if the clicked section is the current active one, then navigate to the section root
-		if (manifest?.meta.preventUrlRetention === true || this._currentSectionAlias === clickedSectionAlias) {
-			const sectionPath = this.#getSectionPath(manifest);
-			history.pushState(null, '', sectionPath);
+		if (manifest.meta.preventUrlRetention === true || this._currentSectionAlias === clickedSectionAlias) {
+			history.pushState(null, '', this.#getSectionPath(manifest));
 			return;
 		}
 
 		// Check if we have a stored path for the clicked section
 		if (this.#sectionPathMap.has(clickedSectionAlias)) {
-			const storedPath = this.#sectionPathMap.get(clickedSectionAlias);
-			history.pushState(null, '', storedPath);
+			history.pushState(null, '', this.#sectionPathMap.get(clickedSectionAlias)!);
 		} else {
 			// Nothing stored, so we navigate to the regular section path
-			const sectionPath = this.#getSectionPath(manifest);
-			history.pushState(null, '', sectionPath);
+			history.pushState(null, '', this.#getSectionPath(manifest));
 		}
 	}
 
+	#onCurrentSectionClick(event: PointerEvent) {
+		if (event.ctrlKey || event.metaKey) return;
+		event.preventDefault();
+		this._backofficeContext?.toggleMobileSidebar();
+	}
+
 	override render() {
+		const activeSection = this._sections.find((s) => s.alias === this._currentSectionAlias);
+		const activeLabel = activeSection ? this.localize.string(activeSection.meta.label || activeSection.name) : undefined;
+
 		return html`
+			<uui-tab
+				id="current-section-tab"
+				data-mark="current-section"
+				label=${ifDefined(activeLabel)}
+				aria-label=${ifDefined(activeLabel ? `${activeLabel} — toggle navigation` : undefined)}
+				@click=${this.#onCurrentSectionClick}></uui-tab>
 			<uui-tab-group id="tabs" data-mark="section-links">
 				${repeat(
 					this._sections,
@@ -123,6 +164,9 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 			:host {
 				display: contents;
 			}
+			#current-section-tab {
+				display: none;
+			}
 			#tabs {
 				height: 60px;
 				flex-basis: 100%;
@@ -132,6 +176,21 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 				--uui-tab-text-hover: var(--uui-color-header-contrast-emphasis);
 				--uui-tab-text-active: var(--uui-color-header-contrast-emphasis);
 				--uui-tab-group-dropdown-background: var(--uui-color-header-surface);
+			}
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
+				#current-section-tab {
+					display: flex;
+					height: 60px;
+					font-size: 16px;
+					--uui-tab-text: var(--uui-color-header-contrast);
+					--uui-tab-text-hover: var(--uui-color-header-contrast-emphasis);
+					--uui-tab-text-active: var(--uui-color-header-contrast);
+					--uui-tab-divider: transparent;
+				}
+				#tabs {
+					flex-basis: auto;
+					max-width: 32px;
+				}
 			}
 		`,
 	];

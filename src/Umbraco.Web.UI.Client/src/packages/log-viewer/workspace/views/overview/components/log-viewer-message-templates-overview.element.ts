@@ -2,6 +2,7 @@ import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, html, customElement, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 import type { LogTemplateResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
@@ -9,7 +10,9 @@ import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 @customElement('umb-log-viewer-message-templates-overview')
 export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	#itemsPerPage = 10;
-	#currentPage = 1;
+
+	@state()
+	private _currentPage = 1;
 
 	@state()
 	private _total = 0;
@@ -37,13 +40,17 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 	}
 
 	#getMessageTemplates() {
-		const skip = this.#currentPage * this.#itemsPerPage - this.#itemsPerPage;
+		const skip = this._currentPage * this.#itemsPerPage - this.#itemsPerPage;
 		this._logViewerContext?.getMessageTemplates(skip, this.#itemsPerPage);
 	}
 
-	#onChangePage(event: UUIPaginationEvent) {
-		this.#currentPage = event.target.current;
+	#goToPage(page: number) {
+		this._currentPage = page;
 		this.#getMessageTemplates();
+	}
+
+	#onChangePage(event: UUIPaginationEvent) {
+		this.#goToPage(event.target.current);
 	}
 
 	override render() {
@@ -70,13 +77,39 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 				</uui-table>
 				${this._total > this.#itemsPerPage
 					? html`<uui-pagination
-							.current=${this.#currentPage}
-							.total=${Math.ceil(this._total / this.#itemsPerPage)}
-							firstlabel=${this.localize.term('general_first')}
-							previouslabel=${this.localize.term('general_previous')}
-							nextlabel=${this.localize.term('general_next')}
-							lastlabel=${this.localize.term('general_last')}
-							@change=${this.#onChangePage}></uui-pagination>`
+								.current=${this._currentPage}
+								.total=${Math.ceil(this._total / this.#itemsPerPage)}
+								firstlabel=${this.localize.term('general_first')}
+								previouslabel=${this.localize.term('general_previous')}
+								nextlabel=${this.localize.term('general_next')}
+								lastlabel=${this.localize.term('general_last')}
+								@change=${this.#onChangePage}></uui-pagination>
+							<div id="mobile-pagination">
+								<uui-button
+									compact
+									look="outline"
+									label=${this.localize.term('general_first')}
+									?disabled=${this._currentPage === 1}
+									@click=${() => this.#goToPage(1)}></uui-button>
+								<uui-button
+									compact
+									look="outline"
+									label=${this.localize.term('general_previous')}
+									?disabled=${this._currentPage === 1}
+									@click=${() => this.#goToPage(this._currentPage - 1)}></uui-button>
+								<uui-button
+									compact
+									look="outline"
+									label=${this.localize.term('general_next')}
+									?disabled=${this._currentPage === Math.ceil(this._total / this.#itemsPerPage)}
+									@click=${() => this.#goToPage(this._currentPage + 1)}></uui-button>
+								<uui-button
+									compact
+									look="outline"
+									label=${this.localize.term('general_last')}
+									?disabled=${this._currentPage === Math.ceil(this._total / this.#itemsPerPage)}
+									@click=${() => this.#goToPage(Math.ceil(this._total / this.#itemsPerPage))}></uui-button>
+							</div>`
 					: nothing}
 			</uui-box>
 		`;
@@ -87,6 +120,35 @@ export class UmbLogViewerMessageTemplatesOverviewElement extends UmbLitElement {
 		css`
 			uui-pagination {
 				margin-top: var(--uui-size-layout-1);
+			}
+
+			#mobile-pagination {
+				display: none;
+			}
+
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
+				uui-pagination {
+					display: none;
+				}
+
+				#mobile-pagination {
+					display: flex;
+					justify-content: center;
+					gap: var(--uui-size-space-2);
+					margin-top: var(--uui-size-layout-1);
+				}
+
+				uui-table-cell {
+					max-width: 0;
+					overflow: hidden;
+				}
+
+				a span:first-child {
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+					min-width: 0;
+				}
 			}
 
 			#show-more-templates-btn {

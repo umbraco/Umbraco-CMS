@@ -1,6 +1,7 @@
 import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../logviewer-workspace.context-token.js';
 import { css, html, customElement, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 import { consumeContext } from '@umbraco-cms/backoffice/context-api';
 
 //TODO: add a disabled attribute to the show more button when the total number of items is correctly returned from the endpoint
@@ -147,6 +148,21 @@ export class UmbLogViewerOverviewViewElement extends UmbLitElement {
 
 			#common-messages-container > uui-box {
 				height: 100%;
+			}
+
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
+				:host {
+					margin: var(--uui-size-space-4);
+				}
+
+				#logviewer-layout {
+					display: flex;
+					flex-direction: column;
+				}
+
+				#info {
+					align-self: stretch;
+				}
 			}
 
 			uui-label:nth-of-type(2) {

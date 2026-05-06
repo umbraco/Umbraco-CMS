@@ -1,4 +1,5 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
+import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 import {
 	css,
 	html,
@@ -228,6 +229,20 @@ export class UmbBodyLayoutElement extends LitElement {
 			#main > slot::slotted(*:first-child) {
 				padding-top: 0;
 				margin-top: 0;
+			}
+
+			@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
+				#main {
+					padding: 0;
+					margin-top: 8px;
+				}
+
+				#navigation-slot {
+					width: 32px;
+					max-width: 32px;
+					min-width: 0;
+					overflow: hidden;
+				}
 			}
 		`,
 	];
