@@ -5,32 +5,16 @@ import { debounce } from '@umbraco-cms/backoffice/utils';
 import { LogLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { path, query, toQueryString } from '@umbraco-cms/backoffice/router';
-import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { observedFrom } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-log-level-filter-menu')
 export class UmbLogViewerLogLevelFilterMenuElement extends UmbLitElement {
 	@queryAll('#log-level-selector > uui-checkbox')
 	private _logLevelSelectorCheckboxes!: NodeListOf<UUICheckboxElement>;
 
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.logLevelsFilter, { default: [] })
 	@state()
 	private _logLevelFilter: LogLevelModel[] = [];
-
-	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
-
-	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
-	private set _logViewerContext(value) {
-		this.#logViewerContext = value;
-		this.#observeLogLevelFilter();
-	}
-	private get _logViewerContext() {
-		return this.#logViewerContext;
-	}
-
-	#observeLogLevelFilter() {
-		this.observe(this._logViewerContext?.logLevelsFilter, (levelsFilter) => {
-			this._logLevelFilter = levelsFilter ?? [];
-		});
-	}
 
 	#setLogLevel() {
 		const logLevels = Array.from(this._logLevelSelectorCheckboxes)

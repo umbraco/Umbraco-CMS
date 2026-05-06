@@ -4,7 +4,7 @@ import { css, html, customElement, query, state } from '@umbraco-cms/backoffice/
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LogMessageResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { DirectionModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { consumeContext, observedFrom } from '@umbraco-cms/backoffice/context-api';
 import { skip } from '@umbraco-cms/backoffice/external/rxjs';
 
 @customElement('umb-log-viewer-messages-list')
@@ -12,55 +12,31 @@ export class UmbLogViewerMessagesListElement extends UmbLitElement {
 	@query('#logs-scroll-container')
 	private _logsScrollContainer!: UUIScrollContainerElement;
 
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.sortingDirection, { default: DirectionModel.ASCENDING })
 	@state()
 	private _sortingDirection: DirectionModel = DirectionModel.ASCENDING;
 
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.logs, { default: [] })
 	@state()
 	private _logs: LogMessageResponseModel[] = [];
 
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.logsTotal, { default: 0 })
 	@state()
 	private _logsTotal = 0;
 
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.isLoadingLogs, { default: true })
 	@state()
 	private _isLoading = true;
 
-	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
-
 	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
-	private set _logViewerContext(value) {
-		this.#logViewerContext = value;
-		this.#observeLogs();
-	}
-	private get _logViewerContext() {
-		return this.#logViewerContext;
-	}
+	private _logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	#observeLogs() {
-		this.observe(this._logViewerContext?.logs, (logs) => {
-			this._logs = logs ?? [];
-		});
-
-		this.observe(this._logViewerContext?.isLoadingLogs, (isLoading) => {
-			this._isLoading = isLoading ?? this._isLoading;
-		});
-
-		this.observe(this._logViewerContext?.logsTotal, (total) => {
-			this._logsTotal = total ?? 0;
-		});
-
-		this.observe(this._logViewerContext?.sortingDirection, (direction) => {
-			this._sortingDirection = direction ?? this._sortingDirection;
-		});
-
-		// Observe filter expression changes to trigger search
-		// Only observes when this component is mounted (when logs are visible)
-		this.observe(
-			this._logViewerContext?.filterExpression.pipe(
-				skip(1), // Skip initial value to avoid duplicate search on page load
-			),
-			() => {
-				this._logViewerContext?.getLogs();
-			},
+	constructor() {
+		super();
+		this.observeContext(
+			UMB_APP_LOG_VIEWER_CONTEXT,
+			(ctx) => ctx.filterExpression.pipe(skip(1)),
+			() => this._logViewerContext?.getLogs(),
 		);
 	}
 

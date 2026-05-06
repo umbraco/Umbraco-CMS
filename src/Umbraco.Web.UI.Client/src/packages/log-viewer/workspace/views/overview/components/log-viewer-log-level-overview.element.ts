@@ -2,22 +2,17 @@ import { UMB_APP_LOG_VIEWER_CONTEXT } from '../../../logviewer-workspace.context
 import { html, nothing, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { LoggerResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-import { consumeContext } from '@umbraco-cms/backoffice/context-api';
+import { consumeContext, observedFrom } from '@umbraco-cms/backoffice/context-api';
 
 @customElement('umb-log-viewer-log-level-overview')
 export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
-	#logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
+	@consumeContext({
+		context: UMB_APP_LOG_VIEWER_CONTEXT,
+		callback: (ctx) => ctx?.getSavedSearches(),
+	})
+	private _logViewerContext?: typeof UMB_APP_LOG_VIEWER_CONTEXT.TYPE;
 
-	@consumeContext({ context: UMB_APP_LOG_VIEWER_CONTEXT })
-	private set _logViewerContext(value) {
-		this.#logViewerContext = value;
-		this.#logViewerContext?.getSavedSearches();
-		this.#observeLogLevels();
-	}
-	private get _logViewerContext() {
-		return this.#logViewerContext;
-	}
-
+	@observedFrom(UMB_APP_LOG_VIEWER_CONTEXT, (ctx) => ctx.loggers, { default: [] })
 	@state()
 	private _loggers: LoggerResponseModel[] = [];
 
@@ -27,12 +22,6 @@ export class UmbLogViewerLogLevelOverviewElement extends UmbLitElement {
 	 */
 	@property()
 	loggerName = 'Global';
-
-	#observeLogLevels() {
-		this.observe(this._logViewerContext?.loggers, (loggers) => {
-			this._loggers = loggers ?? [];
-		});
-	}
 
 	override render() {
 		return html`${this._loggers.length > 0

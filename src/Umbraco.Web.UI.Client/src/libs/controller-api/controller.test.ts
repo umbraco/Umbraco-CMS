@@ -253,6 +253,42 @@ describe('UmbController', () => {
 		});
 	});
 
+	describe('Pre-initialization (addInitializer timing)', () => {
+		it('allows addUmbController from a Lit addInitializer (before class fields initialize)', async () => {
+			let hostConnectedFired = false;
+			let initializerRan = false;
+
+			const { UmbLitElement } = await import('@umbraco-cms/backoffice/lit-element');
+
+			class EarlyAdderElement extends UmbLitElement {
+				static {
+					this.addInitializer((instance: any) => {
+						initializerRan = true;
+						instance.addUmbController({
+							controllerAlias: Symbol('early'),
+							hostConnected: () => {
+								hostConnectedFired = true;
+							},
+							hostDisconnected: () => {},
+							destroy: () => {},
+						});
+					});
+				}
+			}
+			customElements.define('test-early-adder-element', EarlyAdderElement);
+
+			const el = new EarlyAdderElement();
+			expect(initializerRan, 'addInitializer should have run during construction').to.be.true;
+
+			document.body.appendChild(el);
+			await Promise.resolve();
+
+			expect(hostConnectedFired, 'hostConnected should fire after the host connects').to.be.true;
+
+			document.body.removeChild(el);
+		});
+	});
+
 	describe('Controllers against other Controllers', () => {
 		it('controller is replaced by another controller using the same string as controller-alias', () => {
 			const firstCtrl = new UmbTestControllerImplementation(hostElement, 'my-test-alias');
