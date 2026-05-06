@@ -116,5 +116,19 @@ internal sealed class OpenApiContractTestTypedSchemasWithSampleTypes : OpenApiCo
                 ["File"] = "FileMediaWithCropsModel",
                 ["video"] = "VideoMediaWithCropsModel",
             });
+
+        // Verify the polymorphic test schema (auto-built by the framework from [JsonDerivedType])
+        // has discriminator mapping refs that resolve to the actual derived schema ids. Regression
+        // coverage for the framework prefixing each ref with the base schema id even though the
+        // derived schemas are registered without that prefix.
+        AssertSchemaIsPolymorphicUnion(
+            openApiDocument,
+            "IPolymorphicTestModel",
+            "$type",
+            new Dictionary<string, string>
+            {
+                ["PolymorphicTestModelChildA"] = "PolymorphicTestModelChildAModel",
+                ["PolymorphicTestModelChildB"] = "PolymorphicTestModelChildBModel",
+            });
     }
 }

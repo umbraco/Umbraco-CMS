@@ -1268,6 +1268,16 @@
                 "type": "null"
               }
             ]
+          },
+          "polymorphicTest": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IPolymorphicTestModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },
@@ -2092,6 +2102,27 @@
           }
         ]
       },
+      "IPolymorphicTestModel": {
+        "required": [
+          "$type"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/PolymorphicTestModelChildAModel"
+          },
+          {
+            "$ref": "#/components/schemas/PolymorphicTestModelChildBModel"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "$type",
+          "mapping": {
+            "PolymorphicTestModelChildA": "#/components/schemas/PolymorphicTestModelChildAModel",
+            "PolymorphicTestModelChildB": "#/components/schemas/PolymorphicTestModelChildBModel"
+          }
+        }
+      },
       "LandingPageContentModel": {
         "required": [
           "contentType"
@@ -2188,6 +2219,41 @@
             "items": {
               "$ref": "#/components/schemas/IApiMediaWithCropsResponseModel"
             }
+          }
+        }
+      },
+      "PolymorphicTestModelChildAModel": {
+        "required": [
+          "$type",
+          "fieldA"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "PolymorphicTestModelChildA"
+            ],
+            "type": "string"
+          },
+          "fieldA": {
+            "type": "string"
+          }
+        }
+      },
+      "PolymorphicTestModelChildBModel": {
+        "required": [
+          "$type",
+          "fieldB"
+        ],
+        "properties": {
+          "$type": {
+            "enum": [
+              "PolymorphicTestModelChildB"
+            ],
+            "type": "string"
+          },
+          "fieldB": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
