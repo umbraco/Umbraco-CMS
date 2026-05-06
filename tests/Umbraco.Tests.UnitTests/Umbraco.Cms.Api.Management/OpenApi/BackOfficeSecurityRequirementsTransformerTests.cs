@@ -109,7 +109,7 @@ public class BackOfficeSecurityRequirementsTransformerTests
     #region Operation Transformer Tests
 
     [Test]
-    public async Task TransformAsync_Operation_Skips_AllowAnonymous_Methods()
+    public async Task TransformAsync_Operation_Overrides_Security_For_AllowAnonymous_Methods()
     {
         // Arrange
         var operation = new OpenApiOperation();
@@ -134,13 +134,14 @@ public class BackOfficeSecurityRequirementsTransformerTests
         // Act
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
-        // Assert - Should not add 401 response or security
+        // Assert - Should not add 401 response, and security must be an empty list to override document-level security
         Assert.IsFalse(operation.Responses?.ContainsKey(StatusCodes.Status401Unauthorized.ToString()) ?? false);
-        Assert.IsNull(operation.Security);
+        Assert.IsNotNull(operation.Security);
+        Assert.IsEmpty(operation.Security);
     }
 
     [Test]
-    public async Task TransformAsync_Operation_Skips_AllowAnonymous_Controllers()
+    public async Task TransformAsync_Operation_Overrides_Security_For_AllowAnonymous_Controllers()
     {
         // Arrange
         var operation = new OpenApiOperation();
@@ -165,9 +166,10 @@ public class BackOfficeSecurityRequirementsTransformerTests
         // Act
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
-        // Assert - Should not add 401 response or security
+        // Assert - Should not add 401 response, and security must be an empty list to override document-level security
         Assert.IsFalse(operation.Responses?.ContainsKey(StatusCodes.Status401Unauthorized.ToString()) ?? false);
-        Assert.IsNull(operation.Security);
+        Assert.IsNotNull(operation.Security);
+        Assert.IsEmpty(operation.Security);
     }
 
     [Test]

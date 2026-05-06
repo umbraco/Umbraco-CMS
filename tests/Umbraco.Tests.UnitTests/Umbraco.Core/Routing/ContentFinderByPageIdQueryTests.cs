@@ -23,7 +23,7 @@ public class ContentFinderByPageIdQueryTests
         [Frozen] IUmbracoContextAccessor umbracoContextAccessor,
         [Frozen] IUmbracoContext umbracoContext,
         [Frozen] IRequestAccessor requestAccessor,
-        IFileService fileService)
+        ITemplateService templateService)
     {
         var absoluteUrl = "http://localhost" + urlAsString;
 
@@ -37,7 +37,7 @@ public class ContentFinderByPageIdQueryTests
         Mock.Get(requestAccessor).Setup(x => x.GetRequestValue("umbPageID"))
             .Returns(queryStrings["umbPageID"]);
 
-        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), fileService);
+        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri(absoluteUrl, UriKind.Absolute), templateService);
 
         var lookup = new ContentFinderByPageIdQuery(requestAccessor, umbracoContextAccessor);
 

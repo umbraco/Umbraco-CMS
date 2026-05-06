@@ -243,6 +243,11 @@ internal sealed class DatabaseDataCreator
                 ActionElementUnpublish.ActionLetter,
                 ActionElementBrowse.ActionLetter,
                 ActionElementRollback.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerDelete.ActionLetter,
+                ActionElementContainerMove.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
             [Constants.Security.EditorGroupKey] =
             [
@@ -273,6 +278,11 @@ internal sealed class DatabaseDataCreator
                 ActionElementUnpublish.ActionLetter,
                 ActionElementBrowse.ActionLetter,
                 ActionElementRollback.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerDelete.ActionLetter,
+                ActionElementContainerMove.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
             [Constants.Security.WriterGroupKey] =
             [
@@ -286,6 +296,9 @@ internal sealed class DatabaseDataCreator
                 ActionElementNew.ActionLetter,
                 ActionElementUpdate.ActionLetter,
                 ActionElementBrowse.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
             [Constants.Security.TranslatorGroupKey] =
             [
@@ -295,6 +308,8 @@ internal sealed class DatabaseDataCreator
                 ActionDocumentPropertyWrite.ActionLetter,
                 ActionElementUpdate.ActionLetter,
                 ActionElementBrowse.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
         };
 

@@ -15,7 +15,7 @@ public class PublishedRequestBuilderTests
 
     private IPublishedRequestBuilder GetBuilder() => new PublishedRequestBuilder(
         _baseUri,
-        Mock.Of<IFileService>());
+        Mock.Of<ITemplateService>());
 
     [Test]
     public void Setting_Published_Content_Clears_Template_And_Redirect()

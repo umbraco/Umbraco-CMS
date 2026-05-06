@@ -142,7 +142,7 @@ public class ContentFinderByUrlNewTests
 
     private static PublishedRequestBuilder CreatePublishedRequestBuilder(string path, bool withDomain = false)
     {
-        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri($"https://example.com{path}"), Mock.Of<IFileService>());
+        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri($"https://example.com{path}"), Mock.Of<ITemplateService>());
         if (withDomain)
         {
             publishedRequestBuilder.SetDomain(new DomainAndUri(new Domain(1, $"https://{DomainHost}/", DomainContentId, "en-US", false, 0), new Uri($"https://{DomainHost}{path}")));

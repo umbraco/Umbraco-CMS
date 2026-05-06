@@ -49,7 +49,18 @@ public class DeleteElementFolderController : ElementFolderControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ElementPermissionResource.WithKeys(ActionElementDelete.ActionLetter, id),
+            ElementContainerPermissionResource.WithKeys(ActionElementContainerDelete.ActionLetter, id),
+            AuthorizationPolicies.ElementFolderPermissionByResource);
+
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbidden();
+        }
+
+        // Also authorize deletion of all descendant elements.
+        authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ElementPermissionResource.Branch(ActionElementDelete.ActionLetter, id),
             AuthorizationPolicies.ElementPermissionByResource);
 
         if (!authorizationResult.Succeeded)

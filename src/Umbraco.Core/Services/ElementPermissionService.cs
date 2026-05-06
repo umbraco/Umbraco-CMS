@@ -41,7 +41,7 @@ internal sealed class ElementPermissionService : IElementPermissionService
         }
 
         // Use GetAllPaths instead of loading full content items - we only need paths for authorization
-        TreeEntityPath[] entityPaths = _entityService.GetAllPaths([UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer], keys).ToArray();
+        TreeEntityPath[] entityPaths = _entityService.GetAllPaths([UmbracoObjectTypes.Element], keys).ToArray();
         if (entityPaths.Length == 0)
         {
             return Task.FromResult(ElementAuthorizationStatus.NotFound);
@@ -73,10 +73,7 @@ internal sealed class ElementPermissionService : IElementPermissionService
         const int take = 500;
         var total = long.MaxValue;
 
-        UmbracoObjectTypes[] objectTypes = { UmbracoObjectTypes.Element, UmbracoObjectTypes.ElementContainer };
-
-        // Try to find the parent as either Element or ElementContainer
-        IEntitySlim? parentEntity = _entityService.GetAll(objectTypes, parentKey).FirstOrDefault();
+        IEntitySlim? parentEntity = _entityService.Get(parentKey, UmbracoObjectTypes.ElementContainer);
 
         if (parentEntity is null)
         {
@@ -92,7 +89,7 @@ internal sealed class ElementPermissionService : IElementPermissionService
             IEnumerable<IEntitySlim> descendants = _entityService.GetPagedDescendants(
                 parentKey,
                 parentObjectType,
-                objectTypes,
+                [UmbracoObjectTypes.Element],
                 skip,
                 take,
                 out total,
