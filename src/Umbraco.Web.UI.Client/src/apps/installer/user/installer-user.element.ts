@@ -68,6 +68,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 						<uui-label id="nameLabel" for="name" slot="label" required>Name</uui-label>
 						<uui-input
 							${umbFocus()}
+							autocomplete="name"
 							type="text"
 							id="name"
 							.value=${this._userFormData?.name ?? ''}
@@ -81,6 +82,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 						<uui-label id="emailLabel" for="email" slot="label" required>Email</uui-label>
 						<uui-input
 							type="email"
+							autocomplete="email"
 							id="email"
 							.value=${this._userFormData?.email ?? ''}
 							name="email"
@@ -95,6 +97,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 							id="password"
 							name="password"
 							label="password"
+							autocomplete="new-password"
 							minlength=${this._minimumPasswordLength}
 							.value=${this._userFormData?.password ?? ''}
 							required

@@ -308,22 +308,22 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	 * @param {Response} originalResponse The original response to copy status and headers from.
 	 * @returns {Response} The new Response object with the correct Content-Type and body.
 	 */
-	#createResponse(body: unknown, originalResponse: Response): Response {
+	#createResponse(body: unknown, originalResponse?: Response): Response {
 		const isString = typeof body === 'string';
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
 
 		// Construct new headers but preserve "X-" headers from the original response
 		const headersOverride: Record<string, string> = {};
-		originalResponse.headers.forEach((value, key) => {
+		originalResponse?.headers.forEach((value, key) => {
 			if (key.toLowerCase().startsWith('x-')) {
 				headersOverride[key] = value;
 			}
 		});
 
 		return new Response(responseBody, {
-			status: originalResponse.status,
-			statusText: originalResponse.statusText,
+			status: originalResponse?.status ?? 0,
+			statusText: originalResponse?.statusText ?? '',
 			headers: {
 				...headersOverride,
 				'Content-Type': contentType,

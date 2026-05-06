@@ -17,9 +17,12 @@ export default defineConfig({
 		},
 		{
 			name: '@hey-api/sdk',
-			asClass: true,
-			classNameBuilder: (name) => `${name}Service`,
 			responseStyle: 'fields',
+			operations: {
+				strategy: 'byTags',
+				container: 'class',
+				containerName: { name: '{{name}}Service', casing: 'PascalCase' }
+			},
 		}
 	]
 });
