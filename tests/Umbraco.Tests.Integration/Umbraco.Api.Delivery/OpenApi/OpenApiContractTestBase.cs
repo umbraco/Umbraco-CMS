@@ -230,6 +230,24 @@ internal abstract class OpenApiContractTestBase : OpenApiTestBase
             .Build();
         await ContentTypeService.CreateAsync(landingPage, Constants.Security.SuperUserKey);
 
+        // Create a document type with a capital-letter run in its alias to verify that
+        // the schema ID preserves the original casing (e.g. "xMLSitemap" -> "XMLSitemap"
+        // rather than the mangled "XMlsitemap" produced by the legacy ToCleanString tokenizer).
+        var xmlSitemapPage = new ContentTypeBuilder()
+            .WithAlias("xMLSitemap")
+            .WithName("XML Sitemap")
+            .AddPropertyGroup()
+                .WithName("Content")
+                .WithAlias("content")
+                .AddPropertyType()
+                    .WithAlias("changeFrequency")
+                    .WithName("Change Frequency")
+                    .WithDataTypeId(textDataType!.Id)
+                    .Done()
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(xmlSitemapPage, Constants.Security.SuperUserKey);
+
         // Create a custom media type for videos (with media picker for circular reference)
         var videoMedia = new MediaTypeBuilder()
             .WithAlias("video")

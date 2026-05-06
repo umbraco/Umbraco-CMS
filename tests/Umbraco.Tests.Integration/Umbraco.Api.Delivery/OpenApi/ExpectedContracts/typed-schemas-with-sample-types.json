@@ -1466,6 +1466,9 @@
           },
           {
             "$ref": "#/components/schemas/LandingPageContentModel"
+          },
+          {
+            "$ref": "#/components/schemas/XMLSitemapContentModel"
           }
         ],
         "discriminator": {
@@ -1473,7 +1476,8 @@
           "mapping": {
             "seoMetadata": "#/components/schemas/SeoMetadataContentModel",
             "articlePage": "#/components/schemas/ArticlePageContentModel",
-            "landingPage": "#/components/schemas/LandingPageContentModel"
+            "landingPage": "#/components/schemas/LandingPageContentModel",
+            "xMLSitemap": "#/components/schemas/XMLSitemapContentModel"
           }
         }
       },
@@ -1621,6 +1625,9 @@
           },
           {
             "$ref": "#/components/schemas/LandingPageContentResponseModel"
+          },
+          {
+            "$ref": "#/components/schemas/XMLSitemapContentResponseModel"
           }
         ],
         "discriminator": {
@@ -1628,7 +1635,8 @@
           "mapping": {
             "seoMetadata": "#/components/schemas/SeoMetadataContentResponseModel",
             "articlePage": "#/components/schemas/ArticlePageContentResponseModel",
-            "landingPage": "#/components/schemas/LandingPageContentResponseModel"
+            "landingPage": "#/components/schemas/LandingPageContentResponseModel",
+            "xMLSitemap": "#/components/schemas/XMLSitemapContentResponseModel"
           }
         }
       },
@@ -2603,6 +2611,47 @@
             "items": {
               "$ref": "#/components/schemas/IApiMediaWithCropsModel"
             }
+          }
+        }
+      },
+      "XMLSitemapContentModel": {
+        "required": [
+          "contentType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiContentBaseModel"
+          }
+        ],
+        "properties": {
+          "contentType": {
+            "const": "xMLSitemap"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/XMLSitemapPropertiesModel"
+          }
+        }
+      },
+      "XMLSitemapContentResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiContentResponseBaseModel"
+          },
+          {
+            "$ref": "#/components/schemas/XMLSitemapContentModel"
+          }
+        ]
+      },
+      "XMLSitemapPropertiesModel": {
+        "type": "object",
+        "properties": {
+          "changeFrequency": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       }

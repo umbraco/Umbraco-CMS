@@ -49,6 +49,9 @@ internal sealed class OpenApiContractTestTypedSchemasWithSampleTypes : OpenApiCo
         AssertSchemaExists(openApiDocument, "LandingPageContentResponseModel");
         AssertSchemaExists(openApiDocument, "LandingPagePropertiesModel");
 
+        AssertSchemaExists(openApiDocument, "XMLSitemapContentResponseModel");
+        AssertSchemaExists(openApiDocument, "XMLSitemapPropertiesModel");
+
         // Verify element type schemas are present (via block list on landing page)
         AssertSchemaExists(openApiDocument, "TestElementElementModel");
         AssertSchemaExists(openApiDocument, "TestElementPropertiesModel");
@@ -75,6 +78,7 @@ internal sealed class OpenApiContractTestTypedSchemasWithSampleTypes : OpenApiCo
                 ["articlePage"] = "ArticlePageContentResponseModel",
                 ["landingPage"] = "LandingPageContentResponseModel",
                 ["seoMetadata"] = "SeoMetadataContentResponseModel",
+                ["xMLSitemap"] = "XMLSitemapContentResponseModel",
             });
 
         AssertSchemaIsPolymorphicUnion(
@@ -86,6 +90,7 @@ internal sealed class OpenApiContractTestTypedSchemasWithSampleTypes : OpenApiCo
                 ["articlePage"] = "ArticlePageContentModel",
                 ["landingPage"] = "LandingPageContentModel",
                 ["seoMetadata"] = "SeoMetadataContentModel",
+                ["xMLSitemap"] = "XMLSitemapContentModel",
             });
 
         AssertSchemaIsPolymorphicUnion(
