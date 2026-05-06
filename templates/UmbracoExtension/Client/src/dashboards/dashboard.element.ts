@@ -9,7 +9,7 @@ import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
 import { UUIButtonElement } from "@umbraco-cms/backoffice/external/uui";
 import { UMB_NOTIFICATION_CONTEXT } from "@umbraco-cms/backoffice/notification";
 import { UMB_CURRENT_USER_CONTEXT, UmbCurrentUserModel } from "@umbraco-cms/backoffice/current-user";
-import { UmbracoExtensionService, UserModel } from "../api/index.js";
+import { whoAmI, whatsTheTimeMrWolf, whatsMyName, Iuser } from "../api/index.js";
 
 @customElement("example-dashboard")
 export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
@@ -20,7 +20,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
   private _timeFromMrWolf?: Date;
 
   @state()
-  private _serverUserData?: UserModel;
+  private _serverUserData?: Iuser;
 
   @state()
   private _contextCurrentUser?: UmbCurrentUserModel;
@@ -52,7 +52,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
     const buttonElement = ev.target as UUIButtonElement;
     buttonElement.state = "waiting";
 
-    const { data, error } = await UmbracoExtensionService.whoAmI();
+    const { data, error } = await whoAmI();
 
     if (error) {
       buttonElement.state = "failed";
@@ -61,7 +61,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
     }
 
     if (data !== undefined) {
-      this._serverUserData = data as UserModel;
+      this._serverUserData = data as Iuser;
       buttonElement.state = "success";
     }
 
@@ -80,7 +80,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
     buttonElement.state = "waiting";
 
     // Getting a string - should I expect a datetime?!
-    const { data, error } = await UmbracoExtensionService.whatsTheTimeMrWolf();
+    const { data, error } = await whatsTheTimeMrWolf();
 
     if (error) {
       buttonElement.state = "failed";
@@ -98,7 +98,7 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
     const buttonElement = ev.target as UUIButtonElement;
     buttonElement.state = "waiting";
 
-    const { data, error } = await UmbracoExtensionService.whatsMyName();
+    const { data, error } = await whatsMyName();
 
     if (error) {
       buttonElement.state = "failed";
