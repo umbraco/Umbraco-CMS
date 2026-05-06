@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Configuration.Models;
 ///     Typed configuration options for back-office token cookie settings.
 /// </summary>
 [UmbracoOptions(Constants.Configuration.ConfigBackOfficeTokenCookie)]
-[Obsolete("This will be replaced with a different authentication scheme. Scheduled for removal in Umbraco 18.")]
+[Obsolete("This will be replaced with a different authentication scheme. Scheduled for removal in Umbraco 19+. The exact version is unknown but is tied to the BFF project.")]
 public class BackOfficeTokenCookieSettings
 {
     private const string StaticSameSite = "Strict";
