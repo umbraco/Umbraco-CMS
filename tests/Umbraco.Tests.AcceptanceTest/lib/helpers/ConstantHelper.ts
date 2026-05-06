@@ -306,7 +306,7 @@
     notifications: '/notifications',
     currentUser: '/umbraco/management/api/v1/user/current',
     revoke: '/umbraco/management/api/v1/security/back-office/revoke',
-    search: '/umbraco/management/api/v1/item/document/search',
+    documentSearch: '/umbraco/management/api/v1/item/document/search',
     mediaSearch: '/umbraco/management/api/v1/item/media/search',
     memberSearch: '/umbraco/management/api/v1/item/member/search'
   }

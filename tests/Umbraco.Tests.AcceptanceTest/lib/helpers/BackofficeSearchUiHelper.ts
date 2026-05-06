@@ -52,16 +52,32 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
     await this.input.fill('');
   }
 
-  async searchForQuery(query: string, expectedResultName?: string, searchUrl: string = ConstantHelper.apiEndpoints.search) {
-    await this.waitForResponseAfterExecutingPromise(searchUrl, this.enterSearchQuery(query), ConstantHelper.statusCodes.ok);
+  async searchForDocument(query: string) {
+    await this.searchForQuery(query, ConstantHelper.apiEndpoints.documentSearch);
+  }
 
-    if (expectedResultName != null) {
-      await this.isVisible(this.resultByName(expectedResultName));
-    }
+  async searchForMedia(query: string) {
+    await this.searchForQuery(query, ConstantHelper.apiEndpoints.mediaSearch);
+  }
+
+  async searchForMember(query: string) {
+    await this.searchForQuery(query, ConstantHelper.apiEndpoints.memberSearch);
   }
 
   async clickSearchProvider(providerName: string) {
     await this.click(this.searchModal.getByRole('button', {name: providerName, exact: true}));
+  }
+
+  async clickSearchProviderAndWaitForRerun(providerName: string, searchUrl: string) {
+    await this.waitForResponseAfterExecutingPromise(
+      searchUrl,
+      this.click(this.searchModal.getByRole('button', {name: providerName, exact: true})),
+      ConstantHelper.statusCodes.ok,
+    );
+  }
+
+  private async searchForQuery(query: string, searchUrl: string) {
+    await this.waitForResponseAfterExecutingPromise(searchUrl, this.enterSearchQuery(query), ConstantHelper.statusCodes.ok);
   }
 
   async isSearchProviderActive(providerName: string) {

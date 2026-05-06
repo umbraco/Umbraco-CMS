@@ -33,9 +33,12 @@ test.describe('Modal behavior', () => {
   });
 
   test('can see the no results message when nothing matches', async ({umbracoUi}) => {
+    // Arrange
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
-    await umbracoUi.backofficeSearch.searchForQuery('zzz-no-such-content-can-exist-zzz');
+    await umbracoUi.backofficeSearch.searchForDocument('zzz-no-such-content-can-exist-zzz');
 
     // Assert
     await umbracoUi.backofficeSearch.isNoResultsMessageVisible();
@@ -89,7 +92,7 @@ test.describe('Document search', () => {
 
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
-    await umbracoUi.backofficeSearch.searchForQuery(documentName);
+    await umbracoUi.backofficeSearch.searchForDocument(documentName);
 
     // Assert
     await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(documentName);
@@ -103,9 +106,10 @@ test.describe('Document search', () => {
 
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
-    await umbracoUi.backofficeSearch.searchForQuery(documentName);
+    await umbracoUi.backofficeSearch.searchForDocument(documentName);
 
     // Assert
+    await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(documentName);
     const href = await umbracoUi.backofficeSearch.getSearchResultHref(documentName);
     expect(href).toContain('section/content/workspace/document/edit/' + documentId);
   });
@@ -119,11 +123,12 @@ test.describe('Document search', () => {
 
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
-    await umbracoUi.backofficeSearch.searchForQuery(documentNamePrefix);
+    await umbracoUi.backofficeSearch.searchForDocument(documentNamePrefix);
+
+    // Assert
     await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(documentName);
     await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(secondDocumentName);
 
-    // Assert
     await umbracoUi.backofficeSearch.pressArrowDown();
     expect(await umbracoUi.backofficeSearch.getActiveSearchResultIndex()).toBe(0);
 
@@ -142,7 +147,7 @@ test.describe('Document search', () => {
 
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
-    await umbracoUi.backofficeSearch.searchForQuery(documentName);
+    await umbracoUi.backofficeSearch.searchForDocument(documentName);
     await umbracoUi.backofficeSearch.clearSearchQuery();
 
     // Assert
@@ -156,10 +161,11 @@ test.describe('Document search', () => {
     const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithAllowedChildNode(documentTypeName, childDocumentTypeId);
     const parentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
     await umbracoApi.document.createDefaultDocumentWithParent(childDocumentName, childDocumentTypeId, parentId);
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
-    await umbracoUi.backofficeSearch.searchForQuery(childDocumentName);
+    await umbracoUi.backofficeSearch.searchForDocument(childDocumentName);
 
     // Assert
     await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(childDocumentName);
@@ -169,10 +175,11 @@ test.describe('Document search', () => {
     // Arrange
     const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
     await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
-    await umbracoUi.backofficeSearch.searchForQuery(documentNamePrefix);
+    await umbracoUi.backofficeSearch.searchForDocument(documentNamePrefix);
 
     // Assert
     await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(documentName);
@@ -198,7 +205,7 @@ test.describe('Media search', () => {
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
     await umbracoUi.backofficeSearch.clickSearchProvider('Media');
-    await umbracoUi.backofficeSearch.searchForQuery(mediaName, undefined, ConstantHelper.apiEndpoints.mediaSearch);
+    await umbracoUi.backofficeSearch.searchForMedia(mediaName);
 
     // Assert
     await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(mediaName);
@@ -234,7 +241,7 @@ test.describe('Member search', () => {
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
     await umbracoUi.backofficeSearch.clickSearchProvider('Members');
-    await umbracoUi.backofficeSearch.searchForQuery(memberName, undefined, ConstantHelper.apiEndpoints.memberSearch);
+    await umbracoUi.backofficeSearch.searchForMember(memberName);
 
     // Assert
     await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(memberName);
@@ -270,11 +277,10 @@ test.describe('Cross-provider', () => {
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
     await umbracoUi.backofficeSearch.isSearchProviderActive('Documents');
-    await umbracoUi.backofficeSearch.searchForQuery(sharedSearchToken);
+    await umbracoUi.backofficeSearch.searchForDocument(sharedSearchToken);
     await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(sharedDocumentName);
     await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(sharedMediaName, false);
-    await umbracoUi.backofficeSearch.clickSearchProvider('Media');
-    await umbracoUi.backofficeSearch.searchForQuery(sharedSearchToken, undefined, ConstantHelper.apiEndpoints.mediaSearch);
+    await umbracoUi.backofficeSearch.clickSearchProviderAndWaitForRerun('Media', ConstantHelper.apiEndpoints.mediaSearch);
 
     // Assert
     await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(sharedMediaName);
