@@ -101,7 +101,8 @@ public static partial class UmbracoBuilderExtensions
             .AddUmbracoOptions<SystemDateMigrationSettings>()
             .AddUmbracoOptions<DistributedJobSettings>()
             .AddUmbracoOptions<BackOfficeTokenCookieSettings>()
-            .AddUmbracoOptions<WebsiteSettings>();
+            .AddUmbracoOptions<WebsiteSettings>()
+            .AddUmbracoOptions<SignalRSettings>();
 
         // Configure connection string and ensure it's updated when the configuration changes
         builder.Services.AddSingleton<IConfigureOptions<ConnectionStrings>, ConfigureConnectionStrings>();

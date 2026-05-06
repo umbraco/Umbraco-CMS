@@ -6,7 +6,7 @@ import { UmbExtensionsManifestInitializer, createExtensionElement } from '@umbra
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbArrayState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import type { UmbRoute } from '@umbraco-cms/backoffice/router';
+import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 
 export interface UmbCollectionViewManagerConfig {
 	defaultViewAlias?: string;
@@ -87,6 +87,12 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 		);
 	}
 
+	#setupViewComponent(component: PageComponent, view: ManifestCollectionView) {
+		(component as HTMLElement).setAttribute('data-mark', `collection-view:${view.alias}`);
+		(component as UmbCollectionViewElementBase).manifest = view;
+		this.setCurrentView(view);
+	}
+
 	#createRoutes(views: ManifestCollectionView[] | null) {
 		let routes: Array<UmbRoute> = [];
 
@@ -102,10 +108,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 				return {
 					path: `${view.meta.pathName}`,
 					component: () => createExtensionElement(view),
-					setup: (component) => {
-						(component as UmbCollectionViewElementBase).manifest = view;
-						this.setCurrentView(view);
-					},
+					setup: (component) => this.#setupViewComponent(component, view),
 				};
 			});
 
@@ -114,10 +117,7 @@ export class UmbCollectionViewManager extends UmbControllerBase {
 					unique: fallbackView.alias,
 					path: '',
 					component: () => createExtensionElement(fallbackView),
-					setup: (component) => {
-						(component as UmbCollectionViewElementBase).manifest = fallbackView;
-						this.setCurrentView(fallbackView);
-					},
+					setup: (component) => this.#setupViewComponent(component, fallbackView),
 				});
 
 				routes.push({

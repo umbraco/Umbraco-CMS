@@ -2675,6 +2675,7 @@ export type ServerConfigurationResponseModel = {
     versionCheckPeriod: number;
     allowLocalLogin: boolean;
     umbracoCssPath: string;
+    signalR: SignalRClientSettingsResponseModel;
 };
 
 export type ServerInformationResponseModel = {
@@ -2694,6 +2695,10 @@ export type ServerTroubleshootingResponseModel = {
 
 export type SetAvatarRequestModel = {
     file: ReferenceByIdModel;
+};
+
+export type SignalRClientSettingsResponseModel = {
+    skipNegotiation: boolean;
 };
 
 export type SortingRequestModel = {
@@ -2901,10 +2906,7 @@ export type TemplateQuerySettingsResponseModel = {
 export type TemplateResponseModel = {
     id: string;
     layoutTemplate?: null | ReferenceByIdModel;
-    /**
-     * @deprecated
-     */
-    masterTemplate?: ReferenceByIdModel;
+    masterTemplate?: null | ReferenceByIdModel;
     name: string;
     alias: string;
     content?: null | string;

@@ -16272,7 +16272,7 @@
             }
           }
         },
-        "security": []
+        "security": [ ]
       }
     },
     "/umbraco/management/api/v1/install/setup": {
@@ -16336,7 +16336,7 @@
             }
           }
         },
-        "security": []
+        "security": [ ]
       }
     },
     "/umbraco/management/api/v1/install/validate-database": {
@@ -16400,7 +16400,7 @@
             }
           }
         },
-        "security": []
+        "security": [ ]
       }
     },
     "/umbraco/management/api/v1/item/language": {
@@ -17662,7 +17662,7 @@
             }
           }
         },
-        "security": []
+        "security": [ ]
       }
     },
     "/umbraco/management/api/v1/collection/media": {
@@ -28431,7 +28431,7 @@
             }
           }
         },
-        "security": []
+        "security": [ ]
       }
     },
     "/umbraco/management/api/v1/profiling/status": {
@@ -30755,7 +30755,7 @@
             }
           }
         },
-        "security": []
+        "security": [ ]
       }
     },
     "/umbraco/management/api/v1/segment": {
@@ -30838,7 +30838,7 @@
             }
           }
         },
-        "security": []
+        "security": [ ]
       }
     },
     "/umbraco/management/api/v1/server/information": {
@@ -30901,7 +30901,7 @@
             }
           }
         },
-        "security": []
+        "security": [ ]
       }
     },
     "/umbraco/management/api/v1/server/troubleshooting": {
@@ -36941,7 +36941,7 @@
             }
           }
         },
-        "security": []
+        "security": [ ]
       }
     },
     "/umbraco/management/api/v1/user/invite/resend": {
@@ -37148,7 +37148,7 @@
             }
           }
         },
-        "security": []
+        "security": [ ]
       }
     },
     "/umbraco/management/api/v1/user/set-user-groups": {
@@ -49669,7 +49669,8 @@
           "allowPasswordReset",
           "versionCheckPeriod",
           "allowLocalLogin",
-          "umbracoCssPath"
+          "umbracoCssPath",
+          "signalR"
         ],
         "type": "object",
         "properties": {
@@ -49685,6 +49686,9 @@
           },
           "umbracoCssPath": {
             "type": "string"
+          },
+          "signalR": {
+            "$ref": "#/components/schemas/SignalRClientSettingsResponseModel"
           }
         }
       },
@@ -49744,6 +49748,17 @@
         "properties": {
           "file": {
             "$ref": "#/components/schemas/ReferenceByIdModel"
+          }
+        }
+      },
+      "SignalRClientSettingsResponseModel": {
+        "required": [
+          "skipNegotiation"
+        ],
+        "type": "object",
+        "properties": {
+          "skipNegotiation": {
+            "type": "boolean"
           }
         }
       },
@@ -50518,11 +50533,12 @@
           "masterTemplate": {
             "oneOf": [
               {
+                "type": "null"
+              },
+              {
                 "$ref": "#/components/schemas/ReferenceByIdModel"
               }
-            ],
-            "nullable": true,
-            "deprecated": true
+            ]
           },
           "name": {
             "type": "string"

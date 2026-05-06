@@ -3,6 +3,10 @@
 
 ---
 
+This guide covers naming and formatting conventions. For visual design choices — icons, colours, buttons, and UX copy — see [design-choices.md](./design-choices.md).
+
+---
+
 
 ### Naming Conventions
 

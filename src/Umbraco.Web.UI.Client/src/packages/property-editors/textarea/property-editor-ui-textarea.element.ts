@@ -7,7 +7,6 @@ import {
 	property,
 	state,
 	styleMap,
-	unsafeHTML,
 } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { StyleInfo } from '@umbraco-cms/backoffice/external/lit';
@@ -104,7 +103,7 @@ export class UmbPropertyEditorUITextareaElement
 		const { remaining, visible } = getCharacterCountState(this._maxChars, this.value?.length ?? 0);
 		if (!visible) return nothing;
 
-		return html`<div class="char-count">${unsafeHTML(this.localize.term('textbox_characters_left', remaining))}</div>`;
+		return html`<div class="char-count">${this.localize.htmlString('#textbox_characters_left', remaining)}</div>`;
 	}
 
 	override render() {

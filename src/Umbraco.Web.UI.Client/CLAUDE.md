@@ -9,16 +9,20 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 - **[Manifests & Aliases](./docs/manifests.md)** - Manifest shape, alias conventions, alias constants, how aliases connect extensions, registration, registry operations, kind merging
 - **[Entities](./docs/entities.md)** - Entity types, entity context, how entityType connects workspaces/trees/actions/routing
 - **[Workspaces](./docs/workspaces.md)** - Workspace types, base classes, extension points, workspace contexts, save flow, routing
-- **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement, observable state (UmbArrayState, UmbObjectState, etc.), Context API, controller lifecycle
+- **[Core Primitives](./docs/core-primitives.md)** - UmbLitElement, observable state, Context API, controller lifecycle
+- **[State System](./docs/state-system.md)** - `Umb*State` change-detection contract, per-type comparison semantics, `asObservablePart`, mute/unmute, observer-guard anti-patterns
 - **[Data Flow](./docs/data-flow.md)** - Data flow chain, data sources, tryExecute, generated API clients, stores, complete worked example
 - **[Repositories](./docs/repositories.md)** - Repository categories (detail, item, tree, collection, action-specific), file structure, naming, extension registration, data source delegation
 - **[Package Development](./docs/package-development.md)** - Package & module structure, folder structure conventions, localization, organizational rules
+- **[Value Type](./docs/value-type.md)** - Compile-time type map (`UmbValueTypeMap`); declaring typed value type constants via declaration merging
+- **[Value Summary](./docs/value-summary.md)** - `valueSummary` extension type; rendering compact values in collection views, batch resolver pattern, coordinator
 
 ### Development
 - **[Commands](./docs/commands.md)** - Build, test, and development commands
 
 ### Code Quality
 - **[Style Guide](./docs/style-guide.md)** - Naming and formatting conventions
+- **[Design Choices](./docs/design-choices.md)** - Visual restraint: icons, colours, buttons, and UX copy
 - **[Clean Code](./docs/clean-code.md)** - Best practices and SOLID principles
 - **[Deprecation](./docs/deprecation.md)** - Breaking changes policy, deprecation patterns (JSDoc + UmbDeprecation)
 - **[Testing](./docs/testing.md)** - Testing strategy, priority by code area, MSW mocking, test patterns
@@ -41,11 +45,13 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 |----------------|------|
 | Deprecate or remove a public API | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning |
 | Create a new element or component | [docs/style-guide.md](./docs/style-guide.md) |
+| Build, style, or write copy for any UI | [docs/design-choices.md](./docs/design-choices.md) — default to no icon, no colour, terse contextual copy |
 | Create a repository or data source | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md) |
 | Add error handling or debugging | [docs/error-handling.md](./docs/error-handling.md) |
 | Write or modify tests | [docs/testing.md](./docs/testing.md) |
 | Work with auth or security | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md) |
 | Scaffold a new package or module | [docs/package-development.md](./docs/package-development.md) |
+| Write or change observers / `Umb*State` usage | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards |
 
 This is not optional. Skipping these leads to convention violations that are caught in review.
 

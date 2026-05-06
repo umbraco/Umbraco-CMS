@@ -96,6 +96,7 @@ export class UmbInstallerUserElement extends UmbLitElement {
 							name="password"
 							label="password"
 							minlength=${this._minimumPasswordLength}
+							.minlengthMessage=${`Password must be at least ${this._minimumPasswordLength} characters long!`}
 							.value=${this._userFormData?.password ?? ''}
 							required
 							required-message="Password is required"></uui-input-password>
