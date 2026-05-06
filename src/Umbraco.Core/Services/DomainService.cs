@@ -51,23 +51,6 @@ public class DomainService : RepositoryService, IDomainService
         }
     }
 
-    /// <summary>
-    /// Deletes a domain.
-    /// </summary>
-    /// <param name="domain">The domain to delete.</param>
-    /// <returns>An attempt result indicating the success or failure of the operation.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    public Attempt<OperationResult?> Delete(IDomain domain)
-    {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        var result = DeleteAll(new[] { domain }, scope, eventMessages);
-        scope.Complete();
-
-        return result ? OperationResult.Attempt.Succeed(eventMessages) : OperationResult.Attempt.Cancel(eventMessages);
-    }
-
     /// <inheritdoc />
     public IDomain? GetByName(string name)
     {
@@ -86,51 +69,6 @@ public class DomainService : RepositoryService, IDomainService
         }
     }
 
-    /// <summary>
-    /// Gets all domains.
-    /// </summary>
-    /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
-    /// <returns>A collection of all domains.</returns>
-    [Obsolete($"Please use {nameof(GetAllAsync)}. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDomain> GetAll(bool includeWildcards)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _domainRepository.GetAll(includeWildcards);
-        }
-    }
-
-    /// <summary>
-    /// Gets the domains assigned to a specific content item.
-    /// </summary>
-    /// <param name="contentId">The identifier of the content item.</param>
-    /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
-    /// <returns>A collection of domains assigned to the content item.</returns>
-    [Obsolete($"Please use {nameof(GetAssignedDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _domainRepository.GetAssignedDomains(contentId, includeWildcards);
-        }
-    }
-
-    /// <summary>
-    /// Saves a domain.
-    /// </summary>
-    /// <param name="domainEntity">The domain entity to save.</param>
-    /// <returns>An attempt result indicating the success or failure of the operation.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    public Attempt<OperationResult?> Save(IDomain domainEntity)
-    {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        var result = SaveAll(new[] { domainEntity }, scope, eventMessages);
-        scope.Complete();
-
-        return result ? OperationResult.Attempt.Succeed(eventMessages) : OperationResult.Attempt.Cancel(eventMessages);
-    }
     /// <inheritdoc />
     public Task<IEnumerable<IDomain>> GetAssignedDomainsAsync(Guid contentKey, bool includeWildcards)
     {

@@ -1155,10 +1155,121 @@
   },
   "components": {
     "schemas": {
-      "ApiContentModel": {
+      "ApiImageCropperValueModel": {
+        "required": [
+          "url",
+          "focalPoint",
+          "crops"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "focalPoint": {
+            "$ref": "#/components/schemas/ImageFocalPointModel"
+          },
+          "crops": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ImageCropModel"
+            }
+          }
+        }
+      },
+      "FileMediaPropertiesModel": {
+        "type": "object",
+        "properties": {
+          "umbracoFile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoExtension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoBytes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "FileMediaWithCropsModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiMediaWithCropsBaseModel"
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "File"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/FileMediaPropertiesModel"
+          }
+        }
+      },
+      "FileMediaWithCropsResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiMediaWithCropsResponseBaseModel"
+          },
+          {
+            "$ref": "#/components/schemas/FileMediaWithCropsModel"
+          }
+        ]
+      },
+      "FolderMediaPropertiesModel": {
+        "type": "object"
+      },
+      "FolderMediaWithCropsModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiMediaWithCropsBaseModel"
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "Folder"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/FolderMediaPropertiesModel"
+          }
+        }
+      },
+      "FolderMediaWithCropsResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiMediaWithCropsResponseBaseModel"
+          },
+          {
+            "$ref": "#/components/schemas/FolderMediaWithCropsModel"
+          }
+        ]
+      },
+      "IApiContentBaseModel": {
         "required": [
           "contentType",
-          "name",
           "createDate",
           "updateDate",
           "route",
@@ -1168,10 +1279,16 @@
         "type": "object",
         "properties": {
           "contentType": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "name": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "createDate": {
             "type": "string",
@@ -1182,21 +1299,69 @@
             "format": "date-time"
           },
           "route": {
-            "$ref": "#/components/schemas/IApiContentRouteModel"
+            "required": [
+              "path",
+              "startItem"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "queryString": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "startItem": {
+                "required": [
+                  "id",
+                  "path"
+                ],
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "path": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
           },
           "id": {
             "type": "string",
             "format": "uuid"
           },
           "properties": {
-            "type": "object"
+            "type": [
+              "null",
+              "object"
+            ]
           }
         }
       },
-      "ApiContentResponseModel": {
+      "IApiContentModel": {
+        "required": [
+          "contentType"
+        ],
+        "type": "object",
+        "discriminator": {
+          "propertyName": "contentType"
+        }
+      },
+      "IApiContentResponseBaseModel": {
         "required": [
           "contentType",
-          "name",
           "createDate",
           "updateDate",
           "route",
@@ -1207,10 +1372,16 @@
         "type": "object",
         "properties": {
           "contentType": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "name": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "createDate": {
             "type": "string",
@@ -1221,17 +1392,60 @@
             "format": "date-time"
           },
           "route": {
-            "$ref": "#/components/schemas/IApiContentRouteModel"
+            "required": [
+              "path",
+              "startItem"
+            ],
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "queryString": {
+                "type": [
+                  "null",
+                  "string"
+                ]
+              },
+              "startItem": {
+                "required": [
+                  "id",
+                  "path"
+                ],
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "path": {
+                    "type": [
+                      "null",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
           },
           "id": {
             "type": "string",
             "format": "uuid"
           },
           "properties": {
-            "type": "object"
+            "type": [
+              "null",
+              "object"
+            ]
           },
           "cultures": {
-            "type": "object",
+            "type": [
+              "null",
+              "object"
+            ],
             "additionalProperties": {
               "required": [
                 "path",
@@ -1275,332 +1489,6 @@
           }
         }
       },
-      "ApiElementModel": {
-        "required": [
-          "contentType",
-          "id",
-          "properties"
-        ],
-        "type": "object",
-        "properties": {
-          "contentType": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "properties": {
-            "type": "object"
-          }
-        }
-      },
-      "ApiImageCropperValueModel": {
-        "required": [
-          "url",
-          "focalPoint",
-          "crops"
-        ],
-        "type": [
-          "null",
-          "object"
-        ],
-        "properties": {
-          "url": {
-            "type": "string"
-          },
-          "focalPoint": {
-            "$ref": "#/components/schemas/ImageFocalPointModel"
-          },
-          "crops": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "$ref": "#/components/schemas/ImageCropModel"
-            }
-          }
-        }
-      },
-      "ApiMediaWithCropsModel": {
-        "required": [
-          "focalPoint",
-          "crops",
-          "id",
-          "name",
-          "mediaType",
-          "url",
-          "properties"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "mediaType": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "url": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "extension": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "width": {
-            "type": [
-              "null",
-              "integer"
-            ],
-            "format": "int32"
-          },
-          "height": {
-            "type": [
-              "null",
-              "integer"
-            ],
-            "format": "int32"
-          },
-          "bytes": {
-            "type": [
-              "null",
-              "integer"
-            ],
-            "format": "int32"
-          },
-          "properties": {
-            "type": [
-              "null",
-              "object"
-            ]
-          },
-          "focalPoint": {
-            "$ref": "#/components/schemas/ImageFocalPointModel"
-          },
-          "crops": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "$ref": "#/components/schemas/ImageCropModel"
-            }
-          }
-        }
-      },
-      "ApiMediaWithCropsResponseModel": {
-        "required": [
-          "path",
-          "createDate",
-          "updateDate",
-          "focalPoint",
-          "crops",
-          "id",
-          "name",
-          "mediaType",
-          "url",
-          "properties"
-        ],
-        "type": "object",
-        "properties": {
-          "path": {
-            "type": "string"
-          },
-          "createDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updateDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "mediaType": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "url": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "extension": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "width": {
-            "type": [
-              "null",
-              "integer"
-            ],
-            "format": "int32"
-          },
-          "height": {
-            "type": [
-              "null",
-              "integer"
-            ],
-            "format": "int32"
-          },
-          "bytes": {
-            "type": [
-              "null",
-              "integer"
-            ],
-            "format": "int32"
-          },
-          "properties": {
-            "type": [
-              "null",
-              "object"
-            ]
-          },
-          "focalPoint": {
-            "$ref": "#/components/schemas/ImageFocalPointModel"
-          },
-          "crops": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "$ref": "#/components/schemas/ImageCropModel"
-            }
-          }
-        }
-      },
-      "FileMediaWithCropsModel": {
-        "required": [
-          "mediaType"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiMediaWithCropsModel"
-          }
-        ],
-        "properties": {
-          "mediaType": {
-            "const": "File"
-          },
-          "properties": {
-            "$ref": "#/components/schemas/FilePropertiesModel"
-          }
-        },
-        "additionalProperties": false
-      },
-      "FileMediaWithCropsResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiMediaWithCropsResponseModel"
-          },
-          {
-            "$ref": "#/components/schemas/FileMediaWithCropsModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "FilePropertiesModel": {
-        "type": "object",
-        "properties": {
-          "umbracoFile": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "umbracoExtension": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "umbracoBytes": {
-            "type": [
-              "null",
-              "integer"
-            ],
-            "format": "int64"
-          }
-        },
-        "additionalProperties": false
-      },
-      "FolderMediaWithCropsModel": {
-        "required": [
-          "mediaType"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiMediaWithCropsModel"
-          }
-        ],
-        "properties": {
-          "mediaType": {
-            "const": "Folder"
-          },
-          "properties": {
-            "$ref": "#/components/schemas/FolderPropertiesModel"
-          }
-        },
-        "additionalProperties": false
-      },
-      "FolderMediaWithCropsResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiMediaWithCropsResponseModel"
-          },
-          {
-            "$ref": "#/components/schemas/FolderMediaWithCropsModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "FolderPropertiesModel": {
-        "type": "object",
-        "additionalProperties": false
-      },
-      "IApiContentModel": {
-        "required": [
-          "contentType"
-        ],
-        "type": "object",
-        "discriminator": {
-          "propertyName": "contentType"
-        }
-      },
       "IApiContentResponseModel": {
         "required": [
           "contentType"
@@ -1610,45 +1498,28 @@
           "propertyName": "contentType"
         }
       },
-      "IApiContentRouteModel": {
+      "IApiElementBaseModel": {
         "required": [
-          "path",
-          "startItem"
-        ],
-        "type": "object",
-        "properties": {
-          "path": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "queryString": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "startItem": {
-            "$ref": "#/components/schemas/IApiContentStartItemModel"
-          }
-        }
-      },
-      "IApiContentStartItemModel": {
-        "required": [
+          "contentType",
           "id",
-          "path"
+          "properties"
         ],
         "type": "object",
         "properties": {
+          "contentType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "id": {
             "type": "string",
             "format": "uuid"
           },
-          "path": {
+          "properties": {
             "type": [
               "null",
-              "string"
+              "object"
             ]
           }
         }
@@ -1660,6 +1531,85 @@
         "type": "object",
         "discriminator": {
           "propertyName": "contentType"
+        }
+      },
+      "IApiMediaWithCropsBaseModel": {
+        "required": [
+          "id",
+          "name",
+          "mediaType",
+          "url",
+          "properties"
+        ],
+        "type": "object",
+        "properties": {
+          "focalPoint": {
+            "$ref": "#/components/schemas/ImageFocalPointModel"
+          },
+          "crops": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ImageCropModel"
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mediaType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "url": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "width": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "height": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bytes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "properties": {
+            "type": [
+              "null",
+              "object"
+            ]
+          }
         }
       },
       "IApiMediaWithCropsModel": {
@@ -1700,6 +1650,102 @@
             "umbracoMediaAudio": "#/components/schemas/UmbracoMediaAudioMediaWithCropsModel",
             "umbracoMediaArticle": "#/components/schemas/UmbracoMediaArticleMediaWithCropsModel",
             "umbracoMediaVectorGraphics": "#/components/schemas/UmbracoMediaVectorGraphicsMediaWithCropsModel"
+          }
+        }
+      },
+      "IApiMediaWithCropsResponseBaseModel": {
+        "required": [
+          "path",
+          "createDate",
+          "updateDate",
+          "id",
+          "name",
+          "mediaType",
+          "url",
+          "properties"
+        ],
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "focalPoint": {
+            "$ref": "#/components/schemas/ImageFocalPointModel"
+          },
+          "crops": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ImageCropModel"
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mediaType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "url": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "extension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "width": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "height": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bytes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "properties": {
+            "type": [
+              "null",
+              "object"
+            ]
           }
         }
       },
@@ -1816,43 +1862,18 @@
           }
         }
       },
-      "ImageMediaWithCropsModel": {
-        "required": [
-          "mediaType"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiMediaWithCropsModel"
-          }
-        ],
-        "properties": {
-          "mediaType": {
-            "const": "Image"
-          },
-          "properties": {
-            "$ref": "#/components/schemas/ImagePropertiesModel"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ImageMediaWithCropsResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiMediaWithCropsResponseModel"
-          },
-          {
-            "$ref": "#/components/schemas/ImageMediaWithCropsModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "ImagePropertiesModel": {
+      "ImageMediaPropertiesModel": {
         "type": "object",
         "properties": {
           "umbracoFile": {
-            "$ref": "#/components/schemas/ApiImageCropperValueModel"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ApiImageCropperValueModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "umbracoWidth": {
             "type": [
@@ -1881,8 +1902,37 @@
               "string"
             ]
           }
-        },
-        "additionalProperties": false
+        }
+      },
+      "ImageMediaWithCropsModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiMediaWithCropsBaseModel"
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "Image"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/ImageMediaPropertiesModel"
+          }
+        }
+      },
+      "ImageMediaWithCropsResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiMediaWithCropsResponseBaseModel"
+          },
+          {
+            "$ref": "#/components/schemas/ImageMediaWithCropsModel"
+          }
+        ]
       },
       "PagedIApiContentResponseModel": {
         "required": [
@@ -1958,39 +2008,7 @@
           }
         }
       },
-      "UmbracoMediaArticleMediaWithCropsModel": {
-        "required": [
-          "mediaType"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiMediaWithCropsModel"
-          }
-        ],
-        "properties": {
-          "mediaType": {
-            "const": "umbracoMediaArticle"
-          },
-          "properties": {
-            "$ref": "#/components/schemas/UmbracoMediaArticlePropertiesModel"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UmbracoMediaArticleMediaWithCropsResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiMediaWithCropsResponseModel"
-          },
-          {
-            "$ref": "#/components/schemas/UmbracoMediaArticleMediaWithCropsModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "UmbracoMediaArticlePropertiesModel": {
+      "UmbracoMediaArticleMediaPropertiesModel": {
         "type": "object",
         "properties": {
           "umbracoFile": {
@@ -2012,8 +2030,61 @@
             ],
             "format": "int64"
           }
-        },
-        "additionalProperties": false
+        }
+      },
+      "UmbracoMediaArticleMediaWithCropsModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiMediaWithCropsBaseModel"
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "umbracoMediaArticle"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/UmbracoMediaArticleMediaPropertiesModel"
+          }
+        }
+      },
+      "UmbracoMediaArticleMediaWithCropsResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiMediaWithCropsResponseBaseModel"
+          },
+          {
+            "$ref": "#/components/schemas/UmbracoMediaArticleMediaWithCropsModel"
+          }
+        ]
+      },
+      "UmbracoMediaAudioMediaPropertiesModel": {
+        "type": "object",
+        "properties": {
+          "umbracoFile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoExtension": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "umbracoBytes": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          }
+        }
       },
       "UmbracoMediaAudioMediaWithCropsModel": {
         "required": [
@@ -2022,7 +2093,7 @@
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ApiMediaWithCropsModel"
+            "$ref": "#/components/schemas/IApiMediaWithCropsBaseModel"
           }
         ],
         "properties": {
@@ -2030,81 +2101,22 @@
             "const": "umbracoMediaAudio"
           },
           "properties": {
-            "$ref": "#/components/schemas/UmbracoMediaAudioPropertiesModel"
+            "$ref": "#/components/schemas/UmbracoMediaAudioMediaPropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "UmbracoMediaAudioMediaWithCropsResponseModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ApiMediaWithCropsResponseModel"
+            "$ref": "#/components/schemas/IApiMediaWithCropsResponseBaseModel"
           },
           {
             "$ref": "#/components/schemas/UmbracoMediaAudioMediaWithCropsModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
-      "UmbracoMediaAudioPropertiesModel": {
-        "type": "object",
-        "properties": {
-          "umbracoFile": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "umbracoExtension": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "umbracoBytes": {
-            "type": [
-              "null",
-              "integer"
-            ],
-            "format": "int64"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UmbracoMediaVectorGraphicsMediaWithCropsModel": {
-        "required": [
-          "mediaType"
-        ],
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiMediaWithCropsModel"
-          }
-        ],
-        "properties": {
-          "mediaType": {
-            "const": "umbracoMediaVectorGraphics"
-          },
-          "properties": {
-            "$ref": "#/components/schemas/UmbracoMediaVectorGraphicsPropertiesModel"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UmbracoMediaVectorGraphicsMediaWithCropsResponseModel": {
-        "type": "object",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/ApiMediaWithCropsResponseModel"
-          },
-          {
-            "$ref": "#/components/schemas/UmbracoMediaVectorGraphicsMediaWithCropsModel"
-          }
-        ],
-        "additionalProperties": false
-      },
-      "UmbracoMediaVectorGraphicsPropertiesModel": {
+      "UmbracoMediaVectorGraphicsMediaPropertiesModel": {
         "type": "object",
         "properties": {
           "umbracoFile": {
@@ -2140,42 +2152,39 @@
             ],
             "format": "int32"
           }
-        },
-        "additionalProperties": false
+        }
       },
-      "UmbracoMediaVideoMediaWithCropsModel": {
+      "UmbracoMediaVectorGraphicsMediaWithCropsModel": {
         "required": [
           "mediaType"
         ],
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ApiMediaWithCropsModel"
+            "$ref": "#/components/schemas/IApiMediaWithCropsBaseModel"
           }
         ],
         "properties": {
           "mediaType": {
-            "const": "umbracoMediaVideo"
+            "const": "umbracoMediaVectorGraphics"
           },
           "properties": {
-            "$ref": "#/components/schemas/UmbracoMediaVideoPropertiesModel"
+            "$ref": "#/components/schemas/UmbracoMediaVectorGraphicsMediaPropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
-      "UmbracoMediaVideoMediaWithCropsResponseModel": {
+      "UmbracoMediaVectorGraphicsMediaWithCropsResponseModel": {
         "type": "object",
         "allOf": [
           {
-            "$ref": "#/components/schemas/ApiMediaWithCropsResponseModel"
+            "$ref": "#/components/schemas/IApiMediaWithCropsResponseBaseModel"
           },
           {
-            "$ref": "#/components/schemas/UmbracoMediaVideoMediaWithCropsModel"
+            "$ref": "#/components/schemas/UmbracoMediaVectorGraphicsMediaWithCropsModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
-      "UmbracoMediaVideoPropertiesModel": {
+      "UmbracoMediaVideoMediaPropertiesModel": {
         "type": "object",
         "properties": {
           "umbracoFile": {
@@ -2197,8 +2206,37 @@
             ],
             "format": "int64"
           }
-        },
-        "additionalProperties": false
+        }
+      },
+      "UmbracoMediaVideoMediaWithCropsModel": {
+        "required": [
+          "mediaType"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiMediaWithCropsBaseModel"
+          }
+        ],
+        "properties": {
+          "mediaType": {
+            "const": "umbracoMediaVideo"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/UmbracoMediaVideoMediaPropertiesModel"
+          }
+        }
+      },
+      "UmbracoMediaVideoMediaWithCropsResponseModel": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IApiMediaWithCropsResponseBaseModel"
+          },
+          {
+            "$ref": "#/components/schemas/UmbracoMediaVideoMediaWithCropsModel"
+          }
+        ]
       }
     },
     "securitySchemes": {

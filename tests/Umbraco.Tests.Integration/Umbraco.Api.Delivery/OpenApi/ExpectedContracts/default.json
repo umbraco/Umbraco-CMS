@@ -1157,45 +1157,27 @@
     "schemas": {
       "IApiContentResponseModel": {
         "required": [
-          "$type"
-        ],
-        "type": "object",
-        "anyOf": [
-          {
-            "$ref": "#/components/schemas/IApiContentResponseModelApiContentResponseModel"
-          }
-        ],
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "ApiContentResponse": "#/components/schemas/IApiContentResponseModelApiContentResponseModel"
-          }
-        }
-      },
-      "IApiContentResponseModelApiContentResponseModel": {
-        "required": [
           "contentType",
-          "name",
           "createDate",
           "updateDate",
           "route",
           "id",
           "properties",
-          "cultures",
-          "$type"
+          "cultures"
         ],
+        "type": "object",
         "properties": {
-          "$type": {
-            "enum": [
-              "ApiContentResponse"
-            ],
-            "type": "string"
-          },
           "contentType": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "name": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "createDate": {
             "type": "string",
@@ -1213,10 +1195,16 @@
             "format": "uuid"
           },
           "properties": {
-            "type": "object"
+            "type": [
+              "null",
+              "object"
+            ]
           },
           "cultures": {
-            "type": "object",
+            "type": [
+              "null",
+              "object"
+            ],
             "additionalProperties": {
               "$ref": "#/components/schemas/IApiContentRouteModel"
             }
@@ -1268,44 +1256,22 @@
       },
       "IApiMediaWithCropsResponseModel": {
         "required": [
-          "$type"
-        ],
-        "type": "object",
-        "anyOf": [
-          {
-            "$ref": "#/components/schemas/IApiMediaWithCropsResponseModelApiMediaWithCropsResponseModel"
-          }
-        ],
-        "discriminator": {
-          "propertyName": "$type",
-          "mapping": {
-            "ApiMediaWithCropsResponse": "#/components/schemas/IApiMediaWithCropsResponseModelApiMediaWithCropsResponseModel"
-          }
-        }
-      },
-      "IApiMediaWithCropsResponseModelApiMediaWithCropsResponseModel": {
-        "required": [
           "path",
           "createDate",
           "updateDate",
-          "focalPoint",
-          "crops",
-          "$type",
           "id",
           "name",
           "mediaType",
           "url",
           "properties"
         ],
+        "type": "object",
         "properties": {
-          "$type": {
-            "enum": [
-              "ApiMediaWithCropsResponse"
-            ],
-            "type": "string"
-          },
           "path": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "createDate": {
             "type": "string",
@@ -1314,6 +1280,18 @@
           "updateDate": {
             "type": "string",
             "format": "date-time"
+          },
+          "focalPoint": {
+            "$ref": "#/components/schemas/ImageFocalPointModel"
+          },
+          "crops": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/ImageCropModel"
+            }
           },
           "id": {
             "type": "string",
@@ -1369,18 +1347,6 @@
               "null",
               "object"
             ]
-          },
-          "focalPoint": {
-            "$ref": "#/components/schemas/ImageFocalPointModel"
-          },
-          "crops": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "items": {
-              "$ref": "#/components/schemas/ImageCropModel"
-            }
           }
         }
       },

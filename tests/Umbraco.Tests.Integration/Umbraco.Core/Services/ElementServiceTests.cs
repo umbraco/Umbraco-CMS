@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -25,9 +26,7 @@ public partial class ElementServiceTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         // Arrange
-        // TODO ELEMENTS: This seems to be a leftover from early POC implementation; IElementService.Create() is not
-        //                used anywhere else than this. Should probably be removed.
-        var element = ElementService.Create("My Element", elementType.Alias);
+        IElement element = new Element("My Element", elementType);
         element.SetValue("title", "The Element Title");
 
         // Act

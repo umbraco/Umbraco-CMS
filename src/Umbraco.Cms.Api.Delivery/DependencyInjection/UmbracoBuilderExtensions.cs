@@ -53,7 +53,7 @@ public static class UmbracoBuilderExtensions
             provider =>
             {
                 HttpContext? httpContext = provider.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                ApiVersion? apiVersion = httpContext?.GetRequestedApiVersion();
+                ApiVersion? apiVersion = httpContext?.RequestedApiVersion;
                 if (apiVersion is null)
                 {
                     return provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();

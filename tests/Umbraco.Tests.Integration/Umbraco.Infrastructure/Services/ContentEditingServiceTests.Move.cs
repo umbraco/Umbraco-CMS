@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Globalization;
+using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -15,7 +16,7 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         contentType.AllowedAsRoot = allowedAtRoot;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var result = await ContentEditingService.MoveAsync(child.Key, Constants.System.RootKey, Constants.Security.SuperUserKey);
 
@@ -54,7 +55,7 @@ public partial class ContentEditingServiceTests
             contentType.AllowedContentTypes = Enumerable.Empty<ContentTypeSort>();
         }
 
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var result = await ContentEditingService.MoveAsync(child1.Key, root2.Key, Constants.Security.SuperUserKey);
 
@@ -195,5 +196,44 @@ public partial class ContentEditingServiceTests
         var result = await ContentEditingService.MoveAsync(root.Key, child.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
         Assert.AreEqual(ContentEditingOperationStatus.ParentInvalid, result.Status);
+    }
+
+    /// <summary>
+    /// Regression test for <see href="https://github.com/umbraco/Umbraco-CMS/issues/22610"/>:
+    /// restoring a content item from the recycle bin under Arabic culture failed because the
+    /// parent path's "-1" root marker could not be parsed under ar-EG's
+    /// <see cref="NumberFormatInfo.NegativeSign"/> (U+061C + hyphen).
+    /// </summary>
+    [Test]
+    public async Task Can_Restore_From_Recycle_Bin_Under_Arabic_Culture()
+    {
+        var contentType = await CreateTextPageContentTypeAsync();
+        (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
+
+        var moveToRecycleBinResult = await ContentEditingService.MoveToRecycleBinAsync(child.Key, Constants.Security.SuperUserKey);
+        Assert.IsTrue(moveToRecycleBinResult.Success);
+
+        var savedCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = new CultureInfo("ar-EG");
+
+            // Sanity-check that the runtime's culture data actually triggers the bug. If a future
+            // ICU/NLS update reverts ar-EG's NegativeSign to a plain ASCII hyphen, this test would
+            // silently pass without exercising anything; skip rather than give false confidence.
+            Assume.That(
+                CultureInfo.CurrentCulture.NumberFormat.NegativeSign,
+                Is.Not.EqualTo("-"),
+                "ar-EG NegativeSign is plain ASCII hyphen on this host; cannot reproduce #22610.");
+
+            var result = await ContentEditingService.RestoreAsync(child.Key, root.Key, Constants.Security.SuperUserKey);
+
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = savedCulture;
+        }
     }
 }

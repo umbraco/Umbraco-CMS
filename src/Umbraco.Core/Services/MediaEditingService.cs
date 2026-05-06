@@ -48,8 +48,7 @@ internal sealed class MediaEditingService
         IRelationService relationService,
         ContentTypeFilterCollection contentTypeFilters,
         ILanguageService languageService,
-        IUserService userService,
-        ILocalizationService localizationService)
+        IUserService userService)
         : base(
             contentService,
             contentTypeService,
@@ -64,8 +63,7 @@ internal sealed class MediaEditingService
             relationService,
             contentTypeFilters,
             languageService,
-            userService,
-            localizationService)
+            userService)
         => _logger = logger;
 
     /// <inheritdoc/>
@@ -172,7 +170,7 @@ internal sealed class MediaEditingService
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
     /// <inheritdoc />
-    protected override IMedia New(string? name, int parentId, IMediaType mediaType)
+    protected override IMedia New(string name, int parentId, IMediaType mediaType)
         => new Models.Media(name, parentId, mediaType);
 
     /// <inheritdoc />

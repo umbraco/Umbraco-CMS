@@ -1,6 +1,6 @@
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
-using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Api.Management.ViewModels.Element.Item;
 using Umbraco.Cms.Core;
@@ -52,6 +52,7 @@ internal sealed class ElementPresentationFactory
         var responseModel = new ElementItemResponseModel
         {
             Id = entity.Key,
+            IsTrashed = entity.Trashed,
             Parent = parentKeyAttempt.Success ? new ReferenceByIdModel { Id = parentKeyAttempt.Result } : null,
             HasChildren = entity.HasChildren,
             DocumentType = CreateDocumentTypeReferenceResponseModel(entity),
@@ -71,7 +72,7 @@ internal sealed class ElementPresentationFactory
     /// <inheritdoc />
     protected override ElementVariantItemResponseModel CreateVariantItemResponseModel(
         string name,
-        DocumentVariantState state,
+        PublishableVariantState state,
         string? culture)
         => new() { Name = name, State = state, Culture = culture };
 }

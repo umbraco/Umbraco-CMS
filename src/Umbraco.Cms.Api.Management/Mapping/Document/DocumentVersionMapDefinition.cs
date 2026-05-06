@@ -46,7 +46,7 @@ public class DocumentVersionMapDefinition : ContentMapDefinition<IContent, Docum
             source,
             (culture, _, documentVariantViewModel) =>
             {
-                documentVariantViewModel.State = DocumentVariantStateHelper.GetState(source, culture);
+                documentVariantViewModel.State = PublishableVariantStateHelper.GetState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
                     ? source.PublishDate
                     : source.GetPublishDate(culture);

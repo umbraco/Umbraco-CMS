@@ -1,11 +1,8 @@
-using System.Text.Json.Serialization;
-
 namespace Umbraco.Cms.Core.Models.DeliveryApi;
 
 /// <summary>
 ///     Represents content in the Delivery API.
 /// </summary>
-[JsonDerivedType(typeof(ApiContent), nameof(ApiContent))]
 public interface IApiContent : IApiElement
 {
     /// <summary>

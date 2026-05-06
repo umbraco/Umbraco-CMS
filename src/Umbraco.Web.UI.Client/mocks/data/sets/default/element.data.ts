@@ -1,5 +1,5 @@
+import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import type { UmbMockElementModel } from '../../mock-data-set.types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<UmbMockElementModel> = [
 	{
@@ -17,7 +17,7 @@ export const data: Array<UmbMockElementModel> = [
 		name: 'Simple Element',
 		variants: [
 			{
-				state: DocumentVariantStateModel.PUBLISHED,
+				state: UmbElementVariantState.PUBLISHED,
 				culture: null,
 				segment: null,
 				name: 'Simple Element',
@@ -70,7 +70,7 @@ export const data: Array<UmbMockElementModel> = [
 		name: 'Element In Folder',
 		variants: [
 			{
-				state: DocumentVariantStateModel.PUBLISHED,
+				state: UmbElementVariantState.PUBLISHED,
 				culture: null,
 				segment: null,
 				name: 'Element In Folder',
@@ -123,7 +123,7 @@ export const data: Array<UmbMockElementModel> = [
 		name: 'Element In Subfolder 1',
 		variants: [
 			{
-				state: DocumentVariantStateModel.PUBLISHED,
+				state: UmbElementVariantState.PUBLISHED,
 				culture: null,
 				segment: null,
 				name: 'Element In Subfolder 1',
@@ -161,7 +161,7 @@ export const data: Array<UmbMockElementModel> = [
 		name: 'Element With Pending Changes',
 		variants: [
 			{
-				state: DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
+				state: UmbElementVariantState.PUBLISHED_PENDING_CHANGES,
 				culture: null,
 				segment: null,
 				name: 'Element With Pending Changes',
@@ -199,7 +199,7 @@ export const data: Array<UmbMockElementModel> = [
 		name: 'Element With Scheduled Publish',
 		variants: [
 			{
-				state: DocumentVariantStateModel.PUBLISHED,
+				state: UmbElementVariantState.PUBLISHED,
 				culture: null,
 				segment: null,
 				name: 'Element With Scheduled Publish',

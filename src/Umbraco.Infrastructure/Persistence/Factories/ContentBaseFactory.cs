@@ -18,7 +18,9 @@ internal sealed class ContentBaseFactory
     public static Content BuildEntity(DocumentDto dto, IContentType? contentType)
     {
         NodeDto nodeDto = dto.ContentDto.NodeDto;
-        return BuildPublishableEntity(new Content(nodeDto.Text, nodeDto.ParentId, contentType), dto);
+        return BuildPublishableEntity(
+            new Content(nodeDto.Text ?? throw new ArgumentException("The content did not have a name", nameof(dto)), nodeDto.ParentId, contentType),
+            dto);
     }
 
     /// <summary>
@@ -48,7 +50,10 @@ internal sealed class ContentBaseFactory
         NodeDto nodeDto = dto.NodeDto;
         ContentVersionDto contentVersionDto = dto.ContentVersionDto;
 
-        var content = new Core.Models.Media(nodeDto.Text, nodeDto.ParentId, contentType);
+        var content = new Core.Models.Media(
+            nodeDto.Text ?? throw new ArgumentException("The media did not have a name", nameof(dto)),
+            nodeDto.ParentId,
+            contentType);
 
         try
         {
@@ -91,7 +96,12 @@ internal sealed class ContentBaseFactory
         NodeDto nodeDto = dto.ContentDto.NodeDto;
         ContentVersionDto contentVersionDto = dto.ContentVersionDto;
 
-        var content = new Member(nodeDto.Text, dto.Email, dto.LoginName, dto.Password, contentType);
+        var content = new Member(
+            nodeDto.Text ?? throw new ArgumentException("The member did not have a name", nameof(dto)),
+            dto.Email,
+            dto.LoginName,
+            dto.Password,
+            contentType);
 
         try
         {

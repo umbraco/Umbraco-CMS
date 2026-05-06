@@ -9,10 +9,12 @@ using Microsoft.OpenApi;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Delivery.OpenApi.Extensions;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.DeliveryApi;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Delivery.OpenApi.Transformers;
 
@@ -64,10 +66,12 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
     private const string ModelSuffix = "Model";
     private const string ContentSuffix = "Content";
     private const string ElementSuffix = "Element";
+    private const string MediaSuffix = "Media";
     private const string MediaWithCropsSuffix = "MediaWithCrops";
     private const string PropertiesModelSuffix = "PropertiesModel";
 
     private readonly IContentTypeSchemaService _contentTypeSchemaService;
+    private readonly IOptionsMonitor<DeliveryApiSettings> _deliveryApiSettings;
     private readonly ILogger<ContentTypeSchemaTransformer> _logger;
     private readonly IJsonTypeInfoResolver _jsonTypeInfoResolver;
 
@@ -83,13 +87,16 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
     /// </summary>
     /// <param name="contentTypeSchemaService">The content type info service.</param>
     /// <param name="jsonOptionsMonitor">The JSON options monitor.</param>
+    /// <param name="deliveryApiSettings">The Delivery API settings, used to honour the allow/deny content type list.</param>
     /// <param name="logger">The logger.</param>
     public ContentTypeSchemaTransformer(
         IContentTypeSchemaService contentTypeSchemaService,
         IOptionsMonitor<JsonOptions> jsonOptionsMonitor,
+        IOptionsMonitor<DeliveryApiSettings> deliveryApiSettings,
         ILogger<ContentTypeSchemaTransformer> logger)
     {
         _contentTypeSchemaService = contentTypeSchemaService;
+        _deliveryApiSettings = deliveryApiSettings;
         _logger = logger;
         _serializerOptions = jsonOptionsMonitor
             .Get(Constants.JsonOptionsNames.DeliveryApi)
@@ -99,7 +106,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
     }
 
     private IReadOnlyCollection<ContentTypeSchemaInfo> DocumentTypes
-        => field ??= _contentTypeSchemaService.GetDocumentTypes();
+        => field ??= FilterAllowedDocumentTypes(_contentTypeSchemaService.GetDocumentTypes());
 
     private IReadOnlyCollection<ContentTypeSchemaInfo> MediaTypes
         => field ??= _contentTypeSchemaService.GetMediaTypes();
@@ -223,10 +230,10 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
                     },
                     cancellationToken);
                 return;
-            case var type:
+            default:
                 // HACK: Some types with circular references (e.g. ApiBlockGridItem) get left
                 // inlined by the framework, breaking $ref resolution. Register them explicitly.
-                if (GetSchemaId(GetJsonTypeInfo(type)) is not { } schemaId || !_handledSchemas.Add(schemaId))
+                if (GetSchemaId(context.JsonTypeInfo) is not { } schemaId || !_handledSchemas.Add(schemaId))
                 {
                     return;
                 }
@@ -245,15 +252,10 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         Func<ContentTypeSchemaInfo, List<IOpenApiSchema>, Task<OpenApiSchema>> contentTypeSchemaFactory,
         CancellationToken cancellationToken)
     {
-        List<IOpenApiSchema> derivedTypeSchemas = [];
-        foreach (JsonDerivedType derivedType in context.JsonTypeInfo.PolymorphismOptions?.DerivedTypes ?? [])
-        {
-            IOpenApiSchema derivedTypeSchema = await CreateSchema(
-                GetJsonTypeInfo(derivedType.DerivedType),
-                context,
-                cancellationToken);
-            derivedTypeSchemas.Add(derivedTypeSchema);
-        }
+        List<IOpenApiSchema> derivedTypeSchemas = await ResolveDerivedTypeSchemas(
+            schema,
+            context,
+            cancellationToken);
 
         OpenApiDocument document = context.GetRequiredDocument();
         var typePropertyName = GetTypePropertyName(itemType);
@@ -274,6 +276,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
 
         // Remove all schema properties that are now handled by the derived types
         schema.AnyOf = null;
+        schema.Properties = null;
         schema.Required = new HashSet<string> { typePropertyName };
     }
 
@@ -284,20 +287,18 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
     private async Task<IOpenApiSchema> CreateSchema(
         JsonTypeInfo jsonTypeInfo,
         OpenApiSchemaTransformerContext context,
-        CancellationToken cancellationToken,
-        Action<OpenApiSchema>? configureSchema = null)
+        CancellationToken cancellationToken)
     {
         if (jsonTypeInfo.Type.IsArray || jsonTypeInfo.Kind == JsonTypeInfoKind.Enumerable)
         {
             Type elementType = jsonTypeInfo.ElementType ?? jsonTypeInfo.Type.GetElementType() ?? typeof(object);
             JsonTypeInfo elementJsonTypeInfo = GetJsonTypeInfo(elementType);
-            IOpenApiSchema itemSchema = await CreateSchema(elementJsonTypeInfo, context, cancellationToken, configureSchema);
-            var arraySchema = new OpenApiSchema
+            IOpenApiSchema itemSchema = await CreateSchema(elementJsonTypeInfo, context, cancellationToken);
+            return new OpenApiSchema
             {
                 Type = JsonSchemaType.Array,
                 Items = itemSchema,
             };
-            return arraySchema;
         }
 
         var schemaId = GetSchemaId(jsonTypeInfo);
@@ -328,8 +329,6 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             };
         }
 
-        configureSchema?.Invoke(schema);
-
         if (schemaId is null)
         {
             return schema;
@@ -338,6 +337,31 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         OpenApiDocument document = context.GetRequiredDocument();
         document.AddComponent(schemaId, schema);
         return new OpenApiSchemaReference(schemaId, document);
+    }
+
+    /// <summary>
+    /// Allows null at a property reference site without mutating any shared component schema.
+    /// Inline schemas have <c>null</c> OR-ed into their <c>type</c> flags; schema references and
+    /// recursive-ref placeholders are wrapped in a <c>oneOf</c> with an explicit null branch so the
+    /// shared component is left unchanged.
+    /// </summary>
+    private static IOpenApiSchema AsNullable(IOpenApiSchema schema)
+    {
+        if (schema is OpenApiSchema inline
+            && inline.Metadata?.ContainsKey(RecursiveRefMetadataKey) is not true)
+        {
+            inline.Type |= JsonSchemaType.Null;
+            return inline;
+        }
+
+        return new OpenApiSchema
+        {
+            OneOf =
+            [
+                schema,
+                new OpenApiSchema { Type = JsonSchemaType.Null },
+            ],
+        };
     }
 
     private static Task<OpenApiSchema> CreateContentTypeResponseSchema(
@@ -350,7 +374,6 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         var schema = new OpenApiSchema
         {
             Type = JsonSchemaType.Object,
-            AdditionalPropertiesAllowed = false,
             AllOf = [..derivedTypeSchemas, new OpenApiSchemaReference($"{schemaIdPrefix}{ModelSuffix}", document)],
             Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = schemaId },
         };
@@ -374,10 +397,9 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             Properties = new Dictionary<string, IOpenApiSchema>
             {
                 [typePropertyName] = new OpenApiSchema { Const = contentType.Alias },
-                ["properties"] = await CreatePropertiesSchema(contentType, context, cancellationToken),
+                ["properties"] = await CreatePropertiesSchema(contentType, itemType, context, cancellationToken),
             },
             Required = new HashSet<string> { typePropertyName },
-            AdditionalPropertiesAllowed = false,
             AllOf = derivedTypeSchemas.Count > 0 ? derivedTypeSchemas : null,
             Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = schemaId, },
         };
@@ -389,10 +411,11 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
 
     private async Task<OpenApiSchemaReference> CreatePropertiesSchema(
         ContentTypeSchemaInfo contentType,
+        PublishedItemType itemType,
         OpenApiSchemaTransformerContext context,
         CancellationToken cancellationToken)
     {
-        var schemaId = $"{contentType.SchemaId}{PropertiesModelSuffix}";
+        var schemaId = GetPropertiesModelSchemaId(contentType, itemType);
 
         var propertiesSchema = new OpenApiSchema
         {
@@ -400,17 +423,37 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             AllOf =
             [
                 ..contentType.CompositionSchemaIds.Select(compositionSchemaId
-                    => GetPlaceholderSchema($"{compositionSchemaId}{PropertiesModelSuffix}"))
+                    => GetPlaceholderSchema(GetCompositionPropertiesModelSchemaId(compositionSchemaId, itemType)))
             ],
             Properties = await CreateContentTypeProperties(contentType, context, cancellationToken),
             Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = schemaId },
-            AdditionalPropertiesAllowed = false,
         };
 
         OpenApiDocument document = context.GetRequiredDocument();
         document.AddComponent(schemaId, propertiesSchema);
         return new OpenApiSchemaReference(schemaId, document);
     }
+
+    private static string GetPropertiesModelSchemaId(ContentTypeSchemaInfo contentType, PublishedItemType itemType) =>
+        $"{contentType.SchemaId}{GetItemTypeSuffix(itemType, contentType.IsElement)}{PropertiesModelSuffix}";
+
+    private string GetCompositionPropertiesModelSchemaId(string compositionSchemaId, PublishedItemType itemType)
+    {
+        // Look up the composition's own IsElement so its reference points at the right
+        // generated schema (element-type compositions live under the Element suffix).
+        IReadOnlyCollection<ContentTypeSchemaInfo> candidates = itemType == PublishedItemType.Media ? MediaTypes : DocumentTypes;
+        ContentTypeSchemaInfo? composition = candidates.FirstOrDefault(c => c.SchemaId == compositionSchemaId);
+        var suffix = GetItemTypeSuffix(itemType, composition?.IsElement ?? false);
+        return $"{compositionSchemaId}{suffix}{PropertiesModelSuffix}";
+    }
+
+    private static string GetItemTypeSuffix(PublishedItemType itemType, bool isElement) =>
+        itemType switch
+        {
+            PublishedItemType.Media => MediaSuffix,
+            PublishedItemType.Content => isElement ? ElementSuffix : ContentSuffix,
+            _ => throw new NotSupportedException($"Unsupported PublishedItemType: {itemType}"),
+        };
 
     private async Task<Dictionary<string, IOpenApiSchema>> CreateContentTypeProperties(
         ContentTypeSchemaInfo contentType,
@@ -423,11 +466,11 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             IOpenApiSchema schema = await CreateSchema(
                 GetJsonTypeInfo(propertyInfo.DeliveryApiClrType),
                 context,
-                cancellationToken,
-                // All properties can be null (e.g., when a property is added but content has not been republished)
-                schema => schema.Type |= JsonSchemaType.Null);
+                cancellationToken);
 
-            properties[propertyInfo.Alias] = schema;
+            // Properties may be null (e.g. property added after content was last published).
+            // Nullability is applied at the reference site, never on a shared component schema.
+            properties[propertyInfo.Alias] = AsNullable(schema);
         }
 
         return properties;
@@ -581,5 +624,68 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
 
         replaced = false;
         return schema;
+    }
+
+    private IReadOnlyCollection<ContentTypeSchemaInfo> FilterAllowedDocumentTypes(IReadOnlyCollection<ContentTypeSchemaInfo> documentTypes)
+    {
+        DeliveryApiSettings settings = _deliveryApiSettings.CurrentValue;
+        return documentTypes
+            .Where(c => settings.IsAllowedContentType(c.Alias))
+            .ToList();
+    }
+
+    /// <summary>
+    /// Returns the schemas to use as the <c>allOf</c> bases for each typed content type
+    /// schema in a polymorphic union. Prefers concrete derived types declared on the
+    /// interface via <c>[JsonDerivedType]</c>; when none are advertised, falls back to a
+    /// schema built from the interface's own properties.
+    /// </summary>
+    /// <remarks>
+    /// The fallback exists for media interfaces, whose concrete classes are internal in
+    /// Umbraco.Infrastructure and therefore cannot be referenced via <c>[JsonDerivedType]</c>
+    /// from Umbraco.Core.
+    /// </remarks>
+    private async Task<List<IOpenApiSchema>> ResolveDerivedTypeSchemas(
+        OpenApiSchema interfaceSchema,
+        OpenApiSchemaTransformerContext context,
+        CancellationToken cancellationToken)
+    {
+        List<IOpenApiSchema> derivedTypeSchemas = [];
+        foreach (JsonDerivedType derivedType in context.JsonTypeInfo.PolymorphismOptions?.DerivedTypes ?? [])
+        {
+            IOpenApiSchema derivedTypeSchema = await CreateSchema(
+                GetJsonTypeInfo(derivedType.DerivedType),
+                context,
+                cancellationToken);
+            derivedTypeSchemas.Add(derivedTypeSchema);
+        }
+
+        if (derivedTypeSchemas.Count == 0)
+        {
+            derivedTypeSchemas.Add(CreateBaseSchemaFromInterface(interfaceSchema, context));
+        }
+
+        return derivedTypeSchemas;
+    }
+
+    private static IOpenApiSchema CreateBaseSchemaFromInterface(
+        OpenApiSchema interfaceSchema,
+        OpenApiSchemaTransformerContext context)
+    {
+        // Append a "Base" marker so this schema stays distinct from the polymorphic union
+        // schema for the same interface (e.g. IApiMediaWithCropsResponseBaseModel vs.
+        // IApiMediaWithCropsResponseModel).
+        var baseSchemaId = $"{context.JsonTypeInfo.Type.Name}Base{ModelSuffix}";
+        OpenApiDocument document = context.GetRequiredDocument();
+        var baseSchema = new OpenApiSchema
+        {
+            Type = interfaceSchema.Type,
+            Properties = interfaceSchema.Properties,
+            Required = interfaceSchema.Required,
+            Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = baseSchemaId },
+        };
+
+        document.AddComponent(baseSchemaId, baseSchema);
+        return new OpenApiSchemaReference(baseSchemaId, document);
     }
 }

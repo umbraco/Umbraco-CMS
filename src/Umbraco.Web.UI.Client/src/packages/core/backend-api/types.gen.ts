@@ -923,7 +923,7 @@ export type DocumentValueResponseModel = {
 export type DocumentVariantItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     name: string;
     culture?: null | string;
 };
@@ -937,7 +937,7 @@ export type DocumentVariantRequestModel = {
 export type DocumentVariantResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     publishDate?: null | string;
     scheduledPublishDate?: null | string;
     scheduledUnpublishDate?: null | string;
@@ -947,14 +947,6 @@ export type DocumentVariantResponseModel = {
     segment?: null | string;
     name: string;
 };
-
-export enum DocumentVariantStateModel {
-    NOT_CREATED = 'NotCreated',
-    DRAFT = 'Draft',
-    PUBLISHED = 'Published',
-    PUBLISHED_PENDING_CHANGES = 'PublishedPendingChanges',
-    TRASHED = 'Trashed'
-}
 
 export type DocumentVersionItemResponseModel = {
     id: string;
@@ -1025,6 +1017,7 @@ export type ElementConfigurationResponseModel = {
 };
 
 export type ElementItemResponseModel = {
+    isTrashed: boolean;
     parent?: null | ReferenceByIdModel;
     hasChildren: boolean;
     documentType: DocumentTypeReferenceResponseModel;
@@ -1084,7 +1077,7 @@ export type ElementValueResponseModel = {
 export type ElementVariantItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     name: string;
     culture?: null | string;
 };
@@ -1098,7 +1091,7 @@ export type ElementVariantRequestModel = {
 export type ElementVariantResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     publishDate?: null | string;
     scheduledPublishDate?: null | string;
     scheduledUnpublishDate?: null | string;
@@ -1743,10 +1736,6 @@ export type MediaVariantResponseModel = {
     name: string;
 };
 
-export type MemberConfigurationResponseModel = {
-    [key: string]: unknown;
-};
-
 export type MemberGroupItemResponseModel = {
     name: string;
     id: string;
@@ -2244,6 +2233,11 @@ export type PagedModelDocumentTypeItemResponseModel = {
     total: number;
 };
 
+export type PagedModelElementItemResponseModel = {
+    items: Array<ElementItemResponseModel>;
+    total: number;
+};
+
 export type PagedModelMediaItemResponseModel = {
     items: Array<MediaItemResponseModel>;
     total: number;
@@ -2473,6 +2467,14 @@ export type PublicAccessResponseModel = {
     loginDocument: ReferenceByIdModel;
     errorDocument: ReferenceByIdModel;
 };
+
+export enum PublishableVariantStateModel {
+    NOT_CREATED = 'NotCreated',
+    DRAFT = 'Draft',
+    PUBLISHED = 'Published',
+    PUBLISHED_PENDING_CHANGES = 'PublishedPendingChanges',
+    TRASHED = 'Trashed'
+}
 
 export type PublishDocumentRequestModel = {
     publishSchedules: Array<CultureAndScheduleRequestModel>;
@@ -9038,6 +9040,31 @@ export type GetItemElementResponses = {
 
 export type GetItemElementResponse = GetItemElementResponses[keyof GetItemElementResponses];
 
+export type GetItemElementAncestorsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        id?: Array<string>;
+    };
+    url: '/umbraco/management/api/v1/item/element/ancestors';
+};
+
+export type GetItemElementAncestorsErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemElementAncestorsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ItemAncestorsResponseModelNamedItemResponseModel>;
+};
+
+export type GetItemElementAncestorsResponse = GetItemElementAncestorsResponses[keyof GetItemElementAncestorsResponses];
+
 export type GetItemElementFolderData = {
     body?: never;
     path?: never;
@@ -9062,6 +9089,33 @@ export type GetItemElementFolderResponses = {
 };
 
 export type GetItemElementFolderResponse = GetItemElementFolderResponses[keyof GetItemElementFolderResponses];
+
+export type GetItemElementSearchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        query?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/item/element/search';
+};
+
+export type GetItemElementSearchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetItemElementSearchResponses = {
+    /**
+     * OK
+     */
+    200: PagedModelElementItemResponseModel;
+};
+
+export type GetItemElementSearchResponse = GetItemElementSearchResponses[keyof GetItemElementSearchResponses];
 
 export type DeleteRecycleBinElementData = {
     body?: never;
@@ -13140,33 +13194,6 @@ export type GetMemberAreReferencedResponses = {
 };
 
 export type GetMemberAreReferencedResponse = GetMemberAreReferencedResponses[keyof GetMemberAreReferencedResponses];
-
-export type GetMemberConfigurationData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/management/api/v1/member/configuration';
-};
-
-export type GetMemberConfigurationErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-};
-
-export type GetMemberConfigurationResponses = {
-    /**
-     * OK
-     */
-    200: MemberConfigurationResponseModel;
-};
-
-export type GetMemberConfigurationResponse = GetMemberConfigurationResponses[keyof GetMemberConfigurationResponses];
 
 export type PostMemberValidateData = {
     body: CreateMemberRequestModel;

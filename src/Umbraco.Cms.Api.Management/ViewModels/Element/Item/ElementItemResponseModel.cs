@@ -9,6 +9,11 @@ namespace Umbraco.Cms.Api.Management.ViewModels.Element.Item;
 public class ElementItemResponseModel : ItemResponseModelBase
 {
     /// <summary>
+    /// Gets or sets a value indicating whether the element is trashed.
+    /// </summary>
+    public bool IsTrashed { get; set; }
+
+    /// <summary>
     /// Gets or sets a reference to the parent element of this item, if any.
     /// </summary>
     public ReferenceByIdModel? Parent { get; set; }

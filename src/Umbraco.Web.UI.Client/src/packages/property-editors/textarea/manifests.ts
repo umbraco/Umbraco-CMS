@@ -11,6 +11,22 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.TextArea',
 			icon: 'icon-edit',
 			group: 'common',
+			keywords: [
+				'string',
+				'description',
+				'summary',
+				'paragraph',
+				'details',
+				'notes',
+				'bio',
+				'excerpt',
+				'multiline',
+				'comment',
+				'message',
+				'review',
+				'address',
+				'quote',
+			],
 			supportsReadOnly: true,
 			settings: {
 				properties: [

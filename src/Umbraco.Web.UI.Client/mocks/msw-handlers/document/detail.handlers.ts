@@ -5,9 +5,9 @@ import { umbDocumentMockDb } from '../../db/document.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateDocumentRequestModel,
-	DefaultReferenceResponseModel,
 	GetDocumentByIdAvailableSegmentOptionsResponse,
 	GetDocumentByIdReferencedDescendantsResponse,
+	IReferenceResponseModel,
 	PagedIReferenceResponseModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -50,7 +50,7 @@ export const detailHandlers = [
 		const skip = query.get('skip') ? parseInt(query.get('skip') as string, 10) : 0;
 		const take = query.get('take') ? parseInt(query.get('take') as string, 10) : 100;
 
-		let data: Array<DefaultReferenceResponseModel> = [];
+		let data: Array<IReferenceResponseModel> = [];
 
 		if (id === 'all-property-editors-document-id') {
 			data = getReferenceData();

@@ -28,14 +28,14 @@ public class DeliveryApiContentIndexHelperTests : UmbracoIntegrationTestWithCont
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage2", defaultTemplateId: template.Id);
         contentType.Key = Guid.NewGuid();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         ContentType.AllowedContentTypes =
         [
             new ContentTypeSort(ContentType.Key, 0, "umbTextpage"),
             new ContentTypeSort(contentType.Key, 1, "umbTextpage2"),
         ];
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
 
         var subpage = ContentBuilder.CreateSimpleContent(contentType, "Alternate Text Page 4", Textpage.Id);
         ContentService.Save(subpage);
