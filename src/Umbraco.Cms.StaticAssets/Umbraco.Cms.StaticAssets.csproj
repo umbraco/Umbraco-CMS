@@ -113,7 +113,7 @@
     <Exec Command="npm i --no-fund --no-audit" WorkingDirectory="$(LoginProjectDirectory)" />
   </Target>
 
-  <Target Name="BuildLogin" DependsOnTargets="RestoreLogin">
+  <Target Name="BuildLogin" DependsOnTargets="RestoreLogin;RestoreBackoffice">
     <Message Importance="high" Text="Executing Login NPM build script..." />
     <Exec Command="npm run build" WorkingDirectory="$(LoginProjectDirectory)" />
     <ItemGroup>

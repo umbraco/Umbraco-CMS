@@ -3,22 +3,24 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "npm run generate:tsconfig",
     "dev": "vite",
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
     "preview": "vite preview",
-    "generate:server-api": "openapi-ts"
+    "generate:server-api": "openapi-ts",
+    "generate:tsconfig": "node devops/tsconfig/index.js"
   },
   "engines": {
-    "node": ">=24",
-    "npm": ">=10.9"
+    "node": ">=24.13",
+    "npm": ">=11"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.85.2",
-    "@umbraco-cms/backoffice": "^17.3.4",
-    "msw": "^2.12.7",
-    "typescript": "^5.9.3",
-    "vite": "^7.3.2"
+    "msw": "^2.13.5",
+    "typescript": "^6.0.3",
+    "vite": "^7.3.2",
+    "vite-tsconfig-paths": "^6.1.1"
   },
   "msw": {
     "workerDirectory": [

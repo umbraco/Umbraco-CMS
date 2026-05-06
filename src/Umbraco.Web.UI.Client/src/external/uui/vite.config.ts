@@ -21,12 +21,25 @@ cpSync('../../../node_modules/@umbraco-ui/uui/dist/assets/fonts', `${distAssets}
 	recursive: true,
 });
 
+const defaults = getDefaultConfig({
+	dist,
+	base: '/umbraco/backoffice/external/uui',
+	entry: {
+		index: './index.ts',
+	},
+});
+
 export default defineConfig({
-	...getDefaultConfig({
-		dist,
-		base: '/umbraco/backoffice/external/uui',
-		entry: {
-			index: './index.ts',
+	...defaults,
+	build: {
+		...defaults.build,
+		rollupOptions: {
+			...defaults.build!.rollupOptions,
+			// Preserve UUI 2.0's per-component `customElements.define()` side effects
+			// without disabling tree-shaking for the rest of the bundle.
+			treeshake: {
+				moduleSideEffects: (id) => id.includes('@umbraco-ui/uui'),
+			},
 		},
-	}),
+	},
 });

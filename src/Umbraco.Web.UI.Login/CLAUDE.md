@@ -3,9 +3,38 @@
 TypeScript/Lit login SPA for Umbraco CMS backoffice authentication. Provides the `<umb-auth>` web component used in the login page, supporting local login, MFA, password reset, and user invitation flows.
 
 **Project Type**: TypeScript Library (Vite)
-**Runtime**: Node.js >= 22, npm >= 10.9
+**Runtime**: Node.js >= 24.13, npm >= 11
 **Output**: ES Module library → `../Umbraco.Cms.StaticAssets/wwwroot/umbraco/login/`
-**Dependencies**: @umbraco-cms/backoffice, Lit, Vite
+**Dependencies**: Lit, Vite, MSW (Login does **not** declare an npm dep on `@umbraco-cms/backoffice` — see below)
+
+---
+
+## ⚠️ Type resolution against the sibling Umbraco.Web.UI.Client
+
+Login uses the in-repo Client's TypeScript source for types via **generated `tsconfig.json` path aliases**, not via an npm dependency. This keeps Login's types aligned with the in-repo v18 backoffice (UUI 2.0 etc.) without waiting for an npm release.
+
+**The three layers:**
+
+| Concern | Mechanism |
+|---|---|
+| Types at `tsc` time | `tsconfig.json` `paths` map every `@umbraco-cms/backoffice/<sub>` → `../Umbraco.Web.UI.Client/src/.../index.ts` |
+| Bundling at `vite` time | `vite.config.ts` externalises `/^@umbraco-cms/` — none of Client's code ends up in `login.js` |
+| JS at runtime | The host page's importmap resolves `@umbraco-cms/backoffice/*` to the served backoffice bundle |
+
+**The generator** (`devops/tsconfig/index.js`) reads Client's `package.json` `exports` and emits a fresh `tsconfig.json` covering every subpath. It runs as a `postinstall` hook, so any `npm install`/`npm ci` regenerates the file (including the install MSBuild triggers via `RestoreLogin`). The output is committed (so fresh checkouts work before any script runs), but **don't edit it by hand** — it has a "DON'T EDIT" header.
+
+If you change Client's `exports` map and want to preview the result without re-installing, run `npm run generate:tsconfig`.
+
+### Prerequisite: Client must be `npm install`-ed first
+
+`tsc` walks Client source through the path aliases. When it hits an import like `lit` inside Client's `src/external/lit/index.ts`, Node module resolution walks up to Client's `node_modules` to find it. So Client needs its own `node_modules` populated:
+
+```bash
+cd ../Umbraco.Web.UI.Client && npm install
+cd ../Umbraco.Web.UI.Login && npm install
+```
+
+Client does **not** need to be **built** — only installed. CI's `backoffice-install.yml` template handles this automatically; for local dev, do it once after a fresh clone.
 
 ---
 
