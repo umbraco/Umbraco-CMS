@@ -139,12 +139,38 @@ render() {
 	// Safe - Use with escaped content, which is essentially what Lit does by default
 	return html`<div>${unsafeHTML(escapeHTML(this.htmlContent))}</div>`;
 
-	// Safe - Escape arguments in localization strings
-	return html`<div>${unsafeHTML(this.localize.string('#someKey_withHtml', escapeHTML(this.userContent)))}</div>`;
+	// Safe - localize.htmlString() escapes interpolated args and wraps in unsafeHTML for rendering
+	return html`<div>${this.localize.htmlString('#someKey_withHtml', this.userContent)}</div>`;
 
 	// Safe - <umb-localize> component automatically escapes arguments
 	return html`<umb-localize key="someKey_withHtml" .args=${[ this.userContent ]}></umb-localize>`;
 }
+```
+
+**Localized HTML — `localize.string()` vs `localize.htmlString()`**:
+
+- `localize.string(text, ...args)` — returns a plain string. Use for **non-HTML** contexts: attribute bindings (Lit auto-escapes), notification messages, button labels, log strings. Args are NOT escaped because Lit (or the consumer) handles the appropriate escaping for the context.
+- `localize.htmlString(text, ...args)` — returns a Lit directive that renders via `unsafeHTML` with all args HTML-escaped. Use whenever the localized value contains HTML markup that must be rendered (e.g. `<a>` links, `<strong>` emphasis) — this is the only safe path when interpolating user-controlled args into HTML output.
+
+```typescript
+// ✅ Plain text — string() is correct (Lit escapes the attribute itself)
+html`<uui-button label=${this.localize.string('#actions_delete')}></uui-button>`;
+
+// ✅ HTML rendering — htmlString() escapes args + wraps in unsafeHTML
+html`<p>${this.localize.htmlString('#defaultdialogs_confirmdelete', userControlledName)}</p>`;
+
+// ❌ Manually combining string() + unsafeHTML leaves args un-escaped — XSS hazard
+html`<p>${unsafeHTML(this.localize.string('#defaultdialogs_confirmdelete', userControlledName))}</p>`;
+```
+
+**Modal `content` field** (e.g. `umbConfirmModal`) renders strings via `unsafeHTML` internally. When passing a localized string with user-controlled args, wrap it in a template:
+
+```typescript
+// ✅ Safe — htmlString escapes args, html`...` wraps the directive in a TemplateResult
+umbConfirmModal(this, {
+	headline: '#actions_delete',
+	content: html`${this.#localize.htmlString('#defaultdialogs_confirmdelete', item.name)}`,
+});
 ```
 
 **Attribute Binding**:

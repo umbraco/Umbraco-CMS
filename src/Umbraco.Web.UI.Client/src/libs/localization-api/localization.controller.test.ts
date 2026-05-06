@@ -453,6 +453,16 @@ describe('UmbLocalizationController', () => {
 		});
 	});
 
+	describe('htmlString', () => {
+		it('should HTML-escape interpolated arguments', async () => {
+			const xss = '<script>alert("XSS")</script>';
+			// Render the directive into an element to inspect the resulting innerHTML
+			const host = await fixture<HTMLElement>(html`<div>${controller.htmlString('#withInlineToken', xss, '')}</div>`);
+			expect(host.innerHTML, 'XSS detected').to.not.contain('<script>');
+			expect(host.innerHTML).to.contain('&lt;script&gt;');
+		});
+	});
+
 	describe('host element', () => {
 		let element: UmbLocalizeControllerHostElement;
 

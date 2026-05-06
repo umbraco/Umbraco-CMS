@@ -1,4 +1,4 @@
-import { css, customElement, html, nothing, property, state, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -108,7 +108,7 @@ export class UmbPropertyEditorUITextBoxElement
 		const { remaining, visible } = getCharacterCountState(this._maxChars, this.value?.length ?? 0);
 		if (!visible) return nothing;
 
-		return html`<div class="char-count">${unsafeHTML(this.localize.term('textbox_characters_left', remaining))}</div>`;
+		return html`<div class="char-count">${this.localize.htmlString('#textbox_characters_left', remaining)}</div>`;
 	}
 
 	override render() {

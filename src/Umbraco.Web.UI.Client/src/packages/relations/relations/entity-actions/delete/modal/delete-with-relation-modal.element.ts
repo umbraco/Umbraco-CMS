@@ -3,21 +3,12 @@ import type {
 	UmbDeleteWithRelationConfirmModalData,
 	UmbDeleteWithRelationConfirmModalValue,
 } from './delete-with-relation-modal.token.js';
-import {
-	html,
-	customElement,
-	css,
-	state,
-	type PropertyValues,
-	nothing,
-	unsafeHTML,
-} from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, state, type PropertyValues, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-delete-with-relation-confirm-modal')
 export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElement<
@@ -60,12 +51,10 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 
 	override render() {
 		const headline = this.localize.string('#actions_delete');
-		const escapedName = escapeHTML(this._name);
-		const content = this.localize.string('#defaultdialogs_confirmdelete', escapedName);
 
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${headline}>
-				<p>${unsafeHTML(content)}</p>
+				<p>${this.localize.htmlString('#defaultdialogs_confirmdelete', this._name)}</p>
 				${this._referencesConfig
 					? html`<umb-confirm-action-modal-entity-references
 							.config=${this._referencesConfig}></umb-confirm-action-modal-entity-references>`

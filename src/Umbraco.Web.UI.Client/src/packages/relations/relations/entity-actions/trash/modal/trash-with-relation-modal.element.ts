@@ -6,22 +6,13 @@ import type {
 	UmbTrashWithRelationConfirmModalData,
 	UmbTrashWithRelationConfirmModalValue,
 } from './trash-with-relation-modal.token.js';
-import {
-	html,
-	customElement,
-	css,
-	state,
-	type PropertyValues,
-	nothing,
-	unsafeHTML,
-} from '@umbraco-cms/backoffice/external/lit';
+import { html, customElement, css, state, type PropertyValues, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
-import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-trash-with-relation-confirm-modal')
 export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement<
@@ -91,14 +82,11 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 
 	override render() {
 		const headline = this.localize.string('#actions_trash');
-		const escapedName = escapeHTML(this._name);
-		const content = this._canTrash
-			? this.localize.string('#defaultdialogs_confirmTrash', escapedName)
-			: this.localize.string('#defaultdialogs_cannotTrashWhenReferenced', escapedName);
+		const messageKey = this._canTrash ? '#defaultdialogs_confirmTrash' : '#defaultdialogs_cannotTrashWhenReferenced';
 
 		return html`
 			<uui-dialog-layout class="uui-text" headline=${headline}>
-				${this._canTrash !== undefined ? html`<p>${unsafeHTML(content)}</p>` : nothing}
+				${this._canTrash !== undefined ? html`<p>${this.localize.htmlString(messageKey, this._name)}</p>` : nothing}
 				${this._referencesConfig
 					? html`<umb-confirm-action-modal-entity-references
 							.config=${this._referencesConfig}
