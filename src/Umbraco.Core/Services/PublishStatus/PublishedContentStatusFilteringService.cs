@@ -56,7 +56,10 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
                 _publishStatusQueryService.IsDocumentPublished(key, culture)
                 && _publishStatusQueryService.HasPublishedAncestorPath(key, culture));
 
-        return WhereIsInvariantOrHasCultureOrRequestedAllCultures(candidateKeys, culture, preview).ToArray();
+        // Returned lazily so consumers like .FirstOrDefault() / .Take(n) can short-circuit
+        // without materialising the full result. Callers that need to enumerate the result
+        // more than once should buffer it themselves (.ToList() / .ToArray()).
+        return WhereIsInvariantOrHasCultureOrRequestedAllCultures(candidateKeys, culture, preview);
     }
 
     /// <inheritdoc />
