@@ -62,6 +62,49 @@ public class ElementPermissionServiceTests
         Assert.That(result, Is.EqualTo(ElementAuthorizationStatus.Success));
     }
 
+    [TestCase("F", ElementAuthorizationStatus.Success)]
+    [TestCase("X", ElementAuthorizationStatus.UnauthorizedMissingDescendantAccess)]
+    public async Task Can_Authorize_Descendants_Access_With_Required_Permission(string permissionToCheck, ElementAuthorizationStatus expectedResult)
+    {
+        // Arrange
+        var containerKey = Guid.NewGuid();
+        var user = CreateUser();
+
+        _entityServiceMock
+            .Setup(x => x.Get(containerKey, UmbracoObjectTypes.ElementContainer))
+            .Returns(new EntitySlim { NodeObjectType = Constants.ObjectTypes.ElementContainer });
+
+        long total = 1;
+        _entityServiceMock
+            .Setup(x => x.GetPagedDescendants(
+                containerKey,
+                UmbracoObjectTypes.ElementContainer,
+                It.Is<IEnumerable<UmbracoObjectTypes>>(t => t.Contains(UmbracoObjectTypes.Element)),
+                It.IsAny<int>(),
+                It.IsAny<int>(),
+                out total,
+                null,
+                It.IsAny<Ordering>()
+            ))
+            .Returns(
+            [
+                new EntitySlim
+                {
+                    NodeObjectType = Constants.ObjectTypes.ElementContainer,
+                    Id = ElementNodeId,
+                    Path = ElementNodePath,
+                }
+            ]);
+
+        SetupPermissions(user, ElementNodePath, ["A", "F", "C"]);
+
+        // Act
+        var result = await _sut.AuthorizeDescendantsAccessAsync(user, containerKey, permissionToCheck);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expectedResult));
+    }
+
     [Test]
     public async Task Cannot_Authorize_Access_When_Element_Not_Found()
     {
@@ -75,6 +118,24 @@ public class ElementPermissionServiceTests
 
         // Act
         var result = await _sut.AuthorizeAccessAsync(user, elementKey, "A");
+
+        // Assert
+        Assert.That(result, Is.EqualTo(ElementAuthorizationStatus.NotFound));
+    }
+
+    [Test]
+    public async Task Cannot_Authorize_Descendants_Access_When_Element_Container_Not_Found()
+    {
+        // Arrange
+        var containerKey = Guid.NewGuid();
+        var user = CreateUser();
+
+        _entityServiceMock
+            .Setup(x => x.Get(containerKey, UmbracoObjectTypes.ElementContainer))
+            .Returns((IEntitySlim?)null);
+
+        // Act
+        var result = await _sut.AuthorizeDescendantsAccessAsync(user, containerKey, "A");
 
         // Assert
         Assert.That(result, Is.EqualTo(ElementAuthorizationStatus.NotFound));

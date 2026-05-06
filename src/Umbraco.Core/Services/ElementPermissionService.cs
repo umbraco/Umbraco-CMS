@@ -73,9 +73,7 @@ internal sealed class ElementPermissionService : IElementPermissionService
         const int take = 500;
         var total = long.MaxValue;
 
-        UmbracoObjectTypes[] objectTypes = { UmbracoObjectTypes.Element };
-
-        IEntitySlim? parentEntity = _entityService.GetAll(objectTypes, parentKey).FirstOrDefault();
+        IEntitySlim? parentEntity = _entityService.Get(parentKey, UmbracoObjectTypes.ElementContainer);
 
         if (parentEntity is null)
         {
@@ -91,7 +89,7 @@ internal sealed class ElementPermissionService : IElementPermissionService
             IEnumerable<IEntitySlim> descendants = _entityService.GetPagedDescendants(
                 parentKey,
                 parentObjectType,
-                objectTypes,
+                [UmbracoObjectTypes.Element],
                 skip,
                 take,
                 out total,
