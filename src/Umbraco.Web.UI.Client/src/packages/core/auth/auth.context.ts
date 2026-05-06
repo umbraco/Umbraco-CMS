@@ -18,7 +18,7 @@ import {
 } from '@umbraco-cms/backoffice/external/rxjs';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import type { UmbBackofficeExtensionRegistry } from '@umbraco-cms/backoffice/extension-registry';
-import type { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
+import type { UmbApiClient, umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { isTestEnvironment, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
@@ -71,6 +71,12 @@ export class UmbAuthContext extends UmbContextBase {
 
 	// Track clients that have been configured to prevent duplicate interceptor binding
 	#configuredClients = new WeakSet();
+
+	// Lazily initialised on the first configureClient() call. Owns the singleton
+	// UmbAuthSignalerContext provided on the host (`<umb-app>`), so we MUST share
+	// one instance across every client we configure — instantiating a new controller
+	// per call would re-provide the signaler and stack listeners.
+	#interceptorController?: UmbApiInterceptorController;
 
 	// Endpoint URLs
 	#linkEndpoint;
@@ -162,20 +168,25 @@ export class UmbAuthContext extends UmbContextBase {
 		this.#channel.onmessage = (evt: MessageEvent) => {
 			switch (evt.data?.type) {
 				case 'authorized': {
-					// Set session locally — do NOT call #updateSession which would re-broadcast
-					const accessTokenExpiresAt = evt.data.issuedAt + evt.data.expiresIn;
-					const expiresAt = evt.data.issuedAt + evt.data.expiresIn * TOKEN_EXPIRY_MULTIPLIER;
-					this.#session.setValue({ accessTokenExpiresAt, expiresAt });
-					this.#isAuthorized.setValue(true);
+					// Apply locally — do NOT call #updateSession which would re-broadcast.
+					this.#setSessionLocally(evt.data.expiresIn, evt.data.issuedAt);
 					this.#authorizationSignal.next();
 					break;
 				}
 				case 'sessionUpdate':
-					this.#session.setValue({
-						accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
-						expiresAt: evt.data.expiresAt,
-					});
-					this.#isAuthorized.setValue(true);
+					// Peer broadcast already-computed timestamps, so set the session
+					// directly. We still go through the `#inSessionUpdateCallback` guard
+					// so observers triggered re-entrantly skip a redundant /token call.
+					this.#inSessionUpdateCallback = true;
+					try {
+						this.#session.setValue({
+							accessTokenExpiresAt: evt.data.accessTokenExpiresAt,
+							expiresAt: evt.data.expiresAt,
+						});
+						this.#isAuthorized.setValue(true);
+					} finally {
+						this.#inSessionUpdateCallback = false;
+					}
 					break;
 				case 'sessionCleared':
 					this.#session.setValue(undefined);
@@ -216,6 +227,9 @@ export class UmbAuthContext extends UmbContextBase {
 	}
 
 	override destroy(): void {
+		// Tear down any in-flight popup auth flow so its window-level message listener
+		// and the closed-poll interval don't leak past this context's lifetime.
+		this.#popupCleanup?.();
 		super.destroy();
 		this.#channel.close();
 	}
@@ -232,7 +246,7 @@ export class UmbAuthContext extends UmbContextBase {
 		redirect?: boolean,
 		usernameHint?: string,
 		manifest?: ManifestAuthProvider,
-	) {
+	): Promise<void> {
 		const redirectUrl = await this.#client.buildAuthorizationUrl(identityProvider, usernameHint);
 
 		if (redirect) {
@@ -279,22 +293,25 @@ export class UmbAuthContext extends UmbContextBase {
 		window.addEventListener('message', pkceHandler);
 
 		// Wait for the popup to complete via BroadcastChannel.
-		// Resolves when authorized; also resolves (no-op) if the popup is closed/cancelled.
+		// The Promise resolves once cleanup runs — whether triggered by an `authorized`
+		// broadcast, the popup being closed/cancelled, a new auth flow superseding this
+		// one, or the auth context being destroyed. resolve() is parked inside cleanup
+		// so every termination path is observable to the awaiter.
 		return new Promise<void>((resolve) => {
 			const cleanup = () => {
 				clearInterval(closedPoll);
 				this.#channel.removeEventListener('message', handler);
 				window.removeEventListener('message', pkceHandler);
 				this.#popupCleanup = undefined;
+				resolve();
 			};
 			this.#popupCleanup = cleanup;
 
 			const handler = (evt: MessageEvent) => {
 				if (evt.data?.type === 'authorized') {
-					cleanup();
 					this.#client.clearPkceState();
 					this.#authWindowProxy?.close();
-					resolve();
+					cleanup();
 				}
 			};
 			this.#channel.addEventListener('message', handler);
@@ -302,9 +319,8 @@ export class UmbAuthContext extends UmbContextBase {
 			// Poll for popup closed (user cancelled or closed the window)
 			const closedPoll = setInterval(() => {
 				if (this.#authWindowProxy?.closed) {
-					cleanup();
 					this.#client.clearPkceState();
-					resolve();
+					cleanup();
 				}
 			}, 500);
 		});
@@ -324,29 +340,31 @@ export class UmbAuthContext extends UmbContextBase {
 			return null;
 		}
 
-		// Try to get PKCE state — first from the parent window (popup flow), then from sessionStorage (redirect flow)
+		// Try to get PKCE state. Check sessionStorage first — it's synchronous and covers
+		// the redirect flow (where the same tab navigated to the IDP and back). Only fall
+		// back to asking window.opener if sessionStorage didn't have a matching entry.
+		// The previous order hung for the full opener-postMessage timeout whenever
+		// `oauth_complete` happened to load with a non-OAuth window.opener (which is set
+		// for ANY window.open target, not only OAuth popups).
 		let codeVerifier: string | undefined;
 
-		if (window.opener) {
-			// Popup flow: request code_verifier from parent via postMessage
-			codeVerifier = await this.#requestCodeVerifierFromOpener(state);
-		}
-
-		if (!codeVerifier) {
-			// Redirect flow: read from sessionStorage
-			const pkceData = sessionStorage.getItem('umb:pkce');
-			if (pkceData) {
-				try {
-					const parsed = JSON.parse(pkceData);
-					if (parsed.state === state) {
-						codeVerifier = parsed.codeVerifier;
-						sessionStorage.removeItem('umb:pkce');
-					}
-				} catch {
-					// Ignore parse errors
+		const pkceData = sessionStorage.getItem('umb:pkce');
+		if (pkceData) {
+			try {
+				const parsed = JSON.parse(pkceData);
+				if (parsed.state === state) {
+					codeVerifier = parsed.codeVerifier;
 					sessionStorage.removeItem('umb:pkce');
 				}
+			} catch {
+				// Ignore parse errors
+				sessionStorage.removeItem('umb:pkce');
 			}
+		}
+
+		if (!codeVerifier && window.opener) {
+			// Popup flow: request code_verifier from parent via postMessage.
+			codeVerifier = await this.#requestCodeVerifierFromOpener(state);
 		}
 
 		if (!codeVerifier) {
@@ -428,19 +446,12 @@ export class UmbAuthContext extends UmbContextBase {
 	 *   const token = await authContext.getLatestToken();
 	 *   const result = await fetch('https://my-api.com', { headers: { Authorization: `Bearer ${token}` } });
 	 * ```
-	 * @deprecated Use {@link configureClient} for `@hey-api/openapi-ts` clients or {@link getOpenApiConfiguration} for manual fetch calls. With cookie-based auth this always returns `'[redacted]'`. Scheduled for removal in Umbraco 19.
 	 * @see {@link configureClient} for automatic token handling with `@hey-api/openapi-ts` clients.
 	 * @see {@link getOpenApiConfiguration} for manual fetch calls with cookie-based auth.
 	 * @memberof UmbAuthContext
 	 * @returns The latest token from the Management API
 	 */
 	async getLatestToken(): Promise<string> {
-		new UmbDeprecation({
-			deprecated: 'getLatestToken',
-			solution:
-				'Use configureClient for @hey-api/openapi-ts clients or getOpenApiConfiguration for manual fetch calls. With cookie-based auth this always returns "[redacted]".',
-			removeInVersion: '19.0.0',
-		}).warn();
 		await this.#ensureTokenReady();
 		return '[redacted]';
 	}
@@ -534,14 +545,11 @@ export class UmbAuthContext extends UmbContextBase {
 			return;
 		}
 		if (!navigator.locks) return;
-		const state = await navigator.locks.query();
-		if (state.held?.some((l) => l.name === 'umb:token-refresh')) {
-			// A refresh is in progress in another tab — queue behind it so we send
-			// requests with the new cookie rather than the soon-to-be-revoked one.
-			await navigator.locks.request('umb:token-refresh', async () => {
-				// No-op: we only need to wait for the ongoing refresh to finish.
-			});
-		}
+		// Always queue behind the refresh lock with a no-op callback. If the lock is
+		// free we acquire it immediately and resolve; if a peer tab holds it we wait
+		// behind that holder. This avoids a race window where querying the lock state
+		// could return "free" microseconds before another tab acquires it.
+		await navigator.locks.request('umb:token-refresh', () => Promise.resolve());
 	}
 
 	/**
@@ -626,39 +634,50 @@ export class UmbAuthContext extends UmbContextBase {
 		return {
 			base: this.#serverUrl,
 			credentials: 'include',
-			token: () => Promise.resolve('[redacted]'),
+			token: this.getLatestToken.bind(this),
 		};
 	}
 
 	/**
-	 * Configures a `@hey-api/openapi-ts` client for authenticated API calls.
-	 * Sets baseUrl, credentials, auth header, and binds the default response
-	 * interceptors (401 retry, error handling, notifications).
+	 * Configures a `@hey-api/openapi-ts` generated client for authenticated API calls.
+	 *
+	 * Sets `baseUrl`, `credentials`, and the `auth` callback (cookie-based with
+	 * automatic token refresh via {@link getLatestToken}), and binds the default
+	 * response interceptors (401 retry, problem-details error notifications, etc.)
+	 * to the client.
+	 *
+	 * The same auth context owns a single {@link UmbApiInterceptorController} for
+	 * the lifetime of the host (`<umb-app>`), so it's safe to call this method for
+	 * multiple clients (the core's {@link umbHttpClient} *and* an extension's own
+	 * generated client) without registering duplicate auth-signaler contexts.
+	 *
 	 * @example
 	 * ```js
 	 * const authContext = await this.getContext(UMB_AUTH_CONTEXT);
 	 * authContext.configureClient(myClient);
 	 * // Now myClient automatically includes auth headers and interceptors
 	 * ```
-	 * @param client A `@hey-api/openapi-ts` client instance.
+	 * @param client A `@hey-api/openapi-ts` client instance — either {@link umbHttpClient}
+	 * or one regenerated by an extension package against its own OpenAPI document.
 	 */
-	configureClient(client: typeof umbHttpClient) {
+	configureClient(client: UmbApiClient): void {
 		if (this.#configuredClients.has(client)) return;
 		this.#configuredClients.add(client);
 
 		client.setConfig({
 			baseUrl: this.#serverUrl,
 			credentials: 'include',
-			auth: async () => {
-				await this.#ensureTokenReady();
-				return '[redacted]';
-			},
+			auth: this.getLatestToken.bind(this),
 		});
 
-		// Controller self-registers on the host element via UmbControllerBase constructor,
-		// so the anonymous reference is intentional — lifecycle is managed by the host.
-		// Note: _host must be a proper UmbControllerHost (element host) for correct cleanup.
-		new UmbApiInterceptorController(this._host).bindDefaultInterceptors(client);
+		// Lazy single instance — see #interceptorController field comment. Controller
+		// self-registers on the host element via UmbControllerBase, so its lifecycle is
+		// managed by the host. `_host` must be a proper UmbControllerHost.
+		this.#interceptorController ??= new UmbApiInterceptorController(this._host);
+		// Each generated client is structurally identical but TypeScript treats them as
+		// distinct generic instantiations. Cast at the boundary; the controller's own
+		// signature stays strictly typed against `umbHttpClient`.
+		this.#interceptorController.bindDefaultInterceptors(client as unknown as typeof umbHttpClient);
 	}
 
 	/**
@@ -731,15 +750,18 @@ export class UmbAuthContext extends UmbContextBase {
 		const request = new Request(this.#unlinkEndpoint, {
 			method: 'POST',
 			credentials: 'include',
-			headers: { 'Content-Type': 'application/json', Authorization: 'Bearer [redacted]' },
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await this.getLatestToken()}` },
 			body: JSON.stringify({ loginProvider, providerKey }),
 		});
 
 		const result = await fetch(request);
 
 		if (!result.ok) {
-			const error = await result.json();
-			throw error;
+			// Wrap the parsed body in a real Error so consumers using `instanceof Error`
+			// or expecting a stack trace get sane behaviour. The original problem-details
+			// payload is exposed on `.cause` for callers that want the structured fields.
+			const detail = await result.json().catch(() => undefined);
+			throw new Error(`Failed to unlink login (${result.status} ${result.statusText})`, { cause: detail });
 		}
 
 		await this.signOut();
@@ -818,10 +840,13 @@ export class UmbAuthContext extends UmbContextBase {
 				return;
 			}
 
+			// Short timeout: a real OAuth popup parent responds within milliseconds. Any
+			// longer is just a hang for the unrelated-opener case (e.g. an arbitrary
+			// `window.open(...)` target that incidentally landed on `oauth_complete`).
 			const timeout = setTimeout(() => {
 				window.removeEventListener('message', handler);
 				resolve(undefined);
-			}, 5000);
+			}, 1500);
 
 			const handler = (evt: MessageEvent) => {
 				if (evt.origin !== window.location.origin) return;
@@ -843,7 +868,7 @@ export class UmbAuthContext extends UmbContextBase {
 		const request = await fetch(`${this.#linkKeyEndpoint}?provider=${provider}`, {
 			credentials: 'include',
 			headers: {
-				Authorization: 'Bearer [redacted]',
+				Authorization: `Bearer ${await this.getLatestToken()}`,
 				'Content-Type': 'application/json',
 			},
 		});
