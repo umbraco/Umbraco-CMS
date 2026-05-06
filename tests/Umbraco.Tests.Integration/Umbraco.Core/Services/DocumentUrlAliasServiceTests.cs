@@ -1133,4 +1133,98 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     }
 
     #endregion
+
+    #region Duplicate Alias Handling Tests
+
+    // Regression for the 17.1 -> 17.2.x upgrade failure: umbracoUrlAlias property values whose
+    // tokens collide after normalization (literal dup, case-only, slash-only) produced two
+    // PublishedDocumentUrlAlias entries with the same (DocumentKey, LanguageId, Alias) tuple,
+    // which ToDictionary in Save() rejected with ArgumentException "An item with the same key
+    // has already been added".
+    [TestCase("foelelser, foelelser", "foelelser")]
+    [TestCase("UTM, utm", "utm")]
+    [TestCase("/foo/, foo", "foo")]
+    public void CreateOrUpdateAliasesAsync_Deduplicates_Normalization_Colliding_Aliases(string propertyValue, string expectedAlias)
+    {
+        var newPage = ContentBuilder.CreateSimpleContent(ContentType, "Duplicate Alias Page", RootPage.Id);
+        newPage.SetValue(Constants.Conventions.Content.UrlAlias, propertyValue);
+        ContentService.Save(newPage, -1);
+
+        Assert.DoesNotThrow(
+            () => ContentService.Publish(newPage, []),
+            "Publishing content with normalization-colliding tokens in umbracoUrlAlias should not throw.");
+
+        Assert.DoesNotThrowAsync(
+            () => DocumentUrlAliasService.CreateOrUpdateAliasesAsync(newPage.Key),
+            "CreateOrUpdateAliasesAsync should collapse duplicates, not throw.");
+
+        List<PublishedDocumentUrlAlias> stored;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            stored = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == newPage.Key)
+                .ToList();
+        }
+
+        Assert.That(stored, Has.Count.EqualTo(1), "Expected a single row after dedupe.");
+        Assert.That(stored[0].Alias, Is.EqualTo(expectedAlias));
+    }
+
+    [Test]
+    public void RebuildAllAliasesAsync_Deduplicates_Duplicates_From_Existing_Property_Data()
+    {
+        // Simulates the upgrade path: property data already contains "foelelser, foelelser" and
+        // RebuildAllAliasesAsync runs during InitAsync when the rebuild key changes.
+        var newPage = ContentBuilder.CreateSimpleContent(ContentType, "Rebuild Dup Page", RootPage.Id);
+        newPage.SetValue(Constants.Conventions.Content.UrlAlias, "foelelser, foelelser");
+        ContentService.Save(newPage, -1);
+
+        Assert.DoesNotThrow(() => ContentService.Publish(newPage, []));
+
+        Assert.DoesNotThrowAsync(
+            () => DocumentUrlAliasService.RebuildAllAliasesAsync(),
+            "Rebuild should collapse literal duplicates from existing property data, not throw.");
+
+        List<PublishedDocumentUrlAlias> stored;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            stored = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == newPage.Key)
+                .ToList();
+        }
+
+        Assert.That(stored, Has.Count.EqualTo(1));
+        Assert.That(stored[0].Alias, Is.EqualTo("foelelser"));
+    }
+
+    [Test]
+    public void DocumentUrlAliasRepository_Save_Silently_Dedupes_Duplicate_Input()
+    {
+        // Defensive: if a caller ever passes a list containing duplicate (DocumentKey, LanguageId, Alias)
+        // tuples, Save should collapse them rather than throwing ArgumentException from ToDictionary.
+        var documentKey = new Guid(PageWithNoAliasKey);
+        var duplicates = new List<PublishedDocumentUrlAlias>
+        {
+            new() { DocumentKey = documentKey, NullableLanguageId = null, Alias = "dup-test" },
+            new() { DocumentKey = documentKey, NullableLanguageId = null, Alias = "dup-test" },
+        };
+
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope())
+        {
+            Assert.DoesNotThrow(() => DocumentUrlAliasRepository.Save(duplicates));
+            scope.Complete();
+        }
+
+        List<PublishedDocumentUrlAlias> stored;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            stored = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == documentKey && a.Alias == "dup-test")
+                .ToList();
+        }
+
+        Assert.That(stored, Has.Count.EqualTo(1));
+    }
+
+    #endregion
 }

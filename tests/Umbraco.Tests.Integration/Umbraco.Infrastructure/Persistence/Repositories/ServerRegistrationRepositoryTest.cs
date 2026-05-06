@@ -231,6 +231,41 @@ internal sealed class ServerRegistrationRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    [Test]
+    public void Get_By_Id_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var all = repository.GetMany().ToArray();
+            Assert.IsTrue(all.Length > 0);
+
+            var first = repository.Get(all[0].Id);
+            var second = repository.Get(all[0].Id);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Exists_Returns_Correct_Result()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var all = repository.GetMany().ToArray();
+            Assert.IsTrue(all.Length > 0);
+
+            Assert.IsTrue(repository.Exists(all[0].Id));
+            Assert.IsFalse(repository.Exists(99999));
+        }
+    }
+
     public void CreateTestData()
     {
         var provider = ScopeProvider;

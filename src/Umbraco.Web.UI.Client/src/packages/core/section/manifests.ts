@@ -1,6 +1,7 @@
 import { manifest as defaultSectionManifest } from './default/default.section.kind.js';
 import { manifests as sectionUserPermissionConditionManifests } from './conditions/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
@@ -13,4 +14,5 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	defaultSectionManifest,
 	...sectionUserPermissionConditionManifests,
 	...repositoryManifests,
+	...valueSummaryManifests,
 ];
