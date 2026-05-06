@@ -56,8 +56,7 @@ public class MemberManagerTests
             new IdentityErrorDescriber(),
             Mock.Of<IExternalLoginWithKeyService>(),
             Mock.Of<ITwoFactorLoginService>(),
-            Mock.Of<IPublishedMemberCache>(),
-            Mock.Of<IExternalMemberService>());
+            Mock.Of<IPublishedMemberCache>());
 
         _mockIdentityOptions = new Mock<IOptions<IdentityOptions>>();
         var idOptions = new IdentityOptions { Lockout = { AllowedForNewUsers = false } };
@@ -273,43 +272,6 @@ public class MemberManagerTests
         Assert.IsFalse(result.Succeeded);
         var passwordMismatchError = result.Errors.FirstOrDefault(e => e.Code == nameof(IdentityErrorDescriber.PasswordMismatch));
         Assert.IsNotNull(passwordMismatchError);
-    }
-
-    [Test]
-    public void GivenAnExternalOnlyMember_WhenGeneratePasswordResetToken_ThenThrowsInvalidOperation()
-    {
-        // Arrange
-        var sut = CreateSut();
-        var externalUser = new MemberIdentityUser
-        {
-            UserName = "external@test.com",
-            Email = "external@test.com",
-            IsExternalOnly = true,
-        };
-
-        // Act & Assert
-        Assert.ThrowsAsync<InvalidOperationException>(
-            async () => await sut.GeneratePasswordResetTokenAsync(externalUser));
-    }
-
-    [Test]
-    public async Task GivenAnExternalOnlyMember_WhenResetPassword_ThenReturnsFailed()
-    {
-        // Arrange
-        var sut = CreateSut();
-        var externalUser = new MemberIdentityUser
-        {
-            UserName = "external@test.com",
-            Email = "external@test.com",
-            IsExternalOnly = true,
-        };
-
-        // Act
-        IdentityResult result = await sut.ResetPasswordAsync(externalUser, "any-token", "newPassword123!");
-
-        // Assert
-        Assert.IsFalse(result.Succeeded);
-        Assert.IsTrue(result.Errors.Any(e => e.Code == "ExternalMemberCannotResetPassword"));
     }
 
     private static MemberIdentityUser CreateValidUser() =>

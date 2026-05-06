@@ -12,7 +12,7 @@ import type { UUIInputElement, UUIPopoverContainerElement } from '@umbraco-cms/b
 import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UMB_HINT_CONTEXT } from '@umbraco-cms/backoffice/hint';
 import type { UmbHint, UmbVariantHint } from '@umbraco-cms/backoffice/hint';
-import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { createObservablePart, observeMultiple } from '@umbraco-cms/backoffice/observable-api';
 
 @customElement('umb-workspace-split-view-variant-selector')
 export class UmbWorkspaceSplitViewVariantSelectorElement<
@@ -85,8 +85,8 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 			this.#observeVariants(workspaceContext);
 			this.#observeActiveVariants(workspaceContext);
+			this.#observeReadOnlyCultures(workspaceContext);
 			this.#observeCurrentVariant();
-			this.#observeReadOnlyGuardRules(workspaceContext);
 
 			this.observe(
 				workspaceContext?.variesBySegment,
@@ -141,7 +141,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			(variantOptions) => {
 				this._variantOptions = ((variantOptions ?? []) as VariantOptionModelType[]).sort(this._variantSorter);
 				this._cultureVariantOptions = this._variantOptions.filter((variant) => variant.segment === null);
-				this.#setReadOnlyCultures(workspaceContext);
 			},
 			'_observeVariantOptions',
 		);
@@ -208,14 +207,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		);
 	}
 
-	#observeReadOnlyGuardRules(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
-		this.observe(
-			workspaceContext?.readOnlyGuard.rules,
-			() => this.#setReadOnlyCultures(workspaceContext),
-			'umbObserveReadOnlyGuardRules',
-		);
-	}
-
 	#handleInput(event: UUIInputEvent) {
 		if (event instanceof UUIInputEvent) {
 			const target = event.composedPath()[0] as UUIInputElement;
@@ -262,13 +253,22 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 		return this._variantOptions.length > 1;
 	}
 
-	#setReadOnlyCultures(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
+	#observeReadOnlyCultures(workspaceContext?: UmbVariantDatasetWorkspaceContext) {
 		if (workspaceContext) {
-			this._readOnlyCultures = this._variantOptions
-				.filter((variant) => workspaceContext.readOnlyGuard.getIsPermittedForVariant(UmbVariantId.Create(variant)))
-				.map((variant) => variant.culture);
+			this.observe(
+				workspaceContext.readOnlyGuard.isPermittedForObservableVariants(
+					createObservablePart(workspaceContext.variantOptions, (options) =>
+						options.map((option) => UmbVariantId.Create(option)),
+					),
+				),
+				(permitted: { variantId: UmbVariantId; permitted: boolean }[]) => {
+					this._readOnlyCultures = permitted.filter((p) => p.permitted === true).map((p) => p.variantId.culture);
+				},
+				'_observeReadOnlyCultures',
+			);
 		} else {
 			this._readOnlyCultures = [];
+			this.removeUmbControllerByAlias('_observeReadOnlyCultures');
 		}
 	}
 
@@ -517,6 +517,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 		return html`
 			<div class="variant segment-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
+				${notCreated ? nothing : html`<div class="expand-area"></div>`}
 				<button
 					class="switch-button ${notCreated ? 'add-mode' : ''} ${this.#isReadOnlyCulture(variantId.culture)
 						? 'readonly-mode'
@@ -712,7 +713,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			}
 
 			.expand-area + .switch-button {
-				padding-left: var(--uui-size-space-1);
+				padding-left: var(--uui-size-space-3);
+			}
+
+			.segment-variant > .switch-button {
+				padding-left: var(--uui-size-space-6);
 			}
 
 			.switch-button:hover {
@@ -753,14 +758,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			.switch-button.add-mode {
 				position: relative;
 				color: var(--uui-palette-dusty-grey-dark);
-				padding-left: var(--uui-size-space-4);
-			}
-
-			.segment-variant > .switch-button {
-				padding-left: var(--uui-size-space-6);
-			}
-			.segment-variant > .switch-button:not(.add-mode) {
-				padding-left: var(--uui-size-16);
 			}
 
 			.switch-button.add-mode:after {
@@ -786,7 +783,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 			.add-icon {
 				font-size: var(--uui-type-small-size);
-				margin-right: var(--uui-size-space-4);
+				margin-right: 21px;
 			}
 
 			.split-view {

@@ -39,7 +39,6 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly chooseMediaPickerBtn: Locator;
   private readonly chooseMemberPickerBtn: Locator;
   private readonly numericTxt: Locator;
-  private readonly decimalTxt: Locator;
   private readonly resetFocalPointBtn: Locator;
   private readonly addMultiURLPickerBtn: Locator;
   private readonly linkTxt: Locator;
@@ -188,6 +187,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly linkPickerTargetToggle: Locator;
   private readonly confirmToResetBtn: Locator;
   private readonly saveModal: Locator;
+  private readonly blockModal: Locator
   private readonly expandSegmentBtn: Locator;
   private readonly saveAndPreviewBtn: Locator;
   private readonly manualLinkRemoveBtn: Locator;
@@ -227,7 +227,6 @@ export class ContentUiHelper extends UiBaseLocators {
     this.chooseMediaPickerBtn = page.locator('umb-property-editor-ui-media-picker #btn-add');
     this.chooseMemberPickerBtn = page.locator('umb-property-editor-ui-member-picker #btn-add');
     this.numericTxt = page.locator('umb-property-editor-ui-number input');
-    this.decimalTxt = page.locator('umb-property-editor-ui-decimal input');
     this.addMultiURLPickerBtn = page.locator('umb-property-editor-ui-multi-url-picker #btn-add');
     this.linkTxt = page.getByTestId('input:url').locator('#input');
     this.anchorQuerystringTxt = page.getByLabel('#value or ?key=value');
@@ -270,6 +269,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.hostnameComboBox = this.hostNameItem.locator('[label="Culture"]').locator('uui-combobox-list-option');
     this.saveModal = page.locator('umb-document-save-modal');
     this.saveModalBtn = this.saveModal.getByLabel('Save', {exact: true});
+    this.blockModal = page.getByTestId('workspace:block');
     this.resetFocalPointBtn = page.getByLabel('Reset focal point');
     this.addNewHostnameBtn = page.locator('umb-property-layout[label="Hostnames"]').locator('[label="Add new hostname"]');
     // List View
@@ -534,25 +534,6 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.hasText(this.historyItems, text);
   }
 
-  async doesHistoryItemHaveTag(tagText: string, index: number = 0) {
-    const tag = this.historyItems.nth(index).locator('.log-type uui-tag');
-    await this.containsText(tag, tagText);
-  }
-
-  async doesHistoryItemHaveDescription(descriptionText: string, index: number = 0) {
-    const description = this.historyItems.nth(index).locator('.log-type span');
-    await this.hasText(description, descriptionText);
-  }
-
-  async doesHistoryItemHaveUsername(usernameText: string, index: number = 0) {
-    const username = this.historyItems.nth(index).locator('.user-info .name');
-    await this.containsText(username, usernameText);
-  }
-
-  async doesHistoryHaveCount(count: number) {
-    await this.hasCount(this.historyItems, count);
-  }
-
   async doesDocumentStateHaveText(text: string) {
     await this.hasText(this.documentState, text);
   }
@@ -810,11 +791,6 @@ export class ContentUiHelper extends UiBaseLocators {
   // Numeric
   async enterNumeric(number: number) {
     await this.enterText(this.numericTxt, number.toString());
-  }
-
-  // Decimal
-  async enterDecimal(number: number) {
-    await this.enterText(this.decimalTxt, number.toString());
   }
 
   // Radiobox
@@ -1269,8 +1245,8 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickCreateInModal(headline: string, options?: {waitForClose?: 'target' | 'any'}) {
-    const modalLocator = this.page.locator('[headline="' + headline + '"]');
-    await this.click(modalLocator.getByLabel('Create'));
+    const modalLocator = this.blockModal.filter({has: this.page.getByTestId('layout-headline').filter({hasText: headline}),});
+    await this.click(modalLocator.getByTestId('workspace-action:Umb.WorkspaceAction.Block.SubmitCreate'));
 
     if (options?.waitForClose === 'target') {
       await this.waitForHidden(modalLocator);
@@ -1568,7 +1544,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async doesBlockEditorModalContainEditorSize(editorSize: string, elementName: string) {
-    await this.isVisible(this.backofficeModalContainer.locator(`[size="${editorSize}"]`).locator(`[headline="Add ${elementName}"]`));
+    await this.isVisible(this.backofficeModalContainer.locator(`[size="${editorSize}"]`).getByTestId(`block-workspace:Add ${elementName}`));
   }
 
   async doesBlockEditorModalContainInline(richTextEditorAlias: string, elementName: string) {
@@ -1989,7 +1965,7 @@ export class ContentUiHelper extends UiBaseLocators {
   async isMemberGroupSelected(memberGroupName: string) {
     return await this.isVisible(this.page.locator('umb-input-member-group uui-ref-node[name="' + memberGroupName + '"]'));
   }
-  
+
   async clickRemoveProtectionButton() {
     await this.click(this.container.getByLabel('Remove protection'));
   }

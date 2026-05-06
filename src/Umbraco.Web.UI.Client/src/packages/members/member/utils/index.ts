@@ -1,7 +1,6 @@
-export type UmbMemberKindType = 'Default' | 'Api' | 'ExternalOnly';
+export type UmbMemberKindType = 'Default' | 'Api';
 
 export const UmbMemberKind = Object.freeze({
 	DEFAULT: 'Default',
 	API: 'Api',
-	EXTERNAL_ONLY: 'ExternalOnly',
 });

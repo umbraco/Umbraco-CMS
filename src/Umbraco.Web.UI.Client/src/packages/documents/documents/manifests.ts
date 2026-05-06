@@ -12,7 +12,6 @@ import { manifests as previewManifests } from './preview/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editors/manifests.js';
 import { manifests as publishingManifests } from './publishing/manifests.js';
 import { manifests as recycleBinManifests } from './recycle-bin/manifests.js';
-import { manifests as redirectManagementManifests } from './redirect-management/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
 import { manifests as rollbackManifests } from './rollback/manifests.js';
 import { manifests as searchProviderManifests } from './search/manifests.js';
@@ -41,7 +40,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...propertyEditorManifests,
 	...publishingManifests,
 	...recycleBinManifests,
-	...redirectManagementManifests,
 	...repositoryManifests,
 	...rollbackManifests,
 	...searchProviderManifests,

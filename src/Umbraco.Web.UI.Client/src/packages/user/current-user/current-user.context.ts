@@ -3,16 +3,10 @@ import { UmbCurrentUserRepository } from './repository/current-user.repository.j
 import { UMB_CURRENT_USER_CONTEXT } from './current-user.context.token.js';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { debounce } from '@umbraco-cms/backoffice/utils';
 import { filter, firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
-import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import { UmbObjectState } from '@umbraco-cms/backoffice/observable-api';
 import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
-import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
-import { UmbEntityDeletedEvent, UmbEntityUpdatedEvent } from '@umbraco-cms/backoffice/entity-action';
-import { UMB_USER_ENTITY_TYPE } from '@umbraco-cms/backoffice/user';
-import { UMB_USER_GROUP_ENTITY_TYPE } from '@umbraco-cms/backoffice/user-group';
 
 export class UmbCurrentUserContext extends UmbContextBase {
 	#currentUser = new UmbObjectState<UmbCurrentUserModel | undefined>(undefined);
@@ -35,23 +29,10 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	readonly unique = this.#currentUser.asObservablePart((user) => user?.unique);
 	readonly userName = this.#currentUser.asObservablePart((user) => user?.userName);
 
-	#authContext?: typeof UMB_AUTH_CONTEXT.TYPE;
 	#currentUserRepository = new UmbCurrentUserRepository(this);
-	#actionEventContext?: typeof UMB_ACTION_EVENT_CONTEXT.TYPE;
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_CURRENT_USER_CONTEXT);
-
-		this.consumeContext(UMB_AUTH_CONTEXT, (instance) => {
-			this.#authContext = instance;
-			this.#observeIsAuthorized();
-		});
-
-		this.consumeContext(UMB_ACTION_EVENT_CONTEXT, (context) => {
-			this.#removeActionEventListeners();
-			this.#actionEventContext = context;
-			this.#addActionEventListeners();
-		});
 
 		this.observe(this.languageIsoCode, (currentLanguageIsoCode) => {
 			if (!currentLanguageIsoCode) return;
@@ -59,23 +40,35 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		});
 	}
 
+	#loadPromise?: Promise<void>;
 	/**
-	 * Loads the current user
+	 * Loads the current user. Concurrent callers share the same in-flight promise,
+	 * so awaiting `load()` always waits for `#currentUser` to be populated.
+	 * @returns {Promise<void>} Resolves once the current user observable has emitted.
 	 */
-	async load() {
+	public async load(): Promise<void> {
+		if (!this.#loadPromise) {
+			this.#loadPromise = this.#doLoad();
+		}
+		return this.#loadPromise;
+	}
+
+	async #doLoad(): Promise<void> {
 		const { asObservable } = await this.#currentUserRepository.requestCurrentUser();
 
 		if (asObservable) {
-			await this.observe(asObservable(), (currentUser) => {
-				this.#currentUser?.setValue(currentUser);
-			})
+			await this.observe(
+				asObservable(),
+				(currentUser) => {
+					this.#currentUser?.setValue(currentUser);
+				},
+				'observeUser',
+			)
 				.asPromise()
 				// Ignore the error, we can assume that the flow was stopped (asPromise failed), but it does not mean that the consumption was not successful.
 				.catch(() => undefined);
 		}
 	}
-
-	#loadDebounced = debounce(() => this.load(), 100);
 
 	/**
 	 * Checks if a user is the current user.
@@ -230,74 +223,6 @@ export class UmbCurrentUserContext extends UmbContextBase {
 	 */
 	getUserName(): string | undefined {
 		return this.#currentUser.getValue()?.userName;
-	}
-
-	#isInGroup(groupUnique: string): boolean {
-		return this.#currentUser.getValue()?.userGroupUniques.includes(groupUnique) ?? false;
-	}
-
-	#onEntityUpdatedEvent = (event: UmbEntityUpdatedEvent) => {
-		const entityType = event.getEntityType();
-		const unique = event.getUnique();
-		if (!unique) return;
-
-		if (entityType === UMB_USER_GROUP_ENTITY_TYPE) {
-			if (this.#isInGroup(unique)) {
-				this.#loadDebounced();
-			}
-			return;
-		}
-
-		const isCurrentUser = entityType === UMB_USER_ENTITY_TYPE && unique === this.#currentUser.getValue()?.unique;
-		if (isCurrentUser) {
-			this.#loadDebounced();
-		}
-	};
-
-	#onEntityDeletedEvent = (event: UmbEntityDeletedEvent) => {
-		if (event.getEntityType() !== UMB_USER_GROUP_ENTITY_TYPE) return;
-		const unique = event.getUnique();
-		if (!unique) return;
-		if (this.#isInGroup(unique)) {
-			this.#loadDebounced();
-		}
-	};
-
-	#addActionEventListeners(): void {
-		this.#actionEventContext?.addEventListener(
-			UmbEntityUpdatedEvent.TYPE,
-			this.#onEntityUpdatedEvent as unknown as EventListener,
-		);
-		this.#actionEventContext?.addEventListener(
-			UmbEntityDeletedEvent.TYPE,
-			this.#onEntityDeletedEvent as unknown as EventListener,
-		);
-	}
-
-	#removeActionEventListeners(): void {
-		this.#actionEventContext?.removeEventListener(
-			UmbEntityUpdatedEvent.TYPE,
-			this.#onEntityUpdatedEvent as unknown as EventListener,
-		);
-		this.#actionEventContext?.removeEventListener(
-			UmbEntityDeletedEvent.TYPE,
-			this.#onEntityDeletedEvent as unknown as EventListener,
-		);
-	}
-
-	override destroy(): void {
-		this.#removeActionEventListeners();
-		this.#loadDebounced.cancel();
-		super.destroy();
-	}
-
-	#observeIsAuthorized() {
-		if (!this.#authContext) return;
-		this.observe(this.#authContext.isAuthorized, (isAuthorized) => {
-			if (isAuthorized) {
-				this.load();
-			}
-		});
 	}
 }
 

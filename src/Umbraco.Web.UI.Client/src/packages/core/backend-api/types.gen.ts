@@ -1557,8 +1557,7 @@ export type MemberItemResponseModel = {
 
 export enum MemberKindModel {
     DEFAULT = 'Default',
-    API = 'Api',
-    EXTERNAL_ONLY = 'ExternalOnly'
+    API = 'Api'
 }
 
 export type MemberReferenceResponseModel = {
@@ -1585,7 +1584,6 @@ export type MemberResponseModel = {
     lastPasswordChangeDate?: string | null;
     groups: Array<string>;
     kind: MemberKindModel;
-    profileData?: string | null;
 };
 
 export type MemberTypeCompositionModel = {
@@ -2201,16 +2199,6 @@ export type PasswordConfigurationResponseModel = {
     requireUppercase: boolean;
 };
 
-export type PatchDocumentRequestModel = {
-    operations: Array<PatchOperationRequestModel>;
-};
-
-export type PatchOperationRequestModel = {
-    op: string;
-    path: string;
-    value?: unknown;
-};
-
 export type ProblemDetails = {
     type?: string | null;
     title?: string | null;
@@ -2715,11 +2703,6 @@ export enum TreeItemKindModel {
     ALL = 'All'
 }
 
-export type TwoFactorAuthInfo = {
-    qrCodeSetupImageUrl?: string | null;
-    secret?: string | null;
-};
-
 export type UnknownTypePermissionPresentationModel = {
     $type: string;
     verbs: Array<string>;
@@ -2732,10 +2715,6 @@ export type UnlockUsersRequestModel = {
 
 export type UnpublishDocumentRequestModel = {
     cultures?: Array<string> | null;
-};
-
-export type UpdateCurrentUserRequestModel = {
-    languageIsoCode: string;
 };
 
 export type UpdateDataTypeRequestModel = {
@@ -6830,47 +6809,6 @@ export type PutDocumentByIdNotificationsErrors = {
 export type PutDocumentByIdNotificationsError = PutDocumentByIdNotificationsErrors[keyof PutDocumentByIdNotificationsErrors];
 
 export type PutDocumentByIdNotificationsResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type PatchDocumentByIdPatchData = {
-    body?: PatchDocumentRequestModel;
-    path: {
-        id: string;
-    };
-    query?: never;
-    url: '/umbraco/management/api/v1/document/{id}/patch';
-};
-
-export type PatchDocumentByIdPatchErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * The authenticated user does not have access to this resource
-     */
-    403: unknown;
-    /**
-     * Not Found
-     */
-    404: ProblemDetails;
-    /**
-     * Unprocessable Content
-     */
-    422: ProblemDetails;
-};
-
-export type PatchDocumentByIdPatchError = PatchDocumentByIdPatchErrors[keyof PatchDocumentByIdPatchErrors];
-
-export type PatchDocumentByIdPatchResponses = {
     /**
      * OK
      */
@@ -17301,7 +17239,7 @@ export type GetUserCurrent2FaByProviderNameResponses = {
     /**
      * OK
      */
-    200: NoopSetupTwoFactorModel | TwoFactorAuthInfo;
+    200: NoopSetupTwoFactorModel;
 };
 
 export type GetUserCurrent2FaByProviderNameResponse = GetUserCurrent2FaByProviderNameResponses[keyof GetUserCurrent2FaByProviderNameResponses];
@@ -17336,41 +17274,10 @@ export type PostUserCurrent2FaByProviderNameResponses = {
     /**
      * OK
      */
-    200: NoopSetupTwoFactorModel | TwoFactorAuthInfo;
+    200: NoopSetupTwoFactorModel;
 };
 
 export type PostUserCurrent2FaByProviderNameResponse = PostUserCurrent2FaByProviderNameResponses[keyof PostUserCurrent2FaByProviderNameResponses];
-
-export type DeleteUserCurrentAvatarData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/management/api/v1/user/current/avatar';
-};
-
-export type DeleteUserCurrentAvatarErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * Not Found
-     */
-    404: ProblemDetails;
-};
-
-export type DeleteUserCurrentAvatarError = DeleteUserCurrentAvatarErrors[keyof DeleteUserCurrentAvatarErrors];
-
-export type DeleteUserCurrentAvatarResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
 
 export type PostUserCurrentAvatarData = {
     body?: SetAvatarRequestModel;
@@ -17533,7 +17440,7 @@ export type GetUserCurrentPermissionsDocumentResponses = {
     /**
      * OK
      */
-    200: UserPermissionsResponseModel;
+    200: Array<UserPermissionsResponseModel>;
 };
 
 export type GetUserCurrentPermissionsDocumentResponse = GetUserCurrentPermissionsDocumentResponses[keyof GetUserCurrentPermissionsDocumentResponses];
@@ -17568,37 +17475,6 @@ export type GetUserCurrentPermissionsMediaResponses = {
 };
 
 export type GetUserCurrentPermissionsMediaResponse = GetUserCurrentPermissionsMediaResponses[keyof GetUserCurrentPermissionsMediaResponses];
-
-export type PutUserCurrentProfileData = {
-    body?: UpdateCurrentUserRequestModel;
-    path?: never;
-    query?: never;
-    url: '/umbraco/management/api/v1/user/current/profile';
-};
-
-export type PutUserCurrentProfileErrors = {
-    /**
-     * Bad Request
-     */
-    400: ProblemDetails;
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-    /**
-     * Not Found
-     */
-    404: ProblemDetails;
-};
-
-export type PutUserCurrentProfileError = PutUserCurrentProfileErrors[keyof PutUserCurrentProfileErrors];
-
-export type PutUserCurrentProfileResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
 
 export type PostUserDisableData = {
     body?: DisableUserRequestModel;

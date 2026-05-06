@@ -87,27 +87,10 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
         /// <param name="username">The username of the member.</param>
         /// <param name="removed">Whether the member was removed.</param>
         public JsonPayload(int id, string? username, bool removed)
-            : this(id, username, removed, indexableFieldsChanged: true)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="JsonPayload" /> class.
-        /// </summary>
-        /// <param name="id">The identifier of the member.</param>
-        /// <param name="username">The username of the member.</param>
-        /// <param name="removed">Whether the member was removed.</param>
-        /// <param name="indexableFieldsChanged">
-        ///     Whether any field that is part of the Examine value set has changed as part of this operation.
-        ///     When <c>false</c>, Examine indexing handlers will skip the re-index for this payload.
-        /// </param>
-        [System.Text.Json.Serialization.JsonConstructor]
-        public JsonPayload(int id, string? username, bool removed, bool indexableFieldsChanged)
         {
             Id = id;
             Username = username;
             Removed = removed;
-            IndexableFieldsChanged = indexableFieldsChanged;
         }
 
         /// <summary>
@@ -129,16 +112,6 @@ public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCache
         ///     Gets a value indicating whether the member was removed.
         /// </summary>
         public bool Removed { get; }
-
-        /// <summary>
-        ///     Gets a value indicating whether any indexable field changed as part of the originating save.
-        /// </summary>
-        /// <remarks>
-        ///     Defaults to <c>true</c> for backward compatibility. Explicitly set to <c>false</c>
-        ///     on login-only updates (which do not bump <c>UpdateDate</c>) so that the Examine
-        ///     indexing handlers skip re-indexing this payload.
-        /// </remarks>
-        public bool IndexableFieldsChanged { get; } = true;
     }
 
     /// <inheritdoc />

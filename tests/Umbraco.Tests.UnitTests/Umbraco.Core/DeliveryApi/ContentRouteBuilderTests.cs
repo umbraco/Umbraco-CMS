@@ -204,7 +204,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
     [TestCase("")]
     [TestCase(" ")]
-    [TestCase(Constants.Routing.Unroutable)]
+    [TestCase("#")]
     public void FallsBackToContentPathIfUrlProviderCannotResolveUrl(string resolvedUrl)
     {
         var result = GetUnRoutableRoute(resolvedUrl, "/the/content/route");
@@ -214,7 +214,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
 
     [TestCase("")]
     [TestCase(" ")]
-    [TestCase(Constants.Routing.Unroutable)]
+    [TestCase("#")]
     public void YieldsNullForUnRoutableContent(string contentPath)
     {
         var result = GetUnRoutableRoute(contentPath, contentPath);
@@ -438,7 +438,7 @@ public class ContentRouteBuilderTests : DeliveryApiTests
             var ancestorsOrSelf = content.AncestorsOrSelf(navigationQueryService, publishedContentStatusFilteringService).ToArray();
             return ancestorsOrSelf.All(c => c.IsPublished(culture))
                 ? string.Join("/", ancestorsOrSelf.Reverse().Skip(hideTopLevelNodeFromPath ? 1 : 0).Select(c => c.UrlSegment(variantContextAccessor, culture))).EnsureStartsWith("/")
-                : Constants.Routing.Unroutable;
+                : "#";
         }
 
         var publishedUrlProvider = new Mock<IPublishedUrlProvider>();

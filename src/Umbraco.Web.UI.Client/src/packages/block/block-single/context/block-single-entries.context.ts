@@ -57,15 +57,11 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 
 				const blockTypes = this._manager.getBlockTypes() ?? [];
 
-				const configuredSize = this._manager
-					.getEditorConfiguration()
-					?.getValueByAlias<'small' | 'medium' | 'large' | 'full'>('createModalSize');
 				/*
 				modal size logic:
 				If more than 8 block types, medium modal, more than 12 large modal:
 				*/
-				const modalSize =
-					configuredSize ?? (blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small');
+				const modalSize = blockTypes.length > 12 ? 'large' : blockTypes.length > 8 ? 'medium' : 'small';
 
 				return {
 					modal: { size: modalSize },

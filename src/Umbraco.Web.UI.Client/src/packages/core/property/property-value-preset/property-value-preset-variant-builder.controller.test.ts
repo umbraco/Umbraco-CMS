@@ -523,48 +523,6 @@ describe('UmbPropertyValuePresetVariantBuilderController', () => {
 			expect(result.some((r) => r.culture === null)).to.be.false;
 		});
 
-		it('produces one value per distinct segment when variant options include cultures but the property varies by segment only', async () => {
-			const ctrlHost = new UmbTestControllerHostElement();
-			const ctrl = new UmbPropertyValuePresetVariantBuilderController(ctrlHost);
-			// Variant options reflect a content type that varies by culture AND segment: a cultures × segments
-			// list plus the invariant option the caller appends for invariant properties.
-			ctrl.setVariantOptions([
-				new UmbVariantId('cultureA', null),
-				new UmbVariantId('cultureA', 'segmentA'),
-				new UmbVariantId('cultureA', 'segmentB'),
-				new UmbVariantId('cultureB', null),
-				new UmbVariantId('cultureB', 'segmentA'),
-				new UmbVariantId('cultureB', 'segmentB'),
-				new UmbVariantId(null, null),
-			]);
-
-			// Property varies by segment but not by culture: each culture-bearing option must be projected
-			// to culture-null and deduped by segment, so one value per distinct segment is produced.
-			// If the logic instead filtered out everything with a non-null culture, only the invariant value
-			// would survive and segmented values would be silently dropped.
-			const propertyTypes: Array<UmbPropertyTypePresetModel | UmbPropertyTypePresetWithSchemaAliasModel> = [
-				{
-					alias: 'test',
-					propertyEditorUiAlias: 'test-editor-ui',
-					config: [],
-					typeArgs: { variesByCulture: false, variesBySegment: true },
-				},
-			];
-
-			const result = await ctrl.create(propertyTypes, {
-				entityType: 'test',
-				entityUnique: 'some-unique',
-			});
-
-			expect(result.length).to.be.equal(3);
-			expect(result[0]?.culture).to.be.null;
-			expect(result[0]?.segment).to.be.null;
-			expect(result[1]?.culture).to.be.null;
-			expect(result[1]?.segment).to.be.equal('segmentA');
-			expect(result[2]?.culture).to.be.null;
-			expect(result[2]?.segment).to.be.equal('segmentB');
-		});
-
 		it('excludes all variant options when property is invariant', async () => {
 			const ctrlHost = new UmbTestControllerHostElement();
 			const ctrl = new UmbPropertyValuePresetVariantBuilderController(ctrlHost);

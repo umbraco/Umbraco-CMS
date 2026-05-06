@@ -210,8 +210,9 @@ export class UmbDataTypePickerFlowDataTypePickerModalElement extends UmbModalBas
 			#item-grid .item .label {
 				max-width: 100%;
 				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
 				overflow: hidden;
-				padding-bottom: 0.1em;
 			}
 		`,
 	];

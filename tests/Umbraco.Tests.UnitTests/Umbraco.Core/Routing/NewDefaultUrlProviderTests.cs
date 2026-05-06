@@ -2,7 +2,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -145,7 +144,7 @@ public class NewDefaultUrlProviderTests
     }
 
     /// <summary>
-    /// Verifies that the <see cref="Constants.Routing.Unroutable"/> route marker returns null (unpublished content).
+    /// Verifies that the "#" route marker returns null (unpublished content).
     /// </summary>
     [Test]
     public void Can_Return_Null_For_Hash_Route()
@@ -153,7 +152,7 @@ public class NewDefaultUrlProviderTests
         var ctx = new TestContext();
         var provider = ctx.CreateProvider();
 
-        var result = provider.GetUrlFromRoute(Constants.Routing.Unroutable, 123, _currentUri, UrlMode.Auto, null);
+        var result = provider.GetUrlFromRoute("#", 123, _currentUri, UrlMode.Auto, null);
 
         Assert.That(result, Is.Null);
     }

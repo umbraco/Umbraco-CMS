@@ -218,7 +218,6 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 						slot="editor"
 						id="data-type-input"
 						.value=${this._data?.dataType?.unique ?? ''}
-						.suggestionQuery=${this._data?.name}
 						@change=${this.#onDataTypeIdChange}
 						required
 						${umbBindToValidation(this, '$.dataType.unique')}></umb-data-type-flow-input>

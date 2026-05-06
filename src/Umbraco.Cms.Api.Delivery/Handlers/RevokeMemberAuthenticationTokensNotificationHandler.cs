@@ -5,7 +5,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Delivery.Handlers;
@@ -14,11 +13,7 @@ internal sealed class RevokeMemberAuthenticationTokensNotificationHandler
     : INotificationAsyncHandler<MemberSavedNotification>,
         INotificationAsyncHandler<MemberDeletedNotification>,
         INotificationAsyncHandler<AssignedMemberRolesNotification>,
-        INotificationAsyncHandler<RemovedMemberRolesNotification>,
-        INotificationAsyncHandler<ExternalMemberSavedNotification>,
-        INotificationAsyncHandler<ExternalMemberDeletedNotification>,
-        INotificationAsyncHandler<AssignedExternalMemberRolesNotification>,
-        INotificationAsyncHandler<RemovedExternalMemberRolesNotification>
+        INotificationAsyncHandler<RemovedMemberRolesNotification>
 {
     private readonly IMemberService _memberService;
     private readonly IOpenIddictTokenManager _tokenManager;
@@ -85,38 +80,6 @@ internal sealed class RevokeMemberAuthenticationTokensNotificationHandler
         }
     }
 
-    public async Task HandleAsync(ExternalMemberSavedNotification notification, CancellationToken cancellationToken)
-    {
-        if (_enabled is false)
-        {
-            return;
-        }
-
-        foreach (ExternalMemberIdentity member in notification.SavedEntities.Where(m => m.IsLockedOut || m.IsApproved is false))
-        {
-            await RevokeTokensByKeyAsync(member.Key);
-        }
-    }
-
-    public async Task HandleAsync(ExternalMemberDeletedNotification notification, CancellationToken cancellationToken)
-    {
-        if (_enabled is false)
-        {
-            return;
-        }
-
-        foreach (ExternalMemberIdentity member in notification.DeletedEntities)
-        {
-            await RevokeTokensByKeyAsync(member.Key);
-        }
-    }
-
-    public async Task HandleAsync(AssignedExternalMemberRolesNotification notification, CancellationToken cancellationToken)
-        => await ExternalMemberRolesChangedAsync(notification);
-
-    public async Task HandleAsync(RemovedExternalMemberRolesNotification notification, CancellationToken cancellationToken)
-        => await ExternalMemberRolesChangedAsync(notification);
-
     private async Task MemberRolesChangedAsync(MemberRolesNotification notification)
     {
         if (_enabled is false)
@@ -134,34 +97,6 @@ internal sealed class RevokeMemberAuthenticationTokensNotificationHandler
             }
 
             await RevokeTokensAsync(member);
-        }
-    }
-
-    private async Task ExternalMemberRolesChangedAsync(ExternalMemberRolesNotification notification)
-    {
-        if (_enabled is false)
-        {
-            return;
-        }
-
-        foreach (Guid memberKey in notification.MemberKeys)
-        {
-            await RevokeTokensByKeyAsync(memberKey);
-        }
-    }
-
-    private async Task RevokeTokensByKeyAsync(Guid memberKey)
-    {
-        var tokens = await _tokenManager.FindBySubjectAsync(memberKey.ToString()).ToArrayAsync();
-        if (tokens.Any() is false)
-        {
-            return;
-        }
-
-        _logger.LogInformation("Revoking {count} active tokens for external member with key {key}", tokens.Length, memberKey);
-        foreach (var token in tokens)
-        {
-            await _tokenManager.DeleteAsync(token);
         }
     }
 }

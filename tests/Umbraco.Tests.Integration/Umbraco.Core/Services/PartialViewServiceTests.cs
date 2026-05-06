@@ -6,7 +6,9 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Attributes;
@@ -19,6 +21,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
 {
     private IPartialViewService PartialViewService => GetRequiredService<IPartialViewService>();
+
+    private IPartialViewFolderService PartialViewFolderService => GetRequiredService<IPartialViewFolderService>();
+
+    private IKeyValueService KeyValueService => GetRequiredService<IKeyValueService>();
 
     /// <summary>
     /// Configures the runtime mode to Production for tests decorated with [ConfigureBuilder].
@@ -217,6 +223,55 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
         Assert.AreEqual(PartialViewOperationStatus.NotAllowedInProductionMode, result.Status);
         Assert.IsTrue(partialViewFileSystem.FileExists(originalFileName), "Original file should still exist");
         Assert.IsFalse(partialViewFileSystem.FileExists("RenamedFile.cshtml"), "Renamed file should not exist");
+    }
+
+    [Test]
+    public async Task PartialViewFolderService_GetAsync_For_Missing_Folder_Does_Not_Roll_Back_Outer_Scope()
+    {
+        // Regression: FolderServiceOperationBase.HandleGetAsync used to open a scope without ever
+        // calling scope.Complete() when the folder didn't exist (early-return null path). When
+        // called inside an outer scope, the un-completed child propagated Completed=false up to
+        // the parent on dispose, silently rolling back the entire outer transaction including any
+        // unrelated writes made alongside it.
+        const string canaryKey = "Tests.PartialViewFolderService.OuterScopeCanary";
+
+        using (ICoreScope outer = ScopeProvider.CreateCoreScope())
+        {
+            // GetAsync against a path that does not exist takes the read-miss code path.
+            var result = await PartialViewFolderService.GetAsync("does-not-exist");
+            Assert.IsNull(result);
+
+            // Persist a canary in the same outer scope - this should survive scope.Complete().
+            KeyValueService.SetValue(canaryKey, "ok");
+            outer.Complete();
+        }
+
+        // If the outer scope was poisoned by the un-completed child, this returns null.
+        Assert.AreEqual("ok", KeyValueService.GetValue(canaryKey));
+    }
+
+    [Test]
+    public async Task PartialViewService_UpdateAsync_For_Missing_File_Does_Not_Roll_Back_Outer_Scope()
+    {
+        // Regression: FileServiceOperationBase.HandleUpdateAsync (and the other Handle* methods)
+        // used to open a scope and return early without calling scope.Complete() on validation
+        // failures (here: NotFound when Repository.Get returns null). When wrapped in an outer
+        // scope, the un-completed child rolled the parent transaction back.
+        const string canaryKey = "Tests.PartialViewService.OuterScopeCanary";
+
+        using (ICoreScope outer = ScopeProvider.CreateCoreScope())
+        {
+            var result = await PartialViewService.UpdateAsync(
+                "does-not-exist.cshtml",
+                new PartialViewUpdateModel { Content = string.Empty },
+                Constants.Security.SuperUserKey);
+            Assert.AreEqual(PartialViewOperationStatus.NotFound, result.Status);
+
+            KeyValueService.SetValue(canaryKey, "ok");
+            outer.Complete();
+        }
+
+        Assert.AreEqual("ok", KeyValueService.GetValue(canaryKey));
     }
 
     private void DeleteAllPartialViewFiles()

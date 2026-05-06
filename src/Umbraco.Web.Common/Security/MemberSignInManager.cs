@@ -162,13 +162,6 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
             return await AutoLinkAndSignInExternalAccount(loginInfo, autoLinkOptions);
         }
 
-        // For external-only members, sync identity fields from the external provider's claims
-        // on each login. The external provider is the source of truth for these fields.
-        if (user.IsExternalOnly)
-        {
-            SyncExternalMemberIdentityFields(user, loginInfo);
-        }
-
         if (autoLinkOptions != null && autoLinkOptions.OnExternalLogin != null)
         {
             var shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
@@ -178,9 +171,6 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
                 return ExternalLoginSignInResult.NotAllowed;
             }
         }
-
-        // Changes from SyncExternalMemberIdentityFields and OnExternalLogin are persisted
-        // by ASP.NET Identity's own UpdateAsync call during sign-in (security stamp update).
 
         SignInResult? error = await PreSignInCheck(user);
         if (error != null)
@@ -279,13 +269,6 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
 
         autoLinkUser = MemberIdentityUser.CreateNew(email!, email!, autoLinkOptions.DefaultMemberTypeAlias, autoLinkOptions.DefaultIsApproved, name);
 
-        // When ExternalOnly is enabled, the member is stored as a lightweight identity record
-        // in the umbracoExternalMember table, bypassing the content system entirely.
-        if (autoLinkOptions.ExternalOnly)
-        {
-            autoLinkUser.IsExternalOnly = true;
-        }
-
         foreach (var userGroup in autoLinkOptions.DefaultMemberGroups)
         {
             autoLinkUser.AddRole(userGroup);
@@ -353,26 +336,6 @@ public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMe
 
         Logger.LogError("Failed to external link user. The following errors happened: {errors}", errors);
         return Task.FromResult(AutoLinkSignInResult.FailedLinkingUser(errors));
-    }
-
-    /// <summary>
-    ///     Syncs identity fields on an external-only member from the external provider's claims.
-    ///     The external provider is the source of truth for these fields.
-    /// </summary>
-    private static void SyncExternalMemberIdentityFields(MemberIdentityUser user, ExternalLoginInfo loginInfo)
-    {
-        var email = loginInfo.Principal.FindFirstValue(ClaimTypes.Email);
-        if (email.IsNullOrWhiteSpace() is false)
-        {
-            user.Email = email;
-            user.UserName = email;
-        }
-
-        var name = loginInfo.Principal?.Identity?.Name;
-        if (name.IsNullOrWhiteSpace() is false)
-        {
-            user.Name = name;
-        }
     }
 
     private void LogFailedExternalLogin(ExternalLoginInfo loginInfo, MemberIdentityUser user) =>

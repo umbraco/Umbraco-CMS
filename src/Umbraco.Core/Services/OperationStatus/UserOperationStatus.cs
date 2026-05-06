@@ -196,9 +196,4 @@ public enum UserOperationStatus
     ///     <c>ApplicationUrlDetection</c> to <c>FirstRequest</c> or <c>EveryRequest</c>.
     /// </summary>
     ApplicationUrlNotConfigured,
-
-    /// <summary>
-    ///     The operation failed because the user has login history, and therefore might be referenced in audit logs etc.
-    /// </summary>
-    CannotDeleteUserWithLoginHistory,
 }

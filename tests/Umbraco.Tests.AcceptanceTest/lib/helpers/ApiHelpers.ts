@@ -240,11 +240,6 @@ export class ApiHelpers {
     await this.updateTokenAndCookie(umbracoConfig.user.login, umbracoConfig.user.password);
   }
 
-  async resetAuthState() {
-    await this.revokeTokens();
-    await this.page.context().clearCookies();
-  }
-
   async getCurrentTimePlusMinute(minute: number = 1) {
     const now = new Date();
     now.setMinutes(now.getMinutes() + minute); // Add one minute

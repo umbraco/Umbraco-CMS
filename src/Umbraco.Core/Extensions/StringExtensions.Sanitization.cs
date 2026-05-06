@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Collections.Frozen;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
@@ -13,15 +12,14 @@ public static partial class StringExtensions
 {
 #pragma warning disable IDE1006 // Naming Styles (internal Guid is clearer without a _ prefix).
     /// <summary>
-    /// Compiled regular expression that matches one or more whitespace characters.
+    /// Provides a lazily initialized, compiled regular expression that matches one or more whitespace characters.
     /// </summary>
-    [GeneratedRegex(@"\s+")]
-    private static partial Regex WhitespaceRegex();
+    internal static readonly Lazy<Regex> Whitespace = new(() => new Regex(@"\s+", RegexOptions.Compiled));
 
     /// <summary>
     /// Provides a collection of JSON string representations that are considered empty objects or arrays.
     /// </summary>
-    internal static readonly FrozenSet<string> JsonEmpties = FrozenSet.ToFrozenSet(["[]", "{}"]);
+    internal static readonly string[] JsonEmpties = { "[]", "{}" };
 #pragma warning restore IDE1006 // Naming Styles
 
     private static readonly char[] _cleanForXssChars = "*?(){}[];:%<>/\\|&'\"".ToCharArray();
@@ -33,8 +31,10 @@ public static partial class StringExtensions
     /// Filters control characters but allows only properly-formed surrogate sequences.
     /// Hat-tip: http://stackoverflow.com/a/961504/5018.
     /// </remarks>
-    [GeneratedRegex(@"(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFEFF\uFFFE\uFFFF]")]
-    private static partial Regex InvalidXmlCharsRegex();
+    private static readonly Lazy<Regex> _invalidXmlChars = new(() =>
+        new Regex(
+            @"(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFEFF\uFFFE\uFFFF]",
+            RegexOptions.Compiled));
 
     /// <summary>
     /// Attempts to detect whether a string is JSON by checking for opening and closing brackets or braces.
@@ -62,7 +62,7 @@ public static partial class StringExtensions
     /// <param name="input">The string to check.</param>
     /// <returns><c>true</c> if the string is "[]" or "{}" (ignoring whitespace); otherwise, <c>false</c>.</returns>
     public static bool DetectIsEmptyJson(this string input) =>
-        JsonEmpties.Contains(WhitespaceRegex().Replace(input, string.Empty));
+        JsonEmpties.Contains(Whitespace.Value.Replace(input, string.Empty));
 
     /// <summary>
     /// Cleans a string to aid in preventing XSS attacks.
@@ -160,7 +160,7 @@ public static partial class StringExtensions
     /// <param name="text">The string to filter.</param>
     /// <returns>The string with invalid XML characters removed.</returns>
     public static string ToValidXmlString(this string text) =>
-        string.IsNullOrEmpty(text) ? text : InvalidXmlCharsRegex().Replace(text, string.Empty);
+        string.IsNullOrEmpty(text) ? text : _invalidXmlChars.Value.Replace(text, string.Empty);
 
     /// <summary>
     /// Turns a null-or-whitespace string into a null string.

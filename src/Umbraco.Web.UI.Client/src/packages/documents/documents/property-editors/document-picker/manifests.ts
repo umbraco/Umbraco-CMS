@@ -11,7 +11,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.ContentPicker',
 			icon: 'icon-document',
 			group: 'pickers',
-			keywords: ['select', 'page', 'link', 'reference', 'related', 'document', 'target', 'destination'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [

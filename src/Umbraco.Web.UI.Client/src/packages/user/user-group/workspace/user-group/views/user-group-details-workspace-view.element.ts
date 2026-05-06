@@ -10,7 +10,6 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 import '../components/user-group-entity-type-permission-groups.element.js';
-import '../components/user-group-workspace-users.element.js';
 
 @customElement('umb-user-group-details-workspace-view')
 export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement implements UmbWorkspaceViewElement {
@@ -164,7 +163,6 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 
 					${this.#renderPermissionGroups()}
 				</umb-stack>
-				<umb-user-group-workspace-users></umb-user-group-workspace-users>
 			</div>
 		`;
 	}
@@ -259,9 +257,6 @@ export class UmbUserGroupDetailsWorkspaceViewElement extends UmbLitElement imple
 			}
 
 			#main {
-				display: grid;
-				grid-template-columns: 1fr 350px;
-				gap: var(--uui-size-layout-1);
 				padding: var(--uui-size-layout-1);
 			}
 

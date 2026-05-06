@@ -1,10 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.DeliveryApi;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
@@ -19,35 +16,18 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
 {
     private readonly IMemberService _memberService;
     private readonly IPublishedMemberCache _memberCache;
-    private readonly IExternalMemberService _externalMemberService;
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MemberPickerValueConverter" /> class.
-    /// </summary>
-    public MemberPickerValueConverter(
-        IMemberService memberService,
-        IPublishedMemberCache memberCache,
-        IExternalMemberService externalMemberService)
-    {
-        _memberService = memberService;
-        _memberCache = memberCache;
-        _externalMemberService = externalMemberService;
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberPickerValueConverter" /> class.
     /// </summary>
     /// <param name="memberService">The member service.</param>
     /// <param name="memberCache">The published member cache.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public MemberPickerValueConverter(
         IMemberService memberService,
         IPublishedMemberCache memberCache)
-        : this(
-            memberService,
-            memberCache,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalMemberService>())
     {
+        _memberService = memberService;
+        _memberCache = memberCache;
     }
 
     /// <inheritdoc />
@@ -93,6 +73,7 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
             return null;
         }
 
+        IPublishedContent? member;
         if (source is int id)
         {
             IMember? m = _memberService.GetById(id);
@@ -101,7 +82,7 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
                 return null;
             }
 
-            IPublishedContent? member = _memberCache.Get(m);
+            member = _memberCache.Get(m);
             if (member != null)
             {
                 return member;
@@ -115,21 +96,16 @@ public class MemberPickerValueConverter : PropertyValueConverterBase, IDeliveryA
             }
 
             IMember? m = _memberService.GetById(sourceUdi.Guid);
-            if (m != null)
+            if (m == null)
             {
-                IPublishedContent? member = _memberCache.Get(m);
-                if (member != null)
-                {
-                    return member;
-                }
+                return null;
             }
 
-            // Fall back to external member store.
-            ExternalMemberIdentity? external = _externalMemberService.GetByKeyAsync(sourceUdi.Guid)
-                .GetAwaiter().GetResult();
-            if (external != null)
+            member = _memberCache.Get(m);
+
+            if (member != null)
             {
-                return new PublishedExternalMember(external);
+                return member;
             }
         }
 
