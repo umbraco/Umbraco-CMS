@@ -1,5 +1,5 @@
-import type { UmbBlockRteLayoutModel, UmbBlockRteValueModel } from '../../types.js';
-import { UMB_BLOCK_RTE, UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS } from '../../constants.js';
+import type { UmbBlockRteLayoutModel } from '../../types.js';
+import { UMB_BLOCK_RTE } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
 import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
@@ -13,10 +13,9 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
-import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
-import { UMB_PROPERTY_DATASET_CONTEXT, UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
 
 import '../ref-rte-block/index.js';
+import '../../../block/action/block-action-list.element.js';
 
 /**
  * @class UmbBlockRteEntryElement
@@ -50,9 +49,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	private _showContentEdit = false;
 
 	@state()
-	private _hasSettings = false;
-
-	@state()
 	private _label = '';
 
 	@state()
@@ -63,12 +59,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	@state()
 	private _showActions?: boolean;
-
-	@state()
-	private _workspaceEditContentPath?: string;
-
-	@state()
-	private _workspaceEditSettingsPath?: string;
 
 	@state()
 	private _contentTypeAlias?: string;
@@ -100,17 +90,11 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.requestUpdate('_blockViewProps');
 	}
 
-	#clipboardContext?: typeof UMB_CLIPBOARD_PROPERTY_CONTEXT.TYPE;
-
 	constructor() {
 		super();
 
 		// We do not have index for RTE Blocks at the moment.
 		this.#context.setIndex(0);
-
-		this.consumeContext(UMB_CLIPBOARD_PROPERTY_CONTEXT, (clipboardContext) => {
-			this.#clipboardContext = clipboardContext;
-		});
 
 		this.observe(
 			this.#context.showContentEdit,
@@ -123,7 +107,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.observe(
 			this.#context.settingsElementTypeKey,
 			(key) => {
-				this._hasSettings = !!key;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, showSettingsEdit: !!key } });
 			},
 			null,
@@ -175,13 +158,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			null,
 		);
 
-		this.observe(
-			this.#context.actionsVisibility,
-			(showActions) => {
-				this._showActions = showActions;
-			},
-			null,
-		);
+		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
+
 		// Data props:
 		this.observe(
 			this.#context.layout,
@@ -216,7 +194,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.observe(
 			this.#context.workspaceEditContentPath,
 			(path) => {
-				this._workspaceEditContentPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editContentPath: path } });
 			},
 			null,
@@ -224,7 +201,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.observe(
 			this.#context.workspaceEditSettingsPath,
 			(path) => {
-				this._workspaceEditSettingsPath = path;
 				this.#updateBlockViewProps({ config: { ...this._blockViewProps.config!, editSettingsPath: path } });
 			},
 			null,
@@ -259,43 +235,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	override connectedCallback() {
 		super.connectedCallback();
 		this.setAttribute('contenteditable', 'false');
-	}
-
-	async #copyToClipboard() {
-		if (!this.#clipboardContext) {
-			console.warn('Clipboard context is not available.');
-			return;
-		}
-
-		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);
-		const propertyContext = await this.getContext(UMB_PROPERTY_CONTEXT);
-		if (!propertyDatasetContext || !propertyContext) {
-			throw new Error('Could not get required contexts to copy.');
-		}
-
-		const workspaceName = this.localize.string(propertyDatasetContext?.getName());
-		const propertyLabel = this.localize.string(propertyContext?.getLabel());
-
-		const blockLabel = this.#context.getName();
-		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
-		const content = this.#context.getContent();
-		const layout = this.#context.getLayout();
-		const settings = this.#context.getSettings();
-		const expose = this.#context.getExpose();
-		const propertyValue: UmbBlockRteValueModel = {
-			contentData: content ? [structuredClone(content)] : [],
-			layout: { [UMB_BLOCK_RTE_PROPERTY_EDITOR_SCHEMA_ALIAS]: layout ? [structuredClone(layout)] : undefined },
-			settingsData: settings ? [structuredClone(settings)] : [],
-			expose: expose ? [structuredClone(expose)] : [],
-		};
-		const editorUiManifest = propertyContext.getEditorManifest();
-
-		this.#clipboardContext.write({
-			icon: this._icon,
-			name: entryName,
-			propertyValue,
-			propertyEditorUiAlias: editorUiManifest?.alias ?? '',
-		});
 	}
 
 	readonly #filterBlockCustomViews = (manifest: ManifestBlockEditorCustomView) => {
@@ -348,12 +287,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	#renderActionBar() {
 		if (!this._showActions) return nothing;
-		return html`
-			<uui-action-bar>
-				${this.#renderEditAction()} ${this.#renderEditSettingsAction()}
-				${this.#renderCopyToClipboardAction()}${this.#renderDeleteAction()}
-			</uui-action-bar>
-		`;
+		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
 	}
 
 	#renderBuiltinBlockView = () => {
@@ -375,66 +309,6 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			.config=${this._blockViewProps.config}></umb-ref-rte-block>`;
 	}
 
-	#renderEditAction() {
-		return this._showContentEdit && this._workspaceEditContentPath
-			? html`<uui-button
-					label="edit"
-					look="secondary"
-					color=${this._contentInvalid ? 'invalid' : ''}
-					href=${this._workspaceEditContentPath}>
-					<uui-icon name=${this._exposed === false ? 'icon-add' : 'icon-edit'}></uui-icon>
-					${this._contentInvalid
-						? html`<uui-badge attention color="invalid" label="Invalid content">!</uui-badge>`
-						: nothing}
-				</uui-button>`
-			: this._showContentEdit === false && this._exposed === false
-				? html`<uui-button
-						@click=${this.#expose}
-						label=${this.localize.term('blockEditor_createThisFor', this._contentTypeName)}
-						look="secondary">
-						<uui-icon name="icon-add"></uui-icon>
-					</uui-button>`
-				: nothing;
-	}
-
-	#renderEditSettingsAction() {
-		return html`
-			${this._hasSettings && this._workspaceEditSettingsPath
-				? html`<uui-button
-						label="Edit settings"
-						look="secondary"
-						color=${this._settingsInvalid ? 'invalid' : ''}
-						href=${this._workspaceEditSettingsPath}>
-						<uui-icon name="icon-settings"></uui-icon>
-						${this._settingsInvalid
-							? html`<uui-badge attention color="invalid" label="Invalid settings">!</uui-badge>`
-							: nothing}
-					</uui-button>`
-				: nothing}
-		`;
-	}
-
-	#renderCopyToClipboardAction() {
-		if (!this.#clipboardContext) return nothing;
-		return html`
-			<uui-button
-				label=${this.localize.term('clipboard_labelForCopyToClipboard')}
-				look="secondary"
-				@click=${() => this.#copyToClipboard()}>
-				<uui-icon name="icon-clipboard-copy"></uui-icon>
-			</uui-button>
-		`;
-	}
-
-	#renderDeleteAction() {
-		if (this._isReadOnly) return nothing;
-		return html`
-			<uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()}>
-				<uui-icon name="icon-remove"></uui-icon>
-			</uui-button>
-		`;
-	}
-
 	override render() {
 		return this.#renderBlock();
 	}
@@ -448,6 +322,13 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				user-select: all;
 				user-drag: auto;
 				white-space: nowrap;
+
+				--umb-block-entry-actions-opacity: 0;
+			}
+
+			:host(:hover),
+			:host(:focus-within) {
+				--umb-block-entry-actions-opacity: 1;
 			}
 
 			:host(.ProseMirror-selectednode) {
@@ -462,10 +343,13 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				z-index: 0;
 			}
 
-			uui-action-bar {
+			#actions {
 				position: absolute;
 				top: var(--uui-size-2);
 				right: var(--uui-size-2);
+				opacity: var(--umb-block-entry-actions-opacity, 0);
+				transition: opacity 120ms;
+				z-index: 1;
 			}
 
 			:host([drag-placeholder]) {
