@@ -1,3 +1,4 @@
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
 import { UMB_CURRENT_USER_ALLOW_CHANGE_PASSWORD_CONDITION_ALIAS } from '@umbraco-cms/backoffice/user';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -16,13 +17,19 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'currentUserAction',
 		kind: 'default',
 		alias: 'Umb.CurrentUser.Button.Edit',
-		name: 'Current User Edit Profile Action',
+		name: 'Current User Edit Button',
 		weight: 1000,
 		api: () => import('./edit-current-user.action.js'),
 		meta: {
 			label: '#general_edit',
 			icon: 'edit',
 		},
+		conditions: [
+			{
+				alias: UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS,
+				match: 'Umb.Section.Users',
+			},
+		],
 	},
 	{
 		type: 'currentUserAction',

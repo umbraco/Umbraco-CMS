@@ -51,7 +51,6 @@ internal partial class UserService : RepositoryService, IUserService
     private readonly IUserRepository _userRepository;
     private readonly ContentSettings _contentSettings;
     private readonly IUserIdKeyResolver _userIdKeyResolver;
-    private readonly IBackOfficeUserReader _backOfficeUserReader;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="UserService" /> class.
@@ -75,7 +74,6 @@ internal partial class UserService : RepositoryService, IUserService
     /// <param name="isoCodeValidator">The validator for ISO codes.</param>
     /// <param name="forgotPasswordSender">The sender for forgot password emails.</param>
     /// <param name="userIdKeyResolver">The resolver for user ID to key mappings.</param>
-    /// <param name="backOfficeUserReader">The shared reader used for back office user lookups.</param>
     public UserService(
         ICoreScopeProvider provider,
         ILoggerFactory loggerFactory,
@@ -95,8 +93,7 @@ internal partial class UserService : RepositoryService, IUserService
         IOptions<ContentSettings> contentSettings,
         IIsoCodeValidator isoCodeValidator,
         IUserForgotPasswordSender forgotPasswordSender,
-        IUserIdKeyResolver userIdKeyResolver,
-        IBackOfficeUserReader backOfficeUserReader)
+        IUserIdKeyResolver userIdKeyResolver)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _userRepository = userRepository;
@@ -112,7 +109,6 @@ internal partial class UserService : RepositoryService, IUserService
         _isoCodeValidator = isoCodeValidator;
         _forgotPasswordSender = forgotPasswordSender;
         _userIdKeyResolver = userIdKeyResolver;
-        _backOfficeUserReader = backOfficeUserReader;
         _globalSettings = globalSettings.Value;
         _securitySettings = securitySettings.Value;
         _contentSettings = contentSettings.Value;
@@ -953,39 +949,7 @@ internal partial class UserService : RepositoryService, IUserService
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Success, updated);
-    }
 
-    /// <inheritdoc/>
-    public async Task<Attempt<IUser?, UserOperationStatus>> UpdateProfileAsync(Guid userKey, UserUpdateProfileModel model)
-    {
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        using IServiceScope serviceScope = _serviceScopeFactory.CreateScope();
-        IBackOfficeUserStore userStore = serviceScope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
-
-        IUser? existingUser = await userStore.GetAsync(userKey);
-
-        if (existingUser is null)
-        {
-            return Attempt.FailWithStatus(UserOperationStatus.UserNotFound, existingUser);
-        }
-
-        UserOperationStatus validationStatus = ValidateUserProfileUpdateModel(model);
-        if (validationStatus is not UserOperationStatus.Success)
-        {
-            scope.Complete();
-            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(validationStatus, existingUser);
-        }
-
-        IUser updated = MapUserProfileUpdate(model, existingUser);
-        UserOperationStatus saveStatus = await userStore.SaveAsync(updated);
-
-        if (saveStatus is not UserOperationStatus.Success)
-        {
-            return Attempt.FailWithStatus<IUser?, UserOperationStatus>(saveStatus, existingUser);
-        }
-
-        scope.Complete();
-        return Attempt.SucceedWithStatus<IUser?, UserOperationStatus>(UserOperationStatus.Success, updated);
     }
 
     /// <inheritdoc/>
@@ -1115,35 +1079,6 @@ internal partial class UserService : RepositoryService, IUserService
         }
 
         return UserOperationStatus.Success;
-    }
-
-    /// <summary>
-    ///     Validates a user profile update model.
-    /// </summary>
-    /// <param name="model">The profile update model to validate.</param>
-    /// <returns>The <see cref="UserOperationStatus" /> indicating validation result.</returns>
-    private UserOperationStatus ValidateUserProfileUpdateModel(UserUpdateProfileModel model)
-    {
-        if (_isoCodeValidator.IsValid(model.LanguageIsoCode) is false)
-        {
-            return UserOperationStatus.InvalidIsoCode;
-        }
-
-        return UserOperationStatus.Success;
-    }
-
-    /// <summary>
-    ///     Maps user profile update model properties to an existing user.
-    /// </summary>
-    /// <param name="source">The source update profile model.</param>
-    /// <param name="target">The target user to update.</param>
-    /// <returns>The updated <see cref="IUser" />.</returns>
-    private IUser MapUserProfileUpdate(
-        UserUpdateProfileModel source,
-        IUser target)
-    {
-        target.Language = source.LanguageIsoCode;
-        return target;
     }
 
     /// <summary>
@@ -1508,7 +1443,7 @@ internal partial class UserService : RepositoryService, IUserService
             // the Id is associated with audit trails, versions etc. and can't be removed.
             if (user.LastLoginDate is not null && user.LastLoginDate != default(DateTime))
             {
-                return UserOperationStatus.CannotDeleteUserWithLoginHistory;
+                return UserOperationStatus.CannotDelete;
             }
 
             user.IsApproved = false;
@@ -1760,7 +1695,10 @@ internal partial class UserService : RepositoryService, IUserService
             return Array.Empty<IUser>();
         }
 
-        return _backOfficeUserReader.GetAllInGroup(groupId.Value);
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        return backOfficeUserStore.GetAllInGroupAsync(groupId.Value).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc/>
@@ -1801,15 +1739,30 @@ internal partial class UserService : RepositoryService, IUserService
 
     /// <inheritdoc/>
     public IUser? GetUserById(int id)
-        => _backOfficeUserReader.GetById(id);
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        return backOfficeUserStore.GetAsync(id).GetAwaiter().GetResult();
+    }
 
     /// <inheritdoc/>
     public Task<IUser?> GetAsync(Guid key)
-        => Task.FromResult(_backOfficeUserReader.GetByKey(key));
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        return backOfficeUserStore.GetAsync(key);
+    }
 
     /// <inheritdoc/>
     public Task<IEnumerable<IUser>> GetAsync(IEnumerable<Guid> keys)
-        => Task.FromResult(_backOfficeUserReader.GetManyByKey(keys));
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        return backOfficeUserStore.GetUsersAsync(keys.ToArray());
+    }
 
     /// <inheritdoc/>
     public async Task<Attempt<ICollection<IIdentityUserLogin>, UserOperationStatus>> GetLinkedLoginsAsync(Guid userKey)
@@ -1834,7 +1787,12 @@ internal partial class UserService : RepositoryService, IUserService
 
     /// <inheritdoc/>
     public IEnumerable<IUser> GetUsersById(params int[]? ids)
-        => ids is null ? Enumerable.Empty<IUser>() : _backOfficeUserReader.GetManyById(ids);
+    {
+        using IServiceScope scope = _serviceScopeFactory.CreateScope();
+        IBackOfficeUserStore backOfficeUserStore = scope.ServiceProvider.GetRequiredService<IBackOfficeUserStore>();
+
+        return backOfficeUserStore.GetUsersAsync(ids).GetAwaiter().GetResult();
+    }
 
     /// <inheritdoc/>
     public void ReplaceUserGroupPermissions(int groupId, ISet<string> permissions, params int[] entityIds)

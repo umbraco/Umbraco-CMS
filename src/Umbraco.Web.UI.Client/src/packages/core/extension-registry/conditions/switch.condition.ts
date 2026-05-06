@@ -9,32 +9,26 @@ import type {
 
 export class UmbSwitchCondition extends UmbConditionBase<SwitchConditionConfig> implements UmbExtensionCondition {
 	#timer?: ReturnType<typeof setTimeout>;
-	#frequency: number;
 
 	constructor(host: UmbControllerHost, args: UmbConditionControllerArguments<SwitchConditionConfig>) {
 		super(host, args);
-		const frequency = parseInt(this.config.frequency);
-		if (isNaN(frequency) || frequency <= 0) {
-			throw new Error(`Frequency must be a positive number (frequency: ${this.config.frequency})`);
-		}
-		this.#frequency = frequency;
-		this.#startApprove();
+		this.startApprove();
 	}
 
-	#startApprove() {
+	startApprove() {
 		clearTimeout(this.#timer);
 		this.#timer = setTimeout(() => {
 			this.permitted = true;
-			this.#startDisapprove();
-		}, this.#frequency);
+			this.startDisapprove();
+		}, parseInt(this.config.frequency));
 	}
 
-	#startDisapprove() {
+	startDisapprove() {
 		clearTimeout(this.#timer);
 		this.#timer = setTimeout(() => {
 			this.permitted = false;
-			this.#startApprove();
-		}, this.#frequency);
+			this.startApprove();
+		}, parseInt(this.config.frequency));
 	}
 
 	override destroy() {

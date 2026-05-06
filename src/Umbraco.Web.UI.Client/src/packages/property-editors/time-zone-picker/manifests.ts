@@ -9,6 +9,5 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Time Zone Picker',
 		icon: 'icon-globe',
 		group: '',
-		keywords: ['timezone', 'tz', 'utc', 'region', 'locale'],
 	},
 };

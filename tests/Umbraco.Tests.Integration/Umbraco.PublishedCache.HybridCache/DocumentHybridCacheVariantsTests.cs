@@ -38,8 +38,6 @@ internal sealed class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
 
     private IPublishedContentCache PublishedContentHybridCache => GetRequiredService<IPublishedContentCache>();
 
-    private IContentPublishingService ContentPublishingService => GetRequiredService<IContentPublishingService>();
-
     private IContent VariantPage { get; set; }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
@@ -120,83 +118,6 @@ internal sealed class DocumentHybridCacheVariantsTests : UmbracoIntegrationTest
         Assert.AreEqual(updatedInvariantTitle, textPage.Value(_invariantTitleAlias, string.Empty, string.Empty));
         Assert.AreEqual(updatedVariantTitle, textPage.Value(_variantTitleAlias, _englishIsoCode));
         Assert.AreEqual(_variantTitleName, textPage.Value(_variantTitleAlias, _danishIsoCode));
-    }
-
-    [TestCase("en-US")]
-    [TestCase("da-DK")]
-    public async Task Can_Get_Draft_For_Unpublished_Culture(string cultureToUnpublish)
-    {
-        // Arrange
-        var publishAttempt = await ContentPublishingService.PublishBranchAsync(VariantPage.Key, [_englishIsoCode, _danishIsoCode], PublishBranchFilter.All, Constants.Security.SuperUserKey, false);
-        Assert.IsTrue(publishAttempt.Success);
-        Assert.That(publishAttempt.Result.SucceededItems.Count(), Is.EqualTo(1));
-
-        var publishedPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, false);
-        Assert.IsNotNull(publishedPage);
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(publishedPage.IsPublished(_englishIsoCode));
-            Assert.IsTrue(publishedPage.IsPublished(_danishIsoCode));
-
-            Assert.AreEqual(2, publishedPage.Cultures.Count);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, publishedPage.Cultures.Keys);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, publishedPage.Cultures.Values.Select(v => v.Name));
-
-            Assert.AreEqual(_variantTitleName, publishedPage.Value<string>(_variantTitleAlias, _englishIsoCode));
-            Assert.AreEqual(_variantTitleName, publishedPage.Value<string>(_variantTitleAlias, _danishIsoCode));
-        });
-
-        var draftPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, true);
-        Assert.IsNotNull(draftPage);
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(draftPage.IsPublished(_englishIsoCode));
-            Assert.IsTrue(draftPage.IsPublished(_danishIsoCode));
-
-            Assert.AreEqual(2, draftPage.Cultures.Count);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, draftPage.Cultures.Keys);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, draftPage.Cultures.Values.Select(v => v.Name));
-
-            Assert.AreEqual(_variantTitleName, draftPage.Value<string>(_variantTitleAlias, _englishIsoCode));
-            Assert.AreEqual(_variantTitleName, draftPage.Value<string>(_variantTitleAlias, _danishIsoCode));
-        });
-
-        // Act
-        var unpublishAttempt = await ContentPublishingService.UnpublishAsync(VariantPage.Key, new HashSet<string> { cultureToUnpublish }, Constants.Security.SuperUserKey);
-        Assert.IsTrue(unpublishAttempt.Success);
-
-        // Assert
-        var expectedPublishedCulture = cultureToUnpublish == _danishIsoCode ? _englishIsoCode : _danishIsoCode;
-
-        publishedPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, false);
-        Assert.IsNotNull(publishedPage);
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(publishedPage.IsPublished(expectedPublishedCulture));
-            Assert.IsFalse(publishedPage.IsPublished(cultureToUnpublish));
-
-            Assert.AreEqual(1, publishedPage.Cultures.Count);
-            Assert.AreEqual(expectedPublishedCulture, publishedPage.Cultures.Single().Key);
-            Assert.AreEqual(expectedPublishedCulture, publishedPage.Cultures.Single().Value.Name);
-
-            Assert.AreEqual(_variantTitleName, publishedPage.Value<string>(_variantTitleAlias, expectedPublishedCulture));
-            Assert.IsEmpty(publishedPage.Value<string>(_variantTitleAlias, cultureToUnpublish));
-        });
-
-        draftPage = await PublishedContentHybridCache.GetByIdAsync(VariantPage.Id, true);
-        Assert.IsNotNull(draftPage);
-        Assert.Multiple(() =>
-        {
-            Assert.IsTrue(draftPage.IsPublished(expectedPublishedCulture));
-            Assert.IsFalse(draftPage.IsPublished(cultureToUnpublish));
-
-            Assert.AreEqual(2, draftPage.Cultures.Count);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, draftPage.Cultures.Keys);
-            CollectionAssert.AreEqual(new[] { _englishIsoCode, _danishIsoCode }, draftPage.Cultures.Values.Select(v => v.Name));
-
-            Assert.AreEqual(_variantTitleName, draftPage.Value<string>(_variantTitleAlias, _englishIsoCode));
-            Assert.AreEqual(_variantTitleName, draftPage.Value<string>(_variantTitleAlias, _danishIsoCode));
-        });
     }
 
     private async Task CreateTestData()

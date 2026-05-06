@@ -33,9 +33,6 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 		selection: [],
 	};
 
-	@state()
-	private _searchQuery?: string;
-
 	#pickerContext = new UmbDocumentLinkPickerContext(this);
 
 	constructor() {
@@ -51,10 +48,6 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 
 		this.observe(this.#pickerContext.selection.hasSelection, (hasSelection) => {
 			this._hasSelection = hasSelection;
-		});
-
-		this.observe(this.#pickerContext.search.query, (query) => {
-			this._searchQuery = query?.query;
 		});
 	}
 
@@ -85,7 +78,18 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 	override render() {
 		return html`
 			<umb-body-layout headline=${this.localize.term('general_choose')}>
-				${this.#renderLanguageSelector()} ${this.#renderSearch()} ${this.#renderTree()}
+				${this.#renderLanguageSelector()} ${this.#renderSearch()}
+				<uui-box>
+					<umb-tree
+						alias=${UMB_DOCUMENT_TREE_ALIAS}
+						.props=${{
+							hideTreeItemActions: true,
+							hideTreeRoot: true,
+							selectionConfiguration: this._selectionConfiguration,
+						}}
+						@selected=${this.#onTreeItemSelected}
+						@deselected=${this.#onTreeItemDeselected}></umb-tree>
+				</uui-box>
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_close')} @click=${this._rejectModal}></uui-button>
 					<uui-button
@@ -130,26 +134,6 @@ export class UmbDocumentLinkPickerModalElement extends UmbModalBaseElement<
 					)}
 				</uui-combobox-list>
 			</uui-combobox>
-		`;
-	}
-
-	#renderTree() {
-		if (this._searchQuery) {
-			return nothing;
-		}
-
-		return html`
-			<uui-box>
-				<umb-tree
-					alias=${UMB_DOCUMENT_TREE_ALIAS}
-					.props=${{
-						hideTreeItemActions: true,
-						hideTreeRoot: true,
-						selectionConfiguration: this._selectionConfiguration,
-					}}
-					@selected=${this.#onTreeItemSelected}
-					@deselected=${this.#onTreeItemDeselected}></umb-tree>
-			</uui-box>
 		`;
 	}
 

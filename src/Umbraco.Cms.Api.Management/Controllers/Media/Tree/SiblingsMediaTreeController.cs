@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,54 +18,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Tree;
 /// </summary>
 public class SiblingsMediaTreeController : MediaTreeControllerBase
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SiblingsMediaTreeController"/> class.
-    /// </summary>
-    /// <param name="entityService">Service for accessing and managing entities within the system.</param>
-    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
-    /// <param name="treeFilterService">Service for filtering media tree entities based on user start nodes.</param>
-    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
-    [ActivatorUtilitiesConstructor]
-    public SiblingsMediaTreeController(
-        IEntityService entityService,
-        FlagProviderCollection flagProviders,
-        IMediaStartNodeTreeFilterService treeFilterService,
-        IMediaPresentationFactory mediaPresentationFactory)
-        : base(entityService, flagProviders, treeFilterService, mediaPresentationFactory)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SiblingsMediaTreeController"/> class.
-    /// </summary>
-    /// <remarks>
-    /// This constructor exists solely to disambiguate DI container constructor resolution between the new
-    /// and the existing obsolete constructors; all parameters except those forwarded to the non-obsolete
-    /// constructor are ignored.
-    /// </remarks>
-    /// <param name="entityService">Service for accessing and managing entities within the system.</param>
-    /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
-    /// <param name="userStartNodeEntitiesService">Service for resolving user start nodes for entities.</param>
-    /// <param name="dataTypeService">Service for accessing and managing data types.</param>
-    /// <param name="treeFilterService">Service for filtering media tree entities based on user start nodes.</param>
-    /// <param name="appCaches">Provides access to application-level caches.</param>
-    /// <param name="backofficeSecurityAccessor">Accessor for backoffice security context and operations.</param>
-    /// <param name="mediaPresentationFactory">Factory for creating media presentation models.</param>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public SiblingsMediaTreeController(
-        IEntityService entityService,
-        FlagProviderCollection flagProviders,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        IMediaStartNodeTreeFilterService treeFilterService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-        IMediaPresentationFactory mediaPresentationFactory)
-        : this(entityService, flagProviders, treeFilterService, mediaPresentationFactory)
-    {
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="SiblingsMediaTreeController"/> class, responsible for handling API requests related to sibling media items in the media tree.
     /// </summary>
@@ -98,7 +49,7 @@ public class SiblingsMediaTreeController : MediaTreeControllerBase
     /// <param name="appCaches">Provides access to application-level caches for performance optimization.</param>
     /// <param name="backofficeSecurityAccessor">Accessor for back office security context, used for authorization and user information.</param>
     /// <param name="mediaPresentationFactory">Factory for creating media presentation models for API responses.</param>
-    [Obsolete("Please use the constructor accepting IMediaStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
+    [ActivatorUtilitiesConstructor]
     public SiblingsMediaTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,

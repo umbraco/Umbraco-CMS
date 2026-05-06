@@ -15,10 +15,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Controllers;
 
-/// <summary>
-///     Surface controller that handles updates to the profile of the currently authenticated member,
-///     posted from the Edit Profile snippet.
-/// </summary>
 [UmbracoMemberAuthorize]
 public class UmbProfileController : SurfaceController
 {
@@ -27,9 +23,6 @@ public class UmbProfileController : SurfaceController
     private readonly IMemberTypeService _memberTypeService;
     private readonly ICoreScopeProvider _scopeProvider;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbProfileController" /> class.
-    /// </summary>
     public UmbProfileController(
         IUmbracoContextAccessor umbracoContextAccessor,
         IUmbracoDatabaseFactory databaseFactory,
@@ -49,14 +42,6 @@ public class UmbProfileController : SurfaceController
         _scopeProvider = scopeProvider;
     }
 
-    /// <summary>
-    ///     Handles the profile update form post for the currently authenticated member.
-    /// </summary>
-    /// <param name="model">The posted profile model.</param>
-    /// <returns>
-    ///     A redirect to the supplied local URL (or the current page) on success; otherwise the current
-    ///     page with validation errors added to ModelState.
-    /// </returns>
     [HttpPost]
     [ValidateAntiForgeryToken]
     [ValidateUmbracoFormRouteString]
@@ -85,8 +70,8 @@ public class UmbProfileController : SurfaceController
 
         TempData["FormSuccess"] = true;
 
-        // If there is a specified path to redirect to and it is validated as a local URL, then use it.
-        if (model.RedirectUrl.IsNullOrWhiteSpace() is false && Url.IsLocalUrl(model.RedirectUrl!))
+        // If there is a specified path to redirect to then use it.
+        if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
         {
             return Redirect(model.RedirectUrl!);
         }
@@ -95,7 +80,10 @@ public class UmbProfileController : SurfaceController
         return RedirectToCurrentUmbracoPage();
     }
 
-    // Route values carry encrypted, tamper-proof overrides for the posted model (see ValidateUmbracoFormRouteString).
+    /// <summary>
+    ///     We pass in values via encrypted route values so they cannot be tampered with and merge them into the model for use
+    /// </summary>
+    /// <param name="model"></param>
     private void MergeRouteValuesToModel(ProfileModel model)
     {
         if (RouteData.Values.TryGetValue(nameof(ProfileModel.RedirectUrl), out var redirectUrl) && redirectUrl != null)

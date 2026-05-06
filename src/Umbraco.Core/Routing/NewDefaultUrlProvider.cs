@@ -123,7 +123,7 @@ public class NewDefaultUrlProvider : IUrlProvider
 
             // although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
             var route = GetLegacyRouteFormatById(key, culture);
-            if (route == null || route == Constants.Routing.Unroutable)
+            if (route == null || route == "#")
             {
                 continue;
             }
@@ -184,7 +184,7 @@ public class NewDefaultUrlProvider : IUrlProvider
         var isDraft = _umbracoContextAccessor.GetRequiredUmbracoContext().InPreviewMode;
         if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && content.Cultures.Any() && content.IsInvariantOrHasCulture(culture) is false)
         {
-            route = Constants.Routing.Unroutable;
+            route = "#";
         }
         else
         {
@@ -206,7 +206,7 @@ public class NewDefaultUrlProvider : IUrlProvider
         UrlMode mode,
         string? culture)
     {
-        if (string.IsNullOrWhiteSpace(route) || route.Equals(Constants.Routing.Unroutable))
+        if (string.IsNullOrWhiteSpace(route) || route.Equals("#"))
         {
             if (_logger.IsEnabled(LogLevel.Debug))
             {

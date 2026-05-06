@@ -227,10 +227,8 @@ Project ownership is distributed across teams. Check individual project director
 
 1. **Layered Architecture with Dependency Inversion**
    - Core defines contracts (interfaces)
-   - Infrastructure implements contracts that need Infrastructure-owned machinery
+   - Infrastructure implements contracts
    - Web/APIs consume implementations via DI
-
-   **Where service implementations live**: Services whose dependencies are satisfiable from Core interfaces alone (repositories, scope, config, other Core services) live in `Umbraco.Core/Services/` — this covers the majority of domain services (`MemberService`, `ContentService`, `MediaService`, `ContentTypeService`, `EntityService`, `AuditService`, `ExternalMemberService`, etc.). Service implementations only live in `Umbraco.Infrastructure/Services/Implement/` when they genuinely need Infrastructure concerns — Examine indexes (`ContentSearchService`, `MediaSearchService`, `IndexedEntitySearchService`), log files (`LogViewerRepository`), packaging internals (`PackagingService`), webhook firing (`WebhookFiringService`), distributed-job coordination (`DistributedJobService`). When adding a new service, default to Core and only move to Infrastructure if a concrete dependency forces it.
 
 2. **Interface-First Design**
    - All services defined as interfaces in Core
@@ -502,32 +500,6 @@ Labels are only added, never removed. Claude applies only labels it is confident
 - **`id-token: write` permission** — required for OIDC token exchange with the Claude GitHub App.
 - **Trigger phrase stripping** — the action strips `@claude` from comments before passing to Claude. Prompts must reference commands without the prefix (e.g., `review` not `@claude review`).
 - **PR number injection** — the interactive workflow injects the PR/issue number into the prompt via `${{ github.event.issue.number }}` since Claude can't discover it from `gh pr view` when checked out on `main`.
-
----
-
-## 8. Code Comment Policy
-
-**Default to no comment.** Applies to all code in this repository — C#, TypeScript, Razor, build scripts. Well-named identifiers and small functions are the primary form of self-documentation; comments are a fallback for the rare cases where the code itself cannot carry the meaning.
-
-### When NOT to comment
-
-- **Don't restate what the code does.** A line calling `resetState()` does not need `// Reset state`. A method named `validateInput` does not need `// Validate input`.
-- **Don't narrate a sequence of calls.** If three lines run in order, the order is in the code — don't paraphrase it above.
-- **Don't reference the current task, fix, callers, or PR.** No `// Fix for X`, `// Used by Y`, `// Added for the Z flow`, `// See PR #1234`. That belongs in commit messages and PR descriptions; in source it rots as the codebase evolves.
-
-### When a comment IS justified
-
-Write a comment only when **removing it would leave a future reader confused**. Concretely:
-
-- **A non-obvious WHY.** A hidden constraint, business rule, or ordering requirement that is not visible from the code.
-- **A workaround for a specific bug or platform quirk.** Link the issue (`(#21996)`, `https://...`) so the comment can be deleted once the upstream fix lands.
-- **A subtle invariant** that the type system or method names do not enforce.
-- **An edge case the code intentionally handles** that would surprise a reader (e.g. "must run before X because Y").
-- **API documentation** — XML doc comments on C# members, JSDoc on exported TypeScript symbols. Required for the public contract; still keep them concise.
-
-### TODOs
-
-Allowed, but cheap to write and cheaper to leave behind. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
 
 ---
 

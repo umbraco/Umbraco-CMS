@@ -109,7 +109,7 @@ export class UmbSearchModalElement extends UmbLitElement {
 			const globalSearch: Array<GlobalSearchers> = [];
 
 			for (const controller of controllers) {
-				let searchApi;
+				let searchApi = undefined;
 
 				if (controller.manifest.api) {
 					searchApi = await createExtensionApi<UmbGlobalSearchApi>(this, controller.manifest);

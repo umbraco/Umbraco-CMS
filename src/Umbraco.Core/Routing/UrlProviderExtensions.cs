@@ -146,18 +146,18 @@ public static class UrlProviderExtensions
             catch (Exception ex)
             {
                 logger.LogError(ex, "GetUrl exception.");
-                url = Constants.Routing.UrlProviderException;
+                url = "#ex";
             }
 
             switch (url)
             {
                 // deal with 'could not get the URL'
-                case Constants.Routing.Unroutable:
+                case "#":
                     result.Add(HandleCouldNotGetUrl(content, culture, contentService, textService));
                     break;
 
                 // deal with exceptions
-                case Constants.Routing.UrlProviderException:
+                case "#ex":
                     result.Add(UrlInfo.AsMessage(textService.Localize("content", "getUrlException"), UrlProviderAlias, culture));
                     break;
 
@@ -183,7 +183,7 @@ public static class UrlProviderExtensions
 
     private static UrlInfo HandleCouldNotGetUrl(IContent content, string culture, IContentService contentService, ILocalizedTextService textService)
     {
-        // document has a published version yet its URL is unrouteable => a parent must be
+        // document has a published version yet its URL is "#" => a parent must be
         // unpublished, walk up the tree until we find it, and report.
         IContent? parent = content;
         do

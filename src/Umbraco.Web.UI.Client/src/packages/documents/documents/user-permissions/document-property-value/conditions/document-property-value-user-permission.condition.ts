@@ -23,8 +23,6 @@ export class UmbDocumentPropertyValueUserPermissionCondition
 			this.observe(
 				context?.currentUser,
 				(currentUser) => {
-					if (!currentUser) return;
-
 					this.#documentPropertyValuePermissions =
 						currentUser?.permissions?.filter(isDocumentPropertyValueUserPermission) || [];
 					this.#fallbackPermissions = currentUser?.fallbackPermissions || [];

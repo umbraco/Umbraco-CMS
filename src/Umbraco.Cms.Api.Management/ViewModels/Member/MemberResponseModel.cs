@@ -62,15 +62,4 @@ public class MemberResponseModel : ContentResponseModelBase<MemberValueResponseM
     /// Gets or sets the classification of the member, indicating the type or category of the member entity.
     /// </summary>
     public MemberKind Kind { get; set; }
-
-    /// <summary>
-    /// Gets or sets the raw JSON profile data for external-only members.
-    /// </summary>
-    /// <remarks>
-    ///     Populated only for members whose <see cref="Kind"/> is <see cref="MemberKind.ExternalOnly"/>,
-    ///     from <see cref="Umbraco.Cms.Core.Security.ExternalMemberIdentity.ProfileData"/>. The shape is
-    ///     integrator-defined (typically claims serialised by an <c>OnExternalLogin</c> handler), so the
-    ///     API returns the raw JSON string and leaves interpretation to the consumer.
-    /// </remarks>
-    public string? ProfileData { get; set; }
 }

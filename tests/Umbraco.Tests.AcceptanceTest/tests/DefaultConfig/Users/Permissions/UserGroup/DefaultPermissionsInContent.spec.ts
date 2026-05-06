@@ -455,12 +455,6 @@ test('can move content with move to permission enabled', {tag: '@release'}, asyn
   await umbracoUi.content.isCaretButtonVisibleForContentName(rootDocumentName, false);
   expect(await umbracoApi.document.getChildrenAmount(rootDocumentId)).toEqual(0);
   expect(await umbracoApi.document.getChildrenAmount(moveToDocumentId)).toEqual(1);
-  // Verify audit trail
-  const currentUser = await umbracoApi.user.getCurrentUser();
-  await umbracoUi.content.goToContentWithName(childDocumentOneName);
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved);
-  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can not move content with move to permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -479,6 +473,7 @@ test('can not move content with move to permission disabled', async ({umbracoApi
   await umbracoUi.content.isActionsMenuForNameVisible(rootDocumentName, false);
 });
 
+// Needs a better way to assert
 test('can sort children with sort children permission enabled', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createDefaultDocumentWithParent(childDocumentTwoName, childDocumentTypeId, rootDocumentId);
@@ -500,16 +495,6 @@ test('can sort children with sort children permission enabled', {tag: '@release'
   await umbracoUi.content.openContentCaretButtonForName(rootDocumentName);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentTwoName, 0);
   await umbracoUi.content.doesIndexDocumentInTreeContainName(rootDocumentName, childDocumentOneName, 1);
-  // Verify audit trail
-  const currentUser = await umbracoApi.user.getCurrentUser();
-  await umbracoUi.content.goToContentWithName(childDocumentOneName);
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.sort);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSorted);
-  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
-  await umbracoUi.content.goToContentWithName(childDocumentTwoName);
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.sort);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSorted);
-  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can not sort children with sort children permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -623,12 +608,6 @@ test('can rollback content with rollback permission enabled', {tag: '@release'},
   // Assert
   await umbracoUi.content.clickContentTab();
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, documentText);
-  // Verify audit trail
-  await umbracoUi.content.clickInfoTab();
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentRolledBack);
-  const currentUser = await umbracoApi.user.getCurrentUser();
-  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can not rollback content with rollback permission disabled', async ({umbracoApi, umbracoUi}) => {

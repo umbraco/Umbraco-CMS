@@ -16,7 +16,7 @@ export class PartialViewUiHelper extends UiBaseLocators {
     this.newEmptyPartialViewBtn = this.partialViewCreateModal.locator('umb-ref-item', {hasText: 'Empty partial view'});
     this.newPartialViewFromSnippetBtn = this.partialViewCreateModal.locator('umb-ref-item', {hasText: 'Partial view from snippet'});
     this.partialViewTree = page.locator('umb-tree[alias="Umb.Tree.PartialView"]');
-    this.partialViewUiLoader = page.getByTestId('workspace:partial-view').locator('uui-loader');
+    this.partialViewUiLoader = page.locator('uui-loader');
     this.newFolderThreeDots = this.partialViewCreateModal.locator('umb-ref-item', {hasText: 'Folder'});
   }
 

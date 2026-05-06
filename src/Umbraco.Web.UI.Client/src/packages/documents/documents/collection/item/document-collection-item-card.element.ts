@@ -117,32 +117,32 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	}
 
 	#getPropertyValueByAlias(alias: string) {
-		if (!this.item) return { value: '' };
+		if (!this.item) return '';
 
 		switch (alias) {
 			case 'contentTypeAlias':
-				return { value: this.item.documentType.alias };
+				return this.item.documentType.alias;
 			case 'createDate':
-				return { value: this._createDate?.toLocaleString() };
+				return this._createDate?.toLocaleString();
 			case 'creator':
 			case 'owner':
-				return { value: this.item.creator };
+				return this.item.creator;
 			case 'name':
-				return { value: this._name };
+				return this._name;
 			case 'state':
-				return { value: this._state ? fromCamelCase(this._state) : '' };
+				return this._state ? fromCamelCase(this._state) : '';
 			case 'published':
-				return { value: this._state !== DocumentVariantStateModel.DRAFT ? 'True' : 'False' };
+				return this._state !== DocumentVariantStateModel.DRAFT ? 'True' : 'False';
 			case 'sortOrder':
-				return { value: this.item.sortOrder };
+				return this.item.sortOrder;
 			case 'updateDate':
-				return { value: this._updateDate?.toLocaleString() };
+				return this._updateDate?.toLocaleString();
 			case 'updater':
-				return { value: this.item.updater };
+				return this.item.updater;
 			default: {
 				const culture = this.#resolver.getCulture();
 				const prop = this.item.values.find((x) => x.alias === alias && (!x.culture || x.culture === culture));
-				return { value: prop?.value ?? '', editorAlias: prop?.editorAlias };
+				return prop?.value ?? '';
 			}
 		}
 	}
@@ -207,17 +207,14 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	}
 
 	#renderProperty(column: UmbCollectionColumnConfiguration) {
-		const { value, editorAlias } = this.#getPropertyValueByAlias(column.alias);
+		const value = this.#getPropertyValueByAlias(column.alias);
 		return html`
 			<li>
 				<span>${this.localize.string(column.header)}:</span>
 				${when(
 					column.nameTemplate,
 					() => html`<umb-ufm-render inline .markdown=${column.nameTemplate} .value=${{ value }}></umb-ufm-render>`,
-					() =>
-						editorAlias
-							? html`<umb-value-summary-extension .valueType=${editorAlias} .value=${value}></umb-value-summary-extension>`
-							: html`${value}`,
+					() => html`${value}`,
 				)}
 			</li>
 		`;

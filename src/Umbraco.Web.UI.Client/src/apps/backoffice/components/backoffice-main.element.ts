@@ -10,7 +10,7 @@ import type { PageComponent, UmbRoute } from '@umbraco-cms/backoffice/router';
 @customElement('umb-backoffice-main')
 export class UmbBackofficeMainElement extends UmbLitElement {
 	@state()
-	private _routes?: Array<UmbRoute>;
+	private _routes: Array<UmbRoute> = [];
 
 	@state()
 	private _sections: Array<ManifestSection> = [];
@@ -82,9 +82,7 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 	}
 
 	override render() {
-		if (!this._routes || !this._routes.length) {
-			return html`<div id="loader"><uui-loader></uui-loader></div>`;
-		}
+		if (!this._routes.length) return;
 		return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
 	}
 
@@ -97,19 +95,6 @@ export class UmbBackofficeMainElement extends UmbLitElement {
 				height: calc(
 					100% - 60px
 				); /* 60 => top header height, TODO: Make sure this comes from somewhere so it is maintainable and eventually responsive. */
-			}
-
-			#loader {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				opacity: 0;
-				animation: fadeIn 240ms forwards;
-			}
-			@keyframes fadeIn {
-				to {
-					opacity: 1;
-				}
 			}
 		`,
 	];

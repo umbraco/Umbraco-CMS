@@ -146,17 +146,6 @@ export class UserApiHelper {
     return await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/user/unlock', users);
   }
 
-  async lockOutByFailedLogins(userEmail: string, attempts: number = 5) {
-    const loginUrl = this.api.baseUrl + '/umbraco/management/api/v1/security/back-office/login';
-    for (let i = 0; i < attempts; i++) {
-      await this.page.request.post(loginUrl, {
-        headers: {'Content-Type': 'application/json'},
-        data: {username: userEmail, password: 'WrongPassword!'},
-        ignoreHTTPSErrors: true
-      });
-    }
-  }
-
   async getCurrentUser() {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/user/current');
     return await response.json();
@@ -310,9 +299,4 @@ export class UserApiHelper {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/filter/user?skip=0&take=100&userGroupIds=' + userGroupIds);
     return await response.json();
   }
-
-  async getCurrentUserStatus(){                                                                                                                                                                                                   
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/user/current');                                                                                                                                              
-    return response.status();                                                                                                                                                                                                                       
-  } 
 }

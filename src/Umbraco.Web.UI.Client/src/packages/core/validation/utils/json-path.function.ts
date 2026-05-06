@@ -68,8 +68,8 @@ function _GetNextArrayEntryFromPath(array: Array<any>, path: string): any {
 		// get the filter from the entryPointer:
 		// get the filter as a function:
 		const jsFilter = JsFilterFromJsonPathFilter(entryPointer);
-		// find the index of the value that matches every condition of the filter:
-		const index = array.findIndex((item) => jsFilter.every((c) => c(item)));
+		// find the index of the value that matches the filter:
+		const index = array.findIndex(jsFilter[0]);
 		// if the index is -1, return undefined:
 		if (index === -1) return undefined;
 		// get the value at the index:
@@ -101,7 +101,7 @@ function _GetNextArrayEntryFromPath(array: Array<any>, path: string): any {
 function JsFilterFromJsonPathFilter(filter: string): Array<(item: any) => boolean> {
 	// strip ?( and ) from the filter
 	const jsFilter = filter.slice(2, -1);
-	// split the filter into single conditions by splitting at ' && '
+	// split the filter into parts by splitting at ' && '
 	const parts = jsFilter.split(' && ');
 	// map each part to a function that returns true if the part is true
 	return parts.map((part) => {
@@ -109,8 +109,8 @@ function JsFilterFromJsonPathFilter(filter: string): Array<(item: any) => boolea
 		const [path, equal] = part.split(' == ');
 		// remove @.
 		const key = path.slice(2);
-		// `null` is the only unquoted literal currently emitted; everything else is a quoted string.
-		const value = equal === 'null' ? null : equal.slice(1, -1);
+		// remove quotes:
+		const value = equal.slice(1, -1);
 		// return a function that returns true if the key is equal to the value
 		return (item: any) => item[key] === value;
 	});

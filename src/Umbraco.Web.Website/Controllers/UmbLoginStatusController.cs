@@ -13,17 +13,11 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Controllers;
 
-/// <summary>
-///     Surface controller that handles member logout from the Login Status snippet.
-/// </summary>
 [UmbracoMemberAuthorize]
 public class UmbLoginStatusController : SurfaceController
 {
     private readonly IMemberSignInManager _signInManager;
 
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="UmbLoginStatusController" /> class.
-    /// </summary>
     public UmbLoginStatusController(
         IUmbracoContextAccessor umbracoContextAccessor,
         IUmbracoDatabaseFactory databaseFactory,
@@ -35,13 +29,6 @@ public class UmbLoginStatusController : SurfaceController
         : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         => _signInManager = signInManager;
 
-    /// <summary>
-    ///     Handles the logout form post, signing the current member out if they are authenticated.
-    /// </summary>
-    /// <param name="model">The posted model, optionally containing a redirect URL.</param>
-    /// <returns>
-    ///     A redirect to the supplied local URL when provided; otherwise a redirect to the current Umbraco page.
-    /// </returns>
     [HttpPost]
     [AllowAnonymous]
     [ValidateAntiForgeryToken]
@@ -64,8 +51,8 @@ public class UmbLoginStatusController : SurfaceController
 
         TempData["LogoutSuccess"] = true;
 
-        // If there is a specified path to redirect to and it is validated as a local URL, then use it.
-        if (model.RedirectUrl.IsNullOrWhiteSpace() is false && Url.IsLocalUrl(model.RedirectUrl!))
+        // If there is a specified path to redirect to then use it.
+        if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
         {
             return Redirect(model.RedirectUrl!);
         }
@@ -74,7 +61,10 @@ public class UmbLoginStatusController : SurfaceController
         return RedirectToCurrentUmbracoPage();
     }
 
-    // Route values carry encrypted, tamper-proof overrides for the posted model (see ValidateUmbracoFormRouteString).
+    /// <summary>
+    ///     We pass in values via encrypted route values so they cannot be tampered with and merge them into the model for use
+    /// </summary>
+    /// <param name="model"></param>
     private void MergeRouteValuesToModel(PostRedirectModel model)
     {
         if (RouteData.Values.TryGetValue(nameof(PostRedirectModel.RedirectUrl), out var redirectUrl) && redirectUrl is not null)

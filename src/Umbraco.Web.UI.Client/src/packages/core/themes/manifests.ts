@@ -1,7 +1,3 @@
-export const UMB_THEME_LIGHT_ALIAS = 'umb-light-theme';
-export const UMB_THEME_DARK_ALIAS = 'umb-dark-theme';
-export const UMB_THEME_HIGH_CONTRAST_ALIAS = 'umb-high-contrast-theme';
-
 export const themes: Array<UmbExtensionManifest> = [
 	{
 		type: 'globalContext',
@@ -11,20 +7,20 @@ export const themes: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'theme',
-		alias: UMB_THEME_LIGHT_ALIAS,
+		alias: 'umb-light-theme',
 		name: 'Light',
 		weight: 300,
 	},
 	{
 		type: 'theme',
-		alias: UMB_THEME_DARK_ALIAS,
+		alias: 'umb-dark-theme',
 		name: 'Dark (Experimental)',
 		css: '/umbraco/backoffice/css/dark.theme.css',
 		weight: 200,
 	},
 	{
 		type: 'theme',
-		alias: UMB_THEME_HIGH_CONTRAST_ALIAS,
+		alias: 'umb-high-contrast-theme',
 		name: 'High contrast (Experimental)',
 		css: '/umbraco/backoffice/css/high-contrast.theme.css',
 		weight: 100,

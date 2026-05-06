@@ -96,25 +96,17 @@ export class UmbBlockElementManager<LayoutDataType extends UmbBlockLayoutBaseMod
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
 
-		this.observe(
-			this.contentTypeId,
-			(id) => {
-				if (id) {
-					this.structure.loadType(id);
-				}
-			},
-			null,
-		);
+		this.observe(this.contentTypeId, (id) => {
+			if (id) {
+				this.structure.loadType(id);
+			}
+		});
 
-		this.observe(
-			this.unique,
-			(key) => {
-				if (key) {
-					this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.key == '${key}')]`);
-				}
-			},
-			null,
-		);
+		this.observe(this.unique, (key) => {
+			if (key) {
+				this.validation.setDataPath('$.' + dataPathPropertyName + `[?(@.key == '${key}')]`);
+			}
+		});
 
 		this.observe(
 			this.structure.contentTypeDataTypeUniques,

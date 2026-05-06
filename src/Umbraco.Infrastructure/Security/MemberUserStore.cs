@@ -2,37 +2,29 @@ using System.Data;
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
 
 /// <summary>
-///     A custom user store that uses Umbraco member data.
+///     A custom user store that uses Umbraco member data
 /// </summary>
 public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdentityRole>, IMemberUserStore
 {
-    /// <summary>
-    /// Represents the error code used to indicate that an identity operation was canceled by the user store.
-    /// </summary>
-    public const string CancelledIdentityErrorCode = "CancelledIdentityErrorUserStore";
-
     private const string GenericIdentityErrorCode = "IdentityErrorUserStore";
-
+    public const string CancelledIdentityErrorCode = "CancelledIdentityErrorUserStore";
     private readonly IExternalLoginWithKeyService _externalLoginService;
     private readonly IUmbracoMapper _mapper;
     private readonly IMemberService _memberService;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ITwoFactorLoginService _twoFactorLoginService;
     private readonly IPublishedMemberCache _memberCache;
-    private readonly IExternalMemberService _externalMemberService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberUserStore" /> class for the members identity store
@@ -44,38 +36,6 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     /// <param name="externalLoginService">The external login service</param>
     /// <param name="twoFactorLoginService">The two factor login service</param>
     /// <param name="memberCache">The published member cache for resolving member content.</param>
-    /// <param name="externalMemberService">The external member service for external-only members.</param>
-    public MemberUserStore(
-        IMemberService memberService,
-        IUmbracoMapper mapper,
-        ICoreScopeProvider scopeProvider,
-        IdentityErrorDescriber describer,
-        IExternalLoginWithKeyService externalLoginService,
-        ITwoFactorLoginService twoFactorLoginService,
-        IPublishedMemberCache memberCache,
-        IExternalMemberService externalMemberService)
-        : base(describer)
-    {
-        _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
-        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
-        _externalLoginService = externalLoginService;
-        _twoFactorLoginService = twoFactorLoginService;
-        _memberCache = memberCache;
-        _externalMemberService = externalMemberService ?? throw new ArgumentNullException(nameof(externalMemberService));
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MemberUserStore" /> class for the members identity store
-    /// </summary>
-    /// <param name="memberService">The member service</param>
-    /// <param name="mapper">The mapper for properties</param>
-    /// <param name="scopeProvider">The scope provider</param>
-    /// <param name="describer">The error describer</param>
-    /// <param name="externalLoginService">The external login service</param>
-    /// <param name="twoFactorLoginService">The two factor login service</param>
-    /// <param name="memberCache">The published member cache for resolving member content.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public MemberUserStore(
         IMemberService memberService,
         IUmbracoMapper mapper,
@@ -84,20 +44,18 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         IExternalLoginWithKeyService externalLoginService,
         ITwoFactorLoginService twoFactorLoginService,
         IPublishedMemberCache memberCache)
-        : this(
-            memberService,
-            mapper,
-            scopeProvider,
-            describer,
-            externalLoginService,
-            twoFactorLoginService,
-            memberCache,
-            StaticServiceProvider.Instance.GetRequiredService<IExternalMemberService>())
+        : base(describer)
     {
+        _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
+        _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
+        _externalLoginService = externalLoginService;
+        _twoFactorLoginService = twoFactorLoginService;
+        _memberCache = memberCache;
     }
 
     /// <inheritdoc />
-    public override async Task<IdentityResult> CreateAsync(
+    public override Task<IdentityResult> CreateAsync(
         MemberIdentityUser user,
         CancellationToken cancellationToken = default)
     {
@@ -105,19 +63,14 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            ArgumentNullException.ThrowIfNull(user);
-
-            // External-only members are stored in the lightweight umbracoExternalMember table,
-            // bypassing the content system entirely (no umbracoNode, cmsContent, or property data).
-            if (user.IsExternalOnly)
+            if (user is null)
             {
-                return await CreateExternalMemberAsync(user);
+                throw new ArgumentNullException(nameof(user));
             }
 
-            // Create the in-memory member entity before opening the write scope.
-            // CreateMember only does a member type lookup (in its own read-only scope) and
-            // builds the entity in memory — keeping it outside the write scope avoids holding
-            // table locks that conflict with concurrent write transactions on SQLite.
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
+
+            // create member
             IMember memberEntity = _memberService.CreateMember(
                 user.UserName!,
                 user.Email!,
@@ -133,11 +86,11 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
                 // will detect this change of behavior.
                 if (memberEntity.HasIdentity)
                 {
-                    return IdentityResult.Failed(new IdentityError
+                    return Task.FromResult(IdentityResult.Failed(new IdentityError
                     {
                         Code = GenericIdentityErrorCode,
                         Description = "Cannot assign a new key to a member that already has identity."
-                    });
+                    }));
                 }
 
                 memberEntity.Key = user.Key;
@@ -145,20 +98,18 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
             UpdateMemberProperties(memberEntity, user, out bool _);
 
-            using ICoreScope scope = _scopeProvider.CreateCoreScope();
-
-            // save the member
+            // create the member
             Attempt<OperationResult?> saveAttempt = _memberService.Save(memberEntity, PublishNotificationSaveOptions.Saving);
             if (saveAttempt.Success is false)
             {
                 scope.Complete();
-                return IdentityResult.Failed(
+                return Task.FromResult(IdentityResult.Failed(
                     new IdentityError
                     {
                         Code = CancelledIdentityErrorCode,
                         Description = string.Empty
 
-                    });
+                    }));
             }
 
             // We need to add roles now that the member has an Id. It do not work implicit in UpdateMemberProperties
@@ -200,11 +151,12 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             }
 
             scope.Complete();
-            return IdentityResult.Success;
+            return Task.FromResult(IdentityResult.Success);
         }
         catch (Exception ex)
         {
-            return IdentityResult.Failed(new IdentityError { Code = GenericIdentityErrorCode, Description = ex.Message });
+            return Task.FromResult(
+                IdentityResult.Failed(new IdentityError { Code = GenericIdentityErrorCode, Description = ex.Message }));
         }
     }
 
@@ -217,13 +169,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            ArgumentNullException.ThrowIfNull(user);
-
-            // External-only members are stored in the lightweight umbracoExternalMember table,
-            // bypassing the content system entirely (no umbracoNode, cmsContent, or property data).
-            if (user.IsExternalOnly)
+            if (user == null)
             {
-                return await UpdateExternalMemberAsync(user);
+                throw new ArgumentNullException(nameof(user));
             }
 
             if (!int.TryParse(user.Id, NumberStyles.Integer, CultureInfo.InvariantCulture, out var asInt))
@@ -302,7 +250,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
     }
 
     /// <inheritdoc />
-    public override async Task<IdentityResult> DeleteAsync(
+    public override Task<IdentityResult> DeleteAsync(
         MemberIdentityUser user,
         CancellationToken cancellationToken = default)
     {
@@ -310,13 +258,9 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            ArgumentNullException.ThrowIfNull(user);
-
-            // External-only members are stored in the lightweight umbracoExternalMember table,
-            // bypassing the content system entirely (no umbracoNode, cmsContent, or property data).
-            if (user.IsExternalOnly)
+            if (user == null)
             {
-                return await DeleteExternalMemberAsync(user);
+                throw new ArgumentNullException(nameof(user));
             }
 
             IMember? found = _memberService.GetById(user.Key);
@@ -327,11 +271,12 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
             _externalLoginService.DeleteUserLogins(user.Key);
 
-            return IdentityResult.Success;
+            return Task.FromResult(IdentityResult.Success);
         }
         catch (Exception ex)
         {
-            return IdentityResult.Failed(new IdentityError { Code = GenericIdentityErrorCode, Description = ex.Message });
+            return Task.FromResult(
+                IdentityResult.Failed(new IdentityError { Code = GenericIdentityErrorCode, Description = ex.Message }));
         }
     }
 
@@ -343,13 +288,6 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         IMember? user = _memberService.GetByUsername(userName);
         if (user == null)
         {
-            // Check external member store
-            ExternalMemberIdentity? externalMember = _externalMemberService.GetByUsernameAsync(userName).GetAwaiter().GetResult();
-            if (externalMember is not null)
-            {
-                return Task.FromResult<MemberIdentityUser?>(AssignLoginsCallback(MapExternalMemberToIdentityUser(externalMember)));
-            }
-
             return Task.FromResult<MemberIdentityUser?>(null);
         }
 
@@ -372,13 +310,6 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             return null;
         }
 
-        if (user.IsExternalOnly)
-        {
-            ExternalMemberIdentity? external = _externalMemberService.GetByKeyAsync(user.Key)
-                .GetAwaiter().GetResult();
-            return external is not null ? new PublishedExternalMember(external) : null;
-        }
-
         IMember? member = _memberService.GetById(user.Key);
         if (member is null)
         {
@@ -396,19 +327,10 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
         IMember? member = _memberService.GetByEmail(email);
-        if (member == null)
-        {
-            // Check external member store
-            ExternalMemberIdentity? externalMember = _externalMemberService.GetByEmailAsync(email).GetAwaiter().GetResult();
-            if (externalMember is not null)
-            {
-                return Task.FromResult(AssignLoginsCallback(MapExternalMemberToIdentityUser(externalMember)));
-            }
+        MemberIdentityUser? result = member == null
+            ? null
+            : _mapper.Map<MemberIdentityUser>(member);
 
-            return Task.FromResult<MemberIdentityUser?>(null);
-        }
-
-        MemberIdentityUser? result = _mapper.Map<MemberIdentityUser>(member);
         return Task.FromResult(AssignLoginsCallback(result));
     }
 
@@ -435,18 +357,6 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
 
         if (user == null)
         {
-            // Check external member store — userId is the Guid key as a string for external members.
-            ExternalMemberIdentity? externalMember = null;
-            if (Guid.TryParse(userId, out Guid externalKey))
-            {
-                externalMember = _externalMemberService.GetByKeyAsync(externalKey).GetAwaiter().GetResult();
-            }
-
-            if (externalMember is not null)
-            {
-                return Task.FromResult(AssignLoginsCallback(MapExternalMemberToIdentityUser(externalMember)))!;
-            }
-
             return Task.FromResult((MemberIdentityUser)null!)!;
         }
 
@@ -473,7 +383,6 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         return false;
     }
 
-    /// <inheritdoc/>
     protected override Task<int> ResolveEntityIdFromIdentityId(string? identityId)
     {
         if (TryResolveEntityIdFromIdentityId(identityId, out var entityId))
@@ -690,16 +599,7 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
         {
             // if there are no roles, they either haven't been loaded since we don't eagerly
             // load for members, or they just have no roles.
-            IEnumerable<string> currentRoles;
-            if (user.IsExternalOnly)
-            {
-                currentRoles = _externalMemberService.GetRolesAsync(user.Key).GetAwaiter().GetResult();
-            }
-            else
-            {
-                currentRoles = _memberService.GetAllRoles(user.UserName!);
-            }
-
+            IEnumerable<string> currentRoles = _memberService.GetAllRoles(user.UserName!);
             ICollection<IdentityUserRole<string>> roles = currentRoles
                 .Select(role => new IdentityUserRole<string> { RoleId = role, UserId = user.Id }).ToList();
 
@@ -847,215 +747,6 @@ public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdent
             user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>?>(() => _externalLoginService.GetExternalLoginTokens(user.Key)));
         }
 
-        return user;
-    }
-
-    private async Task<IdentityResult> CreateExternalMemberAsync(MemberIdentityUser user)
-    {
-        var externalIdentity = new ExternalMemberIdentity
-        {
-            Key = user.Key != Guid.Empty ? user.Key : Guid.NewGuid(),
-            Email = user.Email!,
-            UserName = user.UserName!,
-            Name = user.Name,
-            IsApproved = user.IsApproved,
-            SecurityStamp = user.SecurityStamp,
-            ProfileData = user.ProfileData,
-            CreateDate = DateTime.UtcNow,
-        };
-
-        // Build the external login upfront so it can be saved in the same transaction
-        // as the member creation, reducing database write-lock contention.
-        IExternalLogin? externalLogin = user.Logins
-            .Select(x => new ExternalLogin(x.LoginProvider, x.ProviderKey, x.UserData))
-            .FirstOrDefault();
-
-        Attempt<ExternalMemberIdentity, ExternalMemberOperationStatus> result =
-            await _externalMemberService.CreateAsync(externalIdentity, externalLogin);
-
-        if (result.Success is false)
-        {
-            return IdentityResult.Failed(new IdentityError
-            {
-                Code = result.Status == ExternalMemberOperationStatus.CancelledByNotification
-                    ? CancelledIdentityErrorCode
-                    : GenericIdentityErrorCode,
-                Description = result.Status.ToString(),
-            });
-        }
-
-        // Use the Guid key as the user ID for external members so that FindUserAsync
-        // can resolve them via Guid.TryParse → GetByKeyAsync. Content members use int IDs,
-        // but external members don't have content node IDs.
-        user.Id = result.Result.Key.ToString();
-        user.Key = result.Result.Key;
-
-        // Handle roles.
-        var roles = user.Roles.Select(x => x.RoleId).Where(x => x is not null).ToArray();
-        if (roles.Length > 0)
-        {
-            await _externalMemberService.AssignRolesAsync(result.Result.Key, roles);
-        }
-
-        // Save any additional logins beyond the first (which was batched with create above).
-        if (user.IsPropertyDirty(nameof(MemberIdentityUser.Logins)) && user.Logins.Count > 1)
-        {
-            _externalLoginService.Save(
-                result.Result.Key,
-                user.Logins.Select(x => new ExternalLogin(
-                    x.LoginProvider,
-                    x.ProviderKey,
-                    x.UserData)));
-        }
-
-        if (user.IsPropertyDirty(nameof(MemberIdentityUser.LoginTokens)))
-        {
-            _externalLoginService.Save(
-                result.Result.Key,
-                user.LoginTokens.Select(x => new ExternalLoginToken(
-                    x.LoginProvider,
-                    x.Name,
-                    x.Value)));
-        }
-
-        return IdentityResult.Success;
-    }
-
-    private async Task<IdentityResult> UpdateExternalMemberAsync(MemberIdentityUser user)
-    {
-        var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
-        var isTokensPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.LoginTokens));
-
-        // Detect login-only updates — on the OIDC callback we typically only set LastLoginDate
-        // (and SecurityStamp when concurrent logins are disabled). In that case we route to the
-        // lightweight UpdateLoginPropertiesAsync which issues a targeted SQL UPDATE and lets the
-        // downstream indexing handler skip re-indexing when nothing indexable changed.
-        if (IsUpdatingOnlyLoginProperties(user))
-        {
-            var loginIdentity = new ExternalMemberIdentity
-            {
-                Key = user.Key,
-                LastLoginDate = user.LastLoginDate,
-                SecurityStamp = user.SecurityStamp,
-            };
-
-            ExternalMemberIdentity? existingForLogin = await _externalMemberService.GetByKeyAsync(user.Key);
-            if (existingForLogin is not null)
-            {
-                loginIdentity.Id = existingForLogin.Id;
-            }
-
-            await _externalMemberService.UpdateLoginPropertiesAsync(loginIdentity);
-        }
-        else
-        {
-            // Full update — covers ProfileData changes from OnExternalLogin callbacks, role updates,
-            // email/username changes etc.
-            var externalIdentity = new ExternalMemberIdentity
-            {
-                Key = user.Key,
-                Email = user.Email!,
-                UserName = user.UserName!,
-                Name = user.Name,
-                IsApproved = user.IsApproved,
-                IsLockedOut = user.LockoutEnd.HasValue && user.LockoutEnd.Value >= DateTimeOffset.UtcNow,
-                LastLoginDate = user.LastLoginDate,
-                LastLockoutDate = user.LastLockoutDate,
-                CreateDate = user.CreatedDate,
-                SecurityStamp = user.SecurityStamp,
-                ProfileData = user.ProfileData,
-            };
-
-            // Resolve the int Id and CreateDate from the stored record — MemberIdentityUser
-            // doesn't carry the int Id (it uses Guid key as Id) and CreateDate may not be set.
-            ExternalMemberIdentity? existing = await _externalMemberService.GetByKeyAsync(user.Key);
-            if (existing is not null)
-            {
-                externalIdentity.Id = existing.Id;
-                if (externalIdentity.CreateDate == default)
-                {
-                    externalIdentity.CreateDate = existing.CreateDate;
-                }
-            }
-
-            await _externalMemberService.UpdateAsync(externalIdentity);
-        }
-
-        if (isLoginsPropertyDirty)
-        {
-            _externalLoginService.Save(
-                user.Key,
-                user.Logins.Select(x => new ExternalLogin(
-                    x.LoginProvider,
-                    x.ProviderKey,
-                    x.UserData)));
-        }
-
-        if (isTokensPropertyDirty)
-        {
-            _externalLoginService.Save(
-                user.Key,
-                user.LoginTokens.Select(x => new ExternalLoginToken(
-                    x.LoginProvider,
-                    x.Name,
-                    x.Value)));
-        }
-
-        return IdentityResult.Success;
-    }
-
-    private static bool IsUpdatingOnlyLoginProperties(MemberIdentityUser user)
-    {
-        // Only consider a login-only update if at least LastLoginDate or SecurityStamp is dirty,
-        // and none of the other tracked fields that would require a full update are dirty.
-        bool hasLoginChange = user.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDate))
-            || user.IsPropertyDirty(nameof(MemberIdentityUser.SecurityStamp));
-        if (hasLoginChange is false)
-        {
-            return false;
-        }
-
-        string[] disqualifyingProperties =
-        [
-            nameof(MemberIdentityUser.Email),
-            nameof(MemberIdentityUser.UserName),
-            nameof(MemberIdentityUser.Name),
-            nameof(MemberIdentityUser.IsApproved),
-            nameof(MemberIdentityUser.LockoutEnd),
-            nameof(MemberIdentityUser.LastLockoutDate),
-            nameof(MemberIdentityUser.ProfileData),
-        ];
-
-        return disqualifyingProperties.All(p => user.IsPropertyDirty(p) is false);
-    }
-
-    private async Task<IdentityResult> DeleteExternalMemberAsync(MemberIdentityUser user)
-    {
-        await _externalMemberService.DeleteAsync(user.Key);
-        _externalLoginService.DeleteUserLogins(user.Key);
-        return IdentityResult.Success;
-    }
-
-    private MemberIdentityUser MapExternalMemberToIdentityUser(ExternalMemberIdentity external)
-    {
-        var user = new MemberIdentityUser();
-        user.DisableChangeTracking();
-        // Use Guid key as ID for external members (content members use int node IDs).
-        // This ensures FindUserAsync can resolve external members via Guid.TryParse.
-        user.Id = external.Key.ToString();
-        user.Key = external.Key;
-        user.UserName = external.UserName;
-        user.Email = external.Email;
-        user.Name = external.Name;
-        user.IsApproved = external.IsApproved;
-        user.LockoutEnd = external.IsLockedOut ? (external.LastLockoutDate ?? DateTime.MaxValue).ToUniversalTime() : null;
-        user.LastLoginDate = external.LastLoginDate;
-        user.LastLockoutDate = external.LastLockoutDate;
-        user.CreatedDate = external.CreateDate;
-        user.SecurityStamp = external.SecurityStamp;
-        user.IsExternalOnly = true;
-        user.ProfileData = external.ProfileData;
-        user.EnableChangeTracking();
         return user;
     }
 

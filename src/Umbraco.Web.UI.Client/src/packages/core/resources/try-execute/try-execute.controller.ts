@@ -59,7 +59,7 @@ export class UmbTryExecuteController<T> extends UmbResourceController<T> {
 
 		/** This is a constant on purpose, because the headline should not change. We cannot trust the error details to provide a reliable headline. */
 		const headline = 'An error occurred';
-		let message: string;
+		let message = 'A fatal server error occurred. If this continues, please reach out to your administrator.';
 		let detail: string | undefined;
 		let errors: Record<string, string[]> | undefined;
 

@@ -4,7 +4,6 @@ import type { MappingFunction } from '../types/mapping-function.type.js';
 import type { MemoizationFunction } from '../types/memoization-function.type.js';
 import { jsonStringComparison } from '../utils/json-string-comparison.function.js';
 import { UmbBasicState } from './basic-state.js';
-import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * @class UmbDeepState
@@ -15,7 +14,6 @@ import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 export class UmbDeepState<T> extends UmbBasicState<T> {
 	#mute?: boolean;
 	#value: T;
-	#muteResolvers?: Array<(value: boolean) => void>;
 
 	constructor(initialData: T) {
 		super(deepFreeze(initialData));
@@ -25,14 +23,14 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	/**
 	 * @function createObservablePart
 	 * @param {(mappable: T) => R} mappingFunction - Method to return the part for this Observable to return.
-	 * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to compare two results. Should return true when data is the same (unchanged), preventing unnecessary emissions.
+	 * @param {(previousResult: R, currentResult: R) => boolean} [memoizationFunction] - Method to Compare if the data has changed. Should return true when data is different.
 	 * @returns {Observable<R>}
 	 * @description - Creates an Observable from this State.
 	 */
-	override asObservablePart<ReturnType>(
+	asObservablePart<ReturnType>(
 		mappingFunction: MappingFunction<T, ReturnType>,
 		memoizationFunction?: MemoizationFunction<ReturnType>,
-	): Observable<ReturnType> {
+	) {
 		return createObservablePart(this._subject, mappingFunction, memoizationFunction ?? jsonStringComparison);
 	}
 
@@ -76,12 +74,6 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 		if (!jsonStringComparison(this.#value, this._subject.getValue())) {
 			this._subject.next(this.#value);
 		}
-		// Resolve any pending mute promises — independent of whether an emission occurred. [NL]
-		if ((this.#muteResolvers?.length ?? 0) > 0) {
-			const resolvers = this.#muteResolvers!;
-			this.#muteResolvers = [];
-			resolvers.forEach((resolve) => resolve(true));
-		}
 	}
 
 	/**
@@ -89,31 +81,25 @@ export class UmbDeepState<T> extends UmbBasicState<T> {
 	 * @description - Check if the state is muted.
 	 * @returns {boolean} - Returns true if the state is muted.
 	 */
-	isMuted(): boolean {
-		return this.#mute ?? false;
+	isMuted() {
+		return this.#mute;
 	}
 
 	/**
 	 * @function getMutePromise
 	 * @description - Get a promise which resolves when the mute is unset.
-	 * @returns {Promise<boolean>} - Returns a promise which resolves to true if the state was muted and is now unmuted, or false if the state was not muted.
+	 * @returns {Promise<void>}
 	 */
-	getMutePromise(): Promise<boolean> {
-		if (!this.#mute) {
-			return Promise.resolve(false);
-		}
-		return new Promise<boolean>((resolve) => {
-			(this.#muteResolvers ??= []).push(resolve);
+	getMutePromise() {
+		return new Promise<void>((resolve) => {
+			if (!this.#mute) {
+				resolve();
+				return;
+			}
+			const subscription = this._subject.subscribe(() => {
+				subscription.unsubscribe();
+				resolve();
+			});
 		});
-	}
-
-	override destroy(): void {
-		// Drain any pending mute promises so awaiters don't hang. [NL]
-		if ((this.#muteResolvers?.length ?? 0) > 0) {
-			const resolvers = this.#muteResolvers!;
-			this.#muteResolvers = [];
-			resolvers.forEach((resolve) => resolve(false));
-		}
-		super.destroy();
 	}
 }

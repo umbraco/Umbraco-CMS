@@ -1,5 +1,4 @@
 import { manifests as collectionManifests } from './collection/manifests.js';
-import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 import { manifests as entityActionManifests } from './entity-actions/manifests.js';
 import { manifests as entityBulkActionManifests } from './entity-bulk-actions/manifests.js';
 import { manifests as menuItemManifests } from './menu-item/manifests.js';
@@ -11,7 +10,6 @@ import * as entryPointModule from './entry-point.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	...collectionManifests,
-	...valueSummaryManifests,
 	...entityActionManifests,
 	...entityBulkActionManifests,
 	...menuItemManifests,

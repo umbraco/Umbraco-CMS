@@ -4,5 +4,3 @@ export * from './increment-string/index.js';
 export * from './split-string-to-array/index.js';
 export * from './string-or-string-array-contains/index.js';
 export * from './to-camel-case/index.js';
-export * from './fuzzy/index.js';
-export * from './levenshtein/index.js';

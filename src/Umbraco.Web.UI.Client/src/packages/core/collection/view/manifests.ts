@@ -1,10 +1,5 @@
 import { manifests as cardManifests } from './card/manifests.js';
 import { manifests as refManifests } from './ref/manifests.js';
-import { manifests as tableManifests } from './table/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
-	...cardManifests,
-	...refManifests,
-	...tableManifests,
-];
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [...cardManifests, ...refManifests];

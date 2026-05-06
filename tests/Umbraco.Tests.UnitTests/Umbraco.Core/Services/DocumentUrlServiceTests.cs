@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
@@ -213,8 +212,7 @@ public class DocumentUrlServiceTests
     /// </summary>
     private static (DocumentUrlService Service, Mock<IDocumentUrlRepository> Repository) CreateDocumentUrlServiceWithMocks(
         UrlSegmentProviderCollection urlSegmentProviderCollection,
-        IEnumerable<ILanguage> languages,
-        ServerRole serverRole = ServerRole.Single)
+        IEnumerable<ILanguage> languages)
     {
         var loggerMock = Mock.Of<ILogger<DocumentUrlService>>();
         var documentUrlRepositoryMock = new Mock<IDocumentUrlRepository>();
@@ -232,9 +230,6 @@ public class DocumentUrlServiceTests
         var publishStatusQueryServiceMock = Mock.Of<IPublishStatusQueryService>();
         var domainCacheServiceMock = Mock.Of<IDomainCacheService>();
         var defaultCultureAccessorMock = Mock.Of<IDefaultCultureAccessor>();
-
-        var serverRoleAccessorMock = new Mock<IServerRoleAccessor>();
-        serverRoleAccessorMock.Setup(x => x.CurrentServerRole).Returns(serverRole);
 
         var scopeContextMock = new Mock<IScopeContext>();
         var coreScopeMock = new Mock<ICoreScope>();
@@ -268,8 +263,7 @@ public class DocumentUrlServiceTests
             documentNavigationQueryServiceMock,
             publishStatusQueryServiceMock,
             domainCacheServiceMock,
-            defaultCultureAccessorMock,
-            serverRoleAccessorMock.Object);
+            defaultCultureAccessorMock);
 
         return (service, documentUrlRepositoryMock);
     }
@@ -552,94 +546,6 @@ public class DocumentUrlServiceTests
         repositoryMock.Verify(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()), Times.Never);
     }
 
-    /// <summary>
-    /// On a Subscriber the scheduling publisher has already persisted URL segments before publishing the
-    /// cache-refresh instruction, so the subscriber must not re-persist them. Re-writing blows up on
-    /// subscribers configured against a read-only database (issue #22570).
-    /// </summary>
-    [Test]
-    public async Task CreateOrUpdateUrlSegmentsAsync_OnSubscriber_DoesNotCallRepositorySave()
-    {
-        // Arrange
-        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
-
-        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
-        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
-
-        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(
-            urlSegmentProviderCollection, languages, ServerRole.Subscriber);
-
-        var contentMock = CreateMockContent(Guid.NewGuid(), variesByCulture: false, isPublished: true);
-
-        // Act
-        await service.CreateOrUpdateUrlSegmentsAsync([contentMock.Object]);
-
-        // Assert
-        repositoryMock.Verify(
-            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
-            Times.Never,
-            "Subscribers must not persist URL segments — the publisher already has.");
-    }
-
-    /// <summary>
-    /// Regression guard for the subscriber guard: Single and SchedulingPublisher roles must still persist
-    /// URL segments as they did before the fix.
-    /// </summary>
-    [TestCase(ServerRole.Single)]
-    [TestCase(ServerRole.SchedulingPublisher)]
-    public async Task CreateOrUpdateUrlSegmentsAsync_OnSingleOrPublisher_CallsRepositorySave(ServerRole role)
-    {
-        // Arrange
-        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
-
-        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
-        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
-
-        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(
-            urlSegmentProviderCollection, languages, role);
-
-        var contentMock = CreateMockContent(Guid.NewGuid(), variesByCulture: false, isPublished: true);
-
-        // Act
-        await service.CreateOrUpdateUrlSegmentsAsync([contentMock.Object]);
-
-        // Assert
-        repositoryMock.Verify(
-            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
-            Times.Once,
-            $"The {role} role must continue to persist URL segments.");
-    }
-
-    /// <summary>
-    /// Even though a subscriber skips the database write, the in-memory URL cache must still be refreshed
-    /// so that URL resolution keeps working on the subscriber after the publisher renames a node. This
-    /// guards against over-zealous skipping of the deferred scope-context enlistments.
-    /// </summary>
-    [Test]
-    public async Task CreateOrUpdateUrlSegmentsAsync_OnSubscriber_StillPopulatesInMemoryCache()
-    {
-        // Arrange — initialize an empty subscriber service with immediate scope-context enlistment
-        // so deferred cache updates apply straight away.
-        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
-        var service = await CreateInitializedDocumentUrlService(
-            segments: Array.Empty<PublishedDocumentUrlSegment>(),
-            languages: languages,
-            serverRole: ServerRole.Subscriber);
-
-        var documentKey = Guid.NewGuid();
-        var contentMock = CreateMockContent(documentKey, variesByCulture: false, isPublished: true);
-
-        // Act
-        await service.CreateOrUpdateUrlSegmentsAsync([contentMock.Object]);
-
-        // Assert — the in-memory lookup resolves even though we never wrote to the database.
-        var resolved = service.GetUrlSegment(documentKey, "en-US", isDraft: false);
-        Assert.AreEqual(
-            "test-segment",
-            resolved,
-            "Subscribers must still update the in-memory URL cache so routing keeps working locally.");
-    }
-
     #endregion
 
     #region GetUrlSegment Tests
@@ -650,8 +556,7 @@ public class DocumentUrlServiceTests
     /// </summary>
     private static async Task<DocumentUrlService> CreateInitializedDocumentUrlService(
         IEnumerable<PublishedDocumentUrlSegment> segments,
-        IEnumerable<ILanguage> languages,
-        ServerRole serverRole = ServerRole.Single)
+        IEnumerable<ILanguage> languages)
     {
         var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
         var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
@@ -703,9 +608,6 @@ public class DocumentUrlServiceTests
             .Returns(coreScopeMock.Object);
         coreScopeProviderMock.Setup(x => x.Context).Returns(scopeContextMock.Object);
 
-        var serverRoleAccessorMock = new Mock<IServerRoleAccessor>();
-        serverRoleAccessorMock.Setup(x => x.CurrentServerRole).Returns(serverRole);
-
         var service = new DocumentUrlService(
             loggerMock,
             documentUrlRepositoryMock.Object,
@@ -722,8 +624,7 @@ public class DocumentUrlServiceTests
             documentNavigationQueryServiceMock,
             publishStatusQueryServiceMock,
             domainCacheServiceMock,
-            defaultCultureAccessorMock,
-            serverRoleAccessorMock.Object);
+            defaultCultureAccessorMock);
 
         await service.InitAsync(forceEmpty: false, CancellationToken.None);
 

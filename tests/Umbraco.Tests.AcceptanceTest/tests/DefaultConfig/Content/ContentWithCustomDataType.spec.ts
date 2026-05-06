@@ -93,7 +93,7 @@ test('can add decimal number to the decimal in the content section', async ({umb
 
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.enterDecimal(decimal);
+  await umbracoUi.content.enterNumeric(decimal);
   await umbracoUi.content.clickSaveButtonAndWaitForContentToBeUpdated();
 
   // Assert

@@ -6,9 +6,6 @@ export interface UmbIconDefinition<JsType = any> {
 	name: string;
 	path: JsLoaderProperty<JsType>;
 	hidden?: boolean;
-	keywords?: Array<string>;
-	groups?: Array<string>;
-	related?: Array<string>;
 }
 
 export type UmbIconDictionary = Array<UmbIconDefinition>;

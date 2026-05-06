@@ -20,7 +20,6 @@ import '@umbraco-cms/backoffice/property-action';
 import '@umbraco-cms/backoffice/property-editor-data-source';
 import '@umbraco-cms/backoffice/property-sort-mode';
 import '@umbraco-cms/backoffice/entity-item';
-import '@umbraco-cms/backoffice/value-summary';
 
 export const onInit: UmbEntryPointOnInit = (host, extensionRegistry) => {
 	new UmbExtensionsApiInitializer(host, extensionRegistry, 'globalContext', [host]);

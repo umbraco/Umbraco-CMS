@@ -13,11 +13,5 @@ public enum MemberKind
     /// <summary>
     ///     A member created through the API.
     /// </summary>
-    Api,
-
-    /// <summary>
-    ///     An external-only member backed by the lightweight umbracoExternalMember table,
-    ///     not the content system. Authenticated via an external provider.
-    /// </summary>
-    ExternalOnly
+    Api
 }

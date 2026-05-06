@@ -25,6 +25,9 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 
 	#lookup: Map<string, unknown> = new Map();
 
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
 	@property({ attribute: false })
 	editor?: Editor;
 
@@ -97,6 +100,11 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 	}
 
 	static override readonly styles = css`
+		:host([readonly]) {
+			pointer-events: none;
+			background-color: var(--uui-color-surface-alt);
+		}
+
 		:host {
 			border-radius: var(--uui-border-radius);
 			border: 1px solid var(--uui-color-border);

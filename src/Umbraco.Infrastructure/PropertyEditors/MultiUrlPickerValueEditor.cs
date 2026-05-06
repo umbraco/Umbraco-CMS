@@ -286,7 +286,7 @@ public class MultiUrlPickerValueEditor : DataValueEditor, IDataValueReference, I
             _logger.LogError(ex, "Error getting links");
         }
 
-        return Enumerable.Empty<object>();
+        return base.ToEditor(property, culture, segment);
     }
 
     /// <summary>
