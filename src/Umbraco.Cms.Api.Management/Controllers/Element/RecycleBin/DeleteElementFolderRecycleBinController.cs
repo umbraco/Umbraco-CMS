@@ -71,6 +71,17 @@ public class DeleteElementFolderRecycleBinController : ElementRecycleBinControll
             return Forbidden();
         }
 
+        // Also authorize deletion of all descendant elements.
+        authorizationResult = await _authorizationService.AuthorizeResourceAsync(
+            User,
+            ElementPermissionResource.Branch(ActionElementDelete.ActionLetter, id),
+            AuthorizationPolicies.ElementPermissionByResource);
+
+        if (!authorizationResult.Succeeded)
+        {
+            return Forbidden();
+        }
+
         Attempt<EntityContainer?, EntityContainerOperationStatus> result = await _elementContainerService.DeleteFromRecycleBinAsync(id, CurrentUserKey(_backOfficeSecurityAccessor));
 
         return result.Success
