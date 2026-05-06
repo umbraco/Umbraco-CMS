@@ -1192,7 +1192,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             }
 
             TryGetParentKey(parentId, out Guid? parentKey);
-            var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId, parentKey);
+            var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentKey);
 
             var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
             if (scope.Notifications.PublishCancelable(movingNotification))
