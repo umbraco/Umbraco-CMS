@@ -49,8 +49,8 @@ public class ByKeyElementFolderController : ElementFolderControllerBase
     {
         AuthorizationResult authorizationResult = await _authorizationService.AuthorizeResourceAsync(
             User,
-            ElementPermissionResource.WithKeys(ActionElementBrowse.ActionLetter, id),
-            AuthorizationPolicies.ElementPermissionByResource);
+            ElementContainerPermissionResource.WithKeys(ActionElementContainerBrowse.ActionLetter, id),
+            AuthorizationPolicies.ElementFolderPermissionByResource);
 
         if (!authorizationResult.Succeeded)
         {

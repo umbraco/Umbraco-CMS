@@ -2900,12 +2900,14 @@ export type TemplateQuerySettingsResponseModel = {
 
 export type TemplateResponseModel = {
     id: string;
-    masterTemplate?: null | ReferenceByIdModel;
+    layoutTemplate?: null | ReferenceByIdModel;
+    /**
+     * @deprecated
+     */
+    masterTemplate?: ReferenceByIdModel;
     name: string;
     alias: string;
     content?: null | string;
-    layoutTemplate?: ReferenceByIdModel | null;
-    /** @deprecated Use layoutTemplate instead. Scheduled for removal in Umbraco 20. */
 };
 
 export type TemporaryFileConfigurationResponseModel = {

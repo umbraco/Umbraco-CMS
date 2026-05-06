@@ -1,53 +1,45 @@
-import { UmbElementItemRepository } from '../item/repository/element-item.repository.js';
-import { UMB_ELEMENT_PICKER_MODAL } from '../modals/element-picker-modal.token.js';
-import type { UmbElementItemModel } from '../item/repository/types.js';
-import type { UmbElementTreeItemModel } from '../tree/types.js';
-import type { UmbElementUserPermissionModel } from './types.js';
+import { UmbElementFolderItemRepository } from '../repository/item/element-folder-item.repository.js';
+import { UMB_ELEMENT_PICKER_MODAL } from '../../modals/element-picker-modal.token.js';
+import type { UmbElementFolderItemModel } from '../repository/item/types.js';
+import type { UmbElementTreeItemModel } from '../../tree/types.js';
+import type { UmbElementFolderUserPermissionModel } from './types.js';
 import { css, customElement, html, property, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_ENTITY_USER_PERMISSION_MODAL } from '@umbraco-cms/backoffice/user-permission';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/user-permission';
-import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
-@customElement('umb-input-element-granular-user-permission')
-export class UmbInputElementGranularUserPermissionElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
-	#permissions: Array<UmbElementUserPermissionModel> = [];
-	public get permissions(): Array<UmbElementUserPermissionModel> {
+@customElement('umb-input-element-folder-granular-user-permission')
+export class UmbInputElementFolderGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
+	#permissions: Array<UmbElementFolderUserPermissionModel> = [];
+	public get permissions(): Array<UmbElementFolderUserPermissionModel> {
 		return this.#permissions;
 	}
-	public set permissions(value: Array<UmbElementUserPermissionModel>) {
+	public set permissions(value: Array<UmbElementFolderUserPermissionModel>) {
 		this.#permissions = value;
-		const uniques = value.map((item) => item.element.id);
-		this.#observePickedElements(uniques);
+		const uniques = value.map((item) => item.elementContainer.id);
+		this.#observePickedFolders(uniques);
 	}
 
 	@property({ type: Array, attribute: false })
 	public fallbackPermissions: Array<string> = [];
 
 	@state()
-	private _items?: Array<UmbElementItemModel>;
+	private _items?: Array<UmbElementFolderItemModel>;
 
-	#elementItemRepository = new UmbElementItemRepository(this);
-	#modalManagerContext?: UmbModalManagerContext;
-	#elementPickerModalContext?: any;
+	#folderItemRepository = new UmbElementFolderItemRepository(this);
+	#folderPickerModalContext?: any;
 	#entityUserPermissionModalContext?: any;
-
-	constructor() {
-		super();
-
-		this.consumeContext(UMB_MODAL_MANAGER_CONTEXT, (instance) => (this.#modalManagerContext = instance));
-	}
 
 	protected override getFormElement() {
 		return undefined;
 	}
 
-	async #observePickedElements(uniques: Array<string>) {
-		const { asObservable } = await this.#elementItemRepository.requestItems(uniques);
+	async #observePickedFolders(uniques: Array<string>) {
+		const { asObservable } = await this.#folderItemRepository.requestItems(uniques);
 		this.observe(
 			asObservable?.(),
 			(items) => {
@@ -57,15 +49,15 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 		);
 	}
 
-	async #editGranularPermission(item: UmbElementItemModel) {
-		const currentPermissionVerbs = this.#getPermissionForElement(item.unique)?.verbs ?? [];
-		const result = await this.#selectEntityUserPermissionsForElement(item, currentPermissionVerbs);
+	async #editGranularPermission(item: UmbElementFolderItemModel) {
+		const currentPermissionVerbs = this.#getPermissionForFolder(item.unique)?.verbs ?? [];
+		const result = await this.#selectEntityUserPermissionsForFolder(item, currentPermissionVerbs);
 		// don't do anything if the verbs have not been updated
 		if (JSON.stringify(result) === JSON.stringify(currentPermissionVerbs)) return;
 
 		// update permission with new verbs
 		this.permissions = this.#permissions.map((permission) => {
-			if (permission.element.id === item.unique) {
+			if (permission.elementContainer.id === item.unique) {
 				return {
 					...permission,
 					verbs: result,
@@ -78,28 +70,30 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 	}
 
 	async #addGranularPermission() {
-		this.#elementPickerModalContext = this.#modalManagerContext?.open(this, UMB_ELEMENT_PICKER_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		this.#folderPickerModalContext = modalManager?.open(this, UMB_ELEMENT_PICKER_MODAL, {
 			data: {
 				hideTreeRoot: true,
+				foldersOnly: true,
 				// prevent already selected items to be picked again
 				pickableFilter: (treeItem: UmbElementTreeItemModel) =>
-					!treeItem.isFolder && !this._items?.map((i) => i.unique).includes(treeItem.unique),
+					!this._items?.map((i) => i.unique).includes(treeItem.unique),
 			},
 		});
 
-		this.#elementPickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbSelectedEvent) => {
+		this.#folderPickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbSelectedEvent) => {
 			const unique = event.unique;
 			if (!unique) return;
 
-			const elementItem = await this.#requestElementItem(unique);
+			const folderItem = await this.#requestFolderItem(unique);
 
-			this.#selectEntityUserPermissionsForElement(elementItem).then(
+			this.#selectEntityUserPermissionsForFolder(folderItem).then(
 				(result) => {
-					this.#elementPickerModalContext?.reject();
+					this.#folderPickerModalContext?.reject();
 
-					const permissionItem: UmbElementUserPermissionModel = {
-						$type: 'ElementPermissionPresentationModel',
-						element: { id: unique },
+					const permissionItem: UmbElementFolderUserPermissionModel = {
+						$type: 'ElementContainerPermissionPresentationModel',
+						elementContainer: { id: unique },
 						verbs: result,
 					};
 
@@ -107,29 +101,28 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 					this.dispatchEvent(new UmbChangeEvent());
 				},
 				() => {
-					this.#elementPickerModalContext?.reject();
+					this.#folderPickerModalContext?.reject();
 				},
 			);
 		});
 	}
 
-	async #requestElementItem(unique: string) {
+	async #requestFolderItem(unique: string) {
 		if (!unique) throw new Error('Could not open permissions modal, no unique was provided');
 
-		const { data } = await this.#elementItemRepository.requestItems([unique]);
+		const { data } = await this.#folderItemRepository.requestItems([unique]);
 
-		const elementItem = data?.[0];
-		if (!elementItem) throw new Error('No element item found');
-		return elementItem;
+		const folderItem = data?.[0];
+		if (!folderItem) throw new Error('No element folder item found');
+		return folderItem;
 	}
 
-	async #selectEntityUserPermissionsForElement(item: UmbElementItemModel, allowedVerbs: Array<string> = []) {
-		// TODO: get correct variant name
-		const name = item.variants[0]?.name;
-		const headline = name ? `Permissions for ${name}` : 'Permissions';
+	async #selectEntityUserPermissionsForFolder(item: UmbElementFolderItemModel, allowedVerbs: Array<string> = []) {
+		const headline = item.name ? `Permissions for ${item.name}` : 'Permissions';
 		const fallbackVerbs = this.#getFallbackPermissionVerbsForEntityType(item.entityType);
 		const value = allowedVerbs.length > 0 ? { allowedVerbs } : undefined;
-		this.#entityUserPermissionModalContext = this.#modalManagerContext?.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
+		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT);
+		this.#entityUserPermissionModalContext = modalManager?.open(this, UMB_ENTITY_USER_PERMISSION_MODAL, {
 			data: {
 				entityType: item.entityType,
 				headline,
@@ -150,8 +143,8 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 		}
 	}
 
-	#removeGranularPermission(item: UmbElementItemModel) {
-		const permission = this.#getPermissionForElement(item.unique);
+	#removeGranularPermission(item: UmbElementFolderItemModel) {
+		const permission = this.#getPermissionForFolder(item.unique);
 		if (!permission) return;
 
 		this.permissions = this.#permissions.filter((v) => JSON.stringify(v) !== JSON.stringify(permission));
@@ -183,15 +176,13 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 			label=${this.localize.term('general_add')}></uui-button>`;
 	}
 
-	#renderRef(item: UmbElementItemModel) {
+	#renderRef(item: UmbElementFolderItemModel) {
 		if (!item.unique) return;
-		// TODO: get correct variant name
-		const name = item.variants[0]?.name;
-		const permissionNames = this.#getPermissionNamesForElement(item);
+		const permissionNames = this.#getPermissionNamesForFolder(item);
 
 		return html`
-			<uui-ref-node .name=${name} .detail=${permissionNames || ''}>
-				${this.#renderIcon(item)} ${this.#renderIsTrashed(item)}
+			<uui-ref-node .name=${item.name} .detail=${permissionNames || ''}>
+				${this.#renderIcon(item)}
 				<uui-action-bar slot="actions">
 					${this.#renderEditButton(item)} ${this.#renderRemoveButton(item)}
 				</uui-action-bar>
@@ -199,17 +190,12 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 		`;
 	}
 
-	#renderIcon(item: UmbElementItemModel) {
-		if (!item.documentType.icon) return;
-		return html`<umb-icon slot="icon" name=${item.documentType.icon}></umb-icon>`;
+	#renderIcon(item: UmbElementFolderItemModel) {
+		if (!item.icon) return;
+		return html`<umb-icon slot="icon" name=${item.icon}></umb-icon>`;
 	}
 
-	#renderIsTrashed(item: UmbElementItemModel) {
-		if (!item.isTrashed) return;
-		return html`<uui-tag size="s" slot="tag" color="danger">Trashed</uui-tag>`;
-	}
-
-	#renderEditButton(item: UmbElementItemModel) {
+	#renderEditButton(item: UmbElementFolderItemModel) {
 		return html`
 			<uui-button
 				@click=${() => this.#editGranularPermission(item)}
@@ -217,18 +203,18 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 		`;
 	}
 
-	#renderRemoveButton(item: UmbElementItemModel) {
+	#renderRemoveButton(item: UmbElementFolderItemModel) {
 		return html`<uui-button
 			@click=${() => this.#removeGranularPermission(item)}
 			label=${this.localize.term('general_remove')}></uui-button>`;
 	}
 
-	#getPermissionForElement(unique: string) {
-		return this.#permissions?.find((permission) => permission.element.id === unique);
+	#getPermissionForFolder(unique: string) {
+		return this.#permissions?.find((permission) => permission.elementContainer.id === unique);
 	}
 
-	#getPermissionNamesForElement(item: UmbElementItemModel) {
-		const permission = this.#getPermissionForElement(item.unique);
+	#getPermissionNamesForFolder(item: UmbElementFolderItemModel) {
+		const permission = this.#getPermissionForFolder(item.unique);
 		if (!permission) return;
 
 		return umbExtensionsRegistry
@@ -246,8 +232,6 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 	}
 
 	#getFallbackPermissionVerbsForEntityType(entityType: string) {
-		// get all permissions that are allowed for the entity type and have at least one of the fallback permissions
-		// this is used to determine the default permissions for a element
 		const verbs = umbExtensionsRegistry
 			.getByTypeAndFilter(
 				'entityUserPermission',
@@ -257,7 +241,6 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 			)
 			.flatMap((permission) => permission.meta.verbs);
 
-		// ensure that the verbs are unique
 		return [...new Set([...verbs])];
 	}
 
@@ -270,10 +253,10 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 	];
 }
 
-export default UmbInputElementGranularUserPermissionElement;
+export default UmbInputElementFolderGranularUserPermissionElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-input-element-granular-user-permission': UmbInputElementGranularUserPermissionElement;
+		'umb-input-element-folder-granular-user-permission': UmbInputElementFolderGranularUserPermissionElement;
 	}
 }

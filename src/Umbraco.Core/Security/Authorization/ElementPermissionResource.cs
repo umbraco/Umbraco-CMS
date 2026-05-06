@@ -169,7 +169,7 @@ public class ElementPermissionResource : IPermissionResource
     /// <param name="parentKeyForBranch">The parent key of the branch.</param>
     /// <returns>An instance of <see cref="ElementPermissionResource" />.</returns>
     public static ElementPermissionResource Branch(ISet<string> permissionsToCheck, Guid parentKeyForBranch) =>
-        new(Enumerable.Empty<Guid>(), permissionsToCheck, false, true, parentKeyForBranch, null);
+        new(Enumerable.Empty<Guid>(), permissionsToCheck, false, false, parentKeyForBranch, null);
 
     /// <summary>
     ///     Creates a <see cref="ElementPermissionResource" /> with the specified permission and the branch from the specified parent key.
@@ -178,7 +178,7 @@ public class ElementPermissionResource : IPermissionResource
     /// <param name="parentKeyForBranch">The parent key of the branch.</param>
     /// <returns>An instance of <see cref="ElementPermissionResource" />.</returns>
     public static ElementPermissionResource Branch(string permissionToCheck, Guid parentKeyForBranch) =>
-        new(Enumerable.Empty<Guid>(), new HashSet<string> { permissionToCheck }, false, true, parentKeyForBranch, null);
+        new(Enumerable.Empty<Guid>(), new HashSet<string> { permissionToCheck }, false, false, parentKeyForBranch, null);
 
     /// <summary>
     ///     Creates a <see cref="ElementPermissionResource" /> with the specified permission and the branch from the specified parent key.
