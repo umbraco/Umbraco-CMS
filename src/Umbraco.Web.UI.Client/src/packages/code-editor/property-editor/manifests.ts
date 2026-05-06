@@ -9,7 +9,7 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Code Editor',
 		propertyEditorSchemaAlias: 'Umbraco.Plain.String',
 		icon: 'icon-brackets',
-		group: 'richContent',
+		group: '#propertyEditorUIGroups_richContent',
 		settings: {
 			properties: [
 				{

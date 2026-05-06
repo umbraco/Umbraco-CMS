@@ -4,7 +4,7 @@ import type {
 	UmbPropertyEditorUIPickerModalValue,
 } from './property-editor-ui-picker-modal.token.js';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import { fromCamelCaseIfCamelCase } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -56,11 +56,20 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		this.#groupPropertyEditorUIs(result);
 	}
 
+	#resolveGroupName(group: string): string {
+		if (group.startsWith('#')) {
+			return this.localize.string(group);
+		}
+
+		// Backward compatibility: external packages may still register camelCase group names.
+		return fromCamelCaseIfCamelCase(group);
+	}
+
 	#groupPropertyEditorUIs(items: Array<ManifestPropertyEditorUi>) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
 		const grouped = Object.groupBy(items, (propertyEditorUi: ManifestPropertyEditorUi) =>
-			fromCamelCase(propertyEditorUi.meta.group),
+			this.#resolveGroupName(propertyEditorUi.meta.group),
 		);
 
 		this._groupedPropertyEditorUIs = Object.keys(grouped)

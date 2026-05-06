@@ -11,10 +11,15 @@ export interface MetaPropertyEditorUi {
 	label: string;
 	icon: string;
 	/**
-	 * The group that this property editor UI belongs to, which will be used to group the property editor UIs in the property editor picker.
+	 * The group that this property editor UI belongs to, which will be used to group
+	 * the property editor UIs in the property editor picker.
 	 * If not specified, the property editor UI will be grouped under "Common".
+	 *
+	 * Core property editors use localization keys prefixed with `#` (e.g. `"#propertyEditorUIGroups_common"`).
+	 * External packages can use either display-ready names (e.g. `"My Group"`) or camelCase names
+	 * (e.g. `"myGroup"`) which will be automatically converted to title case.
 	 * @default "Common"
-	 * @example ["Common", "Content", "Media"]
+	 * @example ["#propertyEditorUIGroups_common", "#propertyEditorUIGroups_richContent", "My Custom Group"]
 	 */
 	group: string;
 	/**

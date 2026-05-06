@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Icon Picker',
 			icon: 'icon-autofill',
-			group: 'common',
+			group: '#propertyEditorUIGroups_common',
 			settings: {
 				properties: [
 					{

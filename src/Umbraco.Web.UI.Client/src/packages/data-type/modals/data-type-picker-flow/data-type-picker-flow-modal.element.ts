@@ -13,7 +13,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbPaginationManager, debounce, fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, debounce, fromCamelCaseIfCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/property-type';
@@ -218,6 +218,15 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		this.#performFiltering();
 	}
 
+	#resolveGroupName(group: string): string {
+		if (group.startsWith('#')) {
+			return this.localize.string(group);
+		}
+
+		// Backward compatibility: external packages may still register camelCase group names.
+		return fromCamelCaseIfCamelCase(group);
+	}
+
 	#performFiltering() {
 		if (this.#currentFilterQuery) {
 			const filteredDataTypes = this.#dataTypes
@@ -227,7 +236,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-expect-error
 			const grouped = Object.groupBy(filteredDataTypes, (dataType: UmbDataTypeItemModel) =>
-				fromCamelCase(this.#groupLookup[dataType.propertyEditorUiAlias] ?? 'Uncategorized'),
+				this.#resolveGroupName(this.#groupLookup[dataType.propertyEditorUiAlias] ?? 'Uncategorized'),
 			);
 
 			this._groupedDataTypes = Object.keys(grouped)
@@ -248,7 +257,7 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
 		const grouped = Object.groupBy(filteredUIs, (propertyEditorUi: ManifestPropertyEditorUi) =>
-			fromCamelCase(propertyEditorUi.meta.group ?? 'Uncategorized'),
+			this.#resolveGroupName(propertyEditorUi.meta.group ?? 'Uncategorized'),
 		);
 
 		this._groupedPropertyEditorUIs = Object.keys(grouped)

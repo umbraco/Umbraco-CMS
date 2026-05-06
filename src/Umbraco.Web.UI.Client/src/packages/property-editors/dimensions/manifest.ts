@@ -6,6 +6,6 @@ export const manifest: UmbExtensionManifest = {
 	meta: {
 		label: 'Dimensions',
 		icon: 'icon-fullscreen-alt',
-		group: 'common',
+		group: 'Common',
 	},
 };

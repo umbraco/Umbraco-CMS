@@ -17,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Markdown Editor',
 			propertyEditorSchemaAlias: 'Umbraco.MarkdownEditor',
 			icon: 'icon-code',
-			group: 'richContent',
+			group: '#propertyEditorUIGroups_richContent',
 			supportsReadOnly: true,
 			settings: {
 				properties: [
