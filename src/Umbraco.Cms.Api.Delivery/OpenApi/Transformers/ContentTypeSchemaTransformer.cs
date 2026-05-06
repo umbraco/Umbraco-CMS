@@ -229,10 +229,10 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
                     },
                     cancellationToken);
                 return;
-            case var type:
+            default:
                 // HACK: Some types with circular references (e.g. ApiBlockGridItem) get left
                 // inlined by the framework, breaking $ref resolution. Register them explicitly.
-                if (GetSchemaId(GetJsonTypeInfo(type)) is not { } schemaId || !_handledSchemas.Add(schemaId))
+                if (GetSchemaId(context.JsonTypeInfo) is not { } schemaId || !_handledSchemas.Add(schemaId))
                 {
                     return;
                 }
@@ -286,20 +286,18 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
     private async Task<IOpenApiSchema> CreateSchema(
         JsonTypeInfo jsonTypeInfo,
         OpenApiSchemaTransformerContext context,
-        CancellationToken cancellationToken,
-        Action<OpenApiSchema>? configureSchema = null)
+        CancellationToken cancellationToken)
     {
         if (jsonTypeInfo.Type.IsArray || jsonTypeInfo.Kind == JsonTypeInfoKind.Enumerable)
         {
             Type elementType = jsonTypeInfo.ElementType ?? jsonTypeInfo.Type.GetElementType() ?? typeof(object);
             JsonTypeInfo elementJsonTypeInfo = GetJsonTypeInfo(elementType);
-            IOpenApiSchema itemSchema = await CreateSchema(elementJsonTypeInfo, context, cancellationToken, configureSchema);
-            var arraySchema = new OpenApiSchema
+            IOpenApiSchema itemSchema = await CreateSchema(elementJsonTypeInfo, context, cancellationToken);
+            return new OpenApiSchema
             {
                 Type = JsonSchemaType.Array,
                 Items = itemSchema,
             };
-            return arraySchema;
         }
 
         var schemaId = GetSchemaId(jsonTypeInfo);
@@ -330,8 +328,6 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             };
         }
 
-        configureSchema?.Invoke(schema);
-
         if (schemaId is null)
         {
             return schema;
@@ -340,6 +336,31 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         OpenApiDocument document = context.GetRequiredDocument();
         document.AddComponent(schemaId, schema);
         return new OpenApiSchemaReference(schemaId, document);
+    }
+
+    /// <summary>
+    /// Allows null at a property reference site without mutating any shared component schema.
+    /// Inline schemas have <c>null</c> OR-ed into their <c>type</c> flags; schema references and
+    /// recursive-ref placeholders are wrapped in a <c>oneOf</c> with an explicit null branch so the
+    /// shared component is left unchanged.
+    /// </summary>
+    private static IOpenApiSchema AsNullable(IOpenApiSchema schema)
+    {
+        if (schema is OpenApiSchema inline
+            && inline.Metadata?.ContainsKey(RecursiveRefMetadataKey) is not true)
+        {
+            inline.Type |= JsonSchemaType.Null;
+            return inline;
+        }
+
+        return new OpenApiSchema
+        {
+            OneOf =
+            [
+                schema,
+                new OpenApiSchema { Type = JsonSchemaType.Null },
+            ],
+        };
     }
 
     private static Task<OpenApiSchema> CreateContentTypeResponseSchema(
@@ -425,11 +446,11 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             IOpenApiSchema schema = await CreateSchema(
                 GetJsonTypeInfo(propertyInfo.DeliveryApiClrType),
                 context,
-                cancellationToken,
-                // All properties can be null (e.g., when a property is added but content has not been republished)
-                schema => schema.Type |= JsonSchemaType.Null);
+                cancellationToken);
 
-            properties[propertyInfo.Alias] = schema;
+            // Properties may be null (e.g. property added after content was last published).
+            // Nullability is applied at the reference site, never on a shared component schema.
+            properties[propertyInfo.Alias] = AsNullable(schema);
         }
 
         return properties;
