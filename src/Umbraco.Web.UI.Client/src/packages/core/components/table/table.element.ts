@@ -323,7 +323,8 @@ export class UmbTableElement extends UmbLitElement {
 							aria-label=${this.localize.term('general_selectAll')}
 							style="padding: var(--uui-size-4) var(--uui-size-5);"
 							@change="${this._handleAllRowsCheckboxChange}"
-							?checked=${this.selection.length === this.items.length}></uui-checkbox>
+							?checked=${this.selection.length === this.items.length}
+							?indeterminate=${this.selection.length > 0 && this.selection.length < this.items.length}></uui-checkbox>
 					`,
 				)}
 			</uui-table-head-cell>
