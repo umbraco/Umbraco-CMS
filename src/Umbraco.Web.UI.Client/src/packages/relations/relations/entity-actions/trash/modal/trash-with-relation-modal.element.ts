@@ -91,7 +91,7 @@ export class UmbTrashWithRelationConfirmModalElement extends UmbModalBaseElement
 
 	override render() {
 		const headline = this.localize.string('#actions_trash');
-		const escapedName = escapeHTML(this._name ?? '');
+		const escapedName = escapeHTML(this._name);
 		const content = this._canTrash
 			? this.localize.string('#defaultdialogs_confirmTrash', escapedName)
 			: this.localize.string('#defaultdialogs_cannotTrashWhenReferenced', escapedName);

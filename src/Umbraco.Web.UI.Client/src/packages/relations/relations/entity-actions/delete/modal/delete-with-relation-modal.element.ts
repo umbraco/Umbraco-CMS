@@ -60,7 +60,7 @@ export class UmbDeleteWithRelationConfirmModalElement extends UmbModalBaseElemen
 
 	override render() {
 		const headline = this.localize.string('#actions_delete');
-		const escapedName = escapeHTML(this._name ?? '');
+		const escapedName = escapeHTML(this._name);
 		const content = this.localize.string('#defaultdialogs_confirmdelete', escapedName);
 
 		return html`
