@@ -46,8 +46,8 @@ internal sealed class OpenApiContractTestTypedSchemasEmptyProject : OpenApiContr
         AssertSchemaExists(openApiDocument, "FolderMediaWithCropsResponseModel");
 
         // Verify the properties models for built-in media types
-        AssertSchemaExists(openApiDocument, "ImagePropertiesModel");
-        AssertSchemaExists(openApiDocument, "FilePropertiesModel");
-        AssertSchemaExists(openApiDocument, "FolderPropertiesModel");
+        AssertSchemaExists(openApiDocument, "ImageMediaPropertiesModel");
+        AssertSchemaExists(openApiDocument, "FileMediaPropertiesModel");
+        AssertSchemaExists(openApiDocument, "FolderMediaPropertiesModel");
     }
 }

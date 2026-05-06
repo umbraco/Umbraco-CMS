@@ -66,6 +66,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
     private const string ModelSuffix = "Model";
     private const string ContentSuffix = "Content";
     private const string ElementSuffix = "Element";
+    private const string MediaSuffix = "Media";
     private const string MediaWithCropsSuffix = "MediaWithCrops";
     private const string PropertiesModelSuffix = "PropertiesModel";
 
@@ -396,7 +397,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             Properties = new Dictionary<string, IOpenApiSchema>
             {
                 [typePropertyName] = new OpenApiSchema { Const = contentType.Alias },
-                ["properties"] = await CreatePropertiesSchema(contentType, context, cancellationToken),
+                ["properties"] = await CreatePropertiesSchema(contentType, itemType, context, cancellationToken),
             },
             Required = new HashSet<string> { typePropertyName },
             AllOf = derivedTypeSchemas.Count > 0 ? derivedTypeSchemas : null,
@@ -410,10 +411,11 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
 
     private async Task<OpenApiSchemaReference> CreatePropertiesSchema(
         ContentTypeSchemaInfo contentType,
+        PublishedItemType itemType,
         OpenApiSchemaTransformerContext context,
         CancellationToken cancellationToken)
     {
-        var schemaId = $"{contentType.SchemaId}{PropertiesModelSuffix}";
+        var schemaId = GetPropertiesModelSchemaId(contentType, itemType);
 
         var propertiesSchema = new OpenApiSchema
         {
@@ -421,7 +423,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             AllOf =
             [
                 ..contentType.CompositionSchemaIds.Select(compositionSchemaId
-                    => GetPlaceholderSchema($"{compositionSchemaId}{PropertiesModelSuffix}"))
+                    => GetPlaceholderSchema(GetCompositionPropertiesModelSchemaId(compositionSchemaId, itemType)))
             ],
             Properties = await CreateContentTypeProperties(contentType, context, cancellationToken),
             Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = schemaId },
@@ -431,6 +433,27 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         document.AddComponent(schemaId, propertiesSchema);
         return new OpenApiSchemaReference(schemaId, document);
     }
+
+    private static string GetPropertiesModelSchemaId(ContentTypeSchemaInfo contentType, PublishedItemType itemType) =>
+        $"{contentType.SchemaId}{GetItemTypeSuffix(itemType, contentType.IsElement)}{PropertiesModelSuffix}";
+
+    private string GetCompositionPropertiesModelSchemaId(string compositionSchemaId, PublishedItemType itemType)
+    {
+        // Look up the composition's own IsElement so its reference points at the right
+        // generated schema (element-type compositions live under the Element suffix).
+        IReadOnlyCollection<ContentTypeSchemaInfo> candidates = itemType == PublishedItemType.Media ? MediaTypes : DocumentTypes;
+        ContentTypeSchemaInfo? composition = candidates.FirstOrDefault(c => c.SchemaId == compositionSchemaId);
+        var suffix = GetItemTypeSuffix(itemType, composition?.IsElement ?? false);
+        return $"{compositionSchemaId}{suffix}{PropertiesModelSuffix}";
+    }
+
+    private static string GetItemTypeSuffix(PublishedItemType itemType, bool isElement) =>
+        itemType switch
+        {
+            PublishedItemType.Media => MediaSuffix,
+            PublishedItemType.Content => isElement ? ElementSuffix : ContentSuffix,
+            _ => throw new NotSupportedException($"Unsupported PublishedItemType: {itemType}"),
+        };
 
     private async Task<Dictionary<string, IOpenApiSchema>> CreateContentTypeProperties(
         ContentTypeSchemaInfo contentType,

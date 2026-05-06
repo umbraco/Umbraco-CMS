@@ -45,20 +45,20 @@ internal sealed class OpenApiContractTestTypedSchemasWithSampleTypes : OpenApiCo
 
         // Verify sample document type schemas are present
         AssertSchemaExists(openApiDocument, "ArticlePageContentResponseModel");
-        AssertSchemaExists(openApiDocument, "ArticlePagePropertiesModel");
+        AssertSchemaExists(openApiDocument, "ArticlePageContentPropertiesModel");
         AssertSchemaExists(openApiDocument, "LandingPageContentResponseModel");
-        AssertSchemaExists(openApiDocument, "LandingPagePropertiesModel");
+        AssertSchemaExists(openApiDocument, "LandingPageContentPropertiesModel");
 
         AssertSchemaExists(openApiDocument, "XMLSitemapContentResponseModel");
-        AssertSchemaExists(openApiDocument, "XMLSitemapPropertiesModel");
+        AssertSchemaExists(openApiDocument, "XMLSitemapContentPropertiesModel");
 
         // Verify element type schemas are present (via block list on landing page)
         AssertSchemaExists(openApiDocument, "TestElementElementModel");
-        AssertSchemaExists(openApiDocument, "TestElementPropertiesModel");
+        AssertSchemaExists(openApiDocument, "TestElementElementPropertiesModel");
 
         // Verify the SEO composition schema is present and referenced from the composing type's properties model
-        AssertSchemaExists(openApiDocument, "SeoMetadataPropertiesModel");
-        AssertSchemaComposesFrom(openApiDocument, "ArticlePagePropertiesModel", "SeoMetadataPropertiesModel");
+        AssertSchemaExists(openApiDocument, "SeoMetadataContentPropertiesModel");
+        AssertSchemaComposesFrom(openApiDocument, "ArticlePageContentPropertiesModel", "SeoMetadataContentPropertiesModel");
 
         // Verify built-in media types are also present
         AssertSchemaExists(openApiDocument, "ImageMediaWithCropsResponseModel");
@@ -66,7 +66,7 @@ internal sealed class OpenApiContractTestTypedSchemasWithSampleTypes : OpenApiCo
 
         // Verify sample media type schemas are present
         AssertSchemaExists(openApiDocument, "VideoMediaWithCropsResponseModel");
-        AssertSchemaExists(openApiDocument, "VideoPropertiesModel");
+        AssertSchemaExists(openApiDocument, "VideoMediaPropertiesModel");
 
         // Verify the polymorphic interface schemas wire each derived type into oneOf + discriminator mapping
         AssertSchemaIsPolymorphicUnion(
