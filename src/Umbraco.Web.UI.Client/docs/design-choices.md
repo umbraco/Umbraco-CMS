@@ -122,8 +122,8 @@ Use `<strong>` for target names (easy to anchor on visually); use `<i>` for seco
 
 | Don't | Do |
 |-------|----|
-| "Are you sure you want to delete this content and all content items underneath?" | "**My Page 1** and all content items underneath will be transferred to the trash bin." |
-| "Are you sure you want to publish My Page 1 and all descendant items." | "Make **My Page 1** and all content items underneath publicly available." |
+| "Are you sure you want to delete this content and all content items underneath?" | "<strong>My Page 1</strong> will be transferred to the trash bin, including <i>all content items underneath</i>." |
+| "Are you sure you want to publish My Page 1 and all descendant items." | "Make <strong>My Page 1</strong> publicly available, including <i>all content items underneath</i>." |
 
 ### Actions
 
