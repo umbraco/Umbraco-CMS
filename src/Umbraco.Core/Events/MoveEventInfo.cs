@@ -28,7 +28,7 @@ public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
     /// <param name="newParentId">The identifier of the new parent.</param>
     [Obsolete("Use the overload with the newParentKey parameter instead. Scheduled for removal in v19.")]
     public MoveEventInfo(TEntity entity, string originalPath, int newParentId)
-        : this(entity, originalPath, newParentId, null)
+        : this(entity, originalPath, null)
     {
     }
 

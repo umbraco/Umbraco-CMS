@@ -1226,7 +1226,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 .Select(x =>
                 {
                     TryGetParentKey(x.Item1.ParentId, out Guid? itemParentKey);
-                    return new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId, itemParentKey);
+                    return new MoveEventInfo<IContent>(x.Item1, x.Item2, itemParentKey);
                 })
                 .ToArray();
 
