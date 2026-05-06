@@ -162,10 +162,11 @@
     4: ['Dimensions', 'Sets the fixed width and height of the editor. This excludes the toolbar and statusbar heights.'],
     5: ['Maximum size for inserted images', 'Maximum width or height - enter 0 to disable resizing.'],
     6: ['Overlay size', 'Select the width of the overlay (link picker).'],
-    7: ['Available Blocks', 'Define the available blocks.'],
-    8: ['Image Upload Folder', 'Choose the upload location of pasted images.'],
-    9: ['Accepted media types', 'Limit to specific media types for the media picker toolbar and drag-and-drop uploads.'],
-    10: ['Ignore User Start Nodes', ''],
+    7: ['Create modal size', ''],
+    8: ['Available Blocks', 'Define the available blocks.'],
+    9: ['Image Upload Folder', 'Choose the upload location of pasted images.'],
+    10: ['Accepted media types', 'Limit to specific media types for the media picker toolbar and drag-and-drop uploads.'],
+    11: ['Ignore User Start Nodes', ''],
   }
 
   public static readonly tinyMCESettings = {
@@ -357,3 +358,4 @@
     unpublish: 'Unpublish'
   }
 }
+

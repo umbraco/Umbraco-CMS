@@ -9,5 +9,6 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Stylesheet Picker',
 		icon: 'icon-document',
 		group: 'common',
+		keywords: ['css', 'style', 'theme'],
 	},
 };

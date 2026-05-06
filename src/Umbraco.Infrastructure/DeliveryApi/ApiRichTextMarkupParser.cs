@@ -67,11 +67,13 @@ internal sealed class ApiRichTextMarkupParser : ApiRichTextParserBase, IApiRichT
         HtmlNode[] links = doc.DocumentNode.SelectNodes("//a")?.ToArray() ?? Array.Empty<HtmlNode>();
         foreach (HtmlNode link in links)
         {
+            // Normalize the type to lower case to tolerate historic mis-cased values written by the (now fixed)
+            // ConvertLocalLinks migration for Umbraco 15 (see #22597). Constants.UdiEntityType.* values are lower case.
             ReplaceLocalLinks(
                     contentCache,
                     mediaCache,
                 link.GetAttributeValue("href", string.Empty),
-                link.GetAttributeValue("type", "unknown"),
+                link.GetAttributeValue("type", "unknown").ToLowerInvariant(),
                 (route, content) =>
                 {
                     link.SetAttributeValue("href", $"{route.Path}{route.QueryString}");

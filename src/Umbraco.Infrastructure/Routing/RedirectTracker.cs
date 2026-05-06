@@ -115,7 +115,7 @@ internal sealed class RedirectTracker : IRedirectTracker
                 try
                 {
                     var route = _publishedUrlProvider.GetUrl(publishedContent.Key, UrlMode.Relative, culture).TrimEnd(Constants.CharArrays.ForwardSlash);
-                    if (IsValidRoute(route))
+                    if (IsValidRoute(route) && HasPublishedUrlSegment(publishedContent.Key, culture))
                     {
                         StoreRoute(oldRoutes, publishedContent, culture, route, domainRootId.Value);
                     }
@@ -125,7 +125,7 @@ internal sealed class RedirectTracker : IRedirectTracker
                         foreach (string languageIsoCode in languageIsoCodes.Value)
                         {
                             route = GetUrl(publishedContent.Key, languageIsoCode);
-                            if (IsValidRoute(route))
+                            if (IsValidRoute(route) && HasPublishedUrlSegment(publishedContent.Key, languageIsoCode))
                             {
                                 StoreRoute(oldRoutes, publishedContent, languageIsoCode, route, domainRootId.Value);
                             }
@@ -223,7 +223,7 @@ internal sealed class RedirectTracker : IRedirectTracker
     }
 
     private int GetNodeIdWithAssignedDomain(IPublishedContent entityContent) =>
-        entityContent.Path.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).Reverse()
+        entityContent.Path.GetIdsFromPathReversed()
             .FirstOrDefault(x => _domainCache.HasAssigned(x, includeWildcards: true));
 
     private string GetUrl(Guid contentKey, string languageIsoCode) =>
@@ -300,7 +300,7 @@ internal sealed class RedirectTracker : IRedirectTracker
                     newRoute = domainRootId + newRoute;
                 }
 
-                if (!IsValidRoute(newRoute) || oldRoute == newRoute)
+                if (!IsValidRoute(oldRoute) || !IsValidRoute(newRoute) || oldRoute == newRoute)
                 {
                     continue;
                 }
@@ -318,7 +318,21 @@ internal sealed class RedirectTracker : IRedirectTracker
         }
     }
 
-    private static bool IsValidRoute([NotNullWhen(true)] string? route) => route is not null && !route.StartsWith("err/");
+    private static bool IsValidRoute([NotNullWhen(true)] string? route) =>
+        route is not null
+        && !route.StartsWith(Constants.Routing.Unroutable)
+        && !route.StartsWith("err/");
+
+    // Only treat the resolved route as a valid "old URL" when the content actually has a
+    // published URL segment for this culture — i.e. it has been published before, so a redirect
+    // from its prior URL is meaningful. Without this gate, never-published content can have a
+    // misleading route captured (e.g. an ancestor's URL when the URL provider resolves drafts
+    // under an active preview cookie). See https://github.com/umbraco/Umbraco-CMS/issues/22256.
+    // Falls back to "true" during upgrades when the document URL service is not yet initialized,
+    // matching the fallback behaviour in HasUrlSegmentChanged.
+    private bool HasPublishedUrlSegment(Guid contentKey, string culture) =>
+        _documentUrlService.IsInitialized is false
+        || _documentUrlService.GetUrlSegment(contentKey, culture, isDraft: false) is not null;
 
     private void RemoveSelfReferencingRedirect(Guid contentKey, string route)
     {
