@@ -488,6 +488,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
         node.UpdateSortOrder(newSortOrder);
 
+        // The parent's cached ordered-children snapshot sorts by child SortOrder and is now
+        // stale — invalidate so the next read rebuilds against the new value.
+        if (node.Parent is not null
+            && _navigation.Structure.TryGetValue(node.Parent.Value, out NavigationNode? parentNode))
+        {
+            parentNode.InvalidateOrderedChildren();
+        }
+
         return true;
     }
 
@@ -859,6 +867,15 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return [];
         }
 
+        // Unfiltered case uses the cached snapshot maintained on the node — returns the same
+        // sorted Guid[] across calls until the children set or a child's SortOrder changes.
+        if (contentTypeKey.HasValue is false)
+        {
+            return node.GetOrderedChildren(structure);
+        }
+
+        // Filtered-by-content-type case stays uncached: it would need a composite (node, type)
+        // key to memoise, and the call site is rare enough not to be worth it.
         var childrenWithSortOrder = new List<(Guid ChildNodeKey, int SortOrder)>(node.Children.Count);
         foreach (Guid childNodeKey in node.Children)
         {
@@ -867,8 +884,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
                 continue;
             }
 
-            // Apply contentTypeKey filter
-            if (contentTypeKey.HasValue && childNode.ContentTypeKey != contentTypeKey.Value)
+            if (childNode.ContentTypeKey != contentTypeKey.Value)
             {
                 continue;
             }

@@ -8,7 +8,25 @@ namespace Umbraco.Cms.Core.Models.Navigation;
 /// </summary>
 public sealed class NavigationNode
 {
-    private ConcurrentHashSet<Guid> _children;
+    private static readonly Comparison<(Guid Key, int SortOrder)> _sortBySortOrder =
+        static (a, b) => a.SortOrder.CompareTo(b.SortOrder);
+
+    private readonly ConcurrentHashSet<Guid> _children;
+
+    /// <summary>
+    /// Cached snapshot of <see cref="Children"/> ordered by each child's <c>SortOrder</c>.
+    /// </summary>
+    /// <remarks>
+    /// Built lazily by <see cref="GetOrderedChildren"/> on first access and invalidated
+    /// (set to <c>null</c>) by <see cref="AddChild"/> / <see cref="RemoveChild"/> /
+    /// <see cref="InvalidateOrderedChildren"/>. Reads are lock-free on the fast path; the
+    /// build and invalidation paths take <see cref="_orderedChildrenLock"/> so concurrent
+    /// first-access threads agree on a single canonical array and an in-flight build
+    /// cannot finish after a concurrent invalidation has cleared it.
+    /// </remarks>
+    private Guid[]? _orderedChildren;
+
+    private readonly Lock _orderedChildrenLock = new();
 
     /// <summary>
     ///     Gets the unique key of this navigation node.
@@ -53,6 +71,13 @@ public sealed class NavigationNode
     ///     Updates the sort order of this node.
     /// </summary>
     /// <param name="newSortOrder">The new sort order value.</param>
+    /// <remarks>
+    ///     The parent node's cached ordered-children list (if any) is now stale because it sorts
+    ///     by child <c>SortOrder</c>. Callers that hold a reference to the parent should call
+    ///     <see cref="InvalidateOrderedChildren"/> on it; <see cref="NavigationNode"/> does not
+    ///     hold a reference to its parent <see cref="NavigationNode"/> so cannot invalidate it
+    ///     itself.
+    /// </remarks>
     public void UpdateSortOrder(int newSortOrder) => SortOrder = newSortOrder;
 
     /// <summary>
@@ -74,6 +99,8 @@ public sealed class NavigationNode
         child.SortOrder = _children.Count;
 
         _children.Add(childKey);
+
+        InvalidateOrderedChildren();
     }
 
     /// <summary>
@@ -91,5 +118,84 @@ public sealed class NavigationNode
 
         _children.Remove(childKey);
         child.Parent = null;
+
+        InvalidateOrderedChildren();
+    }
+
+    /// <summary>
+    ///     Returns this node's children ordered by <c>SortOrder</c>.
+    /// </summary>
+    /// <param name="navigationStructure">The navigation structure dictionary containing all nodes; needed to look up each child's current <c>SortOrder</c>.</param>
+    /// <returns>An immutable, sort-order-presorted snapshot of the children. The result is cached and reused across calls until the children set or a child's <c>SortOrder</c> is mutated.</returns>
+    /// <remarks>
+    ///     Lock-free fast path: a non-null cached array is returned without acquiring the lock.
+    ///     If the cache is empty, <see cref="BuildOrderedChildren"/> is called under the lock to
+    ///     build (with double-checked re-read) and store the canonical array.
+    /// </remarks>
+    internal IReadOnlyList<Guid> GetOrderedChildren(ConcurrentDictionary<Guid, NavigationNode> navigationStructure)
+    {
+        Guid[]? cached = _orderedChildren;
+        if (cached is not null)
+        {
+            return cached;
+        }
+
+        return BuildOrderedChildren(navigationStructure);
+    }
+
+    /// <summary>
+    ///     Invalidates the cached ordered-children snapshot.
+    /// </summary>
+    /// <remarks>
+    ///     Called by <see cref="AddChild"/> and <see cref="RemoveChild"/> automatically. Must be
+    ///     called externally when a child's <c>SortOrder</c> changes (the parent's cache sorts by
+    ///     child <c>SortOrder</c> and so is stale after such an update).
+    /// </remarks>
+    internal void InvalidateOrderedChildren()
+    {
+        lock (_orderedChildrenLock)
+        {
+            _orderedChildren = null;
+        }
+    }
+
+    private Guid[] BuildOrderedChildren(ConcurrentDictionary<Guid, NavigationNode> navigationStructure)
+    {
+        lock (_orderedChildrenLock)
+        {
+            // Double-check under the lock — another thread may have built the cache while we
+            // were waiting to acquire it.
+            Guid[]? cached = _orderedChildren;
+            if (cached is not null)
+            {
+                return cached;
+            }
+
+            if (_children.Count == 0)
+            {
+                _orderedChildren = [];
+                return _orderedChildren;
+            }
+
+            var sorted = new List<(Guid Key, int SortOrder)>(_children.Count);
+            foreach (Guid childKey in _children)
+            {
+                if (navigationStructure.TryGetValue(childKey, out NavigationNode? childNode))
+                {
+                    sorted.Add((childKey, childNode.SortOrder));
+                }
+            }
+
+            sorted.Sort(_sortBySortOrder);
+
+            var result = new Guid[sorted.Count];
+            for (var i = 0; i < sorted.Count; i++)
+            {
+                result[i] = sorted[i].Key;
+            }
+
+            _orderedChildren = result;
+            return result;
+        }
     }
 }
