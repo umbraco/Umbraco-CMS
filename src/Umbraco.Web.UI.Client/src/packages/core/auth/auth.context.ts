@@ -428,19 +428,12 @@ export class UmbAuthContext extends UmbContextBase {
 	 *   const token = await authContext.getLatestToken();
 	 *   const result = await fetch('https://my-api.com', { headers: { Authorization: `Bearer ${token}` } });
 	 * ```
-	 * @deprecated Use {@link configureClient} for `@hey-api/openapi-ts` clients or {@link getOpenApiConfiguration} for manual fetch calls. With cookie-based auth this always returns `'[redacted]'`. Scheduled for removal in Umbraco 19.
 	 * @see {@link configureClient} for automatic token handling with `@hey-api/openapi-ts` clients.
 	 * @see {@link getOpenApiConfiguration} for manual fetch calls with cookie-based auth.
 	 * @memberof UmbAuthContext
 	 * @returns The latest token from the Management API
 	 */
 	async getLatestToken(): Promise<string> {
-		new UmbDeprecation({
-			deprecated: 'getLatestToken',
-			solution:
-				'Use configureClient for @hey-api/openapi-ts clients or getOpenApiConfiguration for manual fetch calls. With cookie-based auth this always returns "[redacted]".',
-			removeInVersion: '19.0.0',
-		}).warn();
 		await this.#ensureTokenReady();
 		return '[redacted]';
 	}
@@ -626,7 +619,7 @@ export class UmbAuthContext extends UmbContextBase {
 		return {
 			base: this.#serverUrl,
 			credentials: 'include',
-			token: () => Promise.resolve('[redacted]'),
+			token: this.getLatestToken.bind(this),
 		};
 	}
 
@@ -649,10 +642,7 @@ export class UmbAuthContext extends UmbContextBase {
 		client.setConfig({
 			baseUrl: this.#serverUrl,
 			credentials: 'include',
-			auth: async () => {
-				await this.#ensureTokenReady();
-				return '[redacted]';
-			},
+			auth: this.getLatestToken.bind(this),
 		});
 
 		// Controller self-registers on the host element via UmbControllerBase constructor,
@@ -731,7 +721,7 @@ export class UmbAuthContext extends UmbContextBase {
 		const request = new Request(this.#unlinkEndpoint, {
 			method: 'POST',
 			credentials: 'include',
-			headers: { 'Content-Type': 'application/json', Authorization: 'Bearer [redacted]' },
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await this.getLatestToken()}` },
 			body: JSON.stringify({ loginProvider, providerKey }),
 		});
 
@@ -843,7 +833,7 @@ export class UmbAuthContext extends UmbContextBase {
 		const request = await fetch(`${this.#linkKeyEndpoint}?provider=${provider}`, {
 			credentials: 'include',
 			headers: {
-				Authorization: 'Bearer [redacted]',
+				Authorization: `Bearer ${await this.getLatestToken()}`,
 				'Content-Type': 'application/json',
 			},
 		});
