@@ -71,7 +71,7 @@ export class UmbModalManagerContext extends UmbContextBase {
 	#closeNoneRoutableModals() {
 		this.#modals
 			.getValue()
-			.filter((modal) => modal.router === null)
+			.filter((modal) => modal.router === null && modal.indisposable !== true)
 			.forEach((modal) => {
 				modal.forceResolve();
 			});
