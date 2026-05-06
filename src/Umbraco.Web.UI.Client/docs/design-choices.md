@@ -138,7 +138,7 @@ Never put the target name in the action button. The text carries the target; the
 Use UUI spacing tokens (`--uui-size-*`), prefer (`--uui-size-space-*`), not hardcoded pixels. The system is built on a 6px base-unit; tokens compose into a vertical rhythm that keeps the UI calm.
 
 The space between elements declares their relationship — related elements closer, unrelated elements farther. If no token fits, rethink the layout instead of inventing a value.
-Optical adjustments are welcome, but needs careful consideration before introduced.
+Optical adjustments are welcome, but need careful consideration before being introduced.
 
 Source: [UUI Layout Style Guide](https://uui.umbraco.com/?path=/story/design-style-guide--layout).
 
