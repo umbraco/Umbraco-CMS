@@ -1,8 +1,6 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
 import {expect} from '@playwright/test';
 
-const documentTypeName = 'BackofficeSearchDocType';
-
 test.describe('Modal behavior', () => {
   test.beforeEach(async ({umbracoUi}) => {
     await umbracoUi.goToBackOffice();
@@ -23,7 +21,7 @@ test.describe('Modal behavior', () => {
     await umbracoUi.backofficeSearch.isSearchModalVisible(false);
   });
 
-  test('can default to the Documents provider when in the Content section', async ({umbracoUi}) => {
+  test('can see the documents provider is selected in the content section', async ({umbracoUi}) => {
     // Arrange
     await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
@@ -34,7 +32,7 @@ test.describe('Modal behavior', () => {
     await umbracoUi.backofficeSearch.isSearchProviderActive('Documents');
   });
 
-  test('can show the no results message when nothing matches', async ({umbracoUi}) => {
+  test('can see the no results message when nothing matches', async ({umbracoUi}) => {
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
     await umbracoUi.backofficeSearch.searchForQuery('zzz-no-such-content-can-exist-zzz');
@@ -59,6 +57,7 @@ test.describe('Modal behavior', () => {
 });
 
 test.describe('Document search', () => {
+  const documentTypeName = 'BackofficeSearchDocType';
   const childDocumentTypeName = 'BackofficeSearchDocTypeChild';
   const documentNamePrefix = 'BackofficeSearchDoc';
   const documentName = documentNamePrefix + 'Item';
@@ -96,7 +95,7 @@ test.describe('Document search', () => {
     await umbracoUi.backofficeSearch.isSearchResultWithNameVisible(documentName);
   });
 
-  test('can navigate to the document workspace from a search result', async ({umbracoApi, umbracoUi}) => {
+  test('search result links to the document workspace', async ({umbracoApi, umbracoUi}) => {
     // Arrange
     const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
     const documentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
@@ -116,6 +115,7 @@ test.describe('Document search', () => {
     const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
     await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
     await umbracoApi.document.createDefaultDocument(secondDocumentName, documentTypeId);
+    await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 
     // Act
     await umbracoUi.backofficeSearch.clickSearchHeaderButton();
@@ -242,6 +242,7 @@ test.describe('Member search', () => {
 });
 
 test.describe('Cross-provider', () => {
+  const documentTypeName = 'BackofficeSearchDocType';
   const sharedSearchToken = 'BackofficeSearchShared';
   const sharedDocumentName = sharedSearchToken + 'Doc';
   const sharedMediaName = sharedSearchToken + 'Media';

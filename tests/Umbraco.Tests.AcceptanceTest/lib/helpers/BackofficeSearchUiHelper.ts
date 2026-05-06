@@ -52,11 +52,11 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
     await this.input.fill('');
   }
 
-  async searchForQuery(query: string, expected?: string, searchUrl: string = ConstantHelper.apiEndpoints.search) {
+  async searchForQuery(query: string, expectedResultName?: string, searchUrl: string = ConstantHelper.apiEndpoints.search) {
     await this.waitForResponseAfterExecutingPromise(searchUrl, this.enterSearchQuery(query), ConstantHelper.statusCodes.ok);
 
-    if (expected != null) {
-      await this.isVisible(this.resultByName(expected));
+    if (expectedResultName != null) {
+      await this.isVisible(this.resultByName(expectedResultName));
     }
   }
 
