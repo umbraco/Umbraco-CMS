@@ -1,5 +1,5 @@
 # Design Choices
-[← Umbraco Backoffice](../CLAUDE.md) | [← Monorepo Root](../../CLAUDE.md)
+[← Umbraco Backoffice](../CLAUDE.md) | [← Monorepo Root](../../../CLAUDE.md)
 
 ---
 
