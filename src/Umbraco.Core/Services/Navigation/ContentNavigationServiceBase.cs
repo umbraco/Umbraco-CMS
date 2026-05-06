@@ -30,11 +30,48 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// <summary>
     ///     Bundles a navigation structure dictionary and its root keys into a single reference so that
     ///     <see cref="HandleRebuildAsync"/> can swap both atomically with one <see cref="Interlocked.Exchange{T}"/>
-    ///     call and readers always observe a consistent pair.
+    ///     call and readers always observe a consistent pair. Also carries the per-snapshot
+    ///     descendants cache populated by <see cref="TryGetDescendantsKeysFromStructure"/>.
     /// </summary>
     private sealed record NavigationSnapshot(
         ConcurrentDictionary<Guid, NavigationNode> Structure,
-        HashSet<Guid> Roots);
+        HashSet<Guid> Roots)
+    {
+        private long _generation;
+
+        /// <summary>
+        ///     Cache of descendants <c>Guid[]</c> keyed by parent and an optional content-type
+        ///     filter. Populated lazily by <see cref="TryGetDescendantsKeysFromStructure"/> and
+        ///     cleared by <see cref="Invalidate"/> on any structural mutation.
+        /// </summary>
+        /// <remarks>
+        ///     The composite key allows both <c>TryGetDescendantsKeys</c> (content-type =
+        ///     <c>null</c>) and <c>TryGetDescendantsKeysOfType</c> (content-type = the resolved
+        ///     <c>Guid</c>) to share one cache without their results contaminating each other.
+        ///     Realistic per-parent fan-out is bounded by the "allowed types" content model
+        ///     (typically 1-5 types per parent), and the cache is populated only for queries
+        ///     that actually run, so memory grows with the templates exercised rather than the
+        ///     theoretical product of (parents × content types).
+        /// </remarks>
+        public ConcurrentDictionary<(Guid Parent, Guid? ContentType), Guid[]> DescendantsCache { get; } = new();
+
+        /// <summary>
+        ///     A monotonic counter incremented on every mutation. Used by readers to detect a
+        ///     concurrent mutation that occurred during their compute, so they can avoid writing
+        ///     a now-stale result back to <see cref="DescendantsCache"/>.
+        /// </summary>
+        public long Generation => Interlocked.Read(ref _generation);
+
+        /// <summary>
+        ///     Clears the descendants cache and bumps the generation. Call after any mutation to
+        ///     this snapshot's <see cref="Structure"/> or <see cref="Roots"/>.
+        /// </summary>
+        public void Invalidate()
+        {
+            Interlocked.Increment(ref _generation);
+            DescendantsCache.Clear();
+        }
+    }
 
     private NavigationSnapshot _navigation = new(new(), []);
     private NavigationSnapshot _recycleBinNavigation = new(new(), []);
@@ -164,7 +201,12 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// </param>
     /// <returns><c>true</c> if the parent node exists in the structure; otherwise, <c>false</c>.</returns>
     public bool TryGetDescendantsKeys(Guid parentKey, out IEnumerable<Guid> descendantsKeys)
-        => TryGetDescendantsKeysFromStructure(_navigation.Structure, parentKey, out descendantsKeys);
+    {
+        // Snapshot to a local so cache lookups, the structure walk, and the generation check
+        // all see the same NavigationSnapshot instance even if a rebuild swaps it in mid-call.
+        NavigationSnapshot snapshot = _navigation;
+        return TryGetDescendantsKeysFromStructure(snapshot.Structure, parentKey, out descendantsKeys, contentTypeKey: null, cachingSnapshot: snapshot);
+    }
 
     /// <summary>
     ///     Attempts to get all descendant node keys of a specific content type under a parent node.
@@ -182,7 +224,11 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     {
         if (TryGetContentTypeKey(contentTypeAlias, out Guid? contentTypeKey))
         {
-            return TryGetDescendantsKeysFromStructure(_navigation.Structure, parentKey, out descendantsKeys, contentTypeKey);
+            // Snapshot to a local so cache lookups, the structure walk, and the generation
+            // check all see the same NavigationSnapshot instance even if a rebuild swaps it
+            // in mid-call.
+            NavigationSnapshot snapshot = _navigation;
+            return TryGetDescendantsKeysFromStructure(snapshot.Structure, parentKey, out descendantsKeys, contentTypeKey, cachingSnapshot: snapshot);
         }
 
         // Content type alias doesn't exist
@@ -297,7 +343,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// </param>
     /// <returns><c>true</c> if the parent node exists in the recycle bin; otherwise, <c>false</c>.</returns>
     public bool TryGetDescendantsKeysInBin(Guid parentKey, out IEnumerable<Guid> descendantsKeys)
-        => TryGetDescendantsKeysFromStructure(_recycleBinNavigation.Structure, parentKey, out descendantsKeys);
+    {
+        NavigationSnapshot snapshot = _recycleBinNavigation;
+        return TryGetDescendantsKeysFromStructure(snapshot.Structure, parentKey, out descendantsKeys, contentTypeKey: null, cachingSnapshot: snapshot);
+    }
 
     /// <summary>
     ///     Attempts to get all ancestor node keys of a child node in the recycle bin navigation structure.
@@ -375,8 +424,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
         // Reset the SortOrder based on its new position in the bin
         nodeToRemove.UpdateSortOrder(_recycleBinNavigation.Structure.Count);
-        return _recycleBinNavigation.Structure.TryAdd(nodeToRemove.Key, nodeToRemove) &&
-               _navigation.Structure.TryRemove(key, out _);
+        var moved = _recycleBinNavigation.Structure.TryAdd(nodeToRemove.Key, nodeToRemove) &&
+                    _navigation.Structure.TryRemove(key, out _);
+
+        // Both snapshots' descendant lists are now potentially stale.
+        _navigation.Invalidate();
+        _recycleBinNavigation.Invalidate();
+
+        return moved;
     }
 
     /// <summary>
@@ -418,6 +473,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
         parentNode?.AddChild(_navigation.Structure, key);
 
+        _navigation.Invalidate();
         return true;
     }
 
@@ -468,6 +524,7 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         // Set the new parent for the node (if parent node is null - the node is moved to root)
         targetParentNode?.AddChild(_navigation.Structure, key);
 
+        _navigation.Invalidate();
         return true;
     }
 
@@ -496,6 +553,10 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             parentNode.InvalidateOrderedChildren();
         }
 
+        // Descendants lists are sort-order-presorted (depth-first using each parent's
+        // ordered children), so re-ordering a child re-orders any cached ancestor descendants.
+        _navigation.Invalidate();
+
         return true;
     }
 
@@ -518,7 +579,9 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
         RemoveDescendantsRecursively(nodeToRemove);
 
-        return _recycleBinNavigation.Structure.TryRemove(key, out _);
+        var removed = _recycleBinNavigation.Structure.TryRemove(key, out _);
+        _recycleBinNavigation.Invalidate();
+        return removed;
     }
 
     /// <summary>
@@ -553,8 +616,14 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         // Restore the node and its descendants from the recycle bin to the main structure
         RestoreNodeAndDescendantsRecursively(nodeToRestore);
 
-        return _navigation.Structure.TryAdd(nodeToRestore.Key, nodeToRestore) &&
-               _recycleBinNavigation.Structure.TryRemove(key, out _);
+        var restored = _navigation.Structure.TryAdd(nodeToRestore.Key, nodeToRestore) &&
+                       _recycleBinNavigation.Structure.TryRemove(key, out _);
+
+        // Both snapshots' descendant lists are now potentially stale.
+        _navigation.Invalidate();
+        _recycleBinNavigation.Invalidate();
+
+        return restored;
     }
 
     /// <summary>
@@ -663,10 +732,9 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         ConcurrentDictionary<Guid, NavigationNode> structure,
         Guid parentKey,
         out IEnumerable<Guid> descendantsKeys,
-        Guid? contentTypeKey = null)
+        Guid? contentTypeKey = null,
+        NavigationSnapshot? cachingSnapshot = null)
     {
-        var descendants = new List<Guid>();
-
         if (structure.TryGetValue(parentKey, out NavigationNode? parentNode) is false)
         {
             // Parent doesn't exist
@@ -674,9 +742,48 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
             return false;
         }
 
+        // Both unfiltered and content-type-filtered queries are cached, distinguished by the
+        // optional contentTypeKey in the composite key. Realistic per-parent fan-out is bounded
+        // by the "allowed types" model (a few types per parent), and entries are populated
+        // lazily for queries that actually run — so memory tracks the templates exercised, not
+        // the theoretical product of (parents × types).
+        var useCache = cachingSnapshot is not null;
+        (Guid parentKey, Guid? contentTypeKey) cacheKey = (parentKey, contentTypeKey);
+
+        if (useCache && cachingSnapshot!.DescendantsCache.TryGetValue(cacheKey, out Guid[]? cached))
+        {
+            descendantsKeys = cached;
+            return true;
+        }
+
+        // Capture the snapshot's mutation generation BEFORE walking. If a mutation invalidates
+        // between here and the cache write, the result we computed may be stale relative to
+        // the now-current Structure; we still hand it to the caller (it was correct at the
+        // moment we read), but skip the cache write so future readers don't see stale data.
+        var startGeneration = useCache ? cachingSnapshot!.Generation : 0;
+
+        var descendants = new List<Guid>();
         GetDescendantsRecursively(structure, parentNode, descendants, contentTypeKey);
 
-        descendantsKeys = descendants;
+        if (useCache)
+        {
+            Guid[] result = [.. descendants];
+
+            // Only install if no mutation happened during compute, and skip caching empty
+            // results — they're cheap to recompute and caching them bloats the dictionary with
+            // one entry per (parent, type) pair queried with no measurable benefit.
+            if (result.Length > 0 && cachingSnapshot!.Generation == startGeneration)
+            {
+                cachingSnapshot.DescendantsCache[cacheKey] = result;
+            }
+
+            descendantsKeys = result;
+        }
+        else
+        {
+            descendantsKeys = descendants;
+        }
+
         return true;
     }
 
