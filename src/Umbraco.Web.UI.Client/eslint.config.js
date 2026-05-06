@@ -54,6 +54,7 @@ export default [
 			'import/no-self-import': 'error',
 			'import/no-cycle': ['error', { maxDepth: 6, allowUnsafeDynamicCyclicDependency: true }],
 			'local-rules/prefer-static-styles-last': 'warn',
+			'local-rules/no-unsafe-localize': 'error',
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
 				{
