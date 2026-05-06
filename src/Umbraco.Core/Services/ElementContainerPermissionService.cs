@@ -2,6 +2,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services.AuthorizationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -35,22 +36,24 @@ internal sealed class ElementContainerPermissionService : IElementContainerPermi
             return Task.FromResult(ElementAuthorizationStatus.NotFound);
         }
 
-        IEntitySlim[] entities = _entityService.GetAll(
-            new[] { UmbracoObjectTypes.ElementContainer },
-            keys).ToArray();
-
-        if (entities.Length == 0)
+        // Use GetAllPaths instead of loading full content items - we only need paths for authorization
+        TreeEntityPath[] entityPaths = _entityService.GetAllPaths([UmbracoObjectTypes.ElementContainer], keys).ToArray();
+        if (entityPaths.Length == 0)
         {
             return Task.FromResult(ElementAuthorizationStatus.NotFound);
         }
 
-        if (entities.Any(entity => user.HasElementPathAccess(entity, _entityService, _appCaches) == false))
+        // Check path access using the paths directly
+        int[]? startNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
+        foreach (TreeEntityPath entityPath in entityPaths)
         {
-            return Task.FromResult(ElementAuthorizationStatus.UnauthorizedMissingPathAccess);
+            if (ContentPermissions.HasPathAccess(entityPath.Path, startNodeIds, Constants.System.RecycleBinElement) == false)
+            {
+                return Task.FromResult(ElementAuthorizationStatus.UnauthorizedMissingPathAccess);
+            }
         }
 
-        return Task.FromResult(
-            HasPermissionAccess(user, entities.Select(e => e.Path), permissionsToCheck)
+        return Task.FromResult(HasPermissionAccess(user, entityPaths.Select(p => p.Path), permissionsToCheck)
                 ? ElementAuthorizationStatus.Success
                 : ElementAuthorizationStatus.UnauthorizedMissingPermissionAccess);
     }
