@@ -1,5 +1,5 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import { UmbDocumentVariantState } from '@umbraco-cms/backoffice/document';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 const baseDocument = {
 	ancestors: [],
@@ -24,7 +24,7 @@ const baseDocument = {
 	values: [],
 	variants: [
 		{
-			state: UmbDocumentVariantState.PUBLISHED,
+			state: DocumentVariantStateModel.PUBLISHED,
 			publishDate: '2023-02-06T15:32:24.957009',
 			culture: null,
 			segment: null,

@@ -1,23 +1,23 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import { UmbDocumentVariantState } from '@umbraco-cms/backoffice/document';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 // Map string state to enum
 /**
  *
  * @param state
  */
-function mapState(state: string): UmbDocumentVariantState {
+function mapState(state: string): DocumentVariantStateModel {
 	switch (state) {
 		case 'Published':
-			return UmbDocumentVariantState.PUBLISHED;
+			return DocumentVariantStateModel.PUBLISHED;
 		case 'Draft':
-			return UmbDocumentVariantState.DRAFT;
+			return DocumentVariantStateModel.DRAFT;
 		case 'NotCreated':
-			return UmbDocumentVariantState.NOT_CREATED;
+			return DocumentVariantStateModel.NOT_CREATED;
 		case 'PublishedPendingChanges':
-			return UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES;
+			return DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES;
 		default:
-			return UmbDocumentVariantState.DRAFT;
+			return DocumentVariantStateModel.DRAFT;
 	}
 }
 

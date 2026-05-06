@@ -8,7 +8,7 @@ import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbEntityRecycleBin } from './utils/entity/entity-recycle-bin.js';
 import { UmbMockDocumentCollectionManager } from './document-collection.manager.js';
 import { UmbMockDocumentPublishingManager } from './document-publishing.manager.js';
-import { UmbDocumentVariantState } from '@umbraco-cms/backoffice/document';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	DocumentCollectionResponseModel,
@@ -124,7 +124,7 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
-				state: UmbDocumentVariantState.DRAFT,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: null,
 				id: UmbId.new(),
 				flags: [],
