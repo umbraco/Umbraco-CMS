@@ -373,7 +373,6 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         var schema = new OpenApiSchema
         {
             Type = JsonSchemaType.Object,
-            AdditionalPropertiesAllowed = false,
             AllOf = [..derivedTypeSchemas, new OpenApiSchemaReference($"{schemaIdPrefix}{ModelSuffix}", document)],
             Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = schemaId },
         };
@@ -400,7 +399,6 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
                 ["properties"] = await CreatePropertiesSchema(contentType, context, cancellationToken),
             },
             Required = new HashSet<string> { typePropertyName },
-            AdditionalPropertiesAllowed = false,
             AllOf = derivedTypeSchemas.Count > 0 ? derivedTypeSchemas : null,
             Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = schemaId, },
         };
@@ -427,7 +425,6 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             ],
             Properties = await CreateContentTypeProperties(contentType, context, cancellationToken),
             Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = schemaId },
-            AdditionalPropertiesAllowed = false,
         };
 
         OpenApiDocument document = context.GetRequiredDocument();
@@ -662,7 +659,6 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             Type = interfaceSchema.Type,
             Properties = interfaceSchema.Properties,
             Required = interfaceSchema.Required,
-            AdditionalPropertiesAllowed = interfaceSchema.AdditionalPropertiesAllowed,
             Metadata = new Dictionary<string, object> { [SchemaIdMetadataKey] = baseSchemaId },
         };
 

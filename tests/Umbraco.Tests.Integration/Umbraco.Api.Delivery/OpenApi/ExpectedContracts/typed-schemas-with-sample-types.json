@@ -1226,8 +1226,7 @@
           "properties": {
             "$ref": "#/components/schemas/ArticlePagePropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "ArticlePageContentResponseModel": {
         "type": "object",
@@ -1238,8 +1237,7 @@
           {
             "$ref": "#/components/schemas/ArticlePageContentModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
       "ArticlePagePropertiesModel": {
         "type": "object",
@@ -1282,8 +1280,7 @@
               }
             ]
           }
-        },
-        "additionalProperties": false
+        }
       },
       "FileMediaWithCropsModel": {
         "required": [
@@ -1302,8 +1299,7 @@
           "properties": {
             "$ref": "#/components/schemas/FilePropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "FileMediaWithCropsResponseModel": {
         "type": "object",
@@ -1314,8 +1310,7 @@
           {
             "$ref": "#/components/schemas/FileMediaWithCropsModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
       "FilePropertiesModel": {
         "type": "object",
@@ -1339,8 +1334,7 @@
             ],
             "format": "int64"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "FolderMediaWithCropsModel": {
         "required": [
@@ -1359,8 +1353,7 @@
           "properties": {
             "$ref": "#/components/schemas/FolderPropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "FolderMediaWithCropsResponseModel": {
         "type": "object",
@@ -1371,12 +1364,10 @@
           {
             "$ref": "#/components/schemas/FolderMediaWithCropsModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
       "FolderPropertiesModel": {
-        "type": "object",
-        "additionalProperties": false
+        "type": "object"
       },
       "IApiContentBaseModel": {
         "required": [
@@ -2038,8 +2029,7 @@
           "properties": {
             "$ref": "#/components/schemas/ImagePropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "ImageMediaWithCropsResponseModel": {
         "type": "object",
@@ -2050,8 +2040,7 @@
           {
             "$ref": "#/components/schemas/ImageMediaWithCropsModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
       "ImagePropertiesModel": {
         "type": "object",
@@ -2093,8 +2082,7 @@
               "string"
             ]
           }
-        },
-        "additionalProperties": false
+        }
       },
       "LandingPageContentModel": {
         "required": [
@@ -2113,8 +2101,7 @@
           "properties": {
             "$ref": "#/components/schemas/LandingPagePropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "LandingPageContentResponseModel": {
         "type": "object",
@@ -2125,8 +2112,7 @@
           {
             "$ref": "#/components/schemas/LandingPageContentModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
       "LandingPagePropertiesModel": {
         "type": "object",
@@ -2157,8 +2143,7 @@
               }
             ]
           }
-        },
-        "additionalProperties": false
+        }
       },
       "PagedIApiContentResponseModel": {
         "required": [
@@ -2269,8 +2254,7 @@
           "properties": {
             "$ref": "#/components/schemas/SeoMetadataPropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "SeoMetadataContentResponseModel": {
         "type": "object",
@@ -2281,8 +2265,7 @@
           {
             "$ref": "#/components/schemas/SeoMetadataContentModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
       "SeoMetadataPropertiesModel": {
         "type": "object",
@@ -2299,8 +2282,7 @@
               "string"
             ]
           }
-        },
-        "additionalProperties": false
+        }
       },
       "TestElementElementModel": {
         "required": [
@@ -2319,8 +2301,7 @@
           "properties": {
             "$ref": "#/components/schemas/TestElementPropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "TestElementPropertiesModel": {
         "type": "object",
@@ -2337,8 +2318,7 @@
               "string"
             ]
           }
-        },
-        "additionalProperties": false
+        }
       },
       "UmbracoMediaArticleMediaWithCropsModel": {
         "required": [
@@ -2357,8 +2337,7 @@
           "properties": {
             "$ref": "#/components/schemas/UmbracoMediaArticlePropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "UmbracoMediaArticleMediaWithCropsResponseModel": {
         "type": "object",
@@ -2369,8 +2348,7 @@
           {
             "$ref": "#/components/schemas/UmbracoMediaArticleMediaWithCropsModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
       "UmbracoMediaArticlePropertiesModel": {
         "type": "object",
@@ -2394,8 +2372,7 @@
             ],
             "format": "int64"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "UmbracoMediaAudioMediaWithCropsModel": {
         "required": [
@@ -2414,8 +2391,7 @@
           "properties": {
             "$ref": "#/components/schemas/UmbracoMediaAudioPropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "UmbracoMediaAudioMediaWithCropsResponseModel": {
         "type": "object",
@@ -2426,8 +2402,7 @@
           {
             "$ref": "#/components/schemas/UmbracoMediaAudioMediaWithCropsModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
       "UmbracoMediaAudioPropertiesModel": {
         "type": "object",
@@ -2451,8 +2426,7 @@
             ],
             "format": "int64"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "UmbracoMediaVectorGraphicsMediaWithCropsModel": {
         "required": [
@@ -2471,8 +2445,7 @@
           "properties": {
             "$ref": "#/components/schemas/UmbracoMediaVectorGraphicsPropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "UmbracoMediaVectorGraphicsMediaWithCropsResponseModel": {
         "type": "object",
@@ -2483,8 +2456,7 @@
           {
             "$ref": "#/components/schemas/UmbracoMediaVectorGraphicsMediaWithCropsModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
       "UmbracoMediaVectorGraphicsPropertiesModel": {
         "type": "object",
@@ -2522,8 +2494,7 @@
             ],
             "format": "int32"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "UmbracoMediaVideoMediaWithCropsModel": {
         "required": [
@@ -2542,8 +2513,7 @@
           "properties": {
             "$ref": "#/components/schemas/UmbracoMediaVideoPropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "UmbracoMediaVideoMediaWithCropsResponseModel": {
         "type": "object",
@@ -2554,8 +2524,7 @@
           {
             "$ref": "#/components/schemas/UmbracoMediaVideoMediaWithCropsModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
       "UmbracoMediaVideoPropertiesModel": {
         "type": "object",
@@ -2579,8 +2548,7 @@
             ],
             "format": "int64"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "VideoMediaWithCropsModel": {
         "required": [
@@ -2599,8 +2567,7 @@
           "properties": {
             "$ref": "#/components/schemas/VideoPropertiesModel"
           }
-        },
-        "additionalProperties": false
+        }
       },
       "VideoMediaWithCropsResponseModel": {
         "type": "object",
@@ -2611,8 +2578,7 @@
           {
             "$ref": "#/components/schemas/VideoMediaWithCropsModel"
           }
-        ],
-        "additionalProperties": false
+        ]
       },
       "VideoPropertiesModel": {
         "type": "object",
@@ -2638,8 +2604,7 @@
               "$ref": "#/components/schemas/IApiMediaWithCropsModel"
             }
           }
-        },
-        "additionalProperties": false
+        }
       }
     },
     "securitySchemes": {
