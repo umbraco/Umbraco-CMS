@@ -12,7 +12,6 @@ import type { ManifestCollection } from '../extensions/types.js';
 import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
 import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
-import { UmbValueSummaryCoordinatorContext } from '@umbraco-cms/backoffice/value-summary';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbArrayState,
@@ -80,7 +79,6 @@ export class UmbDefaultCollectionContext<
 	public readonly selection = new UmbCollectionSelectionManager(this);
 	public readonly view = new UmbCollectionViewManager(this);
 	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
-	public readonly valueSummaryCoordinator = new UmbValueSummaryCoordinatorContext(this);
 
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;

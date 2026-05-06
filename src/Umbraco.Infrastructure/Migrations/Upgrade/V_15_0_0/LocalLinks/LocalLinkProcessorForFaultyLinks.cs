@@ -72,19 +72,17 @@ public class LocalLinkProcessorForFaultyLinks
 
     private (Guid Key, string EntityType)? CreateIntBasedKeyType(int id)
     {
-        // very old data, best effort replacement.
-        // entity type must match the lowercase UDI entity type, which is what the tiptap RTE
-        // expects in the "type" attribute.
+        // very old data, best effort replacement
         Attempt<Guid> documentAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
         if (documentAttempt.Success)
         {
-            return (Key: documentAttempt.Result, EntityType: Constants.UdiEntityType.Document);
+            return (Key: documentAttempt.Result, EntityType: UmbracoObjectTypes.Document.ToString());
         }
 
         Attempt<Guid> mediaAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
         if (mediaAttempt.Success)
         {
-            return (Key: mediaAttempt.Result, EntityType: Constants.UdiEntityType.Media);
+            return (Key: mediaAttempt.Result, EntityType: UmbracoObjectTypes.Media.ToString());
         }
 
         return null;

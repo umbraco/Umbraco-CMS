@@ -280,55 +280,6 @@ internal sealed class DocumentHybridCacheMockTests : UmbracoIntegrationTestWithC
             Times.Exactly(1));
     }
 
-    [Test]
-    public async Task Null_Is_Not_Cached_When_Content_Exists_But_Ancestor_Check_Fails()
-    {
-        // Arrange - create a new DocumentCacheService with a controllable HasPublishedAncestorPath mock.
-        var ancestorCheckReturnsTrue = false;
-
-        var controllableMock = new Mock<IPublishStatusQueryService>();
-        controllableMock.Setup(x => x.IsDocumentPublishedInAnyCulture(It.IsAny<Guid>())).Returns(true);
-        controllableMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()))
-            .Returns(() => ancestorCheckReturnsTrue);
-
-        var controlledCacheService = new DocumentCacheService(
-            _mockDatabaseCacheRepository.Object,
-            GetRequiredService<IIdKeyMap>(),
-            GetRequiredService<ICoreScopeProvider>(),
-            GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>(),
-            GetRequiredService<IPublishedContentFactory>(),
-            GetRequiredService<ICacheNodeFactory>(),
-            GetSeedProviders(controllableMock.Object),
-            new OptionsWrapper<CacheSettings>(new CacheSettings()),
-            GetRequiredService<IPublishedModelFactory>(),
-            GetRequiredService<IPreviewService>(),
-            controllableMock.Object,
-            new NullLogger<DocumentCacheService>());
-
-        var controlledCache = new DocumentCache(
-            controlledCacheService,
-            GetRequiredService<IPublishedContentTypeCache>(),
-            GetRequiredService<IDocumentNavigationQueryService>(),
-            GetRequiredService<IDocumentUrlService>(),
-            new Lazy<IPublishedUrlProvider>(GetRequiredService<IPublishedUrlProvider>));
-
-        // Clear any existing cache entry for this key.
-        var hybridCache = GetRequiredService<Microsoft.Extensions.Caching.Hybrid.HybridCache>();
-        await hybridCache.RemoveAsync($"{Textpage.Key}");
-
-        // Act 1 - ancestor check returns false, so GetByKeyAsync should return null.
-        var firstResult = await controlledCache.GetByIdAsync(Textpage.Key, false);
-        Assert.IsNull(firstResult, "First call should return null when ancestor check fails");
-
-        // Act 2 - now the ancestor check returns true.
-        ancestorCheckReturnsTrue = true;
-        var secondResult = await controlledCache.GetByIdAsync(Textpage.Key, false);
-
-        // Assert - the null from step 1 should NOT have been cached, so step 2 should
-        // hit the database again and return the content.
-        Assert.IsNotNull(secondResult, "Second call should return content because null should not have been cached when ancestor check failed");
-    }
-
     private void AssertTextPage(IPublishedContent textPage)
     {
         Assert.Multiple(() =>

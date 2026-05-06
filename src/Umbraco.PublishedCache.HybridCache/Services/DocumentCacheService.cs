@@ -119,20 +119,12 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         (bool exists, ContentCacheNode? contentCacheNode) = await _hybridCache.TryGetValueAsync<ContentCacheNode?>(cacheKey, CancellationToken.None);
         if (exists is false)
         {
-            bool ancestorCheckFailed;
-            (contentCacheNode, ancestorCheckFailed) = await GetContentCacheNodeFromRepo();
-
-            // Only cache the result if the ancestor check didn't fail.
-            // When content exists in DB but the ancestor check fails, this could be a transient
-            // race condition during cache rebuild. Caching null would poison the distributed cache.
-            if (ancestorCheckFailed is false)
-            {
-                await _hybridCache.SetAsync(
-                    cacheKey,
-                    contentCacheNode,
-                    GetEntryOptions(key, preview),
-                    GenerateTags(contentCacheNode));
-            }
+            contentCacheNode = await GetContentCacheNodeFromRepo();
+            await _hybridCache.SetAsync(
+                cacheKey,
+                contentCacheNode,
+                GetEntryOptions(key, preview),
+                GenerateTags(contentCacheNode));
         }
 
         if (contentCacheNode is null)
@@ -148,7 +140,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
         return result;
 
-        async Task<(ContentCacheNode? Node, bool AncestorCheckFailed)> GetContentCacheNodeFromRepo()
+        async Task<ContentCacheNode?> GetContentCacheNodeFromRepo()
         {
             using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
             ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview);
@@ -161,13 +153,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
             // cache clear will re-query the database.
             if (preview is false && contentCacheNode is not null && _publishStatusQueryService.HasPublishedAncestorPath(contentCacheNode.Key) is false)
             {
-                // Content exists in the DB but the ancestor path is not published. Return null but
-                // signal to the caller that this should NOT be cached — the ancestor check may be
-                // transiently wrong during a cache rebuild.
-                return (null, true);
+                // Careful not to early return here. We need to complete the scope even if returning null.
+                contentCacheNode = null;
             }
 
-            return (contentCacheNode, false);
+            return contentCacheNode;
         }
     }
 
@@ -343,17 +333,19 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
         var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
-        await _databaseCacheRepository.RefreshContentAsync(draftCacheNode);
 
-        if (content.PublishedState is PublishedState.Publishing)
+        await _databaseCacheRepository.RefreshContentAsync(draftCacheNode, content.PublishedState);
+
+        if (content.PublishedState is PublishedState.Publishing or PublishedState.Unpublishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
-            await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode);
-        }
-        else if (content.PublishedState is PublishedState.Unpublishing)
-        {
-            await _databaseCacheRepository.RemovePublishedContentAsync(content.Id);
-            await ClearPublishedCacheAsync(content.Key);
+
+            await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode, content.PublishedState);
+
+            if (content.PublishedState == PublishedState.Unpublishing)
+            {
+                await ClearPublishedCacheAsync(publishedCacheNode.Key);
+            }
         }
 
         scope.Complete();
@@ -389,16 +381,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     }
 
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
-        => _databaseCacheRepository.Rebuild(
-            contentTypeIds.ToList(),
-            null,
-            null,
-            action =>
-            {
-                using ICoreScope scope = _scopeProvider.CreateCoreScope();
-                action();
-                scope.Complete();
-            });
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        _databaseCacheRepository.Rebuild(contentTypeIds.ToList());
+        scope.Complete();
+    }
 
     public async Task RebuildMemoryCacheByContentTypeAsync(IEnumerable<int> contentTypeIds)
     {

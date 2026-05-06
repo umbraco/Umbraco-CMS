@@ -20,7 +20,6 @@ public class RelationSavedNotification : SavedNotification<IRelation>
         : base(target, messages)
     {
     }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="RelationSavedNotification"/>.
     /// </summary>
@@ -34,17 +33,4 @@ public class RelationSavedNotification : SavedNotification<IRelation>
         : base(target, messages)
     {
     }
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether the relations were saved automatically
-    ///     as a side-effect of content being saved (e.g. umbMedia, umbDocument, umbMember),
-    ///     rather than explicitly via <see cref="IRelationService"/>.
-    /// </summary>
-    /// <remarks>
-    ///     When <c>true</c>, the <see cref="IRelation.Id"/> of each saved entity may be <c>0</c>
-    ///     because automatic relations are persisted via a bulk operation that does not return
-    ///     database identities. <see cref="IRelation.ParentId"/>, <see cref="IRelation.ChildId"/>,
-    ///     and <see cref="IRelation.RelationType"/> are always populated.
-    /// </remarks>
-    public bool IsAutomatic { get; set; }
 }

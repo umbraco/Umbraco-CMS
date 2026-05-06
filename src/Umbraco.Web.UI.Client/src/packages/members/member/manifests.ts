@@ -4,7 +4,6 @@ import { manifests as itemManifests } from './item/manifests.js';
 import { manifests as memberPickerModalManifests } from './components/member-picker-modal/manifests.js';
 import { manifests as menuItemManifests } from './menu-item/manifests.js';
 import { manifests as pickerManifests } from './picker/manifests.js';
-import { manifests as profileDataManifests } from './profile-data/manifests.js';
 import { manifests as propertyEditorManifests } from './property-editor/manifests.js';
 import { manifests as referenceManifests } from './reference/manifests.js';
 import { manifests as repositoryManifests } from './repository/manifests.js';
@@ -21,7 +20,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...memberPickerModalManifests,
 	...menuItemManifests,
 	...pickerManifests,
-	...profileDataManifests,
 	...propertyEditorManifests,
 	...referenceManifests,
 	...repositoryManifests,

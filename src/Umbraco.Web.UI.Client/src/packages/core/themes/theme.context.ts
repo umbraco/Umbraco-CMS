@@ -1,4 +1,3 @@
-import { UMB_THEME_LIGHT_ALIAS } from './manifests.js';
 import type { ManifestTheme } from './theme.extension.js';
 import { loadManifestPlainCss } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
@@ -11,7 +10,7 @@ import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-a
 const LOCAL_STORAGE_KEY = 'umb-theme-alias';
 
 export class UmbThemeContext extends UmbContextBase {
-	#theme = new UmbStringState(UMB_THEME_LIGHT_ALIAS);
+	#theme = new UmbStringState('umb-light-theme');
 	#themeObserver?: UmbObserverController<ManifestTheme[]>;
 
 	public readonly theme = this.#theme.asObservable();

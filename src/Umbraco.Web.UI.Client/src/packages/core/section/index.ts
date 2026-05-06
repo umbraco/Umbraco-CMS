@@ -7,4 +7,3 @@ export * from './section-sidebar/index.js';
 export * from './section.context.js';
 export * from './section.context.token.js';
 export type * from './types.js';
-export * from './value-type/constants.js';

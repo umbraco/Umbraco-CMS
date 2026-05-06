@@ -17,7 +17,7 @@ internal static class ListExtensions
         items.Any(x => x.Suffix.HasValue);
 }
 
-internal sealed partial class SimilarNodeName
+internal sealed class SimilarNodeName
 {
     /// <summary>
     /// Gets or sets the unique identifier for this SimilarNodeName instance.
@@ -194,14 +194,11 @@ internal sealed partial class SimilarNodeName
         return current;
     }
 
-    internal sealed partial class StructuredName
+    internal sealed class StructuredName
     {
         internal const uint Initialsuffix = 1;
         private const string Spacecharacter = " ";
-
-        [GeneratedRegex(@"(.*) \(([1-9]\d*)\)$")]
-        private static partial Regex SuffixedPatternRegex();
-
+        private const string Suffixedpattern = @"(.*) \(([1-9]\d*)\)$";
         internal static readonly uint? _nosuffix = default;
 
         internal StructuredName(string? name)
@@ -213,7 +210,8 @@ internal sealed partial class SimilarNodeName
                 return;
             }
 
-            MatchCollection matches = SuffixedPatternRegex().Matches(name);
+            var rg = new Regex(Suffixedpattern);
+            MatchCollection matches = rg.Matches(name);
             if (matches.Count > 0)
             {
                 Match match = matches[0];

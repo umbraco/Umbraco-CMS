@@ -42,11 +42,7 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 		if (!this._isSearchable) return nothing;
 
 		return html`
-			<uui-input
-				.value=${this._query}
-				label=${this.localize.term('general_search')}
-				placeholder=${this.localize.term('placeholders_search')}
-				@input=${this.#onInput}>
+			<uui-input .value=${this._query} label=${this.localize.term('general_search')}	placeholder=${this.localize.term('placeholders_search')}	@input=${this.#onInput}>
 				<div slot="prepend">
 					${this._searching
 						? html`<uui-loader-circle id="searching-indicator"></uui-loader-circle>`
@@ -55,12 +51,7 @@ export class UmbPickerSearchFieldElement extends UmbLitElement {
 
 				${this._query
 					? html`
-							<uui-button
-								label=${this.localize.term('general_clear')}
-								slot="append"
-								type="button"
-								@click=${() => this.#pickerContext?.search.clear()}
-								compact>
+							<uui-button slot="append" type="button" @click=${() => this.#pickerContext?.search.clear()} compact>
 								<uui-icon name="icon-delete"></uui-icon>
 							</uui-button>
 						`

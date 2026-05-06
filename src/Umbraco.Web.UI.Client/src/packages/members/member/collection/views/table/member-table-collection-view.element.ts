@@ -114,15 +114,13 @@ export class UmbMemberTableCollectionViewElement extends UmbLitElement {
 			const kind =
 				member.kind === UmbMemberKind.API
 					? this.localize.term('member_memberKindApi')
-					: member.kind === UmbMemberKind.EXTERNAL_ONLY
-						? this.localize.term('member_memberKindExternalOnly')
-						: this.localize.term('member_memberKindDefault');
+					: this.localize.term('member_memberKindDefault');
 
 			const memberType = memberTypes?.find((type) => type.unique === member.memberType.unique);
 
 			return {
 				id: member.unique,
-				icon: memberType?.icon || 'icon-user',
+				icon: memberType?.icon,
 				data: [
 					{
 						columnAlias: 'memberName',

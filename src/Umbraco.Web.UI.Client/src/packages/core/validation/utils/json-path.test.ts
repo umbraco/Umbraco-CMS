@@ -48,26 +48,4 @@ describe('UmbJsonPathFunctions', () => {
 
 		expect(result).to.eq('test');
 	});
-
-	it('multi-AND filter matches all conditions, not just the first', () => {
-		const data = [
-			{ alias: 'blocks', culture: 'en-US', value: 'en' },
-			{ alias: 'blocks', culture: 'bs', value: 'bs' },
-		];
-
-		const result = GetValueByJsonPath(data, `$[?(@.alias == 'blocks' && @.culture == 'bs')].value`);
-
-		expect(result).to.eq('bs');
-	});
-
-	it('matches the null literal in a filter condition', () => {
-		const data = [
-			{ alias: 'a', segment: 'foo', value: 'with-segment' },
-			{ alias: 'a', segment: null, value: 'no-segment' },
-		];
-
-		const result = GetValueByJsonPath(data, `$[?(@.alias == 'a' && @.segment == null)].value`);
-
-		expect(result).to.eq('no-segment');
-	});
 });

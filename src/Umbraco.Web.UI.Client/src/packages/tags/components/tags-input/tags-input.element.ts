@@ -87,48 +87,34 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	}
 
 	#onInputKeydown(e: KeyboardEvent) {
-		const keyHandlers: Record<string, () => void> = {
-			Tab: () => this.#handleTabKey(e),
-			Enter: () => this.#handleEnterKey(),
-			Escape: () => this.#handleEscapeKey(),
-			ArrowDown: () => this.#handleArrowDownKey(e),
-		};
-
-		const handler = keyHandlers[e.key];
-		if (handler) {
-			handler();
-		} else {
-			this.#inputError(false);
-		}
-	}
-
-	#handleTabKey(e: KeyboardEvent) {
 		const inputLength = (this._tagInput.value as string).trim().length;
-		if (!inputLength) return;
 
-		// If the dropdown is open, Tab navigates into it rather than creating a tag
-		if (this._matches.length) {
+		//Prevent tab away if there is a text in the input.
+		if (e.key === 'Tab' && inputLength && !this._matches.length) {
 			e.preventDefault();
-			this._optionCollection?.item(0)?.focus();
+			this.#createTag();
 			return;
 		}
 
-		e.preventDefault();
-		this.#createTag();
-	}
+		//If the input is empty we can navigate out of it using tab
+		if (e.key === 'Tab' && !inputLength) {
+			return;
+		}
 
-	#handleEnterKey() {
-		this.#createTag();
-	}
+		//Create a new tag when enter to the input
+		if (e.key === 'Enter') {
+			this.#createTag();
+			return;
+		}
 
-	#handleEscapeKey() {
-		this._matches = [];
-	}
-
-	#handleArrowDownKey(e: KeyboardEvent) {
-		e.preventDefault();
-		this._currentInput = this._optionCollection?.item(0)?.value ?? this._currentInput;
-		this._optionCollection?.item(0)?.focus();
+		//This one to show option collection if there is any
+		if (e.key === 'ArrowDown') {
+			e.preventDefault();
+			this._currentInput = this._optionCollection?.item(0)?.value ?? this._currentInput;
+			this._optionCollection?.item(0)?.focus();
+			return;
+		}
+		this.#inputError(false);
 	}
 
 	#focusTag(index: number) {
@@ -197,17 +183,6 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		else this.#createTag();
 	}
 
-	#onMainTagFocusOut(e: FocusEvent) {
-		const relatedTarget = e.relatedTarget as Node | null;
-		if (!relatedTarget || !this._mainTag.contains(relatedTarget)) {
-			this._matches = [];
-		}
-	}
-
-	#onMatchlistMouseDown(e: MouseEvent) {
-		e.preventDefault();
-	}
-
 	#createTag() {
 		this.#inputError(false);
 		const newTag = (this._tagInput.value as string).trim();
@@ -220,7 +195,6 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		this.items = [...this.items, newTag];
 		this._tagInput.value = '';
 		this._currentInput = '';
-		this._matches = [];
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
@@ -248,69 +222,40 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 
 	/** Dropdown */
 
-	#optionClick(option: HTMLInputElement) {
-		this._tagInput.value = option.value;
+	#optionClick(index: number) {
+		this._tagInput.value = this._optionCollection?.item(index)?.value ?? '';
 		this.#createTag();
 		this.focus();
+		return;
 	}
 
-	#optionKeydown(e: KeyboardEvent, option: HTMLInputElement) {
-		const keyHandlers: Record<string, () => void> = {
-			Enter: () => this.#handleOptionEnter(option),
-			Tab: () => this.#handleOptionTab(e, option),
-			ArrowDown: () => this.#handleOptionArrowDown(e, option),
-			ArrowUp: () => this.#handleOptionArrowUp(e, option),
-			Backspace: () => this.focus(),
-			Escape: () => {
-				this._matches = [];
-				this.focus();
-			},
-		};
+	#optionKeydown(e: KeyboardEvent, index: number) {
+		if (e.key === 'Enter' || e.key === 'Tab') {
+			e.preventDefault();
+			this._currentInput = this._optionCollection?.item(index)?.value ?? '';
+			this.#createTag();
+			this.focus();
+			return;
+		}
 
-		keyHandlers[e.key]?.();
-	}
+		if (e.key === 'ArrowDown') {
+			e.preventDefault();
+			if (!this._optionCollection?.item(index + 1)) return;
+			this._optionCollection?.item(index + 1)?.focus();
+			this._currentInput = this._optionCollection?.item(index + 1)?.value ?? '';
+			return;
+		}
 
-	#handleOptionEnter(option: HTMLInputElement) {
-		this._tagInput.value = option.value;
-		this.#createTag();
-		this.focus();
-	}
+		if (e.key === 'ArrowUp') {
+			e.preventDefault();
+			if (!this._optionCollection?.item(index - 1)) return;
+			this._optionCollection?.item(index - 1)?.focus();
+			this._currentInput = this._optionCollection?.item(index - 1)?.value ?? '';
+		}
 
-	#handleOptionTab(e: KeyboardEvent, option: HTMLInputElement) {
-		e.preventDefault();
-		const next = this.#nextOption(option);
-		if (next) {
-			next.focus();
-			this._currentInput = next.value;
-		} else {
+		if (e.key === 'Backspace') {
 			this.focus();
 		}
-	}
-
-	#handleOptionArrowDown(e: KeyboardEvent, option: HTMLInputElement) {
-		e.preventDefault();
-		const next = this.#nextOption(option);
-		if (!next) return;
-		next.focus();
-		this._currentInput = next.value;
-	}
-
-	#handleOptionArrowUp(e: KeyboardEvent, option: HTMLInputElement) {
-		e.preventDefault();
-		const prev = this.#prevOption(option);
-		if (!prev) return;
-		prev.focus();
-		this._currentInput = prev.value;
-	}
-
-	#nextOption(option: HTMLInputElement): HTMLInputElement | undefined {
-		const options = Array.from(this._optionCollection ?? []);
-		return options[options.indexOf(option) + 1];
-	}
-
-	#prevOption(option: HTMLInputElement): HTMLInputElement | undefined {
-		const options = Array.from(this._optionCollection ?? []);
-		return options[options.indexOf(option) - 1];
 	}
 
 	/** Render */
@@ -351,18 +296,18 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 		const matchfilter = this._matches.filter((tag) => tag.text !== this.#items.find((x) => x === tag.text));
 		if (!matchfilter.length) return;
 		return html`
-			<div id="matchlist" @mousedown="${this.#onMatchlistMouseDown}">
+			<div id="matchlist">
 				${repeat(
 					matchfilter.slice(0, 5),
 					(tag: TagResponseModel) => tag.id,
-					(tag: TagResponseModel) => {
+					(tag: TagResponseModel, index: number) => {
 						return html`<input
 								class="options"
 								id="tag-${tag.id}"
 								type="radio"
 								name="${tag.group ?? ''}"
-								@click="${(e: MouseEvent) => this.#optionClick(e.currentTarget as HTMLInputElement)}"
-								@keydown="${(e: KeyboardEvent) => this.#optionKeydown(e, e.currentTarget as HTMLInputElement)}"
+								@click="${() => this.#optionClick(index)}"
+								@keydown="${(e: KeyboardEvent) => this.#optionKeydown(e, index)}"
 								value="${tag.text ?? ''}"
 								?readonly=${this.readonly} />
 							<label for="tag-${tag.id}"> ${tag.text} </label>`;
@@ -375,7 +320,7 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 	#renderAddButton() {
 		if (this.readonly) return nothing;
 		return html`
-			<uui-tag look="outline" id="main-tag" @click="${this.focus}" @focusout="${this.#onMainTagFocusOut}" slot="trigger">
+			<uui-tag look="outline" id="main-tag" @click="${this.focus}" slot="trigger">
 				<input
 					id="tag-input"
 					aria-label="tag input"
@@ -531,6 +476,10 @@ export class UmbTagsInputElement extends UUIFormControlMixin(UmbLitElement, '') 
 				background-color: transparent;
 				/* Not removed via appearance */
 				margin: 0;
+			}
+
+			uui-tag:focus-within #matchlist {
+				display: flex;
 			}
 
 			#matchlist {

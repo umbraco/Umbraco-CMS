@@ -50,7 +50,6 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<ICacheNodeFactory, CacheNodeFactory>();
         builder.Services.AddSingleton<ICacheManager, CacheManager>();
         builder.Services.AddSingleton<IDatabaseCacheRebuilder, DatabaseCacheRebuilder>();
-        builder.Services.AddSingleton<IDeferredCacheRebuildService, DeferredCacheRebuildService>();
         builder.Services.AddSingleton<IContentCacheDataSerializerFactory>(s =>
         {
             IOptions<NuCacheSettings> options = s.GetRequiredService<IOptions<NuCacheSettings>>();
@@ -74,8 +73,6 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaTypeRefreshedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, CacheRefreshingNotificationHandler>();
-        builder.AddNotificationHandler<ContentTypeChangedNotification, DeferredCacheRebuildNotificationHandler>();
-        builder.AddNotificationHandler<MediaTypeChangedNotification, DeferredCacheRebuildNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, SeedingNotificationHandler>();
         builder.AddCacheSeeding();
         return builder;

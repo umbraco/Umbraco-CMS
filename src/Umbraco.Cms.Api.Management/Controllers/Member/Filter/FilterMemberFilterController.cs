@@ -1,15 +1,10 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Member;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -24,48 +19,40 @@ namespace Umbraco.Cms.Api.Management.Controllers.Member.Filter;
 [ApiVersion("1.0")]
 public class FilterMemberFilterController : MemberFilterControllerBase
 {
-    private readonly IMemberFilterService _memberFilterService;
+    private readonly IMemberService _memberService;
     private readonly IMemberPresentationFactory _memberPresentationFactory;
+    private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FilterMemberFilterController"/> class.
     /// </summary>
-    /// <param name="memberService">Service used for member management operations (unused, retained for DI compatibility).</param>
+    /// <param name="memberService">Service used for member management operations.</param>
     /// <param name="memberPresentationFactory">Factory responsible for creating member presentation models.</param>
-    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context (unused, retained for DI compatibility).</param>
-    /// <param name="memberFilterService">Service for combined member filtering across content and external stores.</param>
-    // TODO (V19): Remove unused parameters which are only here to avoid ambiguous constructor errors.
-    [ActivatorUtilitiesConstructor]
-    public FilterMemberFilterController(
-        IMemberService memberService,
-        IMemberPresentationFactory memberPresentationFactory,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-        IMemberFilterService memberFilterService)
-    {
-        _memberFilterService = memberFilterService;
-        _memberPresentationFactory = memberPresentationFactory;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FilterMemberFilterController"/> class.
-    /// </summary>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and authentication.</param>
     public FilterMemberFilterController(
         IMemberService memberService,
         IMemberPresentationFactory memberPresentationFactory,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
-        : this(
-            memberService,
-            memberPresentationFactory,
-            backOfficeSecurityAccessor,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberFilterService>())
     {
+        _memberService = memberService;
+        _memberPresentationFactory = memberPresentationFactory;
+        _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
     /// <summary>
     /// Retrieves a paged, filtered collection of members based on the specified criteria.
-    /// Returns both content-based and external-only members in a unified, correctly paginated result.
     /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="memberTypeId">An optional member type identifier to filter the results.</param>
+    /// <param name="memberGroupName">An optional member group name to filter the results.</param>
+    /// <param name="isApproved">An optional value to filter by member approval status.</param>
+    /// <param name="isLockedOut">An optional value to filter by member lockout status.</param>
+    /// <param name="orderBy">The field by which to order the results. The default is <c>"username"</c>.</param>
+    /// <param name="orderDirection">The direction in which to order the results. The default is <see cref="Direction.Ascending"/>.</param>
+    /// <param name="filter">An optional filter string to search for members.</param>
+    /// <param name="skip">The number of items to skip for pagination. The default is 0.</param>
+    /// <param name="take">The number of items to return for pagination. The default is 100.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a <see cref="PagedViewModel{MemberResponseModel}"/> representing the filtered members.</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<MemberResponseModel>), StatusCodes.Status200OK)]
@@ -84,7 +71,7 @@ public class FilterMemberFilterController : MemberFilterControllerBase
         int skip = 0,
         int take = 100)
     {
-        var memberFilter = new MemberFilter
+        var memberFilter = new MemberFilter()
         {
             MemberTypeId = memberTypeId,
             MemberGroupName = memberGroupName,
@@ -93,14 +80,14 @@ public class FilterMemberFilterController : MemberFilterControllerBase
             Filter = filter,
         };
 
-        PagedModel<MemberFilterItem> result = await _memberFilterService.FilterAsync(memberFilter, orderBy, orderDirection, skip, take);
+        PagedModel<IMember> members = await _memberService.FilterAsync(memberFilter, orderBy, orderDirection, skip, take);
 
-        var responseModels = result.Items.Select(_memberPresentationFactory.CreateFilterItemResponseModel).ToList();
-
-        return Ok(new PagedViewModel<MemberResponseModel>
+        var pageViewModel = new PagedViewModel<MemberResponseModel>
         {
-            Items = responseModels,
-            Total = result.Total,
-        });
+            Items = await _memberPresentationFactory.CreateMultipleAsync(members.Items, CurrentUser(_backOfficeSecurityAccessor)),
+            Total = members.Total,
+        };
+
+        return Ok(pageViewModel);
     }
 }

@@ -258,18 +258,6 @@ public static partial class Constants
             ///     if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
             /// </summary>
             public static readonly string InternalRolePrefix = "__umbracoRole";
-
-            /// <summary>
-            ///     Notification-state key that flags a save as touching only login-related properties
-            ///     (e.g. <c>LastLoginDate</c>, <c>SecurityStamp</c>).
-            /// </summary>
-            public const string LoginPropertiesOnlyStateKey = "LoginPropertiesOnly";
-
-            /// <summary>
-            ///     Notification-state key that indicates whether any indexable field changed as part of the save.
-            ///     When explicitly set to <c>false</c>, Examine indexing for the affected member is skipped.
-            /// </summary>
-            public const string IndexableFieldsChangedStateKey = "IndexableFieldsChanged";
         }
 
         /// <summary>

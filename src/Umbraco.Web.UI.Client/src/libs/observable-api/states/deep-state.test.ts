@@ -50,45 +50,4 @@ describe('UmbDeepState', () => {
 		subject.setValue({ key: 'change_this_first_should_not_trigger_update', another: 'myValue' });
 		subject.setValue({ key: 'some', another: 'myNewValue' });
 	});
-
-	describe('getMutePromise', () => {
-		it('returns false immediately when state is not muted', async () => {
-			const result = await subject.getMutePromise();
-			expect(result).to.be.false;
-		});
-
-		it('resolves with true when unmute is called', async () => {
-			subject.mute();
-			const promise = subject.getMutePromise();
-			subject.unmute();
-			const result = await promise;
-			expect(result).to.be.true;
-		});
-
-		it('resolves with true when unmute is called even if no emission occurs', async () => {
-			subject.mute();
-			const promise = subject.getMutePromise();
-			// setValue to the same content — unmute will not emit, but the promise must still resolve
-			subject.setValue({ key: 'some', another: 'myValue' });
-			subject.unmute();
-			const result = await promise;
-			expect(result).to.be.true;
-		});
-
-		it('resolves all concurrent callers on unmute', async () => {
-			subject.mute();
-			const promises = [subject.getMutePromise(), subject.getMutePromise(), subject.getMutePromise()];
-			subject.unmute();
-			const results = await Promise.all(promises);
-			expect(results).to.deep.equal([true, true, true]);
-		});
-
-		it('resolves with false when state is destroyed while muted', async () => {
-			subject.mute();
-			const promise = subject.getMutePromise();
-			subject.destroy();
-			const result = await promise;
-			expect(result).to.be.false;
-		});
-	});
 });

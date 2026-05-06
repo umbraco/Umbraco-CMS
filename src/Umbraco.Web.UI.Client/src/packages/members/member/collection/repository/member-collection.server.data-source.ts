@@ -65,7 +65,6 @@ export class UmbMemberCollectionServerDataSource implements UmbCollectionDataSou
 				lastLoginDate: item.lastLoginDate || null,
 				lastLockoutDate: item.lastLockoutDate || null,
 				lastPasswordChangeDate: item.lastPasswordChangeDate || null,
-				profileData: item.profileData ?? null,
 				failedPasswordAttempts: item.failedPasswordAttempts,
 				isApproved: item.isApproved,
 				isLockedOut: item.isLockedOut,

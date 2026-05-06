@@ -1,4 +1,3 @@
-import type { UmbDocumentBlueprintItemBaseModel } from '@umbraco-cms/backoffice/document-blueprint';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
@@ -6,11 +5,6 @@ export interface UmbDocumentCreateOptionsModalData {
 	parent: UmbEntityModel;
 	documentType: {
 		unique: string;
-	} | null;
-	preselectedDocumentType?: {
-		unique: string;
-		icon?: string;
-		blueprints?: Array<UmbDocumentBlueprintItemBaseModel>;
 	} | null;
 }
 

@@ -19,13 +19,11 @@ public class DeleteMemberController : MemberControllerBase
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DeleteMemberController"/> class.
+    /// Initializes a new instance of the <see cref="DeleteMemberController"/> class, which handles member deletion operations.
     /// </summary>
     /// <param name="memberEditingService">Service used to perform member editing and deletion operations.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and authorization.</param>
-    public DeleteMemberController(
-        IMemberEditingService memberEditingService,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+    public DeleteMemberController(IMemberEditingService memberEditingService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _memberEditingService = memberEditingService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;

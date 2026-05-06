@@ -12,10 +12,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-/// <summary>
-/// Provides services for validating, creating, updating, and deleting members, including support for member data
-/// validation, password management, role assignment, and two-factor authentication operations.
-/// </summary>
 internal sealed class MemberEditingService : IMemberEditingService
 {
     private readonly IMemberService _memberService;
@@ -27,7 +23,6 @@ internal sealed class MemberEditingService : IMemberEditingService
     private readonly ILogger<MemberEditingService> _logger;
     private readonly IMemberGroupService _memberGroupService;
     private readonly SecuritySettings _securitySettings;
-    private readonly IExternalMemberService _externalMemberService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MemberEditingService"/> class.
@@ -41,7 +36,6 @@ internal sealed class MemberEditingService : IMemberEditingService
     /// <param name="logger">The <see cref="ILogger{MemberEditingService}"/> for logging.</param>
     /// <param name="memberGroupService">The <see cref="IMemberGroupService"/> for managing member groups.</param>
     /// <param name="securitySettings">The <see cref="IOptions{SecuritySettings}"/> containing security configuration.</param>
-    /// <param name="externalMemberService">The <see cref="IExternalMemberService"/> for cross-store uniqueness validation.</param>
     public MemberEditingService(
         IMemberService memberService,
         IMemberTypeService memberTypeService,
@@ -51,8 +45,7 @@ internal sealed class MemberEditingService : IMemberEditingService
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         ILogger<MemberEditingService> logger,
         IMemberGroupService memberGroupService,
-        IOptions<SecuritySettings> securitySettings,
-        IExternalMemberService externalMemberService)
+        IOptions<SecuritySettings> securitySettings)
     {
         _memberService = memberService;
         _memberTypeService = memberTypeService;
@@ -63,7 +56,6 @@ internal sealed class MemberEditingService : IMemberEditingService
         _logger = logger;
         _memberGroupService = memberGroupService;
         _securitySettings = securitySettings.Value;
-        _externalMemberService = externalMemberService;
     }
 
     /// <summary>
@@ -263,7 +255,6 @@ internal sealed class MemberEditingService : IMemberEditingService
 
     /// <summary>
     /// Asynchronously deletes a member by its unique key.
-    /// Checks for external-only members first and routes to the external member service if found.
     /// </summary>
     /// <param name="key">The unique key (identifier) of the member to delete.</param>
     /// <param name="userKey">The unique key (identifier) of the user performing the deletion.</param>
@@ -272,26 +263,6 @@ internal sealed class MemberEditingService : IMemberEditingService
     /// </returns>
     public async Task<Attempt<IMember?, MemberEditingStatus>> DeleteAsync(Guid key, Guid userKey)
     {
-        // Check if this is an external-only member and delete via the external service.
-        ExternalMemberIdentity? externalMember = await _externalMemberService.GetByKeyAsync(key);
-        if (externalMember is not null)
-        {
-            Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus> externalResult = await _externalMemberService.DeleteAsync(key);
-            return externalResult.Success
-                ? Attempt.SucceedWithStatus(
-                    new MemberEditingStatus
-                    {
-                        MemberEditingOperationStatus = MemberEditingOperationStatus.Success,
-                    },
-                    (IMember?)null)
-                : Attempt.FailWithStatus(
-                    new MemberEditingStatus
-                    {
-                        MemberEditingOperationStatus = MemberEditingOperationStatus.MemberNotFound,
-                    },
-                    (IMember?)null);
-        }
-
         Attempt<IMember?, ContentEditingOperationStatus> contentDeleteResult = await _memberContentEditingService.DeleteAsync(key, userKey);
         return contentDeleteResult.Success
             ? Attempt.SucceedWithStatus(
@@ -310,19 +281,7 @@ internal sealed class MemberEditingService : IMemberEditingService
                 contentDeleteResult.Result);
     }
 
-    /// <summary>
-    /// Checks whether the specified key belongs to an external-only member.
-    /// </summary>
-    /// <param name="key">The unique key to check.</param>
-    /// <returns><c>true</c> if the key belongs to an external-only member; otherwise, <c>false</c>.</returns>
-    public async Task<bool> IsExternalMemberAsync(Guid key)
-        => await _externalMemberService.GetByKeyAsync(key) is not null;
-
-    /// <inheritdoc />
-    public async Task<ExternalMemberIdentity?> GetExternalMemberAsync(Guid key)
-        => await _externalMemberService.GetByKeyAsync(key);
-
-    private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateMember(MemberEditingModelBase model, Guid? memberKey, string? password, Guid memberTypeKey)
+        private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateMember(MemberEditingModelBase model, Guid? memberKey, string? password, Guid memberTypeKey)
     {
         var validationErrors = new List<PropertyValidationError>();
         MemberEditingOperationStatus validationStatus = await ValidateMemberDataAsync(model, memberKey, password);
@@ -429,24 +388,10 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.DuplicateUsername;
         }
 
-        // Cross-store uniqueness: also check external members for duplicate username.
-        ExternalMemberIdentity? externalByUsername = await _externalMemberService.GetByUsernameAsync(model.Username);
-        if (externalByUsername is not null && externalByUsername.Key != memberKey)
-        {
-            return MemberEditingOperationStatus.DuplicateUsername;
-        }
-
         if (_securitySettings.MemberRequireUniqueEmail)
         {
             IMember? byEmail = _memberService.GetByEmail(model.Email);
             if (byEmail is not null && byEmail.Key != memberKey)
-            {
-                return MemberEditingOperationStatus.DuplicateEmail;
-            }
-
-            // Cross-store uniqueness: also check external members for duplicate email.
-            ExternalMemberIdentity? externalByEmail = await _externalMemberService.GetByEmailAsync(model.Email);
-            if (externalByEmail is not null && externalByEmail.Key != memberKey)
             {
                 return MemberEditingOperationStatus.DuplicateEmail;
             }

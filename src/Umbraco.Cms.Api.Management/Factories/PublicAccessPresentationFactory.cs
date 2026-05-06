@@ -1,12 +1,12 @@
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Member.Item;
 using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Api.Management.ViewModels.PublicAccess;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Security;
@@ -23,10 +23,8 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
     private readonly IEntityService _entityService;
     private readonly IMemberService _memberService;
     private readonly IUmbracoMapper _mapper;
+    private readonly IMemberRoleManager _memberRoleManager;
     private readonly IMemberPresentationFactory _memberPresentationFactory;
-    private readonly IMemberGroupService _memberGroupService;
-
-    // TODO (V19): When the obsolete constructor is removed, consider also remove the unused dependency on IMemberRoleManager.
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PublicAccessPresentationFactory"/> class.
@@ -36,37 +34,18 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
     /// <param name="mapper">The Umbraco mapper for mapping entities to response models.</param>
     /// <param name="memberRoleManager">The member role manager for resolving member groups.</param>
     /// <param name="memberPresentationFactory">The member presentation factory for creating member item response models.</param>
-    /// <param name="memberGroupService">The member group service for resolving member groups by name.</param>
-    public PublicAccessPresentationFactory(
-        IEntityService entityService,
-        IMemberService memberService,
-        IUmbracoMapper mapper,
-        IMemberRoleManager memberRoleManager,
-        IMemberPresentationFactory memberPresentationFactory,
-        IMemberGroupService memberGroupService)
-    {
-        _entityService = entityService;
-        _memberService = memberService;
-        _mapper = mapper;
-        _memberPresentationFactory = memberPresentationFactory;
-        _memberGroupService = memberGroupService;
-    }
-
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public PublicAccessPresentationFactory(
         IEntityService entityService,
         IMemberService memberService,
         IUmbracoMapper mapper,
         IMemberRoleManager memberRoleManager,
         IMemberPresentationFactory memberPresentationFactory)
-        : this(
-            entityService,
-            memberService,
-            mapper,
-            memberRoleManager,
-            memberPresentationFactory,
-            StaticServiceProvider.Instance.GetRequiredService<IMemberGroupService>())
     {
+        _entityService = entityService;
+        _memberService = memberService;
+        _mapper = mapper;
+        _memberRoleManager = memberRoleManager;
+        _memberPresentationFactory = memberPresentationFactory;
     }
 
     /// <inheritdoc/>
@@ -128,14 +107,20 @@ public class PublicAccessPresentationFactory : IPublicAccessPresentationFactory
             .Select(_memberPresentationFactory.CreateItemResponseModel)
             .ToArray();
 
-        // Resolve groups via IMemberGroupService so custom implementations (e.g. backed by an external
-        // user store) are honoured here, rather than going directly to IMemberRoleManager/IEntityService.
-        MemberGroupItemResponseModel[] memberGroups = entry.Rules
+        var allGroups = _memberRoleManager.Roles.Where(x => x.Name != null).ToDictionary(x => x.Name!);
+        IEnumerable<UmbracoIdentityRole> identityRoles = entry.Rules
             .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
-            .Select(rule => rule.RuleValue is null ? null : _memberGroupService.GetByName(rule.RuleValue))
+            .Select(rule =>
+                rule.RuleValue is not null && allGroups.TryGetValue(rule.RuleValue, out UmbracoIdentityRole? memberRole)
+                    ? memberRole
+                    : null)
             .WhereNotNull()
-            .Select(group => _mapper.Map<MemberGroupItemResponseModel>(group)!)
             .ToArray();
+
+        IEnumerable<IEntitySlim> groupsEntities = identityRoles.Any()
+            ? _entityService.GetAll(UmbracoObjectTypes.MemberGroup, identityRoles.Select(x => Convert.ToInt32(x.Id)).ToArray())
+            : Enumerable.Empty<IEntitySlim>();
+        MemberGroupItemResponseModel[] memberGroups = groupsEntities.Select(x => _mapper.Map<MemberGroupItemResponseModel>(x)!).ToArray();
 
         var responseModel = new PublicAccessResponseModel
         {
