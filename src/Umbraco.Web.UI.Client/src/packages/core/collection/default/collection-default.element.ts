@@ -102,7 +102,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 			? html`
 					<umb-body-layout header-transparent class=${this._hasItems ? 'has-items' : ''}>
 						<umb-router-slot id="router" .routes=${this._routes}></umb-router-slot>
-						${this.renderToolbar()} ${this._hasItems ? this.#renderContent() : this.#renderEmptyState()}
+						${this.renderToolbar()} ${this._hasItems ? this.#renderContent() : this.renderEmptyState()}
 					</umb-body-layout>
 				`
 			: nothing;
@@ -120,11 +120,7 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 		return html`<umb-collection-selection-actions slot="footer"></umb-collection-selection-actions>`;
 	}
 
-	#renderContent() {
-		return html`${this.renderPagination()} ${this.renderSelectionActions()}`;
-	}
-
-	#renderEmptyState() {
+	protected renderEmptyState() {
 		if (!this._initialLoadDone) return nothing;
 
 		return html`
@@ -132,6 +128,10 @@ export class UmbCollectionDefaultElement extends UmbLitElement {
 				<h4>${this.localize.string(this._emptyLabel)}</h4>
 			</div>
 		`;
+	}
+
+	#renderContent() {
+		return html`${this.renderPagination()} ${this.renderSelectionActions()}`;
 	}
 
 	static override styles = [
