@@ -43,6 +43,9 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		// Add the default observables to the instance
 		this.handleUnauthorizedAuthRetry();
 		// Add the default interceptors to the client
+		// TODO: Investigate whether some of these interceptors (e.g. addUmbGeneratedResourceInterceptor,
+		// addForbiddenResponseInterceptor, addUmbNotificationsInterceptor, addErrorInterceptor) belong
+		// somewhere else, since they are not auth-specific.
 		this.addAuthResponseInterceptor(client);
 		this.addForbiddenResponseInterceptor(client);
 		this.addUmbGeneratedResourceInterceptor(client);

@@ -1,4 +1,4 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/document-workspace.context-token.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/context/document-workspace.context-token.js';
 import type {
 	UmbDocumentDetailModel,
 	UmbDocumentVariantOptionModel,
@@ -522,8 +522,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	#hasPublishedVariant() {
 		// Use persisted data (falls back to current) because this may be called
 		// from the persistedData observer before setCurrent has run.
-		const variants = this.#documentWorkspaceContext?.getPersistedData()?.variants
-			?? this.#documentWorkspaceContext?.getVariants();
+		const variants =
+			this.#documentWorkspaceContext?.getPersistedData()?.variants ?? this.#documentWorkspaceContext?.getVariants();
 		return (
 			variants?.some(
 				(variant) =>

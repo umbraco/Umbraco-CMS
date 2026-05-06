@@ -91,4 +91,17 @@ describe('UmbDeepState', () => {
 			expect(result).to.be.false;
 		});
 	});
+
+	describe('destroy', () => {
+		it('throws when setValue is called after destroy', () => {
+			subject.destroy();
+			expect(() => subject.setValue({ key: 'some', another: 'value' })).to.throw();
+		});
+
+		it('throws when unmute is called after destroy', () => {
+			subject.mute();
+			subject.destroy();
+			expect(() => subject.unmute()).to.throw();
+		});
+	});
 });

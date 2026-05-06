@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'routable',
 		alias: UMB_DOCUMENT_WORKSPACE_ALIAS,
 		name: 'Document Workspace',
-		api: () => import('./document-workspace.context.js'),
+		api: () => import('./context/document-workspace.context.js'),
 		meta: {
 			entityType: UMB_DOCUMENT_ENTITY_TYPE,
 		},

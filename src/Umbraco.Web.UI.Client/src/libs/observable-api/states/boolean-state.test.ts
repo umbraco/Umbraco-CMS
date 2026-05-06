@@ -113,7 +113,7 @@ describe('UmbBooleanState', () => {
 		});
 	});
 
-	it('does not emit after destroy', () => {
+	it('throws when setValue is called after destroy', () => {
 		const state = new UmbBooleanState(false);
 		let amountOfCallbacks = 0;
 
@@ -125,8 +125,7 @@ describe('UmbBooleanState', () => {
 
 		state.destroy();
 
-		// Setting after destroy must not throw and must not emit.
-		expect(() => state.setValue(true)).to.not.throw();
+		expect(() => state.setValue(true)).to.throw();
 		expect(amountOfCallbacks).to.equal(1);
 	});
 });
