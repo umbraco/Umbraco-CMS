@@ -2,12 +2,14 @@ using System.Text.Json.Nodes;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Integration.Umbraco.Api.Delivery.OpenApi.Helpers;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Api.Delivery.OpenApi;
 
@@ -25,6 +27,18 @@ internal abstract class OpenApiContractTestBase : OpenApiTestBase
     private PropertyEditorCollection PropertyEditorCollection => GetRequiredService<PropertyEditorCollection>();
 
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
+
+    /// <inheritdoc />
+    protected override void CustomTestSetup(IUmbracoBuilder builder)
+    {
+        base.CustomTestSetup(builder);
+
+        // Register a test-only property editor whose Delivery API model is a polymorphic type
+        // declared with [JsonDerivedType]. Used to verify that the OpenAPI schema generator
+        // produces correctly-resolved discriminator mapping refs for framework auto-built unions.
+        builder.DataEditors().Add<PolymorphicTestPropertyEditor>();
+        builder.PropertyValueConverters().Append<PolymorphicTestPropertyValueConverter>();
+    }
 
     /// <summary>
     /// Asserts that the specified schema exists in the OpenAPI document.
@@ -80,17 +94,17 @@ internal abstract class OpenApiContractTestBase : OpenApiTestBase
 
         var schema = schemas![schemaName]!;
 
-        var oneOf = schema["oneOf"]?.AsArray();
-        Assert.That(oneOf, Is.Not.Null, $"Schema '{schemaName}' has no 'oneOf' entries.");
+        var unionEntries = schema["oneOf"]?.AsArray() ?? schema["anyOf"]?.AsArray();
+        Assert.That(unionEntries, Is.Not.Null, $"Schema '{schemaName}' has no 'oneOf' or 'anyOf' entries.");
 
-        var oneOfRefs = oneOf!
+        var unionRefs = unionEntries!
             .Select(entry => entry?["$ref"]?.GetValue<string>())
             .Where(value => value is not null)
             .ToHashSet();
         foreach (var expectedSchemaName in expectedDiscriminatorMapping.Values)
         {
             var expectedRef = $"#/components/schemas/{expectedSchemaName}";
-            Assert.That(oneOfRefs, Contains.Item(expectedRef), $"Schema '{schemaName}' 'oneOf' is missing reference to '{expectedSchemaName}'.");
+            Assert.That(unionRefs, Contains.Item(expectedRef), $"Schema '{schemaName}' union is missing reference to '{expectedSchemaName}'.");
         }
 
         var discriminator = schema["discriminator"];
@@ -151,6 +165,11 @@ internal abstract class OpenApiContractTestBase : OpenApiTestBase
         // Create a block list data type that allows the test element
         var blockListDataType = await CreateBlockListDataTypeAsync(testElement);
 
+        // Create a data type backed by the polymorphic test property editor (Delivery API model
+        // declared with [JsonDerivedType]). Used to verify that the OpenAPI generator produces
+        // discriminator mapping refs that match the registered schema names.
+        var polymorphicDataType = await CreatePolymorphicTestDataTypeAsync();
+
         // Create a composition type that exposes shared SEO metadata properties
         var seoMetadataComposition = new ContentTypeBuilder()
             .WithAlias("seoMetadata")
@@ -198,6 +217,11 @@ internal abstract class OpenApiContractTestBase : OpenApiTestBase
                     .WithAlias("relatedArticles")
                     .WithName("Related Articles")
                     .WithDataTypeId(contentPickerDataType!.Id)
+                    .Done()
+                .AddPropertyType()
+                    .WithAlias("polymorphicTest")
+                    .WithName("Polymorphic Test")
+                    .WithDataTypeId(polymorphicDataType.Id)
                     .Done()
                 .Done()
             .Build();
@@ -293,6 +317,24 @@ internal abstract class OpenApiContractTestBase : OpenApiTestBase
                 },
             },
             Name = "Content Blocks",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow,
+        };
+
+        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        return dataType;
+    }
+
+    private async Task<IDataType> CreatePolymorphicTestDataTypeAsync()
+    {
+        var editor = PropertyEditorCollection[PolymorphicTestPropertyEditor.EditorAlias]
+                     ?? throw new InvalidOperationException(
+                         $"Property editor '{PolymorphicTestPropertyEditor.EditorAlias}' was not registered.");
+
+        var dataType = new DataType(editor, ConfigurationEditorJsonSerializer)
+        {
+            Name = "Polymorphic Test",
             DatabaseType = ValueStorageType.Ntext,
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow,
