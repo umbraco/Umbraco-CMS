@@ -84,9 +84,6 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
         TOperationStatus validateResult = ValidateCreate(name, path, parentPath);
         if (Success.Equals(validateResult) is false)
         {
-            // Validation failure is a logical "no-op", not a transactional error. Complete the scope so a parent
-            // scope (e.g. a package migration) is not silently rolled back by this child failing to complete.
-            scope.Complete();
             return Task.FromResult(Attempt.FailWithStatus<TFolderModel?, TOperationStatus>(validateResult, null));
         }
 
@@ -118,9 +115,6 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
         TOperationStatus validateResult = ValidateDelete(path);
         if (Success.Equals(validateResult) is false)
         {
-            // Validation failure is a logical "no-op", not a transactional error. Complete the scope so a parent
-            // scope is not silently rolled back by this child failing to complete.
-            scope.Complete();
             return Task.FromResult(validateResult);
         }
 
@@ -141,9 +135,7 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
     /// </returns>
     protected Task<TFolderModel?> HandleGetAsync(string path)
     {
-        // Use autoComplete because this is a read-only operation; there's nothing to roll back, and an
-        // un-completed child scope would silently roll back any enclosing parent scope (e.g. a package migration).
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
         // There's not much we can actually get when it's a folder, so it more a matter of ensuring the folder exists and returning a model.
         if (_repository.FolderExists(path) is false)
@@ -157,6 +149,8 @@ internal abstract class FolderServiceOperationBase<TRepository, TFolderModel, TO
             Path = path,
             ParentPath = GetParentFolderPath(path)
         };
+
+        scope.Complete();
 
         return Task.FromResult<TFolderModel?>(result);
     }
