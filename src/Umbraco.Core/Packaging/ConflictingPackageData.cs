@@ -10,15 +10,20 @@ namespace Umbraco.Cms.Core.Packaging;
 /// </summary>
 public class ConflictingPackageData
 {
-    private readonly IFileService _fileService;
+    private readonly IStylesheetService _stylesheetService;
+    private readonly ITemplateService _templateService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ConflictingPackageData"/> class.
     /// </summary>
-    /// <param name="fileService">The file service used to check for existing files.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="fileService"/> is <c>null</c>.</exception>
-    public ConflictingPackageData(IFileService fileService)
-        => _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+    /// <param name="stylesheetService">The stylesheet service used to check for existing stylesheets.</param>
+    /// <param name="templateService">The template service used to check for existing templates.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="stylesheetService"/> or <paramref name="templateService"/> is <c>null</c>.</exception>
+    public ConflictingPackageData(IStylesheetService stylesheetService, ITemplateService templateService)
+    {
+        _stylesheetService = stylesheetService ?? throw new ArgumentNullException(nameof(stylesheetService));
+        _templateService = templateService ?? throw new ArgumentNullException(nameof(templateService));
+    }
 
     /// <summary>
     ///     Finds stylesheets in the package that already exist in the system.
@@ -36,7 +41,7 @@ public class ConflictingPackageData
                     throw new FormatException("Missing \"Name\" element");
                 }
 
-                return _fileService.GetStylesheet(xElement.Value) as IFile;
+                return _stylesheetService.GetAsync(xElement.Value).GetAwaiter().GetResult() as IFile;
             })
             .Where(v => v != null);
 
@@ -53,10 +58,10 @@ public class ConflictingPackageData
                 XElement? xElement = n.Element("Alias") ?? n.Element("alias");
                 if (xElement == null)
                 {
-                    throw new FormatException("missing a \"Alias\" element");
+                    throw new FormatException("Missing \"Alias\" element");
                 }
 
-                return _fileService.GetTemplate(xElement.Value);
+                return _templateService.GetAsync(xElement.Value).GetAwaiter().GetResult();
             })
             .WhereNotNull();
 }

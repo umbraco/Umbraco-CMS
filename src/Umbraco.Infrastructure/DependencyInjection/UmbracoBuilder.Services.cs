@@ -2,21 +2,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Packaging;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
@@ -65,7 +61,7 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<FileSystems>(),
                 factory.GetRequiredService<IEntityXmlSerializer>(),
                 factory.GetRequiredService<IDataTypeService>(),
-                factory.GetRequiredService<IFileService>(),
+                factory.GetRequiredService<IStylesheetService>(),
                 factory.GetRequiredService<IMediaService>(),
                 factory.GetRequiredService<IMediaTypeService>(),
                 factory.GetRequiredService<IContentService>(),
@@ -104,20 +100,19 @@ public static partial class UmbracoBuilderExtensions
             factory.GetRequiredService<IContentService>(),
             factory.GetRequiredService<IContentTypeService>(),
             factory.GetRequiredService<IDataTypeService>(),
-            factory.GetRequiredService<IFileService>(),
+            factory.GetRequiredService<ITemplateService>(),
+            factory.GetRequiredService<IStylesheetService>(),
             factory.GetRequiredService<ILanguageRepository>(),
             factory.GetRequiredService<IDictionaryRepository>(),
             factory.GetRequiredService<ICoreScopeProvider>(),
             factory.GetRequiredService<IHostingEnvironment>(),
             factory.GetRequiredService<IEntityXmlSerializer>(),
-            factory.GetRequiredService<IOptions<GlobalSettings>>(),
             factory.GetRequiredService<IMediaService>(),
             factory.GetRequiredService<IMediaTypeService>(),
             factory.GetRequiredService<MediaFileManager>(),
             factory.GetRequiredService<FileSystems>(),
             factory.GetRequiredService<IIdKeyMap>(),
             packageRepoFileName);
-
 
     private static LocalizedTextServiceFileSources CreateLocalizedTextServiceFileSourcesFactory(
         IServiceProvider container)

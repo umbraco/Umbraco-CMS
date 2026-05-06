@@ -2,10 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO.Compression;
 using System.Xml.Linq;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -26,10 +22,10 @@ public class PackagesRepository : ICreatedPackagesRepository
 {
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
-    private readonly string _createdPackagesFolderPath;
     private readonly IDataTypeService _dataTypeService;
+    private readonly ITemplateService _templateService;
     private readonly IIdKeyMap _idKeyMap;
-    private readonly IFileService _fileService;
+    private readonly IStylesheetService _stylesheetService;
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILanguageRepository _languageRepository;
@@ -38,46 +34,29 @@ public class PackagesRepository : ICreatedPackagesRepository
     private readonly MediaFileManager _mediaFileManager;
     private readonly IMediaService _mediaService;
     private readonly IMediaTypeService _mediaTypeService;
-    private readonly string _packageRepositoryFileName;
-    private readonly string _packagesFolderPath;
     private readonly PackageDefinitionXmlParser _parser;
     private readonly IEntityXmlSerializer _serializer;
+
+    private readonly string _createdPackagesFolderPath;
+    private readonly string _packageRepositoryFileName;
+    private readonly string _packagesFolderPath;
     private readonly string _tempFolderPath;
 
     /// <summary>
-    ///     Constructor
+    /// Initializes a new instance of the <see cref="PackagesRepository"/> class.
     /// </summary>
-    /// <param name="contentService"></param>
-    /// <param name="contentTypeService"></param>
-    /// <param name="dataTypeService"></param>
-    /// <param name="fileService"></param>
-    /// <param name="languageRepository"></param>
-    /// <param name="dictionaryRepository"></param>
-    /// <param name="scopeProvider"></param>
-    /// <param name="hostingEnvironment"></param>
-    /// <param name="serializer"></param>
-    /// <param name="globalSettings"></param>
-    /// <param name="packageRepositoryFileName">
-    ///     The file name for storing the package definitions (i.e. "createdPackages.config")
-    /// </param>
-    /// <param name="tempFolderPath"></param>
-    /// <param name="packagesFolderPath"></param>
-    /// <param name="mediaFolderPath"></param>
-    /// <param name="mediaService"></param>
-    /// <param name="mediaTypeService"></param>
-    /// <param name="mediaFileManager"></param>
-    /// <param name="fileSystems"></param>
+
     public PackagesRepository(
         IContentService contentService,
         IContentTypeService contentTypeService,
         IDataTypeService dataTypeService,
-        IFileService fileService,
+        ITemplateService templateService,
+        IStylesheetService stylesheetService,
         ILanguageRepository languageRepository,
         IDictionaryRepository dictionaryRepository,
         ICoreScopeProvider scopeProvider,
         IHostingEnvironment hostingEnvironment,
         IEntityXmlSerializer serializer,
-        IOptions<GlobalSettings> globalSettings,
         IMediaService mediaService,
         IMediaTypeService mediaTypeService,
         MediaFileManager mediaFileManager,
@@ -96,8 +75,9 @@ public class PackagesRepository : ICreatedPackagesRepository
         _contentService = contentService;
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;
+        _templateService = templateService;
         _idKeyMap = idKeyMap;
-        _fileService = fileService;
+        _stylesheetService = stylesheetService;
         _languageRepository = languageRepository;
         _dictionaryRepository = dictionaryRepository;
         _scopeProvider = scopeProvider;
@@ -609,7 +589,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            ITemplate? template = _fileService.GetTemplate(outInt);
+            ITemplate? template = _templateService.GetAsync(outInt).GetAwaiter().GetResult();
             if (template == null)
             {
                 continue;
@@ -837,7 +817,7 @@ public class PackagesRepository : ICreatedPackagesRepository
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
         }
 
-        IStylesheet? stylesheet = _fileService.GetStylesheet(path);
+        IStylesheet? stylesheet = _stylesheetService.GetAsync(path).GetAwaiter().GetResult();
         if (stylesheet == null)
         {
             return null;

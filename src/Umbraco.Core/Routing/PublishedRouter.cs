@@ -25,7 +25,7 @@ public class PublishedRouter : IPublishedRouter
     private readonly IContentTypeService _contentTypeService;
     private readonly IEventAggregator _eventAggregator;
     private readonly IDomainCache _domainCache;
-    private readonly IFileService _fileService;
+    private readonly ITemplateService _templateService;
     private readonly ILogger<PublishedRouter> _logger;
     private readonly IProfilingLogger _profilingLogger;
     private readonly IPublishedUrlProvider _publishedUrlProvider;
@@ -48,7 +48,7 @@ public class PublishedRouter : IPublishedRouter
         IPublishedUrlProvider publishedUrlProvider,
         IRequestAccessor requestAccessor,
         IPublishedValueFallback publishedValueFallback,
-        IFileService fileService,
+        ITemplateService templateService,
         IContentTypeService contentTypeService,
         IUmbracoContextAccessor umbracoContextAccessor,
         IEventAggregator eventAggregator,
@@ -66,7 +66,7 @@ public class PublishedRouter : IPublishedRouter
         _publishedUrlProvider = publishedUrlProvider;
         _requestAccessor = requestAccessor;
         _publishedValueFallback = publishedValueFallback;
-        _fileService = fileService;
+        _templateService = templateService;
         _contentTypeService = contentTypeService;
         _umbracoContextAccessor = umbracoContextAccessor;
         _eventAggregator = eventAggregator;
@@ -93,7 +93,7 @@ public class PublishedRouter : IPublishedRouter
         var creatingRequest = new CreatingRequestNotification(uri);
         await _eventAggregator.PublishAsync(creatingRequest);
 
-        var publishedRequestBuilder = new PublishedRequestBuilder(creatingRequest.Url, _fileService);
+        var publishedRequestBuilder = new PublishedRequestBuilder(creatingRequest.Url, _templateService);
         return publishedRequestBuilder;
     }
 
@@ -128,7 +128,7 @@ public class PublishedRouter : IPublishedRouter
         // store the original (if any)
         IPublishedContent? content = request.PublishedContent;
 
-        IPublishedRequestBuilder builder = new PublishedRequestBuilder(request.Uri, _fileService);
+        IPublishedRequestBuilder builder = new PublishedRequestBuilder(request.Uri, _templateService);
 
         // ensure we keep the previous domain and culture
         if (request.Domain is not null)
@@ -253,7 +253,7 @@ public class PublishedRouter : IPublishedRouter
             await HandlePublishedContent(builder);
 
             // find a template
-            FindTemplate(builder, foundContentByFinders);
+            await FindTemplateAsync(builder, foundContentByFinders);
 
             // handle umbracoRedirect
             FollowExternalRedirect(builder);
@@ -707,7 +707,7 @@ public class PublishedRouter : IPublishedRouter
     ///     If the content was found by the finders, before anything such as 404, redirect...
     ///     took place.
     /// </param>
-    private void FindTemplate(IPublishedRequestBuilder request, bool contentFoundByFinders)
+    private async Task FindTemplateAsync(IPublishedRequestBuilder request, bool contentFoundByFinders)
     {
         // TODO: We've removed the event, might need to re-add?
         // NOTE: at the moment there is only 1 way to find a template, and then ppl must
@@ -749,7 +749,7 @@ public class PublishedRouter : IPublishedRouter
             // if the template isn't assigned to the document type we should log a warning and return 404
             if (request.PublishedContent.TemplateId is int templateId && templateId != default)
             {
-                ITemplate? template = GetTemplate(templateId);
+                ITemplate? template = await GetTemplateAsync(templateId);
                 request.SetTemplate(template);
                 if (template != null)
                 {
@@ -787,36 +787,34 @@ public class PublishedRouter : IPublishedRouter
                 _logger.LogDebug("FindTemplate: Look for alternative template alias={AltTemplate}", altTemplate);
             }
 
-            // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
-            if (request.PublishedContent.IsAllowedTemplate(
-                    _fileService,
-                    _contentTypeService,
-                    _webRoutingSettings.DisableAlternativeTemplates,
-                    _webRoutingSettings.ValidateAlternativeTemplates,
-                    altTemplate))
-            {
-                // allowed, use
-                ITemplate? template = _fileService.GetTemplate(altTemplate);
+            // Resolve once and reuse: combines existence check with the alt-template policy gate
+            // (DisableAlternativeTemplates / ValidateAlternativeTemplates).
+            ITemplate? altTemplateModel = await _templateService.GetAsync(altTemplate);
+            var altTemplateAllowed = altTemplateModel != null
+                                     && request.PublishedContent.IsAllowedTemplate(
+                                         _contentTypeService,
+                                         _webRoutingSettings.DisableAlternativeTemplates,
+                                         _webRoutingSettings.ValidateAlternativeTemplates,
+                                         altTemplateModel.Id);
 
-                if (template != null)
+            if (altTemplateAllowed)
+            {
+                request.SetTemplate(altTemplateModel);
+                if (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    request.SetTemplate(template);
-                    if (_logger.IsEnabled(LogLevel.Debug))
-                    {
-                        _logger.LogDebug(
-                            "FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}",
-                            template.Id,
-                            template.Alias);
-                    }
+                    _logger.LogDebug(
+                        "FindTemplate: Got alternative template id={TemplateId} alias={TemplateAlias}",
+                        altTemplateModel!.Id,
+                        altTemplateModel.Alias);
                 }
-                else
+            }
+            else if (altTemplateModel == null)
+            {
+                if (_logger.IsEnabled(LogLevel.Debug))
                 {
-                    if (_logger.IsEnabled(LogLevel.Debug))
-                    {
-                        _logger.LogDebug(
-                            "FindTemplate: The alternative template with alias={AltTemplate} does not exist, ignoring.",
-                            altTemplate);
-                    }
+                    _logger.LogDebug(
+                        "FindTemplate: The alternative template with alias={AltTemplate} does not exist, ignoring.",
+                        altTemplate);
                 }
             }
             else
@@ -826,9 +824,9 @@ public class PublishedRouter : IPublishedRouter
                     altTemplate,
                     request.PublishedContent.Id);
 
-                // no allowed, back to default
+                // not allowed, back to default
                 var templateId = request.PublishedContent.TemplateId;
-                ITemplate? template = GetTemplate(templateId);
+                ITemplate? template = await GetTemplateAsync(templateId);
                 request.SetTemplate(template);
                 if (_logger.IsEnabled(LogLevel.Debug))
                 {
@@ -858,7 +856,7 @@ public class PublishedRouter : IPublishedRouter
         }
     }
 
-    private ITemplate? GetTemplate(int? templateId)
+    private async Task<ITemplate?> GetTemplateAsync(int? templateId)
     {
         if (templateId.HasValue == false || templateId.Value == default)
         {
@@ -875,12 +873,7 @@ public class PublishedRouter : IPublishedRouter
             _logger.LogDebug("GetTemplateModel: Get template id={TemplateId}", templateId);
         }
 
-        if (templateId == null)
-        {
-            throw new InvalidOperationException("The template is not set, the page cannot render.");
-        }
-
-        ITemplate? template = _fileService.GetTemplate(templateId.Value);
+        ITemplate? template = await _templateService.GetAsync(templateId.Value);
         if (template == null)
         {
             throw new InvalidOperationException("The template with Id " + templateId +

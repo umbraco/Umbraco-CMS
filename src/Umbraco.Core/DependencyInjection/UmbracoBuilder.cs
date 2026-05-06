@@ -336,7 +336,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IMediaTypeService, MediaTypeService>();
             Services.AddUnique<IContentTypeEditingService, ContentTypeEditingService>();
             Services.AddUnique<IMediaTypeEditingService, MediaTypeEditingService>();
-            Services.AddUnique<IFileService, FileService>();
             Services.AddUnique<ITemplateService, TemplateService>();
             Services.AddUnique<IScriptService, ScriptService>();
             Services.AddUnique<IStylesheetService, StylesheetService>();

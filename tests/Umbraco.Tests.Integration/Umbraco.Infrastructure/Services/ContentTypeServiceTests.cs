@@ -20,8 +20,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
 internal sealed partial class ContentTypeServiceTests : UmbracoIntegrationTest
 {
-    private IFileService FileService => GetRequiredService<IFileService>();
-
     private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private IContentTypeContainerService ContentTypeContainerService => GetRequiredService<IContentTypeContainerService>();
