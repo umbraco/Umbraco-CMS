@@ -7,12 +7,6 @@ const dataTypeName = 'Textstring';
 const originalText = 'Original version text';
 const updatedText = 'Updated version text';
 
-test.beforeEach(async ({umbracoApi}) => {
-  await umbracoApi.document.ensureNameNotExists(contentName);
-  await umbracoApi.document.ensureNameNotExists(renamedContentName);
-  await umbracoApi.documentType.ensureNameNotExists(documentTypeName);
-});
-
 test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.document.ensureNameNotExists(contentName);
   await umbracoApi.document.ensureNameNotExists(renamedContentName);
@@ -39,7 +33,7 @@ test('can rollback content to a previous published version', {tag: '@smoke'}, as
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, originalText);
 });
 
-test('records a rollback entry in the audit trail', async ({umbracoApi, umbracoUi}) => {
+test('can see rollback adds an entry to the audit trail', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.document.createPublishedDocumentWithTwoTextVersions(contentName, documentTypeName, dataTypeName, originalText, updatedText);
   await umbracoUi.goToBackOffice();
@@ -81,11 +75,11 @@ test('can rollback to a previous version from the tree action menu', async ({umb
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, originalText);
 });
 
-test('can rollback content with a culture variant to a previous published version', async ({umbracoApi, umbracoUi}) => {
+test('can rollback a variant document to a previous published version', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const dataTypeData = await umbracoApi.dataType.getByName(dataTypeName);
-  const documentTypeId = await umbracoApi.documentType.createVariantDocumentTypeWithInvariantPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-  const documentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, originalText, dataTypeName);
+  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id, 'TestGroup', true, true);
+  const documentId = await umbracoApi.document.createDocumentWithEnglishCultureAndTextContent(contentName, documentTypeId, originalText, dataTypeName, true);
   await umbracoApi.document.publishDocumentWithCulture(documentId, 'en-US');
   const documentData = await umbracoApi.document.get(documentId);
   documentData.values[0].value = updatedText;
@@ -106,7 +100,7 @@ test('can rollback content with a culture variant to a previous published versio
   await umbracoUi.content.isSuccessNotificationVisible();
   await umbracoUi.content.clickContentTab();
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, originalText);
-  await umbracoApi.document.verifyDocumentValueForCulture(documentId, originalText);
+  await umbracoApi.document.verifyDocumentValueWithCulture(documentId, originalText, 'en-US');
 });
 
 test('rollback restores the document name to the previous version', async ({umbracoApi, umbracoUi}) => {
@@ -133,8 +127,9 @@ test('rollback restores the document name to the previous version', async ({umbr
 
   // Assert
   await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoApi.document.verifyDocumentNameForCulture(documentId, contentName);
-  await umbracoApi.document.verifyDocumentValueForCulture(documentId, originalText);
+  await umbracoUi.content.doesDocumentHaveName(contentName);
+  await umbracoApi.document.verifyDocumentName(documentId, contentName);
+  await umbracoApi.document.verifyDocumentValue(documentId, originalText);
 });
 
 test('cancelling the rollback modal leaves the content unchanged', async ({umbracoApi, umbracoUi}) => {
@@ -154,5 +149,8 @@ test('cancelling the rollback modal leaves the content unchanged', async ({umbra
   // Assert
   await umbracoUi.content.clickContentTab();
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, updatedText);
-  await umbracoApi.document.verifyDocumentValueForCulture(documentId, updatedText);
+  await umbracoApi.document.verifyDocumentValue(documentId, updatedText);
+  await umbracoUi.content.clickInfoTab();
+  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
+  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSavedAndPublished);
 });

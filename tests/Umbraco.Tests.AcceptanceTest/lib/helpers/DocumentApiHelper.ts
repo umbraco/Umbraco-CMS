@@ -1803,13 +1803,21 @@ export class DocumentApiHelper {
     );
   }
 
-  async verifyDocumentValueForCulture(documentId: string, expectedValue: string, culture: string | null = null) {
+  async verifyDocumentValue(documentId: string, expectedValue: string) {
+    await this.verifyDocumentValueWithCulture(documentId, expectedValue, null);
+  }
+
+  async verifyDocumentValueWithCulture(documentId: string, expectedValue: string, culture: string | null) {
     const documentData = await this.get(documentId);
     const valueEntry = documentData.values.find(v => v.culture === culture);
     expect(valueEntry?.value).toBe(expectedValue);
   }
 
-  async verifyDocumentNameForCulture(documentId: string, expectedName: string, culture: string | null = null) {
+  async verifyDocumentName(documentId: string, expectedName: string) {
+    await this.verifyDocumentNameWithCulture(documentId, expectedName, null);
+  }
+
+  async verifyDocumentNameWithCulture(documentId: string, expectedName: string, culture: string | null) {
     const documentData = await this.get(documentId);
     const variantEntry = documentData.variants.find(v => v.culture === culture);
     expect(variantEntry?.name).toBe(expectedName);
