@@ -90,7 +90,7 @@ public class ElementPermissionServiceTests
             [
                 new EntitySlim
                 {
-                    NodeObjectType = Constants.ObjectTypes.ElementContainer,
+                    NodeObjectType = Constants.ObjectTypes.Element,
                     Id = ElementNodeId,
                     Path = ElementNodePath,
                 }
