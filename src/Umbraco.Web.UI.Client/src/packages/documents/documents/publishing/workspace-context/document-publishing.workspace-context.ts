@@ -19,6 +19,7 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbMergeContentVariantDataController } from '@umbraco-cms/backoffice/content';
 import {
 	UmbRequestReloadChildrenOfEntityEvent,
 	UmbRequestReloadStructureForEntityEvent,
@@ -182,7 +183,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 				this.#notificationContext?.peek('positive', notification);
 
 				// reload the document so all states are updated after the publish operation
-				await this.#documentWorkspaceContext.reload();
+				await this.#reloadPreservingUnpublishedDrafts(variantIds);
 				this.#loadAndProcessLastPublished();
 
 				// request reload of this entity
@@ -412,12 +413,72 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			this.#clear();
 
 			// reload the document so all states are updated after the publish operation
-			await this.#documentWorkspaceContext.reload();
+			await this.#reloadPreservingUnpublishedDrafts(variantIds);
 			await this.#loadAndProcessLastPublished();
 
 			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 			this.#eventContext?.dispatchEvent(event);
 		}
+	}
+
+	/**
+	 * Reload the workspace while preserving in-memory drafts for variants the user did
+	 * not select in the publish / schedule modal. Without this, `reload()` replaces
+	 * `current` with the fresh server state for every variant, silently wiping unsaved
+	 * edits in variants outside the publish scope and clearing the dirty state that
+	 * drives the unsaved-changes warning (see #22577).
+	 *
+	 * After this runs:
+	 * - `persisted` = fresh server state (correct baseline for dirty detection).
+	 * - `current` = fresh server state for `variantIds`; pre-reload drafts for every
+	 *   other edited variant.
+	 */
+	async #reloadPreservingUnpublishedDrafts(variantIds: Array<UmbVariantId>): Promise<void> {
+		if (!this.#documentWorkspaceContext) throw new Error('Document workspace context is missing');
+
+		const preReloadCurrent = this.#documentWorkspaceContext.getData();
+
+		await this.#documentWorkspaceContext.reload();
+
+		const freshServerData = this.#documentWorkspaceContext.getPersistedData();
+		if (!preReloadCurrent || !freshServerData) return;
+
+		// Mirror UmbElementWorkspaceDataManager.constructData's scope expansion: when
+		// the content varies by segment, the save scope also covers the segment variants
+		// of each selected culture (and invariant). Those segment variants were persisted
+		// server-side, so we must treat them as in-scope here too — otherwise the merge
+		// would restore pre-reload drafts over fresh server values and produce a false
+		// dirty state for segment variants that were actually saved.
+		let selectedVariants = [...variantIds];
+		let variantsToStore = [...variantIds, UmbVariantId.CreateInvariant()];
+
+		if (this.#documentWorkspaceContext.getVariesBySegment()) {
+			const dataSegments = Array.from(
+				new Set(preReloadCurrent.values.map((v) => v.segment).filter((s): s is string => !!s)),
+			);
+			variantsToStore = [
+				...variantsToStore,
+				...dataSegments.flatMap((segment) => variantsToStore.map((v) => v.toSegment(segment))),
+			];
+			selectedVariants = [
+				...selectedVariants,
+				...dataSegments.flatMap((segment) => selectedVariants.map((v) => v.toSegment(segment))),
+			];
+		}
+
+		const mergedCurrent = await new UmbMergeContentVariantDataController(this).process(
+			preReloadCurrent,
+			freshServerData,
+			this.#dedupeVariantIds(selectedVariants),
+			this.#dedupeVariantIds(variantsToStore),
+		);
+		this.#documentWorkspaceContext.setData(mergedCurrent);
+	}
+
+	#dedupeVariantIds(variantIds: Array<UmbVariantId>): Array<UmbVariantId> {
+		const byKey = new Map<string, UmbVariantId>();
+		for (const variantId of variantIds) byKey.set(variantId.toString(), variantId);
+		return [...byKey.values()];
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
