@@ -21,6 +21,7 @@ export interface UmbTreeRootItemsRequestArgs {
 export interface UmbTreeChildrenOfRequestArgs {
 	parent: UmbEntityModel;
 	foldersOnly?: boolean;
+	culture?: string | null;
 	/**
 	 * @deprecated - Deprecated from 16.3. Use paging instead. To be removed in v18.
 	 * @type {number} - The number of items to skip

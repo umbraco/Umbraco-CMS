@@ -6,6 +6,7 @@ export const UMB_SORT_CHILDREN_OF_MODAL_ALIAS = 'Umb.Modal.SortChildrenOf';
 export interface UmbSortChildrenOfModalData extends UmbEntityModel {
 	treeRepositoryAlias: string;
 	sortChildrenOfRepositoryAlias: string;
+	culture?: string | null;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

@@ -98,6 +98,7 @@ export class UmbSortChildrenOfModalElement<
 			},
 			skip: this.#pagination.getSkip(),
 			take: this.#pagination.getPageSize(),
+			culture: this.data.culture ?? null,
 		});
 
 		if (data) {
