@@ -113,12 +113,6 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 		const allowedSections = firstUser.userGroupIds?.length
 			? umbUserGroupMockDb.getAllowedSections(firstUser.userGroupIds)
 			: [];
-		const hasAccessToAllLanguages = firstUser.userGroupIds?.length
-			? umbUserGroupMockDb.getHasAccessToAllLanguages(firstUser.userGroupIds)
-			: false;
-		const languages = firstUser.userGroupIds?.length
-			? umbUserGroupMockDb.getAllowedLanguages(firstUser.userGroupIds)
-			: [];
 
 		return {
 			id: firstUser.id,
@@ -127,9 +121,9 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			userName: firstUser.email,
 			hasAccessToSensitiveData: true,
 			avatarUrls: [],
-			hasAccessToAllLanguages,
+			hasAccessToAllLanguages: true,
 			languageIsoCode: firstUser.languageIsoCode || null,
-			languages,
+			languages: [],
 			documentStartNodeIds: firstUser.documentStartNodeIds,
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,
 			hasDocumentRootAccess: firstUser.hasDocumentRootAccess,
