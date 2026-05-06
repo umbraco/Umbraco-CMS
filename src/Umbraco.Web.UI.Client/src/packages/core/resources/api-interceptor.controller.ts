@@ -305,10 +305,11 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Helper to create a new Response with correct Content-Type.
 	 * @param {unknown} body The body of the response, can be a string or an object.
-	 * @param {Response} originalResponse The original response to copy status and headers from.
+	 * @param {Response} [originalResponse] The original response to copy status and headers from, if any.
+	 * @param {number} [fallbackStatus] Status to use when no upstream response is available. Defaults to 500.
 	 * @returns {Response} The new Response object with the correct Content-Type and body.
 	 */
-	#createResponse(body: unknown, originalResponse?: Response): Response {
+	#createResponse(body: unknown, originalResponse?: Response, fallbackStatus: number = 500): Response {
 		const isString = typeof body === 'string';
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
@@ -322,7 +323,7 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		});
 
 		return new Response(responseBody, {
-			status: originalResponse?.status ?? 0,
+			status: originalResponse?.status ?? fallbackStatus,
 			statusText: originalResponse?.statusText ?? '',
 			headers: {
 				...headersOverride,
