@@ -369,18 +369,6 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             Content c = content[i] = ContentBaseFactory.BuildEntity(dto, contentType);
 
-            // Defensive check: umbracoDocument.published = 1 but no umbracoDocumentVersion row has published = 1
-            // leaves PublishedVersionDto null.
-            // See https://github.com/umbraco/Umbraco-CMS/issues/22293.
-            // Treat as unpublished here rather than running into a NRE when dereferencing PublishedVersionDto below.
-            var hasPublishedVersion = dto.PublishedVersionDto is not null;
-            if (dto.Published && hasPublishedVersion is false)
-            {
-                Logger.LogWarning(
-                    "Node {NodeKey} appears published but has no published version, indicating an inconsistent database state. Consider republishing the content. Treating as unpublished.",
-                    dto.ContentDto.NodeDto.UniqueId);
-            }
-
             if (loadTemplates)
             {
                 // need templates
@@ -390,7 +378,7 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
                     templateIds.Add(templateId.Value);
                 }
 
-                if (dto.Published && hasPublishedVersion)
+                if (dto.Published)
                 {
                     templateId = dto.PublishedVersionDto!.TemplateId;
                     if (templateId.HasValue)
@@ -402,12 +390,12 @@ public class DocumentRepository : ContentRepositoryBase<int, IContent, DocumentR
 
             // need temps, for properties, templates and variations
             var versionId = dto.DocumentVersionDto.Id;
-            var publishedVersionId = dto.Published && hasPublishedVersion ? dto.PublishedVersionDto!.Id : 0;
+            var publishedVersionId = dto.Published ? dto.PublishedVersionDto!.Id : 0;
             var temp = new TempContent<Content>(dto.NodeId, versionId, publishedVersionId, contentType, c)
             {
                 Template1Id = dto.DocumentVersionDto.TemplateId
             };
-            if (dto.Published && hasPublishedVersion)
+            if (dto.Published)
             {
                 temp.Template2Id = dto.PublishedVersionDto!.TemplateId;
             }

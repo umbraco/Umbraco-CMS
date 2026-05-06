@@ -49,9 +49,6 @@
     <Compile Update="Umbraco.Core\Extensions\StringExtensionsTests.Manipulation.cs">
       <DependentUpon>StringExtensionsTests.cs</DependentUpon>
     </Compile>
-    <Compile Update="Umbraco.Core\Extensions\StringExtensionsTests.Sanitization.cs">
-      <DependentUpon>StringExtensionsTests.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>

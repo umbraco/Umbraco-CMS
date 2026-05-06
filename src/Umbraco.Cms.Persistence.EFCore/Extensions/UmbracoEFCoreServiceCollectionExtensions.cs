@@ -31,19 +31,22 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         this IServiceCollection services,
         Action<DbContextOptionsBuilder>? optionsAction = null)
         where T : DbContext
-#pragma warning disable CS0618 // Type or member is obsolete
         => AddUmbracoDbContext<T>(services, (sp, optionsBuilder, connectionString, providerName) => optionsAction?.Invoke(optionsBuilder));
-#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
     /// </summary>
-    [Obsolete("Use the overload accepting shareUmbracoConnection. Scheduled for removal in Umbraco 19.")]
     public static IServiceCollection AddUmbracoDbContext<T>(
         this IServiceCollection services,
         Action<DbContextOptionsBuilder, string?, string?, IServiceProvider?>? optionsAction = null)
         where T : DbContext
-        => AddUmbracoDbContext<T>(services, optionsAction, shareUmbracoConnection: true);
+    {
+        return AddUmbracoDbContext<T>(services, (IServiceProvider provider, DbContextOptionsBuilder optionsBuilder, string? providerName, string? connectionString) =>
+        {
+            ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
+            optionsAction?.Invoke(optionsBuilder, connectionStrings.ConnectionString, connectionStrings.ProviderName, provider);
+        });
+    }
 
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
@@ -53,68 +56,22 @@ public static class UmbracoEFCoreServiceCollectionExtensions
         this IServiceCollection services,
         Action<IServiceProvider, DbContextOptionsBuilder>? optionsAction = null)
         where T : DbContext
-#pragma warning disable CS0618 // Type or member is obsolete
         => AddUmbracoDbContext<T>(services, (sp, optionsBuilder, connectionString, providerName) => optionsAction?.Invoke(sp, optionsBuilder));
-#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
     /// </summary>
-    [Obsolete("Use the overload accepting shareUmbracoConnection. Scheduled for removal in Umbraco 19.")]
     public static IServiceCollection AddUmbracoDbContext<T>(
         this IServiceCollection services,
         Action<IServiceProvider, DbContextOptionsBuilder, string?, string?>? optionsAction = null)
         where T : DbContext
-        => AddUmbracoDbContext<T>(services, optionsAction, shareUmbracoConnection: true);
-
-    /// <summary>
-    /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
-    /// </summary>
-    /// <param name="services">The service collection.</param>
-    /// <param name="optionsAction">An optional action to configure the DbContext options.</param>
-    /// <param name="shareUmbracoConnection">
-    /// When <c>true</c> (default), the EF Core scope shares the NPoco (Umbraco main database)
-    /// connection and transaction. Set to <c>false</c> when the DbContext targets a separate
-    /// database with its own connection string.
-    /// </param>
-    public static IServiceCollection AddUmbracoDbContext<T>(
-        this IServiceCollection services,
-        Action<DbContextOptionsBuilder, string?, string?, IServiceProvider?>? optionsAction,
-        bool shareUmbracoConnection)
-        where T : DbContext
-    {
-        return AddUmbracoDbContext<T>(
-            services,
-            (IServiceProvider provider, DbContextOptionsBuilder optionsBuilder, string? connectionString, string? providerName) =>
-            {
-                ConnectionStrings connectionStrings = GetConnectionStringAndProviderName(provider);
-                optionsAction?.Invoke(optionsBuilder, connectionStrings.ConnectionString, connectionStrings.ProviderName, provider);
-            },
-            shareUmbracoConnection);
-    }
-
-    /// <summary>
-    /// Adds a EFCore DbContext with all the services needed to integrate with Umbraco scopes.
-    /// </summary>
-    /// <param name="services">The service collection.</param>
-    /// <param name="optionsAction">An optional action to configure the DbContext options.</param>
-    /// <param name="shareUmbracoConnection">
-    /// When <c>true</c> (default), the EF Core scope shares the NPoco (Umbraco main database)
-    /// connection and transaction. Set to <c>false</c> when the DbContext targets a separate
-    /// database with its own connection string.
-    /// </param>
-    public static IServiceCollection AddUmbracoDbContext<T>(
-        this IServiceCollection services,
-        Action<IServiceProvider, DbContextOptionsBuilder, string?, string?>? optionsAction,
-        bool shareUmbracoConnection)
-        where T : DbContext
     {
         optionsAction ??= (sp, optionsBuilder, connectionString, providerName) => { };
+
 
         services.AddPooledDbContextFactory<T>((provider, optionsBuilder) => SetupDbContext(optionsAction, provider, optionsBuilder));
         services.AddTransient(services => services.GetRequiredService<IDbContextFactory<T>>().CreateDbContext());
 
-        services.AddSingleton(new EFCoreScopeConfiguration<T> { ShareUmbracoConnection = shareUmbracoConnection });
         services.AddUnique<IAmbientEFCoreScopeStack<T>, AmbientEFCoreScopeStack<T>>();
         services.AddUnique<IEFCoreScopeAccessor<T>, EFCoreScopeAccessor<T>>();
         services.AddUnique<IEFCoreScopeProvider<T>, EFCoreScopeProvider<T>>();

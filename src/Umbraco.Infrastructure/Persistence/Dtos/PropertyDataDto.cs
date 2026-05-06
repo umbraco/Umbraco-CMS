@@ -14,8 +14,6 @@ internal sealed class PropertyDataDto
     public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
     public const string PropertyTypeIdColumnName = "propertyTypeId";
     public const string VersionIdColumnName = "versionId";
-    public const string TextValueColumnName = "textValue";
-    public const string VarcharValueColumnName = "varcharValue";
     public const int VarcharLength = 512;
     public const int SegmentLength = 256;
 
@@ -95,7 +93,7 @@ internal sealed class PropertyDataDto
     /// Gets or sets the string value stored in the <c>varcharValue</c> column for this property data record.
     /// This typically contains the value of a property when stored as a variable-length string.
     /// </summary>
-    [Column(VarcharValueColumnName)]
+    [Column("varcharValue")]
     [NullSetting(NullSetting = NullSettings.Null)]
     [Length(VarcharLength)]
     public string? VarcharValue { get; set; }
@@ -103,7 +101,7 @@ internal sealed class PropertyDataDto
     /// <summary>
     /// Gets or sets the text value associated with the property data in the database.
     /// </summary>
-    [Column(TextValueColumnName)]
+    [Column("textValue")]
     [NullSetting(NullSetting = NullSettings.Null)]
     [SpecialDbType(SpecialDbTypes.NVARCHARMAX)]
     public string? TextValue { get; set; }

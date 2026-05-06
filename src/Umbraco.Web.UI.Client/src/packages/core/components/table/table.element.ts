@@ -4,9 +4,7 @@ import {
 	customElement,
 	html,
 	ifDefined,
-	keyed,
 	property,
-	ref,
 	repeat,
 	state,
 	when,
@@ -30,7 +28,6 @@ export interface UmbTableItemData {
 
 export interface UmbTableColumn {
 	name: string;
-	/** Unique identifier for the column — must be unique within a given table instance, as it is used as the key for header and cell reconciliation. */
 	alias: string;
 	elementName?: string;
 	width?: string;
@@ -151,9 +148,6 @@ export class UmbTableElement extends UmbLitElement {
 	@property({ type: Array, attribute: false })
 	public selection: Array<string> = [];
 
-	@property({ attribute: false })
-	public onRowRendered?: (element: HTMLElement | undefined, item: UmbTableItem) => void;
-
 	@property({ type: String, attribute: false })
 	public orderingColumn = '';
 
@@ -182,29 +176,11 @@ export class UmbTableElement extends UmbLitElement {
 	@state()
 	private _selectionMode = false;
 
-	#lastColumnKey = '';
-
 	override updated(changedProperties: Map<string | number | symbol, unknown>) {
 		super.updated(changedProperties);
 		if (changedProperties.has('selection')) {
 			this._selectionMode = this.selection.length > 0;
 		}
-
-		// The `keyed` directive in `render()` rebuilds the `<uui-table>` element when the column
-		// signature changes. The sorter caches its container element on first initialization, so
-		// when the table is replaced we need to reattach it to the fresh node.
-		if (changedProperties.has('columns') && this._sortable) {
-			const columnKey = this.#getColumnKey();
-			if (columnKey !== this.#lastColumnKey) {
-				this.#lastColumnKey = columnKey;
-				this.#sorter.disable();
-				this.#sorter.enable();
-			}
-		}
-	}
-
-	#getColumnKey() {
-		return JSON.stringify(this.columns.map((column) => column.alias));
 	}
 
 	#sorter = new UmbSorterController<UmbTableItem>(this, {
@@ -303,26 +279,15 @@ export class UmbTableElement extends UmbLitElement {
 
 	override render() {
 		const style = !(this.config.allowSelection === false && this.config.hideIcon === true) ? 'width: 60px' : undefined;
-		// Firefox's `display: table-*` engine does not reliably relayout when cells are
-		// inserted or removed from existing rows. Key the whole table on the column
-		// signature so the table is rebuilt whenever the column set changes.
-		return keyed(
-			this.#getColumnKey(),
-			html`
-				<uui-table class="uui-text">
-					<uui-table-column style=${ifDefined(style)}></uui-table-column>
-					<uui-table-head>
-						${this._renderHeaderCheckboxCell()}
-						${repeat(
-							this.columns,
-							(column) => column.alias,
-							(column) => this._renderHeaderCell(column),
-						)}
-					</uui-table-head>
-					${repeat(this.items, (item) => item.id, this._renderRow)}
-				</uui-table>
-			`,
-		);
+		return html`
+			<uui-table class="uui-text">
+				<uui-table-column style=${ifDefined(style)}></uui-table-column>
+				<uui-table-head>
+					${this._renderHeaderCheckboxCell()} ${this.columns.map((column) => this._renderHeaderCell(column))}
+				</uui-table-head>
+				${repeat(this.items, (item) => item.id, this._renderRow)}
+			</uui-table>
+		`;
 	}
 
 	private _renderHeaderCell(column: UmbTableColumn) {
@@ -369,21 +334,13 @@ export class UmbTableElement extends UmbLitElement {
 		const isItemSelectable = this.#isSelectableItem(item);
 		return html`
 			<uui-table-row
-				${ref((el) => {
-					this.onRowRendered?.(el as HTMLElement | undefined, item);
-				})}
 				data-sortable-id=${item.id}
 				?selectable=${this.config.allowSelection && !this._sortable && isItemSelectable}
 				?select-only=${this._selectionMode || this.config.selectOnly}
 				?selected=${this._isSelected(item.id)}
 				@selected=${() => this._selectRow(item)}
 				@deselected=${() => this._deselectRow(item)}>
-				${this._renderRowCheckboxCell(item)}
-				${repeat(
-					this.columns,
-					(column) => column.alias,
-					(column) => this._renderRowCell(column, item),
-				)}
+				${this._renderRowCheckboxCell(item)} ${this.columns.map((column) => this._renderRowCell(column, item))}
 			</uui-table-row>
 		`;
 	};
@@ -421,11 +378,12 @@ export class UmbTableElement extends UmbLitElement {
 	private _renderRowCell(column: UmbTableColumn, item: UmbTableItem) {
 		return html`
 			<uui-table-cell
-				style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ??
-				'left'}; width: ${column.width || 'auto'};"
-				?clip-text=${column.clipText}>
-				${this._renderCellContent(column, item)}
+				style="--uui-table-cell-padding: 0 var(--uui-size-5); text-align:${column.align ?? 'left'}; width: ${column.width || 'auto'};"
+				?clip-text=${column.clipText}
+				>
+					${this._renderCellContent(column, item)}
 			</uui-table-cell>
+		</uui-table-cell>
 		`;
 	}
 

@@ -25,14 +25,9 @@ internal sealed class MemberCacheService : IMemberCacheService
     public async Task<IPublishedMember?> Get(IMember member) => member is null ? null : _publishedContentFactory.ToPublishedMember(member);
 
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
-        => _databaseCacheRepository.Rebuild(
-            null,
-            null,
-            contentTypeIds.ToList(),
-            action =>
-            {
-                using ICoreScope scope = _scopeProvider.CreateCoreScope();
-                action();
-                scope.Complete();
-            });
+    {
+        using ICoreScope scope = _scopeProvider.CreateCoreScope();
+        _databaseCacheRepository.Rebuild(memberTypeIds: contentTypeIds.ToList());
+        scope.Complete();
+    }
 }

@@ -11,7 +11,6 @@ export * from './modals/index.js';
 export * from './paths.js';
 export * from './publishing/index.js';
 export * from './recycle-bin/index.js';
-export * from './redirect-management/index.js';
 export * from './reference/index.js';
 export * from './repository/index.js';
 export * from './search/index.js';

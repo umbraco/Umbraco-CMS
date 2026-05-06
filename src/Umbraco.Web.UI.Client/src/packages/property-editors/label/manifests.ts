@@ -10,7 +10,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Label',
 			icon: 'icon-readonly',
 			group: 'common',
-			keywords: ['readonly', 'display', 'static', 'computed', 'info', 'key', 'id'],
 			propertyEditorSchemaAlias: 'Umbraco.Label',
 			supportsReadOnly: true,
 			settings: {

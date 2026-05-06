@@ -7,6 +7,7 @@ import { MediaService } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbMediaTypeDetailServerDataSource } from '@umbraco-cms/backoffice/media-type';
+import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 
 /**
@@ -22,6 +23,9 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 	 * @memberof UmbMediaServerDataSource
 	 */
 	async createScaffold(preset: UmbDeepPartialObject<UmbMediaDetailModel> = {}) {
+		let mediaTypeIcon: string | null = null;
+		let mediaTypeCollection: UmbReferenceByUnique | null = null;
+
 		const mediaTypeUnique = preset.mediaType?.unique;
 
 		if (!mediaTypeUnique) {
@@ -29,8 +33,8 @@ export class UmbMediaServerDataSource extends UmbControllerBase implements UmbDe
 		}
 
 		const { data } = await new UmbMediaTypeDetailServerDataSource(this).read(mediaTypeUnique);
-		const mediaTypeIcon = data?.icon ?? null;
-		const mediaTypeCollection = data?.collection ?? null;
+		mediaTypeIcon = data?.icon ?? null;
+		mediaTypeCollection = data?.collection ?? null;
 
 		const defaultData: UmbMediaDetailModel = {
 			entityType: UMB_MEDIA_ENTITY_TYPE,

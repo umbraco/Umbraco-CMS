@@ -23,7 +23,6 @@ import {RedirectManagementUiHelper} from './RedirectManagementUiHelper';
 import {MemberGroupUiHelper} from "./MemberGroupUiHelper";
 import {MemberUiHelper} from "./MemberUiHelper";
 import {MemberTypeUiHelper} from "./MemberTypeUiHelper";
-import {MemberAuthenticationUiHelper} from "./MemberAuthenticationUiHelper";
 import {MediaTypeUiHelper} from "./MediaTypeUiHelper";
 import {UserUiHelper} from "./UserUiHelper";
 import {UserGroupUiHelper} from "./UserGroupUiHelper";
@@ -65,7 +64,6 @@ export class UiHelpers {
   memberGroup: MemberGroupUiHelper;
   member: MemberUiHelper;
   memberType: MemberTypeUiHelper;
-  memberAuthentication: MemberAuthenticationUiHelper;
   mediaType: MediaTypeUiHelper;
   user: UserUiHelper;
   userGroup: UserGroupUiHelper;
@@ -106,7 +104,6 @@ export class UiHelpers {
     this.memberGroup = new MemberGroupUiHelper(this.page);
     this.member = new MemberUiHelper(this.page);
     this.memberType = new MemberTypeUiHelper(this.page);
-    this.memberAuthentication = new MemberAuthenticationUiHelper(this.page);
     this.mediaType = new MediaTypeUiHelper(this.page);
     this.user = new UserUiHelper(this.page);
     this.userGroup = new UserGroupUiHelper(this.page);

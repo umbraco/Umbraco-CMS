@@ -517,6 +517,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 		return html`
 			<div class="variant segment-variant ${this.#isVariantActive(variantId) ? 'selected' : ''}">
+				${notCreated ? nothing : html`<div class="expand-area"></div>`}
 				<button
 					class="switch-button ${notCreated ? 'add-mode' : ''} ${this.#isReadOnlyCulture(variantId.culture)
 						? 'readonly-mode'
@@ -712,7 +713,11 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			}
 
 			.expand-area + .switch-button {
-				padding-left: var(--uui-size-space-1);
+				padding-left: var(--uui-size-space-3);
+			}
+
+			.segment-variant > .switch-button {
+				padding-left: var(--uui-size-space-6);
 			}
 
 			.switch-button:hover {
@@ -753,14 +758,6 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 			.switch-button.add-mode {
 				position: relative;
 				color: var(--uui-palette-dusty-grey-dark);
-				padding-left: var(--uui-size-space-4);
-			}
-
-			.segment-variant > .switch-button {
-				padding-left: var(--uui-size-space-6);
-			}
-			.segment-variant > .switch-button:not(.add-mode) {
-				padding-left: var(--uui-size-16);
 			}
 
 			.switch-button.add-mode:after {
@@ -786,7 +783,7 @@ export class UmbWorkspaceSplitViewVariantSelectorElement<
 
 			.add-icon {
 				font-size: var(--uui-type-small-size);
-				margin-right: var(--uui-size-space-4);
+				margin-right: 21px;
 			}
 
 			.split-view {

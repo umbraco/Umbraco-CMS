@@ -9,7 +9,6 @@ export const manifest: ManifestPropertyEditorUi = {
 		label: 'Document Type Picker',
 		icon: 'icon-document-dashed-line',
 		group: 'advanced',
-		keywords: ['doctype', 'type', 'element', 'schema', 'pick'],
 		supportsReadOnly: true,
 		settings: {
 			properties: [

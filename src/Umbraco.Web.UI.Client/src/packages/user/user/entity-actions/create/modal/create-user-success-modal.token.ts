@@ -1,10 +1,8 @@
-import type { UmbUserKindType } from '../../../utils/index.js';
 import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 
 export interface UmbCreateUserSuccessModalData {
 	user: {
 		unique: string;
-		kind: UmbUserKindType;
 	};
 }
 

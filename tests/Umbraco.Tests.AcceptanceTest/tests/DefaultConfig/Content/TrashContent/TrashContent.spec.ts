@@ -40,16 +40,6 @@ test('can trash an invariant content node', {tag: '@smoke'}, async ({umbracoApi,
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
-  // Verify audit trail
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickInfoTab();
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.delete);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentDeleted);
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move, 1);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved, 1);
-  const currentUser = await umbracoApi.user.getCurrentUser();
-  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
-  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name, 1);
 });
 
 test('can trash a variant content node', async ({umbracoApi, umbracoUi}) => {
@@ -70,16 +60,6 @@ test('can trash a variant content node', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.document.doesNameExist(contentName)).toBeFalsy();
   await umbracoUi.content.isItemVisibleInRecycleBin(contentName);
   expect(await umbracoApi.document.doesItemExistInRecycleBin(contentName)).toBeTruthy();
-    // Verify audit trail
-  await umbracoUi.content.goToContentWithName(contentName);
-  await umbracoUi.content.clickInfoTab();
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.delete);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentDeleted);
-  await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move, 1);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved, 1);
-  const currentUser = await umbracoApi.user.getCurrentUser();
-  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
-  await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name, 1);
 });
 
 test('can trash a published content node', async ({umbracoApi, umbracoUi}) => {

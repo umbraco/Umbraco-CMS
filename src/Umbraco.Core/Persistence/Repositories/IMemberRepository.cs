@@ -69,11 +69,5 @@ public interface IMemberRepository : IContentRepository<int, IMember>
     /// </summary>
     /// <param name="member">The member to update.</param>
     /// <returns>Used to avoid the full save of the member object after a login operation.</returns>
-    /// <remarks>
-    ///     Updates only the login-related columns (<c>LastLoginDate</c>, <c>SecurityStampToken</c>).
-    ///     Deliberately does <em>not</em> touch <c>UpdateDate</c> or the corresponding
-    ///     <c>ContentVersionDto.VersionDate</c> — those reflect real edits to the member, not login
-    ///     activity. The member index is consequently not refreshed for login-only updates.
-    /// </remarks>
     Task UpdateLoginPropertiesAsync(IMember member) => Task.CompletedTask;
 }
