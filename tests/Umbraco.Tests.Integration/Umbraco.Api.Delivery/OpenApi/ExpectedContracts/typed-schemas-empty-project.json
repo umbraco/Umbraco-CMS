@@ -1161,10 +1161,7 @@
           "focalPoint",
           "crops"
         ],
-        "type": [
-          "null",
-          "object"
-        ],
+        "type": "object",
         "properties": {
           "url": {
             "type": "string"
@@ -1907,7 +1904,14 @@
         "type": "object",
         "properties": {
           "umbracoFile": {
-            "$ref": "#/components/schemas/ApiImageCropperValueModel"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ApiImageCropperValueModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "umbracoWidth": {
             "type": [

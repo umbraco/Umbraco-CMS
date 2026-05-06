@@ -1174,10 +1174,7 @@
         "required": [
           "items"
         ],
-        "type": [
-          "null",
-          "object"
-        ],
+        "type": "object",
         "properties": {
           "items": {
             "type": "array",
@@ -1193,10 +1190,7 @@
           "focalPoint",
           "crops"
         ],
-        "type": [
-          "null",
-          "object"
-        ],
+        "type": "object",
         "properties": {
           "url": {
             "type": "string"
@@ -1262,7 +1256,14 @@
             ]
           },
           "bodyText": {
-            "$ref": "#/components/schemas/RichTextModel"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RichTextModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "publishDate": {
             "type": [
@@ -1272,7 +1273,14 @@
             "format": "date-time"
           },
           "relatedArticles": {
-            "$ref": "#/components/schemas/IApiContentModel"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IApiContentModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -2049,7 +2057,14 @@
         "type": "object",
         "properties": {
           "umbracoFile": {
-            "$ref": "#/components/schemas/ApiImageCropperValueModel"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ApiImageCropperValueModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "umbracoWidth": {
             "type": [
@@ -2123,10 +2138,24 @@
             ]
           },
           "introduction": {
-            "$ref": "#/components/schemas/RichTextModel"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RichTextModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "contentBlocks": {
-            "$ref": "#/components/schemas/ApiBlockListModel"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ApiBlockListModel"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false
@@ -2210,10 +2239,7 @@
           "markup",
           "blocks"
         ],
-        "type": [
-          "null",
-          "object"
-        ],
+        "type": "object",
         "properties": {
           "markup": {
             "type": "string"
@@ -2604,7 +2630,10 @@
             ]
           },
           "thumbnailImage": {
-            "type": "array",
+            "type": [
+              "null",
+              "array"
+            ],
             "items": {
               "$ref": "#/components/schemas/IApiMediaWithCropsModel"
             }
