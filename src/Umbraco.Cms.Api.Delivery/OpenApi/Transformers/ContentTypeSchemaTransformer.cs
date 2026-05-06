@@ -140,7 +140,9 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
     /// </remarks>
     private static void FixAutoBuiltDiscriminatorMapping(OpenApiDocument document, string parentSchemaId, IOpenApiSchema schema)
     {
-        if (schema is not OpenApiSchema concrete || concrete.Discriminator?.Mapping is not { } mapping)
+        if (schema is not OpenApiSchema concrete
+            || concrete.Discriminator?.Mapping is not { } mapping
+            || document.Components?.Schemas is not { } schemas)
         {
             return;
         }
@@ -148,7 +150,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         foreach ((var key, OpenApiSchemaReference currentRef) in mapping.ToList())
         {
             var targetId = currentRef.Reference.Id;
-            if (string.IsNullOrEmpty(targetId) || document.Components?.Schemas?.ContainsKey(targetId) == true)
+            if (string.IsNullOrEmpty(targetId) || schemas.ContainsKey(targetId))
             {
                 continue;
             }
@@ -159,7 +161,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             }
 
             var stripped = targetId[parentSchemaId.Length..];
-            if (document.Components?.Schemas?.ContainsKey(stripped) == true)
+            if (schemas.ContainsKey(stripped))
             {
                 mapping[key] = new OpenApiSchemaReference(stripped, document);
             }
