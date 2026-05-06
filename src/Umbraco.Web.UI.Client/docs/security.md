@@ -122,6 +122,7 @@ const response = await client.getById({ id });
 **Template Security** (Lit):
 
 ```typescript
+import { html, unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { sanitizeHTML, escapeHTML } from '@umbraco-cms/backoffice/utils';
 
 // Lit automatically escapes content in templates

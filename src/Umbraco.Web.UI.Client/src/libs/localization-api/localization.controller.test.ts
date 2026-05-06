@@ -461,6 +461,13 @@ describe('UmbLocalizationController', () => {
 			expect(host.innerHTML, 'XSS detected').to.not.contain('<script>');
 			expect(host.innerHTML).to.contain('&lt;script&gt;');
 		});
+
+		it('should HTML-escape the toString() representation of non-string args', async () => {
+			const xss = { toString: () => '<script>alert("XSS")</script>' };
+			const host = await fixture<HTMLElement>(html`<div>${controller.htmlString('#withInlineToken', xss, '')}</div>`);
+			expect(host.innerHTML, 'XSS via toString detected').to.not.contain('<script>');
+			expect(host.innerHTML).to.contain('&lt;script&gt;');
+		});
 	});
 
 	describe('host element', () => {
