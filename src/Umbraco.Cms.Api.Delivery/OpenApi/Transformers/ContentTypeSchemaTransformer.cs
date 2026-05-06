@@ -122,12 +122,48 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
             return Task.CompletedTask;
         }
 
-        foreach (IOpenApiSchema componentsSchema in document.Components.Schemas.Values)
+        foreach ((var schemaId, IOpenApiSchema componentsSchema) in document.Components.Schemas)
         {
             ResolveSchemaReferences(document, componentsSchema);
+            FixAutoBuiltDiscriminatorMapping(document, schemaId, componentsSchema);
         }
 
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Repairs broken discriminator mapping refs auto-built by the framework for polymorphic types.
+    /// </summary>
+    /// <remarks>
+    /// The framework prefixes each ref with the base schema id, but the derived schemas are
+    /// registered without that prefix. Stripping the prefix recovers the correct ref.
+    /// </remarks>
+    private static void FixAutoBuiltDiscriminatorMapping(OpenApiDocument document, string parentSchemaId, IOpenApiSchema schema)
+    {
+        if (schema is not OpenApiSchema concrete || concrete.Discriminator?.Mapping is not { } mapping)
+        {
+            return;
+        }
+
+        foreach ((var key, OpenApiSchemaReference currentRef) in mapping.ToList())
+        {
+            var targetId = currentRef.Reference.Id;
+            if (string.IsNullOrEmpty(targetId) || document.Components?.Schemas?.ContainsKey(targetId) == true)
+            {
+                continue;
+            }
+
+            if (targetId.StartsWith(parentSchemaId, StringComparison.Ordinal) is false)
+            {
+                continue;
+            }
+
+            var stripped = targetId[parentSchemaId.Length..];
+            if (document.Components?.Schemas?.ContainsKey(stripped) == true)
+            {
+                mapping[key] = new OpenApiSchemaReference(stripped, document);
+            }
+        }
     }
 
     /// <inheritdoc />
