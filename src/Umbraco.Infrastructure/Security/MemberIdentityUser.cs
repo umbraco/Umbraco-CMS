@@ -1,6 +1,4 @@
 using System.Globalization;
-using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security;
 
@@ -9,13 +7,13 @@ namespace Umbraco.Cms.Core.Security;
 /// </summary>
 public class MemberIdentityUser : UmbracoIdentityUser
 {
-    // Custom comparer for enumerables
-    private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> _groupsComparer = new(
-        (groups, enumerable) =>
-            groups?.Select(x => x.Alias).UnsortedSequenceEqual(enumerable?.Select(x => x.Alias)) ?? false,
-        groups => groups.GetHashCode());
-
+    // IDE0032: explicit backing fields are required because the Comments and ProfileData setters pass them by ref
+    // to BeingDirty.SetPropertyValueAndDetectChanges for change detection.
+    // Converting to auto-properties would silently remove the dirty tracking.
+#pragma warning disable IDE0032 // Use auto property
     private string? _comments;
+    private string? _profileData;
+#pragma warning restore IDE0032 // Use auto property
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MemberIdentityUser" /> class.
@@ -64,6 +62,38 @@ public class MemberIdentityUser : UmbracoIdentityUser
     ///     Gets or sets the alias of the member type
     /// </summary>
     public string? MemberTypeAlias { get; set; }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether this member exists only as an external identity
+    ///     (backed by the lightweight umbracoExternalMember table, not the content system).
+    /// </summary>
+    /// <remarks>No change tracking because this is a routing flag set at load time.</remarks>
+    public bool IsExternalOnly { get; set; }
+
+    /// <summary>
+    ///     Gets or sets arbitrary profile data as a JSON string.
+    ///     Only used for external-only members. For content-based members, profile data
+    ///     lives in content properties and this value is null.
+    /// </summary>
+    /// <remarks>
+    ///     Dirty-tracked so that login-path routing (see <c>MemberUserStore.UpdateExternalMemberAsync</c>)
+    ///     can detect when an <c>OnExternalLogin</c> callback refreshes profile data and route to the
+    ///     full update path — ensuring the change is persisted and the member index is refreshed.
+    /// </remarks>
+    public string? ProfileData
+    {
+        get => _profileData;
+        set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _profileData, nameof(ProfileData));
+    }
+
+    /// <summary>
+    ///     Deserialises the <see cref="ProfileData"/> JSON string into a typed object.
+    /// </summary>
+    /// <typeparam name="T">The type to deserialise to.</typeparam>
+    /// <param name="options">Optional JSON serializer options. If null, the default <see cref="System.Text.Json.JsonSerializer"/> options are used.</param>
+    /// <returns>The deserialised object, or <c>default</c> if <see cref="ProfileData"/> is null or empty.</returns>
+    public T? GetProfileData<T>(System.Text.Json.JsonSerializerOptions? options = null) where T : class =>
+        string.IsNullOrEmpty(ProfileData) ? default : System.Text.Json.JsonSerializer.Deserialize<T>(ProfileData, options);
 
     /// <summary>
     ///     Creates a new <see cref="MemberIdentityUser"/> instance without assigning an identity.
