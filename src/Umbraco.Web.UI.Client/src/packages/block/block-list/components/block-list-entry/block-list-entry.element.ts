@@ -242,7 +242,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		);
 		this.observe(
 			this.#context.readOnlyGuard.permitted,
-			(isReadOnly) => (this._isReadOnly = isReadOnly),
+			(isReadOnly) => {
+				this._isReadOnly = isReadOnly;
+				this.#updateBlockViewProps({ readonly: isReadOnly });
+			},
 			'umbReadOnlyObserver',
 		);
 	}
@@ -377,6 +380,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
+				.readOnly=${this._isReadOnly}
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
@@ -391,6 +395,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 			.icon=${this._icon}
 			.index=${this._blockViewProps.index}
 			.unpublished=${!this._exposed}
+			.readOnly=${this._isReadOnly}
 			.config=${this._blockViewProps.config}
 			.content=${this._blockViewProps.content}
 			.settings=${this._blockViewProps.settings}
@@ -455,7 +460,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderEditContentAction() {
-		if (this._isReadOnly) return nothing;
 		return this._showContentEdit && this._workspaceEditContentPath
 			? html`<uui-button
 					label="edit"
@@ -479,7 +483,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderEditSettingsAction() {
-		if (this._isReadOnly) return nothing;
 		return html`
 			${this._hasSettings && this._workspaceEditSettingsPath
 				? html`<uui-button
@@ -499,7 +502,11 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#renderDeleteAction() {
 		if (this._isReadOnly) return nothing;
-		return html` <uui-button label="delete" look="secondary" @click=${() => this.#context.requestDelete()} title=${this.localize.term('general_delete')}>
+		return html` <uui-button
+			label="delete"
+			look="secondary"
+			@click=${() => this.#context.requestDelete()}
+			title=${this.localize.term('general_delete')}>
 			<uui-icon name="icon-remove"></uui-icon>
 		</uui-button>`;
 	}
