@@ -1192,7 +1192,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
             }
 
             TryGetParentKey(parentId, out Guid? parentKey);
-            var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId, parentKey);
+            var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentKey);
 
             var movingNotification = new ContentMovingNotification(moveEventInfo, eventMessages);
             if (scope.Notifications.PublishCancelable(movingNotification))
@@ -1226,7 +1226,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 .Select(x =>
                 {
                     TryGetParentKey(x.Item1.ParentId, out Guid? itemParentKey);
-                    return new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId, itemParentKey);
+                    return new MoveEventInfo<IContent>(x.Item1, x.Item2, itemParentKey);
                 })
                 .ToArray();
 

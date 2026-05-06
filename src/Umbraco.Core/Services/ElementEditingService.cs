@@ -316,12 +316,12 @@ internal sealed class ElementEditingService
             userKey,
             (elem, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, containerKey);
                 return new ElementMovingNotification(moveEventInfo, eventMessages);
             },
             (elem, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, containerKey);
                 return new ElementMovedNotification(moveEventInfo, eventMessages);
             });
 
