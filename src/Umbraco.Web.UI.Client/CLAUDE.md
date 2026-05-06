@@ -22,6 +22,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 
 ### Code Quality
 - **[Style Guide](./docs/style-guide.md)** - Naming and formatting conventions
+- **[Design Choices](./docs/design-choices.md)** - Visual restraint: icons, colours, buttons, and UX copy
 - **[Clean Code](./docs/clean-code.md)** - Best practices and SOLID principles
 - **[Deprecation](./docs/deprecation.md)** - Breaking changes policy, deprecation patterns (JSDoc + UmbDeprecation)
 - **[Testing](./docs/testing.md)** - Testing strategy, priority by code area, MSW mocking, test patterns
@@ -44,6 +45,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 |----------------|------|
 | Deprecate or remove a public API | [docs/deprecation.md](./docs/deprecation.md) — requires **both** `@deprecated` JSDoc **and** runtime `UmbDeprecation` warning |
 | Create a new element or component | [docs/style-guide.md](./docs/style-guide.md) |
+| Build, style, or write copy for any UI | [docs/design-choices.md](./docs/design-choices.md) — default to no icon, no colour, terse contextual copy |
 | Create a repository or data source | [docs/repositories.md](./docs/repositories.md) + [docs/data-flow.md](./docs/data-flow.md) |
 | Add error handling or debugging | [docs/error-handling.md](./docs/error-handling.md) |
 | Write or modify tests | [docs/testing.md](./docs/testing.md) |
