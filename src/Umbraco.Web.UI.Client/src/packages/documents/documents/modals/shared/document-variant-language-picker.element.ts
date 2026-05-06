@@ -1,4 +1,5 @@
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../types.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
+import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { sortVariants } from '../../utils.js';
 import type { UUIBooleanInputElement } from '@umbraco-cms/backoffice/external/uui';
 import {

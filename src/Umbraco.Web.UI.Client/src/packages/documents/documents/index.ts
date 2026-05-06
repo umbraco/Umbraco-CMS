@@ -17,6 +17,7 @@ export * from './search/index.js';
 export * from './tree/index.js';
 export * from './url/index.js';
 export * from './user-permissions/index.js';
+export * from './variant-state.js';
 
 export { UMB_CONTENT_MENU_ALIAS } from './menu/manifests.js';
 export { UMB_DOCUMENT_COLLECTION_ALIAS } from './collection/constants.js';
