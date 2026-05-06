@@ -45,6 +45,8 @@ public class DatabaseSchemaCreator
         typeof(MemberPropertyTypeDto),
         typeof(MemberDto),
         typeof(Member2MemberGroupDto),
+        typeof(ExternalMemberDto),
+        typeof(ExternalMember2MemberGroupDto),
         typeof(PropertyTypeGroupDto),
         typeof(PropertyTypeDto),
         typeof(PropertyDataDto),
