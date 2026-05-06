@@ -143,7 +143,7 @@ render() {
 	return html`<div>${unsafeHTML(this.localize.string('#someKey_withHtml', escapeHTML(this.userContent)))}</div>`;
 
 	// Safe - <umb-localize> component automatically escapes arguments
-	return unsafeHTML(html`<umb-localize key="someKey_withHtml" .args=${[ this.userContent ]}></umb-localize>`);
+	return html`<umb-localize key="someKey_withHtml" .args=${[ this.userContent ]}></umb-localize>`;
 }
 ```
 
