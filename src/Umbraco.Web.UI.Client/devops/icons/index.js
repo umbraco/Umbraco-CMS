@@ -99,6 +99,7 @@ const collectDictionaryIcons = async () => {
 					output: `${iconsOutputDirectory}/${iconFileName}.ts`,
 					keywords,
 					groups,
+					related: iconDef.related,
 				};
 
 				icons.push(icon);
@@ -133,6 +134,7 @@ const collectDictionaryIcons = async () => {
 					output: `${iconsOutputDirectory}/${iconFileName}.ts`,
 					keywords: iconDef.keywords,
 					groups: iconDef.groups,
+					related: iconDef.related,
 				};
 
 				icons.push(icon);
@@ -161,6 +163,7 @@ const collectDictionaryIcons = async () => {
 					output: `${iconsOutputDirectory}/${iconFileName}.ts`,
 					keywords: iconDef.keywords,
 					groups: iconDef.groups,
+					related: iconDef.related,
 				};
 
 				icons.push(icon);
@@ -190,6 +193,7 @@ const collectDictionaryIcons = async () => {
 						output: `${iconsOutputDirectory}/${iconFileName}.ts`,
 						keywords: iconDef.keywords,
 						groups: iconDef.groups,
+						related: iconDef.related,
 					};
 
 					icons.push(icon);
@@ -263,6 +267,7 @@ const generateJS = (icons) => {
 			${icon.hidden || icon.legacy ? 'hidden: true,' : ''}
 			${icon.keywords?.length ? `keywords: ${JSON.stringify(icon.keywords)},` : ''}
 			${icon.groups?.length ? `groups: ${JSON.stringify(icon.groups)},` : ''}
+			${icon.related?.length ? `related: ${JSON.stringify(icon.related)},` : ''}
 			path: () => import("./icons/${icon.fileName}.js"),
 		}`
 			.replace(/\t/g, '') // Regex removes white space [NL]

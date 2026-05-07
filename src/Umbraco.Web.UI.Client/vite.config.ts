@@ -48,7 +48,7 @@ export default defineConfig({
 		sourcemap: true,
 		rollupOptions: {
 			input: {
-				main: new URL('index.html', import.meta.url).pathname,
+				main: new URL('index.html', import.meta.url).pathname, // Vite should only load the main index.html file
 			},
 		},
 	},
