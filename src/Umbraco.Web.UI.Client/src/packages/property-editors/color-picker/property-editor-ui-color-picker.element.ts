@@ -55,7 +55,9 @@ export class UmbPropertyEditorUIColorPickerElement
 
 	#syncLabelFromSwatches() {
 		if (!this.value || this._swatches.length === 0) return;
-		const match = this._swatches.find((swatch) => swatch.value === this.value!.value);
+		// Compare case-insensitively to match legacy/inconsistently-cased stored values (e.g. "#FF0000" vs "#ff0000").
+		const targetValue = this.value.value.toLowerCase();
+		const match = this._swatches.find((swatch) => swatch.value.toLowerCase() === targetValue);
 		if (match && match.label !== this.value.label) {
 			super.value = match;
 			// Dispatch outside of user interaction so the refreshed label is persisted on the next save.
