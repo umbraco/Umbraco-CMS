@@ -39,6 +39,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly chooseMediaPickerBtn: Locator;
   private readonly chooseMemberPickerBtn: Locator;
   private readonly numericTxt: Locator;
+  private readonly decimalTxt: Locator;
   private readonly resetFocalPointBtn: Locator;
   private readonly addMultiURLPickerBtn: Locator;
   private readonly linkTxt: Locator;
@@ -90,6 +91,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly sortChildrenBtn: Locator;
   private readonly rollbackBtn: Locator;
   private readonly rollbackContainerBtn: Locator;
+  private readonly rollbackCancelBtn: Locator;
   private readonly publicAccessBtn: Locator;
   private readonly uuiCheckbox: Locator;
   private readonly sortBtn: Locator;
@@ -226,6 +228,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.chooseMediaPickerBtn = page.locator('umb-property-editor-ui-media-picker #btn-add');
     this.chooseMemberPickerBtn = page.locator('umb-property-editor-ui-member-picker #btn-add');
     this.numericTxt = page.locator('umb-property-editor-ui-number input');
+    this.decimalTxt = page.locator('umb-property-editor-ui-decimal input');
     this.addMultiURLPickerBtn = page.locator('umb-property-editor-ui-multi-url-picker #btn-add');
     this.linkTxt = page.getByTestId('input:url').locator('#input');
     this.anchorQuerystringTxt = page.getByLabel('#value or ?key=value');
@@ -301,6 +304,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
     this.rollbackBtn = this.documentWorkspace.getByRole('button', { name: /^Rollback(…)?$/ });
     this.rollbackContainerBtn = this.container.getByLabel('Rollback');
+    this.rollbackCancelBtn = page.locator('umb-content-rollback-modal').getByRole('button', {name: 'Cancel', exact: true});
     this.publicAccessBtn = page.getByRole('button', {name: 'Public Access'});
     this.uuiCheckbox = page.locator('uui-checkbox');
     this.sortBtn = page.getByLabel('Sort', {exact: true});
@@ -530,6 +534,25 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async doesHistoryHaveText(text: string) {
     await this.hasText(this.historyItems, text);
+  }
+
+  async doesHistoryItemHaveTag(tagText: string, index: number = 0) {
+    const tag = this.historyItems.nth(index).locator('.log-type uui-tag');
+    await this.containsText(tag, tagText);
+  }
+
+  async doesHistoryItemHaveDescription(descriptionText: string, index: number = 0) {
+    const description = this.historyItems.nth(index).locator('.log-type span');
+    await this.hasText(description, descriptionText);
+  }
+
+  async doesHistoryItemHaveUsername(usernameText: string, index: number = 0) {
+    const username = this.historyItems.nth(index).locator('.user-info .name');
+    await this.containsText(username, usernameText);
+  }
+
+  async doesHistoryHaveCount(count: number) {
+    await this.hasCount(this.historyItems, count);
   }
 
   async doesDocumentStateHaveText(text: string) {
@@ -789,6 +812,11 @@ export class ContentUiHelper extends UiBaseLocators {
   // Numeric
   async enterNumeric(number: number) {
     await this.enterText(this.numericTxt, number.toString());
+  }
+
+  // Decimal
+  async enterDecimal(number: number) {
+    await this.enterText(this.decimalTxt, number.toString());
   }
 
   // Radiobox
@@ -1143,6 +1171,14 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickLatestRollBackItem() {
     await this.click(this.rollbackItem.last());
+  }
+
+  async waitForRollbackItems() {
+    await expect(this.rollbackItem).not.toHaveCount(0);
+  }
+
+  async clickRollbackCancelButton() {
+    await this.click(this.rollbackCancelBtn);
   }
 
   async clickPublicAccessButton() {

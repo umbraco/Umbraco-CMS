@@ -26,7 +26,7 @@ export const publishingHandlers = [
 			if (error instanceof Error) {
 				return HttpResponse.json(createProblemDetails({ title: 'Schedule', detail: error.message }), { status: 400 });
 			}
-			throw new Error('An error occurred while publishing the document');
+			throw new Error('An error occurred while publishing the document', { cause: error });
 		}
 	}),
 
@@ -43,7 +43,7 @@ export const publishingHandlers = [
 			if (error instanceof Error) {
 				return HttpResponse.json(createProblemDetails({ title: 'Schedule', detail: error.message }), { status: 400 });
 			}
-			throw new Error('An error occurred while publishing the document');
+			throw new Error('An error occurred while publishing the document', { cause: error });
 		}
 	}),
 

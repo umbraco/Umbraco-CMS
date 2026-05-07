@@ -28,10 +28,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
 				match: false,
 			},
-			{
-				alias: 'Umb.Condition.BlockWorkspaceIsReadOnly',
-				match: false,
-			},
 		],
 	},
 	{
@@ -53,10 +49,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			},
 			{
 				alias: 'Umb.Condition.BlockWorkspaceIsExposed',
-			},
-			{
-				alias: 'Umb.Condition.BlockWorkspaceIsReadOnly',
-				match: false,
 			},
 		],
 	},

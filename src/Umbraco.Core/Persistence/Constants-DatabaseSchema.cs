@@ -300,6 +300,16 @@ public static partial class Constants
             public const string ExternalLoginToken = TableNamePrefix + "ExternalLoginToken";
 
             /// <summary>
+            ///     The external member table name.
+            /// </summary>
+            public const string ExternalMember = TableNamePrefix + "ExternalMember";
+
+            /// <summary>
+            ///     The external member to member group mapping table name.
+            /// </summary>
+            public const string ExternalMember2MemberGroup = TableNamePrefix + "ExternalMember2MemberGroup";
+
+            /// <summary>
             ///     The member table name.
             /// </summary>
             public const string Member = /*TableNamePrefix*/ "cms" + "Member";
