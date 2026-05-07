@@ -25,7 +25,7 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	private _fileInput?: HTMLInputElement;
 
 	@query('#dropzone')
-	private _dropzone?: any;
+	private _dropzone?: UmbDropzoneMediaElement;
 
 	constructor() {
 		super();
@@ -97,24 +97,6 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		}
 	}
 
-	#handleBrowseClick() {
-		// Use the queried element directly
-		this._fileInput?.click();
-	}
-
-	#handleFileSelect(event: Event) {
-		const input = event.target as HTMLInputElement;
-		if (!input.files || input.files.length === 0) return;
-		
-		// Use the queried element directly
-		if (this._dropzone && typeof this._dropzone.onUpload === 'function') {
-			this._dropzone.onUpload({ detail: { files: Array.from(input.files), folders: [] } });
-		}
-		
-		input.value = ''; 
-	}
-
-
 	protected override renderToolbar() {
 		return html`
 			<umb-collection-toolbar slot="header">
@@ -144,17 +126,9 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 						<uui-icon name="icon-picture"></uui-icon>
 						<p>Drag and drop your media files here</p>
 						<p>or</p>
-						<uui-button look="primary" label="Browse files" @click=${this.#handleBrowseClick}>
-							Browse files
+						<uui-button look="primary" label="Browse files" @click=${() => this._dropzone?.browse()}>
+						    Browse files
 						</uui-button>
-						
-						<input 
-							type="file" 
-							id="native-file-input" 
-							multiple 
-							@change=${this.#handleFileSelect} 
-							style="display:none;" 
-						/>
 					</div>
 				`
 			)}
