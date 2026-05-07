@@ -1,12 +1,11 @@
-import {Locator, Page} from "@playwright/test";
+import {Page, Locator} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
 export class BackofficeSearchUiHelper extends UiBaseLocators {
   private readonly searchHeaderBtn: Locator;
   private readonly searchModal: Locator;
-  private readonly input: Locator;
-  private readonly providers: Locator;
+  private readonly searchInputTxt: Locator;
   private readonly activeProvider: Locator;
   private readonly results: Locator;
   private readonly activeResult: Locator;
@@ -17,8 +16,7 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
     super(page);
     this.searchHeaderBtn = page.getByTestId('header-app:Umb.HeaderApp.Search');
     this.searchModal = page.locator('umb-search-modal');
-    this.input = this.searchModal.locator('input[name="search-input"]');
-    this.providers = this.searchModal.locator('.search-provider');
+    this.searchInputTxt = this.searchModal.locator('input[name="search-input"]');
     this.activeProvider = this.searchModal.locator('.search-provider.active');
     this.results = this.searchModal.locator('.search-item');
     this.activeResult = this.searchModal.locator('.search-item.active');
@@ -45,11 +43,11 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   }
 
   async enterSearchQuery(query: string) {
-    await this.enterText(this.input, query);
+    await this.enterText(this.searchTxt, query);
   }
 
   async clearSearchQuery() {
-    await this.input.fill('');
+    await this.searchTxt.fill('');
   }
 
   async searchForDocument(query: string) {
@@ -65,13 +63,13 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   }
 
   async clickSearchProvider(providerName: string) {
-    await this.click(this.searchModal.getByRole('button', {name: providerName, exact: true}));
+    await this.click(this.providerByName(providerName));
   }
 
   async clickSearchProviderAndWaitForRerun(providerName: string, searchUrl: string) {
     await this.waitForResponseAfterExecutingPromise(
       searchUrl,
-      this.click(this.searchModal.getByRole('button', {name: providerName, exact: true})),
+      this.click(this.providerByName(providerName)),
       ConstantHelper.statusCodes.ok,
     );
   }
@@ -92,8 +90,8 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
     return await this.results.count();
   }
 
-  async getSearchResultHref(name: string) {
-    return await this.resultByName(name).getAttribute('href');
+  async clickSearchResult(name: string) {
+    await this.click(this.resultByName(name));
   }
 
   async isNoResultsMessageVisible(isVisible: boolean = true) {
@@ -120,5 +118,9 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
 
   private resultByName(name: string) {
     return this.results.filter({hasText: name});
+  }
+
+  private providerByName(providerName: string) {
+    return this.searchModal.getByRole('button', {name: providerName, exact: true});
   }
 }
