@@ -1,5 +1,7 @@
 import type { UmbMockDocumentBlueprintModel } from '../../mock-data-set.types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+
+type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 export const data: Array<UmbMockDocumentBlueprintModel> = [
 	{
@@ -14,7 +16,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 		name: 'The Simplest Document Blueprint',
 		variants: [
 			{
-				state: DocumentVariantStateModel.DRAFT,
+				state: 'Draft' as UmbDocumentVariantState,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-us',
 				segment: null,
@@ -48,7 +50,7 @@ export const data: Array<UmbMockDocumentBlueprintModel> = [
 		name: 'A Forbidden Document Blueprint',
 		variants: [
 			{
-				state: DocumentVariantStateModel.DRAFT,
+				state: 'Draft' as UmbDocumentVariantState,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-US',
 				segment: null,
