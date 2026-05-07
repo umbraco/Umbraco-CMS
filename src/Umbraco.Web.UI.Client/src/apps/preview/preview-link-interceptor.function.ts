@@ -4,26 +4,41 @@
 const NON_HTML_RESOURCE_PATTERN =
 	/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|csv|txt|rtf|zip|7z|rar|tar|gz|mp3|wav|ogg|opus|flac|aiff|mp4|mov|webm|ogv|mkv|avi|wmv)$/i;
 
+// Tracks documents that already have a click interceptor so that repeated `load` events
+// for the same Document (e.g. back/forward cache restoration) don't stack listeners and
+// trigger multiple window.open calls per click. WeakSet entries are GC'd with the doc.
+const instrumentedDocuments = new WeakSet<Document>();
+
 /**
  * Attaches a click listener to the iframe document that intercepts links to resources
  * the sandbox would block (downloads, PDFs, archives, media) and opens them in a new
- * top-level tab via the un-sandboxed parent shell.
+ * top-level tab via the un-sandboxed parent shell. Idempotent per Document — calling it
+ * again with the same iframe content document is a no-op.
+ *
+ * Runs in the capture phase and intercepts unconditionally for matched resources, so
+ * SPA routers that preventDefault on all anchor clicks (for client-side navigation) do
+ * not silence this handler — a previewed SPA's PDF link still opens in a new tab.
  */
 export function attachPreviewLinkInterceptor(iframe: HTMLIFrameElement): void {
 	const doc = iframe.contentDocument;
 	if (!doc) return;
+	if (instrumentedDocuments.has(doc)) return;
+	instrumentedDocuments.add(doc);
 
-	doc.addEventListener('click', (event) => {
-		if (event.defaultPrevented) return;
+	doc.addEventListener(
+		'click',
+		(event) => {
+			const link = (event.target as Element | null)?.closest('a');
+			if (!link?.href) return;
 
-		const link = (event.target as Element | null)?.closest('a');
-		if (!link?.href) return;
+			const isDownload = link.hasAttribute('download');
+			const isNonHtmlResource = NON_HTML_RESOURCE_PATTERN.test(new URL(link.href).pathname);
+			if (!isDownload && !isNonHtmlResource) return;
 
-		const isDownload = link.hasAttribute('download');
-		const isNonHtmlResource = NON_HTML_RESOURCE_PATTERN.test(new URL(link.href).pathname);
-		if (!isDownload && !isNonHtmlResource) return;
-
-		event.preventDefault();
-		window.open(link.href, '_blank', 'noopener,noreferrer');
-	});
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			window.open(link.href, '_blank', 'noopener,noreferrer');
+		},
+		{ capture: true },
+	);
 }

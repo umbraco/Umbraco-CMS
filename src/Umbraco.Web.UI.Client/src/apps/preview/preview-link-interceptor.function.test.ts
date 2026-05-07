@@ -174,25 +174,74 @@ describe('attachPreviewLinkInterceptor', () => {
 		});
 	});
 
-	describe('defaultPrevented guard', () => {
-		it('does not open a new tab when an earlier listener has already prevented default', () => {
-			// Re-create the iframe so we can attach a "preventer" listener BEFORE the interceptor —
-			// click listeners run in registration order, so the preventer must be registered first
-			// for the interceptor to observe defaultPrevented === true when it runs.
+	describe('idempotency', () => {
+		it('does not stack listeners when called multiple times on the same document', () => {
+			// Simulates the back/forward cache scenario where `load` fires repeatedly for the
+			// same Document — the interceptor should remain a single listener.
+			attachPreviewLinkInterceptor(iframe);
+			attachPreviewLinkInterceptor(iframe);
+
+			const anchor = appendAnchor({ href: '/files/brochure.pdf' });
+			clickAnchor(anchor);
+
+			expect(openSpy.calls, 'window.open should be called exactly once per click').to.have.lengthOf(1);
+		});
+
+		it('attaches a fresh listener when the iframe loads a new Document', () => {
+			// First document gets clicked once.
+			const firstAnchor = appendAnchor({ href: '/files/first.pdf' });
+			clickAnchor(firstAnchor);
+			expect(openSpy.calls).to.have.lengthOf(1);
+
+			// Replace the iframe content with a new Document and re-attach.
 			iframe.remove();
 			iframe = document.createElement('iframe');
 			document.body.appendChild(iframe);
-			iframe.contentDocument!.addEventListener('click', (event) => event.preventDefault());
 			attachPreviewLinkInterceptor(iframe);
 
-			const anchor = iframe.contentDocument!.createElement('a');
-			anchor.setAttribute('href', '/files/brochure.pdf');
-			iframe.contentDocument!.body.appendChild(anchor);
+			const secondAnchor = iframe.contentDocument!.createElement('a');
+			secondAnchor.setAttribute('href', '/files/second.pdf');
+			iframe.contentDocument!.body.appendChild(secondAnchor);
+			clickAnchor(secondAnchor);
 
-			const event = clickAnchor(anchor);
+			expect(openSpy.calls, 'new document should still be intercepted').to.have.lengthOf(2);
+		});
+	});
 
-			expect(event.defaultPrevented).to.be.true;
-			expect(openSpy.calls, 'window.open should not be called').to.have.lengthOf(0);
+	describe('SPA-router compatibility', () => {
+		it('still intercepts non-HTML resources when an SPA router has preventDefaulted the click', () => {
+			// SPAs commonly attach a bubble-phase click listener that calls preventDefault on every
+			// anchor for client-side routing. The interceptor runs in capture phase and matches on
+			// the resource type, so the PDF link still opens in a new tab.
+			iframe.contentDocument!.addEventListener('click', (event) => event.preventDefault());
+
+			const anchor = appendAnchor({ href: '/files/brochure.pdf' });
+			clickAnchor(anchor);
+
+			expect(openSpy.calls, 'PDF should still open in a new tab').to.have.lengthOf(1);
+			expect(openSpy.calls[0].url).to.equal(anchor.href);
+		});
+
+		it('runs before bubble-phase handlers and stops propagation for matched links', () => {
+			const order: string[] = [];
+			iframe.contentDocument!.addEventListener('click', () => order.push('spa-router'));
+
+			const anchor = appendAnchor({ href: '/files/brochure.pdf' });
+			clickAnchor(anchor);
+
+			expect(order, 'matched click should not reach the SPA-router bubble handler').to.deep.equal([]);
+			expect(openSpy.calls).to.have.lengthOf(1);
+		});
+
+		it('lets HTML links flow through to bubble-phase handlers (so SPA routing still works)', () => {
+			const order: string[] = [];
+			iframe.contentDocument!.addEventListener('click', () => order.push('spa-router'));
+
+			const anchor = appendAnchor({ href: '/about' });
+			clickAnchor(anchor);
+
+			expect(order, 'unmatched click should reach the SPA-router handler').to.deep.equal(['spa-router']);
+			expect(openSpy.calls).to.have.lengthOf(0);
 		});
 	});
 });
