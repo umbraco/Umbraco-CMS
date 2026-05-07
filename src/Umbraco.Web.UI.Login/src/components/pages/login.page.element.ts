@@ -121,15 +121,9 @@ export default class UmbLoginPageElement extends UmbLitElement {
 	};
 
 	get #greetingLocalizationKey() {
-		return [
-			'auth_greeting0',
-			'auth_greeting1',
-			'auth_greeting2',
-			'auth_greeting3',
-			'auth_greeting4',
-			'auth_greeting5',
-			'auth_greeting6',
-		][new Date().getDay()];
+		// The login_* greetings are resolved from the shared backoffice localization
+		// dictionary, registered by UmbSlimBackofficeController. See #56402.
+		return `login_greeting${new Date().getDay()}`;
 	}
 
 	#onSubmitClick = () => {
@@ -150,8 +144,8 @@ export default class UmbLoginPageElement extends UmbLitElement {
 					this.supportPersistLogin,
 					() =>
 						html` <uui-form-layout-item>
-							<uui-checkbox name="persist" .label=${this.localize.term('auth_rememberMe')}>
-								<umb-localize key="auth_rememberMe">Remember me</umb-localize>
+							<uui-checkbox name="persist" .label=${this.localize.term('login_rememberMe')}>
+								<umb-localize key="login_rememberMe">Remember me</umb-localize>
 							</uui-checkbox>
 						</uui-form-layout-item>`,
 				)}
@@ -159,7 +153,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 					this.allowPasswordReset,
 					() =>
 						html` <uui-button type="button" id="forgot-password" @click=${this.#handleForgottenPassword} compact>
-							<umb-localize key="auth_forgottenPassword">Forgotten password?</umb-localize>
+							<umb-localize key="login_forgottenPassword">Forgotten password?</umb-localize>
 						</uui-button>`,
 				)}
 			</div>
@@ -168,7 +162,7 @@ export default class UmbLoginPageElement extends UmbLitElement {
 				type="submit"
 				id="umb-login-button"
 				look="primary"
-				.label=${this.localize.term('auth_login')}
+				.label=${this.localize.term('login_login')}
 				color="default"
 				.state=${this._loginState}></uui-button>
 
