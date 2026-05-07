@@ -35,15 +35,12 @@ fetch(openApiUrl).then(async (response) => {
     input: openApiUrl,
     output: 'src/api',
     plugins: [
-      ...defaultPlugins,
-      {
-        name: '@hey-api/client-fetch',
-        runtimeConfigPath: '../hey-api',
-      },
+      // Spread defaults so future @hey-api/openapi-ts additions come along automatically,
+      // but filter out @hey-api/sdk because we override its responseStyle below.
+      ...defaultPlugins.filter((plugin) => (typeof plugin === 'string' ? plugin : plugin.name) !== '@hey-api/sdk'),
       {
         name: '@hey-api/sdk',
-        asClass: true,
-        classNameBuilder: '{{name}}Service',
+        responseStyle: 'fields',
       }
     ],
   });
