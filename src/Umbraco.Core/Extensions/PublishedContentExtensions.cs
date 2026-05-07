@@ -196,14 +196,14 @@ public static class PublishedContentExtensions
     ///     Returns the current template Alias
     /// </summary>
     /// <returns>Empty string if none is set.</returns>
-    public static string GetTemplateAlias(this IPublishedContent content, IFileService fileService)
+    public static string GetTemplateAlias(this IPublishedContent content, ITemplateService templateService)
     {
         if (content.TemplateId.HasValue == false)
         {
             return string.Empty;
         }
 
-        ITemplate? template = fileService.GetTemplate(content.TemplateId.Value);
+        ITemplate? template = templateService.GetAsync(content.TemplateId.Value).GetAwaiter().GetResult();
         return template?.Alias ?? string.Empty;
     }
 
@@ -253,15 +253,15 @@ public static class PublishedContentExtensions
     /// Determines whether a specific template is allowed for the content item by template alias.
     /// </summary>
     /// <param name="content">The content item.</param>
-    /// <param name="fileService">The file service.</param>
+    /// <param name="templateService">The template service.</param>
     /// <param name="contentTypeService">The content type service.</param>
     /// <param name="disableAlternativeTemplates">Whether alternative templates are disabled.</param>
     /// <param name="validateAlternativeTemplates">Whether to validate alternative templates against allowed templates.</param>
     /// <param name="templateAlias">The template alias.</param>
     /// <returns><c>true</c> if the template is allowed; otherwise, <c>false</c>.</returns>
-    public static bool IsAllowedTemplate(this IPublishedContent content, IFileService fileService, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, string templateAlias)
+    public static bool IsAllowedTemplate(this IPublishedContent content, ITemplateService templateService, IContentTypeService contentTypeService, bool disableAlternativeTemplates, bool validateAlternativeTemplates, string templateAlias)
     {
-        ITemplate? template = fileService.GetTemplate(templateAlias);
+        ITemplate? template = templateService.GetAsync(templateAlias).GetAwaiter().GetResult();
         return template != null && content.IsAllowedTemplate(contentTypeService, disableAlternativeTemplates, validateAlternativeTemplates, template.Id);
     }
 

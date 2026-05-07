@@ -46,8 +46,6 @@ internal sealed class TagServiceTests : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
-
     private ITagService TagService => GetRequiredService<ITagService>();
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();

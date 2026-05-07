@@ -35,7 +35,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     {
         ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
 
-        IPublishedContent? publishedContent = GetModel(contentNode, preview);
+        IPublishedContent? publishedContent = GetPublishedContent(contentNode, preview);
 
         if (preview)
         {
@@ -75,7 +75,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             null,
             contentCacheNode.Data);
 
-        return GetModel(contentNode, false);
+        return GetPublishedContent(contentNode, false);
     }
 
     /// <inheritdoc/>
@@ -156,8 +156,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         properties[alias] = new[] { new PropertyData { Value = value, Culture = string.Empty, Segment = string.Empty } };
     }
 
-    // TODO ELEMENTS: rename this to GetPublishedContent
-    private IPublishedContent? GetModel(ContentNode node, bool preview)
+    private IPublishedContent? GetPublishedContent(ContentNode node, bool preview)
     {
         ContentData? contentData = preview ? node.DraftModel : node.PublishedModel;
         return contentData == null

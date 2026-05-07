@@ -1,6 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.PermissionFilter;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -26,7 +27,7 @@ public class ElementPermissionFilterServiceTests
     public async Task FilterAsync_ReturnsAllEntities_WhenAllHaveBrowsePermission()
     {
         // Arrange
-        var entities = CreateEntities(3);
+        var entities = CreateElementEntities(3);
         SetupGetElementPermissionsAsync(
             entities.Select(e => CreateNodePermissions(e.Key, ActionElementBrowse.ActionLetter)));
 
@@ -43,7 +44,7 @@ public class ElementPermissionFilterServiceTests
     public async Task FilterAsync_FiltersEntities_WhenSomeAreDeniedBrowsePermission()
     {
         // Arrange
-        var entities = CreateEntities(3);
+        var entities = CreateElementEntities(3);
         SetupGetElementPermissionsAsync(
             [
                 CreateNodePermissions(entities[0].Key, ActionElementBrowse.ActionLetter),
@@ -67,7 +68,7 @@ public class ElementPermissionFilterServiceTests
     public async Task FilterAsync_FiltersEntities_WhenNoPermissionEntryExists()
     {
         // Arrange
-        var entities = CreateEntities(3);
+        var entities = CreateElementEntities(3);
         SetupGetElementPermissionsAsync(
             [
                 CreateNodePermissions(entities[0].Key, ActionElementBrowse.ActionLetter),
@@ -91,7 +92,7 @@ public class ElementPermissionFilterServiceTests
     public async Task FilterAsync_FiltersAllEntities_WhenNoneHaveBrowsePermission()
     {
         // Arrange
-        var entities = CreateEntities(3);
+        var entities = CreateElementEntities(3);
         SetupGetElementPermissionsAsync(
             entities.Select(e => CreateNodePermissions(e.Key))); // No browse permission
 
@@ -108,7 +109,7 @@ public class ElementPermissionFilterServiceTests
     public async Task FilterAsync_Siblings_ReturnsAllEntities_WhenAllHaveBrowsePermission()
     {
         // Arrange
-        var entities = CreateEntities(5);
+        var entities = CreateElementEntities(5);
         var targetKey = entities[2].Key;
         SetupGetElementPermissionsAsync(
             entities.Select(e => CreateNodePermissions(e.Key, ActionElementBrowse.ActionLetter)));
@@ -127,7 +128,7 @@ public class ElementPermissionFilterServiceTests
     public async Task FilterAsync_Siblings_DecrementsTotalBefore_WhenEntityBeforeTargetIsFiltered()
     {
         // Arrange
-        var entities = CreateEntities(5);
+        var entities = CreateElementEntities(5);
         var targetKey = entities[2].Key; // Index 2 is target, indices 0,1 are before
         SetupGetElementPermissionsAsync(
             [
@@ -152,7 +153,7 @@ public class ElementPermissionFilterServiceTests
     public async Task FilterAsync_Siblings_DecrementsTotalAfter_WhenEntityAfterTargetIsFiltered()
     {
         // Arrange
-        var entities = CreateEntities(5);
+        var entities = CreateElementEntities(5);
         var targetKey = entities[2].Key; // Index 2 is target, indices 3,4 are after
         SetupGetElementPermissionsAsync(
             [
@@ -177,7 +178,7 @@ public class ElementPermissionFilterServiceTests
     public async Task FilterAsync_Siblings_DecrementsBothTotals_WhenEntitiesBeforeAndAfterAreFiltered()
     {
         // Arrange
-        var entities = CreateEntities(5);
+        var entities = CreateElementEntities(5);
         var targetKey = entities[2].Key;
         SetupGetElementPermissionsAsync(
             [
@@ -202,7 +203,7 @@ public class ElementPermissionFilterServiceTests
     public async Task FilterAsync_Siblings_DoesNotAffectTotals_WhenTargetEntityIsFiltered()
     {
         // Arrange
-        var entities = CreateEntities(5);
+        var entities = CreateElementEntities(5);
         var targetKey = entities[2].Key;
         SetupGetElementPermissionsAsync(
             [
@@ -223,7 +224,83 @@ public class ElementPermissionFilterServiceTests
         Assert.AreEqual(20, totalAfter); // Unchanged - target is not before or after
     }
 
-    private static IEntitySlim[] CreateEntities(int count)
+    [Test]
+    public async Task FilterAsync_ReturnsAllContainerEntities_WhenAllHaveBrowsePermission()
+    {
+        // Arrange
+        var entities = CreateElementContainerEntities(3);
+        SetupGetElementPermissionsAsync(
+            entities.Select(e => CreateNodePermissions(e.Key, ActionElementContainerBrowse.ActionLetter)));
+
+        // Act
+        var (filteredEntities, totalItems) = await ElementPermissionFilterService
+            .FilterAsync(entities, 100);
+
+        // Assert
+        Assert.AreEqual(3, filteredEntities.Length);
+        Assert.AreEqual(100, totalItems);
+    }
+
+    [Test]
+    public async Task FilterAsyncMixedEntities_ReturnsAllEntities_WhenAllHaveBrowsePermission()
+    {
+        // Arrange
+        var entities = CreateEntities(10, i => i % 2 == 0 ? Constants.ObjectTypes.Element : Constants.ObjectTypes.ElementContainer);
+        SetupGetElementPermissionsAsync(
+            entities.Select(e => CreateNodePermissions(e.Key, ActionElementBrowse.ActionLetter, ActionElementContainerBrowse.ActionLetter)));
+
+        // Act
+        var (filteredEntities, totalItems) = await ElementPermissionFilterService
+            .FilterAsync(entities, 100);
+
+        // Assert
+        Assert.AreEqual(10, filteredEntities.Length);
+        Assert.AreEqual(100, totalItems);
+    }
+
+    [Test]
+    public async Task FilterAsyncMixedEntities_ReturnsOnlyAllowedEntities_WhenSomeHaveBrowsePermission()
+    {
+        // Arrange
+        var entities = CreateEntities(10, i => i % 2 == 0 ? Constants.ObjectTypes.Element : Constants.ObjectTypes.ElementContainer);
+        var count = 0;
+        SetupGetElementPermissionsAsync(
+            entities.Select(e => CreateNodePermissions(e.Key, count++ % 5 == 0 ? [] : [ActionElementBrowse.ActionLetter, ActionElementContainerBrowse.ActionLetter])));
+
+        // Act
+        var (filteredEntities, totalItems) = await ElementPermissionFilterService
+            .FilterAsync(entities, 100);
+
+        // Assert
+        Assert.AreEqual(8, filteredEntities.Length); // Decremented by 2
+        Assert.AreEqual(98, totalItems); // Decremented by 2
+    }
+
+    [TestCase(true)]
+    [TestCase(false)]
+    public async Task FilterAsyncEntities_ReturnsNoEntities_WhenNoneHaveBrowsePermission(bool isContainer)
+    {
+        // Arrange
+        var entities = CreateEntities(5, _ => isContainer ? Constants.ObjectTypes.ElementContainer : Constants.ObjectTypes.Element);
+        SetupGetElementPermissionsAsync(
+            entities.Select(e => CreateNodePermissions(e.Key, isContainer ? ActionElementBrowse.ActionLetter : ActionElementContainerBrowse.ActionLetter)));
+
+        // Act
+        var (filteredEntities, totalItems) = await ElementPermissionFilterService
+            .FilterAsync(entities, 100);
+
+        // Assert
+        Assert.AreEqual(0, filteredEntities.Length);
+        Assert.AreEqual(95, totalItems); // Decremented by 5
+    }
+
+    private static IEntitySlim[] CreateElementEntities(int count)
+        => CreateEntities(count, _ => Constants.ObjectTypes.Element);
+
+    private static IEntitySlim[] CreateElementContainerEntities(int count)
+        => CreateEntities(count, _ => Constants.ObjectTypes.ElementContainer);
+
+    private static IEntitySlim[] CreateEntities(int count, Func<int, Guid> objectTypeForIndex)
     {
         var entities = new IEntitySlim[count];
         for (var i = 0; i < count; i++)
@@ -231,6 +308,7 @@ public class ElementPermissionFilterServiceTests
             var mock = new Mock<IEntitySlim>();
             mock.Setup(e => e.Key).Returns(Guid.NewGuid());
             mock.Setup(e => e.Id).Returns(i + 1);
+            mock.Setup(e => e.NodeObjectType).Returns(objectTypeForIndex(i));
             entities[i] = mock.Object;
         }
 

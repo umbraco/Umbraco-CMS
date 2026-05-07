@@ -1586,7 +1586,7 @@ internal sealed partial class ContentTypeEditingServiceTests
         createModel.AllowedInLibrary = true;
         var contentType = (await ContentTypeEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey)).Result!;
 
-        var element = ElementService.Create("Test Element", contentType.Alias);
+        var element = new Element("Test Element", contentType);
         var saveResult = ElementService.Save(element);
         Assert.IsTrue(saveResult.Success);
 

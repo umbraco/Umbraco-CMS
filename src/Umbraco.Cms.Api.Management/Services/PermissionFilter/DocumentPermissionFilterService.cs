@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -25,7 +26,7 @@ internal sealed class DocumentPermissionFilterService : PermissionFilterServiceB
         => _contentPermissionService = contentPermissionService;
 
     /// <inheritdoc/>
-    protected override string BrowseActionLetter => ActionBrowse.ActionLetter;
+    protected override string BrowseActionLetter(IEntitySlim entity) => ActionBrowse.ActionLetter;
 
     /// <inheritdoc/>
     protected override Task<IEnumerable<NodePermissions>> GetPermissionsAsync(IUser user, IEnumerable<Guid> entityKeys)

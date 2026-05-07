@@ -282,7 +282,7 @@ export class LibraryUiHelper extends UiBaseLocators {
     this.duplicateBtn = page.getByLabel('Duplicate', {exact: true});
     this.elementTreeRefreshBtn = page.locator('#header').getByLabel('#actions_refreshNode');
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
-    this.rollbackBtn = page.getByRole('button', { name: 'Rollback…' });
+    this.rollbackBtn = page.getByTestId('audit-log-action:Umb.AuditLogAction.Element.Rollback');
     this.rollbackContainerBtn = this.container.getByLabel('Rollback');
     this.publicAccessBtn = page.getByRole('button', {name: 'Public Access'});
     this.uuiCheckbox = page.locator('uui-checkbox');

@@ -26,7 +26,7 @@ public static class FriendlyPublishedContentExtensions
     private static IUmbracoContextAccessor? _umbracoContextAccessor;
     private static ISiteDomainMapper? _siteDomainHelper;
     private static IExamineManager? _examineManager;
-    private static IFileService? _fileService;
+    private static ITemplateService? _templateService;
     private static IOptions<WebRoutingSettings>? _webRoutingSettings;
     private static IContentTypeService? _contentTypeService;
     private static IPublishedValueFallback? _publishedValueFallback;
@@ -124,12 +124,12 @@ public static class FriendlyPublishedContentExtensions
         }
     }
 
-    private static IFileService FileService
+    private static ITemplateService TemplateService
     {
         get
         {
-            _fileService ??= StaticServiceProvider.Instance.GetRequiredService<IFileService>();
-            return _fileService;
+            _templateService ??= StaticServiceProvider.Instance.GetRequiredService<ITemplateService>();
+            return _templateService;
         }
     }
 
@@ -199,7 +199,7 @@ public static class FriendlyPublishedContentExtensions
         _umbracoContextAccessor = null;
         _siteDomainHelper = null;
         _examineManager = null;
-        _fileService = null;
+        _templateService = null;
         _webRoutingSettings = null;
         _contentTypeService = null;
         _publishedValueFallback = null;
@@ -298,7 +298,7 @@ public static class FriendlyPublishedContentExtensions
     /// </summary>
     /// <returns>Empty string if none is set.</returns>
     public static string GetTemplateAlias(this IPublishedContent content)
-        => content.GetTemplateAlias(FileService);
+        => content.GetTemplateAlias(TemplateService);
 
     public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
         => content.IsAllowedTemplate(ContentTypeService, WebRoutingSettings.Value, templateId);
@@ -326,7 +326,7 @@ public static class FriendlyPublishedContentExtensions
         bool validateAlternativeTemplates,
         string templateAlias)
         => content.IsAllowedTemplate(
-            FileService,
+            TemplateService,
             ContentTypeService,
             disableAlternativeTemplates,
             validateAlternativeTemplates,

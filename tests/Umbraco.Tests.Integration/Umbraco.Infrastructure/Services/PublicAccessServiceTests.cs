@@ -33,8 +33,6 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
-
     private IPublicAccessService PublicAccessService => GetRequiredService<IPublicAccessService>();
 
     private Content _content;

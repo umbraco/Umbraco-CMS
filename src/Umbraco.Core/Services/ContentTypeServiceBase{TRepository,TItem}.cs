@@ -1136,7 +1136,7 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         var moveInfo = new List<MoveEventInfo<TItem>>();
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
-            var moveEventInfo = new MoveEventInfo<TItem>(toMove, toMove.Path, containerId.Value);
+            var moveEventInfo = new MoveEventInfo<TItem>(toMove, toMove.Path, containerKey);
             MovingNotification<TItem> movingNotification = GetMovingNotification(moveEventInfo, eventMessages);
             if (scope.Notifications.PublishCancelable(movingNotification))
             {

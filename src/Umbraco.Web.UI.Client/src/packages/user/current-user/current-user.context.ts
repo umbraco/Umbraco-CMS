@@ -84,7 +84,10 @@ export class UmbCurrentUserContext extends UmbContextBase {
 		}
 	}
 
-	#loadDebounced = debounce(() => this.load(), 100);
+	#loadDebounced = debounce(() => {
+		this.#loadPromise = undefined;
+		this.load();
+	}, 100);
 
 	/**
 	 * Checks if a user is the current user.

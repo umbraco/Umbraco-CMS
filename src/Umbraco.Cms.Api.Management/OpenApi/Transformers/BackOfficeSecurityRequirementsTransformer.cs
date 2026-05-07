@@ -26,11 +26,20 @@ internal class BackOfficeSecurityRequirementsTransformer : IOpenApiOperationTran
         OpenApiOperationTransformerContext context,
         CancellationToken cancellationToken)
     {
-        if (context.Description.ActionDescriptor is not ControllerActionDescriptor description ||
-            description.MethodInfo.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) ||
+        if (context.Description.ActionDescriptor is not ControllerActionDescriptor description)
+        {
+            return Task.CompletedTask;
+        }
+
+        if (description.MethodInfo.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) ||
             description.MethodInfo.DeclaringType?.GetCustomAttributes(true).Any(x => x is AllowAnonymousAttribute) ==
             true)
         {
+            // Explicitly clear security on anonymous operations so they override the document-level
+            // security requirement added below. Without this, OpenAPI consumers (including the
+            // generated backoffice SDK) treat these endpoints as authenticated and attach a Bearer
+            // token, which triggers a /token refresh before the user has logged in.
+            operation.Security = [];
             return Task.CompletedTask;
         }
 

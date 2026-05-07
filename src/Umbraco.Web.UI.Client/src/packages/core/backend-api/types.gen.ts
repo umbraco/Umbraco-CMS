@@ -923,7 +923,7 @@ export type DocumentValueResponseModel = {
 export type DocumentVariantItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     name: string;
     culture?: null | string;
 };
@@ -937,7 +937,7 @@ export type DocumentVariantRequestModel = {
 export type DocumentVariantResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     publishDate?: null | string;
     scheduledPublishDate?: null | string;
     scheduledUnpublishDate?: null | string;
@@ -947,14 +947,6 @@ export type DocumentVariantResponseModel = {
     segment?: null | string;
     name: string;
 };
-
-export enum DocumentVariantStateModel {
-    NOT_CREATED = 'NotCreated',
-    DRAFT = 'Draft',
-    PUBLISHED = 'Published',
-    PUBLISHED_PENDING_CHANGES = 'PublishedPendingChanges',
-    TRASHED = 'Trashed'
-}
 
 export type DocumentVersionItemResponseModel = {
     id: string;
@@ -1085,7 +1077,7 @@ export type ElementValueResponseModel = {
 export type ElementVariantItemResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     name: string;
     culture?: null | string;
 };
@@ -1099,7 +1091,7 @@ export type ElementVariantRequestModel = {
 export type ElementVariantResponseModel = {
     id: string;
     flags: Array<FlagModel>;
-    state: DocumentVariantStateModel;
+    state: PublishableVariantStateModel;
     publishDate?: null | string;
     scheduledPublishDate?: null | string;
     scheduledUnpublishDate?: null | string;
@@ -2476,6 +2468,14 @@ export type PublicAccessResponseModel = {
     errorDocument: ReferenceByIdModel;
 };
 
+export enum PublishableVariantStateModel {
+    NOT_CREATED = 'NotCreated',
+    DRAFT = 'Draft',
+    PUBLISHED = 'Published',
+    PUBLISHED_PENDING_CHANGES = 'PublishedPendingChanges',
+    TRASHED = 'Trashed'
+}
+
 export type PublishDocumentRequestModel = {
     publishSchedules: Array<CultureAndScheduleRequestModel>;
 };
@@ -2675,6 +2675,7 @@ export type ServerConfigurationResponseModel = {
     versionCheckPeriod: number;
     allowLocalLogin: boolean;
     umbracoCssPath: string;
+    signalR: SignalRClientSettingsResponseModel;
 };
 
 export type ServerInformationResponseModel = {
@@ -2694,6 +2695,10 @@ export type ServerTroubleshootingResponseModel = {
 
 export type SetAvatarRequestModel = {
     file: ReferenceByIdModel;
+};
+
+export type SignalRClientSettingsResponseModel = {
+    skipNegotiation: boolean;
 };
 
 export type SortingRequestModel = {
@@ -2900,12 +2905,11 @@ export type TemplateQuerySettingsResponseModel = {
 
 export type TemplateResponseModel = {
     id: string;
+    layoutTemplate?: null | ReferenceByIdModel;
     masterTemplate?: null | ReferenceByIdModel;
     name: string;
     alias: string;
     content?: null | string;
-    layoutTemplate?: ReferenceByIdModel | null;
-    /** @deprecated Use layoutTemplate instead. Scheduled for removal in Umbraco 20. */
 };
 
 export type TemporaryFileConfigurationResponseModel = {

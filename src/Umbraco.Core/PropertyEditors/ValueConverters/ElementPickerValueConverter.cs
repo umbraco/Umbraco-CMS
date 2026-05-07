@@ -8,22 +8,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
-public class ElementPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
+internal sealed class ElementPickerValueConverter : PropertyValueConverterBase, IDeliveryApiPropertyValueConverter
 {
     private readonly IJsonSerializer _jsonSerializer;
-    // TODO ELEMENTS: this needs replacing with IPublishedElementCache when #22369 is merged
-    private readonly IElementCacheService _elementCacheService;
+    private readonly IPublishedElementCache _publishedElementCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IApiElementBuilder _apiElementBuilder;
 
     public ElementPickerValueConverter(
         IJsonSerializer jsonSerializer,
-        IElementCacheService elementCacheService,
+        IPublishedElementCache publishedElementCache,
         IVariationContextAccessor variationContextAccessor,
         IApiElementBuilder apiElementBuilder)
     {
         _jsonSerializer = jsonSerializer;
-        _elementCacheService = elementCacheService;
+        _publishedElementCache = publishedElementCache;
         _variationContextAccessor = variationContextAccessor;
         _apiElementBuilder = apiElementBuilder;
     }
@@ -75,7 +74,7 @@ public class ElementPickerValueConverter : PropertyValueConverterBase, IDelivery
         }
 
         IEnumerable<IPublishedElement> elements = keys
-            .Select(key => _elementCacheService.GetByKeyAsync(key, preview).GetAwaiter().GetResult())
+            .Select(key => _publishedElementCache.GetByIdAsync(key, preview).GetAwaiter().GetResult())
             .WhereNotNull();
 
         if (preview is false && _variationContextAccessor.VariationContext?.Culture is not null)

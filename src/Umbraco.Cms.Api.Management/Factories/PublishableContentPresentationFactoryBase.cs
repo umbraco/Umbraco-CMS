@@ -65,7 +65,7 @@ internal abstract class PublishableContentPresentationFactoryBase<TEntity, TVari
 
         if (entity.Variations.VariesByCulture() is false)
         {
-            TVariantItemResponseModel model = CreateVariantItemResponseModel(entity.Name ?? string.Empty, DocumentVariantStateHelper.GetState(entity, null), null);
+            TVariantItemResponseModel model = CreateVariantItemResponseModel(entity.Name ?? string.Empty, PublishableVariantStateHelper.GetState(entity, null), null);
 
             await PopulateFlagsAsync(model);
             models.Add(model);
@@ -74,7 +74,7 @@ internal abstract class PublishableContentPresentationFactoryBase<TEntity, TVari
 
         foreach (KeyValuePair<string, string> cultureNamePair in entity.CultureNames)
         {
-            TVariantItemResponseModel model = CreateVariantItemResponseModel(cultureNamePair.Value, DocumentVariantStateHelper.GetState(entity, cultureNamePair.Key), cultureNamePair.Key);
+            TVariantItemResponseModel model = CreateVariantItemResponseModel(cultureNamePair.Value, PublishableVariantStateHelper.GetState(entity, cultureNamePair.Key), cultureNamePair.Key);
 
             await PopulateFlagsAsync(model);
             models.Add(model);
@@ -100,7 +100,7 @@ internal abstract class PublishableContentPresentationFactoryBase<TEntity, TVari
     /// <returns>A new variant item response model.</returns>
     protected abstract TVariantItemResponseModel CreateVariantItemResponseModel(
         string name,
-        DocumentVariantState state,
+        PublishableVariantState state,
         string? culture);
 
     /// <summary>

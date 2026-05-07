@@ -7,13 +7,16 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.FileSystem;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.FileSystem;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.IO;
 using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Extensions;
 
@@ -26,9 +29,14 @@ namespace Umbraco.Cms.Infrastructure.Packaging
     {
         private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly ILogger<PackageDataInstallation> _logger;
-        private readonly IFileService _fileService;
+        private readonly IPartialViewService _partialViewService;
+        private readonly IPartialViewFolderService _partialViewFolderService;
         private readonly ILanguageService _languageService;
         private readonly IDictionaryItemService _dictionaryItemService;
+        private readonly IStylesheetService _stylesheetService;
+        private readonly IStylesheetFolderService _stylesheetFolderService;
+        private readonly IScriptService _scriptService;
+        private readonly IScriptFolderService _scriptFolderService;
         private readonly IUserIdKeyResolver _userIdKeyResolver;
         private readonly IDataTypeService _dataTypeService;
         private readonly IDataTypeContainerService _dataTypeContainerService;
@@ -48,33 +56,14 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageDataInstallation"/> class.
         /// </summary>
-        /// <param name="dataValueEditorFactory">Factory for creating data value editors used in property editing.</param>
-        /// <param name="logger">The logger used for logging installation events and errors.</param>
-        /// <param name="fileService">Service for managing files such as templates, stylesheets, and scripts.</param>
-        /// <param name="languageService">Service for managing languages.</param>
-        /// <param name="dictionaryItemService">Service for managing dictionary items.</param>
-        /// <param name="dataTypeService">Service for managing data types within Umbraco.</param>
-        /// <param name="entityService">Service for managing Umbraco entities generically.</param>
-        /// <param name="contentTypeService">Service for managing content types (document types, media types, etc.).</param>
-        /// <param name="contentService">Service for managing content items (nodes).</param>
-        /// <param name="propertyEditors">Collection of available property editors.</param>
-        /// <param name="scopeProvider">Provider for managing database transaction scopes.</param>
-        /// <param name="shortStringHelper">Helper for generating and manipulating short strings (e.g., aliases).</param>
-        /// <param name="serializer">Serializer for configuration editor JSON data.</param>
-        /// <param name="mediaService">Service for managing media items.</param>
-        /// <param name="mediaTypeService">Service for managing media types.</param>
-        /// <param name="templateContentParserService">Service for parsing template content.</param>
-        /// <param name="templateService">Service for managing templates.</param>
-        /// <param name="memberTypeService">Service for managing member types.</param>
-        /// <param name="dataTypeContainerService">Service for managing data type containers (folders).</param>
-        /// <param name="idKeyMap">The cached id-to-key map used to resolve int IDs to GUID keys.</param>
-        /// <param name="userIdKeyResolver">Resolver between int user IDs and GUID user keys.</param>
         public PackageDataInstallation(
             IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
-            IFileService fileService,
+            IPartialViewService partialViewService,
+            IPartialViewFolderService partialViewFolderService,
             ILanguageService languageService,
             IDictionaryItemService dictionaryItemService,
+            IUserIdKeyResolver userIdKeyResolver,
             IDataTypeService dataTypeService,
             IEntityService entityService,
             IContentTypeService contentTypeService,
@@ -87,13 +76,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             IMediaTypeService mediaTypeService,
             ITemplateContentParserService templateContentParserService,
             ITemplateService templateService,
+            IStylesheetService stylesheetService,
+            IStylesheetFolderService stylesheetFolderService,
+            IScriptService scriptService,
+            IScriptFolderService scriptFolderService,
             IMemberTypeService memberTypeService,
-            IDataTypeContainerService dataTypeContainerService,
-            IUserIdKeyResolver userIdKeyResolver)
+            IDataTypeContainerService dataTypeContainerService)
         {
             _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
-            _fileService = fileService;
+            _partialViewService = partialViewService;
+            _partialViewFolderService = partialViewFolderService;
             _languageService = languageService;
             _dictionaryItemService = dictionaryItemService;
             _dataTypeService = dataTypeService;
@@ -108,6 +101,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             _mediaTypeService = mediaTypeService;
             _templateContentParserService = templateContentParserService;
             _templateService = templateService;
+            _stylesheetService = stylesheetService;
+            _stylesheetFolderService = stylesheetFolderService;
+            _scriptService = scriptService;
+            _scriptFolderService = scriptFolderService;
             _memberTypeService = memberTypeService;
             _dataTypeContainerService = dataTypeContainerService;
             _userIdKeyResolver = userIdKeyResolver;
@@ -420,7 +417,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             //TODO: This will almost never work, we can't reference a template by an INT Id within a package manifest, we need to change the
             // packager to package templates by UDI and resolve by the same, in 98% of cases, this isn't going to work, or it will resolve the wrong template.
-            ITemplate? template = templateId.HasValue ? _fileService.GetTemplate(templateId.Value) : null;
+            ITemplate? template = templateId.HasValue ? _templateService.GetAsync(templateId.Value).GetAwaiter().GetResult() : null;
 
             //now double check this is correct since its an INT it could very well be pointing to an invalid template :/
             if (template != null && contentType is IContentType contentTypex)
@@ -1093,7 +1090,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 foreach (XElement templateElement in allowedTemplatesElement.Elements("Template"))
                 {
                     var alias = templateElement.Value;
-                    ITemplate? template = _fileService.GetTemplate(alias.ToSafeAlias(_shortStringHelper));
+                    ITemplate? template = _templateService.GetAsync(alias.ToSafeAlias(_shortStringHelper)).GetAwaiter().GetResult();
                     if (template != null)
                     {
                         if (allowedTemplates?.Any(x => x.Id == template.Id) ?? true)
@@ -1117,7 +1114,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             if (string.IsNullOrEmpty((string?)defaultTemplateElement) == false)
             {
                 ITemplate? defaultTemplate =
-                    _fileService.GetTemplate(defaultTemplateElement.Value.ToSafeAlias(_shortStringHelper));
+                    _templateService.GetAsync(defaultTemplateElement.Value.ToSafeAlias(_shortStringHelper)).GetAwaiter().GetResult();
                 if (defaultTemplate != null)
                 {
                     contentType.SetDefaultTemplate(defaultTemplate);
@@ -1709,13 +1706,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             translations.Add(translation);
         }
 
-        // Resolves an int user id to its Guid key, falling back to SuperUserKey for unknown ids.
-        private Guid ResolveUserKey(int userId)
-        {
-            Attempt<Guid> attempt = _userIdKeyResolver.TryGetAsync(userId).GetAwaiter().GetResult();
-            return attempt.Success ? attempt.Result : Constants.Security.SuperUserKey;
-        }
-
         #endregion
 
         #region Languages
@@ -1774,6 +1764,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         public IReadOnlyList<IScript> ImportScripts(IEnumerable<XElement> scriptElements, int userId)
         {
             var result = new List<IScript>();
+            Guid userKey = ResolveUserKey(userId);
 
             foreach (XElement scriptXml in scriptElements)
             {
@@ -1783,7 +1774,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     continue;
                 }
 
-                IScript? script = _fileService.GetScript(path!);
+                IScript? script = _scriptService.GetAsync(path!).GetAwaiter().GetResult();
 
                 // only update if it doesn't exist
                 if (script == null)
@@ -1794,9 +1785,31 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    script = new Script(path!) { Content = content };
-                    _fileService.SaveScript(script, userId);
-                    result.Add(script);
+                    (var name, var parentPath) = FileSystemPath.Split(path!);
+                    EnsureFolderHierarchy(
+                        parentPath,
+                        path!,
+                        p => _scriptFolderService.GetAsync(p).GetAwaiter().GetResult() is not null,
+                        (folderName, folderParent) => _scriptFolderService
+                            .CreateAsync(new ScriptFolderCreateModel { Name = folderName, ParentPath = folderParent })
+                            .GetAwaiter().GetResult().Success);
+
+                    var createModel = new ScriptCreateModel
+                    {
+                        Name = name,
+                        ParentPath = parentPath,
+                        Content = content,
+                    };
+
+                    Attempt<IScript?, ScriptOperationStatus> createAttempt = _scriptService.CreateAsync(createModel, userKey).GetAwaiter().GetResult();
+                    if (createAttempt.Success && createAttempt.Result is not null)
+                    {
+                        result.Add(createAttempt.Result);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Skipping script '{Path}' during package install: {Status}", path, createAttempt.Status);
+                    }
                 }
             }
 
@@ -1812,22 +1825,45 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         public IReadOnlyList<IPartialView> ImportPartialViews(IEnumerable<XElement> partialViewElements, int userId)
         {
             var result = new List<IPartialView>();
+            Guid userKey = ResolveUserKey(userId);
 
             foreach (XElement partialViewXml in partialViewElements)
             {
                 var path = partialViewXml.AttributeValue<string>("path")
                     ?? throw new InvalidOperationException("No path attribute found");
 
-                IPartialView? partialView = _fileService.GetPartialView(path);
+                IPartialView? partialView = _partialViewService.GetAsync(path).GetAwaiter().GetResult();
 
                 // only update if it doesn't exist
                 if (partialView == null)
                 {
                     var content = partialViewXml.Value ?? string.Empty;
 
-                    partialView = new PartialView(path) { Content = content };
-                    _fileService.SavePartialView(partialView, userId);
-                    result.Add(partialView);
+                    (var name, var parentPath) = FileSystemPath.Split(path);
+                    EnsureFolderHierarchy(
+                        parentPath,
+                        path,
+                        p => _partialViewFolderService.GetAsync(p).GetAwaiter().GetResult() is not null,
+                        (folderName, folderParent) => _partialViewFolderService
+                            .CreateAsync(new PartialViewFolderCreateModel { Name = folderName, ParentPath = folderParent })
+                            .GetAwaiter().GetResult().Success);
+
+                    var createModel = new PartialViewCreateModel
+                    {
+                        Name = name,
+                        ParentPath = parentPath,
+                        Content = content,
+                    };
+
+                    Attempt<IPartialView?, PartialViewOperationStatus> createAttempt = _partialViewService.CreateAsync(createModel, userKey).GetAwaiter().GetResult();
+                    if (createAttempt.Success && createAttempt.Result is not null)
+                    {
+                        result.Add(createAttempt.Result);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Skipping partial view '{Path}' during package install: {Status}", path, createAttempt.Status);
+                    }
                 }
             }
 
@@ -1848,6 +1884,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         public IReadOnlyList<IFile> ImportStylesheets(IEnumerable<XElement> stylesheetElements, int userId)
         {
             var result = new List<IFile>();
+            Guid userKey = ResolveUserKey(userId);
 
             foreach (XElement n in stylesheetElements)
             {
@@ -1857,7 +1894,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     continue;
                 }
 
-                IStylesheet? s = _fileService.GetStylesheet(stylesheetPath!);
+                IStylesheet? s = _stylesheetService.GetAsync(stylesheetPath!).GetAwaiter().GetResult();
                 if (s == null)
                 {
                     var content = n.Element("Content")?.Value;
@@ -1866,8 +1903,30 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         continue;
                     }
 
-                    s = new Stylesheet(stylesheetPath!) { Content = content };
-                    _fileService.SaveStylesheet(s, userId);
+                    (var name, var parentPath) = FileSystemPath.Split(stylesheetPath!);
+                    EnsureFolderHierarchy(
+                        parentPath,
+                        stylesheetPath!,
+                        p => _stylesheetFolderService.GetAsync(p).GetAwaiter().GetResult() is not null,
+                        (folderName, folderParent) => _stylesheetFolderService
+                            .CreateAsync(new StylesheetFolderCreateModel { Name = folderName, ParentPath = folderParent })
+                            .GetAwaiter().GetResult().Success);
+
+                    var createModel = new StylesheetCreateModel
+                    {
+                        Name = name,
+                        ParentPath = parentPath,
+                        Content = content,
+                    };
+
+                    Attempt<IStylesheet?, StylesheetOperationStatus> createAttempt = _stylesheetService.CreateAsync(createModel, userKey).GetAwaiter().GetResult();
+                    if (createAttempt.Success is false || createAttempt.Result is null)
+                    {
+                        _logger.LogWarning("Skipping stylesheet '{Path}' during package install: {Status}", stylesheetPath, createAttempt.Status);
+                        continue;
+                    }
+
+                    s = createAttempt.Result;
                 }
 
                 foreach (XElement prop in n.XPathSelectElements("Properties/Property"))
@@ -1882,8 +1941,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     }
                     else
                     {
-                        //sp.Text = name;
-                        //Changing the name requires removing the current property and then adding another new one
+                        // Changing the name requires removing the current property and then adding another new one
                         if (sp.Name != name)
                         {
                             s.RemoveProperty(sp.Name);
@@ -1897,7 +1955,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                     sp.Value = prop.Element("Value")!.Value;
                 }
 
-                _fileService.SaveStylesheet(s, userId);
+                var updateModel = new StylesheetUpdateModel
+                {
+                    Content = s.Content ?? string.Empty,
+                };
+                _stylesheetService.UpdateAsync(s.Path, updateModel, userKey).GetAwaiter().GetResult();
                 result.Add(s);
             }
 
@@ -1995,5 +2057,45 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
 
         #endregion
+
+        // Resolves an int user id to its Guid key, falling back to SuperUserKey for unknown ids.
+        private Guid ResolveUserKey(int userId)
+        {
+            Attempt<Guid> attempt = _userIdKeyResolver.TryGetAsync(userId).GetAwaiter().GetResult();
+            return attempt.Success ? attempt.Result : Constants.Security.SuperUserKey;
+        }
+
+        // Walks a '/'-separated parent path and creates each missing folder via the supplied folder service callbacks.
+        // The legacy IFileService.Save* methods relied on the underlying file system to auto-create directories;
+        // the per-domain services validate that the parent already exists, so packages with nested files need the
+        // hierarchy materialised up-front.
+        private void EnsureFolderHierarchy(
+            string? parentPath,
+            string filePath,
+            Func<string, bool> folderExists,
+            Func<string, string?, bool> tryCreateFolder)
+        {
+            if (string.IsNullOrEmpty(parentPath))
+            {
+                return;
+            }
+
+            var segments = parentPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            string? accumulated = null;
+            foreach (var segment in segments)
+            {
+                var fullPath = accumulated is null ? segment : $"{accumulated}/{segment}";
+                if (folderExists(fullPath) is false && tryCreateFolder(segment, accumulated) is false)
+                {
+                    _logger.LogWarning(
+                        "Could not create parent folder '{FolderPath}' for package file '{FilePath}'.",
+                        fullPath,
+                        filePath);
+                    return;
+                }
+
+                accumulated = fullPath;
+            }
+        }
     }
 }

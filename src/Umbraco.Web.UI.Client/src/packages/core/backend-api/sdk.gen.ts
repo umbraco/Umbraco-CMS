@@ -3792,12 +3792,6 @@ export class InstallService {
      */
     public static getInstallSettings<ThrowOnError extends boolean = true>(options?: Options<GetInstallSettingsData, ThrowOnError>) {
         return (options?.client ?? client).get<GetInstallSettingsResponses, GetInstallSettingsErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/umbraco/management/api/v1/install/settings',
             ...options
         });
@@ -3810,12 +3804,6 @@ export class InstallService {
      */
     public static postInstallSetup<ThrowOnError extends boolean = true>(options: Options<PostInstallSetupData, ThrowOnError>) {
         return (options.client ?? client).post<PostInstallSetupResponses, PostInstallSetupErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/umbraco/management/api/v1/install/setup',
             ...options,
             headers: {
@@ -3832,12 +3820,6 @@ export class InstallService {
      */
     public static postInstallValidateDatabase<ThrowOnError extends boolean = true>(options: Options<PostInstallValidateDatabaseData, ThrowOnError>) {
         return (options.client ?? client).post<PostInstallValidateDatabaseResponses, PostInstallValidateDatabaseErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/umbraco/management/api/v1/install/validate-database',
             ...options,
             headers: {
@@ -4196,12 +4178,6 @@ export class ManifestService {
      */
     public static getManifestManifestPublic<ThrowOnError extends boolean = true>(options?: Options<GetManifestManifestPublicData, ThrowOnError>) {
         return (options?.client ?? client).get<GetManifestManifestPublicResponses, unknown, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/umbraco/management/api/v1/manifest/manifest/public',
             ...options
         });
@@ -6842,12 +6818,6 @@ export class PreviewService {
      */
     public static deletePreview<ThrowOnError extends boolean = true>(options?: Options<DeletePreviewData, ThrowOnError>) {
         return (options?.client ?? client).delete<DeletePreviewResponses, unknown, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/umbraco/management/api/v1/preview',
             ...options
         });
@@ -7500,12 +7470,6 @@ export class SecurityService {
      */
     public static postSecurityForgotPasswordVerify<ThrowOnError extends boolean = true>(options: Options<PostSecurityForgotPasswordVerifyData, ThrowOnError>) {
         return (options.client ?? client).post<PostSecurityForgotPasswordVerifyResponses, PostSecurityForgotPasswordVerifyErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/umbraco/management/api/v1/security/forgot-password/verify',
             ...options,
             headers: {
@@ -7544,12 +7508,6 @@ export class ServerService {
      */
     public static getServerConfiguration<ThrowOnError extends boolean = true>(options?: Options<GetServerConfigurationData, ThrowOnError>) {
         return (options?.client ?? client).get<GetServerConfigurationResponses, unknown, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/umbraco/management/api/v1/server/configuration',
             ...options
         });
@@ -7580,12 +7538,6 @@ export class ServerService {
      */
     public static getServerStatus<ThrowOnError extends boolean = true>(options?: Options<GetServerStatusData, ThrowOnError>) {
         return (options?.client ?? client).get<GetServerStatusResponses, GetServerStatusErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/umbraco/management/api/v1/server/status',
             ...options
         });
@@ -9138,12 +9090,6 @@ export class UserService {
      */
     public static postUserInviteCreatePassword<ThrowOnError extends boolean = true>(options: Options<PostUserInviteCreatePasswordData, ThrowOnError>) {
         return (options.client ?? client).post<PostUserInviteCreatePasswordResponses, PostUserInviteCreatePasswordErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/umbraco/management/api/v1/user/invite/create-password',
             ...options,
             headers: {
@@ -9182,12 +9128,6 @@ export class UserService {
      */
     public static postUserInviteVerify<ThrowOnError extends boolean = true>(options: Options<PostUserInviteVerifyData, ThrowOnError>) {
         return (options.client ?? client).post<PostUserInviteVerifyResponses, PostUserInviteVerifyErrors, ThrowOnError>({
-            security: [
-                {
-                    scheme: 'bearer',
-                    type: 'http'
-                }
-            ],
             url: '/umbraco/management/api/v1/user/invite/verify',
             ...options,
             headers: {

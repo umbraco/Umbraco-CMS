@@ -65,7 +65,7 @@ internal static class SurfaceControllerTestHelpers
         };
 
         // Provide a routed request feature so CurrentPage/RedirectToCurrentUmbracoPage can resolve.
-        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri("http://localhost/"), Mock.Of<IFileService>());
+        var publishedRequestBuilder = new PublishedRequestBuilder(new Uri("http://localhost/"), Mock.Of<ITemplateService>());
         if (currentPage is not null)
         {
             publishedRequestBuilder.SetPublishedContent(currentPage);

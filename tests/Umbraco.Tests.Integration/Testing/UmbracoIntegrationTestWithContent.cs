@@ -23,8 +23,6 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
 
     protected IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
-    protected IFileService FileService => GetRequiredService<IFileService>();
-
     protected ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     protected ContentService ContentService => (ContentService)GetRequiredService<IContentService>();

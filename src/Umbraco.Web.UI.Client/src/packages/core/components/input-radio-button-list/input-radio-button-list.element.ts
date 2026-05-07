@@ -1,10 +1,8 @@
 import { css, html, nothing, repeat, customElement, property, classMap } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import { UUIRadioElement } from '@umbraco-cms/backoffice/external/uui';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 
-import type { UUIRadioEvent } from '@umbraco-cms/backoffice/external/uui';
 
 export type UmbRadioButtonItem = { label: string; value: string; invalid?: boolean };
 
@@ -54,10 +52,11 @@ export class UmbInputRadioButtonListElement extends UmbFormControlMixin<string, 
 		);
 	}
 
-	#onChange(event: UUIRadioEvent) {
+	#onChange(event: Event) {
 		event.stopPropagation();
-		if (!(event.target instanceof UUIRadioElement)) return;
-		this.value = event.target.value;
+		const group = event.currentTarget as HTMLElement & { value: string };
+		if (!group) return;
+		this.value = group.value;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
