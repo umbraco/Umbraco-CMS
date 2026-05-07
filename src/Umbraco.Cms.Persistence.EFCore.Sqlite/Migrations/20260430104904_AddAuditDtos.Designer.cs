@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
@@ -10,9 +11,11 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    partial class UmbracoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430104904_AddAuditDtos")]
+    partial class AddAuditDtos
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.5");
@@ -363,53 +366,6 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("umbracoCacheInstruction", (string)null);
-                });
-
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ConsentDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Action")
-                        .HasMaxLength(512)
-                        .HasColumnType("TEXT")
-                        .HasColumnName("action")
-                        .UseCollation("NOCASE");
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("comment")
-                        .UseCollation("NOCASE");
-
-                    b.Property<string>("Context")
-                        .HasMaxLength(128)
-                        .HasColumnType("TEXT")
-                        .HasColumnName("context")
-                        .UseCollation("NOCASE");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("createDate");
-
-                    b.Property<bool>("Current")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("current");
-
-                    b.Property<string>("Source")
-                        .HasMaxLength(512)
-                        .HasColumnType("TEXT")
-                        .HasColumnName("source")
-                        .UseCollation("NOCASE");
-
-                    b.Property<int>("State")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("state");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("umbracoConsent", (string)null);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DomainDto", b =>
