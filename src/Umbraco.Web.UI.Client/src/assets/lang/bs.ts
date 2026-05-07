@@ -994,13 +994,6 @@ export default {
 		setPasswordInstruction: 'Molimo unesite novu lozinku',
 		setPasswordConfirmation: 'Vaša lozinka je ažurirana',
 		resetCodeExpired: 'Link na koji ste kliknuli je nevažeći ili je istekao',
-		mfaSecurityCodeMessage: 'Vaš sigurnosni kod je: %0%',
-		'2faTitle': 'Poslednji korak',
-		'2faText': 'Omogućili ste 2-faktorsku autentifikaciju i morate potvrditi svoj identitet.',
-		'2faMultipleText': 'Molimo odaberite 2-faktor provajdera',
-		'2faCodeInput': 'Verifikacijski kod',
-		'2faCodeInputHelp': 'Unesite verifikacioni kod',
-		'2faInvalidCode': 'Unesen je nevažeći kod',
 	},
 	main: {
 		dashboard: 'Kontrolna tabla',

@@ -1041,13 +1041,6 @@ export default {
 		setPasswordInstruction: 'Darparwch gyfrinair newydd',
 		setPasswordConfirmation: "Mae eich cyfrinair wedi'i ddiweddaru",
 		resetCodeExpired: "Mae'r ddolen rydych wedi clicio arno naill ai yn annilys neu wedi dod i ben",
-		'2faTitle': 'Un cam olaf',
-		'2faText': "Rydych chi wedi galluogi dilysu 2-ffactor ac mae'n rhaid i chi wirio pwy ydych chi.",
-		'2faMultipleText': 'Dewiswch ddarparwr 2 ffactor',
-		'2faCodeInput': 'Cod dilysu',
-		'2faCodeInputHelp': 'Rhowch y cod dilysu os gwelwch yn dda',
-		'2faInvalidCode': "Cod annilys wedi'i nodi",
-		mfaSecurityCodeMessage: 'Eich cod diogelwch yw: %0%',
 	},
 	main: {
 		dashboard: 'Dashfwrdd',
