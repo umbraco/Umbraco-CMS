@@ -14,7 +14,7 @@ const umbWarnLegacyGreetingKey = (legacyKey: string, canonicalKey: string) => {
 	new UmbDeprecation({
 		deprecated: `Translation key "${legacyKey}"`,
 		removeInVersion: '20.0.0',
-		solution: `Use "${canonicalKey}" instead. See https://github.com/umbraco/Umbraco-CMS/issues/56402`,
+		solution: `Use "${canonicalKey}" instead. See https://github.com/umbraco/Umbraco-CMS/issues/20082`,
 	}).warn();
 };
 
@@ -57,7 +57,7 @@ export class UmbAuthViewElement extends UmbLitElement {
 		const legacyKey = `auth_greeting${day}`;
 		const canonicalKey = `login_greeting${day}`;
 		// Honour translation packages still shipping the legacy `auth_greeting*` namespace,
-		// otherwise use the canonical `login_greeting*` key. See #56402.
+		// otherwise use the canonical `login_greeting*` key. See #20082.
 		// TODO (V20): remove the auth_greeting* fallback and the warning helper above; only
 		// login_greeting* remains.
 		if (this.localize.termOrDefault(legacyKey, null) !== null) {
