@@ -463,31 +463,19 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 	#renderBody() {
 		return html`
-		${this.#renderToolbar()}
-
-		${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()} 
+			${this.#renderToolbar()} ${this._searchQuery ? this.#renderSearchResult() : this.#renderCurrentChildren()}
 
 			<umb-dropzone-media
 				id="dropzone"
 				multiple
-				?is-empty=${!this._currentChildren.length && !this._searchQuery}
 				@change=${this.#onDropzoneChange}
 				.parentUnique=${this._currentMediaEntity.unique}>
 			</umb-dropzone-media>
-			`;
+		`;
 	}
 
 	#renderEmptyState() {
-		return html`
-			<div class="empty-media-state">
-				<uui-icon name="icon-picture"></uui-icon>
-				<p>Drag and drop your media files here</p>
-				<p>or</p>
-				<uui-button look="primary" label="Browse files" @click=${() => this._dropzone.browse()}>
-					Browse files
-				</uui-button>
-			</div>
-		`;
+		return html` <umb-empty-media-state @browse=${() => this._dropzone.browse()}> </umb-empty-media-state> `;
 	}
 
 	#renderSearchResult() {
@@ -498,10 +486,10 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 					? this.#renderTable(this._searchResult)
 					: html`<div id="media-grid">
 							${repeat(
-						this._searchResult,
-						(item) => item.unique,
-						(item) => this.#renderCard(item),
-					)}
+								this._searchResult,
+								(item) => item.unique,
+								(item) => this.#renderCard(item),
+							)}
 						</div>`}
 		`;
 	}
@@ -511,13 +499,13 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 			${!this._currentChildren.length
 				? this.#renderEmptyState()
 				: html`${this._currentView === 'table'
-					? this.#renderTable(this._currentChildren)
-					: html`<div id="media-grid">
+						? this.#renderTable(this._currentChildren)
+						: html`<div id="media-grid">
 								${repeat(
-						this._currentChildren,
-						(item) => item.unique,
-						(item) => this.#renderCard(item),
-					)}
+									this._currentChildren,
+									(item) => item.unique,
+									(item) => this.#renderCard(item),
+								)}
 							</div>`}
 					${this._currentTotalPages > 1
 						? html`<uui-pagination
@@ -543,17 +531,17 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 						value=${this._searchQuery}>
 						<div slot="prepend">
 							${this._searching
-				? html`<uui-loader-circle id="searching-indicator"></uui-loader-circle>`
-				: html`<uui-icon name="search"></uui-icon>`}
+								? html`<uui-loader-circle id="searching-indicator"></uui-loader-circle>`
+								: html`<uui-icon name="search"></uui-icon>`}
 						</div>
 					</uui-input>
 
 					${this._currentMediaEntity.unique && this._currentMediaEntity.unique !== this._startNode?.unique
-				? html`<uui-checkbox
+						? html`<uui-checkbox
 								?checked=${this._searchFrom?.unique === this._currentMediaEntity.unique}
 								@change=${this.#onSearchFromChange}
 								label="Search only in ${this._currentMediaEntity.name}"></uui-checkbox>`
-				: nothing}
+						: nothing}
 				</div>
 				<uui-button
 					@click=${() => this._dropzone.browse()}
@@ -630,9 +618,9 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 										compact
 										label=${item.name}
 										@click=${(e: Event) => {
-										e.stopPropagation();
-										this.#onOpen(item);
-									}}
+											e.stopPropagation();
+											this.#onOpen(item);
+										}}
 										>${item.name}</uui-button
 									>`
 								: html`<span class="table-name">${item.name}</span>`,
@@ -692,10 +680,10 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 
 		const startNode: UmbMediaPathModel | undefined = this._startNode
 			? {
-				entityType: this._startNode.entityType,
-				unique: this._startNode.unique,
-				name: this._startNode.name,
-			}
+					entityType: this._startNode.entityType,
+					unique: this._startNode.unique,
+					name: this._startNode.name,
+				}
 			: undefined;
 
 		return html`<umb-media-picker-folder-path
@@ -752,30 +740,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				max-width: 100%;
 			}
 
-			.empty-media-state {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				justify-content: center;
-				background-color: var(--uui-palette-sand); 
-				border: 1px dashed var(--uui-color-border-standalone, --uui-palette-grey-light);
-				border-radius: var(--uui-border-radius);
-				color: var(--uui-color-default);
+			umb-empty-media-state {
 				padding: var(--uui-size-layout-1);
-				opacity: 0;
-				animation: fadeInEmptyState 0.2s ease-in forwards 0.15s; 
-			}
-
-			@keyframes fadeInEmptyState {
-				to {
-					opacity: 1;
-				}
-			}   
-
-			.empty-media-state uui-icon {
-				font-size: clamp(1rem, 2.5vw, 3rem);
-				margin-bottom: var(--uui-size-space-4);
-				color: var(--uui-color-default);
 			}
 
 			.not-allowed {

@@ -211,9 +211,7 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 					${when(
 						item.status === UmbFileDropzoneItemStatus.NOT_ALLOWED,
 						() =>
-							html`<div class="error">
-								${item.statusMessage ?? this.localize.term('media_disallowedFileType')}.
-							</div>`,
+							html`<div class="error">${item.statusMessage ?? this.localize.term('media_disallowedFileType')}.</div>`,
 					)}
 				</div>
 				<div class="fileActions">
@@ -305,7 +303,6 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				flex-wrap: wrap;
 				align-items: center;
 				gap: var(--uui-size-space-3);
-				margin-top: var(--uui-size-layout-2);
 				margin-top: var(--uui-size-layout-2);
 
 				.placeholder {
