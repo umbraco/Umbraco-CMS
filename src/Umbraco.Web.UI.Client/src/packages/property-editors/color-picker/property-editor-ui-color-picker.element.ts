@@ -20,6 +20,7 @@ export class UmbPropertyEditorUIColorPickerElement
 	@property({ type: Object })
 	public override set value(value: UmbSwatchDetails | undefined) {
 		super.value = value ? this.#ensureHashPrefix(value) : undefined;
+		this.#syncLabelFromSwatches();
 	}
 	public override get value(): UmbSwatchDetails | undefined {
 		return super.value;
@@ -49,6 +50,16 @@ export class UmbPropertyEditorUIColorPickerElement
 
 		const swatches = config?.getValueByAlias<Array<UmbSwatchDetails>>('items') ?? [];
 		this._swatches = swatches.map((swatch) => this.#ensureHashPrefix(swatch));
+		this.#syncLabelFromSwatches();
+	}
+
+	#syncLabelFromSwatches() {
+		if (!this.value || this._swatches.length === 0) return;
+		const match = this._swatches.find((swatch) => swatch.value === this.value!.value);
+		if (match && match.label !== this.value.label) {
+			super.value = match;
+			this.dispatchEvent(new UmbChangeEvent());
+		}
 	}
 
 	#ensureHashPrefix(swatch: UmbSwatchDetails): UmbSwatchDetails {
