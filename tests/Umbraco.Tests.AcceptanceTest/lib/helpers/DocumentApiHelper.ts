@@ -234,19 +234,13 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
-  async createPublishedDocumentForTemplate(documentName: string, documentTypeName: string, templateId: string) {
-    const documentTypeId = await this.api.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId, true);
-    const documentId = await this.createDocumentWithTemplate(documentName, documentTypeId, templateId);
-    await this.publish(documentId);
-    return documentId;
-  }
-
-  async createPublishedDocumentWithTwoTextVersions(documentName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string) {
+  async createPublishedDocumentWithTwoNameVersionsAndTwoTextVersions(originalDocumentName: string, renamedDocumentName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string) {
     const dataTypeData = await this.api.dataType.getByName(dataTypeName);
     const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-    const documentId = await this.createDocumentWithTextContent(documentName, documentTypeId, originalText, dataTypeName);
+    const documentId = await this.createDocumentWithTextContent(originalDocumentName, documentTypeId, originalText, dataTypeName);
     await this.publish(documentId);
     const documentData = await this.get(documentId);
+    documentData.variants[0].name = renamedDocumentName;
     documentData.values[0].value = updatedText;
     await this.update(documentId, documentData);
     await this.publish(documentId);
@@ -1803,21 +1797,13 @@ export class DocumentApiHelper {
     );
   }
 
-  async verifyDocumentValue(documentId: string, expectedValue: string) {
-    await this.verifyDocumentValueWithCulture(documentId, expectedValue, null);
-  }
-
-  async verifyDocumentValueWithCulture(documentId: string, expectedValue: string, culture: string | null) {
+  async doesDocumentWithCultureHaveValue(documentId: string, expectedValue: string, culture: string | null) {
     const documentData = await this.get(documentId);
     const valueEntry = documentData.values.find(v => v.culture === culture);
     expect(valueEntry?.value).toBe(expectedValue);
   }
 
-  async verifyDocumentName(documentId: string, expectedName: string) {
-    await this.verifyDocumentNameWithCulture(documentId, expectedName, null);
-  }
-
-  async verifyDocumentNameWithCulture(documentId: string, expectedName: string, culture: string | null) {
+  async doesDocumentWithCultureHaveName(documentId: string, expectedName: string, culture: string | null) {
     const documentData = await this.get(documentId);
     const variantEntry = documentData.variants.find(v => v.culture === culture);
     expect(variantEntry?.name).toBe(expectedName);
