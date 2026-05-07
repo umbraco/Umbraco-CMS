@@ -36,7 +36,7 @@ public class PublishedContentTests
 
         var aliases = content.Properties.Select(p => p.Alias).ToArray();
 
-        Assert.That(aliases, Is.EquivalentTo(new[] { "prop0", "prop1", "prop2" }));
+        Assert.That(aliases, Is.EqualTo(new[] { "prop0", "prop1", "prop2" }));
     }
 
     [Test]

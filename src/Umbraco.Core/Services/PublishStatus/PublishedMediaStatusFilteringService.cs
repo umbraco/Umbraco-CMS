@@ -34,5 +34,5 @@ internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStat
 
     /// <inheritdoc />
     public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
-        => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull().ToArray();
+        => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull();
 }

@@ -138,7 +138,14 @@ public sealed class NavigationNode
     /// </remarks>
     internal IReadOnlyList<Guid> GetOrderedChildren(ConcurrentDictionary<Guid, NavigationNode> navigationStructure)
     {
-        Guid[]? cached = _orderedChildren;
+        // Volatile.Read provides the acquire fence that pairs with the release fence on the
+        // lock-protected stores in BuildOrderedChildren / InvalidateOrderedChildren. On weak
+        // memory architectures (e.g. ARM64) a plain read can observe writes out of order with
+        // the lock release, so without this barrier a reader could in principle see a torn or
+        // unpublished reference; on x86/x64 the TSO model already gives acquire semantics so
+        // this compiles to a normal load. Matches the lock-free read idiom in System.Lazy<T>
+        // and LazyInitializer.EnsureInitialized.
+        Guid[]? cached = Volatile.Read(ref _orderedChildren);
         if (cached is not null)
         {
             return cached;

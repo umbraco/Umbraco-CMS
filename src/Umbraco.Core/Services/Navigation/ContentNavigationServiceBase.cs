@@ -748,7 +748,9 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
         // lazily for queries that actually run — so memory tracks the templates exercised, not
         // the theoretical product of (parents × types).
         var useCache = cachingSnapshot is not null;
-        (Guid parentKey, Guid? contentTypeKey) cacheKey = (parentKey, contentTypeKey);
+#pragma warning disable IDE0008 // Use explicit type (in this case using var improves the readability of the tuple key).
+        var cacheKey = (parentKey, contentTypeKey);
+#pragma warning restore IDE0008 // Use explicit type
 
         if (useCache && cachingSnapshot!.DescendantsCache.TryGetValue(cacheKey, out Guid[]? cached))
         {
