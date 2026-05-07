@@ -1,6 +1,7 @@
 import { expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
+import { UmbBasicState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbReadOnlyVariantGuardManager } from './readonly-variant-guard.manager.js';
 import { UmbVariantId } from '../../variant/variant-id.class.js';
 
@@ -142,6 +143,75 @@ describe('UmbReadOnlyVariantGuardManager', () => {
 					done();
 				})
 				.unsubscribe();
+		});
+	});
+
+	describe('Fallback', () => {
+		it('isPermittedForVariant reacts to late fallback updates when no rules match', () => {
+			const emitted: boolean[] = [];
+			const subscription = manager
+				.isPermittedForVariant(englishVariant)
+				.subscribe((value) => emitted.push(value));
+
+			manager.fallbackToPermitted();
+			manager.fallbackToNotPermitted();
+			manager.fallbackToPermitted();
+
+			subscription.unsubscribe();
+
+			expect(emitted).to.deep.equal([false, true, false, true]);
+		});
+
+		it('isPermittedForVariant is stable when a matching rule determines the result', () => {
+			manager.addRule(ruleEn);
+			const emitted: boolean[] = [];
+			const subscription = manager
+				.isPermittedForVariant(englishVariant)
+				.subscribe((value) => emitted.push(value));
+
+			manager.fallbackToPermitted();
+			manager.fallbackToNotPermitted();
+
+			subscription.unsubscribe();
+
+			expect(emitted).to.deep.equal([true]);
+		});
+
+		it('isPermittedForVariant uses late fallback updates for variants without a matching rule', () => {
+			manager.addRule(ruleEn);
+			const emitted: boolean[] = [];
+			const subscription = manager
+				.isPermittedForVariant(invariantVariant)
+				.subscribe((value) => emitted.push(value));
+
+			manager.fallbackToPermitted();
+
+			subscription.unsubscribe();
+
+			expect(emitted).to.deep.equal([false, true]);
+		});
+
+		it('getIsPermittedForVariant reflects the current fallback when no rules match', () => {
+			expect(manager.getIsPermittedForVariant(englishVariant)).to.equal(false);
+			manager.fallbackToPermitted();
+			expect(manager.getIsPermittedForVariant(englishVariant)).to.equal(true);
+			manager.fallbackToNotPermitted();
+			expect(manager.getIsPermittedForVariant(englishVariant)).to.equal(false);
+		});
+
+		it('isPermittedForObservableVariant reacts to late fallback updates when no rules match', () => {
+			const variantIdState = new UmbBasicState<UmbVariantId | undefined>(englishVariant);
+			const emitted: Array<boolean | undefined> = [];
+			const subscription = manager
+				.isPermittedForObservableVariant(variantIdState.asObservable())
+				.subscribe((value) => emitted.push(value));
+
+			manager.fallbackToPermitted();
+			manager.fallbackToNotPermitted();
+
+			subscription.unsubscribe();
+
+			expect(emitted).to.deep.equal([false, true, false]);
 		});
 	});
 });

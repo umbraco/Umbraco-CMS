@@ -91,7 +91,7 @@ export class UmbInstalledPackagesSectionViewItemElement extends UmbLitElement {
 		await umbConfirmModal(this, {
 			color: 'positive',
 			headline: this.name,
-			content: this.localize.term('packager_packageMigrationsConfirmText'),
+			content: '#packager_packageMigrationsConfirmText',
 		});
 
 		this._migrationButtonState = 'waiting';

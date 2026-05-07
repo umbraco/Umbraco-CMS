@@ -18,6 +18,11 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
     meta?: Record<string, unknown>;
 };
 
+/**
+ * Requests a password reset.
+ *
+ * Initiates a password reset process by sending a reset link to the specified email address.
+ */
 export const postSecurityForgotPassword = <ThrowOnError extends boolean = false>(options?: Options<PostSecurityForgotPasswordData, ThrowOnError>) => {
     return (options?.client ?? client).post<PostSecurityForgotPasswordResponses, PostSecurityForgotPasswordErrors, ThrowOnError>({
         security: [
@@ -35,6 +40,11 @@ export const postSecurityForgotPassword = <ThrowOnError extends boolean = false>
     });
 };
 
+/**
+ * Initiates password reset.
+ *
+ * Initiates a password reset process for the user with the provided email.
+ */
 export const postSecurityForgotPasswordReset = <ThrowOnError extends boolean = false>(options?: Options<PostSecurityForgotPasswordResetData, ThrowOnError>) => {
     return (options?.client ?? client).post<PostSecurityForgotPasswordResetResponses, PostSecurityForgotPasswordResetErrors, ThrowOnError>({
         security: [
@@ -52,6 +62,11 @@ export const postSecurityForgotPasswordReset = <ThrowOnError extends boolean = f
     });
 };
 
+/**
+ * Verifies a password reset token.
+ *
+ * Verifies the provided password reset token for the specified user.
+ */
 export const postSecurityForgotPasswordVerify = <ThrowOnError extends boolean = false>(options?: Options<PostSecurityForgotPasswordVerifyData, ThrowOnError>) => {
     return (options?.client ?? client).post<PostSecurityForgotPasswordVerifyResponses, PostSecurityForgotPasswordVerifyErrors, ThrowOnError>({
         url: '/umbraco/management/api/v1/security/forgot-password/verify',
@@ -63,6 +78,11 @@ export const postSecurityForgotPasswordVerify = <ThrowOnError extends boolean = 
     });
 };
 
+/**
+ * Creates an initial password for a user.
+ *
+ * Creates an initial password for a newly invited user using the provided token.
+ */
 export const postUserInviteCreatePassword = <ThrowOnError extends boolean = false>(options?: Options<PostUserInviteCreatePasswordData, ThrowOnError>) => {
     return (options?.client ?? client).post<PostUserInviteCreatePasswordResponses, PostUserInviteCreatePasswordErrors, ThrowOnError>({
         url: '/umbraco/management/api/v1/user/invite/create-password',
@@ -74,6 +94,11 @@ export const postUserInviteCreatePassword = <ThrowOnError extends boolean = fals
     });
 };
 
+/**
+ * Verifies a user invitation.
+ *
+ * Verifies that the invitation token is valid for creating a new user account.
+ */
 export const postUserInviteVerify = <ThrowOnError extends boolean = false>(options?: Options<PostUserInviteVerifyData, ThrowOnError>) => {
     return (options?.client ?? client).post<PostUserInviteVerifyResponses, PostUserInviteVerifyErrors, ThrowOnError>({
         url: '/umbraco/management/api/v1/user/invite/verify',

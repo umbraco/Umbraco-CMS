@@ -377,7 +377,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 		flags: [],
 		values: [
 			{
-				alias: 'inputMode',
+				alias: 'inputType',
 				value: 'email',
 			},
 		],

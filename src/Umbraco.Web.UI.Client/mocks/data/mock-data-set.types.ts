@@ -169,6 +169,8 @@ export type UmbMockWebhookEventModel = WebhookEventResponseModel;
 
 export type UmbMockWebhookDeliveryModel = WebhookLogResponseModel;
 
+export type UmbMockAuditLogModel = AuditLogResponseModel;
+
 export type UmbMockTrackedReferenceItemModel =
 	| DefaultReferenceResponseModel
 	| DocumentReferenceResponseModel
@@ -232,7 +234,7 @@ export interface UmbMockDataSet {
 	logs?: Array<LogMessageResponseModel>;
 
 	// Audit logs
-	auditLogs?: Array<AuditLogResponseModel>;
+	auditLogs?: Array<UmbMockAuditLogModel>;
 
 	// Health check data
 	healthGroups?: Array<HealthCheckGroupWithResultResponseModel & { name: string }>;

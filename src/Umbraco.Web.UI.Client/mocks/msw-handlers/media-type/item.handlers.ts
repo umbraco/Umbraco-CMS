@@ -22,6 +22,21 @@ export const itemHandlers = [
 		return HttpResponse.json(items);
 	}),
 
+	http.get(umbracoPath(`/item${UMB_SLUG}/folders`), ({ request }) => {
+		const url = new URL(request.url);
+		const skip = Number(url.searchParams.get('skip')) || 0;
+		const take = Number(url.searchParams.get('take')) || 100;
+
+		const allItems = umbMediaTypeMockDb.getAll();
+		const folders = allItems.filter((item) => item.isFolder);
+		const paged = folders.slice(skip, skip + take);
+
+		return HttpResponse.json({
+			items: paged.map((item) => ({ id: item.id, name: item.name, icon: item.icon, flags: item.flags })),
+			total: folders.length,
+		});
+	}),
+
 	http.get(umbracoPath(`/item${UMB_SLUG}/allowed`), ({ request }) => {
 		const fileExtension = new URL(request.url).searchParams.get('fileExtension');
 		if (!fileExtension) return;
