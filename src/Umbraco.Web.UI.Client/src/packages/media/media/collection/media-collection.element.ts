@@ -22,10 +22,10 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	private _isEmpty = false
 
 	@query('#native-file-input')
-    private _fileInput?: HTMLInputElement;
+	private _fileInput?: HTMLInputElement;
 
-    @query('#dropzone')
-    private _dropzone?: any;
+	@query('#dropzone')
+	private _dropzone?: any;
 
 	constructor() {
 		super();
@@ -35,10 +35,10 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 			this.#collectionContext = context;
 
 			if (context) {
-                this.observe(context.items, (items) => {
-                    this._isEmpty = items.length === 0;
-                });
-            }
+				this.observe(context.items, (items) => {
+					this._isEmpty = items.length === 0;
+				});
+			}
 		});
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
@@ -98,21 +98,21 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	}
 
 	#handleBrowseClick() {
-        // Use the queried element directly
-        this._fileInput?.click();
-    }
+		// Use the queried element directly
+		this._fileInput?.click();
+	}
 
 	#handleFileSelect(event: Event) {
-        const input = event.target as HTMLInputElement;
-        if (!input.files || input.files.length === 0) return;
-        
-        // Use the queried element directly
-        if (this._dropzone && typeof this._dropzone.onUpload === 'function') {
-            this._dropzone.onUpload({ detail: { files: Array.from(input.files), folders: [] } });
-        }
-        
-        input.value = ''; 
-    }
+		const input = event.target as HTMLInputElement;
+		if (!input.files || input.files.length === 0) return;
+		
+		// Use the queried element directly
+		if (this._dropzone && typeof this._dropzone.onUpload === 'function') {
+			this._dropzone.onUpload({ detail: { files: Array.from(input.files), folders: [] } });
+		}
+		
+		input.value = ''; 
+	}
 
 
 	protected override renderToolbar() {
@@ -134,84 +134,84 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 		`;
 	}
 	public override render() {
-        return html`
-            ${super.render()}
+		return html`
+			${super.render()}
 
-            ${when(
-                this._isEmpty,
-                () => html`
-                <div class="empty-media-state">
-                        <uui-icon name="icon-picture"></uui-icon>
-                        <p>Drag and drop your media files here</p>
-                        <p>or</p>
-                        <uui-button look="primary" label="Browse files" @click=${this.#handleBrowseClick}>
-                            Browse files
-                        </uui-button>
-                        
-                        <input 
-                            type="file" 
-                            id="native-file-input" 
-                            multiple 
-                            @change=${this.#handleFileSelect} 
-                            style="display:none;" 
-                        />
-                    </div>
-                `
-            )}
-        `;
-    }
+			${when(
+				this._isEmpty,
+				() => html`
+				<div class="empty-media-state">
+						<uui-icon name="icon-picture"></uui-icon>
+						<p>Drag and drop your media files here</p>
+						<p>or</p>
+						<uui-button look="primary" label="Browse files" @click=${this.#handleBrowseClick}>
+							Browse files
+						</uui-button>
+						
+						<input 
+							type="file" 
+							id="native-file-input" 
+							multiple 
+							@change=${this.#handleFileSelect} 
+							style="display:none;" 
+						/>
+					</div>
+				`
+			)}
+		`;
+	}
 
 	static override styles = [
-        ...UmbCollectionDefaultElement.styles,
-        css`
+		...UmbCollectionDefaultElement.styles,
+		css`
 			umb-dropzone-media {
-                top: var(--uui-size-layout-4);
-                left: 0;
-                right: 0;
-                bottom: 0;
-            }
+				top: var(--uui-size-layout-4);
+				left: 0;
+				right: 0;
+				bottom: 0;
+			}
 
-            .empty-media-state {
-                cursor: pointer;
-                position: absolute;
-                top: var(--uui-size-layout-4);
-                left: var(--uui-size-layout-1);
-                right: var(--uui-size-layout-1);
-                bottom: calc(var(--uui-size-60) * 2);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                background-color: var(--uui-palette-sand); 
-                border: 1px dashed var(--uui-color-border-standalone, --uui-palette-grey-light);
-                border-radius: var(--uui-border-radius);
-                color: var(--uui-color-default);
-                opacity: 0;
-                animation: fadeInEmptyState 0.2s ease-in forwards 0.15s; 
-            	pointer-events: none;
+			.empty-media-state {
+				cursor: pointer;
+				position: absolute;
+				top: var(--uui-size-layout-4);
+				left: var(--uui-size-layout-1);
+				right: var(--uui-size-layout-1);
+				bottom: calc(var(--uui-size-60) * 2);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				background-color: var(--uui-palette-sand); 
+				border: 1px dashed var(--uui-color-border-standalone, --uui-palette-grey-light);
+				border-radius: var(--uui-border-radius);
+				color: var(--uui-color-default);
+				opacity: 0;
+				animation: fadeInEmptyState 0.2s ease-in forwards 0.15s; 
+				pointer-events: none;
 				}
 
-            @keyframes fadeInEmptyState {
-                to {
-                    opacity: 1;
-                }
-            }   
-            .empty-media-state uui-icon {
-                font-size: clamp(1rem, 2.5vw, 3rem);
-                margin-bottom: var(--uui-size-space-4);
-                color: var(--uui-color-default);
-            }
-            
-            .empty-media-state uui-button {
-                z-index: 1000; 
-                position: relative;
+			@keyframes fadeInEmptyState {
+				to {
+					opacity: 1;
+				}
+			}   
+			.empty-media-state uui-icon {
+				font-size: clamp(1rem, 2.5vw, 3rem);
+				margin-bottom: var(--uui-size-space-4);
+				color: var(--uui-color-default);
+			}
+			
+			.empty-media-state uui-button {
+				z-index: 1000; 
+				position: relative;
 				pointer-events: auto;
-            }
-            #empty-state {
-                display: none;
-            }
-        `,
-    ];
+			}
+			#empty-state {
+				display: none;
+			}
+		`,
+	];
 }
 
 export default UmbMediaCollectionElement;

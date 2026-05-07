@@ -305,7 +305,8 @@ export class UmbInputDropzoneElement extends UmbFormControlMixin<UmbUploadableIt
 				flex-wrap: wrap;
 				align-items: center;
 				gap: var(--uui-size-space-3);
-				margin: var(--uui-size-layout-1) var(--uui-size-layout-1) 0 0;
+				margin-top: var(--uui-size-layout-2);
+				margin-top: var(--uui-size-layout-2);
 
 				.placeholder {
 					display: grid;
