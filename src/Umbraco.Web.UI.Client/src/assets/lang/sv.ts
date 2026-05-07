@@ -686,8 +686,6 @@ export default {
 		renewSession: 'Förnya nu för att spara ditt arbete',
 	},
 	login: {
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',
 		greeting0: 'Välkommen',
 		greeting1: 'Välkommen',
 		greeting2: 'Välkommen',
@@ -710,6 +708,7 @@ export default {
 		forgottenPassword: "Glömt lösenord?",
 		forgottenPasswordInstruction: "Ett e-postmeddelande kommer att skickas till den angivna adressen med en länk för att återställa ditt lösenord",
 		requestPasswordResetConfirmation: "Ett e-postmeddelande med instruktioner för lösenordsåterställning kommer att skickas till den angivna adressen om den matchar våra uppgifter",
+		setPasswordInstruction: "Vänligen välj ett nytt lösenord",
 		setPasswordConfirmation: "Ditt lösenord har uppdaterats",
 		rememberMe: "Kom ihåg mig",
 		error: "Fel",

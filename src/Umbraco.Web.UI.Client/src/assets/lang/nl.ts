@@ -945,8 +945,6 @@ export default {
 		instruction: 'log hieronder in',
 		signInWith: 'Inloggen met',
 		timeout: 'Sessie is verlopen',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p>',
 		forgottenPassword: 'Wachtwoord vergeten?',
 		forgottenPasswordInstruction:
 			'Er zal een e-mail worden gestuurd naar het e-mailadres van jouw account.\n      Hierin staat een link om je wachtwoord te resetten\n    ',
@@ -958,10 +956,6 @@ export default {
 		setPasswordInstruction: 'Geef alsjeblieft een nieuw wachtwoord op',
 		setPasswordConfirmation: 'Je wachtwoord is aangepast',
 		resetCodeExpired: 'De link die je hebt aangeklikt is niet (meer) geldig.',
-		resetPasswordEmailCopySubject: 'Umbraco: Wachtwoord Reset',
-		resetPasswordEmailCopyFormat:
-			'<p>De gebruikersnaam om in te loggen bij jouw Umbraco omgeving is: <strong>%0%</strong></p><p>Klik <a href="%1%"><strong>hier</strong></a> om je wachtwoord te resetten of knip/plak deze URL in je browser:</p><p><em>%1%</em></p>',
-		mfaSecurityCodeSubject: 'Umbraco: Beveiligingscode',
 		mfaSecurityCodeMessage: 'Jouw beveiligingscode is: %0%',
 		'2faTitle': 'Laatste stap',
 		'2faText': 'Je hebt tweestapsverificatie ingeschakeld en moet je identiteit verifiëren.',

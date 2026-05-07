@@ -1236,6 +1236,7 @@ export default {
 		forgottenPasswordInstruction: 'An email will be sent with a link to reset your password',
 		requestPasswordResetConfirmation:
 			'We sent an email with password reset instructions, if the email address matches a registered user.',
+		setPasswordInstruction: "Please provide a new password.",
 		setPasswordConfirmation: 'Your password has been updated',
 		rememberMe: 'Remember me',
 		error: 'Error',

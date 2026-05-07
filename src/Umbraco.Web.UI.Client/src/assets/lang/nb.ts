@@ -714,8 +714,6 @@ export default {
 		instruction: 'Logg på nedenfor',
 		signInWith: 'Logg på med',
 		timeout: 'Din sesjon er utløpt',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',
 		continue: "Fortsett",
 		validate: "Valider",
 		login: "Logg inn",
@@ -728,6 +726,7 @@ export default {
 		forgottenPassword: "Glemt passord?",
 		forgottenPasswordInstruction: "En e-post vil bli sendt til den angitte adressen med en lenke for å tilbakestille passordet ditt",
 		requestPasswordResetConfirmation: "En e-post med instruksjoner for tilbakestilling av passordet vil bli sendt til den angitte adressen hvis den samsvarer med våre opplysninger",
+		setPasswordInstruction: "Vennligst velg et nytt passord",
 		setPasswordConfirmation: "Passordet ditt er oppdatert",
 		rememberMe: "Husk meg",
 		error: "Feil",

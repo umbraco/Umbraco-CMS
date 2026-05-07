@@ -1192,6 +1192,7 @@ export default {
 			'En e-mail vil blive sendt til den angivne adresse med et link til at nulstille din adgangskode',
 		requestPasswordResetConfirmation:
 			'En e-mail med instruktioner for nulstilling af adgangskoden vil blive sendt til den angivne adresse, hvis det matcher vores optegnelser',
+		setPasswordInstruction: "Vælg venligst en ny adgangskode",
 		setPasswordConfirmation: 'Din adgangskode er blevet opdateret',
 		rememberMe: 'Husk mig',
 		error: 'Fejl',
