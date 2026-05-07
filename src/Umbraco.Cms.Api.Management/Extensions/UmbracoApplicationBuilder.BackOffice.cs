@@ -14,6 +14,8 @@ namespace Umbraco.Extensions;
 /// </summary>
 public static partial class UmbracoApplicationBuilderExtensions
 {
+    private const string LoggerCategoryName = "Umbraco.Extensions.UmbracoApplicationBuilderExtensions";
+
     /// <summary>
     ///     Adds all required middleware to run the back office
     /// </summary>
@@ -60,7 +62,7 @@ public static partial class UmbracoApplicationBuilderExtensions
             .SelectMany(ds => ds.Endpoints)
             .OfType<RouteEndpoint>()
             .Any(e => string.Equals(
-                e.RoutePattern.RawText,
+                e.DisplayName,
                 Constants.Web.Routing.DynamicRoutePattern,
                 StringComparison.Ordinal));
 
@@ -69,11 +71,9 @@ public static partial class UmbracoApplicationBuilderExtensions
             return;
         }
 
-#pragma warning disable CS0436 // Type conflicts with imported type
         ILogger logger = app.ApplicationServices
             .GetRequiredService<ILoggerFactory>()
-            .CreateLogger(typeof(UmbracoApplicationBuilderExtensions).FullName!);
-#pragma warning restore CS0436 // Type conflicts with imported type
+            .CreateLogger(LoggerCategoryName);
 
         logger.LogWarning(
             "UseWebsiteEndpoints() appears to have been called before UseBackOfficeEndpoints() in the WithEndpoints configuration. " +
