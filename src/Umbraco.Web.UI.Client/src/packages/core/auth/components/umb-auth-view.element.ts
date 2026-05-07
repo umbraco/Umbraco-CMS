@@ -5,6 +5,18 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+
+const warnedLegacyKeys = new Set<string>();
+const umbWarnLegacyGreetingKey = (legacyKey: string, canonicalKey: string) => {
+	if (warnedLegacyKeys.has(legacyKey)) return;
+	warnedLegacyKeys.add(legacyKey);
+	new UmbDeprecation({
+		deprecated: `Translation key "${legacyKey}"`,
+		removeInVersion: '20.0.0',
+		solution: `Use "${canonicalKey}" instead. See https://github.com/umbraco/Umbraco-CMS/issues/56402`,
+	}).warn();
+};
 
 /**
  * A reusable auth login view that renders the full login screen (background, logo, greeting, providers).
@@ -38,19 +50,21 @@ export class UmbAuthViewElement extends UmbLitElement {
 	}
 
 	get headline() {
-		return this.userLoginState === 'timedOut'
-			? this.localize.term('login_instruction')
-			: this.localize.term(
-					[
-						'login_greeting0',
-						'login_greeting1',
-						'login_greeting2',
-						'login_greeting3',
-						'login_greeting4',
-						'login_greeting5',
-						'login_greeting6',
-					][new Date().getDay()],
-				);
+		if (this.userLoginState === 'timedOut') {
+			return this.localize.term('login_instruction');
+		}
+		const day = new Date().getDay();
+		const legacyKey = `auth_greeting${day}`;
+		const canonicalKey = `login_greeting${day}`;
+		// Honour translation packages still shipping the legacy `auth_greeting*` namespace,
+		// otherwise use the canonical `login_greeting*` key. See #56402.
+		// TODO (V20): remove the auth_greeting* fallback and the warning helper above; only
+		// login_greeting* remains.
+		if (this.localize.termOrDefault(legacyKey, null) !== null) {
+			umbWarnLegacyGreetingKey(legacyKey, canonicalKey);
+			return this.localize.term(legacyKey);
+		}
+		return this.localize.term(canonicalKey);
 	}
 
 	override firstUpdated(): void {

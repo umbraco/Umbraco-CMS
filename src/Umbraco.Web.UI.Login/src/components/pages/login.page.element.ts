@@ -11,7 +11,20 @@ import {
 	state,
 } from '@umbraco-cms/backoffice/external/lit';
 
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
+
 import { UMB_AUTH_CONTEXT } from '../../contexts/index.js';
+
+const warnedLegacyKeys = new Set<string>();
+const umbWarnLegacyGreetingKey = (legacyKey: string, canonicalKey: string) => {
+	if (warnedLegacyKeys.has(legacyKey)) return;
+	warnedLegacyKeys.add(legacyKey);
+	new UmbDeprecation({
+		deprecated: `Translation key "${legacyKey}"`,
+		removeInVersion: '20.0.0',
+		solution: `Use "${canonicalKey}" instead. See https://github.com/umbraco/Umbraco-CMS/issues/56402`,
+	}).warn();
+};
 
 @customElement('umb-login-page')
 export default class UmbLoginPageElement extends UmbLitElement {
@@ -121,9 +134,19 @@ export default class UmbLoginPageElement extends UmbLitElement {
 	};
 
 	get #greetingLocalizationKey() {
-		// The login_* greetings are resolved from the shared backoffice localization
-		// dictionary, registered by UmbSlimBackofficeController. See #56402.
-		return `login_greeting${new Date().getDay()}`;
+		const day = new Date().getDay();
+		const legacyKey = `auth_greeting${day}`;
+		const canonicalKey = `login_greeting${day}`;
+		// Honour translation packages still shipping the legacy `auth_greeting*` namespace,
+		// otherwise use the canonical `login_greeting*` key (the shipped default lives there
+		// in the shared backoffice dictionary). See #56402.
+		// TODO (V20): remove the auth_greeting* fallback and the warning helper above; only
+		// login_greeting* remains.
+		if (this.localize.termOrDefault(legacyKey, null) !== null) {
+			umbWarnLegacyGreetingKey(legacyKey, canonicalKey);
+			return legacyKey;
+		}
+		return canonicalKey;
 	}
 
 	#onSubmitClick = () => {
