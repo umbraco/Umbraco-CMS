@@ -132,6 +132,96 @@ public class ContentNavigationDescendantsCacheTests
     }
 
     [Test]
+    public void TryGetDescendantsKeysInBin_AfterRemoveFromBin_RebuildsBinDescendantsCache()
+    {
+        // RemoveFromBin invalidates the recycle-bin snapshot. Primed bin entries for an unrelated
+        // trashed subtree must therefore be discarded (whole-snapshot invalidation, not surgical).
+        DocumentNavigationService service = CreateService();
+        Guid contentType = Guid.NewGuid();
+
+        Guid trashedRootA = Guid.NewGuid();
+        Guid trashedChildA = Guid.NewGuid();
+        service.Add(trashedRootA, contentType);
+        service.Add(trashedChildA, contentType, trashedRootA);
+        service.MoveToBin(trashedRootA);
+
+        Guid trashedRootB = Guid.NewGuid();
+        service.Add(trashedRootB, contentType);
+        service.MoveToBin(trashedRootB);
+
+        Assume.That(service.TryGetDescendantsKeysInBin(trashedRootA, out IEnumerable<Guid> primedBin), Is.True);
+        Assume.That(primedBin, Does.Contain(trashedChildA));
+
+        service.RemoveFromBin(trashedRootB);
+
+        Assert.That(service.TryGetDescendantsKeysInBin(trashedRootA, out IEnumerable<Guid> afterRemove), Is.True);
+        Assert.That(afterRemove, Is.Not.SameAs(primedBin));
+        Assert.That(afterRemove, Does.Contain(trashedChildA));
+    }
+
+    [Test]
+    public void TryGetDescendantsKeys_AfterRestoreFromBin_RebuildsMainDescendantsCache()
+    {
+        // RestoreFromBin invalidates the main snapshot. Primed main entries for the restore
+        // target must therefore be rebuilt to include the restored subtree.
+        DocumentNavigationService service = CreateService();
+        Guid contentType = Guid.NewGuid();
+
+        Guid mainRoot = Guid.NewGuid();
+        Guid mainChild = Guid.NewGuid();
+        service.Add(mainRoot, contentType);
+        service.Add(mainChild, contentType, mainRoot);
+
+        Guid trashedRoot = Guid.NewGuid();
+        Guid trashedChild = Guid.NewGuid();
+        service.Add(trashedRoot, contentType);
+        service.Add(trashedChild, contentType, trashedRoot);
+        service.MoveToBin(trashedRoot);
+
+        Assume.That(service.TryGetDescendantsKeys(mainRoot, out IEnumerable<Guid> primedMain), Is.True);
+        Assume.That(primedMain.ToArray(), Is.EqualTo(new[] { mainChild }));
+
+        service.RestoreFromBin(trashedRoot, mainRoot);
+
+        Assert.That(service.TryGetDescendantsKeys(mainRoot, out IEnumerable<Guid> afterRestore), Is.True);
+        Assert.That(afterRestore, Is.Not.SameAs(primedMain));
+        Assert.That(afterRestore, Does.Contain(trashedRoot));
+        Assert.That(afterRestore, Does.Contain(trashedChild));
+        Assert.That(afterRestore, Does.Contain(mainChild));
+    }
+
+    [Test]
+    public void TryGetDescendantsKeysInBin_AfterRestoreFromBin_RebuildsBinDescendantsCache()
+    {
+        // RestoreFromBin invalidates the recycle-bin snapshot too. Primed bin entries for an
+        // unrelated trashed subtree must be discarded even though the restore did not touch them.
+        DocumentNavigationService service = CreateService();
+        Guid contentType = Guid.NewGuid();
+
+        Guid mainRoot = Guid.NewGuid();
+        service.Add(mainRoot, contentType);
+
+        Guid trashedRootA = Guid.NewGuid();
+        Guid trashedChildA = Guid.NewGuid();
+        service.Add(trashedRootA, contentType);
+        service.Add(trashedChildA, contentType, trashedRootA);
+        service.MoveToBin(trashedRootA);
+
+        Guid trashedRootB = Guid.NewGuid();
+        service.Add(trashedRootB, contentType);
+        service.MoveToBin(trashedRootB);
+
+        Assume.That(service.TryGetDescendantsKeysInBin(trashedRootA, out IEnumerable<Guid> primedBin), Is.True);
+        Assume.That(primedBin, Does.Contain(trashedChildA));
+
+        service.RestoreFromBin(trashedRootB, mainRoot);
+
+        Assert.That(service.TryGetDescendantsKeysInBin(trashedRootA, out IEnumerable<Guid> afterRestore), Is.True);
+        Assert.That(afterRestore, Is.Not.SameAs(primedBin));
+        Assert.That(afterRestore, Does.Contain(trashedChildA));
+    }
+
+    [Test]
     public void TryGetDescendantsKeys_AfterUpdateSortOrder_RebuildsAndReflectsNewOrder()
     {
         DocumentNavigationService service = CreateService();

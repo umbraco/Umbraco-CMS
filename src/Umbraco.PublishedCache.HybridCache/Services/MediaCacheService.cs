@@ -105,7 +105,7 @@ internal sealed class MediaCacheService : IMediaCacheService
 
     public bool TryGetCached(Guid key, out IPublishedContent? content)
     {
-        // Mirror the L0 (published content cache)fast path in GetNodeAsync.
+        // Mirror the L0 (published content cache) fast path in GetNodeAsync.
         if (_publishedContentCache.TryGetValue(key, out content))
         {
             return true;
