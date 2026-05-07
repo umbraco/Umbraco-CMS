@@ -5,10 +5,13 @@
 		"moduleResolution": "bundler",
 		"lib": ["ES2022", "DOM", "DOM.Iterable"],
 		"strict": true,
+		"experimentalDecorators": true,
 		"useDefineForClassFields": false,
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
 		"skipLibCheck": true,
 		"noEmit": true
 	},
