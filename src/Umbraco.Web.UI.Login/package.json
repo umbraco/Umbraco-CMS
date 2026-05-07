@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "postinstall": "npm run generate:tsconfig",
     "dev": "vite",
     "build": "tsc && vite build",
     "watch": "tsc && vite build --watch",
