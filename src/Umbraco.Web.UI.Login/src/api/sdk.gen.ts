@@ -4,7 +4,7 @@ import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
 import type { PostSecurityForgotPasswordData, PostSecurityForgotPasswordErrors, PostSecurityForgotPasswordResetData, PostSecurityForgotPasswordResetErrors, PostSecurityForgotPasswordResetResponses, PostSecurityForgotPasswordResponses, PostSecurityForgotPasswordVerifyData, PostSecurityForgotPasswordVerifyErrors, PostSecurityForgotPasswordVerifyResponses, PostUserInviteCreatePasswordData, PostUserInviteCreatePasswordErrors, PostUserInviteCreatePasswordResponses, PostUserInviteVerifyData, PostUserInviteVerifyErrors, PostUserInviteVerifyResponses } from './types.gen';
 
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
      * You can provide a client instance returned by `createClient()` instead of
      * individual options. This might be also useful if you want to implement a
@@ -23,89 +23,69 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  *
  * Initiates a password reset process by sending a reset link to the specified email address.
  */
-export const postSecurityForgotPassword = <ThrowOnError extends boolean = false>(options?: Options<PostSecurityForgotPasswordData, ThrowOnError>) => {
-    return (options?.client ?? client).post<PostSecurityForgotPasswordResponses, PostSecurityForgotPasswordErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/umbraco/management/api/v1/security/forgot-password',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options?.headers
-        }
-    });
-};
+export const postSecurityForgotPassword = <ThrowOnError extends boolean = false>(options: Options<PostSecurityForgotPasswordData, ThrowOnError>) => (options.client ?? client).post<PostSecurityForgotPasswordResponses, PostSecurityForgotPasswordErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/umbraco/management/api/v1/security/forgot-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Initiates password reset.
  *
  * Initiates a password reset process for the user with the provided email.
  */
-export const postSecurityForgotPasswordReset = <ThrowOnError extends boolean = false>(options?: Options<PostSecurityForgotPasswordResetData, ThrowOnError>) => {
-    return (options?.client ?? client).post<PostSecurityForgotPasswordResetResponses, PostSecurityForgotPasswordResetErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/umbraco/management/api/v1/security/forgot-password/reset',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options?.headers
-        }
-    });
-};
+export const postSecurityForgotPasswordReset = <ThrowOnError extends boolean = false>(options: Options<PostSecurityForgotPasswordResetData, ThrowOnError>) => (options.client ?? client).post<PostSecurityForgotPasswordResetResponses, PostSecurityForgotPasswordResetErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/umbraco/management/api/v1/security/forgot-password/reset',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Verifies a password reset token.
  *
  * Verifies the provided password reset token for the specified user.
  */
-export const postSecurityForgotPasswordVerify = <ThrowOnError extends boolean = false>(options?: Options<PostSecurityForgotPasswordVerifyData, ThrowOnError>) => {
-    return (options?.client ?? client).post<PostSecurityForgotPasswordVerifyResponses, PostSecurityForgotPasswordVerifyErrors, ThrowOnError>({
-        url: '/umbraco/management/api/v1/security/forgot-password/verify',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options?.headers
-        }
-    });
-};
+export const postSecurityForgotPasswordVerify = <ThrowOnError extends boolean = false>(options: Options<PostSecurityForgotPasswordVerifyData, ThrowOnError>) => (options.client ?? client).post<PostSecurityForgotPasswordVerifyResponses, PostSecurityForgotPasswordVerifyErrors, ThrowOnError>({
+    url: '/umbraco/management/api/v1/security/forgot-password/verify',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Creates an initial password for a user.
  *
  * Creates an initial password for a newly invited user using the provided token.
  */
-export const postUserInviteCreatePassword = <ThrowOnError extends boolean = false>(options?: Options<PostUserInviteCreatePasswordData, ThrowOnError>) => {
-    return (options?.client ?? client).post<PostUserInviteCreatePasswordResponses, PostUserInviteCreatePasswordErrors, ThrowOnError>({
-        url: '/umbraco/management/api/v1/user/invite/create-password',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options?.headers
-        }
-    });
-};
+export const postUserInviteCreatePassword = <ThrowOnError extends boolean = false>(options: Options<PostUserInviteCreatePasswordData, ThrowOnError>) => (options.client ?? client).post<PostUserInviteCreatePasswordResponses, PostUserInviteCreatePasswordErrors, ThrowOnError>({
+    url: '/umbraco/management/api/v1/user/invite/create-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Verifies a user invitation.
  *
  * Verifies that the invitation token is valid for creating a new user account.
  */
-export const postUserInviteVerify = <ThrowOnError extends boolean = false>(options?: Options<PostUserInviteVerifyData, ThrowOnError>) => {
-    return (options?.client ?? client).post<PostUserInviteVerifyResponses, PostUserInviteVerifyErrors, ThrowOnError>({
-        url: '/umbraco/management/api/v1/user/invite/verify',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options?.headers
-        }
-    });
-};
+export const postUserInviteVerify = <ThrowOnError extends boolean = false>(options: Options<PostUserInviteVerifyData, ThrowOnError>) => (options.client ?? client).post<PostUserInviteVerifyResponses, PostUserInviteVerifyErrors, ThrowOnError>({
+    url: '/umbraco/management/api/v1/user/invite/verify',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
