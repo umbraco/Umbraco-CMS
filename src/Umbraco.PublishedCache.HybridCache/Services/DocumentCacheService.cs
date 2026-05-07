@@ -107,6 +107,18 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         return await GetNodeAsync(key, calculatedPreview);
     }
 
+    public bool TryGetCached(Guid key, bool preview, out IPublishedContent? content)
+    {
+        // Mirror the L0 (published content cache)fast path in GetNodeAsync.
+        if (preview is false && _publishedContentCache.TryGetValue(GetCacheKey(key, preview), out content))
+        {
+            return true;
+        }
+
+        content = null;
+        return false;
+    }
+
     private async Task<IPublishedContent?> GetNodeAsync(Guid key, bool preview)
     {
         var cacheKey = GetCacheKey(key, preview);
