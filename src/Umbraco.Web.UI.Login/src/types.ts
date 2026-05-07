@@ -1,4 +1,4 @@
-import { PasswordConfigurationResponseModel as PasswordConfigurationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { PasswordConfigurationResponseModel as PasswordConfigurationModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export type LoginRequestModel = {
 	username: string;
