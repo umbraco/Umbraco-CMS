@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.Middleware;
@@ -58,15 +57,11 @@ public static partial class UmbracoApplicationBuilderExtensions
 
     private static void WarnIfWebsiteEndpointsAlreadyRegistered(IUmbracoEndpointBuilderContext app)
     {
-        bool dynamicRouteAlreadyRegistered = app.EndpointRouteBuilder.DataSources
-            .SelectMany(ds => ds.Endpoints)
-            .OfType<RouteEndpoint>()
-            .Any(e => string.Equals(
-                e.DisplayName,
-                Constants.Web.Routing.DynamicRoutePattern,
-                StringComparison.Ordinal));
-
-        if (dynamicRouteAlreadyRegistered is false)
+        // UseWebsiteEndpoints sets a flag in AppBuilder.Properties that we can read to determine
+        // if it has already been called. If it has, then we log a warning that the order of endpoint registration is wrong,
+        // which can lead to very confusing issues where the back office routes are shadowed by the front-end dynamic content
+        // route, resulting in blank pages and no errors.
+        if (app.AppBuilder.Properties.TryGetValue(Constants.Web.Routing.WebsiteEndpointsRegisteredKey, out object? flag) is false || flag is not true)
         {
             return;
         }
