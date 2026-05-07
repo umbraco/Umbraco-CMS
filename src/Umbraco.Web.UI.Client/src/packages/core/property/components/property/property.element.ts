@@ -2,6 +2,7 @@ import { UmbPropertyContext } from './property.context.js';
 import { css, customElement, html, property, state, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionElement, UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import {
@@ -22,6 +23,12 @@ import type {
 import type { UmbObserverController } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_MARK_ATTRIBUTE_NAME } from '@umbraco-cms/backoffice/const';
 import { UmbRoutePathAddendumContext } from '@umbraco-cms/backoffice/router';
+
+const UMB_LEGACY_PROPERTY_VALUE_CHANGE_DEPRECATION = new UmbDeprecation({
+	deprecated: '`property-value-change` event',
+	removeInVersion: '20.0.0',
+	solution: 'Use `UmbChangeEvent` or the standard `change` event instead',
+});
 
 /**
  *  @element umb-property
@@ -216,6 +223,7 @@ export class UmbPropertyElement extends UmbLitElement {
 	#configObserver?: UmbObserverController<UmbPropertyEditorConfigCollection | undefined>;
 	#validationMessageObserver?: UmbObserverController<string | undefined>;
 	#extensionsController?: UmbExtensionsApiInitializer<any>;
+	#hasWarnedLegacyPropertyValueChange = false;
 
 	constructor() {
 		super();
@@ -302,6 +310,14 @@ export class UmbPropertyElement extends UmbLitElement {
 		e.stopPropagation();
 	};
 
+	private _onLegacyPropertyValueChange = (e: CustomEvent): void => {
+		if (!this.#hasWarnedLegacyPropertyValueChange) {
+			this.#hasWarnedLegacyPropertyValueChange = true;
+			UMB_LEGACY_PROPERTY_VALUE_CHANGE_DEPRECATION.warn();
+		}
+		this._onPropertyEditorChange(e);
+	};
+
 	private _observePropertyEditorUI(): void {
 		if (this._propertyEditorUiAlias) {
 			this.observe(
@@ -345,8 +361,8 @@ export class UmbPropertyElement extends UmbLitElement {
 			this.#validationMessageObserver?.destroy();
 			this.#controlValidator?.destroy();
 			oldElement?.removeEventListener('change', this._onPropertyEditorChange as any as EventListener);
-			// Legacy support for the deprecated `property-value-change` event, which might still be used by older property editors. [LK]
-			oldElement?.removeEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
+			/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 20. [LK] */
+			oldElement?.removeEventListener('property-value-change', this._onLegacyPropertyValueChange as any as EventListener);
 			oldElement?.destroy?.();
 
 			this._element = el as ManifestPropertyEditorUi['ELEMENT_TYPE'];
@@ -355,8 +371,8 @@ export class UmbPropertyElement extends UmbLitElement {
 
 			if (this._element) {
 				this._element.addEventListener('change', this._onPropertyEditorChange as any as EventListener);
-				// Legacy support for the deprecated `property-value-change` event, which might still be used by older property editors. [LK]
-				this._element.addEventListener('property-value-change', this._onPropertyEditorChange as any as EventListener);
+				/** @deprecated The `UmbPropertyValueChangeEvent` has been deprecated, and will be removed in Umbraco 20. [LK] */
+				this._element.addEventListener('property-value-change', this._onLegacyPropertyValueChange as any as EventListener);
 				// No need to observe mandatory or label, as we already do so and set it on the _element if present: [NL]
 				this._element.manifest = manifest;
 				this._element.mandatory = this._mandatory;
