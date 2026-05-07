@@ -768,4 +768,12 @@ export abstract class UmbBlockEntryContext<
 		const exposes = this._manager?.getExposes();
 		return exposes?.find((x) => x.contentKey === this.#contentKey);
 	}
+
+	/**
+	 * Copy the block entry to the clipboard.
+	 * Subclasses must override this method with editor-specific clipboard logic.
+	 */
+	public async copyToClipboard(): Promise<void> {
+		throw new Error('copyToClipboard() is not implemented for this block entry context.');
+	}
 }

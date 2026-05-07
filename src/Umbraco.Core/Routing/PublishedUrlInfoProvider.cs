@@ -68,7 +68,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
             var url = _publishedUrlProvider.GetUrl(content.Key, culture: culture);
 
             // Handle "could not get URL"
-            if (url is "#" or "#ex")
+            if (url is Constants.Routing.Unroutable or Constants.Routing.UrlProviderException)
             {
                 // For invariant content, a missing URL just means there's no domain
                 // for this culture — not a problem worth reporting.

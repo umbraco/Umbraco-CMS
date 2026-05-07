@@ -272,6 +272,7 @@ export abstract class UmbTreeItemContextBase<
 			this.#observeIsSelectable();
 			this.#observeIsSelected();
 			this.#observeFoldersOnly();
+			this.#observeAdditionalRequestArgs();
 			this.#observeActive();
 		}).asPromise();
 	}
@@ -319,6 +320,19 @@ export abstract class UmbTreeItemContextBase<
 				this._treeItemChildrenManager.setFoldersOnly(foldersOnly ?? false);
 			},
 			'observeFoldersOnly',
+		);
+	}
+
+	#observeAdditionalRequestArgs() {
+		if (this.unique === undefined) return;
+
+		this.observe(
+			this.treeContext?.additionalRequestArgs,
+			(additionalRequestArgs) => {
+				if (!additionalRequestArgs) return;
+				this._treeItemChildrenManager.setAdditionalRequestArgs(additionalRequestArgs);
+			},
+			'observeAdditionalRequestArgs',
 		);
 	}
 

@@ -13,6 +13,7 @@ public static partial class Constants
         /// <summary>
         ///     Name for http client which ignores certificate errors.
         /// </summary>
+        [Obsolete("Register a project specific named HttpClient with DangerousAcceptAnyServerCertificateValidator if this behavior is required. Scheduled for removal in Umbraco 19.")]
         public const string IgnoreCertificateErrors = "Umbraco:HttpClients:IgnoreCertificateErrors";
 
         /// <summary>

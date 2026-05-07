@@ -429,4 +429,72 @@ internal sealed partial class UserServiceCrudTests
             Assert.AreEqual(UserOperationStatus.AdminUserGroupMustNotBeEmpty, adminUserUpdateResult.Status);
         }
     }
+
+    [Test]
+    public async Task Can_Update_User_Profile()
+    {
+        var userService = CreateUserService();
+        var (_, createdUser) = await CreateUserForUpdate(userService);
+        var model = new UserUpdateProfileModel
+        {
+            LanguageIsoCode = "da"
+        };
+
+        var result = await userService.UpdateProfileAsync(createdUser.Key, model);
+
+        Assert.IsTrue(result.Success);
+        var updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.IsNotNull(updatedUser);
+        Assert.AreEqual("da", updatedUser.Language);
+    }
+
+    [Test]
+    public async Task Can_Only_Update_Profile_Language_Other_Fields_Remain_Unchanged()
+    {
+        var userService = CreateUserService(securitySettings: new SecuritySettings { UsernameIsEmail = false });
+        var (_, createdUser) = await CreateUserForUpdate(userService);
+        var model = new UserUpdateProfileModel
+        {
+            LanguageIsoCode = "da",
+        };
+
+        var result = await userService.UpdateProfileAsync(createdUser.Key, model);
+
+        Assert.IsTrue(result.Success);
+        var updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.IsNotNull(updatedUser);
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual("da", updatedUser.Language);
+            Assert.AreEqual(createdUser.Email, updatedUser.Email);
+            Assert.AreEqual(createdUser.Username, updatedUser.Username);
+            Assert.AreEqual(createdUser.Name, updatedUser.Name);
+        });
+    }
+
+    [TestCase("en-US", true)]
+    [TestCase("Not an ISO Code (:", false)]
+    public async Task Profile_Iso_Code_Is_Validated(string isoCode, bool shouldSucceed)
+    {
+        var userService = CreateUserService();
+        var (_, createdUser) = await CreateUserForUpdate(userService);
+        var model = new UserUpdateProfileModel
+        {
+            LanguageIsoCode = isoCode,
+        };
+
+        var result = await userService.UpdateProfileAsync(createdUser.Key, model);
+
+        if (shouldSucceed is false)
+        {
+            Assert.IsFalse(result.Success);
+            Assert.AreEqual(UserOperationStatus.InvalidIsoCode, result.Status);
+            return;
+        }
+
+        Assert.IsTrue(result.Success);
+        var updatedUser = await userService.GetAsync(createdUser.Key);
+        Assert.IsNotNull(updatedUser);
+        Assert.AreEqual(isoCode, updatedUser.Language);
+    }
 }

@@ -228,6 +228,47 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
         return _currentMember;
     }
 
+    /// <summary>
+    ///     Generates a password reset token for the specified member.
+    ///     External-only members cannot reset passwords as they authenticate via their external provider.
+    /// </summary>
+    /// <param name="user">The member to generate the reset token for.</param>
+    /// <returns>The password reset token, or throws if the member is external-only.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the member is an external-only member.</exception>
+    public override Task<string> GeneratePasswordResetTokenAsync(MemberIdentityUser user)
+    {
+        if (user.IsExternalOnly)
+        {
+            throw new InvalidOperationException(
+                "Cannot generate a password reset token for an external-only member. " +
+                "This member authenticates via an external provider — use the provider's password recovery mechanism.");
+        }
+
+        return base.GeneratePasswordResetTokenAsync(user);
+    }
+
+    /// <summary>
+    ///     Resets the password for the specified member using a reset token.
+    ///     External-only members cannot have local passwords.
+    /// </summary>
+    /// <param name="user">The member whose password is being reset.</param>
+    /// <param name="token">The password reset token.</param>
+    /// <param name="newPassword">The new password.</param>
+    /// <returns>An <see cref="IdentityResult"/> indicating the result of the operation.</returns>
+    public override Task<IdentityResult> ResetPasswordAsync(MemberIdentityUser user, string token, string newPassword)
+    {
+        if (user.IsExternalOnly)
+        {
+            return Task.FromResult(IdentityResult.Failed(new IdentityError
+            {
+                Code = "ExternalMemberCannotResetPassword",
+                Description = "Cannot reset password for an external-only member. This member authenticates via an external provider.",
+            }));
+        }
+
+        return base.ResetPasswordAsync(user, token, newPassword);
+    }
+
     /// <inheritdoc />
     public virtual IPublishedContent? AsPublishedMember(MemberIdentityUser user)
     {

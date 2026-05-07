@@ -17,7 +17,7 @@ public class PublishStatusService : IPublishStatusManagementService, IPublishSta
     private readonly ILanguageService _languageService;
     private readonly IDocumentNavigationQueryService _documentNavigationQueryService;
 
-    private readonly ConcurrentDictionary<Guid, ISet<string>> _publishedCultures = new();
+    private ConcurrentDictionary<Guid, ISet<string>> _publishedCultures = new();
 
     /// <summary>
     /// Gets or sets the default culture ISO code used when no culture is specified.
@@ -49,7 +49,18 @@ public PublishStatusService(
     /// <inheritdoc/>
     public async Task InitializeAsync(CancellationToken cancellationToken)
     {
-        _publishedCultures.Clear();
+        // On subscriber/CD servers in a load-balanced setup, cache refresh notifications can trigger
+        // re-initialization while other threads are reading _publishedCultures. The previous approach
+        // called _publishedCultures.Clear() then gradually re-added entries, creating a window where
+        // concurrent readers (e.g. HasPublishedAncestorPath) would see an empty dictionary and
+        // incorrectly conclude that content is unpublished.
+        //
+        // Instead, we build a completely new dictionary from the DB, then swap it in with
+        // Interlocked.Exchange. Readers that already hold a reference to the old dictionary continue
+        // to use it safely; new readers pick up the fully populated replacement. There is no window
+        // where the dictionary is empty.
+        //
+        // Verified by: PublishStatusServiceTests.Concurrent_Initialize_Never_Transiently_Loses_Published_Status
         IDictionary<Guid, ISet<string>> publishStatus;
         using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
@@ -57,15 +68,10 @@ public PublishStatusService(
             scope.Complete();
         }
 
-        foreach ((Guid documentKey, ISet<string> publishedCultures) in publishStatus)
-        {
-            if (_publishedCultures.TryAdd(documentKey, publishedCultures) is false)
-            {
-                _logger.LogWarning("Failed to add published cultures for document {DocumentKey}", documentKey);
-            }
-        }
-
+        var newDictionary = new ConcurrentDictionary<Guid, ISet<string>>(publishStatus);
         DefaultCulture = await _languageService.GetDefaultIsoCodeAsync();
+
+        Interlocked.Exchange(ref _publishedCultures, newDictionary);
     }
 
     /// <inheritdoc/>
@@ -101,6 +107,13 @@ public PublishStatusService(
 
     /// <inheritdoc/>
     public bool HasPublishedAncestorPath(Guid contentKey)
+        => HasPublishedAncestorPathInternal(contentKey, null);
+
+    /// <inheritdoc/>
+    public bool HasPublishedAncestorPath(Guid contentKey, string culture)
+        => HasPublishedAncestorPathInternal(contentKey, culture);
+
+    private bool HasPublishedAncestorPathInternal(Guid contentKey, string? culture)
     {
         var success = _documentNavigationQueryService.TryGetAncestorsKeys(contentKey, out IEnumerable<Guid> keys);
         if (success is false)
@@ -113,8 +126,11 @@ public PublishStatusService(
 
         foreach (Guid key in keys)
         {
+            var isPublished = culture is null
+                ? IsDocumentPublishedInAnyCulture(key)
+                : IsDocumentPublished(key, culture);
 
-            if (IsDocumentPublishedInAnyCulture(key) is false)
+            if (isPublished is false)
             {
                 return false;
             }

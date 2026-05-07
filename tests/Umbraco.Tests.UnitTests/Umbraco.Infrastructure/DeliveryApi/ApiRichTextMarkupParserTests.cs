@@ -83,6 +83,35 @@ public class ApiRichTextMarkupParserTests
         Assert.AreEqual(expectedOutput, parsedHtml);
     }
 
+    // PascalCase type — historic mis-cased values written by the (now fixed) ConvertLocalLinks migration for Umbraco 15 (see #22597).
+    [Test]
+    public void Can_Parse_LocalLinks_With_PascalCase_Type()
+    {
+        var key1 = Guid.Parse("eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f");
+        var data1 = new MockData()
+            .WithKey(key1)
+            .WithContentTypeAlias("someAlias")
+            .WithRoutePath("/self/")
+            .WithRouteStartPath("self");
+
+        var mockData = new Dictionary<Guid, MockData>
+        {
+            { key1, data1 },
+        };
+
+        var parser = BuildDefaultSut(mockData);
+
+        var html =
+            @"<p>Rich text outside of the blocks with a link to <a type=""Document"" href=""/{localLink:eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f}"" title=""itself"">itself</a></p>";
+
+        var expectedOutput =
+            $@"<p>Rich text outside of the blocks with a link to <a href=""/self/"" title=""itself"" data-destination-id=""{key1:D}"" data-destination-type=""someAlias"" data-start-item-path=""self"" data-start-item-id=""eed5fc6b-96fd-45a5-a0f1-b1adfb483c2f"" data-link-type=""{LinkType.Content}"">itself</a></p>";
+
+        var parsedHtml = parser.Parse(html);
+
+        Assert.AreEqual(expectedOutput, parsedHtml);
+    }
+
     [TestCase("#some-anchor")]
     [TestCase("?something=true")]
     [TestCase("#!some-hashbang")]

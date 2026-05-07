@@ -23,8 +23,6 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 	 * @memberof UmbMemberServerDataSource
 	 */
 	async createScaffold(preset: UmbDeepPartialObject<UmbMemberDetailModel> = {}) {
-		let memberTypeIcon = '';
-
 		const memberTypeUnique = preset.memberType?.unique;
 
 		if (!memberTypeUnique) {
@@ -32,7 +30,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 		}
 
 		const { data } = await new UmbMemberTypeDetailServerDataSource(this).read(memberTypeUnique);
-		memberTypeIcon = data?.icon ?? '';
+		const memberTypeIcon = data?.icon ?? '';
 
 		const defaultData: UmbMemberDetailModel = {
 			entityType: UMB_MEMBER_ENTITY_TYPE,
@@ -51,6 +49,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 			lastLoginDate: null,
 			lastLockoutDate: null,
 			lastPasswordChangeDate: null,
+			profileData: null,
 			groups: [],
 			values: [],
 			flags: [],
@@ -104,6 +103,7 @@ export class UmbMemberServerDataSource extends UmbControllerBase implements UmbD
 			lastLoginDate: data.lastLoginDate || null,
 			lastLockoutDate: data.lastLockoutDate || null,
 			lastPasswordChangeDate: data.lastPasswordChangeDate || null,
+			profileData: data.profileData ?? null,
 			groups: data.groups,
 			values: data.values.map((value) => {
 				return {
