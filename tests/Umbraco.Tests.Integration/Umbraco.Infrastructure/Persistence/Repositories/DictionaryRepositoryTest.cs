@@ -546,6 +546,65 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         }
     }
 
+    /// <summary>
+    /// Verifies that <see cref="IDictionaryRepository.GetDictionaryItemDescendants"/> returns each
+    /// dictionary item exactly once when items have multiple translations.
+    /// </summary>
+    /// <remarks>
+    /// Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22640.
+    /// The underlying SQL left-joins cmsDictionary with cmsLanguageText (one row per
+    /// translation) and relies on NPoco's FetchOneToMany to collapse them back into a
+    /// single dictionary item. FetchOneToMany only merges adjacent rows that share the
+    /// same primary key, so the SQL must order rows such that translations for the same
+    /// dictionary item are contiguous. Without that ordering, items with multiple
+    /// translations get yielded multiple times.
+    /// </remarks>
+    [Test]
+    public async Task GetDictionaryItemDescendants_With_Multiple_Translations_Returns_Each_Item_Exactly_Once()
+    {
+        var languageService = GetRequiredService<ILanguageService>();
+        var languageDe = new Language("de-DE", "German (Germany)");
+        await languageService.CreateAsync(languageDe, Constants.Security.SuperUserKey);
+        var languageFr = new Language("fr-FR", "French (France)");
+        await languageService.CreateAsync(languageFr, Constants.Security.SuperUserKey);
+
+        var languageEn = await languageService.GetAsync("en-US");
+        var languageDk = await languageService.GetAsync("da-DK");
+
+        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
+        var additionalKeys = new[] { "Header", "Footer", "Sidebar", "Title", "Subtitle" };
+        foreach (var key in additionalKeys)
+        {
+            await dictionaryItemService.CreateAsync(
+                new DictionaryItem(key)
+                {
+                    Translations =
+                    [
+                        new DictionaryTranslation(languageEn, $"{key} (en)"),
+                        new DictionaryTranslation(languageDk, $"{key} (dk)"),
+                        new DictionaryTranslation(languageDe, $"{key} (de)"),
+                        new DictionaryTranslation(languageFr, $"{key} (fr)"),
+                    ],
+                },
+                Constants.Security.SuperUserKey);
+        }
+
+        using (ScopeProvider.CreateScope())
+        {
+            var repository = CreateRepository();
+
+            var results = repository.GetDictionaryItemDescendants(null).ToArray();
+
+            // 2 items from CreateTestData ("Read More", "Article") + the 5 items added above.
+            var expectedKeys = new[] { "Read More", "Article" }.Concat(additionalKeys).OrderBy(x => x).ToArray();
+            Assert.Multiple(() =>
+            {
+                Assert.That(results.Select(x => x.ItemKey).OrderBy(x => x), Is.EqualTo(expectedKeys));
+                Assert.That(results.Select(x => x.Key).Distinct().Count(), Is.EqualTo(results.Length), "Each dictionary item should appear exactly once.");
+            });
+        }
+    }
+
     [Test]
     public void GetDictionaryItemDescendants_WithValueSearch_Disabled_Does_Not_Return_Items_Matching_Only_Translation_Value()
     {
