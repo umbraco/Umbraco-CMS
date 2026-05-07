@@ -58,6 +58,7 @@ export class UmbPropertyEditorUIColorPickerElement
 		const match = this._swatches.find((swatch) => swatch.value === this.value!.value);
 		if (match && match.label !== this.value.label) {
 			super.value = match;
+			// Dispatch outside of user interaction so the refreshed label is persisted on the next save.
 			this.dispatchEvent(new UmbChangeEvent());
 		}
 	}
