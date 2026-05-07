@@ -1,4 +1,5 @@
 import { manifest as sliderSchemaManifest } from './Umbraco.Slider.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -18,6 +19,19 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.Slider',
 			icon: 'icon-navigation-horizontal',
 			group: 'common',
+			keywords: [
+				'number',
+				'range',
+				'percentage',
+				'rating',
+				'level',
+				'opacity',
+				'scale',
+				'volume',
+				'score',
+				'progress',
+				'zoom',
+			],
 			supportsReadOnly: true,
 			settings: {
 				properties: [
@@ -79,4 +93,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	sliderSchemaManifest,
+	...valueSummaryManifests,
 ];

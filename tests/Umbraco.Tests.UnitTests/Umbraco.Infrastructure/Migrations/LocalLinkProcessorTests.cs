@@ -88,13 +88,13 @@ public class LocalLinkProcessorTests
         var result = processor.ProcessStringValue(input);
 
         Assert.AreEqual(
-            $@"<a href=""{{localLink:{documentKey}}}"" type=""Document"">link</a>",
+            $@"<a href=""{{localLink:{documentKey}}}"" type=""document"">link</a>",
             result);
     }
 
     /// <summary>
     /// Verifies that an integer-based link that resolves to media (not document)
-    /// is converted with the correct "Media" type attribute.
+    /// is converted with the correct "media" type attribute.
     /// </summary>
     [Test]
     public void ProcessStringValue_IntegerMediaLink_ConvertsToGuidWithType()
@@ -115,7 +115,7 @@ public class LocalLinkProcessorTests
         var result = processor.ProcessStringValue(input);
 
         Assert.AreEqual(
-            $@"<a href=""{{localLink:{mediaKey}}}"" type=""Media"">link</a>",
+            $@"<a href=""{{localLink:{mediaKey}}}"" type=""media"">link</a>",
             result);
     }
 
@@ -305,7 +305,7 @@ public class LocalLinkProcessorTests
         var result = processor.ProcessStringValue(input);
 
         Assert.AreEqual(
-            $@"<a href=""{{localLink:{documentKey}}}#anchor"" type=""Document"">link</a>",
+            $@"<a href=""{{localLink:{documentKey}}}#anchor"" type=""document"">link</a>",
             result);
     }
 
@@ -328,7 +328,7 @@ public class LocalLinkProcessorTests
         var result = processor.ProcessStringValue(input);
 
         Assert.AreEqual(
-            $@"<a href=""{{localLink:{documentKey}}}?page=2"" type=""Document"">link</a>",
+            $@"<a href=""{{localLink:{documentKey}}}?page=2"" type=""document"">link</a>",
             result);
     }
 
