@@ -3,7 +3,6 @@ export interface IconEntry {
 	file: string;
 	keywords?: string[];
 	groups?: string[];
-	related?: string[];
 	legacy?: boolean;
 	internal?: boolean;
 }
@@ -29,7 +28,6 @@ export interface ManagedIcon {
 	category: IconCategory;
 	keywords: string[];
 	groups: string[];
-	related: string[];
 	legacy: boolean;
 	internal: boolean;
 	svgMarkup: string;

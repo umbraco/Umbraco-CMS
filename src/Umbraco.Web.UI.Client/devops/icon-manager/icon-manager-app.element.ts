@@ -76,7 +76,6 @@ export class IconManagerAppElement extends LitElement {
 					category,
 					keywords: entry.keywords ?? [],
 					groups: entry.groups ?? [],
-					related: entry.related ?? [],
 					legacy: entry.legacy ?? false,
 					internal: entry.internal ?? false,
 					svgMarkup,
@@ -97,7 +96,6 @@ export class IconManagerAppElement extends LitElement {
 					category: 'lucide',
 					keywords: [],
 					groups: [],
-					related: [],
 					legacy: false,
 					internal: false,
 					svgMarkup: iconNodesToSvg(nodes),
@@ -196,7 +194,6 @@ export class IconManagerAppElement extends LitElement {
 			const entry: Record<string, unknown> = { name: icon.name, file: icon.file };
 			if (icon.keywords.length) entry.keywords = icon.keywords;
 			if (icon.groups.length) entry.groups = icon.groups;
-			if (icon.related.length) entry.related = icon.related;
 			if (icon.legacy) entry.legacy = true;
 			if (icon.internal) entry.internal = true;
 			(dictionary[icon.category] as Record<string, unknown>[]).push(entry);
@@ -262,7 +259,6 @@ export class IconManagerAppElement extends LitElement {
 							<aside class="editor-panel">
 								<icon-editor
 									.icon=${this._editingIcon}
-									.allIcons=${this._pickedIcons}
 									.allGroups=${this._allGroups}></icon-editor>
 							</aside>
 						`

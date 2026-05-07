@@ -3,16 +3,12 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { repeat } from 'lit/directives/repeat.js';
 import type { ManagedIcon } from './types.js';
-import './icon-related-input.element.js';
 import '@umbraco-ui/uui';
 
 @customElement('icon-editor')
 export class IconEditorElement extends LitElement {
 	@property({ type: Object })
 	icon: ManagedIcon | null = null;
-
-	@property({ type: Array })
-	allIcons: ManagedIcon[] = [];
 
 	@property({ type: Array })
 	allGroups: string[] = [];
@@ -65,10 +61,6 @@ export class IconEditorElement extends LitElement {
 	#removeGroup(group: string) {
 		if (!this.icon) return;
 		this.#dispatchUpdate({ groups: this.icon.groups.filter((g) => g !== group) });
-	}
-
-	#onRelatedChanged(e: CustomEvent<string[]>) {
-		this.#dispatchUpdate({ related: e.detail });
 	}
 
 	#onLegacyChange(e: Event) {
@@ -224,14 +216,6 @@ export class IconEditorElement extends LitElement {
 							@keydown=${this.#onGroupKeydown}></uui-input>
 						<uui-button compact look="secondary" @click=${this.#addGroup}>Add</uui-button>
 					</div>
-				</div>
-
-				<div class="field">
-					<label>Related Icons</label>
-					<icon-related-input
-						.selectedNames=${this.icon.related}
-						.allIcons=${this.allIcons}
-						@related-changed=${this.#onRelatedChanged}></icon-related-input>
 				</div>
 
 				<div class="field">

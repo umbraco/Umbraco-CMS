@@ -24,7 +24,7 @@ export class IconCardElement extends LitElement {
 	override render() {
 		if (!this.icon) return nothing;
 
-		const hasMetadata = this.icon.keywords.length > 0 || this.icon.groups.length > 0 || this.icon.related.length > 0;
+		const hasMetadata = this.icon.keywords.length > 0 || this.icon.groups.length > 0;
 
 		return html`
 			<div
