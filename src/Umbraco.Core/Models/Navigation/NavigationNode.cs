@@ -78,6 +78,10 @@ public sealed class NavigationNode
     ///     hold a reference to its parent <see cref="NavigationNode"/> so cannot invalidate it
     ///     itself.
     /// </remarks>
+    // TODO (V19): Make internal. The contract requires the caller to invalidate the parent's
+    // ordered-children cache (InvalidateOrderedChildren is internal, so external callers cannot
+    // satisfy that contract and would silently observe stale ordering on subsequent reads).
+    // Internal callers in ContentNavigationServiceBase already do the invalidation correctly.
     public void UpdateSortOrder(int newSortOrder) => SortOrder = newSortOrder;
 
     /// <summary>
