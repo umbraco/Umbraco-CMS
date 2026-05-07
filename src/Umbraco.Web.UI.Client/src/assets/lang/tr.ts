@@ -926,13 +926,6 @@ export default {
 		setPasswordInstruction: 'Lütfen yeni bir şifre girin',
 		setPasswordConfirmation: 'Şifreniz güncellendi',
 		resetCodeExpired: 'Tıkladığınız bağlantı geçersiz veya süresi dolmuş',
-		mfaSecurityCodeMessage: 'Güvenlik kodunuz: %0%',
-		'2faTitle': 'Son adım',
-		'2faText': '2-aşamalı kimlik doğrulamayı etkinleştirdiniz ve kimliğinizi doğrulamanız gerekmekte.',
-		'2faMultipleText': 'Lütfen bir tane 2-aşamalı kimlik doğrulama hizmet sağlayıcı seçin',
-		'2faCodeInput': 'Doğrulama kodu',
-		'2faCodeInputHelp': 'Lütfen doğrulama kodunu girin',
-		'2faInvalidCode': 'Geçersiz kod girildi',
 	},
 	main: {
 		dashboard: 'Gösterge Paneli',
