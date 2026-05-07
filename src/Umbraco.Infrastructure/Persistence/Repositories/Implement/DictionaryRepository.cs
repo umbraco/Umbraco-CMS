@@ -172,6 +172,10 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
 
             ApplyFilterToQuery(sql, filter);
 
+            // FetchOneToMany only merges adjacent rows that share the same primary key, so
+            // translations for the same dictionary item must be contiguous in the result set.
+            sql.OrderBy<DictionaryDto>(x => x.UniqueId);
+
             return Database
                 .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
                 .Select(dto => ConvertFromDto(dto, languageIsoCodeById))
@@ -369,6 +373,9 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
                 sql.WhereIn<DictionaryDto>(x => x.UniqueId, ids);
             }
 
+            // FetchOneToMany requires translations for the same dictionary item to be contiguous.
+            sql.OrderBy<DictionaryDto>(x => x.UniqueId);
+
             return Database
                 .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
                 .Select(ConvertToEntity);
@@ -456,6 +463,9 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
                 sql.WhereIn<DictionaryDto>(x => x.Key, ids);
             }
 
+            // FetchOneToMany requires translations for the same dictionary item to be contiguous.
+            sql.OrderBy<DictionaryDto>(x => x.UniqueId);
+
             return Database
                 .FetchOneToMany<DictionaryDto>(x => x.LanguageTextDtos, sql)
                 .Select(ConvertToEntity);
@@ -469,6 +479,9 @@ internal sealed class DictionaryRepository : EntityRepositoryBase<int, IDictiona
         {
             sql.WhereIn<DictionaryDto>(x => x.PrimaryKey, ids);
         }
+
+        // FetchOneToMany requires translations for the same dictionary item to be contiguous.
+        sql.OrderBy<DictionaryDto>(x => x.UniqueId);
 
         IDictionary<int, ILanguage> languageIsoCodeById = GetLanguagesById();
 
