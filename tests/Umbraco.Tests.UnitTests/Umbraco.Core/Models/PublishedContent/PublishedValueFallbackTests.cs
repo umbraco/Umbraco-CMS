@@ -99,7 +99,7 @@ public class PublishedValueFallbackTests
 
     private static PublishedValueFallback CreateFallback() =>
         new(
-ServiceContext.CreatePartial(languageService: Mock.Of<ILanguageService>()),
+            ServiceContext.CreatePartial(languageService: Mock.Of<ILanguageService>()),
             Mock.Of<IVariationContextAccessor>(),
             Mock.Of<IPropertyRenderingContextAccessor>());
 
