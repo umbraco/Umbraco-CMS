@@ -65,6 +65,7 @@ export class UmbElementTreeServerDataSource
 			entityType: item.isFolder ? UMB_ELEMENT_FOLDER_ENTITY_TYPE : UMB_ELEMENT_ENTITY_TYPE,
 			hasChildren: item.hasChildren,
 			isTrashed: false,
+			noAccess: item.noAccess,
 			isFolder: item.isFolder,
 			documentType: {
 				unique: item.documentType?.id ?? '',
