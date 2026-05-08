@@ -1188,4 +1188,127 @@ export class DocumentTypeApiHelper {
 
     return await this.create(documentType);
   }
+
+  /**
+   * Creates a document type with a nested Block List structure for testing the
+   * AllowEditInvariantFromNonDefault matrix.
+   *
+   * Structure created:
+   * - Document Type (Vary by culture)
+   *   - Outer Block List property (variance per `variance.outerBlockList`)
+   *     -> Outer Block List Data Type
+   *        -> Outer Element Type (variance per `variance.outerElement`)
+   *           - Inner Block List property (variance per `variance.innerBlockList`)
+   *             -> Inner Block List Data Type
+   *                -> Inner Element Type (variance per `variance.innerElement`)
+   *                   - Text property (variance per `variance.text`)
+   *
+   * Note: a property can only vary by culture when its containing type also varies.
+   * The caller is responsible for passing a consistent combination
+   * (e.g. when innerElement = false, text must also be false).
+   */
+  async createDocumentTypeWithNestedBlockList(
+    documentTypeName: string,
+    outerBlockListDataTypeName: string,
+    outerElementTypeName: string,
+    innerBlockListDataTypeName: string,
+    innerElementTypeName: string,
+    textPropertyName: string,
+    textDataTypeId: string,
+    variance: {
+      outerBlockList: boolean,
+      outerElement: boolean,
+      innerBlockList: boolean,
+      innerElement: boolean,
+      text: boolean,
+    }
+  ) {
+    const crypto = require('crypto');
+    await this.ensureNameNotExists(documentTypeName);
+    await this.ensureNameNotExists(outerElementTypeName);
+    await this.ensureNameNotExists(innerElementTypeName);
+    await this.api.dataType.ensureNameNotExists(outerBlockListDataTypeName);
+    await this.api.dataType.ensureNameNotExists(innerBlockListDataTypeName);
+
+    // 1. Inner Element Type (with Text property)
+    const innerElementContainerId = crypto.randomUUID();
+    const innerElementType = new DocumentTypeBuilder()
+      .withName(innerElementTypeName)
+      .withAlias(AliasHelper.toAlias(innerElementTypeName))
+      .withIsElement(true)
+      .withVariesByCulture(variance.innerElement)
+      .withIcon('icon-plugin')
+      .addContainer()
+        .withName('Content')
+        .withId(innerElementContainerId)
+        .withType('Group')
+        .done()
+      .addProperty()
+        .withContainerId(innerElementContainerId)
+        .withAlias(AliasHelper.toAlias(textPropertyName))
+        .withName(textPropertyName)
+        .withDataTypeId(textDataTypeId)
+        .withVariesByCulture(variance.text)
+        .done()
+      .build();
+    const innerElementTypeId = await this.create(innerElementType) as string;
+
+    // 2. Inner Block List Data Type
+    const innerBlockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithABlock(
+      innerBlockListDataTypeName,
+      innerElementTypeId
+    ) as string;
+
+    // 3. Outer Element Type (with Inner Block List property)
+    const outerElementContainerId = crypto.randomUUID();
+    const outerElementType = new DocumentTypeBuilder()
+      .withName(outerElementTypeName)
+      .withAlias(AliasHelper.toAlias(outerElementTypeName))
+      .withIsElement(true)
+      .withVariesByCulture(variance.outerElement)
+      .withIcon('icon-plugin')
+      .addContainer()
+        .withName('Content')
+        .withId(outerElementContainerId)
+        .withType('Group')
+        .done()
+      .addProperty()
+        .withContainerId(outerElementContainerId)
+        .withAlias(AliasHelper.toAlias(innerBlockListDataTypeName))
+        .withName(innerBlockListDataTypeName)
+        .withDataTypeId(innerBlockListDataTypeId)
+        .withVariesByCulture(variance.innerBlockList)
+        .done()
+      .build();
+    const outerElementTypeId = await this.create(outerElementType) as string;
+
+    // 4. Outer Block List Data Type
+    const outerBlockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithABlock(
+      outerBlockListDataTypeName,
+      outerElementTypeId
+    ) as string;
+
+    // 5. Document Type (Vary by culture) with Outer Block List property
+    const documentTypeContainerId = crypto.randomUUID();
+    const documentType = new DocumentTypeBuilder()
+      .withName(documentTypeName)
+      .withAlias(AliasHelper.toAlias(documentTypeName))
+      .withAllowedAsRoot(true)
+      .withVariesByCulture(true)
+      .addContainer()
+        .withName('Content')
+        .withId(documentTypeContainerId)
+        .withType('Group')
+        .done()
+      .addProperty()
+        .withContainerId(documentTypeContainerId)
+        .withAlias(AliasHelper.toAlias(outerBlockListDataTypeName))
+        .withName(outerBlockListDataTypeName)
+        .withDataTypeId(outerBlockListDataTypeId)
+        .withVariesByCulture(variance.outerBlockList)
+        .done()
+      .build();
+
+    return await this.create(documentType);
+  }
 }
