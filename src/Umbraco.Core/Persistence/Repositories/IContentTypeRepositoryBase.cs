@@ -60,6 +60,5 @@ public interface IContentTypeRepositoryBase<TItem> : IReadWriteQueryRepository<i
     /// </summary>
     /// <param name="key">The child content type.</param>
     /// <returns>An IEnumerable of the allowed parent keys.</returns>
-    /// TODO (V18): Remove default implementation.
-    IEnumerable<Guid> GetAllowedParentKeys(Guid key) => [];
+    IEnumerable<Guid> GetAllowedParentKeys(Guid key);
 }

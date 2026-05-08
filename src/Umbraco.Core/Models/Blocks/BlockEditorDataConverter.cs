@@ -117,16 +117,6 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
 
             // no matter what, clear the RawPropertyValues collection so it is not saved back to the DB
             blockItemData.RawPropertyValues.Clear();
-
-            // assign the correct Key if only a UDI is set
-            if (blockItemData.Key == Guid.Empty && blockItemData.Udi is GuidUdi guidUdi)
-            {
-                blockItemData.Key = guidUdi.Guid;
-                converted = true;
-            }
-
-            // no matter what, clear the UDI value so it's not saved back to the DB
-            blockItemData.Udi = null;
         }
 
         return converted;

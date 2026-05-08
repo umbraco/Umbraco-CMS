@@ -50,7 +50,6 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
 
         services.AddSingleton<IPermissionMapper, CustomPermissionMapper>();
         services.AddSingleton<IPermissionPresentationMapper, CustomPermissionMapper>();
-
     }
 
     [Test]
@@ -99,6 +98,8 @@ public class UserPresentationFactoryTests : UmbracoIntegrationTestWithContent
         Assert.IsFalse(model.HasMediaRootAccess);
         Assert.AreEqual(1, model.MediaStartNodeIds.Count);
         Assert.AreEqual(rootMediaFolder.Key, model.MediaStartNodeIds.First().Id);
+        Assert.IsTrue(model.HasElementRootAccess);
+        Assert.AreEqual(0, model.ElementStartNodeIds.Count);
         Assert.IsFalse(model.HasAccessToSensitiveData);
     }
 

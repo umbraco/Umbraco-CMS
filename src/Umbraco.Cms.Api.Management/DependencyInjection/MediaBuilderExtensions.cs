@@ -16,7 +16,7 @@ internal static class MediaBuilderExtensions
         builder.Services.AddTransient<IMediaEditingPresentationFactory, MediaEditingPresentationFactory>();
         builder.Services.AddTransient<IUrlAssembler, DefaultUrlAssembler>();
         builder.Services.AddTransient<IMediaUrlFactory, MediaUrlFactory>();
-        builder.Services.AddTransient<IReziseImageUrlFactory, ReziseImageUrlFactory>();
+        builder.Services.AddTransient<IResizeImageUrlFactory, ResizeImageUrlFactory>();
         builder.Services.AddScoped<IAbsoluteUrlBuilder, DefaultAbsoluteUrlBuilder>();
         builder.Services.AddTransient<IMediaCollectionPresentationFactory, MediaCollectionPresentationFactory>();
 

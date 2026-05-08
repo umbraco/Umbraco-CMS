@@ -13,11 +13,10 @@ public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
     /// <param name="originalPath">The original path of the entity.</param>
     /// <param name="newParentId">The identifier of the new parent.</param>
     /// <param name="newParentKey">The unique identifier of the new parent.</param>
+    [Obsolete("Use the overload without the newParentId parameter instead. Scheduled for removal in v19.")]
     public MoveEventInfo(TEntity entity, string originalPath, int newParentId, Guid? newParentKey)
-        : base(entity, originalPath)
+        : this(entity, originalPath, newParentKey)
     {
-        NewParentId = newParentId;
-        NewParentKey = newParentKey;
     }
 
     /// <summary>
@@ -26,15 +25,23 @@ public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
     /// <param name="entity">The entity being moved.</param>
     /// <param name="originalPath">The original path of the entity.</param>
     /// <param name="newParentId">The identifier of the new parent.</param>
-    public MoveEventInfo(TEntity entity, string originalPath, int newParentId) : this(entity, originalPath, newParentId, null)
+    [Obsolete("Use the overload with the newParentKey parameter instead. Scheduled for removal in v19.")]
+    public MoveEventInfo(TEntity entity, string originalPath, int newParentId)
+        : this(entity, originalPath, null)
     {
     }
 
     /// <summary>
-    ///     Gets or sets the identifier of the new parent.
+    ///     Initializes a new instance of the <see cref="MoveEventInfo{TEntity}" /> class.
     /// </summary>
-    [Obsolete("Please use NewParentKey instead. Scheduled for removal in Umbraco 18.")]
-    public int NewParentId { get; set; }
+    /// <param name="entity">The entity being moved.</param>
+    /// <param name="originalPath">The original path of the entity.</param>
+    /// <param name="newParentKey">The unique identifier of the new parent.</param>
+    public MoveEventInfo(TEntity entity, string originalPath, Guid? newParentKey)
+        : base(entity, originalPath)
+    {
+        NewParentKey = newParentKey;
+    }
 
     /// <summary>
     ///     Gets the unique identifier of the new parent.
@@ -57,7 +64,7 @@ public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
     /// </summary>
     /// <param name="other">The other instance to compare.</param>
     /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
-    public bool Equals(MoveEventInfo<TEntity>? other) => NewParentId == other?.NewParentId && NewParentKey == other.NewParentKey && base.Equals(other);
+    public bool Equals(MoveEventInfo<TEntity>? other) => NewParentKey == other?.NewParentKey && base.Equals(other);
 
     /// <inheritdoc />
     public override int GetHashCode()
@@ -67,7 +74,7 @@ public class MoveEventInfo<TEntity> : MoveEventInfoBase<TEntity>
             var hashCode = Entity is not null
                 ? EqualityComparer<TEntity>.Default.GetHashCode(Entity)
                 : base.GetHashCode();
-            hashCode = (hashCode * 397) ^ NewParentId;
+            hashCode = (hashCode * 397) ^ NewParentKey.GetHashCode();
             hashCode = (hashCode * 397) ^ OriginalPath.GetHashCode();
             return hashCode;
         }
