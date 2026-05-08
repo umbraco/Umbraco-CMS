@@ -18,6 +18,7 @@ const silencedLogs = [
 	'Found an issue? https://github.com/mswjs/msw/issues',
 	'Worker script URL:',
 	'Worker scope:',
+	'[MSW] Using mock data set: "default"',
 ];
 
 /** @type {import('@web/dev-server').DevServerConfig} */
