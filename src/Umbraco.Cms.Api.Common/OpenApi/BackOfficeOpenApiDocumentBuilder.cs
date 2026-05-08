@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
@@ -76,17 +77,29 @@ public sealed class BackOfficeOpenApiDocumentBuilder
     }
 
     /// <summary>
-    /// Sets the <see cref="JsonOptions"/> used when generating this document's schema. Use this to match
-    /// the serialization conventions of the API endpoints the document describes.
+    /// Sets the named <see cref="JsonOptions">Microsoft.AspNetCore.Http.Json.JsonOptions</see> used when
+    /// generating this document's schema. Use this to match the serialization conventions of the API
+    /// endpoints the document describes.
     /// </summary>
-    /// <param name="jsonOptions">The options to apply.</param>
+    /// <param name="jsonOptionsName">The name of the registered HTTP <see cref="JsonOptions"/> to apply.</param>
+    /// <returns>The same builder for chaining.</returns>
+    public BackOfficeOpenApiDocumentBuilder WithJsonOptions(string jsonOptionsName)
+        => WithJsonOptions(sp => sp.GetRequiredService<IOptionsMonitor<JsonOptions>>().Get(jsonOptionsName));
+
+    /// <summary>
+    /// Sets the <see cref="JsonOptions">Microsoft.AspNetCore.Http.Json.JsonOptions</see> used when
+    /// generating this document's schema. Use this to match the serialization conventions of the API
+    /// endpoints the document describes.
+    /// </summary>
+    /// <param name="jsonOptions">The HTTP JSON options to apply.</param>
     /// <returns>The same builder for chaining.</returns>
     public BackOfficeOpenApiDocumentBuilder WithJsonOptions(JsonOptions jsonOptions)
         => WithJsonOptions(_ => jsonOptions);
 
     /// <summary>
-    /// Sets a factory that produces the <see cref="JsonOptions"/> used when generating this document's
-    /// schema. Use this to match the serialization conventions of the API endpoints the document describes.
+    /// Sets a factory that produces the <see cref="JsonOptions">Microsoft.AspNetCore.Http.Json.JsonOptions</see>
+    /// used when generating this document's schema. Use this to match the serialization conventions of the
+    /// API endpoints the document describes.
     /// </summary>
     /// <param name="jsonOptionsFactory">Factory invoked when the schema service is first resolved.</param>
     /// <returns>The same builder for chaining.</returns>
