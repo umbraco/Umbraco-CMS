@@ -7,6 +7,10 @@ import type { UmbCollectionRepository } from '@umbraco-cms/backoffice/collection
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { fetchAllPages } from '@umbraco-cms/backoffice/utils';
 
+// Mirrors the server's default page size for `GET /language` — chosen so the underlying request matches
+// the unconfigured server contract.
+const LANGUAGE_PAGE_SIZE = 100;
+
 export class UmbLanguageCollectionRepository extends UmbRepositoryBase implements UmbCollectionRepository {
 	#collectionSource: UmbLanguageCollectionDataSource;
 
@@ -28,7 +32,7 @@ export class UmbLanguageCollectionRepository extends UmbRepositoryBase implement
 	async requestAllItems() {
 		return fetchAllPages<UmbLanguageDetailModel>(
 			(skip, take) => this.#collectionSource.getCollection({ skip, take }),
-			100,
+			LANGUAGE_PAGE_SIZE,
 		);
 	}
 }

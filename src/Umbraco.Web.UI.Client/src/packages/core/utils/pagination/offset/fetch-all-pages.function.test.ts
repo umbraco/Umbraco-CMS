@@ -46,6 +46,7 @@ describe('fetchAllPages', () => {
 		const { data } = await fetchAllPages(fetchPage, 2);
 
 		expect(data?.items).to.eql(all);
+		expect(data?.total).to.equal(4);
 		expect(calls).to.have.lengthOf(2);
 	});
 
