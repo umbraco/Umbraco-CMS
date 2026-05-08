@@ -15,6 +15,7 @@ export type { UmbElementTreeRepository } from './element-tree.repository.js';
 export interface UmbElementTreeItemModel extends Omit<UmbTreeItemModel, 'flags'>, UmbEntityWithFlags {
 	entityType: UmbElementEntityType | UmbElementFolderEntityType;
 	isTrashed: boolean;
+	noAccess: boolean;
 	documentType: {
 		unique: string;
 		icon: string;
