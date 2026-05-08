@@ -1,6 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi;
-using Umbraco.Cms.Api.Common.Attributes;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Management.OpenApi;
 using Umbraco.Cms.Core.Composing;
@@ -11,46 +8,32 @@ namespace Umbraco.Extension.Composers;
 public class UmbracoExtensionApiComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
-    {
-        builder.Services.AddOpenApi(
+        => builder.AddBackOfficeOpenApiDocument(
             Constants.ApiName,
-            options =>
+            documentTitle: "Umbraco Extension Backoffice API",
+            configure: options =>
             {
                 // Related documentation:
                 // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api
                 // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/adding-a-custom-openapi-document
                 // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/versioning-your-api
                 // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/access-policies
-
-                // Configure the OpenAPI generation options
-                // Add in a new OpenAPI document solely for our own package that can be browsed via the OpenAPI UI
-                // Along with having a generated OpenAPI JSON file that we can use to auto generate a TypeScript client
                 options.AddDocumentTransformer((document, _, _) =>
                 {
-                    document.Info = new OpenApiInfo
-                    {
-                        Title = "Umbraco ExtensionBackoffice API",
-                        Version = "1.0",
-                        // Contact = new OpenApiContact
-                        // {
-                        //     Name = "Some Developer",
-                        //     Email = "you@company.com",
-                        //     Url = new Uri("https://company.com")
-                        // }
-                    };
+                    document.Info.Version = "1.0";
+                    // document.Info.Contact = new OpenApiContact
+                    // {
+                    //     Name = "Some Developer",
+                    //     Email = "you@company.com",
+                    //     Url = new Uri("https://company.com")
+                    // };
                     return Task.CompletedTask;
                 });
 
-                // Only include endpoints decorated with the `MapToApi` attribute for our own API.
-                options.ShouldInclude = apiDescription =>
-                    apiDescription.ActionDescriptor.EndpointMetadata
-                        .OfType<MapToApiAttribute>()
-                        .Any(attribute => attribute.ApiName == Constants.ApiName);
-
-                // Enable Umbraco authentication for the "Example" OpenAPI document
+                // Enable Umbraco authentication for this OpenAPI document.
                 options.AddBackofficeSecurityRequirements();
 
-                // This is used to generate operation IDs in our OpenAPI JSON file so that the generated 
+                // This is used to generate operation IDs in our OpenAPI JSON file so that the generated
                 // TypeScript client has nice method names which are not too verbose.
                 // https://docs.umbraco.com/umbraco-cms/tutorials/creating-a-backoffice-api/umbraco-schema-and-operation-ids#operation-ids
                 options.AddOperationTransformer((operation, context, _) =>
@@ -59,7 +42,4 @@ public class UmbracoExtensionApiComposer : IComposer
                     return Task.CompletedTask;
                 });
             });
-
-        builder.Services.AddOpenApiDocumentToUi(Constants.ApiName, "Umbraco Extension Backoffice API");
-    }
 }
