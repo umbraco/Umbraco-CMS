@@ -2953,6 +2953,10 @@ public class ContentService : RepositoryService, IContentService
                 copy.Published = false;
             }
 
+            // clear any per-culture published state copied from the source - the copy is unpublished,
+            // so no culture variations should be marked as published either (see #22540).
+            copy.ClearPublishInfos();
+
             copy.CreatorId = userId;
             copy.WriterId = userId;
 
@@ -3016,6 +3020,10 @@ public class ContentService : RepositoryService, IContentService
                         {
                             descendantCopy.Published = false;
                         }
+
+                        // clear any per-culture published state copied from the source - the copy is unpublished,
+                        // so no culture variations should be marked as published either (see #22540).
+                        descendantCopy.ClearPublishInfos();
 
                         descendantCopy.CreatorId = userId;
                         descendantCopy.WriterId = userId;

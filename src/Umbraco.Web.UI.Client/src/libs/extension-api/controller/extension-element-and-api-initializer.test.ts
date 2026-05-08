@@ -7,6 +7,7 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { SwitchConditionConfig } from 'src/packages/core/extension-registry/conditions/switch.condition.js';
 
 @customElement('umb-test-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
@@ -25,7 +26,8 @@ class UmbTestApiController extends UmbControllerBase implements UmbApi {
 }
 
 interface TestManifest
-	extends ManifestWithDynamicConditions,
+	extends
+		ManifestWithDynamicConditions<SwitchConditionConfig>,
 		ManifestElementAndApi<UmbControllerHostElement, UmbTestApiController> {
 	type: 'test-type';
 }
@@ -103,8 +105,12 @@ describe('UmbExtensionElementAndApiController', () => {
 
 	describe('Manifest with multiple conditions that changes over time', () => {
 		let hostElement: UmbControllerHostElement;
-		let extensionRegistry: UmbExtensionRegistry<TestManifest>;
-		let manifest: TestManifest;
+		let extensionRegistry: UmbExtensionRegistry<
+			ManifestWithDynamicConditions<SwitchConditionConfig> &
+				ManifestElementAndApi<UmbControllerHostElement, UmbTestApiController>
+		>;
+		let manifest: ManifestWithDynamicConditions<SwitchConditionConfig> &
+			ManifestElementAndApi<UmbControllerHostElement, UmbTestApiController>;
 
 		beforeEach(async () => {
 			hostElement = new UmbTestControllerHostElement();
@@ -118,13 +124,13 @@ describe('UmbExtensionElementAndApiController', () => {
 				api: UmbTestApiController,
 				conditions: [
 					{
-						alias: 'Umb.Test.Condition.Delay',
+						alias: 'Umb.Condition.Switch',
 						frequency: '100',
-					} as any,
+					},
 					{
-						alias: 'Umb.Test.Condition.Delay',
+						alias: 'Umb.Condition.Switch',
 						frequency: '200',
-					} as any,
+					},
 				],
 			};
 
@@ -136,8 +142,8 @@ describe('UmbExtensionElementAndApiController', () => {
 
 			const conditionManifest = {
 				type: 'condition',
-				name: 'test-condition-delay',
-				alias: 'Umb.Test.Condition.Delay',
+				name: 'test-condition-switch',
+				alias: 'Umb.Condition.Switch',
 				api: UmbSwitchCondition,
 			};
 
@@ -251,11 +257,11 @@ describe('UmbExtensionElementAndApiController', () => {
 				api: UmbTestApiController,
 				conditions: [
 					{
-						alias: 'Umb.Test.Condition.Delay',
+						alias: 'Umb.Condition.Switch',
 						frequency: '100',
 					} as any,
 					{
-						alias: 'Umb.Test.Condition.Delay',
+						alias: 'Umb.Condition.Switch',
 						frequency: '200',
 					} as any,
 				],
@@ -269,8 +275,8 @@ describe('UmbExtensionElementAndApiController', () => {
 
 			const conditionManifest = {
 				type: 'condition',
-				name: 'test-condition-delay',
-				alias: 'Umb.Test.Condition.Delay',
+				name: 'test-condition-switch',
+				alias: 'Umb.Condition.Switch',
 				api: UmbSwitchCondition,
 			};
 

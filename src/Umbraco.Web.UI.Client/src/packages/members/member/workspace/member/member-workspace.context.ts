@@ -73,6 +73,7 @@ export class UmbMemberWorkspaceContext
 			null,
 		);
 
+		// TODO: This is done by the content detail base class, so we can remove it from there and only do it here. [NL]
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
 

@@ -4,6 +4,7 @@ import { UmbBlockWorkspaceEditorElement } from './block-workspace-editor.element
 import { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
 import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
+import { UmbBlockLanguageAccessWorkspaceController } from './block-workspace-language-access.controller.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -25,6 +26,7 @@ import { decodeFilePath, UmbReadOnlyVariantGuardManager } from '@umbraco-cms/bac
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
+import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 
@@ -84,6 +86,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		window.addEventListener('willchangestate', this.#onWillNavigate);
 
+		new UmbBlockLanguageAccessWorkspaceController(this);
+
 		this.content.view.inheritFrom(this.view);
 		this.settings.view.inheritFrom(this.view);
 
@@ -104,6 +108,30 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
 		}).asPromise({ preventTimeout: true });
+
+		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
+			this.observe(
+				context?.isTrashed,
+				(isTrashed) => {
+					const trashed = isTrashed === true;
+					const unique = 'UMB_PREVENT_EDIT_TRASHED_ITEM';
+					if (trashed) {
+						const rule = {
+							unique,
+							permitted: true,
+						};
+						this.readOnlyGuard.addRule(rule);
+						this.content.readOnlyGuard.addRule(rule);
+						this.settings.readOnlyGuard.addRule(rule);
+					} else {
+						this.readOnlyGuard.removeRule(unique);
+						this.content.readOnlyGuard.removeRule(unique);
+						this.settings.readOnlyGuard.removeRule(unique);
+					}
+				},
+				'observeIsTrashed',
+			);
+		}).skipHost();
 
 		this.observe(
 			this.variantId,
@@ -197,30 +225,6 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				);
 			},
 			'observeContentKeyAndVariantId',
-		);
-
-		this.observe(
-			// TODO: Again we need to parse on all variants....
-			manager.readOnlyState.isPermittedForObservableVariant(this.variantId),
-			(isReadOnly) => {
-				const unique = 'UMB_BLOCK_MANAGER_CONTEXT';
-
-				if (isReadOnly) {
-					const rule = {
-						unique,
-						variantId: this.#variantId.getValue(),
-					};
-
-					this.readOnlyGuard?.addRule(rule);
-					this.content.propertyWriteGuard.addRule({ unique, permitted: false });
-					this.settings.propertyWriteGuard.addRule({ unique, permitted: false });
-				} else {
-					this.readOnlyGuard?.removeRule(unique);
-					this.content.propertyWriteGuard.removeRule(unique);
-					this.settings.propertyWriteGuard.removeRule(unique);
-				}
-			},
-			'observeIsReadOnly',
 		);
 
 		this.observe(

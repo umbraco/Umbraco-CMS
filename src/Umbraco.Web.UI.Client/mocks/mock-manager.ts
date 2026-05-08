@@ -33,6 +33,11 @@ class UmbMockManager {
 			loader: () => import('./data/sets/user-permissions/index.js') as Promise<UmbMockDataSet>,
 			visible: false,
 		},
+		documents: {
+			label: 'Documents',
+			loader: () => import('./data/sets/documents/index.js') as Promise<UmbMockDataSet>,
+			visible: false,
+		},
 	};
 
 	/**
