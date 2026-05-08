@@ -11,6 +11,27 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 public static class UmbracoSchemaIdGenerator
 {
     /// <summary>
+    /// Generates a schema ID for the specified type following Umbraco's naming conventions.
+    /// </summary>
+    /// <param name="type">The type to generate a schema ID for.</param>
+    /// <returns>The generated schema ID.</returns>
+    public static string Generate(Type type)
+    {
+        var name = SanitizedTypeName(type);
+        name = HandleGenerics(name, type);
+
+        if (name.EndsWith("Model") == false)
+        {
+            // because some models names clash with common classes in TypeScript (i.e. Document),
+            // we need to add a "Model" postfix to all models
+            name = $"{name}Model";
+        }
+
+        // make absolutely sure we don't pass any invalid named by removing all non-word chars
+        return Regex.Replace(name, @"[^\w]", string.Empty);
+    }
+
+    /// <summary>
     /// Creates a schema reference ID for the given JSON type info, applying Umbraco's naming conventions to
     /// types in the <c>Umbraco.Cms</c> namespace and falling back to the framework default for other types.
     /// </summary>
@@ -34,27 +55,6 @@ public static class UmbracoSchemaIdGenerator
         }
 
         return Generate(targetType);
-    }
-
-    /// <summary>
-    /// Generates a schema ID for the specified type following Umbraco's naming conventions.
-    /// </summary>
-    /// <param name="type">The type to generate a schema ID for.</param>
-    /// <returns>The generated schema ID.</returns>
-    public static string Generate(Type type)
-    {
-        var name = SanitizedTypeName(type);
-        name = HandleGenerics(name, type);
-
-        if (name.EndsWith("Model") == false)
-        {
-            // because some models names clash with common classes in TypeScript (i.e. Document),
-            // we need to add a "Model" postfix to all models
-            name = $"{name}Model";
-        }
-
-        // make absolutely sure we don't pass any invalid named by removing all non-word chars
-        return Regex.Replace(name, @"[^\w]", string.Empty);
     }
 
     private static string SanitizedTypeName(Type t) => t.Name
