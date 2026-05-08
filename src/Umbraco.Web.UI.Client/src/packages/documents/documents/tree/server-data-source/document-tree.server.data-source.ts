@@ -38,7 +38,7 @@ export class UmbDocumentTreeServerDataSource
 		const mappedData = data
 			? {
 					...data,
-					items: data?.items.map((item) => this.#mapItem(item)),
+					items: data?.items.map((item) => this.#mapItem(item, args.culture)),
 				}
 			: undefined;
 
@@ -53,7 +53,7 @@ export class UmbDocumentTreeServerDataSource
 		return { data: mappedData, error };
 	}
 
-	#mapItem(item: DocumentTreeItemResponseModel): UmbDocumentTreeItemModel {
+	#mapItem(item: DocumentTreeItemResponseModel, culture?: string | null): UmbDocumentTreeItemModel {
 		return {
 			ancestors: item.ancestors.map((ancestor) => {
 				return {
@@ -86,7 +86,7 @@ export class UmbDocumentTreeServerDataSource
 					flags: variant.flags,
 				};
 			}),
-			name: item.variants[0]?.name, // TODO: this is not correct. We need to get it from the variants. This is a temp solution.
+			name: item.variants.find((v) => v.culture === culture)?.name ?? item.variants.find((v) => v.culture === null)?.name ?? item.variants[0]?.name,
 			isFolder: false,
 			createDate: item.createDate,
 		};
