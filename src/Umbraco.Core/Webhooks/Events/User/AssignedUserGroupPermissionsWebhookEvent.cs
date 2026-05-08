@@ -42,7 +42,7 @@ public class AssignedUserGroupPermissionsWebhookEvent : WebhookEventBase<Assigne
         => notification.EntityPermissions.Select(permission =>
         new
         {
-            UserId = _idKeyMap.GetKeyForId(permission.EntityId, UmbracoObjectTypes.Unknown).Result,
-            UserGroupId = _idKeyMap.GetKeyForId(permission.UserGroupId, UmbracoObjectTypes.Unknown).Result,
+            UserId = _idKeyMap.GetKeyForIdAsync(permission.EntityId, UmbracoObjectTypes.Unknown).GetAwaiter().GetResult().Result,
+            UserGroupId = _idKeyMap.GetKeyForIdAsync(permission.UserGroupId, UmbracoObjectTypes.Unknown).GetAwaiter().GetResult().Result,
         });
 }

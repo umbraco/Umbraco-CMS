@@ -1591,7 +1591,7 @@ internal abstract class ContentTypeRepositoryBase<TEntity> : EntityRepositoryBas
         // If a key is provided, use that.
         if (propertyType.DataTypeKey != Guid.Empty)
         {
-            Attempt<int> dataTypeIdAttempt = _idKeyMap.GetIdForKey(propertyType.DataTypeKey, UmbracoObjectTypes.DataType);
+            Attempt<int> dataTypeIdAttempt = _idKeyMap.GetIdForKeyAsync(propertyType.DataTypeKey, UmbracoObjectTypes.DataType).GetAwaiter().GetResult();
             if (dataTypeIdAttempt.Success)
             {
                 propertyType.DataTypeId = dataTypeIdAttempt.Result;

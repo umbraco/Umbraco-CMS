@@ -43,7 +43,7 @@ internal sealed class MediaPresentationFactory : IMediaPresentationFactory
     /// <returns>A <see cref="MediaItemResponseModel"/> representing the media entity.</returns>
     public MediaItemResponseModel CreateItemResponseModel(IMediaEntitySlim entity)
     {
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(entity.ParentId, UmbracoObjectTypes.Media);
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(entity.ParentId, UmbracoObjectTypes.Media).GetAwaiter().GetResult();
 
         return new MediaItemResponseModel
         {

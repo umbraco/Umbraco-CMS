@@ -218,14 +218,14 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
 
         if (FolderObjectType != UmbracoObjectTypes.Unknown)
         {
-            Attempt<Guid> getKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, FolderObjectType);
+            Attempt<Guid> getKeyAttempt = IdKeyMap.GetKeyForIdAsync(entity.ParentId, FolderObjectType).GetAwaiter().GetResult();
             if (getKeyAttempt.Success)
             {
                 return getKeyAttempt.Result;
             }
         }
 
-        Attempt<Guid> itemKeyAttempt = IdKeyMap.GetKeyForId(entity.ParentId, ItemObjectType);
+        Attempt<Guid> itemKeyAttempt = IdKeyMap.GetKeyForIdAsync(entity.ParentId, ItemObjectType).GetAwaiter().GetResult();
         if (itemKeyAttempt.Success)
         {
             return itemKeyAttempt.Result;

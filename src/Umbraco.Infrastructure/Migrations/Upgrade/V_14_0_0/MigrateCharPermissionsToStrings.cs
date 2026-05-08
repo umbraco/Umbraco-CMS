@@ -93,7 +93,7 @@ internal class MigrateCharPermissionsToStrings : MigrationBase
             return permissions.Select(permission =>
             {
                 var uniqueIdAttempt =
-                    _idKeyMap.GetKeyForId(userGroup2NodePermissionDto.NodeId, UmbracoObjectTypes.Document);
+                    _idKeyMap.GetKeyForIdAsync(userGroup2NodePermissionDto.NodeId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
 
                 if (uniqueIdAttempt.Success is false)
                 {

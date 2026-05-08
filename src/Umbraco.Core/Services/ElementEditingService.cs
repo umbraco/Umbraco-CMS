@@ -438,7 +438,7 @@ internal sealed class ElementEditingService
         }
         else
         {
-            Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(newParentId, UmbracoObjectTypes.ElementContainer);
+            Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(newParentId, UmbracoObjectTypes.ElementContainer).GetAwaiter().GetResult();
             if (parentKeyAttempt.Success is false)
             {
                 return null;

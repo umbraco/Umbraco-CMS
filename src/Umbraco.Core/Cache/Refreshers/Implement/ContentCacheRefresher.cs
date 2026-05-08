@@ -262,7 +262,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private void HandleMemoryCache(JsonPayload payload)
     {
-        Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+        Guid key = payload.Key ?? _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult().Result;
 
         if (payload.Blueprint)
         {
@@ -322,7 +322,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     {
         if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
         {
-            Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+            Guid key = payload.Key ?? _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult().Result;
 
             // Remove routing must run before HandleNavigation removes the node from the navigation tree,
             // since we need the tree structure to resolve descendant keys.
@@ -346,14 +346,14 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
-            Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+            Guid key = payload.Key ?? _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult().Result;
             _documentUrlService.CreateOrUpdateUrlSegmentsAsync(key).GetAwaiter().GetResult();
             _documentUrlAliasService.CreateOrUpdateAliasesAsync(key).GetAwaiter().GetResult();
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
-            Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
+            Guid key = payload.Key ?? _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult().Result;
             _documentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(key).GetAwaiter().GetResult();
             _documentUrlAliasService.CreateOrUpdateAliasesWithDescendantsAsync(key).GetAwaiter().GetResult();
         }
@@ -455,7 +455,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         }
     }
 
-    private Guid? GetParentKey(IContent content) => (content.ParentId == -1) ? null : _idKeyMap.GetKeyForId(content.ParentId, UmbracoObjectTypes.Document).Result;
+    private Guid? GetParentKey(IContent content) => (content.ParentId == -1) ? null : _idKeyMap.GetKeyForIdAsync(content.ParentId, UmbracoObjectTypes.Document).GetAwaiter().GetResult().Result;
 
     private bool ExistsInNavigation(Guid contentKey) => _documentNavigationQueryService.TryGetParentKey(contentKey, out _);
 

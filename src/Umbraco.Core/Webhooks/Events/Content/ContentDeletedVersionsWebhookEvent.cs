@@ -46,7 +46,7 @@ public class ContentDeletedVersionsWebhookEvent : WebhookEventBase<ContentDelete
     {
         return new
         {
-            Id = _idKeyMap.GetKeyForId(notification.Id, UmbracoObjectTypes.Document).Result,
+            Id = _idKeyMap.GetKeyForIdAsync(notification.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult().Result,
             notification.DeletePriorVersions,
             notification.SpecificVersion,
             notification.DateToRetain,

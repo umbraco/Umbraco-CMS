@@ -413,7 +413,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
             return result;
         }
 
-        Attempt<Guid> idToKeyAttempt = _idKeyMap.GetKeyForId(result.Result.ProtectedNodeId, UmbracoObjectTypes.Document);
+        Attempt<Guid> idToKeyAttempt = _idKeyMap.GetKeyForIdAsync(result.Result.ProtectedNodeId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
         if (idToKeyAttempt.Success is false || idToKeyAttempt.Result != key)
         {
             return Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.EntryNotFound, null);

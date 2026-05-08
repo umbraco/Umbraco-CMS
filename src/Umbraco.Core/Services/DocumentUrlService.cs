@@ -522,7 +522,7 @@ public class DocumentUrlService : IDocumentUrlService
     /// <inheritdoc/>
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
     {
-        var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
+        var id = _idKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Document).GetAwaiter().GetResult().Result;
         IContent? item = _contentService.GetById(id);
         if (item is null)
         {
@@ -978,7 +978,7 @@ public class DocumentUrlService : IDocumentUrlService
             return null;
         }
 
-        Attempt<Guid> attempt = _idKeyMap.GetKeyForId(documentStartNodeId.Value, UmbracoObjectTypes.Document);
+        Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(documentStartNodeId.Value, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
         return attempt.Success ? attempt.Result : null;
     }
 
@@ -1068,7 +1068,7 @@ public class DocumentUrlService : IDocumentUrlService
     /// <inheritdoc/>
     public string GetLegacyRouteFormat(Guid documentKey, string? culture, bool isDraft)
     {
-        Attempt<int> documentIdAttempt = _idKeyMap.GetIdForKey(documentKey, UmbracoObjectTypes.Document);
+        Attempt<int> documentIdAttempt = _idKeyMap.GetIdForKeyAsync(documentKey, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
 
         if (documentIdAttempt.Success is false)
         {
@@ -1090,7 +1090,7 @@ public class DocumentUrlService : IDocumentUrlService
         Guid[] ancestorsOrSelfKeysArray = ancestorsOrSelfKeys as Guid[] ?? ancestorsOrSelfKeys.ToArray();
         ILookup<Guid, Domain?> ancestorOrSelfKeyToDomains = ancestorsOrSelfKeysArray.ToLookup(x => x, ancestorKey =>
         {
-            Attempt<int> idAttempt = _idKeyMap.GetIdForKey(ancestorKey, UmbracoObjectTypes.Document);
+            Attempt<int> idAttempt = _idKeyMap.GetIdForKeyAsync(ancestorKey, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
 
             if (idAttempt.Success is false)
             {

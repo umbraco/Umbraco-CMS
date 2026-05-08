@@ -35,7 +35,7 @@ internal class PublishedContent : PublishedElement, IPublishedContent
                 var sb = new StringBuilder("-1");
                 foreach (Guid ancestorsOrSelfKey in ancestorsOrSelfKeys.Reverse())
                 {
-                    Attempt<int> idAttempt = idKeyMap.GetIdForKey(ancestorsOrSelfKey, GetObjectType());
+                    Attempt<int> idAttempt = idKeyMap.GetIdForKeyAsync(ancestorsOrSelfKey, GetObjectType()).GetAwaiter().GetResult();
                     if (idAttempt.Success)
                     {
                         sb.AppendFormat(",{0}", idAttempt.Result);

@@ -138,7 +138,7 @@ public class ContentFinderByUrlAlias : IContentFinder
         Guid? domainRootKey = null;
         if (rootNodeId > 0)
         {
-            Attempt<Guid> attempt = _idKeyMap.GetKeyForId(rootNodeId, UmbracoObjectTypes.Document);
+            Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(rootNodeId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
             domainRootKey = attempt.Success ? attempt.Result : null;
         }
 
