@@ -76,19 +76,21 @@ public sealed class BackOfficeOpenApiDocumentBuilder
     }
 
     /// <summary>
-    /// Sets the <see cref="JsonOptions"/> used to generate this document's schema.
+    /// Sets the <see cref="JsonOptions"/> used when generating this document's schema. Use this to match
+    /// the serialization conventions of the API endpoints the document describes.
     /// </summary>
     /// <param name="jsonOptions">The options to apply.</param>
     /// <returns>The same builder for chaining.</returns>
-    public BackOfficeOpenApiDocumentBuilder WithHttpJsonOptions(JsonOptions jsonOptions)
-        => WithHttpJsonOptions(_ => jsonOptions);
+    public BackOfficeOpenApiDocumentBuilder WithJsonOptions(JsonOptions jsonOptions)
+        => WithJsonOptions(_ => jsonOptions);
 
     /// <summary>
-    /// Sets a factory that produces the <see cref="JsonOptions"/> used to generate this document's schema.
+    /// Sets a factory that produces the <see cref="JsonOptions"/> used when generating this document's
+    /// schema. Use this to match the serialization conventions of the API endpoints the document describes.
     /// </summary>
     /// <param name="jsonOptionsFactory">Factory invoked when the schema service is first resolved.</param>
     /// <returns>The same builder for chaining.</returns>
-    public BackOfficeOpenApiDocumentBuilder WithHttpJsonOptions(Func<IServiceProvider, JsonOptions> jsonOptionsFactory)
+    public BackOfficeOpenApiDocumentBuilder WithJsonOptions(Func<IServiceProvider, JsonOptions> jsonOptionsFactory)
     {
         _httpJsonOptionsFactory = jsonOptionsFactory;
         return this;
