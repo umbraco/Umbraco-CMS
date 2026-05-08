@@ -225,7 +225,7 @@ test('can edit invariant text property inside a variant block in non-default lan
   await umbracoUi.content.isBlockPropertyEditable(secondTextName, true);
 });
 
-// This test fails due to the issue: https://github.com/umbraco/Umbraco-CMS/issues/22001
+// This test is not applicable as if block is invariant, then all properties inside the block are invariant
 test.skip('can edit variant text property inside invariant block in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithVariantAndInvariantBlockLists(
