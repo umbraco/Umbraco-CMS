@@ -488,6 +488,24 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createDocumentWithMultipleVariantsAndNoValues(documentName: string, documentTypeId: string, cultureVariants: {isoCode: string, name: string}[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const document = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .build();
+
+    for (const variant of cultureVariants) {
+      document.variants.push({
+        name: variant.name,
+        culture: variant.isoCode,
+        segment: null,
+      });
+    }
+
+    return await this.create(document);
+  }
+
   async createDocumentWithMultipleVariantsWithSharedProperty(documentName: string, documentTypeId: string, dataTypeAlias: string, dataTypeEditorAlias: string, cultureVariants: {isoCode: string, name: string}[], value) {
     await this.ensureNameNotExists(documentName);
 
