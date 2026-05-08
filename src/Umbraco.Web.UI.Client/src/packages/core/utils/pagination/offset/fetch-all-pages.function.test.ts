@@ -1,5 +1,6 @@
 import { expect } from '@open-wc/testing';
 import { fetchAllPages } from './fetch-all-pages.function.js';
+import type { UmbDataSourceResponse, UmbPagedModel } from '@umbraco-cms/backoffice/repository';
 
 interface TestItem {
 	id: number;
@@ -75,8 +76,32 @@ describe('fetchAllPages', () => {
 		expect(callCount).to.equal(2);
 	});
 
-	it('breaks out if the server returns an empty page despite reporting a higher total', async () => {
-		// Defensive guard: prevents an infinite loop if the server's `total` and the items it actually returns disagree.
+	it('returns a synthesised error when the fetcher returns neither data nor error', async () => {
+		const fetchPage = async () => ({}) as UmbDataSourceResponse<UmbPagedModel<TestItem>>;
+
+		const { data, error } = await fetchAllPages<TestItem>(fetchPage, 2);
+
+		expect(data).to.be.undefined;
+		expect(error).to.be.an.instanceOf(Error);
+	});
+
+	it('rejects when `take` is not a positive finite number', async () => {
+		const { fetchPage } = buildFakeFetcher([{ id: 1 }, { id: 2 }]);
+
+		for (const invalid of [0, -1, NaN, Number.POSITIVE_INFINITY]) {
+			let thrown: unknown;
+			try {
+				await fetchAllPages(fetchPage, invalid);
+			} catch (e) {
+				thrown = e;
+			}
+			expect(thrown, `take=${invalid}`).to.be.an.instanceOf(RangeError);
+		}
+	});
+
+	it('returns an error if the server delivers an empty page before reaching the reported total', async () => {
+		// Surfaces (rather than masks) a server that reports more items than it returns. Also guards against
+		// an infinite loop if `total` and the actual items disagree.
 		let callCount = 0;
 		const fetchPage = async (skip: number, take: number) => {
 			callCount++;
@@ -86,9 +111,10 @@ describe('fetchAllPages', () => {
 			return { data: { items: [] as Array<TestItem>, total: 10 } };
 		};
 
-		const { data } = await fetchAllPages<TestItem>(fetchPage, 2);
+		const { data, error } = await fetchAllPages<TestItem>(fetchPage, 2);
 
-		expect(data?.items).to.have.lengthOf(2);
+		expect(data).to.be.undefined;
+		expect(error).to.be.an.instanceOf(Error);
 		expect(callCount).to.equal(2);
 	});
 });
