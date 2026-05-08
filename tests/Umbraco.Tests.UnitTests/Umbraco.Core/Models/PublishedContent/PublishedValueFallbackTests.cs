@@ -99,9 +99,7 @@ public class PublishedValueFallbackTests
 
     private static PublishedValueFallback CreateFallback() =>
         new(
-#pragma warning disable CS0618 // Type or member is obsolete
-            ServiceContext.CreatePartial(localizationService: Mock.Of<ILocalizationService>()),
-#pragma warning restore CS0618 // Type or member is obsolete
+ServiceContext.CreatePartial(languageService: Mock.Of<ILanguageService>()),
             Mock.Of<IVariationContextAccessor>(),
             Mock.Of<IPropertyRenderingContextAccessor>());
 
