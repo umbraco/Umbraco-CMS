@@ -13,7 +13,7 @@ public interface IIdKeyMapRepository
     /// <param name="key">The unique key of the entity.</param>
     /// <param name="umbracoObjectType">The type of the Umbraco object.</param>
     /// <returns>The integer identifier if found; otherwise, <c>null</c>.</returns>
-    int? GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType);
+    Task<int?> GetIdForKeyAsync(Guid key, UmbracoObjectTypes umbracoObjectType);
 
     /// <summary>
     ///     Gets the unique key for a given integer identifier.
@@ -21,5 +21,5 @@ public interface IIdKeyMapRepository
     /// <param name="id">The integer identifier of the entity.</param>
     /// <param name="umbracoObjectType">The type of the Umbraco object.</param>
     /// <returns>The unique key if found; otherwise, <c>null</c>.</returns>
-    Guid? GetIdForKey(int id, UmbracoObjectTypes umbracoObjectType);
+    Task<Guid?> GetIdForKeyAsync(int id, UmbracoObjectTypes umbracoObjectType);
 }
