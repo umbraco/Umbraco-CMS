@@ -13,7 +13,7 @@ import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registr
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { UmbPaginationManager, debounce, fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import { UmbPaginationManager, debounce, fromCamelCaseIfCamelCase } from '@umbraco-cms/backoffice/utils';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_CONTENT_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/content-type';
 import { UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/property-type';
@@ -277,7 +277,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
 		const grouped = Object.groupBy(dataTypes, (dataType: UmbDataTypeItemModel) =>
-			fromCamelCase(this.#groupLookup[dataType.propertyEditorUiAlias] ?? 'Uncategorized'),
+			// Use fromCamelCaseIfCamelCase for backward compatibility: although core property editors provide
+			// title cased group names, external packages may still register them as camelCase.
+			fromCamelCaseIfCamelCase(this.#groupLookup[dataType.propertyEditorUiAlias] ?? 'Uncategorized'),
 		);
 
 		return Object.keys(grouped)
@@ -289,7 +291,9 @@ export class UmbDataTypePickerFlowModalElement extends UmbModalBaseElement<
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
 		const grouped = Object.groupBy(uis, (propertyEditorUi: ManifestPropertyEditorUi) =>
-			fromCamelCase(propertyEditorUi.meta.group ?? 'Uncategorized'),
+			// Use fromCamelCaseIfCamelCase for backward compatibility: although core property editors provide
+			// title cased group names, external packages may still register them as camelCase.
+			fromCamelCaseIfCamelCase(propertyEditorUi.meta.group ?? 'Uncategorized'),
 		);
 
 		return Object.keys(grouped)

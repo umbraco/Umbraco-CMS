@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Stylesheet Picker',
 		icon: 'icon-document',
-		group: 'common',
+		group: 'Common',
 		keywords: ['css', 'style', 'theme'],
 	},
 };

@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Number Range',
 		icon: 'icon-autofill',
-		group: 'common',
+		group: 'Common',
 	},
 };

@@ -5,7 +5,7 @@ import type {
 } from './property-editor-ui-picker-modal.token.js';
 import { UmbPropertyEditorUISearchController } from './property-editor-ui-search.controller.js';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { debounce, fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import { debounce, fromCamelCaseIfCamelCase } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -85,7 +85,9 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-expect-error
 		const grouped = Object.groupBy(items, (propertyEditorUi: ManifestPropertyEditorUi) =>
-			fromCamelCase(propertyEditorUi.meta.group),
+			// Use fromCamelCaseIfCamelCase for backward compatibility: although core property editors provide
+			// title cased group names, external packages may still register them as camelCase.
+			fromCamelCaseIfCamelCase(propertyEditorUi.meta.group),
 		);
 
 		this._groupedPropertyEditorUIs = Object.keys(grouped)

@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Image Crops Configuration',
 		icon: 'icon-autofill',
-		group: 'common',
+		group: 'Common',
 	},
 };

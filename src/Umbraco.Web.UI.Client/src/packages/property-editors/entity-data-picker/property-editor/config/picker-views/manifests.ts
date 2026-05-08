@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Entity Data Picker Picker Views Configuration',
 		icon: 'icon-grid',
-		group: 'pickers',
+		group: 'Pickers',
 	},
 };

@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Entity Data Picker',
 			icon: 'icon-page-add',
-			group: 'pickers',
+			group: 'Pickers',
 			keywords: ['select', 'entity', 'data', 'source', 'pick'],
 			propertyEditorSchemaAlias: 'Umbraco.EntityDataPicker',
 			supportsReadOnly: true,

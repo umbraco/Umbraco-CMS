@@ -9,7 +9,7 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 		meta: {
 			label: 'Tiptap Toolbar Configuration',
 			icon: 'icon-autofill',
-			group: 'common',
+			group: 'Common',
 		},
 	},
 ];

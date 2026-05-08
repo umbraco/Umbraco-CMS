@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Collection Column Configuration',
 		icon: 'icon-autofill',
-		group: 'lists',
+		group: 'Lists',
 	},
 };

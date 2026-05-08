@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Block Grid Block Configuration',
 		icon: 'icon-autofill',
-		group: 'blocks',
+		group: 'Blocks',
 	},
 };

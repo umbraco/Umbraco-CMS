@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Block Grid Layout Stylesheet',
 		icon: 'icon-document',
-		group: 'common',
+		group: 'Common',
 	},
 };

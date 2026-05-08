@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Time Only',
 			propertyEditorSchemaAlias: 'Umbraco.TimeOnly',
 			icon: 'icon-time',
-			group: 'date',
+			group: 'Date',
 			keywords: ['time', 'clock', 'hour', 'schedule', 'duration', 'opening', 'closing', 'start', 'end', 'minute'],
 			supportsReadOnly: true,
 			settings: {

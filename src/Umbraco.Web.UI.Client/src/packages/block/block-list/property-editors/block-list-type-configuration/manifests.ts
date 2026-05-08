@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Block List Type Configuration',
 		icon: 'icon-autofill',
-		group: 'common',
+		group: 'Common',
 	},
 };
