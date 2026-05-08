@@ -1835,17 +1835,17 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickAddBlockListElementWithName(blockName: string) {
-    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).getByLabel('Add content');
+    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).getByLabel('Add ' + blockName);
     await this.click(createNewButtonLocator);
   }
 
   async isAddBlockListElementWithNameDisabled(blockName: string) {
-    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Add content'});
+    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Add' + blockName});
     await expect(createNewButtonLocator).toHaveAttribute('disabled');
   }
 
   async isAddBlockListElementWithNameVisible(blockName: string) {
-    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Add content'});
+    const createNewButtonLocator = this.page.getByTestId(`property:${blockName.toLowerCase()}`).locator('uui-button').filter({hasText: 'Add' + blockName});
     await this.waitForVisible(createNewButtonLocator);
     await expect(createNewButtonLocator).not.toHaveAttribute('disabled');
   }
@@ -1859,6 +1859,19 @@ export class ContentUiHelper extends UiBaseLocators {
     const propertyLocator = this.blockProperty.filter({hasText: propertyName}).locator('#input');
     await this.waitForVisible(propertyLocator);
     await expect(propertyLocator).toBeEditable({editable: isEditable});
+  }
+
+  async isBlockWorkspacePropertyEditable(elementTypeName: string, propertyName: string, isEditable: boolean = true) {
+    const propertyLocator = this.blockModal.filter({has: this.page.getByTestId('layout-headline').filter({hasText: elementTypeName})})
+      .locator(this.blockProperty).filter({hasText: propertyName}).locator('#input');
+    await this.waitForVisible(propertyLocator);
+    await expect(propertyLocator).toBeEditable({editable: isEditable});
+  }
+
+  async clickEditNestedBlockListEntry(parentElementTypeName: string, blockListElementName: string) {
+    const innerEntry = this.blockModal.filter({has: this.page.getByTestId('layout-headline').filter({hasText: parentElementTypeName})})
+      .locator(this.blockListEntry).filter({hasText: blockListElementName});
+    await this.click(innerEntry.getByLabel('edit'), {force: true});
   }
 
   async isInlineBlockPropertyVisible(propertyName: string, isVisible: boolean = true) {
