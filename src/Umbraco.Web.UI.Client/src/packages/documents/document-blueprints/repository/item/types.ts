@@ -1,5 +1,5 @@
 import type { UmbDocumentBlueprintEntityType } from '../../entity.js';
-import type { UmbDocumentBlueprintVariantState } from '../../index.js';
+import type { UmbDocumentBlueprintVariantState } from '../../variant-state.js';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 
 export interface UmbDocumentBlueprintItemModel extends UmbDocumentBlueprintItemBaseModel {

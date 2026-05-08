@@ -13,5 +13,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		flags: [],
+		noAccess: false,
 	},
 ];
