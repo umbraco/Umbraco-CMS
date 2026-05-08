@@ -79,7 +79,7 @@ export class UmbPropertyEditorUIBlockGridLayoutStylesheetElement
 				.min=${this._limitMin}
 				.max=${this._limitMax}></umb-input-static-file>
 			<br />
-			<a href="/umbraco/backoffice/css/umbraco-blockgridlayout.css" target="_blank"
+			<a class="uui-a" href="/umbraco/backoffice/css/umbraco-blockgridlayout.css" target="_blank"
 				>Link to default layout stylesheet</a
 			>
 		`;
