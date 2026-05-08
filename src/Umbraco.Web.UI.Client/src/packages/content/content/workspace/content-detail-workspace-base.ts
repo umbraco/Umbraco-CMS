@@ -394,7 +394,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	public async loadLanguages() {
 		// TODO: If we don't end up having a Global Context for languages, then we should at least change this into using a asObservable which should be returned from the repository. [Nl]
-		const { data } = await this.#languageRepository.requestCollection({});
+		const { data } = await this.#languageRepository.requestAllItems();
 		this.#languages.setValue(data?.items ?? []);
 	}
 
