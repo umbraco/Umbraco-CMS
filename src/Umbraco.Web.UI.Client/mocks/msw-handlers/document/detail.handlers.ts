@@ -18,6 +18,11 @@ function getReferenceData() {
 }
 
 export const detailHandlers = [
+	http.post(umbracoPath(`${UMB_SLUG}/validate`), () => {
+		umbDocumentMockDb.detail.validate();
+		return new HttpResponse(null, { status: 200 });
+	}),
+
 	http.post(umbracoPath(`${UMB_SLUG}`), async ({ request }) => {
 		const requestBody = (await request.json()) as CreateDocumentRequestModel;
 		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
@@ -131,6 +136,7 @@ export const detailHandlers = [
 			return new HttpResponse(null, { status: 403 });
 		}
 
+		umbDocumentMockDb.detail.validate(id);
 		return new HttpResponse(null, { status: 200 });
 	}),
 
@@ -141,8 +147,12 @@ export const detailHandlers = [
 			// Simulate a forbidden response
 			return new HttpResponse(null, { status: 403 });
 		}
-		const response = umbDocumentMockDb.detail.read(id);
-		return HttpResponse.json(response);
+		try {
+			const response = umbDocumentMockDb.detail.read(id);
+			return HttpResponse.json(response);
+		} catch {
+			return new HttpResponse(null, { status: 404 });
+		}
 	}),
 
 	http.put(umbracoPath(`${UMB_SLUG}/:id`), async ({ request, params }) => {
