@@ -8,7 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Media Entity Picker',
 		icon: 'icon-picture',
-		group: 'Pickers',
+		group: '#propertyEditorUIGroups_pickers',
 		supportsReadOnly: true,
 	},
 };

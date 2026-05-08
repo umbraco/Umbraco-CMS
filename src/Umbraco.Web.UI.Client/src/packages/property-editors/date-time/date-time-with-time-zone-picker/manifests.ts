@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Date Time (with time zone)',
 			propertyEditorSchemaAlias: 'Umbraco.DateTimeWithTimeZone',
 			icon: 'icon-calendar-alt',
-			group: 'Date',
+			group: '#propertyEditorUIGroups_date',
 			keywords: [
 				'date',
 				'time',

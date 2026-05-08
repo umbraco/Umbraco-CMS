@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Static File Picker',
 		icon: 'icon-document',
-		group: 'Common',
+		group: '#propertyEditorUIGroups_common',
 	},
 };

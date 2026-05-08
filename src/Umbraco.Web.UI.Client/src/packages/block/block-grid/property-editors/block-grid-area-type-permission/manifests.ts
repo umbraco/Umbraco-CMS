@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Block Grid Area Type Permissions',
 		icon: 'icon-document',
-		group: 'Common',
+		group: '#propertyEditorUIGroups_common',
 	},
 };

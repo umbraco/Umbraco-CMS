@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: '',
 		icon: 'icon-box-alt',
-		group: 'Common',
+		group: '#propertyEditorUIGroups_common',
 	},
 };

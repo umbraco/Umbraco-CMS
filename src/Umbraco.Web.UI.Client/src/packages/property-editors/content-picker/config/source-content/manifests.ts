@@ -8,6 +8,6 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Content Picker Source',
 		icon: 'icon-page-add',
-		group: 'Pickers',
+		group: '#propertyEditorUIGroups_pickers',
 	},
 };
