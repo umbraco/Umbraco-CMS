@@ -35,14 +35,7 @@ describe('aliasToPath', () => {
 });
 
 describe('encodeFilePath / decodeFilePath round-trip', () => {
-	const originals = [
-		'plain',
-		'my.file:v2',
-		'a.b.c',
-		'hello world',
-		'rød grød/blå bær',
-		'',
-	];
+	const originals = ['plain', 'my.file:v2', 'a.b.c', 'hello world', 'rød grød/blå bær', ''];
 
 	originals.forEach((original) => {
 		it(`encode → decode is the identity for ${JSON.stringify(original)}`, () => {
