@@ -114,7 +114,7 @@ internal sealed class ContentRelationsUpdate :
         }
 
         // Lookup all relation type IDs.
-        var relationTypeLookup = _relationTypeRepository.GetMany(Array.Empty<int>())
+        var relationTypeLookup = _relationTypeRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult()
             .Where(x => automaticRelationTypeAliases.Contains(x.Alias))
             .ToDictionary(x => x.Alias, x => x.Id);
 

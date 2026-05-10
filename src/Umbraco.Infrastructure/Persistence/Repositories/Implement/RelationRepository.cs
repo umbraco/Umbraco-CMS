@@ -424,17 +424,16 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
             return await BuildEntitiesAsync(dtos);
         });
 
-    private Task<IEnumerable<IRelation>> BuildEntitiesAsync(IReadOnlyCollection<RelationDto> dtos)
+    private async Task<IEnumerable<IRelation>> BuildEntitiesAsync(IReadOnlyCollection<RelationDto> dtos)
     {
         if (dtos.Count == 0)
         {
-            return Task.FromResult<IEnumerable<IRelation>>(Array.Empty<IRelation>());
+            return Array.Empty<IRelation>();
         }
 
         int[] relationTypeIds = dtos.Select(x => x.RelationType).Distinct().ToArray();
-        Dictionary<int, IRelationType> relationTypes = _relationTypeRepository
-            .GetMany(relationTypeIds)
-            .ToDictionary(x => x.Id, x => x);
+        IEnumerable<IRelationType> relationTypeEntities = await _relationTypeRepository.GetManyAsync(relationTypeIds, CancellationToken.None);
+        Dictionary<int, IRelationType> relationTypes = relationTypeEntities.ToDictionary(x => x.Id, x => x);
 
         var entities = new List<IRelation>(dtos.Count);
         foreach (RelationDto dto in dtos)
@@ -447,18 +446,18 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
             entities.Add(RelationFactory.BuildEntity(dto, relationType));
         }
 
-        return Task.FromResult<IEnumerable<IRelation>>(entities);
+        return entities;
     }
 
     private async Task<IRelation> BuildEntityAsync(RelationDto dto)
     {
-        IRelationType? relationType = _relationTypeRepository.Get(dto.RelationType);
+        IRelationType? relationType = await _relationTypeRepository.GetAsync(dto.RelationType, CancellationToken.None);
         if (relationType is null)
         {
             throw new InvalidOperationException($"RelationType with Id: {dto.RelationType} doesn't exist");
         }
 
-        return await Task.FromResult(RelationFactory.BuildEntity(dto, relationType));
+        return RelationFactory.BuildEntity(dto, relationType);
     }
 
     /// <summary>

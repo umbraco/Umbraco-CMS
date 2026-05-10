@@ -61,7 +61,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(out var repositoryType);
 
             // Act
-            var relationType = repositoryType.Get(1);
+            var relationType = repositoryType.GetAsync(1, CancellationToken.None).GetAwaiter().GetResult();
             var relation = new Relation(_textpage.Id, _subpage.Id, relationType);
             repository.SaveAsync(relation, CancellationToken.None).GetAwaiter().GetResult();
 
@@ -528,8 +528,8 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var relationTypeRepository = GetRequiredService<IRelationTypeRepository>();
             var relationRepository = GetRequiredService<IRelationRepository>();
 
-            relationTypeRepository.Save(_relateContent);
-            relationTypeRepository.Save(_relateContentType);
+            await relationTypeRepository.SaveAsync(_relateContent, CancellationToken.None);
+            await relationTypeRepository.SaveAsync(_relateContentType, CancellationToken.None);
 
             var templateService = GetRequiredService<ITemplateService>();
             var template = TemplateBuilder.CreateTextPageTemplate();
