@@ -107,7 +107,7 @@ internal sealed class ContentRelationsUpdate :
         if (references.Count == 0)
         {
             // Delete all relations using the automatic relation type aliases.
-            _relationRepository.DeleteByParent(entity.Id, automaticRelationTypeAliases.ToArray());
+            _relationRepository.DeleteByParentAsync(entity.Id, automaticRelationTypeAliases.ToArray()).GetAwaiter().GetResult();
 
             // No need to add new references/relations
             return;
@@ -158,19 +158,21 @@ internal sealed class ContentRelationsUpdate :
             }
         }
 
-        // Get all existing relations (optimize for adding new and keeping existing relations).
-        IQuery<IRelation> query = scope.SqlContext.Query<IRelation>().Where(x => x.ParentId == entity.Id).WhereIn(x => x.RelationTypeId, relationTypeLookup.Values);
-        var existingRelations = _relationRepository.GetPagedRelationsByQuery(query, 0, int.MaxValue, out _, null)
-            .ToDictionary(x => (x.ChildId, x.RelationTypeId)); // Relations are unique by parent ID, child ID and relation type ID.
+        // Get existing relations for this parent and filter to the (small) set of automatic relation types.
+        // Relations are unique by parent ID, child ID and relation type ID.
+        var relationTypeIds = relationTypeLookup.Values.ToHashSet();
+        var existingRelations = _relationRepository.GetByParentIdAsync(entity.Id).GetAwaiter().GetResult()
+            .Where(x => relationTypeIds.Contains(x.RelationTypeId))
+            .ToDictionary(x => (x.ChildId, x.RelationTypeId));
 
         // Add relations that don't exist yet.
         IEnumerable<ReadOnlyRelation> relationsToAdd = relations.Except(existingRelations.Keys).Select(x => new ReadOnlyRelation(entity.Id, x.ChildId, x.RelationTypeId));
-        _relationRepository.SaveBulk(relationsToAdd);
+        _relationRepository.SaveBulkAsync(relationsToAdd).GetAwaiter().GetResult();
 
         // Delete relations that don't exist anymore.
         foreach (IRelation relation in existingRelations.Where(x => !relations.Contains(x.Key)).Select(x => x.Value))
         {
-            _relationRepository.Delete(relation);
+            _relationRepository.DeleteAsync(relation, CancellationToken.None).GetAwaiter().GetResult();
         }
     }
 
