@@ -198,6 +198,15 @@ describe('UmbValidationMessagesManager', () => {
 			expect(paths).to.not.contain('$.foo.bar');
 			expect(paths).to.contain('$.baz');
 		});
+
+		it('does not remove paths that share the prefix but are not descendants', () => {
+			messages.addMessage('server', '$.foo', 'a');
+			messages.addMessage('server', '$.foobar', 'b');
+			messages.removeMessagesAndDescendantsByPath('$.foo');
+			const paths = messages.getMessages().map((m) => m.path);
+			expect(paths).to.not.contain('$.foo');
+			expect(paths).to.contain('$.foobar');
+		});
 	});
 
 	describe('clear', () => {
