@@ -21,11 +21,6 @@ public static partial class Constants
             ///     The cache tag for media items.
             /// </summary>
             public const string Media = "media";
-
-            /// <summary>
-            ///     The cache tag for element items.
-            /// </summary>
-            public const string Element = "element";
         }
 
         /// <summary>

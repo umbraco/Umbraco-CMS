@@ -36,7 +36,6 @@ import {WebhookApiHelper} from "./WebhookApiHelper";
 import {MediaDeliveryApiHelper} from './differentAppSettingsHelpers/MediaDeliveryApiHelper';
 import {ContentDeliveryApiHelper} from "./differentAppSettingsHelpers/ContentDeliveryApiHelper";
 import {SmtpApiHelper} from './SmtpApiHelper';
-import {ElementApiHelper} from "./ElementApiHelper";
 
 export class ApiHelpers {
   baseUrl: string = umbracoConfig.environment.baseUrl;
@@ -76,7 +75,6 @@ export class ApiHelpers {
   mediaDeliveryApi: MediaDeliveryApiHelper;
   contentDeliveryApi: ContentDeliveryApiHelper;
   smtp: SmtpApiHelper;
-  element: ElementApiHelper;
 
   constructor(page: Page) {
     this.page = page;
@@ -115,7 +113,6 @@ export class ApiHelpers {
     this.mediaDeliveryApi = new MediaDeliveryApiHelper(this);
     this.contentDeliveryApi = new ContentDeliveryApiHelper(this);
     this.smtp = new SmtpApiHelper(this);
-    this.element = new ElementApiHelper(this);
   }
 
   async getHeaders() {
@@ -241,11 +238,6 @@ export class ApiHelpers {
   async loginToAdminUser() {
     await this.revokeTokens();
     await this.updateTokenAndCookie(umbracoConfig.user.login, umbracoConfig.user.password);
-  }
-
-  async resetAuthState() {
-    await this.revokeTokens();
-    await this.page.context().clearCookies();
   }
 
   async getCurrentTimePlusMinute(minute: number = 1) {

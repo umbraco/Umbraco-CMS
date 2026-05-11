@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -7,7 +8,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
+using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
 namespace Umbraco.Tests.Scheduling;
@@ -22,8 +25,7 @@ internal class ContentVersionCleanupTest
         [Frozen] Mock<IMainDom> mainDom,
         [Frozen] Mock<IServerRoleAccessor> serverRoleAccessor,
         [Frozen] Mock<IRuntimeState> runtimeState,
-        [Frozen] Mock<IContentVersionService> contentVersionService,
-        [Frozen] Mock<IElementVersionService> elementVersionService,
+        [Frozen] Mock<IContentVersionService> cleanupService,
         ContentVersionCleanupJob sut)
     {
         settings.Setup(x => x.CurrentValue).Returns(new ContentSettings
@@ -36,8 +38,7 @@ internal class ContentVersionCleanupTest
 
         await sut.ExecuteAsync();
 
-        contentVersionService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Never);
-        elementVersionService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Never);
+        cleanupService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Never);
     }
 
     [Test]
@@ -47,8 +48,7 @@ internal class ContentVersionCleanupTest
         [Frozen] Mock<IMainDom> mainDom,
         [Frozen] Mock<IServerRoleAccessor> serverRoleAccessor,
         [Frozen] Mock<IRuntimeState> runtimeState,
-        [Frozen] Mock<IContentVersionService> contentVersionService,
-        [Frozen] Mock<IElementVersionService> elementVersionService,
+        [Frozen] Mock<IContentVersionService> cleanupService,
         ContentVersionCleanupJob sut)
     {
         settings.Setup(x => x.CurrentValue).Returns(new ContentSettings
@@ -62,7 +62,6 @@ internal class ContentVersionCleanupTest
 
         await sut.ExecuteAsync();
 
-        contentVersionService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Once);
-        elementVersionService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Once);
+        cleanupService.Verify(x => x.PerformContentVersionCleanup(It.IsAny<DateTime>()), Times.Once);
     }
 }

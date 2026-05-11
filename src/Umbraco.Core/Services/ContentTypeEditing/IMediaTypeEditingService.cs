@@ -83,7 +83,23 @@ public interface IMediaTypeEditingService
     ///     Unlike <c>GetMediaTypesForFileExtensionAsync</c>, this method always includes catch-all media types
     ///     (those with no extension restrictions) alongside specific extension matches.
     /// </remarks>
-    Task<PagedModel<MediaTypeFileExtensionMatchResult>> GetMediaTypesForFileExtensionWithMatchInfoAsync(string fileExtension, int skip, int take);
+    // TODO (V18): Remove the default implementation.
+    async Task<PagedModel<MediaTypeFileExtensionMatchResult>> GetMediaTypesForFileExtensionWithMatchInfoAsync(string fileExtension, int skip, int take)
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        PagedModel<IMediaType> result = await GetMediaTypesForFileExtensionAsync(fileExtension, skip, take);
+#pragma warning restore CS0618 // Type or member is obsolete
+        return new PagedModel<MediaTypeFileExtensionMatchResult>
+        {
+            Items = result.Items
+                .Select(mt => new MediaTypeFileExtensionMatchResult
+                {
+                    MediaType = mt,
+                    IsSpecificMatch = true,
+                }),
+            Total = result.Total,
+        };
+    }
 
     /// <summary>
     ///     Gets media types that are considered folder types.

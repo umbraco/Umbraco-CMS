@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Routing;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder;
 
@@ -32,13 +31,19 @@ public interface IUmbracoPipelineFilter
     /// Executes after static files middlewares are registered and just before the routing middleware is registered.
     /// </summary>
     /// <param name="app">The application.</param>
-    void OnPreRouting(IApplicationBuilder app);
+    void OnPreRouting(IApplicationBuilder app)
+    {
+        // TODO: Remove default implementation in Umbraco 13
+    }
 
     /// <summary>
     /// Executes after the routing middleware is registered and just before the authentication and authorization middlewares are registered. This can be used to add CORS policies.
     /// </summary>
     /// <param name="app">The application.</param>
-    void OnPostRouting(IApplicationBuilder app);
+    void OnPostRouting(IApplicationBuilder app)
+    {
+        // TODO: Remove default implementation in Umbraco 13
+    }
 
     /// <summary>
     /// Executes after core Umbraco middlewares are registered and before any endpoints are declared.
@@ -51,16 +56,4 @@ public interface IUmbracoPipelineFilter
     /// </summary>
     /// <param name="app">The application.</param>
     void OnEndpoints(IApplicationBuilder app);
-
-    /// <summary>
-    /// Executes inside UseEndpoints, before Umbraco registers its endpoints.
-    /// </summary>
-    /// <param name="endpoints">The endpoint route builder.</param>
-    void OnPreMapEndpoints(IEndpointRouteBuilder endpoints);
-
-    /// <summary>
-    /// Executes inside UseEndpoints, after Umbraco registers its endpoints.
-    /// </summary>
-    /// <param name="endpoints">The endpoint route builder.</param>
-    void OnPostMapEndpoints(IEndpointRouteBuilder endpoints);
 }

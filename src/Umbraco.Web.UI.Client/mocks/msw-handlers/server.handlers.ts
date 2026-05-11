@@ -35,9 +35,6 @@ export const serverInformationHandlers = [
 			versionCheckPeriod: 7, // days
 			allowLocalLogin: true,
 			umbracoCssPath: '/css',
-			signalR: {
-				skipNegotiation: false,
-			},
 		});
 	}),
 	http.get(umbracoPath('/server/information'), () => {

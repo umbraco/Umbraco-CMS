@@ -5,11 +5,11 @@ import { createClient, defaultPlugins } from '@hey-api/openapi-ts';
 // Start notifying user we are generating the TypeScript client
 console.log(chalk.green("Generating OpenAPI client..."));
 
-const openApiUrl = process.argv[2];
-if (openApiUrl === undefined) {
+const swaggerUrl = process.argv[2];
+if (swaggerUrl === undefined) {
   console.error(chalk.red(`ERROR: Missing URL to OpenAPI spec`));
   console.error(`Please provide the URL to the OpenAPI spec as the first argument found in ${chalk.yellow('package.json')}`);
-  console.error(`Example: node generate-openapi.js ${chalk.yellow('https://localhost:44339/umbraco/openapi/REPLACE_ME.json')}`);
+  console.error(`Example: node generate-openapi.js ${chalk.yellow('https://localhost:44339/umbraco/swagger/REPLACE_ME/swagger.json')}`);
   process.exit();
 }
 
@@ -18,9 +18,9 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // Start checking to see if we can connect to the OpenAPI spec
 console.log("Ensure your Umbraco instance is running");
-console.log(`Fetching OpenAPI definition from ${chalk.yellow(openApiUrl)}`);
+console.log(`Fetching OpenAPI definition from ${chalk.yellow(swaggerUrl)}`);
 
-fetch(openApiUrl).then(async (response) => {
+fetch(swaggerUrl).then(async (response) => {
   if (!response.ok) {
     console.error(chalk.red(`ERROR: OpenAPI spec returned with a non OK (200) response: ${response.status} ${response.statusText}`));
     console.error(`The URL to your Umbraco instance may be wrong or the instance is not running`);
@@ -32,15 +32,18 @@ fetch(openApiUrl).then(async (response) => {
   console.log(`Calling ${chalk.yellow('hey-api')} to generate TypeScript client`);
 
   await createClient({
-    input: openApiUrl,
+    input: swaggerUrl,
     output: 'src/api',
     plugins: [
-      // Spread defaults so future @hey-api/openapi-ts additions come along automatically,
-      // but filter out @hey-api/sdk because we override its responseStyle below.
-      ...defaultPlugins.filter((plugin) => (typeof plugin === 'string' ? plugin : plugin.name) !== '@hey-api/sdk'),
+      ...defaultPlugins,
+      {
+        name: '@hey-api/client-fetch',
+        runtimeConfigPath: '../hey-api',
+      },
       {
         name: '@hey-api/sdk',
-        responseStyle: 'fields',
+        asClass: true,
+        classNameBuilder: '{{name}}Service',
       }
     ],
   });

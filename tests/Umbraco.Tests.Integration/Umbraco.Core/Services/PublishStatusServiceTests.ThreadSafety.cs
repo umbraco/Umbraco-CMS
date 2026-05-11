@@ -42,7 +42,7 @@ internal sealed partial class PublishStatusServiceTests
             }));
         }
 
-        // Readers - IsPublished
+        // Readers - IsDocumentPublished
         for (var i = 0; i < numberOfOperations; i++)
         {
             var key = documentKeys[i % documentKeys.Length];
@@ -50,7 +50,7 @@ internal sealed partial class PublishStatusServiceTests
             {
                 try
                 {
-                    _ = sut.IsPublished(key, DefaultCulture);
+                    _ = sut.IsDocumentPublished(key, DefaultCulture);
                 }
                 catch (Exception ex)
                 {
@@ -64,7 +64,7 @@ internal sealed partial class PublishStatusServiceTests
             }));
         }
 
-        // Readers - IsPublishedInAnyCulture
+        // Readers - IsDocumentPublishedInAnyCulture
         for (var i = 0; i < numberOfOperations; i++)
         {
             var key = documentKeys[i % documentKeys.Length];
@@ -72,7 +72,7 @@ internal sealed partial class PublishStatusServiceTests
             {
                 try
                 {
-                    _ = sut.IsPublishedInAnyCulture(key);
+                    _ = sut.IsDocumentPublishedInAnyCulture(key);
                 }
                 catch (Exception ex)
                 {
@@ -154,8 +154,8 @@ internal sealed partial class PublishStatusServiceTests
             {
                 try
                 {
-                    _ = sut.IsPublished(Textpage.Key, DefaultCulture);
-                    _ = sut.IsPublishedInAnyCulture(Subpage.Key);
+                    _ = sut.IsDocumentPublished(Textpage.Key, DefaultCulture);
+                    _ = sut.IsDocumentPublishedInAnyCulture(Subpage.Key);
                     _ = sut.HasPublishedAncestorPath(Subpage2.Key);
                 }
                 catch (Exception ex)
@@ -187,7 +187,7 @@ internal sealed partial class PublishStatusServiceTests
 
         // Initialize once and confirm the baseline.
         await sut.InitializeAsync(CancellationToken.None);
-        Assert.IsTrue(sut.IsPublishedInAnyCulture(Textpage.Key), "Textpage should be published after initial load");
+        Assert.IsTrue(sut.IsDocumentPublishedInAnyCulture(Textpage.Key), "Textpage should be published after initial load");
 
         var falseCount = 0;
         var totalReads = 0;
@@ -203,7 +203,7 @@ internal sealed partial class PublishStatusServiceTests
                 while (cts.IsCancellationRequested is false)
                 {
                     Interlocked.Increment(ref totalReads);
-                    if (sut.IsPublishedInAnyCulture(Textpage.Key) is false)
+                    if (sut.IsDocumentPublishedInAnyCulture(Textpage.Key) is false)
                     {
                         Interlocked.Increment(ref falseCount);
                     }

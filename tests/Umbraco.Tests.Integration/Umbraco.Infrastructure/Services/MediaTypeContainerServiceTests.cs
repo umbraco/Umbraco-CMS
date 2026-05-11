@@ -181,7 +181,7 @@ internal sealed class MediaTypeContainerServiceTests : UmbracoIntegrationTest
         {
             Alias = "test", Name = "Test"
         };
-        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(mediaType);
 
         var result = await MediaTypeContainerService.DeleteAsync(container.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);

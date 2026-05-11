@@ -1,1 +1,2 @@
-export { UmbDeleteWithRelationEntityAction } from './delete-with-relation.action.js';
+export * from './delete-with-relation.action.js';
+export type * from './types.js';

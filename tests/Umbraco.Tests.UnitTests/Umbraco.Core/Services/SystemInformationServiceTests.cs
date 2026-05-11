@@ -139,14 +139,14 @@ public class SystemInformationServiceTests
         bool isDebug = true,
         RuntimeMode runtimeMode = RuntimeMode.BackofficeDevelopment)
     {
-        var languageService = CreateILanguageService(culture);
+        var localizationService = CreateILocalizationService(culture);
 
         var databaseMock = new Mock<IUmbracoDatabase>();
         databaseMock.Setup(x => x.DatabaseType.GetProviderName()).Returns("SQL");
 
         return new SystemTroubleshootingInformationTelemetryProvider(
             _umbracoVersion,
-            languageService,
+            localizationService,
             Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),
             Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings { Debug = isDebug }),
             Mock.Of<IHostEnvironment>(),
@@ -155,11 +155,11 @@ public class SystemInformationServiceTests
             Mock.Of<IOptionsMonitor<RuntimeSettings>>(x => x.CurrentValue == new RuntimeSettings { Mode = runtimeMode }));
     }
 
-    private ILanguageService CreateILanguageService(string culture)
+    private ILocalizationService CreateILocalizationService(string culture)
     {
-        var languageService = new Mock<ILanguageService>();
-        languageService.Setup(x => x.GetDefaultIsoCodeAsync()).ReturnsAsync(culture);
-        return languageService.Object;
+        var localizationService = new Mock<ILocalizationService>();
+        localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns(culture);
+        return localizationService.Object;
     }
 
     private void CreateUmbracoVersion(int major, int minor, int patch)

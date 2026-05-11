@@ -11,7 +11,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.DropDown.Flexible',
 			icon: 'icon-list',
 			group: 'lists',
-			keywords: ['select', 'dropdown', 'choice', 'option', 'list'],
 			supportsReadOnly: true,
 		},
 	},

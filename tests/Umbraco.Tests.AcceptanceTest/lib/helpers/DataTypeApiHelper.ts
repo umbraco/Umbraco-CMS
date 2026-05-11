@@ -1,5 +1,4 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
-import {AliasHelper} from "./AliasHelper";
 import {
   CheckboxListDataTypeBuilder,
   DatePickerDataTypeBuilder,
@@ -29,10 +28,9 @@ import {
   NumericDataTypeBuilder,
   TagsDataTypeBuilder,
   MultiNodeTreePickerDataTypeBuilder,
-  DateTimeWithTimeZonePickerDataTypeBuilder,
-  EntityDataPickerDataTypeBuilder,
-  ElementPickerDataTypeBuilder
+  DateTimeWithTimeZonePickerDataTypeBuilder, EntityDataPickerDataTypeBuilder
 } from "../builders";
+import {AliasHelper} from "./AliasHelper";
 
 export class DataTypeApiHelper {
   api: ApiHelpers
@@ -1762,45 +1760,6 @@ export class DataTypeApiHelper {
     return await this.createRichTextEditorWithABlockWithBlockSettings(richTextEditorName, contentElementTypeId, "", "", "", "", "", "", displayInline);
   }
 
-  async createDefaultContentPickerSourceDataType(name: string) {
-    await this.ensureNameNotExists(name);
-
-    const dataType = new MultiNodeTreePickerDataTypeBuilder()
-      .withName(name)
-      .build();
-
-    return await this.save(dataType);
-  }
-
-  async createContentPickerSourceDataTypeWithDynamicRoot(name: string, originAlias: string) {
-    await this.ensureNameNotExists(name);
-
-    const dataType = new MultiNodeTreePickerDataTypeBuilder()
-      .withName(name)
-      .addStartNode()
-        .withType('content')
-        .withOriginAlias(originAlias)
-        .done()
-      .build();
-
-    return await this.save(dataType);
-  }
-
-  async doesContentPickerHaveDynamicRoot(dataTypeName: string, originAlias: string) {
-    const dataType = await this.getByName(dataTypeName);
-    const startNodeValue = dataType.values.find((item: any) => item.alias === 'startNode');
-    if (!startNodeValue?.value?.dynamicRoot) {
-      return false;
-    }
-    return startNodeValue.value.dynamicRoot.originAlias === originAlias;
-  }
-
-  async getContentPickerDynamicRoot(dataTypeName: string) {
-    const dataType = await this.getByName(dataTypeName);
-    const startNodeValue = dataType.values.find((item: any) => item.alias === 'startNode');
-    return startNodeValue?.value?.dynamicRoot;
-  }
-
   async doesDataTypeHaveValue(dataTypeName: string, alias: string, value?: any, dataTypeData?) {
     const dataType = dataTypeData || await this.getByName(dataTypeName);
     const valueData = dataType.values.find(item => item.alias === alias);
@@ -2177,37 +2136,42 @@ export class DataTypeApiHelper {
     return await this.save(blockList);
   }
 
-  async createDefaultElementPickerDataType(name: string) {
+  async createDefaultContentPickerSourceDataType(name: string) {
     await this.ensureNameNotExists(name);
 
-    const builder = new ElementPickerDataTypeBuilder()
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
       .withName(name)
       .build();
 
-    return await this.save(builder);
+    return await this.save(dataType);
   }
 
-  async createDefaultElementPickerWithValidationLimit(name: string, minValidation: number = 0, maxValidation: number = 0) {
+  async createContentPickerSourceDataTypeWithDynamicRoot(name: string, originAlias: string) {
     await this.ensureNameNotExists(name);
 
-    const builder = new ElementPickerDataTypeBuilder()
+    const dataType = new MultiNodeTreePickerDataTypeBuilder()
       .withName(name)
-      .withMinValidation(minValidation)
-      .withMaxValidation(maxValidation)
+      .addStartNode()
+        .withType('content')
+        .withOriginAlias(originAlias)
+        .done()
       .build();
 
-    return await this.save(builder);
+    return await this.save(dataType);
   }
 
-  async doesElementPickerHaveMinAndMaxAmount(dataTypeName: string, min?: number, max?: number) {
-    const dataTypeData = await this.getByName(dataTypeName);
-    const valueData = dataTypeData.values.find(item => item.alias === 'validationLimit');
-    if (min === undefined) {
-      return valueData?.value.max === max;
-    } else if (max === undefined) {
-      return valueData?.value.min === min;
-    } else {
-      return valueData?.value.max === max && valueData?.value.min === min;
+  async doesContentPickerHaveDynamicRoot(dataTypeName: string, originAlias: string) {
+    const dataType = await this.getByName(dataTypeName);
+    const startNodeValue = dataType.values.find((item: any) => item.alias === 'startNode');
+    if (!startNodeValue?.value?.dynamicRoot) {
+      return false;
     }
+    return startNodeValue.value.dynamicRoot.originAlias === originAlias;
+  }
+
+  async getContentPickerDynamicRoot(dataTypeName: string) {
+    const dataType = await this.getByName(dataTypeName);
+    const startNodeValue = dataType.values.find((item: any) => item.alias === 'startNode');
+    return startNodeValue?.value?.dynamicRoot;
   }
 }

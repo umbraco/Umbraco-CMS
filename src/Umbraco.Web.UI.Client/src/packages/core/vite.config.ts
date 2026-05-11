@@ -71,8 +71,6 @@ export default defineConfig({
 			'tree/index': './tree/index.ts',
 			'utils/index': './utils/index.ts',
 			'validation/index': './validation/index.ts',
-			'value-summary/index': './value-summary/index.ts',
-			'value-type/index': './value-type/index.ts',
 			'variant/index': './variant/index.ts',
 			'view/index': './view/index.ts',
 			'workspace/index': './workspace/index.ts',

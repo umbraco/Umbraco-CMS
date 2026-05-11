@@ -201,7 +201,7 @@ public class ContentModelBinderTests
         Type modelType,
         IPublishedContent publishedContent)
     {
-        var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<ITemplateService>());
+        var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<IFileService>());
         builder.SetPublishedContent(publishedContent);
         var publishedRequest = builder.Build();
 
@@ -232,7 +232,7 @@ public class ContentModelBinderTests
     public class ContentType1 : PublishedContentWrapped
     {
         public ContentType1(IPublishedContent content, IPublishedValueFallback fallback)
-            : base(content)
+            : base(content, fallback)
         {
         }
     }

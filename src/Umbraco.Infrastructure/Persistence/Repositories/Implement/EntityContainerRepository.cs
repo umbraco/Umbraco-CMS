@@ -46,7 +46,6 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             Constants.ObjectTypes.MediaTypeContainer,
             Constants.ObjectTypes.MemberTypeContainer,
             Constants.ObjectTypes.DocumentBlueprintContainer,
-            Constants.ObjectTypes.ElementContainer,
         };
         NodeObjectTypeId = containerObjectType;
         if (allowedContainers.Contains(NodeObjectTypeId) == false)
@@ -65,8 +64,7 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
     /// <returns>The corresponding <see cref="Umbraco.Cms.Core.Models.EntityContainer"/> if found; otherwise, <c>null</c>.</returns>
     public EntityContainer? Get(Guid id)
     {
-        Sql<ISqlContext> sql = GetBaseQuery(false)
-            .Where<NodeDto>(c => c.UniqueId == id && c.NodeObjectType == NodeObjectTypeId);
+        Sql<ISqlContext> sql = GetBaseQuery(false).Where<NodeDto>(c => c.UniqueId == id);
 
         NodeDto? nodeDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
         return nodeDto == null ? null : CreateEntity(nodeDto);
@@ -160,7 +158,6 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
             containedObjectType,
             nodeDto.Text,
             nodeDto.UserId ?? Constants.Security.UnknownUserId);
-        entity.Trashed = nodeDto.Trashed;
 
         // reset dirty initial properties (U4-1946)
         entity.ResetDirtyProperties(false);
@@ -359,21 +356,11 @@ internal class EntityContainerRepository : EntityRepositoryBase<int, EntityConta
 
         // update
         nodeDto.Text = entity.Name;
-        nodeDto.Path = entity.Path;
-        nodeDto.Level = Convert.ToInt16(entity.Level);
-        nodeDto.Trashed = entity.Trashed;
         if (nodeDto.ParentId != entity.ParentId)
         {
-            nodeDto.Level = 1;
-            if (entity.ParentId == Constants.System.Root)
-            {
-                nodeDto.Path = $"{Constants.System.Root},{nodeDto.NodeId}";
-            }
-            else if (entity.ParentId == Constants.System.RecycleBinElement)
-            {
-                nodeDto.Path = $"{Constants.System.RecycleBinElementPathPrefix}{nodeDto.NodeId}";
-            }
-            else
+            nodeDto.Level = 0;
+            nodeDto.Path = "-1";
+            if (entity.ParentId > -1)
             {
                 NodeDto parent = Database.FirstOrDefault<NodeDto>(Sql().SelectAll()
                     .From<NodeDto>()

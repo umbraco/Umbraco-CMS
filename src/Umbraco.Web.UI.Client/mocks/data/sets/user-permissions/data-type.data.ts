@@ -9,7 +9,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		editorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 		values: [],
 		hasChildren: false,
-		noAccess: false,
 		isFolder: false,
 		isDeletable: true,
 		canIgnoreStartNodes: false,

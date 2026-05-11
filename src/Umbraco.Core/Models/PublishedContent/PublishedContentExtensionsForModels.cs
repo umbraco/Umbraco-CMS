@@ -16,23 +16,6 @@ public static class PublishedContentExtensionsForModels
     public static IPublishedContent? CreateModel(
         this IPublishedContent? content,
         IPublishedModelFactory? publishedModelFactory)
-        => CreateModel<IPublishedContent>(content, publishedModelFactory);
-
-    /// <summary>
-    ///     Creates a strongly typed published content model for an internal published element.
-    /// </summary>
-    /// <param name="element">The internal published element.</param>
-    /// <param name="publishedModelFactory">The published model factory</param>
-    /// <returns>The strongly typed published element model.</returns>
-    public static IPublishedElement? CreateModel(
-        this IPublishedElement? element,
-        IPublishedModelFactory? publishedModelFactory)
-        => CreateModel<IPublishedElement>(element, publishedModelFactory);
-
-    private static T? CreateModel<T>(
-        IPublishedElement? content,
-        IPublishedModelFactory? publishedModelFactory)
-        where T : IPublishedElement
     {
         if (publishedModelFactory == null)
         {
@@ -41,7 +24,7 @@ public static class PublishedContentExtensionsForModels
 
         if (content == null)
         {
-            return default;
+            return null;
         }
 
         // get model
@@ -53,10 +36,10 @@ public static class PublishedContentExtensionsForModels
         }
 
         // if factory returns a different type, throw
-        if (!(model is T publishedContent))
+        if (!(model is IPublishedContent publishedContent))
         {
             throw new InvalidOperationException(
-                $"Factory returned model of type {model.GetType().FullName} which does not implement {typeof(T).Name}.");
+                $"Factory returned model of type {model.GetType().FullName} which does not implement IPublishedContent.");
         }
 
         return publishedContent;

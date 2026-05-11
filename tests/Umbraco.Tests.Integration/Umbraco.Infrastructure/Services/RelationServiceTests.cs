@@ -39,12 +39,12 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Get_Paged_Relations_By_Relation_Type()
+    public void Get_Paged_Relations_By_Relation_Type()
     {
         // Create content
         var createdContent = new List<IContent>();
         var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
         for (var i = 0; i < 3; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
@@ -55,7 +55,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         // Create media
         var createdMedia = new List<IMedia>();
         var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
-        await MediaTypeService.CreateAsync(imageType, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(imageType);
         for (var i = 0; i < 3; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageType, -1);
@@ -90,16 +90,16 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Return_List_Of_Content_Items_Where_Media_Item_Referenced()
+    public void Return_List_Of_Content_Items_Where_Media_Item_Referenced()
     {
         var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
-        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(mt);
         var m1 = MediaBuilder.CreateSimpleMedia(mt, "hello 1", -1);
         MediaService.Save(m1);
 
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest");
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(ct);
 
         void CreateContentWithMediaRefs()
         {
@@ -126,16 +126,16 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Return_List_Of_Content_Items_Where_Member_Item_Referenced()
+    public void Return_List_Of_Content_Items_Where_Member_Item_Referenced()
     {
         var memberType = MemberTypeBuilder.CreateSimpleMemberType("testMemberType", "Test Member Type");
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        MemberTypeService.Save(memberType);
         var member = MemberBuilder.CreateSimpleMember(memberType, "Test Member", "test@test.com", "xxxxxxxx", "testMember");
         MemberService.Save(member);
 
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest");
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(ct);
 
         void CreateContentWithMemberRefs()
         {
@@ -198,18 +198,18 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Relation_Returns_Parent_Child_Object_Types_When_Creating()
+    public void Relation_Returns_Parent_Child_Object_Types_When_Creating()
     {
-        var r = await CreateAndSaveRelation("Test", "test");
+        var r = CreateAndSaveRelation("Test", "test");
 
         Assert.AreEqual(Constants.ObjectTypes.Document, r.ParentObjectType);
         Assert.AreEqual(Constants.ObjectTypes.Media, r.ChildObjectType);
     }
 
     [Test]
-    public async Task Relation_Returns_Parent_Child_Object_Types_When_Getting()
+    public void Relation_Returns_Parent_Child_Object_Types_When_Getting()
     {
-        var r = await CreateAndSaveRelation("Test", "test");
+        var r = CreateAndSaveRelation("Test", "test");
 
         // re-get
         r = RelationService.GetById(r.Id);
@@ -219,11 +219,11 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Insert_Bulk_Relations()
+    public void Insert_Bulk_Relations()
     {
         var rs = RelationService;
 
-        var newRelations = await CreateRelations(10);
+        var newRelations = CreateRelations(10);
 
         Assert.IsTrue(newRelations.All(x => !x.HasIdentity));
 
@@ -233,12 +233,12 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Update_Bulk_Relations()
+    public void Update_Bulk_Relations()
     {
         var rs = RelationService;
 
         var date = DateTime.UtcNow.AddDays(-10);
-        var newRelations = await CreateRelations(10);
+        var newRelations = CreateRelations(10);
         foreach (var r in newRelations)
         {
             r.CreateDate = date;
@@ -260,17 +260,17 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         Assert.IsTrue(newRelations.All(x => x.UpdateDate == newDate));
     }
 
-    private async Task<IRelation> CreateAndSaveRelation(string name, string alias)
+    private IRelation CreateAndSaveRelation(string name, string alias)
     {
         var rs = RelationService;
         var rt = new RelationType(name, alias, false, null, null, false);
         rs.Save(rt);
 
         var ct = ContentTypeBuilder.CreateBasicContentType();
-        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(ct);
 
         var mt = MediaTypeBuilder.CreateImageMediaType("img");
-        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(mt);
 
         var c1 = ContentBuilder.CreateBasicContent(ct);
         var c2 = MediaBuilder.CreateMediaImage(mt, -1);
@@ -288,7 +288,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     /// </summary>
     /// <param name="count"></param>
     /// <returns></returns>
-    private async Task<IEnumerable<IRelation>> CreateRelations(int count)
+    private IEnumerable<IRelation> CreateRelations(int count)
     {
         var rs = RelationService;
         var rtName = Guid.NewGuid().ToString();
@@ -296,10 +296,10 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         rs.Save(rt);
 
         var ct = ContentTypeBuilder.CreateBasicContentType();
-        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(ct);
 
         var mt = MediaTypeBuilder.CreateImageMediaType("img");
-        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(mt);
 
         return Enumerable.Range(1, count).Select(index =>
         {

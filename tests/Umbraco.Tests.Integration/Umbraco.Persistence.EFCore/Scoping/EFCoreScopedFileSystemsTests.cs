@@ -26,8 +26,8 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
 
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
-    private IEFCoreScopeProvider<TestUmbracoDbContext> EFCoreScopeProvider => GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
-    private IEFCoreScopeAccessor<TestUmbracoDbContext> EFCoreScopeAccessor => GetRequiredService<IEFCoreScopeAccessor<TestUmbracoDbContext>>();
+    private IEFCoreScopeProvider<TestUmbracoDbContext> EfCoreScopeProvider => GetRequiredService<IEFCoreScopeProvider<TestUmbracoDbContext>>();
+    private IEFCoreScopeAccessor<TestUmbracoDbContext> EfCoreScopeAccessor => GetRequiredService<IEFCoreScopeAccessor<TestUmbracoDbContext>>();
 
     private void ClearFiles(IIOHelper ioHelper)
     {
@@ -46,7 +46,7 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
 
         Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
-        using (EFCoreScopeProvider.CreateScope(scopeFileSystems: true))
+        using (EfCoreScopeProvider.CreateScope(scopeFileSystems: true))
         {
             using (var ms = new MemoryStream("foo"u8.ToArray()))
             {
@@ -72,7 +72,7 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
 
         Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
-        using (var scope = EFCoreScopeProvider.CreateScope(scopeFileSystems: true))
+        using (var scope = EfCoreScopeProvider.CreateScope(scopeFileSystems: true))
         {
             using (var ms = new MemoryStream("foo"u8.ToArray()))
             {
@@ -102,7 +102,7 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
         var mediaFileManager = MediaFileManager;
         var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
 
-        using (EFCoreScopeProvider.CreateScope(scopeFileSystems: true))
+        using (EfCoreScopeProvider.CreateScope(scopeFileSystems: true))
         {
             using (var ms = new MemoryStream("foo"u8.ToArray()))
             {
@@ -140,14 +140,14 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
     {
         var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
         var isThrown = false;
-        using (EFCoreScopeProvider.CreateScope(scopeFileSystems: true))
+        using (EfCoreScopeProvider.CreateScope(scopeFileSystems: true))
         {
             // This is testing when another thread concurrently tries to create a scoped file system
             // because at the moment we don't support concurrent scoped filesystems.
             var t = taskHelper.ExecuteBackgroundTask(() =>
             {
                 // ok to create a 'normal' other scope
-                using (var other = EFCoreScopeProvider.CreateScope())
+                using (var other = EfCoreScopeProvider.CreateScope())
                 {
                     other.Complete();
                 }
@@ -156,7 +156,7 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
                 // we will get a "Already shadowing." exception.
                 Assert.Throws<InvalidOperationException>(() =>
                 {
-                    using var other = EFCoreScopeProvider.CreateScope(scopeFileSystems: true);
+                    using var other = EfCoreScopeProvider.CreateScope(scopeFileSystems: true);
                 });
 
                 isThrown = true;
@@ -174,7 +174,7 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
     public void SingleShadowEvenDetached()
     {
         var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
-        using (var scope = EFCoreScopeProvider.CreateScope(scopeFileSystems: true))
+        using (var scope = EfCoreScopeProvider.CreateScope(scopeFileSystems: true))
         {
             // This is testing when another thread concurrently tries to create a scoped file system
             // because at the moment we don't support concurrent scoped filesystems.
@@ -186,7 +186,7 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
                 // we will get a "Already shadowing." exception.
                 Assert.Throws<InvalidOperationException>(() =>
                 {
-                    using var other = EFCoreScopeProvider.CreateDetachedScope(scopeFileSystems: true);
+                    using var other = EfCoreScopeProvider.CreateDetachedScope(scopeFileSystems: true);
                 });
 
                 return Task.CompletedTask;
@@ -195,17 +195,17 @@ internal sealed class EFCoreScopedFileSystemsTests : UmbracoIntegrationTest
             t.Wait();
         }
 
-        var detached = EFCoreScopeProvider.CreateDetachedScope(scopeFileSystems: true);
+        var detached = EfCoreScopeProvider.CreateDetachedScope(scopeFileSystems: true);
 
-        Assert.IsNull(EFCoreScopeAccessor.AmbientScope);
+        Assert.IsNull(EfCoreScopeAccessor.AmbientScope);
 
         Assert.Throws<InvalidOperationException>(() =>
         {
             // even if there is no ambient scope, there's a single shadow
-            using var other = EFCoreScopeProvider.CreateScope(scopeFileSystems: true);
+            using var other = EfCoreScopeProvider.CreateScope(scopeFileSystems: true);
         });
 
-        EFCoreScopeProvider.AttachScope(detached);
+        EfCoreScopeProvider.AttachScope(detached);
         detached.Dispose();
     }
 }

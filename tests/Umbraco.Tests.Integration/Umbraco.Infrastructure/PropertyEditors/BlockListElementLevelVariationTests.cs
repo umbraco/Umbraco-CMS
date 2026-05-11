@@ -140,30 +140,30 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
 
     private async Task<IPublishedContent> CreatePublishedContent(ContentVariation variation, IList<BlockPropertyValue> blockContentValues, IList<BlockPropertyValue> blockSettingsValues)
     {
-        var elementType = await CreateElementType(variation);
+        var elementType = CreateElementType(variation);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = await CreateContentType(variation, blockListDataType);
+        var contentType = CreateContentType(variation, blockListDataType);
 
         var content = CreateContent(contentType, elementType, blockContentValues, blockSettingsValues, true);
         return GetPublishedContent(content.Key);
     }
 
-    private async Task<IContentType> CreateElementTypeWithValidation(ContentVariation contentVariation = ContentVariation.Culture)
+    private IContentType CreateElementTypeWithValidation(ContentVariation contentVariation = ContentVariation.Culture)
     {
-        var elementType = await CreateElementType(contentVariation);
+        var elementType = CreateElementType(contentVariation);
         foreach (var propertyType in elementType.PropertyTypes)
         {
             propertyType.Mandatory = true;
             propertyType.ValidationRegExp = "^Valid.*$";
         }
 
-        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(elementType);
         return elementType;
     }
 
     private async Task<(IContentType RootElementType, IContentType NestedElementType)> CreateElementTypeWithValidationAndNestedBlocksAsync()
     {
-        var nestedElementType = await CreateElementTypeWithValidation();
+        var nestedElementType = CreateElementTypeWithValidation();
         var nestedBlockListDataType = await CreateBlockListDataType(nestedElementType);
 
         var rootElementType = new ContentTypeBuilder()
@@ -200,7 +200,7 @@ internal sealed partial class BlockListElementLevelVariationTests : BlockEditorE
             .WithVariations(ContentVariation.Nothing)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(rootElementType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(rootElementType);
 
         return (rootElementType, nestedElementType);
     }

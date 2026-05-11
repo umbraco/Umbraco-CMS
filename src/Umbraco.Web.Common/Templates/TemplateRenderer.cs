@@ -28,44 +28,32 @@ namespace Umbraco.Cms.Web.Common.Templates;
 /// </remarks>
 internal sealed class TemplateRenderer : ITemplateRenderer
 {
-    private readonly ITemplateService _templateService;
+    private readonly IFileService _fileService;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ILocalizationService _languageService;
     private readonly IModelMetadataProvider _modelMetadataProvider;
     private readonly IPublishedRouter _publishedRouter;
     private readonly ITempDataDictionaryFactory _tempDataDictionaryFactory;
     private readonly IUmbracoContextAccessor _umbracoContextAccessor;
     private readonly ICompositeViewEngine _viewEngine;
     private WebRoutingSettings _webRoutingSettings;
-    private readonly ILanguageService _languageService;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TemplateRenderer"/> class.
-    /// </summary>
-    /// <param name="umbracoContextAccessor">Provides access to the current Umbraco context.</param>
-    /// <param name="publishedRouter">The published router</param>
-    /// <param name="templateService"></param>
-    /// <param name="webRoutingSettings"></param>
-    /// <param name="httpContextAccessor"></param>
-    /// <param name="viewEngine"></param>
-    /// <param name="modelMetadataProvider"></param>
-    /// <param name="tempDataDictionaryFactory"></param>
-    /// <param name="languageService"></param>
-    /// <exception cref="ArgumentNullException"></exception>
     public TemplateRenderer(
         IUmbracoContextAccessor umbracoContextAccessor,
         IPublishedRouter publishedRouter,
-        ITemplateService templateService,
+        IFileService fileService,
+        ILocalizationService textService,
         IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
         IHttpContextAccessor httpContextAccessor,
         ICompositeViewEngine viewEngine,
         IModelMetadataProvider modelMetadataProvider,
-        ITempDataDictionaryFactory tempDataDictionaryFactory,
-        ILanguageService languageService)
+        ITempDataDictionaryFactory tempDataDictionaryFactory)
     {
         _umbracoContextAccessor =
             umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
         _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
-        _templateService = templateService ?? throw new ArgumentNullException(nameof(templateService));
+        _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+        _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
         _webRoutingSettings = webRoutingSettings.CurrentValue ??
                               throw new ArgumentNullException(nameof(webRoutingSettings));
         _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -74,7 +62,6 @@ internal sealed class TemplateRenderer : ITemplateRenderer
         _tempDataDictionaryFactory = tempDataDictionaryFactory;
 
         webRoutingSettings.OnChange(x => _webRoutingSettings = x);
-        _languageService = languageService;
     }
 
     public async Task RenderAsync(int pageId, int? altTemplateId, StringWriter writer)
@@ -105,7 +92,7 @@ internal sealed class TemplateRenderer : ITemplateRenderer
         // set the culture to the same as is currently rendering
         if (umbracoContext.PublishedRequest == null)
         {
-            ILanguage? defaultLanguage = await _languageService.GetDefaultLanguageAsync();
+            ILanguage? defaultLanguage = _languageService.GetAllLanguages().FirstOrDefault();
 
             requestBuilder.SetCulture(defaultLanguage == null
                 ? CultureInfo.CurrentUICulture.Name
@@ -127,7 +114,7 @@ internal sealed class TemplateRenderer : ITemplateRenderer
 
         if (templateId.HasValue)
         {
-            requestBuilder.SetTemplate(await _templateService.GetAsync(templateId.Value));
+            requestBuilder.SetTemplate(_fileService.GetTemplate(templateId.Value));
         }
 
         // if there is not template then exit

@@ -1,10 +1,10 @@
-import type { UmbCollectionFilterModel, UmbCollectionItemModel } from '@umbraco-cms/backoffice/collection';
-import type { UmbWithDescriptionModel } from '@umbraco-cms/backoffice/models';
+import type { UmbCollectionFilterModel } from '@umbraco-cms/backoffice/collection';
 
-export interface ExampleCollectionItemModel extends UmbCollectionItemModel, UmbWithDescriptionModel {
+export interface ExampleCollectionItemModel {
+	unique: string;
+	entityType: string;
 	name: string;
 	icon: string;
-	status: string;
 }
 
 export interface ExampleCollectionFilterModel extends UmbCollectionFilterModel {}

@@ -48,7 +48,6 @@ public class UserBuilder<TParent>
     private int? _sessionTimeout;
     private int[] _startContentIds;
     private int[] _startMediaIds;
-    private int[] _startElementIds;
     private string _suffix = string.Empty;
     private DateTime? _updateDate;
     private string _username;
@@ -198,18 +197,6 @@ public class UserBuilder<TParent>
         return this;
     }
 
-    public UserBuilder<TParent> WithStartElementId(int startElementId)
-    {
-        _startElementIds = new[] { startElementId };
-        return this;
-    }
-
-    public UserBuilder<TParent> WithStartElementIds(int[] startElementIds)
-    {
-        _startElementIds = startElementIds;
-        return this;
-    }
-
     public UserBuilder<TParent> WithSuffix(string suffix)
     {
         _suffix = suffix;
@@ -246,7 +233,6 @@ public class UserBuilder<TParent>
         var sessionTimeout = _sessionTimeout ?? 0;
         var startContentIds = _startContentIds ?? new[] { -1 };
         var startMediaIds = _startMediaIds ?? new[] { -1 };
-        var startElementIds = _startElementIds ?? new[] { -1 };
         var groups = _userGroupBuilders.Select(x => x.Build());
 
         var result = new User(
@@ -270,8 +256,7 @@ public class UserBuilder<TParent>
             Comments = comments,
             SessionTimeout = sessionTimeout,
             StartContentIds = startContentIds,
-            StartMediaIds = startMediaIds,
-            StartElementIds = startElementIds
+            StartMediaIds = startMediaIds
         };
         foreach (var readOnlyUserGroup in groups)
         {

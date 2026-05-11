@@ -357,7 +357,7 @@ public class PackagingService : IPackagingService
             }
 
             // Set additional values
-            installedPackage.AllowPackageTelemetry = packageManifest is { AllowTelemetry: true };
+            installedPackage.AllowPackageTelemetry = packageManifest is { AllowTelemetry: true, AllowPackageTelemetry: true };
 
             if (!string.IsNullOrEmpty(packageManifest.Version))
             {

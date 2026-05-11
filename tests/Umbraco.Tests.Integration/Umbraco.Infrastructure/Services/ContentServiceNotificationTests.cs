@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -25,12 +26,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public async Task SetupTest()
+    public void SetupTest()
     {
         ContentRepositoryBase.ThrowOnWarning = true;
         _globalSettings = new GlobalSettings();
 
-        await CreateTestData();
+        CreateTestData();
     }
 
     [TearDown]
@@ -42,7 +43,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
 
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+    private IFileService FileService => GetRequiredService<IFileService>();
 
     private GlobalSettings _globalSettings;
     private IContentType _contentType;
@@ -56,13 +57,13 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
         .AddNotificationHandler<ContentUnpublishedNotification, ContentNotificationHandler>()
         .AddNotificationHandler<ContentTreeChangeNotification, ContentNotificationHandler>();
 
-    private async Task CreateTestData()
+    private void CreateTestData()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+        FileService.SaveTemplate(template); // else, FK violation on contentType!
 
         _contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(_contentType);
     }
 
     [Test]
@@ -76,7 +77,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(_contentType);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
@@ -250,7 +251,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(_contentType);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");
@@ -403,11 +404,11 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Publishing_Set_Mandatory_Value()
+    public void Publishing_Set_Mandatory_Value()
     {
         var titleProperty = _contentType.PropertyTypes.First(x => x.Alias == "title");
         titleProperty.Mandatory = true; // make this required!
-        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(_contentType);
 
         IContent document = new Content("content", -1, _contentType);
 
@@ -459,7 +460,7 @@ internal sealed class ContentServiceNotificationTests : UmbracoIntegrationTest
             propertyType.Variations = ContentVariation.Culture;
         }
 
-        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(_contentType);
 
         IContent document = new Content("content", -1, _contentType);
         document.SetCultureName("hello", "en-US");

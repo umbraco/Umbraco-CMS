@@ -11,7 +11,6 @@ import type {
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
 import { UmbTreeServerDataSourceBase } from '@umbraco-cms/backoffice/tree';
-import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 import {
 	StaticFileService,
 	type FileSystemTreeItemPresentationModel,
@@ -42,27 +41,20 @@ export class UmbStaticFileTreeServerDataSource extends UmbTreeServerDataSourceBa
 	}
 }
 
-const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
-	const { skip = 0, take = 100 } = (args.paging ?? {}) as UmbOffsetPaginationRequestModel;
+const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	const { data, ...rest } = await StaticFileService.getTreeStaticFileRoot({
-		query: { skip, take },
-	});
-	return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
-};
+	StaticFileService.getTreeStaticFileRoot({ query: { skip: args.skip, take: args.take } });
 
-const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
+const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
 	const parentPath = new UmbServerFilePathUniqueSerializer().toServerPath(args.parent.unique);
 
 	if (parentPath === null) {
 		return getRootItems(args);
 	} else {
-		const { skip = 0, take = 100 } = (args.paging ?? {}) as UmbOffsetPaginationRequestModel;
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		const { data, ...rest } = await StaticFileService.getTreeStaticFileChildren({
-			query: { parentPath, skip, take },
+		return StaticFileService.getTreeStaticFileChildren({
+			query: { parentPath, skip: args.skip, take: args.take },
 		});
-		return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
 	}
 };
 

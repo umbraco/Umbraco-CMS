@@ -107,7 +107,7 @@ public class SystemTroubleshootingInformationTelemetryProviderTests
 
         return new SystemTroubleshootingInformationTelemetryProvider(
             Mock.Of<IUmbracoVersion>(),
-            Mock.Of<ILanguageService>(),
+            Mock.Of<ILocalizationService>(),
             Mock.Of<IOptionsMonitor<ModelsBuilderSettings>>(x => x.CurrentValue == new ModelsBuilderSettings { ModelsMode = modelsMode }),
             Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings { Debug = isDebug }),
             hostEnvironment.Object,

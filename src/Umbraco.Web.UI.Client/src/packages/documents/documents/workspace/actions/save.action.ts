@@ -1,5 +1,5 @@
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../context/document-workspace.context-token.js';
-import type UmbDocumentWorkspaceContext from '../context/document-workspace.context.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../document-workspace.context-token.js';
+import type UmbDocumentWorkspaceContext from '../document-workspace.context.js';
 import type { UmbDocumentVariantModel } from '../../types.js';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -25,8 +25,7 @@ export class UmbDocumentSaveWorkspaceAction
 
 	async hasAdditionalOptions() {
 		await this._retrieveWorkspaceContext;
-		if (!this._workspaceContext) return false;
-		const variantOptions = await this.observe(this._workspaceContext.variantOptions)
+		const variantOptions = await this.observe(this._workspaceContext!.variantOptions)
 			.asPromise()
 			.catch(() => undefined);
 		const cultureVariantOptions = variantOptions?.filter((option) => option.culture);

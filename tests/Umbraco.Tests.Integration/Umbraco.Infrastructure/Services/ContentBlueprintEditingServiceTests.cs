@@ -24,7 +24,7 @@ public partial class ContentBlueprintEditingServiceTests : ContentEditingService
 
     private async Task<IContent> CreateInvariantContentBlueprint()
     {
-        var contentType = await CreateInvariantContentType();
+        var contentType = CreateInvariantContentType();
 
         var createModel = new ContentBlueprintCreateModel
         {

@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 /// </summary>
 public class PublishedValueFallback : IPublishedValueFallback
 {
-    private readonly ILanguageService? _languageService;
+    private readonly ILocalizationService? _localizationService;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
 
@@ -23,7 +23,7 @@ public class PublishedValueFallback : IPublishedValueFallback
     /// <param name="propertyRenderingContextAccessor">The property rendering context accessor.</param>
     public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor, IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
     {
-        _languageService = serviceContext.LanguageService;
+        _localizationService = serviceContext.LocalizationService;
         _variationContextAccessor = variationContextAccessor;
         _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
     }
@@ -74,10 +74,6 @@ public class PublishedValueFallback : IPublishedValueFallback
                     }
 
                     break;
-                case Fallback.Ancestors:
-                    // Ancestors fallback only applies at IPublishedContent level (tree-aware).
-                    // Skip silently here so chained fallbacks still work and direct element calls don't throw.
-                    continue;
                 default:
                     throw NotSupportedFallbackMethod(f, "property");
             }
@@ -131,10 +127,6 @@ public class PublishedValueFallback : IPublishedValueFallback
                     }
 
                     break;
-                case Fallback.Ancestors:
-                    // Ancestors fallback only applies at IPublishedContent level (tree-aware).
-                    // Skip silently here so chained fallbacks still work and direct element calls don't throw.
-                    continue;
                 default:
                     throw NotSupportedFallbackMethod(f, "element");
             }
@@ -311,7 +303,7 @@ public class PublishedValueFallback : IPublishedValueFallback
 
         var visited = new HashSet<string>();
 
-        ILanguage? language = culture is not null ? _languageService?.GetAsync(culture).GetAwaiter().GetResult() : null;
+        ILanguage? language = culture is not null ? _localizationService?.GetLanguageByIsoCode(culture) : null;
         if (language == null)
         {
             return false;
@@ -332,7 +324,7 @@ public class PublishedValueFallback : IPublishedValueFallback
 
             visited.Add(language2IsoCode);
 
-            ILanguage? language2 = _languageService?.GetAsync(language2IsoCode).GetAwaiter().GetResult();
+            ILanguage? language2 = _localizationService?.GetLanguageByIsoCode(language2IsoCode);
             if (language2 == null)
             {
                 return false;
@@ -379,7 +371,7 @@ public class PublishedValueFallback : IPublishedValueFallback
             return false;
         }
 
-        var defaultCulture = _languageService?.GetDefaultIsoCodeAsync().GetAwaiter().GetResult();
+        var defaultCulture = _localizationService?.GetDefaultLanguageIsoCode();
         if (defaultCulture.IsNullOrWhiteSpace())
         {
             return false;

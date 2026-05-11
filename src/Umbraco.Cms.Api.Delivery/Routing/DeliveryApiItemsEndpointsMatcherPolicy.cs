@@ -30,7 +30,7 @@ internal sealed class DeliveryApiItemsEndpointsMatcherPolicy : MatcherPolicy, IE
     public Task ApplyAsync(HttpContext httpContext, CandidateSet candidates)
     {
         var hasIdQueryParameter = httpContext.Request.Query.ContainsKey("id");
-        ApiVersion? requestedApiVersion = httpContext.RequestedApiVersion;
+        ApiVersion? requestedApiVersion = httpContext.GetRequestedApiVersion();
         for (var i = 0; i < candidates.Count; i++)
         {
             CandidateState candidate = candidates[i];

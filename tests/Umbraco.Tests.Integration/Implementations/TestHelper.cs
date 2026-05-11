@@ -190,7 +190,11 @@ public class TestHelper : TestHelperBase
         if (actualListEx.Count != expectedListEx.Count)
         {
             Assert.Fail(
-                $"Collection {property.PropertyType.Name}.{property.Name} does not match. Expected IEnumerable containing {expectedListEx.Count} elements but was IEnumerable containing {actualListEx.Count} elements");
+                "Collection {0}.{1} does not match. Expected IEnumerable containing {2} elements but was IEnumerable containing {3} elements",
+                property.PropertyType.Name,
+                property.Name,
+                expectedListEx.Count,
+                actualListEx.Count);
         }
 
         for (var i = 0; i < actualListEx.Count; i++)

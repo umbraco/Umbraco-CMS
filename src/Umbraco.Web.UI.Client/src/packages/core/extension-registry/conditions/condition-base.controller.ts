@@ -14,9 +14,9 @@ export class UmbConditionBase<ConditionConfigType extends UmbConditionConfigBase
 	public set permitted(value) {
 		if (value === this.#permitted) return;
 		this.#permitted = value;
-		this.#onChange?.(value);
+		this.#onChange(value);
 	}
-	#onChange: ((permitted: boolean) => void) | undefined;
+	#onChange: (permitted: boolean) => void;
 
 	constructor(host: UmbControllerHost, args: { config: ConditionConfigType; onChange: (permitted: boolean) => void }) {
 		super(host);
@@ -25,9 +25,8 @@ export class UmbConditionBase<ConditionConfigType extends UmbConditionConfigBase
 	}
 
 	override destroy() {
-		// Clear `#onChange` before `super.destroy()`. [NL]
-		this.#onChange = undefined;
 		super.destroy();
 		(this.config as unknown) = undefined;
+		(this.#onChange as unknown) = undefined;
 	}
 }

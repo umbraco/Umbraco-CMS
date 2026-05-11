@@ -3,7 +3,6 @@ import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbDocumentUrlModel } from '../repository/types.js';
 import { UmbDocumentUrlsDataResolver } from '../document-urls-data-resolver.js';
-import { UmbDocumentVariantState } from '../../variant-state.js';
 import {
 	css,
 	customElement,
@@ -19,6 +18,7 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -26,7 +26,7 @@ import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 interface UmbDocumentInfoViewLink {
 	culture: string | null;
 	url: string | null | undefined;
-	state: UmbDocumentVariantState | null | undefined;
+	state: DocumentVariantStateModel | null | undefined;
 }
 
 @customElement('umb-document-links-workspace-info-app')
@@ -152,15 +152,15 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 		this._loading = false;
 	}
 
-	#getStateLocalizationKey(state: UmbDocumentVariantState | null | undefined): string {
+	#getStateLocalizationKey(state: DocumentVariantStateModel | null | undefined): string {
 		switch (state) {
 			case null:
 			case undefined:
-			case UmbDocumentVariantState.NOT_CREATED:
+			case DocumentVariantStateModel.NOT_CREATED:
 				return 'content_notCreated';
-			case UmbDocumentVariantState.DRAFT:
+			case DocumentVariantStateModel.DRAFT:
 				return 'content_itemNotPublished';
-			case UmbDocumentVariantState.PUBLISHED:
+			case DocumentVariantStateModel.PUBLISHED:
 				return 'content_routeErrorCannotRoute';
 			default:
 				return 'content_parentNotPublishedAnomaly';
@@ -238,7 +238,7 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 			.map((variantOption) => this.#renderEmptyLink(variantOption.culture, variantOption.variant?.state))}`;
 	}
 
-	#renderEmptyLink(culture: string | null, state: UmbDocumentVariantState | null | undefined) {
+	#renderEmptyLink(culture: string | null, state: DocumentVariantStateModel | null | undefined) {
 		return html`<div class="link-item">
 			<span>
 				${this.#renderLinkCulture(culture)}

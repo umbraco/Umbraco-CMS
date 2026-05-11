@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.Serialization;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Api.Management.Serialization;
@@ -31,7 +30,7 @@ public class ConfigureUmbracoBackofficeJsonOptions : IConfigureNamedOptions<Json
     /// <param name="options">The <see cref="JsonOptions"/> instance to be configured.</param>
     public void Configure(string? name, JsonOptions options)
     {
-        if (name != Constants.JsonOptionsNames.BackOffice)
+        if (name != Core.Constants.JsonOptionsNames.BackOffice)
         {
             return;
         }
@@ -53,8 +52,8 @@ public class ConfigureUmbracoBackofficeJsonOptions : IConfigureNamedOptions<Json
         options.JsonSerializerOptions.Converters.Add(new ValidationProblemDetailsConverter());
         options.JsonSerializerOptions.Converters.Add(new JsonObjectConverter());
 
-        options.JsonSerializerOptions.MaxDepth = 64; // Ensures the maximum possible value is used, in particular to support handling as best we can levels of nested blocks.
-
         options.JsonSerializerOptions.TypeInfoResolver = _umbracoJsonTypeInfoResolver;
+
+        options.JsonSerializerOptions.MaxDepth = 64; // Ensures the maximum possible value is used, in particular to support handling as best we can levels of nested blocks.
     }
 }

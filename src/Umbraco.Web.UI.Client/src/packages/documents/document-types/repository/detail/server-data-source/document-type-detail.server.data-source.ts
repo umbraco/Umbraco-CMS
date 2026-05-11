@@ -41,7 +41,6 @@ export class UmbDocumentTypeDetailServerDataSource
 			variesByCulture: false,
 			variesBySegment: false,
 			isElement: false,
-			allowedInLibrary: false,
 			properties: [],
 			containers: [],
 			allowedContentTypes: [],
@@ -115,7 +114,6 @@ export class UmbDocumentTypeDetailServerDataSource
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			allowedInLibrary: model.allowedInLibrary,
 			properties: model.properties.map((property) => {
 				return {
 					id: property.unique,
@@ -176,7 +174,6 @@ export class UmbDocumentTypeDetailServerDataSource
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			allowedInLibrary: model.allowedInLibrary,
 			properties: model.properties.map((property) => {
 				return {
 					id: property.unique,
@@ -248,7 +245,6 @@ export class UmbDocumentTypeDetailServerDataSource
 			variesByCulture: data.variesByCulture,
 			variesBySegment: data.variesBySegment,
 			isElement: data.isElement,
-			allowedInLibrary: data.allowedInLibrary,
 			properties: data.properties.map((property) => {
 				return {
 					id: property.id,

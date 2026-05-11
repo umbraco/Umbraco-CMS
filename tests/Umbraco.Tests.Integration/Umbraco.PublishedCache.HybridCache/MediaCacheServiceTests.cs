@@ -44,9 +44,9 @@ internal sealed class MediaCacheServiceTests : UmbracoIntegrationTestWithContent
 
     private IMedia MediaItem { get; set; }
 
-    public override async Task CreateTestDataAsync()
+    public override void CreateTestData()
     {
-        await base.CreateTestDataAsync();
+        base.CreateTestData();
 
         MediaType = MediaTypeService.Get("image")!;
 

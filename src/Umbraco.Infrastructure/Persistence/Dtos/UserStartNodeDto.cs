@@ -26,7 +26,6 @@ public class UserStartNodeDto : IEquatable<UserStartNodeDto>
     {
         Content = 1,
         Media = 2,
-        Element = 3,
     }
 
     /// <summary>

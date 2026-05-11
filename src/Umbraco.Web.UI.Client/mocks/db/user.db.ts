@@ -55,10 +55,8 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			id: user.id,
 			documentStartNodeIds: user.documentStartNodeIds,
 			mediaStartNodeIds: user.mediaStartNodeIds,
-			elementStartNodeIds: user.elementStartNodeIds,
 			hasDocumentRootAccess: user.hasDocumentRootAccess,
 			hasMediaRootAccess: user.hasMediaRootAccess,
-			hasElementRootAccess: user.hasElementRootAccess,
 		};
 	}
 
@@ -115,12 +113,6 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 		const allowedSections = firstUser.userGroupIds?.length
 			? umbUserGroupMockDb.getAllowedSections(firstUser.userGroupIds)
 			: [];
-		const hasAccessToAllLanguages = firstUser.userGroupIds?.length
-			? umbUserGroupMockDb.getHasAccessToAllLanguages(firstUser.userGroupIds)
-			: false;
-		const languages = firstUser.userGroupIds?.length
-			? umbUserGroupMockDb.getAllowedLanguages(firstUser.userGroupIds)
-			: [];
 
 		return {
 			id: firstUser.id,
@@ -129,15 +121,13 @@ class UmbUserMockDB extends UmbEntityMockDbBase<UmbMockUserModel> {
 			userName: firstUser.email,
 			hasAccessToSensitiveData: true,
 			avatarUrls: [],
-			hasAccessToAllLanguages,
+			hasAccessToAllLanguages: true,
 			languageIsoCode: firstUser.languageIsoCode || null,
-			languages,
+			languages: [],
 			documentStartNodeIds: firstUser.documentStartNodeIds,
 			mediaStartNodeIds: firstUser.mediaStartNodeIds,
-			elementStartNodeIds: firstUser.elementStartNodeIds,
 			hasDocumentRootAccess: firstUser.hasDocumentRootAccess,
 			hasMediaRootAccess: firstUser.hasMediaRootAccess,
-			hasElementRootAccess: firstUser.hasElementRootAccess,
 			fallbackPermissions,
 			permissions,
 			allowedSections,
@@ -272,10 +262,8 @@ const createMockMapper = (item: CreateUserRequestModel): UmbMockUserModel => {
 		languageIsoCode: null,
 		documentStartNodeIds: [],
 		mediaStartNodeIds: [],
-		elementStartNodeIds: [],
 		hasDocumentRootAccess: false,
 		hasMediaRootAccess: false,
-		hasElementRootAccess: false,
 		avatarUrls: [],
 		state: UserStateModel.INACTIVE,
 		failedLoginAttempts: 0,
@@ -295,12 +283,10 @@ const detailResponseMapper = (item: UmbMockUserModel): UserResponseModel => {
 		avatarUrls: item.avatarUrls,
 		createDate: item.createDate,
 		documentStartNodeIds: item.documentStartNodeIds,
-		elementStartNodeIds: item.elementStartNodeIds,
 		email: item.email,
 		failedLoginAttempts: item.failedLoginAttempts,
 		hasDocumentRootAccess: item.hasDocumentRootAccess,
 		hasMediaRootAccess: item.hasMediaRootAccess,
-		hasElementRootAccess: item.hasElementRootAccess,
 		id: item.id,
 		isAdmin: item.isAdmin,
 		kind: item.kind,

@@ -49,30 +49,12 @@ public interface IEntityRepository : IRepository
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids);
 
     /// <summary>
-    ///     Gets entities of multiple object types.
-    /// </summary>
-    /// <param name="objectTypes">The object types of the entities.</param>
-    /// <param name="ids">The identifiers of the entities.</param>
-    /// <remarks>If <paramref name="ids" /> is empty, returns all entities of the specified types.</remarks>
-    IEnumerable<IEntitySlim> GetAll(IEnumerable<Guid> objectTypes, params int[] ids)
-        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
-
-    /// <summary>
     ///     Gets all entities of a specific object type by their unique keys.
     /// </summary>
     /// <param name="objectType">The object type identifier.</param>
     /// <param name="keys">The unique keys of the entities.</param>
     /// <returns>A collection of entities.</returns>
     IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);
-
-    /// <summary>
-    ///     Gets entities of multiple object types.
-    /// </summary>
-    /// <param name="objectTypes">The object types of the entities.</param>
-    /// <param name="keys">The unique identifiers of the entities.</param>
-    /// <remarks>If <paramref name="keys" /> is empty, returns all entities of the specified types.</remarks>
-    IEnumerable<IEntitySlim> GetAll(IEnumerable<Guid> objectTypes, params Guid[] keys)
-        => throw new NotImplementedException(); // TODO (V19): Remove default implementation.
 
     /// <summary>
     /// Gets sibling entities of a specified target entity, within a given range before and after the target, ordered as specified.
@@ -179,14 +161,6 @@ public interface IEntityRepository : IRepository
     /// <param name="keys">The unique keys to filter the results.</param>
     /// <returns>A collection of entity paths.</returns>
     IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params Guid[] keys);
-
-    /// <summary>
-    /// Gets all paths for entities of the specified object types, optionally filtered by the provided entity IDs.
-    /// </summary>
-    /// <param name="objectTypes">The unique identifiers of the object types.</param>
-    /// <param name="keys">Optional array of entity keys to filter the paths. If not provided, paths for all entities of the specified type are returned.</param>
-    /// <returns>A collection of entity paths.</returns>
-    IEnumerable<TreeEntityPath> GetAllPaths(Guid[] objectTypes, params Guid[] keys);
 
     /// <summary>
     ///     Checks whether an entity with the specified identifier exists.

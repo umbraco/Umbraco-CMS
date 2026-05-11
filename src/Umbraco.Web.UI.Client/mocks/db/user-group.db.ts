@@ -5,9 +5,9 @@ import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager
 import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js';
 import type {
 	CreateUserGroupRequestModel,
-	IPermissionPresentationModelDocumentPermissionPresentationModel,
+	DocumentPermissionPresentationModel,
 	PagedUserGroupResponseModel,
-	IPermissionPresentationModelUnknownTypePermissionPresentationModel,
+	UnknownTypePermissionPresentationModel,
 	UserGroupItemResponseModel,
 	UserGroupResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -38,10 +38,7 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 	 */
 	getPermissions(
 		userGroupIds: Array<{ id: string }>,
-	): Array<
-		| IPermissionPresentationModelDocumentPermissionPresentationModel
-		| IPermissionPresentationModelUnknownTypePermissionPresentationModel
-	> {
+	): Array<DocumentPermissionPresentationModel | UnknownTypePermissionPresentationModel> {
 		const permissions = this.data
 			.filter((userGroup) => userGroupIds.map((reference) => reference.id).includes(userGroup.id))
 			.map((userGroup) => (userGroup.permissions?.length ? userGroup.permissions : []))
@@ -70,24 +67,6 @@ export class UmbUserGroupMockDB extends UmbEntityMockDbBase<UmbMockUserGroupMode
 
 		// Remove duplicates
 		return Array.from(new Set(sections));
-	}
-
-	getHasAccessToAllLanguages(userGroupIds: Array<{ id: string }>): boolean {
-		const ids = new Set(userGroupIds.map((reference) => reference.id));
-		return this.data
-			.filter((userGroup) => ids.has(userGroup.id))
-			.some((userGroup) => userGroup.hasAccessToAllLanguages);
-	}
-
-	getAllowedLanguages(userGroupIds: Array<{ id: string }>): string[] {
-		const ids = new Set(userGroupIds.map((reference) => reference.id));
-		const languages = this.data
-			.filter((userGroup) => ids.has(userGroup.id))
-			.map((userGroup) => (userGroup.languages?.length ? userGroup.languages : []))
-			.flat();
-
-		// Remove duplicates
-		return Array.from(new Set(languages));
 	}
 
 	filter(options: UserGroupFilterOptions): PagedUserGroupResponseModel {
@@ -122,8 +101,6 @@ const createMockMapper = (item: CreateUserGroupRequestModel): UmbMockUserGroupMo
 		alias: item.alias,
 		documentRootAccess: item.documentRootAccess,
 		documentStartNode: item.documentStartNode,
-		elementRootAccess: item.elementRootAccess,
-		elementStartNode: item.elementStartNode,
 		hasAccessToAllLanguages: item.hasAccessToAllLanguages,
 		icon: item.icon,
 		id: UmbId.new(),
@@ -145,8 +122,6 @@ const detailResponseMapper = (item: UmbMockUserGroupModel): UserGroupResponseMod
 		alias: item.alias,
 		documentRootAccess: item.documentRootAccess,
 		documentStartNode: item.documentStartNode,
-		elementRootAccess: item.elementRootAccess,
-		elementStartNode: item.elementStartNode,
 		hasAccessToAllLanguages: item.hasAccessToAllLanguages,
 		icon: item.icon,
 		id: item.id,

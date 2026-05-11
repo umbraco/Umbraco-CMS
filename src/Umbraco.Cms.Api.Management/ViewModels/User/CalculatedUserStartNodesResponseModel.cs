@@ -29,8 +29,4 @@ public class CalculatedUserStartNodesResponseModel
     /// Gets or sets a value indicating whether the user has access to the media root.
     /// </summary>
     public bool HasMediaRootAccess { get; set; }
-
-    public ISet<ReferenceByIdModel> ElementStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
-
-    public bool HasElementRootAccess { get; set; }
 }

@@ -10,7 +10,6 @@ using Umbraco.Cms.Infrastructure.HybridCache.Factories;
 using Umbraco.Cms.Infrastructure.HybridCache.NotificationHandlers;
 using Umbraco.Cms.Infrastructure.HybridCache.Persistence;
 using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Document;
-using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Element;
 using Umbraco.Cms.Infrastructure.HybridCache.SeedKeyProviders.Media;
 using Umbraco.Cms.Infrastructure.HybridCache.Serialization;
 using Umbraco.Cms.Infrastructure.HybridCache.Services;
@@ -40,15 +39,12 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IPublishedContentCache, DocumentCache>();
         builder.Services.AddSingleton<IPublishedMediaCache, MediaCache>();
         builder.Services.AddSingleton<IPublishedMemberCache, MemberCache>();
-        builder.Services.AddSingleton<IPublishedElementCache, ElementCache>();
         builder.Services.AddSingleton<IDomainCache, DomainCache>();
         builder.Services.AddSingleton<IElementsCache, ElementsDictionaryAppCache>();
         builder.Services.AddSingleton<IPublishedContentTypeCache, PublishedContentTypeCache>();
         builder.Services.AddSingleton<IDocumentCacheService, DocumentCacheService>();
         builder.Services.AddSingleton<IMediaCacheService, MediaCacheService>();
         builder.Services.AddSingleton<IMemberCacheService, MemberCacheService>();
-        builder.Services.AddSingleton<IElementCacheService, ElementCacheService>();
-        builder.Services.AddSingleton<IBlockElementService, BlockElementService>();
         builder.Services.AddSingleton<IDomainCacheService, DomainCacheService>();
         builder.Services.AddSingleton<IPublishedContentFactory, PublishedContentFactory>();
         builder.Services.AddSingleton<ICacheNodeFactory, CacheNodeFactory>();
@@ -78,8 +74,6 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<ContentTypeDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaTypeRefreshedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationAsyncHandler<MediaTypeDeletedNotification, CacheRefreshingNotificationHandler>();
-        builder.AddNotificationAsyncHandler<ElementRefreshNotification, CacheRefreshingNotificationHandler>();
-        builder.AddNotificationAsyncHandler<ElementDeletedNotification, CacheRefreshingNotificationHandler>();
         builder.AddNotificationHandler<ContentTypeChangedNotification, DeferredCacheRebuildNotificationHandler>();
         builder.AddNotificationHandler<MediaTypeChangedNotification, DeferredCacheRebuildNotificationHandler>();
         builder.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, SeedingNotificationHandler>();
@@ -94,9 +88,6 @@ public static class UmbracoBuilderExtensions
 
 
         builder.Services.AddSingleton<IMediaSeedKeyProvider, MediaBreadthFirstKeyProvider>();
-
-        builder.Services.AddSingleton<IElementSeedKeyProvider, ElementContentTypeSeedKeyProvider>();
-        builder.Services.AddSingleton<IElementSeedKeyProvider, ElementBreadthFirstKeyProvider>();
         return builder;
     }
 }

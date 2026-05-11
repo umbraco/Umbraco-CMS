@@ -15,8 +15,6 @@ export class UserGroupBuilder {
   fallbackPermissionsBuilder: UserGroupsPermissionsBaseBuilder;
   userGroupPermissionBuilder: UserGroupPermissionBuilder;
   description: string;
-  elementRootAccess: boolean;
-  elementStartNodeId: string;
 
   constructor() {
     this.sections = [];
@@ -85,16 +83,6 @@ export class UserGroupBuilder {
     return this;
   }
 
-  withElementStartNodeId(elementStartNodeId: string) {
-    this.elementStartNodeId = elementStartNodeId;
-    return this;
-  }
-
-  withElementRootAccess(elementRootAccess: boolean) {
-    this.elementRootAccess = elementRootAccess;
-    return this;
-  }
-
   build() {
     return {
       name: this.name || '',
@@ -110,8 +98,6 @@ export class UserGroupBuilder {
       fallbackPermissions: this.fallbackPermissionsBuilder ? this.fallbackPermissionsBuilder.build() : [],
       permissions: this.userGroupPermissionBuilder ? this.userGroupPermissionBuilder.build() : [],
       description: this.description || '',
-      elementStartNode: this.elementStartNodeId ? {id: this.elementStartNodeId} : null,
-      elementRootAccess: this.elementRootAccess || false,
     };
   }
 }

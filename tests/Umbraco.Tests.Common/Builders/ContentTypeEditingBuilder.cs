@@ -136,7 +136,6 @@ public class ContentTypeEditingBuilder : ContentTypeEditingBaseBuilder<ContentTy
             .WithAlias(alias)
             .WithName(name)
             .WithIsElement(true)
-            .WithAllowedInLibrary(true)
             .AddPropertyGroup()
                 .WithName("Content")
                 .WithKey(containerKey)
@@ -158,7 +157,6 @@ public class ContentTypeEditingBuilder : ContentTypeEditingBaseBuilder<ContentTy
             .WithAlias(alias)
             .WithName(name)
             .WithIsElement(true)
-            .WithAllowedInLibrary(true)
             .AddPropertyGroup()
                 .WithName("Content")
                 .WithKey(containerKey)
@@ -194,19 +192,14 @@ public class ContentTypeEditingBuilder : ContentTypeEditingBaseBuilder<ContentTy
             .Build();
     }
 
-    public static ContentTypeCreateModel CreateContentTypeWithTwoPropertiesOneVariantAndOneInvariant(
-        string alias = "test",
-        string name = "TestName",
-        string variantPropertyAlias = "variant",
-        string variantPropertyName = "Variant",
-        string invariantAlias = "invariant",
-        string invariantName = "Invariant",
-        bool isElement = false)
+    public static ContentTypeCreateModel CreateContentTypeWithTwoPropertiesOneVariantAndOneInvariant(string alias = "test", string name = "TestName", string variantPropertyAlias = "variant", string variantPropertyName = "Variant", string invariantAlias = "invariant", string invariantName = "Invariant")
     {
         var containerKey = Guid.NewGuid();
-        var builder = new ContentTypeEditingBuilder()
+        var builder = new ContentTypeEditingBuilder();
+        return (ContentTypeCreateModel)builder
             .WithAlias(alias)
             .WithName(name)
+            .WithAllowAsRoot(true)
             .WithVariesByCulture(true)
             .AddPropertyGroup()
                 .WithName("Content")
@@ -222,19 +215,7 @@ public class ContentTypeEditingBuilder : ContentTypeEditingBaseBuilder<ContentTy
                 .WithAlias(invariantAlias)
                 .WithName(invariantName)
                 .WithContainerKey(containerKey)
-                .Done();
-
-        if (isElement)
-        {
-            builder
-                .WithIsElement(true)
-                .WithAllowedInLibrary(true);
-        }
-        else
-        {
-            builder.WithAllowAsRoot(true);
-        }
-
-        return (ContentTypeCreateModel)builder.Build();
+                .Done()
+            .Build();
     }
 }

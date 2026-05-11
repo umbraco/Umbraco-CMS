@@ -171,20 +171,10 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
 
         AppBuilder.UseEndpoints(endpoints =>
         {
-            foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
-            {
-                filter.OnPreMapEndpoints(endpoints);
-            }
-
             var umbAppBuilder =
                 (IUmbracoEndpointBuilderContext)ActivatorUtilities.CreateInstance<UmbracoEndpointBuilder>(
                     ApplicationServices, AppBuilder, endpoints);
             configureUmbraco(umbAppBuilder);
-
-            foreach (IUmbracoPipelineFilter filter in _umbracoPipelineStartupOptions.Value.PipelineFilters)
-            {
-                filter.OnPostMapEndpoints(endpoints);
-            }
         });
     }
 

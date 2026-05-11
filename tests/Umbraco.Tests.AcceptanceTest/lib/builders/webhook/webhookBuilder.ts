@@ -4,7 +4,7 @@
   description: string;
   url: string;
   contentTypeKeys: string[];
-  headers;
+  headers: Record<string, string>;
   events: string[];
 
   constructor() {

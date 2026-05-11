@@ -19,14 +19,8 @@ import type {
 	// Document Type
 	DocumentTypeConfigurationResponseModel,
 	DocumentTypeItemResponseModel,
-	DocumentTypeReferenceResponseModel,
 	DocumentTypeResponseModel,
 	DocumentTypeTreeItemResponseModel,
-	// Element
-	ElementResponseModel,
-	ElementTreeItemResponseModel,
-	ElementItemResponseModel,
-	ElementVariantResponseModel,
 	// Language
 	LanguageItemResponseModel,
 	LanguageResponseModel,
@@ -94,10 +88,10 @@ import type {
 	PagedIndexResponseModel,
 	SearchResultResponseModel,
 	// Tracked Reference
-	IReferenceResponseModelDefaultReferenceResponseModel,
-	IReferenceResponseModelDocumentReferenceResponseModel,
-	IReferenceResponseModelMediaReferenceResponseModel,
-	IReferenceResponseModelMemberReferenceResponseModel,
+	DefaultReferenceResponseModel,
+	DocumentReferenceResponseModel,
+	MediaReferenceResponseModel,
+	MemberReferenceResponseModel,
 	// News
 	NewsDashboardItemResponseModel,
 	// Webhook
@@ -126,15 +120,6 @@ export type UmbMockDocumentBlueprintModel = DocumentBlueprintResponseModel &
 export type UmbMockDocumentTypeModel = DocumentTypeResponseModel &
 	DocumentTypeTreeItemResponseModel &
 	DocumentTypeItemResponseModel;
-
-export type UmbMockElementModel = Omit<ElementResponseModel, 'documentType'> &
-	Omit<ElementTreeItemResponseModel, 'documentType' | 'variants'> &
-	Omit<ElementItemResponseModel, 'documentType' | 'variants'> & {
-		ancestors: Array<{ id: string }>;
-		createDate: string;
-		documentType: DocumentTypeReferenceResponseModel | null;
-		variants: Array<ElementVariantResponseModel>;
-	};
 
 export type UmbMockLanguageModel = LanguageResponseModel & LanguageItemResponseModel;
 
@@ -187,10 +172,10 @@ export type UmbMockWebhookDeliveryModel = WebhookLogResponseModel;
 export type UmbMockAuditLogModel = AuditLogResponseModel;
 
 export type UmbMockTrackedReferenceItemModel =
-	| IReferenceResponseModelDefaultReferenceResponseModel
-	| IReferenceResponseModelDocumentReferenceResponseModel
-	| IReferenceResponseModelMediaReferenceResponseModel
-	| IReferenceResponseModelMemberReferenceResponseModel;
+	| DefaultReferenceResponseModel
+	| DocumentReferenceResponseModel
+	| MediaReferenceResponseModel
+	| MemberReferenceResponseModel;
 
 // ============================================================================
 // Log Levels Type (matches the structure in log-viewer.data.ts)
@@ -221,7 +206,6 @@ export interface UmbMockDataSet {
 	documentBlueprint?: Array<UmbMockDocumentBlueprintModel>;
 	documentType?: Array<UmbMockDocumentTypeModel>;
 	documentTypeConfiguration?: DocumentTypeConfigurationResponseModel;
-	element?: Array<UmbMockElementModel>;
 	language?: Array<UmbMockLanguageModel>;
 	media?: Array<UmbMockMediaModel>;
 	mediaType?: Array<UmbMockMediaTypeModel>;

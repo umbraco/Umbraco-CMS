@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_0_0;
 /// <summary>
 /// Executes a migration that updates the Umbraco OpenIddict integration to version 7.
 /// </summary>
-public class UpdateToOpenIddictV7 : AsyncMigrationBase
+public class UpdateToOpenIddictV7 : MigrationBase
 {
     private readonly IEFCoreMigrationExecutor _efCoreMigrationExecutor;
 
@@ -20,9 +20,8 @@ public class UpdateToOpenIddictV7 : AsyncMigrationBase
         _efCoreMigrationExecutor = efCoreMigrationExecutor;
     }
 
-    /// <inheritdoc />
-    protected override async Task MigrateAsync()
+    protected override void Migrate()
     {
-        await _efCoreMigrationExecutor.ExecuteSingleMigrationAsync(EFCoreMigration.UpdateOpenIddictToV7);
+        _efCoreMigrationExecutor.ExecuteSingleMigrationAsync(EFCoreMigration.UpdateOpenIddictToV7).GetAwaiter().GetResult();
     }
 }

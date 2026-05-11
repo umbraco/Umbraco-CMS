@@ -1,4 +1,6 @@
+﻿using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -6,22 +8,46 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Services;
 
 [TestFixture]
-public partial class UserStartNodeEntitiesServiceMediaTests : UserStartNodeEntitiesServiceTestsBase
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+public partial class UserStartNodeEntitiesServiceMediaTests : UmbracoIntegrationTest
 {
+    private Dictionary<string, IMedia> _mediaByName = new ();
+    private IUserGroup _userGroup;
+
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
-    protected override UmbracoObjectTypes ObjectType => UmbracoObjectTypes.Media;
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
-    protected override string SectionAlias => "media";
+    private IUserService UserService => GetRequiredService<IUserService>();
 
-    protected override async Task CreateContentTypeAndHierarchy()
+    private IEntityService EntityService => GetRequiredService<IEntityService>();
+
+    private IUserStartNodeEntitiesService UserStartNodeEntitiesService => GetRequiredService<IUserStartNodeEntitiesService>();
+
+    protected readonly Ordering BySortOrder = Ordering.By("sortOrder");
+
+    protected override void ConfigureTestServices(IServiceCollection services)
     {
+        base.ConfigureTestServices(services);
+        services.AddTransient<IUserStartNodeEntitiesService, UserStartNodeEntitiesService>();
+    }
+
+    [SetUp]
+    public async Task SetUpTestAsync()
+    {
+        if (_mediaByName.Any())
+        {
+            return;
+        }
+
         var mediaType = new MediaTypeBuilder()
             .WithAlias("theMediaType")
             .Build();
@@ -37,7 +63,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests : UserStartNodeEntit
                 .WithName($"{rootNumber}")
                 .Build();
             MediaService.Save(root);
-            ItemsByName[root.Name!] = (root.Id, root.Key);
+            _mediaByName[root.Name!] = root;
 
             foreach (var childNumber in Enumerable.Range(1, 10))
             {
@@ -47,7 +73,7 @@ public partial class UserStartNodeEntitiesServiceMediaTests : UserStartNodeEntit
                     .Build();
                 child.SetParent(root);
                 MediaService.Save(child);
-                ItemsByName[child.Name!] = (child.Id, child.Key);
+                _mediaByName[child.Name!] = child;
 
                 foreach (var grandChildNumber in Enumerable.Range(1, 5))
                 {
@@ -57,24 +83,52 @@ public partial class UserStartNodeEntitiesServiceMediaTests : UserStartNodeEntit
                         .Build();
                     grandchild.SetParent(child);
                     MediaService.Save(grandchild);
-                    ItemsByName[grandchild.Name!] = (grandchild.Id, grandchild.Key);
+                    _mediaByName[grandchild.Name!] = grandchild;
                 }
             }
         }
+
+        _userGroup = new UserGroupBuilder()
+            .WithAlias("theGroup")
+            .WithAllowedSections(["media"])
+            .Build();
+        _userGroup.StartMediaId = null;
+        await UserGroupService.CreateAsync(_userGroup, Constants.Security.SuperUserKey);
     }
 
-    protected override void ClearUserGroupStartNode(IUserGroup userGroup)
-        => userGroup.StartMediaId = null;
+    private async Task<string[]> CreateUserAndGetStartNodePaths(params int[] startNodeIds)
+    {
+        var user = await CreateUser(startNodeIds);
 
-    protected override Core.Models.Membership.User BuildUserWithStartNodes(int[] startNodeIds)
-        => new UserBuilder()
+        var mediaStartNodePaths = user.GetMediaStartNodePaths(EntityService, AppCaches.NoCache);
+        Assert.IsNotNull(mediaStartNodePaths);
+
+        return mediaStartNodePaths;
+    }
+
+    private async Task<int[]> CreateUserAndGetStartNodeIds(params int[] startNodeIds)
+    {
+        var user = await CreateUser(startNodeIds);
+
+        var mediaStartNodeIds = user.CalculateMediaStartNodeIds(EntityService, AppCaches.NoCache);
+        Assert.IsNotNull(mediaStartNodeIds);
+
+        return mediaStartNodeIds;
+    }
+
+    private async Task<Core.Models.Membership.User> CreateUser(int[] startNodeIds)
+    {
+        var user = new UserBuilder()
             .WithName(Guid.NewGuid().ToString("N"))
             .WithStartMediaIds(startNodeIds)
             .Build();
+        UserService.Save(user);
 
-    protected override string[]? GetStartNodePaths(Core.Models.Membership.User user)
-        => user.GetMediaStartNodePaths(EntityService, AppCaches.NoCache);
+        var attempt = await UserGroupService.AddUsersToUserGroupAsync(
+            new UsersToUserGroupManipulationModel(_userGroup.Key, [user.Key]),
+            Constants.Security.SuperUserKey);
 
-    protected override int[]? CalculateStartNodeIds(Core.Models.Membership.User user)
-        => user.CalculateMediaStartNodeIds(EntityService, AppCaches.NoCache);
+        Assert.IsTrue(attempt.Success);
+        return user;
+    }
 }

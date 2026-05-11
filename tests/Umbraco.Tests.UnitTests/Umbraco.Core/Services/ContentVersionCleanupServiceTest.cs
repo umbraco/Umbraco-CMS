@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Linq;
 using AutoFixture.NUnit3;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -27,7 +26,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetContentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator.Setup(x => x.PublishCancelable(It.IsAny<ContentDeletingVersionsNotification>()))
@@ -59,7 +58,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetContentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator
@@ -85,7 +84,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetContentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator
@@ -112,7 +111,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetContentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator
@@ -144,7 +143,7 @@ internal class ContentVersionCleanupServiceTest
         DateTime aDateTime,
         ContentVersionService sut)
     {
-        documentVersionRepository.Setup(x => x.GetContentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(someHistoricVersions);
 
         eventAggregator
@@ -194,7 +193,7 @@ internal class ContentVersionCleanupServiceTest
                 new() { ContentTypeId = 1, KeepAllVersionsNewerThanDays = 2 },
             ]);
 
-        documentVersionRepository.Setup(x => x.GetContentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(Array.Empty<ContentVersionMeta>());
 
         sut.PerformContentVersionCleanup(asAtDate);
@@ -202,7 +201,7 @@ internal class ContentVersionCleanupServiceTest
         // The effective cutoff should be 2 days (the override's value, not the global 7).
         DateTime expectedCutoff = asAtDate.AddDays(-2);
         documentVersionRepository.Verify(
-            x => x.GetContentVersionsEligibleForCleanup(expectedCutoff, It.IsAny<int?>()),
+            x => x.GetDocumentVersionsEligibleForCleanup(expectedCutoff, It.IsAny<int?>()),
             Times.Once);
     }
 
@@ -232,7 +231,7 @@ internal class ContentVersionCleanupServiceTest
                 new() { ContentTypeId = 1, KeepAllVersionsNewerThanDays = null, PreventCleanup = true },
             ]);
 
-        documentVersionRepository.Setup(x => x.GetContentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(Array.Empty<ContentVersionMeta>());
 
         sut.PerformContentVersionCleanup(asAtDate);
@@ -240,7 +239,7 @@ internal class ContentVersionCleanupServiceTest
         // The effective cutoff should remain 7 days (the global value).
         DateTime expectedCutoff = asAtDate.AddDays(-7);
         documentVersionRepository.Verify(
-            x => x.GetContentVersionsEligibleForCleanup(expectedCutoff, It.IsAny<int?>()),
+            x => x.GetDocumentVersionsEligibleForCleanup(expectedCutoff, It.IsAny<int?>()),
             Times.Once);
     }
 
@@ -271,14 +270,14 @@ internal class ContentVersionCleanupServiceTest
                 new() { ContentTypeId = 2, KeepAllVersionsNewerThanDays = 1 },
             ]);
 
-        documentVersionRepository.Setup(x => x.GetContentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
+        documentVersionRepository.Setup(x => x.GetDocumentVersionsEligibleForCleanup(It.IsAny<DateTime>(), It.IsAny<int?>()))
             .Returns(Array.Empty<ContentVersionMeta>());
 
         sut.PerformContentVersionCleanup(asAtDate);
 
         DateTime expectedCutoff = asAtDate.AddDays(-1);
         documentVersionRepository.Verify(
-            x => x.GetContentVersionsEligibleForCleanup(expectedCutoff, It.IsAny<int?>()),
+            x => x.GetDocumentVersionsEligibleForCleanup(expectedCutoff, It.IsAny<int?>()),
             Times.Once);
     }
 }

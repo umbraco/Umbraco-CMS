@@ -1,6 +1,7 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
@@ -11,6 +12,7 @@ internal sealed class ContentTypeSchemaService : IContentTypeSchemaService
     private readonly IContentTypeService _contentTypeService;
     private readonly IMediaTypeService _mediaTypeService;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
+    private readonly IShortStringHelper _shortStringHelper;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentTypeSchemaService"/> class.
@@ -18,11 +20,13 @@ internal sealed class ContentTypeSchemaService : IContentTypeSchemaService
     public ContentTypeSchemaService(
         IContentTypeService contentTypeService,
         IMediaTypeService mediaTypeService,
-        IPublishedContentTypeCache publishedContentTypeCache)
+        IPublishedContentTypeCache publishedContentTypeCache,
+        IShortStringHelper shortStringHelper)
     {
         _contentTypeService = contentTypeService;
         _mediaTypeService = mediaTypeService;
         _publishedContentTypeCache = publishedContentTypeCache;
+        _shortStringHelper = shortStringHelper;
     }
 
     /// <inheritdoc/>
@@ -77,9 +81,7 @@ internal sealed class ContentTypeSchemaService : IContentTypeSchemaService
         return result;
     }
 
-    // Aliases are already valid identifiers, so only the first char needs uppercasing.
-    // Deliberately avoids ModelsBuilder's GetClrName, which re-tokenises by case boundaries
-    // and mangles capital-letter runs (e.g. "xMLSitemap" -> "XMlsitemap" instead of "XMLSitemap").
-    private static string GetContentTypeSchemaId(string contentTypeAlias) =>
-        contentTypeAlias.ToFirstUpperInvariant();
+    // Currently uses the same transformation as ModelsBuilder (UmbracoServices.GetClrName)
+    private string GetContentTypeSchemaId(string contentTypeAlias) =>
+        contentTypeAlias.ToCleanString(_shortStringHelper, CleanStringType.ConvertCase | CleanStringType.PascalCase);
 }

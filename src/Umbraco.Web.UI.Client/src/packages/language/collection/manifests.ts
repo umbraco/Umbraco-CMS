@@ -10,7 +10,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: UMB_LANGUAGE_COLLECTION_ALIAS,
 		name: 'Language Collection',
-		api: () => import('./language-collection.context.js'),
 		meta: {
 			repositoryAlias: UMB_LANGUAGE_COLLECTION_REPOSITORY_ALIAS,
 		},

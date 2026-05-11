@@ -28,7 +28,7 @@ internal sealed class MemberTwoFactorLoginService : TwoFactorLoginServiceBase, I
     /// <inheritdoc cref="IMemberTwoFactorLoginService.DisableAsync" />
     public override async Task<Attempt<TwoFactorOperationStatus>> DisableAsync(Guid memberKey, string providerName)
     {
-        IMember? member = _memberService.GetById(memberKey);
+        IMember? member = _memberService.GetByKey(memberKey);
 
         if (member is null)
         {
@@ -41,7 +41,7 @@ internal sealed class MemberTwoFactorLoginService : TwoFactorLoginServiceBase, I
     /// <inheritdoc cref="IMemberTwoFactorLoginService.GetProviderNamesAsync" />
     public override async Task<Attempt<IEnumerable<UserTwoFactorProviderModel>, TwoFactorOperationStatus>> GetProviderNamesAsync(Guid memberKey)
     {
-        IMember? member = _memberService.GetById(memberKey);
+        IMember? member = _memberService.GetByKey(memberKey);
 
         if (member is null)
         {
@@ -54,7 +54,7 @@ internal sealed class MemberTwoFactorLoginService : TwoFactorLoginServiceBase, I
     /// <inheritdoc cref="IMemberTwoFactorLoginService.GetSetupInfoAsync" />
     public override async Task<Attempt<ISetupTwoFactorModel, TwoFactorOperationStatus>> GetSetupInfoAsync(Guid memberKey, string providerName)
     {
-        IMember? member = _memberService.GetById(memberKey);
+        IMember? member = _memberService.GetByKey(memberKey);
 
         if (member is null)
         {
@@ -67,7 +67,7 @@ internal sealed class MemberTwoFactorLoginService : TwoFactorLoginServiceBase, I
     /// <inheritdoc cref="IMemberTwoFactorLoginService.ValidateAndSaveAsync" />
     public override async Task<Attempt<TwoFactorOperationStatus>> ValidateAndSaveAsync(string providerName, Guid memberKey, string secret, string code)
     {
-        IMember? member = _memberService.GetById(memberKey);
+        IMember? member = _memberService.GetByKey(memberKey);
 
         if (member is null)
         {

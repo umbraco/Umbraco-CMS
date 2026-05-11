@@ -104,8 +104,10 @@ export const handlers = [
 				{
 					type: 'validation',
 					status: 400,
-					title: 'Something went wrong',
-					detail: 'Database name is invalid',
+					detail: 'Something went wrong',
+					errors: {
+						name: ['Database name is invalid'],
+					},
 				},
 				{ status: 400 },
 			);

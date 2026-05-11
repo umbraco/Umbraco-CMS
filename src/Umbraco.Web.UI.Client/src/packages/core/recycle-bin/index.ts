@@ -4,4 +4,5 @@ export * from './entity-bulk-action/index.js';
 export { UmbRecycleBinRepositoryBase } from './recycle-bin-repository-base.js';
 export { UmbIsTrashedEntityContext } from './contexts/is-trashed/index.js';
 
+export type * from './collection-action/index.js';
 export type * from './types.js';

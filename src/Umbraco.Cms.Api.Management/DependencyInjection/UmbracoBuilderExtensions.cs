@@ -29,7 +29,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
         builder.Services.AddSingleton<IManagementApiRouteBuilder, ManagementApiRouteBuilder>();
         builder.Services.AddUnique<IConflictingRouteService, ConflictingRouteService>();
-        builder.AddUmbracoOpenApi();
+        builder.AddUmbracoApiOpenApiUI();
 
 #pragma warning disable CS0618 // Type or member is obsolete
         if (!services.Any(x => !x.IsKeyedService && x.ImplementationType == typeof(JsonPatchService)))
@@ -47,7 +47,6 @@ public static partial class UmbracoBuilderExtensions
                 .AddConfigurationFactories()
                 .AddDocuments()
                 .AddDocumentTypes()
-                .AddElements()
                 .AddMedia()
                 .AddMediaTypes()
                 .AddMemberGroups()
@@ -95,23 +94,16 @@ public static partial class UmbracoBuilderExtensions
                 })
                 .AddJsonOptions(Constants.JsonOptionsNames.BackOffice, _ => { });
 
-            builder.Services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>();
-
-            // Configures the JSON options for the Open API schema generation (based on the back-office MVC JSON options)
-            builder.Services.ConfigureOptions<ConfigureUmbracoBackofficeHttpJsonOptions>();
-
-            builder.AddUmbracoOpenApiDocument<ConfigureUmbracoManagementApiOpenApiOptions>(
-                ManagementApiConfiguration.ApiName,
-                ManagementApiConfiguration.ApiTitle,
-                Constants.JsonOptionsNames.BackOffice);
+            services.ConfigureOptions<ConfigureUmbracoBackofficeJsonOptions>();
+            services.ConfigureOptions<ConfigureUmbracoManagementApiSwaggerGenOptions>();
 
             services.Configure<UmbracoPipelineOptions>(options =>
             {
-                options.AddFilter(
-                    new UmbracoPipelineFilter(
+                options.AddFilter(new UmbracoPipelineFilter(
                     "BackOfficeManagementApiFilter",
                     applicationBuilder => applicationBuilder.UseProblemDetailsExceptionHandling(),
-                    preMapEndpoints: endpoints => endpoints.MapManagementApiEndpoints()));
+                    postPipeline: _ => { },
+                    endpoints: applicationBuilder => applicationBuilder.UseEndpoints()));
             });
         }
 

@@ -54,9 +54,7 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
         ITreeEntitySortingService treeEntitySortingService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters,
-        ILanguageService languageService,
-        IUserService userService)
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             contentService,
             contentTypeService,
@@ -68,9 +66,7 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
             validationService,
             optionsMonitor,
             relationService,
-            contentTypeFilters,
-            languageService,
-            userService)
+            contentTypeFilters)
     {
         _logger = logger;
         _treeEntitySortingService = treeEntitySortingService;

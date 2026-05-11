@@ -17,9 +17,11 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
 
     public ContentCacheNode ToContentCacheNode(IContent content, bool preview)
     {
+
+
         ContentData contentData = GetContentData(
             content,
-            preview is false,
+            GetPublishedValue(content, preview),
             GetTemplateId(content, preview),
             content.PublishCultureInfos!.Values.Select(x => x.Culture).ToHashSet());
         return new ContentCacheNode
@@ -33,6 +35,21 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             Data = contentData,
             IsDraft = preview,
         };
+    }
+
+    private static bool GetPublishedValue(IContent content, bool preview)
+    {
+        switch (content.PublishedState)
+        {
+            case PublishedState.Published:
+                return preview is false;
+            case PublishedState.Publishing:
+                return preview is false || content.Published; // The type changes after this operation
+            case PublishedState.Unpublished:
+            case PublishedState.Unpublishing:
+            default:
+                return false;
+        }
     }
 
     private static int? GetTemplateId(IContent content, bool preview)
@@ -64,26 +81,6 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             ContentTypeId = media.ContentTypeId,
             Data = contentData,
             IsDraft = false,
-        };
-    }
-
-    public ContentCacheNode ToContentCacheNode(IElement element, bool preview)
-    {
-        ContentData contentData = GetContentData(
-            element,
-            preview is false,
-            null,
-            element.PublishCultureInfos?.Values.Select(x => x.Culture).ToHashSet() ?? []);
-        return new ContentCacheNode
-        {
-            Id = element.Id,
-            Key = element.Key,
-            SortOrder = element.SortOrder,
-            CreateDate = element.CreateDate,
-            CreatorId = element.CreatorId,
-            ContentTypeId = element.ContentTypeId,
-            Data = contentData,
-            IsDraft = preview,
         };
     }
 
@@ -131,11 +128,10 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
         // sanitize - names should be ok but ... never knows
         if (content.ContentType.VariesByCulture())
         {
-            var publishableContent = content as IPublishableContentBase;
-            ContentCultureInfosCollection? infos = publishableContent is not null
+            ContentCultureInfosCollection? infos = content is IContent document
                 ? published
-                    ? publishableContent.PublishCultureInfos
-                    : publishableContent.CultureInfos
+                    ? document.PublishCultureInfos
+                    : document.CultureInfos
                 : content.CultureInfos;
 
             // ReSharper disable once UseDeconstruction
@@ -143,7 +139,7 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             {
                 foreach (ContentCultureInfos cultureInfo in infos)
                 {
-                    var cultureIsDraft = !published && publishableContent is not null && publishableContent.IsCultureEdited(cultureInfo.Culture);
+                    var cultureIsDraft = !published && content is IContent d && d.IsCultureEdited(cultureInfo.Culture);
                     cultureData[cultureInfo.Culture] = new CultureVariation
                     {
                         Name = cultureInfo.Name,

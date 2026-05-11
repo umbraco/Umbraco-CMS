@@ -43,9 +43,6 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 		// Add the default observables to the instance
 		this.handleUnauthorizedAuthRetry();
 		// Add the default interceptors to the client
-		// TODO: Investigate whether some of these interceptors (e.g. addUmbGeneratedResourceInterceptor,
-		// addForbiddenResponseInterceptor, addUmbNotificationsInterceptor, addErrorInterceptor) belong
-		// somewhere else, since they are not auth-specific.
 		this.addAuthResponseInterceptor(client);
 		this.addForbiddenResponseInterceptor(client);
 		this.addUmbGeneratedResourceInterceptor(client);
@@ -308,26 +305,25 @@ export class UmbApiInterceptorController extends UmbControllerBase {
 	/**
 	 * Helper to create a new Response with correct Content-Type.
 	 * @param {unknown} body The body of the response, can be a string or an object.
-	 * @param {Response} [originalResponse] The original response to copy status and headers from, if any.
-	 * @param {number} [fallbackStatus] Status to use when no upstream response is available. Defaults to 500.
+	 * @param {Response} originalResponse The original response to copy status and headers from.
 	 * @returns {Response} The new Response object with the correct Content-Type and body.
 	 */
-	#createResponse(body: unknown, originalResponse?: Response, fallbackStatus: number = 500): Response {
+	#createResponse(body: unknown, originalResponse: Response): Response {
 		const isString = typeof body === 'string';
 		const contentType = isString ? 'text/plain' : 'application/json';
 		const responseBody = isString ? body : JSON.stringify(body);
 
 		// Construct new headers but preserve "X-" headers from the original response
 		const headersOverride: Record<string, string> = {};
-		originalResponse?.headers.forEach((value, key) => {
+		originalResponse.headers.forEach((value, key) => {
 			if (key.toLowerCase().startsWith('x-')) {
 				headersOverride[key] = value;
 			}
 		});
 
 		return new Response(responseBody, {
-			status: originalResponse?.status ?? fallbackStatus,
-			statusText: originalResponse?.statusText ?? '',
+			status: originalResponse.status,
+			statusText: originalResponse.statusText,
 			headers: {
 				...headersOverride,
 				'Content-Type': contentType,

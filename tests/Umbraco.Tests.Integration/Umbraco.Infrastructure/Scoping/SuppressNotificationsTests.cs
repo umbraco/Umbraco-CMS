@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
@@ -32,19 +31,19 @@ internal sealed class SuppressNotificationsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GivenScope_WhenNotificationsSuppressed_ThenNotificationsDoNotExecute()
+    public void GivenScope_WhenNotificationsSuppressed_ThenNotificationsDoNotExecute()
     {
         using var scope = ScopeProvider.CreateScope(autoComplete: true);
         using var suppressed = scope.Notifications.Suppress();
 
         var contentType = ContentTypeBuilder.CreateBasicContentType();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
         var content = ContentBuilder.CreateBasicContent(contentType);
         ContentService.Save(content);
     }
 
     [Test]
-    public async Task GivenNestedScope_WhenOuterNotificationsSuppressed_ThenNotificationsDoNotExecute()
+    public void GivenNestedScope_WhenOuterNotificationsSuppressed_ThenNotificationsDoNotExecute()
     {
         using (var parentScope = ScopeProvider.CreateScope(autoComplete: true))
         {
@@ -53,7 +52,7 @@ internal sealed class SuppressNotificationsTests : UmbracoIntegrationTest
             using (var childScope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 var contentType = ContentTypeBuilder.CreateBasicContentType();
-                await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+                ContentTypeService.Save(contentType);
                 var content = ContentBuilder.CreateBasicContent(contentType);
                 ContentService.Save(content);
             }
@@ -61,7 +60,7 @@ internal sealed class SuppressNotificationsTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task GivenSuppressedNotifications_WhenDisposed_ThenNotificationsExecute()
+    public void GivenSuppressedNotifications_WhenDisposed_ThenNotificationsExecute()
     {
         var asserted = 0;
         using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -69,7 +68,7 @@ internal sealed class SuppressNotificationsTests : UmbracoIntegrationTest
             using var suppressed = scope.Notifications.Suppress();
 
             var mediaType = MediaTypeBuilder.CreateImageMediaType("test");
-            await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+            MediaTypeService.Save(mediaType);
 
             suppressed.Dispose();
 

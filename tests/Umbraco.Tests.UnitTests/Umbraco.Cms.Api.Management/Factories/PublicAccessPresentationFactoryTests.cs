@@ -6,6 +6,8 @@ using Umbraco.Cms.Api.Management.ViewModels.MemberGroup.Item;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Web.Common.Security;
@@ -20,7 +22,6 @@ public class PublicAccessPresentationFactoryTests
     private Mock<IUmbracoMapper> _mapper = null!;
     private Mock<IMemberRoleManager> _memberRoleManager = null!;
     private Mock<IMemberPresentationFactory> _memberPresentationFactory = null!;
-    private Mock<IMemberGroupService> _memberGroupService = null!;
     private PublicAccessPresentationFactory _factory = null!;
 
     [SetUp]
@@ -31,15 +32,16 @@ public class PublicAccessPresentationFactoryTests
         _mapper = new Mock<IUmbracoMapper>();
         _memberRoleManager = new Mock<IMemberRoleManager>();
         _memberPresentationFactory = new Mock<IMemberPresentationFactory>();
-        _memberGroupService = new Mock<IMemberGroupService>();
+
+        // Default: no roles
+        _memberRoleManager.Setup(x => x.Roles).Returns(Enumerable.Empty<UmbracoIdentityRole>());
 
         _factory = new PublicAccessPresentationFactory(
             _entityService.Object,
             _memberService.Object,
             _mapper.Object,
             _memberRoleManager.Object,
-            _memberPresentationFactory.Object,
-            _memberGroupService.Object);
+            _memberPresentationFactory.Object);
     }
 
     [Test]
@@ -230,11 +232,17 @@ public class PublicAccessPresentationFactoryTests
         SetupNodeKeyResolution(200, loginNodeKey);
         SetupNodeKeyResolution(300, errorNodeKey);
 
-        var memberGroup = Mock.Of<IMemberGroup>(x => x.Name == "Editors" && x.Key == groupKey);
-        _memberGroupService.Setup(x => x.GetByName("Editors")).Returns(memberGroup);
+        _memberRoleManager.Setup(x => x.Roles).Returns(new[]
+        {
+            new UmbracoIdentityRole("Editors") { Id = "42" },
+        });
+
+        var groupEntity = Mock.Of<IEntitySlim>();
+        _entityService.Setup(x => x.GetAll(UmbracoObjectTypes.MemberGroup, It.Is<int[]>(ids => ids.Contains(42))))
+            .Returns(new[] { groupEntity });
 
         var groupModel = new MemberGroupItemResponseModel { Id = groupKey, Name = "Editors" };
-        _mapper.Setup(x => x.Map<MemberGroupItemResponseModel>(memberGroup)).Returns(groupModel);
+        _mapper.Setup(x => x.Map<MemberGroupItemResponseModel>(groupEntity)).Returns(groupModel);
 
         // Act
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
@@ -297,8 +305,11 @@ public class PublicAccessPresentationFactoryTests
         SetupNodeKeyResolution(200, loginNodeKey);
         SetupNodeKeyResolution(300, errorNodeKey);
 
-        // No matching group exists
-        _memberGroupService.Setup(x => x.GetByName("DeletedGroup")).Returns((IMemberGroup?)null);
+        // No matching role exists
+        _memberRoleManager.Setup(x => x.Roles).Returns(new[]
+        {
+            new UmbracoIdentityRole("Administrators") { Id = "1" },
+        });
 
         // Act
         var result = _factory.CreatePublicAccessResponseModel(entry, protectedNodeKey);
@@ -339,9 +350,14 @@ public class PublicAccessPresentationFactoryTests
             .Returns(new MemberItemResponseModel { Id = memberKey });
 
         // Group setup
-        var memberGroup = Mock.Of<IMemberGroup>(x => x.Name == "VIPs" && x.Key == groupKey);
-        _memberGroupService.Setup(x => x.GetByName("VIPs")).Returns(memberGroup);
-        _mapper.Setup(x => x.Map<MemberGroupItemResponseModel>(memberGroup))
+        _memberRoleManager.Setup(x => x.Roles).Returns(new[]
+        {
+            new UmbracoIdentityRole("VIPs") { Id = "10" },
+        });
+        var groupEntity = Mock.Of<IEntitySlim>();
+        _entityService.Setup(x => x.GetAll(UmbracoObjectTypes.MemberGroup, It.Is<int[]>(ids => ids.Contains(10))))
+            .Returns(new[] { groupEntity });
+        _mapper.Setup(x => x.Map<MemberGroupItemResponseModel>(groupEntity))
             .Returns(new MemberGroupItemResponseModel { Id = groupKey, Name = "VIPs" });
 
         // Act

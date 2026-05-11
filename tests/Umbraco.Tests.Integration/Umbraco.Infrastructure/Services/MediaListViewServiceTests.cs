@@ -183,12 +183,12 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
 
     }
 
-    private async Task CreateTenMediaItemsFromTwoMediaTypesAtRoot()
+    private void CreateTenMediaItemsFromTwoMediaTypesAtRoot()
     {
         var mediaType1 = MediaTypeBuilder.CreateImageMediaType("Image2");
-        await MediaTypeService.CreateAsync(mediaType1, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(mediaType1);
         var mediaType2 = MediaTypeBuilder.CreateImageMediaType("Image3");
-        await MediaTypeService.CreateAsync(mediaType2, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(mediaType2);
 
         for (var i = 0; i < 5; i++)
         {
@@ -203,7 +203,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
     {
         var childImageMediaType = MediaTypeService.Get(Constants.Conventions.MediaTypes.Image);
         childImageMediaType.PropertyTypes.First(x => x.Alias == "umbracoFile").Mandatory = false;
-        await MediaTypeService.CreateAsync(childImageMediaType, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(childImageMediaType);
 
         var mediaTypeWithListView = new MediaTypeBuilder()
             .WithAlias("album")
@@ -216,7 +216,7 @@ internal sealed class MediaListViewServiceTests : ContentListViewServiceTestsBas
         {
             new ContentTypeSort(childImageMediaType.Key, 1, childImageMediaType.Alias),
         };
-        await MediaTypeService.CreateAsync(mediaTypeWithListView, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(mediaTypeWithListView);
 
         var rootContentCreateModel = new MediaCreateModel
         {

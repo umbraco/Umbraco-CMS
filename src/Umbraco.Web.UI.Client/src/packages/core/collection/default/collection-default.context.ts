@@ -12,7 +12,6 @@ import type { ManifestCollection } from '../extensions/types.js';
 import { UmbCollectionBulkActionManager } from '../bulk-action/collection-bulk-action.manager.js';
 import { UmbCollectionSelectionManager } from '../selection/collection-selection.manager.js';
 import { UMB_COLLECTION_CONTEXT } from './collection-default.context-token.js';
-import { UmbValueSummaryCoordinatorContext } from '@umbraco-cms/backoffice/value-summary';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import {
 	UmbArrayState,
@@ -80,7 +79,6 @@ export class UmbDefaultCollectionContext<
 	public readonly selection = new UmbCollectionSelectionManager(this);
 	public readonly view = new UmbCollectionViewManager(this);
 	public readonly bulkAction = new UmbCollectionBulkActionManager(this);
-	public readonly valueSummaryCoordinator = new UmbValueSummaryCoordinatorContext(this);
 
 	#defaultViewAlias: string;
 	#defaultFilter: Partial<FilterModelType>;
@@ -386,6 +384,35 @@ export class UmbDefaultCollectionContext<
 		);
 
 		super.destroy();
+	}
+
+	/**
+	 * Sets the manifest for the collection.
+	 * @param {ManifestCollection} manifest - The manifest for the collection.
+	 * @memberof UmbCollectionContext
+	 * @deprecated Use set the `.manifest` property instead.
+	 */
+	public setManifest(manifest: ManifestCollection | undefined) {
+		if (this._manifest === manifest) return;
+		this._manifest = manifest;
+
+		if (!this._manifest) return;
+		this.#observeRepository(this._manifest.meta.repositoryAlias);
+	}
+
+	/**
+	 * Returns the manifest for the collection.
+	 * @returns {ManifestCollection} - The manifest for the collection.
+	 * @memberof UmbCollectionContext
+	 * @deprecated Use the `.manifest` property instead.
+	 */
+	public getManifest(): ManifestCollection | undefined {
+		new UmbDeprecation({
+			removeInVersion: '18.0.0',
+			deprecated: 'getManifest',
+			solution: 'Use .manifest property instead',
+		}).warn();
+		return this._manifest;
 	}
 
 	/**

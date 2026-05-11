@@ -16,6 +16,7 @@ function findRule(rule: UmbVariantGuardRule, variantId: UmbVariantId) {
 	return rule.variantId?.compare(variantId) || rule.variantId === undefined;
 }
 
+// TODO: Check the need for this one.
 /**
  * Read only guard manager for variant rules.
  * @export
@@ -30,45 +31,23 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	isPermittedForVariant(variantId: UmbVariantId): Observable<boolean> {
-		return mergeObservables(
-			[
-				this._rules.asObservablePart((rules) => {
-					return this.#resolvePermission(rules, variantId);
-				}),
-				this._fallback,
-			],
-			([permitted, fallback]) => permitted ?? fallback,
-		);
-	}
-
-	/**
-	 * @param {Observable<UmbVariantId | undefined>} variantId
-	 * @returns {Observable<boolean | undefined>} - Observable that emits true if the variantId is permitted to read, false otherwise
-	 * @memberof UmbReadOnlyVariantGuardManager
-	 */
-	isPermittedForObservableVariant(variantId: Observable<UmbVariantId | undefined>): Observable<boolean | undefined> {
-		return mergeObservables([this.rules, variantId, this._fallback], ([rules, variantId, fallback]) => {
-			if (!variantId) {
-				return undefined;
-			}
-			return this.#resolvePermission(rules, variantId) ?? fallback;
+		return this._rules.asObservablePart((states) => {
+			return this.#resolvePermission(states, variantId);
 		});
 	}
 
 	/**
-	 * Observe the permission for multiple given variantIds
-	 * @param {Observable<UmbVariantId[]>} variantIds - Observable emitting the variantIds to evaluate
-	 * @returns {Observable<{ variantId: UmbVariantId; permitted: boolean }[]>} - Observable that emits an array of objects with a permitted boolean and the variantId
+	 * @param {Observable<UmbVariantId | undefined>} variantId
+	 * @returns {Observable<boolean>} - Observable that emits true if the variantId is permitted to read, false otherwise
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
-	isPermittedForObservableVariants(
-		variantIds: Observable<UmbVariantId[]>,
-	): Observable<{ variantId: UmbVariantId; permitted: boolean }[]> {
-		return mergeObservables([this.rules, variantIds, this._fallback], ([rules, variantIds, fallback]) => {
-			if (!variantIds || variantIds.length === 0) {
-				return [];
+	isPermittedForObservableVariant(variantId: Observable<UmbVariantId | undefined>): Observable<boolean> {
+		return mergeObservables([this.rules, variantId], ([states, variantId]) => {
+			if (!variantId) {
+				// Or should we know about the fallback state here? [NL]
+				return false;
 			}
-			return variantIds.map((id) => ({ variantId: id, permitted: this.#resolvePermission(rules, id) ?? fallback }));
+			return this.#resolvePermission(states, variantId);
 		});
 	}
 
@@ -79,16 +58,16 @@ export class UmbReadOnlyVariantGuardManager extends UmbReadOnlyGuardManager<UmbV
 	 * @memberof UmbReadOnlyVariantGuardManager
 	 */
 	getIsPermittedForVariant(variantId: UmbVariantId): boolean {
-		return this.#resolvePermission(this.getRules(), variantId) ?? this._getFallback();
+		return this.#resolvePermission(this.getRules(), variantId);
 	}
 
-	#resolvePermission(rules: UmbVariantGuardRule[], variantId: UmbVariantId): boolean | undefined {
+	#resolvePermission(rules: UmbVariantGuardRule[], variantId: UmbVariantId) {
 		if (rules.filter((x) => x.permitted === false).some((rule) => findRule(rule, variantId))) {
 			return false;
 		}
 		if (rules.filter((x) => x.permitted === true).some((rule) => findRule(rule, variantId))) {
 			return true;
 		}
-		return undefined;
+		return this._fallback;
 	}
 }

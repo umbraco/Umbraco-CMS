@@ -35,9 +35,9 @@ export type VerifyInviteUserRequestModel = {
 };
 
 export type ResetPasswordTokenRequestModel = {
-    password: string;
     user: ReferenceByIdModel;
     resetCode: string;
+    password: string;
 };
 
 export type ResetPasswordRequestModel = {
@@ -45,15 +45,16 @@ export type ResetPasswordRequestModel = {
 };
 
 export type ProblemDetailsBuilderModel = {
-    [key: string]: unknown;
+    [key: string]: never;
 };
 
 export type ProblemDetails = {
-    type?: null | string;
-    title?: null | string;
-    status?: null | number;
-    detail?: null | string;
-    instance?: null | string;
+    type?: string | null;
+    title?: string | null;
+    status?: number | null;
+    detail?: string | null;
+    instance?: string | null;
+    [key: string]: unknown | string | null | string | null | number | null | string | null | string | null | undefined;
 };
 
 export type NotificationHeaderModel = {
@@ -71,13 +72,13 @@ export enum EventMessageTypeModel {
 }
 
 export type CreateInitialPasswordUserRequestModel = {
-    password: string;
     user: ReferenceByIdModel;
     token: string;
+    password: string;
 };
 
 export type PostSecurityForgotPasswordData = {
-    body: ResetPasswordRequestModel;
+    body?: ResetPasswordRequestModel;
     path?: never;
     query?: never;
     url: '/umbraco/management/api/v1/security/forgot-password';
@@ -108,7 +109,7 @@ export type PostSecurityForgotPasswordResponses = {
 };
 
 export type PostSecurityForgotPasswordResetData = {
-    body: ResetPasswordTokenRequestModel;
+    body?: ResetPasswordTokenRequestModel;
     path?: never;
     query?: never;
     url: '/umbraco/management/api/v1/security/forgot-password/reset';
@@ -145,7 +146,7 @@ export type PostSecurityForgotPasswordResetResponses = {
 export type PostSecurityForgotPasswordResetResponse = PostSecurityForgotPasswordResetResponses[keyof PostSecurityForgotPasswordResetResponses];
 
 export type PostSecurityForgotPasswordVerifyData = {
-    body: VerifyResetPasswordTokenRequestModel;
+    body?: VerifyResetPasswordTokenRequestModel;
     path?: never;
     query?: never;
     url: '/umbraco/management/api/v1/security/forgot-password/verify';
@@ -174,7 +175,7 @@ export type PostSecurityForgotPasswordVerifyResponses = {
 export type PostSecurityForgotPasswordVerifyResponse = PostSecurityForgotPasswordVerifyResponses[keyof PostSecurityForgotPasswordVerifyResponses];
 
 export type PostUserInviteCreatePasswordData = {
-    body: CreateInitialPasswordUserRequestModel;
+    body?: CreateInitialPasswordUserRequestModel;
     path?: never;
     query?: never;
     url: '/umbraco/management/api/v1/user/invite/create-password';
@@ -185,6 +186,10 @@ export type PostUserInviteCreatePasswordErrors = {
      * Bad Request
      */
     400: ProblemDetails;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */
@@ -201,7 +206,7 @@ export type PostUserInviteCreatePasswordResponses = {
 };
 
 export type PostUserInviteVerifyData = {
-    body: VerifyInviteUserRequestModel;
+    body?: VerifyInviteUserRequestModel;
     path?: never;
     query?: never;
     url: '/umbraco/management/api/v1/user/invite/verify';
@@ -212,6 +217,10 @@ export type PostUserInviteVerifyErrors = {
      * Bad Request
      */
     400: ProblemDetails;
+    /**
+     * The authenticated user does not have access to this resource
+     */
+    403: unknown;
     /**
      * Not Found
      */

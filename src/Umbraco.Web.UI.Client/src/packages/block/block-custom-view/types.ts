@@ -29,11 +29,10 @@ export interface UmbBlockEditorCustomViewProperties<
 	settingsInvalid?: boolean;
 	unsupported?: boolean;
 	unpublished?: boolean;
-	readonly?: boolean;
 }
 
 export interface UmbBlockEditorCustomViewElement<
 	LayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
 	BlockType extends UmbBlockTypeBaseModel = UmbBlockTypeBaseModel,
->
-	extends UmbBlockEditorCustomViewProperties<LayoutType, BlockType>, HTMLElement {}
+> extends UmbBlockEditorCustomViewProperties<LayoutType, BlockType>,
+		HTMLElement {}

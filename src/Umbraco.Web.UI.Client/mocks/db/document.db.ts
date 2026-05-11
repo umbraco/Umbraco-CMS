@@ -8,6 +8,7 @@ import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
 import { UmbEntityRecycleBin } from './utils/entity/entity-recycle-bin.js';
 import { UmbMockDocumentCollectionManager } from './document-collection.manager.js';
 import { UmbMockDocumentPublishingManager } from './document-publishing.manager.js';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	DocumentCollectionResponseModel,
@@ -18,10 +19,7 @@ import type {
 	DomainsResponseModel,
 	DocumentConfigurationResponseModel,
 	DocumentValueResponseModel,
-	DocumentVariantResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-
-type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 export class UmbDocumentMockDB extends UmbEntityMockDbBase<UmbMockDocumentModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockDocumentModel>(this, treeItemMapper);
@@ -126,7 +124,7 @@ const createMockDocumentMapper = (request: CreateDocumentRequestModel): UmbMockD
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
-				state: 'Draft' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: null,
 				id: UmbId.new(),
 				flags: [],

@@ -81,7 +81,7 @@ test('can delete a template', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.template.isTemplateRootTreeItemVisible(templateName, false, false);
 });
 
-test('can set a template as layout template', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
+test('can set a template as master template', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childTemplateName = 'ChildTemplate';
   await umbracoApi.template.ensureNameNotExists(childTemplateName);
@@ -90,23 +90,23 @@ test('can set a template as layout template', {tag: '@release'}, async ({umbraco
 
   // Act
   await umbracoUi.template.goToTemplate(childTemplateName);
-  await umbracoUi.template.clickChangeLayoutTemplateButton();
+  await umbracoUi.template.clickChangeMasterTemplateButton();
   await umbracoUi.template.clickModalMenuItemWithName(templateName);
   await umbracoUi.template.clickChooseButton();
   await umbracoUi.template.clickSaveButtonAndWaitForTemplateToBeUpdated();
 
   // Assert
-  await umbracoUi.template.isLayoutTemplateNameVisible(templateName);
-  // Checks if the childTemplate has the layoutTemplate set
+  await umbracoUi.template.isMasterTemplateNameVisible(templateName);
+  // Checks if the childTemplate has the masterTemplate set
   const childTemplateData = await umbracoApi.template.getByName(childTemplateName);
-  const layoutTemplateData = await umbracoApi.template.getByName(templateName);
-  expect(childTemplateData.layoutTemplate.id).toBe(layoutTemplateData.id);
+  const masterTemplateData = await umbracoApi.template.getByName(templateName);
+  expect(childTemplateData.masterTemplate.id).toBe(masterTemplateData.id);
 
   // Clean
   await umbracoApi.template.ensureNameNotExists(childTemplateName);
 });
 
-test('can remove a layout template', async ({umbracoApi, umbracoUi}) => {
+test('can remove a master template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const childTemplateName = 'ChildTemplate';
   const templateAlias = AliasHelper.toAlias(templateName);
@@ -118,13 +118,13 @@ test('can remove a layout template', async ({umbracoApi, umbracoUi}) => {
 
   // Act
   await umbracoUi.template.goToTemplate(templateName, childTemplateName);
-  await umbracoUi.template.clickRemoveLayoutTemplateButton();
+  await umbracoUi.template.clickRemoveMasterTemplateButton();
   await umbracoUi.template.clickSaveButtonAndWaitForTemplateToBeUpdated();
 
   // Assert
-  await umbracoUi.template.isLayoutTemplateNameVisible('No layout');
+  await umbracoUi.template.isMasterTemplateNameVisible('No master');
   const childTemplate = await umbracoApi.template.getByName(childTemplateName);
-  expect(childTemplate.layoutTemplate).toBe(null);
+  expect(childTemplate.masterTemplate).toBe(null);
 
   // Clean
   await umbracoApi.template.ensureNameNotExists(childTemplateName);
@@ -167,8 +167,7 @@ test('can use query builder with Order By statement for a template', async ({umb
   expect(templateData.content).toBe(expectedTemplateContent);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22000
-test.skip('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
+test('can use query builder with Where statement for a template', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const propertyAliasValue = 'Name';
   const operatorValue = 'is';

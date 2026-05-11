@@ -206,7 +206,8 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				entityType: this._currentMediaEntity.entityType,
 			},
 			dataType: this.#dataType,
-			paging: { skip, take },
+			skip,
+			take,
 		});
 
 		this._currentChildren = data?.items ?? [];

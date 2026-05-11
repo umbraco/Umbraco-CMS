@@ -15,7 +15,6 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
         { Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.DocumentTypeContainer },
         { Constants.ObjectTypes.MediaType, Constants.ObjectTypes.MediaTypeContainer },
         { Constants.ObjectTypes.MemberType, Constants.ObjectTypes.MemberTypeContainer },
-        { Constants.ObjectTypes.Element, Constants.ObjectTypes.ElementContainer },
     }.ToFrozenDictionary();
 
     /// <summary>
@@ -32,7 +31,7 @@ public sealed class EntityContainer : TreeEntityBase, IUmbracoEntity
 
         ParentId = -1;
         Path = "-1";
-        Level = 1;
+        Level = 0;
         SortOrder = 0;
     }
 

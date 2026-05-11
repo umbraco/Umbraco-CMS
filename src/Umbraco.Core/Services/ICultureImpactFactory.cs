@@ -18,7 +18,7 @@ public interface ICultureImpactFactory
     /// <remarks>
     /// <para>Validates that the culture is compatible with the variation.</para>
     /// </remarks>
-    CultureImpact? Create(string culture, bool isDefault, IContentBase content);
+    CultureImpact? Create(string culture, bool isDefault, IContent content);
 
     /// <summary>
     /// Gets the impact of 'all' cultures (including the invariant culture).

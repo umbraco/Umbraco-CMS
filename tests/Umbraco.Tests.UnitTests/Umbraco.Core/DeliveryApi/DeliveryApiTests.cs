@@ -22,7 +22,7 @@ public class DeliveryApiTests
 
     protected IPublishedPropertyType DefaultPropertyType { get; private set; }
 
-    protected IDocumentPublishStatusQueryService PublishStatusQueryService { get; private set; }
+    protected IPublishStatusQueryService PublishStatusQueryService { get; private set; }
 
     [SetUp]
     public virtual void Setup()
@@ -62,9 +62,9 @@ public class DeliveryApiTests
 
         DefaultPropertyType = SetupPublishedPropertyType(defaultPropertyValueConverter.Object, "default", "Default.Editor");
 
-        var publishStatusQueryService = new Mock<IDocumentPublishStatusQueryService>();
+        var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
         publishStatusQueryService
-            .Setup(x => x.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns(true);
         publishStatusQueryService
             .Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>()))
@@ -100,8 +100,6 @@ public class DeliveryApiTests
 
     protected IVariationContextAccessor CreateVariationContextAccessor() => new TestVariationContextAccessor();
 
-    protected IPropertyRenderingContextAccessor CreatePropertyRenderingContextAccessor() => new TestPropertyRenderingContextAccessor();
-
     protected IOptions<GlobalSettings> CreateGlobalSettings(bool hideTopLevelNodeFromPath = true)
     {
         var globalSettings = new GlobalSettings { HideTopLevelNodeFromPath = hideTopLevelNodeFromPath };
@@ -110,17 +108,18 @@ public class DeliveryApiTests
         return globalSettingsOptionsMock.Object;
     }
 
-    protected void ConfigurePublishedContentMock(Mock<IPublishedContent> content, Guid key, string name, IPublishedContentType contentType, IEnumerable<IPublishedProperty> properties)
+    protected void ConfigurePublishedContentMock(Mock<IPublishedContent> content, Guid key, string name, string urlSegment, IPublishedContentType contentType, IEnumerable<IPublishedProperty> properties)
     {
         content.SetupGet(c => c.Key).Returns(key);
         content.SetupGet(c => c.Name).Returns(name);
+        content.SetupGet(c => c.UrlSegment).Returns(urlSegment);
         content
             .SetupGet(m => m.Cultures)
             .Returns(new Dictionary<string, PublishedCultureInfo>()
             {
                 {
                     string.Empty,
-                    new PublishedCultureInfo(string.Empty, name, null, DateTime.UtcNow)
+                    new PublishedCultureInfo(string.Empty, name, urlSegment, DateTime.UtcNow)
                 }
             });
         content.SetupGet(c => c.ContentType).Returns(contentType);
@@ -128,25 +127,6 @@ public class DeliveryApiTests
         content.SetupGet(c => c.ItemType).Returns(contentType.ItemType);
         content.SetupGet(c => c.Level).Returns(1);
         content.Setup(c => c.IsPublished(It.IsAny<string?>())).Returns(true);
-    }
-
-    protected void ConfigurePublishedElementMock(Mock<IPublishedElement> element, Guid key, string name, IPublishedContentType contentType, IEnumerable<IPublishedProperty> properties)
-    {
-        element.SetupGet(c => c.Key).Returns(key);
-        element.SetupGet(c => c.Name).Returns(name);
-        element
-            .SetupGet(m => m.Cultures)
-            .Returns(new Dictionary<string, PublishedCultureInfo>()
-            {
-                {
-                    string.Empty,
-                    new PublishedCultureInfo(string.Empty, name,null, DateTime.UtcNow)
-                }
-            });
-        element.SetupGet(c => c.ContentType).Returns(contentType);
-        element.SetupGet(c => c.Properties).Returns(properties);
-        element.SetupGet(c => c.ItemType).Returns(contentType.ItemType);
-        element.Setup(c => c.IsPublished(It.IsAny<string?>())).Returns(true);
     }
 
     protected string DefaultUrlSegment(string name, string? culture = null)
@@ -160,7 +140,7 @@ public class DeliveryApiTests
         IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
         IPublishedContentCache? contentCache = null,
         IDocumentNavigationQueryService? navigationQueryService = null,
-        IDocumentPublishStatusQueryService? publishStatusQueryService = null,
+        IPublishStatusQueryService? publishStatusQueryService = null,
         IDocumentUrlService? documentUrlService = null)
     {
         if (requestHandlerSettingsMonitor == null)

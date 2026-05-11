@@ -2,7 +2,7 @@ import type { UmbControllerHost } from './controller-host.interface.js';
 import type { UmbController } from './controller.interface.js';
 import type { ClassConstructor } from '@umbraco-cms/backoffice/extension-api';
 
-export interface UmbControllerHostBaseDeclaration extends Omit<UmbControllerHost, 'getHostElement'> {
+interface UmbControllerHostBaseDeclaration extends Omit<UmbControllerHost, 'getHostElement'> {
 	hostConnected(): void;
 	hostDisconnected(): void;
 	destroy(): void;

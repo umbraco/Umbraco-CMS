@@ -1,2 +1,0 @@
-export const UMB_ELEMENT_RECYCLE_BIN_TREE_ITEM_CHILDREN_COLLECTION_REPOSITORY_ALIAS =
-	'Umb.Repository.ElementRecycleBin.TreeItemChildrenCollection';

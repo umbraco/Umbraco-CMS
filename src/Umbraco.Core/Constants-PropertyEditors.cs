@@ -305,11 +305,6 @@ public static partial class Constants
             ///     Configuration-less time.
             /// </summary>
             public const string PlainTime = "Umbraco.Plain.Time";
-
-            /// <summary>
-            ///     Element Picker.
-            /// </summary>
-            public const string ElementPicker = "Umbraco.ElementPicker";
         }
 
         /// <summary>

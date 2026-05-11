@@ -78,13 +78,6 @@ internal class ContentTypeDto
     public bool IsElement { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether this content type is allowed in the library.
-    /// </summary>
-    [Column("allowedInLibrary")]
-    [Constraint(Default = "0")]
-    public bool AllowedInLibrary { get; set; }
-
-    /// <summary>
     /// Gets or sets a value indicating whether this content type is allowed at the root level.
     /// </summary>
     [Column("allowAtRoot")]

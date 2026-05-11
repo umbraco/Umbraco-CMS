@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
@@ -98,7 +97,7 @@ public class RedirectToUmbracoPageResult : IKeepTempDataResult
 
             var result = _publishedUrlProvider.GetUrl(PublishedContent.Id);
 
-            if (result == Constants.Routing.Unroutable)
+            if (result == "#")
             {
                 throw new InvalidOperationException(
                     $"Could not route to entity with key {Key}, the NiceUrlProvider could not generate a URL");

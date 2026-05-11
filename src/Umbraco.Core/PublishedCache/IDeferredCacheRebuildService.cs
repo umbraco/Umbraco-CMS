@@ -16,10 +16,4 @@ public interface IDeferredCacheRebuildService
     /// </summary>
     /// <param name="mediaTypeIds">The media type IDs to rebuild.</param>
     void QueueMediaTypeRebuild(IReadOnlyCollection<int> mediaTypeIds);
-
-    /// <summary>
-    ///     Queues the specified element type IDs for a deferred database cache rebuild.
-    /// </summary>
-    /// <param name="elementTypeIds">The element type IDs to rebuild.</param>
-    void QueueElementTypeRebuild(IReadOnlyCollection<int> elementTypeIds);
 }

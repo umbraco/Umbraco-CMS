@@ -11,20 +11,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.DateTimeUnspecified',
 			icon: 'icon-calendar-alt',
 			group: 'date',
-			keywords: [
-				'date',
-				'time',
-				'datetime',
-				'timestamp',
-				'schedule',
-				'when',
-				'meeting',
-				'appointment',
-				'event',
-				'start time',
-				'end time',
-				'deadline',
-			],
 			supportsReadOnly: true,
 			settings: {
 				properties: [

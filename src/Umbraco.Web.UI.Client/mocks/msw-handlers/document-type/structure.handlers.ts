@@ -22,9 +22,4 @@ export const structureHandlers = [
 		const response = umbDocumentTypeMockDb.getAllowedParents(id);
 		return HttpResponse.json(response);
 	}),
-
-	http.get(umbracoPath(`${UMB_SLUG}/allowed-in-library`), () => {
-		const response = umbDocumentTypeMockDb.getAllowedInLibrary();
-		return HttpResponse.json(response);
-	}),
 ];

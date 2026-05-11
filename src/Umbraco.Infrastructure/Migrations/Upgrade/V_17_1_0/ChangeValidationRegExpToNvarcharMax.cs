@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_1_0;
 /// <summary>
 /// Represents a migration that alters the <c>ValidationRegExp</c> column to use <c>nvarchar(max)</c>, allowing for longer regular expression patterns to be stored.
 /// </summary>
-public class ChangeValidationRegExpToNvarcharMax : AsyncMigrationBase
+public class ChangeValidationRegExpToNvarcharMax : MigrationBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_1_0.ChangeValidationRegExpToNvarcharMax"/> class for updating the validation regular expression column type.
@@ -17,13 +17,12 @@ public class ChangeValidationRegExpToNvarcharMax : AsyncMigrationBase
     {
     }
 
-    /// <inheritdoc />
-    protected override Task MigrateAsync()
+    protected override void Migrate()
     {
         // SQLite doesn't need this - text is already unlimited
         if (DatabaseType == DatabaseType.SQLite)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         // Check if column is already nvarchar(max) (CHARACTER_MAXIMUM_LENGTH = -1)
@@ -40,7 +39,7 @@ public class ChangeValidationRegExpToNvarcharMax : AsyncMigrationBase
         // -1 means nvarchar(max) - already migrated
         if (maxLength == -1)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         Alter.Table(Constants.DatabaseSchema.Tables.PropertyType)
@@ -48,7 +47,5 @@ public class ChangeValidationRegExpToNvarcharMax : AsyncMigrationBase
             .AsCustom("nvarchar(max)")
             .Nullable()
             .Do();
-
-        return Task.CompletedTask;
     }
 }

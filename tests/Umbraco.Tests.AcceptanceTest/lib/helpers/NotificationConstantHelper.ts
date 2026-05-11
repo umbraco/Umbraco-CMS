@@ -29,9 +29,7 @@ export class NotificationConstantHelper {
     itemsSorted: 'Items sorted',
     passwordChanged: 'Password changed',
     schedulePublishingUpdated: 'A schedule for publishing has been updated',
-    publishWithDescendants: 'and subpages have been published',
-    elementPublished: 'Element published',
-    elementUnpublished: 'Element unpublished',
+    publishWithDescendants: 'and subpages have been published'
   }
 
   public static readonly error = {

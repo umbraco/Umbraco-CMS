@@ -51,7 +51,7 @@ public abstract class DeliveryApiVersionAwareJsonConverterBase<T> : JsonConverte
     private int? GetApiVersion()
     {
         HttpContext? httpContext = _httpContextAccessor.HttpContext;
-        ApiVersion? apiVersion = httpContext?.RequestedApiVersion;
+        ApiVersion? apiVersion = httpContext?.GetRequestedApiVersion();
 
         return apiVersion?.MajorVersion;
     }

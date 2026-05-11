@@ -10,12 +10,10 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		description: null,
 		icon: 'icon-document',
 		allowedAsRoot: true,
-		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
 		hasChildren: false,
-		noAccess: false,
 		parent: null,
 		isFolder: false,
 		properties: [

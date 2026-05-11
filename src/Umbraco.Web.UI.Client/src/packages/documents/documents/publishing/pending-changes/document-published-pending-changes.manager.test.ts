@@ -3,7 +3,7 @@ import { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbDocumentPublishedPendingChangesManager } from './document-published-pending-changes.manager.js';
-import { UmbDocumentVariantState } from '../../variant-state.js';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { type UmbDocumentDetailModel } from '../../types.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 
@@ -58,7 +58,7 @@ describe('UmbSelectionManager', () => {
 				flags: [],
 				variants: [
 					{
-						state: UmbDocumentVariantState.PUBLISHED,
+						state: DocumentVariantStateModel.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: null,
 						segment: null,
@@ -124,7 +124,7 @@ describe('UmbSelectionManager', () => {
 				flags: [],
 				variants: [
 					{
-						state: UmbDocumentVariantState.PUBLISHED,
+						state: DocumentVariantStateModel.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: 'en-US',
 						segment: null,
@@ -136,7 +136,7 @@ describe('UmbSelectionManager', () => {
 						flags: [],
 					},
 					{
-						state: UmbDocumentVariantState.PUBLISHED,
+						state: DocumentVariantStateModel.PUBLISHED,
 						publishDate: '2023-02-06T15:32:24.957009',
 						culture: 'da-DK',
 						segment: null,

@@ -86,8 +86,10 @@ public abstract class PluginController : Controller, IDiscoverable
     public static PluginControllerMetadata GetMetadata(Type controllerType) =>
         MetadataStorage.GetOrAdd(controllerType, type =>
         {
+            // plugin controller? back-office controller?
             PluginControllerAttribute? pluginAttribute =
                 controllerType.GetCustomAttribute<PluginControllerAttribute>(false);
+            IsBackOfficeAttribute? backOfficeAttribute = controllerType.GetCustomAttribute<IsBackOfficeAttribute>(true);
 
             return new PluginControllerMetadata
             {
@@ -95,6 +97,7 @@ public abstract class PluginController : Controller, IDiscoverable
                 ControllerName = ControllerExtensions.GetControllerName(controllerType),
                 ControllerNamespace = controllerType.Namespace,
                 ControllerType = controllerType,
+                IsBackOffice = backOfficeAttribute != null,
             };
         });
 }

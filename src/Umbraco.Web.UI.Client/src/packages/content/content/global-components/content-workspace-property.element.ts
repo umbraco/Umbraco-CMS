@@ -60,7 +60,7 @@ export class UmbContentWorkspacePropertyElement extends UmbLitElement {
 
 		// The Content Workspace Context is used to retrieve the property type we like to observe.
 		// This gives us the configuration from the property type as part of the data type.
-		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, (workspaceContext) => {
+		this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, async (workspaceContext) => {
 			this._workspaceContext = workspaceContext;
 			this.#observePropertyType();
 		});

@@ -95,8 +95,7 @@ test('can not create content with an entity picker using the tree data source th
   await umbracoUi.content.isChooseButtonVisible(false);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
-test.skip('can not create content with an entity picker using the tree data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
+test('can not create content with an entity picker using the tree data source that has less items than min amount', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   const dataTypeId = await umbracoApi.dataType.createEntityDataPickerDataTypeWithMinAndMaxValues(dataTypeName, treeDataSourceAlias, 2, 5);

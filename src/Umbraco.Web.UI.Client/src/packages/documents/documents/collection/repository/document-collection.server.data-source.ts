@@ -54,7 +54,6 @@ export class UmbDocumentCollectionServerDataSource implements UmbCollectionDataS
 						return {
 							alias: item.alias,
 							culture: item.culture ?? undefined,
-							editorAlias: item.editorAlias,
 							segment: item.segment ?? undefined,
 							value: item.value as string,
 						};

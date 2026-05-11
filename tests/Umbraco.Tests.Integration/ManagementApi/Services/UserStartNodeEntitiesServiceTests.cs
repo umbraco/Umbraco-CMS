@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
+using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -6,22 +8,46 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.ManagementApi.Services;
 
 [TestFixture]
-public partial class UserStartNodeEntitiesServiceTests : UserStartNodeEntitiesServiceTestsBase
+[UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+public partial class UserStartNodeEntitiesServiceTests : UmbracoIntegrationTest
 {
+    private Dictionary<string, IContent> _contentByName = new ();
+    private IUserGroup _userGroup;
+
     private IContentService ContentService => GetRequiredService<IContentService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    protected override UmbracoObjectTypes ObjectType => UmbracoObjectTypes.Document;
+    private IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
-    protected override string SectionAlias => "content";
+    private IUserService UserService => GetRequiredService<IUserService>();
 
-    protected override async Task CreateContentTypeAndHierarchy()
+    private IEntityService EntityService => GetRequiredService<IEntityService>();
+
+    private IUserStartNodeEntitiesService UserStartNodeEntitiesService => GetRequiredService<IUserStartNodeEntitiesService>();
+
+    protected static readonly Ordering BySortOrder = Ordering.By("sortOrder");
+
+    protected override void ConfigureTestServices(IServiceCollection services)
     {
+        base.ConfigureTestServices(services);
+        services.AddTransient<IUserStartNodeEntitiesService, UserStartNodeEntitiesService>();
+    }
+
+    [SetUp]
+    public async Task SetUpTestAsync()
+    {
+        if (_contentByName.Any())
+        {
+            return;
+        }
+
         var contentType = new ContentTypeBuilder()
             .WithAlias("theContentType")
             .Build();
@@ -37,7 +63,7 @@ public partial class UserStartNodeEntitiesServiceTests : UserStartNodeEntitiesSe
                 .WithName($"{rootNumber}")
                 .Build();
             ContentService.Save(root);
-            ItemsByName[root.Name!] = (root.Id, root.Key);
+            _contentByName[root.Name!] = root;
 
             foreach (var childNumber in Enumerable.Range(1, 10))
             {
@@ -47,7 +73,7 @@ public partial class UserStartNodeEntitiesServiceTests : UserStartNodeEntitiesSe
                     .WithName($"{rootNumber}-{childNumber}")
                     .Build();
                 ContentService.Save(child);
-                ItemsByName[child.Name!] = (child.Id, child.Key);
+                _contentByName[child.Name!] = child;
 
                 foreach (var grandChildNumber in Enumerable.Range(1, 5))
                 {
@@ -57,24 +83,52 @@ public partial class UserStartNodeEntitiesServiceTests : UserStartNodeEntitiesSe
                         .WithName($"{rootNumber}-{childNumber}-{grandChildNumber}")
                         .Build();
                     ContentService.Save(grandchild);
-                    ItemsByName[grandchild.Name!] = (grandchild.Id, grandchild.Key);
+                    _contentByName[grandchild.Name!] = grandchild;
                 }
             }
         }
+
+        _userGroup = new UserGroupBuilder()
+            .WithAlias("theGroup")
+            .WithAllowedSections(["content"])
+            .Build();
+        _userGroup.StartContentId = null;
+        await UserGroupService.CreateAsync(_userGroup, Constants.Security.SuperUserKey);
     }
 
-    protected override void ClearUserGroupStartNode(IUserGroup userGroup)
-        => userGroup.StartContentId = null;
+    private async Task<string[]> CreateUserAndGetStartNodePaths(params int[] startNodeIds)
+    {
+        var user = await CreateUser(startNodeIds);
 
-    protected override Cms.Core.Models.Membership.User BuildUserWithStartNodes(int[] startNodeIds)
-        => new UserBuilder()
+        var contentStartNodePaths = user.GetContentStartNodePaths(EntityService, AppCaches.NoCache);
+        Assert.IsNotNull(contentStartNodePaths);
+
+        return contentStartNodePaths;
+    }
+
+    private async Task<int[]> CreateUserAndGetStartNodeIds(params int[] startNodeIds)
+    {
+        var user = await CreateUser(startNodeIds);
+
+        var contentStartNodeIds = user.CalculateContentStartNodeIds(EntityService, AppCaches.NoCache);
+        Assert.IsNotNull(contentStartNodeIds);
+
+        return contentStartNodeIds;
+    }
+
+    private async Task<Core.Models.Membership.User> CreateUser(int[] startNodeIds)
+    {
+        var user = new UserBuilder()
             .WithName(Guid.NewGuid().ToString("N"))
             .WithStartContentIds(startNodeIds)
             .Build();
+        UserService.Save(user);
 
-    protected override string[]? GetStartNodePaths(Cms.Core.Models.Membership.User user)
-        => user.GetContentStartNodePaths(EntityService, AppCaches.NoCache);
+        var attempt = await UserGroupService.AddUsersToUserGroupAsync(
+            new UsersToUserGroupManipulationModel(_userGroup.Key, [user.Key]),
+            Constants.Security.SuperUserKey);
 
-    protected override int[]? CalculateStartNodeIds(Cms.Core.Models.Membership.User user)
-        => user.CalculateContentStartNodeIds(EntityService, AppCaches.NoCache);
+        Assert.IsTrue(attempt.Success);
+        return user;
+    }
 }

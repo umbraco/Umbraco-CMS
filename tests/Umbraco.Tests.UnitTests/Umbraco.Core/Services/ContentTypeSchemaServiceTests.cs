@@ -4,6 +4,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
@@ -25,7 +27,8 @@ public class ContentTypeSchemaServiceTests
         _sut = new ContentTypeSchemaService(
             _contentTypeServiceMock.Object,
             _mediaTypeServiceMock.Object,
-            _publishedContentTypeCacheMock.Object);
+            _publishedContentTypeCacheMock.Object,
+            new DefaultShortStringHelper(new DefaultShortStringHelperConfig()));
     }
 
     [Test]
@@ -51,7 +54,7 @@ public class ContentTypeSchemaServiceTests
         // Assert
         Assert.That(result, Has.Count.EqualTo(1));
         Assert.That(result.First().Alias, Is.EqualTo("cachedType"));
-        Assert.That(result.First().SchemaId, Is.EqualTo("CachedType"));
+        Assert.That(result.First().SchemaId, Is.EqualTo("Cachedtype"));
     }
 
     [Test]
@@ -103,8 +106,8 @@ public class ContentTypeSchemaServiceTests
 
         // Assert
         var schema = result.First();
-        Assert.That(schema.SchemaId, Is.EqualTo("ArticlePage"));
-        Assert.That(schema.CompositionSchemaIds, Is.EquivalentTo(new[] { "BasePage", "SeoComposition" }));
+        Assert.That(schema.SchemaId, Is.EqualTo("Articlepage"));
+        Assert.That(schema.CompositionSchemaIds, Is.EquivalentTo(new[] { "Basepage", "Seocomposition" }));
     }
 
     [Test]
@@ -173,6 +176,6 @@ public class ContentTypeSchemaServiceTests
         // Assert
         Assert.That(result, Has.Count.EqualTo(1));
         Assert.That(result.First().Alias, Is.EqualTo("cachedType"));
-        Assert.That(result.First().SchemaId, Is.EqualTo("CachedType"));
+        Assert.That(result.First().SchemaId, Is.EqualTo("Cachedtype"));
     }
 }

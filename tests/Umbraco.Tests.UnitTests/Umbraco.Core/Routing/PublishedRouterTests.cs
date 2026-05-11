@@ -33,7 +33,7 @@ public class PublishedRouterTests
             Mock.Of<IPublishedUrlProvider>(),
             Mock.Of<IRequestAccessor>(),
             Mock.Of<IPublishedValueFallback>(),
-            Mock.Of<ITemplateService>(),
+            Mock.Of<IFileService>(),
             Mock.Of<IContentTypeService>(),
             umbracoContextAccessor,
             Mock.Of<IEventAggregator>(),

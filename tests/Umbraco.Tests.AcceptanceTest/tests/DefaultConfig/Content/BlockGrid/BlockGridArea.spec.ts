@@ -140,8 +140,7 @@ test('can create content with block grid area with row span', async ({umbracoApi
   await umbracoUi.content.doesBlockAreaContainRowSpan(firstElementTypeName, firstAreaName, rowSpan, 0);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
-test.skip('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with block grid area with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const minAllowed = 2;
@@ -173,8 +172,7 @@ test.skip('can create content with block grid area with min allowed', async ({um
   await umbracoApi.documentType.ensureNameNotExists(secondElementTypeName);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
-test.skip('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with block grid area with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const maxAllowed = 0;
@@ -227,8 +225,7 @@ test('can create content with a block grid area with specified allowance', async
   await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 1);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121
-test.skip('can create content with a block grid area with specified allowance with min allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with a block grid area with specified allowance with min allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const minAllowed = 2;
@@ -255,8 +252,7 @@ test.skip('can create content with a block grid area with specified allowance wi
   await umbracoUi.content.doesBlockContainBlockCountInArea(firstElementTypeName, firstAreaName, 2);
 });
 
-// Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/22121 
-test.skip('can create content with a block grid area with specified allowance with max allowed', async ({umbracoApi, umbracoUi}) => {
+test('can create content with a block grid area with specified allowance with max allowed', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const secondElementTypeId = await umbracoApi.documentType.createEmptyElementType(secondElementTypeName);
   const maxAllowed = 1;

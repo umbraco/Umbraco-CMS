@@ -89,7 +89,7 @@ export {
 };
 
 // Type assertion to ensure this module satisfies UmbMockDataSet
-({
+const _typeCheck: UmbMockDataSet = {
 	dataType,
 	dictionary,
 	document,
@@ -130,4 +130,5 @@ export {
 	webhook,
 	webhookEvent,
 	webhookDelivery,
-} satisfies UmbMockDataSet);
+};
+void _typeCheck;

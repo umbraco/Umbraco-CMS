@@ -6,6 +6,4 @@ internal interface ICacheNodeFactory
 {
     ContentCacheNode ToContentCacheNode(IContent content, bool preview);
     ContentCacheNode ToContentCacheNode(IMedia media);
-
-    ContentCacheNode ToContentCacheNode(IElement element, bool preview);
 }

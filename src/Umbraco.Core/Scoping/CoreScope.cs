@@ -16,9 +16,12 @@ namespace Umbraco.Cms.Core.Scoping;
 public class CoreScope : ICoreScope
 {
     /// <summary>
-    ///     Gets or sets a value indicating whether the scope has been completed.
+    ///     Indicates whether the scope has been completed.
     /// </summary>
-    protected bool? Completed { get; set; }
+    /// <remarks>
+    ///     TODO (V18): Rename to _completed to comply with SA1306 (field names should begin with lowercase), or consider converting to a property.
+    /// </remarks>
+    protected bool? Completed;
     private ICompletable? _scopedFileSystem;
     private IScopedNotificationPublisher? _notificationPublisher;
     private IsolatedCaches? _isolatedCaches;

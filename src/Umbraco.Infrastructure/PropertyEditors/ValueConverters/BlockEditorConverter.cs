@@ -4,6 +4,7 @@
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
@@ -13,10 +14,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 public sealed class BlockEditorConverter
 {
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
+    private readonly ICacheManager _cacheManager;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IVariationContextAccessor _variationContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
-    private readonly IBlockElementService _blockElementService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.PropertyEditors.ValueConverters.BlockEditorConverter"/> class.
@@ -28,16 +29,16 @@ public sealed class BlockEditorConverter
     /// <param name="blockEditorVarianceHandler">Handles variance logic specific to block editor properties.</param>
     public BlockEditorConverter(
         IPublishedContentTypeCache publishedContentTypeCache,
+        ICacheManager cacheManager,
         IPublishedModelFactory publishedModelFactory,
         IVariationContextAccessor variationContextAccessor,
-        BlockEditorVarianceHandler blockEditorVarianceHandler,
-        IBlockElementService blockElementService)
+        BlockEditorVarianceHandler blockEditorVarianceHandler)
     {
         _publishedContentTypeCache = publishedContentTypeCache;
+        _cacheManager = cacheManager;
         _publishedModelFactory = publishedModelFactory;
         _variationContextAccessor = variationContextAccessor;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
-        _blockElementService = blockElementService;
     }
 
     /// <summary>
@@ -65,8 +66,7 @@ public sealed class BlockEditorConverter
             .PropertyTypes
             .ToDictionary(propertyType => propertyType.Alias);
 
-        var alignedProperties = new List<BlockPropertyValue>();
-
+        var propertyValues = new Dictionary<string, object?>();
         foreach (BlockPropertyValue property in data.Values)
         {
             if (!propertyTypesByAlias.TryGetValue(property.Alias, out IPublishedPropertyType? propertyType))
@@ -83,18 +83,36 @@ public sealed class BlockEditorConverter
                 continue;
             }
 
-            alignedProperties.Add(alignedProperty);
+            var expectedCulture = owner.ContentType.VariesByCulture() && publishedContentType.VariesByCulture() && propertyType.VariesByCulture()
+                ? variationContext.Culture
+                : null;
+            var expectedSegment = owner.ContentType.VariesBySegment() && publishedContentType.VariesBySegment() && propertyType.VariesBySegment()
+                ? variationContext.Segment
+                : null;
+
+            if (alignedProperty.Culture.NullOrWhiteSpaceAsNull().InvariantEquals(expectedCulture.NullOrWhiteSpaceAsNull())
+                && alignedProperty.Segment.NullOrWhiteSpaceAsNull().InvariantEquals(expectedSegment.NullOrWhiteSpaceAsNull()))
+            {
+                propertyValues[alignedProperty.Alias] = alignedProperty.Value;
+            }
         }
 
-        var alignedData = new BlockItemData
+        // Get the key from the deserialized object. If this is empty, we can fallback to checking the 'key' if there is one
+        Guid key = data.Key;
+        if (key == Guid.Empty && propertyValues.TryGetValue("key", out var keyo))
         {
-            Values = alignedProperties,
-            ContentTypeAlias = data.ContentTypeAlias,
-            ContentTypeKey = data.ContentTypeKey,
-            Key = data.Key,
-        };
+            Guid.TryParse(keyo!.ToString(), out key);
+        }
 
-        return _blockElementService.BuildElementAsync(alignedData, preview).GetAwaiter().GetResult();
+        if (key == Guid.Empty)
+        {
+            return null;
+        }
+
+        IPublishedElement element = new PublishedElement(publishedContentType, key, propertyValues, preview, referenceCacheLevel, variationContext, _cacheManager);
+        element = _publishedModelFactory.CreateModel(element);
+
+        return element;
     }
 
     /// <summary>

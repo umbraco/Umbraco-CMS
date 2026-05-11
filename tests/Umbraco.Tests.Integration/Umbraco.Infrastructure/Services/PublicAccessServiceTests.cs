@@ -1,8 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Linq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -15,15 +15,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
 {
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
     [SetUp]
-    public async Task CreateTestData()
+    public void CreateTestData()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+        FileService.SaveTemplate(template); // else, FK violation on contentType!
 
         var ct = ContentTypeBuilder.CreateSimpleContentType("blah", "Blah", defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(ct);
 
         _content = ContentBuilder.CreateSimpleContent(ct, "Test");
         ContentService.Save(_content);
@@ -32,6 +31,8 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
     private IContentService ContentService => GetRequiredService<IContentService>();
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
+
+    private IFileService FileService => GetRequiredService<IFileService>();
 
     private IPublicAccessService PublicAccessService => GetRequiredService<IPublicAccessService>();
 

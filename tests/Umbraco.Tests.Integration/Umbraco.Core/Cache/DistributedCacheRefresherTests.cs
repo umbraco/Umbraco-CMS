@@ -19,8 +19,6 @@ internal sealed class DistributedCacheRefresherTests : UmbracoIntegrationTest
 
     private MediaCacheRefresher MediaCacheRefresher => GetRequiredService<MediaCacheRefresher>();
 
-    private ElementCacheRefresher ElementCacheRefresher => GetRequiredService<ElementCacheRefresher>();
-
     [Test]
     public void DistributedContentCacheRefresherClearsElementsCache()
     {
@@ -41,17 +39,6 @@ internal sealed class DistributedCacheRefresherTests : UmbracoIntegrationTest
 
         MediaCacheRefresher.RefreshInternal([new MediaCacheRefresher.JsonPayload(1, Guid.NewGuid(), TreeChangeTypes.RefreshAll)]);
         MediaCacheRefresher.Refresh([new MediaCacheRefresher.JsonPayload(1, Guid.NewGuid(), TreeChangeTypes.RefreshAll)]);
-
-        Assert.IsNull(ElementsCache.Get(cacheKey));
-    }
-
-    [Test]
-    public void DistributedElementCacheRefresherClearsElementsCache()
-    {
-        var cacheKey = "test";
-        PopulateCache("test");
-
-        ElementCacheRefresher.Refresh([new ElementCacheRefresher.JsonPayload(1, Guid.NewGuid(), TreeChangeTypes.RefreshAll)]);
 
         Assert.IsNull(ElementsCache.Get(cacheKey));
     }

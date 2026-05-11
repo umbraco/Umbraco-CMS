@@ -25,6 +25,8 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
 {
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
+    private IFileService FileService => GetRequiredService<IFileService>();
+
     private IDomainService DomainService => GetRequiredService<IDomainService>();
 
     private IContentService ContentService => GetRequiredService<IContentService>();
@@ -54,8 +56,6 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
 
     private IContentBlueprintEditingService ContentBlueprintEditingService => GetRequiredService<IContentBlueprintEditingService>();
 
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
-
     private readonly LanguageBuilder _languageBuilder = new();
 
     private readonly UserBuilder _userBuilder = new();
@@ -80,7 +80,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     {
         // Arrange
         var contentType = ContentTypeBuilder.CreateBasicContentType();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         var content = ContentBuilder.CreateBasicContent(contentType);
         ContentService.Save(content);
@@ -105,10 +105,10 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         var blueprint = ContentBuilder.CreateTextpageContent(contentType, "hello", Constants.System.Root);
         blueprint.SetValue("title", "blueprint 1");
@@ -191,7 +191,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task PropertyEditorTelemetry_Counts_Same_Editor_As_One()
+    public void PropertyEditorTelemetry_Counts_Same_Editor_As_One()
     {
         var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2");
         AddPropType("title", -88, ct2);
@@ -200,9 +200,9 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         var ct5 = ContentTypeBuilder.CreateBasicContentType("ct5", "CT5");
         AddPropType("blah", -88, ct5);
 
-        await ContentTypeService.CreateAsync(ct2, Constants.Security.SuperUserKey);
-        await ContentTypeService.CreateAsync(ct3, Constants.Security.SuperUserKey);
-        await ContentTypeService.CreateAsync(ct5, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(ct2);
+        ContentTypeService.Save(ct3);
+        ContentTypeService.Save(ct5);
 
         var properties = PropertyEditorTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.Properties);
@@ -211,7 +211,7 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task PropertyEditorTelemetry_Can_Get_All_PropertyTypes()
+    public void PropertyEditorTelemetry_Can_Get_All_PropertyTypes()
     {
         var ct2 = ContentTypeBuilder.CreateBasicContentType("ct2", "CT2");
         AddPropType("title", -88, ct2);
@@ -219,8 +219,8 @@ internal sealed class TelemetryProviderTests : UmbracoIntegrationTest
         var ct5 = ContentTypeBuilder.CreateBasicContentType("ct5", "CT5");
         AddPropType("blah", -88, ct5);
 
-        await ContentTypeService.CreateAsync(ct2, Constants.Security.SuperUserKey);
-        await ContentTypeService.CreateAsync(ct5, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(ct2);
+        ContentTypeService.Save(ct5);
 
         var properties = PropertyEditorTelemetryProvider.GetInformation()
             .FirstOrDefault(x => x.Name == Constants.Telemetry.Properties);

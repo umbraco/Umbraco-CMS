@@ -14,9 +14,11 @@ export class UmbDocumentBlockPropertyValueUserPermissionWorkspaceContext extends
 			this.#blockWorkspaceContext = context;
 
 			// We only want to apply the permission logic if the block is in a document
-			const contentWorkspaceContext = await this.getContext(UMB_CONTENT_WORKSPACE_CONTEXT, {
-				passContextAliasMatches: true,
-			}).catch(() => undefined);
+			// TODO: revisit this when getContext supports passContextAliasMatches
+			const contentWorkspaceContext = await this.consumeContext(UMB_CONTENT_WORKSPACE_CONTEXT, () => {})
+				.passContextAliasMatches()
+				.asPromise()
+				.catch(() => undefined);
 
 			if (contentWorkspaceContext?.getEntityType() === UMB_DOCUMENT_ENTITY_TYPE) {
 				this.#observeDocumentBlockProperties();

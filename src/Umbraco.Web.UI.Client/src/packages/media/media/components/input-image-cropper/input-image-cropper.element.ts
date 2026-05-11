@@ -21,11 +21,12 @@ import './image-cropper-focus-setter.element.js';
 import './image-cropper-preview.element.js';
 import './image-cropper.element.js';
 
+const DefaultFocalPoint = { left: 0.5, top: 0.5 };
 const DefaultValue: UmbImageCropperPropertyEditorValue = {
 	temporaryFileId: null,
 	src: '',
 	crops: [],
-	focalPoint: null,
+	focalPoint: DefaultFocalPoint,
 };
 
 @customElement('umb-input-image-cropper')

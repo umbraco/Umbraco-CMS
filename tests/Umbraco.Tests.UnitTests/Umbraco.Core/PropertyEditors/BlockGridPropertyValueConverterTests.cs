@@ -186,31 +186,11 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
 
     private BlockGridPropertyValueConverter CreateConverter()
     {
-        var blockElementServiceMock = new Mock<IBlockElementService>();
-        var publishedContentTypeCache = GetPublishedContentTypeCache();
-        blockElementServiceMock
-            .Setup(service => service.BuildElementAsync(It.IsAny<BlockItemData>(), It.IsAny<bool?>()))
-            .Returns<BlockItemData, bool?>((blockItemData, preview) =>
-            {
-                var publishedElementType = publishedContentTypeCache.Get(PublishedItemType.Element, blockItemData.ContentTypeKey);
-
-                var elementTypeMock = Mock.Of<IPublishedContentType>(mock =>
-                    mock.Variations == publishedElementType.Variations
-                    && mock.Key == publishedElementType.Key
-                    && mock.Alias == publishedElementType.Alias);
-
-                var elementMock = Mock.Of<IPublishedElement>(mock =>
-                    mock.Key == blockItemData.Key
-                    && mock.ContentType == elementTypeMock);
-
-                return Task.FromResult(elementMock);
-            });
-
         var publishedModelFactory = new NoopPublishedModelFactory();
-        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>(), Mock.Of<IVariationContextAccessor>());
+        var blockVarianceHandler = new BlockEditorVarianceHandler(Mock.Of<ILanguageService>(), Mock.Of<IContentTypeService>());
         var editor = new BlockGridPropertyValueConverter(
             Mock.Of<IProfilingLogger>(),
-            new BlockEditorConverter(publishedContentTypeCache, publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler, blockElementServiceMock.Object),
+            new BlockEditorConverter(GetPublishedContentTypeCache(), Mock.Of<ICacheManager>(), publishedModelFactory, Mock.Of<IVariationContextAccessor>(), blockVarianceHandler),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new BlockGridPropertyValueConstructorCache(),

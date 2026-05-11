@@ -11,7 +11,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: UMB_USER_GROUP_COLLECTION_ALIAS,
 		name: 'User Group Collection',
-		api: () => import('./user-group-collection.context.js'),
 		meta: {
 			repositoryAlias: UMB_USER_GROUP_COLLECTION_REPOSITORY_ALIAS,
 		},

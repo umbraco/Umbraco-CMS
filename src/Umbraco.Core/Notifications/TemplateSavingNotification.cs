@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models;
 namespace Umbraco.Cms.Core.Notifications;
 
 /// <summary>
-///     A notification that is used to trigger the <see cref="Services.ITemplateService"/> when a template is saved.
+///     A notification that is used to trigger the IFileService when the SaveTemplate method is called in the API.
 /// </summary>
 /// <remarks>
 ///     This notification is cancelable, allowing handlers to prevent the save operation

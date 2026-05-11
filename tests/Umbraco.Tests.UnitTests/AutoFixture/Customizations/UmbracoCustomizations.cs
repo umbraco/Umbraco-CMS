@@ -2,7 +2,6 @@ using AutoFixture;
 using AutoFixture.Kernel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Moq;
 using Umbraco.Cms.Api.Management.Controllers.Security;
 using Umbraco.Cms.Api.Management.Routing;
@@ -48,14 +47,10 @@ internal sealed class UmbracoCustomizations : ICustomization
             x.With(settings => settings.ApplicationVirtualPath, string.Empty));
 
         fixture.Customize<BackOfficeAreaRoutes>(u => u.FromFactory(
-            () => new BackOfficeAreaRoutes(
-                Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run),
-                Options.Create(new SignalRSettings()))));
+            () => new BackOfficeAreaRoutes(Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
 
         fixture.Customize<PreviewRoutes>(u => u.FromFactory(
-            () => new PreviewRoutes(
-                Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run),
-                Options.Create(new SignalRSettings()))));
+            () => new PreviewRoutes(Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run))));
 
         var httpContextAccessor = new HttpContextAccessor { HttpContext = new DefaultHttpContext() };
         fixture.Customize<HttpContext>(x => x.FromFactory(() => httpContextAccessor.HttpContext));

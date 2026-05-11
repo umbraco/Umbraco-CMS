@@ -21,7 +21,7 @@ export class LanguageUiHelper extends UiBaseLocators {
     this.defaultLanguageToggle = page.locator('uui-toggle').filter({hasText: /Default language/}).locator('#toggle');
     this.mandatoryLanguageToggle = page.locator('uui-toggle').filter({hasText: /Mandatory language/}).locator('#toggle');
     this.addFallbackLanguageBtn = page.locator('#add-button');
-    this.languageTable = page.locator('[data-mark="collection-view:Umb.CollectionView.Language.Table"]');
+    this.languageTable = page.locator('umb-language-table-collection-view');
     this.deleteLanguageEntityAction = page.getByTestId('entity-action:Umb.EntityAction.Language.Delete');
     this.languageCreateBtn = page.getByTestId('collection-action:Umb.CollectionAction.Language.Create');
   }

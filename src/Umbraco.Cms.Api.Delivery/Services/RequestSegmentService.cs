@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.DeliveryApi;
 
 namespace Umbraco.Cms.Api.Delivery.Services;
 
-internal sealed class RequestSegmentService : RequestHeaderHandler, IRequestSegmentService
+internal sealed class RequestSegmentService : RequestHeaderHandler, IRequestSegmentService, IRequestSegmmentService
 {
     public RequestSegmentService(IHttpContextAccessor httpContextAccessor)
         : base(httpContextAccessor)

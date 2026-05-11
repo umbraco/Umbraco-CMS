@@ -79,6 +79,9 @@ public class CoreConfigurationHttpTests : UmbracoIntegrationTestBase
     {
         var contentRoot = GetTestContentRoot();
 
+        // Disable ModelsBuilder to avoid BootFailedException requiring Umbraco.Cms.DevelopmentMode.Backoffice package
+        InMemoryConfiguration["Umbraco:CMS:ModelsBuilder:ModelsMode"] = "Nothing";
+
         return new UmbracoWebApplicationFactory<CoreConfigurationHttpTests>(() => CreateHostBuilder(configureUmbraco, configureApp))
             .WithWebHostBuilder(builder =>
             {

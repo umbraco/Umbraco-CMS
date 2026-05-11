@@ -54,7 +54,6 @@ export class UmbMockEntityFolderManager<MockItemType extends { id: string; name:
 		return {
 			name: item.name,
 			id: item.id,
-			isTrashed: false,
 		};
 	};
 }

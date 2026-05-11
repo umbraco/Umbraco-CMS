@@ -1,9 +1,9 @@
 import type { UmbReferenceModel } from './types.js';
 import type {
-	IReferenceResponseModelDefaultReferenceResponseModel as DefaultReferenceResponseModel,
-	IReferenceResponseModelDocumentReferenceResponseModel as DocumentReferenceResponseModel,
-	IReferenceResponseModelMediaReferenceResponseModel as MediaReferenceResponseModel,
-	IReferenceResponseModelMemberReferenceResponseModel as MemberReferenceResponseModel,
+	DefaultReferenceResponseModel,
+	DocumentReferenceResponseModel,
+	MediaReferenceResponseModel,
+	MemberReferenceResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**

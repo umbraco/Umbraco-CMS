@@ -1,17 +1,25 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Xml.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache.PropertyEditors;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -33,15 +41,16 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
     private IDataValueEditorFactory DataValueEditorFactory => GetRequiredService<IDataValueEditorFactory>();
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+    private ILocalizedTextService TextService => GetRequiredService<ILocalizedTextService>();
+    private IFileService FileService => GetRequiredService<IFileService>();
 
     [Test]
     public async Task Can_Export_DictionaryItems()
     {
         // Arrange
         await CreateDictionaryData();
-        var dictionaryItemService = GetRequiredService<IDictionaryItemService>();
-        var dictionaryItem = await dictionaryItemService.GetAsync("Parent");
+        var localizationService = GetRequiredService<ILocalizationService>();
+        var dictionaryItem = localizationService.GetDictionaryItemByKey("Parent");
 
         var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
         var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
@@ -81,14 +90,14 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Generate_Xml_Representation_Of_Content()
+    public void Can_Generate_Xml_Representation_Of_Content()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+        FileService.SaveTemplate(template); // else, FK violation on contentType!
         var contentType = ContentTypeBuilder.CreateTextPageContentType(
             defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "Root Home", -1);
         ContentService.Save(content, Constants.Security.SuperUserId);
@@ -133,12 +142,12 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Generate_Xml_Representation_Of_Media()
+    public void Can_Generate_Xml_Representation_Of_Media()
     {
         // Arrange
         var mediaType = MediaTypeBuilder.CreateImageMediaType("image2");
 
-        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(mediaType);
 
         // reference, so static ctor runs, so event handlers register
         // and then, this will reset the width, height... because the file does not exist, of course ;-(
@@ -204,11 +213,11 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Serialize_ForContentTypeWithHistoryCleanupPolicy_OutputsSerializedHistoryCleanupPolicy()
+    public void Serialize_ForContentTypeWithHistoryCleanupPolicy_OutputsSerializedHistoryCleanupPolicy()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+        FileService.SaveTemplate(template); // else, FK violation on contentType!
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
 
@@ -219,7 +228,7 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
             KeepLatestVersionPerDayForDays = 2
         };
 
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         // Act
         var element = Serializer.Serialize(contentType);
@@ -237,17 +246,17 @@ internal sealed class EntityXmlSerializerTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Serialize_ForContentTypeWithNullHistoryCleanupPolicy_DoesNotOutputSerializedDefaultPolicy()
+    public void Serialize_ForContentTypeWithNullHistoryCleanupPolicy_DoesNotOutputSerializedDefaultPolicy()
     {
         // Arrange
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+        FileService.SaveTemplate(template); // else, FK violation on contentType!
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
 
         contentType.HistoryCleanup = null;
 
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         var element = Serializer.Serialize(contentType);
 

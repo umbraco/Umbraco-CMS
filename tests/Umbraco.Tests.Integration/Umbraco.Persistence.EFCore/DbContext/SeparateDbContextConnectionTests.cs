@@ -49,7 +49,7 @@ public class SeparateDbContextConnectionTests : UmbracoIntegrationTest
     [Test]
     public async Task Scope_Uses_Own_Connection_When_ShareUmbracoConnection_Is_False()
     {
-        using IEFCoreScope<SeparateDbContext> scope = EfCoreScopeProvider.CreateScope();
+        using IEfCoreScope<SeparateDbContext> scope = EfCoreScopeProvider.CreateScope();
 
         await scope.ExecuteWithContextAsync<Task>(async db =>
         {
@@ -71,7 +71,7 @@ public class SeparateDbContextConnectionTests : UmbracoIntegrationTest
     [Test]
     public async Task Scope_Can_Create_And_Query_Own_Tables()
     {
-        using IEFCoreScope<SeparateDbContext> scope = EfCoreScopeProvider.CreateScope();
+        using IEfCoreScope<SeparateDbContext> scope = EfCoreScopeProvider.CreateScope();
 
         await scope.ExecuteWithContextAsync<Task>(async db =>
         {

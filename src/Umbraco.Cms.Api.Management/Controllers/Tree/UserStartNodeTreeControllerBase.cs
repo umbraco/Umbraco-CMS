@@ -1,11 +1,13 @@
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Models.Entities;
 using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Tree;
 
@@ -21,6 +23,19 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
     private Dictionary<Guid, bool> _accessMap = new();
     private Guid? _dataTypeKey;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    protected UserStartNodeTreeControllerBase(
+        IEntityService entityService,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService)
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+              userStartNodeEntitiesService,
+              dataTypeService)
+    {
+    }
+
 #pragma warning disable CS0618 // Type or member is obsolete
     [Obsolete("Please use the constructor accepting IUserStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     protected UserStartNodeTreeControllerBase(
@@ -34,8 +49,8 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
                 dataTypeService,
                 GetUserStartNodeIds,
                 GetUserStartNodePaths,
-                () => [ItemObjectType]);
-#pragma warning restore CS0618 // Type or member is obsolete>
+                () => ItemObjectType);
+#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserStartNodeTreeControllerBase{TItem}"/> class.
@@ -89,28 +104,14 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
             : MapAccessEntities(_treeFilterService.GetFilteredSiblingEntities(target, before, after, ItemOrdering, out totalBefore, out totalAfter));
 
     /// <inheritdoc />
-    protected override async Task<TItem[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
-    {
-        if (ShouldBypassStartNodeFiltering())
-        {
-            return await base.MapTreeItemViewModelsAsync(parentKey, entities);
-        }
-
-        IEnumerable<Task<TItem?>> tasks = entities.Select(async entity =>
-        {
-            if (_accessMap.TryGetValue(entity.Key, out var hasAccess) is false)
-            {
-                return null;
-            }
-
-            return hasAccess
-                ? await MapTreeItemViewModelAsync(parentKey, entity)
-                : await MapTreeItemViewModelAsNoAccessAsync(parentKey, entity);
-        });
-
-        TItem?[] mapped = await Task.WhenAll(tasks);
-        return mapped.WhereNotNull().ToArray();
-    }
+    protected override TItem[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+        => ShouldBypassStartNodeFiltering()
+            ? base.MapTreeItemViewModels(parentKey, entities)
+            : _treeFilterService.MapWithAccessFiltering(
+                entities,
+                _accessMap,
+                entity => MapTreeItemViewModel(parentKey, entity),
+                entity => MapTreeItemViewModelAsNoAccess(parentKey, entity));
 
     private IEntitySlim[] MapAccessEntities(UserAccessEntity[] userAccessEntities)
     {
@@ -118,9 +119,9 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
         return userAccessEntities.Select(uae => uae.Entity).ToArray();
     }
 
-    private async Task<TItem> MapTreeItemViewModelAsNoAccessAsync(Guid? parentKey, IEntitySlim entity)
+    private TItem MapTreeItemViewModelAsNoAccess(Guid? parentKey, IEntitySlim entity)
     {
-        TItem viewModel = await MapTreeItemViewModelAsync(parentKey, entity);
+        TItem viewModel = MapTreeItemViewModel(parentKey, entity);
         viewModel.NoAccess = true;
         return viewModel;
     }
@@ -141,23 +142,23 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
     {
         private readonly Func<int[]> _getStartNodeIds;
         private readonly Func<string[]> _getStartNodePaths;
-        private readonly Func<UmbracoObjectTypes[]> _getTreeObjectTypes;
+        private readonly Func<UmbracoObjectTypes> _getTreeObjectType;
 
         public CallbackStartNodeTreeFilterService(
             IUserStartNodeEntitiesService userStartNodeEntitiesService,
             IDataTypeService dataTypeService,
             Func<int[]> getStartNodeIds,
             Func<string[]> getStartNodePaths,
-            Func<UmbracoObjectTypes[]> getTreeObjectTypes)
+            Func<UmbracoObjectTypes> getTreeObjectType)
             : base(userStartNodeEntitiesService, dataTypeService)
         {
             _getStartNodeIds = getStartNodeIds;
             _getStartNodePaths = getStartNodePaths;
-            _getTreeObjectTypes = getTreeObjectTypes;
+            _getTreeObjectType = getTreeObjectType;
         }
 
         /// <inheritdoc />
-        protected override UmbracoObjectTypes[] TreeObjectTypes => _getTreeObjectTypes();
+        protected override UmbracoObjectTypes TreeObjectType => _getTreeObjectType();
 
         /// <inheritdoc />
         protected override int[] CalculateUserStartNodeIds() => _getStartNodeIds();

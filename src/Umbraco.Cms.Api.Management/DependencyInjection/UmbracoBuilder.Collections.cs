@@ -11,8 +11,7 @@ namespace Umbraco.Extensions
         internal static void AddCollectionBuilders(this IUmbracoBuilder builder)
         {
             builder.FlagProviders()
-                .Append<HasDocumentScheduleFlagProvider>()
-                .Append<HasElementScheduleFlagProvider>()
+                .Append<HasScheduleFlagProvider>()
                 .Append<IsProtectedFlagProvider>()
                 .Append<HasPendingChangesFlagProvider>()
                 .Append<HasCollectionFlagProvider>();

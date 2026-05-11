@@ -8,7 +8,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Icon Picker',
 			icon: 'icon-autofill',
 			group: 'common',
-			keywords: ['icon', 'symbol', 'glyph'],
 			settings: {
 				properties: [
 					{

@@ -4,7 +4,6 @@ using Umbraco.Cms.Core.DynamicRoot.QuerySteps;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Services.Implement;
@@ -47,7 +46,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IMediaTypeContainerRepository, MediaTypeContainerRepository>();
         builder.Services.AddUnique<IMediaTypeRepository, MediaTypeRepository>();
         builder.Services.AddUnique<IMemberGroupRepository, MemberGroupRepository>();
-        builder.Services.AddUnique<IMemberRepository>(sp => ActivatorUtilities.CreateInstance<MemberRepository>(sp));
+        builder.Services.AddUnique<IMemberRepository, MemberRepository>();
         builder.Services.AddUnique<IExternalMemberRepository, ExternalMemberRepository>();
         builder.Services.AddUnique<IMemberFilterRepository, MemberFilterRepository>();
         builder.Services.AddUnique<IMemberTypeContainerRepository, MemberTypeContainerRepository>();
@@ -94,9 +93,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDatabaseReadOnlyAccessor, DatabaseReadOnlyAccessor>();
         builder.Services.AddUnique<ILastSyncedRepository, ServerRoleAwareLastSyncedRepository>();
         builder.Services.AddUnique<IDistributedJobRepository, DistributedJobRepository>();
-        builder.Services.AddUnique<IElementRepository, ElementRepository>();
-        builder.Services.AddUnique<IElementContainerRepository, ElementContainerRepository>();
-        builder.Services.AddUnique<IElementVersionRepository, ElementVersionRepository>();
 
         return builder;
     }

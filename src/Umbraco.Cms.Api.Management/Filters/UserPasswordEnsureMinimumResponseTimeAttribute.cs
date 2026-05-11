@@ -20,8 +20,8 @@ internal sealed class UserPasswordEnsureMinimumResponseTimeAttribute : TypeFilte
         /// Initializes a new instance of the <see cref="UserPasswordEnsureMinimumResponseTimeFilter"/> class with the specified user password configuration settings.
         /// </summary>
         /// <param name="options">The options containing user password configuration settings.</param>
-        public UserPasswordEnsureMinimumResponseTimeFilter(IOptions<SecuritySettings> options)
-            : base(options.Value.UserPassword.MinimumResponseTime)
+        public UserPasswordEnsureMinimumResponseTimeFilter(IOptions<UserPasswordConfigurationSettings> options)
+            : base(options.Value.MinimumResponseTime)
         {
         }
     }

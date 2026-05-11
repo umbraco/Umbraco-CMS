@@ -13,14 +13,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Upgrade;
 public class UmbracoPlanTests
 {
     [Test]
-    public void GetVersionForState_InitialState_Returns_16_4_0()
+    public void GetVersionForState_InitialState_Returns_9_4_0()
     {
         UmbracoPlan plan = CreateUmbracoPlan();
 
         // InitialState is documented as the final migration state of 9.4.
         SemVersion? result = plan.GetVersionForState(plan.InitialState);
 
-        Assert.AreEqual(new SemVersion(16, 4, 0), result);
+        Assert.AreEqual(new SemVersion(9, 4, 0), result);
     }
 
     [Test]
@@ -48,6 +48,17 @@ public class UmbracoPlanTests
     }
 
     [Test]
+    public void GetVersionForState_V13_5_0_Returns_Correct_Version()
+    {
+        UmbracoPlan plan = CreateUmbracoPlan();
+
+        // Last migration state of the v13.5.0 block (ChangeRedirectUrlToNvarcharMax).
+        SemVersion? result = plan.GetVersionForState("{CC47C751-A81B-489A-A2BC-0240245DB687}");
+
+        Assert.AreEqual(new SemVersion(13, 5, 0), result);
+    }
+
+    [Test]
     public void GetVersionForState_V17_2_0_Returns_Correct_Version()
     {
         UmbracoPlan plan = CreateUmbracoPlan();
@@ -70,7 +81,6 @@ public class UmbracoPlanTests
     }
 
     [Test]
-    [Ignore("Current plan has no no-op migrations, enable and update state-id/version when one exists.")]
     public void GetVersionForState_NoopMigration_Carries_Forward_Previous_Version()
     {
         UmbracoPlan plan = CreateUmbracoPlan();
@@ -83,7 +93,6 @@ public class UmbracoPlanTests
     }
 
     [Test]
-
     public void GetVersionForState_V17_0_0_Returns_Correct_Version()
     {
         UmbracoPlan plan = CreateUmbracoPlan();

@@ -4,6 +4,7 @@ import { UmbMockEntityItemManager } from './utils/entity/entity-item.manager.js'
 import { UmbMockEntityDetailManager } from './utils/entity/entity-detail.manager.js';
 import { umbDocumentTypeMockDb } from './document-type.db.js';
 import { UmbEntityMockDbBase } from './utils/entity/entity-base.js';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type {
 	CreateDocumentBlueprintRequestModel,
@@ -11,10 +12,7 @@ import type {
 	DocumentBlueprintResponseModel,
 	DocumentBlueprintTreeItemResponseModel,
 	DocumentValueResponseModel,
-	DocumentVariantResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-
-type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 export class UmbDocumentBlueprintMockDB extends UmbEntityMockDbBase<UmbMockDocumentBlueprintModel> {
 	tree = new UmbMockEntityTreeManager<UmbMockDocumentBlueprintModel>(this, treeItemMapper);
@@ -45,7 +43,6 @@ const treeItemMapper = (model: UmbMockDocumentBlueprintModel): DocumentBlueprint
 		name: model.name,
 		parent: model.parent,
 		flags: model.flags,
-		noAccess: model.noAccess,
 	};
 };
 
@@ -76,14 +73,13 @@ const createMockDocumentBlueprintMapper = (
 				name: variantRequest.name,
 				createDate: now,
 				updateDate: now,
-				state: 'Draft' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: null,
 				id: UmbId.new(),
 				flags: [],
 			};
 		}),
 		flags: [],
-		noAccess: false,
 	};
 };
 

@@ -37,6 +37,27 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
     private readonly AppCaches? _appCaches;
     private readonly IBackOfficeSecurityAccessor? _backofficeSecurityAccessor;
 
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    protected DocumentTreeControllerBase(
+        IEntityService entityService,
+        IUserStartNodeEntitiesService userStartNodeEntitiesService,
+        IDataTypeService dataTypeService,
+        IPublicAccessService publicAccessService,
+        AppCaches appCaches,
+        IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+        IDocumentPresentationFactory documentPresentationFactory)
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+              userStartNodeEntitiesService,
+              dataTypeService,
+              publicAccessService,
+              appCaches,
+              backofficeSecurityAccessor,
+              documentPresentationFactory)
+    {
+    }
+
     [Obsolete("Please use the constructor accepting IDocumentStartNodeTreeFilterService. Scheduled for removal in Umbraco 19.")]
     protected DocumentTreeControllerBase(
         IEntityService entityService,
@@ -108,9 +129,9 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
 
     protected override Ordering ItemOrdering => Ordering.By(Infrastructure.Persistence.Dtos.NodeDto.SortOrderColumnName);
 
-    protected override async Task<DocumentTreeItemResponseModel> MapTreeItemViewModelAsync(Guid? parentId, IEntitySlim entity)
+    protected override DocumentTreeItemResponseModel MapTreeItemViewModel(Guid? parentId, IEntitySlim entity)
     {
-        DocumentTreeItemResponseModel responseModel = await base.MapTreeItemViewModelAsync(parentId, entity);
+        DocumentTreeItemResponseModel responseModel = base.MapTreeItemViewModel(parentId, entity);
 
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
@@ -121,7 +142,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
             responseModel.Id = entity.Key;
             responseModel.CreateDate = entity.CreateDate;
 
-            responseModel.Variants = await _documentPresentationFactory.CreateVariantsItemResponseModelsAsync(documentEntitySlim);
+            responseModel.Variants = _documentPresentationFactory.CreateVariantsItemResponseModels(documentEntitySlim);
             responseModel.DocumentType = _documentPresentationFactory.CreateDocumentTypeReferenceResponseModel(documentEntitySlim);
         }
 

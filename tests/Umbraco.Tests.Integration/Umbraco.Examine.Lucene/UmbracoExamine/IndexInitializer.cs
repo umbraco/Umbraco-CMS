@@ -30,6 +30,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine;
 public class IndexInitializer
 {
     private readonly IOptions<ContentSettings> _contentSettings;
+    private readonly ILocalizationService _localizationService;
     private readonly ILoggerFactory _loggerFactory;
     private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
     private readonly PropertyEditorCollection _propertyEditors;
@@ -47,6 +48,7 @@ public class IndexInitializer
         IScopeProvider scopeProvider,
         ILoggerFactory loggerFactory,
         IOptions<ContentSettings> contentSettings,
+        ILocalizationService localizationService,
         IContentTypeService contentTypeService,
         IDocumentUrlService documentUrlService,
         ILanguageService languageService,
@@ -58,6 +60,7 @@ public class IndexInitializer
         _scopeProvider = scopeProvider;
         _loggerFactory = loggerFactory;
         _contentSettings = contentSettings;
+        _localizationService = localizationService;
         _contentTypeService = contentTypeService;
         _documentUrlService = documentUrlService;
         _languageService = languageService;
@@ -73,6 +76,7 @@ public class IndexInitializer
             _shortStringHelper,
             _scopeProvider,
             publishedValuesOnly,
+            _localizationService,
             _contentTypeService,
             _loggerFactory.CreateLogger<ContentValueSetBuilder>(),
             _documentUrlService,
@@ -196,12 +200,8 @@ public class IndexInitializer
         return mediaServiceMock.Object;
     }
 
-    public ILanguageService GetMockLanguageService()
-    {
-        var mock = new Mock<ILanguageService>();
-        mock.Setup(x => x.GetAllAsync()).ReturnsAsync(Array.Empty<ILanguage>());
-        return mock.Object;
-    }
+    public ILocalizationService GetMockLocalizationService() =>
+        Mock.Of<ILocalizationService>(x => x.GetAllLanguages() == Array.Empty<ILanguage>());
 
     public static IMediaTypeService GetMockMediaTypeService(IShortStringHelper shortStringHelper)
     {
@@ -229,12 +229,12 @@ public class IndexInitializer
         IRuntimeState runtimeState,
         Directory luceneDir,
         Analyzer analyzer = null,
-        ILanguageService languageService = null,
+        ILocalizationService languageService = null,
         IContentValueSetValidator validator = null)
     {
         if (languageService == null)
         {
-            languageService = GetMockLanguageService();
+            languageService = GetMockLocalizationService();
         }
 
         if (analyzer == null)

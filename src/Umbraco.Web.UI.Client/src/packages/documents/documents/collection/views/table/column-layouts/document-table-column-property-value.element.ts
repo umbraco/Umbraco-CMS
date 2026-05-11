@@ -1,9 +1,9 @@
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
 import { customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbDocumentVariantState } from '../../../../variant-state.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-document-table-column-property-value')
 export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement implements UmbTableColumnLayoutElement {
@@ -47,36 +47,35 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 		const item = this.value.item;
 		switch (alias) {
 			case 'contentTypeAlias':
-				return { value: item.documentType.alias };
+				return item.documentType.alias;
 			case 'createDate':
-				return { value: this._createDate?.toLocaleString() };
+				return this._createDate?.toLocaleString();
 			case 'creator':
 			case 'owner':
-				return { value: item.creator };
+				return item.creator;
 			case 'published':
-				return { value: this._state !== UmbDocumentVariantState.DRAFT ? 'True' : 'False' };
+				return this._state !== DocumentVariantStateModel.DRAFT ? 'True' : 'False';
 			case 'sortOrder':
-				return { value: item.sortOrder };
+				return item.sortOrder;
 			case 'updateDate':
-				return { value: this._updateDate?.toLocaleString() };
+				return this._updateDate?.toLocaleString();
 			case 'updater':
-				return { value: item.updater };
+				return item.updater;
 			default: {
 				const culture = this.#resolver.getCulture();
 				const prop = item.values.find((x) => x.alias === alias && (!x.culture || x.culture === culture));
-				return { value: prop?.value ?? '', editorAlias: prop?.editorAlias };
+				return prop?.value ?? '';
 			}
 		}
 	}
 
 	override render() {
 		if (!this.value) return nothing;
-		const { value, editorAlias } = this.#getPropertyValueByAlias();
+		const value = this.#getPropertyValueByAlias();
 		return when(
 			this.column.labelTemplate,
 			() => html`<umb-ufm-render inline .markdown=${this.column.labelTemplate} .value=${{ value }}></umb-ufm-render>`,
-			() =>
-				editorAlias ? html`<umb-value-summary-extension .valueType=${editorAlias} .value=${value}></umb-value-summary-extension>` : value,
+			() => html`${value}`,
 		);
 	}
 }

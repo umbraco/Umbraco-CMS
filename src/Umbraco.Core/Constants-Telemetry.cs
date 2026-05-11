@@ -7,174 +7,176 @@ public static partial class Constants
     /// </summary>
     public static class Telemetry
     {
+        // TODO (V18): Convert these static fields to const to comply with SA1401 (fields should be private)
+
         /// <summary>
         ///     The telemetry key for the count of root content nodes.
         /// </summary>
-        public const string RootCount = "RootCount";
+        public static string RootCount = "RootCount";
 
         /// <summary>
         ///     The telemetry key for the count of domains configured.
         /// </summary>
-        public const string DomainCount = "DomainCount";
+        public static string DomainCount = "DomainCount";
 
         /// <summary>
         ///     The telemetry key for the count of Examine search indexes.
         /// </summary>
-        public const string ExamineIndexCount = "ExamineIndexCount";
+        public static string ExamineIndexCount = "ExamineIndexCount";
 
         /// <summary>
         ///     The telemetry key for the count of languages configured.
         /// </summary>
-        public const string LanguageCount = "LanguageCount";
+        public static string LanguageCount = "LanguageCount";
 
         /// <summary>
         ///     The telemetry key for the count of media items.
         /// </summary>
-        public const string MediaCount = "MediaCount";
+        public static string MediaCount = "MediaCount";
 
         /// <summary>
         ///     The telemetry key for the count of members.
         /// </summary>
-        public const string MemberCount = "MemberCount";
+        public static string MemberCount = "MemberCount";
 
         /// <summary>
         ///     The telemetry key for the count of templates.
         /// </summary>
-        public const string TemplateCount = "TemplateCount";
+        public static string TemplateCount = "TemplateCount";
 
         /// <summary>
         ///     The telemetry key for the count of content items.
         /// </summary>
-        public const string ContentCount = "ContentCount";
+        public static string ContentCount = "ContentCount";
 
         /// <summary>
         ///     The telemetry key for the count of document types.
         /// </summary>
-        public const string DocumentTypeCount = "DocumentTypeCount";
+        public static string DocumentTypeCount = "DocumentTypeCount";
 
         /// <summary>
         ///     The telemetry key for property information.
         /// </summary>
-        public const string Properties = "Properties";
+        public static string Properties = "Properties";
 
         /// <summary>
         ///     The telemetry key for the count of users.
         /// </summary>
-        public const string UserCount = "UserCount";
+        public static string UserCount = "UserCount";
 
         /// <summary>
         ///     The telemetry key for the count of user groups.
         /// </summary>
-        public const string UserGroupCount = "UserGroupCount";
+        public static string UserGroupCount = "UserGroupCount";
 
         /// <summary>
         ///     The telemetry key for the server operating system.
         /// </summary>
-        public const string ServerOs = "ServerOs";
+        public static string ServerOs = "ServerOs";
 
         /// <summary>
         ///     The telemetry key for the server framework version.
         /// </summary>
-        public const string ServerFramework = "ServerFramework";
+        public static string ServerFramework = "ServerFramework";
 
         /// <summary>
         ///     The telemetry key for the operating system language.
         /// </summary>
-        public const string OsLanguage = "OsLanguage";
+        public static string OsLanguage = "OsLanguage";
 
         /// <summary>
         ///     The telemetry key for the web server type.
         /// </summary>
-        public const string WebServer = "WebServer";
+        public static string WebServer = "WebServer";
 
         /// <summary>
         ///     The telemetry key for the Models Builder mode.
         /// </summary>
-        public const string ModelsBuilderMode = "ModelBuilderMode";
+        public static string ModelsBuilderMode = "ModelBuilderMode";
 
         /// <summary>
         ///     The telemetry key for the ASP.NET Core environment name.
         /// </summary>
-        public const string AspEnvironment = "AspEnvironment";
+        public static string AspEnvironment = "AspEnvironment";
 
         /// <summary>
         ///     The telemetry key indicating whether debug mode is enabled.
         /// </summary>
-        public const string IsDebug = "IsDebug";
+        public static string IsDebug = "IsDebug";
 
         /// <summary>
         ///     The telemetry key for the database provider type.
         /// </summary>
-        public const string DatabaseProvider = "DatabaseProvider";
+        public static string DatabaseProvider = "DatabaseProvider";
 
         /// <summary>
         ///     The telemetry key for the current server role in a load-balanced environment.
         /// </summary>
-        public const string CurrentServerRole = "CurrentServerRole";
+        public static string CurrentServerRole = "CurrentServerRole";
 
         /// <summary>
         ///     The telemetry key for the runtime mode.
         /// </summary>
-        public const string RuntimeMode = "RuntimeMode";
+        public static string RuntimeMode = "RuntimeMode";
 
         /// <summary>
         ///     The telemetry key for the count of backoffice external login providers.
         /// </summary>
-        public const string BackofficeExternalLoginProviderCount = "BackofficeExternalLoginProviderCount";
+        public static string BackofficeExternalLoginProviderCount = "BackofficeExternalLoginProviderCount";
 
         /// <summary>
         ///     The telemetry key indicating whether the Delivery API is enabled.
         /// </summary>
-        public const string DeliverApiEnabled = "DeliverApiEnabled";
+        public static string DeliverApiEnabled = "DeliverApiEnabled";
 
         /// <summary>
         ///     The telemetry key for Delivery API public access configuration.
         /// </summary>
-        public const string DeliveryApiPublicAccess = "DeliveryApiPublicAccess";
+        public static string DeliveryApiPublicAccess = "DeliveryApiPublicAccess";
 
         /// <summary>
         ///     The prefix used for webhook-related telemetry keys.
         /// </summary>
-        public const string WebhookPrefix = "WebhookCount_";
+        public static string WebhookPrefix = "WebhookCount_";
 
         /// <summary>
         ///     The telemetry key for the total count of webhooks.
         /// </summary>
-        public const string WebhookTotal = WebhookPrefix + "Total";
+        public static string WebhookTotal = $"{WebhookPrefix}Total";
 
         /// <summary>
         ///     The telemetry key for the count of webhooks with custom headers.
         /// </summary>
-        public const string WebhookCustomHeaders = WebhookPrefix + "CustomHeaders";
+        public static string WebhookCustomHeaders = $"{WebhookPrefix}CustomHeaders";
 
         /// <summary>
         ///     The telemetry key for the count of webhooks with custom events.
         /// </summary>
-        public const string WebhookCustomEvent = WebhookPrefix + "CustomEvent";
+        public static string WebhookCustomEvent = $"{WebhookPrefix}CustomEvent";
 
         /// <summary>
         ///     The telemetry key for the count of rich text editors.
         /// </summary>
-        public const string RichTextEditorCount = "RichTextEditorCount";
+        public static string RichTextEditorCount = "RichTextEditorCount";
 
         /// <summary>
         ///     The telemetry key for the count of rich text blocks.
         /// </summary>
-        public const string RichTextBlockCount = "RichTextBlockCount";
+        public static string RichTextBlockCount = "RichTextBlockCount";
 
         /// <summary>
         ///     The telemetry key for the total count of properties across all content types.
         /// </summary>
-        public const string TotalPropertyCount = "TotalPropertyCount";
+        public static string TotalPropertyCount = "TotalPropertyCount";
 
         /// <summary>
         ///     The telemetry key for the highest property count on a single content type.
         /// </summary>
-        public const string HighestPropertyCount = "HighestPropertyCount";
+        public static string HighestPropertyCount = "HighestPropertyCount";
 
         /// <summary>
         ///     The telemetry key for the total count of compositions used.
         /// </summary>
-        public const string TotalCompositions = "TotalCompositions";
+        public static string TotalCompositions = "TotalCompositions";
     }
 }

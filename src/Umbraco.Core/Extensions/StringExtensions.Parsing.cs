@@ -21,41 +21,11 @@ public static partial class StringExtensions
 #pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
-    /// Extracts the parent ID from a path string.
-    /// </summary>
-    /// <param name="path">The path string, expected as a comma-delimited collection of integers (e.g., "-1,1234,5678").</param>
-    /// <returns>The parent ID (second-to-last segment), or <see cref="Constants.System.Root"/> if the path has no commas.</returns>
-    public static int GetParentIdFromPath(this string path)
-    {
-        ReadOnlySpan<char> pathSpan = path.AsSpan();
-        var lastCommaIndex = pathSpan.LastIndexOf(',');
-
-        if (lastCommaIndex <= 0)
-        {
-            return Constants.System.Root;
-        }
-
-        ReadOnlySpan<char> beforeLastSegment = pathSpan[..lastCommaIndex];
-        var secondLastCommaIndex = beforeLastSegment.LastIndexOf(',');
-
-        ReadOnlySpan<char> parentIdSpan = secondLastCommaIndex < 0
-            ? beforeLastSegment
-            : beforeLastSegment[(secondLastCommaIndex + 1)..];
-
-        return int.Parse(parentIdSpan, NumberStyles.Integer, CultureInfo.InvariantCulture);
-    }
-
-    /// <summary>
     /// Converts a path string to an array of node IDs in reverse order (deepest to shallowest).
     /// </summary>
     /// <param name="path">The path string, expected as a comma-delimited collection of integers.</param>
-    /// <returns>An array of integers matching the provided path.</returns>
-    /// <remarks>
-    /// Parsing uses <see cref="CultureInfo.InvariantCulture"/> because paths persist the root
-    /// marker as ASCII "-1", which fails to parse under cultures whose
-    /// <see cref="NumberFormatInfo.NegativeSign"/> is not the ASCII hyphen-minus.
-    /// </remarks>
-    public static int[] GetIdsFromPath(this string path)
+    /// <returns>An array of integers matching the provided path, in reverse order.</returns>
+    public static int[] GetIdsFromPathReversed(this string path)
     {
         ReadOnlySpan<char> pathSpan = path.AsSpan();
 
@@ -74,22 +44,14 @@ public static partial class StringExtensions
             }
         }
 
-        return [.. nodeIds];
-    }
+        var result = new int[nodeIds.Count];
+        var resultIndex = 0;
+        for (int i = nodeIds.Count - 1; i >= 0; i--)
+        {
+            result[resultIndex++] = nodeIds[i];
+        }
 
-    /// <summary>
-    /// Converts a path string to an array of node IDs in reverse order (deepest to shallowest).
-    /// </summary>
-    /// <param name="path">The path string, expected as a comma-delimited collection of integers.</param>
-    /// <returns>An array of integers matching the provided path, in reverse order.</returns>
-    /// <remarks>
-    /// See <see cref="GetIdsFromPath"/> for parsing semantics.
-    /// </remarks>
-    public static int[] GetIdsFromPathReversed(this string path)
-    {
-        int[] ids = path.GetIdsFromPath();
-        Array.Reverse(ids);
-        return ids;
+        return result;
     }
 
     /// <summary>

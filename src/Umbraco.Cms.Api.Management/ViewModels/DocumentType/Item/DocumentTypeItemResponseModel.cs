@@ -13,17 +13,12 @@ public class DocumentTypeItemResponseModel : NamedItemResponseModelBase
     public bool IsElement { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether this document type is an element allowed in the library.
-    /// </summary>
-    public bool AllowedInLibrary { get; set; }
-
-    /// <summary>
     /// Gets or sets the icon associated with the document type.
     /// </summary>
     public string? Icon { get; set; }
 
     /// <summary>
-    /// Gets or sets the description of the document type.
+    /// The description of the document type.
     /// </summary>
     public string? Description { get; set; }
 }

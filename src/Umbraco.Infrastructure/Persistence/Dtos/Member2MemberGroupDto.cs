@@ -12,7 +12,7 @@ internal sealed class Member2MemberGroupDto
     public const string TableName = Constants.DatabaseSchema.Tables.Member2MemberGroup;
     public const string MemberColumnName = "Member";
 
-    public const string MemberGroupColumnName = "MemberGroup";
+    private const string MemberGroupColumnName = "MemberGroup";
 
     /// <summary>
     /// Gets or sets the unique identifier of the member.

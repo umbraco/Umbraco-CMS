@@ -374,7 +374,7 @@ public class BlockEditorVarianceHandlerTests
             // This is tested by AlignExposeVariance_Skips_When_ElementType_Not_Found.
             return null!;
         });
-        return new BlockEditorVarianceHandler(languageServiceMock.Object, contentTypeServiceMock.Object, Mock.Of<IVariationContextAccessor>());
+        return new BlockEditorVarianceHandler(languageServiceMock.Object, contentTypeServiceMock.Object);
     }
 
     private static IPublishedPropertyType PublishedPropertyType(ContentVariation variation)

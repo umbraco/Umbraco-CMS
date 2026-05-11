@@ -105,10 +105,5 @@ public static partial class Constants
         ///     All document URL aliases.
         /// </summary>
         public const int DocumentUrlAliases = -348;
-
-        /// <summary>
-        ///     The entire element tree, i.e. all element items.
-        /// </summary>
-        public const int ElementTree = -349;
     }
 }

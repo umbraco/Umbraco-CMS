@@ -77,12 +77,7 @@ public class ElementSwitchValidator : IElementSwitchValidator
 
     /// <inheritdoc />
     public Task<bool> DocumentToElementHasNoContentAsync(IContentTypeBase contentType) =>
-        HasNoContentNodesAsync(contentType);
 
-    /// <inheritdoc />
-    public Task<bool> ElementToDocumentHasNoContentAsync(IContentTypeBase contentType) =>
-        HasNoContentNodesAsync(contentType);
-
-    private Task<bool> HasNoContentNodesAsync(IContentTypeBase contentType) =>
+        // if any content for the content type exists, the validation fails.
         Task.FromResult(_contentTypeService.HasContentNodes(contentType.Id) is false);
 }

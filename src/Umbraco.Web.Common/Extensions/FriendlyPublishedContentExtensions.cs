@@ -16,197 +16,56 @@ namespace Umbraco.Extensions;
 
 public static class FriendlyPublishedContentExtensions
 {
-    private static IVariationContextAccessor? _variationContextAccessor;
-    private static IDomainCache? _domainCache;
-    private static IPublishedContentCache? _publishedContentCache;
-    private static IDocumentNavigationQueryService? _documentNavigationQueryService;
-    private static IMediaNavigationQueryService? _mediaNavigationQueryService;
-    private static IPublishedModelFactory? _publishedModelFactory;
-    private static IPublishedUrlProvider? _publishedUrlProvider;
-    private static IUmbracoContextAccessor? _umbracoContextAccessor;
-    private static ISiteDomainMapper? _siteDomainHelper;
-    private static IExamineManager? _examineManager;
-    private static ITemplateService? _templateService;
-    private static IOptions<WebRoutingSettings>? _webRoutingSettings;
-    private static IContentTypeService? _contentTypeService;
-    private static IPublishedValueFallback? _publishedValueFallback;
-    private static IMediaTypeService? _mediaTypeService;
-    private static IMemberTypeService? _memberTypeService;
-    private static IDocumentUrlService? _documentUrlService;
+    private static IVariationContextAccessor VariationContextAccessor { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>();
 
-    private static IVariationContextAccessor VariationContextAccessor
-    {
-        get
-        {
-            _variationContextAccessor ??= StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>();
-            return _variationContextAccessor;
-        }
-    }
+    private static IDomainCache DomainCache { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IDomainCache>();
 
-    private static IDomainCache DomainCache
-    {
-        get
-        {
-            _domainCache ??= StaticServiceProvider.Instance.GetRequiredService<IDomainCache>();
-            return _domainCache;
-        }
-    }
+    private static IPublishedContentCache PublishedContentCache { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
 
-    private static IPublishedContentCache PublishedContentCache
-    {
-        get
-        {
-            _publishedContentCache ??= StaticServiceProvider.Instance.GetRequiredService<IPublishedContentCache>();
-            return _publishedContentCache;
-        }
-    }
+    private static IDocumentNavigationQueryService DocumentNavigationQueryService { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
 
-    private static IDocumentNavigationQueryService DocumentNavigationQueryService
-    {
-        get
-        {
-            _documentNavigationQueryService ??= StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>();
-            return _documentNavigationQueryService;
-        }
-    }
+    private static IMediaNavigationQueryService MediaNavigationQueryService { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
 
-    private static IMediaNavigationQueryService MediaNavigationQueryService
-    {
-        get
-        {
-            _mediaNavigationQueryService ??= StaticServiceProvider.Instance.GetRequiredService<IMediaNavigationQueryService>();
-            return _mediaNavigationQueryService;
-        }
-    }
+    private static IPublishedModelFactory PublishedModelFactory { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedModelFactory>();
 
-    private static IPublishedModelFactory PublishedModelFactory
-    {
-        get
-        {
-            _publishedModelFactory ??= StaticServiceProvider.Instance.GetRequiredService<IPublishedModelFactory>();
-            return _publishedModelFactory;
-        }
-    }
+    private static IPublishedUrlProvider PublishedUrlProvider { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>();
 
-    private static IPublishedUrlProvider PublishedUrlProvider
-    {
-        get
-        {
-            _publishedUrlProvider ??= StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>();
-            return _publishedUrlProvider;
-        }
-    }
+    private static IUserService UserService { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IUserService>();
 
-    private static IUmbracoContextAccessor UmbracoContextAccessor
-    {
-        get
-        {
-            _umbracoContextAccessor ??= StaticServiceProvider.Instance.GetRequiredService<IUmbracoContextAccessor>();
-            return _umbracoContextAccessor;
-        }
-    }
+    private static IUmbracoContextAccessor UmbracoContextAccessor { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IUmbracoContextAccessor>();
 
-    private static ISiteDomainMapper SiteDomainHelper
-    {
-        get
-        {
-            _siteDomainHelper ??= StaticServiceProvider.Instance.GetRequiredService<ISiteDomainMapper>();
-            return _siteDomainHelper;
-        }
-    }
+    private static ISiteDomainMapper SiteDomainHelper { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<ISiteDomainMapper>();
 
-    private static IExamineManager ExamineManager
-    {
-        get
-        {
-            _examineManager ??= StaticServiceProvider.Instance.GetRequiredService<IExamineManager>();
-            return _examineManager;
-        }
-    }
+    private static IExamineManager ExamineManager { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IExamineManager>();
 
-    private static ITemplateService TemplateService
-    {
-        get
-        {
-            _templateService ??= StaticServiceProvider.Instance.GetRequiredService<ITemplateService>();
-            return _templateService;
-        }
-    }
+    private static IFileService FileService { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IFileService>();
 
-    private static IOptions<WebRoutingSettings> WebRoutingSettings
-    {
-        get
-        {
-            _webRoutingSettings ??= StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>();
-            return _webRoutingSettings;
-        }
-    }
+    private static IOptions<WebRoutingSettings> WebRoutingSettings { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IOptions<WebRoutingSettings>>();
 
-    private static IContentTypeService ContentTypeService
-    {
-        get
-        {
-            _contentTypeService ??= StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>();
-            return _contentTypeService;
-        }
-    }
+    private static IContentTypeService ContentTypeService { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IContentTypeService>();
 
-    private static IPublishedValueFallback PublishedValueFallback
-    {
-        get
-        {
-            _publishedValueFallback ??= StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>();
-            return _publishedValueFallback;
-        }
-    }
+    private static IPublishedValueFallback PublishedValueFallback { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>();
 
-    private static IMediaTypeService MediaTypeService
-    {
-        get
-        {
-            _mediaTypeService ??= StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>();
-            return _mediaTypeService;
-        }
-    }
+    private static IMediaTypeService MediaTypeService { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>();
 
-    private static IMemberTypeService MemberTypeService
-    {
-        get
-        {
-            _memberTypeService ??= StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>();
-            return _memberTypeService;
-        }
-    }
-
-    private static IDocumentUrlService DocumentUrlService
-    {
-        get
-        {
-            _documentUrlService ??= StaticServiceProvider.Instance.GetRequiredService<IDocumentUrlService>();
-            return _documentUrlService;
-        }
-    }
-
-    internal static void Reset()
-    {
-        _variationContextAccessor = null;
-        _domainCache = null;
-        _publishedContentCache = null;
-        _documentNavigationQueryService = null;
-        _mediaNavigationQueryService = null;
-        _publishedModelFactory = null;
-        _publishedUrlProvider = null;
-        _umbracoContextAccessor = null;
-        _siteDomainHelper = null;
-        _examineManager = null;
-        _templateService = null;
-        _webRoutingSettings = null;
-        _contentTypeService = null;
-        _publishedValueFallback = null;
-        _mediaTypeService = null;
-        _memberTypeService = null;
-        _documentUrlService = null;
-    }
+    private static IMemberTypeService MemberTypeService { get; } =
+        StaticServiceProvider.Instance.GetRequiredService<IMemberTypeService>();
 
     private static INavigationQueryService GetNavigationQueryService(IPublishedContent content)
     {
@@ -254,7 +113,7 @@ public static class FriendlyPublishedContentExtensions
     public static string Name(
         this IPublishedContent content,
         string? culture = null)
-        => content.AsPublishedElement().Name(culture);
+        => content.Name(VariationContextAccessor, culture);
 
     /// <summary>
     ///     Gets the URL segment of the content item.
@@ -264,21 +123,10 @@ public static class FriendlyPublishedContentExtensions
     ///     The specific culture to get the URL segment for. If null is used the current culture is used
     ///     (Default is null).
     /// </param>
-    /// <remarks>
-    ///     Convenience wrapper around <see cref="IDocumentUrlService.GetUrlSegment"/> for use in Razor templates
-    ///     where injecting the service directly is awkward. Preview state is detected via the ambient
-    ///     <see cref="IUmbracoContext"/>.
-    /// </remarks>
     public static string? UrlSegment(
         this IPublishedContent content,
         string? culture = null)
-    {
-        ArgumentNullException.ThrowIfNull(content);
-
-        var resolvedCulture = culture ?? VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
-        var isDraft = UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext) && umbracoContext.InPreviewMode;
-        return DocumentUrlService.GetUrlSegment(content.Key, resolvedCulture, isDraft);
-    }
+        => content.UrlSegment(VariationContextAccessor, culture);
 
     /// <summary>
     ///     Gets the culture date of the content item.
@@ -291,14 +139,14 @@ public static class FriendlyPublishedContentExtensions
     public static DateTime CultureDate(
         this IPublishedContent content,
         string? culture = null)
-        => content.AsPublishedElement().CultureDate(culture);
+        => content.CultureDate(VariationContextAccessor, culture);
 
     /// <summary>
     ///     Returns the current template Alias
     /// </summary>
     /// <returns>Empty string if none is set.</returns>
     public static string GetTemplateAlias(this IPublishedContent content)
-        => content.GetTemplateAlias(TemplateService);
+        => content.GetTemplateAlias(FileService);
 
     public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
         => content.IsAllowedTemplate(ContentTypeService, WebRoutingSettings.Value, templateId);
@@ -326,7 +174,7 @@ public static class FriendlyPublishedContentExtensions
         bool validateAlternativeTemplates,
         string templateAlias)
         => content.IsAllowedTemplate(
-            TemplateService,
+            FileService,
             ContentTypeService,
             disableAlternativeTemplates,
             validateAlternativeTemplates,
@@ -851,14 +699,14 @@ public static class FriendlyPublishedContentExtensions
     /// </summary>
     /// <param name="content">The content item.</param>
     public static string? CreatorName(this IPublishedContent content) =>
-        content.AsPublishedElement().CreatorName();
+        content.CreatorName(UserService);
 
     /// <summary>
     ///     Gets the name of the content item writer.
     /// </summary>
     /// <param name="content">The content item.</param>
     public static string? WriterName(this IPublishedContent content) =>
-        content.AsPublishedElement().WriterName();
+        content.WriterName(UserService);
 
     /// <summary>
     ///     Gets the culture assigned to a document by domains, in the context of a current Uri.
@@ -890,7 +738,4 @@ public static class FriendlyPublishedContentExtensions
         string? indexName = null)
         => content.SearchChildren(ExamineManager, UmbracoContextAccessor, term, indexName);
 
-    // There is a lot of overlap between published content and published element extensions. To avoid duplicate code,
-    // we delegate to the published element extensions with this.
-    private static IPublishedElement AsPublishedElement(this IPublishedContent content) => content;
 }

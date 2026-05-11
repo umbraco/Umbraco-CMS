@@ -23,8 +23,6 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
 
     private IContentService ContentService => GetRequiredService<IContentService>();
 
-    private IElementService ElementService => GetRequiredService<IElementService>();
-
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
     [TestCase(new[] { true }, 0, true, true, TestName = "E=>E No Ancestor or children")]
@@ -273,33 +271,10 @@ internal sealed class ElementSwitchValidatorTests : UmbracoIntegrationTest
         Assert.AreEqual(result, validationShouldPass);
     }
 
-    [TestCase(0, true, TestName = "No Elements")]
-    [TestCase(1, false, TestName = "One Element Item")]
-    [TestCase(5, false, TestName = "Many Element Items")]
-    public async Task ElementToDocumentHasNoContent(int amountOfElementsCreated, bool validationShouldPass)
-    {
-        // Arrange
-        var contentType = await SetupContentType(true);
-
-        for (int i = 0; i < amountOfElementsCreated; i++)
-        {
-            var element = new Element($"Element {i}", contentType);
-            ElementService.Save(element);
-        }
-
-        // Act
-        contentType.IsElement = false;
-        var result = await ElementSwitchValidator.ElementToDocumentHasNoContentAsync(contentType);
-
-        // Assert
-        Assert.AreEqual(result, validationShouldPass);
-    }
-
     private async Task<IContentType> SetupContentType(bool isElement)
     {
         var typeBuilder = new ContentTypeBuilder()
-            .WithIsElement(isElement)
-            .WithAllowedInLibrary(isElement);
+            .WithIsElement(isElement);
         var contentType = typeBuilder.Build();
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         return contentType;

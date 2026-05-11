@@ -7,34 +7,41 @@ namespace Umbraco.Cms.Core.Services;
 /// </summary>
 public class DictionaryService : IDictionaryService
 {
-    private readonly IDictionaryItemService _dictionaryItemService;
+    private readonly ILocalizationService _localizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DictionaryService"/> class.
     /// </summary>
-    /// <param name="dictionaryItemService">The dictionary item service.</param>
-    public DictionaryService(IDictionaryItemService dictionaryItemService) => _dictionaryItemService = dictionaryItemService;
+    /// <param name="localizationService">The localization service.</param>
+    public DictionaryService(ILocalizationService localizationService) => _localizationService = localizationService;
 
     /// <inheritdoc />
-    public async Task<string> CalculatePathAsync(Guid? parentId, int sourceId)
+    public string CalculatePath(Guid? parentId, int sourceId)
     {
-        if (parentId.HasValue is false)
+        string path;
+
+        // TODO: check if there is a better way
+        if (parentId.HasValue)
         {
-            return "-1," + sourceId;
+            var ids = new List<int> { -1 };
+            var parentIds = new List<int>();
+            GetParentId(parentId.Value, parentIds);
+            parentIds.Reverse();
+            ids.AddRange(parentIds);
+            ids.Add(sourceId);
+            path = string.Join(",", ids);
+        }
+        else
+        {
+            path = "-1," + sourceId;
         }
 
-        var ids = new List<int> { -1 };
-        var parentIds = new List<int>();
-        await GetParentIdAsync(parentId.Value, parentIds);
-        parentIds.Reverse();
-        ids.AddRange(parentIds);
-        ids.Add(sourceId);
-        return string.Join(",", ids);
+        return path;
     }
 
-    private async Task GetParentIdAsync(Guid parentId, List<int> ids)
+    private void GetParentId(Guid parentId, List<int> ids)
     {
-        IDictionaryItem? dictionary = await _dictionaryItemService.GetAsync(parentId);
+        IDictionaryItem? dictionary = _localizationService.GetDictionaryItemById(parentId);
         if (dictionary == null)
         {
             return;
@@ -44,7 +51,7 @@ public class DictionaryService : IDictionaryService
 
         if (dictionary.ParentId.HasValue)
         {
-            await GetParentIdAsync(dictionary.ParentId.Value, ids);
+            GetParentId(dictionary.ParentId.Value, ids);
         }
     }
 }

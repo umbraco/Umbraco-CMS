@@ -8,39 +8,41 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Dictionary;
 
 /// <summary>
-///     A culture dictionary that uses the Umbraco ILanguageService and IDictionaryItemService.
+///     A culture dictionary that uses the Umbraco ILocalizationService
 /// </summary>
 /// <remarks>
 ///     TODO: The ICultureDictionary needs to represent the 'fast' way to do dictionary item retrieval - for front-end and
 ///     back office.
-///     ILanguageService and IDictionaryItemService are the services used for interacting with this data from the database
-///     which isn't all that fast (even though there is caching involved, if there's lots of dictionary items the caching is
-///     not great).
+///     The ILocalizationService is the service used for interacting with this data from the database which isn't all that
+///     fast
+///     (even though there is caching involved, if there's lots of dictionary items the caching is not great)
 /// </remarks>
 internal sealed class DefaultCultureDictionary : ICultureDictionary
 {
-    private readonly ILanguageService _languageService;
-    private readonly IDictionaryItemService _dictionaryItemService;
+    private readonly ILocalizationService _localizationService;
     private readonly IAppCache _requestCache;
     private readonly CultureInfo? _specificCulture;
 
     /// <summary>
     ///     Default constructor which will use the current thread's culture
     /// </summary>
-    public DefaultCultureDictionary(ILanguageService languageService, IDictionaryItemService dictionaryItemService, IAppCache requestCache)
+    /// <param name="localizationService"></param>
+    /// <param name="requestCache"></param>
+    public DefaultCultureDictionary(ILocalizationService localizationService, IAppCache requestCache)
     {
-        _languageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
-        _dictionaryItemService = dictionaryItemService ?? throw new ArgumentNullException(nameof(dictionaryItemService));
+        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
     }
 
     /// <summary>
     ///     Constructor for testing to specify a static culture
     /// </summary>
-    public DefaultCultureDictionary(CultureInfo specificCulture, ILanguageService languageService, IDictionaryItemService dictionaryItemService, IAppCache requestCache)
+    /// <param name="specificCulture"></param>
+    /// <param name="localizationService"></param>
+    /// <param name="requestCache"></param>
+    public DefaultCultureDictionary(CultureInfo specificCulture, ILocalizationService localizationService, IAppCache requestCache)
     {
-        _languageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
-        _dictionaryItemService = dictionaryItemService ?? throw new ArgumentNullException(nameof(dictionaryItemService));
+        _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
         _specificCulture = specificCulture ?? throw new ArgumentNullException(nameof(specificCulture));
     }
@@ -62,7 +64,7 @@ internal sealed class DefaultCultureDictionary : ICultureDictionary
                 CultureInfo culture = Culture;
                 while (culture != CultureInfo.InvariantCulture)
                 {
-                    ILanguage? language = _languageService.GetAsync(culture.Name).GetAwaiter().GetResult();
+                    ILanguage? language = _localizationService.GetLanguageByIsoCode(culture.Name);
                     if (language != null)
                     {
                         return language;
@@ -83,7 +85,7 @@ internal sealed class DefaultCultureDictionary : ICultureDictionary
     {
         get
         {
-            IDictionaryItem? found = _dictionaryItemService.GetAsync(key).GetAwaiter().GetResult();
+            IDictionaryItem? found = _localizationService.GetDictionaryItemByKey(key);
             if (found == null)
             {
                 return string.Empty;
@@ -113,13 +115,13 @@ internal sealed class DefaultCultureDictionary : ICultureDictionary
     {
         var result = new Dictionary<string, string>();
 
-        IDictionaryItem? found = _dictionaryItemService.GetAsync(key).GetAwaiter().GetResult();
+        IDictionaryItem? found = _localizationService.GetDictionaryItemByKey(key);
         if (found == null)
         {
             return result;
         }
 
-        IEnumerable<IDictionaryItem>? children = _dictionaryItemService.GetChildrenAsync(found.Key).GetAwaiter().GetResult();
+        IEnumerable<IDictionaryItem>? children = _localizationService.GetDictionaryItemChildren(found.Key);
         if (children == null)
         {
             return result;

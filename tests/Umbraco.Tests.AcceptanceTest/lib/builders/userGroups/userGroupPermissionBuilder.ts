@@ -1,11 +1,10 @@
 import {UserGroupBuilder} from './userGroupBuilder';
 import {UserGroupDocumentPermissionBuilder} from './userGroupDocumentPermissionBuilder';
-import {UserGroupElementPermissionBuilder} from './userGroupElementPermissionBuilder';
 import {UserGroupPropertyValuePermissionBuilder} from './userGroupPropertyValuePermissionBuilder';
 
 export class UserGroupPermissionBuilder {
   parentBuilder: UserGroupBuilder;
-  permissionBuilders: (UserGroupDocumentPermissionBuilder | UserGroupElementPermissionBuilder | UserGroupPropertyValuePermissionBuilder)[];
+  permissionBuilders: (UserGroupDocumentPermissionBuilder | UserGroupPropertyValuePermissionBuilder)[];
 
   constructor(parentBuilder: UserGroupBuilder) {
     this.parentBuilder = parentBuilder;
@@ -14,12 +13,6 @@ export class UserGroupPermissionBuilder {
 
   addDocumentPermission() {
     const builder = new UserGroupDocumentPermissionBuilder(this);
-    this.permissionBuilders.push(builder);
-    return builder;
-  }
-
-  addElementPermission() {
-    const builder = new UserGroupElementPermissionBuilder(this);
     this.permissionBuilders.push(builder);
     return builder;
   }

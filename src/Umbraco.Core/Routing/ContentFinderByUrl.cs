@@ -1,11 +1,5 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Core.Routing;
@@ -16,34 +10,23 @@ namespace Umbraco.Cms.Core.Routing;
 /// <remarks>
 ///     <para>Handles <c>/foo/bar</c> where <c>/foo/bar</c> is the nice URL of a document.</para>
 /// </remarks>
+[Obsolete("Scheduled for removal in Umbraco 18.")]
 public class ContentFinderByUrl : IContentFinder
 {
     private readonly ILogger<ContentFinderByUrl> _logger;
-    private readonly IPublishedContentCache _publishedContentCache;
-    private readonly IDocumentUrlService _documentUrlService;
-    private WebRoutingSettings _webRoutingSettings;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentFinderByUrl" /> class.
     /// </summary>
-    public ContentFinderByUrl(
-        ILogger<ContentFinderByUrl> logger,
-        IUmbracoContextAccessor umbracoContextAccessor,
-        IDocumentUrlService documentUrlService,
-        IPublishedContentCache publishedContentCache,
-        IOptionsMonitor<WebRoutingSettings> webRoutingSettings)
+    public ContentFinderByUrl(ILogger<ContentFinderByUrl> logger, IUmbracoContextAccessor umbracoContextAccessor)
     {
-        _logger = logger;
-        _publishedContentCache = publishedContentCache;
-        _documentUrlService = documentUrlService;
-        UmbracoContextAccessor = umbracoContextAccessor;
-
-        _webRoutingSettings = webRoutingSettings.CurrentValue;
-        webRoutingSettings.OnChange(x => _webRoutingSettings = x);
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        UmbracoContextAccessor =
+            umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
     }
 
     /// <summary>
-    ///     Gets the <see cref="IUmbracoContextAccessor" />.
+    ///     Gets the <see cref="IUmbracoContextAccessor" />
     /// </summary>
     protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
 
@@ -67,14 +50,6 @@ public class ContentFinderByUrl : IContentFinder
         }
         else
         {
-            // If we have configured strict domain matching, and a domain has not been found for the request configured on an ancestor node,
-            // do not route the content by URL.
-            if (_webRoutingSettings.UseStrictDomainMatching)
-            {
-                return Task.FromResult(false);
-            }
-
-            // Default behaviour if strict domain matching is not enabled will be to route under the to the first root node found.
             route = frequest.AbsolutePathDecoded;
         }
 
@@ -86,49 +61,5 @@ public class ContentFinderByUrl : IContentFinder
     ///     Tries to find an Umbraco document for a <c>PublishedRequest</c> and a route.
     /// </summary>
     /// <returns>The document node, or null.</returns>
-    protected IPublishedContent? FindContent(IPublishedRequestBuilder docreq, string route)
-    {
-        if (!UmbracoContextAccessor.TryGetUmbracoContext(out IUmbracoContext? umbracoContext))
-        {
-            return null;
-        }
-
-        ArgumentNullException.ThrowIfNull(docreq);
-
-        if (_logger.IsEnabled(LogLevel.Debug))
-        {
-            _logger.LogDebug("Test route {Route}", route);
-        }
-
-        Guid? documentKey = _documentUrlService.GetDocumentKeyByRoute(
-            docreq.Domain is null ? route : route[docreq.Domain.ContentId.ToString().Length..],
-            docreq.Culture,
-            docreq.Domain?.ContentId,
-            umbracoContext.InPreviewMode);
-
-
-        IPublishedContent? node = null;
-        if (documentKey.HasValue)
-        {
-            node = _publishedContentCache.GetById(umbracoContext.InPreviewMode, documentKey.Value);
-        }
-
-        if (node != null)
-        {
-            docreq.SetPublishedContent(node);
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("Got content, id={NodeId}", node.Id);
-            }
-        }
-        else
-        {
-            if (_logger.IsEnabled(LogLevel.Debug))
-            {
-                _logger.LogDebug("No match.");
-            }
-        }
-
-        return node;
-    }
+    protected IPublishedContent? FindContent(IPublishedRequestBuilder docreq, string route) => null;
 }

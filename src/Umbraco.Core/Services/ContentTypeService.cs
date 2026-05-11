@@ -20,8 +20,6 @@ namespace Umbraco.Cms.Core.Services;
 public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType>, IContentTypeService
 {
     private readonly ITemplateService _templateService;
-    private readonly IContentService _contentService;
-    private readonly IElementService _elementService;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentTypeService" /> class.
@@ -43,7 +41,6 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IContentService contentService,
-        IElementService elementService,
         IContentTypeRepository repository,
         IAuditService auditService,
         IDocumentTypeContainerRepository entityContainerRepository,
@@ -65,39 +62,7 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
             contentTypeFilters)
     {
         _templateService = templateService;
-        _contentService = contentService;
-        _elementService = elementService;
-    }
-
-    [Obsolete("Use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IContentTypeRepository repository,
-        IAuditService auditService,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters,
-        ITemplateService templateService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            StaticServiceProvider.Instance.GetRequiredService<IElementService>(),
-            repository,
-            auditService,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters,
-            templateService)
-    {
+        ContentService = contentService;
     }
 
     /// <summary>
@@ -278,39 +243,6 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     {
     }
 
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled removal in v19.")]
-    public ContentTypeService(
-        ICoreScopeProvider provider,
-        ILoggerFactory loggerFactory,
-        IEventMessagesFactory eventMessagesFactory,
-        IContentService contentService,
-        IElementService elementService,
-        IContentTypeRepository repository,
-        IAuditRepository auditRepository,
-        IAuditService auditService,
-        IDocumentTypeContainerRepository entityContainerRepository,
-        IEntityRepository entityRepository,
-        IEventAggregator eventAggregator,
-        IUserIdKeyResolver userIdKeyResolver,
-        ContentTypeFilterCollection contentTypeFilters,
-        ITemplateService templateService)
-        : this(
-            provider,
-            loggerFactory,
-            eventMessagesFactory,
-            contentService,
-            elementService,
-            repository,
-            auditService,
-            entityContainerRepository,
-            entityRepository,
-            eventAggregator,
-            userIdKeyResolver,
-            contentTypeFilters,
-            templateService)
-    {
-    }
-
     /// <inheritdoc />
     protected override int[] ReadLockIds => ContentTypeLocks.ReadLockIds;
 
@@ -323,6 +255,8 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
     /// <summary>
     ///     Gets the content service.
     /// </summary>
+    private IContentService ContentService { get; }
+
     /// <summary>
     ///     Gets all property type aliases across content, media and member types.
     /// </summary>
@@ -434,9 +368,8 @@ public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository,
         using (ICoreScope scope = ScopeProvider.CreateCoreScope())
         {
             var typeIdsA = typeIds.ToArray();
-            _contentService.DeleteOfTypes(typeIdsA);
-            _contentService.DeleteBlueprintsOfTypes(typeIdsA);
-            _elementService.DeleteOfTypes(typeIdsA);
+            ContentService.DeleteOfTypes(typeIdsA);
+            ContentService.DeleteBlueprintsOfTypes(typeIdsA);
             scope.Complete();
         }
     }

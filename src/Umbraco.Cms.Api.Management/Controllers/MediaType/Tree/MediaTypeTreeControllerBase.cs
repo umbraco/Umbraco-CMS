@@ -27,6 +27,20 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
     private readonly IMediaTypeService _mediaTypeService;
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="MediaTypeTreeControllerBase"/> class.
+    /// </summary>
+    /// <param name="entityService">Service used for managing and retrieving entities in the system.</param>
+    /// <param name="mediaTypeService">Service used for managing and retrieving media types.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    public MediaTypeTreeControllerBase(IEntityService entityService, IMediaTypeService mediaTypeService)
+        : this(
+            entityService,
+            StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+            mediaTypeService)
+    {
+    }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="MediaTypeTreeControllerBase"/> class with the specified services.
     /// </summary>
     /// <param name="entityService">The service used for entity operations.</param>
@@ -56,15 +70,15 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.MediaTypeContainer;
 
-    protected override async Task<MediaTypeTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
+    protected override MediaTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var mediaTypes = _mediaTypeService
             .GetMany(entities.Select(entity => entity.Id).ToArray())
             .ToDictionary(contentType => contentType.Id);
 
-        IEnumerable<Task<MediaTypeTreeItemResponseModel>> tasks = entities.Select(async entity =>
+        return entities.Select(entity =>
         {
-            MediaTypeTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentKey, entity);
+            MediaTypeTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
             if (mediaTypes.TryGetValue(entity.Id, out IMediaType? mediaType))
             {
                 responseModel.Icon = mediaType.Icon ?? responseModel.Icon;
@@ -72,8 +86,6 @@ public class MediaTypeTreeControllerBase : FolderTreeControllerBase<MediaTypeTre
             }
 
             return responseModel;
-        });
-
-        return await Task.WhenAll(tasks);
+        }).ToArray();
     }
 }

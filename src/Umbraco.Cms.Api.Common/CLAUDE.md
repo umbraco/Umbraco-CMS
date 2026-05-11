@@ -13,8 +13,7 @@ Shared infrastructure for Umbraco CMS REST APIs (Management and Delivery).
 ### Key Technologies
 
 - **ASP.NET Core** - Web framework
-- **Microsoft.AspNetCore.OpenApi** - OpenAPI document generation
-- **Swashbuckle.AspNetCore.SwaggerUI** - Swagger UI for browsing API documentation
+- **Swashbuckle** - OpenAPI/Swagger documentation generation
 - **OpenIddict** - OAuth 2.0/OpenID Connect authentication
 - **Asp.Versioning** - API versioning
 - **System.Text.Json** - Polymorphic JSON serialization
@@ -28,18 +27,14 @@ Shared infrastructure for Umbraco CMS REST APIs (Management and Delivery).
 
 ```
 Umbraco.Cms.Api.Common/
-├── OpenApi/                    # OpenAPI transformers and schema generators
-│   ├── UmbracoSchemaIdGenerator.cs         # Generates schema IDs (e.g., "PagedUserModel")
-│   ├── UmbracoOperationIdTransformer.cs    # Generates operation IDs
-│   ├── SortTagsAndPathsTransformer.cs      # Sorts OpenAPI tags and paths
-│   ├── TagActionsByGroupNameTransformer.cs # Tags operations by controller group
-│   ├── FixFileReturnTypesTransformer.cs    # Fixes file return type schemas
-│   ├── RequireNonNullablePropertiesSchemaTransformer.cs # Schema nullability
-│   └── OpenApiRouteTemplatePipelineFilter.cs # Adds OpenAPI endpoints
+├── OpenApi/                    # Schema/Operation ID handlers for Swagger
+│   ├── SchemaIdHandler.cs     # Generates schema IDs (e.g., "PagedUserModel")
+│   ├── OperationIdHandler.cs  # Generates operation IDs
+│   └── SubTypesHandler.cs     # Polymorphism support
 ├── Serialization/              # JSON type resolution
 │   └── UmbracoJsonTypeInfoResolver.cs
 ├── Configuration/              # Options configuration
-│   ├── ConfigureUmbracoOpenApiOptionsBase.cs
+│   ├── ConfigureUmbracoSwaggerGenOptions.cs
 │   └── ConfigureOpenIddict.cs
 ├── DependencyInjection/        # Service registration
 │   ├── UmbracoBuilderApiExtensions.cs
@@ -52,8 +47,9 @@ Umbraco.Cms.Api.Common/
 
 ### Design Patterns
 
-1. **Builder Pattern** - `ProblemDetailsBuilder` for fluent error responses
-2. **Options Pattern** - All configuration via `IConfigureOptions<T>`
+1. **Strategy Pattern** - `ISchemaIdHandler`, `IOperationIdHandler` (extensible via inheritance)
+2. **Builder Pattern** - `ProblemDetailsBuilder` for fluent error responses
+3. **Options Pattern** - All configuration via `IConfigureOptions<T>`
 
 ---
 
@@ -65,12 +61,25 @@ See "Quick Reference" section at bottom for common commands.
 
 ## 3. Key Patterns
 
-### Schema ID Generation (OpenApi/UmbracoSchemaIdGenerator.cs)
+### Virtual Handlers for Extensibility
 
-Static utility class that generates OpenAPI schema IDs following Umbraco's naming conventions:
+Handlers are intentionally virtual to allow consuming APIs to override:
 
 ```csharp
-// Add "Model" suffix to avoid TypeScript name clashes
+// NOTE: Left unsealed on purpose, so it is extendable.
+public class SchemaIdHandler : ISchemaIdHandler
+{
+    public virtual bool CanHandle(Type type) { }
+    public virtual string Handle(Type type) { }
+}
+```
+
+**Why**: Management and Delivery APIs can customize schema/operation ID generation.
+
+### Schema ID Sanitization (OpenApi/SchemaIdHandler.cs:24-29, 32)
+
+```csharp
+// Add "Model" suffix to avoid TypeScript name clashes (lines 24-29)
 if (name.EndsWith("Model") == false)
 {
     // because some models names clash with common classes in TypeScript (i.e. Document),
@@ -78,11 +87,9 @@ if (name.EndsWith("Model") == false)
     name = $"{name}Model";
 }
 
-// Remove invalid characters to prevent OpenAPI generation errors
+// Remove invalid characters to prevent OpenAPI generation errors (line 32)
 return Regex.Replace(name, @"[^\w]", string.Empty);
 ```
-
-**Generic Type Handling**: `PagedViewModel<RelationItemViewModel>` becomes `PagedRelationItemModel`
 
 ### Polymorphic Deserialization (Serialization/UmbracoJsonTypeInfoResolver.cs:29-35)
 
@@ -109,12 +116,9 @@ if (type.IsInterface is false)
 dotnet test tests/Umbraco.Tests.Integration/
 
 # Verify OpenAPI generation
-# 1. Run the application: dotnet run --project src/Umbraco.Web.UI
-# 2. Navigate to /umbraco/openapi/ for Swagger UI
+# 1. Run Management API
+# 2. Navigate to /umbraco/swagger/
 # 3. Check schema IDs and operation IDs
-# OpenAPI JSON documents available at:
-#   - /umbraco/openapi/management.json (Management API)
-#   - /umbraco/openapi/delivery.json (Delivery API)
 ```
 
 **Focus areas when testing**:
@@ -203,24 +207,49 @@ catch (NotSupportedException exception)
 
 **Issue**: Type names like `Document` clash with TypeScript built-ins.
 
-**Solution**: `UmbracoSchemaIdGenerator` adds "Model" suffix to all schema names.
+**Solution**: Add "Model" suffix (OpenApi/SchemaIdHandler.cs:24-29)
 
 ### Generic Type Handling
 
 **Issue**: `PagedViewModel<T>` needs flattened schema name.
 
-**Solution**: `UmbracoSchemaIdGenerator.Generate()` flattens generic types:
-- `PagedViewModel<RelationItemViewModel>` becomes `PagedRelationItemModel`
+**Solution** (OpenApi/SchemaIdHandler.cs:41-50):
+```csharp
+private string HandleGenerics(string name, Type type)
+{
+    if (!type.IsGenericType)
+        return name;
+
+    // use attribute custom name or append the generic type names
+    // turns "PagedViewModel<RelationItemViewModel>" into "PagedRelationItem"
+    return $"{name}{string.Join(string.Empty, type.GenericTypeArguments.Select(SanitizedTypeName))}";
+}
+```
 
 ---
 
 ## 7. Extending This Library
 
-### Adding Custom OpenAPI Transformers
+### Adding a Custom OpenAPI Handler
 
-OpenAPI transformers are scoped per-document. To customize a document, implement `IOpenApiDocumentTransformer`, `IOpenApiOperationTransformer`, or `IOpenApiSchemaTransformer` and register with your OpenAPI options.
+1. **Implement interface**:
+   ```csharp
+   public class MySchemaIdHandler : SchemaIdHandler
+   {
+       public override bool CanHandle(Type type)
+           => type.Namespace?.StartsWith("MyProject") is true;
 
-For schema ID generation, use the static `UmbracoSchemaIdGenerator.Generate(Type)` method.
+       public override string Handle(Type type)
+           => $"My{base.Handle(type)}";
+   }
+   ```
+
+2. **Register in consuming API**:
+   ```csharp
+   builder.Services.AddSingleton<ISchemaIdHandler, MySchemaIdHandler>();
+   ```
+
+**Note**: Handlers registered later take precedence in the selector.
 
 ### Customizing Problem Details
 
@@ -240,9 +269,13 @@ return BadRequest(problemDetails);
 
 ## 8. Project-Specific Notes
 
-### Per-Document Transformer Scoping
+### Why Virtual Handlers?
 
-With Microsoft.AspNetCore.OpenApi, transformers are configured per OpenAPI document. This means custom transformers only apply to the documents they're registered with, not globally. Each API (Management, Delivery) configures its own transformers via `ConfigureUmbracoOpenApiOptionsBase` subclasses.
+**Decision**: Make `SchemaIdHandler`, `OperationIdHandler`, etc. virtual.
+
+**Why**: Management API and Delivery API have different schema ID requirements. Virtual methods allow override without rewriting the entire handler.
+
+**Example**: Management API might prefix all schemas with "Management", Delivery API with "Delivery".
 
 ### Performance: Subtype Caching
 
@@ -271,13 +304,9 @@ With Microsoft.AspNetCore.OpenApi, transformers are configured per OpenAPI docum
 - Version: See `Directory.Packages.props`
 - Uses ASP.NET Core Data Protection for token encryption
 
-**Microsoft.AspNetCore.OpenApi**:
-- OpenAPI 3.1.1 document generation
-- Custom transformers: `SchemaIdTransformer`, `OperationIdTransformer`, `MimeTypeDocumentTransformer`, `ServerTransformer`
-
-**Swashbuckle.AspNetCore.SwaggerUI**:
-- Swagger UI for browsing and testing API endpoints
-- Accessed at `/umbraco/openapi/`
+**Swashbuckle**:
+- OpenAPI 3.0 document generation
+- Custom filters: `EnumSchemaFilter`, `MimeTypeDocumentFilter`, `RemoveSecuritySchemesDocumentFilter`
 
 **Asp.Versioning**:
 - API versioning via `ApiVersion` attribute
@@ -289,7 +318,7 @@ With Microsoft.AspNetCore.OpenApi, transformers are configured per OpenAPI docum
 
 ### Usage Pattern
 
-Consuming APIs call `builder.AddUmbracoOpenApi().AddUmbracoOpenIddict()`
+Consuming APIs call `builder.AddUmbracoApiOpenApiUI().AddUmbracoOpenIddict()`
 
 ---
 
@@ -317,8 +346,7 @@ dotnet list src/Umbraco.Cms.Api.Common/Umbraco.Cms.Api.Common.csproj package --v
 | Class | Purpose | File |
 |-------|---------|------|
 | `ProblemDetailsBuilder` | Build RFC 7807 error responses | Builders/ProblemDetailsBuilder.cs |
-| `UmbracoSchemaIdGenerator` | Generate OpenAPI schema IDs | OpenApi/UmbracoSchemaIdGenerator.cs |
-| `UmbracoOperationIdTransformer` | Generate operation IDs | OpenApi/UmbracoOperationIdTransformer.cs |
+| `SchemaIdHandler` | Generate OpenAPI schema IDs | OpenApi/SchemaIdHandler.cs |
 | `UmbracoJsonTypeInfoResolver` | Polymorphic JSON serialization | Serialization/UmbracoJsonTypeInfoResolver.cs |
 | `UmbracoBuilderAuthExtensions` | Configure OpenIddict | DependencyInjection/UmbracoBuilderAuthExtensions.cs |
 | `HideBackOfficeTokensHandler` | Secure cookie-based token storage | DependencyInjection/HideBackOfficeTokensHandler.cs |

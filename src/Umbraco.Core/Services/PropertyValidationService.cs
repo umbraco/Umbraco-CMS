@@ -18,7 +18,6 @@ namespace Umbraco.Cms.Core.Services;
 public class PropertyValidationService : IPropertyValidationService
 {
     private readonly IDataTypeService _dataTypeService;
-    private readonly IIdKeyMap _idKeyMap;
     private readonly ILocalizedTextService _textService;
     private readonly PropertyEditorCollection _propertyEditors;
     private readonly IValueEditorCache _valueEditorCache;
@@ -36,31 +35,6 @@ public class PropertyValidationService : IPropertyValidationService
     /// <param name="cultureDictionary">The culture dictionary for translating validation messages.</param>
     /// <param name="languageService">The language service for language operations.</param>
     /// <param name="contentSettings">The content settings options.</param>
-    /// <param name="idKeyMap">The cached id-to-key map used to resolve int data type IDs to GUID keys.</param>
-    public PropertyValidationService(
-        PropertyEditorCollection propertyEditors,
-        IDataTypeService dataTypeService,
-        ILocalizedTextService textService,
-        IValueEditorCache valueEditorCache,
-        ICultureDictionary cultureDictionary,
-        ILanguageService languageService,
-        IOptions<ContentSettings> contentSettings,
-        IIdKeyMap idKeyMap)
-    {
-        _propertyEditors = propertyEditors;
-        _dataTypeService = dataTypeService;
-        _textService = textService;
-        _valueEditorCache = valueEditorCache;
-        _cultureDictionary = cultureDictionary;
-        _languageService = languageService;
-        _contentSettings = contentSettings.Value;
-        _idKeyMap = idKeyMap;
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PropertyValidationService" /> class.
-    /// </summary>
-    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public PropertyValidationService(
         PropertyEditorCollection propertyEditors,
         IDataTypeService dataTypeService,
@@ -69,16 +43,14 @@ public class PropertyValidationService : IPropertyValidationService
         ICultureDictionary cultureDictionary,
         ILanguageService languageService,
         IOptions<ContentSettings> contentSettings)
-        : this(
-            propertyEditors,
-            dataTypeService,
-            textService,
-            valueEditorCache,
-            cultureDictionary,
-            languageService,
-            contentSettings,
-            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
     {
+        _propertyEditors = propertyEditors;
+        _dataTypeService = dataTypeService;
+        _textService = textService;
+        _valueEditorCache = valueEditorCache;
+        _cultureDictionary = cultureDictionary;
+        _languageService = languageService;
+        _contentSettings = contentSettings.Value;
     }
 
     /// <inheritdoc />
@@ -92,7 +64,7 @@ public class PropertyValidationService : IPropertyValidationService
             throw new ArgumentNullException(nameof(propertyType));
         }
 
-        IDataType? dataType = propertyType.GetDataType(_dataTypeService, _idKeyMap);
+        IDataType? dataType = GetDataType(propertyType);
         if (dataType == null)
         {
             throw new InvalidOperationException("No data type found by id " + propertyType.DataTypeId);
@@ -157,7 +129,7 @@ public class PropertyValidationService : IPropertyValidationService
     }
 
     /// <inheritdoc />
-    public bool IsPropertyDataValid(IPublishableContentBase content, out IProperty[] invalidProperties, CultureImpact? impact)
+    public bool IsPropertyDataValid(IContent content, out IProperty[] invalidProperties, CultureImpact? impact)
     {
         // select invalid properties
         invalidProperties = content.Properties.Where(x =>
@@ -304,11 +276,14 @@ public class PropertyValidationService : IPropertyValidationService
             return true;
         }
 
-        var configuration = propertyType.GetDataType(_dataTypeService, _idKeyMap)?.ConfigurationObject;
+        var configuration = GetDataType(propertyType)?.ConfigurationObject;
         IDataValueEditor valueEditor = editor.GetValueEditor(configuration);
 
         return !valueEditor.Validate(value, propertyType.Mandatory, propertyType.ValidationRegExp, validationContext).Any();
     }
+
+    private IDataType? GetDataType(IPropertyType propertyType)
+        => _dataTypeService.GetDataType(propertyType.DataTypeId);
 
     private IDataEditor? GetDataEditor(IPropertyType propertyType)
         => _propertyEditors[propertyType.PropertyEditorAlias];

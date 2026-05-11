@@ -31,39 +31,19 @@ public enum TemplateOperationStatus
     TemplateNotFound,
 
     /// <summary>
-    ///     The operation failed because the layout template could not be found.
+    ///     The operation failed because the master template could not be found.
     /// </summary>
-    LayoutTemplateNotFound,
+    MasterTemplateNotFound,
 
     /// <summary>
-    ///     The operation failed because it would create a circular reference in the layout template hierarchy.
+    ///     The operation failed because it would create a circular reference in the master template hierarchy.
     /// </summary>
-    CircularLayoutTemplateReference,
+    CircularMasterTemplateReference,
 
     /// <summary>
-    ///     The operation failed because a layout template cannot be deleted while it has child templates.
+    ///     The operation failed because the master template cannot be deleted while it has child templates.
     /// </summary>
-    LayoutTemplateCannotBeDeleted,
-
-    /// <summary>
-    ///     The operation failed because it is not allowed in production mode.
-    /// </summary>
+    MasterTemplateCannotBeDeleted,
     NotAllowedInProductionMode,
-
-    /// <summary>
-    ///     The operation failed because changing template content is not allowed in production mode.
-    /// </summary>
     ContentChangeNotAllowedInProductionMode,
-
-    /// <inheritdoc cref="LayoutTemplateNotFound" />
-    [Obsolete("Use LayoutTemplateNotFound instead. Scheduled for removal in Umbraco 20.")]
-    MasterTemplateNotFound = LayoutTemplateNotFound,
-
-    /// <inheritdoc cref="CircularLayoutTemplateReference" />
-    [Obsolete("Use CircularLayoutTemplateReference instead. Scheduled for removal in Umbraco 20.")]
-    CircularMasterTemplateReference = CircularLayoutTemplateReference,
-
-    /// <inheritdoc cref="LayoutTemplateCannotBeDeleted" />
-    [Obsolete("Use LayoutTemplateCannotBeDeleted instead. Scheduled for removal in Umbraco 20.")]
-    MasterTemplateCannotBeDeleted = LayoutTemplateCannotBeDeleted,
 }

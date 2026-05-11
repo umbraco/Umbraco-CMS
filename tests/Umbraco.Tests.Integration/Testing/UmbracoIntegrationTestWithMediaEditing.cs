@@ -55,9 +55,9 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
     protected IMediaType CustomMediaType { get; private set; }
 
     [SetUp]
-    public new async Task Setup() => await CreateTestData();
+    public new void Setup() => CreateTestData();
 
-    protected async Task CreateTestData()
+    protected async void CreateTestData()
     {
         CustomMediaTypeCreateModel = MediaTypeEditingBuilder.CreateMediaTypeWithOneProperty();
         var mediaTypeTestAttempt = await MediaTypeEditingService.CreateAsync(CustomMediaTypeCreateModel, Constants.Security.SuperUserKey);
@@ -71,7 +71,7 @@ public abstract class UmbracoIntegrationTestWithMediaEditing : UmbracoIntegratio
         var mediaTypesList = mediaTypes.ToList();
         var imageMediaType = mediaTypesList.FirstOrDefault(x => x.Alias == "Image");
         imageMediaType.PropertyTypes.First().Mandatory = false;
-        await MediaTypeService.UpdateAsync(imageMediaType, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(imageMediaType);
 
         // Add CustomMediaType to FolderMediaType AllowedContentTypes
         var mediaTypeUpdateHelper = new MediaTypeUpdateHelper();

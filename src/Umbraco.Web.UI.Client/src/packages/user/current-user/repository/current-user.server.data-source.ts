@@ -1,5 +1,4 @@
 import type { UmbCurrentUserModel } from '../types.js';
-import type { SetAvatarRequestModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbManagementApiDataMapper } from '@umbraco-cms/backoffice/repository';
@@ -39,19 +38,25 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 			const user: UmbCurrentUserModel = {
 				allowedSections: data.allowedSections,
 				avatarUrls: data.avatarUrls,
-				documentStartNodeUniques: data.documentStartNodeIds.map((node) => ({ unique: node.id })),
-				elementStartNodeUniques: data.elementStartNodeIds.map((node) => ({ unique: node.id })),
+				documentStartNodeUniques: data.documentStartNodeIds.map((node) => {
+					return {
+						unique: node.id,
+					};
+				}),
 				email: data.email,
 				fallbackPermissions: data.fallbackPermissions,
 				hasAccessToAllLanguages: data.hasAccessToAllLanguages,
 				hasAccessToSensitiveData: data.hasAccessToSensitiveData,
 				hasDocumentRootAccess: data.hasDocumentRootAccess,
 				hasMediaRootAccess: data.hasMediaRootAccess,
-				hasElementRootAccess: data.hasElementRootAccess,
 				isAdmin: data.isAdmin,
 				languageIsoCode: data.languageIsoCode || 'en-us', // TODO: make global variable
 				languages: data.languages,
-				mediaStartNodeUniques: data.mediaStartNodeIds.map((node) => ({ unique: node.id })),
+				mediaStartNodeUniques: data.mediaStartNodeIds.map((node) => {
+					return {
+						unique: node.id,
+					};
+				}),
 				name: data.name,
 				permissions,
 				unique: data.id,
@@ -141,42 +146,6 @@ export class UmbCurrentUserServerDataSource extends UmbControllerBase {
 				},
 			}),
 			{ disableNotifications: true },
-		);
-	}
-
-	/**
-	 * Upload an avatar for the current user using a temporary file unique
-	 * @param {string} fileUnique
-	 */
-	async uploadCurrentUserAvatar(fileUnique: string) {
-		const body: SetAvatarRequestModel = {
-			file: {
-				id: fileUnique,
-			},
-		};
-
-		return tryExecute(this, UserService.postUserCurrentAvatar({ body }));
-	}
-
-	/**
-	 * Delete the current user's avatar
-	 */
-	async deleteCurrentUserAvatar() {
-		return tryExecute(this, UserService.deleteUserCurrentAvatar());
-	}
-
-	/**
-	 * Update the current user's profile
-	 * @param languageIsoCode
-	 */
-	async updateCurrentUserProfile(languageIsoCode: string) {
-		return tryExecute(
-			this,
-			UserService.putUserCurrentProfile({
-				body: {
-					languageIsoCode,
-				},
-			}),
 		);
 	}
 }

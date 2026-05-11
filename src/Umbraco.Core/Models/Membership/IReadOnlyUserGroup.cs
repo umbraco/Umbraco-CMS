@@ -20,7 +20,10 @@ public interface IReadOnlyUserGroup
     /// <summary>
     ///     Gets the description of the user group.
     /// </summary>
-    string? Description { get; }
+    /// <remarks>
+    ///     TODO (V18): Remove the default implementations.
+    /// </remarks>
+    string? Description { get { return null; } }
 
     /// <summary>
     ///     Gets the icon for the user group.
@@ -46,11 +49,6 @@ public interface IReadOnlyUserGroup
     ///     Gets the starting media node identifier for this user group.
     /// </summary>
     int? StartMediaId { get; }
-
-    /// <summary>
-    ///     Gets the starting element node identifier for this user group.
-    /// </summary>
-    int? StartElementId { get; }
 
     /// <summary>
     ///     Gets a value indicating whether this user group has access to all languages.

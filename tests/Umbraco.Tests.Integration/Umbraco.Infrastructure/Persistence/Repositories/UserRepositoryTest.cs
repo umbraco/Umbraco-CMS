@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -23,6 +24,7 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories;
 
@@ -52,7 +54,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
             LoggerFactory.CreateLogger<UserRepository>(),
             Mappers,
             Options.Create(GlobalSettings),
-            Options.Create(new SecuritySettings()),
+            Options.Create(new UserPasswordConfigurationSettings()),
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
             mockRuntimeState.Object,
             Mock.Of<IRepositoryCacheVersionService>(),
@@ -71,15 +73,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
     private UserGroupRepository CreateUserGroupRepository(ICoreScopeProvider provider)
     {
         var accessor = (IScopeAccessor)provider;
-        return new UserGroupRepository(
-            accessor,
-            AppCaches.Disabled,
-            LoggerFactory.CreateLogger<UserGroupRepository>(),
-            LoggerFactory,
-            ShortStringHelper,
-            PermissionMappers,
-            Mock.Of<IRepositoryCacheVersionService>(),
-            Mock.Of<ICacheSyncService>());
+        return new UserGroupRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper, PermissionMappers);
     }
 
     [Test]
@@ -169,7 +163,7 @@ internal sealed class UserRepositoryTest : UmbracoIntegrationTest
                 LoggerFactory.CreateLogger<UserRepository>(),
                 Mock.Of<IMapperCollection>(),
                 Options.Create(GlobalSettings),
-                Options.Create(new SecuritySettings()),
+                Options.Create(new UserPasswordConfigurationSettings()),
                 new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
                 mockRuntimeState.Object,
                 Mock.Of<IRepositoryCacheVersionService>(),

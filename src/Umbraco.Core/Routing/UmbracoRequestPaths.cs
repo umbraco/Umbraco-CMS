@@ -58,7 +58,9 @@ public class UmbracoRequestPaths
     ///     </para>
     ///     <para>
     ///         If it's not any of the above then we cannot determine if it's back office or front-end
-    ///         so we can only assume that it is not back office.
+    ///         so we can only assume that it is not back office. This will occur if people use an UmbracoApiController for the
+    ///         backoffice
+    ///         but do not inherit from UmbracoAuthorizedApiController and do not use [IsBackOffice] attribute.
     ///     </para>
     ///     <para>
     ///         These are def front-end:

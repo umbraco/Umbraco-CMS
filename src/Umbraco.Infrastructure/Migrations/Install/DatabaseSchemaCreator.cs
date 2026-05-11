@@ -35,7 +35,6 @@ public class DatabaseSchemaCreator
         typeof(ContentVersionDto),
         typeof(MediaVersionDto),
         typeof(DocumentDto),
-        typeof(ElementDto),
         typeof(ContentTypeTemplateDto),
         typeof(DataTypeDto),
         typeof(DictionaryDto),
@@ -76,7 +75,6 @@ public class DatabaseSchemaCreator
         typeof(UserStartNodeDto),
         typeof(ContentNuDto),
         typeof(DocumentVersionDto),
-        typeof(ElementVersionDto),
         typeof(DocumentUrlDto),
         typeof(DocumentUrlAliasDto),
         typeof(KeyValueDto),
@@ -85,7 +83,6 @@ public class DatabaseSchemaCreator
         typeof(AuditEntryDto),
         typeof(ContentVersionCultureVariationDto),
         typeof(DocumentCultureVariationDto),
-        typeof(ElementCultureVariationDto),
         typeof(ContentScheduleDto),
         typeof(LogViewerQueryDto),
         typeof(ContentVersionCleanupPolicyDto),
@@ -126,14 +123,14 @@ public class DatabaseSchemaCreator
         ILoggerFactory loggerFactory,
         IUmbracoVersion umbracoVersion,
         IEventAggregator eventAggregator,
-        IOptionsMonitor<InstallDefaultDataSettings> installDefaultDataSettings)
+        IOptionsMonitor<InstallDefaultDataSettings> defaultDataCreationSettings)
     {
         _database = database ?? throw new ArgumentNullException(nameof(database));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
         _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
         _eventAggregator = eventAggregator;
-        _installDefaultDataSettings = installDefaultDataSettings;
+        _installDefaultDataSettings = defaultDataCreationSettings;  // TODO (V18): Rename this parameter to installDefaultDataSettings.
 
         if (_database.SqlContext?.SqlSyntax == null)
         {

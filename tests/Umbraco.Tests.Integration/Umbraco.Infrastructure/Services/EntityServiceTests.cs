@@ -55,7 +55,7 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
 
     private IMediaService MediaService => GetRequiredService<IMediaService>();
 
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+    private IFileService FileService => GetRequiredService<IFileService>();
 
     private IContentTypeContainerService ContentTypeContainerService => GetRequiredService<IContentTypeContainerService>();
 
@@ -692,14 +692,14 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
+    public void EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
     {
         var alias = "test" + Guid.NewGuid();
         var template = TemplateBuilder.CreateTextPageTemplate(alias);
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType("test2", "Test2", defaultTemplateId: template.Id);
         contentType.Variations = ContentVariation.Culture;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         var c1 = ContentBuilder.CreateSimpleContent(contentType, "Test");
         c1.SetCultureName("Test - FR", _langFr.IsoCode);
@@ -716,13 +716,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
+    public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
         var contentType = ContentTypeBuilder.CreateSimpleContentType("test1", "Test1", defaultTemplateId: template.Id);
         contentType.Variations = ContentVariation.Culture;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         root.SetCultureName("Root", _langFr.IsoCode); // else cannot save
@@ -1201,13 +1201,13 @@ internal sealed class EntityServiceTests : UmbracoIntegrationTest
             _isSetup = true;
 
             var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
+            FileService.SaveTemplate(template); // else, FK violation on contentType!
 
             // Create and Save ContentType "umbTextpage" -> _contentType.Id
             _contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
             _contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-            await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
+            ContentTypeService.Save(_contentType);
 
             // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
             _textpage = ContentBuilder.CreateSimpleContent(_contentType);

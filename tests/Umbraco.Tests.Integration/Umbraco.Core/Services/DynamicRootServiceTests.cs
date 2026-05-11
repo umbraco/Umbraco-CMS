@@ -563,7 +563,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            Assert.That(result, Has.Member(ContentStages2022.Key));
+            CollectionAssert.Contains(result, ContentStages2022.Key);
         });
     }
 

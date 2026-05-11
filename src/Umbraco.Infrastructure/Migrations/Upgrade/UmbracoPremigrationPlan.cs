@@ -51,6 +51,29 @@ public class UmbracoPremigrationPlan : MigrationPlan
 
         From(InitialState);
 
+        // To 14.0.0
+        To<V_14_0_0.UpdateToOpenIddictV5>("{76FBF80E-37E6-462E-ADC1-25668F56151D}");
+        To<V_14_0_0.AddGuidsToUserGroups>("{37CF4AC3-8489-44BC-A7E8-64908FEEC656}");
+        To<V_14_0_0.AddUserGroup2PermisionTable>("{7BCB5352-B2ED-4D4B-B27D-ECDED930B50A}");
+        To<V_14_0_0.AddGuidsToUsers>("{3E69BF9B-BEAB-41B1-BB11-15383CCA1C7F}");
+        To<V_14_0_0.MigrateCharPermissionsToStrings>("{F12C609B-86B9-4386-AFA4-78E02857247C}");
+
+        // To 15.0.0
+        // - The tours data migration was run as part of the regular upgrade plan for V14, but as it affects User data,
+        //   we need it to be run before the V15 User data migrations run. In the regular upgrade plan it has now been
+        //   replaced with a noop migration for the corresponding migration state.
+        To<V_14_0_0.MigrateTours>("{A08254B6-D9E7-4207-A496-2ED0A87FB4FD}");
+        To<V_15_0_0.AddKindToUser>("{69AA6889-8B67-42B4-AA4F-114704487A45}");
+        To<V_15_0_0.AddDocumentUrl>("{B9133686-B758-404D-AF12-708AA80C7E44}");
+        To<V_14_0_0.AddPropertyEditorUiAliasColumn>("{EEB1F012-B44D-4AB4-8756-F7FB547345B4}");
+        To<V_14_0_0.AddListViewKeysToDocumentTypes>("{0F49E1A4-AFD8-4673-A91B-F64E78C48174}");
+
+        // To 16.2.0
+        // - This needs to be a pre-migration as it adds a lock to the process for rebuilding document URLs, which is
+        //   called by a migration for 15. By using a pre-migration we ensure the lock record is in place when migrating
+        //   through 15 versions to the latest.
+        To<V_16_2_0.AddDocumentUrlLock>("{5ECCE7A7-2EFC-47A5-A081-FFD94D9F79AA}");
+
         // To 17.0.0
         To<V_17_0_0.UpdateToOpenIddictV7>("{D54EE168-C19D-48D8-9006-C7E719AD61FE}");
         // The lock and table are required to access caches.
@@ -58,9 +81,5 @@ public class UmbracoPremigrationPlan : MigrationPlan
         To<V_17_0_0.AddCacheVersionDatabaseLock>("{1DC39DC7-A88A-4912-8E60-4FD36246E8D1}");
         To<V_17_0_0.AddRepositoryCacheVersionTable>("{A1B3F5D6-4C8B-4E7A-9F8C-1D2B3E4F5A6B}");
         To<V_17_0_0.AddLastSyncedTable>("{72894BCA-9FAD-4CC3-B0D0-D6CDA2FFA636}");
-
-        // To 18.0.0
-        To<V_18_0_0.AddElements>("{E51033DE-B4F9-45F3-87B3-0E774B2939C2}");
-        To<V_18_0_0.AddAllowedInLibraryToContentType>("{31C0D92A-49DD-47EC-B2A7-932A58FF224E}");
     }
 }

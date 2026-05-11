@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using OpenIddict.Server;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
@@ -33,12 +32,12 @@ public class ExposeBackOfficeAuthenticationOpenIddictServerEventsHandler : IOpen
 
         // These are the type identifiers for the claims required by the principal
         // for the custom authentication scheme.
-        // We make available the ID and user name claims, plus the claim necessary for parsing the user key.
+        // We make available the ID, user name and allowed applications (sections) claims.
         _claimTypes =
         [
             backOfficeIdentityOptions.Value.ClaimsIdentity.UserIdClaimType,
             backOfficeIdentityOptions.Value.ClaimsIdentity.UserNameClaimType,
-            Constants.Security.OpenIdDictSubClaimType
+            Core.Constants.Security.AllowedApplicationsClaimType,
         ];
     }
 

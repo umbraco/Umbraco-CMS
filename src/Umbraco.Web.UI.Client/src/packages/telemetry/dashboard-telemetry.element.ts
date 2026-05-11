@@ -5,7 +5,6 @@ import { TelemetryLevelModel, TelemetryService } from '@umbraco-cms/backoffice/e
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecute, UmbApiError } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { sanitizeHTML } from '@umbraco-cms/backoffice/utils';
 
 @customElement('umb-dashboard-telemetry')
 export class UmbDashboardTelemetryElement extends UmbLitElement {
@@ -85,9 +84,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 
 	private _renderSettingSlider() {
 		if (!this._telemetryLevels || this._telemetryLevels.length < 1) return;
-		const sanitizedDescription = this._selectedTelemetryDescription
-			? sanitizeHTML(this._selectedTelemetryDescription)
-			: '';
+
 		return html`
 			<uui-slider
 				@input=${this._handleChange}
@@ -99,7 +96,7 @@ export class UmbDashboardTelemetryElement extends UmbLitElement {
 				hide-step-values
 				hide-value-label></uui-slider>
 			<h3>${this._selectedTelemetry.telemetryLevel}</h3>
-			<p>${unsafeHTML(sanitizedDescription)}</p>
+			<p>${unsafeHTML(this._selectedTelemetryDescription)}</p>
 		`;
 	}
 

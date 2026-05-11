@@ -157,7 +157,6 @@ internal static class ContentTypeFactory
             AllowAtRoot = entity.AllowedAsRoot,
             ListView = entity.ListView,
             IsElement = entity.IsElement,
-            AllowedInLibrary = entity.AllowedInLibrary,
             Variations = (byte)entity.Variations,
             NodeDto = BuildNodeDto(entity, nodeObjectType),
         };
@@ -186,7 +185,6 @@ internal static class ContentTypeFactory
         entity.AllowedAsRoot = dto.AllowAtRoot;
         entity.ListView = dto.ListView;
         entity.IsElement = dto.IsElement;
-        entity.AllowedInLibrary = dto.AllowedInLibrary;
         entity.Trashed = dto.NodeDto.Trashed;
 
         if (setVariations)

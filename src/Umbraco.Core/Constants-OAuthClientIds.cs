@@ -13,12 +13,9 @@ public static partial class Constants
         public const string BackOffice = "umbraco-back-office";
 
         /// <summary>
-        ///     Client ID used for OpenAPI UI access.
+        ///     Client ID used for Swagger API access.
         /// </summary>
-        /// <remarks>
-        ///     The value remains "umbraco-swagger" for backwards compatibility with existing database registrations.
-        /// </remarks>
-        public const string OpenApiUi = "umbraco-swagger";
+        public const string Swagger = "umbraco-swagger";
 
         /// <summary>
         ///     Client ID used for Postman API access.

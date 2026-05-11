@@ -8,7 +8,6 @@ import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbDetailRepository, UmbItemRepository } from '@umbraco-cms/backoffice/repository';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
-import { html } from '@umbraco-cms/backoffice/external/lit';
 
 export class UmbDeleteEntityAction<
 	MetaKind extends MetaEntityActionDeleteKind = MetaEntityActionDeleteKind,
@@ -43,7 +42,7 @@ export class UmbDeleteEntityAction<
 		// TODO: handle items with variants
 		await umbConfirmModal(this, {
 			headline,
-			content: html`${this.#localize.htmlString(message, item.name)}`,
+			content: this.#localize.string(message, item.name),
 			color: 'danger',
 			confirmLabel: '#general_delete',
 		});

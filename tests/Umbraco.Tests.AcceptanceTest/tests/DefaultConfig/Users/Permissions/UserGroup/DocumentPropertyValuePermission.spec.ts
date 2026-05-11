@@ -29,7 +29,7 @@ test.afterEach(async ({umbracoApi}) => {
 
 test('cannot see property values without UI read permission', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermissionAndReadPropertyValueDocumentPermission(userGroupName, true, false);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionAndReadPropertyValuePermission(userGroupName, true, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -44,7 +44,7 @@ test('cannot see property values without UI read permission', async ({umbracoApi
 
 test('can see property values with UI read but not UI write permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermissionAndReadPropertyValueDocumentPermission(userGroupName, true, true);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionAndReadPropertyValuePermission(userGroupName, true, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -60,7 +60,7 @@ test('can see property values with UI read but not UI write permission', {tag: '
 // Skip this test due to this issue: https://github.com/umbraco/Umbraco-CMS/issues/20505
 test.skip('cannot open content without document read permission even with UI read permission', {tag: '@release'}, async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadDocumentPermissionAndReadPropertyValueDocumentPermission(userGroupName, false, true);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadPermissionAndReadPropertyValuePermission(userGroupName, false, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -75,7 +75,7 @@ test.skip('cannot open content without document read permission even with UI rea
 
 test('cannot edit property values without UI write permission', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdateDocumentPermissionAndWritePropertyValueDocumentPermission(userGroupName, true, false);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionAndWritePropertyValuePermission(userGroupName, true, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -92,7 +92,7 @@ test('cannot edit property values without UI write permission', async ({umbracoA
 test('can edit property values with UI write permission', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const updatedText = 'Updated test text';
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdateDocumentPermissionAndWritePropertyValueDocumentPermission(userGroupName, true, true);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionAndWritePropertyValuePermission(userGroupName, true, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -111,7 +111,7 @@ test('can edit property values with UI write permission', async ({umbracoApi, um
 
 test('cannot see property values with only UI write but no UI read permission', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdateDocumentPermissionAndWritePropertyValueDocumentPermission(userGroupName, true, true, false);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionAndWritePropertyValuePermission(userGroupName, true, true, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();

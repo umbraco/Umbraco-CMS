@@ -20,14 +20,11 @@ public class WebhookTelemetryProvider : IDetailedTelemetryProvider
 
     private readonly string[] _defaultEventTypes =
         [
-            Constants.WebhookEvents.Aliases.ContentDelete,
-            Constants.WebhookEvents.Aliases.ContentPublish,
-            Constants.WebhookEvents.Aliases.ContentUnpublish,
-            Constants.WebhookEvents.Aliases.MediaDelete,
-            Constants.WebhookEvents.Aliases.MediaSave,
-            Constants.WebhookEvents.Aliases.ElementDelete,
-            Constants.WebhookEvents.Aliases.ElementPublish,
-            Constants.WebhookEvents.Aliases.ElementUnpublish,
+            "Umbraco.ContentDelete",
+            "Umbraco.ContentPublish",
+            "Umbraco.ContentUnpublish",
+            "Umbraco.MediaDelete",
+            "Umbraco.MediaSave"
         ];
 
     /// <summary>

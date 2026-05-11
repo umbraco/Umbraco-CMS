@@ -147,8 +147,6 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasDocumentRootAccess = HasRootAccess(user.StartContentIds),
             MediaStartNodeIds = GetKeysFromIds(user.StartMediaIds, UmbracoObjectTypes.Media),
             HasMediaRootAccess = HasRootAccess(user.StartMediaIds),
-            ElementStartNodeIds = GetKeysFromIds(user.StartElementIds, UmbracoObjectTypes.ElementContainer),
-            HasElementRootAccess = HasRootAccess(user.StartElementIds),
             FailedLoginAttempts = user.FailedPasswordAttempts,
             LastLoginDate = user.LastLoginDate,
             LastLockoutDate = user.LastLockoutDate,
@@ -258,8 +256,6 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasContentRootAccess = updateModel.HasDocumentRootAccess,
             MediaStartNodeKeys = updateModel.MediaStartNodeIds.Select(x => x.Id).ToHashSet(),
             HasMediaRootAccess = updateModel.HasMediaRootAccess,
-            ElementStartNodeKeys = updateModel.ElementStartNodeIds.Select(x => x.Id).ToHashSet(),
-            HasElementRootAccess = updateModel.HasElementRootAccess,
             UserGroupKeys = updateModel.UserGroupIds.Select(x => x.Id).ToHashSet()
         };
 
@@ -276,8 +272,6 @@ public class UserPresentationFactory : IUserPresentationFactory
         ISet<ReferenceByIdModel> mediaStartNodeKeys = GetKeysFromIds(mediaStartNodeIds, UmbracoObjectTypes.Media);
         var contentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
         ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
-        var elementStartNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
-        ISet<ReferenceByIdModel> elementStartNodeKeys = GetKeysFromIds(elementStartNodeIds, UmbracoObjectTypes.ElementContainer);
 
         HashSet<IPermissionPresentationModel> permissions = GetAggregatedGranularPermissions(user, presentationGroups);
         ISet<string> fallbackPermissions = await _contentPermissionService.FilterFallbackPermissionsAsync(
@@ -301,8 +295,6 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasMediaRootAccess = HasRootAccess(mediaStartNodeIds),
             DocumentStartNodeIds = documentStartNodeKeys,
             HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
-            ElementStartNodeIds = elementStartNodeKeys,
-            HasElementRootAccess = HasRootAccess(elementStartNodeIds),
             Permissions = permissions,
             FallbackPermissions = fallbackPermissions,
             HasAccessToAllLanguages = hasAccessToAllLanguages,
@@ -371,8 +363,6 @@ public class UserPresentationFactory : IUserPresentationFactory
         ISet<ReferenceByIdModel> mediaStartNodeKeys = GetKeysFromIds(mediaStartNodeIds, UmbracoObjectTypes.Media);
         var contentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
         ISet<ReferenceByIdModel> documentStartNodeKeys = GetKeysFromIds(contentStartNodeIds, UmbracoObjectTypes.Document);
-        var elementStartNodeIds = user.CalculateElementStartNodeIds(_entityService, _appCaches);
-        ISet<ReferenceByIdModel> elementStartNodeKeys = GetKeysFromIds(elementStartNodeIds, UmbracoObjectTypes.ElementContainer);
 
         return Task.FromResult<CalculatedUserStartNodesResponseModel>(new CalculatedUserStartNodesResponseModel()
         {
@@ -381,8 +371,6 @@ public class UserPresentationFactory : IUserPresentationFactory
             HasMediaRootAccess = HasRootAccess(mediaStartNodeIds),
             DocumentStartNodeIds = documentStartNodeKeys,
             HasDocumentRootAccess = HasRootAccess(contentStartNodeIds),
-            ElementStartNodeIds = elementStartNodeKeys,
-            HasElementRootAccess = HasRootAccess(elementStartNodeIds),
         });
     }
 
@@ -401,15 +389,4 @@ public class UserPresentationFactory : IUserPresentationFactory
 
     private static bool HasRootAccess(IEnumerable<int>? startNodeIds)
         => startNodeIds?.Contains(Constants.System.Root) is true;
-
-    /// <inheritdoc/>
-    public Task<UserUpdateProfileModel> CreateUpdateProfileModelAsync(UpdateCurrentUserRequestModel updateModel)
-    {
-        var model = new UserUpdateProfileModel
-        {
-            LanguageIsoCode = updateModel.LanguageIsoCode
-        };
-
-        return Task.FromResult(model);
-    }
 }

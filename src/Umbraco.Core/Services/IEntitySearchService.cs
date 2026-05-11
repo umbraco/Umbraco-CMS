@@ -24,10 +24,17 @@ public interface IEntitySearchService
     /// <remarks>
     /// This method has a no-op default implementation.
     /// </remarks>
-    PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, string query, int skip = 0, int take = 100);
+    // TODO (V18): Remove the default implementation.
+    PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, string query, int skip = 0, int take = 100)
+        => new() { Items = [], Total = 0 };
 
     /// <summary>
     /// Gets all entities of multiple object types with pagination.
     /// </summary>
-    PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, int skip = 0, int take = 100);
+    /// <remarks>
+    /// This method has a no-op default implementation.
+    /// </remarks>
+    // TODO (V18): Remove the default implementation.
+    PagedModel<IEntitySlim> Search(IEnumerable<UmbracoObjectTypes> objectTypes, int skip = 0, int take = 100)
+        => new() { Items = [], Total = 0 };
 }

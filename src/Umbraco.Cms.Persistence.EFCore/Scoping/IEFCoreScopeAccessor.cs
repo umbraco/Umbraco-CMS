@@ -10,5 +10,5 @@ public interface IEFCoreScopeAccessor<TDbContext>
     ///     Gets the ambient scope.
     /// </summary>
     /// <remarks>Returns <c>null</c> if there is no ambient scope.</remarks>
-    IEFCoreScope<TDbContext>? AmbientScope { get; }
+    IEfCoreScope<TDbContext>? AmbientScope { get; }
 }

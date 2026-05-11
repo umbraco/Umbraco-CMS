@@ -9,7 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_2_0;
 /// <summary>
 /// Adds the umbracoDocumentUrlAlias table and its associated lock record.
 /// </summary>
-public class AddDocumentUrlAlias : AsyncMigrationBase
+public class AddDocumentUrlAlias : MigrationBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="AddDocumentUrlAlias"/> class.
@@ -21,7 +21,7 @@ public class AddDocumentUrlAlias : AsyncMigrationBase
     }
 
     /// <inheritdoc/>
-    protected override Task MigrateAsync()
+    protected override void Migrate()
     {
         if (TableExists(Constants.DatabaseSchema.Tables.DocumentUrlAlias) is false)
         {
@@ -37,14 +37,11 @@ public class AddDocumentUrlAlias : AsyncMigrationBase
         LockDto? existingLockDto = Database.FirstOrDefault<LockDto>(sql);
         if (existingLockDto is null)
         {
-            // Can't use InsertAsync as we can't pass in AutoIncrement = false
             Database.Insert(
                 Constants.DatabaseSchema.Tables.Lock,
                 "id",
                 false,
                 new LockDto { Id = Constants.Locks.DocumentUrlAliases, Name = "DocumentUrlAliases" });
         }
-
-        return Task.CompletedTask;
     }
 }

@@ -11,8 +11,6 @@ namespace Umbraco.Cms.Api.Management.Services.Entities;
 /// </summary>
 internal sealed class MediaStartNodeTreeFilterService : UserStartNodeTreeFilterService, IMediaStartNodeTreeFilterService
 {
-    private static readonly UmbracoObjectTypes[] _treeObjectTypes = [UmbracoObjectTypes.Media];
-
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
     private readonly IEntityService _entityService;
     private readonly AppCaches _appCaches;
@@ -31,7 +29,7 @@ internal sealed class MediaStartNodeTreeFilterService : UserStartNodeTreeFilterS
     }
 
     /// <inheritdoc />
-    protected override UmbracoObjectTypes[] TreeObjectTypes => _treeObjectTypes;
+    protected override UmbracoObjectTypes TreeObjectType => UmbracoObjectTypes.Media;
 
     /// <inheritdoc />
     protected override int[] CalculateUserStartNodeIds()

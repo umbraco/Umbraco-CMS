@@ -8,7 +8,7 @@ import type {
 	MemberTypeResponseModel,
 	UpdateMemberTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
@@ -103,7 +103,6 @@ export class UmbMemberTypeDetailServerDataSource
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			allowedInLibrary: false,
 			properties: model.properties.map((property) => {
 				return {
 					id: property.unique,
@@ -156,7 +155,6 @@ export class UmbMemberTypeDetailServerDataSource
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
-			allowedInLibrary: false,
 			properties: model.properties.map((property) => {
 				return {
 					id: property.unique,
@@ -229,15 +227,7 @@ export class UmbMemberTypeDetailServerDataSource
 					isSensitive: property.isSensitive,
 				};
 			}),
-			containers: data.containers.map((container) => {
-				return {
-					id: container.id,
-					parent: container.parent ? { id: container.parent.id } : null,
-					name: container.name ?? '',
-					type: container.type as UmbPropertyContainerTypes, // TODO: check if the value is valid
-					sortOrder: container.sortOrder,
-				};
-			}),
+			containers: data.containers as UmbPropertyTypeContainerModel[],
 			allowedContentTypes: [],
 			compositions: data.compositions.map((composition) => {
 				return {

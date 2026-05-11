@@ -16,7 +16,7 @@ public partial class ContentEditingServiceTests
         (IContent root, IContent child) = await CreateRootAndChildAsync(contentType);
 
         contentType.AllowedAsRoot = allowedAtRoot;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         var result = await ContentEditingService.CopyAsync(child.Key, Constants.System.RootKey, false, false, Constants.Security.SuperUserKey);
 
@@ -58,7 +58,7 @@ public partial class ContentEditingServiceTests
             contentType.AllowedContentTypes = Enumerable.Empty<ContentTypeSort>();
         }
 
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         var result = await ContentEditingService.CopyAsync(child1.Key, root2.Key, false, false, Constants.Security.SuperUserKey);
 

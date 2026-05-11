@@ -1,4 +1,9 @@
 using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Navigation;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent;
 
@@ -17,30 +22,50 @@ namespace Umbraco.Cms.Core.Models.PublishedContent;
 ///     wrap and extend another <c>IPublishedContent</c>.
 /// </summary>
 [DebuggerDisplay("{Id}: {Name} ({ContentType?.Alias})")]
-public abstract class PublishedContentWrapped : PublishedElementWrapped<IPublishedContent>, IPublishedContent
+public abstract class PublishedContentWrapped : IPublishedContent
 {
     private readonly IPublishedContent _content;
+    private readonly IPublishedValueFallback _publishedValueFallback;
 
     /// <summary>
     ///     Initialize a new instance of the <see cref="PublishedContentWrapped" /> class
     ///     with an <c>IPublishedContent</c> instance to wrap.
     /// </summary>
     /// <param name="content">The content to wrap.</param>
-    protected PublishedContentWrapped(IPublishedContent content)
-        : base(content)
-        => _content = content;
+    /// <param name="publishedValueFallback">The published value fallback.</param>
+    protected PublishedContentWrapped(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
+    {
+        _content = content;
+        _publishedValueFallback = publishedValueFallback;
+    }
 
     /// <inheritdoc />
-    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 20.")]
-    public virtual string? UrlSegment
-    {
-        get
-        {
-#pragma warning disable CS0618 // Type or member is obsolete
-            return _content.UrlSegment;
-#pragma warning restore CS0618 // Type or member is obsolete
-        }
-    }
+    public virtual IPublishedContentType ContentType => _content.ContentType;
+
+    /// <inheritdoc />
+    public Guid Key => _content.Key;
+
+    #region PublishedContent
+
+    /// <inheritdoc />
+    public virtual int Id => _content.Id;
+
+    #endregion
+
+    /// <summary>
+    ///     Gets the wrapped content.
+    /// </summary>
+    /// <returns>The wrapped content, that was passed as an argument to the constructor.</returns>
+    public IPublishedContent Unwrap() => _content;
+
+    /// <inheritdoc />
+    public virtual string Name => _content.Name;
+
+    /// <inheritdoc />
+    public virtual string? UrlSegment => _content.UrlSegment;
+
+    /// <inheritdoc />
+    public virtual int SortOrder => _content.SortOrder;
 
     /// <inheritdoc />
     public virtual int Level => _content.Level;
@@ -50,4 +75,42 @@ public abstract class PublishedContentWrapped : PublishedElementWrapped<IPublish
 
     /// <inheritdoc />
     public virtual int? TemplateId => _content.TemplateId;
+
+    /// <inheritdoc />
+    public virtual int CreatorId => _content.CreatorId;
+
+    /// <inheritdoc />
+    public virtual DateTime CreateDate => _content.CreateDate;
+
+    /// <inheritdoc />
+    public virtual int WriterId => _content.WriterId;
+
+    /// <inheritdoc />
+    public virtual DateTime UpdateDate => _content.UpdateDate;
+
+    /// <inheritdoc />
+    public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _content.Cultures;
+
+    /// <inheritdoc />
+    public virtual PublishedItemType ItemType => _content.ItemType;
+
+    /// <inheritdoc />
+    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
+    public virtual IPublishedContent? Parent => _content.Parent;
+
+    /// <inheritdoc />
+    public virtual bool IsDraft(string? culture = null) => _content.IsDraft(culture);
+
+    /// <inheritdoc />
+    public virtual bool IsPublished(string? culture = null) => _content.IsPublished(culture);
+
+    /// <inheritdoc />
+    [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
+    public virtual IEnumerable<IPublishedContent> Children => _content.Children;
+
+    /// <inheritdoc cref="IPublishedElement.Properties" />
+    public virtual IEnumerable<IPublishedProperty> Properties => _content.Properties;
+
+    /// <inheritdoc cref="IPublishedElement.GetProperty(string)" />
+    public virtual IPublishedProperty? GetProperty(string alias) => _content.GetProperty(alias);
 }

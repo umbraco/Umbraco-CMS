@@ -38,12 +38,6 @@ export interface MetaPropertyEditorUi {
 		 */
 		forDataSourceTypes: string[];
 	};
-	/**
-	 * A list of keywords that can be used to search for this property editor UI in the property editor picker.
-	 * If not specified, the property editor UI will not have any keywords.
-	 * @example ["text", "input", "string"]
-	 */
-	keywords?: string[];
 }
 
 // Model

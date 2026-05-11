@@ -43,7 +43,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 			name: '',
 			alias: '',
 			content: scaffold,
-			layoutTemplate: preset.layoutTemplate ?? null,
+			masterTemplate: preset.masterTemplate ?? null,
 			...preset,
 		};
 
@@ -72,7 +72,7 @@ export class UmbTemplateServerDataSource implements UmbDetailDataSource<UmbTempl
 			name: data.name,
 			content: data.content || null,
 			alias: data.alias,
-			layoutTemplate: data.layoutTemplate ? { unique: data.layoutTemplate.id } : null,
+			masterTemplate: data.masterTemplate ? { unique: data.masterTemplate.id } : null,
 		};
 
 		return { data: template };

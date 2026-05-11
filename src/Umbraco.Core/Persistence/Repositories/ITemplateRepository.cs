@@ -22,16 +22,16 @@ public interface ITemplateRepository : IReadWriteQueryRepository<int, ITemplate>
     IEnumerable<ITemplate> GetAll(params string[] aliases);
 
     /// <summary>
-    ///     Gets all child templates of a layout template.
+    ///     Gets all child templates of a master template.
     /// </summary>
-    /// <param name="layoutTemplateId">The identifier of the layout template.</param>
+    /// <param name="masterTemplateId">The identifier of the master template.</param>
     /// <returns>A collection of child templates.</returns>
-    IEnumerable<ITemplate> GetChildren(int layoutTemplateId);
+    IEnumerable<ITemplate> GetChildren(int masterTemplateId);
 
     /// <summary>
-    ///     Gets all descendant templates of a layout template.
+    ///     Gets all descendant templates of a master template.
     /// </summary>
-    /// <param name="layoutTemplateId">The identifier of the layout template.</param>
+    /// <param name="masterTemplateId">The identifier of the master template.</param>
     /// <returns>A collection of descendant templates.</returns>
-    IEnumerable<ITemplate> GetDescendants(int layoutTemplateId);
+    IEnumerable<ITemplate> GetDescendants(int masterTemplateId);
 }

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -60,13 +59,13 @@ internal sealed class ScopedNuCacheTests : UmbracoIntegrationTest
     [TestCase(true)]
     [TestCase(false)]
     [LongRunning]
-    public async Task TestScope(bool complete)
+    public void TestScope(bool complete)
     {
         var umbracoContext = UmbracoContextFactory.EnsureUmbracoContext().UmbracoContext;
 
         // create document type, document
         var contentType = new ContentType(ShortStringHelper, -1) { Alias = "CustomDocument", Name = "Custom Document" };
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
         var item = new Content("name", -1, contentType);
 
         using (var scope = ScopeProvider.CreateScope())

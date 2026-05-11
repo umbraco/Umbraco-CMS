@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Core.Models;
@@ -25,6 +26,7 @@ public class ItemDocumentItemController : DocumentItemControllerBase
     /// </summary>
     /// <param name="entityService">The service used to manage and retrieve entities within the CMS.</param>
     /// <param name="documentPresentationFactory">The factory responsible for creating document presentation models.</param>
+    [ActivatorUtilitiesConstructor]
     public ItemDocumentItemController(
         IEntityService entityService,
         IDocumentPresentationFactory documentPresentationFactory)
@@ -57,8 +59,7 @@ public class ItemDocumentItemController : DocumentItemControllerBase
             .GetAll(UmbracoObjectTypes.Document, ids.ToArray())
             .OfType<IDocumentEntitySlim>();
 
-        IEnumerable<Task<DocumentItemResponseModel>> tasks = documents.Select(_documentPresentationFactory.CreateItemResponseModelAsync);
-        DocumentItemResponseModel[] responseModels = await Task.WhenAll(tasks);
+        IEnumerable<DocumentItemResponseModel> responseModels = documents.Select(_documentPresentationFactory.CreateItemResponseModel);
         return Ok(responseModels);
     }
 }

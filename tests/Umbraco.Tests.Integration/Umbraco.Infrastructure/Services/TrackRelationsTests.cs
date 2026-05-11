@@ -41,11 +41,11 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
     }
 
     [SetUp]
-    public override async Task Setup()
+    public override void Setup()
     {
         RelationSavedTracker.Reset();
         RelationDeletedTracker.Reset();
-        await base.Setup();
+        base.Setup();
     }
 
     [Test]

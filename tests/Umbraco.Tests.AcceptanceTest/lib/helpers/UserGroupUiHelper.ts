@@ -19,9 +19,8 @@ export class UserGroupUiHelper extends UiBaseLocators {
   private readonly addGranularPermissionBtn: Locator;
   private readonly granularPermissionsModal: Locator;
   private readonly iconChecked: Locator;
+  private readonly inputEntityUserPermissionList: Locator;
   private readonly sectionList: Locator;
-  private readonly documentPermissionsGroups: Locator;
-  private readonly elementPermissionsGroups: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -42,8 +41,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
     this.addGranularPermissionBtn = this.granularPermission.getByLabel('Add');
     this.granularPermissionsModal = page.locator('umb-entity-user-permission-settings-modal');
     this.iconChecked = page.locator('uui-toggle').locator('#icon-checked').getByRole('img');
-    this.documentPermissionsGroups = page.locator('umb-user-group-entity-type-permission-groups uui-box').filter({hasText: 'Document permissions'});
-    this.elementPermissionsGroups = page.locator('umb-user-group-entity-type-permission-groups uui-box').filter({hasText: 'Element permissions'});
+    this.inputEntityUserPermissionList = page.locator('umb-input-entity-user-permission');
   }
 
   async clickUserGroupsButton() {
@@ -90,15 +88,9 @@ export class UserGroupUiHelper extends UiBaseLocators {
     await this.page.waitForTimeout(ConstantHelper.wait.short);
   }
 
-  async clickDocumentPermissionsByName(permissionName: string[]) {
+  async clickPermissionsByName(permissionName: string[]) {
     for (let i = 0; i < permissionName.length; i++) {
-      await this.click(this.documentPermissionsGroups.getByText(permissionName[i], {exact: true}));
-    }
-  }
-
-  async clickElementPermissionsByName(permissionName: string[]) {
-    for (let i = 0; i < permissionName.length; i++) {
-      await this.click(this.elementPermissionsGroups.getByText(permissionName[i], {exact: true}));
+      await this.click(this.permissionVerbBtn.getByText(permissionName[i], {exact: true}));
     }
   }
 
@@ -108,8 +100,8 @@ export class UserGroupUiHelper extends UiBaseLocators {
     }
   }
 
-  async doesUserGroupHaveDocumentPermission(permissionName: string, hasPermission = true) {
-    await this.isVisible(this.documentPermissionsGroups.locator('umb-input-user-permission-verb[label="' + permissionName + '"]').filter({has: this.iconChecked}), hasPermission);
+  async doesUserGroupHavePermission(permissionName: string, hasPermission = true) {
+    await this.isVisible(this.permissionVerbBtn.filter({has: this.page.getByLabel(permissionName, {exact: true})}).filter({has: this.iconChecked}), hasPermission);
   }
 
   async doesUserGroupHaveGranularPermission(permissionName: string, hasPermission = true) {
@@ -127,7 +119,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
   }
 
   async doesUserGroupTableHaveSection(userGroupName: string, sectionName: string, hasSection = true) {
-    await this.isVisible(this.page.locator('uui-table-row', {hasText: userGroupName}).locator('umb-section-aliases-value-summary', {hasText: sectionName}), hasSection);
+    await this.isVisible(this.page.locator('uui-table-row', {hasText: userGroupName}).locator('umb-user-group-table-sections-column-layout', {hasText: sectionName}), hasSection);
   }
 
   async doesUserGroupContainLanguage(languageName: string, isVisible = true) {
@@ -148,9 +140,9 @@ export class UserGroupUiHelper extends UiBaseLocators {
     await this.click(this.mediaStartNode.filter({hasText: mediaStartNodeName}).getByLabel('Remove'), {force: true});
   }
 
-  async doesUserGroupHaveDocumentPermissionEnabled(permissionName: string[]) {
+  async doesUserGroupHavePermissionEnabled(permissionName: string[]) {
     return await Promise.all(
-      permissionName.map(permission => this.doesUserGroupHaveDocumentPermission(permission))
+      permissionName.map(permission => this.doesUserGroupHavePermission(permission))
     );
   }
 
@@ -176,10 +168,10 @@ export class UserGroupUiHelper extends UiBaseLocators {
     }
   }
 
-  async doesDocumentPermissionsSettingsHaveValue(settings) {
+  async doesPermissionsSettingsHaveValue(settings) {
     for (let index = 0; index < Object.keys(settings).length; index++) {
       const [name, description] = settings[index];
-      const permissionItemLocator = this.documentPermissionsGroups.locator(this.permissionVerbBtn).nth(index);
+      const permissionItemLocator = this.inputEntityUserPermissionList.locator(this.permissionVerbBtn).nth(index);
       await expect(permissionItemLocator.locator('#name')).toHaveText(name);
       if (description !== '')
         await expect(permissionItemLocator.locator('#setting small')).toHaveText(description);
@@ -216,25 +208,5 @@ export class UserGroupUiHelper extends UiBaseLocators {
     const userGroupRow = this.page.locator('uui-table-row', {hasText: userGroupName});
     const descriptionCell = userGroupRow.locator('uui-table-cell').nth(2);
     await this.hasText(descriptionCell, description);
-  }
-
-  async doesUserGroupHaveElementPermission(permissionName: string, hasPermission = true) {
-    await this.isVisible(this.elementPermissionsGroups.locator('umb-input-user-permission-verb[label="' + permissionName + '"]').filter({has: this.iconChecked}), hasPermission);
-  }
-
-  async doesUserGroupHaveElementPermissionEnabled(permissionName: string[]) {
-    return await Promise.all(
-      permissionName.map(permission => this.doesUserGroupHaveElementPermission(permission))
-    );
-  }
-
-  async doesElementPermissionsSettingsHaveValue(settings) {
-    for (let index = 0; index < Object.keys(settings).length; index++) {
-      const [name, description] = settings[index];
-      const permissionItemLocator = this.elementPermissionsGroups.locator(this.permissionVerbBtn).nth(index);
-      await expect(permissionItemLocator.locator('#name')).toHaveText(name);
-      if (description !== '')
-        await expect(permissionItemLocator.locator('#setting small')).toHaveText(description);
-    }
   }
 }

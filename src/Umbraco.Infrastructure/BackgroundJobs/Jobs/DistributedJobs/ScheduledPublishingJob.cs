@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -27,7 +26,6 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
 
 
     private readonly IContentService _contentService;
-    private readonly IElementService _elementService;
     private readonly ILogger<ScheduledPublishingJob> _logger;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly TimeProvider _timeProvider;
@@ -39,7 +37,6 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
     /// </summary>
     public ScheduledPublishingJob(
         IContentService contentService,
-        IElementService elementService,
         IUmbracoContextFactory umbracoContextFactory,
         ILogger<ScheduledPublishingJob> logger,
         IServerMessenger serverMessenger,
@@ -47,7 +44,6 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
         TimeProvider timeProvider)
     {
         _contentService = contentService;
-        _elementService = elementService;
         _umbracoContextFactory = umbracoContextFactory;
         _logger = logger;
         _serverMessenger = serverMessenger;
@@ -84,10 +80,15 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
             scope.EagerWriteLock(Constants.Locks.ScheduledPublishing);
             try
             {
-                DateTime date = _timeProvider.GetUtcNow().UtcDateTime;
-
-                PerformScheduledPublish(_contentService, Constants.UdiEntityType.Document, date);
-                PerformScheduledPublish(_elementService, Constants.UdiEntityType.Element, date);
+                // Run
+                IEnumerable<PublishResult> result = _contentService.PerformScheduledPublish(_timeProvider.GetUtcNow().UtcDateTime);
+                foreach (IGrouping<PublishResultType, PublishResult> grouped in result.GroupBy(x => x.Result))
+                {
+                    _logger.LogInformation(
+                        "Scheduled publishing result: '{StatusCount}' items with status {Status}",
+                        grouped.Count(),
+                        grouped.Key);
+                }
             }
             finally
             {
@@ -105,19 +106,5 @@ internal class ScheduledPublishingJob : IDistributedBackgroundJob
         }
 
         return Task.CompletedTask;
-    }
-
-    private void PerformScheduledPublish<TContent>(IPublishableContentService<TContent> service, string entityType, DateTime date)
-        where TContent : class, IPublishableContentBase
-    {
-        IEnumerable<PublishResult> results = service.PerformScheduledPublish(date);
-        foreach (IGrouping<PublishResultType, PublishResult> grouped in results.GroupBy(x => x.Result))
-        {
-            _logger.LogInformation(
-                "Scheduled {EntityType} publishing result: '{StatusCount}' items with status {Status}",
-                entityType,
-                grouped.Count(),
-                grouped.Key);
-        }
     }
 }

@@ -557,17 +557,13 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
     /// <param name="objectTypeKey">The key of the object type to rebuild.</param>
     /// <param name="trashed">Indicates whether the items are in the recycle bin.</param>
     protected Task HandleRebuildAsync(int readLock, Guid objectTypeKey, bool trashed)
-        => HandleRebuildAsync(readLock, [objectTypeKey], trashed);
-
-    /// <summary>
-    ///     Rebuilds the navigation structure for multiple object types.
-    ///     Used when the tree contains mixed node types (e.g. elements and element containers).
-    /// </summary>
-    /// <param name="readLock">The lock identifier to acquire during the rebuild.</param>
-    /// <param name="objectTypeKeys">The object type keys to include in the navigation structure.</param>
-    /// <param name="trashed">Indicates whether the items are in the recycle bin.</param>
-    protected Task HandleRebuildAsync(int readLock, IEnumerable<Guid> objectTypeKeys, bool trashed)
     {
+        // This is only relevant for items in the content and media trees
+        if (readLock != Constants.Locks.ContentTree && readLock != Constants.Locks.MediaTree)
+        {
+            return Task.CompletedTask;
+        }
+
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope(autoComplete: true);
         scope.ReadLock(readLock);
 
@@ -579,13 +575,13 @@ internal abstract class ContentNavigationServiceBase<TContentType, TContentTypeS
 
         if (trashed)
         {
-            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKeys);
+            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetTrashedContentNodesByObjectType(objectTypeKey);
             BuildNavigationDictionary(newStructure, newRoots, navigationModels);
             Interlocked.Exchange(ref _recycleBinNavigation, new NavigationSnapshot(newStructure, newRoots));
         }
         else
         {
-            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKeys);
+            IEnumerable<INavigationModel> navigationModels = _navigationRepository.GetContentNodesByObjectType(objectTypeKey);
             BuildNavigationDictionary(newStructure, newRoots, navigationModels);
             Interlocked.Exchange(ref _navigation, new NavigationSnapshot(newStructure, newRoots));
         }

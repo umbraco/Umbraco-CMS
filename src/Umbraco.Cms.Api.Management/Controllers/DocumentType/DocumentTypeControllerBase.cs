@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType;
 /// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.DocumentType)]
 [ApiExplorerSettings(GroupName = "Document Type")]
-[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrElementsOrDocumentTypes)]
+[Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentsOrDocumentTypes)]
 public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
 {
     protected IActionResult OperationStatusResult(ContentTypeOperationStatus status)
@@ -117,10 +117,6 @@ public abstract class DocumentTypeControllerBase : ManagementApiControllerBase
                 ContentTypeOperationStatus.InvalidElementFlagElementIsUsedInPropertyEditorConfiguration => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")
                     .WithDetail("Cannot change to document type because this element type is used in the configuration of a data type.")
-                    .Build()),
-                ContentTypeOperationStatus.InvalidElementFlagElementHasContent => new BadRequestObjectResult(problemDetailsBuilder
-                    .WithTitle("Invalid IsElement flag")
-                    .WithDetail("Cannot change to document type because content has already been created with this element type.")
                     .Build()),
                 ContentTypeOperationStatus.InvalidElementFlagComparedToParent => new BadRequestObjectResult(problemDetailsBuilder
                     .WithTitle("Invalid IsElement flag")

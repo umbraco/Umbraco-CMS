@@ -37,17 +37,6 @@ public class UserResponseModel : UserPresentationBase
     public bool HasMediaRootAccess { get; set; }
 
     /// <summary>
-    /// Gets or sets the collection of element start node identifiers assigned to the user.
-    /// Each identifier references a media node that serves as a starting point for the user's element access.
-    /// </summary>
-    public ISet<ReferenceByIdModel> ElementStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the user has access to the element root.
-    /// </summary>
-    public bool HasElementRootAccess { get; set; }
-
-    /// <summary>
     /// Gets or sets a collection of URLs pointing to the user's avatar images.
     /// </summary>
     public IEnumerable<string> AvatarUrls { get; set; } = Enumerable.Empty<string>();

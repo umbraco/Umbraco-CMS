@@ -29,7 +29,6 @@ internal sealed class MemberCacheService : IMemberCacheService
             null,
             null,
             contentTypeIds.ToList(),
-            null,
             action =>
             {
                 using ICoreScope scope = _scopeProvider.CreateCoreScope();

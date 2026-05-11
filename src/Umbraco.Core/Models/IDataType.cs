@@ -53,6 +53,7 @@ public interface IDataType : IUmbracoEntity, IRememberBeingDirty
     IDataType DeepCloneWithResetIdentities()
     {
         var clone = (DataType)DeepClone();
+        clone.Key = Guid.Empty;
         clone.ResetIdentity();
         return clone;
     }

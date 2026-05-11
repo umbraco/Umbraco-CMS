@@ -1,8 +1,6 @@
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Flags;
-using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
-using Umbraco.Cms.Api.Management.ViewModels.Element;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Flags;
 
@@ -10,35 +8,21 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Services.Flags;
 internal class HasPendingChangesFlagProviderTests
 {
     [Test]
-    public void HasPendingChangesFlagProvider_Can_Provide_Document_Variant_Item_Flags()
+    public void HasPendingChangesFlagProvider_Can_Provide_Variant_Item_Flags()
     {
         var sut = new HasPendingChangesFlagProvider();
         Assert.IsTrue(sut.CanProvideFlags<DocumentVariantItemResponseModel>());
     }
 
     [Test]
-    public void HasPendingChangesFlagProvider_Can_Provide_Document_Variant_Flags()
+    public void HasPendingChangesFlagProvider_Can_Provide_Variant_Flags()
     {
         var sut = new HasPendingChangesFlagProvider();
         Assert.IsTrue(sut.CanProvideFlags<DocumentVariantResponseModel>());
     }
 
     [Test]
-    public void HasPendingChangesFlagProvider_Can_Provide_Element_Variant_Item_Flags()
-    {
-        var sut = new HasPendingChangesFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<ElementVariantItemResponseModel>());
-    }
-
-    [Test]
-    public void HasPendingChangesFlagProvider_Can_Provide_Element_Variant_Flags()
-    {
-        var sut = new HasPendingChangesFlagProvider();
-        Assert.IsTrue(sut.CanProvideFlags<ElementVariantResponseModel>());
-    }
-
-    [Test]
-    public async Task HasPendingChangesFlagProvider_Should_Populate_Document_Variant_Item_Flags()
+    public async Task HasPendingChangesFlagProvider_Should_Populate_Variant_Item_Flags()
     {
         var sut = new HasPendingChangesFlagProvider();
 
@@ -46,13 +30,13 @@ internal class HasPendingChangesFlagProviderTests
         {
             new()
             {
-                State = PublishableVariantState.PublishedPendingChanges,
+                State = DocumentVariantState.PublishedPendingChanges,
                 Culture = null,
                 Name = "Test",
             },
             new()
             {
-                State = PublishableVariantState.Published,
+                State = DocumentVariantState.Published,
                 Culture = null,
                 Name = "Test2",
             },
@@ -68,7 +52,7 @@ internal class HasPendingChangesFlagProviderTests
     }
 
     [Test]
-    public async Task HasPendingChangesFlagProvider_Should_Populate_Document_Variant_Flags()
+    public async Task HasPendingChangesFlagProvider_Should_Populate_Variant_Flags()
     {
         var sut = new HasPendingChangesFlagProvider();
 
@@ -76,73 +60,13 @@ internal class HasPendingChangesFlagProviderTests
         {
             new()
             {
-                State = PublishableVariantState.PublishedPendingChanges,
+                State = DocumentVariantState.PublishedPendingChanges,
                 Culture = null,
                 Name = "Test",
             },
             new()
             {
-                State = PublishableVariantState.Published,
-                Culture = null,
-                Name = "Test2",
-            },
-        };
-
-        await sut.PopulateFlagsAsync(variants);
-
-        Assert.AreEqual(variants[0].Flags.Count(), 1);
-        Assert.AreEqual(variants[1].Flags.Count(), 0);
-
-        var flagModel = variants[0].Flags.First();
-        Assert.AreEqual("Umb.PendingChanges", flagModel.Alias);
-    }
-
-    [Test]
-    public async Task HasPendingChangesFlagProvider_Should_Populate_Element_Variant_Item_Flags()
-    {
-        var sut = new HasPendingChangesFlagProvider();
-
-        var variants = new List<ElementVariantItemResponseModel>
-        {
-            new()
-            {
-                State = PublishableVariantState.PublishedPendingChanges,
-                Culture = null,
-                Name = "Test",
-            },
-            new()
-            {
-                State = PublishableVariantState.Published,
-                Culture = null,
-                Name = "Test2",
-            },
-        };
-
-        await sut.PopulateFlagsAsync(variants);
-
-        Assert.AreEqual(variants[0].Flags.Count(), 1);
-        Assert.AreEqual(variants[1].Flags.Count(), 0);
-
-        var flagModel = variants[0].Flags.First();
-        Assert.AreEqual("Umb.PendingChanges", flagModel.Alias);
-    }
-
-    [Test]
-    public async Task HasPendingChangesFlagProvider_Should_Populate_Element_Variant_Flags()
-    {
-        var sut = new HasPendingChangesFlagProvider();
-
-        var variants = new List<ElementVariantResponseModel>
-        {
-            new()
-            {
-                State = PublishableVariantState.PublishedPendingChanges,
-                Culture = null,
-                Name = "Test",
-            },
-            new()
-            {
-                State = PublishableVariantState.Published,
+                State = DocumentVariantState.Published,
                 Culture = null,
                 Name = "Test2",
             },

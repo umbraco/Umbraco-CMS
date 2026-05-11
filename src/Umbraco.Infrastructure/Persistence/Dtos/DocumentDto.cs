@@ -8,16 +8,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 /// Represents a data transfer object (DTO) for a content document within the Umbraco CMS persistence layer.
 /// </summary>
 [TableName(TableName)]
-[PrimaryKey(IPublishableContentDto<DocumentVersionDto>.Columns.NodeId, AutoIncrement = false)]
+[PrimaryKey(PrimaryKeyColumnName, AutoIncrement = false)]
 [ExplicitColumns]
-public class DocumentDto : IPublishableContentDto<DocumentVersionDto>
+public class DocumentDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.Document;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.NodeIdName;
+
+    // Public constants to bind properties between DTOs
+    public const string PublishedColumnName = "published";
 
     /// <summary>
     /// Gets or sets the unique identifier for the node associated with this document.
     /// </summary>
-    [Column(IPublishableContentDto<DocumentVersionDto>.Columns.NodeId)]
+    [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn(AutoIncrement = false)]
     [ForeignKey(typeof(ContentDto))]
     public int NodeId { get; set; }
@@ -25,14 +29,14 @@ public class DocumentDto : IPublishableContentDto<DocumentVersionDto>
     /// <summary>
     /// Gets or sets a value indicating whether the document is published.
     /// </summary>
-    [Column(IPublishableContentDto<DocumentVersionDto>.Columns.Published)]
+    [Column(PublishedColumnName)]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_Published")]
     public bool Published { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether this document has been modified since it was last published or saved.
     /// </summary>
-    [Column(IPublishableContentDto<DocumentVersionDto>.Columns.Edited)]
+    [Column("edited")]
     public bool Edited { get; set; }
 
     // [Column("publishDate")]
@@ -70,7 +74,7 @@ public class DocumentDto : IPublishableContentDto<DocumentVersionDto>
     /// </remarks>
     [ResultColumn]
     [Reference(ReferenceType.OneToOne)]
-    public DocumentVersionDto ContentVersionDto { get; set; } = null!;
+    public DocumentVersionDto DocumentVersionDto { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the DTO containing information about the published version of the document.

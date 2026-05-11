@@ -1,8 +1,17 @@
-import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
-import { manifests as buttonManifests } from './button/manifests.js';
+import UmbCollectionActionButtonElement from './collection-action-button.element.js';
 import { manifests as createManifests } from './create/manifests.js';
+import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
-export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
-	...buttonManifests,
-	...createManifests,
-];
+const manifest: UmbExtensionManifestKind = {
+	type: 'kind',
+	alias: 'Umb.Kind.CollectionAction.Button',
+	matchKind: 'button',
+	matchType: 'collectionAction',
+	manifest: {
+		type: 'collectionAction',
+		kind: 'button',
+		element: UmbCollectionActionButtonElement,
+	},
+};
+
+export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [manifest, ...createManifests];

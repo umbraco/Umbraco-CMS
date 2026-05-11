@@ -33,9 +33,19 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     /// <inheritdoc/>
     public IPublishedContent? ToIPublishedContent(ContentCacheNode contentCacheNode, bool preview)
     {
-        ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
+        IPublishedContentType contentType =
+            _publishedContentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
+        var contentNode = new ContentNode(
+            contentCacheNode.Id,
+            contentCacheNode.Key,
+            contentCacheNode.SortOrder,
+            contentCacheNode.CreateDate.EnsureUtc(),
+            contentCacheNode.CreatorId,
+            contentType,
+            preview ? contentCacheNode.Data : null,
+            preview ? null : contentCacheNode.Data);
 
-        IPublishedContent? publishedContent = GetPublishedContent(contentNode, preview);
+        IPublishedContent? publishedContent = GetModel(contentNode, preview);
 
         if (preview)
         {
@@ -43,21 +53,6 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         }
 
         return publishedContent;
-    }
-
-    public IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview)
-    {
-        ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
-
-        IPublishedElement? publishedElement = GetPublishedElement(contentNode, preview);
-
-        if (preview)
-        {
-            // TODO ELEMENTS: what is the element equivalent of this?
-            // return model ?? GetPublishedContentAsDraft(model);
-        }
-
-        return publishedElement;
     }
 
     /// <inheritdoc/>
@@ -75,7 +70,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             null,
             contentCacheNode.Data);
 
-        return GetPublishedContent(contentNode, false);
+        return GetModel(contentNode, false);
     }
 
     /// <inheritdoc/>
@@ -106,20 +101,6 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             null,
             contentData);
         return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor, _propertyRenderingContextAccessor);
-    }
-
-    private ContentNode CreateContentNode(ContentCacheNode contentCacheNode, bool preview)
-    {
-        IPublishedContentType contentType = _publishedContentTypeCache.Get(PublishedItemType.Content, contentCacheNode.ContentTypeId);
-        return new ContentNode(
-            contentCacheNode.Id,
-            contentCacheNode.Key,
-            contentCacheNode.SortOrder,
-            contentCacheNode.CreateDate,
-            contentCacheNode.CreatorId,
-            contentType,
-            preview ? contentCacheNode.Data : null,
-            preview ? null : contentCacheNode.Data);
     }
 
     private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
@@ -156,25 +137,12 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         properties[alias] = new[] { new PropertyData { Value = value, Culture = string.Empty, Segment = string.Empty } };
     }
 
-    private IPublishedContent? GetPublishedContent(ContentNode node, bool preview)
+    private IPublishedContent? GetModel(ContentNode node, bool preview)
     {
         ContentData? contentData = preview ? node.DraftModel : node.PublishedModel;
         return contentData == null
             ? null
             : new PublishedContent(
-                node,
-                preview,
-                _elementsCache,
-                _variationContextAccessor,
-                _propertyRenderingContextAccessor);
-    }
-
-    private IPublishedElement? GetPublishedElement(ContentNode node, bool preview)
-    {
-        ContentData? contentData = preview ? node.DraftModel : node.PublishedModel;
-        return contentData == null
-            ? null
-            : new PublishedElement(
                 node,
                 preview,
                 _elementsCache,

@@ -99,5 +99,18 @@ public interface IContentPermissionAuthorizer
     ///     The default implementation falls back to calling <see cref="IsDeniedAsync(IUser, IEnumerable{Guid}, ISet{string})"/>
     ///     for each key individually. Override this method for better performance with batch authorization.
     /// </remarks>
-    Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck);
+    // TODO (V18): Remove default implementation.
+    async Task<ISet<Guid>> FilterAuthorizedAsync(IUser currentUser, IEnumerable<Guid> contentKeys, ISet<string> permissionsToCheck)
+    {
+        var authorizedKeys = new HashSet<Guid>();
+        foreach (Guid key in contentKeys)
+        {
+            if (await IsDeniedAsync(currentUser, [key], permissionsToCheck) == false)
+            {
+                authorizedKeys.Add(key);
+            }
+        }
+
+        return authorizedKeys;
+    }
 }

@@ -42,8 +42,7 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
         return Ok(new FolderResponseModel
         {
             Name = container.Name!,
-            Id = container.Key,
-            IsTrashed = container.Trashed
+            Id = container.Key
         });
     }
 
@@ -82,37 +81,33 @@ public abstract class FolderManagementControllerBase<TTreeEntity> : ManagementAp
             : OperationStatusResult(result.Status);
     }
 
-    internal static IActionResult OperationStatusResult(EntityContainerOperationStatus status)
+    protected IActionResult OperationStatusResult(EntityContainerOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
-            EntityContainerOperationStatus.NotFound => new NotFoundObjectResult(problemDetailsBuilder
+            EntityContainerOperationStatus.NotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The folder could not be found")
                 .Build()),
-            EntityContainerOperationStatus.ParentNotFound => new NotFoundObjectResult(problemDetailsBuilder
+            EntityContainerOperationStatus.ParentNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The parent folder could not be found")
                 .Build()),
-            EntityContainerOperationStatus.DuplicateName => new BadRequestObjectResult(problemDetailsBuilder
+            EntityContainerOperationStatus.DuplicateName => BadRequest(problemDetailsBuilder
                 .WithTitle("The name is already used")
                 .WithDetail("The folder name must be unique on this parent.")
                 .Build()),
-            EntityContainerOperationStatus.DuplicateKey => new BadRequestObjectResult(problemDetailsBuilder
+            EntityContainerOperationStatus.DuplicateKey => BadRequest(problemDetailsBuilder
                 .WithTitle("The id is already used")
                 .WithDetail("The folder id must be unique.")
                 .Build()),
-            EntityContainerOperationStatus.NotEmpty => new BadRequestObjectResult(problemDetailsBuilder
+            EntityContainerOperationStatus.NotEmpty => BadRequest(problemDetailsBuilder
                 .WithTitle("The folder is not empty")
                 .WithDetail("The folder must be empty to perform this action.")
                 .Build()),
-            EntityContainerOperationStatus.CancelledByNotification => new BadRequestObjectResult(problemDetailsBuilder
+            EntityContainerOperationStatus.CancelledByNotification => BadRequest(problemDetailsBuilder
                 .WithTitle("Cancelled by notification")
                 .WithDetail("A notification handler prevented the folder operation.")
                 .Build()),
-            EntityContainerOperationStatus.HasReferencedDescendants => new BadRequestObjectResult(problemDetailsBuilder
-                .WithTitle("The folder has referenced descendants")
-                .WithDetail("The folder cannot be moved to the recycle bin because it contains items that are referenced by other content.")
-                .Build()),
-            _ => new ObjectResult(problemDetailsBuilder
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown folder operation status.")
-                .Build()) { StatusCode = StatusCodes.Status500InternalServerError },
+                .Build()),
         });
 }

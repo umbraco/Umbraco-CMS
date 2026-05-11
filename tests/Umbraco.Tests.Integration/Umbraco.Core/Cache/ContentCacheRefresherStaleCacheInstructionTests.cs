@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -37,7 +36,7 @@ internal sealed class ContentCacheRefresherStaleCacheInstructionTests : UmbracoI
 
     private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+    private IFileService FileService => GetRequiredService<IFileService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
@@ -46,13 +45,13 @@ internal sealed class ContentCacheRefresherStaleCacheInstructionTests : UmbracoI
         builder.AddNotificationHandler<MediaTreeChangeNotification, MediaTreeChangeDistributedCacheNotificationHandler>();
     }
 
-    private async Task<IContent> CreateAndDeleteContent(string alias)
+    private IContent CreateAndDeleteContent(string alias)
     {
         var template = TemplateBuilder.CreateTextPageTemplate(alias + "Template");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(alias, alias, defaultTemplateId: template.Id);
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Test Content");
         ContentService.Save(content);
@@ -71,10 +70,10 @@ internal sealed class ContentCacheRefresherStaleCacheInstructionTests : UmbracoI
     /// 3. Server processes the stale instruction on restart
     /// </summary>
     [Test]
-    public async Task ContentCacheRefresher_Handles_Stale_RefreshBranch_Instruction_For_Deleted_Content()
+    public void ContentCacheRefresher_Handles_Stale_RefreshBranch_Instruction_For_Deleted_Content()
     {
         // Arrange - Create and delete content
-        var content = await CreateAndDeleteContent("testPage");
+        var content = CreateAndDeleteContent("testPage");
 
         // Act - Simulate processing a stale RefreshBranch cache instruction
         // This is what happens when the server restarts and processes queued instructions
@@ -97,10 +96,10 @@ internal sealed class ContentCacheRefresherStaleCacheInstructionTests : UmbracoI
     /// for content that has been deleted.
     /// </summary>
     [Test]
-    public async Task ContentCacheRefresher_Handles_Stale_RefreshNode_Instruction_For_Deleted_Content()
+    public void ContentCacheRefresher_Handles_Stale_RefreshNode_Instruction_For_Deleted_Content()
     {
         // Arrange - Create and delete content
-        var content = await CreateAndDeleteContent("testPage2");
+        var content = CreateAndDeleteContent("testPage2");
 
         // Act - Simulate processing a stale RefreshNode cache instruction
         var stalePayload = new ContentCacheRefresher.JsonPayload
@@ -122,11 +121,11 @@ internal sealed class ContentCacheRefresherStaleCacheInstructionTests : UmbracoI
     /// for media that has been deleted.
     /// </summary>
     [Test]
-    public async Task MediaCacheRefresher_Handles_Stale_RefreshBranch_Instruction_For_Deleted_Media()
+    public void MediaCacheRefresher_Handles_Stale_RefreshBranch_Instruction_For_Deleted_Media()
     {
         // Arrange - Create media
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
-        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(mediaType);
 
         var media = MediaBuilder.CreateSimpleMedia(mediaType, "Test Media", -1);
         MediaService.Save(media);

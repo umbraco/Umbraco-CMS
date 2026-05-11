@@ -36,52 +36,13 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     private readonly IContentService _contentService;
     private readonly IDocumentCacheService _documentCacheService;
     private readonly ICacheManager _cacheManager;
-    private readonly IDocumentPublishStatusManagementService _publishStatusManagementService;
+    private readonly IPublishStatusManagementService _publishStatusManagementService;
     private readonly IIdKeyMap _idKeyMap;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
     /// </summary>
-    public ContentCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IDomainService domainService,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IDocumentUrlService documentUrlService,
-        IDocumentUrlAliasService documentUrlAliasService,
-        IDomainCacheService domainCacheService,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IDocumentNavigationManagementService documentNavigationManagementService,
-        IContentService contentService,
-        IDocumentPublishStatusManagementService publishStatusManagementService,
-        IDocumentCacheService documentCacheService,
-        ICacheManager cacheManager)
-        : base(appCaches, serializer, eventAggregator, factory)
-    {
-        _idKeyMap = idKeyMap;
-        _domainService = domainService;
-        _domainCacheService = domainCacheService;
-        _documentUrlService = documentUrlService;
-        _documentUrlAliasService = documentUrlAliasService;
-        _documentNavigationQueryService = documentNavigationQueryService;
-        _documentNavigationManagementService = documentNavigationManagementService;
-        _contentService = contentService;
-        _documentCacheService = documentCacheService;
-        _publishStatusManagementService = publishStatusManagementService;
-
-        // TODO: Ideally we should inject IElementsCache
-        // this interface is in infrastructure, and changing this is very breaking
-        // so as long as we have the cache manager, which casts the IElementsCache to a simple AppCache we might as well use that.
-        // see also ElementCacheRefresher.
-        _cacheManager = cacheManager;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
-    /// </summary>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 19.")]
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -110,7 +71,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             documentNavigationQueryService,
             documentNavigationManagementService,
             contentService,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusManagementService>(),
+            publishStatusManagementService,
             documentCacheService,
             cacheManager)
     {
@@ -119,7 +80,6 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
     /// </summary>
-    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
     public ContentCacheRefresher(
         AppCaches appCaches,
         IJsonSerializer serializer,
@@ -136,63 +96,23 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         IPublishStatusManagementService publishStatusManagementService,
         IDocumentCacheService documentCacheService,
         ICacheManager cacheManager)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            domainService,
-            eventAggregator,
-            factory,
-            documentUrlService,
-            documentUrlAliasService,
-            domainCacheService,
-            documentNavigationQueryService,
-            documentNavigationManagementService,
-            contentService,
-            StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusManagementService>(),
-            documentCacheService,
-            cacheManager)
+        : base(appCaches, serializer, eventAggregator, factory)
     {
-    }
+        _idKeyMap = idKeyMap;
+        _domainService = domainService;
+        _domainCacheService = domainCacheService;
+        _documentUrlService = documentUrlService;
+        _documentUrlAliasService = documentUrlAliasService;
+        _documentNavigationQueryService = documentNavigationQueryService;
+        _documentNavigationManagementService = documentNavigationManagementService;
+        _contentService = contentService;
+        _documentCacheService = documentCacheService;
+        _publishStatusManagementService = publishStatusManagementService;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentCacheRefresher"/> class.
-    /// </summary>
-    [Obsolete("Please use the non-obsolete constructor instead. Scheduled for removal in Umbraco 19.")]
-    public ContentCacheRefresher(
-        AppCaches appCaches,
-        IJsonSerializer serializer,
-        IIdKeyMap idKeyMap,
-        IDomainService domainService,
-        IEventAggregator eventAggregator,
-        ICacheRefresherNotificationFactory factory,
-        IDocumentUrlService documentUrlService,
-        IDocumentUrlAliasService documentUrlAliasService,
-        IDomainCacheService domainCacheService,
-        IDocumentNavigationQueryService documentNavigationQueryService,
-        IDocumentNavigationManagementService documentNavigationManagementService,
-        IContentService contentService,
-        IPublishStatusManagementService publishStatusManagementService,
-        IDocumentPublishStatusManagementService documentPublishStatusManagementService,
-        IDocumentCacheService documentCacheService,
-        ICacheManager cacheManager)
-        : this(
-            appCaches,
-            serializer,
-            idKeyMap,
-            domainService,
-            eventAggregator,
-            factory,
-            documentUrlService,
-            documentUrlAliasService,
-            domainCacheService,
-            documentNavigationQueryService,
-            documentNavigationManagementService,
-            contentService,
-            documentPublishStatusManagementService,
-            documentCacheService,
-            cacheManager)
-    {
+        // TODO: Ideally we should inject IElementsCache
+        // this interface is in infrastructure, and changing this is very breaking
+        // so as long as we have the cache manager, which casts the IElementsCache to a simple AppCache we might as well use that.
+        _cacheManager = cacheManager;
     }
 
     #region Indirect
@@ -290,7 +210,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             }
 
             HandleNavigation(payload);
-            HandlePublishStatusAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
+            HandlePublishedAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
 
             HandleMemoryCache(payload);
 
@@ -315,30 +235,27 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         base.Refresh(payloads);
     }
 
-    internal static bool ShouldClearPartialViewCache(IEnumerable<(TreeChangeTypes ChangeTypes, string[]? PublishedCultures, string[]? UnpublishedCultures)> changes)
-        => changes.Any(change =>
+    private static bool ShouldClearPartialViewCache(JsonPayload[] payloads)
+    {
+        return payloads.Any(x =>
         {
-            // Check for relevant change type
-            var isRelevantChangeType = change.ChangeTypes.HasType(TreeChangeTypes.RefreshAll) ||
-                                       change.ChangeTypes.HasType(TreeChangeTypes.Remove) ||
-                                       change.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) ||
-                                       change.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch);
+            // Check for relelvant change type
+            var isRelevantChangeType = x.ChangeTypes.HasType(TreeChangeTypes.RefreshAll) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.Remove) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) ||
+                x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch);
 
             // Check for published/unpublished changes
-            var hasChanges = change.PublishedCultures?.Length > 0 ||
-                             change.UnpublishedCultures?.Length > 0;
+            var hasChanges = x.PublishedCultures?.Length > 0 ||
+                   x.UnpublishedCultures?.Length > 0;
 
-            // There's no other way to detect trashed state as the change type is only Remove when deleted permanently
-            var isTrashed = change.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && change.PublishedCultures is null && change.UnpublishedCultures is null;
+            // There's no other way to detect trashed content as the change type is only Remove when deleted permanently
+            var isTrashed = x.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch) && x.PublishedCultures is null && x.UnpublishedCultures is null;
 
-            // Only clear the partial cache for removals or refreshes with changes
-            return isTrashed || (isRelevantChangeType && hasChanges);
+            // Skip blueprints and only clear the partial cache for removals or refreshes with changes
+            return x.Blueprint == false && (isTrashed || (isRelevantChangeType && hasChanges));
         });
-
-    private static bool ShouldClearPartialViewCache(JsonPayload[] payloads)
-        => ShouldClearPartialViewCache(payloads
-            .Where(payload => payload.Blueprint is false)
-            .Select(payload => (payload.ChangeTypes, payload.PublishedCultures, payload.UnpublishedCultures)));
+    }
 
     private void HandleMemoryCache(JsonPayload payload)
     {
@@ -542,7 +459,7 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
 
     private bool ExistsInNavigationBin(Guid contentKey) => _documentNavigationQueryService.TryGetParentKeyInBin(contentKey, out _);
 
-    private async Task HandlePublishStatusAsync(JsonPayload payload, CancellationToken cancellationToken)
+    private async Task HandlePublishedAsync(JsonPayload payload, CancellationToken cancellationToken)
     {
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
         {
@@ -598,9 +515,11 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
             return;
         }
 
-        var assignedDomains = _domainService.GetAllAsync(true).GetAwaiter().GetResult()
+#pragma warning disable CS0618 // Type or member is obsolete
+        var assignedDomains = _domainService.GetAll(true)
             .Where(x => x.RootContentId.HasValue && idsRemoved.Contains(x.RootContentId.Value))
             .ToList();
+#pragma warning restore CS0618 // Type or member is obsolete
         if (assignedDomains.Count <= 0)
         {
             return;

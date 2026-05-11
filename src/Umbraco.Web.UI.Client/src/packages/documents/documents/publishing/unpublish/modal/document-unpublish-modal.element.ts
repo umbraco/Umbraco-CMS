@@ -1,5 +1,4 @@
-import { UmbDocumentVariantState } from '../../../variant-state.js';
-import type { UmbDocumentVariantOptionModel } from '../../../types.js';
+import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
 import { UMB_DOCUMENT_ITEM_REPOSITORY_ALIAS, UMB_DOCUMENT_REFERENCE_REPOSITORY_ALIAS } from '../../../constants.js';
 import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../../global-contexts/index.js';
 import type {

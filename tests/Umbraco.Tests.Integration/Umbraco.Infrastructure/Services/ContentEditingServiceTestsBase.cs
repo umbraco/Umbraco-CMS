@@ -27,7 +27,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
 
     protected IUserGroupService UserGroupService => GetRequiredService<IUserGroupService>();
 
-    protected async Task<IContentType> CreateInvariantContentType(params ITemplate[] templates)
+    protected IContentType CreateInvariantContentType(params ITemplate[] templates)
     {
         var contentTypeBuilder = new ContentTypeBuilder()
             .WithAlias("invariantTest")
@@ -69,7 +69,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
 
         var contentType = contentTypeBuilder.Build();
         contentType.AllowedAsRoot = true;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         return contentType;
     }
@@ -105,13 +105,13 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
                 .Done()
             .Build();
         contentType.AllowedAsRoot = true;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
         return contentType;
     }
 
     protected async Task<IContent> CreateInvariantContent(params ITemplate[] templates)
     {
-        var contentType = await CreateInvariantContentType(templates);
+        var contentType = CreateInvariantContentType(templates);
 
         var createModel = new ContentCreateModel
         {
@@ -194,7 +194,7 @@ public abstract class ContentEditingServiceTestsBase : UmbracoIntegrationTestWit
         var propertyType = contentType.PropertyTypes.First(pt => pt.Alias == "invariantTitle");
         propertyType.Alias = "otherTitle";
         propertyType.Variations = otherTitleVariation;
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         IEnumerable<PropertyValueModel> otherTitleValues = otherTitleVariation switch
         {

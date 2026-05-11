@@ -2,7 +2,7 @@ import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
-import { UmbDocumentVariantState } from '../../../../variant-state.js';
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
@@ -37,13 +37,13 @@ export class UmbDocumentTableColumnStateElement extends UmbLitElement implements
 
 	#getStateTagConfig(): { color: UUIInterfaceColor; label: string } {
 		switch (this._state) {
-			case UmbDocumentVariantState.PUBLISHED:
+			case DocumentVariantStateModel.PUBLISHED:
 				return { color: 'positive', label: this.localize.term('content_published') };
-			case UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES:
+			case DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES:
 				return { color: 'warning', label: this.localize.term('content_publishedPendingChanges') };
-			case UmbDocumentVariantState.DRAFT:
+			case DocumentVariantStateModel.DRAFT:
 				return { color: 'default', label: this.localize.term('content_unpublished') };
-			case UmbDocumentVariantState.NOT_CREATED:
+			case DocumentVariantStateModel.NOT_CREATED:
 				return { color: 'danger', label: this.localize.term('content_notCreated') };
 			default:
 				return { color: 'danger', label: fromCamelCase(this._state) };

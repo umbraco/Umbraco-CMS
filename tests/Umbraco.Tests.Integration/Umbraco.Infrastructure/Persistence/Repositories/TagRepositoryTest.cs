@@ -4,7 +4,6 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -22,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class TagRepositoryTest : UmbracoIntegrationTest
 {
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+    private IFileService FileService => GetRequiredService<IFileService>();
 
     private IContentTypeRepository ContentTypeRepository => GetRequiredService<IContentTypeRepository>();
 
@@ -71,7 +70,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Create_Tag_Relations()
+    public void Can_Create_Tag_Relations()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -79,7 +78,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -101,7 +100,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Append_Tag_Relations()
+    public void Can_Append_Tag_Relations()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -109,7 +108,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -138,7 +137,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Replace_Tag_Relations()
+    public void Can_Replace_Tag_Relations()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -146,7 +145,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -177,7 +176,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Merge_Tag_Relations()
+    public void Can_Merge_Tag_Relations()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -185,7 +184,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -215,7 +214,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Clear_Tag_Relations()
+    public void Can_Clear_Tag_Relations()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -223,7 +222,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -251,7 +250,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Remove_Specific_Tags_From_Property()
+    public void Can_Remove_Specific_Tags_From_Property()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -259,7 +258,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -294,7 +293,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Tags_For_Content_By_Id()
+    public void Can_Get_Tags_For_Content_By_Id()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -302,7 +301,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -338,7 +337,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Tags_For_Content_By_Key()
+    public void Can_Get_Tags_For_Content_By_Key()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -346,7 +345,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -383,7 +382,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_All()
+    public void Can_Get_All()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -391,7 +390,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -420,7 +419,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_All_With_Ids()
+    public void Can_Get_All_With_Ids()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -428,7 +427,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -461,7 +460,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Tags_For_Content_For_Group()
+    public void Can_Get_Tags_For_Content_For_Group()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -469,7 +468,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -505,7 +504,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Tags_For_Property_By_Id()
+    public void Can_Get_Tags_For_Property_By_Id()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -513,7 +512,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -549,7 +548,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Tags_For_Property_By_Key()
+    public void Can_Get_Tags_For_Property_By_Key()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -557,7 +556,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -594,7 +593,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Tags_For_Property_For_Group()
+    public void Can_Get_Tags_For_Property_For_Group()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -602,7 +601,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -641,13 +640,13 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Tags_For_Entity_Type_Excluding_Trashed_Entity()
+    public void Can_Get_Tags_For_Entity_Type_Excluding_Trashed_Entity()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
         {
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
             ContentTypeRepository.Save(contentType);
@@ -724,7 +723,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Tags_For_Entity_Type()
+    public void Can_Get_Tags_For_Entity_Type()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -732,7 +731,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -781,7 +780,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Tags_For_Entity_Type_For_Group()
+    public void Can_Get_Tags_For_Entity_Type_For_Group()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -789,7 +788,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -832,7 +831,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Cascade_Deletes_Tag_Relations()
+    public void Cascade_Deletes_Tag_Relations()
     {
         var provider = ScopeProvider;
         using (var scope = ScopeProvider.CreateScope())
@@ -840,7 +839,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -870,7 +869,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Tagged_Entities_For_Tag_Group()
+    public void Can_Get_Tagged_Entities_For_Tag_Group()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -878,7 +877,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -964,7 +963,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Tagged_Entities_For_Tag()
+    public void Can_Get_Tagged_Entities_For_Tag()
     {
         var provider = ScopeProvider;
         using (ScopeProvider.CreateScope())
@@ -972,7 +971,7 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
             // create data to relate to
             // We have to create and save a template, otherwise we get an FK violation on contentType.
             var template = TemplateBuilder.CreateTextPageTemplate();
-            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+            FileService.SaveTemplate(template);
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
@@ -1050,12 +1049,12 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Create_Tag_Relations_With_Mixed_Casing_For_Tag()
+    public void Can_Create_Tag_Relations_With_Mixed_Casing_For_Tag()
     {
         var provider = ScopeProvider;
         using (var scope = ScopeProvider.CreateScope())
         {
-            (IContentType contentType, IContent content1, IContent content2) = await CreateContentForCreateTagTests();
+            (IContentType contentType, IContent content1, IContent content2) = CreateContentForCreateTagTests();
 
             var repository = CreateRepository(provider);
 
@@ -1086,12 +1085,12 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Create_Tag_Relations_With_Mixed_Casing_For_Group()
+    public void Can_Create_Tag_Relations_With_Mixed_Casing_For_Group()
     {
         var provider = ScopeProvider;
         using (var scope = ScopeProvider.CreateScope())
         {
-            (IContentType contentType, IContent content1, IContent content2) = await CreateContentForCreateTagTests();
+            (IContentType contentType, IContent content1, IContent content2) = CreateContentForCreateTagTests();
 
             var repository = CreateRepository(provider);
 
@@ -1125,10 +1124,10 @@ internal sealed class TagRepositoryTest : UmbracoIntegrationTest
         }
     }
 
-    private async Task<(IContentType ContentType, IContent Content1, IContent Content2)> CreateContentForCreateTagTests()
+    private (IContentType ContentType, IContent Content1, IContent Content2) CreateContentForCreateTagTests()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType("test", "Test", defaultTemplateId: template.Id);
         ContentTypeRepository.Save(contentType);

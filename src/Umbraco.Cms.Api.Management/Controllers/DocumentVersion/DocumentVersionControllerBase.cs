@@ -16,26 +16,25 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentVersion;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
 public abstract class DocumentVersionControllerBase : ManagementApiControllerBase
 {
-    internal static IActionResult MapFailure(ContentVersionOperationStatus status)
+    protected IActionResult MapFailure(ContentVersionOperationStatus status)
         => OperationStatusResult(status, problemDetailsBuilder => status switch
         {
-            ContentVersionOperationStatus.NotFound => new NotFoundObjectResult(problemDetailsBuilder
+            ContentVersionOperationStatus.NotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The requested version could not be found")
                 .Build()),
-            ContentVersionOperationStatus.ContentNotFound => new NotFoundObjectResult(problemDetailsBuilder
+            ContentVersionOperationStatus.ContentNotFound => NotFound(problemDetailsBuilder
                 .WithTitle("The requested document could not be found")
                 .Build()),
             ContentVersionOperationStatus.InvalidSkipTake => SkipTakeToPagingProblem(),
-            ContentVersionOperationStatus.RollBackFailed => new BadRequestObjectResult(problemDetailsBuilder
+            ContentVersionOperationStatus.RollBackFailed => BadRequest(problemDetailsBuilder
                 .WithTitle("Rollback failed")
-                .WithDetail(
-                    "An unspecified error occurred while rolling back the requested version. Please check the logs for additional information.")),
-            ContentVersionOperationStatus.RollBackCanceled => new BadRequestObjectResult(problemDetailsBuilder
+                .WithDetail("An unspecified error occurred while rolling back the requested version. Please check the logs for additional information.")),
+            ContentVersionOperationStatus.RollBackCanceled => BadRequest(problemDetailsBuilder
                 .WithTitle("Request cancelled by notification")
                 .WithDetail("The request to roll back was cancelled by a notification handler.")
                 .Build()),
-            _ => new ObjectResult(problemDetailsBuilder
+            _ => StatusCode(StatusCodes.Status500InternalServerError, problemDetailsBuilder
                 .WithTitle("Unknown content version operation status.")
-                .Build()) { StatusCode = StatusCodes.Status500InternalServerError },
+                .Build()),
         });
 }

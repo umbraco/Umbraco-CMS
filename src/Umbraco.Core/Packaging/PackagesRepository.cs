@@ -2,11 +2,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO.Compression;
 using System.Xml.Linq;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using File = System.IO.File;
@@ -22,46 +22,55 @@ public class PackagesRepository : ICreatedPackagesRepository
 {
     private readonly IContentService _contentService;
     private readonly IContentTypeService _contentTypeService;
+    private readonly string _createdPackagesFolderPath;
     private readonly IDataTypeService _dataTypeService;
-    private readonly ITemplateService _templateService;
-    private readonly IIdKeyMap _idKeyMap;
-    private readonly IStylesheetService _stylesheetService;
+    private readonly IFileService _fileService;
     private readonly FileSystems _fileSystems;
     private readonly IHostingEnvironment _hostingEnvironment;
-    private readonly ILanguageRepository _languageRepository;
-    private readonly IDictionaryRepository _dictionaryRepository;
-    private readonly ICoreScopeProvider _scopeProvider;
+    private readonly ILocalizationService _languageService;
     private readonly MediaFileManager _mediaFileManager;
     private readonly IMediaService _mediaService;
     private readonly IMediaTypeService _mediaTypeService;
-    private readonly PackageDefinitionXmlParser _parser;
-    private readonly IEntityXmlSerializer _serializer;
-
-    private readonly string _createdPackagesFolderPath;
     private readonly string _packageRepositoryFileName;
     private readonly string _packagesFolderPath;
+    private readonly PackageDefinitionXmlParser _parser;
+    private readonly IEntityXmlSerializer _serializer;
     private readonly string _tempFolderPath;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PackagesRepository"/> class.
+    ///     Constructor
     /// </summary>
-
+    /// <param name="contentService"></param>
+    /// <param name="contentTypeService"></param>
+    /// <param name="dataTypeService"></param>
+    /// <param name="fileService"></param>
+    /// <param name="languageService"></param>
+    /// <param name="hostingEnvironment"></param>
+    /// <param name="serializer"></param>
+    /// <param name="globalSettings"></param>
+    /// <param name="packageRepositoryFileName">
+    ///     The file name for storing the package definitions (i.e. "createdPackages.config")
+    /// </param>
+    /// <param name="tempFolderPath"></param>
+    /// <param name="packagesFolderPath"></param>
+    /// <param name="mediaFolderPath"></param>
+    /// <param name="mediaService"></param>
+    /// <param name="mediaTypeService"></param>
+    /// <param name="mediaFileManager"></param>
+    /// <param name="fileSystems"></param>
     public PackagesRepository(
         IContentService contentService,
         IContentTypeService contentTypeService,
         IDataTypeService dataTypeService,
-        ITemplateService templateService,
-        IStylesheetService stylesheetService,
-        ILanguageRepository languageRepository,
-        IDictionaryRepository dictionaryRepository,
-        ICoreScopeProvider scopeProvider,
+        IFileService fileService,
+        ILocalizationService languageService,
         IHostingEnvironment hostingEnvironment,
         IEntityXmlSerializer serializer,
+        IOptions<GlobalSettings> globalSettings,
         IMediaService mediaService,
         IMediaTypeService mediaTypeService,
         MediaFileManager mediaFileManager,
         FileSystems fileSystems,
-        IIdKeyMap idKeyMap,
         string packageRepositoryFileName,
         string? tempFolderPath = null,
         string? packagesFolderPath = null,
@@ -75,12 +84,8 @@ public class PackagesRepository : ICreatedPackagesRepository
         _contentService = contentService;
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;
-        _templateService = templateService;
-        _idKeyMap = idKeyMap;
-        _stylesheetService = stylesheetService;
-        _languageRepository = languageRepository;
-        _dictionaryRepository = dictionaryRepository;
-        _scopeProvider = scopeProvider;
+        _fileService = fileService;
+        _languageService = languageService;
         _serializer = serializer;
         _hostingEnvironment = hostingEnvironment;
         _packageRepositoryFileName = packageRepositoryFileName;
@@ -367,13 +372,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(outInt, UmbracoObjectTypes.DataType);
-            if (keyAttempt.Success is false)
-            {
-                continue;
-            }
-
-            IDataType? dataType = _dataTypeService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult();
+            IDataType? dataType = _dataTypeService.GetDataType(outInt);
             if (dataType == null)
             {
                 continue;
@@ -393,23 +392,20 @@ public class PackagesRepository : ICreatedPackagesRepository
     private void PackageLanguages(PackageDefinition definition, XContainer root)
     {
         var languages = new XElement("Languages");
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        foreach (var langId in definition.Languages)
         {
-            foreach (var langId in definition.Languages)
+            if (!int.TryParse(langId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
             {
-                if (!int.TryParse(langId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
-                {
-                    continue;
-                }
-
-                ILanguage? lang = _languageRepository.Get(outInt);
-                if (lang == null)
-                {
-                    continue;
-                }
-
-                languages.Add(_serializer.Serialize(lang));
+                continue;
             }
+
+            ILanguage? lang = _languageService.GetLanguageById(outInt);
+            if (lang == null)
+            {
+                continue;
+            }
+
+            languages.Add(_serializer.Serialize(lang));
         }
 
         root.Add(languages);
@@ -425,23 +421,21 @@ public class PackagesRepository : ICreatedPackagesRepository
         var rootDictionaryItems = new XElement("DictionaryItems");
         var items = new Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)>();
 
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true))
+        foreach (var dictionaryId in definition.DictionaryItems)
         {
-            foreach (var dictionaryId in definition.DictionaryItems)
+            if (!int.TryParse(dictionaryId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
             {
-                if (!int.TryParse(dictionaryId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var outInt))
-                {
-                    continue;
-                }
-
-                IDictionaryItem? di = _dictionaryRepository.Get(outInt);
-                if (di == null)
-                {
-                    continue;
-                }
-
-                items[di.Key] = (di, _serializer.Serialize(di, false));
+                continue;
             }
+
+            IDictionaryItem? di = _languageService.GetDictionaryItemById(outInt);
+
+            if (di == null)
+            {
+                continue;
+            }
+
+            items[di.Key] = (di, _serializer.Serialize(di, false));
         }
 
         // organize them in hierarchy ...
@@ -589,7 +583,7 @@ public class PackagesRepository : ICreatedPackagesRepository
                 continue;
             }
 
-            ITemplate? template = _templateService.GetAsync(outInt).GetAwaiter().GetResult();
+            ITemplate? template = _fileService.GetTemplate(outInt);
             if (template == null)
             {
                 continue;
@@ -817,7 +811,7 @@ public class PackagesRepository : ICreatedPackagesRepository
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
         }
 
-        IStylesheet? stylesheet = _stylesheetService.GetAsync(path).GetAwaiter().GetResult();
+        IStylesheet? stylesheet = _fileService.GetStylesheet(path);
         if (stylesheet == null)
         {
             return null;

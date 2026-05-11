@@ -29,20 +29,17 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
 
     [Test]
-    public async Task Can_Get_Index_Values_From_RichText_With_Blocks()
+    public void Can_Get_Index_Values_From_RichText_With_Blocks()
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(elementType);
 
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
-        var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
-        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
-        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
-        var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
+        var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
         var editor = dataType.Editor!;
 
         var elementId = Guid.NewGuid();
@@ -104,16 +101,13 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Can_Get_Index_Values_From_RichText_Without_Blocks()
+    public void Can_Get_Index_Values_From_RichText_Without_Blocks()
     {
         var contentType = ContentTypeBuilder.CreateTextPageContentType("myContentType");
         contentType.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
-        var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
-        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
-        Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
-        var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
+        var dataType = DataTypeService.GetDataType(contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId)!;
         var editor = dataType.Editor!;
 
         var content = ContentBuilder.CreateTextpageContent(contentType, "My Content", -1);
@@ -145,7 +139,7 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(elementType);
 
         var dataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockList], ConfigurationEditorJsonSerializer)
         {
@@ -176,7 +170,7 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             .WithDataTypeId(dataType.Id)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         var editor = dataType.Editor!;
 
@@ -234,7 +228,7 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(elementType);
 
         var dataType = new DataType(PropertyEditorCollection[Constants.PropertyEditors.Aliases.BlockGrid], ConfigurationEditorJsonSerializer)
         {
@@ -278,7 +272,7 @@ internal sealed class PropertyIndexValueFactoryTests : UmbracoIntegrationTest
             .WithDataTypeId(dataType.Id)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
 
         var editor = dataType.Editor!;
 

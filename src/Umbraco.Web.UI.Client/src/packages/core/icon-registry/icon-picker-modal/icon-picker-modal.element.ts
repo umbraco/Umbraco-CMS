@@ -25,13 +25,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 
 	#searchController = new UmbIconSearchController(this);
 
-	#debouncedFilterIcons = debounce(() => {
-		void this.#filterIcons().catch((error) => {
-			if ((error as DOMException)?.name !== 'AbortError') {
-				console.error(error);
-			}
-		});
-	}, 250);
+	#debouncedFilterIcons = debounce(() => this.#filterIcons(), 250);
 
 	@query('#search')
 	private _searchInput?: HTMLInputElement;
@@ -51,11 +45,7 @@ export class UmbIconPickerModalElement extends UmbModalBaseElement<UmbIconPicker
 			this.observe(context?.approvedIcons, (icons) => {
 				this.#icons = icons;
 				this.#searchController.setIcons(icons ?? []);
-				this.#filterIcons().catch((error) => {
-					if ((error as DOMException)?.name !== 'AbortError') {
-						console.error(error);
-					}
-				});
+				this.#filterIcons();
 			});
 		});
 	}

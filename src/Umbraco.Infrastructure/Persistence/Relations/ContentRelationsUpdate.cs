@@ -22,9 +22,7 @@ internal sealed class ContentRelationsUpdate :
     IDistributedCacheNotificationHandler<ContentSavedNotification>,
     IDistributedCacheNotificationHandler<ContentPublishedNotification>,
     IDistributedCacheNotificationHandler<MediaSavedNotification>,
-    IDistributedCacheNotificationHandler<MemberSavedNotification>,
-    IDistributedCacheNotificationHandler<ElementSavedNotification>,
-    IDistributedCacheNotificationHandler<ElementPublishedNotification>
+    IDistributedCacheNotificationHandler<MemberSavedNotification>
 {
     private readonly IScopeProvider _scopeProvider;
     private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
@@ -75,18 +73,6 @@ internal sealed class ContentRelationsUpdate :
 
     /// <inheritdoc/>
     public void Handle(IEnumerable<MemberSavedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.SavedEntities));
-
-    /// <inheritdoc/>
-    public void Handle(ElementSavedNotification notification) => PersistRelations(notification.SavedEntities);
-
-    /// <inheritdoc/>
-    public void Handle(IEnumerable<ElementSavedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.SavedEntities));
-
-    /// <inheritdoc/>
-    public void Handle(ElementPublishedNotification notification) => PersistRelations(notification.PublishedEntities);
-
-    /// <inheritdoc/>
-    public void Handle(IEnumerable<ElementPublishedNotification> notifications) => PersistRelations(notifications.SelectMany(x => x.PublishedEntities));
 
     private void PersistRelations(IEnumerable<IContentBase> entities)
     {

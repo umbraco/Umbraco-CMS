@@ -14,8 +14,6 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
-using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -45,9 +43,11 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
-    private IStylesheetService StylesheetService => GetRequiredService<IStylesheetService>();
+    private IFileService FileService => GetRequiredService<IFileService>();
 
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
+
+    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
     private IEntityXmlSerializer EntityXmlSerializer => GetRequiredService<IEntityXmlSerializer>();
 
@@ -61,24 +61,19 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
-    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
-
     public ICreatedPackagesRepository PackageBuilder => new PackagesRepository(
         ContentService,
         ContentTypeService,
         DataTypeService,
-        TemplateService,
-        StylesheetService,
-        GetRequiredService<ILanguageRepository>(),
-        GetRequiredService<IDictionaryRepository>(),
-        GetRequiredService<IScopeProvider>(),
+        FileService,
+        LocalizationService,
         HostingEnvironment,
         EntityXmlSerializer,
+        Options.Create(new GlobalSettings()),
         MediaService,
         MediaTypeService,
         MediaFileManager,
         FileSystems,
-        GetRequiredService<IIdKeyMap>(),
         "createdPackages.config",
 
         // temp paths
@@ -216,10 +211,10 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public async Task Export_Zip()
+    public void Export_Zip()
     {
         var mt = MediaTypeBuilder.CreateImageMediaType("testImage");
-        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
+        MediaTypeService.Save(mt);
         var m1 = MediaBuilder.CreateMediaFile(mt, -1);
         MediaService.Save(m1);
 
@@ -268,11 +263,11 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
 
     [Test]
-    public async Task Export_Xml()
+    public void Export_Xml()
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
 
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         var def = new PackageDefinition { Name = "test", Templates = new[] { template.Id.ToString() } };
         var result = PackageBuilder.SavePackage(def);

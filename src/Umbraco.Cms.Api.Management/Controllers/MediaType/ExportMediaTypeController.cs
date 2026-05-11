@@ -1,4 +1,3 @@
-using System.Net.Mime;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -18,8 +17,8 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType;
 [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaTypes)]
 public class ExportMediaTypeController : MediaTypeControllerBase
 {
-    private readonly IUdtFileContentFactory _fileContentFactory;
     private readonly IMediaTypeService _mediaTypeService;
+    private readonly IUdtFileContentFactory _fileContentFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ExportMediaTypeController"/> class, used for exporting media types.
@@ -42,7 +41,7 @@ public class ExportMediaTypeController : MediaTypeControllerBase
     /// <returns>A <see cref="FileContentResult"/> containing the exported media type, or a 404 Not Found result if the media type does not exist.</returns>
     [HttpGet("{id:guid}/export")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK, MediaTypeNames.Application.Octet)]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Exports a media type.")]
     [EndpointDescription("Exports the media type identified by the provided Id to a downloadable format.")]

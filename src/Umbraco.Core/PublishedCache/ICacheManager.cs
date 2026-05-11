@@ -28,11 +28,6 @@ public interface ICacheManager
     IPublishedMemberCache Members { get; }
 
     /// <summary>
-    ///     Gets the <see cref="IPublishedElementCache" />.
-    /// </summary>
-    IPublishedElementCache Elements { get; }
-
-    /// <summary>
     ///     Gets the <see cref="IDomainCache" />.
     /// </summary>
     IDomainCache Domains { get; }

@@ -7,11 +7,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos;
 [TableName(TableName)]
 [PrimaryKey(PrimaryKeyColumnName)]
 [ExplicitColumns]
-internal sealed class DocumentCultureVariationDto : ICultureVariationDto
+internal sealed class DocumentCultureVariationDto
 {
     public const string TableName = Constants.DatabaseSchema.Tables.DocumentCultureVariation;
+    public const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
 
-    private const string PrimaryKeyColumnName = Constants.DatabaseSchema.Columns.PrimaryKeyNameId;
+    // Public constants to bind properties between DTOs
+    public const string PublishedColumnName = "published";
+
+    private const string LanguageIdColumnName = "languageId";
+    private const string NodeIdColumnName = "nodeId";
 
     /// <summary>
     /// Gets or sets the unique identifier for the document culture variation.
@@ -23,15 +28,15 @@ internal sealed class DocumentCultureVariationDto : ICultureVariationDto
     /// <summary>
     /// Gets or sets the identifier of the content node associated with this culture variation.
     /// </summary>
-    [Column(ICultureVariationDto.Columns.NodeId)]
+    [Column(NodeIdColumnName)]
     [ForeignKey(typeof(NodeDto))]
-    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = $"{INodeDto.Columns.NodeId},{ICultureVariationDto.Columns.LanguageId}")]
+    [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName + "_NodeId", ForColumns = $"{NodeIdColumnName},{LanguageIdColumnName}")]
     public int NodeId { get; set; }
 
     /// <summary>
     /// Gets or sets the language identifier associated with the document culture variation.
     /// </summary>
-    [Column(ICultureVariationDto.Columns.LanguageId)]
+    [Column(LanguageIdColumnName)]
     [ForeignKey(typeof(LanguageDto))]
     [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
     public int LanguageId { get; set; }
@@ -48,7 +53,7 @@ internal sealed class DocumentCultureVariationDto : ICultureVariationDto
     /// Gets or sets a value indicating whether this culture variation of the document has been edited.
     /// </summary>
     /// <remarks>authority on whether a culture has been edited</remarks>
-    [Column(ICultureVariationDto.Columns.Edited)]
+    [Column("edited")]
     public bool Edited { get; set; }
 
     /// <summary>
@@ -58,7 +63,7 @@ internal sealed class DocumentCultureVariationDto : ICultureVariationDto
     /// de-normalized for perfs
     /// (means there is a current content version culture variation for the language)
     /// </remarks>
-    [Column(ICultureVariationDto.Columns.Available)]
+    [Column("available")]
     public bool Available { get; set; }
 
     /// <summary>
@@ -68,7 +73,7 @@ internal sealed class DocumentCultureVariationDto : ICultureVariationDto
     /// de-normalized for perfs
     /// (means there is a published content version culture variation for the language)
     /// </remarks>
-    [Column(ICultureVariationDto.Columns.Published)]
+    [Column(PublishedColumnName)]
     public bool Published { get; set; }
 
     /// <summary>
@@ -80,7 +85,7 @@ internal sealed class DocumentCultureVariationDto : ICultureVariationDto
     /// (when available, copies name from current content version culture variation for the language)
     /// (otherwise, it's the published one, 'cos we need to have one)
     /// </remarks>
+    [Column("name")]
     [NullSetting(NullSetting = NullSettings.Null)]
-    [Column(ICultureVariationDto.Columns.Name)]
     public string? Name { get; set; }
 }

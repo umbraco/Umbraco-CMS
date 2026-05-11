@@ -74,10 +74,10 @@ internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegration
     {
         var publishResult = ContentService.Publish(content, culturesToPublish);
         Assert.IsTrue(publishResult.Success);
-        DocumentCacheService.RefreshContentAsync(content).GetAwaiter().GetResult();
+        DocumentCacheService.RefreshContentAsync(content);
     }
 
-    protected async Task<IContentType> CreateElementType(ContentVariation variation, string alias = "myElementType")
+    protected IContentType CreateElementType(ContentVariation variation, string alias = "myElementType")
     {
         var elementType = new ContentTypeBuilder()
             .WithAlias(alias)
@@ -101,11 +101,11 @@ internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegration
             .WithVariations(variation)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(elementType);
         return elementType;
     }
 
-    protected async Task<IContentType> CreateContentType(ContentVariation contentTypeVariation, IDataType blocksEditorDataType, ContentVariation blocksPropertyVariation = ContentVariation.Nothing)
+    protected IContentType CreateContentType(ContentVariation contentTypeVariation, IDataType blocksEditorDataType, ContentVariation blocksPropertyVariation = ContentVariation.Nothing)
     {
         var contentType = new ContentTypeBuilder()
             .WithAlias("myPage")
@@ -118,7 +118,7 @@ internal abstract class BlockEditorElementVariationTestBase : UmbracoIntegration
             .WithVariations(blocksPropertyVariation)
             .Done()
             .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(contentType);
         return contentType;
     }
 

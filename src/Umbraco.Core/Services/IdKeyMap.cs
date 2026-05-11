@@ -151,11 +151,6 @@ public class IdKeyMap : IIdKeyMap, IDisposable
             return Attempt.Succeed(Constants.System.RecycleBinMedia);
         }
 
-        if (key == Constants.System.RecycleBinElementKey && umbracoObjectType is UmbracoObjectTypes.Element or UmbracoObjectTypes.ElementContainer)
-        {
-            return Attempt.Succeed(Constants.System.RecycleBinElement);
-        }
-
         bool empty;
 
         try
@@ -289,11 +284,6 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         if (id == Constants.System.RecycleBinMedia && umbracoObjectType == UmbracoObjectTypes.Media)
         {
             return Attempt.Succeed(Constants.System.RecycleBinMediaKey);
-        }
-
-        if (id == Constants.System.RecycleBinElement && umbracoObjectType is UmbracoObjectTypes.Element or UmbracoObjectTypes.ElementContainer)
-        {
-            return Attempt.Succeed(Constants.System.RecycleBinElementKey);
         }
 
         bool empty;

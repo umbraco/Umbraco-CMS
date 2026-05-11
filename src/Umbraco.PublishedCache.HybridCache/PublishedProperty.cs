@@ -11,10 +11,8 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 
 internal sealed class PublishedProperty : PublishedPropertyBase
 {
-    private readonly IPublishedElement _element;
+    private readonly PublishedContent _content;
     private readonly bool _isPreviewing;
-    private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
     private readonly IElementsCache _elementsCache;
     private readonly bool _isMember;
     private string? _valuesCacheKey;
@@ -38,10 +36,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     // initializes a published content property with a value
     public PublishedProperty(
         IPublishedPropertyType propertyType,
-        IPublishedElement element,
-        IVariationContextAccessor variationContextAccessor,
-        IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
-        bool preview,
+        PublishedContent content,
         PropertyData[]? sourceValues,
         IElementsCache elementsElementsCache,
         PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
@@ -70,23 +65,21 @@ internal sealed class PublishedProperty : PublishedPropertyBase
             }
         }
 
-        _element = element;
-        _variationContextAccessor = variationContextAccessor;
-        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
-        _isPreviewing = preview;
-        _isMember = element.ContentType.ItemType == PublishedItemType.Member;
+        _content = content;
+        _isPreviewing = content.IsPreviewing;
+        _isMember = content.ContentType.ItemType == PublishedItemType.Member;
         _elementsCache = elementsElementsCache;
 
         // this variable is used for contextualizing the variation level when calculating property values.
         // it must be set to the union of variance (the combination of content type and property type variance).
-        _variations = propertyType.Variations | element.ContentType.Variations;
+        _variations = propertyType.Variations | content.ContentType.Variations;
         _sourceVariations = propertyType.Variations;
 
         _propertyTypeAlias = propertyType.Alias;
     }
 
     // used to cache the CacheValues of this property
-    internal string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValues(_element.Key, Alias, _isPreviewing);
+    internal string ValuesCacheKey => _valuesCacheKey ??= PropertyCacheValues(_content.Key, Alias, _isPreviewing);
 
     private static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
     {
@@ -101,7 +94,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     // determines whether a property has value
     public override bool HasValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         var value = GetSourceValue(culture, segment);
         var isValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
@@ -125,7 +118,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_sourceVariations, _element.Id, PropertyType.Alias, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_sourceVariations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         // source values are tightly bound to the property/schema culture and segment configurations, so we need to
         // sanitize the contextualized culture/segment states before using them to access the source values.
@@ -158,22 +151,21 @@ internal sealed class PublishedProperty : PublishedPropertyBase
                 return _interValue;
             }
 
-            _interValue = PropertyType.ConvertSourceToInter(_element, _sourceValue, _isPreviewing);
+            _interValue = PropertyType.ConvertSourceToInter(_content, _sourceValue, _isPreviewing);
             _interInitialized = true;
             return _interValue;
         }
 
-        return PropertyType.ConvertSourceToInter(_element, GetSourceValue(culture, segment), _isPreviewing);
+        return PropertyType.ConvertSourceToInter(_content, GetSourceValue(culture, segment), _isPreviewing);
     }
 
     public override object? GetValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         // Include the fallback policy in the cache key so that different fallback strategies
         // produce separate cached values (e.g., block editors filter differently with Fallback.ToLanguage).
-        Fallback fallback = _propertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
-
+        Fallback fallback = _content.PropertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
         CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment, fallback);
 
         // initial reference cache level always is .Content
@@ -184,7 +176,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
             return cacheValues.ObjectValue;
         }
 
-        cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_element, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
+        cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
         cacheValues.ObjectInitialized = true;
 
         return cacheValues.ObjectValue;
@@ -233,7 +225,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
+        _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, _propertyTypeAlias, ref culture, ref segment);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);
@@ -242,7 +234,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         // initial reference cache level always is .Content
         const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
 
-        object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(_element, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing, expanding);
+        object? GetDeliveryApiObject() => PropertyType.ConvertInterToDeliveryApiObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing, expanding);
         value = expanding
             ? GetDeliveryApiExpandedObject(cacheValues, GetDeliveryApiObject)
             : GetDeliveryApiDefaultObject(cacheValues, GetDeliveryApiObject);

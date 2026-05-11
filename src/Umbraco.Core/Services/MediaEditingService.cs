@@ -46,9 +46,7 @@ internal sealed class MediaEditingService
         IMediaValidationService mediaValidationService,
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
-        ContentTypeFilterCollection contentTypeFilters,
-        ILanguageService languageService,
-        IUserService userService)
+        ContentTypeFilterCollection contentTypeFilters)
         : base(
             contentService,
             contentTypeService,
@@ -61,16 +59,14 @@ internal sealed class MediaEditingService
             treeEntitySortingService,
             optionsMonitor,
             relationService,
-            contentTypeFilters,
-            languageService,
-            userService)
+            contentTypeFilters)
         => _logger = logger;
 
     /// <inheritdoc/>
     protected override string? RelateParentOnDeleteAlias => Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
 
     /// <inheritdoc />
-    public override Task<IMedia?> GetAsync(Guid key)
+    public Task<IMedia?> GetAsync(Guid key)
     {
         IMedia? media = ContentService.GetById(key);
         return Task.FromResult(media);
@@ -170,7 +166,7 @@ internal sealed class MediaEditingService
         => await HandleSortAsync(parentKey, sortingModels, userKey);
 
     /// <inheritdoc />
-    protected override IMedia New(string name, int parentId, IMediaType mediaType)
+    protected override IMedia New(string? name, int parentId, IMediaType mediaType)
         => new Models.Media(name, parentId, mediaType);
 
     /// <inheritdoc />
@@ -179,7 +175,7 @@ internal sealed class MediaEditingService
 
     /// <inheritdoc />
     /// <exception cref="NotSupportedException">Copy is not supported for media items.</exception>
-    protected override Task<IMedia?> CopyAsync(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, Guid userKey)
+    protected override IMedia? Copy(IMedia media, int newParentId, bool relateToOriginal, bool includeDescendants, int userId)
         => throw new NotSupportedException("Copy is not supported for media");
 
     /// <inheritdoc />

@@ -13,7 +13,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		flags: [],
-		noAccess: false,
 	},
 	{
 		name: 'Folder 2',
@@ -27,7 +26,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		flags: [],
-		noAccess: false,
 	},
 	{
 		id: 'forbidden',
@@ -41,7 +39,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		flags: [],
-		noAccess: false,
 	},
 	{
 		id: '0cc0eba1-9960-42c9-bf9b-60e150b429ae',
@@ -55,7 +52,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		isDeletable: true,
 		canIgnoreStartNodes: false,
 		flags: [],
-		noAccess: false,
 	},
 	{
 		name: 'Text',
@@ -74,7 +70,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 10,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Text Area',
@@ -88,7 +83,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		values: [],
 		flags: [],
-		noAccess: false,
 	},
 	{
 		name: 'My JS Property Editor',
@@ -102,7 +96,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		values: [],
 		flags: [],
-		noAccess: false,
 	},
 	{
 		name: 'Color Picker',
@@ -162,7 +155,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				],
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Content Picker',
@@ -181,7 +173,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: { min: 2, max: 4 },
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Eye Dropper',
@@ -222,7 +213,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: false,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Multi URL Picker',
@@ -257,7 +247,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 0,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Multi Node Tree Picker',
@@ -304,7 +293,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: '',
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Date Picker',
@@ -331,7 +319,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: true,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Date Picker With Time',
@@ -354,7 +341,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: true,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Time',
@@ -377,7 +363,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: false,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Email',
@@ -396,7 +381,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 'email',
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Multiple Text String',
@@ -419,7 +403,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 4,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Dropdown',
@@ -442,7 +425,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: ['First Option', 'Second Option', 'I Am the third Option'],
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Dropdown (Multiple)',
@@ -465,7 +447,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: ['First Option', 'Second Option', 'I Am the third Option'],
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Dropdown Alignment Options',
@@ -488,7 +469,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: ['left', 'center', 'right'],
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Slider',
@@ -527,7 +507,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 10,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Toggle',
@@ -558,7 +537,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: true,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Tags',
@@ -581,7 +559,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: [],
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Code Editor',
@@ -600,7 +577,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 'html',
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Markdown Editor',
@@ -614,7 +590,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Radio Button List',
@@ -633,7 +608,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: ['First Option', 'Second Option', 'I Am the third Option'],
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Checkbox List',
@@ -652,7 +626,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: ['First Option', 'Second Option', 'I Am the third Option'],
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Block List',
@@ -716,7 +689,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: true,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Media Picker',
@@ -730,7 +702,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Image Cropper',
@@ -765,7 +736,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				],
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Upload Field',
@@ -788,7 +758,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: true,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Upload Field (Files)',
@@ -811,7 +780,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: true,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Upload Field (Movies)',
@@ -834,7 +802,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: true,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Upload Field (Vector)',
@@ -857,7 +824,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: true,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Block Grid',
@@ -942,6 +908,7 @@ export const data: Array<UmbMockDataTypeModel> = [
 						editorSize: 'medium',
 						allowInAreas: true,
 					},
+
 					{
 						label: 'Headline',
 						contentElementTypeKey: 'headline-umbraco-demo-block-id',
@@ -981,7 +948,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				],
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Collection View',
@@ -1025,7 +991,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'tabName', value: 'Children' },
 			{ alias: 'showContentFirst', value: true },
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Collection View - Media',
@@ -1069,7 +1034,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'tabName', value: 'Items' },
 			{ alias: 'showContentFirst', value: false },
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Icon Picker',
@@ -1083,7 +1047,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Rich Text Editor',
@@ -1184,7 +1147,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 			{ alias: 'ignoreUserStartNodes', value: false },
 			{ alias: 'overlaySize', value: 'medium' },
 		],
-		noAccess: false,
 	},
 	{
 		name: 'Label',
@@ -1198,7 +1160,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Integer',
@@ -1212,7 +1173,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Decimal',
@@ -1231,7 +1191,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 				value: 0.01,
 			},
 		],
-		noAccess: false,
 	},
 	{
 		name: 'User Picker',
@@ -1245,7 +1204,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Member Picker',
@@ -1259,7 +1217,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Member Group Picker',
@@ -1273,7 +1230,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Data Type in folder',
@@ -1287,7 +1243,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Static File Picker',
@@ -1301,7 +1256,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Date Only',
@@ -1315,7 +1269,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Time Only',
@@ -1329,7 +1282,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Date Time (Unspecified)',
@@ -1343,7 +1295,6 @@ export const data: Array<UmbMockDataTypeModel> = [
 		canIgnoreStartNodes: false,
 		flags: [],
 		values: [],
-		noAccess: false,
 	},
 	{
 		name: 'Date Time (with time zone)',
@@ -1365,6 +1316,5 @@ export const data: Array<UmbMockDataTypeModel> = [
 				},
 			},
 		],
-		noAccess: false,
 	},
 ];

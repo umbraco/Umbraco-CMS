@@ -20,8 +20,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
 {
-    private IRelationType _relateContentToMedia;
-
     [SetUp]
     public void SetUp() => CreateTestData();
 
@@ -103,7 +101,7 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(provider);
 
             // Act
-            var relationType = repository.Get(_relateContentToMedia.Id) as IRelationTypeWithIsDependency;
+            var relationType = repository.Get(9) as IRelationTypeWithIsDependency;
 
             // Assert
             Assert.That(relationType, Is.Not.Null);
@@ -131,8 +129,9 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
 
             // Assert
             Assert.That(relationTypes, Is.Not.Null);
-            Assert.That(relationTypes.Length, Is.EqualTo(12));
+            Assert.That(relationTypes.Any(), Is.True);
             Assert.That(relationTypes.Any(x => x == null), Is.False);
+            Assert.That(relationTypes.Count(), Is.EqualTo(9));
         }
     }
 
@@ -189,7 +188,7 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
             var count = repository.Count(query);
 
             // Assert
-            Assert.That(count, Is.EqualTo(8));
+            Assert.That(count, Is.EqualTo(6));
         }
     }
 
@@ -244,13 +243,11 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
         {
             var repository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
 
-            repository.Save(relateContent);
-            repository.Save(relateContentType);
-            repository.Save(relateContentMedia);
+            repository.Save(relateContent); // Id 2
+            repository.Save(relateContentType); // Id 3
+            repository.Save(relateContentMedia); // Id 4
             scope.Complete();
         }
-
-        _relateContentToMedia = relateContentMedia;
     }
 
     [Test]

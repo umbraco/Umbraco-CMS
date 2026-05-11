@@ -20,7 +20,7 @@ public class LoggingSettings
     /// <summary>
     ///     The default directory for log files.
     /// </summary>
-    internal const string StaticDirectory = "~/umbraco/Logs";
+    internal const string StaticDirectory = Constants.SystemDirectories.LogFiles;
 
     /// <summary>
     ///     The default file name format for log files.

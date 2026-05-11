@@ -64,7 +64,4 @@ export class UmbMockEntityDetailManager<MockType extends { id: string }> {
 	delete(id: string) {
 		this.#db.delete(id);
 	}
-
-	// TODO: Implement actual validation logic. Currently always returns valid.
-	validate(_id?: string) {}
 }

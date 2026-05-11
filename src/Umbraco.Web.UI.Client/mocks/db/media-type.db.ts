@@ -88,7 +88,6 @@ const createMockMediaTypeFolderMapper = (request: CreateFolderRequestModel): Umb
 		properties: [],
 		containers: [],
 		allowedAsRoot: false,
-		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -100,7 +99,6 @@ const createMockMediaTypeFolderMapper = (request: CreateFolderRequestModel): Umb
 		isDeletable: false,
 		aliasCanBeChanged: false,
 		flags: [],
-		noAccess: false,
 	};
 };
 
@@ -114,7 +112,6 @@ const createMockMediaTypeMapper = (request: CreateMediaTypeRequestModel): UmbMoc
 		properties: request.properties,
 		containers: request.containers,
 		allowedAsRoot: request.allowedAsRoot,
-		allowedInLibrary: request.allowedInLibrary,
 		variesByCulture: request.variesByCulture,
 		variesBySegment: request.variesBySegment,
 		isElement: request.isElement,
@@ -127,7 +124,6 @@ const createMockMediaTypeMapper = (request: CreateMediaTypeRequestModel): UmbMoc
 		isDeletable: false,
 		aliasCanBeChanged: false,
 		flags: [],
-		noAccess: false,
 	};
 };
 
@@ -141,7 +137,6 @@ const mediaTypeDetailMapper = (item: UmbMockMediaTypeModel): MediaTypeResponseMo
 		properties: item.properties,
 		containers: item.containers,
 		allowedAsRoot: item.allowedAsRoot,
-		allowedInLibrary: false,
 		variesByCulture: item.variesByCulture,
 		variesBySegment: item.variesBySegment,
 		isElement: item.isElement,
@@ -163,7 +158,6 @@ const mediaTypeTreeItemMapper = (item: UmbMockMediaTypeModel): MediaTypeTreeItem
 		icon: item.icon,
 		isDeletable: item.isDeletable,
 		flags: item.flags,
-		noAccess: item.noAccess,
 	};
 };
 

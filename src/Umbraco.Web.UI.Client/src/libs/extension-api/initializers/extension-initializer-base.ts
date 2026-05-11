@@ -3,7 +3,7 @@ import type { UmbExtensionRegistry } from '../registry/extension.registry.js';
 import type { SpecificManifestTypeOrManifestBase } from '../types/map.types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbElement } from '@umbraco-cms/backoffice/element-api';
-import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
+import { ReplaySubject } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * Base class for extension initializers, which are responsible for loading and unloading extensions.
@@ -12,12 +12,10 @@ export abstract class UmbExtensionInitializerBase<
 	Key extends string,
 	T extends ManifestBase = SpecificManifestTypeOrManifestBase<UmbExtensionManifest, Key>,
 > extends UmbControllerBase {
-	protected host: UmbElement;
-	protected extensionRegistry: UmbExtensionRegistry<T>;
+	protected host;
+	protected extensionRegistry;
 	#extensionMap = new Map();
-
-	// Use the value `undefined`, as that would not resolve a observation promise. [NL]
-	#loaded = new UmbBooleanState(undefined);
+	#loaded = new ReplaySubject<void>(1);
 	loaded = this.#loaded.asObservable();
 
 	constructor(host: UmbElement, extensionRegistry: UmbExtensionRegistry<T>, manifestType: Key) {
@@ -40,9 +38,7 @@ export abstract class UmbExtensionInitializerBase<
 				}),
 			);
 
-			if (extensions.length > 0) {
-				this.#loaded.setValue(true);
-			}
+			this.#loaded.next();
 		});
 	}
 

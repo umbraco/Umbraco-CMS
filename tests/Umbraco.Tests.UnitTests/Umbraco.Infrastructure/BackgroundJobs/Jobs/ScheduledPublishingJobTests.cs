@@ -24,7 +24,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs
 public class ScheduledPublishingJobTests
 {
     private Mock<IContentService> _mockContentService;
-    private Mock<IElementService> _mockElementService;
     private Mock<ILogger<ScheduledPublishingJob>> _mockLogger;
 
     [Test]
@@ -33,7 +32,6 @@ public class ScheduledPublishingJobTests
         var sut = CreateScheduledPublishing(enabled: false);
         await sut.ExecuteAsync();
         VerifyScheduledPublishingNotPerformed();
-        VerifyElementScheduledPublishingNotPerformed();
     }
 
     [Test]
@@ -42,7 +40,6 @@ public class ScheduledPublishingJobTests
         var sut = CreateScheduledPublishing();
         await sut.ExecuteAsync();
         VerifyScheduledPublishingPerformed();
-        VerifyElementScheduledPublishingPerformed();
     }
 
     private ScheduledPublishingJob CreateScheduledPublishing(
@@ -58,7 +55,6 @@ public class ScheduledPublishingJobTests
         }
 
         _mockContentService = new Mock<IContentService>();
-        _mockElementService = new Mock<IElementService>();
 
         var mockUmbracoContextFactory = new Mock<IUmbracoContextFactory>();
         mockUmbracoContextFactory.Setup(x => x.EnsureUmbracoContext())
@@ -82,7 +78,6 @@ public class ScheduledPublishingJobTests
 
         return new ScheduledPublishingJob(
             _mockContentService.Object,
-            _mockElementService.Object,
             mockUmbracoContextFactory.Object,
             _mockLogger.Object,
             mockServerMessenger.Object,
@@ -96,11 +91,4 @@ public class ScheduledPublishingJobTests
 
     private void VerifyScheduledPublishingPerformed(Times times) =>
         _mockContentService.Verify(x => x.PerformScheduledPublish(It.IsAny<DateTime>()), times);
-
-    private void VerifyElementScheduledPublishingNotPerformed() => VerifyElementScheduledPublishingPerformed(Times.Never());
-
-    private void VerifyElementScheduledPublishingPerformed() => VerifyElementScheduledPublishingPerformed(Times.Once());
-
-    private void VerifyElementScheduledPublishingPerformed(Times times) =>
-        _mockElementService.Verify(x => x.PerformScheduledPublish(It.IsAny<DateTime>()), times);
 }

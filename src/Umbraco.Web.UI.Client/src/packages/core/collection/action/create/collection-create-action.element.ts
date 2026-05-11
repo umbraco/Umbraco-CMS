@@ -1,7 +1,12 @@
 import { customElement, html, ifDefined, state } from '@umbraco-cms/backoffice/external/lit';
+import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbExtensionsApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbCreateCollectionActionApi } from './collection-create-action.api.js';
-import type { UmbCollectionCreateOption } from './types.js';
+import { UMB_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/entity';
+import type { ManifestEntityCreateOptionAction } from '@umbraco-cms/backoffice/entity-create-option-action';
+import type { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
+
+type ManifestType = ManifestEntityCreateOptionAction;
 
 @customElement('umb-collection-create-action-button')
 export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
@@ -12,25 +17,13 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	private _multipleOptions = false;
 
 	@state()
-	private _options: Array<UmbCollectionCreateOption> = [];
+	private _apiControllers: Array<UmbExtensionApiInitializer<ManifestType>> = [];
+
+	@state()
+	private _hrefList: Array<string | undefined> = [];
 
 	#createLabel = this.localize.term('general_create');
-	#api: UmbCreateCollectionActionApi | undefined;
-
-	public get api(): UmbCreateCollectionActionApi | undefined {
-		return this.#api;
-	}
-	public set api(value: UmbCreateCollectionActionApi | undefined) {
-		this.#api = value;
-
-		this.observe(this.#api?.options, (options) => {
-			this._options = options ?? [];
-		});
-
-		this.observe(this.#api?.multipleOptions, (multipleOptions) => {
-			this._multipleOptions = multipleOptions ?? false;
-		});
-	}
+	#entityContext?: typeof UMB_ENTITY_CONTEXT.TYPE;
 
 	#onPopoverToggle(event: PointerEvent) {
 		// TODO: This ignorer is just neede for JSON SCHEMA TO WORK, As its not updated with latest TS jet.
@@ -39,14 +32,51 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 		this._popoverOpen = event.newState === 'open';
 	}
 
-	async #onClick(event: Event, alias: string, href?: string) {
+	async #onClick(event: Event, controller: UmbExtensionApiInitializer<ManifestType>, href?: string) {
+		// skip if href is defined
 		if (href) {
 			return;
 		}
 
 		event.stopPropagation();
 
-		await this.#api?.executeByAlias(alias).catch(() => {});
+		if (!controller.api) throw new Error('No API found');
+		await controller.api.execute().catch(() => {});
+	}
+
+	constructor() {
+		super();
+
+		this.consumeContext(UMB_ENTITY_CONTEXT, (context) => {
+			this.#entityContext = context;
+			this.#initApi();
+		});
+	}
+
+	#initApi() {
+		if (!this.#entityContext) return;
+
+		const entityType = this.#entityContext.getEntityType();
+		if (!entityType) throw new Error('No entity type found');
+
+		const unique = this.#entityContext.getUnique();
+		if (unique === undefined) throw new Error('No unique found');
+
+		new UmbExtensionsApiInitializer(
+			this,
+			umbExtensionsRegistry,
+			'entityCreateOptionAction',
+			(manifest: ManifestType) => {
+				return [{ entityType, unique, meta: manifest.meta }];
+			},
+			(manifest: ManifestType) => manifest.forEntityTypes.includes(entityType),
+			async (controllers) => {
+				this._apiControllers = controllers as unknown as Array<UmbExtensionApiInitializer<ManifestType>>;
+				this._multipleOptions = controllers.length > 1;
+				const hrefPromises = this._apiControllers.map((controller) => controller.api?.getHref());
+				this._hrefList = await Promise.all(hrefPromises);
+			},
+		);
 	}
 
 	#getTarget(href?: string) {
@@ -62,15 +92,15 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 	}
 
 	#renderSingleOptionAction() {
-		const option = this._options[0];
+		const href = this._hrefList[0];
 		return html`
 			<uui-button
 				label=${this.#createLabel}
 				color="default"
 				look="outline"
-				href=${ifDefined(option?.href)}
-				target=${this.#getTarget(option?.href)}
-				@click=${(event: Event) => this.#onClick(event, option?.alias, option?.href)}></uui-button>
+				href=${ifDefined(href)}
+				target=${this.#getTarget(href)}
+				@click=${(event: Event) => this.#onClick(event, this._apiControllers[0], href)}></uui-button>
 		`;
 	}
 
@@ -95,22 +125,28 @@ export class UmbCollectionCreateActionButtonElement extends UmbLitElement {
 				placement="bottom-start"
 				@toggle=${this.#onPopoverToggle}>
 				<umb-popover-layout>
-					<uui-scroll-container> ${this._options.map((option) => this.#renderMenuItem(option))} </uui-scroll-container>
+					<uui-scroll-container>
+						${this._apiControllers.map((controller, index) => this.#renderMenuItem(controller, index))}
+					</uui-scroll-container>
 				</umb-popover-layout>
 			</uui-popover-container>
 		`;
 	}
 
-	#renderMenuItem(option: UmbCollectionCreateOption) {
-		const label = option.label ? this.localize.string(option.label) : option.alias;
+	#renderMenuItem(controller: UmbExtensionApiInitializer<ManifestType>, index: number) {
+		const manifest = controller.manifest;
+		if (!manifest) throw new Error('No manifest found');
+
+		const label = manifest.meta.label ? this.localize.string(manifest.meta.label) : manifest.name;
+		const href = this._hrefList[index];
 
 		return html`
 			<uui-menu-item
-				label=${option.additionalOptions ? label + '...' : label}
-				href=${ifDefined(option.href)}
-				target=${this.#getTarget(option.href)}
-				@click=${(event: Event) => this.#onClick(event, option.alias, option.href)}>
-				<umb-icon slot="icon" .name=${option.icon}></umb-icon>
+				label=${manifest.meta.additionalOptions ? label + '...' : label}
+				href=${ifDefined(href)}
+				target=${this.#getTarget(href)}
+				@click=${(event: Event) => this.#onClick(event, controller, href)}>
+				<umb-icon slot="icon" .name=${manifest.meta.icon}></umb-icon>
 			</uui-menu-item>
 		`;
 	}

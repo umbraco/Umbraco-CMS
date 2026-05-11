@@ -44,7 +44,10 @@ export const defaultPathSerializer = ({ path, url: _url }: PathSerializer) => {
       }
 
       if (Array.isArray(value)) {
-        url = url.replace(match, serializeArrayParam({ explode, name, style, value }));
+        url = url.replace(
+          match,
+          serializeArrayParam({ explode, name, style, value }),
+        );
         continue;
       }
 
@@ -126,7 +129,7 @@ export function getValidRequestBody(options: {
       return hasSerializedBody ? options.serializedBody : null;
     }
 
-    // not all clients implement a serializedBody property (i.e., client-axios)
+    // not all clients implement a serializedBody property (i.e. client-axios)
     return options.body !== '' ? options.body : null;
   }
 

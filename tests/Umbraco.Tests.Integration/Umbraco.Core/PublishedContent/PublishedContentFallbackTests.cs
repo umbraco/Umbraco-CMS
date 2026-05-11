@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -128,52 +128,6 @@ public class PublishedContentFallbackTests : UmbracoIntegrationTest
         VariationContextAccessor.VariationContext = new VariationContext(culture: "en-US", segment: null);
         var englishValue = publishedContent.Value<string>(PublishedValueFallback, "title");
         Assert.AreEqual(englishTitle, englishValue);
-    }
-
-    // Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22759.
-    // When a property exists on the content type but neither the requested node nor any ancestor holds a value, Value<T>
-    // with Fallback.ToAncestors should return default(T) — not throw NotSupportedException.
-    [Test]
-    public async Task Property_Value_With_Ancestors_Fallback_Returns_Default_When_No_Ancestor_Has_Value()
-    {
-        var contentType = new ContentTypeBuilder()
-            .WithAlias("theContentType")
-            .AddPropertyType()
-                .WithAlias("title")
-                .WithName("Title")
-                .WithDataTypeId(Constants.DataTypes.Textbox)
-                .WithPropertyEditorAlias(Constants.PropertyEditors.Aliases.TextBox)
-                .WithValueStorageType(ValueStorageType.Nvarchar)
-                .Done()
-            .WithAllowAsRoot(true)
-            .Build();
-        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
-
-        // Allow children of the same type so we can build a tree.
-        contentType.AllowedContentTypes = [new ContentTypeSort(contentType.Key, 0, contentType.Alias)];
-        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
-
-        var parent = new ContentBuilder()
-            .WithContentType(contentType)
-            .WithName("Parent")
-            .Build();
-        ContentService.Save(parent);
-        ContentService.Publish(parent, ["*"]);
-
-        var child = new ContentBuilder()
-            .WithContentType(contentType)
-            .WithParent(parent)
-            .WithName("Child")
-            .Build();
-        ContentService.Save(child);
-        ContentService.Publish(child, ["*"]);
-
-        var publishedChild = GetPublishedContent(child.Key);
-
-        // NOTE: the TextStringValueConverter.ConvertIntermediateToObject() explicitly converts a null source value to an empty string
-        string? value = null;
-        Assert.DoesNotThrow(() => value = publishedChild.Value<string>(PublishedValueFallback, "title", fallback: Fallback.ToAncestors));
-        Assert.AreEqual(string.Empty, value);
     }
 
     private async Task<IPublishedContent> SetupSegmentedContentAsync(string? invariantTitle, string? segmentedTitle)

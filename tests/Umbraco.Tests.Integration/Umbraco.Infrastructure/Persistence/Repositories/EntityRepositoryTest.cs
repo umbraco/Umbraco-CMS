@@ -24,14 +24,14 @@ internal sealed class EntityRepositoryTest : UmbracoIntegrationTest
 {
     [Test]
     [LongRunning]
-    public async Task Get_Paged_Mixed_Entities_By_Ids()
+    public void Get_Paged_Mixed_Entities_By_Ids()
     {
         // Create content
         var contentService = GetRequiredService<IContentService>();
         var contentTypeService = GetRequiredService<IContentTypeService>();
         var createdContent = new List<IContent>();
         var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
-        await contentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        contentTypeService.Save(contentType);
         for (var i = 0; i < 10; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
@@ -44,7 +44,7 @@ internal sealed class EntityRepositoryTest : UmbracoIntegrationTest
         var mediaTypeService = GetRequiredService<IMediaTypeService>();
         var createdMedia = new List<IMedia>();
         var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
-        await mediaTypeService.CreateAsync(imageType, Constants.Security.SuperUserKey);
+        mediaTypeService.Save(imageType);
         for (var i = 0; i < 10; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageType, -1);
@@ -56,7 +56,7 @@ internal sealed class EntityRepositoryTest : UmbracoIntegrationTest
         var memberService = GetRequiredService<IMemberService>();
         var memberTypeService = GetRequiredService<IMemberTypeService>();
         var memberType = MemberTypeBuilder.CreateSimpleMemberType("simple");
-        await memberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        memberTypeService.Save(memberType);
         var createdMembers = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10).ToList();
         memberService.Save(createdMembers);
 

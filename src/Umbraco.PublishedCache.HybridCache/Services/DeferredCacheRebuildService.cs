@@ -18,12 +18,10 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
 {
     private readonly IDocumentCacheService _documentCacheService;
     private readonly IMediaCacheService _mediaCacheService;
-    private readonly IElementCacheService _elementCacheService;
     private readonly ILogger<DeferredCacheRebuildService> _logger;
     private readonly CancellationTokenSource _shutdownCts;
     private readonly ConcurrentDictionary<int, byte> _pendingContentTypeIds = new();
     private readonly ConcurrentDictionary<int, byte> _pendingMediaTypeIds = new();
-    private readonly ConcurrentDictionary<int, byte> _pendingElementTypeIds = new();
     private int _processing; // 0 = idle, 1 = active
 
     /// <summary>
@@ -31,19 +29,16 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
     /// </summary>
     /// <param name="documentCacheService">The document cache service used to rebuild content caches.</param>
     /// <param name="mediaCacheService">The media cache service used to rebuild media caches.</param>
-    /// <param name="elementCacheService">The element cache service used to rebuild element caches.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="hostApplicationLifetime">The application lifetime, used to cancel in-flight rebuilds on shutdown.</param>
     public DeferredCacheRebuildService(
         IDocumentCacheService documentCacheService,
         IMediaCacheService mediaCacheService,
-        IElementCacheService elementCacheService,
         ILogger<DeferredCacheRebuildService> logger,
         IHostApplicationLifetime hostApplicationLifetime)
     {
         _documentCacheService = documentCacheService;
         _mediaCacheService = mediaCacheService;
-        _elementCacheService = elementCacheService;
         _logger = logger;
         _shutdownCts = CancellationTokenSource.CreateLinkedTokenSource(hostApplicationLifetime.ApplicationStopping);
     }
@@ -65,17 +60,6 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
         foreach (var id in mediaTypeIds)
         {
             _pendingMediaTypeIds.TryAdd(id, 0);
-        }
-
-        ScheduleProcessing();
-    }
-
-    /// <inheritdoc />
-    public void QueueElementTypeRebuild(IReadOnlyCollection<int> elementTypeIds)
-    {
-        foreach (var id in elementTypeIds)
-        {
-            _pendingElementTypeIds.TryAdd(id, 0);
         }
 
         ScheduleProcessing();
@@ -116,7 +100,6 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
 
                 var contentTypeIds = DrainIds(_pendingContentTypeIds);
                 var mediaTypeIds = DrainIds(_pendingMediaTypeIds);
-                var elementTypeIds = DrainIds(_pendingElementTypeIds);
 
                 try
                 {
@@ -136,14 +119,6 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
                         _logger.LogInformation("Deferred rebuild completed for media type IDs: {MediaTypeIds}", mediaTypeIds);
                     }
 
-                    if (elementTypeIds.Length > 0)
-                    {
-                        _logger.LogInformation("Deferred rebuild starting for element type IDs: {ElementTypeIds}", elementTypeIds);
-                        _elementCacheService.Rebuild(elementTypeIds);
-                        await _elementCacheService.RebuildMemoryCacheByContentTypeAsync(elementTypeIds);
-                        _logger.LogInformation("Deferred rebuild completed for element type IDs: {ElementTypeIds}", elementTypeIds);
-                    }
-
                     consecutiveFailures = 0;
                 }
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -151,7 +126,6 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
                     // Shutdown requested — re-add IDs so no work is silently lost, then exit.
                     RequeueIds(_pendingContentTypeIds, contentTypeIds);
                     RequeueIds(_pendingMediaTypeIds, mediaTypeIds);
-                    RequeueIds(_pendingElementTypeIds, elementTypeIds);
                     throw;
                 }
                 catch (Exception ex)
@@ -162,7 +136,6 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
                     // re-queuing IDs that partially succeeded is safe.
                     RequeueIds(_pendingContentTypeIds, contentTypeIds);
                     RequeueIds(_pendingMediaTypeIds, mediaTypeIds);
-                    RequeueIds(_pendingElementTypeIds, elementTypeIds);
 
                     if (consecutiveFailures >= MaxConsecutiveFailures)
                     {
@@ -229,10 +202,7 @@ internal sealed class DeferredCacheRebuildService : IDeferredCacheRebuildService
         }
     }
 
-    private bool HasPendingIds() =>
-        _pendingContentTypeIds.IsEmpty is false
-        || _pendingMediaTypeIds.IsEmpty is false
-        || _pendingElementTypeIds.IsEmpty is false;
+    private bool HasPendingIds() => _pendingContentTypeIds.IsEmpty is false || _pendingMediaTypeIds.IsEmpty is false;
 
     /// <summary>
     ///     Snapshots and removes all keys from the dictionary, returning them as an array.

@@ -97,11 +97,11 @@ describe('UmbExtensionElementController', () => {
 				elementName: 'section',
 				conditions: [
 					{
-						alias: 'Umb.Condition.Switch',
+						alias: 'Umb.Test.Condition.Delay',
 						frequency: '100',
 					},
 					{
-						alias: 'Umb.Condition.Switch',
+						alias: 'Umb.Test.Condition.Delay',
 						frequency: '200',
 					},
 				],
@@ -115,8 +115,8 @@ describe('UmbExtensionElementController', () => {
 
 			const conditionManifest = {
 				type: 'condition',
-				name: 'test-condition-switch',
-				alias: 'Umb.Condition.Switch',
+				name: 'test-condition-delay',
+				alias: 'Umb.Test.Condition.Delay',
 				api: UmbSwitchCondition,
 			};
 

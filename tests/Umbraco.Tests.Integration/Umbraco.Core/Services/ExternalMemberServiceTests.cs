@@ -168,7 +168,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.IsTrue(assignResult.Success);
         Assert.IsNotNull(roles);
-        Assert.That(roles.ToList(), Does.Contain("ExternalTestGroup"));
+        CollectionAssert.Contains(roles.ToList(), "ExternalTestGroup");
     }
 
     [Test]
@@ -184,7 +184,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
 
         // Verify role is assigned
         var rolesBefore = await ExternalMemberService.GetRolesAsync(createResult.Result.Key);
-        Assert.That(rolesBefore.ToList(), Does.Contain("RemovableGroup"));
+        CollectionAssert.Contains(rolesBefore.ToList(), "RemovableGroup");
 
         // Act
         var removeResult = await ExternalMemberService.RemoveRolesAsync(createResult.Result.Key, ["RemovableGroup"]);
@@ -192,7 +192,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
         // Assert
         Assert.IsTrue(removeResult.Success);
         var rolesAfter = await ExternalMemberService.GetRolesAsync(createResult.Result.Key);
-        Assert.That(rolesAfter.ToList(), Does.Not.Contain("RemovableGroup"));
+        CollectionAssert.DoesNotContain(rolesAfter.ToList(), "RemovableGroup");
     }
 
     [Test]
@@ -309,7 +309,7 @@ internal sealed class ExternalMemberServiceTests : UmbracoIntegrationTest
 
         // Assert — group memberships migrated.
         IEnumerable<string> contentRoles = MemberService.GetAllRoles(result.Result.Username);
-        Assert.That(contentRoles.ToList(), Does.Contain("ConvertGroup"));
+        CollectionAssert.Contains(contentRoles.ToList(), "ConvertGroup");
     }
 
     [Test]

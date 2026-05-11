@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Scoping;
 /// Represents an EF Core scope that provides database context access and transaction management.
 /// </summary>
 /// <typeparam name="TDbContext">The type of DbContext.</typeparam>
-internal class EFCoreScope<TDbContext> : CoreScope, IEFCoreScope<TDbContext>
+internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     where TDbContext : DbContext
 {
     private readonly IEFCoreScopeAccessor<TDbContext> _efCoreScopeAccessor;
@@ -188,7 +188,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEFCoreScope<TDbContext>
 
         if (ParentScope is null)
         {
-            DisposeEFCoreDatabase();
+            DisposeEfCoreDatabase();
         }
 
         Locks.ClearLocks(InstanceId);
@@ -281,7 +281,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEFCoreScope<TDbContext>
         }
     }
 
-    private void DisposeEFCoreDatabase()
+    private void DisposeEfCoreDatabase()
     {
         var completed = Completed.HasValue && Completed.Value;
         {

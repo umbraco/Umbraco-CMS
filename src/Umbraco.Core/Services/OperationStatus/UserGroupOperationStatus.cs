@@ -104,5 +104,4 @@ public enum UserGroupOperationStatus
     ///     The operation failed because the user is not a member of the specified group.
     /// </summary>
     UserNotInGroup,
-    ElementStartNodeKeyNotFound,
 }

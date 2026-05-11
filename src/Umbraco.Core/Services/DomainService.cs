@@ -51,6 +51,23 @@ public class DomainService : RepositoryService, IDomainService
         }
     }
 
+    /// <summary>
+    /// Deletes a domain.
+    /// </summary>
+    /// <param name="domain">The domain to delete.</param>
+    /// <returns>An attempt result indicating the success or failure of the operation.</returns>
+    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
+    public Attempt<OperationResult?> Delete(IDomain domain)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        var result = DeleteAll(new[] { domain }, scope, eventMessages);
+        scope.Complete();
+
+        return result ? OperationResult.Attempt.Succeed(eventMessages) : OperationResult.Attempt.Cancel(eventMessages);
+    }
+
     /// <inheritdoc />
     public IDomain? GetByName(string name)
     {
@@ -67,6 +84,100 @@ public class DomainService : RepositoryService, IDomainService
         {
             return _domainRepository.Get(id);
         }
+    }
+
+    /// <summary>
+    /// Gets all domains.
+    /// </summary>
+    /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
+    /// <returns>A collection of all domains.</returns>
+    [Obsolete($"Please use {nameof(GetAllAsync)}. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<IDomain> GetAll(bool includeWildcards)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _domainRepository.GetAll(includeWildcards);
+        }
+    }
+
+    /// <summary>
+    /// Gets the domains assigned to a specific content item.
+    /// </summary>
+    /// <param name="contentId">The identifier of the content item.</param>
+    /// <param name="includeWildcards">A value indicating whether to include wildcard domains.</param>
+    /// <returns>A collection of domains assigned to the content item.</returns>
+    [Obsolete($"Please use {nameof(GetAssignedDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
+    public IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards)
+    {
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            return _domainRepository.GetAssignedDomains(contentId, includeWildcards);
+        }
+    }
+
+    /// <summary>
+    /// Saves a domain.
+    /// </summary>
+    /// <param name="domainEntity">The domain entity to save.</param>
+    /// <returns>An attempt result indicating the success or failure of the operation.</returns>
+    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
+    public Attempt<OperationResult?> Save(IDomain domainEntity)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        using ICoreScope scope = ScopeProvider.CreateCoreScope();
+
+        var result = SaveAll(new[] { domainEntity }, scope, eventMessages);
+        scope.Complete();
+
+        return result ? OperationResult.Attempt.Succeed(eventMessages) : OperationResult.Attempt.Cancel(eventMessages);
+    }
+
+    /// <summary>
+    /// Sorts domains.
+    /// </summary>
+    /// <param name="items">The domains to sort.</param>
+    /// <returns>An attempt result indicating the success or failure of the operation.</returns>
+    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
+    public Attempt<OperationResult?> Sort(IEnumerable<IDomain> items)
+    {
+        EventMessages eventMessages = EventMessagesFactory.Get();
+
+        IDomain[] domains = items.ToArray();
+        if (domains.Length == 0)
+        {
+            return OperationResult.Attempt.NoOperation(eventMessages);
+        }
+
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            var savingNotification = new DomainSavingNotification(domains, eventMessages);
+            if (scope.Notifications.PublishCancelable(savingNotification))
+            {
+                scope.Complete();
+                return OperationResult.Attempt.Cancel(eventMessages);
+            }
+
+            scope.WriteLock(Constants.Locks.Domains);
+
+            int sortOrder = 0;
+            foreach (IDomain domain in domains)
+            {
+                // If the current sort order equals that of the domain we don't need to update it, so just increment the sort order and continue
+                if (domain.SortOrder == sortOrder)
+                {
+                    sortOrder++;
+                    continue;
+                }
+
+                domain.SortOrder = sortOrder++;
+                _domainRepository.Save(domain);
+            }
+
+            scope.Complete();
+            scope.Notifications.Publish(new DomainSavedNotification(domains, eventMessages).WithStateFrom(savingNotification));
+        }
+
+        return OperationResult.Attempt.Succeed(eventMessages);
     }
 
     /// <inheritdoc />

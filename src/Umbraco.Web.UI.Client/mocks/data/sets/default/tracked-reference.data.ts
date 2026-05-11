@@ -1,8 +1,8 @@
 import type { UmbMockTrackedReferenceItemModel } from '../../mock-data-set.types.js';
 import type {
-	IReferenceResponseModelDefaultReferenceResponseModel,
-	IReferenceResponseModelDocumentReferenceResponseModel,
-	IReferenceResponseModelMediaReferenceResponseModel,
+	DefaultReferenceResponseModel,
+	DocumentReferenceResponseModel,
+	MediaReferenceResponseModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const items: Array<UmbMockTrackedReferenceItemModel> = [
@@ -18,7 +18,7 @@ export const items: Array<UmbMockTrackedReferenceItemModel> = [
 			id: 'simple-document-type-id',
 		},
 		variants: [],
-	} satisfies IReferenceResponseModelDocumentReferenceResponseModel,
+	} satisfies DocumentReferenceResponseModel,
 	{
 		$type: 'DocumentReferenceResponseModel',
 		id: '1234',
@@ -31,7 +31,7 @@ export const items: Array<UmbMockTrackedReferenceItemModel> = [
 			id: 'image-block-id',
 		},
 		variants: [],
-	} satisfies IReferenceResponseModelDocumentReferenceResponseModel,
+	} satisfies DocumentReferenceResponseModel,
 	{
 		$type: 'MediaReferenceResponseModel',
 		id: 'media-id',
@@ -42,12 +42,12 @@ export const items: Array<UmbMockTrackedReferenceItemModel> = [
 			name: 'Image',
 			id: 'media-type-id',
 		},
-	} satisfies IReferenceResponseModelMediaReferenceResponseModel,
+	} satisfies MediaReferenceResponseModel,
 	{
 		$type: 'DefaultReferenceResponseModel',
 		id: 'default-id',
 		name: 'Some other reference',
 		type: 'Default',
 		icon: 'icon-bug',
-	} satisfies IReferenceResponseModelDefaultReferenceResponseModel,
+	} satisfies DefaultReferenceResponseModel,
 ];

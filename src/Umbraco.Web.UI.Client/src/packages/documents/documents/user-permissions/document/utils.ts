@@ -1,4 +1,4 @@
-import type { IPermissionPresentationModelDocumentPermissionPresentationModel as DocumentPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
+import type { DocumentPermissionPresentationModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 /**
  *

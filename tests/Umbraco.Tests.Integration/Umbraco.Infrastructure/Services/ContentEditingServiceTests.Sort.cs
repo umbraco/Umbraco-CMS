@@ -48,7 +48,7 @@ public partial class ContentEditingServiceTests
 
         var rootContentType = ContentTypeBuilder.CreateBasicContentType(alias: "rootPage", name: "Root Page");
         rootContentType.AllowedAsRoot = true;
-        await ContentTypeService.CreateAsync(rootContentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(rootContentType);
 
         for (var i = 1; i < 11; i++)
         {
@@ -117,7 +117,7 @@ public partial class ContentEditingServiceTests
     private async Task<IContent> CreateRootContentWithTenChildren()
     {
         var childContentType = ContentTypeBuilder.CreateBasicContentType(alias: "childPage", name: "Child Page");
-        await ContentTypeService.CreateAsync(childContentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(childContentType);
 
         var rootContentType = ContentTypeBuilder.CreateBasicContentType(alias: "rootPage", name: "Root Page");
         rootContentType.AllowedAsRoot = true;
@@ -125,7 +125,7 @@ public partial class ContentEditingServiceTests
         {
             new ContentTypeSort(childContentType.Key, 1, childContentType.Alias)
         };
-        await ContentTypeService.CreateAsync(rootContentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(rootContentType);
 
         var root = (await ContentEditingService.CreateAsync(
             new ContentCreateModel

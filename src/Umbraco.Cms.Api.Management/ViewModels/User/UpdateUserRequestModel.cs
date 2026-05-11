@@ -29,8 +29,4 @@ public class UpdateUserRequestModel : UserPresentationBase
     /// Gets a value indicating whether the user has access to the media root.
     /// </summary>
     public bool HasMediaRootAccess { get; init; }
-
-    public ISet<ReferenceByIdModel> ElementStartNodeIds { get; set; } = new HashSet<ReferenceByIdModel>();
-
-    public bool HasElementRootAccess { get; init; }
 }

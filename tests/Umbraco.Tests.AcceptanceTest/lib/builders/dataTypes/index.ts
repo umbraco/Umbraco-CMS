@@ -32,4 +32,3 @@ export {DateOnlyPickerDataTypeBuilder} from './dateOnlyPickerDataTypeBuilder';
 export {TimeOnlyPickerDataTypeBuilder} from './timeOnlyPickerDataTypeBuilder';
 export {DateTimePickerDataTypeBuilder} from './dateTimePickerDataTypeBuilder';
 export {EntityDataPickerDataTypeBuilder} from './entityDataPickerDataTypeBuilder';
-export {ElementPickerDataTypeBuilder} from './elementPickerDataTypeBuilder';

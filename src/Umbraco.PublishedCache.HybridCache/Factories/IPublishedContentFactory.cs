@@ -22,6 +22,4 @@ internal interface IPublishedContentFactory
     /// Converts a <see cref="IMember"/> to an <see cref="IPublishedMember"/>.
     /// </summary>
     IPublishedMember ToPublishedMember(IMember member);
-
-    IPublishedElement? ToIPublishedElement(ContentCacheNode contentCacheNode, bool preview);
 }

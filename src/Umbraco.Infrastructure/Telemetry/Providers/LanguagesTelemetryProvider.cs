@@ -10,14 +10,14 @@ namespace Umbraco.Cms.Infrastructure.Telemetry.Providers;
 /// </summary>
 public class LanguagesTelemetryProvider : IDetailedTelemetryProvider
 {
-    private readonly ILanguageService _languageService;
+    private readonly ILocalizationService _localizationService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LanguagesTelemetryProvider"/> class, which provides telemetry data related to languages.
     /// </summary>
-    /// <param name="languageService">An instance of <see cref="ILanguageService"/> used to retrieve language data.</param>
-    public LanguagesTelemetryProvider(ILanguageService languageService) =>
-        _languageService = languageService;
+    /// <param name="localizationService">An instance of <see cref="ILocalizationService"/> used to retrieve language data.</param>
+    public LanguagesTelemetryProvider(ILocalizationService localizationService) =>
+        _localizationService = localizationService;
 
     /// <summary>
     /// Retrieves telemetry information about the number of languages configured in the system.
@@ -27,7 +27,7 @@ public class LanguagesTelemetryProvider : IDetailedTelemetryProvider
     /// </returns>
     public IEnumerable<UsageInformation> GetInformation()
     {
-        var languages = _languageService.GetAllAsync().GetAwaiter().GetResult().Count();
+        var languages = _localizationService.GetAllLanguages().Count();
         yield return new UsageInformation(Constants.Telemetry.LanguageCount, languages);
     }
 }

@@ -59,14 +59,9 @@ export abstract class UmbTreeItemChildrenCollectionRepositoryBase
 		const parent: UmbEntityModel = { entityType, unique };
 
 		if (parent.unique === null) {
-			return this.#treeRepository.requestTreeRootItems({
-				paging: { skip: filter.skip ?? 0, take: filter.take ?? 100 },
-			});
+			return this.#treeRepository.requestTreeRootItems({ skip: filter.skip, take: filter.take });
 		} else {
-			return this.#treeRepository.requestTreeItemsOf({
-				parent,
-				paging: { skip: filter.skip ?? 0, take: filter.take ?? 100 },
-			});
+			return this.#treeRepository.requestTreeItemsOf({ parent, skip: filter.skip, take: filter.take });
 		}
 	}
 }

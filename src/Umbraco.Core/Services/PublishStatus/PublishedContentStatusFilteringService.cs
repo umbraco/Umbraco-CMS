@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 internal sealed class PublishedContentStatusFilteringService : IPublishedContentStatusFilteringService
 {
     private readonly IVariationContextAccessor _variationContextAccessor;
-    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
+    private readonly IPublishStatusQueryService _publishStatusQueryService;
     private readonly IPreviewService _previewService;
     private readonly IPublishedContentCache _publishedContentCache;
 
@@ -28,7 +28,7 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
     /// <param name="publishedContentCache">The published content cache for retrieving content items.</param>
     public PublishedContentStatusFilteringService(
         IVariationContextAccessor variationContextAccessor,
-        IDocumentPublishStatusQueryService publishStatusQueryService,
+        IPublishStatusQueryService publishStatusQueryService,
         IPreviewService previewService,
         IPublishedContentCache publishedContentCache)
     {
@@ -53,17 +53,10 @@ internal sealed class PublishedContentStatusFilteringService : IPublishedContent
         candidateKeys = preview
             ? candidateKeysAsArray
             : candidateKeysAsArray.Where(key =>
-                _publishStatusQueryService.IsPublished(key, culture)
-                && _publishStatusQueryService.HasPublishedAncestorPath(key, culture));
+                _publishStatusQueryService.IsDocumentPublished(key, culture)
+                && _publishStatusQueryService.HasPublishedAncestorPath(key));
 
         return WhereIsInvariantOrHasCultureOrRequestedAllCultures(candidateKeys, culture, preview).ToArray();
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
-    {
-        var preview = _previewService.IsInPreview();
-        return candidateKeys.Select(key => _publishedContentCache.GetById(preview, key)).WhereNotNull().ToArray();
     }
 
     /// <summary>

@@ -129,14 +129,6 @@ public class UserGroupDto
     public int? StartMediaId { get; set; }
 
     /// <summary>
-    /// Gets or sets the identifier of the element node that defines the starting point for media access for the user group.
-    /// </summary>
-    [Column("startElementId")]
-    [NullSetting(NullSetting = NullSettings.Null)]
-    [ForeignKey(typeof(NodeDto), Name = "FK_startElementId_umbracoNode_id")]
-    public int? StartElementId { get; set; }
-
-    /// <summary>
     /// Gets or sets the collection of application associations for this user group.
     /// </summary>
     [ResultColumn]

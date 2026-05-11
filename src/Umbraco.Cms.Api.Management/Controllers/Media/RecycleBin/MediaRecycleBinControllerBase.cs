@@ -22,8 +22,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.RecycleBin;
 [Authorize(Policy = AuthorizationPolicies.SectionAccessMedia)]
 public class MediaRecycleBinControllerBase : RecycleBinControllerBase<MediaRecycleBinItemResponseModel>
 {
-    protected override string EntityName => "media";
-
     private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
     /// <summary>
@@ -39,9 +37,9 @@ public class MediaRecycleBinControllerBase : RecycleBinControllerBase<MediaRecyc
 
     protected override Guid RecycleBinRootKey => Constants.System.RecycleBinMediaKey;
 
-    protected override async Task<MediaRecycleBinItemResponseModel> MapRecycleBinViewModelAsync(Guid? parentKey, IEntitySlim entity)
+    protected override MediaRecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
     {
-        MediaRecycleBinItemResponseModel responseModel = await base.MapRecycleBinViewModelAsync(parentKey, entity);
+        MediaRecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentKey, entity);
 
         if (entity is IMediaEntitySlim mediaEntitySlim)
         {

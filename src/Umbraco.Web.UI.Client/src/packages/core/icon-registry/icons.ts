@@ -3325,16 +3325,6 @@ keywords: ["area","surface","square metres","allotment","parcel","property","pla
 groups: ["design","tools","math","sports","gaming"],
 path: () => import("./icons/icon-land-plot.js"),
 },{
-name: "icon-true",
-keywords: ["done","todo","tick","complete","task"],
-groups: ["notifications"],
-path: () => import("./icons/icon-true.js"),
-},{
-name: "icon-false",
-keywords: ["cancel","close","cross","delete","ex","remove","times","clear","math","multiply","multiplication"],
-groups: ["notifications","math"],
-path: () => import("./icons/icon-false.js"),
-},{
 name: "icon-ball",
 path: () => import("./icons/icon-ball.js"),
 },{

@@ -38,16 +38,15 @@ public class User : EntityBase, IUser, IProfile
     private int _sessionTimeout;
     private int[]? _startContentIds;
     private int[]? _startMediaIds;
-    private int[]? _startElementIds;
     private HashSet<IReadOnlyUserGroup> _userGroups;
 
     private string _username;
     private UserKind _kind;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="User"/> class for a new/empty user.
+    ///     Constructor for creating a new/empty user
     /// </summary>
-    /// <param name="globalSettings">The global settings.</param>
+    /// <param name="globalSettings">The global settings for default values.</param>
     public User(GlobalSettings globalSettings)
     {
         SessionTimeout = 60;
@@ -57,7 +56,6 @@ public class User : EntityBase, IUser, IProfile
         _isLockedOut = false;
         _startContentIds = [];
         _startMediaIds = [];
-        _startElementIds = [];
 
         // cannot be null
         _rawPasswordValue = string.Empty;
@@ -67,7 +65,7 @@ public class User : EntityBase, IUser, IProfile
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="User"/> class for a new/empty user.
+    ///     Constructor for creating a new/empty user
     /// </summary>
     /// <param name="globalSettings">The global settings for default values.</param>
     /// <param name="name">The display name of the user.</param>
@@ -106,11 +104,10 @@ public class User : EntityBase, IUser, IProfile
         _isLockedOut = false;
         _startContentIds = [];
         _startMediaIds = [];
-        _startElementIds = [];
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="User"/> class for an existing user.
+    ///     Constructor for creating a new User instance for an existing user
     /// </summary>
     /// <param name="globalSettings">The global settings for default values.</param>
     /// <param name="id">The unique identifier for the user.</param>
@@ -122,7 +119,6 @@ public class User : EntityBase, IUser, IProfile
     /// <param name="userGroups">The user groups the user belongs to.</param>
     /// <param name="startContentIds">The starting content node identifiers.</param>
     /// <param name="startMediaIds">The starting media node identifiers.</param>
-    [Obsolete("Use the constructor that includes startElementIds. Scheduled for removal in Umbraco 19.")]
     public User(
         GlobalSettings globalSettings,
         int id,
@@ -134,36 +130,6 @@ public class User : EntityBase, IUser, IProfile
         IEnumerable<IReadOnlyUserGroup> userGroups,
         int[] startContentIds,
         int[] startMediaIds)
-        : this(globalSettings, id, name, email, username, rawPasswordValue, passwordConfig, userGroups, startContentIds, startMediaIds, [])
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="User"/> class for an existing user.
-    /// </summary>
-    /// <param name="globalSettings">The global settings.</param>
-    /// <param name="id">The identifier.</param>
-    /// <param name="name">The name.</param>
-    /// <param name="email">The email.</param>
-    /// <param name="username">The username.</param>
-    /// <param name="rawPasswordValue">The raw password value.</param>
-    /// <param name="passwordConfig">The password configuration.</param>
-    /// <param name="userGroups">The user groups.</param>
-    /// <param name="startContentIds">The start content identifiers.</param>
-    /// <param name="startMediaIds">The start media identifiers.</param>
-    /// <param name="startElementIds">The start element identifiers.</param>
-    public User(
-        GlobalSettings globalSettings,
-        int id,
-        string? name,
-        string email,
-        string? username,
-        string? rawPasswordValue,
-        string? passwordConfig,
-        IEnumerable<IReadOnlyUserGroup> userGroups,
-        int[] startContentIds,
-        int[] startMediaIds,
-        int[] startElementIds)
         : this(globalSettings)
     {
         // we allow whitespace for this value so just check null
@@ -198,7 +164,6 @@ public class User : EntityBase, IUser, IProfile
         _isLockedOut = false;
         _startContentIds = startContentIds ?? throw new ArgumentNullException(nameof(startContentIds));
         _startMediaIds = startMediaIds ?? throw new ArgumentNullException(nameof(startMediaIds));
-        _startElementIds = startElementIds ?? throw new ArgumentNullException(nameof(startElementIds));
     }
 
     /// <inheritdoc />
@@ -405,20 +370,6 @@ public class User : EntityBase, IUser, IProfile
         set => SetPropertyValueAndDetectChanges(value, ref _startMediaIds, nameof(StartMediaIds), IntegerEnumerableComparer);
     }
 
-    /// <summary>
-    ///     Gets or sets the start element ids.
-    /// </summary>
-    /// <value>
-    ///     The start element ids.
-    /// </value>
-    [DataMember]
-    [DoNotClone]
-    public int[]? StartElementIds
-    {
-        get => _startElementIds;
-        set => SetPropertyValueAndDetectChanges(value, ref _startElementIds, nameof(StartElementIds), IntegerEnumerableComparer);
-    }
-
     /// <inheritdoc />
     [DataMember]
     public string? Language
@@ -491,7 +442,6 @@ public class User : EntityBase, IUser, IProfile
         // manually clone the start node props
         clonedEntity._startContentIds = _startContentIds?.ToArray();
         clonedEntity._startMediaIds = _startMediaIds?.ToArray();
-        clonedEntity._startElementIds = _startElementIds?.ToArray();
 
         // need to create new collections otherwise they'll get copied by ref
         clonedEntity._userGroups = new HashSet<IReadOnlyUserGroup>(_userGroups);

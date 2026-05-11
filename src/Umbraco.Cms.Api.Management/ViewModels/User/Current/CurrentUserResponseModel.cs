@@ -31,21 +31,8 @@ public class CurrentUserResponseModel : UserPresentationBase
     /// </summary>
     public required ISet<ReferenceByIdModel> MediaStartNodeIds { get; init; } = new HashSet<ReferenceByIdModel>();
 
-    /// <summary>
-    /// Gets or sets a value indicating whether the current user has access to the media root.
-    /// </summary>
+    /// <summary>Gets or sets a value indicating whether the current user has access to the media root.</summary>
     public required bool HasMediaRootAccess { get; init; }
-
-    /// <summary>
-    /// Gets or sets the set of element start node IDs (as <see cref="ReferenceByIdModel"/>) associated with the current user.
-    /// These define the root nodes in the element tree that the user has access to.
-    /// </summary>
-    public required ISet<ReferenceByIdModel> ElementStartNodeIds { get; init; } = new HashSet<ReferenceByIdModel>();
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the current user has access to the element root.
-    /// </summary>
-    public required bool HasElementRootAccess { get; init; }
 
     /// <summary>
     /// Gets or sets the collection of URLs representing the current user's avatars, which may include multiple sizes or formats.

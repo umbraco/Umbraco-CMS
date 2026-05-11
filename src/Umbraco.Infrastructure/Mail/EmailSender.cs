@@ -48,6 +48,14 @@ public class EmailSender : IEmailSender
     }
 
     /// <inheritdoc/>
+    public async Task SendAsync(EmailMessage message, string emailType) =>
+        await SendAsyncInternal(message, emailType, false, null);
+
+    /// <inheritdoc/>
+    public async Task SendAsync(EmailMessage message, string emailType, bool enableNotification) =>
+        await SendAsyncInternal(message, emailType, enableNotification, null);
+
+    /// <inheritdoc/>
     public async Task SendAsync(EmailMessage message, string emailType, bool enableNotification = false, TimeSpan? expires = null) =>
         await SendAsyncInternal(message, emailType, enableNotification, expires);
 

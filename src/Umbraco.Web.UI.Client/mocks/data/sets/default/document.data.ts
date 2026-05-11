@@ -1,7 +1,5 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
-
-type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
+import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export const data: Array<UmbMockDocumentModel> = [
 	{
@@ -20,7 +18,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		isTrashed: false,
 		variants: [
 			{
-				state: 'Draft' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-US',
 				segment: null,
@@ -639,7 +637,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		variants: [
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-US',
 				segment: null,
@@ -650,7 +648,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'da-dk',
 				segment: null,
@@ -751,7 +749,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		variants: [
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-US',
 				segment: null,
@@ -762,7 +760,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'da',
 				segment: null,
@@ -773,7 +771,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'da',
 				segment: 'vip',
@@ -784,7 +782,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: null,
 				segment: 'vip-invariant',
@@ -795,7 +793,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: null,
 				segment: 'generic',
@@ -806,7 +804,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'no-no',
 				segment: null,
@@ -817,7 +815,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: 'PublishedPendingChanges' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'es-es',
 				segment: null,
@@ -828,7 +826,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: 'NotCreated' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.NOT_CREATED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'pl-pl',
 				segment: null,
@@ -915,7 +913,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		variants: [
 			{
-				state: 'Draft' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-US',
 				segment: null,
@@ -945,7 +943,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		isTrashed: false,
 		variants: [
 			{
-				state: 'Draft' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-US',
 				segment: null,
@@ -990,7 +988,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		isTrashed: false,
 		variants: [
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-US',
 				segment: null,
@@ -1278,7 +1276,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		],
 		variants: [
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'en-US',
 				segment: null,
@@ -1289,7 +1287,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:31:51.354764',
 				culture: 'da-dk',
 				segment: null,
@@ -1318,7 +1316,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		isTrashed: false,
 		variants: [
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'en-US',
 				segment: null,
@@ -1329,7 +1327,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2023-02-06T15:32:24.957009',
 				culture: 'da-dk',
 				segment: null,

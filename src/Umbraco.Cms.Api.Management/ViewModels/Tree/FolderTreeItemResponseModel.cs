@@ -9,6 +9,4 @@ public class FolderTreeItemResponseModel : NamedEntityTreeItemResponseModel
     /// Gets or sets a value indicating whether this item is a folder.
     /// </summary>
     public bool IsFolder { get; set; }
-
-    public bool NoAccess { get; set; }
 }

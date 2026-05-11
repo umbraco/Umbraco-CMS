@@ -28,6 +28,20 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
     /// <summary>
     /// Initializes a new instance of the <see cref="DocumentTypeTreeControllerBase"/> class.
     /// </summary>
+    /// <param name="entityService">Service used for managing and retrieving entities within the Umbraco CMS.</param>
+    /// <param name="contentTypeService">Service used for managing and retrieving content types (document types) within the Umbraco CMS.</param>
+    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
+    public DocumentTypeTreeControllerBase(IEntityService entityService, IContentTypeService contentTypeService)
+        : this(
+              entityService,
+              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
+              contentTypeService)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DocumentTypeTreeControllerBase"/> class.
+    /// </summary>
     /// <param name="entityService">Service used for entity operations such as retrieval and management.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for document types.</param>
     /// <param name="contentTypeService">Service responsible for managing content types.</param>
@@ -55,15 +69,15 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.DocumentTypeContainer;
 
-    protected override async Task<DocumentTypeTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
+    protected override DocumentTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
     {
         var contentTypes = _contentTypeService
             .GetMany(entities.Select(entity => entity.Id).ToArray())
             .ToDictionary(contentType => contentType.Id);
 
-        IEnumerable<Task<DocumentTypeTreeItemResponseModel>> tasks = entities.Select(async entity =>
+        return entities.Select(entity =>
         {
-            DocumentTypeTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentKey, entity);
+            DocumentTypeTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
             if (contentTypes.TryGetValue(entity.Id, out IContentType? contentType))
             {
                 responseModel.Icon = contentType.Icon ?? responseModel.Icon;
@@ -71,8 +85,6 @@ public class DocumentTypeTreeControllerBase : FolderTreeControllerBase<DocumentT
             }
 
             return responseModel;
-        });
-
-        return await Task.WhenAll(tasks);
+        }).ToArray();
     }
 }

@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -23,7 +22,7 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
 
     protected IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
-    protected ITemplateService TemplateService => GetRequiredService<ITemplateService>();
+    protected IFileService FileService => GetRequiredService<IFileService>();
 
     protected ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
 
@@ -39,19 +38,19 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
     protected ContentType ContentType { get; private set; }
 
     [SetUp]
-    public virtual async Task Setup() => await CreateTestDataAsync();
+    public virtual void Setup() => CreateTestData();
 
-    public virtual async Task CreateTestDataAsync()
+    public virtual void CreateTestData()
     {
         // NOTE Maybe not the best way to create/save test data as we are using the services, which are being tested.
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        FileService.SaveTemplate(template);
 
         // Create and Save ContentType "umbTextpage" -> 1051 (template), 1052 (content type)
         ContentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
         ContentType.Key = new Guid(TextpageContentTypeKey);
-        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
+        ContentTypeService.Save(ContentType);
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
         Textpage = ContentBuilder.CreateSimpleContent(ContentType, "Textpage");

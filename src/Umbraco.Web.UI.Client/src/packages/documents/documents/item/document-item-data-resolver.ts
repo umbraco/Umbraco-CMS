@@ -1,8 +1,9 @@
-import { UmbDocumentVariantState } from '../variant-state.js';
+import { UmbDocumentVariantState } from '../types.js';
 import type { UmbDocumentItemModel } from './types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityFlag } from '@umbraco-cms/backoffice/entity-flag';
+import type { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import {
 	UmbArrayState,
 	UmbBasicState,
@@ -54,8 +55,8 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 	#name = new UmbStringState(undefined);
 	public readonly name = this.#name.asObservable();
 
-	#state = new UmbStringState<UmbDocumentVariantState | null | undefined>(undefined);
-	public readonly state = this.#state.asObservable() as Observable<UmbDocumentVariantState | null | undefined>;
+	#state = new UmbStringState<DocumentVariantStateModel | null | undefined>(undefined);
+	public readonly state = this.#state.asObservable() as Observable<DocumentVariantStateModel | null | undefined>;
 
 	#isDraft = new UmbBooleanState(undefined);
 	public readonly isDraft = this.#isDraft.asObservable();
@@ -173,7 +174,7 @@ export class UmbDocumentItemDataResolver<DocumentItemModel extends UmbDocumentIt
 	 * @returns {Promise<string | undefined>} The state of the item
 	 * @memberof UmbDocumentItemDataResolver
 	 */
-	async getState(): Promise<UmbDocumentVariantState | null | undefined> {
+	async getState(): Promise<DocumentVariantStateModel | null | undefined> {
 		return await this.observe(this.state).asPromise();
 	}
 
