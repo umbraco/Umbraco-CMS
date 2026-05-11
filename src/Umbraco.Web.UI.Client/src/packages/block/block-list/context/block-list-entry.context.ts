@@ -1,8 +1,5 @@
 import type { UmbBlockListValueModel } from '../types.js';
-import {
-	UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS,
-	UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
-} from '../constants.js';
+import { UMB_BLOCK_LIST_PROPERTY_EDITOR_SCHEMA_ALIAS, UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS } from '../constants.js';
 import { UMB_BLOCK_LIST_MANAGER_CONTEXT } from './block-list-manager.context-token.js';
 import { UMB_BLOCK_LIST_ENTRIES_CONTEXT } from './block-list-entries.context-token.js';
 import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
@@ -10,6 +7,8 @@ import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboar
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_LIST_MANAGER_CONTEXT.TYPE,
@@ -34,6 +33,9 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_LIST_MANAGER_CONTEXT, UMB_BLOCK_LIST_ENTRIES_CONTEXT);
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
+		});
 	}
 
 	protected override _gotManager() {
@@ -51,6 +53,7 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 			'observeIsSortMode',
 		);
 	}
+	#serverUrl = '';
 
 	protected override _gotEntries() {}
 
@@ -71,15 +74,24 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 		const blockLabel = this.getName();
 		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
 
+		const blockTypeThumbnail = this.getBlockType()?.thumbnail;
+
+		const path = blockTypeThumbnail ? transformServerPathToClientPath(blockTypeThumbnail) : undefined;
+
+		const thumbnailPath = path ? new URL(path, this.#serverUrl)?.href : undefined;
+
+		const thumbnail = thumbnailPath ? { src: thumbnailPath } : undefined;
+
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
+			thumbnail,
 			name: entryName,
 			propertyValue: this.#buildPropertyValue(),
 			propertyEditorUiAlias: UMB_BLOCK_LIST_PROPERTY_EDITOR_UI_ALIAS,
 		});
 	}
 
-	#buildPropertyValue(): UmbBlockListValueModel {
+	#buildPropertyValue(): UmbBlockListValueModel {	
 		const content = this.getContent();
 		const layout = this.getLayout();
 		const settings = this.getSettings();

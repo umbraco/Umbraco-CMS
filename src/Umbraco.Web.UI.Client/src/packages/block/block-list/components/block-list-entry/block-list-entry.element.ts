@@ -3,7 +3,7 @@ import type { UmbBlockListLayoutModel } from '../../types.js';
 import { UMB_BLOCK_LIST } from '../../constants.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
-import { stringOrStringArrayContains, transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
@@ -54,8 +54,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	private _contentKey?: string | undefined;
 
 	#context = new UmbBlockListEntryContext(this);
-
-	#serverUrl = '';
 
 	@state()
 	private _contentTypeAlias?: string;
@@ -112,9 +110,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	constructor() {
 		super();
 		this.#init();
-		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
-			this.#serverUrl = instance?.getServerUrl() ?? '';
-		});
 	}
 
 	#init() {
