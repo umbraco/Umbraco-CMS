@@ -52,8 +52,8 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
         CancellationToken cancellationToken = default)
         => GetByFilterAsync(
             q => relationTypeId.HasValue
-                ? q.Where(x => x.ParentId == parentId && x.RelationType == relationTypeId.Value)
-                : q.Where(x => x.ParentId == parentId),
+                ? q.Where(x => x.ParentId == parentId && x.RelationType == relationTypeId.Value).OrderBy(x => x.RelationType)
+                : q.Where(x => x.ParentId == parentId).OrderBy(x => x.RelationType),
             cancellationToken);
 
     /// <inheritdoc />
@@ -63,8 +63,8 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
         CancellationToken cancellationToken = default)
         => GetByFilterAsync(
             q => relationTypeId.HasValue
-                ? q.Where(x => x.ChildId == childId && x.RelationType == relationTypeId.Value)
-                : q.Where(x => x.ChildId == childId),
+                ? q.Where(x => x.ChildId == childId && x.RelationType == relationTypeId.Value).OrderBy(x => x.RelationType)
+                : q.Where(x => x.ChildId == childId).OrderBy(x => x.RelationType),
             cancellationToken);
 
     /// <inheritdoc />
@@ -74,8 +74,8 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
         CancellationToken cancellationToken = default)
         => GetByFilterAsync(
             q => relationTypeId.HasValue
-                ? q.Where(x => (x.ParentId == id || x.ChildId == id) && x.RelationType == relationTypeId.Value)
-                : q.Where(x => x.ParentId == id || x.ChildId == id),
+                ? q.Where(x => (x.ParentId == id || x.ChildId == id) && x.RelationType == relationTypeId.Value).OrderBy(x => x.RelationType)
+                : q.Where(x => x.ParentId == id || x.ChildId == id).OrderBy(x => x.RelationType),
             cancellationToken);
 
     /// <inheritdoc />

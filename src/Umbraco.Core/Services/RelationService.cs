@@ -105,7 +105,9 @@ public class RelationService : AsyncRepositoryService, IRelationService
     public IRelation? GetById(int id)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        return _relationRepository.GetAsync(id, CancellationToken.None).GetAwaiter().GetResult();
+        IRelation? result = _relationRepository.GetAsync(id, CancellationToken.None).GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -133,7 +135,9 @@ public class RelationService : AsyncRepositoryService, IRelationService
     public IEnumerable<IRelation> GetAllRelations(params int[] ids)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        return _relationRepository.GetManyAsync(ids, CancellationToken.None).GetAwaiter().GetResult();
+        IEnumerable<IRelation> result = _relationRepository.GetManyAsync(ids, CancellationToken.None).GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -144,7 +148,9 @@ public class RelationService : AsyncRepositoryService, IRelationService
     public IEnumerable<IRelation> GetAllRelationsByRelationType(int relationTypeId)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        return _relationRepository.GetByRelationTypeIdAsync(relationTypeId).GetAwaiter().GetResult();
+        IEnumerable<IRelation> result = _relationRepository.GetByRelationTypeIdAsync(relationTypeId).GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -194,16 +200,21 @@ public class RelationService : AsyncRepositoryService, IRelationService
         using ICoreScope scope = ScopeProvider.CreateScope();
         if (relationTypeAlias.IsNullOrWhiteSpace())
         {
-            return _relationRepository.GetByParentIdAsync(id).GetAwaiter().GetResult();
+            IEnumerable<IRelation> all = _relationRepository.GetByParentIdAsync(id).GetAwaiter().GetResult();
+            scope.Complete();
+            return all;
         }
 
         IRelationType? relationType = GetRelationType(relationTypeAlias!);
         if (relationType == null)
         {
+            scope.Complete();
             return Enumerable.Empty<IRelation>();
         }
 
-        return _relationRepository.GetByParentIdAsync(id, relationType.Id).GetAwaiter().GetResult();
+        IEnumerable<IRelation> result = _relationRepository.GetByParentIdAsync(id, relationType.Id).GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -222,16 +233,21 @@ public class RelationService : AsyncRepositoryService, IRelationService
         using ICoreScope scope = ScopeProvider.CreateScope();
         if (relationTypeAlias.IsNullOrWhiteSpace())
         {
-            return _relationRepository.GetByChildIdAsync(id).GetAwaiter().GetResult();
+            IEnumerable<IRelation> all = _relationRepository.GetByChildIdAsync(id).GetAwaiter().GetResult();
+            scope.Complete();
+            return all;
         }
 
         IRelationType? relationType = GetRelationType(relationTypeAlias!);
         if (relationType == null)
         {
+            scope.Complete();
             return Enumerable.Empty<IRelation>();
         }
 
-        return _relationRepository.GetByChildIdAsync(id, relationType.Id).GetAwaiter().GetResult();
+        IEnumerable<IRelation> result = _relationRepository.GetByChildIdAsync(id, relationType.Id).GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -245,7 +261,9 @@ public class RelationService : AsyncRepositoryService, IRelationService
     public IEnumerable<IRelation> GetByParentOrChildId(int id)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        return _relationRepository.GetByParentOrChildIdAsync(id).GetAwaiter().GetResult();
+        IEnumerable<IRelation> result = _relationRepository.GetByParentOrChildIdAsync(id).GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -255,17 +273,22 @@ public class RelationService : AsyncRepositoryService, IRelationService
         IRelationType? relationType = GetRelationType(relationTypeAlias);
         if (relationType == null)
         {
+            scope.Complete();
             return Enumerable.Empty<IRelation>();
         }
 
-        return _relationRepository.GetByParentOrChildIdAsync(id, relationType.Id).GetAwaiter().GetResult();
+        IEnumerable<IRelation> result = _relationRepository.GetByParentOrChildIdAsync(id, relationType.Id).GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
     public IRelation? GetByParentAndChildId(int parentId, int childId, IRelationType relationType)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        return _relationRepository.GetByParentAndChildIdAsync(parentId, childId, relationType.Id).GetAwaiter().GetResult();
+        IRelation? result = _relationRepository.GetByParentAndChildIdAsync(parentId, childId, relationType.Id).GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -300,7 +323,9 @@ public class RelationService : AsyncRepositoryService, IRelationService
     public IEnumerable<IRelation> GetByRelationTypeId(int relationTypeId)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        return _relationRepository.GetByRelationTypeIdAsync(relationTypeId).GetAwaiter().GetResult();
+        IEnumerable<IRelation> result = _relationRepository.GetByRelationTypeIdAsync(relationTypeId).GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -312,6 +337,7 @@ public class RelationService : AsyncRepositoryService, IRelationService
             .GetPagedByRelationTypeIdAsync(relationTypeId, skip, pageSize, ordering)
             .GetAwaiter().GetResult();
         totalRecords = result.Total;
+        scope.Complete();
         return result.Items;
     }
 
@@ -319,7 +345,9 @@ public class RelationService : AsyncRepositoryService, IRelationService
     public async Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        return await _relationRepository.GetPagedByChildKeyAsync(childKey, skip, take, relationTypeAlias, CancellationToken.None);
+        PagedModel<IRelation> result = await _relationRepository.GetPagedByChildKeyAsync(childKey, skip, take, relationTypeAlias, CancellationToken.None);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -329,6 +357,7 @@ public class RelationService : AsyncRepositoryService, IRelationService
         IRelationType? relationType = await _relationTypeRepository.GetAsync(key);
         if (relationType is null)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<PagedModel<IRelation>, RelationOperationStatus>(RelationOperationStatus.RelationTypeNotFound, null!);
         }
 
@@ -411,6 +440,7 @@ public class RelationService : AsyncRepositoryService, IRelationService
             .GetPagedParentEntitiesByChildIdAsync(id, skip, pageSize, entityTypes.Select(x => x.GetGuid()).ToArray())
             .GetAwaiter().GetResult();
         totalChildren = result.Total;
+        scope.Complete();
         return result.Items;
     }
 
@@ -423,6 +453,7 @@ public class RelationService : AsyncRepositoryService, IRelationService
             .GetPagedChildEntitiesByParentIdAsync(id, skip, pageSize, entityTypes.Select(x => x.GetGuid()).ToArray())
             .GetAwaiter().GetResult();
         totalChildren = result.Total;
+        scope.Complete();
         return result.Items;
     }
 
@@ -507,7 +538,9 @@ public class RelationService : AsyncRepositoryService, IRelationService
     public bool HasRelations(IRelationType relationType)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        return _relationRepository.GetByRelationTypeIdAsync(relationType.Id).GetAwaiter().GetResult().Any();
+        bool result = _relationRepository.GetByRelationTypeIdAsync(relationType.Id).GetAwaiter().GetResult().Any();
+        scope.Complete();
+        return result;
     }
 
     /// <summary>
@@ -522,16 +555,20 @@ public class RelationService : AsyncRepositoryService, IRelationService
     public bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        return _relationRepository
+        bool result = _relationRepository
             .IsRelatedAsync(id, directionFilter, includeRelationTypeIds, excludeRelationTypeIds)
             .GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
     public bool AreRelated(int parentId, int childId)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        return _relationRepository.AreRelatedAsync(parentId, childId).GetAwaiter().GetResult();
+        bool result = _relationRepository.AreRelatedAsync(parentId, childId).GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -712,6 +749,7 @@ public class RelationService : AsyncRepositoryService, IRelationService
         IRelationType? relationType = await _relationTypeRepository.GetAsync(key);
         if (relationType is null)
         {
+            scope.Complete();
             return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.NotFound, null);
         }
 
@@ -745,7 +783,9 @@ public class RelationService : AsyncRepositoryService, IRelationService
     public bool AreRelated(int parentId, int childId, IRelationType relationType)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        return _relationRepository.AreRelatedAsync(parentId, childId, relationType.Id).GetAwaiter().GetResult();
+        bool result = _relationRepository.AreRelatedAsync(parentId, childId, relationType.Id).GetAwaiter().GetResult();
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -803,6 +843,8 @@ public class RelationService : AsyncRepositoryService, IRelationService
                 IEnumerable<IRelation> relation = _relationRepository.GetByRelationTypeIdAsync(relationTypeId).GetAwaiter().GetResult();
                 relations.AddRange(relation);
             }
+
+            scope.Complete();
         }
 
         return relations;
