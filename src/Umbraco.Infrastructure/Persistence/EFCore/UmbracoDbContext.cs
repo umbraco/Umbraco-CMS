@@ -66,6 +66,8 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<AuditEntryDto> AuditEntries { get; set; }
 
+    public required DbSet<LongRunningOperationDto> LongRunningOperations { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var coreExtensions = options.FindExtension<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>();
