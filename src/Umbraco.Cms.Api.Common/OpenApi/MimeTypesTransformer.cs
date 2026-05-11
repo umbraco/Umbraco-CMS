@@ -1,5 +1,5 @@
+using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using Umbraco.Extensions;
@@ -12,6 +12,13 @@ namespace Umbraco.Cms.Api.Common.OpenApi;
 /// </summary>
 internal class MimeTypesTransformer : IOpenApiOperationTransformer
 {
+    private static readonly string[] _jsonEquivalentMimeTypes =
+    [
+        MediaTypeNames.Text.Plain,
+        "application/*+json",
+        "text/json"
+    ];
+
     /// <inheritdoc/>
     public Task TransformAsync(
         OpenApiOperation operation,
@@ -40,7 +47,7 @@ internal class MimeTypesTransformer : IOpenApiOperationTransformer
             }
             else
             {
-                RemoveNonJsonMimeTypes(requestContent);
+                RemoveJsonEquivalentMimeTypes(requestContent);
             }
         }
 
@@ -49,20 +56,20 @@ internal class MimeTypesTransformer : IOpenApiOperationTransformer
         {
             if (response is OpenApiResponse openApiResponse)
             {
-                RemoveNonJsonMimeTypes(openApiResponse.Content);
+                RemoveJsonEquivalentMimeTypes(openApiResponse.Content);
             }
         }
 
         return Task.CompletedTask;
     }
 
-    private static void RemoveNonJsonMimeTypes(IDictionary<string, OpenApiMediaType>? content)
+    private static void RemoveJsonEquivalentMimeTypes(IDictionary<string, OpenApiMediaType>? content)
     {
-        if (content?.ContainsKey("application/json") != true)
+        if (content?.ContainsKey(MediaTypeNames.Application.Json) != true)
         {
             return;
         }
 
-        content.RemoveAll(r => r.Key != "application/json");
+        content.RemoveAll(r => _jsonEquivalentMimeTypes.Contains(r.Key, StringComparer.OrdinalIgnoreCase));
     }
 }

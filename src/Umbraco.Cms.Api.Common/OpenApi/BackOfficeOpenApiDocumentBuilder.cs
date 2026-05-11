@@ -137,6 +137,10 @@ public sealed class BackOfficeOpenApiDocumentBuilder
                 // Generate operation IDs using Umbraco's naming conventions.
                 options.AddOperationTransformer<UmbracoOperationIdTransformer>();
 
+                // Trim redundant JSON-equivalent MIME types (e.g. text/json, application/*+json, text/plain)
+                // that ASP.NET Core adds alongside application/json.
+                options.AddOperationTransformer<MimeTypesTransformer>();
+
                 // Tag actions by group name and cleanup unused tags (caused by the tag changes).
                 options
                     .AddOperationTransformer<TagActionsByGroupNameTransformer>()
