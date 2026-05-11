@@ -28,6 +28,7 @@ import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { notifyWorkspaceActionStarting } from '@umbraco-cms/backoffice/workspace';
 import type {
 	UmbPublishableWorkspaceContext,
 	UmbWorkspaceActionExecutionOptions,
@@ -113,10 +114,6 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		elementStyle.removeProperty('--uui-color-invalid-standalone');
 		elementStyle.removeProperty('--uui-color-invalid-contrast');
 		return this.#handleSaveAndPublish(options);
-	}
-
-	#notifyActionStarting(executionOptions?: UmbWorkspaceActionExecutionOptions) {
-		executionOptions?.onActionStarting?.();
 	}
 
 	/**
@@ -363,7 +360,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		}
 
 		// User has committed to publishing (modal closed with a selection, or no modal needed).
-		this.#notifyActionStarting(executionOptions);
+		notifyWorkspaceActionStarting(executionOptions);
 
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);

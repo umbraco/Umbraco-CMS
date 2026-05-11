@@ -1,4 +1,5 @@
 export * from './entity-workspace.context-token.js';
+export * from './notify-workspace-action-starting.function.js';
 export * from './publishable-workspace.context-token.js';
 export * from './routable-workspace.context-token.js';
 export * from './submittable-tree-entity-workspace.context-token.js';

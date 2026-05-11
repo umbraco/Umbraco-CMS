@@ -21,7 +21,11 @@ import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-type';
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
-import { UmbEntityDetailWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
+import {
+	notifyWorkspaceActionStarting,
+	UmbEntityDetailWorkspaceContextBase,
+	UmbWorkspaceSplitViewManager,
+} from '@umbraco-cms/backoffice/workspace';
 import type { UmbWorkspaceActionExecutionOptions } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEntityUpdatedEvent,
@@ -905,10 +909,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this._handleSave(options);
 	}
 
-	#notifyActionStarting(executionOptions?: UmbWorkspaceActionExecutionOptions) {
-		executionOptions?.onActionStarting?.();
-	}
-
 	/**
 	 * Get the data to save
 	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
@@ -962,7 +962,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		// User has committed to saving (modal closed with a selection, or no modal needed).
-		this.#notifyActionStarting(executionOptions);
+		notifyWorkspaceActionStarting(executionOptions);
 
 		const saveData = await this.constructSaveData(variantIds);
 
