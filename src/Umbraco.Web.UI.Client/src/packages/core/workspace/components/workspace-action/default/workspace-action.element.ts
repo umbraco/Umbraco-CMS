@@ -2,6 +2,7 @@ import type {
 	ManifestWorkspaceAction,
 	ManifestWorkspaceActionMenuItem,
 	MetaWorkspaceActionDefaultKind,
+	UmbWorkspaceAction,
 	UmbWorkspaceActionArgs,
 	UmbWorkspaceActionDefaultKind,
 } from '../../../types.js';
@@ -56,6 +57,7 @@ export class UmbWorkspaceActionElement<
 		});
 
 		this.#observeIsDisabled();
+		this.#observeIsPending();
 	}
 	public get api(): ApiType | undefined {
 		return this.#api;
@@ -81,6 +83,12 @@ export class UmbWorkspaceActionElement<
 	protected _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
 
 	#buttonStateResetTimeoutId: number | null = null;
+
+	// When the api exposes an `isPending` observable we wait for it to flip
+	// true before showing the waiting state, so the spinner only appears once
+	// real work begins (after any preceding modal/dialog). When absent we fall
+	// back to setting waiting eagerly on click for backwards compatibility.
+	#workStarted = false;
 
 	/**
 	 * Create a list of original and overwritten aliases of workspace actions for the action.
@@ -109,24 +117,40 @@ export class UmbWorkspaceActionElement<
 	async #onClick(event: MouseEvent) {
 		if (this._href) {
 			event.stopPropagation();
+			this.dispatchEvent(new UmbActionExecutedEvent());
+			return;
 		}
-		// If its a link, then we do not want to display state on the button. [NL]
-		if (!this._href) {
-			this._buttonState = 'waiting';
 
-			try {
-				const api = this._actionApi ?? this.#api;
-				if (!api) throw new Error('No api defined');
-				await api.execute();
+		// _actionApi is typed as the narrower UmbAction; widen to UmbWorkspaceAction
+		// here so we can probe the optional isPending observable.
+		const api = (this._actionApi ?? this.#api) as UmbWorkspaceAction<UmbWorkspaceActionArgs<MetaType>> | undefined;
+		this.#workStarted = false;
+
+		// If the api does not expose an isPending observable, fall back to
+		// showing the waiting state immediately (legacy behaviour).
+		if (!api?.isPending) {
+			this._buttonState = 'waiting';
+			this.#workStarted = true;
+		}
+
+		try {
+			if (!api) throw new Error('No api defined');
+			await api.execute();
+			// Only show success if real work actually started. A modal-aware
+			// action that the user cancelled will resolve without ever signalling
+			// pending - in that case we leave the button idle.
+			if (this.#workStarted) {
 				this._buttonState = 'success';
 				this.#initButtonStateReset();
-			} catch (reason) {
-				if (reason) {
-					console.warn(reason);
-				}
-				this._buttonState = 'failed';
-				this.#initButtonStateReset();
 			}
+		} catch (reason) {
+			if (reason) {
+				console.warn(reason);
+			}
+			// Always communicate failures, even if they happen before any work
+			// would have started (e.g. context missing in sync prep).
+			this._buttonState = 'failed';
+			this.#initButtonStateReset();
 		}
 		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
@@ -138,6 +162,19 @@ export class UmbWorkspaceActionElement<
 				this._isDisabled = isDisabled || false;
 			},
 			'isDisabledObserver',
+		);
+	}
+
+	#observeIsPending() {
+		this.observe(
+			this.#api?.isPending,
+			(isPending) => {
+				if (isPending) {
+					this._buttonState = 'waiting';
+					this.#workStarted = true;
+				}
+			},
+			'isPendingObserver',
 		);
 	}
 

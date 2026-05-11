@@ -22,6 +22,7 @@ import { UmbContentTypeStructureManager } from '@umbraco-cms/backoffice/content-
 import { UmbDataTypeItemRepositoryManager } from '@umbraco-cms/backoffice/data-type';
 import { UmbReadOnlyVariantGuardManager } from '@umbraco-cms/backoffice/utils';
 import { UmbEntityDetailWorkspaceContextBase, UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
+import type { UmbWorkspaceActionExecutionOptions } from '@umbraco-cms/backoffice/workspace';
 import {
 	UmbEntityUpdatedEvent,
 	UmbRequestReloadChildrenOfEntityEvent,
@@ -899,10 +900,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 
 	/**
 	 * Request a save of the workspace, in the case of Document Workspaces the validation does not need to be valid for this to be saved.
+	 * @param {UmbWorkspaceActionExecutionOptions} [options] - Optional execution options (e.g. `onActionStarting` invoked after any save-variant modal closes).
 	 * @returns {Promise<void>} A promise which resolves once it has been completed.
 	 */
-	public requestSave() {
-		return this._handleSave();
+	public requestSave(options?: UmbWorkspaceActionExecutionOptions) {
+		return this._handleSave(options);
 	}
 
 	/**
@@ -919,7 +921,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		await this._handleSave();
 		this._closeModal();
 	}
-	protected async _handleSave(): Promise<void> {
+	protected async _handleSave(executionOptions?: UmbWorkspaceActionExecutionOptions): Promise<void> {
 		const data = this.getData();
 		if (!data) {
 			throw new Error('Data is missing');
@@ -956,6 +958,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 			These are based on the variants that have been edited */
 			variantIds = selected.map((x) => UmbVariantId.FromString(x));
 		}
+
+		// User has committed to saving (modal closed with a selection, or no modal needed).
+		executionOptions?.onActionStarting?.();
 
 		const saveData = await this.constructSaveData(variantIds);
 
