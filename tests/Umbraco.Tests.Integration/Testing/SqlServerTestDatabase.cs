@@ -1,7 +1,5 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,9 +18,8 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
 {
     public const string DatabaseName = "UmbracoTests";
     private readonly TestDatabaseSettings _settings;
+    private readonly string _snapshotDir;
     private readonly ConcurrentDictionary<string, string> _snapshotPaths = new();
-    private readonly ConcurrentBag<string> _snapshotRestoredDatabases = new();
-    private int _snapshotCounter;
 
     public SqlServerTestDatabase(TestDatabaseSettings settings, ILoggerFactory loggerFactory, IUmbracoDatabaseFactory databaseFactory)
     {
@@ -30,6 +27,7 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
         _databaseFactory = databaseFactory ?? throw new ArgumentNullException(nameof(databaseFactory));
 
         _settings = settings;
+        _snapshotDir = Path.Combine(settings.FilesPath, "snapshots");
 
         var counter = 0;
 
@@ -68,9 +66,18 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
         using (var connection = new SqlConnection(_settings.SQLServerMasterConnectionString))
         {
             connection.Open();
+
+            // Delete leftover .mdf/.ldf files from previously detached (but not dropped) databases
+            var (defaultDataPath, defaultLogPath) = GetDefaultPaths(connection);
+            File.Delete(Path.Combine(defaultDataPath, $"{meta.Name}.mdf"));
+            File.Delete(Path.Combine(defaultLogPath, $"{meta.Name}_log.ldf"));
+
             using (var command = connection.CreateCommand())
             {
-                SetCommand(command, $@"CREATE DATABASE {LocalDb.QuotedName(meta.Name)}");
+                SetCommand(command, $@"
+                    CREATE DATABASE {LocalDb.QuotedName(meta.Name)};
+                    ALTER DATABASE {LocalDb.QuotedName(meta.Name)} SET RECOVERY SIMPLE;
+                ");
                 command.ExecuteNonQuery();
             }
         }
@@ -92,10 +99,7 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
                     return;
                 }
 
-                var sql = $@"
-                        ALTER DATABASE {LocalDb.QuotedName(name)}
-                        SET SINGLE_USER
-                        WITH ROLLBACK IMMEDIATE";
+                var sql = KillAllUsersInDb(name);
                 SetCommand(command, sql);
                 command.ExecuteNonQuery();
 
@@ -105,103 +109,134 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
         }
     }
 
+    /// <summary>
+    ///     Generates T-SQL that kills all sessions connected to the specified database.
+    ///     Uses a cursor approach instead of <c>SET SINGLE_USER WITH ROLLBACK IMMEDIATE</c>
+    ///     to avoid deadlocks when multiple connections are active.
+    /// </summary>
+    private static string KillAllUsersInDb(string databaseName) =>
+        $"""
+         declare @sessions int, @spid int, @proc nvarchar(50);
+         declare cur cursor for select spid from sys.sysprocesses where db_name(dbid) = '{databaseName}';
+         select @sessions = spid from sys.sysprocesses where db_name(dbid) = '{databaseName}';
+         begin try
+             open cur;
+             fetch next from cur into @spid;
+             while @@FETCH_STATUS = 0
+             begin
+                 set @proc = N'kill ' + cast(@spid as nvarchar(20));
+                 exec sp_executesql @proc;
+                 fetch next from cur into @spid;
+             end
+         end try begin catch end catch;
+         begin try close cur;
+         end try begin catch end catch;
+         deallocate cur;
+         select @sessions;
+         """;
+
     #region ISnapshotableTestDatabase
 
     /// <inheritdoc />
-    public bool HasSnapshot(string snapshotKey) => _snapshotPaths.ContainsKey(snapshotKey);
+    public bool HasSnapshot(string snapshotKey)
+    {
+        var seenPath = _snapshotPaths.ContainsKey(snapshotKey);
+        var fileExists = seenPath && File.Exists(_snapshotPaths[snapshotKey]);
+        if (seenPath && !fileExists)
+        {
+            _snapshotPaths.Remove(snapshotKey, out _);
+        }
+
+        return fileExists;
+    }
 
     /// <inheritdoc />
     public void CreateSnapshot(string snapshotKey, TestDatabaseInformation sourceMeta)
     {
+        Directory.CreateDirectory(_snapshotDir);
+
         using var connection = new SqlConnection(_settings.SQLServerMasterConnectionString);
         connection.Open();
 
-        // Write .bak to SQL Server's default data directory so the SQL Server process
-        // can always access it (critical when SQL Server runs in Docker or as a service).
-        var (defaultDataPath, _) = GetDefaultPaths(connection);
-        var backupPath = Path.Combine(defaultDataPath, $"{snapshotKey}.bak");
+        // Get default data/log directories from the server
+        var (defaultDataPath, defaultLogPath) = GetDefaultPaths(connection);
+
+        var dataFilePath = Path.Combine(defaultDataPath, $"{sourceMeta.Name}.mdf").Replace("'", "''");
+        var logFilePath = Path.Combine(defaultLogPath, $"{sourceMeta.Name}_log.ldf").Replace("'", "''");
+
+        var cloneDataFilePath = Path.Combine(_snapshotDir, $"{sourceMeta.Name}.mdf");
+        var cloneLogFilePath = Path.Combine(_snapshotDir, $"{sourceMeta.Name}_log.ldf");
 
         using var cmd = connection.CreateCommand();
 
-        // BACKUP DATABASE cannot use SQL parameters for database name or file path.
-        // Names are internally generated (not user input), matching existing DDL patterns.
-        cmd.CommandText = $@"
-            BACKUP DATABASE {LocalDb.QuotedName(sourceMeta.Name)}
-            TO DISK = N'{backupPath.Replace("'", "''")}'
-            WITH INIT, COMPRESSION";
+        // Detach the source database so we can copy its files
+        Retry(10, () =>
+        {
+            cmd.CommandText = KillAllUsersInDb(sourceMeta.Name);
+            cmd.ExecuteScalar();
+
+            cmd.CommandText = $"exec sp_detach_db N'{sourceMeta.Name}', true, true";
+            cmd.ExecuteNonQuery();
+        });
+
+        // Copy .mdf and .ldf to the snapshot directory
+        File.Copy(dataFilePath, cloneDataFilePath, true);
+        File.Copy(logFilePath, cloneLogFilePath, true);
+
+        // Reattach the source database
+        cmd.CommandText = $"exec sp_attach_db N'{sourceMeta.Name}', N'{dataFilePath}', N'{logFilePath}'";
         cmd.ExecuteNonQuery();
 
-        _snapshotPaths[snapshotKey] = backupPath;
+        _snapshotPaths[snapshotKey] = cloneDataFilePath;
     }
 
     /// <inheritdoc />
     public TestDatabaseInformation AttachFromSnapshot(string snapshotKey)
     {
-        if (!_snapshotPaths.TryGetValue(snapshotKey, out var backupPath))
+        if (!_snapshotPaths.TryGetValue(snapshotKey, out var snapshotDataPath))
         {
             throw new InvalidOperationException($"No snapshot found with key '{snapshotKey}'.");
         }
 
-        var dbName = $"{DatabaseName}-Snap-{Interlocked.Increment(ref _snapshotCounter)}";
-        var meta = TestDatabaseInformation.CreateWithMasterConnectionString(dbName, false, _settings.SQLServerMasterConnectionString);
-
-        _snapshotRestoredDatabases.Add(dbName);
-
-        // Drop if a database with this name already exists
-        DropByName(dbName);
+        // Reuse a pool database instead of creating a new one
+        var meta = _readySchemaQueue.Take();
+        var dbName = meta.Name;
 
         using var connection = new SqlConnection(_settings.SQLServerMasterConnectionString);
         connection.Open();
 
-        // Get logical file names from the backup
-        var (dataLogicalName, logLogicalName) = GetLogicalFileNames(connection, backupPath);
-
         // Get default data/log directories from the server
         var (defaultDataPath, defaultLogPath) = GetDefaultPaths(connection);
 
-        // RESTORE DATABASE cannot use SQL parameters for identifiers or file paths.
-        var escapedBackupPath = backupPath.Replace("'", "''");
         var dataFilePath = Path.Combine(defaultDataPath, $"{dbName}.mdf").Replace("'", "''");
         var logFilePath = Path.Combine(defaultLogPath, $"{dbName}_log.ldf").Replace("'", "''");
 
+        var snapshotLogPath = snapshotDataPath.Replace(".mdf", "_log.ldf");
+
         using var cmd = connection.CreateCommand();
+
+        // Detach the pool database so we can overwrite its files
+        Retry(10, () =>
+        {
+            cmd.CommandText = KillAllUsersInDb(dbName);
+            cmd.ExecuteScalar();
+
+            cmd.CommandText = $"exec sp_detach_db N'{dbName}', true, true";
+            cmd.ExecuteNonQuery();
+        });
+
+        // Overwrite the pool database's files with the snapshot
+        File.Copy(snapshotDataPath, dataFilePath, true);
+        File.Copy(snapshotLogPath, logFilePath, true);
+
+        // Reattach with the pool database's name
         cmd.CommandText = $@"
-            RESTORE DATABASE {LocalDb.QuotedName(dbName)}
-            FROM DISK = N'{escapedBackupPath}'
-            WITH MOVE N'{dataLogicalName.Replace("'", "''")}' TO N'{dataFilePath}',
-                 MOVE N'{logLogicalName.Replace("'", "''")}' TO N'{logFilePath}',
-                 REPLACE";
+            exec sp_attach_db N'{dbName}', N'{dataFilePath}', N'{logFilePath}';
+            ALTER DATABASE [{dbName}] SET MULTI_USER;
+        ";
         cmd.ExecuteNonQuery();
 
         return meta;
-    }
-
-    private static (string DataLogical, string LogLogical) GetLogicalFileNames(
-        SqlConnection connection, string backupPath)
-    {
-        using var cmd = connection.CreateCommand();
-        cmd.CommandText = $"RESTORE FILELISTONLY FROM DISK = N'{backupPath.Replace("'", "''")}'";
-
-        string dataName = null;
-        string logName = null;
-
-        using var reader = cmd.ExecuteReader();
-        while (reader.Read())
-        {
-            var type = reader["Type"].ToString();
-            var logicalName = reader["LogicalName"].ToString();
-            if (type == "D")
-            {
-                dataName = logicalName;
-            }
-            else if (type == "L")
-            {
-                logName = logicalName;
-            }
-        }
-
-        return (dataName ?? throw new InvalidOperationException("No data file found in backup."),
-                logName ?? throw new InvalidOperationException("No log file found in backup."));
     }
 
     private static (string DataPath, string LogPath) GetDefaultPaths(SqlConnection connection)
@@ -225,32 +260,41 @@ public class SqlServerTestDatabase : SqlServerBaseTestDatabase, ITestDatabase, I
             return;
         }
 
+        var stopwatch = Stopwatch.StartNew();
+
         _prepareQueue.CompleteAdding();
-        while (_prepareQueue.TryTake(out _))
+        while (_prepareQueue.TryTake(out _, 10) && stopwatch.ElapsedMilliseconds < 5000)
         {
         }
 
+        stopwatch.Restart();
         _readyEmptyQueue.CompleteAdding();
-        while (_readyEmptyQueue.TryTake(out _))
+        while (_readyEmptyQueue.TryTake(out _, 10) && stopwatch.ElapsedMilliseconds < 5000)
         {
         }
 
+        stopwatch.Restart();
         _readySchemaQueue.CompleteAdding();
-        while (_readySchemaQueue.TryTake(out _))
+        while (_readySchemaQueue.TryTake(out _, 10) && stopwatch.ElapsedMilliseconds < 5000)
         {
         }
 
         // Drop pool databases
         Parallel.ForEach(_testDatabases, Drop);
 
-        // Drop snapshot-restored databases
-        foreach (var name in _snapshotRestoredDatabases)
+        // Clean up snapshot files
+        if (Directory.Exists(_snapshotDir))
         {
-            DropByName(name);
+            try
+            {
+                Directory.Delete(_snapshotDir, recursive: true);
+            }
+            catch
+            {
+                // Best-effort cleanup
+            }
         }
 
-        // Snapshot .bak files reside in SQL Server's data directory.
-        // In containerized environments they are cleaned up with the container.
-        // In local environments they are small and overwritten on next run (WITH INIT).
+        _snapshotPaths.Clear();
     }
 }

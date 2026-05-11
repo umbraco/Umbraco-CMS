@@ -55,14 +55,8 @@ public abstract class ManagementApiTest<T>
     protected TService GetRequiredService<TService>() => Services.GetRequiredService<TService>();
 
     [OneTimeSetUp]
-    public virtual async Task FixtureSetUp()
+    public virtual async Task SetupDatabase()
     {
-        // Ensure StaticServiceProvider points to our live shared host's services.
-        // Other test infrastructure may overwrite this global static during the same test run,
-        // so we re-set it before each fixture class to prevent "disposed IServiceProvider" errors
-        // from obsolete constructors that use StaticServiceProvider.Instance.
-        StaticServiceProvider.Instance = Services;
-
         // Check if this fixture class opted into a seed profile via [DatabaseSeedProfile].
         // If so, use snapshot-aware seeded swap; otherwise fall back to a fresh database.
         var seedAttr = GetType().GetCustomAttribute<DatabaseSeedProfileAttribute>();
@@ -75,6 +69,16 @@ public abstract class ManagementApiTest<T>
         {
             await Fixture.SwapToFreshDatabaseAsync();
         }
+    }
+
+    [OneTimeSetUp]
+    public virtual void FixtureSetUp()
+    {
+        // Ensure StaticServiceProvider points to our live shared host's services.
+        // Other test infrastructure may overwrite this global static during the same test run,
+        // so we re-set it before each fixture class to prevent "disposed IServiceProvider" errors
+        // from obsolete constructors that use StaticServiceProvider.Instance.
+        StaticServiceProvider.Instance = Services;
 
         // Clear token cache — tokens from previous fixture's DB are now invalid
         _tokenCache.Clear();
@@ -88,7 +92,7 @@ public abstract class ManagementApiTest<T>
     }
 
     [SetUp]
-    public virtual void Setup()
+    public virtual void SetupClient()
     {
         Client.DefaultRequestHeaders.Accept.Clear();
         Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));

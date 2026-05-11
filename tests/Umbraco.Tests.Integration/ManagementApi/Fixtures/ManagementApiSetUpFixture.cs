@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers;
@@ -158,7 +159,8 @@ public class ManagementApiSetUpFixture : UmbracoTestServerFixture
             catch (Exception ex)
             {
                 var fullException = ex.ToString();
-                Console.WriteLine($"[ManagementApiSetUpFixture] Unhandled exception for {context.Request.Path}: {fullException}");
+                var logger = context.RequestServices.GetRequiredService<ILogger<ManagementApiSetUpFixture>>();
+                logger.LogError(ex, "[ManagementApiSetUpFixture] Unhandled exception for {Path}", context.Request.Path);
                 if (!context.Response.HasStarted)
                 {
                     context.Response.StatusCode = 500;

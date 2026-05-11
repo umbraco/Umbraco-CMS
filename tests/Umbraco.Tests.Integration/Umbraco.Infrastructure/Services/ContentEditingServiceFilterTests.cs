@@ -1,6 +1,3 @@
-// Copyright (c) Umbraco.
-// See LICENSE for more details.
-//
 // These tests require registering IContentTypeFilter implementations at DI build time,
 // which cannot be done on a shared host. They stay on the old per-test host boot pattern.
 //

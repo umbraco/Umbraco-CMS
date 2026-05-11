@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Persistence.SqlServer;
 
@@ -75,4 +76,68 @@ public static class TestDatabaseFactory
 
     private static ITestDatabase CreateSqlServer(TestDatabaseSettings settings, ILoggerFactory loggerFactory, TestUmbracoDatabaseFactoryProvider dbFactory) =>
         new SqlServerTestDatabase(settings, loggerFactory, dbFactory.Create());
+}
+
+/// <summary>
+///     Diagnostic decorator that wraps an <see cref="ISnapshotableTestDatabase"/> and logs
+///     timing information for every operation. Useful for profiling snapshot performance.
+///     Enable by uncommenting the wrapper in <see cref="TestDatabaseFactory"/>.
+/// </summary>
+internal class LoggingSnapshotableTestDatabase : ISnapshotableTestDatabase
+{
+    private readonly ISnapshotableTestDatabase _innerDb;
+    private readonly ILogger _logger;
+    private readonly Stopwatch _stopwatch = new();
+
+    public LoggingSnapshotableTestDatabase(ISnapshotableTestDatabase innerDb, ILoggerFactory loggerFactory)
+    {
+        _innerDb = innerDb;
+        _logger = loggerFactory.CreateLogger<LoggingSnapshotableTestDatabase>();
+    }
+
+    public TestDatabaseInformation AttachEmpty()
+    {
+        _stopwatch.Restart();
+        var result = _innerDb.AttachEmpty();
+        _logger.LogInformation("{Type} attached empty db {Name} in {Elapsed}", _innerDb.GetType().Name, result.Name, _stopwatch.Elapsed);
+        return result;
+    }
+
+    public TestDatabaseInformation AttachSchema()
+    {
+        _stopwatch.Restart();
+        var result = _innerDb.AttachSchema();
+        _logger.LogInformation("{Type} attached schema db {Name} in {Elapsed}", _innerDb.GetType().Name, result.Name, _stopwatch.Elapsed);
+        return result;
+    }
+
+    public void Detach(TestDatabaseInformation id)
+    {
+        _stopwatch.Restart();
+        _innerDb.Detach(id);
+        _logger.LogInformation("{Type} detached db {Name} in {Elapsed}", _innerDb.GetType().Name, id.Name, _stopwatch.Elapsed);
+    }
+
+    public bool HasSnapshot(string snapshotKey)
+    {
+        _stopwatch.Restart();
+        var result = _innerDb.HasSnapshot(snapshotKey);
+        _logger.LogInformation("{Type} {Result} snapshot {Key} in {Elapsed}", _innerDb.GetType().Name, result ? "found" : "did not find", snapshotKey, _stopwatch.Elapsed);
+        return result;
+    }
+
+    public void CreateSnapshot(string snapshotKey, TestDatabaseInformation sourceMeta)
+    {
+        _stopwatch.Restart();
+        _innerDb.CreateSnapshot(snapshotKey, sourceMeta);
+        _logger.LogInformation("{Type} created snapshot {Key} from {Name} in {Elapsed}", _innerDb.GetType().Name, snapshotKey, sourceMeta.Name, _stopwatch.Elapsed);
+    }
+
+    public TestDatabaseInformation AttachFromSnapshot(string snapshotKey)
+    {
+        _stopwatch.Restart();
+        var result = _innerDb.AttachFromSnapshot(snapshotKey);
+        _logger.LogInformation("{Type} attached db {Name} from snapshot {Key} in {Elapsed}", _innerDb.GetType().Name, result.Name, snapshotKey, _stopwatch.Elapsed);
+        return result;
+    }
 }
