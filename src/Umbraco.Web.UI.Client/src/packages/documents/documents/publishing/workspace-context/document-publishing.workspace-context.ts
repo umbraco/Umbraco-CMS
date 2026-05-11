@@ -115,6 +115,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		return this.#handleSaveAndPublish(options);
 	}
 
+	#notifyActionStarting(executionOptions?: UmbWorkspaceActionExecutionOptions) {
+		executionOptions?.onActionStarting?.();
+	}
+
 	/**
 	 * Schedule the document for publishing
 	 * @returns {Promise<void>}
@@ -359,7 +363,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		}
 
 		// User has committed to publishing (modal closed with a selection, or no modal needed).
-		executionOptions?.onActionStarting?.();
+		this.#notifyActionStarting(executionOptions);
 
 		const saveData = await this.#documentWorkspaceContext.constructSaveData(variantIds);
 		await this.#documentWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
