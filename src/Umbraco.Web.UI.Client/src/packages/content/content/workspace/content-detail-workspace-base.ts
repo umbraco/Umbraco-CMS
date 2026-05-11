@@ -905,6 +905,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		return this._handleSave(options);
 	}
 
+	#notifyActionStarting(executionOptions?: UmbWorkspaceActionExecutionOptions) {
+		executionOptions?.onActionStarting?.();
+	}
+
 	/**
 	 * Get the data to save
 	 * @param {Array<UmbVariantId>} variantIds - The variant ids to save
@@ -958,7 +962,7 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		}
 
 		// User has committed to saving (modal closed with a selection, or no modal needed).
-		executionOptions?.onActionStarting?.();
+		this.#notifyActionStarting(executionOptions);
 
 		const saveData = await this.constructSaveData(variantIds);
 

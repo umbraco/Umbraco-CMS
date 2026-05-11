@@ -117,13 +117,16 @@ export class UmbWorkspaceActionElement<
 	async #onClick(event: MouseEvent) {
 		if (this._href) {
 			event.stopPropagation();
-			this.dispatchEvent(new UmbActionExecutedEvent());
-			return;
+		} else {
+			// _actionApi is typed as the narrower UmbAction; widen to UmbWorkspaceAction
+			// here so we can probe the optional isPending observable.
+			const api = (this._actionApi ?? this.#api) as UmbWorkspaceAction<UmbWorkspaceActionArgs<MetaType>> | undefined;
+			await this.#runApiAction(api);
 		}
+		this.dispatchEvent(new UmbActionExecutedEvent());
+	}
 
-		// _actionApi is typed as the narrower UmbAction; widen to UmbWorkspaceAction
-		// here so we can probe the optional isPending observable.
-		const api = (this._actionApi ?? this.#api) as UmbWorkspaceAction<UmbWorkspaceActionArgs<MetaType>> | undefined;
+	async #runApiAction(api: UmbWorkspaceAction<UmbWorkspaceActionArgs<MetaType>> | undefined) {
 		this.#workStarted = false;
 
 		// If the api does not expose an isPending observable, fall back to
@@ -152,7 +155,6 @@ export class UmbWorkspaceActionElement<
 			this._buttonState = 'failed';
 			this.#initButtonStateReset();
 		}
-		this.dispatchEvent(new UmbActionExecutedEvent());
 	}
 
 	#observeIsDisabled() {
