@@ -16,6 +16,48 @@
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
   <Suppression>
+    <DiagnosticId>CP0001</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.Testing.TestDbMeta</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>F:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase._prepareQueue</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>F:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase._readyEmptyQueue</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>F:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase._readySchemaQueue</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>F:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase._testDatabases</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.ManagementApiTest`1.ClearCache</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.ManagementApi.Services.Trees.PartialViewTreeServiceTests.Can_Get_Ancestors_From_StyleSheet_Tree_Service</Target>
     <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
@@ -80,6 +122,76 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase.AttachEmpty</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase.AttachSchema</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase.Detach(Umbraco.Cms.Tests.Integration.Testing.TestDbMeta)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase.GetConnection(Umbraco.Cms.Tests.Integration.Testing.TestDbMeta)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase.RebuildSchema(System.Data.IDbCommand,Umbraco.Cms.Tests.Integration.Testing.TestDbMeta)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase.ResetTestDatabase(Umbraco.Cms.Tests.Integration.Testing.TestDbMeta)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.ITestDatabase.AttachEmpty</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.ITestDatabase.AttachSchema</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.ITestDatabase.Detach(Umbraco.Cms.Tests.Integration.Testing.TestDbMeta)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.TestDatabaseFactory.Create(Umbraco.Cms.Tests.Integration.Testing.TestDatabaseSettings,Umbraco.Cms.Tests.Integration.Testing.TestUmbracoDatabaseFactoryProvider,Microsoft.Extensions.Logging.ILoggerFactory)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine.IndexInitializer.#ctor(Umbraco.Cms.Core.Strings.IShortStringHelper,Umbraco.Cms.Core.PropertyEditors.PropertyEditorCollection,Umbraco.Cms.Core.PropertyEditors.MediaUrlGeneratorCollection,Umbraco.Cms.Core.Scoping.IScopeProvider,Microsoft.Extensions.Logging.ILoggerFactory,Microsoft.Extensions.Options.IOptions{Umbraco.Cms.Core.Configuration.Models.ContentSettings},Umbraco.Cms.Core.Services.ILocalizationService,Umbraco.Cms.Core.Services.IContentTypeService,Umbraco.Cms.Core.Services.IDocumentUrlService,Umbraco.Cms.Core.Services.ILanguageService)</Target>
     <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
@@ -87,7 +199,42 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentBlueprintEditingServiceTests.AddScaffoldedNotificationHandler(Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.Can_Create_As_Child_With_Content_Type_Filter</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.Can_Create_At_Root_With_Content_Type_Filter</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.Can_Validate_Valid_Variant_Content</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.Cannot_Create_As_Child_With_Content_Type_Filter</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.Cannot_Create_At_Root_With_Content_Type_Filter</Target>
     <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
@@ -108,6 +255,48 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.ConfigureContentTypeFilterToAllowTextPageAsChild(Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.ConfigureContentTypeFilterToAllowTextPageAtRoot(Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.ConfigureContentTypeFilterToDisallowTextPageAsChild(Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.ConfigureContentTypeFilterToDisallowTextPageAtRoot(Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.ConfigureDisableDeleteWhenReferenced(Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.ConfigureDisableUnpublishWhenReferencedTrue(Umbraco.Cms.Core.DependencyInjection.IUmbracoBuilder)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.Relate(Umbraco.Cms.Core.Models.IContent,Umbraco.Cms.Core.Models.IContent)</Target>
     <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
@@ -115,7 +304,77 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.Setup</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0002</DiagnosticId>
     <Target>M:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests.Will_Fail_Invalid_Variant_Content</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0005</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase.GetConnection(Umbraco.Cms.Tests.Integration.Testing.TestDatabaseInformation)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0005</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase.RebuildSchema(System.Data.IDbCommand,Umbraco.Cms.Tests.Integration.Testing.TestDatabaseInformation)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0005</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.BaseTestDatabase.ResetTestDatabase(Umbraco.Cms.Tests.Integration.Testing.TestDatabaseInformation)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.ITestDatabase.AttachEmpty</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.ITestDatabase.AttachSchema</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:Umbraco.Cms.Tests.Integration.Testing.ITestDatabase.Detach(Umbraco.Cms.Tests.Integration.Testing.TestDatabaseInformation)</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0007</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.ManagementApi.ManagementApiTest`1</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0007</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentBlueprintEditingServiceTests</Target>
+    <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
+    <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0007</DiagnosticId>
+    <Target>T:Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.ContentEditingServiceTests</Target>
     <Left>lib/net10.0/Umbraco.Tests.Integration.dll</Left>
     <Right>lib/net10.0/Umbraco.Tests.Integration.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
