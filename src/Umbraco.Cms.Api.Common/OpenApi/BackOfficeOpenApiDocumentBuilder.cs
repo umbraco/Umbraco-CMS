@@ -134,6 +134,9 @@ public sealed class BackOfficeOpenApiDocumentBuilder
                     });
                 }
 
+                // Generate operation IDs using Umbraco's naming conventions.
+                options.AddOperationTransformer<UmbracoOperationIdTransformer>();
+
                 // Tag actions by group name and cleanup unused tags (caused by the tag changes).
                 options
                     .AddOperationTransformer<TagActionsByGroupNameTransformer>()
