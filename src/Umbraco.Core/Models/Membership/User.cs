@@ -286,8 +286,10 @@ public class User : EntityBase, IUser, IProfile
                 return UserState.Disabled;
             }
 
-            // User is not disabled or locked and has never logged in before
-            if (LastLoginDate == default && IsApproved && IsLockedOut == false)
+            // User is not disabled or locked and has never logged in before.
+            // API users authenticate via client credentials and never set LastLoginDate, so the "never logged in"
+            // check does not apply to them — an approved, unlocked API user is considered Active.
+            if (Kind == UserKind.Default && LastLoginDate == default && IsApproved && IsLockedOut == false)
             {
                 return UserState.Inactive;
             }
