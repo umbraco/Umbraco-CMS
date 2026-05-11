@@ -46,6 +46,16 @@ public class UnattendedSettings
     public bool PackageMigrationsUnattended { get; set; } = true;
 
     /// <summary>
+    ///     Gets or sets the maximum time a migration leadership claim is considered valid before
+    ///     another server may take over. Protects against a leader crashing mid-migration.
+    /// </summary>
+    /// <remarks>
+    ///     Only relevant in load-balanced deployments with <see cref="UpgradeUnattended"/> enabled.
+    ///     Default is 2 hours, which should exceed the longest reasonable migration run time.
+    /// </remarks>
+    public TimeSpan MigrationClaimTimeout { get; set; } = TimeSpan.FromHours(2);
+
+    /// <summary>
     ///     Gets or sets a value to use for creating a user with a name for Unattended Installs
     /// </summary>
     public string? UnattendedUserName { get; set; } = null;
