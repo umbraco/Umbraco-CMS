@@ -15,17 +15,17 @@ namespace Umbraco.Cms.Api.Management.Controllers.UrlSegment;
 public class ResizeImagingController : ImagingControllerBase
 {
     private readonly IMediaService _mediaService;
-    private readonly IReziseImageUrlFactory _reziseImageUrlFactory;
+    private readonly IResizeImageUrlFactory _resizeImageUrlFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ResizeImagingController"/> class.
     /// </summary>
     /// <param name="mediaService">The media service used to perform media-related operations.</param>
-    /// <param name="reziseImageUrlFactory">The factory responsible for generating URLs for resized images.</param>
-    public ResizeImagingController(IMediaService mediaService, IReziseImageUrlFactory reziseImageUrlFactory)
+    /// <param name="resizeImageUrlFactory">The factory responsible for generating URLs for resized images.</param>
+    public ResizeImagingController(IMediaService mediaService, IResizeImageUrlFactory resizeImageUrlFactory)
     {
         _mediaService = mediaService;
-        _reziseImageUrlFactory = reziseImageUrlFactory;
+        _resizeImageUrlFactory = resizeImageUrlFactory;
     }
 
     /// <summary>
@@ -49,6 +49,6 @@ public class ResizeImagingController : ImagingControllerBase
         IEnumerable<IMedia> items = _mediaService.GetByIds(ids);
         var options = new ImageResizeOptions(height, width, mode, format);
 
-        return Task.FromResult<IActionResult>(Ok(_reziseImageUrlFactory.CreateUrlSets(items, options)));
+        return Task.FromResult<IActionResult>(Ok(_resizeImageUrlFactory.CreateUrlSets(items, options)));
     }
 }

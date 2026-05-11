@@ -297,7 +297,7 @@ export class UmbBlockGridEntryContext
 		return columnSpan;
 	}
 
-	async copyToClipboard() {
+	override async copyToClipboard() {
 		if (!this._manager) return;
 
 		const propertyDatasetContext = await this.getContext(UMB_PROPERTY_DATASET_CONTEXT);

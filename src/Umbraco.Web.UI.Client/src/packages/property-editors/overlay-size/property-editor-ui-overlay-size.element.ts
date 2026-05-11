@@ -4,7 +4,7 @@ import type {
 	UmbPropertyEditorConfigCollection,
 } from '@umbraco-cms/backoffice/property-editor';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UUIModalSidebarSize, UUISelectEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIModalSidebarSize, UUISelectEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 /**
@@ -16,7 +16,7 @@ export class UmbPropertyEditorUIOverlaySizeElement extends UmbLitElement impleme
 	value: UUIModalSidebarSize | string = '';
 
 	@state()
-	private _list: Array<Option> = [
+	private _list: Array<UUISelectOption> = [
 		{ value: undefined as any, name: 'Default', selected: true },
 		{ value: 'small', name: 'Small' },
 		{ value: 'medium', name: 'Medium' },

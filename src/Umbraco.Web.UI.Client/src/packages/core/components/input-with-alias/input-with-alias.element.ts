@@ -122,7 +122,7 @@ export class UmbInputWithAliasElement extends UmbFormControlMixin<string, typeof
 	}
 
 	override render() {
-		const nameLabel = this.label ?? this.localize.term('placeholders_entername');
+		const nameLabel = this.label || this.localize.term('placeholders_entername');
 		const aliasLabel = this.localize.term('placeholders_enterAlias');
 
 		return html`

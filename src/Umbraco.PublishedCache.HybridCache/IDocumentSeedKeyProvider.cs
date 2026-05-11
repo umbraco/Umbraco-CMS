@@ -1,6 +1,3 @@
 ﻿namespace Umbraco.Cms.Infrastructure.HybridCache;
 
-public interface IDocumentSeedKeyProvider : ISeedKeyProvider
-{
-
-}
+public interface IDocumentSeedKeyProvider : ISeedKeyProvider;

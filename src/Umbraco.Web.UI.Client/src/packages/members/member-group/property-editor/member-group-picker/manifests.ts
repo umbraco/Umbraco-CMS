@@ -11,6 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.MemberGroupPicker',
 			icon: 'icon-users-alt',
 			group: 'people',
+			keywords: ['group', 'role', 'permission', 'audience', 'community', 'members'],
 			supportsReadOnly: true,
 		},
 	},

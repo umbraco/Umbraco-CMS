@@ -399,20 +399,6 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 		this.#languages.setValue(data?.items ?? []);
 	}
 
-	/**
-	 * @deprecated Call `_loadSegmentsFor` instead. `loadSegments` will be removed in v.18.
-	 * (note this was introduced in v.17, and deprecated in v.17.0.1)
-	 */
-	protected async loadSegments() {
-		console.warn('Stop using loadSegments, call _loadSegmentsFor instead. loadSegments will be removed in v.18.');
-		const unique = await firstValueFrom(this.unique);
-		if (!unique) {
-			this._segments.setValue([]);
-			return;
-		}
-		this._loadSegmentsFor(unique);
-	}
-
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	protected async _loadSegmentsFor(unique: string): Promise<void> {
 		console.warn(
@@ -644,8 +630,10 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	): Promise<Observable<PropertyValueType | undefined> | undefined> {
 		return this._data.createObservablePartOfCurrent(
 			(data) =>
-				data?.values?.find((x) => x?.alias === propertyAlias && (variantId ? variantId.compare(x) : true))
-					?.value as PropertyValueType,
+				data?.values?.find(
+					// No variantId means invariant: match only entries with culture === null and segment === null.
+					(x) => x?.alias === propertyAlias && (variantId ?? UmbVariantId.CreateInvariant()).compare(x),
+				)?.value as PropertyValueType,
 		);
 	}
 
@@ -658,8 +646,9 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	public getPropertyValue<ReturnType = unknown>(alias: string, variantId?: UmbVariantId) {
 		const currentData = this._data.getCurrent();
 		if (currentData) {
+			// No variantId means invariant: match only entries with culture === null and segment === null.
 			const newDataSet = currentData.values?.find(
-				(x) => x.alias === alias && (variantId ? variantId.compare(x) : true),
+				(x) => x.alias === alias && (variantId ?? UmbVariantId.CreateInvariant()).compare(x),
 			);
 			return newDataSet?.value as ReturnType;
 		}
@@ -675,44 +664,53 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 	 * @memberof UmbContentDetailWorkspaceContextBase
 	 */
 	public async setPropertyValue<ValueType = unknown>(alias: string, value: ValueType, variantId?: UmbVariantId) {
-		this.initiatePropertyValueChange();
-		variantId ??= UmbVariantId.CreateInvariant();
-		const property = await this.structure.getPropertyStructureByAlias(alias);
+		try {
+			this.initiatePropertyValueChange();
+			variantId ??= UmbVariantId.CreateInvariant();
+			const property = await this.structure.getPropertyStructureByAlias(alias);
 
-		if (!property) {
-			throw new Error(`Property alias "${alias}" not found.`);
+			if (!property) {
+				throw new Error(`Property alias "${alias}" not found.`);
+			}
+
+			if (
+				(property.variesByCulture && variantId.isCultureInvariant()) ||
+				(property.variesBySegment && variantId.isSegmentInvariant())
+			) {
+				throw new Error(`Property alias "${alias}" requires a variantId.`);
+			}
+
+			// the getItemByUnique is a async method that first resolves once the item is loaded.
+			const editorAlias = (await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique))
+				.propertyEditorSchemaAlias;
+			// This means if its not loaded this will never resolve and the error below will never happen.
+			if (!editorAlias) {
+				throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
+			}
+
+			// Notice the order of the properties is important for our JSON String Compare function. [NL]
+			const entry: UmbElementValueModel = {
+				editorAlias,
+				...variantId.toObject(),
+				alias,
+				value,
+			};
+
+			const currentData = this.getData();
+			if (currentData) {
+				const values: DetailModelType['values'] = appendToFrozenArray(
+					currentData.values ?? [],
+					entry,
+					(x) => x.alias === alias && variantId!.compare(x),
+				);
+
+				this.#ensureVariantsExistsForProperty(variantId, entry);
+
+				this._data.updateCurrent({ values } as Partial<DetailModelType>);
+			}
+		} finally {
+			this.finishPropertyValueChange();
 		}
-
-		// the getItemByUnique is a async method that first resolves once the item is loaded.
-		const editorAlias = (await this.#dataTypeItemManager.getItemByUnique(property.dataType.unique))
-			.propertyEditorSchemaAlias;
-		// This means if its not loaded this will never resolve and the error below will never happen.
-		if (!editorAlias) {
-			throw new Error(`Editor Alias of "${property.dataType.unique}" not found.`);
-		}
-
-		// Notice the order of the properties is important for our JSON String Compare function. [NL]
-		const entry: UmbElementValueModel = {
-			editorAlias,
-			...variantId.toObject(),
-			alias,
-			value,
-		};
-
-		const currentData = this.getData();
-		if (currentData) {
-			const values: DetailModelType['values'] = appendToFrozenArray(
-				currentData.values ?? [],
-				entry,
-				(x) => x.alias === alias && variantId!.compare(x),
-			);
-
-			this.#ensureVariantsExistsForProperty(variantId, entry);
-
-			this._data.updateCurrent({ values } as Partial<DetailModelType>);
-		}
-
-		this.finishPropertyValueChange();
 	}
 
 	async #ensureVariantsExistsForProperty(variantId: UmbVariantId, entry: UmbElementValueModel) {

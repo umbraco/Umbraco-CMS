@@ -24,7 +24,6 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     private readonly IShortStringHelper _shortStringHelper;
     private readonly UrlSegmentProviderCollection _urlSegmentProviders;
     private readonly IUserService _userService;
-    private readonly ILocalizationService _localizationService;
     private readonly IContentTypeService _contentTypeService;
     private readonly ILogger<ContentValueSetBuilder> _logger;
     private readonly IDocumentUrlService _documentUrlService;
@@ -39,7 +38,6 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
     /// <param name="shortStringHelper">The helper used for generating and manipulating short strings.</param>
     /// <param name="scopeProvider">The provider for managing database scopes.</param>
     /// <param name="publishedValuesOnly">If set to <c>true</c>, only published values will be used.</param>
-    /// <param name="localizationService">The service used for localization and translations.</param>
     /// <param name="contentTypeService">The service used to manage content types.</param>
     /// <param name="logger">The logger used for logging information and errors.</param>
     /// <param name="documentUrlService">The service used to generate document URLs.</param>
@@ -51,7 +49,6 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         IShortStringHelper shortStringHelper,
         ICoreScopeProvider scopeProvider,
         bool publishedValuesOnly,
-        ILocalizationService localizationService,
         IContentTypeService contentTypeService,
         ILogger<ContentValueSetBuilder> logger,
         IDocumentUrlService documentUrlService,
@@ -62,7 +59,6 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
         _userService = userService;
         _shortStringHelper = shortStringHelper;
         _scopeProvider = scopeProvider;
-        _localizationService = localizationService;
         _contentTypeService = contentTypeService;
         _logger = logger;
         _documentUrlService = documentUrlService;
@@ -167,7 +163,7 @@ public class ContentValueSetBuilder : BaseValueSetBuilder<IContent>, IContentVal
             var availableCultures = new List<string>(c.AvailableCultures);
             if (availableCultures.Any() is false)
             {
-                availableCultures.Add(_localizationService.GetDefaultLanguageIsoCode());
+                availableCultures.Add(defaultCulture);
             }
 
             foreach (IProperty property in c.Properties)

@@ -242,4 +242,43 @@ describe('UmbVariantPropertyGuardManager', () => {
 				.unsubscribe();
 		});
 	});
+
+	describe('Fallback', () => {
+		it('isPermittedForVariantAndProperty reacts to late fallback updates when no rules match', () => {
+			const emitted: boolean[] = [];
+			const subscription = manager
+				.isPermittedForVariantAndProperty(englishVariant, propB, invariantVariant)
+				.subscribe((value) => emitted.push(value));
+
+			manager.fallbackToPermitted();
+			manager.fallbackToNotPermitted();
+
+			subscription.unsubscribe();
+
+			expect(emitted).to.deep.equal([false, true, false]);
+		});
+
+		it('isPermittedForVariantAndProperty is stable when a matching rule determines the result', () => {
+			manager.addRule(statePropBEn);
+			const emitted: boolean[] = [];
+			const subscription = manager
+				.isPermittedForVariantAndProperty(englishVariant, propB, invariantVariant)
+				.subscribe((value) => emitted.push(value));
+
+			manager.fallbackToPermitted();
+			manager.fallbackToNotPermitted();
+
+			subscription.unsubscribe();
+
+			expect(emitted).to.deep.equal([true]);
+		});
+
+		it('getIsPermittedForVariantAndProperty reflects the current fallback when no rules match', () => {
+			expect(manager.getIsPermittedForVariantAndProperty(englishVariant, propB, invariantVariant)).to.equal(false);
+			manager.fallbackToPermitted();
+			expect(manager.getIsPermittedForVariantAndProperty(englishVariant, propB, invariantVariant)).to.equal(true);
+			manager.fallbackToNotPermitted();
+			expect(manager.getIsPermittedForVariantAndProperty(englishVariant, propB, invariantVariant)).to.equal(false);
+		});
+	});
 });

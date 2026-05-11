@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Services.Navigation;
 /// Filters published media based on availability.
 /// </summary>
 /// <remarks>
-/// NOTE: this class is basically a no-op implementation of IPublishStatusQueryService, because the published
+/// NOTE: this class is basically a no-op implementation of IDocumentPublishStatusQueryService, because the published
 /// content extensions need a media equivalent to the content implementation.
 /// Incidentally, if we'll ever support variant and/or draft media, this comes in really handy :-)
 /// </remarks>
@@ -25,5 +25,9 @@ internal sealed class PublishedMediaStatusFilteringService : IPublishedMediaStat
 
     /// <inheritdoc />
     public IEnumerable<IPublishedContent> FilterAvailable(IEnumerable<Guid> candidateKeys, string? culture)
+        => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull().ToArray();
+
+    /// <inheritdoc />
+    public IEnumerable<IPublishedContent> Unfiltered(IEnumerable<Guid> candidateKeys)
         => candidateKeys.Select(_publishedMediaCache.GetById).WhereNotNull().ToArray();
 }

@@ -885,7 +885,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         {
             Assert.That(singleAlias.DocumentKey, Is.EqualTo(singleAliasKey), "DocumentKey should match PageWithSingleAlias key");
             Assert.That(singleAlias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-            Assert.That(singleAlias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+            Assert.That(singleAlias.LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             Assert.That(singleAlias.Alias, Is.EqualTo("my-single-alias"), "Alias should be normalized (lowercase, no leading slash)");
         });
 
@@ -907,7 +907,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
             Assert.Multiple(() =>
             {
                 Assert.That(alias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-                Assert.That(alias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+                Assert.That(alias.LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             });
         }
 
@@ -921,7 +921,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         {
             Assert.That(childAlias.DocumentKey, Is.EqualTo(childPageKey), "DocumentKey should match ChildPage key");
             Assert.That(childAlias.DocumentKey, Is.Not.EqualTo(Guid.Empty), "DocumentKey should not be empty GUID");
-            Assert.That(childAlias.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+            Assert.That(childAlias.LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
             Assert.That(childAlias.Alias, Is.EqualTo("child-alias"), "Alias should be 'child-alias'");
         });
 
@@ -965,7 +965,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
         // Assert - invariant content should have NULL languageId
         Assert.That(storedAliases, Has.Count.EqualTo(1));
-        Assert.That(storedAliases[0].NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId");
+        Assert.That(storedAliases[0].LanguageId, Is.Null, "Invariant content should have NULL LanguageId");
     }
 
     [Test]
@@ -998,7 +998,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         // Assert - variant content should have specific languageId (not NULL)
         var defaultLanguage = await LanguageService.GetDefaultLanguageAsync();
         Assert.That(storedAliases, Has.Count.EqualTo(1));
-        Assert.That(storedAliases[0].NullableLanguageId, Is.EqualTo(defaultLanguage.Id), "Variant content should have specific LanguageId");
+        Assert.That(storedAliases[0].LanguageId, Is.EqualTo(defaultLanguage.Id), "Variant content should have specific LanguageId");
     }
 
     [Test]
@@ -1020,7 +1020,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(aliasesBefore, Has.Count.GreaterThan(0), "Should have aliases before change");
-        Assert.That(aliasesBefore.All(a => a.NullableLanguageId == null), Is.True, "All aliases should have NULL languageId before change");
+        Assert.That(aliasesBefore.All(a => a.LanguageId == null), Is.True, "All aliases should have NULL languageId before change");
 
         // Act - change content type from invariant to variant
         ContentType.Variations = ContentVariation.Culture;
@@ -1050,8 +1050,8 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(aliasesAfter, Has.Count.GreaterThan(0), "Should have aliases after change");
-        Assert.That(aliasesAfter.All(a => a.NullableLanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
-        Assert.That(aliasesAfter.Any(a => a.NullableLanguageId == defaultLanguage.Id), Is.True, "Should have alias for default language");
+        Assert.That(aliasesAfter.All(a => a.LanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
+        Assert.That(aliasesAfter.Any(a => a.LanguageId == defaultLanguage.Id), Is.True, "Should have alias for default language");
     }
 
     [Test]
@@ -1073,7 +1073,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(invariantAliases, Has.Count.GreaterThan(0), "Should have invariant aliases");
-        Assert.That(invariantAliases.All(a => a.NullableLanguageId == null), Is.True, "Invariant aliases should have NULL languageId");
+        Assert.That(invariantAliases.All(a => a.LanguageId == null), Is.True, "Invariant aliases should have NULL languageId");
 
         // Change content type to variant
         ContentType.Variations = ContentVariation.Culture;
@@ -1103,7 +1103,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(variantAliases, Has.Count.GreaterThan(0), "Should have variant aliases after change to variant");
-        Assert.That(variantAliases.All(a => a.NullableLanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
+        Assert.That(variantAliases.All(a => a.LanguageId != null), Is.True, "All aliases should have specific languageId after change to variant");
 
         // Act - change content type from variant to invariant
         ContentType.Variations = ContentVariation.Nothing;
@@ -1129,7 +1129,101 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
         }
 
         Assert.That(aliasesAfter, Has.Count.GreaterThan(0), "Should have aliases after change to invariant");
-        Assert.That(aliasesAfter.All(a => a.NullableLanguageId == null), Is.True, "All aliases should have NULL languageId after change to invariant");
+        Assert.That(aliasesAfter.All(a => a.LanguageId == null), Is.True, "All aliases should have NULL languageId after change to invariant");
+    }
+
+    #endregion
+
+    #region Duplicate Alias Handling Tests
+
+    // Regression for the 17.1 -> 17.2.x upgrade failure: umbracoUrlAlias property values whose
+    // tokens collide after normalization (literal dup, case-only, slash-only) produced two
+    // PublishedDocumentUrlAlias entries with the same (DocumentKey, LanguageId, Alias) tuple,
+    // which ToDictionary in Save() rejected with ArgumentException "An item with the same key
+    // has already been added".
+    [TestCase("foelelser, foelelser", "foelelser")]
+    [TestCase("UTM, utm", "utm")]
+    [TestCase("/foo/, foo", "foo")]
+    public void CreateOrUpdateAliasesAsync_Deduplicates_Normalization_Colliding_Aliases(string propertyValue, string expectedAlias)
+    {
+        var newPage = ContentBuilder.CreateSimpleContent(ContentType, "Duplicate Alias Page", RootPage.Id);
+        newPage.SetValue(Constants.Conventions.Content.UrlAlias, propertyValue);
+        ContentService.Save(newPage, -1);
+
+        Assert.DoesNotThrow(
+            () => ContentService.Publish(newPage, []),
+            "Publishing content with normalization-colliding tokens in umbracoUrlAlias should not throw.");
+
+        Assert.DoesNotThrowAsync(
+            () => DocumentUrlAliasService.CreateOrUpdateAliasesAsync(newPage.Key),
+            "CreateOrUpdateAliasesAsync should collapse duplicates, not throw.");
+
+        List<PublishedDocumentUrlAlias> stored;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            stored = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == newPage.Key)
+                .ToList();
+        }
+
+        Assert.That(stored, Has.Count.EqualTo(1), "Expected a single row after dedupe.");
+        Assert.That(stored[0].Alias, Is.EqualTo(expectedAlias));
+    }
+
+    [Test]
+    public void RebuildAllAliasesAsync_Deduplicates_Duplicates_From_Existing_Property_Data()
+    {
+        // Simulates the upgrade path: property data already contains "foelelser, foelelser" and
+        // RebuildAllAliasesAsync runs during InitAsync when the rebuild key changes.
+        var newPage = ContentBuilder.CreateSimpleContent(ContentType, "Rebuild Dup Page", RootPage.Id);
+        newPage.SetValue(Constants.Conventions.Content.UrlAlias, "foelelser, foelelser");
+        ContentService.Save(newPage, -1);
+
+        Assert.DoesNotThrow(() => ContentService.Publish(newPage, []));
+
+        Assert.DoesNotThrowAsync(
+            () => DocumentUrlAliasService.RebuildAllAliasesAsync(),
+            "Rebuild should collapse literal duplicates from existing property data, not throw.");
+
+        List<PublishedDocumentUrlAlias> stored;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            stored = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == newPage.Key)
+                .ToList();
+        }
+
+        Assert.That(stored, Has.Count.EqualTo(1));
+        Assert.That(stored[0].Alias, Is.EqualTo("foelelser"));
+    }
+
+    [Test]
+    public void DocumentUrlAliasRepository_Save_Silently_Dedupes_Duplicate_Input()
+    {
+        // Defensive: if a caller ever passes a list containing duplicate (DocumentKey, LanguageId, Alias)
+        // tuples, Save should collapse them rather than throwing ArgumentException from ToDictionary.
+        var documentKey = new Guid(PageWithNoAliasKey);
+        var duplicates = new List<PublishedDocumentUrlAlias>
+        {
+            new() { DocumentKey = documentKey, LanguageId = null, Alias = "dup-test" },
+            new() { DocumentKey = documentKey, LanguageId = null, Alias = "dup-test" },
+        };
+
+        using (ICoreScope scope = CoreScopeProvider.CreateCoreScope())
+        {
+            Assert.DoesNotThrow(() => DocumentUrlAliasRepository.Save(duplicates));
+            scope.Complete();
+        }
+
+        List<PublishedDocumentUrlAlias> stored;
+        using (CoreScopeProvider.CreateCoreScope(autoComplete: true))
+        {
+            stored = DocumentUrlAliasRepository.GetAll()
+                .Where(a => a.DocumentKey == documentKey && a.Alias == "dup-test")
+                .ToList();
+        }
+
+        Assert.That(stored, Has.Count.EqualTo(1));
     }
 
     #endregion

@@ -53,7 +53,6 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IShortStringHelper>(),
                 factory.GetRequiredService<IScopeProvider>(),
                 true,
-                factory.GetRequiredService<ILocalizationService>(),
                 factory.GetRequiredService<IContentTypeService>(),
                 factory.GetRequiredService<ILogger<ContentValueSetBuilder>>(),
                 factory.GetRequiredService<IDocumentUrlService>(),
@@ -66,7 +65,6 @@ public static partial class UmbracoBuilderExtensions
                 factory.GetRequiredService<IShortStringHelper>(),
                 factory.GetRequiredService<IScopeProvider>(),
                 false,
-                factory.GetRequiredService<ILocalizationService>(),
                 factory.GetRequiredService<IContentTypeService>(),
                 factory.GetRequiredService<ILogger<ContentValueSetBuilder>>(),
                 factory.GetRequiredService<IDocumentUrlService>(),
@@ -78,6 +76,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddUnique<IDeliveryApiContentIndexFieldDefinitionBuilder, DeliveryApiContentIndexFieldDefinitionBuilder>();
         builder.Services.AddUnique<IDeliveryApiContentIndexHelper, DeliveryApiContentIndexHelper>();
         builder.Services.AddSingleton<IDeliveryApiIndexingHandler, DeliveryApiIndexingHandler>();
+        builder.Services.AddSingleton<IDeferredSearchReindexService, DeferredSearchReindexService>();
 
         builder.Services.AddUnique<IDeliveryApiCompositeIdHandler, DeliveryApiCompositeIdHandler>();
 
