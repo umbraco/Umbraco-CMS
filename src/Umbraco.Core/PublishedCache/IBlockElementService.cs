@@ -5,5 +5,5 @@ namespace Umbraco.Cms.Core.PublishedCache;
 
 public interface IBlockElementService
 {
-    Task<IPublishedElement?> BuildElementAsync(BlockItemData blockItemData, bool? preview = null);
+    Task<IPublishedElement?> BuildElementAsync(IPublishedElement owner, BlockItemData blockItemData, bool? preview = null);
 }
