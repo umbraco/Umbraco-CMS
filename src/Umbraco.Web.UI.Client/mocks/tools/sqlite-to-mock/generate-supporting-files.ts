@@ -116,7 +116,7 @@ export {
 };
 
 // Type assertion to ensure this module satisfies UmbMockDataSet
-const _typeCheck: UmbMockDataSet = {
+({
 	dataType,
 	dictionary,
 	document,
@@ -154,8 +154,7 @@ const _typeCheck: UmbMockDataSet = {
 	examineSearchResults,
 	trackedReferenceItems,
 	news,
-};
-void _typeCheck;
+} satisfies UmbMockDataSet);
 `;
 
 	const outputDir = getOutputDir();

@@ -11,6 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			propertyEditorSchemaAlias: 'Umbraco.UploadField',
 			icon: 'icon-download-alt',
 			group: 'media',
+			keywords: ['file', 'upload', 'attachment', 'document', 'asset', 'download'],
 		},
 	},
 	schemaManifest,

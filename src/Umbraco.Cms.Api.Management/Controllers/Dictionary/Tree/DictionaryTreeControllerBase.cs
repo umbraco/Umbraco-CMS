@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Controllers.Tree;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -25,26 +23,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Dictionary.Tree;
 // tree controller base. We'll keep it though, in the hope that we can mend EntityService.
 public class DictionaryTreeControllerBase : NamedEntityTreeControllerBase<NamedEntityTreeItemResponseModel>
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DictionaryTreeControllerBase"/> class.
-    /// </summary>
-    /// <param name="entityService">Service used for managing and retrieving entities within the Umbraco system.</param>
-    /// <param name="dictionaryItemService">Service used for managing and retrieving dictionary items for localization.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public DictionaryTreeControllerBase(IEntityService entityService, IDictionaryItemService dictionaryItemService)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              dictionaryItemService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DictionaryTreeControllerBase"/> class.
-    /// </summary>
-    /// <param name="entityService">Service for managing entities within the system.</param>
-    /// <param name="flagProviders">A collection of providers for entity flags.</param>
-    /// <param name="dictionaryItemService">Service for managing dictionary items.</param>
     public DictionaryTreeControllerBase(
         IEntityService entityService, 
         FlagProviderCollection flagProviders, 

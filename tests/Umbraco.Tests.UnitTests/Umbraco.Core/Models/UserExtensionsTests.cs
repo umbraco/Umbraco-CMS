@@ -9,6 +9,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 
@@ -113,5 +114,45 @@ public class UserExtensionsTests
             Assert.Fail("Expected \"" + string.Join(",", expectedA) + "\" but got \"" + string.Join(",", combinedA) +
                         "\".");
         }
+    }
+
+    [Test]
+    public async Task CalculateAllowedLanguageIdsAsync_HasAccessToAllLanguages_ReturnsAllLanguageIds()
+    {
+        var group = Mock.Of<IReadOnlyUserGroup>(g => g.HasAccessToAllLanguages == true);
+        var user = Mock.Of<IUser>(u => u.Groups == new[] { group });
+
+        var languageService = new Mock<ILanguageService>();
+        languageService
+            .Setup(x => x.GetAllAsync())
+            .ReturnsAsync(new[]
+            {
+                Mock.Of<ILanguage>(l => l.Id == 1),
+                Mock.Of<ILanguage>(l => l.Id == 2),
+                Mock.Of<ILanguage>(l => l.Id == 3),
+            });
+
+        var result = await user.CalculateAllowedLanguageIdsAsync(languageService.Object);
+
+        Assert.That(result, Is.EquivalentTo(new[] { 1, 2, 3 }));
+    }
+
+    [Test]
+    public async Task CalculateAllowedLanguageIdsAsync_NoAllAccess_ReturnsDistinctGroupLanguages()
+    {
+        var group1 = Mock.Of<IReadOnlyUserGroup>(g =>
+            g.HasAccessToAllLanguages == false &&
+            g.AllowedLanguages == new[] { 1, 2 });
+        var group2 = Mock.Of<IReadOnlyUserGroup>(g =>
+            g.HasAccessToAllLanguages == false &&
+            g.AllowedLanguages == new[] { 2, 3 });
+        var user = Mock.Of<IUser>(u => u.Groups == new[] { group1, group2 });
+
+        var languageService = new Mock<ILanguageService>();
+
+        var result = await user.CalculateAllowedLanguageIdsAsync(languageService.Object);
+
+        Assert.That(result, Is.EquivalentTo(new[] { 1, 2, 3 }));
+        languageService.Verify(x => x.GetAllAsync(), Times.Never);
     }
 }

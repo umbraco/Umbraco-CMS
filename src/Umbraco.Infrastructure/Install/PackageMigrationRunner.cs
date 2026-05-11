@@ -62,18 +62,6 @@ public class PackageMigrationRunner
     }
 
     /// <summary>
-    /// Synchronously runs any pending migrations for the specified package.
-    /// </summary>
-    /// <param name="packageName">The name of the package for which to run pending migrations.</param>
-    /// <returns>An enumerable containing details of the executed migration plans, if any were run; otherwise, an empty enumerable.</returns>
-    /// <remarks>
-    /// This method is obsolete. Use <see cref="RunPackageMigrationsIfPendingAsync(string)"/> instead.
-    /// </remarks>
-    [Obsolete("Please use RunPackageMigrationsIfPendingAsync instead. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<ExecutedMigrationPlan> RunPackageMigrationsIfPending(string packageName)
-        => RunPackageMigrationsIfPendingAsync(packageName).GetAwaiter().GetResult();
-
-    /// <summary>
     ///     Runs all migration plans for a package name if any are pending.
     /// </summary>
     /// <param name="packageName"></param>
@@ -117,18 +105,6 @@ public class PackageMigrationRunner
 
         return Attempt.SucceedWithStatus(PackageMigrationOperationStatus.Success, true);
     }
-
-    /// <summary>
-    /// Runs the specified package migration plans synchronously.
-    /// </summary>
-    /// <param name="plansToRun">A collection of package migration plan names to run.</param>
-    /// <returns>An enumerable of executed migration plans.</returns>
-    /// <remarks>
-    /// This method is obsolete. Use <see cref="RunPackageMigrationsIfPendingAsync"/> instead.
-    /// </remarks>
-    [Obsolete("Please use RunPackageMigrationsIfPendingAsync instead. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<ExecutedMigrationPlan> RunPackagePlans(IEnumerable<string> plansToRun)
-        => RunPackagePlansAsync(plansToRun).GetAwaiter().GetResult();
 
     /// <summary>
     ///     Runs the all specified package migration plans and publishes a <see cref="MigrationPlansExecutedNotification" />

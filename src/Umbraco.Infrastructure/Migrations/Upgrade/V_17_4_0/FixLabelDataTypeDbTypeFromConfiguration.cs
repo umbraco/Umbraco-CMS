@@ -3,6 +3,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_4_0;
 
@@ -67,20 +69,21 @@ public class FixLabelDataTypeDbTypeFromConfiguration : AsyncMigrationBase
         // could exceed the default command timeout, so extend it here.
         EnsureLongCommandTimeout(database);
 
+        ISqlSyntaxProvider syntax = database.SqlContext.SqlSyntax;
         var sql = $@"
-UPDATE umbracoPropertyData
-SET textValue = varcharValue, varcharValue = NULL
-WHERE propertyTypeId IN (
-    SELECT id
-    FROM cmsPropertyType
-    WHERE dataTypeId IN (
-        SELECT nodeId
-        FROM umbracoDataType
-        WHERE propertyEditorAlias = '{Constants.PropertyEditors.Aliases.Label}'
-        AND dbType = '{nameof(ValueStorageType.Ntext)}'
+UPDATE {syntax.GetQuotedTableName(PropertyDataDto.TableName)}
+SET {syntax.GetQuotedColumnName(PropertyDataDto.TextValueColumnName)} = {syntax.GetQuotedColumnName(PropertyDataDto.VarcharValueColumnName)}, {syntax.GetQuotedColumnName(PropertyDataDto.VarcharValueColumnName)} = NULL
+WHERE {syntax.GetQuotedColumnName(PropertyDataDto.PropertyTypeIdColumnName)} IN (
+    SELECT {syntax.GetQuotedColumnName(PropertyTypeDto.PrimaryKeyColumnName)}
+    FROM {syntax.GetQuotedTableName(PropertyTypeDto.TableName)}
+    WHERE {syntax.GetQuotedColumnName(PropertyTypeDto.DataTypeIdColumnName)} IN (
+        SELECT {syntax.GetQuotedColumnName(DataTypeDto.PrimaryKeyColumnName)}
+        FROM {syntax.GetQuotedTableName(DataTypeDto.TableName)}
+        WHERE {syntax.GetQuotedColumnName(DataTypeDto.EditorAliasColumnName)} = '{Constants.PropertyEditors.Aliases.Label}'
+        AND {syntax.GetQuotedColumnName(DataTypeDto.DbTypeColumnName)} = '{nameof(ValueStorageType.Ntext)}'
     )
 )
-AND varcharValue IS NOT NULL";
+AND {syntax.GetQuotedColumnName(PropertyDataDto.VarcharValueColumnName)} IS NOT NULL";
         await database.ExecuteAsync(sql);
     }
 }

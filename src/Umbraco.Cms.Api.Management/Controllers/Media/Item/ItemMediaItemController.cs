@@ -1,12 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
-using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -29,7 +26,6 @@ public class ItemMediaItemController : MediaItemControllerBase
     /// <param name="entityService">Service used for entity operations within the media item controller.</param>
     /// <param name="mediaPresentationFactory">Factory responsible for creating media presentation models.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for media items.</param>
-    [ActivatorUtilitiesConstructor]
     public ItemMediaItemController(
         IEntityService entityService,
         IMediaPresentationFactory mediaPresentationFactory,
@@ -38,17 +34,6 @@ public class ItemMediaItemController : MediaItemControllerBase
         _entityService = entityService;
         _mediaPresentationFactory = mediaPresentationFactory;
         _flagProviders = flagProviders;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ItemMediaItemController"/> class.
-    /// </summary>
-    /// <param name="entityService">Service used for entity operations within the controller.</param>
-    /// <param name="mediaPresentationFactory">Factory responsible for creating media presentation models.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18")]
-    public ItemMediaItemController(IEntityService entityService, IMediaPresentationFactory mediaPresentationFactory)
-        : this(entityService, mediaPresentationFactory, StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>())
-    {
     }
 
     [HttpGet]

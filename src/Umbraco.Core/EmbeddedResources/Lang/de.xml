@@ -393,10 +393,6 @@
     ]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Status der Umbraco Systemzustand: %0%</key>
   </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Inhalt mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen</key>
-    <key alias="mediaTrashed">Medienelement mit Id = {0} des Oberknotens mit Id = {1} wurde verworfen</key>
-  </area>
   <area alias="permissions">
     <key alias="FolderCreation">Ornder erstellen</key>
     <key alias="FileWritingForPackages">Dateien durch Packages erstellen lassen</key>

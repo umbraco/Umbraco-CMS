@@ -33,7 +33,6 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
     /// <param name="localizedTextService">The localized text service.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="uriUtility">The URI utility.</param>
-    /// <param name="variationContextAccessor">The variation context accessor.</param>
     public PublishedUrlInfoProvider(
         IPublishedUrlProvider publishedUrlProvider,
         ILanguageService languageService,
@@ -41,10 +40,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
         IUmbracoContextAccessor umbracoContextAccessor,
         ILocalizedTextService localizedTextService,
         ILogger<PublishedUrlInfoProvider> logger,
-        UriUtility uriUtility,
-#pragma warning disable IDE0060 // Remove unused parameter
-        IVariationContextAccessor variationContextAccessor) // TODO (V18): Remove this unused parameter.
-#pragma warning restore IDE0060 // Remove unused parameter
+        UriUtility uriUtility)
     {
         _publishedUrlProvider = publishedUrlProvider;
         _languageService = languageService;
@@ -68,7 +64,7 @@ public class PublishedUrlInfoProvider : IPublishedUrlInfoProvider
             var url = _publishedUrlProvider.GetUrl(content.Key, culture: culture);
 
             // Handle "could not get URL"
-            if (url is "#" or "#ex")
+            if (url is Constants.Routing.Unroutable or Constants.Routing.UrlProviderException)
             {
                 // For invariant content, a missing URL just means there's no domain
                 // for this culture — not a problem worth reporting.

@@ -58,6 +58,11 @@ public abstract class ContentTypeModelBase<TPropertyType, TPropertyTypeContainer
     public bool IsElement { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether this content type is allowed in the library.
+    /// </summary>
+    public bool AllowedInLibrary { get; set; }
+
+    /// <summary>
     /// Gets or sets the collection of property types associated with the content type.
     /// </summary>
     [Required]

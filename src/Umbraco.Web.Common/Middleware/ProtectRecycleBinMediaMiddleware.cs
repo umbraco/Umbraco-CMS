@@ -1,9 +1,11 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Extensions;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware;
 
@@ -13,14 +15,17 @@ namespace Umbraco.Cms.Web.Common.Middleware;
 /// </summary>
 public class ProtectRecycleBinMediaMiddleware : IMiddleware
 {
+    private readonly IUserService _userService;
     private ContentSettings _contentSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProtectRecycleBinMediaMiddleware"/> class.
     /// </summary>
     public ProtectRecycleBinMediaMiddleware(
+        IUserService userService,
         IOptionsMonitor<ContentSettings> contentSettings)
     {
+        _userService = userService;
         _contentSettings = contentSettings.CurrentValue;
         contentSettings.OnChange(x => _contentSettings = x);
     }
@@ -51,10 +56,15 @@ public class ProtectRecycleBinMediaMiddleware : IMiddleware
             return;
         }
 
-        Claim? mediaSectionClaim = authenticateResult.Principal.Claims
-            .FirstOrDefault(x => x.Type == Core.Constants.Security.AllowedApplicationsClaimType && x.Value == Core.Constants.Applications.Media);
+        Guid? userKey = authenticateResult.Principal?.Identity?.GetUserKey();
+        if (userKey is null)
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return;
+        }
 
-        if (mediaSectionClaim is null)
+        IUser? user = await _userService.GetAsync(userKey.Value);
+        if (user is null || user.AllowedSections.Contains(Core.Constants.Applications.Media) is false)
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
             return;

@@ -73,6 +73,7 @@ export class UmbMemberWorkspaceContext
 			null,
 		);
 
+		// TODO: This is done by the content detail base class, so we can remove it from there and only do it here. [NL]
 		this.propertyViewGuard.fallbackToPermitted();
 		this.propertyWriteGuard.fallbackToPermitted();
 
@@ -210,16 +211,6 @@ export class UmbMemberWorkspaceContext
 		}
 
 		return super.submit();
-	}
-
-	/**
-	 * Gets the unique identifier of the content type.
-	 * @deprecated Use `getContentTypeUnique` instead.
-	 * @returns { string | undefined} The unique identifier of the content type.
-	 * @memberof UmbMemberWorkspaceContext
-	 */
-	getContentTypeId(): string | undefined {
-		return this.getContentTypeUnique();
 	}
 
 	/**

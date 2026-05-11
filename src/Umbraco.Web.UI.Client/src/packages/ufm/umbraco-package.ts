@@ -1,3 +1,4 @@
+export const name = 'Umbraco.FlavoredMarkdown';
 export const extensions = [
 	{
 		name: 'Umbraco Flavored Markdown Bundle',

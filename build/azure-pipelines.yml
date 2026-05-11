@@ -897,12 +897,27 @@ stages:
   - stage: Deploy_NuGet
     displayName: NuGet release
     dependsOn: Deploy_MyGet
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
+    # Run only when Deploy_MyGet actually ran (succeeded or failed) — not when it was skipped due to an upstream test failure.
+    # Inspect Deploy_MyGet's direct result rather than succeeded()/failed(), which are transitive across the full ancestor graph.
+    # Approval is required every run via the WaitForApproval job below.
+    condition: and(in(dependencies.Deploy_MyGet.result, 'Succeeded', 'SucceededWithIssues', 'Failed'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.nuGetDeploy}}))
     jobs:
-      - job:
+      - job: WaitForApproval
+        displayName: Wait for manual approval
+        pool: server
+        timeoutInMinutes: 4320 # 3 days
+        steps:
+          - task: ManualValidation@0
+            displayName: Manual approval to push to NuGet
+            inputs:
+              notifyUsers: ''
+              instructions: 'Approve to push the NuGet release.'
+              onTimeout: 'reject'
+      - job: Push
+        displayName: Push to NuGet
+        dependsOn: WaitForApproval
         pool:
           vmImage: "windows-latest" # NuGetCommand@2 is no longer supported on Ubuntu 24.04 so we'll use windows until an alternative is available.
-        displayName: Push to NuGet
         steps:
           - checkout: none
           - task: DownloadPipelineArtifact@2
@@ -920,7 +935,10 @@ stages:
 
   - stage: Deploy_Npm
     displayName: Npm release
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
+    # Inspect Deploy_NuGet.result directly so a MyGet failure (which is in the transitive ancestor graph)
+    # doesn't cascade-skip this stage via succeeded(). Deploy_NuGet must itself have succeeded — a NuGet
+    # failure deliberately blocks the npm release.
+    condition: and(in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
     dependsOn:
       - Deploy_NuGet
     jobs:
@@ -981,7 +999,10 @@ stages:
       - Build
       - Build_Docs
       - Deploy_NuGet
-    condition: and(succeeded(), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
+    # Build_Docs must have produced artifacts (we won't upload anything otherwise) and Deploy_NuGet must
+    # have succeeded — a NuGet failure deliberately blocks the docs upload. Direct result checks avoid
+    # transitive succeeded()/failed() which would cascade-skip on a MyGet failure.
+    condition: and(in(dependencies.Build_Docs.result, 'Succeeded', 'SucceededWithIssues'), in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
     jobs:
       - job:
         displayName: Upload C# Docs

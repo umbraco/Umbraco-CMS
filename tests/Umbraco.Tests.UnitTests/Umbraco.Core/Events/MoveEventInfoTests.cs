@@ -28,28 +28,27 @@ public class MoveEventInfoTests
     [Test]
     public void Can_Equate_Move_Event_Infos_Parent_Key_Null()
     {
-        var moveEvent = new MoveEventInfo<string>("entity", "path", 123, null);
-        var moveEventTwo = new MoveEventInfo<string>("entity", "path", 123, null);
+        var moveEvent = new MoveEventInfo<string>("entity", "path",  null);
+        var moveEventTwo = new MoveEventInfo<string>("entity", "path",  null);
         Assert.IsTrue(moveEvent.Equals(moveEventTwo));
     }
 
     [Test]
     public void Can_Equate_Move_Event_Infos_All_Params_Null_Or_Empty()
     {
-        var moveEvent = new MoveEventInfo<string>(string.Empty, string.Empty, 0, null);
-        var moveEventTwo = new MoveEventInfo<string>(string.Empty, string.Empty, 0, null);
+        var moveEvent = new MoveEventInfo<string>(string.Empty, string.Empty, null);
+        var moveEventTwo = new MoveEventInfo<string>(string.Empty, string.Empty, null);
         Assert.IsTrue(moveEvent.Equals(moveEventTwo));
     }
 
-    [TestCase(123, "entity", "", "063897F1-194A-4C42-B406-CA80DBC12968", false)]
-    [TestCase(123, "", "path", "063897F1-194A-4C42-B406-CA80DBC12968", false)]
-    [TestCase(12, "entity", "path", "063897F1-194A-4C42-B406-CA80DBC12968", false)]
-    [TestCase(123, "entity", "path", "C6D6EA3E-C2B0-483F-B772-2F4D8BBF5027", false)]
-    [TestCase(123, "entity", "path", "063897F1-194A-4C42-B406-CA80DBC12968", true)]
-    public void Can_Equate_Move_Event_Infos(int parentId, string entity, string originalPath, Guid parentKey, bool expectedResult)
+    [TestCase("entity", "", "063897F1-194A-4C42-B406-CA80DBC12968", false)]
+    [TestCase("", "path", "063897F1-194A-4C42-B406-CA80DBC12968", false)]
+    [TestCase("entity", "path", "C6D6EA3E-C2B0-483F-B772-2F4D8BBF5027", false)]
+    [TestCase("entity", "path", "063897F1-194A-4C42-B406-CA80DBC12968", true)]
+    public void Can_Equate_Move_Event_Infos(string entity, string originalPath, Guid parentKey, bool expectedResult)
     {
-        var moveEvent = new MoveEventInfo<string>(entity, originalPath, parentId, parentKey);
-        var moveEventTwo = new MoveEventInfo<string>("entity", "path", 123, new Guid("063897F1-194A-4C42-B406-CA80DBC12968"));
+        var moveEvent = new MoveEventInfo<string>(entity, originalPath, parentKey);
+        var moveEventTwo = new MoveEventInfo<string>("entity", "path",  new Guid("063897F1-194A-4C42-B406-CA80DBC12968"));
         Assert.AreEqual(expectedResult, moveEvent.Equals(moveEventTwo));
     }
 }
