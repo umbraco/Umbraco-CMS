@@ -55,13 +55,11 @@ internal class BlockElementService : IBlockElementService
                 // vary by culture. Since the created element is fully culture aware at render time, we need to replicate
                 // property values across all available languages, to make them available for rendering.
 
-                if (allLanguages is null)
-                {
-                    allLanguages = (await _languageService.GetAllAsync()).ToArray();
-                    defaultLanguage = allLanguages.Single(l => l.IsDefault);
-                }
+                allLanguages ??= (await _languageService.GetAllAsync()).ToArray();
+                defaultLanguage ??= allLanguages.SingleOrDefault(l => l.IsDefault)
+                                    ?? throw new InvalidOperationException("Could not find the default language.");
 
-                BlockPropertyValue property = properties.FirstOrDefault(p => p.Culture.InvariantEquals(defaultLanguage!.IsoCode))
+                BlockPropertyValue property = properties.FirstOrDefault(p => p.Culture.InvariantEquals(defaultLanguage.IsoCode))
                                               ?? properties.First();
                 propertyData[properties.Key] = allLanguages.Select(language => new PropertyData
                 {
