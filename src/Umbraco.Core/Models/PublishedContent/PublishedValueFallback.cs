@@ -74,6 +74,10 @@ public class PublishedValueFallback : IPublishedValueFallback
                     }
 
                     break;
+                case Fallback.Ancestors:
+                    // Ancestors fallback only applies at IPublishedContent level (tree-aware).
+                    // Skip silently here so chained fallbacks still work and direct element calls don't throw.
+                    continue;
                 default:
                     throw NotSupportedFallbackMethod(f, "property");
             }
@@ -127,6 +131,10 @@ public class PublishedValueFallback : IPublishedValueFallback
                     }
 
                     break;
+                case Fallback.Ancestors:
+                    // Ancestors fallback only applies at IPublishedContent level (tree-aware).
+                    // Skip silently here so chained fallbacks still work and direct element calls don't throw.
+                    continue;
                 default:
                     throw NotSupportedFallbackMethod(f, "element");
             }

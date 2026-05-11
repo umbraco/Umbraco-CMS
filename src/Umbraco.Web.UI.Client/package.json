@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "17.5.0-rc",
+	"version": "17.6.0-rc",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -190,6 +190,7 @@
 		"dev": "vite",
 		"dev:server": "cross-env VITE_UMBRACO_USE_MSW=off vite",
 		"dev:mock": "cross-env VITE_UMBRACO_USE_MSW=on vite",
+		"dev:icon-manager": "npm install --prefix devops/icon-manager && npm run dev --prefix devops/icon-manager",
 		"example": "node ./devops/example-runner/index.js",
 		"format:fix": "npm run format -- --write",
 		"format": "prettier 'src/**/*.ts' --check",
