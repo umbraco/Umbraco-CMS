@@ -1,10 +1,7 @@
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Common.OpenApi;
-using Umbraco.Cms.Api.Management.Configuration;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.Middleware;
 using Umbraco.Cms.Api.Management.OpenApi;
