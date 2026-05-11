@@ -141,6 +141,9 @@ public sealed class BackOfficeOpenApiDocumentBuilder
                 // that ASP.NET Core adds alongside application/json.
                 options.AddOperationTransformer<MimeTypesTransformer>();
 
+                // Mark non-nullable properties as required so generated SDKs reflect the C# nullability.
+                options.AddSchemaTransformer<RequireNonNullablePropertiesSchemaTransformer>();
+
                 // Tag actions by group name and cleanup unused tags (caused by the tag changes).
                 options
                     .AddOperationTransformer<TagActionsByGroupNameTransformer>()

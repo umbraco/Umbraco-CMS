@@ -48,6 +48,20 @@ public static class UmbracoBuilderOpenApiExtensions
     ///   </item>
     ///   <item>
     ///     <description>
+    ///     Redundant JSON-equivalent media types (such as <c>text/json</c>, <c>application/*+json</c>, and
+    ///     <c>text/plain</c>) are stripped from request and response content when <c>application/json</c> is present,
+    ///     so the document doesn't list spurious media types that ASP.NET Core adds by default.
+    ///     </description>
+    ///   </item>
+    ///   <item>
+    ///     <description>
+    ///     Non-nullable properties are marked as <c>required</c> in the schema so generated client SDKs reflect
+    ///     C# nullability. Override via <see cref="BackOfficeOpenApiDocumentBuilder.ConfigureOpenApiOptions"/>
+    ///     if your types don't follow this convention.
+    ///     </description>
+    ///   </item>
+    ///   <item>
+    ///     <description>
     ///     The document is registered in the OpenAPI UI document selector dropdown. Call
     ///     <see cref="BackOfficeOpenApiDocumentBuilder.ExcludeFromUi"/> to opt out.
     ///     </description>
