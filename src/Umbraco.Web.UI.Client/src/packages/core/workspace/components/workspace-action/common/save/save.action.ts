@@ -48,10 +48,10 @@ export class UmbSaveWorkspaceAction<
 	}
 
 	override async execute() {
-		this.setPending(false);
+		this.setExecuting(false);
 		await this._retrieveWorkspaceContext;
 		await this._workspaceContext?.requestSave({
-			onActionStarting: () => this.setPending(true),
+			onActionStarting: () => this.setExecuting(true),
 		});
 	}
 }

@@ -43,13 +43,13 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 	}
 
 	override async execute() {
-		this.setPending(false);
+		this.setExecuting(false);
 		const workspaceContext = await this.getContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
 		if (!workspaceContext) {
 			throw new Error('The workspace context is missing');
 		}
 		return workspaceContext.saveAndPublish({
-			onActionStarting: () => this.setPending(true),
+			onActionStarting: () => this.setExecuting(true),
 		});
 	}
 }

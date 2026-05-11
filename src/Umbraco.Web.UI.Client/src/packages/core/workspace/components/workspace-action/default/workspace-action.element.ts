@@ -57,7 +57,7 @@ export class UmbWorkspaceActionElement<
 		});
 
 		this.#observeIsDisabled();
-		this.#observeIsPending();
+		this.#observeIsExecuting();
 	}
 	public get api(): ApiType | undefined {
 		return this.#api;
@@ -84,11 +84,11 @@ export class UmbWorkspaceActionElement<
 
 	#buttonStateResetTimeoutId: number | null = null;
 
-	// When the api exposes an `isPending` observable we wait for it to flip
+	// When the api exposes an `isExecuting` observable we wait for it to flip
 	// true before showing the waiting state, so the spinner only appears once
 	// real work begins (after any preceding modal/dialog). When absent we fall
 	// back to setting waiting eagerly on click for backwards compatibility.
-	#workStarted = false;
+	#executionStarted = false;
 
 	/**
 	 * Create a list of original and overwritten aliases of workspace actions for the action.
@@ -119,7 +119,7 @@ export class UmbWorkspaceActionElement<
 			event.stopPropagation();
 		} else {
 			// _actionApi is typed as the narrower UmbAction; widen to UmbWorkspaceAction
-			// here so we can probe the optional isPending observable.
+			// here so we can probe the optional isExecuting observable.
 			const api = (this._actionApi ?? this.#api) as UmbWorkspaceAction<UmbWorkspaceActionArgs<MetaType>> | undefined;
 			await this.#runApiAction(api);
 		}
@@ -127,13 +127,13 @@ export class UmbWorkspaceActionElement<
 	}
 
 	async #runApiAction(api: UmbWorkspaceAction<UmbWorkspaceActionArgs<MetaType>> | undefined) {
-		this.#workStarted = false;
+		this.#executionStarted = false;
 
-		// If the api does not expose an isPending observable, fall back to
+		// If the api does not expose an isExecuting observable, fall back to
 		// showing the waiting state immediately (legacy behaviour).
-		if (!api?.isPending) {
+		if (!api?.isExecuting) {
 			this._buttonState = 'waiting';
-			this.#workStarted = true;
+			this.#executionStarted = true;
 		}
 
 		try {
@@ -141,8 +141,8 @@ export class UmbWorkspaceActionElement<
 			await api.execute();
 			// Only show success if real work actually started. A modal-aware
 			// action that the user cancelled will resolve without ever signalling
-			// pending - in that case we leave the button idle.
-			if (this.#workStarted) {
+			// execution - in that case we leave the button idle.
+			if (this.#executionStarted) {
 				this._buttonState = 'success';
 				this.#initButtonStateReset();
 			}
@@ -167,16 +167,16 @@ export class UmbWorkspaceActionElement<
 		);
 	}
 
-	#observeIsPending() {
+	#observeIsExecuting() {
 		this.observe(
-			this.#api?.isPending,
-			(isPending) => {
-				if (isPending) {
+			this.#api?.isExecuting,
+			(isExecuting) => {
+				if (isExecuting) {
 					this._buttonState = 'waiting';
-					this.#workStarted = true;
+					this.#executionStarted = true;
 				}
 			},
-			'isPendingObserver',
+			'isExecutingObserver',
 		);
 	}
 
