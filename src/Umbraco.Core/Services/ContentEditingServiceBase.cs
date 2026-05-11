@@ -367,14 +367,14 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             int[]? excludeRelationTypeIds = null;
             if (string.IsNullOrWhiteSpace(RelateParentOnDeleteAlias) is false)
             {
-                IRelationType? relateParentOnDeleteRelationType = _relationService.GetRelationTypeByAlias(RelateParentOnDeleteAlias);
+                IRelationType? relateParentOnDeleteRelationType = await _relationService.GetRelationTypeByAliasAsync(RelateParentOnDeleteAlias);
                 if (relateParentOnDeleteRelationType is not null)
                 {
                     excludeRelationTypeIds = [relateParentOnDeleteRelationType.Id];
                 }
             }
 
-            if (_relationService.IsRelated(
+            if (await _relationService.IsRelatedAsync(
                 content.Id,
                 RelationDirectionFilter.Child,
                 excludeRelationTypeIds: excludeRelationTypeIds))

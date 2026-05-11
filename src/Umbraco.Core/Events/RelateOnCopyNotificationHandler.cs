@@ -60,8 +60,9 @@ public class RelateOnCopyNotificationHandler :
             return;
         }
 
-        IRelationType? relationType =
-            _relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
+        IRelationType? relationType = await _relationService.GetRelationTypeByAliasAsync(
+            Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
+            cancellationToken);
 
         if (relationType == null)
         {
@@ -73,11 +74,11 @@ public class RelateOnCopyNotificationHandler :
                 Constants.ObjectTypes.Document,
                 false);
 
-            _relationService.Save(relationType);
+            await _relationService.SaveAsync(relationType, cancellationToken);
         }
 
         var relation = new Relation(notification.Original.Id, notification.Copy.Id, relationType);
-        _relationService.Save(relation);
+        await _relationService.SaveAsync(relation, cancellationToken);
 
         Guid writerKey = await _userIdKeyResolver.GetAsync(notification.Copy.WriterId);
         await _auditService.AddAsync(

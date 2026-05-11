@@ -245,7 +245,7 @@ internal sealed class ElementEditingService
         }
 
         if (ContentSettings.DisableUnpublishWhenReferenced
-            && _relationService.IsRelated(element.Id, RelationDirectionFilter.Child, null))
+            && await _relationService.IsRelatedAsync(element.Id, RelationDirectionFilter.Child, null))
         {
             scope.Complete();
             return Attempt.Fail(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced);

@@ -102,243 +102,203 @@ public class RelationService : AsyncRepositoryService, IRelationService
     }
 
     /// <inheritdoc />
-    public IRelation? GetById(int id)
+    public async Task<IRelation?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        IRelation? result = _relationRepository.GetAsync(id, CancellationToken.None).GetAwaiter().GetResult();
+        IRelation? result = await _relationRepository.GetAsync(id, cancellationToken);
         scope.Complete();
         return result;
     }
 
     /// <inheritdoc />
-    public IRelationType? GetRelationTypeById(int id)
+    public async Task<IRelationType?> GetRelationTypeByIdAsync(int id, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        IRelationType? result = _relationTypeRepository.GetAsync(id, CancellationToken.None).GetAwaiter().GetResult();
+        IRelationType? result = await _relationTypeRepository.GetAsync(id, cancellationToken);
         scope.Complete();
         return result;
     }
 
     /// <inheritdoc />
-    public IRelationType? GetRelationTypeById(Guid id)
+    public async Task<IRelationType?> GetRelationTypeByKeyAsync(Guid key, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        IRelationType? result = _relationTypeRepository.GetAsync(id, CancellationToken.None).GetAwaiter().GetResult();
+        IRelationType? result = await _relationTypeRepository.GetAsync(key, cancellationToken);
         scope.Complete();
         return result;
     }
 
     /// <inheritdoc />
-    public IRelationType? GetRelationTypeByAlias(string alias) => GetRelationType(alias);
-
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetAllRelations(params int[] ids)
+    public async Task<IRelationType?> GetRelationTypeByAliasAsync(string alias, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        IEnumerable<IRelation> result = _relationRepository.GetManyAsync(ids, CancellationToken.None).GetAwaiter().GetResult();
+        IRelationType? result = await _relationTypeRepository.GetByAliasAsync(alias, cancellationToken);
         scope.Complete();
         return result;
     }
 
     /// <inheritdoc />
-    public IEnumerable<IRelation> GetAllRelationsByRelationType(IRelationType relationType) =>
-        GetAllRelationsByRelationType(relationType.Id);
-
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetAllRelationsByRelationType(int relationTypeId)
+    public async Task<IEnumerable<IRelation>> GetAllRelationsAsync(int[] ids, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        IEnumerable<IRelation> result = _relationRepository.GetByRelationTypeIdAsync(relationTypeId).GetAwaiter().GetResult();
+        IEnumerable<IRelation> result = await _relationRepository.GetManyAsync(ids, cancellationToken);
         scope.Complete();
         return result;
     }
 
     /// <inheritdoc />
-    public IEnumerable<IRelationType> GetAllRelationTypes(params int[] ids)
+    public async Task<IEnumerable<IRelation>> GetAllRelationsByRelationTypeAsync(int relationTypeId, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        IEnumerable<IRelationType> result = _relationTypeRepository.GetManyAsync(ids, CancellationToken.None).GetAwaiter().GetResult();
+        IEnumerable<IRelation> result = await _relationRepository.GetByRelationTypeIdAsync(relationTypeId, cancellationToken);
         scope.Complete();
         return result;
     }
 
     /// <inheritdoc />
-    public async Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids)
+    public async Task<IEnumerable<IRelationType>> GetAllRelationTypesAsync(int[] ids, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-
-        IRelationType[] items = (await _relationTypeRepository.GetManyAsync(ids, CancellationToken.None)).ToArray();
+        IEnumerable<IRelationType> result = await _relationTypeRepository.GetManyAsync(ids, cancellationToken);
         scope.Complete();
+        return result;
+    }
 
-        if (take == 0)
+    /// <inheritdoc />
+    public async Task<IEnumerable<IRelation>> GetByParentIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        try
         {
-            return new PagedModel<IRelationType>(items.Length, Enumerable.Empty<IRelationType>());
+            if (relationTypeAlias.IsNullOrWhiteSpace())
+            {
+                return await _relationRepository.GetByParentIdAsync(id, cancellationToken: cancellationToken);
+            }
+
+            IRelationType? relationType = await _relationTypeRepository.GetByAliasAsync(relationTypeAlias!, cancellationToken);
+            if (relationType is null)
+            {
+                return Enumerable.Empty<IRelation>();
+            }
+
+            return await _relationRepository.GetByParentIdAsync(id, relationType.Id, cancellationToken);
         }
-
-        return new PagedModel<IRelationType>(
-            items.Length,
-            items.OrderBy(relationType => relationType.Name)
-                .Skip(skip)
-                .Take(take));
-    }
-
-    /// <inheritdoc />
-    public int CountRelationTypes()
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        var count = _relationTypeRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().Count();
-        scope.Complete();
-        return count;
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetByParentId(int id) => GetByParentId(id, null);
-
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetByParentId(int id, string? relationTypeAlias)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        if (relationTypeAlias.IsNullOrWhiteSpace())
-        {
-            IEnumerable<IRelation> all = _relationRepository.GetByParentIdAsync(id).GetAwaiter().GetResult();
-            scope.Complete();
-            return all;
-        }
-
-        IRelationType? relationType = GetRelationType(relationTypeAlias!);
-        if (relationType == null)
+        finally
         {
             scope.Complete();
-            return Enumerable.Empty<IRelation>();
         }
-
-        IEnumerable<IRelation> result = _relationRepository.GetByParentIdAsync(id, relationType.Id).GetAwaiter().GetResult();
-        scope.Complete();
-        return result;
     }
 
     /// <inheritdoc />
-    public IEnumerable<IRelation> GetByParent(IUmbracoEntity parent) => GetByParentId(parent.Id);
-
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetByParent(IUmbracoEntity parent, string relationTypeAlias) =>
-        GetByParentId(parent.Id, relationTypeAlias);
-
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetByChildId(int id) => GetByChildId(id, null);
-
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetByChildId(int id, string? relationTypeAlias)
+    public async Task<IEnumerable<IRelation>> GetByChildIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        if (relationTypeAlias.IsNullOrWhiteSpace())
+        try
         {
-            IEnumerable<IRelation> all = _relationRepository.GetByChildIdAsync(id).GetAwaiter().GetResult();
-            scope.Complete();
-            return all;
-        }
+            if (relationTypeAlias.IsNullOrWhiteSpace())
+            {
+                return await _relationRepository.GetByChildIdAsync(id, cancellationToken: cancellationToken);
+            }
 
-        IRelationType? relationType = GetRelationType(relationTypeAlias!);
-        if (relationType == null)
+            IRelationType? relationType = await _relationTypeRepository.GetByAliasAsync(relationTypeAlias!, cancellationToken);
+            if (relationType is null)
+            {
+                return Enumerable.Empty<IRelation>();
+            }
+
+            return await _relationRepository.GetByChildIdAsync(id, relationType.Id, cancellationToken);
+        }
+        finally
         {
             scope.Complete();
-            return Enumerable.Empty<IRelation>();
         }
-
-        IEnumerable<IRelation> result = _relationRepository.GetByChildIdAsync(id, relationType.Id).GetAwaiter().GetResult();
-        scope.Complete();
-        return result;
     }
 
     /// <inheritdoc />
-    public IEnumerable<IRelation> GetByChild(IUmbracoEntity child) => GetByChildId(child.Id);
-
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetByChild(IUmbracoEntity child, string relationTypeAlias) =>
-        GetByChildId(child.Id, relationTypeAlias);
-
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetByParentOrChildId(int id)
+    public async Task<IEnumerable<IRelation>> GetByParentOrChildIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        IEnumerable<IRelation> result = _relationRepository.GetByParentOrChildIdAsync(id).GetAwaiter().GetResult();
-        scope.Complete();
-        return result;
-    }
+        try
+        {
+            if (relationTypeAlias.IsNullOrWhiteSpace())
+            {
+                return await _relationRepository.GetByParentOrChildIdAsync(id, cancellationToken: cancellationToken);
+            }
 
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        IRelationType? relationType = GetRelationType(relationTypeAlias);
-        if (relationType == null)
+            IRelationType? relationType = await _relationTypeRepository.GetByAliasAsync(relationTypeAlias!, cancellationToken);
+            if (relationType is null)
+            {
+                return Enumerable.Empty<IRelation>();
+            }
+
+            return await _relationRepository.GetByParentOrChildIdAsync(id, relationType.Id, cancellationToken);
+        }
+        finally
         {
             scope.Complete();
-            return Enumerable.Empty<IRelation>();
         }
-
-        IEnumerable<IRelation> result = _relationRepository.GetByParentOrChildIdAsync(id, relationType.Id).GetAwaiter().GetResult();
-        scope.Complete();
-        return result;
     }
 
     /// <inheritdoc />
-    public IRelation? GetByParentAndChildId(int parentId, int childId, IRelationType relationType)
+    public async Task<IRelation?> GetByParentAndChildIdAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        IRelation? result = _relationRepository.GetByParentAndChildIdAsync(parentId, childId, relationType.Id).GetAwaiter().GetResult();
+        IRelation? result = await _relationRepository.GetByParentAndChildIdAsync(parentId, childId, relationType.Id, cancellationToken);
         scope.Complete();
         return result;
     }
 
     /// <inheritdoc />
-    public IEnumerable<IRelation> GetByRelationTypeName(string relationTypeName)
+    public async Task<IEnumerable<IRelation>> GetByRelationTypeNameAsync(string relationTypeName, CancellationToken cancellationToken = default)
     {
-        List<int>? relationTypeIds;
-        using (ICoreScope scope = ScopeProvider.CreateScope())
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        // The relation type table is small (typically <50 rows) and fully cached by the repository's
+        // FullDataSet cache policy, so filtering in memory is cheap and avoids a per-name SQL query.
+        IEnumerable<IRelationType> relationTypes = await _relationTypeRepository.GetAllAsync(cancellationToken);
+        List<int> relationTypeIds = relationTypes.Where(x => x.Name == relationTypeName).Select(x => x.Id).ToList();
+        if (relationTypeIds.Count == 0)
         {
-            // The relation type table is small (typically <50 rows) and fully cached by the repository's
-            // FullDataSet cache policy, so filtering in memory is cheap and avoids a per-name SQL query.
-            IEnumerable<IRelationType> relationTypes = _relationTypeRepository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult();
-            relationTypeIds = relationTypes.Where(x => x.Name == relationTypeName).Select(x => x.Id).ToList();
             scope.Complete();
+            return Array.Empty<IRelation>();
         }
 
-        return relationTypeIds.Count == 0
-            ? []
-            : GetRelationsByListOfTypeIds(relationTypeIds);
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetByRelationTypeAlias(string relationTypeAlias)
-    {
-        IRelationType? relationType = GetRelationType(relationTypeAlias);
-
-        return relationType == null
-            ? []
-            : GetRelationsByListOfTypeIds([relationType.Id]);
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<IRelation> GetByRelationTypeId(int relationTypeId)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        IEnumerable<IRelation> result = _relationRepository.GetByRelationTypeIdAsync(relationTypeId).GetAwaiter().GetResult();
+        IEnumerable<IRelation> result = await GetRelationsByListOfTypeIdsAsync(relationTypeIds, cancellationToken);
         scope.Complete();
         return result;
     }
 
     /// <inheritdoc />
-    public IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null)
+    public async Task<IEnumerable<IRelation>> GetByRelationTypeAliasAsync(string relationTypeAlias, CancellationToken cancellationToken = default)
     {
         using ICoreScope scope = ScopeProvider.CreateScope();
-        var skip = (int)(pageIndex * pageSize);
-        PagedModel<IRelation> result = _relationRepository
-            .GetPagedByRelationTypeIdAsync(relationTypeId, skip, pageSize, ordering)
-            .GetAwaiter().GetResult();
-        totalRecords = result.Total;
+        IRelationType? relationType = await _relationTypeRepository.GetByAliasAsync(relationTypeAlias, cancellationToken);
+        if (relationType is null)
+        {
+            scope.Complete();
+            return Array.Empty<IRelation>();
+        }
+
+        IEnumerable<IRelation> result = await GetRelationsByListOfTypeIdsAsync([relationType.Id], cancellationToken);
         scope.Complete();
-        return result.Items;
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<IRelation>> GetByRelationTypeIdAsync(int relationTypeId, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IEnumerable<IRelation> result = await _relationRepository.GetByRelationTypeIdAsync(relationTypeId, cancellationToken);
+        scope.Complete();
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedModel<IRelation>> GetPagedByRelationTypeIdAsync(int relationTypeId, int skip, int take, Ordering? ordering = null, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        PagedModel<IRelation> result = await _relationRepository.GetPagedByRelationTypeIdAsync(relationTypeId, skip, take, ordering, cancellationToken);
+        scope.Complete();
+        return result;
     }
 
     /// <inheritdoc />
@@ -364,6 +324,297 @@ public class RelationService : AsyncRepositoryService, IRelationService
         PagedModel<IRelation> result = await _relationRepository.GetPagedByRelationTypeIdAsync(relationType.Id, skip, take, ordering);
         scope.Complete();
         return Attempt.SucceedWithStatus(RelationOperationStatus.Success, result);
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedModel<IUmbracoEntity>> GetPagedParentEntitiesByChildIdAsync(int id, int skip, int take, UmbracoObjectTypes[]? entityTypes = null, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        Guid[] typeGuids = (entityTypes ?? []).Select(x => x.GetGuid()).ToArray();
+        PagedModel<IUmbracoEntity> result = await _relationRepository.GetPagedParentEntitiesByChildIdAsync(id, skip, take, typeGuids, cancellationToken);
+        scope.Complete();
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedModel<IUmbracoEntity>> GetPagedChildEntitiesByParentIdAsync(int id, int skip, int take, UmbracoObjectTypes[]? entityTypes = null, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        Guid[] typeGuids = (entityTypes ?? []).Select(x => x.GetGuid()).ToArray();
+        PagedModel<IUmbracoEntity> result = await _relationRepository.GetPagedChildEntitiesByParentIdAsync(id, skip, take, typeGuids, cancellationToken);
+        scope.Complete();
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IRelationType[] items = (await _relationTypeRepository.GetManyAsync(ids, CancellationToken.None)).ToArray();
+        scope.Complete();
+
+        if (take == 0)
+        {
+            return new PagedModel<IRelationType>(items.Length, Enumerable.Empty<IRelationType>());
+        }
+
+        return new PagedModel<IRelationType>(
+            items.Length,
+            items.OrderBy(relationType => relationType.Name)
+                .Skip(skip)
+                .Take(take));
+    }
+
+    /// <inheritdoc />
+    public async Task<int> CountRelationTypesAsync(CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        int count = (await _relationTypeRepository.GetAllAsync(cancellationToken)).Count();
+        scope.Complete();
+        return count;
+    }
+
+    /// <inheritdoc />
+    public async Task<IRelation> RelateAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default)
+    {
+        // Ensure that the RelationType has an identity before using it to relate two entities.
+        if (relationType.HasIdentity == false)
+        {
+            await SaveAsync(relationType, cancellationToken);
+        }
+
+        // NOTE: We don't check if this exists first, it will throw a data integrity exception if it already exists.
+        var relation = new Relation(parentId, childId, relationType);
+
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var savingNotification = new RelationSavingNotification(relation, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return relation;
+        }
+
+        await _relationRepository.SaveAsync(relation, cancellationToken);
+        scope.Notifications.Publish(
+            new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
+        scope.Complete();
+        return relation;
+    }
+
+    /// <inheritdoc />
+    public async Task<IRelation> RelateAsync(int parentId, int childId, string relationTypeAlias, CancellationToken cancellationToken = default)
+    {
+        IRelationType? relationType = await GetRelationTypeByAliasAsync(relationTypeAlias, cancellationToken);
+        if (relationType is null || string.IsNullOrEmpty(relationType.Alias))
+        {
+            throw new ArgumentException($"No RelationType with Alias '{relationTypeAlias}' exists.", nameof(relationTypeAlias));
+        }
+
+        return await RelateAsync(parentId, childId, relationType, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> HasRelationsAsync(IRelationType relationType, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        bool result = (await _relationRepository.GetByRelationTypeIdAsync(relationType.Id, cancellationToken)).Any();
+        scope.Complete();
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> IsRelatedAsync(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        bool result = await _relationRepository.IsRelatedAsync(id, directionFilter, includeRelationTypeIds, excludeRelationTypeIds, cancellationToken);
+        scope.Complete();
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> AreRelatedAsync(int parentId, int childId, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        bool result = await _relationRepository.AreRelatedAsync(parentId, childId, cancellationToken: cancellationToken);
+        scope.Complete();
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> AreRelatedAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        bool result = await _relationRepository.AreRelatedAsync(parentId, childId, relationType.Id, cancellationToken);
+        scope.Complete();
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> AreRelatedAsync(int parentId, int childId, string relationTypeAlias, CancellationToken cancellationToken = default)
+    {
+        IRelationType? relationType = await GetRelationTypeByAliasAsync(relationTypeAlias, cancellationToken);
+        if (relationType is null)
+        {
+            return false;
+        }
+
+        return await AreRelatedAsync(parentId, childId, relationType, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task SaveAsync(IRelation relation, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var savingNotification = new RelationSavingNotification(relation, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return;
+        }
+
+        await _relationRepository.SaveAsync(relation, cancellationToken);
+        scope.Complete();
+        scope.Notifications.Publish(
+            new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
+    }
+
+    /// <inheritdoc />
+    public async Task SaveAsync(IEnumerable<IRelation> relations, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IRelation[] relationsA = relations.ToArray();
+
+        EventMessages messages = EventMessagesFactory.Get();
+        var savingNotification = new RelationSavingNotification(relationsA, messages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return;
+        }
+
+        await _relationRepository.SaveManyAsync(relationsA, cancellationToken);
+        scope.Complete();
+        scope.Notifications.Publish(
+            new RelationSavedNotification(relationsA, messages).WithStateFrom(savingNotification));
+    }
+
+    /// <inheritdoc />
+    public async Task SaveAsync(IRelationType relationType, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return;
+        }
+
+        await _relationTypeRepository.SaveAsync(relationType, cancellationToken);
+        await AuditAsync(AuditType.Save, Constants.Security.SuperUserId, relationType.Id, $"Saved relation type: {relationType.Name}");
+        scope.Complete();
+        scope.Notifications.Publish(
+            new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, Guid userKey)
+    {
+        if (relationType.Id != 0)
+        {
+            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidId, relationType);
+        }
+
+        return await SaveWithAuditAsync(
+            relationType,
+            async () => await _relationTypeRepository.GetAsync(relationType.Key) is not null ? RelationTypeOperationStatus.KeyAlreadyExists : RelationTypeOperationStatus.Success,
+            AuditType.New,
+            $"Created relation type: {relationType.Name}",
+            userKey);
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, Guid userKey) =>
+        await SaveWithAuditAsync(
+            relationType,
+            async () => await _relationTypeRepository.GetAsync(relationType.Key) is null ? RelationTypeOperationStatus.NotFound : RelationTypeOperationStatus.Success,
+            AuditType.Save,
+            $"Created relation type: {relationType.Name}",
+            userKey);
+
+    /// <inheritdoc />
+    public async Task DeleteRelationAsync(IRelation relation, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var deletingNotification = new RelationDeletingNotification(relation, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            scope.Complete();
+            return;
+        }
+
+        await _relationRepository.DeleteAsync(relation, cancellationToken);
+        scope.Complete();
+        scope.Notifications.Publish(
+            new RelationDeletedNotification(relation, eventMessages).WithStateFrom(deletingNotification));
+    }
+
+    /// <inheritdoc />
+    public async Task DeleteRelationTypeAsync(IRelationType relationType, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            scope.Complete();
+            return;
+        }
+
+        await _relationTypeRepository.DeleteAsync(relationType, cancellationToken);
+        scope.Complete();
+        scope.Notifications.Publish(
+            new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
+    }
+
+    /// <inheritdoc />
+    public async Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, Guid userKey)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IRelationType? relationType = await _relationTypeRepository.GetAsync(key);
+        if (relationType is null)
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.NotFound, null);
+        }
+
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            scope.Complete();
+            return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.CancelledByNotification, null);
+        }
+
+        await _relationTypeRepository.DeleteAsync(relationType, CancellationToken.None);
+        await AuditAsync(AuditType.Delete, userKey, relationType.Id, "Deleted relation type");
+        scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
+        scope.Complete();
+        return Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType);
+    }
+
+    /// <inheritdoc />
+    public async Task DeleteRelationsOfTypeAsync(IRelationType relationType, CancellationToken cancellationToken = default)
+    {
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        List<IRelation> relations = (await _relationRepository.GetByRelationTypeIdAsync(relationType.Id, cancellationToken)).ToList();
+        await _relationRepository.DeleteRelationsOfTypeAsync(relationType.Id, cancellationToken);
+        scope.Complete();
+
+        scope.Notifications.Publish(new RelationDeletedNotification(relations, EventMessagesFactory.Get()));
     }
 
     /// <inheritdoc />
@@ -400,8 +651,7 @@ public class RelationService : AsyncRepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IUmbracoEntity> GetChildEntitiesFromRelations(IEnumerable<IRelation> relations)
     {
-        // Trying to avoid full N+1 lookups, so we'll group by the object type and then use the GetAll
-        // method to lookup batches of entities for each parent object type
+        // Avoid N+1 lookups: group by object type and batch-load each group.
         foreach (IGrouping<UmbracoObjectTypes, IRelation> groupedRelations in relations.GroupBy(x =>
                      ObjectTypes.GetUmbracoObjectType(x.ChildObjectType)))
         {
@@ -417,8 +667,6 @@ public class RelationService : AsyncRepositoryService, IRelationService
     /// <inheritdoc />
     public IEnumerable<IUmbracoEntity> GetParentEntitiesFromRelations(IEnumerable<IRelation> relations)
     {
-        // Trying to avoid full N+1 lookups, so we'll group by the object type and then use the GetAll
-        // method to lookup batches of entities for each parent object type
         foreach (IGrouping<UmbracoObjectTypes, IRelation> groupedRelations in relations.GroupBy(x =>
                      ObjectTypes.GetUmbracoObjectType(x.ParentObjectType)))
         {
@@ -432,35 +680,8 @@ public class RelationService : AsyncRepositoryService, IRelationService
     }
 
     /// <inheritdoc />
-    public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        var skip = (int)(pageIndex * pageSize);
-        PagedModel<IUmbracoEntity> result = _relationRepository
-            .GetPagedParentEntitiesByChildIdAsync(id, skip, pageSize, entityTypes.Select(x => x.GetGuid()).ToArray())
-            .GetAwaiter().GetResult();
-        totalChildren = result.Total;
-        scope.Complete();
-        return result.Items;
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        var skip = (int)(pageIndex * pageSize);
-        PagedModel<IUmbracoEntity> result = _relationRepository
-            .GetPagedChildEntitiesByParentIdAsync(id, skip, pageSize, entityTypes.Select(x => x.GetGuid()).ToArray())
-            .GetAwaiter().GetResult();
-        totalChildren = result.Total;
-        scope.Complete();
-        return result.Items;
-    }
-
-    /// <inheritdoc />
     public IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations)
     {
-        // TODO: Argh! N+1
         foreach (IRelation relation in relations)
         {
             UmbracoObjectTypes childObjectType = ObjectTypes.GetUmbracoObjectType(relation.ChildObjectType);
@@ -477,202 +698,304 @@ public class RelationService : AsyncRepositoryService, IRelationService
     }
 
     /// <inheritdoc />
+    public IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes() =>
+        [
+            UmbracoObjectTypes.Document,
+            UmbracoObjectTypes.Media,
+            UmbracoObjectTypes.Member,
+            UmbracoObjectTypes.DocumentType,
+            UmbracoObjectTypes.MediaType,
+            UmbracoObjectTypes.MemberType,
+            UmbracoObjectTypes.DataType,
+            UmbracoObjectTypes.MemberGroup,
+            UmbracoObjectTypes.ROOT,
+            UmbracoObjectTypes.RecycleBin,
+        ];
+
+    // ====================================================================
+    // Obsolete synchronous bridges (legacy surface, will be removed in V19).
+    // Each delegates to the corresponding async method via GetAwaiter().GetResult().
+    // ====================================================================
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IRelation? GetById(int id)
+        => GetByIdAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetRelationTypeByIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IRelationType? GetRelationTypeById(int id)
+        => GetRelationTypeByIdAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetRelationTypeByKeyAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IRelationType? GetRelationTypeById(Guid id)
+        => GetRelationTypeByKeyAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetRelationTypeByAliasAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IRelationType? GetRelationTypeByAlias(string alias)
+        => GetRelationTypeByAliasAsync(alias).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetAllRelationsAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation> GetAllRelations(params int[] ids)
+        => GetAllRelationsAsync(ids).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetAllRelationsByRelationTypeAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation>? GetAllRelationsByRelationType(IRelationType relationType)
+        => GetAllRelationsByRelationTypeAsync(relationType.Id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetAllRelationsByRelationTypeAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation>? GetAllRelationsByRelationType(int relationTypeId)
+        => GetAllRelationsByRelationTypeAsync(relationTypeId).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetAllRelationTypesAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelationType> GetAllRelationTypes(params int[] ids)
+        => GetAllRelationTypesAsync(ids).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByParentIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation>? GetByParentId(int id)
+        => GetByParentIdAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByParentIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation>? GetByParentId(int id, string relationTypeAlias)
+        => GetByParentIdAsync(id, relationTypeAlias).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByParentIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation>? GetByParent(IUmbracoEntity parent)
+        => GetByParentIdAsync(parent.Id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByParentIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation> GetByParent(IUmbracoEntity parent, string relationTypeAlias)
+        => GetByParentIdAsync(parent.Id, relationTypeAlias).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByChildIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation> GetByChildId(int id)
+        => GetByChildIdAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByChildIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation> GetByChildId(int id, string relationTypeAlias)
+        => GetByChildIdAsync(id, relationTypeAlias).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByChildIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation> GetByChild(IUmbracoEntity child)
+        => GetByChildIdAsync(child.Id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByChildIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation> GetByChild(IUmbracoEntity child, string relationTypeAlias)
+        => GetByChildIdAsync(child.Id, relationTypeAlias).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByParentOrChildIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation> GetByParentOrChildId(int id)
+        => GetByParentOrChildIdAsync(id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByParentOrChildIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias)
+        => GetByParentOrChildIdAsync(id, relationTypeAlias).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByParentAndChildIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IRelation? GetByParentAndChildId(int parentId, int childId, IRelationType relationType)
+        => GetByParentAndChildIdAsync(parentId, childId, relationType).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByRelationTypeNameAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation> GetByRelationTypeName(string relationTypeName)
+        => GetByRelationTypeNameAsync(relationTypeName).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByRelationTypeAliasAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation> GetByRelationTypeAlias(string relationTypeAlias)
+        => GetByRelationTypeAliasAsync(relationTypeAlias).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetByRelationTypeIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation>? GetByRelationTypeId(int relationTypeId)
+        => GetByRelationTypeIdAsync(relationTypeId).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use GetPagedByRelationTypeIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null)
+    {
+        var skip = (int)(pageIndex * pageSize);
+        PagedModel<IRelation> result = GetPagedByRelationTypeIdAsync(relationTypeId, skip, pageSize, ordering).GetAwaiter().GetResult();
+        totalRecords = result.Total;
+        return result.Items;
+    }
+
+    /// <inheritdoc />
+    [Obsolete("Use GetPagedParentEntitiesByChildIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
+    {
+        var skip = (int)(pageIndex * pageSize);
+        PagedModel<IUmbracoEntity> result = GetPagedParentEntitiesByChildIdAsync(id, skip, pageSize, entityTypes).GetAwaiter().GetResult();
+        totalChildren = result.Total;
+        return result.Items;
+    }
+
+    /// <inheritdoc />
+    [Obsolete("Use GetPagedChildEntitiesByParentIdAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes)
+    {
+        var skip = (int)(pageIndex * pageSize);
+        PagedModel<IUmbracoEntity> result = GetPagedChildEntitiesByParentIdAsync(id, skip, pageSize, entityTypes).GetAwaiter().GetResult();
+        totalChildren = result.Total;
+        return result.Items;
+    }
+
+    /// <inheritdoc />
+    [Obsolete("Use RelateAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IRelation Relate(int parentId, int childId, IRelationType relationType)
-    {
-        // Ensure that the RelationType has an identity before using it to relate two entities
-        if (relationType.HasIdentity == false)
-        {
-            Save(relationType);
-        }
-
-        // TODO: We don't check if this exists first, it will throw some sort of data integrity exception if it already exists, is that ok?
-        var relation = new Relation(parentId, childId, relationType);
-
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var savingNotification = new RelationSavingNotification(relation, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
-        {
-            scope.Complete();
-            return relation; // TODO: returning sth that does not exist here?!
-        }
-
-        _relationRepository.SaveAsync(relation, CancellationToken.None).GetAwaiter().GetResult();
-        scope.Notifications.Publish(
-            new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
-        scope.Complete();
-        return relation;
-    }
+        => RelateAsync(parentId, childId, relationType).GetAwaiter().GetResult();
 
     /// <inheritdoc />
-    public IRelation Relate(IUmbracoEntity parent, IUmbracoEntity child, IRelationType relationType) =>
-        Relate(parent.Id, child.Id, relationType);
+    [Obsolete("Use RelateAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public IRelation Relate(IUmbracoEntity parent, IUmbracoEntity child, IRelationType relationType)
+        => RelateAsync(parent.Id, child.Id, relationType).GetAwaiter().GetResult();
 
     /// <inheritdoc />
+    [Obsolete("Use RelateAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IRelation Relate(int parentId, int childId, string relationTypeAlias)
-    {
-        IRelationType? relationType = GetRelationTypeByAlias(relationTypeAlias);
-        if (relationType == null || string.IsNullOrEmpty(relationType.Alias))
-        {
-            throw new ArgumentNullException(
-                string.Format("No RelationType with Alias '{0}' exists.", relationTypeAlias));
-        }
-
-        return Relate(parentId, childId, relationType);
-    }
+        => RelateAsync(parentId, childId, relationTypeAlias).GetAwaiter().GetResult();
 
     /// <inheritdoc />
+    [Obsolete("Use RelateAsync() instead. Scheduled for removal in Umbraco 19.")]
     public IRelation Relate(IUmbracoEntity parent, IUmbracoEntity child, string relationTypeAlias)
-    {
-        IRelationType? relationType = GetRelationTypeByAlias(relationTypeAlias);
-        if (relationType == null || string.IsNullOrEmpty(relationType.Alias))
-        {
-            throw new ArgumentNullException(
-                string.Format("No RelationType with Alias '{0}' exists.", relationTypeAlias));
-        }
-
-        return Relate(parent.Id, child.Id, relationType);
-    }
+        => RelateAsync(parent.Id, child.Id, relationTypeAlias).GetAwaiter().GetResult();
 
     /// <inheritdoc />
+    [Obsolete("Use HasRelationsAsync() instead. Scheduled for removal in Umbraco 19.")]
     public bool HasRelations(IRelationType relationType)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        bool result = _relationRepository.GetByRelationTypeIdAsync(relationType.Id).GetAwaiter().GetResult().Any();
-        scope.Complete();
-        return result;
-    }
+        => HasRelationsAsync(relationType).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use IsRelatedAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
+        => IsRelatedAsync(id, directionFilter, includeRelationTypeIds, excludeRelationTypeIds).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use AreRelatedAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public bool AreRelated(int parentId, int childId)
+        => AreRelatedAsync(parentId, childId).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use AreRelatedAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public bool AreRelated(int parentId, int childId, string relationTypeAlias)
+        => AreRelatedAsync(parentId, childId, relationTypeAlias).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use AreRelatedAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public bool AreRelated(IUmbracoEntity parent, IUmbracoEntity child)
+        => AreRelatedAsync(parent.Id, child.Id).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use AreRelatedAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public bool AreRelated(IUmbracoEntity parent, IUmbracoEntity child, string relationTypeAlias)
+        => AreRelatedAsync(parent.Id, child.Id, relationTypeAlias).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use AreRelatedAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public bool AreRelated(int parentId, int childId, IRelationType relationType)
+        => AreRelatedAsync(parentId, childId, relationType).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use SaveAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Save(IRelation relation)
+        => SaveAsync(relation).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use SaveAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Save(IEnumerable<IRelation> relations)
+        => SaveAsync(relations).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use SaveAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Save(IRelationType relationType)
+        => SaveAsync(relationType).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use DeleteRelationAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Delete(IRelation relation)
+        => DeleteRelationAsync(relation).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use DeleteRelationTypeAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void Delete(IRelationType relationType)
+        => DeleteRelationTypeAsync(relationType).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use DeleteRelationsOfTypeAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public void DeleteRelationsOfType(IRelationType relationType)
+        => DeleteRelationsOfTypeAsync(relationType).GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    [Obsolete("Use CountRelationTypesAsync() instead. Scheduled for removal in Umbraco 19.")]
+    public int CountRelationTypes()
+        => CountRelationTypesAsync().GetAwaiter().GetResult();
 
     /// <summary>
-    /// Checks whether an entity has any relations.
+    /// Checks whether an entity has any relations (legacy overload — no direction filter).
     /// </summary>
     /// <param name="id">The identifier of the entity.</param>
     /// <returns><c>true</c> if the entity has any relations; otherwise, <c>false</c>.</returns>
-    [Obsolete("No longer used in Umbraco, please the overload taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public bool IsRelated(int id) => IsRelated(id, RelationDirectionFilter.Any, null, null);
+    [Obsolete("Use IsRelatedAsync() with explicit filters instead. Scheduled for removal in Umbraco 19.")]
+    public bool IsRelated(int id) => IsRelatedAsync(id, RelationDirectionFilter.Any).GetAwaiter().GetResult();
 
-    /// <inheritdoc />
-    public bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        bool result = _relationRepository
-            .IsRelatedAsync(id, directionFilter, includeRelationTypeIds, excludeRelationTypeIds)
-            .GetAwaiter().GetResult();
-        scope.Complete();
-        return result;
-    }
+    // ====================================================================
+    // Private helpers
+    // ====================================================================
 
-    /// <inheritdoc />
-    public bool AreRelated(int parentId, int childId)
+    private RelationTypeOperationStatus? ValidateObjectTypes(IRelationType relationType)
     {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        bool result = _relationRepository.AreRelatedAsync(parentId, childId).GetAwaiter().GetResult();
-        scope.Complete();
-        return result;
-    }
+        UmbracoObjectTypes[] allowedObjectTypes = GetAllowedObjectTypes().ToArray();
 
-    /// <inheritdoc />
-    public bool AreRelated(int parentId, int childId, string relationTypeAlias)
-    {
-        IRelationType? relType = GetRelationTypeByAlias(relationTypeAlias);
-        if (relType == null)
+        bool IsAllowed(Guid? objectType) =>
+            objectType is null || allowedObjectTypes.Any(x => x.GetGuid() == objectType);
+
+        if (IsAllowed(relationType.ChildObjectType) is false)
         {
-            return false;
+            return RelationTypeOperationStatus.InvalidChildObjectType;
         }
 
-        return AreRelated(parentId, childId, relType);
-    }
-
-    /// <inheritdoc />
-    public bool AreRelated(IUmbracoEntity parent, IUmbracoEntity child) => AreRelated(parent.Id, child.Id);
-
-    /// <inheritdoc />
-    public bool AreRelated(IUmbracoEntity parent, IUmbracoEntity child, string relationTypeAlias) =>
-        AreRelated(parent.Id, child.Id, relationTypeAlias);
-
-    /// <inheritdoc />
-    public void Save(IRelation relation)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var savingNotification = new RelationSavingNotification(relation, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        if (IsAllowed(relationType.ParentObjectType) is false)
         {
-            scope.Complete();
-            return;
+            return RelationTypeOperationStatus.InvalidParentObjectType;
         }
 
-        _relationRepository.SaveAsync(relation, CancellationToken.None).GetAwaiter().GetResult();
-        scope.Complete();
-        scope.Notifications.Publish(
-            new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
+        return null;
     }
 
-    /// <inheritdoc />
-    public void Save(IEnumerable<IRelation> relations)
+    private async Task<IEnumerable<IRelation>> GetRelationsByListOfTypeIdsAsync(IEnumerable<int> relationTypeIds, CancellationToken cancellationToken)
     {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        IRelation[] relationsA = relations.ToArray();
-
-        EventMessages messages = EventMessagesFactory.Get();
-        var savingNotification = new RelationSavingNotification(relationsA, messages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
+        var relations = new List<IRelation>();
+        foreach (var relationTypeId in relationTypeIds)
         {
-            scope.Complete();
-            return;
+            relations.AddRange(await _relationRepository.GetByRelationTypeIdAsync(relationTypeId, cancellationToken));
         }
 
-        _relationRepository.SaveManyAsync(relationsA).GetAwaiter().GetResult();
-        scope.Complete();
-        scope.Notifications.Publish(
-            new RelationSavedNotification(relationsA, messages).WithStateFrom(savingNotification));
+        return relations;
     }
 
-    /// <inheritdoc />
-    public void Save(IRelationType relationType)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
-        {
-            scope.Complete();
-            return;
-        }
-
-        _relationTypeRepository.SaveAsync(relationType, CancellationToken.None).GetAwaiter().GetResult();
-        Audit(AuditType.Save, Constants.Security.SuperUserId, relationType.Id, $"Saved relation type: {relationType.Name}");
-        scope.Complete();
-        scope.Notifications.Publish(
-            new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
-    }
-
-    /// <inheritdoc />
-    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, Guid userKey)
-    {
-        if (relationType.Id != 0)
-        {
-            return Attempt.FailWithStatus(RelationTypeOperationStatus.InvalidId, relationType);
-        }
-
-        return await SaveAsync(
-            relationType,
-            async () => await _relationTypeRepository.GetAsync(relationType.Key) is not null ? RelationTypeOperationStatus.KeyAlreadyExists : RelationTypeOperationStatus.Success,
-            AuditType.New,
-            $"Created relation type: {relationType.Name}",
-            userKey);
-    }
-
-    /// <inheritdoc />
-    public async Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, Guid userKey) =>
-        await SaveAsync(
-            relationType,
-            async () => await _relationTypeRepository.GetAsync(relationType.Key) is null ? RelationTypeOperationStatus.NotFound : RelationTypeOperationStatus.Success,
-            AuditType.Save,
-            $"Created relation type: {relationType.Name}",
-            userKey);
-
-    private async Task<Attempt<IRelationType, RelationTypeOperationStatus>> SaveAsync(IRelationType relationType, Func<Task<RelationTypeOperationStatus>> operationValidation, AuditType auditType, string auditMessage, Guid userKey)
+    private async Task<Attempt<IRelationType, RelationTypeOperationStatus>> SaveWithAuditAsync(
+        IRelationType relationType,
+        Func<Task<RelationTypeOperationStatus>> operationValidation,
+        AuditType auditType,
+        string auditMessage,
+        Guid userKey)
     {
         RelationTypeOperationStatus? objectTypeValidationError = ValidateObjectTypes(relationType);
         if (objectTypeValidationError is not null)
@@ -706,157 +1029,9 @@ public class RelationService : AsyncRepositoryService, IRelationService
         return Attempt.SucceedWithStatus(RelationTypeOperationStatus.Success, relationType);
     }
 
-    /// <inheritdoc />
-    public void Delete(IRelation relation)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var deletingNotification = new RelationDeletingNotification(relation, eventMessages);
-        if (scope.Notifications.PublishCancelable(deletingNotification))
-        {
-            scope.Complete();
-            return;
-        }
-
-        _relationRepository.DeleteAsync(relation, CancellationToken.None).GetAwaiter().GetResult();
-        scope.Complete();
-        scope.Notifications.Publish(
-            new RelationDeletedNotification(relation, eventMessages).WithStateFrom(deletingNotification));
-    }
-
-    /// <inheritdoc />
-    public void Delete(IRelationType relationType)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
-        if (scope.Notifications.PublishCancelable(deletingNotification))
-        {
-            scope.Complete();
-            return;
-        }
-
-        _relationTypeRepository.DeleteAsync(relationType, CancellationToken.None).GetAwaiter().GetResult();
-        scope.Complete();
-        scope.Notifications.Publish(
-            new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
-    }
-
-    /// <inheritdoc />
-    public async Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, Guid userKey)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        IRelationType? relationType = await _relationTypeRepository.GetAsync(key);
-        if (relationType is null)
-        {
-            scope.Complete();
-            return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.NotFound, null);
-        }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
-        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
-        {
-            scope.Complete();
-            return Attempt.FailWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.CancelledByNotification, null);
-        }
-
-        await _relationTypeRepository.DeleteAsync(relationType, CancellationToken.None);
-        await AuditAsync(AuditType.Delete, userKey, relationType.Id, "Deleted relation type");
-        scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
-        scope.Complete();
-        return Attempt.SucceedWithStatus<IRelationType?, RelationTypeOperationStatus>(RelationTypeOperationStatus.Success, relationType);
-    }
-
-    /// <inheritdoc />
-    public void DeleteRelationsOfType(IRelationType relationType)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        var relations = _relationRepository.GetByRelationTypeIdAsync(relationType.Id).GetAwaiter().GetResult().ToList();
-        _relationRepository.DeleteRelationsOfTypeAsync(relationType.Id).GetAwaiter().GetResult();
-        scope.Complete();
-
-        scope.Notifications.Publish(new RelationDeletedNotification(relations, EventMessagesFactory.Get()));
-    }
-
-    /// <inheritdoc />
-    public bool AreRelated(int parentId, int childId, IRelationType relationType)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        bool result = _relationRepository.AreRelatedAsync(parentId, childId, relationType.Id).GetAwaiter().GetResult();
-        scope.Complete();
-        return result;
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes() =>
-        [
-            UmbracoObjectTypes.Document,
-            UmbracoObjectTypes.Media,
-            UmbracoObjectTypes.Member,
-            UmbracoObjectTypes.DocumentType,
-            UmbracoObjectTypes.MediaType,
-            UmbracoObjectTypes.MemberType,
-            UmbracoObjectTypes.DataType,
-            UmbracoObjectTypes.MemberGroup,
-            UmbracoObjectTypes.ROOT,
-            UmbracoObjectTypes.RecycleBin,
-        ];
-
-    #region Private Methods
-
-    private RelationTypeOperationStatus? ValidateObjectTypes(IRelationType relationType)
-    {
-        UmbracoObjectTypes[] allowedObjectTypes = GetAllowedObjectTypes().ToArray();
-
-        bool IsAllowed(Guid? objectType) =>
-            objectType is null || allowedObjectTypes.Any(x => x.GetGuid() == objectType);
-
-        if (IsAllowed(relationType.ChildObjectType) is false)
-        {
-            return RelationTypeOperationStatus.InvalidChildObjectType;
-        }
-
-        if (IsAllowed(relationType.ParentObjectType) is false)
-        {
-            return RelationTypeOperationStatus.InvalidParentObjectType;
-        }
-
-        return null;
-    }
-
-    private IRelationType? GetRelationType(string relationTypeAlias)
-    {
-        using ICoreScope scope = ScopeProvider.CreateScope();
-        IRelationType? result = _relationTypeRepository.GetByAliasAsync(relationTypeAlias).GetAwaiter().GetResult();
-        scope.Complete();
-        return result;
-    }
-
-    private List<IRelation> GetRelationsByListOfTypeIds(IEnumerable<int> relationTypeIds)
-    {
-        var relations = new List<IRelation>();
-        using (ICoreScope scope = ScopeProvider.CreateScope())
-        {
-            foreach (var relationTypeId in relationTypeIds)
-            {
-                IEnumerable<IRelation> relation = _relationRepository.GetByRelationTypeIdAsync(relationTypeId).GetAwaiter().GetResult();
-                relations.AddRange(relation);
-            }
-
-            scope.Complete();
-        }
-
-        return relations;
-    }
-
-    private void Audit(AuditType type, int userId, int objectId, string? message = null) =>
-        AuditAsync(type, userId, objectId, message).GetAwaiter().GetResult();
-
     private async Task AuditAsync(AuditType type, int userId, int objectId, string? message = null, string? parameters = null)
     {
         Guid userKey = await _userIdKeyResolver.GetAsync(userId);
-
         await AuditAsync(type, userKey, objectId, message, parameters);
     }
 
@@ -868,6 +1043,4 @@ public class RelationService : AsyncRepositoryService, IRelationService
             UmbracoObjectTypes.RelationType.GetName(),
             message,
             parameters);
-
-    #endregion
 }
