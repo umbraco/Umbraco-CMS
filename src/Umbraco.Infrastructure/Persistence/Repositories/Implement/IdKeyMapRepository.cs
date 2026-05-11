@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -38,19 +39,19 @@ public class IdKeyMapRepository : IIdKeyMapRepository
         {
             if (umbracoObjectType == UmbracoObjectTypes.Unknown)
             {
-                return db.Nodes
+                return await db.Nodes
                     .Where(x => x.UniqueId == key)
-                    .Select(node => node.NodeId)
-                    .FirstOrDefault();
+                    .Select(node => (int?)node.NodeId) // Cast needed to ensure null is returned if not found.
+                    .FirstOrDefaultAsync();
             }
 
             Guid type = GetNodeObjectTypeGuid(umbracoObjectType);
-            return db.Nodes
+            return await db.Nodes
                 .Where(x => x.UniqueId == key
                             && (x.NodeObjectType == type
                                 || x.NodeObjectType == Constants.ObjectTypes.IdReservation))
-                .Select(node => node.NodeId)
-                .FirstOrDefault();
+                .Select(node => (int?)node.NodeId) // Cast needed to ensure null is returned if not found.
+                .FirstOrDefaultAsync();
         });
     }
 
@@ -76,19 +77,19 @@ public class IdKeyMapRepository : IIdKeyMapRepository
             // if it's unknown don't include the nodeObjectType in the query
             if (umbracoObjectType == UmbracoObjectTypes.Unknown)
             {
-                return db.Nodes
+                return await db.Nodes
                     .Where(x => x.NodeId == id)
-                    .Select(node => node.UniqueId)
-                    .FirstOrDefault();
+                    .Select(node => (Guid?)node.UniqueId) // Cast needed to ensure null is returned if not found.
+                    .FirstOrDefaultAsync();
             }
 
             Guid type = GetNodeObjectTypeGuid(umbracoObjectType);
-            return db.Nodes
+            return await db.Nodes
                 .Where(x => x.NodeId == id
                             && (x.NodeObjectType == type
                                 || x.NodeObjectType == Constants.ObjectTypes.IdReservation))
-                .Select(node => node.UniqueId)
-                .FirstOrDefault();
+                .Select(node => (Guid?)node.UniqueId) // Cast needed to ensure null is returned if not found.
+                .FirstOrDefaultAsync();
         });
     }
 
