@@ -45,10 +45,13 @@ describe('attachPreviewLinkInterceptor', () => {
 		iframe.remove();
 	});
 
-	function appendAnchor(attrs: Partial<Record<'href' | 'download', string>> & { html?: string } = {}): HTMLAnchorElement {
+	function appendAnchor(
+		attrs: Partial<Record<'href' | 'download' | 'target', string>> & { html?: string } = {},
+	): HTMLAnchorElement {
 		const anchor = iframe.contentDocument!.createElement('a');
 		if (attrs.href !== undefined) anchor.setAttribute('href', attrs.href);
 		if (attrs.download !== undefined) anchor.setAttribute('download', attrs.download);
+		if (attrs.target !== undefined) anchor.setAttribute('target', attrs.target);
 		if (attrs.html) anchor.innerHTML = attrs.html;
 		iframe.contentDocument!.body.appendChild(anchor);
 		return anchor;
@@ -171,6 +174,101 @@ describe('attachPreviewLinkInterceptor', () => {
 
 			expect(event.defaultPrevented).to.be.false;
 			expect(openSpy.calls).to.have.lengthOf(0);
+		});
+
+		it('does not intercept same-origin links with target="_self"', () => {
+			const anchor = appendAnchor({ href: '/about', target: '_self' });
+
+			const event = clickAnchor(anchor);
+
+			expect(event.defaultPrevented).to.be.false;
+			expect(openSpy.calls).to.have.lengthOf(0);
+		});
+
+		it('does not intercept same-origin links with a named target', () => {
+			const anchor = appendAnchor({ href: '/about', target: 'main-content' });
+
+			const event = clickAnchor(anchor);
+
+			expect(event.defaultPrevented).to.be.false;
+			expect(openSpy.calls).to.have.lengthOf(0);
+		});
+
+		it('does not intercept mailto: links so the OS handler still fires', () => {
+			// window.open('mailto:...') would spawn a blank tab — let the browser hand
+			// these off to the system mail client instead.
+			const anchor = appendAnchor({ href: 'mailto:hello@example.com' });
+
+			const event = clickAnchor(anchor);
+
+			expect(event.defaultPrevented).to.be.false;
+			expect(openSpy.calls).to.have.lengthOf(0);
+		});
+
+		it('does not intercept tel: links', () => {
+			const anchor = appendAnchor({ href: 'tel:+15555550100' });
+
+			const event = clickAnchor(anchor);
+
+			expect(event.defaultPrevented).to.be.false;
+			expect(openSpy.calls).to.have.lengthOf(0);
+		});
+	});
+
+	describe('cross-origin links', () => {
+		it('intercepts an external http(s) link and opens it in a new tab', () => {
+			// Reproduces issue #20323 — without an interceptor, the sandbox swallows
+			// the click and no tab opens.
+			const anchor = appendAnchor({ href: 'https://www.google.com/' });
+
+			const event = clickAnchor(anchor);
+
+			expect(event.defaultPrevented).to.be.true;
+			expect(openSpy.calls).to.have.lengthOf(1);
+			expect(openSpy.calls[0].url).to.equal('https://www.google.com/');
+			expect(openSpy.calls[0].target).to.equal('_blank');
+			expect(openSpy.calls[0].features).to.equal('noopener,noreferrer');
+		});
+
+		it('intercepts an external link even when it has target="_blank"', () => {
+			const anchor = appendAnchor({ href: 'https://example.com/', target: '_blank' });
+
+			const event = clickAnchor(anchor);
+
+			expect(event.defaultPrevented).to.be.true;
+			expect(openSpy.calls).to.have.lengthOf(1);
+		});
+	});
+
+	describe('sandbox-blocked targets', () => {
+		it('intercepts a same-origin link with target="_blank" (sandbox lacks allow-popups)', () => {
+			const anchor = appendAnchor({ href: '/about', target: '_blank' });
+
+			const event = clickAnchor(anchor);
+
+			expect(event.defaultPrevented).to.be.true;
+			expect(openSpy.calls).to.have.lengthOf(1);
+			expect(openSpy.calls[0].url).to.equal(anchor.href);
+		});
+
+		it('intercepts a same-origin link with target="_top" (sandbox lacks allow-top-navigation)', () => {
+			// Without interception this would either be silently blocked or — worse, if
+			// the sandbox were relaxed — replace the backoffice window itself.
+			const anchor = appendAnchor({ href: '/about', target: '_top' });
+
+			const event = clickAnchor(anchor);
+
+			expect(event.defaultPrevented).to.be.true;
+			expect(openSpy.calls).to.have.lengthOf(1);
+		});
+
+		it('intercepts a same-origin link with target="_parent"', () => {
+			const anchor = appendAnchor({ href: '/about', target: '_parent' });
+
+			const event = clickAnchor(anchor);
+
+			expect(event.defaultPrevented).to.be.true;
+			expect(openSpy.calls).to.have.lengthOf(1);
 		});
 	});
 
