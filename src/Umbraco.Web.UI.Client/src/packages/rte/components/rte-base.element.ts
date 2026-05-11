@@ -103,7 +103,18 @@ export abstract class UmbPropertyEditorUiRteElementBase
 	 * @default false
 	 */
 	@property({ type: Boolean, reflect: true })
-	readonly = false;
+	public get readonly() {
+		return this.#readonly;
+	}
+	public set readonly(value) {
+		this.#readonly = value;
+		if (this.#readonly) {
+			this.#managerContext.readOnlyState.fallbackToPermitted();
+		} else {
+			this.#managerContext.readOnlyState.fallbackToNotPermitted();
+		}
+	}
+	#readonly = false;
 
 	@property({ type: Boolean })
 	mandatory?: boolean;

@@ -1137,17 +1137,17 @@ public class DocumentUrlService : IDocumentUrlService
 
         if (documentIdAttempt.Success is false)
         {
-            return "#";
+            return Constants.Routing.Unroutable;
         }
 
         if (_documentNavigationQueryService.TryGetAncestorsOrSelfKeys(documentKey, out IEnumerable<Guid> ancestorsOrSelfKeys) is false)
         {
-            return "#";
+            return Constants.Routing.Unroutable;
         }
 
         if (isDraft is false && string.IsNullOrWhiteSpace(culture) is false && _publishStatusQueryService.IsDocumentPublished(documentKey, culture) is false)
         {
-            return "#";
+            return Constants.Routing.Unroutable;
         }
 
         string cultureOrDefault = GetCultureOrDefault(culture);
@@ -1190,7 +1190,7 @@ public class DocumentUrlService : IDocumentUrlService
             {
                 // There is no URL segment for this content key in the requested context.
                 // Exit early since the legacy route cannot be resolved.
-                return "#";
+                return Constants.Routing.Unroutable;
             }
         }
 

@@ -115,12 +115,17 @@ internal interface IDatabaseCacheRepository
     /// <summary>
     /// Refreshes the cache for the given document cache node.
     /// </summary>
-    Task RefreshContentAsync(ContentCacheNode contentCacheNode, PublishedState publishedState);
+    Task RefreshContentAsync(ContentCacheNode contentCacheNode);
 
     /// <summary>
     /// Refreshes the cache row for the given media cache node.
     /// </summary>
     Task RefreshMediaAsync(ContentCacheNode contentCacheNode);
+
+    /// <summary>
+    /// Removes the cache of published content for the given document.
+    /// </summary>
+    Task RemovePublishedContentAsync(int id);
 
     /// <summary>
     /// Rebuilds the caches for content, media and/or members based on the content type ids specified.

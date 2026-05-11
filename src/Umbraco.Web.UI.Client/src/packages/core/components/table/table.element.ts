@@ -6,6 +6,7 @@ import {
 	ifDefined,
 	keyed,
 	property,
+	ref,
 	repeat,
 	state,
 	when,
@@ -150,6 +151,9 @@ export class UmbTableElement extends UmbLitElement {
 	@property({ type: Array, attribute: false })
 	public selection: Array<string> = [];
 
+	@property({ attribute: false })
+	public onRowRendered?: (element: HTMLElement | undefined, item: UmbTableItem) => void;
+
 	@property({ type: String, attribute: false })
 	public orderingColumn = '';
 
@@ -180,11 +184,17 @@ export class UmbTableElement extends UmbLitElement {
 
 	#lastColumnKey = '';
 
-	override updated(changedProperties: Map<string | number | symbol, unknown>) {
-		super.updated(changedProperties);
+	#cellElementCache = new WeakMap<UmbTableItem, Map<string, UmbTableColumnLayoutElement>>();
+
+	override willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
+		super.willUpdate(changedProperties);
 		if (changedProperties.has('selection')) {
 			this._selectionMode = this.selection.length > 0;
 		}
+	}
+
+	override updated(changedProperties: Map<string | number | symbol, unknown>) {
+		super.updated(changedProperties);
 
 		// The `keyed` directive in `render()` rebuilds the `<uui-table>` element when the column
 		// signature changes. The sorter caches its container element on first initialization, so
@@ -365,6 +375,9 @@ export class UmbTableElement extends UmbLitElement {
 		const isItemSelectable = this.#isSelectableItem(item);
 		return html`
 			<uui-table-row
+				${ref((el) => {
+					this.onRowRendered?.(el as HTMLElement | undefined, item);
+				})}
 				data-sortable-id=${item.id}
 				?selectable=${this.config.allowSelection && !this._sortable && isItemSelectable}
 				?select-only=${this._selectionMode || this.config.selectOnly}
@@ -426,7 +439,18 @@ export class UmbTableElement extends UmbLitElement {
 		const value = item.data.find((data) => data.columnAlias === column.alias)?.value;
 
 		if (column.elementName) {
-			const element = document.createElement(column.elementName) as UmbTableColumnLayoutElement;
+			let itemCache = this.#cellElementCache.get(item);
+			if (!itemCache) {
+				itemCache = new Map();
+				this.#cellElementCache.set(item, itemCache);
+			}
+
+			let element = itemCache.get(column.alias);
+			if (!element || element.tagName.toLowerCase() !== column.elementName.toLowerCase()) {
+				element = document.createElement(column.elementName) as UmbTableColumnLayoutElement;
+				itemCache.set(column.alias, element);
+			}
+
 			element.column = column;
 			element.item = item;
 			element.value = value;

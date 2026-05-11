@@ -913,7 +913,7 @@ public class PublishedRouter : IPublishedRouter
         }
 
         var redirectId = request.PublishedContent.Value(_publishedValueFallback, Constants.Conventions.Content.Redirect, defaultValue: -1);
-        var redirectUrl = "#";
+        var redirectUrl = Constants.Routing.Unroutable;
         if (redirectId > 0)
         {
             redirectUrl = _publishedUrlProvider.GetUrl(redirectId);
@@ -931,7 +931,7 @@ public class PublishedRouter : IPublishedRouter
             }
         }
 
-        if (redirectUrl != "#")
+        if (redirectUrl != Constants.Routing.Unroutable)
         {
             request.SetRedirect(redirectUrl);
         }

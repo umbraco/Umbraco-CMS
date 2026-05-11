@@ -14,6 +14,7 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { customElement, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbSwitchCondition } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { SwitchConditionConfig } from 'src/packages/core/extension-registry/conditions/switch.condition.js';
 
 @customElement('umb-test-controller-host')
 // Element is used in tests
@@ -31,7 +32,7 @@ class UmbTestExtensionController extends UmbBaseExtensionInitializer {
 		this._init();
 	}
 
-	protected async _conditionsAreGood() {
+	protected async _conditionsAreGood(_signal: AbortSignal) {
 		return true;
 	}
 
@@ -487,7 +488,7 @@ describe('UmbBaseExtensionController', () => {
 	describe('Manifest with one condition that changes over time', () => {
 		let hostElement: UmbControllerHostElement;
 		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
-		let manifest: ManifestWithDynamicConditions<UmbConditionConfigBase & { value: string }>;
+		let manifest: ManifestWithDynamicConditions<SwitchConditionConfig>;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
@@ -499,8 +500,8 @@ describe('UmbBaseExtensionController', () => {
 				alias: 'Umb.Test.Section.1',
 				conditions: [
 					{
-						alias: 'Umb.Test.Condition.Delay',
-						value: '100',
+						alias: 'Umb.Condition.Switch',
+						frequency: '100',
 					},
 				],
 			};
@@ -511,8 +512,8 @@ describe('UmbBaseExtensionController', () => {
 
 			const conditionManifest = {
 				type: 'condition',
-				name: 'test-condition-delay',
-				alias: 'Umb.Test.Condition.Delay',
+				name: 'test-condition-switch',
+				alias: 'Umb.Condition.Switch',
 				api: UmbSwitchCondition,
 			};
 
@@ -545,8 +546,8 @@ describe('UmbBaseExtensionController', () => {
 
 	describe('Manifest with multiple conditions that changes over time', () => {
 		let hostElement: UmbControllerHostElement;
-		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions>;
-		let manifest: ManifestWithDynamicConditions<UmbConditionConfigBase & { value: string }>;
+		let extensionRegistry: UmbExtensionRegistry<ManifestWithDynamicConditions<SwitchConditionConfig>>;
+		let manifest: ManifestWithDynamicConditions<SwitchConditionConfig>;
 
 		beforeEach(async () => {
 			hostElement = await fixture(html`<umb-test-controller-host></umb-test-controller-host>`);
@@ -558,12 +559,12 @@ describe('UmbBaseExtensionController', () => {
 				alias: 'Umb.Test.Section.1',
 				conditions: [
 					{
-						alias: 'Umb.Test.Condition.Delay',
-						value: '10',
+						alias: 'Umb.Condition.Switch',
+						frequency: '10',
 					},
 					{
-						alias: 'Umb.Test.Condition.Delay',
-						value: '20',
+						alias: 'Umb.Condition.Switch',
+						frequency: '20',
 					},
 				],
 			};
@@ -576,8 +577,8 @@ describe('UmbBaseExtensionController', () => {
 
 			const conditionManifest = {
 				type: 'condition',
-				name: 'test-condition-delay',
-				alias: 'Umb.Test.Condition.Delay',
+				name: 'test-condition-switch',
+				alias: 'Umb.Condition.Switch',
 				api: UmbSwitchCondition,
 			};
 
