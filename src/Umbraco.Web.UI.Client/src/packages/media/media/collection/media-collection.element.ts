@@ -2,11 +2,12 @@ import { UMB_MEDIA_ENTITY_TYPE, UMB_MEDIA_ROOT_ENTITY_TYPE } from '../entity.js'
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from '../workspace/media-workspace.context-token.js';
 import type { UmbDropzoneMediaElement } from '../dropzone/index.js';
 import { UMB_MEDIA_COLLECTION_CONTEXT } from './media-collection.context-token.js';
-import { customElement, html, ref, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, ref, state, when, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbCollectionDefaultElement } from '@umbraco-cms/backoffice/collection';
 import { UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import type { UmbDropzoneSubmittedEvent } from '@umbraco-cms/backoffice/dropzone';
+import '../components/empty-media-state/index.js';
 
 @customElement('umb-media-collection')
 export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
@@ -18,12 +19,24 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 	@state()
 	private _unique: string | null = null;
 
+	@state()
+	private _isEmpty = false;
+
+	@query('#dropzone')
+	private _dropzone?: UmbDropzoneMediaElement;
+
 	constructor() {
 		super();
 
 		this.consumeContext(UMB_MEDIA_COLLECTION_CONTEXT, (context) => {
 			// TODO: stop consuming the context both in the default element and here. Instead make the default able to inform when the context is consumed. Or come up with a better system for the controllers to talk together. [NL]
 			this.#collectionContext = context;
+
+			if (context) {
+				this.observe(context.items, (items) => {
+					this._isEmpty = items.length === 0;
+				});
+			}
 		});
 
 		this.consumeContext(UMB_MEDIA_WORKSPACE_CONTEXT, (instance) => {
@@ -95,9 +108,43 @@ export class UmbMediaCollectionElement extends UmbCollectionDefaultElement {
 				.parentUnique=${this._unique}
 				@submitted=${this.#setupPlaceholders}
 				@complete=${this.#onComplete}
-				@progress=${this.#onProgress}></umb-dropzone-media>
+				@progress=${this.#onProgress}>
+			</umb-dropzone-media>
 		`;
 	}
+	public override render() {
+		return html`
+			${super.render()}
+			${when(
+				this._isEmpty,
+				() => html` <umb-empty-media-state @browse=${() => this._dropzone?.browse()}> </umb-empty-media-state> `,
+			)}
+		`;
+	}
+
+	static override styles = [
+		...UmbCollectionDefaultElement.styles,
+		css`
+			umb-dropzone-media {
+				top: var(--uui-size-layout-4);
+				left: 0;
+				right: 0;
+				bottom: 0;
+			}
+
+			umb-empty-media-state {
+				position: absolute;
+				top: var(--uui-size-layout-4);
+				left: var(--uui-size-layout-1);
+				right: var(--uui-size-layout-1);
+				bottom: calc(var(--uui-size-60) * 2);
+			}
+
+			#empty-state {
+				display: none;
+			}
+		`,
+	];
 }
 
 export default UmbMediaCollectionElement;
