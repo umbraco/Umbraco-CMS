@@ -1,11 +1,12 @@
-using Microsoft.Extensions.Logging;
-using NPoco;
+using Microsoft.EntityFrameworkCore;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -13,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 /// Repository for managing long-running operations.
 /// </summary>
-internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOperationRepository
+internal class LongRunningOperationRepository : AsyncRepositoryBase, ILongRunningOperationRepository
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly TimeProvider _timeProvider;
@@ -23,7 +24,7 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     /// </summary>
     public LongRunningOperationRepository(
         IJsonSerializer jsonSerializer,
-        IScopeAccessor scopeAccessor,
+        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
         TimeProvider timeProvider)
         : base(scopeAccessor, appCaches)
@@ -36,32 +37,35 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
     public async Task CreateAsync(LongRunningOperation operation, DateTimeOffset expirationDate)
     {
         LongRunningOperationDto dto = MapEntityToDto(operation, expirationDate);
-        await Database.InsertAsync(dto);
+
+        await AmbientScope.ExecuteWithContextAsync<LongRunningOperationDto>(async db =>
+        {
+            db.LongRunningOperations.Add(dto);
+            await db.SaveChangesAsync();
+        });
     }
 
     /// <inheritdoc />
-    public async Task<LongRunningOperation?> GetAsync(Guid id)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Select<LongRunningOperationDto>()
-            .From<LongRunningOperationDto>()
-            .Where<LongRunningOperationDto>(x => x.Id == id);
+    public async Task<LongRunningOperation?> GetAsync(Guid id) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            LongRunningOperationDto? dto = await db.LongRunningOperations
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
 
-        LongRunningOperationDto? dto = await Database.FirstOrDefaultAsync<LongRunningOperationDto>(sql);
-        return dto == null ? null : MapDtoToEntity(dto);
-    }
+            return dto == null ? null : MapDtoToEntity(dto);
+        });
 
     /// <inheritdoc />
-    public async Task<LongRunningOperation<T>?> GetAsync<T>(Guid id)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Select<LongRunningOperationDto>()
-            .From<LongRunningOperationDto>()
-            .Where<LongRunningOperationDto>(x => x.Id == id);
+    public async Task<LongRunningOperation<T>?> GetAsync<T>(Guid id) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            LongRunningOperationDto? dto = await db.LongRunningOperations
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
 
-        LongRunningOperationDto? dto = await Database.FirstOrDefaultAsync<LongRunningOperationDto>(sql);
-        return dto == null ? null : MapDtoToEntity<T>(dto);
-    }
+            return dto == null ? null : MapDtoToEntity<T>(dto);
+        });
 
     /// <inheritdoc/>
     public async Task<PagedModel<LongRunningOperation>> GetByTypeAsync(
@@ -70,80 +74,82 @@ internal class LongRunningOperationRepository : RepositoryBase, ILongRunningOper
         int skip,
         int take)
     {
-        Sql<ISqlContext> sql = Sql()
-            .Select<LongRunningOperationDto>()
-            .From<LongRunningOperationDto>()
-            .Where<LongRunningOperationDto>(x => x.Type == type);
-
-        if (statuses.Length > 0)
+        return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            var includeStale = statuses.Contains(LongRunningOperationStatus.Stale);
-            var possibleStaleStatuses = new List<string>
+            IQueryable<LongRunningOperationDto> query = db.LongRunningOperations
+                .Where(x => x.Type == type);
+
+            if (statuses.Length > 0)
             {
-                nameof(LongRunningOperationStatus.Enqueued),
-                nameof(LongRunningOperationStatus.Running)
-            };
-            var statusList = statuses.Except([LongRunningOperationStatus.Stale]).Select(s => s.ToString()).ToList();
+                var includeStale = statuses.Contains(LongRunningOperationStatus.Stale);
+                var possibleStaleStatuses = new List<string>
+                {
+                    nameof(LongRunningOperationStatus.Enqueued),
+                    nameof(LongRunningOperationStatus.Running)
+                };
+                var statusList = statuses.Except([LongRunningOperationStatus.Stale]).Select(s => s.ToString()).ToList();
 
-            DateTime now = _timeProvider.GetUtcNow().UtcDateTime;
-            sql = sql.Where<LongRunningOperationDto>(x =>
-                (statusList.Contains(x.Status) && (!possibleStaleStatuses.Contains(x.Status) || x.ExpirationDate >= now))
-                || (includeStale && possibleStaleStatuses.Contains(x.Status) && x.ExpirationDate < now));
-        }
+                DateTime now = _timeProvider.GetUtcNow().UtcDateTime;
+                query = query.Where(x =>
+                    (statusList.Contains(x.Status) && (!possibleStaleStatuses.Contains(x.Status) || x.ExpirationDate >= now))
+                    || (includeStale && possibleStaleStatuses.Contains(x.Status) && x.ExpirationDate < now));
+            }
 
-        return await Database.PagedAsync<LongRunningOperationDto, LongRunningOperation>(
-            sql,
-            skip,
-            take,
-            sortingAction: sql2 => sql2.OrderBy<LongRunningOperationDto>(x => x.CreateDate),
-            mapper: MapDtoToEntity);
+            int total = await query.CountAsync();
+
+            List<LongRunningOperationDto> dtos = await query
+                .OrderBy(x => x.CreateDate)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+
+            return new PagedModel<LongRunningOperation>(total, dtos.Select(MapDtoToEntity));
+        });
     }
 
     /// <inheritdoc/>
-    public async Task<LongRunningOperationStatus?> GetStatusAsync(Guid id)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Select<LongRunningOperationDto>(x => x.Status)
-            .From<LongRunningOperationDto>()
-            .Where<LongRunningOperationDto>(x => x.Id == id);
+    public async Task<LongRunningOperationStatus?> GetStatusAsync(Guid id) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            var status = await db.LongRunningOperations
+                .Where(x => x.Id == id)
+                .Select(x => x.Status)
+                .FirstOrDefaultAsync();
 
-        return (await Database.ExecuteScalarAsync<string>(sql))?.EnumParse<LongRunningOperationStatus>(false);
-    }
-
-    /// <inheritdoc/>
-    public async Task UpdateStatusAsync(Guid id, LongRunningOperationStatus status, DateTimeOffset expirationTime)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Update<LongRunningOperationDto>(x => x
-                .Set(y => y.Status, status.ToString())
-                .Set(y => y.UpdateDate, DateTime.UtcNow)
-                .Set(y => y.ExpirationDate, expirationTime.DateTime))
-            .Where<LongRunningOperationDto>(x => x.Id == id);
-
-        await Database.ExecuteAsync(sql);
-    }
+            return status?.EnumParse<LongRunningOperationStatus>(false);
+        });
 
     /// <inheritdoc/>
-    public async Task SetResultAsync<T>(Guid id, T result)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Update<LongRunningOperationDto>(x => x
-                .Set(y => y.Result, _jsonSerializer.Serialize(result))
-                .Set(y => y.UpdateDate, DateTime.UtcNow))
-            .Where<LongRunningOperationDto>(x => x.Id == id);
-
-        await Database.ExecuteAsync(sql);
-    }
+    public async Task UpdateStatusAsync(Guid id, LongRunningOperationStatus status, DateTimeOffset expirationTime) =>
+        await AmbientScope.ExecuteWithContextAsync<LongRunningOperationDto>(async db =>
+        {
+            await db.LongRunningOperations
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setter => setter
+                        .SetProperty(y => y.Status, status.ToString())
+                        .SetProperty(y => y.UpdateDate, DateTime.UtcNow)
+                        .SetProperty(y => y.ExpirationDate, expirationTime.DateTime));
+        });
 
     /// <inheritdoc/>
-    public async Task CleanOperationsAsync(DateTimeOffset olderThan)
-    {
-        Sql<ISqlContext> sql = Sql()
-            .Delete<LongRunningOperationDto>()
-            .Where<LongRunningOperationDto>(x => x.UpdateDate < olderThan);
+    public async Task SetResultAsync<T>(Guid id, T result) =>
+        await AmbientScope.ExecuteWithContextAsync<LongRunningOperationDto>(async db =>
+        {
+            await db.LongRunningOperations
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setter => setter
+                    .SetProperty(y => y.Result, _jsonSerializer.Serialize(result))
+                    .SetProperty(y => y.UpdateDate, DateTime.UtcNow));
+        });
 
-        await Database.ExecuteAsync(sql);
-    }
+    /// <inheritdoc/>
+    public async Task CleanOperationsAsync(DateTimeOffset olderThan) =>
+        await AmbientScope.ExecuteWithContextAsync<LongRunningOperationDto>(async db =>
+        {
+            await db.LongRunningOperations
+                .Where(x => x.UpdateDate < olderThan)
+                .ExecuteDeleteAsync();
+        });
 
     private LongRunningOperation MapDtoToEntity(LongRunningOperationDto dto) =>
         new()
