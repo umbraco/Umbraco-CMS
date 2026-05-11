@@ -85,7 +85,11 @@ internal class BlockElementService : IBlockElementService
         const string name = "n/a";
 
         IEnumerable<string> cultures = publishedContentType.VariesByCulture()
-            ? propertyData.SelectMany(p => p.Value.Select(v => v.Culture)).WhereNotNull().Distinct()
+            ? propertyData
+                .SelectMany(p => p.Value.Select(v => v.Culture))
+                .Where(c => c.IsNullOrWhiteSpace() is false)
+                .OfType<string>()
+                .Distinct()
             : [];
 
         var cultureInfos = cultures.ToDictionary(
