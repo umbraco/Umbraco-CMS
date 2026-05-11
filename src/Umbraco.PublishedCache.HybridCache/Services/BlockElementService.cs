@@ -8,6 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.HybridCache.Services;
 
+/// <inheritdoc/>
 internal class BlockElementService : IBlockElementService
 {
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
@@ -27,6 +28,7 @@ internal class BlockElementService : IBlockElementService
         _languageService = languageService;
     }
 
+    /// <inheritdoc/>
     public async Task<IPublishedElement?> BuildElementAsync(IPublishedElement owner, BlockItemData blockItemData, bool? preview = null)
     {
         ILanguage[]? allLanguages = null;
