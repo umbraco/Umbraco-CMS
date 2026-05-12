@@ -546,20 +546,10 @@ describe('UmbLocalizationManager.setActiveLanguage', () => {
 		expect(umbLocalizationManager.documentDirection).to.equal('ltr');
 	});
 
-	it('does not notify consumers on its own — callers must follow up with notifyLanguageChanged()', () => {
+	it('notifies connected controllers when the language changes', () => {
 		const probe = createCountingController();
 
 		umbLocalizationManager.setActiveLanguage('da-dk', 'ltr');
-
-		expect(probe.updates).to.equal(0);
-		probe.controller.destroy();
-	});
-
-	it('notifyLanguageChanged() flushes pending updates to connected controllers', () => {
-		const probe = createCountingController();
-
-		umbLocalizationManager.setActiveLanguage('da-dk', 'ltr');
-		umbLocalizationManager.notifyLanguageChanged();
 
 		expect(probe.updates).to.equal(1);
 		probe.controller.destroy();

@@ -80,22 +80,17 @@ export class UmbLocalizationManager {
 	}
 
 	/**
-	 * Updates the active language and direction on the manager without notifying consumers.
-	 * Pair this with {@link notifyLanguageChanged} when consumers should react.
+	 * Updates the active language and direction, and tells all connected controllers to re-render.
+	 * Use after dictionaries have been registered for the new language; for a silent sync of the
+	 * fields (e.g., before translations have loaded), assign `documentLanguage`/`documentDirection`
+	 * directly.
 	 * @param {string} language - the language code to set as active; falls back to {@link UMB_DEFAULT_LOCALIZATION_CULTURE} when empty.
 	 * @param {'ltr' | 'rtl'} [direction] - the direction associated with the language (defaults to `'ltr'`).
 	 */
 	setActiveLanguage(language: string, direction: 'ltr' | 'rtl' = 'ltr') {
 		this.documentLanguage = language || UMB_DEFAULT_LOCALIZATION_CULTURE;
 		this.documentDirection = direction;
-	}
 
-	/**
-	 * Tells all connected controllers to re-render against the current active language and
-	 * dictionaries. Use after a batch of {@link registerLocalization} or {@link setActiveLanguage}
-	 * calls to flush the result in one go.
-	 */
-	notifyLanguageChanged() {
 		this.connectedControllers.forEach((ctrl) => {
 			ctrl.documentUpdate();
 		});

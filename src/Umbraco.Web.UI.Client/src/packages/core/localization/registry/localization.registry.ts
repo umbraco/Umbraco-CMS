@@ -94,13 +94,11 @@ export class UmbLocalizationRegistry {
 				distinctUntilChanged(),
 				// Mirror the active language onto the manager synchronously, so a fresh element
 				// rendering between now and the async translation load picks up the requested
-				// language. Direction is set further down once we know which dictionary won;
-				// consumers are notified there too.
+				// language. We're not calling setActiveLanguage here because translations aren't
+				// loaded yet — we don't want to notify consumers to re-render with a fallback.
+				// Direction and the actual re-render happen below once dictionaries are in place.
 				tap((currentLanguage) => {
-					umbLocalizationManager.setActiveLanguage(
-						baseLocaleOf(currentLanguage),
-						umbLocalizationManager.documentDirection,
-					);
+					umbLocalizationManager.documentLanguage = baseLocaleOf(currentLanguage);
 				}),
 				// Switch to the extensions registry to get the current language and the extensions for that language
 				// Note: This also cancels the previous subscription if the language changes
@@ -207,7 +205,6 @@ export class UmbLocalizationRegistry {
 			document.documentElement.dir = direction;
 		}
 		umbLocalizationManager.setActiveLanguage(newLang, direction);
-		umbLocalizationManager.notifyLanguageChanged();
 	}
 
 	#arraysEqual(a: string[], b: string[]) {
