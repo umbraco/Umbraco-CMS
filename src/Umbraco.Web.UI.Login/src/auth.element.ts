@@ -260,19 +260,25 @@ export default class UmbAuthElement extends UmbLitElement {
 	}
 
 	#loadPreferredLanguage() {
-		const preferred = navigator.language;
-		if (!preferred) return;
-
 		const cultures = new Set(
 			umbExtensionsRegistry.getByType('localization').map((ext) => ext.meta.culture.toLowerCase()),
 		);
 
-		const preferredLower = preferred.toLowerCase();
-		const languageLower = preferredLower.split('-')[0];
+		// If the configured DefaultUILanguage already has a matching translation, respect the
+		// admin's choice. Only fall back to the visitor's browser language when the configured
+		// default has no translation available — that's the case where the visitor would otherwise
+		// see English regardless of what the admin configured.
+		const configured = document.documentElement.lang.toLowerCase();
+		const configuredLanguage = configured.split('-')[0];
+		if (configured && (cultures.has(configured) || cultures.has(configuredLanguage))) {
+			return;
+		}
 
-		// Only override the DefaultUILanguage if we actually have a matching translation.
-		// Otherwise we leave the registry on whatever <html lang> set it to.
-		if (cultures.has(preferredLower) || cultures.has(languageLower)) {
+		const preferred = navigator.language;
+		if (!preferred) return;
+		const preferredLower = preferred.toLowerCase();
+		const preferredLanguage = preferredLower.split('-')[0];
+		if (cultures.has(preferredLower) || cultures.has(preferredLanguage)) {
 			umbLocalizationRegistry.loadLanguage(preferred);
 		}
 	}
