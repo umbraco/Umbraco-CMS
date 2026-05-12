@@ -1,6 +1,7 @@
 import { UmbLocalizationRegistry } from './localization.registry.js';
 import { aTimeout, expect } from '@open-wc/testing';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbLocalizationManager } from '@umbraco-cms/backoffice/localization-api';
 import type { ManifestLocalization } from '../extensions/localization.extension.js';
 
 //#region Localizations
@@ -250,5 +251,53 @@ describe('UmbLocalizeController', () => {
 		// Check that both the regional and the base language is loaded.
 		expect(registry.localizations.has(danishRegional.meta.culture), 'expected "da-dk" to be present').to.be.true;
 		expect(registry.localizations.has(danish.meta.culture), 'expected "da" to be present').to.be.true;
+	});
+});
+
+describe('UmbLocalizationRegistry initialization', () => {
+	// The fixture extensions are registered when the suite above runs; they are global
+	// to the extension registry, so they are already available here too.
+
+	const originalLang = document.documentElement.lang;
+	const originalDir = document.documentElement.dir;
+	let registry: UmbLocalizationRegistry;
+
+	afterEach(() => {
+		registry?.destroy();
+		umbLocalizationManager.localizations.clear();
+		document.documentElement.lang = originalLang;
+		document.documentElement.dir = originalDir;
+	});
+
+	it('honors document.documentElement.lang on construction', async () => {
+		// Simulate Razor having rendered <html lang="@DefaultUILanguage"> with "da-dk".
+		document.documentElement.lang = 'da-dk';
+
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		await aTimeout(0);
+
+		expect(registry.localizations.has('da-dk'), 'expected the configured locale to be loaded').to.be.true;
+		expect(document.documentElement.lang, 'expected <html lang> to reflect the configured locale').to.equal('da-dk');
+	});
+
+	it('always loads the English fallback dictionary alongside the active language', async () => {
+		document.documentElement.lang = 'da-dk';
+
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		await aTimeout(0);
+
+		// The active language is loaded.
+		expect(registry.localizations.has('da-dk'), 'expected active "da-dk" to be loaded').to.be.true;
+		// The fallback ("en") is loaded so that missing-key lookups can still resolve via fallback.
+		expect(registry.localizations.has('en'), 'expected fallback "en" to be loaded').to.be.true;
+	});
+
+	it('falls back to the default culture when document.documentElement.lang is empty', async () => {
+		document.documentElement.lang = '';
+
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		await aTimeout(0);
+
+		expect(registry.localizations.has('en'), 'expected default "en" to be loaded').to.be.true;
 	});
 });

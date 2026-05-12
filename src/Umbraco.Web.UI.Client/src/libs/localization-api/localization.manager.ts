@@ -32,25 +32,16 @@ export const UMB_DEFAULT_LOCALIZATION_CULTURE = 'en';
 
 export class UmbLocalizationManager {
 	connectedControllers = new Set<UmbLocalizationController<UmbLocalizationSetBase>>();
-	#documentElementObserver: MutationObserver;
 
 	#changedKeys: Set<UmbLocalizationSetKey> = new Set();
 	#requestUpdateChangedKeysId?: number = undefined;
 
 	localizations: Map<string, UmbLocalizationSetBase> = new Map();
-	documentDirection = document.documentElement.dir || 'ltr';
+	documentDirection: 'ltr' | 'rtl' = (document.documentElement.dir as 'ltr' | 'rtl') || 'ltr';
 	documentLanguage = document.documentElement.lang || navigator.language;
 
 	get fallback(): UmbLocalizationSet | undefined {
 		return this.localizations.get(UMB_DEFAULT_LOCALIZATION_CULTURE) as UmbLocalizationSet;
-	}
-
-	constructor() {
-		this.#documentElementObserver = new MutationObserver(this.updateAll);
-		this.#documentElementObserver.observe(document.documentElement, {
-			attributes: true,
-			attributeFilter: ['dir', 'lang'],
-		});
 	}
 
 	appendConsumer(consumer: UmbLocalizationController<UmbLocalizationSetBase>) {
@@ -88,18 +79,26 @@ export class UmbLocalizationManager {
 		translations.map(this.#registerLocalizationBind);
 	}
 
-	/** Updates all localized elements that are currently connected */
-	updateAll = () => {
-		const newDir = document.documentElement.dir || 'ltr';
-		const newLang = document.documentElement.lang || navigator.language;
+	/**
+	 * Sets the active language and direction and notifies all connected controllers.
+	 * This is the single channel through which the manager learns of a language change;
+	 * callers should not write to `document.documentElement.lang` for this purpose.
+	 * @param {string} language The language code to set as active.
+	 * @param {'ltr' | 'rtl'} [direction] The direction associated with the language.
+	 */
+	setActiveLanguage(language: string, direction: 'ltr' | 'rtl' = 'ltr', options?: { silent?: boolean }) {
+		const newLang = language || UMB_DEFAULT_LOCALIZATION_CULTURE;
+		const changed = this.documentLanguage !== newLang || this.documentDirection !== direction;
 
-		if (this.documentDirection === newDir && this.documentLanguage === newLang) return;
-
-		// The document direction or language did changed, so lets move on:
-		this.documentDirection = newDir;
 		this.documentLanguage = newLang;
+		this.documentDirection = direction;
 
-		// Check if there was any changed.
+		// When `silent` is set, callers want to update the fields without notifying consumers.
+		// This is used by the registry to set the active language synchronously when it changes,
+		// so controllers can pick up the new language on their next render, while deferring the
+		// `documentUpdate` notification until translations have actually loaded.
+		if (options?.silent || !changed) return;
+
 		this.connectedControllers.forEach((ctrl) => {
 			ctrl.documentUpdate();
 		});
@@ -109,7 +108,26 @@ export class UmbLocalizationManager {
 			this.#requestUpdateChangedKeysId = undefined;
 		}
 		this.#changedKeys.clear();
-	};
+	}
+
+	/**
+	 * Explicitly notify all connected controllers that the active language or its translations
+	 * have changed. Use this after registering or loading a new set of translations, when the
+	 * `documentLanguage`/`documentDirection` fields may not have changed but the underlying
+	 * dictionaries did. Tests around the unrelated key-change debounce still rely on the
+	 * documentUpdate path being the canonical "force-rerender" channel.
+	 */
+	notifyLanguageChanged() {
+		this.connectedControllers.forEach((ctrl) => {
+			ctrl.documentUpdate();
+		});
+
+		if (this.#requestUpdateChangedKeysId) {
+			cancelAnimationFrame(this.#requestUpdateChangedKeysId);
+			this.#requestUpdateChangedKeysId = undefined;
+		}
+		this.#changedKeys.clear();
+	}
 
 	#updateChangedKeys = () => {
 		this.#requestUpdateChangedKeysId = undefined;

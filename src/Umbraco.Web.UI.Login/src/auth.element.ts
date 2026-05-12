@@ -2,6 +2,7 @@ import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { InputType, UUIFormLayoutItemElement } from '@umbraco-cms/backoffice/external/uui';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
+import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import { UMB_AUTH_CONTEXT, UmbAuthContext } from './contexts/index.js';
 import { UmbSlimBackofficeController } from './controllers/index.js';
@@ -121,7 +122,7 @@ const createFormLayoutPasswordItem = (
 	label: HTMLLabelElement,
 	input: HTMLInputElement,
 	showPasswordToggle: HTMLSpanElement,
-	requiredMessageKey: string
+	requiredMessageKey: string,
 ) => {
 	const formLayoutItem = document.createElement('uui-form-layout-item') as UUIFormLayoutItemElement;
 	const errorId = input.getAttribute('aria-errormessage') || input.id + '-error';
@@ -228,6 +229,17 @@ export default class UmbAuthElement extends UmbLitElement {
 		});
 	}
 
+	override connectedCallback() {
+		super.connectedCallback();
+
+		// Mirror the active locale onto the host element so that downstream components can
+		// resolve their `lang` from the closest ancestor with one set, rather than relying
+		// on a side-effect read of <html lang>.
+		this.observe(umbLocalizationRegistry.currentLanguage, (lang) => {
+			if (lang) this.lang = lang;
+		});
+	}
+
 	async firstUpdated() {
 		// Bind the (slim) Backoffice controller to this element so that we can use utilities from the Backoffice app.
 		await new UmbSlimBackofficeController(this).register(this);
@@ -235,10 +247,34 @@ export default class UmbAuthElement extends UmbLitElement {
 		// Register the main package for Umbraco.Auth
 		umbExtensionsRegistry.registerMany(extensions);
 
+		// Now that localization extensions are registered, prefer the visitor's browser language
+		// over the configured DefaultUILanguage if we actually have a translation for it. The
+		// pipeline matches `baseName` then `language`, so 'fr-CA' falls through to 'fr' and then
+		// 'en' automatically when no specific extension exists.
+		this.#loadPreferredLanguage();
+
 		// Wait for localization to be ready before loading the form
 		await this.#waitForLocalization();
 
 		this.#initializeForm();
+	}
+
+	#loadPreferredLanguage() {
+		const preferred = navigator.language;
+		if (!preferred) return;
+
+		const cultures = new Set(
+			umbExtensionsRegistry.getByType('localization').map((ext) => ext.meta.culture.toLowerCase()),
+		);
+
+		const preferredLower = preferred.toLowerCase();
+		const languageLower = preferredLower.split('-')[0];
+
+		// Only override the DefaultUILanguage if we actually have a matching translation.
+		// Otherwise we leave the registry on whatever <html lang> set it to.
+		if (cultures.has(preferredLower) || cultures.has(languageLower)) {
+			umbLocalizationRegistry.loadLanguage(preferred);
+		}
 	}
 
 	async #waitForLocalization(): Promise<void> {
@@ -311,13 +347,13 @@ export default class UmbAuthElement extends UmbLitElement {
 		const usernameLayoutItem = createFormLayoutItem(
 			usernameLabel,
 			usernameInput,
-			this.usernameIsEmail ? 'login_requiredEmailValidationMessage' : 'login_requiredUsernameValidationMessage'
+			this.usernameIsEmail ? 'login_requiredEmailValidationMessage' : 'login_requiredUsernameValidationMessage',
 		);
 		const passwordLayoutItem = createFormLayoutPasswordItem(
 			passwordLabel,
 			passwordInput,
 			passwordShowPasswordToggleItem,
-			'login_requiredPasswordValidationMessage'
+			'login_requiredPasswordValidationMessage',
 		);
 		const style = document.createElement('style');
 		style.innerHTML = authStyles;

@@ -27,6 +27,7 @@ import {
 import { redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import './app-logo.element.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
@@ -211,6 +212,14 @@ export class UmbAppElement extends UmbLitElement {
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+
+		// Keep the host's `lang` attribute in sync with the active locale so that
+		// `myApp.lang` always reflects the source of truth (the registry observable),
+		// not a stale snapshot of <html lang> taken at construction time.
+		this.observe(umbLocalizationRegistry.currentLanguage, (lang) => {
+			if (lang) this.lang = lang;
+		});
+
 		this.#setup();
 	}
 
