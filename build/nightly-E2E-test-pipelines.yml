@@ -4,8 +4,8 @@ pr: none
 trigger: none
 
 schedules:
-  - cron: '0 0 * * *'
-    displayName: Daily midnight build (v16/dev)
+  - cron: '0 6 * * *'
+    displayName: Daily 6 AM build (v16/dev)
     branches:
       include:
         - v16/dev
