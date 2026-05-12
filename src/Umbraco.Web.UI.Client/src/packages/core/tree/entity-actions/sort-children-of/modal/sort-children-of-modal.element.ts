@@ -143,23 +143,28 @@ export class UmbSortChildrenOfModalElement<
 		event?.stopPropagation();
 		if (!this.data?.sortChildrenOfRepositoryAlias) throw new Error('sortChildrenOfRepositoryAlias is required');
 
-		const sortChildrenOfRepository = await createExtensionApiByAlias<UmbSortChildrenOfRepository>(
-			this,
-			this.data.sortChildrenOfRepositoryAlias,
-		);
-
 		this._submitButtonState = 'waiting';
 
-		const { error } = await sortChildrenOfRepository.sortChildrenOf({
-			unique: this.data.unique,
-			sorting: this.#getSortOrderOfSortedItems(),
-		});
+		try {
+			const sortChildrenOfRepository = await createExtensionApiByAlias<UmbSortChildrenOfRepository>(
+				this,
+				this.data.sortChildrenOfRepositoryAlias,
+			);
 
-		if (!error) {
-			this._submitButtonState = 'success';
-			this._submitModal();
-		} else {
+			const { error } = await sortChildrenOfRepository.sortChildrenOf({
+				unique: this.data.unique,
+				sorting: this.#getSortOrderOfSortedItems(),
+			});
+
+			if (!error) {
+				this._submitButtonState = 'success';
+				this._submitModal();
+			} else {
+				this._submitButtonState = 'failed';
+			}
+		} catch (error) {
 			this._submitButtonState = 'failed';
+			throw error;
 		}
 	}
 
