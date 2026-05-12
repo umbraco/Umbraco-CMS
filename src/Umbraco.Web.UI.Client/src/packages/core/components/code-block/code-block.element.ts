@@ -1,5 +1,7 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, property, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 
 //TODO consider adding a highlight prop to the code block, that could spin up/access monaco instance and highlight the code
 
@@ -8,7 +10,7 @@ import { css, customElement, html, property, state, when, LitElement } from '@um
  *  @slot - the default slot where the full message resides
  */
 @customElement('umb-code-block')
-export class UmbCodeBlockElement extends LitElement {
+export class UmbCodeBlockElement extends UmbLitElement {
 	@property()
 	language = '';
 
@@ -17,6 +19,8 @@ export class UmbCodeBlockElement extends LitElement {
 
 	@state()
 	private _copyState: 'idle' | 'success' = 'idle';
+
+	readonly #localize = new UmbLocalizationController(this);
 
 	async copyCode() {
 		const text = this.textContent;
@@ -44,7 +48,7 @@ export class UmbCodeBlockElement extends LitElement {
 				${when(
 					this.copy,
 					() => html`
-						<uui-button color=${this._copyState === 'idle' ? 'default' : 'positive'} @click=${this.copyCode}>
+						<uui-button color=${this._copyState === 'idle' ? 'default' : 'positive'} .label=${this._copyState === 'idle' ? this.#localize.term('general_copy') : this.#localize.term('general_copied')} @click=${this.copyCode}>
 							${when(
 								this._copyState === 'idle',
 								() => html`<uui-icon name="copy"></uui-icon> <umb-localize key="general_copy">Copy</umb-localize>`,
