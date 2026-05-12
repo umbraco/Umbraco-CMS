@@ -1,4 +1,5 @@
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -17,6 +18,7 @@ namespace Umbraco.Cms.Api.Management.ServerEvents;
 /// events to connected clients or systems.
 /// </summary>
 internal sealed class ServerEventSender :
+    IDistributedCacheNotificationHandler,
     INotificationAsyncHandler<ContentSavedNotification>,
     INotificationAsyncHandler<ContentSavedBlueprintNotification>,
     INotificationAsyncHandler<ContentTypeSavedNotification>,
