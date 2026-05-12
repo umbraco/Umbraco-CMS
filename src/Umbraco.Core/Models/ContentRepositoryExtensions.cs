@@ -468,6 +468,8 @@ public static class ContentRepositoryExtensions
             content.ClearPublishInfo(culture);
         }
 
+        // Following #22799 the explicit calls to `ClearPublishInfo` for each culture cause the unpublish in all cultures.
+        // `PublishCultureInfos` is set to null purely to retain previous behaviour at a property level.
         content.PublishCultureInfos = null;
     }
 
