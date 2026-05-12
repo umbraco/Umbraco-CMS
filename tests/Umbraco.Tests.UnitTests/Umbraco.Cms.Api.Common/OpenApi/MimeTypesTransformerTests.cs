@@ -6,7 +6,7 @@ using Microsoft.OpenApi;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Common.OpenApi;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Delivery.OpenApi;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Common.OpenApi;
 
 [TestFixture]
 public class MimeTypesTransformerTests
@@ -17,7 +17,39 @@ public class MimeTypesTransformerTests
     public void SetUp() => _transformer = new MimeTypesTransformer();
 
     [Test]
-    public async Task TransformAsync_Removes_Non_Json_MimeTypes_From_Responses()
+    public async Task TransformAsync_Removes_JsonEquivalent_MimeTypes_From_Responses()
+    {
+        // Arrange
+        var operation = new OpenApiOperation
+        {
+            Responses = new OpenApiResponses
+            {
+                ["200"] = new OpenApiResponse
+                {
+                    Content = new Dictionary<string, OpenApiMediaType>
+                    {
+                        ["application/json"] = new(),
+                        ["text/json"] = new(),
+                        ["application/*+json"] = new(),
+                        ["text/plain"] = new(),
+                    },
+                },
+            },
+        };
+
+        OpenApiOperationTransformerContext context = CreateContext();
+
+        // Act
+        await _transformer.TransformAsync(operation, context, CancellationToken.None);
+
+        // Assert
+        var response = (OpenApiResponse)operation.Responses!["200"];
+        Assert.AreEqual(1, response.Content?.Count);
+        Assert.IsTrue(response.Content?.ContainsKey("application/json"));
+    }
+
+    [Test]
+    public async Task TransformAsync_Preserves_NonJsonEquivalent_MimeTypes_When_Json_Present()
     {
         // Arrange
         var operation = new OpenApiOperation
@@ -41,14 +73,15 @@ public class MimeTypesTransformerTests
         // Act
         await _transformer.TransformAsync(operation, context, CancellationToken.None);
 
-        // Assert
+        // Assert - text/plain is removed (JSON-equivalent), application/xml is kept
         var response = (OpenApiResponse)operation.Responses!["200"];
-        Assert.AreEqual(1, response.Content?.Count);
+        Assert.AreEqual(2, response.Content?.Count);
         Assert.IsTrue(response.Content?.ContainsKey("application/json"));
+        Assert.IsTrue(response.Content?.ContainsKey("application/xml"));
     }
 
     [Test]
-    public async Task TransformAsync_Removes_Non_Json_MimeTypes_From_RequestBodies()
+    public async Task TransformAsync_Removes_JsonEquivalent_MimeTypes_From_RequestBodies()
     {
         // Arrange
         var operation = new OpenApiOperation
@@ -58,7 +91,8 @@ public class MimeTypesTransformerTests
                 Content = new Dictionary<string, OpenApiMediaType>
                 {
                     ["application/json"] = new(),
-                    ["application/x-www-form-urlencoded"] = new(),
+                    ["text/json"] = new(),
+                    ["application/*+json"] = new(),
                 },
             },
         };
