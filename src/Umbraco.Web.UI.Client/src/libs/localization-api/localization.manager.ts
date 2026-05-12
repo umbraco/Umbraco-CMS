@@ -37,6 +37,13 @@ export class UmbLocalizationManager {
 	#requestUpdateChangedKeysId?: number = undefined;
 
 	localizations: Map<string, UmbLocalizationSetBase> = new Map();
+
+	/**
+	 * The currently active language and direction. Read-only from a consumer perspective —
+	 * to change the active language, call `umbLocalizationRegistry.loadLanguage(locale)`.
+	 * The fields stay publicly writable for the registry's pipeline; consumers writing here
+	 * directly will only sync the field without loading the matching dictionaries.
+	 */
 	documentDirection: 'ltr' | 'rtl' = (document.documentElement.dir as 'ltr' | 'rtl') || 'ltr';
 	documentLanguage = document.documentElement.lang || navigator.language;
 
