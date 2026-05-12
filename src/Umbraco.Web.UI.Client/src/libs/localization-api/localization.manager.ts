@@ -14,7 +14,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 import type { UmbLocalizationController } from './localization.controller.js';
 import type { UmbLocalizationEntry } from './types/localization.js';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 export type FunctionParams<T> = T extends (...args: infer U) => string ? U : [];
 
@@ -107,25 +106,6 @@ export class UmbLocalizationManager {
 		}
 		this.#changedKeys.clear();
 	}
-
-	/**
-	 * @deprecated Use {@link setActiveLanguage} + {@link notifyLanguageChanged} instead — this method
-	 * previously read `document.documentElement.lang`/`dir` and propagated to consumers; that responsibility
-	 * now lives in `UmbLocalizationRegistry`. Scheduled for removal in Umbraco 20.
-	 */
-	updateAll = () => {
-		new UmbDeprecation({
-			deprecated: 'UmbLocalizationManager.updateAll',
-			solution:
-				'Call setActiveLanguage(lang, dir) and notifyLanguageChanged() explicitly. The active language is now driven by UmbLocalizationRegistry.loadLanguage() rather than mutations to document.documentElement.lang.',
-			removeInVersion: '20.0.0',
-		}).warn();
-		this.setActiveLanguage(
-			document.documentElement.lang || navigator.language,
-			(document.documentElement.dir as 'ltr' | 'rtl') || 'ltr',
-		);
-		this.notifyLanguageChanged();
-	};
 
 	#updateChangedKeys = () => {
 		this.#requestUpdateChangedKeysId = undefined;
