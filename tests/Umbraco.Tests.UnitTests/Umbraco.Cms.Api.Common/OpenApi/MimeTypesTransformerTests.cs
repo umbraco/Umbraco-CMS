@@ -6,7 +6,7 @@ using Microsoft.OpenApi;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Common.OpenApi;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Delivery.OpenApi;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Common.OpenApi;
 
 [TestFixture]
 public class MimeTypesTransformerTests

@@ -117,9 +117,7 @@ public static partial class UmbracoBuilderExtensions
                             doc.Servers?.Clear();
                             return Task.CompletedTask;
                         });
-                        options.AddSchemaTransformer<RequireNonNullablePropertiesSchemaTransformer>();
                         options.AddSchemaTransformer<FixFileReturnTypesTransformer>();
-                        options.AddOperationTransformer<MimeTypesTransformer>();
                         options.AddOperationTransformer<ResponseHeaderTransformer>();
                         options.AddOperationTransformer<NotificationHeaderTransformer>();
                     }));

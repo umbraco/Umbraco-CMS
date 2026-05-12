@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Api.Common.OpenApi;
 /// conventions, default tagging, and title flowing from <c>WithTitle</c>).
 /// </summary>
 [TestFixture]
-internal sealed class BackOfficeOpenApiDocumentExtensionTests : UmbracoTestServerTestBase
+internal sealed class UmbracoBuilderOpenApiExtensionsTests : UmbracoTestServerTestBase
 {
     internal const string ApiName = "test-back-office-api";
 
@@ -31,7 +31,7 @@ internal sealed class BackOfficeOpenApiDocumentExtensionTests : UmbracoTestServe
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)
     {
-        builder.AddMvcAndRazor(mvc => mvc.AddApplicationPart(typeof(BackOfficeOpenApiDocumentExtensionTests).Assembly));
+        builder.AddMvcAndRazor(mvc => mvc.AddApplicationPart(typeof(UmbracoBuilderOpenApiExtensionsTests).Assembly));
 
         builder.AddBackOfficeOpenApiDocument(
             ApiName,
@@ -187,9 +187,9 @@ internal sealed class BackOfficeOpenApiDocumentExtensionTests : UmbracoTestServe
 [ApiController]
 [ApiVersion("1.0")]
 [ApiVersion("2.0")]
-[Route(BackOfficeOpenApiDocumentExtensionTests.ApiName + "/apple")]
+[Route(UmbracoBuilderOpenApiExtensionsTests.ApiName + "/apple")]
 [ApiExplorerSettings(GroupName = "Fruit")]
-[MapToApi(BackOfficeOpenApiDocumentExtensionTests.ApiName)]
+[MapToApi(UmbracoBuilderOpenApiExtensionsTests.ApiName)]
 public class TestBackOfficeApiAppleController : ControllerBase
 {
     [HttpGet("ping")]
@@ -210,9 +210,9 @@ public class TestBackOfficeApiAppleController : ControllerBase
 // "Animal" group name (which sorts BEFORE "Fruit"), this lets the path-sort test distinguish tag-grouping
 // from a naive alphabetical path sort.
 [ApiController]
-[Route(BackOfficeOpenApiDocumentExtensionTests.ApiName + "/zebra")]
+[Route(UmbracoBuilderOpenApiExtensionsTests.ApiName + "/zebra")]
 [ApiExplorerSettings(GroupName = "Animal")]
-[MapToApi(BackOfficeOpenApiDocumentExtensionTests.ApiName)]
+[MapToApi(UmbracoBuilderOpenApiExtensionsTests.ApiName)]
 public class TestBackOfficeApiZebraController : ControllerBase
 {
     [HttpGet("ping")]
@@ -221,7 +221,7 @@ public class TestBackOfficeApiZebraController : ControllerBase
 }
 
 [ApiController]
-[Route(BackOfficeOpenApiDocumentExtensionTests.ApiName + "/unmapped")]
+[Route(UmbracoBuilderOpenApiExtensionsTests.ApiName + "/unmapped")]
 public class TestBackOfficeApiUnmappedController : ControllerBase
 {
     [HttpGet]
