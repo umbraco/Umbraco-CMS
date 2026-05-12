@@ -1,5 +1,4 @@
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, html, customElement, property, LitElement } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, property, LitElement } from '@umbraco-cms/backoffice/external/lit';
 
 /**
  * A passive overlay that frames its parent with a rounded border and shows a label tab
@@ -33,8 +32,7 @@ export class UmbEntityFrameElement extends LitElement {
 		`;
 	}
 
-	static override styles = [
-		UmbTextStyles,
+	static override readonly styles = [
 		css`
 			:host {
 				position: absolute;
@@ -52,8 +50,7 @@ export class UmbEntityFrameElement extends LitElement {
 			.border {
 				position: absolute;
 				inset: 0;
-				border: var(--umb-entity-frame-border-width, 2px) solid
-					var(--umb-entity-frame-color, var(--uui-color-focus));
+				border: var(--umb-entity-frame-border-width, 2px) solid var(--umb-entity-frame-color, var(--uui-color-focus));
 				border-radius: var(--uui-border-radius);
 				border-top-right-radius: 0;
 				box-sizing: border-box;
