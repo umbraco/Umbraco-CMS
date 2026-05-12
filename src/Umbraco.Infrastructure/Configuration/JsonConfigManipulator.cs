@@ -39,7 +39,7 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     /// <inheritdoc />
     public async Task RemoveConnectionStringAsync()
     {
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(UmbracoConnectionStringPath);
+        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(UmbracoConnectionStringPath, preferLast: true);
 
         JsonNode? jsonNode = await GetJsonNodeAsync(provider);
 
@@ -58,7 +58,9 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     /// <inheritdoc />
     public async Task SaveConnectionStringAsync(string connectionString, string? providerName)
     {
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
+        // Target the last JSON provider so connection strings land in the most specific (environment-overriding) file
+        // — typically appsettings.{Environment}.json — instead of the shared appsettings.json.
+        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(preferLast: true);
         JsonNode? node = await GetJsonNodeAsync(provider);
 
         if (node is null)
@@ -247,23 +249,52 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
         }
     }
 
-    private JsonConfigurationProvider? GetJsonConfigurationProvider(string? requiredKey = null)
+    private JsonConfigurationProvider? GetJsonConfigurationProvider(string? requiredKey = null, bool preferLast = false)
     {
         if (_configuration is not IConfigurationRoot configurationRoot)
         {
             return null;
         }
 
-        foreach (IConfigurationProvider provider in configurationRoot.Providers)
+        IEnumerable<IConfigurationProvider> providers = preferLast
+            ? configurationRoot.Providers.Reverse()
+            : configurationRoot.Providers;
+
+        foreach (IConfigurationProvider provider in providers)
         {
-            if (provider is JsonConfigurationProvider jsonConfigurationProvider &&
-                (requiredKey is null || provider.TryGet(requiredKey, out _)))
+            if (provider is not JsonConfigurationProvider jsonConfigurationProvider)
             {
-                return jsonConfigurationProvider;
+                continue;
             }
+
+            if (requiredKey is not null && provider.TryGet(requiredKey, out _) is false)
+            {
+                continue;
+            }
+
+            // When targeting the last provider for writes, skip optional providers whose physical file is missing
+            // (e.g. appsettings.Local.json when running in Debug from source without one) so we fall through to
+            // the most-specific file that actually exists.
+            if (preferLast && JsonProviderFileExists(jsonConfigurationProvider) is false)
+            {
+                continue;
+            }
+
+            return jsonConfigurationProvider;
         }
 
         return null;
+    }
+
+    private static bool JsonProviderFileExists(JsonConfigurationProvider provider)
+    {
+        if (provider.Source.FileProvider is not PhysicalFileProvider physicalFileProvider ||
+            provider.Source.Path is null)
+        {
+            return false;
+        }
+
+        return File.Exists(Path.Combine(physicalFileProvider.Root, provider.Source.Path));
     }
 
     /// <summary>

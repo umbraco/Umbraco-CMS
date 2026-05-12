@@ -1,0 +1,175 @@
+using System.Text.Json.Nodes;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Moq;
+using NUnit.Framework;
+using Umbraco.Cms.Infrastructure.Configuration;
+
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Configuration;
+
+[TestFixture]
+public class JsonConfigManipulatorTests
+{
+    private const string FirstFileName = "appsettings.json";
+    private const string SecondFileName = "appsettings.Development.json";
+    private const string ConnectionString = "Data Source=|DataDirectory|/Umbraco.sqlite.db;Cache=Shared;Foreign Keys=True;Pooling=True";
+    private const string ProviderName = "Microsoft.Data.Sqlite";
+
+    private string _tempPath = null!;
+    private string _firstFilePath = null!;
+    private string _secondFilePath = null!;
+
+    [SetUp]
+    public void SetUp()
+    {
+        _tempPath = Path.Combine(Path.GetTempPath(), "UmbracoTests", Guid.NewGuid().ToString());
+        Directory.CreateDirectory(_tempPath);
+        _firstFilePath = Path.Combine(_tempPath, FirstFileName);
+        _secondFilePath = Path.Combine(_tempPath, SecondFileName);
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        if (Directory.Exists(_tempPath))
+        {
+            Directory.Delete(_tempPath, true);
+        }
+    }
+
+    [Test]
+    public async Task SaveConnectionStringAsync_WritesToLastJsonProvider()
+    {
+        File.WriteAllText(_firstFilePath, "{}");
+        File.WriteAllText(_secondFilePath, "{}");
+
+        JsonConfigManipulator sut = CreateSut(FirstFileName, SecondFileName);
+
+        await sut.SaveConnectionStringAsync(ConnectionString, ProviderName);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsNull(ReadConnectionString(_firstFilePath), "Connection string should not be written to the first JSON provider.");
+            Assert.AreEqual(ConnectionString, ReadConnectionString(_secondFilePath), "Connection string should be written to the last JSON provider.");
+            Assert.AreEqual(ProviderName, ReadProviderName(_secondFilePath));
+        });
+    }
+
+    [Test]
+    public async Task SaveConnectionStringAsync_WithOnlyOneProvider_StillWrites()
+    {
+        File.WriteAllText(_firstFilePath, "{}");
+
+        JsonConfigManipulator sut = CreateSut(FirstFileName);
+
+        await sut.SaveConnectionStringAsync(ConnectionString, ProviderName);
+
+        Assert.AreEqual(ConnectionString, ReadConnectionString(_firstFilePath));
+        Assert.AreEqual(ProviderName, ReadProviderName(_firstFilePath));
+    }
+
+    [Test]
+    public async Task RemoveConnectionStringAsync_RemovesFromLastJsonProviderThatHasKey()
+    {
+        var json = $$"""
+            {
+              "ConnectionStrings": {
+                "umbracoDbDSN": "{{ConnectionString}}",
+                "umbracoDbDSN_ProviderName": "{{ProviderName}}"
+              }
+            }
+            """;
+        File.WriteAllText(_firstFilePath, json);
+        File.WriteAllText(_secondFilePath, json);
+
+        JsonConfigManipulator sut = CreateSut(FirstFileName, SecondFileName);
+
+        await sut.RemoveConnectionStringAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(ConnectionString, ReadConnectionString(_firstFilePath), "Connection string should remain in the earlier file.");
+            Assert.IsNull(ReadConnectionString(_secondFilePath), "Connection string should be removed from the last file.");
+            Assert.IsNull(ReadProviderName(_secondFilePath));
+        });
+    }
+
+    [Test]
+    public async Task SaveConnectionStringAsync_FallsBackWhenLastProviderFileIsMissing()
+    {
+        File.WriteAllText(_firstFilePath, "{}");
+        File.WriteAllText(_secondFilePath, "{}");
+        var missingOptionalFileName = "appsettings.Local.json";
+        var missingOptionalFilePath = Path.Combine(_tempPath, missingOptionalFileName);
+        Assert.IsFalse(File.Exists(missingOptionalFilePath), "Precondition: optional file should not exist on disk.");
+
+        IConfigurationRoot configuration = new ConfigurationBuilder()
+            .SetBasePath(_tempPath)
+            .AddJsonFile(FirstFileName, optional: false, reloadOnChange: false)
+            .AddJsonFile(SecondFileName, optional: false, reloadOnChange: false)
+            .AddJsonFile(missingOptionalFileName, optional: true, reloadOnChange: false)
+            .Build();
+        var sut = new JsonConfigManipulator(configuration, Mock.Of<ILogger<JsonConfigManipulator>>());
+
+        await sut.SaveConnectionStringAsync(ConnectionString, ProviderName);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsNull(ReadConnectionString(_firstFilePath), "Connection string should not be written to the first JSON provider.");
+            Assert.AreEqual(ConnectionString, ReadConnectionString(_secondFilePath), "Connection string should fall back to the last existing JSON provider.");
+            Assert.IsFalse(File.Exists(missingOptionalFilePath), "Optional missing file should not be created by the installer.");
+        });
+    }
+
+    [Test]
+    public async Task SetGlobalIdAsync_StillWritesToFirstProvider()
+    {
+        File.WriteAllText(_firstFilePath, "{}");
+        File.WriteAllText(_secondFilePath, "{}");
+
+        JsonConfigManipulator sut = CreateSut(FirstFileName, SecondFileName);
+
+        var id = Guid.NewGuid().ToString();
+        await sut.SetGlobalIdAsync(id);
+
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(id, ReadJsonValue(_firstFilePath, "Umbraco", "CMS", "Global", "Id"), "Global Id should be written to the first JSON provider (existing behaviour preserved).");
+            Assert.IsNull(ReadJsonValue(_secondFilePath, "Umbraco", "CMS", "Global", "Id"));
+        });
+    }
+
+    private JsonConfigManipulator CreateSut(params string[] fileNames)
+    {
+        IConfigurationBuilder builder = new ConfigurationBuilder().SetBasePath(_tempPath);
+        foreach (var fileName in fileNames)
+        {
+            builder.AddJsonFile(fileName, optional: false, reloadOnChange: false);
+        }
+
+        IConfigurationRoot configuration = builder.Build();
+        return new JsonConfigManipulator(configuration, Mock.Of<ILogger<JsonConfigManipulator>>());
+    }
+
+    private static string? ReadConnectionString(string path) =>
+        ReadJsonValue(path, "ConnectionStrings", "umbracoDbDSN");
+
+    private static string? ReadProviderName(string path) =>
+        ReadJsonValue(path, "ConnectionStrings", "umbracoDbDSN_ProviderName");
+
+    private static string? ReadJsonValue(string path, params string[] segments)
+    {
+        JsonNode? node = JsonNode.Parse(File.ReadAllText(path));
+        foreach (var segment in segments)
+        {
+            if (node is null)
+            {
+                return null;
+            }
+
+            node = node[segment];
+        }
+
+        return node?.GetValue<string>();
+    }
+}
