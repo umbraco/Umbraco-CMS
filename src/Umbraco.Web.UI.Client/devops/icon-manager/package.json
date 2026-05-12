@@ -9,7 +9,7 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"@umbraco-ui/uui": "^1.17.2",
+		"@umbraco-ui/uui": "^2.0.0-alpha.1",
 		"lit": "^3.3.1",
 		"lucide-static": "^1.8.0"
 	},

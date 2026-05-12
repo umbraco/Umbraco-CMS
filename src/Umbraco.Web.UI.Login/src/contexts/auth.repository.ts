@@ -56,7 +56,7 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 		} catch (error) {
 			return {
 				status: 500,
-				error: error instanceof Error ? error.message : this.#localize.term('auth_receivedErrorFromServer'),
+				error: error instanceof Error ? error.message : this.#localize.term('login_receivedErrorFromServer'),
 			};
 		}
 	}
@@ -79,14 +79,14 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 			if (!response.ok) {
 				return {
 					error:
-						response.status === 400 ? this.#localize.term('auth_mfaInvalidCode') : await this.#getErrorText(response),
+						response.status === 400 ? this.#localize.term('login_mfaInvalidCode') : await this.#getErrorText(response),
 				};
 			}
 
 			return {};
 		} catch (error) {
 			return {
-				error: error instanceof Error ? error.message : this.#localize.term('auth_receivedErrorFromServer'),
+				error: error instanceof Error ? error.message : this.#localize.term('login_receivedErrorFromServer'),
 			};
 		}
 	}
@@ -206,16 +206,16 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 		switch (response.status) {
 			case 400:
 			case 401:
-				return this.#localize.term('auth_userFailedLogin');
+				return this.#localize.term('login_userFailedLogin');
 
 			case 402:
-				return this.#localize.term('auth_mfaText');
+				return this.#localize.term('login_mfaText');
 
 			case 403:
-				return this.#localize.term('auth_userLockedOut');
+				return this.#localize.term('login_userLockedOut');
 
 			default:
-				return this.#localize.term('auth_receivedErrorFromServer');
+				return this.#localize.term('login_receivedErrorFromServer');
 		}
 	}
 }
