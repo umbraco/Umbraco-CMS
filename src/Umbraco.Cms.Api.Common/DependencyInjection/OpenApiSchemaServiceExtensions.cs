@@ -30,6 +30,27 @@ internal static class OpenApiSchemaServiceExtensions
         this IServiceCollection services,
         string documentName,
         string jsonOptionsName)
+        => services.ReplaceOpenApiSchemaService(
+            documentName,
+            sp => sp.GetRequiredService<IOptionsMonitor<JsonOptions>>().Get(jsonOptionsName));
+
+    /// <summary>
+    /// Replaces the internal Microsoft <c>OpenApiSchemaService</c> registration for the specified document so that schema
+    /// generation uses the <see cref="JsonOptions"/> instance produced by the supplied factory. Use this overload when
+    /// the options need to be resolved from the service provider, computed at the last moment, or built in a way that
+    /// doesn't fit the named-options lookup.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="documentName">The OpenAPI document key.</param>
+    /// <param name="jsonOptionsFactory">Factory invoked when the schema service is first resolved. Receives the resolving <see cref="IServiceProvider"/> and returns the <see cref="JsonOptions"/> to use.</param>
+    /// <returns>The same <see cref="IServiceCollection"/> for chaining.</returns>
+    /// <remarks>
+    /// Workaround for <see href="https://github.com/dotnet/aspnetcore/issues/66340">dotnet/aspnetcore#66340</see>.
+    /// </remarks>
+    public static IServiceCollection ReplaceOpenApiSchemaService(
+        this IServiceCollection services,
+        string documentName,
+        Func<IServiceProvider, JsonOptions> jsonOptionsFactory)
     {
         ServiceDescriptor descriptor = services.FirstOrDefault(sd =>
             sd.ServiceType.FullName == OpenApiSchemaServiceFullName
@@ -47,7 +68,7 @@ internal static class OpenApiSchemaServiceExtensions
                 sp,
                 descriptor.ServiceType,
                 key,
-                Options.Create(sp.GetRequiredService<IOptionsMonitor<JsonOptions>>().Get(jsonOptionsName))));
+                Options.Create(jsonOptionsFactory(sp))));
 
         return services;
     }

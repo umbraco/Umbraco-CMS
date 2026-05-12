@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
-using Umbraco.Cms.Api.Common.Configuration;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Delivery.OpenApi.Extensions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -533,7 +533,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
     }
 
     private static string? GetSchemaId(JsonTypeInfo type)
-        => ConfigureUmbracoOpenApiOptionsBase.CreateSchemaReferenceId(type);
+        => UmbracoSchemaIdGenerator.CreateSchemaReferenceId(type);
 
     /// <summary>
     /// Creates a temporary placeholder schema to break circular reference chains during schema generation.
