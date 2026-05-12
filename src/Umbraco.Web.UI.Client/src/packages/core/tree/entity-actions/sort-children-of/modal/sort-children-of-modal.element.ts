@@ -8,6 +8,7 @@ import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbTableColumn,
 	UmbTableConfig,
@@ -45,6 +46,9 @@ export class UmbSortChildrenOfModalElement<
 
 	@state()
 	private _sortable = false;
+
+	@state()
+	private _submitButtonState?: UUIButtonState;
 
 	protected _sortedUniques = new Set<string>();
 
@@ -143,13 +147,18 @@ export class UmbSortChildrenOfModalElement<
 			this.data.sortChildrenOfRepositoryAlias,
 		);
 
+		this._submitButtonState = 'waiting';
+
 		const { error } = await sortChildrenOfRepository.sortChildrenOf({
 			unique: this.data.unique,
 			sorting: this.#getSortOrderOfSortedItems(),
 		});
 
 		if (!error) {
+			this._submitButtonState = 'success';
 			this._submitModal();
+		} else {
+			this._submitButtonState = 'failed';
 		}
 	}
 
@@ -213,7 +222,13 @@ export class UmbSortChildrenOfModalElement<
 			<umb-body-layout headline=${this.localize.term('actions_sort')}>
 				${this._children.length === 0 ? this.#renderEmptyState() : this.#renderTable()}
 				<uui-button slot="actions" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}"></uui-button>
-				<uui-button slot="actions" color="positive" look="primary" label=${this.localize.term('general_sort')} @click=${this.#onSubmit}></uui-button>
+				<uui-button
+					slot="actions"
+					color="positive"
+					look="primary"
+					label=${this.localize.term('general_sort')}
+					.state=${this._submitButtonState}
+					@click=${this.#onSubmit}></uui-button>
 			</umb-body-layout>
 		`;
 	}
