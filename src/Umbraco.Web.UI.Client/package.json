@@ -45,7 +45,6 @@
 		"./document-type": "./dist-cms/packages/documents/document-types/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",
 		"./dropzone": "./dist-cms/packages/media/dropzone/index.js",
-		"./element": "./dist-cms/packages/elements/index.js",
 		"./entity-action": "./dist-cms/packages/core/entity-action/index.js",
 		"./entity-bulk-action": "./dist-cms/packages/core/entity-bulk-action/index.js",
 		"./entity-create-option-action": "./dist-cms/packages/core/entity-create-option-action/index.js",
@@ -65,7 +64,6 @@
 		"./imaging": "./dist-cms/packages/media/imaging/index.js",
 		"./interaction-memory": "./dist-cms/packages/core/interaction-memory/index.js",
 		"./language": "./dist-cms/packages/language/index.js",
-		"./library": "./dist-cms/packages/library/index.js",
 		"./lit-element": "./dist-cms/packages/core/lit-element/index.js",
 		"./localization": "./dist-cms/packages/core/localization/index.js",
 		"./log-viewer": "./dist-cms/packages/log-viewer/index.js",
@@ -228,8 +226,8 @@
 		"generate:ui-api-docs": "npm run generate:check-const-test && typedoc --options typedoc.config.js"
 	},
 	"engines": {
-		"node": ">=24.13",
-		"npm": ">=11"
+		"node": ">=22.17.1",
+		"npm": ">=10.9.2"
 	},
 	"dependencies": {
 		"element-internals-polyfill": "^3.0.2"
@@ -264,7 +262,7 @@
 		"eslint-plugin-wc": "^3.1.0",
 		"globals": "^17.5.0",
 		"madge": "^8.0.0",
-		"msw": "^2.13.5",
+		"msw": "^2.13.3",
 		"playwright-msw": "^3.0.1",
 		"postcss": "^8.5.9",
 		"postcss-cli": "^11.0.1",
@@ -275,9 +273,9 @@
 		"tiny-glob": "^0.2.9",
 		"tsc-alias": "^1.8.16",
 		"typedoc": "^0.28.19",
-		"typescript": "6.0.3",
-		"typescript-eslint": "^8.59.0",
-		"typescript-json-schema": "^0.67.1",
+		"typescript": "5.9.3",
+		"typescript-eslint": "^8.45.0",
+		"typescript-json-schema": "^0.65.1",
 		"vite": "^7.3.2",
 		"vite-plugin-static-copy": "^3.2.0",
 		"vite-tsconfig-paths": "^6.1.1",
