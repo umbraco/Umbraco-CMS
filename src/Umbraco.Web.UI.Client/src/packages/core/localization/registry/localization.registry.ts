@@ -54,8 +54,9 @@ function toCanonicalLocale(locale: string): string {
 }
 
 /**
- * Returns the lowercase BCP-47 base name (`language[-region]`) of a locale tag.
- * E.g. `'en-US'` → `'en-us'`, `'da-DK'` → `'da-dk'`.
+ * Returns the lowercase BCP-47 base name (`language[-script][-region]`) of a locale tag, e.g.
+ * `'en-US'` → `'en-us'`, `'zh-Hant-TW'` → `'zh-hant-tw'`. The input is expected to already be
+ * a canonical locale (use {@link toCanonicalLocale} first if it might not be).
  * @param {string} locale - the locale to extract the base name from.
  * @returns {string} the lowercase base name of the locale.
  */

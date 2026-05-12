@@ -111,14 +111,14 @@ export class UmbLocalizationManager {
 	/**
 	 * @deprecated Use {@link setActiveLanguage} + {@link notifyLanguageChanged} instead — this method
 	 * previously read `document.documentElement.lang`/`dir` and propagated to consumers; that responsibility
-	 * now lives in `UmbLocalizationRegistry`. Scheduled for removal in Umbraco 19.
+	 * now lives in `UmbLocalizationRegistry`. Scheduled for removal in Umbraco 20.
 	 */
 	updateAll = () => {
 		new UmbDeprecation({
 			deprecated: 'UmbLocalizationManager.updateAll',
 			solution:
 				'Call setActiveLanguage(lang, dir) and notifyLanguageChanged() explicitly. The active language is now driven by UmbLocalizationRegistry.loadLanguage() rather than mutations to document.documentElement.lang.',
-			removeInVersion: '19.0.0',
+			removeInVersion: '20.0.0',
 		}).warn();
 		this.setActiveLanguage(
 			document.documentElement.lang || navigator.language,
