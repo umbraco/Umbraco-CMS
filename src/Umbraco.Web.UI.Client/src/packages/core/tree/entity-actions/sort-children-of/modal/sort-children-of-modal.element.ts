@@ -139,6 +139,7 @@ export class UmbSortChildrenOfModalElement<
 	}
 
 	async #onSubmit(event: PointerEvent) {
+		if (this._submitButtonState === 'waiting') return;
 		event?.stopPropagation();
 		if (!this.data?.sortChildrenOfRepositoryAlias) throw new Error('sortChildrenOfRepositoryAlias is required');
 
