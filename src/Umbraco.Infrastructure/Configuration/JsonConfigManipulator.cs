@@ -272,10 +272,11 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
                 continue;
             }
 
-            // When targeting the last provider for writes, skip optional providers whose physical file is missing
-            // (e.g. appsettings.Local.json when running in Debug from source without one) so we fall through to
-            // the most-specific file that actually exists.
-            if (preferLast && JsonProviderFileExists(jsonConfigurationProvider) is false)
+            // When targeting the last provider for writes, skip any JSON provider we can't actually read or write
+            // to as a file on disk: non-physical sources (in-memory, embedded) and physical sources whose file
+            // is missing (e.g. appsettings.Local.json registered as optional but not present when running in
+            // Debug from source). This makes the lookup fall through to the most-specific writable file.
+            if (preferLast && IsWritableJsonFile(jsonConfigurationProvider) is false)
             {
                 continue;
             }
@@ -286,7 +287,7 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
         return null;
     }
 
-    private static bool JsonProviderFileExists(JsonConfigurationProvider provider)
+    private static bool IsWritableJsonFile(JsonConfigurationProvider provider)
     {
         if (provider.Source.FileProvider is not PhysicalFileProvider physicalFileProvider ||
             provider.Source.Path is null)
