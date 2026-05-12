@@ -660,30 +660,39 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
         PublishContent(content, ["*"]);
 
         SetVariationContext(culture, null);
+        AssertBlockValues();
 
-        var expectedReusableElementVariantText = culture == "en-US" ? "English" : "Danish";
-        var publishedContent = GetPublishedContent(content.Key);
-        var value = publishedContent.Value<BlockListModel>("blocks");
-        Assert.IsNotNull(value);
-        Assert.AreEqual(2, value.Count);
+        culture = culture == "en-US" ? "da-DK" : "en-US";
+        SetVariationContext(culture, null);
+        AssertBlockValues();
 
-        var blockListItem = value.First();
-        Assert.AreEqual(2, blockListItem.Content.Properties.Count());
-
-        Assert.Multiple(() =>
+        void AssertBlockValues()
         {
-            Assert.AreEqual(localElementKey, blockListItem.ContentKey);
-            Assert.AreEqual("The local invariant text", blockListItem.Content.Value<string>("invariantText"));
-            Assert.AreEqual($"The local variant text", blockListItem.Content.Value<string>("variantText"));
-        });
+            var expectedReusableElementVariantText = culture == "en-US" ? "English" : "Danish";
 
-        blockListItem = value.Last();
-        Assert.Multiple(() =>
-        {
-            Assert.AreEqual(reusableElementKey, blockListItem.ContentKey);
-            Assert.AreEqual("The reusable invariant text", blockListItem.Content.Value<string>("invariantText"));
-            Assert.AreEqual($"The reusable {expectedReusableElementVariantText} text", blockListItem.Content.Value<string>("variantText"));
-        });
+            var publishedContent = GetPublishedContent(content.Key);
+            var value = publishedContent.Value<BlockListModel>("blocks");
+            Assert.IsNotNull(value);
+            Assert.AreEqual(2, value.Count);
+
+            var blockListItem = value.First();
+            Assert.AreEqual(2, blockListItem.Content.Properties.Count());
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(localElementKey, blockListItem.ContentKey);
+                Assert.AreEqual("The local invariant text", blockListItem.Content.Value<string>("invariantText"));
+                Assert.AreEqual($"The local variant text", blockListItem.Content.Value<string>("variantText"));
+            });
+
+            blockListItem = value.Last();
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(reusableElementKey, blockListItem.ContentKey);
+                Assert.AreEqual("The reusable invariant text", blockListItem.Content.Value<string>("invariantText"));
+                Assert.AreEqual($"The reusable {expectedReusableElementVariantText} text", blockListItem.Content.Value<string>("variantText"));
+            });
+        }
     }
 
     [TestCase(true, true)]
