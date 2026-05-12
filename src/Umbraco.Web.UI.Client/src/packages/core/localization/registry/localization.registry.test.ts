@@ -142,8 +142,8 @@ describe('UmbLocalizeController', () => {
 		expect(registry.localizations.size).to.equal(3, 'Should have registered the 3rd language (da)');
 	});
 
-	it('should set the document language and direction', async () => {
-		expect(document.documentElement.lang).to.equal(english.meta.culture);
+	it('should set the manager language and document direction', async () => {
+		expect(umbLocalizationManager.documentLanguage).to.equal(english.meta.culture);
 		expect(document.documentElement.dir).to.equal(english.meta.direction);
 	});
 
@@ -205,15 +205,15 @@ describe('UmbLocalizeController', () => {
 	});
 
 	it('should be able to switch to the fallback language', async () => {
-		// Verify that the document language and direction is set correctly to the default language
-		expect(document.documentElement.lang).to.equal(english.meta.culture);
+		// Verify that the manager language and document direction is set correctly to the default language
+		expect(umbLocalizationManager.documentLanguage).to.equal(english.meta.culture);
 		expect(document.documentElement.dir).to.equal(english.meta.direction);
 
 		// Switch to the fallback language, which is the UK version of English
 		registry.loadLanguage('en');
 		await aTimeout(0);
 
-		expect(document.documentElement.lang).to.equal('en');
+		expect(umbLocalizationManager.documentLanguage).to.equal('en');
 		expect(document.documentElement.dir).to.equal('ltr');
 
 		const current = registry.localizations.get(englishUk.meta.culture);
@@ -223,7 +223,7 @@ describe('UmbLocalizeController', () => {
 		registry.loadLanguage('en-us');
 		await aTimeout(0);
 
-		expect(document.documentElement.lang).to.equal('en-us');
+		expect(umbLocalizationManager.documentLanguage).to.equal('en-us');
 		expect(document.documentElement.dir).to.equal('ltr');
 
 		const newCurrent = registry.localizations.get(english.meta.culture);
@@ -257,45 +257,40 @@ describe('UmbLocalizeController', () => {
 describe('UmbLocalizationRegistry initialization', () => {
 	// The fixture extensions are registered when the suite above runs; they are global
 	// to the extension registry, so they are already available here too.
-
-	const originalLang = document.documentElement.lang;
-	const originalDir = document.documentElement.dir;
 	let registry: UmbLocalizationRegistry;
 
 	afterEach(() => {
 		registry?.destroy();
 		umbLocalizationManager.localizations.clear();
-		document.documentElement.lang = originalLang;
-		document.documentElement.dir = originalDir;
 	});
 
-	it('honors document.documentElement.lang on construction', async () => {
-		// Simulate Razor having rendered <html lang="@DefaultUILanguage"> with "da-dk".
-		document.documentElement.lang = 'da-dk';
-
+	it('loads the language a host element passes via loadLanguage()', async () => {
 		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		registry.loadLanguage('da-dk');
 		await aTimeout(0);
 
-		expect(registry.localizations.has('da-dk'), 'expected the configured locale to be loaded').to.be.true;
-		expect(document.documentElement.lang, 'expected <html lang> to reflect the configured locale').to.equal('da-dk');
+		expect(registry.localizations.has('da-dk'), 'expected the requested locale to be loaded').to.be.true;
 	});
 
 	it('always loads the English fallback dictionary alongside the active language', async () => {
-		document.documentElement.lang = 'da-dk';
-
 		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		registry.loadLanguage('da-dk');
 		await aTimeout(0);
 
-		// The active language is loaded.
 		expect(registry.localizations.has('da-dk'), 'expected active "da-dk" to be loaded').to.be.true;
-		// The fallback ("en") is loaded so that missing-key lookups can still resolve via fallback.
 		expect(registry.localizations.has('en'), 'expected fallback "en" to be loaded').to.be.true;
 	});
 
-	it('falls back to the default culture when document.documentElement.lang is empty', async () => {
-		document.documentElement.lang = '';
-
+	it('starts on the default culture when no host has called loadLanguage', async () => {
 		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		await aTimeout(0);
+
+		expect(registry.localizations.has('en'), 'expected default "en" to be loaded').to.be.true;
+	});
+
+	it('falls back to the default culture when loadLanguage is called with empty or invalid input', async () => {
+		registry = new UmbLocalizationRegistry(umbExtensionsRegistry);
+		registry.loadLanguage('');
 		await aTimeout(0);
 
 		expect(registry.localizations.has('en'), 'expected default "en" to be loaded').to.be.true;

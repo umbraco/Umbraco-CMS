@@ -232,6 +232,11 @@ export default class UmbAuthElement extends UmbLitElement {
 	override connectedCallback() {
 		super.connectedCallback();
 
+		// The host's `lang` attribute is set by Razor from GlobalSettings.DefaultUILanguage.
+		// Use it as the initial active language; current-user.context overrides it after login.
+		if (this.lang) {
+			umbLocalizationRegistry.loadLanguage(this.lang);
+		}
 		this.observe(umbLocalizationRegistry.currentLanguage, (lang) => {
 			if (lang) this.lang = lang;
 		});
@@ -244,36 +249,10 @@ export default class UmbAuthElement extends UmbLitElement {
 		// Register the main package for Umbraco.Auth
 		umbExtensionsRegistry.registerMany(extensions);
 
-		this.#applyPreferredLanguage();
-
 		// Wait for localization to be ready before loading the form
 		await this.#waitForLocalization();
 
 		this.#initializeForm();
-	}
-
-	/**
-	 * Respect the admin's configured DefaultUILanguage when a translation for it is available,
-	 * otherwise fall back to the visitor's `navigator.language` if we have a translation for that.
-	 * Without this, a visitor whose browser is set to English would override an admin's explicit
-	 * `DefaultUILanguage` configuration.
-	 */
-	#applyPreferredLanguage() {
-		const cultures = new Set(
-			umbExtensionsRegistry.getByType('localization').map((ext) => ext.meta.culture.toLowerCase()),
-		);
-		const hasMatch = (tag: string) => {
-			const lower = tag.toLowerCase();
-			return cultures.has(lower) || cultures.has(lower.split('-')[0]);
-		};
-
-		const configured = document.documentElement.lang;
-		if (configured && hasMatch(configured)) return;
-
-		const preferred = navigator.language;
-		if (preferred && hasMatch(preferred)) {
-			umbLocalizationRegistry.loadLanguage(preferred);
-		}
 	}
 
 	async #waitForLocalization(): Promise<void> {

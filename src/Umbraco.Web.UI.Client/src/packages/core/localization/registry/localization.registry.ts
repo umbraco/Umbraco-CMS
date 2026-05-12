@@ -65,7 +65,11 @@ function baseLocaleOf(locale: string): string {
 }
 
 export class UmbLocalizationRegistry {
-	#currentLanguage = new UmbStringState(toCanonicalLocale(document.documentElement.lang));
+	// The active language is driven by the consuming host element (<umb-app>, <umb-auth>) via
+	// `loadLanguage()` — Razor sets `lang="@DefaultUILanguage"` on those, the element passes
+	// it through on connect, and current-user.context takes over after login. The default here
+	// is just the bootstrap value before any host has connected.
+	#currentLanguage = new UmbStringState(UMB_DEFAULT_LOCALIZATION_CULTURE);
 	readonly currentLanguage = this.#currentLanguage.asObservable();
 
 	/**
@@ -88,16 +92,15 @@ export class UmbLocalizationRegistry {
 				filter((currentLanguage) => !!currentLanguage),
 				// Use distinctUntilChanged to avoid unnecessary re-renders when the language hasn't changed
 				distinctUntilChanged(),
-				// Mirror the active language onto the document and the manager synchronously, so a
-				// fresh element rendering between now and the async translation load picks up the
-				// requested language. Direction is set further down once we know which dictionary
-				// won; consumers are notified there too.
+				// Mirror the active language onto the manager synchronously, so a fresh element
+				// rendering between now and the async translation load picks up the requested
+				// language. Direction is set further down once we know which dictionary won;
+				// consumers are notified there too.
 				tap((currentLanguage) => {
-					const newLang = baseLocaleOf(currentLanguage);
-					if (document.documentElement.lang.toLowerCase() !== newLang) {
-						document.documentElement.lang = newLang;
-					}
-					umbLocalizationManager.setActiveLanguage(newLang, umbLocalizationManager.documentDirection);
+					umbLocalizationManager.setActiveLanguage(
+						baseLocaleOf(currentLanguage),
+						umbLocalizationManager.documentDirection,
+					);
 				}),
 				// Switch to the extensions registry to get the current language and the extensions for that language
 				// Note: This also cancels the previous subscription if the language changes

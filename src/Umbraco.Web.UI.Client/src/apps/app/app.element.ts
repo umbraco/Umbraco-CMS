@@ -213,6 +213,11 @@ export class UmbAppElement extends UmbLitElement {
 	override connectedCallback(): void {
 		super.connectedCallback();
 
+		// The host's `lang` attribute is set by Razor from GlobalSettings.DefaultUILanguage.
+		// Use it as the initial active language; current-user.context overrides it after login.
+		if (this.lang) {
+			umbLocalizationRegistry.loadLanguage(this.lang);
+		}
 		this.observe(umbLocalizationRegistry.currentLanguage, (lang) => {
 			if (lang) this.lang = lang;
 		});
