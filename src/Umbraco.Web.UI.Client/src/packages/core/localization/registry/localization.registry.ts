@@ -41,8 +41,8 @@ function addOrUpdateDictionary(
  * Returns the canonical form of the given locale, or the default culture if the input is empty or
  * cannot be canonicalised. `Intl.getCanonicalLocales` throws RangeError for malformed input so we
  * intentionally swallow it here — a misconfigured DefaultUILanguage should fall back, not crash.
- * @param {string} locale The locale to canonicalise.
- * @returns {string} The canonical locale, or the default culture if invalid.
+ * @param {string} locale - the locale to canonicalise.
+ * @returns {string} the canonical locale, or the default culture if invalid.
  */
 function toCanonicalLocale(locale: string): string {
 	if (!locale) return UMB_DEFAULT_LOCALIZATION_CULTURE;
@@ -51,6 +51,16 @@ function toCanonicalLocale(locale: string): string {
 	} catch {
 		return UMB_DEFAULT_LOCALIZATION_CULTURE;
 	}
+}
+
+/**
+ * Returns the lowercase BCP-47 base name (`language[-region]`) of a locale tag.
+ * E.g. `'en-US'` → `'en-us'`, `'da-DK'` → `'da-dk'`.
+ * @param {string} locale - the locale to extract the base name from.
+ * @returns {string} the lowercase base name of the locale.
+ */
+function baseLocaleOf(locale: string): string {
+	return new Intl.Locale(locale).baseName.toLowerCase();
 }
 
 export class UmbLocalizationRegistry {
@@ -77,20 +87,16 @@ export class UmbLocalizationRegistry {
 				filter((currentLanguage) => !!currentLanguage),
 				// Use distinctUntilChanged to avoid unnecessary re-renders when the language hasn't changed
 				distinctUntilChanged(),
-				// Synchronously mirror the active language to the document and manager (silently).
-				// This must happen synchronously so that any controller rendering between now and
-				// translations finishing loading sees the requested language — otherwise the first
-				// render of a fresh element after `loadLanguage(...)` would use the previous language.
-				// We don't fire `documentUpdate` here because translations are still loading; that
-				// happens once the dictionaries are in place (see `#setBrowserLanguage`).
+				// Mirror the active language onto the document and the manager synchronously, so a
+				// fresh element rendering between now and the async translation load picks up the
+				// requested language. Direction is set further down once we know which dictionary
+				// won; consumers are notified there too.
 				tap((currentLanguage) => {
-					const newLang = new Intl.Locale(currentLanguage).baseName.toLowerCase();
+					const newLang = baseLocaleOf(currentLanguage);
 					if (document.documentElement.lang.toLowerCase() !== newLang) {
 						document.documentElement.lang = newLang;
 					}
-					umbLocalizationManager.setActiveLanguage(newLang, umbLocalizationManager.documentDirection, {
-						silent: true,
-					});
+					umbLocalizationManager.setActiveLanguage(newLang, umbLocalizationManager.documentDirection);
 				}),
 				// Switch to the extensions registry to get the current language and the extensions for that language
 				// Note: This also cancels the previous subscription if the language changes
@@ -186,26 +192,17 @@ export class UmbLocalizationRegistry {
 	#setBrowserLanguage(locale: Intl.Locale, translations: UmbLocalizationSetBase[]) {
 		const newLang = locale.baseName.toLowerCase();
 
-		// Resolve direction from the best-matching translation: regional match wins, else
-		// language-only match, else default to 'ltr'.
+		// Regional match wins, then language-only match, then default to LTR.
 		const reverseTranslations = translations.slice().reverse();
-		const directMatch = reverseTranslations.find((t) => t.$code.toLowerCase() === newLang);
 		const bestMatch =
-			directMatch ?? reverseTranslations.find((t) => t.$code.toLowerCase() === locale.language.toLowerCase());
+			reverseTranslations.find((t) => t.$code.toLowerCase() === newLang) ??
+			reverseTranslations.find((t) => t.$code.toLowerCase() === locale.language.toLowerCase());
 		const direction: 'ltr' | 'rtl' = bestMatch?.$dir ?? 'ltr';
 
-		// Lang was already mirrored synchronously in the upstream `tap` so the manager and the
-		// document attribute are in sync. Update the direction now that we know which dictionary
-		// won (the language code alone does not tell us LTR vs RTL).
 		if (document.documentElement.dir !== direction) {
 			document.documentElement.dir = direction;
 		}
-		if (umbLocalizationManager.documentDirection !== direction) {
-			umbLocalizationManager.setActiveLanguage(newLang, direction, { silent: true });
-		}
-
-		// Translations are now available — tell connected controllers that the active language's
-		// dictionaries have changed so they re-render with the freshly loaded terms.
+		umbLocalizationManager.setActiveLanguage(newLang, direction);
 		umbLocalizationManager.notifyLanguageChanged();
 	}
 

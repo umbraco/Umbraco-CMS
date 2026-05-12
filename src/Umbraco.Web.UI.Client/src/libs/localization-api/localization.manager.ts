@@ -80,42 +80,20 @@ export class UmbLocalizationManager {
 	}
 
 	/**
-	 * Sets the active language and direction and notifies all connected controllers.
-	 * This is the single channel through which the manager learns of a language change;
-	 * callers should not write to `document.documentElement.lang` for this purpose.
-	 * @param {string} language The language code to set as active.
-	 * @param {'ltr' | 'rtl'} [direction] The direction associated with the language.
+	 * Updates the active language and direction on the manager without notifying consumers.
+	 * Pair this with {@link notifyLanguageChanged} when consumers should react.
+	 * @param {string} language - the language code to set as active; falls back to {@link UMB_DEFAULT_LOCALIZATION_CULTURE} when empty.
+	 * @param {'ltr' | 'rtl'} [direction] - the direction associated with the language (defaults to `'ltr'`).
 	 */
-	setActiveLanguage(language: string, direction: 'ltr' | 'rtl' = 'ltr', options?: { silent?: boolean }) {
-		const newLang = language || UMB_DEFAULT_LOCALIZATION_CULTURE;
-		const changed = this.documentLanguage !== newLang || this.documentDirection !== direction;
-
-		this.documentLanguage = newLang;
+	setActiveLanguage(language: string, direction: 'ltr' | 'rtl' = 'ltr') {
+		this.documentLanguage = language || UMB_DEFAULT_LOCALIZATION_CULTURE;
 		this.documentDirection = direction;
-
-		// When `silent` is set, callers want to update the fields without notifying consumers.
-		// This is used by the registry to set the active language synchronously when it changes,
-		// so controllers can pick up the new language on their next render, while deferring the
-		// `documentUpdate` notification until translations have actually loaded.
-		if (options?.silent || !changed) return;
-
-		this.connectedControllers.forEach((ctrl) => {
-			ctrl.documentUpdate();
-		});
-
-		if (this.#requestUpdateChangedKeysId) {
-			cancelAnimationFrame(this.#requestUpdateChangedKeysId);
-			this.#requestUpdateChangedKeysId = undefined;
-		}
-		this.#changedKeys.clear();
 	}
 
 	/**
-	 * Explicitly notify all connected controllers that the active language or its translations
-	 * have changed. Use this after registering or loading a new set of translations, when the
-	 * `documentLanguage`/`documentDirection` fields may not have changed but the underlying
-	 * dictionaries did. Tests around the unrelated key-change debounce still rely on the
-	 * documentUpdate path being the canonical "force-rerender" channel.
+	 * Tells all connected controllers to re-render against the current active language and
+	 * dictionaries. Use after a batch of {@link registerLocalization} or {@link setActiveLanguage}
+	 * calls to flush the result in one go.
 	 */
 	notifyLanguageChanged() {
 		this.connectedControllers.forEach((ctrl) => {

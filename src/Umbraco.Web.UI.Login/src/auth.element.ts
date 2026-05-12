@@ -232,9 +232,6 @@ export default class UmbAuthElement extends UmbLitElement {
 	override connectedCallback() {
 		super.connectedCallback();
 
-		// Mirror the active locale onto the host element so that downstream components can
-		// resolve their `lang` from the closest ancestor with one set, rather than relying
-		// on a side-effect read of <html lang>.
 		this.observe(umbLocalizationRegistry.currentLanguage, (lang) => {
 			if (lang) this.lang = lang;
 		});
@@ -247,11 +244,7 @@ export default class UmbAuthElement extends UmbLitElement {
 		// Register the main package for Umbraco.Auth
 		umbExtensionsRegistry.registerMany(extensions);
 
-		// Now that localization extensions are registered, prefer the visitor's browser language
-		// over the configured DefaultUILanguage if we actually have a translation for it. The
-		// pipeline matches `baseName` then `language`, so 'fr-CA' falls through to 'fr' and then
-		// 'en' automatically when no specific extension exists.
-		this.#loadPreferredLanguage();
+		this.#applyPreferredLanguage();
 
 		// Wait for localization to be ready before loading the form
 		await this.#waitForLocalization();
@@ -259,26 +252,26 @@ export default class UmbAuthElement extends UmbLitElement {
 		this.#initializeForm();
 	}
 
-	#loadPreferredLanguage() {
+	/**
+	 * Respect the admin's configured DefaultUILanguage when a translation for it is available,
+	 * otherwise fall back to the visitor's `navigator.language` if we have a translation for that.
+	 * Without this, a visitor whose browser is set to English would override an admin's explicit
+	 * `DefaultUILanguage` configuration.
+	 */
+	#applyPreferredLanguage() {
 		const cultures = new Set(
 			umbExtensionsRegistry.getByType('localization').map((ext) => ext.meta.culture.toLowerCase()),
 		);
+		const hasMatch = (tag: string) => {
+			const lower = tag.toLowerCase();
+			return cultures.has(lower) || cultures.has(lower.split('-')[0]);
+		};
 
-		// If the configured DefaultUILanguage already has a matching translation, respect the
-		// admin's choice. Only fall back to the visitor's browser language when the configured
-		// default has no translation available — that's the case where the visitor would otherwise
-		// see English regardless of what the admin configured.
-		const configured = document.documentElement.lang.toLowerCase();
-		const configuredLanguage = configured.split('-')[0];
-		if (configured && (cultures.has(configured) || cultures.has(configuredLanguage))) {
-			return;
-		}
+		const configured = document.documentElement.lang;
+		if (configured && hasMatch(configured)) return;
 
 		const preferred = navigator.language;
-		if (!preferred) return;
-		const preferredLower = preferred.toLowerCase();
-		const preferredLanguage = preferredLower.split('-')[0];
-		if (cultures.has(preferredLower) || cultures.has(preferredLanguage)) {
+		if (preferred && hasMatch(preferred)) {
 			umbLocalizationRegistry.loadLanguage(preferred);
 		}
 	}

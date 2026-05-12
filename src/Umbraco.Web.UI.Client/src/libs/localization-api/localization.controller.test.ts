@@ -503,6 +503,32 @@ describe('UmbLocalizationController', () => {
 });
 
 describe('UmbLocalizationManager.setActiveLanguage', () => {
+	function createCountingController() {
+		let updates = 0;
+		const host = {
+			getHostElement: () => {
+				const el = document.createElement('div') as HTMLElement & { requestUpdate?: () => void };
+				el.requestUpdate = () => {
+					updates++;
+				};
+				return el;
+			},
+			addUmbController: () => {},
+			removeUmbController: () => {},
+			hasUmbController: () => false,
+			getUmbControllers: () => [],
+			removeUmbControllerByAlias: () => {},
+		} satisfies UmbControllerHost;
+		const controller = new UmbLocalizationController(host);
+		controller.hostConnected();
+		return {
+			controller,
+			get updates() {
+				return updates;
+			},
+		};
+	}
+
 	beforeEach(() => {
 		umbLocalizationManager.registerManyLocalizations([english, danish, danishRegional]);
 		umbLocalizationManager.setActiveLanguage(initialLanguage, 'ltr');
@@ -520,55 +546,22 @@ describe('UmbLocalizationManager.setActiveLanguage', () => {
 		expect(umbLocalizationManager.documentDirection).to.equal('ltr');
 	});
 
-	it('notifies connected controllers when the language changes', async () => {
-		let updates = 0;
-		const host = {
-			getHostElement: () => {
-				const el = document.createElement('div') as HTMLElement & { requestUpdate?: () => void };
-				el.requestUpdate = () => {
-					updates++;
-				};
-				return el;
-			},
-			addUmbController: () => {},
-			removeUmbController: () => {},
-			hasUmbController: () => false,
-			getUmbControllers: () => [],
-			removeUmbControllerByAlias: () => {},
-		} satisfies UmbControllerHost;
-		const controller = new UmbLocalizationController(host);
-		controller.hostConnected();
+	it('does not notify consumers on its own — callers must follow up with notifyLanguageChanged()', () => {
+		const probe = createCountingController();
 
-		updates = 0;
 		umbLocalizationManager.setActiveLanguage('da-dk', 'ltr');
 
-		expect(updates, 'expected the controller to receive a documentUpdate').to.equal(1);
-		controller.destroy();
+		expect(probe.updates).to.equal(0);
+		probe.controller.destroy();
 	});
 
-	it('is a no-op when called with the same language and direction', async () => {
-		let updates = 0;
-		const host = {
-			getHostElement: () => {
-				const el = document.createElement('div') as HTMLElement & { requestUpdate?: () => void };
-				el.requestUpdate = () => {
-					updates++;
-				};
-				return el;
-			},
-			addUmbController: () => {},
-			removeUmbController: () => {},
-			hasUmbController: () => false,
-			getUmbControllers: () => [],
-			removeUmbControllerByAlias: () => {},
-		} satisfies UmbControllerHost;
-		const controller = new UmbLocalizationController(host);
-		controller.hostConnected();
+	it('notifyLanguageChanged() flushes pending updates to connected controllers', () => {
+		const probe = createCountingController();
 
-		updates = 0;
-		umbLocalizationManager.setActiveLanguage(initialLanguage, 'ltr');
+		umbLocalizationManager.setActiveLanguage('da-dk', 'ltr');
+		umbLocalizationManager.notifyLanguageChanged();
 
-		expect(updates, 'expected no update when nothing changes').to.equal(0);
-		controller.destroy();
+		expect(probe.updates).to.equal(1);
+		probe.controller.destroy();
 	});
 });
