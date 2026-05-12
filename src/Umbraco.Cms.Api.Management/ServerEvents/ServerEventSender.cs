@@ -601,7 +601,8 @@ internal sealed class ServerEventSender :
     private async Task NotifyPublicAccessEntrySavedAsync(params IEnumerable<PublicAccessEntrySavedNotification> notifications)
     {
         // Materialize so we can iterate twice (once for the entries, once for the affected documents).
-        IReadOnlyCollection<PublicAccessEntrySavedNotification> materialized = notifications as IReadOnlyCollection<PublicAccessEntrySavedNotification> ?? notifications.ToList();
+        IReadOnlyCollection<PublicAccessEntrySavedNotification> materialized =
+            notifications as IReadOnlyCollection<PublicAccessEntrySavedNotification> ?? notifications.ToList();
 
         await NotifySavedAsync(Constants.ServerEvents.EventSource.PublicAccessEntry, materialized);
 
@@ -613,7 +614,8 @@ internal sealed class ServerEventSender :
     private async Task NotifyUserSavedAsync(params IEnumerable<UserSavedNotification> notifications)
     {
         // Materialize so we can iterate twice.
-        IReadOnlyCollection<UserSavedNotification> materialized = notifications as IReadOnlyCollection<UserSavedNotification> ?? notifications.ToList();
+        IReadOnlyCollection<UserSavedNotification> materialized =
+            notifications as IReadOnlyCollection<UserSavedNotification> ?? notifications.ToList();
 
         // We still need to notify of saved entities like any other event source.
         await NotifySavedAsync(Constants.ServerEvents.EventSource.User, materialized);
