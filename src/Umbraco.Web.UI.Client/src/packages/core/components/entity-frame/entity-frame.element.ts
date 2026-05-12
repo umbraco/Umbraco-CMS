@@ -10,7 +10,7 @@ import { css, customElement, html, property, LitElement } from '@umbraco-cms/bac
  * @element umb-entity-frame
  * @slot - Optional rich content for the tab. Falls back to the `label` property.
  * @cssprop --umb-entity-frame-border-width - Thickness of the border. Defaults to `2px`.
- * @cssprop --umb-entity-frame-color - Accent colour for the border and tab background. Defaults to `--uui-color-focus`.
+ * @cssprop --umb-entity-frame-color - Accent colour for the border and tab background. Defaults to `--uui-color-focus`. Should be dark enough to maintain contrast against the white tab text.
  * @cssprop --umb-entity-frame-opacity - Opacity of the border and tab. Defaults to `1`. Set to `0` on the parent and toggle to `1` on `:hover` / `:focus-within` to gate visibility.
  * @augments {LitElement}
  */
