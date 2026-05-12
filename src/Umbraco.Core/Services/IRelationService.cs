@@ -16,96 +16,81 @@ public interface IRelationService : IService
     /// <summary>
     ///     Gets a <see cref="IRelation" /> by its Id.
     /// </summary>
-    Task<IRelation?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IRelation?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a <see cref="IRelationType" /> by its Id.
     /// </summary>
-    Task<IRelationType?> GetRelationTypeByIdAsync(int id, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IRelationType?> GetRelationTypeByIdAsync(int id, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a <see cref="IRelationType" /> by its key.
     /// </summary>
-    Task<IRelationType?> GetRelationTypeByKeyAsync(Guid key, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IRelationType?> GetRelationTypeByKeyAsync(Guid key, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a <see cref="IRelationType" /> by its Alias.
     /// </summary>
-    Task<IRelationType?> GetRelationTypeByAliasAsync(string alias, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IRelationType?> GetRelationTypeByAliasAsync(string alias, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets all <see cref="IRelation" /> objects.
     /// </summary>
     /// <param name="ids">Optional array of identifiers to filter on. Pass an empty array for all relations.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    Task<IEnumerable<IRelation>> GetAllRelationsAsync(int[] ids, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IEnumerable<IRelation>> GetAllRelationsAsync(int[] ids, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets all <see cref="IRelation" /> objects for the given <see cref="IRelationType" /> id.
     /// </summary>
-    Task<IEnumerable<IRelation>> GetAllRelationsByRelationTypeAsync(int relationTypeId, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IEnumerable<IRelation>> GetAllRelationsByRelationTypeAsync(int relationTypeId, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets all <see cref="IRelationType" /> objects.
     /// </summary>
     /// <param name="ids">Optional array of identifiers to filter on. Pass an empty array for all relation types.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    Task<IEnumerable<IRelationType>> GetAllRelationTypesAsync(int[] ids, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IEnumerable<IRelationType>> GetAllRelationTypesAsync(int[] ids, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a list of <see cref="IRelation" /> objects by their parent id, optionally filtered by relation type alias.
     /// </summary>
-    Task<IEnumerable<IRelation>> GetByParentIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IEnumerable<IRelation>> GetByParentIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a list of <see cref="IRelation" /> objects by their child id, optionally filtered by relation type alias.
     /// </summary>
-    Task<IEnumerable<IRelation>> GetByChildIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IEnumerable<IRelation>> GetByChildIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a list of <see cref="IRelation" /> objects by parent or child id, optionally filtered by relation type alias.
     /// </summary>
-    Task<IEnumerable<IRelation>> GetByParentOrChildIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IEnumerable<IRelation>> GetByParentOrChildIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a relation by the unique combination of parent id, child id, and relation type.
     /// </summary>
-    Task<IRelation?> GetByParentAndChildIdAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IRelation?> GetByParentAndChildIdAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a list of <see cref="IRelation" /> objects by the name of the relation type.
     /// </summary>
-    Task<IEnumerable<IRelation>> GetByRelationTypeNameAsync(string relationTypeName, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IEnumerable<IRelation>> GetByRelationTypeNameAsync(string relationTypeName, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a list of <see cref="IRelation" /> objects by the alias of the relation type.
     /// </summary>
-    Task<IEnumerable<IRelation>> GetByRelationTypeAliasAsync(string relationTypeAlias, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IEnumerable<IRelation>> GetByRelationTypeAliasAsync(string relationTypeAlias, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a list of <see cref="IRelation" /> objects by the relation type id.
     /// </summary>
-    Task<IEnumerable<IRelation>> GetByRelationTypeIdAsync(int relationTypeId, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IEnumerable<IRelation>> GetByRelationTypeIdAsync(int relationTypeId, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a paged result of <see cref="IRelation" /> filtered by relation type id.
     /// </summary>
-    Task<PagedModel<IRelation>> GetPagedByRelationTypeIdAsync(int relationTypeId, int skip, int take, Ordering? ordering = null, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<PagedModel<IRelation>> GetPagedByRelationTypeIdAsync(int relationTypeId, int skip, int take, Ordering? ordering = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a paged result of <see cref="IRelation" />.
@@ -115,14 +100,12 @@ public interface IRelationService : IService
     /// <summary>
     ///     Returns paged parent entities for a related child id.
     /// </summary>
-    Task<PagedModel<IUmbracoEntity>> GetPagedParentEntitiesByChildIdAsync(int id, int skip, int take, UmbracoObjectTypes[]? entityTypes = null, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<PagedModel<IUmbracoEntity>> GetPagedParentEntitiesByChildIdAsync(int id, int skip, int take, UmbracoObjectTypes[]? entityTypes = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Returns paged child entities for a related parent id.
     /// </summary>
-    Task<PagedModel<IUmbracoEntity>> GetPagedChildEntitiesByParentIdAsync(int id, int skip, int take, UmbracoObjectTypes[]? entityTypes = null, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<PagedModel<IUmbracoEntity>> GetPagedChildEntitiesByParentIdAsync(int id, int skip, int take, UmbracoObjectTypes[]? entityTypes = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a paged result of <see cref="IRelation" /> objects by child key.
@@ -162,62 +145,52 @@ public interface IRelationService : IService
     /// <summary>
     ///     Relates two objects by their entity ids.
     /// </summary>
-    Task<IRelation> RelateAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IRelation> RelateAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Relates two objects by their entity ids using a relation type alias.
     /// </summary>
-    Task<IRelation> RelateAsync(int parentId, int childId, string relationTypeAlias, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<IRelation> RelateAsync(int parentId, int childId, string relationTypeAlias, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Checks whether any relations exist for the passed in <see cref="IRelationType" />.
     /// </summary>
-    Task<bool> HasRelationsAsync(IRelationType relationType, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<bool> HasRelationsAsync(IRelationType relationType, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Checks whether any relations exist for the passed in id and direction.
     /// </summary>
-    Task<bool> IsRelatedAsync(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<bool> IsRelatedAsync(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Checks whether two items are related.
     /// </summary>
-    Task<bool> AreRelatedAsync(int parentId, int childId, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<bool> AreRelatedAsync(int parentId, int childId, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Checks whether two items are related under a specific relation type alias.
     /// </summary>
-    Task<bool> AreRelatedAsync(int parentId, int childId, string relationTypeAlias, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<bool> AreRelatedAsync(int parentId, int childId, string relationTypeAlias, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Checks whether two items are related under a specific relation type.
     /// </summary>
-    Task<bool> AreRelatedAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<bool> AreRelatedAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Saves a <see cref="IRelation" />.
     /// </summary>
-    Task SaveAsync(IRelation relation, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task SaveAsync(IRelation relation, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Saves a collection of <see cref="IRelation" /> objects.
     /// </summary>
-    Task SaveAsync(IEnumerable<IRelation> relations, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task SaveAsync(IEnumerable<IRelation> relations, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Saves a <see cref="IRelationType" />.
     /// </summary>
-    Task SaveAsync(IRelationType relationType, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task SaveAsync(IRelationType relationType, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Saves a <see cref="IRelationType" /> with user-attributed audit.
@@ -232,14 +205,12 @@ public interface IRelationService : IService
     /// <summary>
     ///     Deletes a <see cref="IRelation" />.
     /// </summary>
-    Task DeleteRelationAsync(IRelation relation, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task DeleteRelationAsync(IRelation relation, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Deletes a <see cref="IRelationType" />.
     /// </summary>
-    Task DeleteRelationTypeAsync(IRelationType relationType, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task DeleteRelationTypeAsync(IRelationType relationType, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Deletes a <see cref="IRelationType" /> by key with user-attributed audit.
@@ -249,14 +220,12 @@ public interface IRelationService : IService
     /// <summary>
     ///     Deletes all <see cref="IRelation" /> objects of the passed in <see cref="IRelationType" />.
     /// </summary>
-    Task DeleteRelationsOfTypeAsync(IRelationType relationType, CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task DeleteRelationsOfTypeAsync(IRelationType relationType, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets the total count of relation types.
     /// </summary>
-    Task<int> CountRelationTypesAsync(CancellationToken cancellationToken = default)
-        => throw new NotImplementedException();
+    Task<int> CountRelationTypesAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets the relation types in a paged manner.
