@@ -173,7 +173,7 @@ public PublishStatusService(
 
     private void UpdatePublishedCultures(Guid documentKey, ISet<string> publishedCultures)
     {
-        if (publishedCultures.Any())
+        if (publishedCultures.Count > 0)
         {
             _publishedCultures[documentKey] = publishedCultures;
         }
