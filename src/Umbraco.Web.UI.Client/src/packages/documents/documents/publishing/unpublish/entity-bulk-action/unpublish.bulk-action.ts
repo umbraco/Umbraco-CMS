@@ -44,7 +44,7 @@ export class UmbDocumentUnpublishEntityBulkAction extends UmbEntityBulkActionBas
 
 		const [{ data: documentItems }, { data: languageData }] = await Promise.all([
 			itemRepository.requestItems(this.selection),
-			languageRepository.requestCollection({}),
+			languageRepository.requestAllItems(),
 		]);
 
 		if (!documentItems?.length) return;
