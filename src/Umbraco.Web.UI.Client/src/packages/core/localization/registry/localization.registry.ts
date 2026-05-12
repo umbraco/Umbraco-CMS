@@ -94,9 +94,8 @@ export class UmbLocalizationRegistry {
 				distinctUntilChanged(),
 				// Mirror the active language onto the manager synchronously, so a fresh element
 				// rendering between now and the async translation load picks up the requested
-				// language. We're not calling setActiveLanguage here because translations aren't
-				// loaded yet — we don't want to notify consumers to re-render with a fallback.
-				// Direction and the actual re-render happen below once dictionaries are in place.
+				// language on its first render. Direction and the actual consumer notification
+				// happen below, once the dictionaries are in place.
 				tap((currentLanguage) => {
 					umbLocalizationManager.documentLanguage = baseLocaleOf(currentLanguage);
 				}),
@@ -204,7 +203,13 @@ export class UmbLocalizationRegistry {
 		if (document.documentElement.dir !== direction) {
 			document.documentElement.dir = direction;
 		}
-		umbLocalizationManager.setActiveLanguage(newLang, direction);
+		// Write the active language and direction onto the manager, then tell every connected
+		// controller to re-render against the freshly loaded dictionaries. Inlined here because
+		// it's the only place this happens — no need for another public method on the manager
+		// that we'd just have to retire when the manager and registry get merged.
+		umbLocalizationManager.documentLanguage = newLang;
+		umbLocalizationManager.documentDirection = direction;
+		umbLocalizationManager.connectedControllers.forEach((ctrl) => ctrl.documentUpdate());
 	}
 
 	#arraysEqual(a: string[], b: string[]) {
