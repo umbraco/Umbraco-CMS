@@ -601,8 +601,6 @@ export default {
 		greeting6: 'ようこそ',
 		instruction: 'ウェブサイトにログインします。',
 		timeout: 'セッションタイムアウトしました。',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ',
 	},
 	main: {
 		dashboard: 'ダッシュボード',

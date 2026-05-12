@@ -27,6 +27,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         mapper.Define<ISimpleContentType, DocumentTypeCollectionReferenceResponseModel>((_, _) => new DocumentTypeCollectionReferenceResponseModel(), Map);
         mapper.Define<IContentEntitySlim, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
         mapper.Define<IDocumentEntitySlim, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
+        mapper.Define<IElementEntitySlim, DocumentTypeReferenceResponseModel>((_, _) => new DocumentTypeReferenceResponseModel(), Map);
         mapper.Define<IContent, DocumentTypeBlueprintItemResponseModel>((_, _) => new DocumentTypeBlueprintItemResponseModel(), Map);
     }
 
@@ -42,6 +43,7 @@ public class DocumentTypeMapDefinition : ContentTypeMapDefinition<IContentType, 
         target.VariesByCulture = source.VariesByCulture();
         target.VariesBySegment = source.VariesBySegment();
         target.IsElement = source.IsElement;
+        target.AllowedInLibrary = source.AllowedInLibrary;
         target.Collection = ReferenceByIdModel.ReferenceOrNull(source.ListView);
         target.Containers = MapPropertyTypeContainers(source);
         target.Properties = MapPropertyTypes(source);

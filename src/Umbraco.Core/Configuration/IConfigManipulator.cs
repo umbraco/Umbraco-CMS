@@ -55,7 +55,5 @@ public interface IConfigManipulator
     /// </remarks>
     /// </summary>
     /// <param name="base64Key">The base64-encoded key to save.</param>
-    // TODO (V18): Remove the default implementation.
-    Task SetImagingHmacSecretKeyAsync(string base64Key)
-        => Task.CompletedTask;
+    Task SetImagingHmacSecretKeyAsync(string base64Key);
 }

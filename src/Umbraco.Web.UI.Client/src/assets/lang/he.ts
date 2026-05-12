@@ -441,8 +441,6 @@ export default {
 		greeting4: 'ברוכים הבאים',
 		greeting5: 'ברוכים הבאים',
 		greeting6: 'ברוכים הבאים',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',
 	},
 	main: {
 		dashboard: 'לוח הבקרה',

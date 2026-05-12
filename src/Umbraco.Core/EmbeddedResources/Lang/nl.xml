@@ -354,8 +354,4 @@
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Resultaten van de geplande Umbraco Health Checks uitgevoerd op %0% op %1%:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status: %0%</key>
   </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Content verwijderd met id : {0} gerelateerd aan aan bovenliggend item met Id: {1}</key>
-    <key alias="mediaTrashed">Media verwijderd met id: {0} gerelateerd aan aan bovenliggend item met Id: {1}</key>
-  </area>
 </language>

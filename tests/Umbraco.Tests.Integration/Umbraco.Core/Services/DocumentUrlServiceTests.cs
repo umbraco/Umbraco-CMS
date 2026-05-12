@@ -52,9 +52,9 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         builder.UrlSegmentProviders().Insert<CustomUrlSegmentProvider2>();
     }
 
-    public override void CreateTestData()
+    public override async Task CreateTestDataAsync()
     {
-        base.CreateTestData();
+        await base.CreateTestDataAsync();
 
         var subSubPage1 = ContentBuilder.CreateSimpleContent(ContentType, "Sub Sub Page 1", Subpage.Id);
         subSubPage1.Key = new Guid(SubSubPage1Key);
@@ -111,10 +111,11 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             => GetUrlSegment(content, culture, Guid.Parse(SubPage2Key), Guid.Parse(SubSubPage2Key));
     }
 
-    public override void Setup()
+    [SetUp]
+    public override async Task Setup()
     {
-        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
-        base.Setup();
+        await DocumentUrlService.InitAsync(false, CancellationToken.None);
+        await base.Setup();
     }
 
     //
@@ -711,7 +712,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         foreach (var segment in storedSegments)
         {
-            Assert.That(segment.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId in database");
+            Assert.That(segment.LanguageId, Is.Null, "Invariant content should have NULL LanguageId in database");
         }
     }
 
@@ -737,7 +738,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         }
 
         Assert.That(segmentsBefore, Has.Count.GreaterThan(0), "Should have URL segments before change");
-        Assert.That(segmentsBefore.All(s => s.NullableLanguageId == null), Is.True, "All segments should have NULL languageId before change");
+        Assert.That(segmentsBefore.All(s => s.LanguageId == null), Is.True, "All segments should have NULL languageId before change");
 
         // Act - change content type from invariant to variant
         ContentType.Variations = ContentVariation.Culture;
@@ -761,8 +762,8 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         }
 
         Assert.That(segmentsAfter, Has.Count.GreaterThan(0), "Should have URL segments after change");
-        Assert.That(segmentsAfter.All(s => s.NullableLanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
-        Assert.That(segmentsAfter.Any(s => s.NullableLanguageId == defaultLanguage.Id), Is.True, "Should have segment for default language");
+        Assert.That(segmentsAfter.All(s => s.LanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
+        Assert.That(segmentsAfter.Any(s => s.LanguageId == defaultLanguage.Id), Is.True, "Should have segment for default language");
     }
 
     [Test]
@@ -787,7 +788,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         }
 
         Assert.That(invariantSegments, Has.Count.GreaterThan(0), "Should have invariant URL segments");
-        Assert.That(invariantSegments.All(s => s.NullableLanguageId == null), Is.True, "Invariant segments should have NULL languageId");
+        Assert.That(invariantSegments.All(s => s.LanguageId == null), Is.True, "Invariant segments should have NULL languageId");
 
         // Change content type to variant
         ContentType.Variations = ContentVariation.Culture;
@@ -811,7 +812,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         }
 
         Assert.That(variantSegments, Has.Count.GreaterThan(0), "Should have variant URL segments after change to variant");
-        Assert.That(variantSegments.All(s => s.NullableLanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
+        Assert.That(variantSegments.All(s => s.LanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
 
         // Act - change content type from variant to invariant
         ContentType.Variations = ContentVariation.Nothing;
@@ -827,7 +828,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         }
 
         Assert.That(segmentsAfter, Has.Count.GreaterThan(0), "Should have URL segments after change to invariant");
-        Assert.That(segmentsAfter.All(s => s.NullableLanguageId == null), Is.True, "All segments should have NULL languageId after change to invariant");
+        Assert.That(segmentsAfter.All(s => s.LanguageId == null), Is.True, "All segments should have NULL languageId after change to invariant");
     }
 
     #endregion
@@ -926,7 +927,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             new PublishedDocumentUrlSegment
             {
                 DocumentKey = key,
-                NullableLanguageId = null,
+                LanguageId = null,
                 IsDraft = true,
                 UrlSegment = "test-segment",
                 IsPrimary = true,
@@ -934,7 +935,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             new PublishedDocumentUrlSegment
             {
                 DocumentKey = key,
-                NullableLanguageId = null,
+                LanguageId = null,
                 IsDraft = false,
                 UrlSegment = "test-segment",
                 IsPrimary = true,
