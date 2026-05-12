@@ -237,8 +237,14 @@ export class UmbTreeItemChildrenManager<
 		// When reloading we only want to send the target values with the request if we can find the target to reload from.
 		const canSendTarget = reload === false || (reload && this.targetPagination.hasBaseTargetInCurrentItems());
 
+		// If all known items fit within a single page, skip target pagination and load from
+		// the start instead, this prevents "show more" appearing on small lists after operations
+		// that change item order like sort children.
+		const totalKnownItems = this.offsetPagination.getTotalItems();
+		const fitsInSinglePage = reload && totalKnownItems > 0 && totalKnownItems <= this.offsetPagination.getPageSize();
+
 		const targetPaging: UmbTargetPaginationRequestModel | undefined =
-			baseTarget && baseTarget.unique && canSendTarget
+			!fitsInSinglePage && baseTarget && baseTarget.unique && canSendTarget
 				? {
 						target: {
 							unique: baseTarget.unique,
