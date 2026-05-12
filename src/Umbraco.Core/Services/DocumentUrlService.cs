@@ -522,7 +522,7 @@ public class DocumentUrlService : IDocumentUrlService
     /// <inheritdoc/>
     public async Task CreateOrUpdateUrlSegmentsWithDescendantsAsync(Guid key)
     {
-        var id = _idKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Document).GetAwaiter().GetResult().Result;
+        var id = (await _idKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Document)).Result;
         IContent? item = _contentService.GetById(id);
         if (item is null)
         {

@@ -21,5 +21,5 @@ public interface IIdKeyMapRepository
     /// <param name="id">The integer identifier of the entity.</param>
     /// <param name="umbracoObjectType">The type of the Umbraco object.</param>
     /// <returns>The unique key if found; otherwise, <c>null</c>.</returns>
-    Task<Guid?> GetIdForKeyAsync(int id, UmbracoObjectTypes umbracoObjectType);
+    Task<Guid?> GetKeyForIdAsync(int id, UmbracoObjectTypes umbracoObjectType);
 }

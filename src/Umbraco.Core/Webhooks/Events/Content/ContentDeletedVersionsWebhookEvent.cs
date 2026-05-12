@@ -44,9 +44,11 @@ public class ContentDeletedVersionsWebhookEvent : WebhookEventBase<ContentDelete
     /// <inheritdoc />
     public override object ConvertNotificationToRequestPayload(ContentDeletedVersionsNotification notification)
     {
+        Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(notification.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+
         return new
         {
-            Id = _idKeyMap.GetKeyForIdAsync(notification.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult().Result,
+            Id = attempt.Result,
             notification.DeletePriorVersions,
             notification.SpecificVersion,
             notification.DateToRetain,

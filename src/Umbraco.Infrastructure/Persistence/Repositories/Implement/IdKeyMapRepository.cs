@@ -65,7 +65,7 @@ public class IdKeyMapRepository : IIdKeyMapRepository
     /// <param name="umbracoObjectType">The type of the Umbraco object to filter by. If set to <see cref="UmbracoObjectTypes.Unknown"/>,  the object
     /// type is not included in the query.</param>
     /// <returns>The unique identifier (GUID) of the node if found; otherwise, <see langword="null"/>.</returns>
-    public async Task<Guid?> GetIdForKeyAsync(int id, UmbracoObjectTypes umbracoObjectType)
+    public async Task<Guid?> GetKeyForIdAsync(int id, UmbracoObjectTypes umbracoObjectType)
     {
         if (_scopeAccessor.AmbientScope is null)
         {

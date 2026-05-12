@@ -209,7 +209,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
                 keyAttempt.Result))
             : Attempt<Udi?>.Fail();
 
-        return await Task.FromResult(attempt);
+        return attempt;
     }
 
     /// <inheritdoc />
@@ -266,7 +266,7 @@ public class IdKeyMap : IIdKeyMap, IDisposable
         {
             using (ICoreScope scope = _scopeProvider.CreateCoreScope())
             {
-                val = await _idKeyMapRepository.GetIdForKeyAsync(id, umbracoObjectType);
+                val = await _idKeyMapRepository.GetKeyForIdAsync(id, umbracoObjectType);
                 scope.Complete();
             }
         }
