@@ -91,7 +91,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
                 throw new InvalidOperationException("Directory is not empty.");
             }
 
-            Nodes[path] = new ShadowNode(true, true, normPath);
+            Nodes[normPath] = new ShadowNode(true, true, normPath);
             var remove = Nodes.Where(x => IsChild(normPath, x.Key)).ToList();
             foreach (KeyValuePair<string, ShadowNode> kvp in remove)
             {

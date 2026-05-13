@@ -477,9 +477,12 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
             ss.AddFile("views/pagenotfound.cshtml", ms);
         }
 
-        Assert.IsFalse(
-            File.Exists(path + "/ShadowSystem/views/pagenotfound.cshtml"),
-            "Re-staging with different case must not create a second file in the shadow.");
+        // Cross-platform check: the shadow must contain exactly one file under Views.
+        // (File.Exists for a different-cased path would return true on case-insensitive
+        // file systems like Windows / default macOS, so we can't assert it.)
+        var stagedFiles = Directory.GetFiles(path + "/ShadowSystem/Views");
+        Assert.AreEqual(1, stagedFiles.Length, "Re-staging with different case must not create a second file in the shadow.");
+        Assert.IsTrue(stagedFiles[0].EndsWith("PageNotFound.cshtml"), "Staged file name must keep the original case.");
 
         ss.Complete();
 
