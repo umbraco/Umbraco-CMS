@@ -9,7 +9,7 @@ import {
 	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
-import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
+import { umbConfirmModal, umbInfoModal } from '@umbraco-cms/backoffice/modal';
 import { UmbDocumentRedirectManagementRepository } from '@umbraco-cms/backoffice/document';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -113,26 +113,18 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		this.#getRedirectData(this._search.value);
 	}
 
-	async #onRequestTrackerToggle() {
-		if (!this._trackerEnabled) {
-			this.#trackerToggle();
-			return;
-		}
-
-		await umbConfirmModal(this, {
-			headline: '#redirectUrls_disableUrlTracker',
-			content: '#redirectUrls_confirmDisable',
-			color: 'danger',
-			confirmLabel: '#actions_disable',
-		});
-
-		this.#trackerToggle();
-	}
-
-	async #trackerToggle() {
-		const { error } = await this.#repository.setStatus(!this._trackerEnabled);
-		if (error) return;
-		this._trackerEnabled = !this._trackerEnabled;
+	async #onConfigureTracker(enable: boolean) {
+		await umbInfoModal(this, {
+			headline: enable ? '#redirectUrls_enableUrlTracker' : '#redirectUrls_disableUrlTracker',
+			content: html`
+				<p>
+					${this.localize.term(
+						enable ? 'redirectUrls_enableUrlTrackerInstruction' : 'redirectUrls_disableUrlTrackerInstruction',
+					)}
+				</p>
+				<p><code>Umbraco:CMS:WebRouting:DisableRedirectUrlTracking</code></p>
+			`,
+		}).catch(() => undefined);
 	}
 
 	override render() {
@@ -156,7 +148,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 						<uui-button
 							look="outline"
 							label=${this.localize.term('redirectUrls_disableUrlTracker')}
-							@click=${this.#onRequestTrackerToggle}></uui-button>
+							@click=${() => this.#onConfigureTracker(false)}></uui-button>
 					`,
 					() => html`
 						<div></div>
@@ -164,7 +156,7 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 							color="positive"
 							look="outline"
 							label=${this.localize.term('redirectUrls_enableUrlTracker')}
-							@click=${this.#onRequestTrackerToggle}></uui-button>
+							@click=${() => this.#onConfigureTracker(true)}></uui-button>
 					`,
 				)}
 			</div>

@@ -2359,7 +2359,11 @@ export default {
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Disable URL tracker',
+		disableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To disable tracking, set the following configuration key to true:',
 		enableUrlTracker: 'Enable URL tracker',
+		enableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To enable tracking, set the following configuration key to false:',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Redirected To',
 		redirectUrlManagement: 'Redirect URL Management',
