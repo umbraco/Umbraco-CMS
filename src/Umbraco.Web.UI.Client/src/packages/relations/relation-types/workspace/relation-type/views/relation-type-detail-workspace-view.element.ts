@@ -51,8 +51,12 @@ export class UmbRelationTypeDetailWorkspaceViewElement extends UmbLitElement imp
 
 		this.consumeContext(UMB_RELATION_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#workspaceContext = instance;
-			this.#requestRelations();
 			this.#observeDetails();
+			this.observe(instance?.unique, (unique) => {
+				if (unique) {
+					this.#requestRelations();
+				}
+			});
 		});
 	}
 
