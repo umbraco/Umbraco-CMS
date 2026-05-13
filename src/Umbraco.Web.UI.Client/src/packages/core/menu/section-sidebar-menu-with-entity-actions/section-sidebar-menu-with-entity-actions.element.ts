@@ -26,7 +26,7 @@ export class UmbSectionSidebarMenuWithEntityActionsElement extends UmbSectionSid
 		return html`
 			<div id="header">
 				<h3>${label}</h3>
-				<umb-entity-actions-bundle slot="actions" .label=${label}> </umb-entity-actions-bundle>
+				<umb-entity-actions-bundle slot="actions" .label=${label}></umb-entity-actions-bundle>
 			</div>
 		`;
 	}
