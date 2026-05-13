@@ -10,6 +10,8 @@ import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboar
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbBooleanState, mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_SINGLE_MANAGER_CONTEXT,
 	typeof UMB_BLOCK_SINGLE_MANAGER_CONTEXT.TYPE,
@@ -31,6 +33,9 @@ export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_SINGLE_MANAGER_CONTEXT, UMB_BLOCK_SINGLE_ENTRIES_CONTEXT);
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
+		});
 	}
 
 	protected override _gotManager() {
@@ -42,6 +47,8 @@ export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 			'observeInlineEditingMode',
 		);
 	}
+
+	#serverUrl = '';
 
 	protected override _gotEntries() {}
 
@@ -61,9 +68,14 @@ export class UmbBlockSingleEntryContext extends UmbBlockEntryContext<
 		const propertyLabel = this.localize.string(propertyContext.getLabel());
 		const blockLabel = this.getName();
 		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
+		const blockTypeThumbnail = this.getBlockType()?.thumbnail;
+		const path = blockTypeThumbnail ? transformServerPathToClientPath(blockTypeThumbnail) : undefined;
+		const thumbnailPath = path ? new URL(path, this.#serverUrl)?.href : undefined;
+		const thumbnail = thumbnailPath ? { src: thumbnailPath } : undefined;
 
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
+			thumbnail,
 			name: entryName,
 			propertyValue: this.#buildPropertyValue(),
 			propertyEditorUiAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_UI_ALIAS,

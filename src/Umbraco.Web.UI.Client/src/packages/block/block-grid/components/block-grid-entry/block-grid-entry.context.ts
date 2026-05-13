@@ -20,6 +20,8 @@ import { UmbBlockEntryContext } from '@umbraco-cms/backoffice/block';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboard';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 
 export class UmbBlockGridEntryContext
 	extends UmbBlockEntryContext<
@@ -81,7 +83,12 @@ export class UmbBlockGridEntryContext
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_GRID_MANAGER_CONTEXT, UMB_BLOCK_GRID_ENTRIES_CONTEXT);
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
+		});
 	}
+
+	#serverUrl = '';
 
 	layoutsOfArea(areaKey: string) {
 		return this._layout.asObservablePart((x) => x?.areas?.find((x) => x.key === areaKey)?.items);
@@ -328,6 +335,14 @@ export class UmbBlockGridEntryContext
 		const settingsData = settings ? [structuredClone(settings)] : [];
 		const exposes = expose ? [structuredClone(expose)] : [];
 
+		const blockTypeThumbnail = this.getBlockType()?.thumbnail;
+
+		const path = blockTypeThumbnail ? transformServerPathToClientPath(blockTypeThumbnail) : undefined;
+
+		const thumbnailPath = path ? new URL(path, this.#serverUrl)?.href : undefined;
+
+		const thumbnail = thumbnailPath ? { src: thumbnailPath } : undefined;
+
 		// Find sub Blocks and append their data:
 		forEachBlockLayoutEntryOf(layout, async (entry) => {
 			const content = this._manager!.getContentOf(entry.contentKey);
@@ -355,6 +370,7 @@ export class UmbBlockGridEntryContext
 
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
+			thumbnail,
 			name: entryName,
 			propertyValue,
 			propertyEditorUiAlias: UMB_BLOCK_GRID_PROPERTY_EDITOR_UI_ALIAS,

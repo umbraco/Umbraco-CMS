@@ -73,13 +73,9 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 		const propertyLabel = this.localize.string(propertyContext.getLabel());
 		const blockLabel = this.getName();
 		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
-
 		const blockTypeThumbnail = this.getBlockType()?.thumbnail;
-
 		const path = blockTypeThumbnail ? transformServerPathToClientPath(blockTypeThumbnail) : undefined;
-
 		const thumbnailPath = path ? new URL(path, this.#serverUrl)?.href : undefined;
-
 		const thumbnail = thumbnailPath ? { src: thumbnailPath } : undefined;
 
 		clipboardContext.write({
@@ -91,7 +87,7 @@ export class UmbBlockListEntryContext extends UmbBlockEntryContext<
 		});
 	}
 
-	#buildPropertyValue(): UmbBlockListValueModel {	
+	#buildPropertyValue(): UmbBlockListValueModel {
 		const content = this.getContent();
 		const layout = this.getLayout();
 		const settings = this.getSettings();

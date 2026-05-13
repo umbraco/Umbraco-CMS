@@ -138,7 +138,6 @@ export abstract class UmbBlockEntryContext<
 	public readonly thumbnail = this._blockType.asObservablePart((x) => x?.thumbnail);
 
 	public getBlockType(): BlockType | undefined {
-		console.log(this._blockType.getValue())
 		return this._blockType.getValue();
 	}
 

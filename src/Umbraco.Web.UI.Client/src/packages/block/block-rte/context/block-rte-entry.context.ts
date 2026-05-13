@@ -7,6 +7,8 @@ import { UMB_CLIPBOARD_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/clipboar
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { mergeObservables } from '@umbraco-cms/backoffice/observable-api';
 import { UMB_PROPERTY_CONTEXT, UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
+import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
+import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 
 export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 	typeof UMB_BLOCK_RTE_MANAGER_CONTEXT,
@@ -33,7 +35,12 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BLOCK_RTE_MANAGER_CONTEXT, UMB_BLOCK_RTE_ENTRIES_CONTEXT);
+		this.consumeContext(UMB_SERVER_CONTEXT, (instance) => {
+			this.#serverUrl = instance?.getServerUrl() ?? '';
+		});
 	}
+
+	#serverUrl = '';
 
 	protected override _gotManager() {}
 
@@ -70,9 +77,14 @@ export class UmbBlockRteEntryContext extends UmbBlockEntryContext<
 		const propertyLabel = this.localize.string(propertyContext.getLabel());
 		const blockLabel = this.getName();
 		const entryName = [workspaceName, propertyLabel, blockLabel].filter(Boolean).join(' - ');
+		const blockTypeThumbnail = this.getBlockType()?.thumbnail;
+		const path = blockTypeThumbnail ? transformServerPathToClientPath(blockTypeThumbnail) : undefined;
+		const thumbnailPath = path ? new URL(path, this.#serverUrl)?.href : undefined;
+		const thumbnail = thumbnailPath ? { src: thumbnailPath } : undefined;
 
 		clipboardContext.write({
 			icon: this.getContentElementTypeIcon(),
+			thumbnail,
 			name: entryName,
 			propertyValue: this.#buildPropertyValue(),
 			propertyEditorUiAlias: editorUiAlias,
