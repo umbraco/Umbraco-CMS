@@ -67,7 +67,10 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 		}
 		const uuiVersions = (window as { __uuiVersions?: string[] }).__uuiVersions;
 		if (uuiVersions) {
-			this.#serverKeyValues.push({ name: 'UI Library versions', data: JSON.stringify(uuiVersions) });
+			this.#serverKeyValues.push({
+				name: `UI Library version${uuiVersions.length > 1 ? 's' : ''}`,
+				data: uuiVersions.join(', '),
+			});
 		}
 
 		// User information
