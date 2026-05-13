@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
 using Umbraco.Cms.Core.Logging;
@@ -99,7 +98,7 @@ public class LogViewerRepository : LogViewerRepositoryBase
                     break;
                 }
             }
-            catch (Exception ex) when (ex is JsonException or InvalidDataException)
+            catch (Exception ex) when (ex is Newtonsoft.Json.JsonException or InvalidDataException)
             {
                 // Serilog.Formatting.Compact.Reader uses Newtonsoft.Json internally and surfaces
                 // its exceptions (Umbraco's own serialization is on System.Text.Json, but that
