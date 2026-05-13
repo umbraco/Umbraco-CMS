@@ -650,40 +650,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_GRID}></umb-block-action-list>`;
 	}
 
-	// #renderTransferToLibraryAction() {
-	// 	if (this._isReadOnly || this._isLibraryElement) return nothing;
-	// 	const label = this.localize.term('blockEditor_transferToLibrary');
-	// 	return html`
-	// 		<uui-button look="secondary" label=${label} title=${label} @click=${this.#onTransferToLibrary}>
-	// 			<uui-icon name="icon-link"></uui-icon>
-	// 		</uui-button>
-	// 	`;
-	// }
-
-	// #renderDisconnectFromLibraryAction() {
-	// 	if (this._isReadOnly || !this._isLibraryElement) return nothing;
-	// 	const label = this.localize.term('blockEditor_disconnectFromLibrary');
-	// 	return html`
-	// 		<uui-button look="secondary" label=${label} title=${label} @click=${this.#onDisconnectFromLibrary}>
-	// 			<uui-icon name="icon-unlink"></uui-icon>
-	// 		</uui-button>
-	// 	`;
-	// }
-
-	// #onTransferToLibrary = async () => {
-	// 	const key = this._key;
-	// 	if (!key) return;
-	// 	const manager = await this.getContext(UMB_BLOCK_MANAGER_CONTEXT).catch(() => undefined);
-	// 	manager?.requestTransferToLibrary(key);
-	// };
-
-	// #onDisconnectFromLibrary = async () => {
-	// 	const key = this._key;
-	// 	if (!key) return;
-	// 	const manager = await this.getContext(UMB_BLOCK_MANAGER_CONTEXT).catch(() => undefined);
-	// 	manager?.requestDisconnectFromLibrary(key);
-	// };
-
 	static override styles = [
 		UUIBlinkKeyframes,
 		css`

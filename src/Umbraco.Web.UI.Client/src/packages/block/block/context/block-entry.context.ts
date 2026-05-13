@@ -822,6 +822,16 @@ export abstract class UmbBlockEntryContext<
 		this.delete();
 	}
 
+	async requestTransferToLibrary() {
+		if (!this.#key) return;
+		await this._manager?.requestTransferToLibrary(this.#key);
+	}
+
+	async requestDisconnectFromLibrary() {
+		if (!this.#key) return;
+		await this._manager?.requestDisconnectFromLibrary(this.#key);
+	}
+
 	public delete() {
 		if (!this._entries) return;
 		const contentKey = this._layout.value?.contentKey;
