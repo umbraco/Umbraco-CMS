@@ -63,15 +63,17 @@ internal sealed class UnattendedUpgradeBackgroundService : BackgroundService
 
         _logger.LogInformation("Unattended upgrade background service started.");
 
-        bool isLeader = await _coordinator.TryBecomeLeaderAsync(stoppingToken);
-
-        if (_runtimeState.Level == RuntimeLevel.BootFailed)
-        {
-            return;
-        }
+        bool isLeader = false;
 
         try
         {
+            isLeader = await _coordinator.TryBecomeLeaderAsync(stoppingToken);
+
+            if (_runtimeState.Level == RuntimeLevel.BootFailed)
+            {
+                return;
+            }
+
             if (isLeader)
             {
                 // Belt-and-suspenders for graceful shutdowns (e.g. Azure SIGTERM): release the claim
