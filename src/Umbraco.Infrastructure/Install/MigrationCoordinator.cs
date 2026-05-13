@@ -46,7 +46,6 @@ internal sealed class MigrationCoordinator : IMigrationCoordinator
 
         while (cancellationToken.IsCancellationRequested is false)
         {
-            _leaderClaim = $"{machineIdentifier}|{DateTimeOffset.UtcNow:O}";
             if (TryClaimLeadership(machineIdentifier))
             {
                 _logger.LogInformation("This server claimed migration leadership.");
@@ -142,7 +141,8 @@ internal sealed class MigrationCoordinator : IMigrationCoordinator
 
         if (canClaim)
         {
-            _keyValueService.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, _leaderClaim!);
+            _leaderClaim = $"{machineIdentifier}|{DateTimeOffset.UtcNow:O}";
+            _keyValueService.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, _leaderClaim);
         }
 
         scope.Complete();

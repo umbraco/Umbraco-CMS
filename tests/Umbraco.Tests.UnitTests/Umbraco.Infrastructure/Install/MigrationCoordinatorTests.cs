@@ -36,8 +36,6 @@ public class MigrationCoordinatorTests
         SetupScopeProviderMock();
     }
 
-    // TryBecomeLeaderAsync — claim acquisition
-
     [Test]
     public async Task TryBecomeLeaderAsync_WhenClaimKeyIsEmpty_ClaimsLeadershipAndReturnsTrue()
     {
@@ -93,8 +91,6 @@ public class MigrationCoordinatorTests
                 It.Is<string>(v => v.StartsWith(TestMachineIdentifier + "|"))),
             Times.Once);
     }
-
-    // TryBecomeLeaderAsync — follower path
 
     [Test]
     public async Task TryBecomeLeaderAsync_WhenOtherMachineHoldsClaim_PollsUntilRunLevelAndReturnsFalse()
@@ -154,8 +150,6 @@ public class MigrationCoordinatorTests
         Assert.IsFalse(result);
     }
 
-    // TryBecomeLeaderAsync — cancellation
-
     [Test]
     public async Task TryBecomeLeaderAsync_WhenCancelledBeforeFirstIteration_ReturnsFalse()
     {
@@ -177,8 +171,6 @@ public class MigrationCoordinatorTests
                 It.IsAny<bool>()),
             Times.Never);
     }
-
-    // ReleaseLeadership
 
     [Test]
     public async Task ReleaseLeadership_WhenClaimMatchesDatabaseValue_ClearsKey()
