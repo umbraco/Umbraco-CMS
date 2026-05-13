@@ -56,6 +56,10 @@ internal sealed class MigrationCoordinator : IMigrationCoordinator
             {
                 _runtimeState.DetermineRuntimeLevel();
             }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return false;
+            }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Could not determine runtime level during migration wait; will retry.");
