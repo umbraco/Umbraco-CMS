@@ -50,14 +50,23 @@ public class ItemMediaItemController : MediaItemControllerBase
             return Ok(Enumerable.Empty<MediaItemResponseModel>());
         }
 
-        IEnumerable<IMediaEntitySlim> media = _entityService
-            .GetAll(UmbracoObjectTypes.Media, ids.ToArray())
-            .OfType<IMediaEntitySlim>();
+        IEnumerable<IEntitySlim> media = _entityService.GetAll(UmbracoObjectTypes.Media, ids.ToArray());
 
-        IEnumerable<MediaItemResponseModel> responseModels = media.Select(_mediaPresentationFactory.CreateItemResponseModel);
+        IEnumerable<MediaItemResponseModel> responseModels = await MapMediaItemsAsync(media);
         await PopulateFlags(responseModels);
 
         return Ok(responseModels);
+    }
+
+    private async Task<IEnumerable<MediaItemResponseModel>> MapMediaItemsAsync(IEnumerable<IEntitySlim> entities)
+    {
+        List<MediaItemResponseModel> mapped = [];
+        foreach (IMediaEntitySlim entity in entities.OfType<IMediaEntitySlim>())
+        {
+            mapped.Add(await _mediaPresentationFactory.CreateItemResponseModelAsync(entity));
+        }
+
+        return mapped;
     }
 
     private async Task PopulateFlags(IEnumerable<MediaItemResponseModel> itemViewModels)

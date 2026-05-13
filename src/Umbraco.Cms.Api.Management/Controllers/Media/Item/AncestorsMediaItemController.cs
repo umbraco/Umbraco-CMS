@@ -42,11 +42,19 @@ public class AncestorsMediaItemController : MediaItemControllerBase
             UmbracoObjectTypes.Media,
             null,
             ids,
-            ancestors => Task.FromResult(
-                ancestors
-                    .OfType<IMediaEntitySlim>()
-                    .Select(_mediaPresentationFactory.CreateItemResponseModel)));
+            MapMediaItemsAsync);
 
         return Ok(result);
+    }
+
+    private async Task<IEnumerable<MediaItemResponseModel>> MapMediaItemsAsync(IEnumerable<IEntitySlim> entities)
+    {
+        List<MediaItemResponseModel> mapped = [];
+        foreach (IMediaEntitySlim entity in entities.OfType<IMediaEntitySlim>())
+        {
+            mapped.Add(await _mediaPresentationFactory.CreateItemResponseModelAsync(entity));
+        }
+
+        return mapped;
     }
 }

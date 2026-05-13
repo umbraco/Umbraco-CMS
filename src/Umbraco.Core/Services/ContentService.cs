@@ -757,7 +757,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
         var intKeyedResults = new Dictionary<int, IEnumerable<ContentSchedule>>(guidKeyedResults.Count);
         foreach (KeyValuePair<Guid, IEnumerable<ContentSchedule>> entry in guidKeyedResults)
         {
-            Attempt<int> contentId = _idKeyMap.GetIdForKey(entry.Key, UmbracoObjectTypes.Document);
+            Attempt<int> contentId = _idKeyMap.GetIdForKeyAsync(entry.Key, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
             if (contentId.Success)
             {
                 intKeyedResults[contentId.Result] = entry.Value;
@@ -1597,7 +1597,7 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
     private bool TryGetParentKey(int parentId, [NotNullWhen(true)] out Guid? parentKey)
     {
-        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(parentId, UmbracoObjectTypes.Document);
+        Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForIdAsync(parentId, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
         parentKey = parentKeyAttempt.Success ? parentKeyAttempt.Result : null;
         return parentKeyAttempt.Success;
     }

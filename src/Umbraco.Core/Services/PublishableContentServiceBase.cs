@@ -285,7 +285,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
 
     public ContentScheduleCollection GetContentScheduleByContentId(Guid contentId)
     {
-        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(contentId, ContentObjectType);
+        Attempt<int> idAttempt = _idKeyMap.GetIdForKeyAsync(contentId, ContentObjectType).GetAwaiter().GetResult();
         if (idAttempt.Success is false)
         {
             return new ContentScheduleCollection();
@@ -305,7 +305,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         Dictionary<int, Guid> intToKeyMap = new(keys.Length);
         foreach (Guid key in keys)
         {
-            Attempt<int> contentId = _idKeyMap.GetIdForKey(key, ContentObjectType);
+            Attempt<int> contentId = _idKeyMap.GetIdForKeyAsync(key, ContentObjectType).GetAwaiter().GetResult();
             if (contentId.Success is false)
             {
                 continue;

@@ -81,7 +81,7 @@ internal sealed class MediaCacheService : IMediaCacheService
 
     public async Task<IPublishedContent?> GetByKeyAsync(Guid key)
     {
-        Attempt<int> idAttempt = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Media);
+        Attempt<int> idAttempt = await _idKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Media);
         if (idAttempt.Success is false)
         {
             return null;
@@ -92,7 +92,7 @@ internal sealed class MediaCacheService : IMediaCacheService
 
     public async Task<IPublishedContent?> GetByIdAsync(int id)
     {
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
+        Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Media);
         if (keyAttempt.Success is false)
         {
             return null;
@@ -151,7 +151,7 @@ internal sealed class MediaCacheService : IMediaCacheService
 
     public async Task<bool> HasContentByIdAsync(int id)
     {
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
+        Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Media);
         if (keyAttempt.Success is false)
         {
             return false;

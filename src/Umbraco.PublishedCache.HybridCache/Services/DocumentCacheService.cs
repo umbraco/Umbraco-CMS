@@ -95,7 +95,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     public async Task<IPublishedContent?> GetByIdAsync(int id, bool? preview = null)
     {
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document);
         if (keyAttempt.Success is false)
         {
             return null;
@@ -297,7 +297,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
     public async Task<bool> HasContentByIdAsync(int id, bool preview = false)
     {
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        Attempt<Guid> keyAttempt = await _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document);
         if (keyAttempt.Success is false)
         {
             return false;

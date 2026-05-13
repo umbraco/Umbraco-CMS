@@ -16,14 +16,14 @@ public interface IIdKeyMap
     /// <param name="key">The unique GUID key of the entity.</param>
     /// <param name="umbracoObjectType">The type of the Umbraco object.</param>
     /// <returns>An attempt containing the integer ID if found.</returns>
-    Attempt<int> GetIdForKey(Guid key, UmbracoObjectTypes umbracoObjectType);
+    Task<Attempt<int>> GetIdForKeyAsync(Guid key, UmbracoObjectTypes umbracoObjectType);
 
     /// <summary>
     /// Gets the integer ID for a given UDI.
     /// </summary>
     /// <param name="udi">The Umbraco Document Identifier.</param>
     /// <returns>An attempt containing the integer ID if found.</returns>
-    Attempt<int> GetIdForUdi(Udi udi);
+    Task<Attempt<int>> GetIdForUdiAsync(Udi udi);
 
     /// <summary>
     /// Gets the UDI for a given integer ID and object type.
@@ -31,7 +31,7 @@ public interface IIdKeyMap
     /// <param name="id">The integer identifier of the entity.</param>
     /// <param name="umbracoObjectType">The type of the Umbraco object.</param>
     /// <returns>An attempt containing the UDI if found.</returns>
-    Attempt<Udi?> GetUdiForId(int id, UmbracoObjectTypes umbracoObjectType);
+    Task<Attempt<Udi?>> GetUdiForIdAsync(int id, UmbracoObjectTypes umbracoObjectType);
 
     /// <summary>
     /// Gets the GUID key for a given integer ID and object type.
@@ -39,7 +39,7 @@ public interface IIdKeyMap
     /// <param name="id">The integer identifier of the entity.</param>
     /// <param name="umbracoObjectType">The type of the Umbraco object.</param>
     /// <returns>An attempt containing the GUID key if found.</returns>
-    Attempt<Guid> GetKeyForId(int id, UmbracoObjectTypes umbracoObjectType);
+    Task<Attempt<Guid>> GetKeyForIdAsync(int id, UmbracoObjectTypes umbracoObjectType);
 
     /// <summary>
     /// Clears the entire ID/key mapping cache.

@@ -192,8 +192,8 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
 
     private void HandleMemoryCache(JsonPayload payload)
     {
-        Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
-
+        Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(payload.Id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
+        Guid key = payload.Key ?? attempt.Result;
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
@@ -321,7 +321,11 @@ public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRe
         }
     }
 
-    private Guid? GetParentKey(IMedia media) => (media.ParentId == -1) ? null : _idKeyMap.GetKeyForId(media.ParentId, UmbracoObjectTypes.Media).Result;
+    private Guid? GetParentKey(IMedia media)
+    {
+        Attempt<Guid> attempt = _idKeyMap.GetKeyForIdAsync(media.ParentId, UmbracoObjectTypes.Media).GetAwaiter().GetResult();
+        return media.ParentId == -1 ? null : attempt.Result;
+    }
 
     private bool ExistsInNavigation(Guid contentKey) => _mediaNavigationQueryService.TryGetParentKey(contentKey, out _);
 

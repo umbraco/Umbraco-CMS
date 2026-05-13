@@ -73,13 +73,13 @@ public class LocalLinkProcessorForFaultyLinks
     private (Guid Key, string EntityType)? CreateIntBasedKeyType(int id)
     {
         // very old data, best effort replacement
-        Attempt<Guid> documentAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        Attempt<Guid> documentAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
         if (documentAttempt.Success)
         {
             return (Key: documentAttempt.Result, EntityType: UmbracoObjectTypes.Document.ToString());
         }
 
-        Attempt<Guid> mediaAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Media);
+        Attempt<Guid> mediaAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Media).GetAwaiter().GetResult();
         if (mediaAttempt.Success)
         {
             return (Key: mediaAttempt.Result, EntityType: UmbracoObjectTypes.Media.ToString());
