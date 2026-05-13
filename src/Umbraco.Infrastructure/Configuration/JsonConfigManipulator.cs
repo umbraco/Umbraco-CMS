@@ -10,6 +10,11 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.Configuration;
 
+/// <summary>
+/// Default <see cref="IConfigManipulator"/> implementation that persists configuration values back to the
+/// underlying JSON files registered as <see cref="JsonConfigurationProvider"/> sources on the application's
+/// <see cref="IConfigurationRoot"/>.
+/// </summary>
 internal sealed class JsonConfigManipulator : IConfigManipulator
 {
     private const string ConnectionStringObjectName = "ConnectionStrings";
@@ -37,25 +42,6 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     }
 
     /// <inheritdoc />
-    public async Task RemoveConnectionStringAsync()
-    {
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(UmbracoConnectionStringPath, preferLast: true);
-
-        JsonNode? jsonNode = await GetJsonNodeAsync(provider);
-
-        if (jsonNode is null)
-        {
-            _logger.LogWarning("Failed to remove connection string from JSON configuration");
-            return;
-        }
-
-        RemoveJsonNode(jsonNode, UmbracoConnectionStringPath);
-        RemoveJsonNode(jsonNode, UmbracoConnectionStringProviderNamePath);
-
-        await SaveJsonAsync(provider, jsonNode);
-    }
-
-    /// <inheritdoc />
     public async Task SaveConnectionStringAsync(string connectionString, string? providerName)
     {
         // Target the last JSON provider so connection strings land in the most specific (environment-overriding) file
@@ -79,6 +65,26 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     }
 
     /// <inheritdoc />
+    public async Task RemoveConnectionStringAsync()
+    {
+        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(UmbracoConnectionStringPath, preferLast: true);
+
+        JsonNode? jsonNode = await GetJsonNodeAsync(provider);
+
+        if (jsonNode is null)
+        {
+            _logger.LogWarning("Failed to remove connection string from JSON configuration");
+            return;
+        }
+
+        RemoveJsonNode(jsonNode, UmbracoConnectionStringPath);
+        RemoveJsonNode(jsonNode, UmbracoConnectionStringProviderNamePath);
+
+        await SaveJsonAsync(provider, jsonNode);
+    }
+
+    /// <inheritdoc />
+    [Obsolete("This method is no longer used by Umbraco. Scheduled for removal in Umbraco 19.")]
     public async Task SaveConfigValueAsync(string itemPath, object value)
     {
         JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
