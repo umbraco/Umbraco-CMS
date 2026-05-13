@@ -7,7 +7,7 @@ describe('UmbPersistentModalDialogElement', () => {
 
 	beforeEach(async () => {
 		element = await fixture(html`<umb-persistent-modal-dialog></umb-persistent-modal-dialog>`);
-		// `_openModal` defers `isOpen = true` via queueMicrotask
+		// `_openModal` defers `isOpen = true` via queueMicrotask.
 		await aTimeout(0);
 	});
 
