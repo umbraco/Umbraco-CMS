@@ -1,10 +1,10 @@
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import type { UmbBackofficeContext } from '../backoffice.context.js';
-import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
-import { ensureSlash } from '../../../packages/core/router/index.js';
-import { UUITabElement } from '../../../external/uui/index.js';
+import { ensureSlash } from '@umbraco-cms/backoffice/router';
+import { UUITabElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
