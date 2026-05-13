@@ -293,11 +293,13 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 					label=${this.localize.term('blockEditor_tabClipboard')}
 					?active=${this._openClipboard}
 					@click=${() => {
-						this.value = {
-							clipboard: {
-								selection: [],
-							},
-						};
+						if (!this._openClipboard) {
+							this.value = {
+								clipboard: {
+									selection: [],
+								},
+							};
+						}
 						this._openClipboard = true;
 					}}>
 					<umb-localize key=${this.localize.term('blockEditor_tabClipboard')}>Clipboard</umb-localize>
