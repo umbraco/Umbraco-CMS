@@ -1,5 +1,4 @@
-import type { UmbRelationTypeCollectionFilterModel } from '../types.js';
-import type { UmbRelationTypeDetailModel } from '../../types.js';
+import type { UmbRelationTypeCollectionFilterModel, UmbRelationTypeCollectionItemModel } from '../types.js';
 import { UMB_RELATION_TYPE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
 import { RelationTypeService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -11,7 +10,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
  * @class UmbRelationTypeCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
-export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionDataSource<UmbRelationTypeDetailModel> {
+export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionDataSource<UmbRelationTypeCollectionItemModel> {
 	#host: UmbControllerHost;
 
 	/**
@@ -41,8 +40,8 @@ export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionD
 		);
 
 		if (data) {
-			const items = data.items.map((item) => {
-				const model: UmbRelationTypeDetailModel = {
+			const items = data.items.map((item): UmbRelationTypeCollectionItemModel => {
+				return {
 					alias: item.alias || '',
 					child: item.childObject
 						? {
@@ -53,6 +52,7 @@ export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionD
 							}
 						: null,
 					entityType: UMB_RELATION_TYPE_ENTITY_TYPE,
+					icon: 'icon-trafic',
 					isBidirectional: item.isBidirectional,
 					isDependency: item.isDependency,
 					name: item.name,
@@ -66,8 +66,6 @@ export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionD
 						: null,
 					unique: item.id,
 				};
-
-				return model;
 			});
 
 			return { data: { items, total: data.total } };

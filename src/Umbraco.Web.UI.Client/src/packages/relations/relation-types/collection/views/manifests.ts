@@ -3,9 +3,9 @@ import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collecti
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'collectionView',
+		kind: 'table',
 		alias: 'Umb.CollectionView.RelationType.Table',
 		name: 'Relation Type Table Collection View',
-		js: () => import('./table/relation-type-table-collection-view.element.js'),
 		meta: {
 			label: 'Table',
 			icon: 'icon-table',
