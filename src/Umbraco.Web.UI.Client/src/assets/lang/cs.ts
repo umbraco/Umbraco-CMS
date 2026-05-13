@@ -639,6 +639,7 @@ export default {
 		content: 'Obsah',
 		continue: 'Pokračovat',
 		copy: 'Kopírovat',
+		copied: 'Zkopírováno!',
 		create: 'Vytvořit',
 		database: 'Databáze',
 		date: 'Datum',
