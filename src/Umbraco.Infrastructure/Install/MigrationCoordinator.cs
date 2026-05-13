@@ -96,17 +96,24 @@ internal sealed class MigrationCoordinator : IMigrationCoordinator
             return;
         }
 
-        using ICoreScope scope = _scopeProvider.CreateCoreScope();
-        scope.WriteLock(Constants.Locks.KeyValues);
-
-        string? current = _keyValueService.GetValue(Constants.Conventions.Migrations.UpgradeLockKey);
-        if (current == _leaderClaim)
+        try
         {
-            _keyValueService.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty);
-        }
+            using ICoreScope scope = _scopeProvider.CreateCoreScope();
+            scope.WriteLock(Constants.Locks.KeyValues);
 
-        scope.Complete();
-        _leaderClaim = null;
+            string? current = _keyValueService.GetValue(Constants.Conventions.Migrations.UpgradeLockKey);
+            if (current == _leaderClaim)
+            {
+                _keyValueService.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty);
+            }
+
+            scope.Complete();
+            _leaderClaim = null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to release migration leadership; continuing shutdown because leadership release is best-effort.");
+        }
     }
 
     private static bool IsStale(string claim, TimeSpan timeout)
