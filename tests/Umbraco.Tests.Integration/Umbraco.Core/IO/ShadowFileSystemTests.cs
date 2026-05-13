@@ -459,10 +459,34 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(ss.FileExists("Views/PageNotFound.cshtml"));
         Assert.IsTrue(ss.FileExists("views/pagenotfound.cshtml"));
 
+        // _sfs operations via a different-cased path must still hit the staged file
+        // (canonical-path tracking; otherwise on Linux these would throw FileNotFoundException
+        // or return data from a phantom second file).
+        using (var stream = ss.OpenFile("views/pagenotfound.cshtml"))
+        using (var reader = new StreamReader(stream))
+        {
+            Assert.AreEqual("foo", reader.ReadToEnd());
+        }
+
+        Assert.AreEqual(3, ss.GetSize("VIEWS/pagenotfound.cshtml"));
+
+        // re-staging the same logical path with a different case must overwrite the
+        // canonical staged file (not create a second file in the shadow on Linux)
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("bar-updated")))
+        {
+            ss.AddFile("views/pagenotfound.cshtml", ms);
+        }
+
+        Assert.IsFalse(
+            File.Exists(path + "/ShadowSystem/views/pagenotfound.cshtml"),
+            "Re-staging with different case must not create a second file in the shadow.");
+
         ss.Complete();
 
-        // committed at original case
-        Assert.IsTrue(File.Exists(path + "/ShadowTests/Views/PageNotFound.cshtml"));
+        // committed at original case, with the latest content
+        var committedPath = path + "/ShadowTests/Views/PageNotFound.cshtml";
+        Assert.IsTrue(File.Exists(committedPath));
+        Assert.AreEqual("bar-updated", File.ReadAllText(committedPath));
     }
 
     [Test]
