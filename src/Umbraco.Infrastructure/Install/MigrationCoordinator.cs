@@ -43,10 +43,10 @@ internal sealed class MigrationCoordinator : IMigrationCoordinator
     public async Task<bool> TryBecomeLeaderAsync(CancellationToken cancellationToken)
     {
         var machineIdentifier = _machineInfoFactory.GetMachineIdentifier();
-        _leaderClaim = $"{machineIdentifier}|{DateTimeOffset.UtcNow:O}";
 
         while (cancellationToken.IsCancellationRequested is false)
         {
+            _leaderClaim = $"{machineIdentifier}|{DateTimeOffset.UtcNow:O}";
             if (TryClaimLeadership(machineIdentifier))
             {
                 _logger.LogInformation("This server claimed migration leadership.");
@@ -72,7 +72,15 @@ internal sealed class MigrationCoordinator : IMigrationCoordinator
                     return false;
                 default:
                     _logger.LogDebug("Waiting for migration leader to finish...");
-                    await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+                    try
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+                    }
+                    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                    {
+                        return false;
+                    }
+
                     break;
             }
         }
