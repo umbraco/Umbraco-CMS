@@ -436,7 +436,7 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
     /// <c>FileNotFoundException</c> from <c>File.Move</c>.
     /// </summary>
     [Test]
-    public void ShadowCompletePreservesPathCase()
+    public void Can_Complete_Shadow_With_Mixed_Case_Path()
     {
         var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
         Directory.CreateDirectory(path);
