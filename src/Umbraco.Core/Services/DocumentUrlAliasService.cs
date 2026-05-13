@@ -1,7 +1,5 @@
 using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -91,31 +89,6 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
 
         /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(NormalizedAlias, LanguageId ?? 0);
-    }
-
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentUrlAliasService"/> class.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 19.")]
-    public DocumentUrlAliasService(
-        ILogger<DocumentUrlAliasService> logger,
-        IDocumentUrlAliasRepository documentUrlAliasRepository,
-        ICoreScopeProvider coreScopeProvider,
-        ILanguageService languageService,
-        IKeyValueService keyValueService,
-        IContentService contentService,
-        IDocumentNavigationQueryService documentNavigationQueryService)
-        : this(
-            logger,
-            documentUrlAliasRepository,
-            coreScopeProvider,
-            languageService,
-            keyValueService,
-            contentService,
-            documentNavigationQueryService,
-            StaticServiceProvider.Instance.GetRequiredService<IServerRoleAccessor>())
-    {
     }
 
     /// <summary>
@@ -402,7 +375,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                     toSave.Add(new PublishedDocumentUrlAlias
                     {
                         DocumentKey = raw.DocumentKey,
-                        NullableLanguageId = null, // NULL for invariant content
+                        LanguageId = null, // NULL for invariant content
                         Alias = alias,
                     });
                 }
@@ -414,7 +387,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                     toSave.Add(new PublishedDocumentUrlAlias
                     {
                         DocumentKey = raw.DocumentKey,
-                        NullableLanguageId = raw.LanguageId.Value,
+                        LanguageId = raw.LanguageId.Value,
                         Alias = alias,
                     });
                 }
@@ -467,7 +440,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                     aliases.Add(new PublishedDocumentUrlAlias
                     {
                         DocumentKey = document.Key,
-                        NullableLanguageId = null, // NULL for invariant content
+                        LanguageId = null, // NULL for invariant content
                         Alias = alias,
                     });
                 }
@@ -492,7 +465,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
                 aliases.Add(new PublishedDocumentUrlAlias
                 {
                     DocumentKey = document.Key,
-                    NullableLanguageId = language.Id,
+                    LanguageId = language.Id,
                     Alias = alias,
                 });
             }
@@ -548,7 +521,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// </summary>
     private void AddToCache(PublishedDocumentUrlAlias alias)
     {
-        var cacheKey = new AliasCacheKey(alias.Alias, alias.NullableLanguageId);
+        var cacheKey = new AliasCacheKey(alias.Alias, alias.LanguageId);
 
         _aliasCache.AddOrUpdate(
             cacheKey,
@@ -588,7 +561,7 @@ public class DocumentUrlAliasService : IDocumentUrlAliasService
     /// This ensures cache updates are rolled back if the database transaction fails.
     /// </summary>
     private void AddToCacheDeferred(IScopeContext scopeContext, PublishedDocumentUrlAlias alias) =>
-        scopeContext.Enlist($"AddAliasToCache_{alias.DocumentKey}_{alias.Alias}_{alias.NullableLanguageId}", () =>
+        scopeContext.Enlist($"AddAliasToCache_{alias.DocumentKey}_{alias.Alias}_{alias.LanguageId}", () =>
         {
             AddToCache(alias);
             return true;

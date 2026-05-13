@@ -23,6 +23,7 @@
     content: "Content",
     media: "Media",
     settings: "Settings",
+    library: "Library",
     packages: "Packages",
     members: "Members",
     dictionary: "Translation",
@@ -54,7 +55,7 @@
   public static readonly access = {
     denied: 'Access denied'
   }
-  
+
   public static readonly approvedColorSettings = {
     0: ['Include labels?', 'Displays colored field and a label for each color in the color picker, rather than just a colored field.'],
     1: ['Colors', 'Add, remove or sort colors (and labels).'],
@@ -162,10 +163,11 @@
     4: ['Dimensions', 'Sets the fixed width and height of the editor. This excludes the toolbar and statusbar heights.'],
     5: ['Maximum size for inserted images', 'Maximum width or height - enter 0 to disable resizing.'],
     6: ['Overlay size', 'Select the width of the overlay (link picker).'],
-    7: ['Available Blocks', 'Define the available blocks.'],
-    8: ['Image Upload Folder', 'Choose the upload location of pasted images.'],
-    9: ['Accepted media types', 'Limit to specific media types for the media picker toolbar and drag-and-drop uploads.'],
-    10: ['Ignore User Start Nodes', ''],
+    7: ['Create modal size', ''],
+    8: ['Available Blocks', 'Define the available blocks.'],
+    9: ['Image Upload Folder', 'Choose the upload location of pasted images.'],
+    10: ['Accepted media types', 'Limit to specific media types for the media picker toolbar and drag-and-drop uploads.'],
+    11: ['Ignore User Start Nodes', ''],
   }
 
   public static readonly tinyMCESettings = {
@@ -200,7 +202,7 @@
     1: ['Granular permissions', 'Assign permissions to Document property values'],
   }
 
-  public static readonly userGroupPermissionsSettings = {
+  public static readonly userGroupDocumentPermissionsSettings = {
     0: ['Read', 'Allow access to read a Document', 'Umb.Document.Read'],
     1: ['Create Document Blueprint', 'Allow access to create a Document Blueprint', 'Umb.Document.CreateBlueprint'],
     2: ['Delete', 'Allow access to delete a Document', 'Umb.Document.Delete'],
@@ -217,15 +219,27 @@
     13: ['Rollback', 'Allow access to roll back a Document to a previous state', 'Umb.Document.Rollback']
   }
 
+  public static readonly sectionAliases = {
+    content: 'Umb.Section.Content',
+    library: 'Umb.Section.Library',
+    media: 'Umb.Section.Media',
+    members: 'Umb.Section.Members',
+    packages: 'Umb.Section.Packages',
+    settings: 'Umb.Section.Settings',
+    translation: 'Umb.Section.Translation',
+    users: 'Umb.Section.Users',
+  }
+
   public static readonly userGroupSectionsSettings = {
     0: ['Content', 'Umb.Section.Content'],
     1: ['Forms', 'Umb.Section.Forms'],
-    2: ['Media', 'Umb.Section.Media'],
-    3: ['Members', 'Umb.Section.Members'],
-    4: ['Packages', 'Umb.Section.Packages'],
-    5: ['Settings', 'Umb.Section.Settings'],
-    6: ['Translation', 'Umb.Section.Translation'],
-    7: ['Users', 'Umb.Section.Users'],
+    2: ['Library', 'Umb.Section.Library'],
+    3: ['Media', 'Umb.Section.Media'],
+    4: ['Members', 'Umb.Section.Members'],
+    5: ['Packages', 'Umb.Section.Packages'],
+    6: ['Settings', 'Umb.Section.Settings'],
+    7: ['Translation', 'Umb.Section.Translation'],
+    8: ['Users', 'Umb.Section.Users'],
   }
 
   public static readonly trashDeleteDialogMessage = {
@@ -301,9 +315,17 @@
     webhook: '/umbraco/management/api/v1/webhook',
     recycleBinDocument: '/umbraco/management/api/v1/recycle-bin/document',
     recycleBinMedia: '/umbraco/management/api/v1/recycle-bin/media',
+    recycleBinElement: '/umbraco/management/api/v1/recycle-bin/element',
     domains: '/domains',
     notifications: '/notifications',
-    currentUser: '/umbraco/management/api/v1/user/current'
+    currentUser: '/umbraco/management/api/v1/user/current',
+    element: '/umbraco/management/api/v1/element',
+    elementFolder: '/umbraco/management/api/v1/element/folder',
+    treeElementRoot: '/umbraco/management/api/v1/tree/element/root',
+    treeElementChildren: '/umbraco/management/api/v1/tree/element/children',
+    revoke: '/umbraco/management/api/v1/security/back-office/revoke',
+    currentUserProfile: '/umbraco/management/api/v1/user/current/profile',
+    currentUserAvatar: '/umbraco/management/api/v1/user/current/avatar'
   }
 
   public static readonly userGroupDescriptionValues = {
@@ -314,8 +336,54 @@
     'Writers': 'Users with permission to create and update but not publish content'
   }
 
+  public static readonly userGroupElementPermissionsSettings = {
+    0: ['Read', 'Allow access to read an element', 'Umb.Element.Read'],
+    1: ['Create', 'Allow access to create an element', 'Umb.Element.Create'],
+    2: ['Delete', 'Allow access to delete an element', 'Umb.Element.Delete'],
+    3: ['Publish', 'Allow access to publish an element', 'Umb.Element.Publish'],
+    4: ['Unpublish', 'Allow access to unpublish an element', 'Umb.Element.Unpublish'],
+    5: ['Update', 'Allow access to save an element', 'Umb.Element.Update'],
+    6: ['Duplicate', 'Allow access to duplicate an element', 'Umb.Element.Duplicate'],
+    7: ['Move', 'Allow access to move an element', 'Umb.Element.Move'],
+    8: ['Rollback', 'Allow access to rollback an element to a previous state', 'Umb.Element.Rollback']
+  }
+
   public static readonly healthCheckMessages = {
     imagingHMACSecretKeyIsNotConfigured: 'No HMAC secret key is configured for image URL signing. It is recommended to set Umbraco:CMS:Imaging:HMACSecretKey to prevent unauthorized image manipulation requests.',
     imagingHMACSecretKeyIsConfigured: 'The HMAC secret key for image URL signing is configured'
+  }
+
+  public static readonly loginErrorMessages = {
+    lockedAccount: 'Your account has been locked out. Please try again later.',
+    invalidCredentials: "Oops! We couldn't log you in. Please check your credentials and try again.",
+    emptyEmail: 'Please fill in an email',
+    emptyPassword: 'Please fill in a password'
+  }
+
+  public static readonly forgottenPasswordMessages = {
+    confirmation: 'We sent an email with password reset instructions, if the email address matches a registered user.',
+    notFoundUserError: 'The specified user was not found.'
+  }
+
+  public static readonly auditTrailMessages = {
+    contentSaved: 'Content saved',
+    contentSavedAndPublished: 'Content saved and Published',
+    contentUnpublished: 'Content unpublished',
+    contentMoved: 'Content moved',
+    contentCopied: 'Content copied',
+    contentDeleted: 'Content deleted',
+    contentRolledBack: 'Content rolled back',
+    contentSorted: 'Sort child items performed by user'
+  }
+
+  public static readonly auditTrailTypes = {
+    save: 'Save',
+    delete: 'Delete',
+    move: 'Move',
+    sort: 'Sort',
+    publish: 'Publish',
+    rollback: 'Rollback',
+    copy: 'Copy',
+    unpublish: 'Unpublish'
   }
 }

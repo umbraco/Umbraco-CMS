@@ -125,7 +125,7 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = await _sut.CreateResponseModelAsync(member.Object, user.Object);
 
         // Assert
-        CollectionAssert.Contains(result.Groups.ToList(), groupKey);
+        Assert.That(result.Groups.ToList(), Does.Contain(groupKey));
     }
 
     [Test]
@@ -289,7 +289,7 @@ public class MemberPresentationFactoryTests
         MemberResponseModel result = await _sut.CreateExternalMemberResponseModelAsync(member);
 
         // Assert
-        CollectionAssert.Contains(result.Groups.ToList(), groupKey);
+        Assert.That(result.Groups.ToList(), Does.Contain(groupKey));
     }
 
     [Test]

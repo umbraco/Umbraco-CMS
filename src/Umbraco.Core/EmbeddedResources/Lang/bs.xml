@@ -448,10 +448,6 @@
     <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Rezultati zakazanih Umbraco provjera zdravlja koji se pokreću na %0% na %1% su sljedeći:</p>%2%</body></html>]]></key>
     <key alias="scheduledHealthCheckEmailSubject">Status provjere zdravlja Umbraco: %0%</key>
   </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Sadržaj u otpadu s ID-om: {0} povezan je s originalnim nadređenim sadržajem s ID-om: {1}</key>
-    <key alias="mediaTrashed">Medij u otpadu s ID-om: {0} povezan je s originalnim nadređenim medijem s ID-om: {1}</key>
-  </area>
   <area alias="permissions">
     <key alias="FolderCreation">Kreiranje foldera</key>
     <key alias="FileWritingForPackages">Pisanje datoteka za pakete</key>

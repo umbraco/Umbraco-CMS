@@ -17,6 +17,7 @@ public class DeferredCacheRebuildServiceTests
 
     private Mock<IDocumentCacheService> _documentCacheService = null!;
     private Mock<IMediaCacheService> _mediaCacheService = null!;
+    private Mock<IElementCacheService> _elementCacheService = null!;
     private DeferredCacheRebuildService _service = null!;
 
     [SetUp]
@@ -24,6 +25,7 @@ public class DeferredCacheRebuildServiceTests
     {
         _documentCacheService = new Mock<IDocumentCacheService>();
         _mediaCacheService = new Mock<IMediaCacheService>();
+        _elementCacheService = new Mock<IElementCacheService>();
         _service = CreateService();
     }
 
@@ -37,6 +39,7 @@ public class DeferredCacheRebuildServiceTests
         return new DeferredCacheRebuildService(
             _documentCacheService.Object,
             _mediaCacheService.Object,
+            _elementCacheService.Object,
             Mock.Of<ILogger<DeferredCacheRebuildService>>(),
             lifetime.Object);
     }

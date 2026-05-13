@@ -30,17 +30,6 @@ public class MissingPropertyEditor : IDataEditor
         Alias = missingEditorAlias;
     }
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MissingPropertyEditor"/> class.
-    /// </summary>
-    [Obsolete("Use the non-obsolete constructor instead. Scheduled for removal in Umbraco 18.")]
-    public MissingPropertyEditor()
-        : this(
-            EditorAlias,
-            StaticServiceProvider.Instance.GetRequiredService<IDataValueEditorFactory>())
-    {
-    }
-
     /// <inheritdoc />
     public string Alias { get; }
 

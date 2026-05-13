@@ -1,6 +1,7 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
 import {UserBuilder} from "../builders";
 import {Page} from "@playwright/test";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class UserApiHelper {
   api: ApiHelpers;
@@ -144,6 +145,17 @@ export class UserApiHelper {
       "userIds": ids.map(id => ({id}))
     };
     return await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/user/unlock', users);
+  }
+
+  async lockOutByFailedLogins(userEmail: string, attempts: number = 5) {
+    const loginUrl = this.api.baseUrl + '/umbraco/management/api/v1/security/back-office/login';
+    for (let i = 0; i < attempts; i++) {
+      await this.page.request.post(loginUrl, {
+        headers: {'Content-Type': 'application/json'},
+        data: {username: userEmail, password: 'WrongPassword!'},
+        ignoreHTTPSErrors: true
+      });
+    }
   }
 
   async getCurrentUser() {
@@ -298,5 +310,46 @@ export class UserApiHelper {
   async filterByUserGroupIds(userGroupIds: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/filter/user?skip=0&take=100&userGroupIds=' + userGroupIds);
     return await response.json();
+  }
+
+  async doesUserContainElementStartNodeIds(userName: string, elementStartNodeIds: string[]) {
+    const user = await this.getByName(userName);
+    if (!user.elementStartNodeIds || user.elementStartNodeIds.length === 0) {
+      return false;
+    }
+    const elementStartNodeIdsArray = user.elementStartNodeIds.map(elementStartNode => elementStartNode.id);
+    return elementStartNodeIdsArray.every(id => elementStartNodeIds.includes(id));
+  }
+
+  async setUserPermissionsForElement(userName: string, userEmail: string, userPassword: string, userGroupId: string, elementStartNodeIds: string[] = [], hasElementRootAccess = false, uiCulture: string = 'en-us') {
+    let user = await this.getByName(userName);
+
+    // If the user does not exist, create a default user and retrieve the newly created user
+    if (!user) {
+      await this.createDefaultUser(userName, userEmail, [userGroupId]);
+      user = await this.getByName(userName);
+    }
+
+    await this.updatePassword(user.id, userPassword);
+
+    let userSetup = {
+      elementStartNodeIds: [] as { id: string }[],
+      email: user.email,
+      hasElementRootAccess: hasElementRootAccess,
+      languageIsoCode: uiCulture,
+      name: user.name,
+      userGroupIds: [{id: userGroupId}],
+      userName: user.userName,
+    };
+
+    for (const elementStartNodeId of elementStartNodeIds) {
+      userSetup.elementStartNodeIds.push({id: elementStartNodeId});
+    }
+
+    await this.update(user.id, userSetup);
+  }
+  async getCurrentUserStatus(){
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/user/current');
+    return response.status();
   }
 }

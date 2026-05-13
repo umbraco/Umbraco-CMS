@@ -11,7 +11,7 @@ import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 
 // We import what we need from the Backoffice app.
 // In the future the login screen app will be a part of the Backoffice app, and we will not need to import these.
-import '@umbraco-cms/backoffice/localization';
+import { umbLocalizationManifests } from '@umbraco-cms/backoffice/localization';
 
 /**
  * This is the initializer for the slim backoffice.
@@ -20,6 +20,11 @@ import '@umbraco-cms/backoffice/localization';
 export class UmbSlimBackofficeController extends UmbControllerBase {
 	constructor(host: UmbElement) {
 		super(host);
+
+		// Register the Backoffice's built-in localization manifests so that the login screen
+		// can resolve canonical 'login_*' keys (greeting, signInWith, etc.) directly from the
+		// shared backoffice dictionaries — no parallel maintenance in this project. See #56402.
+		umbExtensionsRegistry.registerMany(umbLocalizationManifests);
 
 		new UmbBundleExtensionInitializer(host, umbExtensionsRegistry);
 
@@ -49,7 +54,6 @@ export class UmbSlimBackofficeController extends UmbControllerBase {
 			console.error(`Failed to register public extensions for the slim backoffice.`, error);
 		});
 
-		const initializer = new UmbAppEntryPointExtensionInitializer(host, umbExtensionsRegistry);
-		await firstValueFrom(initializer.loaded);
+		new UmbAppEntryPointExtensionInitializer(host, umbExtensionsRegistry);
 	}
 }

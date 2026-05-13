@@ -25,13 +25,19 @@ public class PropertyValueConverterTests : DeliveryApiTests
 
     protected IPublishedContent DraftContent { get; private set; }
 
+    protected IPublishedElement PublishedElement { get; private set; }
+
     protected IPublishedContentType PublishedContentType { get; private set; }
 
     protected IPublishedContentType PublishedMediaType { get; private set; }
 
+    protected IPublishedContentType PublishedElementType { get; private set; }
+
     protected Mock<IPublishedContentCache> PublishedContentCacheMock { get; private set; }
 
     protected Mock<IPublishedMediaCache> PublishedMediaCacheMock { get; private set; }
+
+    protected Mock<IPublishedElementCache> PublishedElementCacheMock { get; private set; }
 
     protected Mock<IPublishedUrlProvider> PublishedUrlProviderMock { get; private set; }
 
@@ -52,6 +58,10 @@ public class PropertyValueConverterTests : DeliveryApiTests
         publishedMediaType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Media);
         publishedMediaType.SetupGet(c => c.Alias).Returns("TheMediaType");
         PublishedMediaType = publishedMediaType.Object;
+        var publishedElementType = new Mock<IPublishedContentType>();
+        publishedElementType.SetupGet(c => c.ItemType).Returns(PublishedItemType.Element);
+        publishedElementType.SetupGet(c => c.Alias).Returns("TheElementType");
+        PublishedElementType = publishedElementType.Object;
 
         var contentKey = Guid.NewGuid();
         var publishedContent = SetupPublishedContent("The page", contentKey, PublishedItemType.Content, publishedContentType.Object);
@@ -64,6 +74,10 @@ public class PropertyValueConverterTests : DeliveryApiTests
         var draftContentKey = Guid.NewGuid();
         var draftContent = SetupPublishedContent("The page (draft)", draftContentKey, PublishedItemType.Content, publishedContentType.Object);
         DraftContent = draftContent.Object;
+
+        var elementKey = Guid.NewGuid();
+        var publishedElement = SetupPublishedElement("The element", elementKey, publishedElementType.Object);
+        PublishedElement = publishedElement.Object;
 
         PublishedContentCacheMock = new Mock<IPublishedContentCache>();
         PublishedContentCacheMock
@@ -80,6 +94,11 @@ public class PropertyValueConverterTests : DeliveryApiTests
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(mediaKey))
             .Returns(publishedMedia.Object);
+
+        PublishedElementCacheMock = new Mock<IPublishedElementCache>();
+        PublishedElementCacheMock
+            .Setup(ecc => ecc.GetByIdAsync(elementKey, false))
+            .Returns(Task.FromResult(publishedElement.Object));
 
         var cacheMock = new Mock<ICacheManager>();
         cacheMock.SetupGet(cache => cache.Content).Returns(PublishedContentCacheMock.Object);
@@ -107,17 +126,23 @@ public class PropertyValueConverterTests : DeliveryApiTests
     protected Mock<IPublishedContent> SetupPublishedContent(string name, Guid key, PublishedItemType itemType, IPublishedContentType contentType)
     {
         var content = new Mock<IPublishedContent>();
-        var urlSegment = "url-segment";
-        ConfigurePublishedContentMock(content, key, name, urlSegment, contentType, Array.Empty<PublishedElementPropertyBase>());
+        ConfigurePublishedContentMock(content, key, name, contentType, Array.Empty<PublishedPropertyBase>());
         content.SetupGet(c => c.ItemType).Returns(itemType);
         return content;
     }
 
-    protected void RegisterContentWithProviders(IPublishedContent content, bool preview)
+    protected Mock<IPublishedElement> SetupPublishedElement(string name, Guid key, IPublishedContentType contentType)
+    {
+        var element = new Mock<IPublishedElement>();
+        ConfigurePublishedElementMock(element, key, name, contentType, Array.Empty<PublishedPropertyBase>());
+        return element;
+    }
+
+    protected void RegisterContentWithProviders(IPublishedContent content, bool preview, string url = "url-segment")
     {
         PublishedUrlProviderMock
             .Setup(p => p.GetUrl(content, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
-            .Returns(content.UrlSegment);
+            .Returns(url);
         PublishedContentCacheMock
             .Setup(pcc => pcc.GetById(preview, content.Key))
             .Returns(content);
@@ -129,11 +154,11 @@ public class PropertyValueConverterTests : DeliveryApiTests
         }
     }
 
-    protected void RegisterMediaWithProviders(IPublishedContent media)
+    protected void RegisterMediaWithProviders(IPublishedContent media, string url = "url-segment")
     {
         PublishedUrlProviderMock
             .Setup(p => p.GetUrl(media, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
-            .Returns(media.UrlSegment);
+            .Returns(url);
         PublishedMediaCacheMock
             .Setup(pcc => pcc.GetById(media.Key))
             .Returns(media);
@@ -150,7 +175,7 @@ public class PropertyValueConverterTests : DeliveryApiTests
         IOptionsMonitor<RequestHandlerSettings>? requestHandlerSettingsMonitor = null,
         IPublishedContentCache? contentCache = null,
         IDocumentNavigationQueryService? navigationQueryService = null,
-        IPublishStatusQueryService? publishStatusQueryService = null,
+        IDocumentPublishStatusQueryService? publishStatusQueryService = null,
         IDocumentUrlService? documentUrlService = null)
     {
         contentCache ??= PublishedContentCacheMock.Object;

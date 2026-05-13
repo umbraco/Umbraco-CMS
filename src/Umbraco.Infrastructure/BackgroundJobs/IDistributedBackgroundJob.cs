@@ -20,4 +20,13 @@ public interface IDistributedBackgroundJob
     /// Run the job.
     /// </summary>
     Task ExecuteAsync();
+
+    /// <summary>
+    /// Run the job with a cancellation token that signals when the host is shutting down.
+    /// </summary>
+    /// <remarks>
+    /// The default implementation delegates to <see cref="ExecuteAsync()"/>.
+    /// Override this method to respond to graceful shutdown.
+    /// </remarks>
+    Task ExecuteAsync(CancellationToken cancellationToken) => ExecuteAsync();
 }

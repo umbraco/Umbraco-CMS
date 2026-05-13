@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -296,7 +297,7 @@ public class BlockListEditorPropertyValueEditorTests
             Mock.Of<IShortStringHelper>(),
             jsonSerializer,
             Mock.Of<IPropertyValidationService>(),
-            new BlockEditorVarianceHandler(languageService, Mock.Of<IContentTypeService>()),
+            new BlockEditorVarianceHandler(languageService, Mock.Of<IContentTypeService>(), Mock.Of<IVariationContextAccessor>()),
             languageService,
             Mock.Of<IIOHelper>())
         {

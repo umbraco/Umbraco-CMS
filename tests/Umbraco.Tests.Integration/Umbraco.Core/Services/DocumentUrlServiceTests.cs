@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -28,6 +29,8 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
     private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
 
+    private IPublishedContentCache PublishedContentCache => GetRequiredService<IPublishedContentCache>();
+
     private ILanguageService LanguageService => GetRequiredService<ILanguageService>();
 
     private IDomainService DomainService => GetRequiredService<IDomainService>();
@@ -49,9 +52,9 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         builder.UrlSegmentProviders().Insert<CustomUrlSegmentProvider2>();
     }
 
-    public override void CreateTestData()
+    public override async Task CreateTestDataAsync()
     {
-        base.CreateTestData();
+        await base.CreateTestDataAsync();
 
         var subSubPage1 = ContentBuilder.CreateSimpleContent(ContentType, "Sub Sub Page 1", Subpage.Id);
         subSubPage1.Key = new Guid(SubSubPage1Key);
@@ -108,10 +111,11 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             => GetUrlSegment(content, culture, Guid.Parse(SubPage2Key), Guid.Parse(SubSubPage2Key));
     }
 
-    public override void Setup()
+    [SetUp]
+    public override async Task Setup()
     {
-        DocumentUrlService.InitAsync(false, CancellationToken.None).GetAwaiter().GetResult();
-        base.Setup();
+        await DocumentUrlService.InitAsync(false, CancellationToken.None);
+        await base.Setup();
     }
 
     //
@@ -143,7 +147,79 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
     }
 
-    //TODO test with the urlsegment property value!
+    [Test]
+    public async Task GetUrlSegment_Respects_UmbracoUrlName_Property()
+    {
+        var contentType = await CreateInvariantContentTypeWithUrlNameAsync("invariantWithUrlName");
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Find a Park")
+            .Build();
+        content.SetValue(Constants.Conventions.Content.UrlName, "park");
+        ContentService.Save(content);
+        var publishResult = ContentService.Publish(content, ["*"]);
+        Assert.IsTrue(publishResult.Success, $"Publish failed: {publishResult.Result}");
+
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var actual = DocumentUrlService.GetUrlSegment(content.Key, isoCode, isDraft: false);
+
+        Assert.AreEqual("park", actual);
+    }
+
+    [Test]
+    public async Task PublishedContent_UrlSegment_Agrees_With_DocumentUrlService_When_UmbracoUrlName_Set()
+    {
+        var contentType = await CreateInvariantContentTypeWithUrlNameAsync("invariantWithUrlNameAgree");
+
+        var content = new ContentBuilder()
+            .WithContentType(contentType)
+            .WithName("Find a Park")
+            .Build();
+        content.SetValue(Constants.Conventions.Content.UrlName, "park");
+        ContentService.Save(content);
+        var publishResult = ContentService.Publish(content, ["*"]);
+        Assert.IsTrue(publishResult.Success, $"Publish failed: {publishResult.Result}");
+
+        var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
+        var serviceSegment = DocumentUrlService.GetUrlSegment(content.Key, isoCode, isDraft: false);
+
+        var published = await PublishedContentCache.GetByIdAsync(content.Key, preview: false);
+        Assert.IsNotNull(published);
+#pragma warning disable CS0618 // Type or member is obsolete
+        var publishedSegment = published!.UrlSegment;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        Assert.AreEqual("park", serviceSegment);
+        Assert.AreEqual(serviceSegment, publishedSegment);
+    }
+
+    private async Task<IContentType> CreateInvariantContentTypeWithUrlNameAsync(string alias)
+    {
+        var template = TemplateBuilder.CreateTextPageTemplate($"{alias}Template", $"{alias} Template");
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+
+        var contentType = new ContentTypeBuilder()
+            .WithAlias(alias)
+            .WithName(alias)
+            .WithAllowAsRoot(true)
+            .WithDefaultTemplateId(template.Id)
+            .AddPropertyGroup()
+                .WithAlias("content")
+                .WithName("Content")
+                .WithSortOrder(1)
+                .WithSupportsPublishing(true)
+                .AddPropertyType()
+                    .WithAlias(Constants.Conventions.Content.UrlName)
+                    .WithName("Url Name")
+                    .WithVariations(ContentVariation.Nothing)
+                    .WithSortOrder(1)
+                    .Done()
+                .Done()
+            .Build();
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        return contentType;
+    }
 
     [Test]
     public async Task GetUrlSegment_For_Document_With_Parent_Deleted_Does_Not_Have_Url_Segment()
@@ -636,7 +712,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
 
         foreach (var segment in storedSegments)
         {
-            Assert.That(segment.NullableLanguageId, Is.Null, "Invariant content should have NULL LanguageId in database");
+            Assert.That(segment.LanguageId, Is.Null, "Invariant content should have NULL LanguageId in database");
         }
     }
 
@@ -662,7 +738,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         }
 
         Assert.That(segmentsBefore, Has.Count.GreaterThan(0), "Should have URL segments before change");
-        Assert.That(segmentsBefore.All(s => s.NullableLanguageId == null), Is.True, "All segments should have NULL languageId before change");
+        Assert.That(segmentsBefore.All(s => s.LanguageId == null), Is.True, "All segments should have NULL languageId before change");
 
         // Act - change content type from invariant to variant
         ContentType.Variations = ContentVariation.Culture;
@@ -686,8 +762,8 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         }
 
         Assert.That(segmentsAfter, Has.Count.GreaterThan(0), "Should have URL segments after change");
-        Assert.That(segmentsAfter.All(s => s.NullableLanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
-        Assert.That(segmentsAfter.Any(s => s.NullableLanguageId == defaultLanguage.Id), Is.True, "Should have segment for default language");
+        Assert.That(segmentsAfter.All(s => s.LanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
+        Assert.That(segmentsAfter.Any(s => s.LanguageId == defaultLanguage.Id), Is.True, "Should have segment for default language");
     }
 
     [Test]
@@ -712,7 +788,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         }
 
         Assert.That(invariantSegments, Has.Count.GreaterThan(0), "Should have invariant URL segments");
-        Assert.That(invariantSegments.All(s => s.NullableLanguageId == null), Is.True, "Invariant segments should have NULL languageId");
+        Assert.That(invariantSegments.All(s => s.LanguageId == null), Is.True, "Invariant segments should have NULL languageId");
 
         // Change content type to variant
         ContentType.Variations = ContentVariation.Culture;
@@ -736,7 +812,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         }
 
         Assert.That(variantSegments, Has.Count.GreaterThan(0), "Should have variant URL segments after change to variant");
-        Assert.That(variantSegments.All(s => s.NullableLanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
+        Assert.That(variantSegments.All(s => s.LanguageId != null), Is.True, "All segments should have specific languageId after change to variant");
 
         // Act - change content type from variant to invariant
         ContentType.Variations = ContentVariation.Nothing;
@@ -752,7 +828,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
         }
 
         Assert.That(segmentsAfter, Has.Count.GreaterThan(0), "Should have URL segments after change to invariant");
-        Assert.That(segmentsAfter.All(s => s.NullableLanguageId == null), Is.True, "All segments should have NULL languageId after change to invariant");
+        Assert.That(segmentsAfter.All(s => s.LanguageId == null), Is.True, "All segments should have NULL languageId after change to invariant");
     }
 
     #endregion
@@ -851,7 +927,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             new PublishedDocumentUrlSegment
             {
                 DocumentKey = key,
-                NullableLanguageId = null,
+                LanguageId = null,
                 IsDraft = true,
                 UrlSegment = "test-segment",
                 IsPrimary = true,
@@ -859,7 +935,7 @@ internal sealed class DocumentUrlServiceTests : UmbracoIntegrationTestWithConten
             new PublishedDocumentUrlSegment
             {
                 DocumentKey = key,
-                NullableLanguageId = null,
+                LanguageId = null,
                 IsDraft = false,
                 UrlSegment = "test-segment",
                 IsPrimary = true,

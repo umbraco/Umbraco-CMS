@@ -70,6 +70,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         MediaUrlGeneratorCollection mediaUrlGenerators,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeService dataTypeService,
+        IIdKeyMap idKeyMap,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -84,6 +85,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             propertyEditorCollection,
             dataValueReferenceFactories,
             dataTypeService,
+            idKeyMap,
             eventAggregator,
             repositoryCacheVersionService,
             cacheSyncService)
@@ -103,24 +105,26 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MediaRepository"/> class with the specified dependencies.
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.MediaRepository"/> class.
     /// </summary>
-    /// <param name="scopeAccessor">Provides access to the current database scope.</param>
-    /// <param name="cache">The application-level caches used for performance optimization.</param>
-    /// <param name="logger">The logger instance for logging repository operations.</param>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing data retrieval and storage.</param>
+    /// <param name="logger">The logger instance for logging repository operations and errors.</param>
     /// <param name="loggerFactory">Factory for creating logger instances.</param>
-    /// <param name="mediaTypeRepository">Repository for accessing media types.</param>
-    /// <param name="tagRepository">Repository for managing tags associated with media.</param>
-    /// <param name="languageRepository">Repository for managing languages.</param>
-    /// <param name="relationRepository">Repository for managing entity relations.</param>
-    /// <param name="relationTypeRepository">Repository for managing relation types.</param>
-    /// <param name="propertyEditorCollection">Collection of property editors for media properties.</param>
-    /// <param name="mediaUrlGenerators">Collection of generators for creating media URLs.</param>
+    /// <param name="mediaTypeRepository">Repository for accessing and managing media types.</param>
+    /// <param name="tagRepository">Repository for managing tags associated with media items.</param>
+    /// <param name="languageRepository">Repository for accessing language information.</param>
+    /// <param name="relationRepository">Repository for managing relationships between entities.</param>
+    /// <param name="relationTypeRepository">Repository for managing types of relations between entities.</param>
+    /// <param name="propertyEditorCollection">Collection of property editors used for media properties.</param>
+    /// <param name="mediaUrlGenerators">Collection of generators for producing media URLs.</param>
     /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
-    /// <param name="dataTypeService">Service for managing data types.</param>
+    /// <param name="dataTypeService">Service for managing data types used by media properties.</param>
     /// <param name="serializer">The JSON serializer for serializing and deserializing data.</param>
     /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
-    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 18.")]
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning for repositories.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
     public MediaRepository(
         IScopeAccessor scopeAccessor,
         AppCaches cache,
@@ -136,7 +140,9 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeService dataTypeService,
         IJsonSerializer serializer,
-        IEventAggregator eventAggregator)
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
         : this(
             scopeAccessor,
             cache,
@@ -151,10 +157,11 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             mediaUrlGenerators,
             dataValueReferenceFactories,
             dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
             serializer,
             eventAggregator,
-            StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>(),
-            StaticServiceProvider.Instance.GetRequiredService<ICacheSyncService>())
+            repositoryCacheVersionService,
+            cacheSyncService)
     {
     }
 

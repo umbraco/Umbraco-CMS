@@ -11,7 +11,20 @@ export const manifests: Array<ManifestPropertyEditorUi> = [
 			label: '#rte_label',
 			propertyEditorSchemaAlias: 'Umbraco.RichText',
 			icon: 'icon-browser-window',
-			group: 'richContent',
+			group: '#propertyEditorUIGroups_richContent',
+			supportsReadOnly: true,
+			keywords: [
+				'content',
+				'article',
+				'body',
+				'html',
+				'wysiwyg',
+				'richtext',
+				'rte',
+				'editor',
+				'formatted',
+				'paragraph',
+			],
 			settings: {
 				properties: [
 					{
