@@ -14,13 +14,9 @@ export class UmbPersistentModalDialogElement extends UUIModalDialogElement {
 		this.#abortController = new AbortController();
 		const signal = this.#abortController.signal;
 
-		this._popoverElement?.showPopover();
-		if (!this._popoverElement?.hasAttribute('tabindex')) {
-			this._popoverElement?.setAttribute('tabindex', '-1');
-		}
-		this._popoverElement?.addEventListener('cancel', (e) => e.preventDefault(), { signal });
-		document.addEventListener('keydown', this._onKeyDown, { signal });
-		document.addEventListener('focus', this._onFocus, true);
+		this._dialogElement?.showModal();
+		this._dialogElement?.addEventListener('keydown', (e) => e.key === 'Escape' && e.preventDefault(), { signal });
+		this._dialogElement?.addEventListener('cancel', (e) => e.preventDefault(), { signal });
 
 		// Defer isOpen to avoid scheduling a Lit update during firstUpdated
 		queueMicrotask(() => {
@@ -30,23 +26,8 @@ export class UmbPersistentModalDialogElement extends UUIModalDialogElement {
 
 	override forceClose(): void {
 		this.#abortController?.abort();
-		document.removeEventListener('keydown', this._onKeyDown);
-		document.removeEventListener('focus', this._onFocus, true);
 		super.forceClose();
 	}
-
-	private readonly _onKeyDown = (e: KeyboardEvent) => {
-		if (e.key === 'Escape') {
-			e.preventDefault();
-		}
-	};
-
-	private readonly _onFocus = (e: FocusEvent) => {
-		if (this.index !== 0) return;
-		if (!this._popoverElement?.contains(e.target as Node)) {
-			this._popoverElement?.focus();
-		}
-	};
 }
 
 export default UmbPersistentModalDialogElement;
