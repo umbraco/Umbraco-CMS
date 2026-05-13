@@ -223,7 +223,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			onContentError: ({ error }) => {
 				console.error('contentError', [error.message, error.cause]);
 			},
-			onUpdate: ({ editor }) => {
+			onUpdate: ({ editor, transaction }) => {
+				// Tiptap also fires `update` for no-op transactions (e.g. setEditable),
+				// which would otherwise dirty the workspace with a phantom change.
+				if (!transaction.docChanged) return;
 				this.#value = editor.getHTML();
 				this._runValidators();
 				this.dispatchEvent(new UmbChangeEvent());

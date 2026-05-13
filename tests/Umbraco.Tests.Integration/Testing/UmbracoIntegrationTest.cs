@@ -19,6 +19,7 @@ using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Persistence.Sqlite;
 using Umbraco.Cms.Persistence.SqlServer;
 using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Factories;
 using Umbraco.Cms.Tests.Integration.Attributes;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
 using Umbraco.Cms.Tests.Integration.Extensions;
@@ -74,6 +75,8 @@ public abstract class UmbracoIntegrationTest : UmbracoIntegrationTestBase
     public void Setup()
     {
         InMemoryConfiguration[Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
+        InMemoryConfiguration[Constants.Configuration.ConfigModelsMode] = "Nothing";
+
         var hostBuilder = CreateHostBuilder();
 
         _host = hostBuilder.Build();

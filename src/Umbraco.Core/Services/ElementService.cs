@@ -50,21 +50,6 @@ public class ElementService : PublishableContentServiceBase<IElement>, IElementS
         _logger = loggerFactory.CreateLogger<ElementService>();
     }
 
-    #region Create
-
-    public IElement Create(string name, string contentTypeAlias, int userId = Constants.Security.SuperUserId)
-    {
-        IContentType contentType = GetContentType(contentTypeAlias)
-                                   // causes rollback
-                                   ?? throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
-
-        var element = new Element(name, contentType, userId);
-
-        return element;
-    }
-
-    #endregion
-
     #region Others
 
     /// <inheritdoc />

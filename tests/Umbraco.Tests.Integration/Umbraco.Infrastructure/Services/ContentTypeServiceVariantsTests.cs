@@ -86,16 +86,16 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment, true)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment, false)]
     [LongRunning]
-    public void Change_Content_Type_Variation_Clears_Redirects(
+    public async Task Change_Content_Type_Variation_Clears_Redirects(
         ContentVariation startingContentTypeVariation,
         ContentVariation changedContentTypeVariation,
         bool shouldUrlRedirectsBeCleared)
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = startingContentTypeVariation;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var contentType2 = ContentTypeBuilder.CreateBasicContentType("test");
-        ContentTypeService.Save(contentType2);
+        await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
 
         // create some content of this content type
         IContent doc = ContentBuilder.CreateBasicContent(contentType);
@@ -119,7 +119,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // change variation
         contentType.Variations = changedContentTypeVariation;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         var expectedRedirectUrlCount = shouldUrlRedirectsBeCleared ? 0 : 1;
         Assert.AreEqual(expectedRedirectUrlCount, RedirectUrlService.GetContentRedirectUrls(doc.Key).Count());
         Assert.AreEqual(1, RedirectUrlService.GetContentRedirectUrls(doc2.Key).Count());
@@ -129,13 +129,13 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment)]
     [TestCase(ContentVariation.Segment, ContentVariation.Culture)]
     [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment)]
-    public void Change_Content_Type_From_No_Culture_To_Culture(ContentVariation from, ContentVariation to)
+    public async Task Change_Content_Type_From_No_Culture_To_Culture(ContentVariation from, ContentVariation to)
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = from;
         var properties = CreatePropertyCollection(("title", from));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // create some content of this content type
         IContent doc = ContentBuilder.CreateBasicContent(contentType);
@@ -154,7 +154,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         doc.Name = "Hello2";
         ContentService.Save(doc);
         contentType.Variations = to;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
 
         Assert.AreEqual("Hello2", doc.GetCultureName("en-US"));
@@ -167,7 +167,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         doc.SetCultureName("Hello3", "en-US");
         ContentService.Save(doc);
         contentType.Variations = from;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
 
         Assert.AreEqual("Hello3", doc.Name);
@@ -180,14 +180,14 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
-    public void Change_Content_Type_From_Culture_To_No_Culture(ContentVariation startingContentTypeVariation,
+    public async Task Change_Content_Type_From_Culture_To_No_Culture(ContentVariation startingContentTypeVariation,
         ContentVariation changeContentTypeVariationTo)
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = startingContentTypeVariation;
         var properties = CreatePropertyCollection(("title", startingContentTypeVariation));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // create some content of this content type
         IContent doc = ContentBuilder.CreateBasicContent(contentType);
@@ -205,7 +205,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         doc.SetCultureName("Hello2", "en-US");
         ContentService.Save(doc);
         contentType.Variations = changeContentTypeVariationTo;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
 
         Assert.AreEqual("Hello2", doc.Name);
@@ -217,7 +217,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         doc.Name = "Hello3";
         ContentService.Save(doc);
         contentType.Variations = startingContentTypeVariation;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
 
         // at this stage all property types were switched to invariant so even though the variant value
@@ -231,7 +231,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // we can now switch the property type to be variant and the value can be returned again
         contentType.PropertyTypes.First().Variations = startingContentTypeVariation;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
 
         Assert.AreEqual("Hello3", doc.GetCultureName("en-US"));
@@ -261,7 +261,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
         contentType.Variations = contentTypeVariationFrom;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var invariantContentName = "Content Invariant";
 
@@ -336,19 +336,19 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Culture)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.CultureAndSegment)]
-    public void Verify_If_Property_Type_Variation_Is_Correctly_Corrected_When_Content_Type_Is_Updated(
+    public async Task Verify_If_Property_Type_Variation_Is_Correctly_Corrected_When_Content_Type_Is_Updated(
         ContentVariation contentTypeVariation, ContentVariation propertyTypeVariation)
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
 
         // We test an updated content type so it has to be saved first.
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Update it
         contentType.Variations = contentTypeVariation;
         var properties = CreatePropertyCollection(("title", propertyTypeVariation));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Check if property type variations have been updated correctly
         Assert.AreEqual(properties.First().Variations, contentTypeVariation & propertyTypeVariation);
@@ -358,7 +358,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Nothing, ContentVariation.CultureAndSegment)]
     [TestCase(ContentVariation.Segment, ContentVariation.Culture)]
     [TestCase(ContentVariation.Segment, ContentVariation.CultureAndSegment)]
-    public void Change_Property_Type_From_Invariant_Variant(ContentVariation invariant, ContentVariation variant)
+    public async Task Change_Property_Type_From_Invariant_Variant(ContentVariation invariant, ContentVariation variant)
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType();
 
@@ -366,7 +366,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.Variations = ContentVariation.Culture | ContentVariation.Segment;
         var properties = CreatePropertyCollection(("title", invariant));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // create some content of this content type
         IContent doc = ContentBuilder.CreateBasicContent(contentType);
@@ -381,7 +381,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // change the property type to be variant
         contentType.PropertyTypes.First().Variations = variant;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
@@ -390,7 +390,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // change back property type to be invariant
         contentType.PropertyTypes.First().Variations = invariant;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title"));
@@ -402,7 +402,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
-    public void Change_Property_Type_From_Variant_Invariant(ContentVariation variant, ContentVariation invariant)
+    public async Task Change_Property_Type_From_Variant_Invariant(ContentVariation variant, ContentVariation invariant)
     {
         // create content type with a property type that varies by culture
         var contentType = ContentTypeBuilder.CreateBasicContentType();
@@ -411,7 +411,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.Variations = ContentVariation.Culture | ContentVariation.Segment;
         var properties = CreatePropertyCollection(("title", variant));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // create some content of this content type
         IContent doc = ContentBuilder.CreateBasicContent(contentType);
@@ -423,14 +423,14 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // change the property type to be invariant
         contentType.PropertyTypes.First().Variations = invariant;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title"));
 
         // change back property type to be variant
         contentType.PropertyTypes.First().Variations = variant;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
 
         Assert.AreEqual("hello world", doc.GetValue("title", "en-US"));
@@ -440,7 +440,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
-    public void Change_Property_Type_From_Variant_Invariant_On_A_Composition(ContentVariation variant,
+    public async Task Change_Property_Type_From_Variant_Invariant_On_A_Composition(ContentVariation variant,
         ContentVariation invariant)
     {
         // create content type with a property type that varies by culture
@@ -450,13 +450,13 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.Variations = ContentVariation.Culture | ContentVariation.Segment;
         var properties = CreatePropertyCollection(("title", variant));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // compose this from the other one
         var contentType2 = ContentTypeBuilder.CreateBasicContentType("test");
         contentType2.Variations = contentType.Variations;
         contentType2.AddContentType(contentType);
-        ContentTypeService.Save(contentType2);
+        await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
 
         // create some content of this content type
         IContent doc = ContentBuilder.CreateBasicContent(contentType);
@@ -471,7 +471,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // change the property type to be invariant
         contentType.PropertyTypes.First().Variations = invariant;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
         doc2 = ContentService.GetById(doc2.Id); // re-get
 
@@ -480,7 +480,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // change back property type to be variant
         contentType.PropertyTypes.First().Variations = variant;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
         doc2 = ContentService.GetById(doc2.Id); // re-get
 
@@ -492,7 +492,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
     [TestCase(ContentVariation.Culture, ContentVariation.Segment)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Nothing)]
     [TestCase(ContentVariation.CultureAndSegment, ContentVariation.Segment)]
-    public void Change_Content_Type_From_Variant_Invariant_On_A_Composition(ContentVariation variant,
+    public async Task Change_Content_Type_From_Variant_Invariant_On_A_Composition(ContentVariation variant,
         ContentVariation invariant)
     {
         // create content type with a property type that varies by culture
@@ -500,13 +500,13 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         contentType.Variations = variant;
         var properties = CreatePropertyCollection(("title", ContentVariation.Culture));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // compose this from the other one
         var contentType2 = ContentTypeBuilder.CreateBasicContentType("test");
         contentType2.Variations = contentType.Variations;
         contentType2.AddContentType(contentType);
-        ContentTypeService.Save(contentType2);
+        await ContentTypeService.CreateAsync(contentType2, Constants.Security.SuperUserKey);
 
         // create some content of this content type
         IContent doc = ContentBuilder.CreateBasicContent(contentType);
@@ -521,7 +521,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // change the content type to be invariant
         contentType.Variations = invariant;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
         doc2 = ContentService.GetById(doc2.Id); // re-get
 
@@ -530,7 +530,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // change back content type to be variant
         contentType.Variations = variant;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         doc = ContentService.GetById(doc.Id); // re-get
         doc2 = ContentService.GetById(doc2.Id); // re-get
 
@@ -553,7 +553,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value2", ContentVariation.Nothing));
 
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var document = (IContent)new Content("document", -1, contentType);
         document.SetCultureName("doc1en", "en");
@@ -578,7 +578,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch content type to Nothing
         contentType.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1en", document.Name);
@@ -596,7 +596,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch content back to Culture
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1en", document.Name);
@@ -614,7 +614,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch property back to Culture
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1en", document.Name);
@@ -650,7 +650,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value2", ContentVariation.Nothing));
 
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var document = (IContent)new Content("document", -1, contentType);
         document.Name = "doc1";
@@ -674,7 +674,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch content type to Culture
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1", document.GetCultureName("en"));
@@ -691,7 +691,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch property to Culture
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1", document.GetCultureName("en"));
@@ -707,7 +707,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch content back to Nothing
         contentType.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1", document.Name);
@@ -738,7 +738,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value2", ContentVariation.Nothing));
 
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var document = (IContent)new Content("document", -1, contentType);
         document.SetCultureName("doc1en", "en");
@@ -763,7 +763,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch property type to Nothing
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1en", document.Name);
@@ -781,7 +781,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch property back to Culture
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1en", document.Name);
@@ -798,7 +798,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch other property to Culture
         contentType.PropertyTypes.First(x => x.Alias == "value2").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("doc1en", document.Name);
@@ -832,7 +832,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var properties = CreatePropertyCollection(("value1", variant));
 
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         IContent document = new Content("document", -1, contentType);
         document.SetCultureName("doc1en", "en");
@@ -875,7 +875,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch property type to Invariant
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = invariant;
-        ContentTypeService.Save(contentType); // This is going to have to re-normalize the "Edited" flag
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey); // This is going to have to re-normalize the "Edited" flag
 
         document = ContentService.GetById(document.Id);
         Assert.IsTrue(
@@ -915,7 +915,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch property back to Culture
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = variant;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("v1inv",
@@ -967,7 +967,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var properties = CreatePropertyCollection(("value1", invariant));
 
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var document = (IContent)new Content("document", -1, contentType);
         document.SetCultureName("doc1en", "en");
@@ -999,7 +999,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch property type to Culture
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = variant;
-        ContentTypeService.Save(contentType); // This is going to have to re-normalize the "Edited" flag
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey); // This is going to have to re-normalize the "Edited" flag
 
         document = ContentService.GetById(document.Id);
         Assert.IsTrue(document.IsCultureEdited("en")); // Remains true
@@ -1026,7 +1026,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // switch property back to Invariant
         contentType.PropertyTypes.First(x => x.Alias == "value1").Variations = invariant;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         document = ContentService.GetById(document.Id);
         Assert.AreEqual("v1en2",
@@ -1059,7 +1059,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value12", ContentVariation.Nothing));
 
         composing.PropertyGroups.Add(new PropertyGroup(properties1) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(composing);
+        await ContentTypeService.CreateAsync(composing, Constants.Security.SuperUserKey);
 
         var composed = CreateContentType(ContentVariation.Culture, "composed");
 
@@ -1069,7 +1069,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         composed.PropertyGroups.Add(new PropertyGroup(properties2) { Alias = "content", Name = "Content" });
         composed.AddContentType(composing);
-        ContentTypeService.Save(composed);
+        await ContentTypeService.CreateAsync(composed, Constants.Security.SuperUserKey);
 
         var document = (IContent)new Content("document", -1, composed);
         document.SetCultureName("doc1en", "en");
@@ -1089,7 +1089,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}],'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}]},'cd':");
 
         composed.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(composed);
+        await ContentTypeService.CreateAsync(composed, Constants.Security.SuperUserKey);
 
         // both value11 and value21 are invariant
         // Note: After rebuild, property order changes to direct properties first (value21, value22), then composed (value11, value12)
@@ -1099,7 +1099,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value21':[{'c':'','s':'','v':'v21en'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composed.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(composed);
+        await ContentTypeService.CreateAsync(composed, Constants.Security.SuperUserKey);
 
         // value11 is variant again, but value21 is still invariant
         Console.WriteLine(GetJson(document.Id));
@@ -1108,7 +1108,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value21':[{'c':'','s':'','v':'v21en'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composed.PropertyTypes.First(x => x.Alias == "value21").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(composed);
+        await ContentTypeService.CreateAsync(composed, Constants.Security.SuperUserKey);
 
         // we can make it variant again
         Console.WriteLine(GetJson(document.Id));
@@ -1117,7 +1117,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'en','s':'','v':'v11en'},{'c':'fr','s':'','v':'v11fr'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composing.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(composing);
+        await ContentTypeService.CreateAsync(composing, Constants.Security.SuperUserKey);
 
         // value11 is invariant
         Console.WriteLine(GetJson(document.Id));
@@ -1126,7 +1126,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composing.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(composing);
+        await ContentTypeService.CreateAsync(composing, Constants.Security.SuperUserKey);
 
         // value11 is still invariant
         Console.WriteLine(GetJson(document.Id));
@@ -1135,7 +1135,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value21':[{'c':'en','s':'','v':'v21en'},{'c':'fr','s':'','v':'v21fr'}],'value22':[{'c':'','s':'','v':'v22'}],'value11':[{'c':'','s':'','v':'v11en'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composing.PropertyTypes.First(x => x.Alias == "value11").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(composing);
+        await ContentTypeService.CreateAsync(composing, Constants.Security.SuperUserKey);
 
         // we can make it variant again
         Console.WriteLine(GetJson(document.Id));
@@ -1161,7 +1161,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             ("value12", ContentVariation.Nothing));
 
         composing.PropertyGroups.Add(new PropertyGroup(properties1) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(composing);
+        await ContentTypeService.CreateAsync(composing, Constants.Security.SuperUserKey);
 
         var composed1 = CreateContentType(ContentVariation.Culture, "composed1");
 
@@ -1171,7 +1171,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         composed1.PropertyGroups.Add(new PropertyGroup(properties2) { Alias = "content", Name = "Content" });
         composed1.AddContentType(composing);
-        ContentTypeService.Save(composed1);
+        await ContentTypeService.CreateAsync(composed1, Constants.Security.SuperUserKey);
 
         var composed2 = CreateContentType(ContentVariation.Nothing, "composed2");
 
@@ -1181,7 +1181,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         composed2.PropertyGroups.Add(new PropertyGroup(properties3) { Alias = "content", Name = "Content" });
         composed2.AddContentType(composing);
-        ContentTypeService.Save(composed2);
+        await ContentTypeService.CreateAsync(composed2, Constants.Security.SuperUserKey);
 
         var document1 = (IContent)new Content("document1", -1, composed1);
         document1.SetCultureName("doc1en", "en");
@@ -1214,7 +1214,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}],'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}]},'cd':");
 
         composed1.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(composed1);
+        await ContentTypeService.CreateAsync(composed1, Constants.Security.SuperUserKey);
 
         // both value11 and value21 are invariant
         // Note: After rebuild, property order changes to direct properties first, then composed properties
@@ -1230,7 +1230,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}],'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}]},'cd':");
 
         composed1.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(composed1);
+        await ContentTypeService.CreateAsync(composed1, Constants.Security.SuperUserKey);
 
         // value11 is variant again, but value21 is still invariant
         Console.WriteLine(GetJson(document1.Id));
@@ -1245,7 +1245,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}],'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}]},'cd':");
 
         composed1.PropertyTypes.First(x => x.Alias == "value21").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(composed1);
+        await ContentTypeService.CreateAsync(composed1, Constants.Security.SuperUserKey);
 
         // we can make it variant again
         Console.WriteLine(GetJson(document1.Id));
@@ -1260,7 +1260,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}],'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}]},'cd':");
 
         composing.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(composing);
+        await ContentTypeService.CreateAsync(composing, Constants.Security.SuperUserKey);
 
         // value11 is invariant
         Console.WriteLine(GetJson(document1.Id));
@@ -1274,7 +1274,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}],'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composing.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(composing);
+        await ContentTypeService.CreateAsync(composing, Constants.Security.SuperUserKey);
 
         // value11 is still invariant
         Console.WriteLine(GetJson(document1.Id));
@@ -1288,7 +1288,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
             "{'pd':{'value31':[{'c':'','s':'','v':'v31'}],'value32':[{'c':'','s':'','v':'v32'}],'value11':[{'c':'','s':'','v':'v11'}],'value12':[{'c':'','s':'','v':'v12'}]},'cd':");
 
         composing.PropertyTypes.First(x => x.Alias == "value11").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(composing);
+        await ContentTypeService.CreateAsync(composing, Constants.Security.SuperUserKey);
 
         // we can make it variant again
         Console.WriteLine(GetJson(document1.Id));
@@ -1352,7 +1352,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var contentType = CreateContentType(ContentVariation.Culture | ContentVariation.Segment);
         var properties = CreatePropertyCollection(("title", invariant));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Create content ONLY in the non-default language (French)
         // This is the key scenario - no content exists in the default language (English)
@@ -1370,7 +1370,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // Act - Change the property type from invariant to variant
         // This should NOT throw a PanicException even though content only exists in non-default language
         contentType.PropertyTypes.First(x => x.Alias == "title").Variations = variant;
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
         document = ContentService.GetById(document.Id);
@@ -1402,7 +1402,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var contentType = CreateContentType(ContentVariation.Culture | ContentVariation.Segment);
         var properties = CreatePropertyCollection(("title", variant));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Create content ONLY in the non-default language (French)
         IContent document = new Content("document", -1, contentType);
@@ -1420,7 +1420,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // Act - Change the property type from variant to invariant
         // This should NOT throw a PanicException even though content only exists in non-default language
         contentType.PropertyTypes.First(x => x.Alias == "title").Variations = invariant;
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
         document = ContentService.GetById(document.Id);
@@ -1448,7 +1448,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var contentType = CreateContentType(ContentVariation.Culture);
         var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Create content ONLY in the non-default language (French)
         IContent document = new Content("document", -1, contentType);
@@ -1464,7 +1464,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // Act 1 - Change property from invariant to variant
         contentType.PropertyTypes.First(x => x.Alias == "title").Variations = ContentVariation.Culture;
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         document = ContentService.GetById(document.Id);
         Assert.IsNotNull(document);
@@ -1472,7 +1472,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // Act 2 - Change property back from variant to invariant
         contentType.PropertyTypes.First(x => x.Alias == "title").Variations = ContentVariation.Nothing;
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
         document = ContentService.GetById(document.Id);
@@ -1498,7 +1498,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var contentType = CreateContentType(ContentVariation.Nothing);
         var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Create invariant content
         IContent document = new Content("document", -1, contentType);
@@ -1515,7 +1515,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // This changes the content to be culture-variant, with the invariant data
         // migrated to the default language
         contentType.Variations = ContentVariation.Culture;
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should be accessible in the default language
         document = ContentService.GetById(document.Id);
@@ -1547,7 +1547,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var contentType = CreateContentType(ContentVariation.Culture | ContentVariation.Segment);
         var properties = CreatePropertyCollection(("title", invariant));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Create content ONLY in the non-default language (French)
         // This is the key scenario - no content exists in the default language (English)
@@ -1565,7 +1565,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // Act - Change the property type from invariant to variant
         // This should NOT throw a PanicException even though content only exists in non-default language
         contentType.PropertyTypes.First(x => x.Alias == "title").Variations = variant;
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
         document = ContentService.GetById(document.Id);
@@ -1598,7 +1598,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var contentType = CreateContentType(ContentVariation.Culture | ContentVariation.Segment);
         var properties = CreatePropertyCollection(("title", variant));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Create content ONLY in the non-default language (French)
         IContent document = new Content("document", -1, contentType);
@@ -1616,7 +1616,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // Act - Change the property type from variant to invariant
         // This should NOT throw a PanicException even though content only exists in non-default language
         contentType.PropertyTypes.First(x => x.Alias == "title").Variations = invariant;
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
         document = ContentService.GetById(document.Id);
@@ -1645,7 +1645,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var contentType = CreateContentType(ContentVariation.Culture);
         var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Create content ONLY in the non-default language (French)
         IContent document = new Content("document", -1, contentType);
@@ -1661,7 +1661,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // Act 1 - Change property from invariant to variant
         contentType.PropertyTypes.First(x => x.Alias == "title").Variations = ContentVariation.Culture;
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         document = ContentService.GetById(document.Id);
         Assert.IsNotNull(document);
@@ -1669,7 +1669,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
 
         // Act 2 - Change property back from variant to invariant
         contentType.PropertyTypes.First(x => x.Alias == "title").Variations = ContentVariation.Nothing;
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should still be accessible
         document = ContentService.GetById(document.Id);
@@ -1696,7 +1696,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         var contentType = CreateContentType(ContentVariation.Nothing);
         var properties = CreatePropertyCollection(("title", ContentVariation.Nothing));
         contentType.PropertyGroups.Add(new PropertyGroup(properties) { Alias = "content", Name = "Content" });
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         // Create invariant content
         IContent document = new Content("document", -1, contentType);
@@ -1713,7 +1713,7 @@ internal sealed class ContentTypeServiceVariantsTests : UmbracoIntegrationTest
         // This changes the content to be culture-variant, with the invariant data
         // migrated to the default language
         contentType.Variations = ContentVariation.Culture;
-        Assert.DoesNotThrow(() => ContentTypeService.Save(contentType));
+        Assert.DoesNotThrowAsync(async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey));
 
         // Assert - Content should be accessible in the default language
         document = ContentService.GetById(document.Id);

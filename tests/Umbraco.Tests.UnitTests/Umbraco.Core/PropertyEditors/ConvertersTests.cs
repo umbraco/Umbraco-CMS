@@ -70,9 +70,9 @@ public class ConvertersTests
             serializer)
         { Id = 2 };
 
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { dataType1, dataType2 });
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(new[] { dataType1, dataType2 });
 
-        var contentTypeFactory = new PublishedContentTypeFactory(factory, converters, dataTypeServiceMock.Object);
+        var contentTypeFactory = new PublishedContentTypeFactory(factory, converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType, int i)
         {

@@ -45,7 +45,6 @@ internal sealed class ElementEditingService
         IIdKeyMap idKeyMap,
         ILanguageService languageService,
         IUserService userService,
-        ILocalizationService localizationService,
         IAuditService auditService)
         : base(
             elementService,
@@ -60,8 +59,7 @@ internal sealed class ElementEditingService
             relationService,
             contentTypeFilters,
             languageService,
-            userService,
-            localizationService)
+            userService)
     {
         _elementService = elementService;
         _logger = logger;
@@ -184,7 +182,7 @@ internal sealed class ElementEditingService
     public async Task<Attempt<IElement?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
         => await HandleDeleteAsync(key, userKey, true);
 
-    protected override IElement New(string? name, int parentId, IContentType contentType)
+    protected override IElement New(string name, int parentId, IContentType contentType)
         => new Element(name, parentId, contentType);
 
     protected override IContentType? TryGetAndValidateContentType(
@@ -318,12 +316,12 @@ internal sealed class ElementEditingService
             userKey,
             (elem, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, containerKey);
                 return new ElementMovingNotification(moveEventInfo, eventMessages);
             },
             (elem, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, containerKey);
                 return new ElementMovedNotification(moveEventInfo, eventMessages);
             });
 

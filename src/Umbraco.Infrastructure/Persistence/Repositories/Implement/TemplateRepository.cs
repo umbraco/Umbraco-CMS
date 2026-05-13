@@ -201,7 +201,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
     private IEnumerable<IUmbracoEntity> GetAxisDefinitions(params TemplateDto[] templates)
     {
-        // look up the simple template definitions that have a master template assigned, this is used
+        // look up the simple template definitions that have a layout template assigned, this is used
         // later to populate the template item's properties
         Sql<ISqlContext> childIdsSql = SqlContext.Sql()
             .Select<TemplateDto>(t => t.NodeId, t => t.Alias)
@@ -242,11 +242,11 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
         if (dto.NodeDto.ParentId > 0)
         {
-            IUmbracoEntity? masterTemplate = axisDefinitions.FirstOrDefault(x => x.Id == dto.NodeDto.ParentId);
-            if (masterTemplate != null)
+            IUmbracoEntity? layoutTemplate = axisDefinitions.FirstOrDefault(x => x.Id == dto.NodeDto.ParentId);
+            if (layoutTemplate != null)
             {
-                template.MasterTemplateAlias = masterTemplate.Name;
-                template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
+                template.LayoutTemplateAlias = layoutTemplate.Name;
+                template.LayoutTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
             }
         }
 
@@ -438,7 +438,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             return Enumerable.Empty<ITemplate>();
         }
 
-        //look up the simple template definitions that have a master template assigned, this is used
+        //look up the simple template definitions that have a layout template assigned, this is used
         // later to populate the template item's properties
         IUmbracoEntity[] childIds = (ids?.Any() ?? false
                 ? GetAxisDefinitions(dtos.ToArray())
@@ -463,7 +463,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
             return Enumerable.Empty<ITemplate>();
         }
 
-        //look up the simple template definitions that have a master template assigned, this is used
+        //look up the simple template definitions that have a layout template assigned, this is used
         // later to populate the template item's properties
         IUmbracoEntity[] childIds = GetAxisDefinitions(dtos.ToArray()).ToArray();
 
@@ -527,7 +527,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
         //Update with new correct path
-        ITemplate? parent = Get(template.MasterTemplateId!.Value);
+        ITemplate? parent = Get(template.LayoutTemplateId!.Value);
         if (parent != null)
         {
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -578,16 +578,16 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
 
         var template = (Template)entity;
 
-        if (entity.IsPropertyDirty("MasterTemplateId"))
+        if (entity.IsPropertyDirty("LayoutTemplateId"))
         {
-            ITemplate? parent = Get(template.MasterTemplateId!.Value);
+            ITemplate? parent = Get(template.LayoutTemplateId!.Value);
             if (parent != null)
             {
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
             }
             else
             {
-                //this means that the master template has been removed, so we need to reset the template's
+                //this means that the layout template has been removed, so we need to reset the template's
                 //path to be at the root
                 entity.Path = string.Concat("-1,", entity.Id);
             }
@@ -602,9 +602,9 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         Database.Update(dto.NodeDto);
         Database.Update(dto);
 
-        //re-update if this is a master template, since it could have changed!
+        //re-update if this is a layout template, since it could have changed!
         IEnumerable<IUmbracoEntity> axisDefs = GetAxisDefinitions(dto);
-        template.IsMasterTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
+        template.IsLayoutTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
 
         // Only save file when not in production runtime mode
         if (_runtimeSettings.CurrentValue.Mode != RuntimeMode.Production)
@@ -717,58 +717,58 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
     }
 
     /// <summary>
-    /// Gets the child templates of the specified master template.
+    /// Gets the child templates of the specified layout template.
     /// </summary>
-    /// <param name="masterTemplateId">The ID of the master template to get children for. If less than or equal to zero, returns templates without a master template.</param>
-    /// <returns>An enumerable collection of child templates. If the specified master template does not exist, returns an empty collection.</returns>
-    public IEnumerable<ITemplate> GetChildren(int masterTemplateId)
+    /// <param name="layoutTemplateId">The ID of the layout template to get children for. If less than or equal to zero, returns templates without a layout template.</param>
+    /// <returns>An enumerable collection of child templates. If the specified layout template does not exist, returns an empty collection.</returns>
+    public IEnumerable<ITemplate> GetChildren(int layoutTemplateId)
     {
         if (TypedCachePolicy is { } policy)
         {
-            if (masterTemplateId <= 0)
+            if (layoutTemplateId <= 0)
             {
-                return policy.FindAllCached(x => x.MasterTemplateAlias.IsNullOrWhiteSpace(), PerformGetAll);
+                return policy.FindAllCached(x => x.LayoutTemplateAlias.IsNullOrWhiteSpace(), PerformGetAll);
             }
 
-            ITemplate? parent = policy.FindCached(x => x.Id == masterTemplateId, PerformGetAll);
+            ITemplate? parent = policy.FindCached(x => x.Id == layoutTemplateId, PerformGetAll);
             if (parent == null)
             {
                 return Enumerable.Empty<ITemplate>();
             }
 
-            return policy.FindAllCached(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias), PerformGetAll);
+            return policy.FindAllCached(x => x.LayoutTemplateAlias.InvariantEquals(parent.Alias), PerformGetAll);
         }
 
         // Fallback when caching is disabled.
         ITemplate[] all = GetMany().ToArray();
 
-        if (masterTemplateId <= 0)
+        if (layoutTemplateId <= 0)
         {
-            return all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
+            return all.Where(x => x.LayoutTemplateAlias.IsNullOrWhiteSpace());
         }
 
-        ITemplate? fallbackParent = all.FirstOrDefault(x => x.Id == masterTemplateId);
+        ITemplate? fallbackParent = all.FirstOrDefault(x => x.Id == layoutTemplateId);
         if (fallbackParent == null)
         {
             return Enumerable.Empty<ITemplate>();
         }
 
-        return all.Where(x => x.MasterTemplateAlias.InvariantEquals(fallbackParent.Alias));
+        return all.Where(x => x.LayoutTemplateAlias.InvariantEquals(fallbackParent.Alias));
     }
 
     /// <summary>
-    /// Retrieves all descendant templates of the specified master template.
+    /// Retrieves all descendant templates of the specified layout template.
     /// </summary>
-    /// <param name="masterTemplateId">The ID of the master template whose descendants will be returned. If less than or equal to zero, all root templates and their descendants are returned.</param>
-    /// <returns>An <see cref="IEnumerable{ITemplate}"/> containing all descendant templates, ordered by their hierarchy level. Returns an empty collection if the specified master template does not exist.</returns>
-    public IEnumerable<ITemplate> GetDescendants(int masterTemplateId)
+    /// <param name="layoutTemplateId">The ID of the layout template whose descendants will be returned. If less than or equal to zero, all root templates and their descendants are returned.</param>
+    /// <returns>An <see cref="IEnumerable{ITemplate}"/> containing all descendant templates, ordered by their hierarchy level. Returns an empty collection if the specified layout template does not exist.</returns>
+    public IEnumerable<ITemplate> GetDescendants(int layoutTemplateId)
     {
         //return from base.GetAll, this is all cached
         ITemplate[] all = GetMany().ToArray();
         var descendants = new List<ITemplate>();
-        if (masterTemplateId > 0)
+        if (layoutTemplateId > 0)
         {
-            ITemplate? parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
+            ITemplate? parent = all.FirstOrDefault(x => x.Id == layoutTemplateId);
             if (parent == null)
             {
                 return Enumerable.Empty<ITemplate>();
@@ -779,7 +779,7 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         }
         else
         {
-            descendants.AddRange(all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace()));
+            descendants.AddRange(all.Where(x => x.LayoutTemplateAlias.IsNullOrWhiteSpace()));
             foreach (ITemplate parent in descendants)
             {
                 //recursively add all children with a level
@@ -791,9 +791,9 @@ internal sealed class TemplateRepository : EntityRepositoryBase<int, ITemplate>,
         return descendants;
     }
 
-    private static void AddChildren(ITemplate[]? all, List<ITemplate> descendants, string masterAlias)
+    private static void AddChildren(ITemplate[]? all, List<ITemplate> descendants, string layoutAlias)
     {
-        ITemplate[]? c = all?.Where(x => x.MasterTemplateAlias.InvariantEquals(masterAlias)).ToArray();
+        ITemplate[]? c = all?.Where(x => x.LayoutTemplateAlias.InvariantEquals(layoutAlias)).ToArray();
         if (c is null || c.Any() == false)
         {
             return;

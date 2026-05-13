@@ -110,18 +110,17 @@ public class DeliveryApiTests
         return globalSettingsOptionsMock.Object;
     }
 
-    protected void ConfigurePublishedContentMock(Mock<IPublishedContent> content, Guid key, string name, string urlSegment, IPublishedContentType contentType, IEnumerable<IPublishedProperty> properties)
+    protected void ConfigurePublishedContentMock(Mock<IPublishedContent> content, Guid key, string name, IPublishedContentType contentType, IEnumerable<IPublishedProperty> properties)
     {
         content.SetupGet(c => c.Key).Returns(key);
         content.SetupGet(c => c.Name).Returns(name);
-        content.SetupGet(c => c.UrlSegment).Returns(urlSegment);
         content
             .SetupGet(m => m.Cultures)
             .Returns(new Dictionary<string, PublishedCultureInfo>()
             {
                 {
                     string.Empty,
-                    new PublishedCultureInfo(string.Empty, name, urlSegment, DateTime.UtcNow)
+                    new PublishedCultureInfo(string.Empty, name, null, DateTime.UtcNow)
                 }
             });
         content.SetupGet(c => c.ContentType).Returns(contentType);

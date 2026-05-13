@@ -203,6 +203,9 @@ export class UiBaseLocators extends BasePage {
   public readonly newPasswordTxt: Locator;
   public readonly confirmPasswordTxt: Locator;
   public readonly currentPasswordTxt: Locator;
+  public readonly changePhotoBtn: Locator;
+  public readonly removePhotoBtn: Locator;
+  public readonly languageBtn: Locator;
 
   // Collection & Table
   public readonly collectionTreeItemTableRow: Locator;
@@ -546,6 +549,9 @@ export class UiBaseLocators extends BasePage {
     this.currentPasswordTxt = page.locator('input[name="oldPassword"]');
     this.newPasswordTxt = page.locator('input[name="newPassword"]');
     this.confirmPasswordTxt = page.locator('input[name="confirmPassword"]');
+    this.changePhotoBtn = page.getByLabel('Change photo');
+    this.removePhotoBtn = page.getByLabel('Remove photo');
+    this.languageBtn = page.locator('[label="UI Culture"] select');
 
     // Collection & Table
     this.collectionTreeItemTableRow = page.locator(
@@ -574,13 +580,6 @@ export class UiBaseLocators extends BasePage {
       )
       .locator("#reference-headline")
       .first();
-    this.entityItemRef = page
-      .locator(
-        "umb-confirm-action-modal-entity-references,umb-confirm-bulk-action-modal-entity-references",
-      )
-      .locator("uui-ref-list")
-      .first()
-      .getByTestId("entity-item-ref");
     this.entityItem = page.locator("umb-entity-item-ref");
 
     // Workspace & Action
@@ -606,8 +605,10 @@ export class UiBaseLocators extends BasePage {
     // Editor
     this.monacoEditor = page.locator(".monaco-editor");
 
-    // Loader
-    this.uiLoader = page.locator("uui-loader");
+    // Loader (excludes the global app-level loader at #loader)
+    this.uiLoader = page.locator(
+      "uui-loader:not([data-mark='app-router-loader'])",
+    );
 
     // Block
     this.blockTypeCard = page.locator("uui-card-block-type");
@@ -1603,15 +1604,17 @@ export class UiBaseLocators extends BasePage {
   }
 
   async selectMediaWithName(mediaName: string) {
-    const mediaLocator = this.mediaCardItems.filter({ hasText: mediaName });
+    const mediaLocator = this.mediaCardItems.filter({hasText: mediaName});
     await this.waitForVisible(mediaLocator);
-    await this.click(mediaLocator.locator("#select-checkbox"), { force: true });
+    await this.hover(mediaLocator);
+    await this.click(mediaLocator.locator("#select-checkbox"), {force: true});
   }
 
   async selectMediaWithTestId(mediaKey: string) {
     const mediaLocator = this.page.getByTestId("media:" + mediaKey);
     await this.waitForVisible(mediaLocator);
-    await this.click(mediaLocator.locator("#select-checkbox"), { force: true });
+    await this.hover(mediaLocator);
+    await this.click(mediaLocator.locator("#select-checkbox"), {force: true});
   }
 
   async clickMediaPickerModalSubmitButton() {
@@ -2088,5 +2091,24 @@ export class UiBaseLocators extends BasePage {
   async isSelectCheckboxVisibleForMediaName(mediaName: string, isVisible: boolean = true) {
     const selectCheckboxLocator = this.mediaCardItems.filter({hasText: mediaName}).locator('#select-checkbox');
     await this.isVisible(selectCheckboxLocator, isVisible);
+  }
+
+  async clickChangePhotoButton() {
+    await this.click(this.changePhotoBtn);
+  }
+
+  async clickRemovePhotoButton() {
+    await this.click(this.removePhotoBtn);
+  }
+
+  async changePhotoWithFileChooser(filePath: string) {
+    const fileChooserPromise = this.page.waitForEvent('filechooser');
+    await this.clickChangePhotoButton();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(filePath);
+  }
+
+  async selectUserLanguage(language: string) {
+    await this.languageBtn.selectOption(language, {force: true});
   }
 }

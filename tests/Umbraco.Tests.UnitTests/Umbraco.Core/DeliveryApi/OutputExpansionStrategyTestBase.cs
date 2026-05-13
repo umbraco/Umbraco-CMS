@@ -327,8 +327,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     {
         var key = Guid.NewGuid();
         var name = "The page";
-        var urlSegment = "url-segment";
-        ConfigurePublishedContentMock(content, key, name, urlSegment, _contentType, properties);
+        ConfigurePublishedContentMock(content, key, name, _contentType, properties);
 
         RegisterContentWithProviders(content.Object, false);
     }
@@ -337,8 +336,7 @@ public abstract class OutputExpansionStrategyTestBase : PropertyValueConverterTe
     {
         var key = Guid.NewGuid();
         var name = "The media";
-        var urlSegment = "media-url-segment";
-        ConfigurePublishedContentMock(media, key, name, urlSegment, _mediaType, properties);
+        ConfigurePublishedContentMock(media, key, name, _mediaType, properties);
 
         RegisterMediaWithProviders(media.Object);
     }

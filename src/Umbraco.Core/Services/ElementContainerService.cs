@@ -181,12 +181,12 @@ internal sealed class ElementContainerService : EntityTypeContainerService<IElem
                 : EntityContainerOperationStatus.Success,
             (cont, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, originalPath, parentId, parentKey);
+                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, originalPath, parentKey);
                 return new EntityContainerMovingNotification(moveEventInfo, eventMessages);
             },
             (cont, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, originalPath, parentId, parentKey);
+                var moveEventInfo = new MoveEventInfo<EntityContainer>(cont, originalPath, parentKey);
                 return new EntityContainerMovedNotification(moveEventInfo, eventMessages);
             });
 

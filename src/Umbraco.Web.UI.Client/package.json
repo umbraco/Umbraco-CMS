@@ -1,7 +1,7 @@
 {
 	"name": "@umbraco-cms/backoffice",
 	"license": "MIT",
-	"version": "18.0.0-beta1",
+	"version": "18.1.0-rc",
 	"type": "module",
 	"exports": {
 		".": null,
@@ -9,6 +9,7 @@
 		"./class-api": "./dist-cms/libs/class-api/index.js",
 		"./context-api": "./dist-cms/libs/context-api/index.js",
 		"./controller-api": "./dist-cms/libs/controller-api/index.js",
+		"./element": "./dist-cms/packages/elements/index.js",
 		"./element-api": "./dist-cms/libs/element-api/index.js",
 		"./context-proxy": "./dist-cms/libs/context-proxy/index.js",
 		"./embedded-media": "./dist-cms/packages/embedded-media/index.js",
@@ -45,7 +46,6 @@
 		"./document-type": "./dist-cms/packages/documents/document-types/index.js",
 		"./document": "./dist-cms/packages/documents/documents/index.js",
 		"./dropzone": "./dist-cms/packages/media/dropzone/index.js",
-		"./element": "./dist-cms/packages/elements/index.js",
 		"./entity-action": "./dist-cms/packages/core/entity-action/index.js",
 		"./entity-bulk-action": "./dist-cms/packages/core/entity-bulk-action/index.js",
 		"./entity-create-option-action": "./dist-cms/packages/core/entity-create-option-action/index.js",
@@ -129,6 +129,8 @@
 		"./user-permission": "./dist-cms/packages/user/user-permission/index.js",
 		"./user": "./dist-cms/packages/user/user/index.js",
 		"./utils": "./dist-cms/packages/core/utils/index.js",
+		"./value-summary": "./dist-cms/packages/core/value-summary/index.js",
+		"./value-type": "./dist-cms/packages/core/value-type/index.js",
 		"./validation": "./dist-cms/packages/core/validation/index.js",
 		"./variant": "./dist-cms/packages/core/variant/index.js",
 		"./view": "./dist-cms/packages/core/view/index.js",
@@ -190,6 +192,7 @@
 		"dev": "vite",
 		"dev:server": "cross-env VITE_UMBRACO_USE_MSW=off vite",
 		"dev:mock": "cross-env VITE_UMBRACO_USE_MSW=on vite",
+		"dev:icon-manager": "npm install --prefix devops/icon-manager && npm run dev --prefix devops/icon-manager",
 		"example": "node ./devops/example-runner/index.js",
 		"format:fix": "npm run format -- --write",
 		"format": "prettier 'src/**/*.ts' --check",
@@ -225,8 +228,8 @@
 		"generate:ui-api-docs": "npm run generate:check-const-test && typedoc --options typedoc.config.js"
 	},
 	"engines": {
-		"node": ">=24.13",
-		"npm": ">=11"
+		"node": ">=22.17.1",
+		"npm": ">=10.9.2"
 	},
 	"dependencies": {
 		"element-internals-polyfill": "^3.0.2"

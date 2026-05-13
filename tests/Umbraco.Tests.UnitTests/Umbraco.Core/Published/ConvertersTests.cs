@@ -30,10 +30,10 @@ public class ConvertersTests
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), serializer)
         { Id = 1 };
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(dataType.Yield());
 
         var contentTypeFactory =
-            new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
+            new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
         {
@@ -115,10 +115,10 @@ public class ConvertersTests
         var dataType = new DataType(
             new VoidEditor(Mock.Of<IDataValueEditorFactory>()), serializer)
         { Id = 1, Key = dataTypeKey };
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(dataType.Yield());
 
         var contentTypeFactory =
-            new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object);
+            new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
         {

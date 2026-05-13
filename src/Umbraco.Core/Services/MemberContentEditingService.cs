@@ -54,9 +54,8 @@ internal sealed class MemberContentEditingService
         IOptionsMonitor<ContentSettings> optionsMonitor,
         IRelationService relationService,
         ContentTypeFilterCollection contentTypeFilters,
-        ILanguageService languageService,
-        ILocalizationService localizationService)
-        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService, optionsMonitor, relationService, contentTypeFilters, languageService, userService, localizationService)
+        ILanguageService languageService)
+        : base(contentService, contentTypeService, propertyEditorCollection, dataTypeService, logger, scopeProvider, userIdKeyResolver, memberValidationService, optionsMonitor, relationService, contentTypeFilters, languageService, userService)
     {
         _logger = logger;
         _userService = userService;
@@ -115,7 +114,7 @@ internal sealed class MemberContentEditingService
         => await HandleDeleteAsync(key, userKey, false);
 
     /// <inheritdoc />
-    protected override IMember New(string? name, int parentId, IMemberType memberType)
+    protected override IMember New(string name, int parentId, IMemberType memberType)
         => throw new NotSupportedException("Member creation is not supported by this service. This should never be called.");
 
     /// <inheritdoc />

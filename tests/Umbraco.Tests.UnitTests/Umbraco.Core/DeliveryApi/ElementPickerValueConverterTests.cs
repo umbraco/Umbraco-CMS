@@ -16,7 +16,7 @@ public class ElementPickerValueConverterTests : PropertyValueConverterTests
     private ElementPickerValueConverter CreateValueConverter() =>
         new(
             new SystemTextJsonSerializer(new DefaultJsonSerializerEncoderFactory()),
-            ElementCacheServiceMock.Object,
+            PublishedElementCacheMock.Object,
             CreateVariationContextAccessor(),
             new ApiElementBuilder(CreateOutputExpansionStrategyAccessor()));
 
@@ -65,8 +65,8 @@ public class ElementPickerValueConverterTests : PropertyValueConverterTests
         var key = Guid.NewGuid();
         ConfigurePublishedElementMock(publishedElement, key, "The element", contentType.Object, [prop1, prop2]);
 
-        ElementCacheServiceMock
-            .Setup(ecc => ecc.GetByKeyAsync(key, false))
+        PublishedElementCacheMock
+            .Setup(ecc => ecc.GetByIdAsync(key, false))
             .Returns(Task.FromResult(publishedElement.Object));
 
         var valueConverter = CreateValueConverter();

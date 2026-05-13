@@ -54,6 +54,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeService dataTypeService,
+        IIdKeyMap idKeyMap,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -69,6 +70,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
             propertyEditors,
             dataValueReferenceFactories,
             dataTypeService,
+            idKeyMap,
             eventAggregator,
             repositoryCacheVersionService,
             cacheSyncService)

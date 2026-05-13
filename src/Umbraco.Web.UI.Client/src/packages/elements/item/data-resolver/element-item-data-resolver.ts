@@ -1,5 +1,5 @@
 import type { UmbElementEntityType, UmbElementFolderEntityType } from '../../entity.js';
-import { UmbElementVariantState } from '../../types.js';
+import { UmbElementVariantState } from '../../variant-state.js';
 import type { UmbElementItemModel } from '../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';

@@ -13,7 +13,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
-// TODO ELEMENTS: looks like a lot of methods here are only used for the IContentService; check all (public) methods and move them accordingly
+/// <summary>
+/// Base class for publishable content services.
+/// </summary>
+/// <typeparam name="TContent">The type of content managed by the concrete implementation.</typeparam>
+/// <remarks>
+/// A few methods here are currently only used by the <see cref="ContentService"/>, not by the <see cref="ElementService"/>.
+/// We will keep them here all the same for two reasons:
+///
+/// 1. As the Elements feature evolves, they might be needed eventually.
+/// 2. The more this base class aligns with the previous versions of the <see cref="ContentService"/>, the easier forward merging will be.
+///
+/// The service interfaces do not expose these methods unless they're needed, so they're only visible on the concrete implementations.
+/// </remarks>
 public abstract class PublishableContentServiceBase<TContent> : RepositoryService, IPublishableContentService<TContent>
     where TContent : class, IPublishableContentBase
 {
@@ -1161,9 +1173,7 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         {
             // Determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
             culturesUnpublishing = content.GetCulturesUnpublishing();
-            culturesPublishing = variesByCulture
-                ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-                : null;
+            culturesPublishing = GetCulturesPublishing(content);
 
             // ensure that the content can be published, and publish handling events, business rules, etc
             publishResult = StrategyCanPublish(
@@ -1234,6 +1244,12 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         // won't happen in a branch
         if (unpublishing)
         {
+            if (culturesUnpublishing is null)
+            {
+                culturesUnpublishing = content.GetCulturesUnpublishing();
+                culturesPublishing = GetCulturesPublishing(content);
+            }
+
             TContent? newest = GetById(content.Id); // ensure we have the newest version - in scope
             if (content.VersionId != newest?.VersionId)
             {
@@ -1295,12 +1311,13 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
                     var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
                     Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
 
-                    if (publishResult == null)
+                    PublishResultType? publishResultType = publishResult?.Result ?? unpublishResult?.Result;
+                    if (publishResultType == null)
                     {
-                        throw new PanicException("publishResult == null - should not happen");
+                        throw new PanicException("publishResultType == null - should not happen");
                     }
 
-                    switch (publishResult.Result)
+                    switch (publishResultType)
                     {
                         case PublishResultType.FailedPublishMandatoryCultureMissing:
                             // Occurs when a mandatory culture was unpublished (which means we tried publishing the content without a mandatory culture)
@@ -1415,6 +1432,11 @@ public abstract class PublishableContentServiceBase<TContent> : RepositoryServic
         scope.Notifications.Publish(TreeChangeNotification(content, changeType, eventMessages));
         return publishResult!;
     }
+
+    private IReadOnlyList<string>? GetCulturesPublishing(IPublishableContentBase content)
+        => content.ContentType.VariesByCulture()
+            ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
+            : null;
 
     #endregion
 

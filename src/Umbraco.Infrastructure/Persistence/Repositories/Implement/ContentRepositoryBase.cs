@@ -53,6 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             PropertyEditorCollection propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
+            IIdKeyMap idKeyMap,
             IEventAggregator eventAggregator,
             IRepositoryCacheVersionService repositoryCacheVersionService,
             ICacheSyncService cacheSyncService)
@@ -64,6 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 cacheSyncService)
         {
             DataTypeService = dataTypeService;
+            IdKeyMap = idKeyMap;
             LanguageRepository = languageRepository;
             RelationRepository = relationRepository;
             RelationTypeRepository = relationTypeRepository;
@@ -82,6 +84,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected ILanguageRepository LanguageRepository { get; }
 
         protected IDataTypeService DataTypeService { get; }
+
+        /// <summary>
+        /// Gets the cached id-to-key map used to resolve int data type IDs to GUID keys.
+        /// </summary>
+        protected IIdKeyMap IdKeyMap { get; }
 
         protected IRelationRepository RelationRepository { get; }
 
@@ -323,7 +330,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (editor.GetValueEditor() is not IDataValueTags tagsProvider)
                 {
                     // support for legacy tag editors, everything from here down to the last continue can be removed when TagsPropertyEditorAttribute is removed
-                    TagConfiguration? tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService);
+                    TagConfiguration? tagConfiguration = property.GetTagConfiguration(PropertyEditors, DataTypeService, IdKeyMap);
                     if (tagConfiguration == null)
                     {
                         continue;
@@ -334,7 +341,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                         var tags = new List<ITag>();
                         foreach (IPropertyValue pvalue in property.Values)
                         {
-                            IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer, pvalue.Culture);
+                            IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, IdKeyMap, serializer, pvalue.Culture);
                             var languageId = LanguageRepository.GetIdByIsoCode(pvalue.Culture);
                             IEnumerable<Tag> cultureTags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x, LanguageId = languageId });
                             tags.AddRange(cultureTags);
@@ -344,7 +351,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     }
                     else
                     {
-                        IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, serializer); // strings
+                        IEnumerable<string> tagsValue = property.GetTagsValue(PropertyEditors, DataTypeService, IdKeyMap, serializer); // strings
                         IEnumerable<Tag> tags = tagsValue.Select(x => new Tag { Group = tagConfiguration.Group, Text = x });
                         tagRepo.Assign(entity.Id, property.PropertyTypeId, tags);
                     }
@@ -352,7 +359,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue; // not implementing IDataValueTags, continue
                 }
 
-                object? configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
+                object? configurationObject = property.PropertyType.GetDataType(DataTypeService, IdKeyMap)?.ConfigurationObject;
 
                 if (property.PropertyType.VariesByCulture())
                 {
@@ -416,7 +423,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     continue;
                 }
 
-                object? configurationObject = DataTypeService.GetDataType(property.PropertyType.DataTypeId)?.ConfigurationObject;
+                object? configurationObject = property.PropertyType.GetDataType(DataTypeService, IdKeyMap)?.ConfigurationObject;
 
                 // Set sortable values for each matching DTO
                 foreach (PropertyDataDto dto in dtos)

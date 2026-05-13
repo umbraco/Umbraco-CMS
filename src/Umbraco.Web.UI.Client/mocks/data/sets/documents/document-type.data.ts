@@ -1,0 +1,127 @@
+import type { UmbMockDocumentTypeModel } from '../../mock-data-set.types.js';
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const INVARIANT_DOCUMENT_TYPE_ID = 'variant-documents-invariant-document-type-id';
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const VARIANT_DOCUMENT_TYPE_ID = 'variant-documents-variant-document-type-id';
+
+export const data: Array<UmbMockDocumentTypeModel> = [
+	{
+		id: INVARIANT_DOCUMENT_TYPE_ID,
+		alias: 'invariantDocumentType',
+		name: 'Invariant Document Type',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		allowedInLibrary: false,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: null,
+		isFolder: false,
+		properties: [
+			{
+				id: 'variant-documents-invariant-prop-text-id',
+				container: null,
+				alias: 'text',
+				name: 'Text',
+				description: null,
+				dataType: { id: 'variant-documents-textstring-data-type-id' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+		noAccess: false,
+	},
+	{
+		id: VARIANT_DOCUMENT_TYPE_ID,
+		alias: 'variantDocumentType',
+		name: 'Variant Document Type',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		allowedInLibrary: false,
+		variesByCulture: true,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: null,
+		isFolder: false,
+		properties: [
+			{
+				id: 'variant-documents-variant-prop-text-id',
+				container: null,
+				alias: 'text',
+				name: 'Text',
+				description: null,
+				dataType: { id: 'variant-documents-textstring-data-type-id' },
+				variesByCulture: false,
+				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+			{
+				id: 'variant-documents-variant-prop-variant-text-id',
+				container: null,
+				alias: 'variantText',
+				name: 'Variant Text',
+				description: null,
+				dataType: { id: 'variant-documents-textstring-data-type-id' },
+				variesByCulture: true,
+				variesBySegment: false,
+				sortOrder: 1,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+		noAccess: false,
+	},
+];

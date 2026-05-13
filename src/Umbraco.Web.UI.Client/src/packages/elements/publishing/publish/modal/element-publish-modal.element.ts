@@ -1,5 +1,6 @@
-import { UmbElementVariantState, type UmbElementVariantOptionModel } from '../../../types.js';
+import { UmbElementVariantState } from '../../../variant-state.js';
 import { UmbElementReferenceRepository } from '../../../reference/repository/element-reference.repository.js';
+import type { UmbElementVariantOptionModel } from '../../../types.js';
 import type { UmbElementPublishModalData, UmbElementPublishModalValue } from './element-publish-modal.token.js';
 import { css, customElement, html, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
@@ -130,7 +131,6 @@ export class UmbElementPublishModalElement extends UmbModalBaseElement<
 							.requiredFilter=${isNotPublishedMandatory}
 							.pickableFilter=${this.#pickableFilter}></umb-element-variant-language-picker>`,
 				)}
-
 				${when(
 					this._referenceCount !== undefined && this._referenceCount > 0,
 					() => html`

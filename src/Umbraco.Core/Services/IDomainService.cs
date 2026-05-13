@@ -1,4 +1,3 @@
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services.OperationStatus;
@@ -22,14 +21,6 @@ public interface IDomainService : IService
     bool Exists(string domainName);
 
     /// <summary>
-    ///     Deletes a domain.
-    /// </summary>
-    /// <param name="domain">The domain to delete.</param>
-    /// <returns>An attempt containing the operation result.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult?> Delete(IDomain domain);
-
-    /// <summary>
     ///     Gets a domain by its name.
     /// </summary>
     /// <param name="name">The domain name.</param>
@@ -42,31 +33,6 @@ public interface IDomainService : IService
     /// <param name="id">The domain identifier.</param>
     /// <returns>The domain, or <c>null</c> if not found.</returns>
     IDomain? GetById(int id);
-
-    /// <summary>
-    ///     Gets all domains.
-    /// </summary>
-    /// <param name="includeWildcards">Whether to include wildcard domains.</param>
-    /// <returns>A collection of domains.</returns>
-    [Obsolete($"Please use {nameof(GetAllAsync)}. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IDomain> GetAll(bool includeWildcards);
-
-    /// <summary>
-    ///     Gets all domains assigned to a content item.
-    /// </summary>
-    /// <param name="contentId">The content item identifier.</param>
-    /// <param name="includeWildcards">Whether to include wildcard domains.</param>
-    /// <returns>A collection of domains assigned to the content item.</returns>
-    [Obsolete($"Please use {nameof(GetAssignedDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IDomain> GetAssignedDomains(int contentId, bool includeWildcards);
-
-    /// <summary>
-    ///     Saves a domain.
-    /// </summary>
-    /// <param name="domainEntity">The domain to save.</param>
-    /// <returns>An attempt containing the operation result.</returns>
-    [Obsolete($"Please use {nameof(UpdateDomainsAsync)}. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult?> Save(IDomain domainEntity);
 
     /// <summary>
     ///     Gets all assigned domains for a content item.

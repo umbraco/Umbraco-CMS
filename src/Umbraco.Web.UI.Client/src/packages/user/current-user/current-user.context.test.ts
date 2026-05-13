@@ -1,4 +1,4 @@
-import { expect } from '@open-wc/testing';
+import { aTimeout, expect } from '@open-wc/testing';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { UmbNotificationContext } from '@umbraco-cms/backoffice/notification';
@@ -9,6 +9,8 @@ import { UMB_USER_GROUP_ENTITY_TYPE } from '@umbraco-cms/backoffice/user-group';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbCurrentUserContext } from './current-user.context.js';
 import { UmbCurrentUserStore } from './repository/index.js';
+import { UmbUserGroupDetailRepository } from '@umbraco-cms/backoffice/user-group';
+import { UmbUserGroupDetailStore } from '../user-group/repository/detail/user-group-detail.store.js';
 
 // Kitchen sink current user data
 const CURRENT_USER_UNIQUE = '1e70f841-c261-413b-abb2-2d68cdb96094';
@@ -25,6 +27,7 @@ class UmbTestCurrentUserContextHostElement extends UmbControllerHostElementMixin
 	constructor() {
 		super();
 		new UmbCurrentUserStore(this);
+		new UmbUserGroupDetailStore(this);
 		new UmbNotificationContext(this);
 	}
 
@@ -106,13 +109,11 @@ describe('UmbCurrentUserContext', () => {
 				};
 			});
 
-			const wait = () => new Promise((resolve) => setTimeout(resolve, 200));
-
 			it('reloads when the current user entity is updated', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(1);
 			});
 
@@ -120,7 +121,7 @@ describe('UmbCurrentUserContext', () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: OTHER_USER_UNIQUE }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(0);
 			});
 
@@ -128,7 +129,7 @@ describe('UmbCurrentUserContext', () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: CURRENT_USER_GROUP_UNIQUE }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(1);
 			});
 
@@ -136,7 +137,7 @@ describe('UmbCurrentUserContext', () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: OTHER_GROUP_UNIQUE }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(0);
 			});
 
@@ -144,7 +145,7 @@ describe('UmbCurrentUserContext', () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UNRELATED_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(0);
 			});
 
@@ -152,7 +153,7 @@ describe('UmbCurrentUserContext', () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: null }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(0);
 			});
 
@@ -160,7 +161,7 @@ describe('UmbCurrentUserContext', () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: null }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(0);
 			});
 
@@ -174,7 +175,7 @@ describe('UmbCurrentUserContext', () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityUpdatedEvent({ entityType: UMB_USER_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(1);
 			});
 		});
@@ -191,13 +192,11 @@ describe('UmbCurrentUserContext', () => {
 				};
 			});
 
-			const wait = () => new Promise((resolve) => setTimeout(resolve, 200));
-
 			it('reloads when a user group the current user belongs to is deleted', async () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityDeletedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: CURRENT_USER_GROUP_UNIQUE }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(1);
 			});
 
@@ -205,7 +204,7 @@ describe('UmbCurrentUserContext', () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityDeletedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: OTHER_GROUP_UNIQUE }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(0);
 			});
 
@@ -213,7 +212,7 @@ describe('UmbCurrentUserContext', () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityDeletedEvent({ entityType: UNRELATED_ENTITY_TYPE, unique: CURRENT_USER_UNIQUE }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(0);
 			});
 
@@ -221,8 +220,35 @@ describe('UmbCurrentUserContext', () => {
 				hostElement.actionEventContext.dispatchEvent(
 					new UmbEntityDeletedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: null }),
 				);
-				await wait();
+				await aTimeout(200);
 				expect(loadCount).to.equal(0);
+			});
+		});
+
+		describe('reload fetches fresh data', () => {
+			beforeEach(async () => {
+				await useMockSet('kitchenSink');
+			});
+
+			it('reflects updated sections after a user group the current user belongs to is saved', async () => {
+				expect(context.getAllowedSection()).to.include('Umb.Section.Users');
+
+				const userGroupRepo = new UmbUserGroupDetailRepository(hostElement);
+				const { data: userGroup } = await userGroupRepo.requestByUnique(CURRENT_USER_GROUP_UNIQUE);
+				expect(userGroup).to.exist;
+
+				await userGroupRepo.save({
+					...userGroup!,
+					sections: userGroup!.sections.filter((s) => s !== 'Umb.Section.Users'),
+				});
+
+				hostElement.actionEventContext.dispatchEvent(
+					new UmbEntityUpdatedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: CURRENT_USER_GROUP_UNIQUE }),
+				);
+
+				await aTimeout(200);
+
+				expect(context.getAllowedSection()).to.not.include('Umb.Section.Users');
 			});
 		});
 
@@ -244,7 +270,7 @@ describe('UmbCurrentUserContext', () => {
 					new UmbEntityDeletedEvent({ entityType: UMB_USER_GROUP_ENTITY_TYPE, unique: CURRENT_USER_GROUP_UNIQUE }),
 				);
 
-				await new Promise((resolve) => setTimeout(resolve, 200));
+				await aTimeout(200);
 				expect(loadCount).to.equal(0);
 			});
 		});

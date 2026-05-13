@@ -26,13 +26,21 @@ public abstract class PublishedContentWrapped : PublishedElementWrapped<IPublish
     ///     with an <c>IPublishedContent</c> instance to wrap.
     /// </summary>
     /// <param name="content">The content to wrap.</param>
-    /// <param name="publishedValueFallback">The published value fallback.</param>
-    protected PublishedContentWrapped(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
+    protected PublishedContentWrapped(IPublishedContent content)
         : base(content)
         => _content = content;
 
     /// <inheritdoc />
-    public virtual string? UrlSegment => _content.UrlSegment;
+    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 20.")]
+    public virtual string? UrlSegment
+    {
+        get
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            return _content.UrlSegment;
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+    }
 
     /// <inheritdoc />
     public virtual int Level => _content.Level;

@@ -6,6 +6,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services;
 /// Unlike <see cref="ContentTypeEditingServiceModelsBuilderEnabledTestsBase"/> this testbase does not configure the modelsbuilder based <see cref="ConfigurePropertySettingsOptions"/>
 /// which has the same effect as disabling it completely as <see cref="ContentTypeEditingServiceModelsBuilderEnabledTestsBase"/> only loads in that part anyway.
 /// </summary>
-internal class ContentTypeEditingServiceModelsBuilderDisabledTestsBase : ContentTypeEditingServiceTestsBase
+internal abstract class ContentTypeEditingServiceModelsBuilderDisabledTestsBase : ContentTypeEditingServiceTestsBase
 {
 }

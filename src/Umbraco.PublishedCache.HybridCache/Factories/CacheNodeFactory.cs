@@ -17,11 +17,9 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
 
     public ContentCacheNode ToContentCacheNode(IContent content, bool preview)
     {
-
-
         ContentData contentData = GetContentData(
             content,
-            GetPublishedValue(content, preview),
+            preview is false,
             GetTemplateId(content, preview),
             content.PublishCultureInfos!.Values.Select(x => x.Culture).ToHashSet());
         return new ContentCacheNode
@@ -35,21 +33,6 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
             Data = contentData,
             IsDraft = preview,
         };
-    }
-
-    private static bool GetPublishedValue(IPublishableContentBase content, bool preview)
-    {
-        switch (content.PublishedState)
-        {
-            case PublishedState.Published:
-                return preview is false;
-            case PublishedState.Publishing:
-                return preview is false || content.Published; // The type changes after this operation
-            case PublishedState.Unpublished:
-            case PublishedState.Unpublishing:
-            default:
-                return false;
-        }
     }
 
     private static int? GetTemplateId(IContent content, bool preview)
@@ -88,7 +71,7 @@ internal sealed class CacheNodeFactory : ICacheNodeFactory
     {
         ContentData contentData = GetContentData(
             element,
-            GetPublishedValue(element, preview),
+            preview is false,
             null,
             element.PublishCultureInfos?.Values.Select(x => x.Culture).ToHashSet() ?? []);
         return new ContentCacheNode

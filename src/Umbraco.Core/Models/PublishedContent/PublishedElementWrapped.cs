@@ -14,8 +14,7 @@ public abstract class PublishedElementWrapped : PublishedElementWrapped<IPublish
     ///     with an <c>IPublishedElement</c> instance to wrap.
     /// </summary>
     /// <param name="content">The content to wrap.</param>
-    /// <param name="publishedValueFallback">The published value fallback.</param>
-    protected PublishedElementWrapped(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+    protected PublishedElementWrapped(IPublishedElement content)
         : base(content)
     {
     }

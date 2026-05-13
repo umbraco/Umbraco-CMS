@@ -231,7 +231,7 @@ internal sealed class ElementCacheServiceTests : UmbracoIntegrationTest
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
-        var element = ElementService.Create("Test Element", elementType.Alias);
+        var element = new Element("Test Element", elementType);
         element.SetValue("title", "Element Title");
 
         ElementService.Save(element);
@@ -244,7 +244,7 @@ internal sealed class ElementCacheServiceTests : UmbracoIntegrationTest
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
         await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
-        var element = ElementService.Create("Test Element", elementType.Alias);
+        var element = new Element("Test Element", elementType);
         element.SetValue("title", "Element Title");
 
         ElementService.Save(element);

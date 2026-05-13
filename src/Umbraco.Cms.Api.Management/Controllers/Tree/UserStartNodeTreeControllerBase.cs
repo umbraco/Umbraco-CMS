@@ -34,7 +34,7 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
                 dataTypeService,
                 GetUserStartNodeIds,
                 GetUserStartNodePaths,
-                () => ItemObjectType);
+                () => [ItemObjectType]);
 #pragma warning restore CS0618 // Type or member is obsolete>
 
     /// <summary>
@@ -141,23 +141,23 @@ public abstract class UserStartNodeTreeControllerBase<TItem> : EntityTreeControl
     {
         private readonly Func<int[]> _getStartNodeIds;
         private readonly Func<string[]> _getStartNodePaths;
-        private readonly Func<UmbracoObjectTypes> _getTreeObjectType;
+        private readonly Func<UmbracoObjectTypes[]> _getTreeObjectTypes;
 
         public CallbackStartNodeTreeFilterService(
             IUserStartNodeEntitiesService userStartNodeEntitiesService,
             IDataTypeService dataTypeService,
             Func<int[]> getStartNodeIds,
             Func<string[]> getStartNodePaths,
-            Func<UmbracoObjectTypes> getTreeObjectType)
+            Func<UmbracoObjectTypes[]> getTreeObjectTypes)
             : base(userStartNodeEntitiesService, dataTypeService)
         {
             _getStartNodeIds = getStartNodeIds;
             _getStartNodePaths = getStartNodePaths;
-            _getTreeObjectType = getTreeObjectType;
+            _getTreeObjectTypes = getTreeObjectTypes;
         }
 
         /// <inheritdoc />
-        protected override UmbracoObjectTypes TreeObjectType => _getTreeObjectType();
+        protected override UmbracoObjectTypes[] TreeObjectTypes => _getTreeObjectTypes();
 
         /// <inheritdoc />
         protected override int[] CalculateUserStartNodeIds() => _getStartNodeIds();

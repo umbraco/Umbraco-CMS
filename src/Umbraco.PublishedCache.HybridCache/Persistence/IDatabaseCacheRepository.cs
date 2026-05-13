@@ -34,7 +34,12 @@ internal interface IDatabaseCacheRepository
     /// <summary>
     /// Refreshes the cache for the given document cache node.
     /// </summary>
-    Task RefreshDocumentAsync(ContentCacheNode contentCacheNode, PublishedState publishedState);
+    Task RefreshDocumentAsync(ContentCacheNode contentCacheNode);
+
+    /// <summary>
+    /// Removes the cache of published content for the given document.
+    /// </summary>
+    Task RemovePublishedDocumentAsync(int id);
 
     /// <summary>
     /// Gets all content keys of specific document types.
@@ -114,7 +119,12 @@ internal interface IDatabaseCacheRepository
     /// <summary>
     /// Refreshes the cache for the given element cache node.
     /// </summary>
-    Task RefreshElementAsync(ContentCacheNode contentCacheNode, PublishedState publishedState);
+    Task RefreshElementAsync(ContentCacheNode contentCacheNode);
+
+    /// <summary>
+    /// Removes the cache of published content for the given element.
+    /// </summary>
+    Task RemovePublishedElementAsync(int id);
 
     #endregion
 

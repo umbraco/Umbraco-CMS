@@ -486,7 +486,7 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationAsyncHandler<RemovedExternalMemberRolesNotification, AuditNotificationsHandler>();
 
         // Handlers for publish warnings
-        builder.AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
         builder.AddNotificationAsyncHandler<ContentPublishedNotification, AddUnroutableContentWarningsWhenPublishingNotificationHandler>();
 
         // Handlers for save warnings

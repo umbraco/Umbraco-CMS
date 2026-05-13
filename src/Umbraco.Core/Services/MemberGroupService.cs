@@ -32,25 +32,7 @@ internal sealed class MemberGroupService : RepositoryService, IMemberGroupServic
         _memberGroupRepository = memberGroupRepository;
 
     /// <inheritdoc />
-    public IEnumerable<IMemberGroup> GetAll() => GetAllAsync().GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public IEnumerable<IMemberGroup> GetByIds(IEnumerable<int> ids) => GetByIdsAsync(ids).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public IMemberGroup? GetById(int id)
-    {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _memberGroupRepository.Get(id);
-        }
-    }
-
-    /// <inheritdoc />
     public IMemberGroup? GetByName(string? name) => name is null ? null : GetByNameAsync(name).GetAwaiter().GetResult();
-
-    /// <inheritdoc />
-    public void Delete(IMemberGroup memberGroup) => DeleteAsync(memberGroup.Key).GetAwaiter().GetResult();
 
     /// <inheritdoc/>
     public Task<IMemberGroup?> GetByNameAsync(string name)

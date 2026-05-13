@@ -1,5 +1,6 @@
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
 using Umbraco.Cms.Api.Management.ViewModels.DocumentBlueprint.Item;
@@ -126,7 +127,7 @@ internal sealed class DocumentPresentationFactory
     /// <inheritdoc/>
     protected override DocumentVariantItemResponseModel CreateVariantItemResponseModel(
         string name,
-        DocumentVariantState state,
+        PublishableVariantState state,
         string? culture)
         => new() { Name = name, State = state, Culture = culture };
 }

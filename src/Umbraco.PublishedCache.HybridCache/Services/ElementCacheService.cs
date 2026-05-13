@@ -261,19 +261,17 @@ internal sealed class ElementCacheService : IElementCacheService
         // We have nodes separate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
         var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(element, true);
+        await _databaseCacheRepository.RefreshElementAsync(draftCacheNode);
 
-        await _databaseCacheRepository.RefreshElementAsync(draftCacheNode, element.PublishedState);
-
-        if (element.PublishedState == PublishedState.Publishing || element.PublishedState == PublishedState.Unpublishing)
+        if (element.PublishedState is PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(element, false);
-
-            await _databaseCacheRepository.RefreshElementAsync(publishedCacheNode, element.PublishedState);
-
-            if (element.PublishedState == PublishedState.Unpublishing)
-            {
-                await ClearPublishedCacheAsync(publishedCacheNode.Key);
-            }
+            await _databaseCacheRepository.RefreshElementAsync(publishedCacheNode);
+        }
+        else if (element.PublishedState is PublishedState.Unpublishing)
+        {
+            await _databaseCacheRepository.RemovePublishedElementAsync(element.Id);
+            await ClearPublishedCacheAsync(element.Key);
         }
 
         scope.Complete();
