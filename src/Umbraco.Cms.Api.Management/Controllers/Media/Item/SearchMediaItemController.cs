@@ -85,11 +85,22 @@ public class SearchMediaItemController : MediaItemControllerBase
             ignoreUserStartNodes);
         var result = new PagedModel<MediaItemResponseModel>
         {
-            Items = searchResult.Items.OfType<IMediaEntitySlim>().Select(_mediaPresentationFactory.CreateItemResponseModel),
+            Items = await MapMediaItemsAsync(searchResult.Items),
             Total = searchResult.Total,
         };
 
         return Ok(result);
+    }
+
+    private async Task<IEnumerable<MediaItemResponseModel>> MapMediaItemsAsync(IEnumerable<IEntitySlim> entities)
+    {
+        List<MediaItemResponseModel> mapped = [];
+        foreach (IMediaEntitySlim entity in entities.OfType<IMediaEntitySlim>())
+        {
+            mapped.Add(await _mediaPresentationFactory.CreateItemResponseModelAsync(entity));
+        }
+
+        return mapped;
     }
 
     private async Task<bool> IgnoreUserStartNodes(Guid? dataTypeKey) =>
