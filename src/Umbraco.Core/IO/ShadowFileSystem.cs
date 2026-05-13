@@ -45,20 +45,6 @@ internal sealed partial class ShadowFileSystem : IFileSystem
     /// </remarks>
     private Dictionary<string, ShadowNode> Nodes => _nodes ??= new Dictionary<string, ShadowNode>(StringComparer.OrdinalIgnoreCase);
 
-    /// <summary>
-    /// Resolves the path to use for operations against the inner shadow file system
-    /// (<see cref="_sfs"/>) for a logical file path.
-    /// </summary>
-    /// <remarks>
-    /// If the file has already been staged in this scope, its <see cref="ShadowNode.CanonicalPath"/>
-    /// is reused so all reads and writes hit the same on-disk file on case-sensitive file systems.
-    /// Otherwise <paramref name="path"/> becomes the canonical path for any subsequent staging.
-    /// </remarks>
-    private string GetCanonicalPath(string normPath, string path)
-        => Nodes.TryGetValue(normPath, out ShadowNode? node) && node.CanonicalPath is not null
-            ? node.CanonicalPath
-            : path;
-
     /// <inheritdoc />
     public IEnumerable<string> GetDirectories(string path)
     {
@@ -87,7 +73,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         var normPath = NormPath(path);
         if (recursive)
         {
-            Nodes[normPath] = new ShadowNode(true, true);
+            Nodes[normPath] = new ShadowNode(true, true, normPath);
             var remove = Nodes.Where(x => IsDescendant(normPath, x.Key)).ToList();
             foreach (KeyValuePair<string, ShadowNode> kvp in remove)
             {
@@ -105,7 +91,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
                 throw new InvalidOperationException("Directory is not empty.");
             }
 
-            Nodes[path] = new ShadowNode(true, true);
+            Nodes[path] = new ShadowNode(true, true, normPath);
             var remove = Nodes.Where(x => IsChild(normPath, x.Key)).ToList();
             foreach (KeyValuePair<string, ShadowNode> kvp in remove)
             {
@@ -152,7 +138,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
 
                 if (sd.IsDelete)
                 {
-                    Nodes[dirPath] = new ShadowNode(false, true);
+                    Nodes[dirPath] = new ShadowNode(false, true, dirPath);
                 }
             }
             else
@@ -167,11 +153,11 @@ internal sealed partial class ShadowFileSystem : IFileSystem
                     throw new InvalidOperationException("Invalid path.");
                 }
 
-                Nodes[dirPath] = new ShadowNode(false, true);
+                Nodes[dirPath] = new ShadowNode(false, true, dirPath);
             }
         }
 
-        var canonicalPath = GetCanonicalPath(normPath, path);
+        var canonicalPath = sf?.CanonicalPath ?? path;
         _sfs.AddFile(canonicalPath, stream, overrideIfExists);
         Nodes[normPath] = new ShadowNode(false, false, canonicalPath);
     }
@@ -200,7 +186,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
     {
         if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
         {
-            return sf.IsDir || sf.IsDelete ? Stream.Null : _sfs.OpenFile(sf.CanonicalPath ?? path);
+            return sf.IsDir || sf.IsDelete ? Stream.Null : _sfs.OpenFile(sf.CanonicalPath);
         }
 
         return Inner.OpenFile(path);
@@ -214,7 +200,8 @@ internal sealed partial class ShadowFileSystem : IFileSystem
             return;
         }
 
-        Nodes[NormPath(path)] = new ShadowNode(true, false);
+        var normPath = NormPath(path);
+        Nodes[normPath] = new ShadowNode(true, false, normPath);
     }
 
     /// <inheritdoc />
@@ -248,7 +235,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
 
                 if (sd.IsDelete)
                 {
-                    Nodes[dirPath] = new ShadowNode(false, true);
+                    Nodes[dirPath] = new ShadowNode(false, true, dirPath);
                 }
             }
             else
@@ -263,14 +250,14 @@ internal sealed partial class ShadowFileSystem : IFileSystem
                     throw new InvalidOperationException("Invalid path.");
                 }
 
-                Nodes[dirPath] = new ShadowNode(false, true);
+                Nodes[dirPath] = new ShadowNode(false, true, dirPath);
             }
         }
 
         var sourceCanonical = sf?.CanonicalPath ?? normSource;
-        var targetCanonical = GetCanonicalPath(normTarget, normTarget);
+        var targetCanonical = tf?.CanonicalPath ?? normTarget;
         _sfs.MoveFile(sourceCanonical, targetCanonical, overrideIfExists);
-        Nodes[normSource] = new ShadowNode(true, false);
+        Nodes[normSource] = new ShadowNode(true, false, sourceCanonical);
         Nodes[normTarget] = new ShadowNode(false, false, targetCanonical);
     }
 
@@ -293,7 +280,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
     {
         if (Nodes.TryGetValue(NormPath(path), out ShadowNode? sf))
         {
-            return sf.IsDir || sf.IsDelete ? string.Empty : _sfs.GetFullPath(sf.CanonicalPath ?? path);
+            return sf.IsDir || sf.IsDelete ? string.Empty : _sfs.GetFullPath(sf.CanonicalPath);
         }
 
         return Inner.GetFullPath(path);
@@ -315,7 +302,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
             throw new InvalidOperationException("Invalid path.");
         }
 
-        return _sfs.GetLastModified(sf.CanonicalPath ?? path);
+        return _sfs.GetLastModified(sf.CanonicalPath);
     }
 
     /// <inheritdoc />
@@ -331,7 +318,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
             throw new InvalidOperationException("Invalid path.");
         }
 
-        return _sfs.GetCreated(sf.CanonicalPath ?? path);
+        return _sfs.GetCreated(sf.CanonicalPath);
     }
 
     /// <inheritdoc />
@@ -347,7 +334,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
             throw new InvalidOperationException("Invalid path.");
         }
 
-        return _sfs.GetSize(sf.CanonicalPath ?? path);
+        return _sfs.GetSize(sf.CanonicalPath);
     }
 
     /// <inheritdoc />
@@ -372,7 +359,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
 
                 if (sd.IsDelete)
                 {
-                    Nodes[dirPath] = new ShadowNode(false, true);
+                    Nodes[dirPath] = new ShadowNode(false, true, dirPath);
                 }
             }
             else
@@ -387,11 +374,11 @@ internal sealed partial class ShadowFileSystem : IFileSystem
                     throw new InvalidOperationException("Invalid path.");
                 }
 
-                Nodes[dirPath] = new ShadowNode(false, true);
+                Nodes[dirPath] = new ShadowNode(false, true, dirPath);
             }
         }
 
-        var canonicalPath = GetCanonicalPath(normPath, path);
+        var canonicalPath = sf?.CanonicalPath ?? path;
         _sfs.AddFile(canonicalPath, physicalPath, overrideIfExists, copy);
         Nodes[normPath] = new ShadowNode(false, false, canonicalPath);
     }
@@ -416,14 +403,13 @@ internal sealed partial class ShadowFileSystem : IFileSystem
                 {
                     try
                     {
-                        var stagedPath = kvp.Value.CanonicalPath ?? kvp.Key;
                         if (Inner.CanAddPhysical)
                         {
-                            Inner.AddFile(kvp.Key, _sfs.GetFullPath(stagedPath)); // overwrite, move
+                            Inner.AddFile(kvp.Key, _sfs.GetFullPath(kvp.Value.CanonicalPath)); // overwrite, move
                         }
                         else
                         {
-                            using (Stream stream = _sfs.OpenFile(stagedPath))
+                            using (Stream stream = _sfs.OpenFile(kvp.Value.CanonicalPath))
                             {
                                 Inner.AddFile(kvp.Key, stream, true);
                             }
@@ -525,12 +511,14 @@ internal sealed partial class ShadowFileSystem : IFileSystem
     {
         foreach (var file in Inner.GetFiles(path))
         {
-            Nodes[NormPath(file)] = new ShadowNode(true, false);
+            var normFile = NormPath(file);
+            Nodes[normFile] = new ShadowNode(true, false, normFile);
         }
 
         foreach (var dir in Inner.GetDirectories(path))
         {
-            Nodes[NormPath(dir)] = new ShadowNode(true, true);
+            var normDir = NormPath(dir);
+            Nodes[normDir] = new ShadowNode(true, true, normDir);
             if (recurse)
             {
                 Delete(dir, true);
@@ -642,8 +630,8 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         /// </summary>
         /// <param name="isDelete">Whether this node represents a deletion.</param>
         /// <param name="isdir">Whether this node represents a directory.</param>
-        /// <param name="canonicalPath">For existing-file nodes, the original-case path used to stage the file in <c>_sfs</c>; otherwise <c>null</c>.</param>
-        public ShadowNode(bool isDelete, bool isdir, string? canonicalPath = null)
+        /// <param name="canonicalPath">The original-case path tracked by this node.</param>
+        public ShadowNode(bool isDelete, bool isdir, string canonicalPath)
         {
             IsDelete = isDelete;
             IsDir = isdir;
@@ -661,15 +649,15 @@ internal sealed partial class ShadowFileSystem : IFileSystem
         public bool IsDir { get; }
 
         /// <summary>
-        /// Gets the original-case path used the first time this file was staged in the
-        /// current shadow scope, or <c>null</c> for directory / deletion nodes.
+        /// Gets the original-case path tracked by this node. For existing-file nodes this is
+        /// the path used the first time the file was staged in the current shadow scope.
         /// </summary>
         /// <remarks>
         /// All operations against the inner shadow file system (<c>_sfs</c>) must use this
         /// path so that re-staging the same logical path with a different case still reaches
         /// the same on-disk file on case-sensitive file systems (e.g. Linux).
         /// </remarks>
-        public string? CanonicalPath { get; }
+        public string CanonicalPath { get; }
 
         /// <summary>
         /// Gets a value indicating whether this node represents an existing item (not deleted).
