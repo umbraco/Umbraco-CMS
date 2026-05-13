@@ -7,7 +7,6 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { RedirectManagementService, RedirectStatusModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { RedirectUrlResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A data source for the Document Redirect Management feature that fetches data from the server.
@@ -54,13 +53,6 @@ export class UmbDocumentRedirectManagementServerDataSource {
 	 *   Scheduled for removal in Umbraco 19.
 	 */
 	async setStatus(enabled: boolean) {
-		new UmbDeprecation({
-			deprecated: 'UmbDocumentRedirectManagementServerDataSource.setStatus()',
-			removeInVersion: '19.0.0',
-			solution:
-				'The backend endpoint is now a no-op. Set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead.',
-		}).warn();
-
 		const status = enabled ? RedirectStatusModel.ENABLED : RedirectStatusModel.DISABLED;
 		const { error } = await tryExecute(
 			this.#host,

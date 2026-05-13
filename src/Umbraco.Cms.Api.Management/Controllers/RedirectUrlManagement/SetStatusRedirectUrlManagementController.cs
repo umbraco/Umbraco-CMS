@@ -1,7 +1,9 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Models.RedirectUrlManagement;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 
@@ -13,6 +15,19 @@ namespace Umbraco.Cms.Api.Management.Controllers.RedirectUrlManagement;
 [Obsolete("This controller is deprecated and no longer modifies the configuration. Set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead. Scheduled for removal in Umbraco 19.")]
 public class SetStatusRedirectUrlManagementController : RedirectUrlManagementControllerBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SetStatusRedirectUrlManagementController"/> class.
+    /// </summary>
+    /// <param name="backOfficeSecurityAccessor">Ignored. Retained for binary compatibility.</param>
+    /// <param name="configManipulator">Ignored. Retained for binary compatibility.</param>
+    public SetStatusRedirectUrlManagementController(
+#pragma warning disable IDE0060 // Remove unused parameter
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IConfigManipulator configManipulator)
+#pragma warning restore IDE0060 // Remove unused parameter
+    {
+    }
+
     /// <summary>
     /// Deprecated. Returns an OK response without modifying any configuration. To toggle redirect URL tracking,
     /// set the <c>Umbraco:CMS:WebRouting:DisableRedirectUrlTracking</c> configuration key instead.
