@@ -43,11 +43,11 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   }
 
   async enterSearchQuery(query: string) {
-    await this.enterText(this.searchTxt, query);
+    await this.enterText(this.searchInputTxt, query);
   }
 
   async clearSearchQuery() {
-    await this.searchTxt.fill('');
+    await this.searchInputTxt.fill('');
   }
 
   async searchForDocument(query: string) {
