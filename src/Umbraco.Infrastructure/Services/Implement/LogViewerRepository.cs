@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
 using Umbraco.Cms.Core.Logging;
@@ -98,11 +99,17 @@ public class LogViewerRepository : LogViewerRepositoryBase
                     break;
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is JsonException or InvalidDataException)
             {
-                // The reader consumes a line at a time before parsing, so an exception here
-                // means this individual line was unreadable; the next call advances past it.
-                // Aggregate so we surface one warning per file rather than one per bad line.
+                // Serilog.Formatting.Compact.Reader uses Newtonsoft.Json internally and surfaces
+                // its exceptions (Umbraco's own serialization is on System.Text.Json, but that
+                // doesn't apply here — we have to catch what the reader actually throws).
+                // JsonException covers parse failures (e.g. an unterminated string in a truncated
+                // entry); InvalidDataException covers structurally-valid JSON that isn't a valid
+                // Serilog Compact event. Either way the offending line has been consumed from the
+                // underlying StreamReader and the next TryRead call advances. Anything else
+                // (IOException, decoder failures, etc.) is propagated to the file-level catch in
+                // GetLogs so we don't risk a tight loop or silently swallow a more serious failure.
                 errorCount++;
                 firstError ??= ex;
                 continue;
