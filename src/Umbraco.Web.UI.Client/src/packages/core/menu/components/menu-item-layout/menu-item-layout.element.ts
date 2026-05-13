@@ -105,7 +105,7 @@ export class UmbMenuItemLayoutElement extends UmbLitElement {
 				<umb-icon slot="icon" name=${this.iconName}></umb-icon>
 				${when(
 					this.entityType,
-					() => html` <umb-entity-actions-bundle slot="actions" .label=${this.label}></umb-entity-actions-bundle> `,
+					() => html`<umb-entity-actions-bundle slot="actions" .label=${this.label}></umb-entity-actions-bundle>`,
 				)}
 				<slot></slot>
 			</uui-menu-item>
