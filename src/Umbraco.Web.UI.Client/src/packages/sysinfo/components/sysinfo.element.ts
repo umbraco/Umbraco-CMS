@@ -65,13 +65,12 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 		if (clientInformation) {
 			this.#serverKeyValues.push({ name: 'Umbraco client version', data: clientInformation.version });
 		}
-		const uuiVersions = (window as { __uuiVersions?: string[] }).__uuiVersions;
-		if (uuiVersions) {
-			this.#serverKeyValues.push({
-				name: `UI Library version${uuiVersions.length > 1 ? 's' : ''}`,
-				data: uuiVersions.join(', '),
-			});
-		}
+		const uuiVersions = globalThis.__uuiVersions;
+		const formattedUuiVersions = uuiVersions ? uuiVersions.join(', ') : 'Unknown';
+		this.#serverKeyValues.push({
+			name: `UI Library version${uuiVersions && uuiVersions.length > 1 ? 's' : ''}`,
+			data: formattedUuiVersions,
+		});
 
 		// User information
 		this.#serverKeyValues.push({});
@@ -206,5 +205,8 @@ export default UmbSysinfoElement;
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-sysinfo': UmbSysinfoElement;
+	}
+	interface Window {
+		__uuiVersions?: string[];
 	}
 }
