@@ -428,6 +428,43 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsFalse(File.Exists(path + "/ShadowTests/sub/sub/f2.txt"));
     }
 
+    /// <summary>
+    /// Regression test: paths with mixed case must round-trip through Complete() on
+    /// case-sensitive file systems (Linux). Previously, the shadow stored files at their
+    /// original case via <c>_sfs.AddFile</c> but tracked them under a lowercased key, causing
+    /// <c>Complete()</c> to look up the staged file at the lowercased path and fail with
+    /// <c>FileNotFoundException</c> from <c>File.Move</c>.
+    /// </summary>
+    [Test]
+    public void ShadowCompletePreservesPathCase()
+    {
+        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
+        Directory.CreateDirectory(path);
+        Directory.CreateDirectory(path + "/ShadowTests");
+        Directory.CreateDirectory(path + "/ShadowSystem");
+
+        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var ss = new ShadowFileSystem(fs, sfs);
+
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+        {
+            ss.AddFile("Views/PageNotFound.cshtml", ms);
+        }
+
+        // staged at original case
+        Assert.IsTrue(File.Exists(path + "/ShadowSystem/Views/PageNotFound.cshtml"));
+
+        // case-insensitive lookups still resolve the staged file (Windows-like semantics)
+        Assert.IsTrue(ss.FileExists("Views/PageNotFound.cshtml"));
+        Assert.IsTrue(ss.FileExists("views/pagenotfound.cshtml"));
+
+        ss.Complete();
+
+        // committed at original case
+        Assert.IsTrue(File.Exists(path + "/ShadowTests/Views/PageNotFound.cshtml"));
+    }
+
     [Test]
     public void ShadowScopeComplete()
     {

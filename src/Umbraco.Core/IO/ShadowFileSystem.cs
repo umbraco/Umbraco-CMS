@@ -36,7 +36,14 @@ internal sealed partial class ShadowFileSystem : IFileSystem
     /// <summary>
     /// Gets the dictionary of shadow nodes tracking file and directory changes.
     /// </summary>
-    private Dictionary<string, ShadowNode> Nodes => _nodes ??= new Dictionary<string, ShadowNode>();
+    /// <remarks>
+    /// Uses <see cref="StringComparer.OrdinalIgnoreCase"/> so the shadow exposes case-insensitive
+    /// path semantics (matching Windows file system behavior) while preserving the original case
+    /// of paths. Preserving case is required for <see cref="Complete"/>: the stored key is also
+    /// used to locate the shadow file via <c>_sfs.GetFullPath</c>, which on case-sensitive
+    /// file systems (e.g. Linux) must match the case the file was actually written with.
+    /// </remarks>
+    private Dictionary<string, ShadowNode> Nodes => _nodes ??= new Dictionary<string, ShadowNode>(StringComparer.OrdinalIgnoreCase);
 
     /// <inheritdoc />
     public IEnumerable<string> GetDirectories(string path)
@@ -441,11 +448,15 @@ internal sealed partial class ShadowFileSystem : IFileSystem
     }
 
     /// <summary>
-    /// Normalizes a path to lowercase with forward slashes.
+    /// Normalizes a path's directory separators to forward slashes.
     /// </summary>
     /// <param name="path">The path to normalize.</param>
     /// <returns>The normalized path.</returns>
-    private static string NormPath(string path) => path.ToLowerInvariant().Replace("\\", "/");
+    /// <remarks>
+    /// Case is preserved. Case-insensitive matching is handled by <see cref="Nodes"/>'s
+    /// <see cref="StringComparer.OrdinalIgnoreCase"/> comparer.
+    /// </remarks>
+    private static string NormPath(string path) => path.Replace("\\", "/");
 
     /// <summary>
     /// Determines whether the input path is a direct child of the specified path.
@@ -456,7 +467,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
     /// <remarks>Values can be "" (root), "foo", "foo/bar"...</remarks>
     private static bool IsChild(string path, string input)
     {
-        if (input.StartsWith(path) == false || input.Length < path.Length + 2)
+        if (input.StartsWith(path, StringComparison.OrdinalIgnoreCase) == false || input.Length < path.Length + 2)
         {
             return false;
         }
@@ -466,7 +477,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
             return false;
         }
 
-        var pos = input.IndexOf("/", path.Length + 1, StringComparison.OrdinalIgnoreCase);
+        var pos = input.IndexOf('/', path.Length + 1);
         return pos < 0;
     }
 
@@ -478,7 +489,7 @@ internal sealed partial class ShadowFileSystem : IFileSystem
     /// <returns><c>true</c> if input is a descendant of path; otherwise, <c>false</c>.</returns>
     private static bool IsDescendant(string path, string input)
     {
-        if (input.StartsWith(path) == false || input.Length < path.Length + 2)
+        if (input.StartsWith(path, StringComparison.OrdinalIgnoreCase) == false || input.Length < path.Length + 2)
         {
             return false;
         }
