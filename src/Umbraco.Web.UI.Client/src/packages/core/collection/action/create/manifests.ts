@@ -10,6 +10,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			type: 'collectionAction',
 			kind: 'create',
 			element: () => import('./collection-create-action.element.js'),
+			api: () => import('./collection-create-action.api.js'),
 			weight: 1200,
 			meta: {
 				label: '#actions_createFor',

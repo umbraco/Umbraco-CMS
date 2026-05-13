@@ -4,7 +4,7 @@ import type { UmbTemplateItemModel } from '../../repository/item/index.js';
 import { UmbTemplateItemRepository } from '../../repository/item/index.js';
 import { UMB_TEMPLATE_PICKER_MODAL } from '../../modals/index.js';
 import { css, html, customElement, property, state } from '@umbraco-cms/backoffice/external/lit';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
@@ -12,7 +12,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 
 @customElement('umb-input-template')
-export class UmbInputTemplateElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputTemplateElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	/**
 	 * This is a minimum amount of selected items in this input.
 	 * @type {number}

@@ -1,9 +1,9 @@
 import type { UmbEditableDocumentCollectionItemModel } from '../../../types.js';
 import { UmbDocumentItemDataResolver } from '../../../../item/index.js';
 import { customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
+import { UmbDocumentVariantState } from '../../../../variant-state.js';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbTableColumn, UmbTableColumnLayoutElement, UmbTableItem } from '@umbraco-cms/backoffice/components';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 @customElement('umb-document-table-column-property-value')
 export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement implements UmbTableColumnLayoutElement {
@@ -54,7 +54,7 @@ export class UmbDocumentTableColumnPropertyValueElement extends UmbLitElement im
 			case 'owner':
 				return { value: item.creator };
 			case 'published':
-				return { value: this._state !== DocumentVariantStateModel.DRAFT ? 'True' : 'False' };
+				return { value: this._state !== UmbDocumentVariantState.DRAFT ? 'True' : 'False' };
 			case 'sortOrder':
 				return { value: item.sortOrder };
 			case 'updateDate':

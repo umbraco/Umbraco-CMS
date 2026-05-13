@@ -8,8 +8,7 @@ public interface IMediaPathScheme
     /// <summary>
     /// Gets a value indicating whether GUID version 7 is supported.
     /// </summary>
-    // TODO (V18): Remove default implementation.
-    bool SupportsGuid7 => false;
+    bool SupportsGuid7 { get; }
 
     /// <summary>
     ///     Gets a media file path.

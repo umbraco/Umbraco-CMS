@@ -1,6 +1,8 @@
 import type { UmbMockDocumentTypeModel } from '../../mock-data-set.types.js';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const INVARIANT_DOCUMENT_TYPE_ID = 'variant-documents-invariant-document-type-id';
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const VARIANT_DOCUMENT_TYPE_ID = 'variant-documents-variant-document-type-id';
 
 export const data: Array<UmbMockDocumentTypeModel> = [
@@ -13,6 +15,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: true,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -50,6 +53,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 	{
 		id: VARIANT_DOCUMENT_TYPE_ID,
@@ -60,6 +64,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: true,
+		allowedInLibrary: false,
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
@@ -117,5 +122,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 ];

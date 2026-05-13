@@ -1,6 +1,8 @@
 import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { INVARIANT_DOCUMENT_TYPE_ID, VARIANT_DOCUMENT_TYPE_ID } from './document-type.data.js';
+import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
+
+type UmbDocumentVariantState = DocumentVariantResponseModel['state'];
 
 export const data: Array<UmbMockDocumentModel> = [
 	{
@@ -19,7 +21,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		template: null,
 		variants: [
 			{
-				state: DocumentVariantStateModel.PUBLISHED,
+				state: 'Published' as UmbDocumentVariantState,
 				publishDate: '2024-01-15T10:05:00.000Z',
 				culture: null,
 				segment: null,
@@ -57,7 +59,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		template: null,
 		variants: [
 			{
-				state: DocumentVariantStateModel.PUBLISHED,
+				state: 'Published' as UmbDocumentVariantState,
 				publishDate: '2024-01-15T10:05:00.000Z',
 				culture: 'en-US',
 				segment: null,
@@ -68,7 +70,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: DocumentVariantStateModel.DRAFT,
+				state: 'Draft' as UmbDocumentVariantState,
 				publishDate: null,
 				culture: 'da',
 				segment: null,

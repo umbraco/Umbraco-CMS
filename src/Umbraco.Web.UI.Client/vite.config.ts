@@ -18,11 +18,16 @@ export const plugins: PluginOption[] = [
 				dest: 'umbraco/backoffice/css',
 			},
 			{
-				src: 'node_modules/@umbraco-ui/uui-css/dist/uui-css.css',
+				// UUI theme CSS (dark.css, high-contrast.css, etc.).
+				// This config is used by the dev server and PR preview builds only.
+				// The production build (build:for:cms) copies these files via
+				// src/external/uui/vite.config.ts during the workspace build instead.
+				// Theme manifests referencing these files: src/packages/core/themes/manifests.ts.
+				src: 'node_modules/@umbraco-ui/uui/dist/themes/*',
 				dest: 'umbraco/backoffice/css',
 			},
 			{
-				src: 'node_modules/@umbraco-ui/uui-css/assets/fonts/*',
+				src: 'node_modules/@umbraco-ui/uui/dist/assets/fonts/*',
 				dest: 'umbraco/backoffice/assets/fonts',
 			},
 			{

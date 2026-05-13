@@ -22,17 +22,20 @@ const looseVersionRange = (version) => {
 		return version;
 	}
 
-	const major = minVersion.major;
-	const minor = minVersion.minor;
-	const patch = minVersion.patch;
+	const { major, minor, patch, prerelease } = minVersion;
 
-	// For pre-release (0.x.y), always use floor at current version and ceiling at 1.0.0
+	// Preserve any prerelease tag in the floor so a range built from e.g. ^2.0.0-rc.1
+	// stays satisfiable by 2.0.0-rc.1 rather than demanding a non-existent ^2.0.0 stable.
+	const prereleaseSuffix = prerelease.length ? `-${prerelease.join('.')}` : '';
+	const floor = `${major}.${minor}.${patch}${prereleaseSuffix}`;
+
+	// For 0.x.y, always use floor at current version and ceiling at 1.0.0
 	if (major === 0) {
-		return `>=${major}.${minor}.${patch} <1.0.0`;
+		return `>=${floor} <1.0.0`;
 	}
 
 	// Exact version without caret, add caret (e.g., 3.16.0 -> ^3.16.0 and ^3.16.0 -> ^3.16.0 and ~3.16.0 -> ^3.16.0)
-	return `^${major}.${minor}.${patch}`;
+	return `^${floor}`;
 };
 
 // Rename dependencies to peerDependencies with looser version ranges
