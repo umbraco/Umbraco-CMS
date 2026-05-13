@@ -240,8 +240,10 @@ export class UmbTreeItemChildrenManager<
 		// If all known items fit within a single page, skip target pagination and load from
 		// the start instead, this prevents "show more" appearing on small lists after operations
 		// that change item order like sort children.
+		const hasCustomTargetWindow = this.#takeBeforeTarget !== undefined || this.#takeAfterTarget !== undefined;
 		const totalKnownItems = this.offsetPagination.getTotalItems();
-		const fitsInSinglePage = reload && totalKnownItems > 0 && totalKnownItems <= this.offsetPagination.getPageSize();
+		const fitsInSinglePage =
+			!hasCustomTargetWindow && reload && totalKnownItems > 0 && totalKnownItems <= this.offsetPagination.getPageSize();
 
 		const targetPaging: UmbTargetPaginationRequestModel | undefined =
 			!fitsInSinglePage && baseTarget && baseTarget.unique && canSendTarget
