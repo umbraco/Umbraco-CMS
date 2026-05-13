@@ -663,6 +663,7 @@ export default {
 		content: 'Contenu',
 		continue: 'Continuer',
 		copy: 'Copier',
+		copied: 'Copié !',
 		create: 'Créer',
 		database: 'Base de données',
 		date: 'Date',
