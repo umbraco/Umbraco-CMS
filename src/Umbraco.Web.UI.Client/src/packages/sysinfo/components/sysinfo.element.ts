@@ -65,6 +65,10 @@ export class UmbSysinfoElement extends UmbModalBaseElement {
 		if (clientInformation) {
 			this.#serverKeyValues.push({ name: 'Umbraco client version', data: clientInformation.version });
 		}
+		const uuiVersions = (window as { __uuiVersions?: string[] }).__uuiVersions;
+		if (uuiVersions) {
+			this.#serverKeyValues.push({ name: 'UI Library versions', data: JSON.stringify(uuiVersions) });
+		}
 
 		// User information
 		this.#serverKeyValues.push({});
