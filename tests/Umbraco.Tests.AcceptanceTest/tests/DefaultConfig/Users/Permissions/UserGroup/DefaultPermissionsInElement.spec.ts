@@ -123,7 +123,7 @@ test('can trash element with delete permission enabled', async ({umbracoApi, umb
   await umbracoUi.library.clickConfirmTrashButtonAndWaitForElementToBeTrashed();
 
   // Assert
-  await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementName, true, false);
 });
 
 test('can not trash element with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -140,7 +140,8 @@ test('can not trash element with delete permission disabled', async ({umbracoApi
   await umbracoUi.library.isActionsMenuForNameVisible(elementName, false);
 });
 
-test('can empty recycle bin with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Issue link: https://github.com/umbraco/Umbraco-CMS/issues/22798
+test.skip('can empty recycle bin with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.element.moveToRecycleBin(elementId);
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementPermission(userGroupName);
