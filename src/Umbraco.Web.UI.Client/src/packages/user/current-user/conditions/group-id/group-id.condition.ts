@@ -18,6 +18,12 @@ export class UmbCurrentUserGroupCondition
 	}
 
 	#observeCurrentUser = async (currentUser: UmbCurrentUserModel) => {
+		// If currentUser is not yet available, return early to avoid errors
+		if (!currentUser) {
+			this.permitted = false;
+			return;
+		}
+
 		// Idea: This part could be refactored to become a shared util, to align these matching feature across conditions. [NL]
 		// Notice doing so it would be interesting to invistigate if it makes sense to combine some of these properties, to enable more specific matching. (But maybe it is only relevant for the combination of match + oneOf) [NL]
 		const { match, oneOf, allOf, noneOf } = this.config;
