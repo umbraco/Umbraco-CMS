@@ -2,6 +2,8 @@ import type { UmbMockDocumentTypeModel } from '../../mock-data-set.types.js';
 
 export const INVARIANT_DOCUMENT_TYPE_ID = 'variant-documents-invariant-document-type-id';
 export const VARIANT_DOCUMENT_TYPE_ID = 'variant-documents-variant-document-type-id';
+export const INVARIANT_DOCUMENT_TYPE_WITH_VARIANT_COMPOSITION_ID =
+	'variant-documents-invariant-document-type-with-variant-composition-id';
 
 export const data: Array<UmbMockDocumentTypeModel> = [
 	{
@@ -97,6 +99,55 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				variesByCulture: true,
 				variesBySegment: false,
 				sortOrder: 1,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	{
+		// Invariant document type with a culture-variant property — the structure manager flattens
+		// composition properties into this shape, so this mirrors an invariant type composed with a variant type.
+		id: INVARIANT_DOCUMENT_TYPE_WITH_VARIANT_COMPOSITION_ID,
+		alias: 'invariantDocumentTypeWithVariantComposition',
+		name: 'Invariant Document Type With Variant Composition',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: false,
+		isElement: false,
+		hasChildren: false,
+		parent: null,
+		isFolder: false,
+		properties: [
+			{
+				id: 'variant-documents-invariant-with-variant-composition-prop-text-id',
+				container: null,
+				alias: 'compositionVariantText',
+				name: 'Composition Variant Text',
+				description: null,
+				dataType: { id: 'variant-documents-textstring-data-type-id' },
+				variesByCulture: true,
+				variesBySegment: false,
+				sortOrder: 0,
 				validation: {
 					mandatory: false,
 					mandatoryMessage: null,

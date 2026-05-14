@@ -7,6 +7,8 @@ import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-
 
 const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
+const INVARIANT_WITH_VARIANT_COMPOSITION_DOCUMENT_ID =
+	'variant-documents-invariant-with-variant-composition-document-id';
 
 describe('UmbDocumentWorkspaceContext', () => {
 	let hostElement: UmbTestDocumentWorkspaceHostElement;
@@ -142,6 +144,24 @@ describe('UmbDocumentWorkspaceContext', () => {
 				}
 				const values = context.getValues();
 				expect(values).to.be.an('array').with.lengthOf(3);
+			});
+		});
+
+		describe('invariant document with a culture-variant composition property', () => {
+			beforeEach(async () => {
+				await context.load(INVARIANT_WITH_VARIANT_COMPOSITION_DOCUMENT_ID);
+			});
+
+			it('updates the culture-variant composition property as invariant when the document is invariant', async () => {
+				await context.setPropertyValue('compositionVariantText', 'Updated composition value');
+				expect(context.getPropertyValue('compositionVariantText')).to.equal('Updated composition value');
+			});
+
+			it('stores the value with a culture- and segment-invariant variantId', async () => {
+				await context.setPropertyValue('compositionVariantText', 'Updated composition value');
+				const entry = context.getValues()?.find((v) => v.alias === 'compositionVariantText');
+				expect(entry?.culture).to.be.null;
+				expect(entry?.segment).to.be.null;
 			});
 		});
 	});
