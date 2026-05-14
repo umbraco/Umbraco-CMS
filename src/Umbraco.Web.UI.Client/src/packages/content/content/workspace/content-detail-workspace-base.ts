@@ -686,9 +686,14 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				throw new Error(`Property alias "${alias}" not found.`);
 			}
 
+			// Effective variance is the intersection of the property's and the content type's variance —
+			// a variant property on an invariant content type (e.g. inherited from a variant composition)
+			// is effectively invariant and must be stored with a culture/segment-invariant variantId.
+			const contentTypeVariesByCulture = this.getVariesByCulture() ?? false;
+			const contentTypeVariesBySegment = this.getVariesBySegment() ?? false;
 			if (
-				(property.variesByCulture && variantId.isCultureInvariant()) ||
-				(property.variesBySegment && variantId.isSegmentInvariant())
+				(property.variesByCulture && contentTypeVariesByCulture && variantId.isCultureInvariant()) ||
+				(property.variesBySegment && contentTypeVariesBySegment && variantId.isSegmentInvariant())
 			) {
 				throw new Error(`Property alias "${alias}" requires a variantId.`);
 			}
