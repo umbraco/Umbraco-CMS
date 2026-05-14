@@ -156,7 +156,30 @@ export abstract class UmbBlockEntryContext<
 		return this.#label.getValue();
 	}
 
-	#labelRender = new UmbUfmVirtualRenderController(this);
+	#name = new UmbStringState<string>('');
+	/** Observable of the block's resolved label text (UFM rendered as plain text). */
+	public readonly name = this.#name.asObservable();
+
+	/**
+	 * Set the resolved name text. Intended to be called by the block entry element
+	 * when its canonical `<umb-ufm-render>` reports updated text via `umb-ufm-resolved`.
+	 * @param {string} text the resolved text.
+	 */
+	public setName(text: string): void {
+		this.#name.setValue(text);
+	}
+
+	#labelRender?: UmbUfmVirtualRenderController;
+
+	/**
+	 * Whether this context should run its own hidden `UmbUfmVirtualRenderController` as the
+	 * source of `getName()`. Subclasses whose entry element owns a canonical `<umb-ufm-render>`
+	 * (and pushes text via {@link setName}) should override this to return `false`.
+	 * @returns {boolean} `true` to create the legacy hidden renderer; `false` to skip it.
+	 */
+	protected _needsLegacyLabelRenderer(): boolean {
+		return true;
+	}
 
 	#generateWorkspaceEditContentPath = (path?: string, contentKey?: string) =>
 		path && contentKey ? path + 'edit/' + encodeFilePath(contentKey) + '/view/content' : '';
@@ -330,10 +353,15 @@ export abstract class UmbBlockEntryContext<
 	) {
 		super(host, 'UmbBlockEntryContext');
 
-		this.observe(this.label, (label) => {
-			this.#labelRender.markdown = label;
-		});
-		this.#watchContentForLabelRender();
+		if (this._needsLegacyLabelRenderer()) {
+			this.#labelRender = new UmbUfmVirtualRenderController(this);
+			this.observe(this.label, (label) => {
+				if (this.#labelRender) {
+					this.#labelRender.markdown = label;
+				}
+			});
+			this.#watchContentForLabelRender();
+		}
 
 		// Consume block manager:
 		this.consumeContext(blockManagerContextToken, (manager) => {
@@ -433,7 +461,9 @@ export abstract class UmbBlockEntryContext<
 
 	async #watchContentForLabelRender() {
 		this.observe(await this.contentValues(), (content) => {
-			this.#labelRender.value = content;
+			if (this.#labelRender) {
+				this.#labelRender.value = content;
+			}
 		});
 	}
 
@@ -458,7 +488,7 @@ export abstract class UmbBlockEntryContext<
 	 * @returns {string} - the value of the label.
 	 */
 	getName() {
-		return this.#labelRender.toString();
+		return this.#name.getValue() || this.#labelRender?.toString() || '';
 	}
 
 	#updateCreatePaths() {

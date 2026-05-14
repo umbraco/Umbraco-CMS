@@ -1,4 +1,5 @@
 import { UmbUfmRenderElement } from '../components/index.js';
+import { getTextFromDescendants } from '../utils/get-text-from-descendants.function.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
@@ -6,33 +7,6 @@ import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
  */
 export class UmbUfmVirtualRenderController extends UmbControllerBase {
 	#element?: UmbUfmRenderElement;
-
-	#getTextFromDescendants(element?: Element | null): string {
-		if (!element) return '';
-
-		const items: Array<string> = [];
-
-		// Try get the text content from the shadow root first, otherwise get it from the light DOM. [LK]
-		if (element.shadowRoot) {
-			for (const node of element.shadowRoot.childNodes) {
-				if (node.nodeType === Node.ELEMENT_NODE) {
-					items.push(this.#getTextFromDescendants(node as Element));
-				} else if (node.nodeType === Node.TEXT_NODE) {
-					items.push(node.textContent ?? '');
-				}
-			}
-		} else {
-			for (const node of element.childNodes) {
-				if (node.nodeType === Node.ELEMENT_NODE) {
-					items.push(this.#getTextFromDescendants(node as Element));
-				} else if (node.nodeType === Node.TEXT_NODE) {
-					items.push(node.textContent ?? '');
-				}
-			}
-		}
-
-		return items.filter((x) => x).join('');
-	}
 
 	set markdown(markdown: string | undefined) {
 		this.#markdown = markdown;
@@ -73,7 +47,7 @@ export class UmbUfmVirtualRenderController extends UmbControllerBase {
 	}
 
 	override toString(): string {
-		return this.#getTextFromDescendants(this.#element);
+		return getTextFromDescendants(this.#element);
 	}
 
 	override destroy(): void {

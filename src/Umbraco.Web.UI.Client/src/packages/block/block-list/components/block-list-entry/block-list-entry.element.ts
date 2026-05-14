@@ -85,6 +85,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _isSortMode?: boolean;
 
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR [LK]
+	@state()
+	private _name?: string;
+
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
 	private _contentInvalid?: boolean;
@@ -173,6 +177,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
+		this.observe(this.#context.name, (name) => (this._name = name), null);
 
 		// Data props:
 		this.observe(
@@ -279,6 +284,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.#context.expose();
 	};
 
+	#onUfmResolved = (event: CustomEvent<{ text: string }>) => {
+		this.#context.setName(event.detail.text);
+	};
+
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
 		if (this._unsupported) {
 			// If the block is unsupported, we should not allow any custom views to render.
@@ -299,23 +308,52 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
-		if (this._exposed || this._isReadOnly) {
-			return ext.component;
-		} else {
-			return html`<div style="min-height: var(--uui-size-16);">
-				${ext.component}
-				<umb-block-overlay-expose-button
-					.contentTypeName=${this._contentTypeName}
-					@click=${this.#expose}></umb-block-overlay-expose-button>
-			</div>`;
-		}
+		return html`${this.#renderHiddenUfm()}
+		${when(
+			this._exposed || this._isReadOnly,
+			() => ext.component,
+			() => html`
+				<div style="min-height: var(--uui-size-16);">
+					${ext.component}
+					<umb-block-overlay-expose-button
+						.contentTypeName=${this._contentTypeName}
+						@click=${this.#expose}></umb-block-overlay-expose-button>
+				</div>
+			`,
+		)}`;
 	};
+
+	#renderUfm() {
+		const blockValue = {
+			...this._blockViewProps.content,
+			$settings: this._blockViewProps.settings,
+			$index: this.index,
+		};
+		return html`
+			<umb-ufm-render
+				slot="name"
+				inline
+				.markdown=${this._label}
+				.value=${blockValue}
+				@umb-ufm-resolved=${this.#onUfmResolved}>
+			</umb-ufm-render>
+		`;
+	}
+
+	#renderHiddenUfm() {
+		// Inline styles (not a CSS class) because this div is rendered inside
+		// <umb-extension-slot>'s shadow DOM, which our scoped styles can't reach.
+		return html`
+			<div style="position:absolute;inset:0;visibility:hidden;pointer-events:none;overflow:hidden;">
+				${this.#renderUfm()}
+			</div>
+		`;
+	}
 
 	#renderRefBlock() {
 		return html`
 			<umb-ref-list-block
 				class=${this._isSortMode ? 'sortable' : ''}
-				.label=${this._label}
 				.icon=${this._icon}
 				.index=${this._blockViewProps.index}
 				.unpublished=${!this._exposed}
@@ -323,28 +361,35 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
 				${umbDestroyOnDisconnect()}>
+				${this.#renderUfm()}
 			</umb-ref-list-block>
 		`;
 	}
 
 	#renderInlineBlock() {
-		return html`<umb-inline-list-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.index=${this._blockViewProps.index}
-			.unpublished=${!this._exposed}
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-inline-list-block>`;
+		return html`
+			<umb-inline-list-block
+				.icon=${this._icon}
+				.index=${this._blockViewProps.index}
+				.unpublished=${!this._exposed}
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
+				${this.#renderUfm()}
+			</umb-inline-list-block>
+		`;
 	}
 
 	#renderUnsupportedBlock() {
-		return html`<umb-unsupported-list-block
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-unsupported-list-block>`;
+		return html`
+			${this.#renderHiddenUfm()}
+			<umb-unsupported-list-block
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}></umb-unsupported-list-block>
+		`;
 	}
 
 	#renderBuiltinBlockView = () => {
