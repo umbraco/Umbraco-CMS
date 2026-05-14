@@ -1,19 +1,18 @@
-using System.IO;
-using System.Linq;
 using System.Text;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Extensions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO;
 
@@ -22,38 +21,51 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO;
 internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetUp() => ClearFiles(HostingEnvironment);
+    public void ClearTestFilesBeforeTest() => ClearFiles();
 
     [TearDown]
-    public void TearDown() => ClearFiles(HostingEnvironment);
-    // tested:
-    // only 1 instance of this class is created
-    // SetUp and TearDown run before/after each test
-    // SetUp does not start before the previous TearDown returns
+    public void ClearTestFilesAfterTest() => ClearFiles();
+
+    private IHostEnvironment HostEnvironment => GetRequiredService<IHostEnvironment>();
 
     private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
+
     private ILogger<PhysicalFileSystem> Logger => GetRequiredService<ILogger<PhysicalFileSystem>>();
 
-    private void ClearFiles(IHostingEnvironment hostingEnvironment)
+    private void ClearFiles()
     {
-        TestHelper.DeleteDirectory(hostingEnvironment.MapPathContentRoot("FileSysTests"));
+        TestHelper.DeleteDirectory(HostEnvironment.MapPathContentRoot("FileSysTests"));
         TestHelper.DeleteDirectory(
-            hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
+            HostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') + "ShadowFs"));
+    }
+
+    /// <summary>
+    /// Sets up the standard arrangement used by most tests: a <c>FileSysTests</c> root with two
+    /// sibling <see cref="PhysicalFileSystem"/>s — <c>Inner</c> (the "real" file system) and
+    /// <c>Staging</c> (where the shadow buffers writes) — wrapped in a <see cref="ShadowFileSystem"/>.
+    /// </summary>
+    private (PhysicalFileSystem Inner, PhysicalFileSystem Staging, ShadowFileSystem Shadow, string Root) CreateShadowFileSystem()
+    {
+        var root = HostEnvironment.MapPathContentRoot("FileSysTests");
+        Directory.CreateDirectory(root);
+        Directory.CreateDirectory(root + "/ShadowTests");
+        Directory.CreateDirectory(root + "/ShadowSystem");
+
+        var inner = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, root + "/ShadowTests/", "ignore");
+        var staging = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, root + "/ShadowSystem/", "ignore");
+        return (inner, staging, new ShadowFileSystem(inner, staging), root);
     }
 
     private static string NormPath(string path) => path.Replace('\\', Path.AltDirectorySeparatorChar);
 
+    /// <summary>
+    /// Deleting a directory through the shadow hides it from the shadow's view but does not
+    /// touch the inner file system until <see cref="ShadowFileSystem.Complete"/> is called.
+    /// </summary>
     [Test]
-    public void ShadowDeleteDirectory()
+    public void Can_Delete_Directory_In_Shadow_Without_Affecting_Inner()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (fs, _, ss, path) = CreateShadowFileSystem();
 
         Directory.CreateDirectory(path + "/ShadowTests/d1");
         Directory.CreateDirectory(path + "/ShadowTests/d2");
@@ -77,17 +89,14 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(dirs.Contains("d2"));
     }
 
+    /// <summary>
+    /// Deleting a nested directory through the shadow hides only the targeted subdirectory and
+    /// leaves siblings and the inner file system untouched.
+    /// </summary>
     [Test]
-    public void ShadowDeleteDirectoryInDir()
+    public void Can_Delete_Subdirectory_In_Shadow_Without_Affecting_Inner()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (fs, _, ss, path) = CreateShadowFileSystem();
 
         Directory.CreateDirectory(path + "/ShadowTests/sub");
         Directory.CreateDirectory(path + "/ShadowTests/sub/d1");
@@ -126,17 +135,14 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(dirs.Contains("sub/d2"));
     }
 
+    /// <summary>
+    /// Deleting a file through the shadow hides it from the shadow's view without removing the
+    /// underlying file on the inner file system.
+    /// </summary>
     [Test]
-    public void ShadowDeleteFile()
+    public void Can_Delete_File_In_Shadow_Without_Affecting_Inner()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (fs, _, ss, path) = CreateShadowFileSystem();
 
         File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
         File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
@@ -165,17 +171,14 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(files.Contains("f2.txt"));
     }
 
+    /// <summary>
+    /// Moving a file through the shadow renames it in the shadow's view while leaving the
+    /// inner file system unchanged.
+    /// </summary>
     [Test]
-    public void ShadowMoveFile()
+    public void Can_Move_File_In_Shadow_Without_Affecting_Inner()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (fs, _, ss, path) = CreateShadowFileSystem();
 
         File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -208,18 +211,14 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(files.Contains("f2.txt"));
     }
 
+    /// <summary>
+    /// Deleting a file inside a subdirectory through the shadow hides only the targeted file
+    /// and leaves siblings and the inner file system untouched.
+    /// </summary>
     [Test]
-    public void ShadowDeleteFileInDir()
+    public void Can_Delete_File_In_Subdirectory_In_Shadow_Without_Affecting_Inner()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (fs, _, ss, path) = CreateShadowFileSystem();
 
         Directory.CreateDirectory(path + "/ShadowTests/sub");
         File.WriteAllText(path + "/ShadowTests/sub/f1.txt", "foo");
@@ -264,17 +263,15 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(files.Contains("sub/f2.txt"));
     }
 
+    /// <summary>
+    /// Attempting to add a file whose normalised path escapes the file system root is rejected
+    /// with <see cref="UnauthorizedAccessException"/> rather than silently writing outside the
+    /// sandbox.
+    /// </summary>
     [Test]
-    public void ShadowCantCreateFile()
+    public void Cannot_Add_File_With_Path_Traversal_Outside_Root()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (_, _, ss, _) = CreateShadowFileSystem();
 
         Assert.Throws<UnauthorizedAccessException>(() =>
         {
@@ -285,17 +282,15 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         });
     }
 
+    /// <summary>
+    /// New files added through the shadow are written to the staging file system only — the
+    /// inner file system remains untouched until <see cref="ShadowFileSystem.Complete"/>.
+    /// Existing inner files remain visible through the shadow.
+    /// </summary>
     [Test]
-    public void ShadowCreateFile()
+    public void Can_Add_File_To_Shadow_Without_Touching_Inner()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (fs, _, ss, path) = CreateShadowFileSystem();
 
         File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
 
@@ -328,17 +323,15 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.AreEqual("foo", content);
     }
 
+    /// <summary>
+    /// Adding a file in a new subdirectory through the shadow creates the subdirectory only in
+    /// the shadow's staging area; the inner file system sees no new directory until
+    /// <see cref="ShadowFileSystem.Complete"/>.
+    /// </summary>
     [Test]
-    public void ShadowCreateFileInDir()
+    public void Can_Add_File_In_New_Subdirectory_To_Shadow_Only()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (fs, _, ss, path) = CreateShadowFileSystem();
 
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
@@ -372,17 +365,14 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.AreEqual("foo", content);
     }
 
+    /// <summary>
+    /// Discarding a shadow without calling <see cref="ShadowFileSystem.Complete"/> leaves the
+    /// inner file system untouched — staged writes only exist in the staging area.
+    /// </summary>
     [Test]
-    public void ShadowAbort()
+    public void Can_Abandon_Shadow_Without_Affecting_Inner()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (_, _, ss, path) = CreateShadowFileSystem();
 
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
@@ -396,17 +386,14 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         // let the shadow fs die
     }
 
+    /// <summary>
+    /// Calling <see cref="ShadowFileSystem.Complete"/> applies both staged additions and
+    /// staged deletions to the inner file system.
+    /// </summary>
     [Test]
-    public void ShadowComplete()
+    public void Can_Complete_Shadow_Applying_Add_And_Delete_To_Inner()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (_, _, ss, path) = CreateShadowFileSystem();
 
         Directory.CreateDirectory(path + "/ShadowTests/sub/sub");
         File.WriteAllText(path + "/ShadowTests/sub/sub/f2.txt", "foo");
@@ -422,30 +409,22 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
         ss.Complete();
 
-        // yes we are cleaning now
-        //Assert.IsTrue(File.Exists(path + "/ShadowSystem/path/to/some/dir/f1.txt")); // *not* cleaning
         Assert.IsTrue(File.Exists(path + "/ShadowTests/path/to/some/dir/f1.txt"));
         Assert.IsFalse(File.Exists(path + "/ShadowTests/sub/sub/f2.txt"));
     }
 
     /// <summary>
-    /// Regression test: paths with mixed case must round-trip through Complete() on
-    /// case-sensitive file systems (Linux). Previously, the shadow stored files at their
-    /// original case via <c>_sfs.AddFile</c> but tracked them under a lowercased key, causing
-    /// <c>Complete()</c> to look up the staged file at the lowercased path and fail with
-    /// <c>FileNotFoundException</c> from <c>File.Move</c>.
+    /// Regression test: paths with mixed case must round-trip through
+    /// <see cref="ShadowFileSystem.Complete"/> on case-sensitive file systems (Linux).
+    /// Previously the shadow stored files at their original case in the staging area but
+    /// tracked them under a lower-cased key, so <c>Complete()</c> looked up the staged file at
+    /// the lower-cased path and failed with <see cref="FileNotFoundException"/> from
+    /// <see cref="File.Move(string, string)"/>.
     /// </summary>
     [Test]
     public void Can_Complete_Shadow_With_Mixed_Case_Path()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (_, _, ss, path) = CreateShadowFileSystem();
 
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
@@ -459,7 +438,7 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(ss.FileExists("Views/PageNotFound.cshtml"));
         Assert.IsTrue(ss.FileExists("views/pagenotfound.cshtml"));
 
-        // _sfs operations via a different-cased path must still hit the staged file
+        // staging-area operations via a different-cased path must still hit the staged file
         // (canonical-path tracking; otherwise on Linux these would throw FileNotFoundException
         // or return data from a phantom second file).
         using (var stream = ss.OpenFile("views/pagenotfound.cshtml"))
@@ -494,23 +473,16 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
 
     /// <summary>
     /// Cross-platform guard for the path-case invariant. Unlike
-    /// <see cref="Can_Complete_Shadow_With_Mixed_Case_Path"/>, this test does not depend on
-    /// the OS being case-sensitive: it asserts the directly observable shape of the shadow's
-    /// node enumeration. Previously <c>NormPath</c> lower-cased the dictionary keys, so a
-    /// caller staging "Views/..." would see the shadow surface "views" — losing the original
-    /// case the caller used and the case actually written to disk by <c>_sfs.AddFile</c>.
+    /// <see cref="Can_Complete_Shadow_With_Mixed_Case_Path"/>, this test does not depend on the
+    /// OS being case-sensitive: it asserts the directly observable shape of the shadow's node
+    /// enumeration. Previously <c>NormPath</c> lower-cased the dictionary keys, so a caller
+    /// staging "Views/..." would see the shadow surface "views" — losing the original case the
+    /// caller used and the case actually written to disk by the staging file system.
     /// </summary>
     [Test]
-    public void Shadow_Preserves_Original_Path_Case_In_Staged_Nodes()
+    public void Can_Preserve_Original_Path_Case_In_Staged_Shadow_Nodes()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
-
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
+        var (_, _, ss, _) = CreateShadowFileSystem();
 
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
@@ -522,13 +494,20 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsFalse(dirs.Contains("views"), "Shadow must not surface a lower-cased duplicate of the staged directory.");
     }
 
+    /// <summary>
+    /// Verifies the full scoped-shadow lifecycle through <see cref="ShadowWrapper"/> and
+    /// <see cref="ShadowFileSystems"/>: explicit shadow without a scope passes through to the
+    /// real file system, a scope without <c>Complete</c> discards staged writes, a completed
+    /// scope persists them, and writes from "another thread" (no ambient scope) bypass the
+    /// shadow and hit the real file system directly.
+    /// </summary>
     [Test]
-    public void ShadowScopeComplete()
+    public void Can_Complete_Scoped_Shadow_File_Operations()
     {
         var loggerFactory = NullLoggerFactory.Instance;
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
+        var path = HostEnvironment.MapPathContentRoot("FileSysTests");
         var shadowfs =
-            HostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') +
+            HostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') +
                                                   "ShadowFs");
         Directory.CreateDirectory(path);
         Directory.CreateDirectory(shadowfs);
@@ -640,12 +619,16 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         TestHelper.TryAssert(() => Assert.IsFalse(Directory.Exists(shadowfs + "/" + id)));
     }
 
+    /// <summary>
+    /// When the real file system already contains a file written by "another thread" outside
+    /// the scope, completing the shadow scope happily overwrites it — last writer wins.
+    /// </summary>
     [Test]
-    public void ShadowScopeCompleteWithFileConflict()
+    public void Can_Complete_Scoped_Shadow_Overwriting_Concurrent_File_Write()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
+        var path = HostEnvironment.MapPathContentRoot("FileSysTests");
         var shadowfs =
-            HostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') +
+            HostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') +
                                                   "ShadowFs");
         Directory.CreateDirectory(path);
 
@@ -708,13 +691,19 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.AreEqual("foo", text);
     }
 
+    /// <summary>
+    /// When "another thread" creates a directory at a path the scope intends to write a file to,
+    /// completing the scope surfaces the resulting OS error as a nested
+    /// <see cref="AggregateException"/>. Non-conflicting changes within the same scope still
+    /// apply successfully.
+    /// </summary>
     [Test]
     [LongRunning]
-    public void ShadowScopeCompleteWithDirectoryConflict()
+    public void Cannot_Complete_Scoped_Shadow_When_Concurrent_Write_Creates_Directory_Conflict()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
+        var path = HostEnvironment.MapPathContentRoot("FileSysTests");
         var shadowfs =
-            HostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') +
+            HostEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData.EnsureEndsWith('/') +
                                                   "ShadowFs");
         Directory.CreateDirectory(path);
 
@@ -795,10 +784,15 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.IsTrue(phy.FileExists("sub/f3.txt"));
     }
 
+    /// <summary>
+    /// Documents the <see cref="Directory.GetFiles(string)"/> / <see cref="Directory.EnumerateFiles(string)"/>
+    /// contract relied on by the shadow: the non-recursive overloads return direct children
+    /// only, while the <see cref="SearchOption.AllDirectories"/> overload walks the tree.
+    /// </summary>
     [Test]
-    public void GetFilesReturnsChildrenOnly()
+    public void Can_Enumerate_Direct_Children_Only_With_Default_Search_Option()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
+        var path = HostEnvironment.MapPathContentRoot("FileSysTests");
         Directory.CreateDirectory(path);
         File.WriteAllText(path + "/f1.txt", "foo");
         Directory.CreateDirectory(path + "/test");
@@ -817,10 +811,14 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.AreEqual(3, efiles.Count());
     }
 
+    /// <summary>
+    /// Sanity check that recursive <see cref="Directory.Delete(string, bool)"/> removes
+    /// nested files as well as the directories — relied on by shadow cleanup.
+    /// </summary>
     [Test]
-    public void DeleteDirectoryAndFiles()
+    public void Can_Delete_Directory_Recursively_Including_Nested_Files()
     {
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
+        var path = HostEnvironment.MapPathContentRoot("FileSysTests");
         Directory.CreateDirectory(path);
         File.WriteAllText(path + "/f1.txt", "foo");
         Directory.CreateDirectory(path + "/test");
@@ -834,30 +832,21 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
     }
 
     /// <summary>
-    ///     Check that GetFiles will return all files on the shadow, while returning
-    ///     just one on each of the filesystems used by the shadow.
+    /// <see cref="ShadowFileSystem.GetFiles(string)"/> returns the union of inner files and
+    /// staged additions, while each underlying file system still sees only the files written
+    /// against it directly.
     /// </summary>
     [Test]
-    public void ShadowGetFiles()
+    public void Can_Get_Files_From_Shadow_Returning_Union_Of_Inner_And_Staging()
     {
-        // Arrange
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
+        var (fs, sfs, ss, path) = CreateShadowFileSystem();
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
-
-        // Act
         File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             ss.AddFile("f1.txt", ms);
         }
 
-        // Assert
         // ensure we get 2 files from the shadow
         var getFiles = ss.GetFiles(string.Empty);
         Assert.AreEqual(2, getFiles.Count());
@@ -869,29 +858,20 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
     }
 
     /// <summary>
-    ///     Check that GetFiles using the filter function with empty string will return expected results
+    /// Calling <see cref="ShadowFileSystem.GetFiles(string,string?)"/> with an empty filter
+    /// returns the same union as the no-filter overload.
     /// </summary>
     [Test]
-    public void ShadowGetFilesUsingEmptyFilter()
+    public void Can_Get_Files_From_Shadow_With_Empty_Filter()
     {
-        // Arrange
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
+        var (fs, sfs, ss, path) = CreateShadowFileSystem();
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
-
-        // Act
         File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             ss.AddFile("f1.txt", ms);
         }
 
-        // Assert
         // ensure we get 2 files from the shadow
         var getFiles = ss.GetFiles(string.Empty);
         Assert.AreEqual(2, getFiles.Count());
@@ -903,32 +883,24 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
     }
 
     /// <summary>
-    ///     Check that GetFiles using the filter function with null will return expected results
+    /// Calling <see cref="ShadowFileSystem.GetFiles(string,string?)"/> with a <c>null</c>
+    /// filter behaves the same as omitting the filter.
     /// </summary>
     [Test]
-    public void ShadowGetFilesUsingNullFilter()
+    public void Can_Get_Files_From_Shadow_With_Null_Filter()
     {
-        // Arrange
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
+        var (fs, sfs, ss, path) = CreateShadowFileSystem();
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
-
-        // Act
         File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             ss.AddFile("f1.txt", ms);
         }
 
-        // Assert
         // ensure we get 2 files from the shadow
         var getFiles = ss.GetFiles(string.Empty);
         Assert.AreEqual(2, getFiles.Count());
+
         // ensure we get 2 files when using null in filter parameter
         var getFilesWithNullFilter = ss.GetFiles(string.Empty, null);
         Assert.AreEqual(2, getFilesWithNullFilter.Count());
@@ -939,20 +911,15 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.AreEqual(1, sfsFiles.Length);
     }
 
+    /// <summary>
+    /// A <c>*</c> wildcard filter passed to <see cref="ShadowFileSystem.GetFiles(string,string?)"/>
+    /// restricts both inner and staged files to the matching extension.
+    /// </summary>
     [Test]
-    public void ShadowGetFilesUsingWildcardFilter()
+    public void Can_Get_Files_From_Shadow_With_Wildcard_Filter()
     {
-        // Arrange
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
+        var (fs, sfs, ss, path) = CreateShadowFileSystem();
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
-
-        // Act
         File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
         File.WriteAllText(path + "/ShadowTests/f2.doc", "foo");
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
@@ -965,10 +932,10 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
             ss.AddFile("f1.doc", ms);
         }
 
-        // Assert
         // ensure we get 4 files from the shadow
         var getFiles = ss.GetFiles(string.Empty);
         Assert.AreEqual(4, getFiles.Count());
+
         // ensure we get only 2 of 4 files from the shadow when using filter
         var getFilesWithWildcardFilter = ss.GetFiles(string.Empty, "*.doc");
         Assert.AreEqual(2, getFilesWithWildcardFilter.Count());
@@ -979,20 +946,16 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.AreEqual(2, sfsFiles.Length);
     }
 
+    /// <summary>
+    /// A <c>?</c> single-character wildcard in the filter passed to
+    /// <see cref="ShadowFileSystem.GetFiles(string,string?)"/> matches exactly one character —
+    /// e.g. <c>f1.d?c</c> matches <c>f1.doc</c> but not <c>f1.docx</c>.
+    /// </summary>
     [Test]
-    public void ShadowGetFilesUsingSingleCharacterFilter()
+    public void Can_Get_Files_From_Shadow_With_Single_Character_Wildcard_Filter()
     {
-        // Arrange
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
+        var (fs, sfs, ss, path) = CreateShadowFileSystem();
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
-
-        // Act
         File.WriteAllText(path + "/ShadowTests/f2.txt", "foo");
         File.WriteAllText(path + "/ShadowTests/f2.doc", "foo");
         File.WriteAllText(path + "/ShadowTests/f2.docx", "foo");
@@ -1011,14 +974,15 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
             ss.AddFile("f1.docx", ms);
         }
 
-        // Assert
         // ensure we get 6 files from the shadow
         var getFiles = ss.GetFiles(string.Empty);
         Assert.AreEqual(6, getFiles.Count());
-        // ensure we get only 2 of 6 files from the shadow when using filter on shadow
+
+        // ensure we get only 1 of 6 files from the shadow when using filter on shadow
         var getFilesWithWildcardSinglecharFilter = ss.GetFiles(string.Empty, "f1.d?c");
         Assert.AreEqual(1, getFilesWithWildcardSinglecharFilter.Count());
-        // ensure we get only 2 of 6 files from the shadow when using filter on disk
+
+        // ensure we get only 1 of 6 files from the shadow when using filter on disk
         var getFilesWithWildcardSinglecharFilter2 = ss.GetFiles(string.Empty, "f2.d?c");
         Assert.AreEqual(1, getFilesWithWildcardSinglecharFilter2.Count());
 
@@ -1029,32 +993,21 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
     }
 
     /// <summary>
-    ///     Returns the full paths of the files on the disk.
-    ///     Note that this will be the *actual* path of the file, meaning a file existing on the initialized FS
-    ///     will be in one location, while a file written after initializing the shadow, will exist at the
-    ///     shadow location directory.
+    /// <see cref="ShadowFileSystem.GetFullPath(string)"/> returns the path of the file at its
+    /// actual location: inner-resident files resolve to the inner file system, staged files
+    /// resolve to the staging file system.
     /// </summary>
     [Test]
-    public void ShadowGetFullPath()
+    public void Can_Get_Full_Path_Returning_Inner_Or_Staging_Location()
     {
-        // Arrange
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
+        var (_, _, ss, path) = CreateShadowFileSystem();
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
-
-        // Act
         File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             ss.AddFile("f2.txt", ms);
         }
 
-        // Assert
         var f1FullPath = ss.GetFullPath("f1.txt");
         var f2FullPath = ss.GetFullPath("f2.txt");
         Assert.AreEqual(Path.Combine(path, "ShadowTests", "f1.txt"), f1FullPath);
@@ -1062,35 +1015,22 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
     }
 
     /// <summary>
-    ///     Returns the path relative to the filesystem root
+    /// <see cref="ShadowFileSystem.GetRelativePath(string)"/> returns the path relative to the
+    /// shadow's root regardless of whether the file is inner-resident or staged. The current
+    /// implementation is string manipulation only — the on-disk files are present here just to
+    /// document the expected layout in case the method evolves.
     /// </summary>
-    /// <remarks>
-    ///     This file stuff in this test is kinda irrelevant with the current implementation.
-    ///     We do tests that the files are written to the correct places and the relative path is returned correct,
-    ///     but GetRelativePath is currently really just string manipulation so files are not actually hit by the code.
-    ///     Leaving the file stuff in here for now in case the method becomes more clever at some point.
-    /// </remarks>
     [Test]
-    public void ShadowGetRelativePath()
+    public void Can_Get_Relative_Path_From_Shadow()
     {
-        // Arrange
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
+        var (_, _, ss, path) = CreateShadowFileSystem();
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
-        var ss = new ShadowFileSystem(fs, sfs);
-
-        // Act
         File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             ss.AddFile("f2.txt", ms);
         }
 
-        // Assert
         var f1RelativePath = ss.GetRelativePath("f1.txt");
         var f2RelativePath = ss.GetRelativePath("f2.txt");
         Assert.AreEqual("f1.txt", f1RelativePath);
@@ -1102,43 +1042,35 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
     }
 
     /// <summary>
-    ///     Ensure the URL returned contains the path relative to the FS root,
-    ///     but including the rootUrl the FS was initialized with.
+    /// <see cref="ShadowFileSystem.GetUrl(string?)"/> returns the URL relative to the FS root,
+    /// prefixed with the <c>rootUrl</c> the inner file system was constructed with. As with
+    /// <see cref="Can_Get_Relative_Path_From_Shadow"/>, the on-disk files are illustrative.
     /// </summary>
-    /// <remarks>
-    ///     This file stuff in this test is kinda irrelevant with the current implementation.
-    ///     We do tests that the files are written to the correct places and the URL is returned correct,
-    ///     but GetUrl is currently really just string manipulation so files are not actually hit by the code.
-    ///     Leaving the file stuff in here for now in case the method becomes more clever at some point.
-    /// </remarks>
     [Test]
-    public void ShadowGetUrl()
+    public void Can_Get_Url_From_Shadow()
     {
-        // Arrange
-        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
-        Directory.CreateDirectory(path);
-        Directory.CreateDirectory(path + "/ShadowTests");
-        Directory.CreateDirectory(path + "/ShadowSystem");
+        var root = HostEnvironment.MapPathContentRoot("FileSysTests");
+        Directory.CreateDirectory(root);
+        Directory.CreateDirectory(root + "/ShadowTests");
+        Directory.CreateDirectory(root + "/ShadowSystem");
 
-        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "rootUrl");
-        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "rootUrl");
+        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, root + "/ShadowTests/", "rootUrl");
+        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, root + "/ShadowSystem/", "rootUrl");
         var ss = new ShadowFileSystem(fs, sfs);
 
-        // Act
-        File.WriteAllText(path + "/ShadowTests/f1.txt", "foo");
+        File.WriteAllText(root + "/ShadowTests/f1.txt", "foo");
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
         {
             ss.AddFile("f2.txt", ms);
         }
 
-        // Assert
         var f1Url = ss.GetUrl("f1.txt");
         var f2Url = ss.GetUrl("f2.txt");
         Assert.AreEqual("rootUrl/f1.txt", f1Url);
         Assert.AreEqual("rootUrl/f2.txt", f2Url);
-        Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowTests", "f1.txt")));
-        Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowTests", "f2.txt")));
-        Assert.IsTrue(File.Exists(Path.Combine(path, "ShadowSystem", "f2.txt")));
-        Assert.IsFalse(File.Exists(Path.Combine(path, "ShadowSystem", "f1.txt")));
+        Assert.IsTrue(File.Exists(Path.Combine(root, "ShadowTests", "f1.txt")));
+        Assert.IsFalse(File.Exists(Path.Combine(root, "ShadowTests", "f2.txt")));
+        Assert.IsTrue(File.Exists(Path.Combine(root, "ShadowSystem", "f2.txt")));
+        Assert.IsFalse(File.Exists(Path.Combine(root, "ShadowSystem", "f1.txt")));
     }
 }
