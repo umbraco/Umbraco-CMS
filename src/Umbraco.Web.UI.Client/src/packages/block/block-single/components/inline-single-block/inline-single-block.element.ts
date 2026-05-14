@@ -128,6 +128,10 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 		this.#workspaceContext?.expose();
 	};
 
+	#onUfmResolved = (event: CustomEvent<{ text: string }>) => {
+		this.#blockContext?.setName(event.detail.text);
+	};
+
 	override render() {
 		return html`
 			<div id="host">
@@ -161,7 +165,13 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 					<umb-icon .name=${this.icon}></umb-icon>
 				</span>
 				<div id="info">
-					<umb-ufm-render id="name" inline .markdown=${this.label} .value=${blockValue}></umb-ufm-render>
+					<umb-ufm-render
+						id="name"
+						inline
+						.markdown=${this.label}
+						.value=${blockValue}
+						@umb-ufm-resolved=${this.#onUfmResolved}>
+					</umb-ufm-render>
 				</div>
 			</span>
 			${when(

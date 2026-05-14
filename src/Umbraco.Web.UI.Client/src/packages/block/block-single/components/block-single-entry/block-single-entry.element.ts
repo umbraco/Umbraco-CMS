@@ -1,7 +1,7 @@
 import { UmbBlockSingleEntryContext } from '../../context/block-single-entry.context.js';
 import type { UmbBlockSingleLayoutModel } from '../../types.js';
 import { UMB_BLOCK_SINGLE } from '../../constants.js';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
@@ -18,6 +18,7 @@ import '../ref-single-block/index.js';
 import '../inline-single-block/index.js';
 import '../unsupported-single-block/index.js';
 import '../../../block/action/block-action-list.element.js';
+import '@umbraco-cms/backoffice/ufm';
 
 /**
  * @element umb-block-single-entry
@@ -82,6 +83,10 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 
 	@state()
 	private _inlineEditingMode?: boolean;
+
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR [LK]
+	@state()
+	private _name?: string;
 
 	// 'content-invalid' attribute is used for styling purpose.
 	@property({ type: Boolean, attribute: 'content-invalid', reflect: true })
@@ -175,6 +180,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			},
 			null,
 		);
+		this.observe(this.#context.name, (name) => (this._name = name), null);
 		// Data props:
 		this.observe(
 			this.#context.layout,
@@ -280,6 +286,27 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.#context.expose();
 	};
 
+	#onUfmResolved = (event: CustomEvent<{ text: string }>) => {
+		this.#context.setName(event.detail.text);
+	};
+
+	#renderHiddenUfm() {
+		const blockValue = {
+			...this._blockViewProps.content,
+			$settings: this._blockViewProps.settings,
+		};
+		// Inline styles (not a CSS class) because this div is rendered inside
+		// <umb-extension-slot>'s shadow DOM, which our scoped styles can't reach.
+		return html`<div style="position:absolute;inset:0;visibility:hidden;pointer-events:none;overflow:hidden;">
+			<umb-ufm-render
+				inline
+				.markdown=${this._label}
+				.value=${blockValue}
+				@umb-ufm-resolved=${this.#onUfmResolved}>
+			</umb-ufm-render>
+		</div>`;
+	}
+
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {
 		if (this._unsupported) {
 			// If the block is unsupported, we should not allow any custom views to render.
@@ -300,16 +327,19 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
-		if (this._exposed || this._isReadOnly) {
-			return ext.component;
-		} else {
-			return html`<div style="min-height: var(--uui-size-16);">
-				${ext.component}
-				<umb-block-overlay-expose-button
-					.contentTypeName=${this._contentTypeName}
-					@click=${this.#expose}></umb-block-overlay-expose-button>
-			</div>`;
-		}
+		return html`${this.#renderHiddenUfm()}
+		${when(
+			this._exposed || this._isReadOnly,
+			() => ext.component,
+			() => html`
+				<div style="min-height: var(--uui-size-16);">
+					${ext.component}
+					<umb-block-overlay-expose-button
+						.contentTypeName=${this._contentTypeName}
+						@click=${this.#expose}></umb-block-overlay-expose-button>
+				</div>
+			`,
+		)}`;
 	};
 
 	#renderRefBlock() {
@@ -335,11 +365,14 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}
 
 	#renderUnsupportedBlock() {
-		return html`<umb-unsupported-single-block
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-unsupported-single-block>`;
+		return html`
+			${this.#renderHiddenUfm()}
+			<umb-unsupported-single-block
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}></umb-unsupported-single-block>
+		`;
 	}
 
 	#renderBuiltinBlockView = () => {
