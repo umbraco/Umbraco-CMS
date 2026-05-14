@@ -42,7 +42,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	getPersisted() {
-		return this._persisted.getValue();
+		return this._persisted?.getValue();
 	}
 
 	/**
@@ -80,7 +80,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	getCurrent() {
-		return this._current.getValue();
+		return this._current?.getValue();
 	}
 
 	/**
