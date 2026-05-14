@@ -1,18 +1,20 @@
-import { UmbUserRepositoryBase } from '../user-repository-base.js';
-import { UmbUserItemRepository } from '../item/index.js';
-import { UmbEnableUserServerDataSource } from './enable-user.server.data-source.js';
-import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+import { UmbUserServerDataSource } from '../detail/user-detail.server.data-source.js';
+import { UmbUserItemRepository } from '../item/index.js';
+import { UmbUserRepositoryBase } from '../user-repository-base.js';
+import { UmbEnableUserServerDataSource } from './enable-user.server.data-source.js';
 
 export class UmbEnableUserRepository extends UmbUserRepositoryBase {
 	#enableSource: UmbEnableUserServerDataSource;
 	#localize = new UmbLocalizationController(this);
 	#userItemRepository = new UmbUserItemRepository(this);
+	#detailSource: UmbUserServerDataSource;
 
 	constructor(host: UmbControllerHost) {
 		super(host);
 		this.#enableSource = new UmbEnableUserServerDataSource(host);
+		this.#detailSource = new UmbUserServerDataSource(host);
 	}
 
 	async enable(ids: Array<string>) {
@@ -25,10 +27,12 @@ export class UmbEnableUserRepository extends UmbUserRepositoryBase {
 			const { data: items } = await this.#userItemRepository.requestItems(ids);
 			if (!items) throw new Error('Could not load user item');
 
-			// TODO: get state from item when available
-			ids.forEach((id) => {
-				this.detailStore?.updateItem(id, { state: UserStateModel.ACTIVE });
-			});
+			await Promise.all(ids.map(async (id) => {
+				const { data: detail } = await this.#detailSource.read(id);
+				if (detail) {
+					this.detailStore?.append(detail);
+				}
+			}));
 
 			let message = this.#localize.term('speechBubbles_enableUsersSuccess', items.length);
 
