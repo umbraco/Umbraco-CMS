@@ -2,8 +2,8 @@ import { UmbBlockSingleEntryContext } from '../../context/block-single-entry.con
 import type { UmbBlockSingleLayoutModel } from '../../types.js';
 import { UMB_BLOCK_SINGLE } from '../../constants.js';
 import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
-import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
+import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
@@ -18,7 +18,6 @@ import '../ref-single-block/index.js';
 import '../inline-single-block/index.js';
 import '../unsupported-single-block/index.js';
 import '../../../block/action/block-action-list.element.js';
-import '@umbraco-cms/backoffice/ufm';
 
 /**
  * @element umb-block-single-entry
@@ -298,11 +297,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		// Inline styles (not a CSS class) because this div is rendered inside
 		// <umb-extension-slot>'s shadow DOM, which our scoped styles can't reach.
 		return html`<div style="position:absolute;inset:0;visibility:hidden;pointer-events:none;overflow:hidden;">
-			<umb-ufm-render
-				inline
-				.markdown=${this._label}
-				.value=${blockValue}
-				@umb-ufm-resolved=${this.#onUfmResolved}>
+			<umb-ufm-render inline .markdown=${this._label} .value=${blockValue} @umb-ufm-resolved=${this.#onUfmResolved}>
 			</umb-ufm-render>
 		</div>`;
 	}

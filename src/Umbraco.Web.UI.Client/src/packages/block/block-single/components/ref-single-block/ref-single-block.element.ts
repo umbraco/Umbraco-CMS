@@ -2,8 +2,6 @@ import { UMB_BLOCK_SINGLE_ENTRY_CONTEXT } from '../../context/index.js';
 import { css, customElement, html, property, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
-
-import '@umbraco-cms/backoffice/ufm';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
 @customElement('umb-ref-single-block')

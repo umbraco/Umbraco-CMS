@@ -1,7 +1,7 @@
 import type { UmbBlockRteLayoutModel } from '../../types.js';
 import { UMB_BLOCK_RTE } from '../../constants.js';
 import { UmbBlockRteEntryContext } from '../../context/block-rte-entry.context.js';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
@@ -68,6 +68,10 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	@state()
 	private _isReadOnly = false;
+
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR [LK]
+	@state()
+	private _name?: string;
 
 	@state()
 	private _blockViewProps: UmbBlockEditorCustomViewProperties<UmbBlockRteLayoutModel> = {
@@ -159,6 +163,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		);
 
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
+		this.observe(this.#context.name, (name) => (this._name = name), null);
 
 		// Data props:
 		this.observe(
@@ -250,18 +255,39 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.#context.expose();
 	};
 
+	#onUfmResolved = (event: CustomEvent<{ text: string }>) => {
+		this.#context.setName(event.detail.text);
+	};
+
+	#renderHiddenUfm() {
+		const blockValue = {
+			...this._blockViewProps.content,
+			$settings: this._blockViewProps.settings,
+			$index: this._blockViewProps.index,
+		};
+		// Inline styles (not a CSS class) because this div is rendered inside
+		// <umb-extension-slot>'s shadow DOM, which our scoped styles can't reach.
+		return html`<div style="position:absolute;inset:0;visibility:hidden;pointer-events:none;overflow:hidden;">
+			<umb-ufm-render inline .markdown=${this._label} .value=${blockValue} @umb-ufm-resolved=${this.#onUfmResolved}>
+			</umb-ufm-render>
+		</div>`;
+	}
+
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {
 		ext.component?.setAttribute('part', 'component');
-		if (this._exposed || this._isReadOnly) {
-			return ext.component;
-		} else {
-			return html`<div>
-				${ext.component}
-				<umb-block-overlay-expose-button
-					.contentTypeName=${this._contentTypeName}
-					@click=${this.#expose}></umb-block-overlay-expose-button>
-			</div>`;
-		}
+		return html`${this.#renderHiddenUfm()}
+		${when(
+			this._exposed || this._isReadOnly,
+			() => ext.component,
+			() => html`
+				<div>
+					${ext.component}
+					<umb-block-overlay-expose-button
+						.contentTypeName=${this._contentTypeName}
+						@click=${this.#expose}></umb-block-overlay-expose-button>
+				</div>
+			`,
+		)}`;
 	};
 
 	#renderBlock() {
