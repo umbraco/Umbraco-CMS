@@ -100,6 +100,10 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _isSortMode?: boolean;
 
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR [LK]
+	@state()
+	private _name?: string;
+
 	@state()
 	private _canScale?: boolean;
 
@@ -210,6 +214,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.observe(this.#context.actionsVisibility, (showActions) => (this._showActions = showActions), null);
 		this.observe(this.#context.inlineEditingMode, (mode) => (this._inlineEditingMode = mode), null);
 		this.observe(this.#context.isSortMode, (isSortMode) => (this._isSortMode = isSortMode), null);
+		this.observe(this.#context.name, (name) => (this._name = name), null);
 
 		// Data:
 		this.observe(
@@ -360,6 +365,29 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.#context.expose();
 	};
 
+	#onUfmResolved = (event: CustomEvent<{ text: string }>) => {
+		this.#context.setName(event.detail.text);
+	};
+
+	#renderHiddenUfm() {
+		const blockValue = {
+			...this._blockViewProps.content,
+			$settings: this._blockViewProps.settings,
+			$index: this.index,
+		};
+		// Inline styles (not a CSS class) because this div is rendered inside
+		// <umb-extension-slot>'s shadow DOM, which our scoped styles can't reach.
+		return html`
+			<div style="position:absolute;inset:0;visibility:hidden;pointer-events:none;overflow:hidden;">
+				<umb-ufm-render
+					inline
+					.markdown=${this._label}
+					.value=${blockValue}
+					@umb-ufm-resolved=${this.#onUfmResolved}></umb-ufm-render>
+			</div>
+		`;
+	}
+
 	#callUpdateInlineCreateButtons() {
 		clearTimeout(this.#renderTimeout);
 		this.#renderTimeout = setTimeout(this.#updateInlineCreateButtons, 100) as unknown as number;
@@ -421,17 +449,18 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			ext.component.classList.add('umb-block-grid__block--view');
 			ext.component.setAttribute('part', 'component');
 		}
-		if (this._exposed || this._isReadOnly) {
-			return ext.component;
-		} else {
-			return html`
+		return html`${this.#renderHiddenUfm()}
+		${when(
+			this._exposed || this._isReadOnly,
+			() => ext.component,
+			() => html`
 				<div>
 					${ext.component}
 					<umb-block-overlay-expose-button .contentTypeName=${this._contentTypeName} @click=${this.#expose}>
 					</umb-block-overlay-expose-button>
 				</div>
-			`;
-		}
+			`,
+		)}`;
 	};
 
 	override render() {
@@ -494,6 +523,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#renderUnsupportedBlock() {
 		return html`
+			${this.#renderHiddenUfm()}
 			<umb-block-grid-block-unsupported
 				class="umb-block-grid__block--view"
 				.config=${this._blockViewProps.config}
