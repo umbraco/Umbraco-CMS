@@ -4,6 +4,8 @@ import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 
+let hasWarnedLabelDeprecation = false;
+
 /**
  * @element umb-ref-list-block
  * @slot name - Content rendered in the block's primary label area (the `name` slot of the inner `uui-ref-node`). The expected projection is a `<umb-ufm-render>` element owned by the parent block-list entry.
@@ -12,16 +14,19 @@ import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoff
 export class UmbRefListBlockElement extends UmbLitElement {
 	//
 	/**
-	 * @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 20.
+	 * @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 19.
 	 */
 	@property({ type: String, reflect: false })
 	public set label(value: string | undefined) {
 		if (value !== undefined && value !== this._label) {
-			new UmbDeprecation({
-				deprecated: 'umb-ref-list-block.label property',
-				solution: 'Project a `<umb-ufm-render>` into the `name` slot instead.',
-				removeInVersion: '20.0.0',
-			}).warn();
+			if (!hasWarnedLabelDeprecation) {
+				hasWarnedLabelDeprecation = true;
+				new UmbDeprecation({
+					deprecated: 'umb-ref-list-block.label property',
+					solution: 'Project a `<umb-ufm-render>` into the `name` slot instead.',
+					removeInVersion: '19.0.0',
+				}).warn();
+			}
 		}
 		this._label = value;
 	}

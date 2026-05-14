@@ -87,8 +87,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	@state()
 	private _isSortMode?: boolean;
 
-	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR [LK]
-	@state()
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
 	private _name?: string;
 
 	// 'content-invalid' attribute is used for styling purpose.
@@ -325,30 +324,28 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		)}`;
 	};
 
-	#renderUfm() {
-		const blockValue = {
+	get #blockValue() {
+		return {
 			...this._blockViewProps.content,
 			$settings: this._blockViewProps.settings,
 			$index: this.index,
 		};
+	}
+
+	#renderUfm() {
 		return html`
 			<umb-ufm-render
 				slot="name"
 				inline
 				.markdown=${this._label}
-				.value=${blockValue}
+				.value=${this.#blockValue}
 				@umb-ufm-resolved=${this.#onUfmResolved}>
 			</umb-ufm-render>
 		`;
 	}
 
 	#renderHiddenUfm() {
-		const blockValue = {
-			...this._blockViewProps.content,
-			$settings: this._blockViewProps.settings,
-			$index: this.index,
-		};
-		return renderHiddenUfm(this._label, blockValue, this.#onUfmResolved);
+		return renderHiddenUfm(this._label, this.#blockValue, this.#onUfmResolved);
 	}
 
 	#renderRefBlock() {

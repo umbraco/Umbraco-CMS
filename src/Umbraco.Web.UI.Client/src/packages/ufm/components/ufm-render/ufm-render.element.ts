@@ -78,7 +78,8 @@ export class UmbUfmRenderElement extends UmbLitElement {
 
 	// UFM custom-components like `<ufm-content-name>` resolve their text inside their
 	// own shadow root, which is invisible to a parent's MutationObserver. We pick those
-	// up by scanning each newly-added element (and its descendants) for shadow roots.
+	// up by scanning each newly-added element (and its descendants) for shadow roots,
+	// and tear observers down for removed shadow roots so the map doesn't grow stale.
 	#onShadowMutation(mutations: MutationRecord[]): void {
 		for (const mutation of mutations) {
 			for (const node of mutation.addedNodes) {
@@ -89,8 +90,22 @@ export class UmbUfmRenderElement extends UmbLitElement {
 				}
 				this.#discoverDescendantShadowRoots(element);
 			}
+			for (const node of mutation.removedNodes) {
+				if (node.nodeType !== Node.ELEMENT_NODE) continue;
+				this.#disposeDescendantShadowObservers(node as Element);
+			}
 		}
 		this.#scheduleEmitResolved();
+	}
+
+	#disposeDescendantShadowObservers(element: Element): void {
+		if (element.shadowRoot) {
+			this.#shadowObservers.get(element.shadowRoot)?.disconnect();
+			this.#shadowObservers.delete(element.shadowRoot);
+		}
+		for (const child of element.children) {
+			this.#disposeDescendantShadowObservers(child);
+		}
 	}
 
 	#discoverDescendantShadowRoots(root: ShadowRoot | Element): void {

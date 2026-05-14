@@ -10,7 +10,9 @@ import '../components/ufm-render/ufm-render.element.js';
  * name for `<umb-entity-frame>`).
  *
  * Uses inline styles because the wrapper may be rendered inside a shadow DOM (e.g.
- * `<umb-extension-slot>`) where scoped styles can't reach.
+ * `<umb-extension-slot>`) where scoped styles can't reach. Zero-size containment
+ * (rather than `inset:0`) keeps the wrapper from depending on the nearest positioned
+ * ancestor's box.
  * @param {string | undefined} markdown the UFM markdown to resolve.
  * @param {unknown} value the value context passed to the UFM render.
  * @param {(event: UmbUfmResolvedEvent) => void} onResolved called when the UFM render emits its resolved text.
@@ -22,7 +24,7 @@ export function renderHiddenUfm(
 	onResolved: (event: UmbUfmResolvedEvent) => void,
 ) {
 	return html`
-		<div style="position:absolute;inset:0;visibility:hidden;pointer-events:none;overflow:hidden;">
+		<div style="position:absolute;width:0;height:0;overflow:hidden;visibility:hidden;pointer-events:none;">
 			<umb-ufm-render inline .markdown=${markdown} .value=${value} @umb-ufm-resolved=${onResolved}></umb-ufm-render>
 		</div>
 	`;

@@ -85,8 +85,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	@state()
 	private _inlineEditingMode?: boolean;
 
-	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR [LK]
-	@state()
+	// TODO: consumed by <umb-entity-frame> label, landing in a follow-up PR; add `@state()` when used in render [LK]
 	private _name?: string;
 
 	// 'content-invalid' attribute is used for styling purpose.

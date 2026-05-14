@@ -23,6 +23,8 @@ const apiArgsCreator: UmbApiConstructorArgumentsMethodType<unknown> = (manifest:
 	return [{ manifest }];
 };
 
+let hasWarnedLabelDeprecation = false;
+
 /**
  * @element umb-inline-list-block
  * @slot name - Content rendered as the block's primary label. The expected projection is a `<umb-ufm-render>` element owned by the parent block-list entry.
@@ -35,16 +37,19 @@ export class UmbInlineListBlockElement extends UmbLitElement {
 	#contentKey?: string;
 
 	/**
-	 * @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 20.
+	 * @deprecated Use the `name` slot to project a `<umb-ufm-render>` instead. Will be removed in Umbraco 19.
 	 */
 	@property({ type: String, reflect: false })
 	public set label(value: string | undefined) {
 		if (value !== undefined && value !== this._label) {
-			new UmbDeprecation({
-				deprecated: 'umb-inline-list-block.label property',
-				solution: 'Project a `<umb-ufm-render>` into the `name` slot instead.',
-				removeInVersion: '20.0.0',
-			}).warn();
+			if (!hasWarnedLabelDeprecation) {
+				hasWarnedLabelDeprecation = true;
+				new UmbDeprecation({
+					deprecated: 'umb-inline-list-block.label property',
+					solution: 'Project a `<umb-ufm-render>` into the `name` slot instead.',
+					removeInVersion: '19.0.0',
+				}).warn();
+			}
 		}
 		this._label = value;
 	}
