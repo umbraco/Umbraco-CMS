@@ -492,6 +492,36 @@ internal sealed class ShadowFileSystemTests : UmbracoIntegrationTest
         Assert.AreEqual("bar-updated", File.ReadAllText(committedPath));
     }
 
+    /// <summary>
+    /// Cross-platform guard for the path-case invariant. Unlike
+    /// <see cref="Can_Complete_Shadow_With_Mixed_Case_Path"/>, this test does not depend on
+    /// the OS being case-sensitive: it asserts the directly observable shape of the shadow's
+    /// node enumeration. Previously <c>NormPath</c> lower-cased the dictionary keys, so a
+    /// caller staging "Views/..." would see the shadow surface "views" — losing the original
+    /// case the caller used and the case actually written to disk by <c>_sfs.AddFile</c>.
+    /// </summary>
+    [Test]
+    public void Shadow_Preserves_Original_Path_Case_In_Staged_Nodes()
+    {
+        var path = HostingEnvironment.MapPathContentRoot("FileSysTests");
+        Directory.CreateDirectory(path);
+        Directory.CreateDirectory(path + "/ShadowTests");
+        Directory.CreateDirectory(path + "/ShadowSystem");
+
+        var fs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowTests/", "ignore");
+        var sfs = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path + "/ShadowSystem/", "ignore");
+        var ss = new ShadowFileSystem(fs, sfs);
+
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
+        {
+            ss.AddFile("Views/PageNotFound.cshtml", ms);
+        }
+
+        var dirs = ss.GetDirectories(string.Empty).ToList();
+        Assert.IsTrue(dirs.Contains("Views"), "Shadow directory entry must preserve the original case used to stage the file.");
+        Assert.IsFalse(dirs.Contains("views"), "Shadow must not surface a lower-cased duplicate of the staged directory.");
+    }
+
     [Test]
     public void ShadowScopeComplete()
     {
