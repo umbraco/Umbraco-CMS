@@ -10,7 +10,8 @@ import { css, customElement, html, property, LitElement } from '@umbraco-cms/bac
  * @element umb-entity-frame
  * @slot - Optional rich content for the tab. Falls back to the `label` property.
  * @cssprop --umb-entity-frame-border-width - Thickness of the border. Defaults to `2px`.
- * @cssprop --umb-entity-frame-color - Accent colour for the border and tab background. Defaults to `--uui-color-focus`. Should be dark enough to maintain contrast against the white tab text.
+ * @cssprop --umb-entity-frame-color - Accent colour for the border and tab background. Defaults to `--uui-color-focus`.
+ * @cssprop --umb-entity-frame-contrast-color - Text colour for the tab. Defaults to `--uui-color-selected-contrast`. Override when using a custom `--umb-entity-frame-color` that does not pair with the default contrast token.
  * @cssprop --umb-entity-frame-opacity - Opacity of the border and tab. Defaults to `1`. Set to `0` on the parent and toggle to `1` on `:hover` / `:focus-within` to gate visibility.
  * @augments {LitElement}
  */
@@ -28,7 +29,7 @@ export class UmbEntityFrameElement extends LitElement {
 	override render() {
 		return html`
 			<div class="border" aria-hidden="true"></div>
-			<div class="tab"><slot>${this.label}</slot></div>
+			<div class="tab" aria-hidden="true"><slot>${this.label}</slot></div>
 		`;
 	}
 
@@ -62,12 +63,11 @@ export class UmbEntityFrameElement extends LitElement {
 				bottom: 100%;
 				right: 0;
 				background: var(--umb-entity-frame-color, var(--uui-color-focus));
-				color: var(--uui-color-surface, white);
+				color: var(--umb-entity-frame-contrast-color, var(--uui-color-selected-contrast));
 				padding: var(--uui-size-2) var(--uui-size-2) var(--uui-size-1);
 				border-radius: var(--uui-border-radius) var(--uui-border-radius) 0 0;
 				font-size: var(--uui-type-small-size);
 				line-height: 1;
-				pointer-events: auto;
 			}
 		`,
 	];

@@ -34,6 +34,17 @@ describe('UmbEntityFrameElement', () => {
 		expect(tab.textContent?.trim()).to.equal('Document: Hero');
 	});
 
+	it('renders slot content in preference to the label property', async () => {
+		const slotted = await fixture<UmbEntityFrameElement>(
+			html`<umb-entity-frame label="fallback"><span>Slotted</span></umb-entity-frame>`,
+		);
+		const slot = slotted.shadowRoot!.querySelector('.tab slot') as HTMLSlotElement;
+		const assigned = slot.assignedNodes({ flatten: true });
+		expect(assigned.length).to.be.greaterThan(0);
+		const projected = assigned.find((node): node is HTMLElement => node instanceof HTMLElement);
+		expect(projected?.textContent?.trim()).to.equal('Slotted');
+	});
+
 	if ((window as UmbTestRunnerWindow).__UMBRACO_TEST_RUN_A11Y_TEST) {
 		it('passes the a11y audit', async () => {
 			await expect(element).shadowDom.to.be.accessible(defaultA11yConfig);
