@@ -5,6 +5,7 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type {
@@ -13,6 +14,7 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '../ref-rte-block/index.js';
 import '../../../block/action/block-action-list.element.js';
@@ -255,7 +257,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		this.#context.expose();
 	};
 
-	#onUfmResolved = (event: CustomEvent<{ text: string }>) => {
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
 		this.#context.setName(event.detail.text);
 	};
 
@@ -265,12 +267,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			$settings: this._blockViewProps.settings,
 			$index: this._blockViewProps.index,
 		};
-		// Inline styles (not a CSS class) because this div is rendered inside
-		// <umb-extension-slot>'s shadow DOM, which our scoped styles can't reach.
-		return html`<div style="position:absolute;inset:0;visibility:hidden;pointer-events:none;overflow:hidden;">
-			<umb-ufm-render inline .markdown=${this._label} .value=${blockValue} @umb-ufm-resolved=${this.#onUfmResolved}>
-			</umb-ufm-render>
-		</div>`;
+		return renderHiddenUfm(this._label, blockValue, this.#onUfmResolved);
 	}
 
 	#extensionSlotRenderMethod = (ext: UmbExtensionElementInitializer<ManifestBlockEditorCustomView>) => {

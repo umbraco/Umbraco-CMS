@@ -5,6 +5,7 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -13,6 +14,7 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '../ref-single-block/index.js';
 import '../inline-single-block/index.js';
@@ -285,7 +287,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.#context.expose();
 	};
 
-	#onUfmResolved = (event: CustomEvent<{ text: string }>) => {
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
 		this.#context.setName(event.detail.text);
 	};
 
@@ -294,12 +296,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			...this._blockViewProps.content,
 			$settings: this._blockViewProps.settings,
 		};
-		// Inline styles (not a CSS class) because this div is rendered inside
-		// <umb-extension-slot>'s shadow DOM, which our scoped styles can't reach.
-		return html`<div style="position:absolute;inset:0;visibility:hidden;pointer-events:none;overflow:hidden;">
-			<umb-ufm-render inline .markdown=${this._label} .value=${blockValue} @umb-ufm-resolved=${this.#onUfmResolved}>
-			</umb-ufm-render>
-		</div>`;
+		return renderHiddenUfm(this._label, blockValue, this.#onUfmResolved);
 	}
 
 	#extensionSlotFilterMethod = (manifest: ManifestBlockEditorCustomView) => {

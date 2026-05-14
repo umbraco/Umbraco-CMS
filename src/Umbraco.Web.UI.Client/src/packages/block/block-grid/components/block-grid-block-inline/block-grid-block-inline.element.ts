@@ -10,6 +10,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_BLOCK_WORKSPACE_ALIAS } from '@umbraco-cms/backoffice/block';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbPropertyTypeModel } from '@umbraco-cms/backoffice/content-type';
 import type { UmbDataTypeDetailModel } from '@umbraco-cms/backoffice/data-type';
@@ -190,7 +191,7 @@ export class UmbBlockGridBlockInlineElement extends UmbLitElement {
 		this.#workspaceContext?.expose();
 	};
 
-	#onUfmResolved = (event: CustomEvent<{ text: string }>) => {
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
 		this.#blockContext?.setName(event.detail.text);
 	};
 

@@ -8,6 +8,7 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import type { UmbApiConstructorArgumentsMethodType } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbBlockDataType, UMB_BLOCK_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/block';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '../../../block/workspace/views/edit/block-workspace-view-edit-content-no-router.element.js';
 
@@ -128,7 +129,7 @@ export class UmbInlineSingleBlockElement extends UmbLitElement {
 		this.#workspaceContext?.expose();
 	};
 
-	#onUfmResolved = (event: CustomEvent<{ text: string }>) => {
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
 		this.#blockContext?.setName(event.detail.text);
 	};
 

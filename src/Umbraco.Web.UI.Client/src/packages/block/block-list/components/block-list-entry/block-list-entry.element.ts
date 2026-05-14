@@ -5,6 +5,7 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { renderHiddenUfm } from '@umbraco-cms/backoffice/ufm';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -13,6 +14,7 @@ import type {
 } from '@umbraco-cms/backoffice/block-custom-view';
 import type { UmbExtensionElementInitializer } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '../ref-list-block/index.js';
 import '../inline-list-block/index.js';
@@ -284,7 +286,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		this.#context.expose();
 	};
 
-	#onUfmResolved = (event: CustomEvent<{ text: string }>) => {
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
 		this.#context.setName(event.detail.text);
 	};
 
@@ -341,13 +343,12 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderHiddenUfm() {
-		// Inline styles (not a CSS class) because this div is rendered inside
-		// <umb-extension-slot>'s shadow DOM, which our scoped styles can't reach.
-		return html`
-			<div style="position:absolute;inset:0;visibility:hidden;pointer-events:none;overflow:hidden;">
-				${this.#renderUfm()}
-			</div>
-		`;
+		const blockValue = {
+			...this._blockViewProps.content,
+			$settings: this._blockViewProps.settings,
+			$index: this.index,
+		};
+		return renderHiddenUfm(this._label, blockValue, this.#onUfmResolved);
 	}
 
 	#renderRefBlock() {

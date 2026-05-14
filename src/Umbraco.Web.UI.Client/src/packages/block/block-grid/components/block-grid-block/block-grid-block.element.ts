@@ -3,6 +3,7 @@ import { css, customElement, html, property, when } from '@umbraco-cms/backoffic
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { UmbBlockDataType } from '@umbraco-cms/backoffice/block';
 import type { UmbBlockEditorCustomViewConfiguration } from '@umbraco-cms/backoffice/block-custom-view';
+import type { UmbUfmResolvedEvent } from '@umbraco-cms/backoffice/ufm';
 
 import '@umbraco-cms/backoffice/ufm';
 
@@ -17,7 +18,7 @@ export class UmbBlockGridBlockElement extends UmbLitElement {
 		});
 	}
 
-	#onUfmResolved = (event: CustomEvent<{ text: string }>) => {
+	#onUfmResolved = (event: UmbUfmResolvedEvent) => {
 		this.#blockContext?.setName(event.detail.text);
 	};
 
