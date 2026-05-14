@@ -192,5 +192,12 @@ describe('UmbEntityWorkspaceDataManager', () => {
 			manager.destroy();
 			expect(manager.getPersisted()).to.be.undefined;
 		});
+
+		it('getHasUnpersistedChanges returns false instead of throwing', () => {
+			manager.setPersisted({ name: 'test' });
+			manager.setCurrent({ name: 'changed' });
+			manager.destroy();
+			expect(manager.getHasUnpersistedChanges()).to.be.false;
+		});
 	});
 });

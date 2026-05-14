@@ -130,8 +130,8 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	getHasUnpersistedChanges() {
-		const persisted = this._persisted.getValue();
-		const current = this._current.getValue();
+		const persisted = this._persisted?.getValue();
+		const current = this._current?.getValue();
 		const result = jsonStringComparison(persisted, current) === false;
 		// TODO: Implement developer-mode
 		if (result) {

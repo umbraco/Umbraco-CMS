@@ -128,4 +128,10 @@ describe('UmbBooleanState', () => {
 		expect(() => state.setValue(true)).to.throw();
 		expect(amountOfCallbacks).to.equal(1);
 	});
+
+	it('getValue returns undefined after destroy instead of throwing', () => {
+		const state = new UmbBooleanState(true);
+		state.destroy();
+		expect(state.getValue()).to.be.undefined;
+	});
 });
