@@ -10,7 +10,9 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
  * @class UmbRelationTypeCollectionServerDataSource
  * @implements {UmbCollectionDataSource}
  */
-export class UmbRelationTypeCollectionServerDataSource implements UmbCollectionDataSource<UmbRelationTypeCollectionItemModel> {
+export class UmbRelationTypeCollectionServerDataSource
+	implements UmbCollectionDataSource<UmbRelationTypeCollectionItemModel, UmbRelationTypeCollectionFilterModel>
+{
 	#host: UmbControllerHost;
 
 	/**
