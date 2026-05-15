@@ -130,6 +130,30 @@ describe('UmbTableCollectionViewElement', () => {
 			const statusCell = items[0].data.find((d) => d.columnAlias === 'status');
 			expect(statusCell?.value).to.equal('Draft');
 		});
+
+		it('resolves nested field values using dot-notation', async () => {
+			interface NestedItem extends UmbCollectionItemModel {
+				meta: { status: string };
+			}
+			element.manifest = makeManifest([{ label: 'Status', field: 'meta.status' }]);
+			const item = { ...makeItem('1'), meta: { status: 'Published' } } as unknown as TestCollectionItemModel;
+			setCollectionItems([item]);
+			await aTimeout(0);
+
+			const items = getTable().items;
+			const cell = items[0].data.find((d) => d.columnAlias === 'meta.status');
+			expect(cell?.value).to.equal('Published');
+		});
+
+		it('returns undefined silently for a missing nested path', async () => {
+			element.manifest = makeManifest([{ label: 'Missing', field: 'meta.nonExistent' }]);
+			setCollectionItems([makeItem('1')]);
+			await aTimeout(0);
+
+			const items = getTable().items;
+			const cell = items[0].data.find((d) => d.columnAlias === 'meta.nonExistent');
+			expect(cell?.value).to.be.undefined;
+		});
 	});
 
 	describe('dynamic description column', () => {
