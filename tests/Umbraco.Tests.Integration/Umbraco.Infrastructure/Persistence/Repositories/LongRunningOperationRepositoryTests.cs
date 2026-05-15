@@ -1,4 +1,5 @@
 using System.Data.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -132,7 +133,7 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
             Type = "NewTest",
             Status = LongRunningOperationStatus.Enqueued,
         };
-        Assert.ThrowsAsync(Is.InstanceOf<DbException>(), () => repository.CreateAsync(newOperation, DateTimeOffset.UtcNow.AddMinutes(5)));
+        Assert.ThrowsAsync(Is.InstanceOf<DbUpdateException>(), () => repository.CreateAsync(newOperation, DateTimeOffset.UtcNow.AddMinutes(5)));
     }
 
     [Test]

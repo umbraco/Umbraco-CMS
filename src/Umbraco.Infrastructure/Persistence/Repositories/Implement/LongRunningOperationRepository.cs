@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -40,8 +41,13 @@ internal class LongRunningOperationRepository : AsyncRepositoryBase, ILongRunnin
 
         await AmbientScope.ExecuteWithContextAsync<LongRunningOperationDto>(async db =>
         {
-            db.LongRunningOperations.Add(dto);
+            EntityEntry<LongRunningOperationDto> entry = db.LongRunningOperations.Add(dto);
             await db.SaveChangesAsync();
+
+            // Detaching the entity from the change tracker here to get consistent exceptions in case of duplicates.
+            // If not detached, the same scope that created it will throw a InvalidOperationException and a different
+            // scope will throw DbUpdateException.
+            entry.State = EntityState.Detached;
         });
     }
 
@@ -147,7 +153,7 @@ internal class LongRunningOperationRepository : AsyncRepositoryBase, ILongRunnin
         await AmbientScope.ExecuteWithContextAsync<LongRunningOperationDto>(async db =>
         {
             await db.LongRunningOperations
-                .Where(x => x.UpdateDate < olderThan)
+                .Where(x => x.UpdateDate < olderThan.UtcDateTime)
                 .ExecuteDeleteAsync();
         });
 
