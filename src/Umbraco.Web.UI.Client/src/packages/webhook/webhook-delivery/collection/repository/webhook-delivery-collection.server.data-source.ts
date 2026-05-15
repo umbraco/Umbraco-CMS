@@ -46,6 +46,7 @@ export class UmbWebhookDeliveryCollectionServerDataSource implements UmbWebhookD
 				entityType: UMB_WEBHOOK_DELIVERY_ENTITY_TYPE,
 				unique: item.key,
 				name: item.eventAlias,
+				icon: 'icon-box-alt',
 				date: item.date,
 				url: item.url,
 				eventAlias: item.eventAlias,
