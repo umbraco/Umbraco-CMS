@@ -1,4 +1,4 @@
-import type { UmbWebhookDeliveryDetailModel } from '../../../types.js';
+import type { UmbWebhookDeliveryCollectionItemModel } from '../../../types.js';
 import type { UmbDefaultCollectionContext } from '@umbraco-cms/backoffice/collection';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
@@ -42,7 +42,7 @@ export class UmbWebhookDeliveryTableCollectionViewElement extends UmbLitElement 
 	@state()
 	private _tableItems: Array<UmbTableItem> = [];
 
-	#collectionContext?: UmbDefaultCollectionContext<UmbWebhookDeliveryDetailModel>;
+	#collectionContext?: UmbDefaultCollectionContext<UmbWebhookDeliveryCollectionItemModel>;
 
 	constructor() {
 		super();
@@ -58,7 +58,7 @@ export class UmbWebhookDeliveryTableCollectionViewElement extends UmbLitElement 
 		this.observe(this.#collectionContext.items, (items) => this.#createTableItems(items), 'umbCollectionItemsObserver');
 	}
 
-	#createTableItems(deliveries: Array<UmbWebhookDeliveryDetailModel>) {
+	#createTableItems(deliveries: Array<UmbWebhookDeliveryCollectionItemModel>) {
 		this._tableItems = deliveries.map((delivery) => {
 			return {
 				id: delivery.unique,
