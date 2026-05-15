@@ -1,4 +1,5 @@
 import { manifest as userPickerSchemaManifest } from './Umbraco.UserPicker.js';
+import { manifests as valueSummaryManifests } from './value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -15,4 +16,5 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 	},
 	userPickerSchemaManifest,
+	...valueSummaryManifests,
 ];
