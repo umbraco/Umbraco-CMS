@@ -190,7 +190,7 @@ export class UmbClipboardEntryPickerElement extends UmbLitElement {
 		return html`
 			<umb-figure-card
 				name=${label}
-				label=${label}
+				title=${label}
 				selectable
 				?selected=${this.selection.includes(item.unique)}
 				?select-only=${this.selection.length > 0}
