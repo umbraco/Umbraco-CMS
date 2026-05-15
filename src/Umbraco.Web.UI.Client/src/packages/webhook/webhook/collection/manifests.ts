@@ -9,6 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'default',
 		alias: UMB_WEBHOOK_COLLECTION_ALIAS,
 		name: 'Webhook Collection',
+		api: () => import('./webhook-collection.context.js'),
 		meta: {
 			repositoryAlias: UMB_WEBHOOK_COLLECTION_REPOSITORY_ALIAS,
 		},

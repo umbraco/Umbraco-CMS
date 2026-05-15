@@ -1,6 +1,5 @@
-import type { UmbWebhookCollectionFilterModel } from '../types.js';
+import type { UmbWebhookCollectionFilterModel, UmbWebhookCollectionItemModel } from '../types.js';
 import { UMB_WEBHOOK_ENTITY_TYPE } from '../../../entity.js';
-import type { UmbWebhookDetailModel } from '../../types.js';
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -36,20 +35,19 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 			return { error };
 		}
 
-		const items = data.items.map((item) => {
-			const model: UmbWebhookDetailModel = {
+		const items = data.items.map((item): UmbWebhookCollectionItemModel => {
+			return {
 				entityType: UMB_WEBHOOK_ENTITY_TYPE,
 				unique: item.id,
-				url: item.url,
 				name: item.name ?? '',
+				icon: 'icon-webhook',
+				url: item.url,
 				description: item.description,
 				enabled: item.enabled,
 				headers: item.headers,
 				events: item.events,
 				contentTypes: item.contentTypeKeys,
 			};
-
-			return model;
 		});
 
 		return { data: { items, total: data.total } };
