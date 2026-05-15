@@ -11,11 +11,11 @@ export const manifests: Array<UmbExtensionManifest> = [
 			columns: [
 				{
 					field: 'manifest.type',
-					label: 'Type',
+					label: '#general_type',
 				},
 				{
 					field: 'manifest.weight',
-					label: 'Weight',
+					label: '#general_weight',
 				},
 			],
 		},
