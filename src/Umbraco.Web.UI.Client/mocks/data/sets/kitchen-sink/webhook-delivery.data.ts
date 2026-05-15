@@ -9,7 +9,7 @@ export const data: Array<UmbMockWebhookDeliveryModel> = [
 	{
 		key: 'c0ffee01-0000-0000-0000-000000000001',
 		webhookKey: WEBHOOK_MINIMAL_ID,
-		statusCode: '200',
+		statusCode: 'OK (200)',
 		isSuccessStatusCode: true,
 		date: '2026-04-15T10:23:41Z',
 		eventAlias: 'Umbraco.ContentPublish',
@@ -25,7 +25,7 @@ export const data: Array<UmbMockWebhookDeliveryModel> = [
 	{
 		key: 'c0ffee01-0000-0000-0000-000000000002',
 		webhookKey: WEBHOOK_MINIMAL_ID,
-		statusCode: '500',
+		statusCode: 'InternalServerError (500)',
 		isSuccessStatusCode: false,
 		date: '2026-04-13T14:55:22Z',
 		eventAlias: 'Umbraco.ContentPublish',
@@ -37,11 +37,11 @@ export const data: Array<UmbMockWebhookDeliveryModel> = [
 		responseBody: 'Internal Server Error',
 		exceptionOccured: false,
 	},
-	// webhook-minimal-id — network exception (no status code)
+	// webhook-minimal-id — network exception (no HTTP response)
 	{
 		key: 'c0ffee01-0000-0000-0000-000000000003',
 		webhookKey: WEBHOOK_MINIMAL_ID,
-		statusCode: '',
+		statusCode: 'ConnectionRefused',
 		isSuccessStatusCode: false,
 		date: '2026-04-11T16:02:18Z',
 		eventAlias: 'Umbraco.ContentPublish',
@@ -57,7 +57,7 @@ export const data: Array<UmbMockWebhookDeliveryModel> = [
 	{
 		key: 'c0ffee02-0000-0000-0000-000000000001',
 		webhookKey: WEBHOOK_NAMED_ID,
-		statusCode: '200',
+		statusCode: 'OK (200)',
 		isSuccessStatusCode: true,
 		date: '2026-04-14T08:11:05Z',
 		eventAlias: 'Umbraco.ContentPublish',
@@ -73,7 +73,7 @@ export const data: Array<UmbMockWebhookDeliveryModel> = [
 	{
 		key: 'c0ffee02-0000-0000-0000-000000000002',
 		webhookKey: WEBHOOK_NAMED_ID,
-		statusCode: '404',
+		statusCode: 'NotFound (404)',
 		isSuccessStatusCode: false,
 		date: '2026-04-12T09:30:00Z',
 		eventAlias: 'Umbraco.ContentPublish',
