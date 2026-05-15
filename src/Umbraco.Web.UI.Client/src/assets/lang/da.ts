@@ -844,6 +844,7 @@ export default {
 		content: 'Indhold',
 		continue: 'Fortsæt',
 		copy: 'Kopiér',
+		copied: 'Kopieret!',
 		create: 'Opret',
 		cropSection: 'Beskær sektion',
 		database: 'Database',

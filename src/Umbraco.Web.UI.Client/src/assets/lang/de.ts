@@ -763,6 +763,7 @@ export default {
 		content: 'Inhalt',
 		continue: 'Weiter',
 		copy: 'Kopieren',
+		copied: 'Kopiert!',
 		create: 'Neu',
 		cropSection: 'Ausschnitte Bereich',
 		database: 'Datenbank',
