@@ -41,7 +41,7 @@ export const data: Array<UmbMockWebhookDeliveryModel> = [
 	{
 		key: 'c0ffee01-0000-0000-0000-000000000003',
 		webhookKey: WEBHOOK_MINIMAL_ID,
-		statusCode: 'ConnectionRefused',
+		statusCode: 'ConnectionError',
 		isSuccessStatusCode: false,
 		date: '2026-04-11T16:02:18Z',
 		eventAlias: 'Umbraco.ContentPublish',
