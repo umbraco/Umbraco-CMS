@@ -1,0 +1,53 @@
+import { UmbWebhookEventPickerDataSource } from '../picker-data-source/webhook-event.picker-data-source.js';
+import { html, customElement, property } from '@umbraco-cms/backoffice/external/lit';
+import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
+import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
+
+@customElement('umb-input-webhook-event')
+export class UmbInputWebhookEventElement extends UmbFormControlMixin<string | undefined, typeof UmbLitElement>(
+	UmbLitElement,
+) {
+	#dataSource = new UmbWebhookEventPickerDataSource(this);
+
+	@property({ type: Number })
+	min = 0;
+
+	@property({ type: Number })
+	max = Infinity;
+
+	@property({ type: Array })
+	selection: Array<string> = [];
+
+	@property({ type: Boolean, reflect: true })
+	readonly = false;
+
+	protected override getFormElement() {
+		return undefined;
+	}
+
+	#onChange(event: Event) {
+		event.stopPropagation();
+		const target = event.target as HTMLElement & { selection: Array<string>; value: string | undefined };
+		this.selection = target.selection;
+		this.value = target.value;
+		this.dispatchEvent(new UmbChangeEvent());
+	}
+
+	override render() {
+		return html`<umb-input-entity-data
+			.dataSourceApi=${this.#dataSource}
+			.value=${this.value}
+			.selection=${this.selection}
+			.min=${this.min}
+			.max=${this.max}
+			?readonly=${this.readonly}
+			@change=${this.#onChange}></umb-input-entity-data>`;
+	}
+}
+
+declare global {
+	interface HTMLElementTagNameMap {
+		'umb-input-webhook-event': UmbInputWebhookEventElement;
+	}
+}
