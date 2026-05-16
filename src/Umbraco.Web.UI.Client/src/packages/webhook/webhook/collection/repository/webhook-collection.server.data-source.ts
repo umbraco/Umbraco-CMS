@@ -1,5 +1,6 @@
 import type { UmbWebhookCollectionFilterModel } from '../types.js';
 import { UMB_WEBHOOK_ENTITY_TYPE } from '../../../entity.js';
+import { UMB_WEBHOOK_EVENT_ENTITY_TYPE } from '../../../webhook-event/entity.js';
 import type { UmbWebhookDetailModel } from '../../types.js';
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -45,7 +46,13 @@ export class UmbWebhookCollectionServerDataSource implements UmbWebhookCollectio
 				description: item.description,
 				enabled: item.enabled,
 				headers: item.headers,
-				events: item.events,
+				events: item.events.map((event) => ({
+					entityType: UMB_WEBHOOK_EVENT_ENTITY_TYPE,
+					unique: event.alias,
+					eventName: event.eventName,
+					eventType: event.eventType,
+					alias: event.alias,
+				})),
 				contentTypes: item.contentTypeKeys,
 			};
 

@@ -19,7 +19,7 @@ export class UmbWebhookEventStore extends UmbStoreBase<UmbWebhookEventModel> {
 		super(
 			host,
 			UMB_WEBHOOK_EVENT_STORE_CONTEXT.toString(),
-			new UmbArrayState<UmbWebhookEventModel>([], (x) => x.alias),
+			new UmbArrayState<UmbWebhookEventModel>([], (x) => x.unique),
 		);
 	}
 }

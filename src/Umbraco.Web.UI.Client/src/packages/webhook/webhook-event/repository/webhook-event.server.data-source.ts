@@ -1,3 +1,4 @@
+import { UMB_WEBHOOK_EVENT_ENTITY_TYPE } from '../entity.js';
 import { WebhookService } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
@@ -28,6 +29,8 @@ export class UmbWebhookEventServerDataSource {
 
 		const items = data.items.map((item) => {
 			return {
+				entityType: UMB_WEBHOOK_EVENT_ENTITY_TYPE,
+				unique: item.alias,
 				eventName: item.eventName,
 				eventType: item.eventType,
 				alias: item.alias,
