@@ -23,7 +23,7 @@ export class UmbWebhookEventCollectionServerDataSource
 	async getCollection(filter: UmbWebhookEventCollectionFilterModel) {
 		const { data, error } = await tryExecute(
 			this,
-			WebhookService.getWebhookEvents({ query: { skip: filter.skip, take: filter.take } }),
+			WebhookService.getWebhookEvents({ query: { skip: filter.skip ?? 0, take: filter.take ?? 100 } }),
 		);
 
 		if (error || !data) {
