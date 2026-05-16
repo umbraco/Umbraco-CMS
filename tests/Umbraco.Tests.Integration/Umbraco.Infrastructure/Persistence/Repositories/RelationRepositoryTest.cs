@@ -53,7 +53,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Add_On_RelationRepository()
+    public async Task Can_Perform_Add_On_RelationRepository()
     {
         // Arrange
         using (var scope = ScopeProvider.CreateScope())
@@ -61,9 +61,9 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(out var repositoryType);
 
             // Act
-            var relationType = repositoryType.GetAsync(1, CancellationToken.None).GetAwaiter().GetResult();
+            var relationType = await repositoryType.GetAsync(1, CancellationToken.None);
             var relation = new Relation(_textpage.Id, _subpage.Id, relationType);
-            repository.SaveAsync(relation, CancellationToken.None).GetAwaiter().GetResult();
+            await repository.SaveAsync(relation, CancellationToken.None);
 
             // Assert
             Assert.That(relation, Is.Not.Null);
@@ -72,7 +72,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Update_On_RelationRepository()
+    public async Task Can_Perform_Update_On_RelationRepository()
     {
         // Arrange
         using (var scope = ScopeProvider.CreateScope())
@@ -80,11 +80,11 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(out var repositoryType);
 
             // Act
-            var relation = repository.GetAsync(1, CancellationToken.None).GetAwaiter().GetResult();
+            var relation = await repository.GetAsync(1, CancellationToken.None);
             relation.Comment = "This relation has been updated";
-            repository.SaveAsync(relation, CancellationToken.None).GetAwaiter().GetResult();
+            await repository.SaveAsync(relation, CancellationToken.None);
 
-            var relationUpdated = repository.GetAsync(1, CancellationToken.None).GetAwaiter().GetResult();
+            var relationUpdated = await repository.GetAsync(1, CancellationToken.None);
 
             // Assert
             Assert.That(relationUpdated, Is.Not.Null);
@@ -94,7 +94,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Delete_On_RelationRepository()
+    public async Task Can_Perform_Delete_On_RelationRepository()
     {
         // Arrange
         using (var scope = ScopeProvider.CreateScope())
@@ -102,10 +102,10 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(out var repositoryType);
 
             // Act
-            var relation = repository.GetAsync(2, CancellationToken.None).GetAwaiter().GetResult();
-            repository.DeleteAsync(relation, CancellationToken.None).GetAwaiter().GetResult();
+            var relation = await repository.GetAsync(2, CancellationToken.None);
+            await repository.DeleteAsync(relation, CancellationToken.None);
 
-            var exists = repository.ExistsAsync(2, CancellationToken.None).GetAwaiter().GetResult();
+            var exists = await repository.ExistsAsync(2, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.False);
@@ -113,7 +113,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Get_On_RelationRepository()
+    public async Task Can_Perform_Get_On_RelationRepository()
     {
         // Arrange
         using (var scope = ScopeProvider.CreateScope())
@@ -121,7 +121,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(out var repositoryType);
 
             // Act
-            var relation = repository.GetAsync(1, CancellationToken.None).GetAwaiter().GetResult();
+            var relation = await repository.GetAsync(1, CancellationToken.None);
 
             // Assert
             Assert.That(relation, Is.Not.Null);
@@ -133,7 +133,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_GetAll_On_RelationRepository()
+    public async Task Can_Perform_GetAll_On_RelationRepository()
     {
         // Arrange
         using (var scope = ScopeProvider.CreateScope())
@@ -141,7 +141,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(out var repositoryType);
 
             // Act
-            var relations = repository.GetAllAsync(CancellationToken.None).GetAwaiter().GetResult().ToArray();
+            var relations = (await repository.GetAllAsync(CancellationToken.None)).ToArray();
 
             // Assert
             Assert.That(relations, Is.Not.Null);
@@ -152,7 +152,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_GetAll_With_Params_On_RelationRepository()
+    public async Task Can_Perform_GetAll_With_Params_On_RelationRepository()
     {
         // Arrange
         using (var scope = ScopeProvider.CreateScope())
@@ -160,7 +160,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(out var repositoryType);
 
             // Act
-            var relations = repository.GetManyAsync(new[] { 1, 2 }, CancellationToken.None).GetAwaiter().GetResult().ToArray();
+            var relations = (await repository.GetManyAsync(new[] { 1, 2 }, CancellationToken.None)).ToArray();
 
             // Assert
             Assert.That(relations, Is.Not.Null);
@@ -172,21 +172,21 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 
     [Test]
     [Ignore("Deferred until EntityRepository is migrated to EF Core - GetPagedParentEntitiesByChildIdAsync throws NotImplementedException")]
-    public void Get_Paged_Parent_Entities_By_Child_Id()
+    public async Task Get_Paged_Parent_Entities_By_Child_Id()
     {
-        CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out var createdMedia);
+        var (createdContent, createdMembers, createdMedia) = await CreateTestDataForPagingTestsAsync();
 
         using (var scope = ScopeProvider.CreateScope())
         {
             var repository = CreateRepository(out var relationTypeRepository);
 
             // Get parent entities for child id
-            var firstPage = repository.GetPagedParentEntitiesByChildIdAsync(createdMedia[0].Id, 0, 11).GetAwaiter().GetResult();
+            var firstPage = await repository.GetPagedParentEntitiesByChildIdAsync(createdMedia[0].Id, 0, 11);
             Assert.AreEqual(9, firstPage.Total);
             Assert.AreEqual(9, firstPage.Items.Count());
 
             // Add the next page
-            var secondPage = repository.GetPagedParentEntitiesByChildIdAsync(createdMedia[0].Id, 11, 11).GetAwaiter().GetResult();
+            var secondPage = await repository.GetPagedParentEntitiesByChildIdAsync(createdMedia[0].Id, 11, 11);
             Assert.AreEqual(9, secondPage.Total);
 
             var allParents = firstPage.Items.Concat(secondPage.Items).ToList();
@@ -199,17 +199,17 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(3, memberEntities.Count);
 
             // Only of a certain type
-            var documents = repository.GetPagedParentEntitiesByChildIdAsync(createdMedia[0].Id, 0, 100, [UmbracoObjectTypes.Document.GetGuid()]).GetAwaiter().GetResult();
+            var documents = await repository.GetPagedParentEntitiesByChildIdAsync(createdMedia[0].Id, 0, 100, [UmbracoObjectTypes.Document.GetGuid()]);
             Assert.AreEqual(3, documents.Total);
 
-            var members = repository.GetPagedParentEntitiesByChildIdAsync(createdMedia[0].Id, 0, 100, [UmbracoObjectTypes.Member.GetGuid()]).GetAwaiter().GetResult();
+            var members = await repository.GetPagedParentEntitiesByChildIdAsync(createdMedia[0].Id, 0, 100, [UmbracoObjectTypes.Member.GetGuid()]);
             Assert.AreEqual(3, members.Total);
 
-            var media = repository.GetPagedParentEntitiesByChildIdAsync(createdMedia[0].Id, 0, 100, [UmbracoObjectTypes.Media.GetGuid()]).GetAwaiter().GetResult();
+            var media = await repository.GetPagedParentEntitiesByChildIdAsync(createdMedia[0].Id, 0, 100, [UmbracoObjectTypes.Media.GetGuid()]);
             Assert.AreEqual(3, media.Total);
 
             // Test relations on content
-            var contentParents = repository.GetPagedParentEntitiesByChildIdAsync(createdContent[0].Id, 0, int.MaxValue).GetAwaiter().GetResult();
+            var contentParents = await repository.GetPagedParentEntitiesByChildIdAsync(createdContent[0].Id, 0, int.MaxValue);
             Assert.AreEqual(6, contentParents.Total);
             Assert.AreEqual(6, contentParents.Items.Count());
         }
@@ -217,27 +217,27 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 
     [Test]
     [Ignore("Deferred until EntityRepository is migrated to EF Core - GetPagedParentEntitiesByChildIdAsync/GetPagedChildEntitiesByParentIdAsync throw NotImplementedException")]
-    public void Get_Paged_Parent_Child_Entities_With_Same_Entity_Relation()
+    public async Task Get_Paged_Parent_Child_Entities_With_Same_Entity_Relation()
     {
         // Create a media item and create a relationship between itself (parent -> child)
         var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
         MediaTypeService.Save(imageType);
         var media = MediaBuilder.CreateMediaImage(imageType, -1);
         MediaService.Save(media);
-        var relType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
-        RelationService.Relate(media.Id, media.Id, relType);
+        var relType = await RelationService.GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+        await RelationService.RelateAsync(media.Id, media.Id, relType!);
 
         using (var scope = ScopeProvider.CreateScope())
         {
             var repository = CreateRepository(out var relationTypeRepository);
 
             // Get parent entities for child id
-            var parents = repository.GetPagedParentEntitiesByChildIdAsync(media.Id, 0, 10).GetAwaiter().GetResult();
+            var parents = await repository.GetPagedParentEntitiesByChildIdAsync(media.Id, 0, 10);
             Assert.AreEqual(1, parents.Total);
             Assert.AreEqual(1, parents.Items.Count());
 
             // Get child entities for parent id
-            var children = repository.GetPagedChildEntitiesByParentIdAsync(media.Id, 0, 10).GetAwaiter().GetResult();
+            var children = await repository.GetPagedChildEntitiesByParentIdAsync(media.Id, 0, 10);
             Assert.AreEqual(1, children.Total);
             Assert.AreEqual(1, children.Items.Count());
         }
@@ -245,21 +245,21 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 
     [Test]
     [Ignore("Deferred until EntityRepository is migrated to EF Core - GetPagedChildEntitiesByParentIdAsync throws NotImplementedException")]
-    public void Get_Paged_Child_Entities_By_Parent_Id()
+    public async Task Get_Paged_Child_Entities_By_Parent_Id()
     {
-        CreateTestDataForPagingTests(out var createdContent, out var createdMembers, out _);
+        var (createdContent, createdMembers, _) = await CreateTestDataForPagingTestsAsync();
 
         using (var scope = ScopeProvider.CreateScope())
         {
             var repository = CreateRepository(out _);
 
             // Get child entities for parent id
-            var firstPage = repository.GetPagedChildEntitiesByParentIdAsync(createdContent[0].Id, 0, 9).GetAwaiter().GetResult();
+            var firstPage = await repository.GetPagedChildEntitiesByParentIdAsync(createdContent[0].Id, 0, 9);
             Assert.AreEqual(9, firstPage.Total);
             Assert.AreEqual(9, firstPage.Items.Count());
 
             // Add the next page
-            var secondPage = repository.GetPagedChildEntitiesByParentIdAsync(createdContent[0].Id, 9, 9).GetAwaiter().GetResult();
+            var secondPage = await repository.GetPagedChildEntitiesByParentIdAsync(createdContent[0].Id, 9, 9);
             Assert.AreEqual(9, secondPage.Total);
 
             var allChildren = firstPage.Items.Concat(secondPage.Items).ToList();
@@ -272,21 +272,21 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             Assert.AreEqual(3, memberEntities.Count);
 
             // only of a certain type
-            var media = repository.GetPagedChildEntitiesByParentIdAsync(createdContent[0].Id, 0, 100, [UmbracoObjectTypes.Media.GetGuid()]).GetAwaiter().GetResult();
+            var media = await repository.GetPagedChildEntitiesByParentIdAsync(createdContent[0].Id, 0, 100, [UmbracoObjectTypes.Media.GetGuid()]);
             Assert.AreEqual(3, media.Total);
 
-            var membersFromMembers = repository.GetPagedChildEntitiesByParentIdAsync(createdMembers[0].Id, 0, 100, [UmbracoObjectTypes.Media.GetGuid()]).GetAwaiter().GetResult();
+            var membersFromMembers = await repository.GetPagedChildEntitiesByParentIdAsync(createdMembers[0].Id, 0, 100, [UmbracoObjectTypes.Media.GetGuid()]);
             Assert.AreEqual(3, membersFromMembers.Total);
 
-            var membersFromContent = repository.GetPagedChildEntitiesByParentIdAsync(createdContent[0].Id, 0, 100, [UmbracoObjectTypes.Member.GetGuid()]).GetAwaiter().GetResult();
+            var membersFromContent = await repository.GetPagedChildEntitiesByParentIdAsync(createdContent[0].Id, 0, 100, [UmbracoObjectTypes.Member.GetGuid()]);
             Assert.AreEqual(3, membersFromContent.Total);
         }
     }
 
-    private void CreateTestDataForPagingTests(out List<IContent> createdContent, out List<IMember> createdMembers, out List<IMedia> createdMedia)
+    private async Task<(List<IContent> createdContent, List<IMember> createdMembers, List<IMedia> createdMedia)> CreateTestDataForPagingTestsAsync()
     {
         // Create content
-        createdContent = new List<IContent>();
+        var createdContent = new List<IContent>();
         var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
         ContentTypeService.Save(contentType);
         for (var i = 0; i < 3; i++)
@@ -306,7 +306,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         }
 
         // Create media
-        createdMedia = new List<IMedia>();
+        var createdMedia = new List<IMedia>();
         var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
         MediaTypeService.Save(imageType);
         for (var i = 0; i < 3; i++)
@@ -319,22 +319,22 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         // Create members
         var memberType = MemberTypeBuilder.CreateSimpleMemberType("simple");
         MemberTypeService.Save(memberType);
-        createdMembers = MemberBuilder.CreateSimpleMembers(memberType, 3).ToList();
+        var createdMembers = MemberBuilder.CreateSimpleMembers(memberType, 3).ToList();
         GetMemberService().Save(createdMembers);
 
         var relatedMediaRelType =
-            RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
+            await RelationService.GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelatedMediaAlias);
         var relatedContentRelType =
-            RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+            await RelationService.GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
         var relatedMemberRelType =
-            RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMemberAlias);
+            await RelationService.GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelatedMemberAlias);
 
         // Relate content to media
         foreach (var content in createdContent)
         {
             foreach (var media in createdMedia)
             {
-                RelationService.Relate(content.Id, media.Id, relatedMediaRelType);
+                await RelationService.RelateAsync(content.Id, media.Id, relatedMediaRelType!);
             }
         }
 
@@ -343,7 +343,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         {
             foreach (var content in createdContent)
             {
-                RelationService.Relate(relContent.Id, content.Id, relatedContentRelType);
+                await RelationService.RelateAsync(relContent.Id, content.Id, relatedContentRelType!);
             }
         }
 
@@ -352,7 +352,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         {
             foreach (var member in createdMembers)
             {
-                RelationService.Relate(content.Id, member.Id, relatedMemberRelType);
+                await RelationService.RelateAsync(content.Id, member.Id, relatedMemberRelType!);
             }
         }
 
@@ -361,7 +361,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         {
             foreach (var media in createdMedia)
             {
-                RelationService.Relate(member.Id, media.Id, relatedMediaRelType);
+                await RelationService.RelateAsync(member.Id, media.Id, relatedMediaRelType!);
             }
         }
 
@@ -375,14 +375,14 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         }
 
         var copiedContentRelType =
-            RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
+            await RelationService.GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
 
         // Relate content to content (mimics copy)
         foreach (var content in createdContent)
         {
             foreach (var cpContent in copiedContent)
             {
-                RelationService.Relate(content.Id, cpContent.Id, copiedContentRelType);
+                await RelationService.RelateAsync(content.Id, cpContent.Id, copiedContentRelType!);
             }
         }
 
@@ -396,7 +396,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         }
 
         var trashedRelType =
-            RelationService.GetRelationTypeByAlias(
+            await RelationService.GetRelationTypeByAliasAsync(
                 Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
 
         // Relate to trashed content
@@ -404,7 +404,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         {
             foreach (var content in createdContent)
             {
-                RelationService.Relate(trContent.Id, content.Id, trashedRelType);
+                await RelationService.RelateAsync(trContent.Id, content.Id, trashedRelType!);
             }
         }
 
@@ -418,7 +418,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         }
 
         var trashedMediaRelType =
-            RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes
+            await RelationService.GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes
                 .RelateParentMediaFolderOnDeleteAlias);
 
         // Relate to trashed media
@@ -426,13 +426,15 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         {
             foreach (var media in createdMedia)
             {
-                RelationService.Relate(trMedia.Id, media.Id, trashedMediaRelType);
+                await RelationService.RelateAsync(trMedia.Id, media.Id, trashedMediaRelType!);
             }
         }
+
+        return (createdContent, createdMembers, createdMedia);
     }
 
     [Test]
-    public void Can_Perform_Exists_On_RelationRepository()
+    public async Task Can_Perform_Exists_On_RelationRepository()
     {
         // Arrange
         using (var scope = ScopeProvider.CreateScope())
@@ -440,8 +442,8 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(out var repositoryType);
 
             // Act
-            var exists = repository.ExistsAsync(2, CancellationToken.None).GetAwaiter().GetResult();
-            var doesntExist = repository.ExistsAsync(5, CancellationToken.None).GetAwaiter().GetResult();
+            var exists = await repository.ExistsAsync(2, CancellationToken.None);
+            var doesntExist = await repository.ExistsAsync(5, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.True);
@@ -450,7 +452,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_By_Parent_Id_On_RelationRepository()
+    public async Task Can_Get_By_Parent_Id_On_RelationRepository()
     {
         // Arrange
         using (var scope = ScopeProvider.CreateScope())
@@ -458,7 +460,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(out var repositoryType);
 
             // Act
-            var relations = repository.GetByParentIdAsync(_textpage.Id).GetAwaiter().GetResult().ToArray();
+            var relations = (await repository.GetByParentIdAsync(_textpage.Id)).ToArray();
 
             // Assert
             Assert.That(relations.Length, Is.EqualTo(2));
@@ -466,7 +468,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Get_By_Relation_Type_Id_On_RelationRepository()
+    public async Task Can_Get_By_Relation_Type_Id_On_RelationRepository()
     {
         // Arrange
         using (var scope = ScopeProvider.CreateScope())
@@ -474,7 +476,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository(out var repositoryType);
 
             // Act
-            var relations = repository.GetByRelationTypeIdAsync(_relateContent.Id).GetAwaiter().GetResult().ToArray();
+            var relations = (await repository.GetByRelationTypeIdAsync(_relateContent.Id)).ToArray();
 
             // Assert
             Assert.That(relations, Is.Not.Null);
@@ -485,7 +487,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Delete_Content_And_Verify_Relation_Is_Removed()
+    public async Task Can_Delete_Content_And_Verify_Relation_Is_Removed()
     {
         // Arrange
         using (var scope = ScopeProvider.CreateScope())
@@ -496,8 +498,8 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             ContentService.Delete(content, -1);
 
             // Act
-            var shouldntExist = repository.ExistsAsync(1, CancellationToken.None).GetAwaiter().GetResult();
-            var shouldExist = repository.ExistsAsync(2, CancellationToken.None).GetAwaiter().GetResult();
+            var shouldntExist = await repository.ExistsAsync(1, CancellationToken.None);
+            var shouldExist = await repository.ExistsAsync(2, CancellationToken.None);
 
             // Assert
             Assert.That(shouldntExist, Is.False);

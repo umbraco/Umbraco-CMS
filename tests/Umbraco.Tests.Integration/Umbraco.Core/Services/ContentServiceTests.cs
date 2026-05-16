@@ -2138,14 +2138,14 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
         admin.StartContentIds = new[] { content1.Id };
         UserService.Save(admin);
 
-        RelationService.Save(new RelationType(
+        await RelationService.SaveAsync(new RelationType(
             "test",
             "test",
             false,
             Constants.ObjectTypes.Document,
             Constants.ObjectTypes.Document,
             false));
-        Assert.IsNotNull(RelationService.Relate(content1, content2, "test"));
+        Assert.IsNotNull(await RelationService.RelateAsync(content1.Id, content2.Id, "test"));
 
         PublicAccessService.Save(new PublicAccessEntry(
             content1,

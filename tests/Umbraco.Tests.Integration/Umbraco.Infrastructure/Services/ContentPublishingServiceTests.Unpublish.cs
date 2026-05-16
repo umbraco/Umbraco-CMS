@@ -109,7 +109,7 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(Textpage.Key);
 
         // Setup a relation where the page being unpublished is related to another page as a child (e.g. the other page has a picker and has selected this page).
-        RelationService.Relate(Subpage, Textpage, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+        await RelationService.RelateAsync(Subpage.Id, Textpage.Id, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
 
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, null, Constants.Security.SuperUserKey);
 
@@ -126,7 +126,7 @@ public partial class ContentPublishingServiceTests
         VerifyIsPublished(Textpage.Key);
 
         // Setup a relation where the page being unpublished is related to another page as a parent (e.g. this page has a picker and has selected the other page).
-        RelationService.Relate(Textpage, Subpage, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+        await RelationService.RelateAsync(Textpage.Id, Subpage.Id, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
 
         var result = await ContentPublishingService.UnpublishAsync(Textpage.Key, null, Constants.Security.SuperUserKey);
 
