@@ -25,16 +25,16 @@ export class UmbWebhookEventItemServerDataSource extends UmbItemServerDataSource
 	}
 
 	override async getItems(uniques: Array<string>) {
-		if (!uniques.length) return { data: [] };
+		if (!uniques.length) return { data: [], error: undefined };
 
 		const { data, error } = await tryExecute(this, WebhookService.getWebhookEvents());
 
 		if (error || !data) {
-			return { error };
+			return { data: undefined, error };
 		}
 
 		const filtered = data.items.filter((item) => uniques.includes(item.alias));
-		return { data: this._getMappedItems(filtered) };
+		return { data: this._getMappedItems(filtered), error: undefined };
 	}
 }
 

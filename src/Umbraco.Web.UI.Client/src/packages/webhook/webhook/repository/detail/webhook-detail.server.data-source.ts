@@ -1,5 +1,6 @@
 import type { UmbWebhookDetailModel } from '../../../types.js';
 import { UMB_WEBHOOK_ENTITY_TYPE } from '../../../entity.js';
+import { UMB_WEBHOOK_EVENT_ENTITY_TYPE } from '../../../webhook-event/entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
@@ -70,7 +71,13 @@ export class UmbWebhookDetailServerDataSource implements UmbDetailDataSource<Umb
 			entityType: UMB_WEBHOOK_ENTITY_TYPE,
 			unique: data.id,
 			headers: data.headers,
-			events: data.events,
+			events: data.events.map((event) => ({
+				entityType: UMB_WEBHOOK_EVENT_ENTITY_TYPE,
+				unique: event.alias,
+				eventName: event.eventName,
+				eventType: event.eventType,
+				alias: event.alias,
+			})),
 			enabled: data.enabled,
 			url: data.url,
 			name: data.name ?? '',
