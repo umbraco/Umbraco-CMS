@@ -1,7 +1,17 @@
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { css, customElement, html, property, state, when, LitElement } from '@umbraco-cms/backoffice/external/lit';
-
-//TODO consider adding a highlight prop to the code block, that could spin up/access monaco instance and highlight the code
+import {
+	css,
+	customElement,
+	html,
+	property,
+	state,
+	when,
+	LitElement,
+	createRef,
+	ref,
+	type Ref
+} from '@umbraco-cms/backoffice/external/lit';
+import { monaco } from '@umbraco-cms/backoffice/external/monaco-editor';
 
 /**
  *  A simple styled box for showing code-based error messages or blocks od code.
@@ -18,22 +28,100 @@ export class UmbCodeBlockElement extends LitElement {
 	@state()
 	private _copyState: 'idle' | 'success' = 'idle';
 
-	async copyCode() {
-		const text = this.textContent;
-		if (text) {
-			await navigator.clipboard.writeText(text);
-			this._copyState = 'success';
-			setTimeout(() => {
-				this._copyState = 'idle';
-			}, 2000);
+	private _codeRef: Ref<HTMLElement> = createRef();
+	private _rawCode = '';
+	private _lastSignature = '';
+
+	get codeLang() {
+		const lang = this.language.toLowerCase();
+
+		switch (lang) {
+			case 'c#':
+			case 'csharp':
+				return 'csharp';
+			case 'js':
+			case 'javascript':
+				return 'javascript';
+			case 'ts':
+			case 'typescript':
+				return 'typescript';
+			default:
+				return lang || 'plaintext';
 		}
+	}
+
+	async copyCode() {
+		if (!this._rawCode) return;
+
+		await navigator.clipboard.writeText(this._rawCode);
+
+		this._copyState = 'success';
+		setTimeout(() => (this._copyState = 'idle'), 2000);
 	}
 
 	override render() {
 		return html`
 			${this.#renderHeader()}
-			<pre><uui-scroll-container><code><slot></slot></code></uui-scroll-container></pre>
+			<pre><uui-scroll-container><code id="code" data-lang=${this.codeLang} ${ref(this._codeRef)}></code></uui-scroll-container></pre>
+			<slot @slotchange=${this.#onSlotChanged} style="display:none;"></slot>
 		`; // Avoid breaks between elements of <pre></pre>
+	}
+
+	async #onSlotChanged(event: Event) {
+		const slot = event.target as HTMLSlotElement;
+
+		const nodes = slot.assignedNodes({ flatten: true });
+
+		this._rawCode = nodes.map((n) => n.textContent ?? '').join('');
+
+		await this.updateComplete;
+		this.#highlight();
+	}
+
+	async #highlight() {
+		const el = this._codeRef.value;
+		if (!el || !this._rawCode) return;
+
+		const signature = `${this.codeLang}:${this._rawCode}`;
+
+		// Skip if nothing changed
+		if (this._lastSignature === signature) {
+			return;
+		}
+
+		el.textContent = this._rawCode;
+
+		// Apply highlighting
+		await monaco.editor.colorizeElement(el, {
+			mimeType: this.#mapToMime(this.codeLang),
+		});
+
+		// Store new state
+		this._lastSignature = signature;
+	}
+
+	#mapToMime(lang: string) {
+		switch (lang) {
+			case 'css':
+				return 'text/css';
+			case 'json':
+				return 'application/json';
+			case 'javascript':
+				return 'text/javascript';
+			case 'typescript':
+				return 'text/typescript';
+			case 'csharp':
+				return 'text/x-csharp';
+			default:
+				return 'text/plain';
+		}
+	}
+
+	// Re-highlight if language changes
+	protected override updated(changed: Map<string, unknown>) {
+		if (changed.has('language')) {
+			this.updateComplete.then(() => this.#highlight());
+		}
 	}
 
 	#renderHeader() {
