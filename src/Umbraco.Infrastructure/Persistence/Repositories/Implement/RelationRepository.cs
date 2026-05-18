@@ -209,7 +209,7 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
                     foreach (IRelation entity in entities)
                     {
                         entity.UpdatingEntity();
-                        RelationDto dto = RelationFactory.BuildEFCoreDto(entity);
+                        RelationDto dto = RelationFactory.BuildDto(entity);
                         db.Relations.Update(dto);
                     }
 
@@ -221,7 +221,7 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
                     foreach (IRelation entity in entities)
                     {
                         entity.AddingEntity();
-                        dtos.Add(RelationFactory.BuildEFCoreDto(entity));
+                        dtos.Add(RelationFactory.BuildDto(entity));
                     }
 
                     await db.Relations.AddRangeAsync(dtos, cancellationToken);
@@ -253,13 +253,13 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
                 {
                     foreach (ReadOnlyRelation entity in hasIdentityGroup)
                     {
-                        RelationDto dto = RelationFactory.BuildEFCoreDto(entity);
+                        RelationDto dto = RelationFactory.BuildDto(entity);
                         db.Relations.Update(dto);
                     }
                 }
                 else
                 {
-                    IEnumerable<RelationDto> dtos = hasIdentityGroup.Select(RelationFactory.BuildEFCoreDto);
+                    IEnumerable<RelationDto> dtos = hasIdentityGroup.Select(RelationFactory.BuildDto);
                     await db.Relations.AddRangeAsync(dtos, cancellationToken);
                 }
             }
@@ -376,7 +376,7 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
         {
             item.AddingEntity();
 
-            RelationDto dto = RelationFactory.BuildEFCoreDto(item);
+            RelationDto dto = RelationFactory.BuildDto(item);
             await db.Relations.AddAsync(dto);
             await db.SaveChangesAsync();
 
@@ -391,7 +391,7 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
         {
             item.UpdatingEntity();
 
-            RelationDto dto = RelationFactory.BuildEFCoreDto(item);
+            RelationDto dto = RelationFactory.BuildDto(item);
             db.Relations.Update(dto);
             await db.SaveChangesAsync();
 
