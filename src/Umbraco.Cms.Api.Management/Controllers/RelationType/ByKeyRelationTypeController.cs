@@ -34,9 +34,9 @@ public class ByKeyRelationTypeController : RelationTypeControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Gets a relation type.")]
     [EndpointDescription("Gets a relation type identified by the provided Id.")]
-    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid key)
+    public async Task<IActionResult> ByKey(CancellationToken cancellationToken, Guid id)
     {
-        IRelationType? relationType = await _relationService.GetRelationTypeByKeyAsync(key, cancellationToken);
+        IRelationType? relationType = await _relationService.GetRelationTypeByKeyAsync(id, cancellationToken);
         if (relationType is null)
         {
             return RelationTypeNotFound();
