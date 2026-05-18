@@ -77,7 +77,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
     /// The references.
     /// </returns>
     public ISet<UmbracoEntityReference> GetReferences(IDataEditor dataEditor, IEnumerable<object?> values) =>
-        GetReferencesEnumerable(dataEditor, values, null).ToHashSet();
+        GetReferencesEnumerable(dataEditor, values, dataEditor.Alias).ToHashSet();
 
     private ISet<UmbracoEntityReference> GetReferences(IDataEditor dataEditor, IEnumerable<object?> values, string propertyEditorAlias) =>
         GetReferencesEnumerable(dataEditor, values, propertyEditorAlias).ToHashSet();
@@ -106,7 +106,7 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
             if (dataValueReferenceFactory.IsForEditor(dataEditor))
         {
                 IDataValueReference factoryDataValueReference = dataValueReferenceFactory.GetDataValueReference();
-                foreach (UmbracoEntityReference reference in values.SelectMany(factoryDataValueReference.GetReferences))
+                foreach (UmbracoEntityReference reference in GetReferencesFromPropertyValues(values, factoryDataValueReference, propertyEditorAlias))
             {
                     yield return reference;
                 }
@@ -139,7 +139,6 @@ public class DataValueReferenceFactoryCollection : BuilderCollectionBase<IDataVa
                     value,
                     dataValueReference.GetType().FullName,
                     propertyEditorAlias ?? "n/a");
-                throw;
             }
         }
 

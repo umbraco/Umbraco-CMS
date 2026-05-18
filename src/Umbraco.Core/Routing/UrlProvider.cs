@@ -112,13 +112,13 @@ namespace Umbraco.Cms.Core.Routing
         /// <para>The URL is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the published content is multi-lingual, gets the URL for the specified culture or,
         /// when no culture is specified, the current culture.</para>
-        /// <para>If the provider is unable to provide a URL, it returns "#".</para>
+        /// <para>If the provider is unable to provide a URL, it returns <see cref="Constants.Routing.Unroutable"/>.</para>
         /// </remarks>
         public string GetUrl(IPublishedContent? content, UrlMode mode = UrlMode.Default, string? culture = null, Uri? current = null)
         {
             if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
             {
-                return "#";
+                return Constants.Routing.Unroutable;
             }
 
             if (mode == UrlMode.Default)
@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Core.Routing
 
             UrlInfo? url = _urlProviders.Select(provider => provider.GetUrl(content, mode, culture, current))
                 .FirstOrDefault(u => u is not null);
-            return url?.Url?.ToString() ?? "#"; // legacy wants this
+            return url?.Url?.ToString() ?? Constants.Routing.Unroutable; // legacy wants this
         }
 
         /// <inheritdoc />
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Core.Routing
             var url = provider == null
                 ? route // what else?
                 : provider.GetUrlFromRoute(route, id, umbracoContext.CleanedUmbracoUrl, Mode, culture)?.Url?.ToString();
-            return url ?? "#";
+            return url ?? Constants.Routing.Unroutable;
         }
 
         #endregion

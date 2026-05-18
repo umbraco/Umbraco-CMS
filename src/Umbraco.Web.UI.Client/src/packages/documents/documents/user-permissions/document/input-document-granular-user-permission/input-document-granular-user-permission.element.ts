@@ -205,7 +205,7 @@ export class UmbInputDocumentGranularUserPermissionElement extends UUIFormContro
 
 	#renderIcon(item: UmbDocumentItemModel) {
 		if (!item.documentType.icon) return;
-		return html`<uui-icon slot="icon" name=${item.documentType.icon}></uui-icon>`;
+		return html`<umb-icon slot="icon" name=${item.documentType.icon}></umb-icon>`;
 	}
 
 	#renderIsTrashed(item: UmbDocumentItemModel) {

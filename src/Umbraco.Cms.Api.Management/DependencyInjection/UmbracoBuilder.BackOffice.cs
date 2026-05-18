@@ -17,20 +17,45 @@ public static partial class UmbracoBuilderExtensions
     /// Adds all required components to run the Umbraco back office.
     /// </summary>
     /// <remarks>
-    /// This method calls <c>AddCore()</c> internally to register all core services,
-    /// then adds backoffice-specific services on top.
+    /// This method calls <c>AddCore()</c> and <see cref="AddBackOfficeSignIn"/> internally
+    /// to register core services, identity, and cookie authentication, then adds backoffice-specific
+    /// services on top (OpenIddict, backoffice SPA infrastructure, token management).
+    /// <para>
+    /// For frontend-only deployments that only need basic authentication with backoffice credentials
+    /// (no backoffice UI), use <see cref="AddBackOfficeSignIn"/> instead.
+    /// </para>
     /// </remarks>
     /// <param name="builder">The Umbraco builder.</param>
     /// <param name="configureMvc">Optional action to configure the MVC builder.</param>
     /// <returns>The Umbraco builder.</returns>
     public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, Action<IMvcBuilder>? configureMvc = null) =>
         builder
-            .AddCore(configureMvc)           // All core services
-            .AddBackOfficeCore()             // Backoffice-specific: IBackOfficePathGenerator
-            .AddBackOfficeIdentity()         // Backoffice user identity
-            .AddBackOfficeAuthentication()   // OpenIddict, authorization policies
-            .AddTokenRevocation()            // Token cleanup handlers
-            .AddMembersIdentity();           // Member identity (also needed for backoffice admin)
+            .AddCore(configureMvc)                   // All core services
+            .AddBackOfficeSignIn()                   // Identity + Cookie authentication
+            .AddBackOfficeCore()                     // IBackOfficePathGenerator, IBackOfficeEnabledMarker
+            .AddBackOfficeOpenIddictServices()       // OpenIddict, application manager, middleware
+            .AddTokenRevocation()                    // Token cleanup handlers
+            .AddMembersIdentity();                   // Member identity (also needed for backoffice admin)
+
+    /// <summary>
+    /// Adds backoffice identity and cookie authentication without the full backoffice UI or OpenIddict.
+    /// Use this for frontend-only deployments that need basic authentication with backoffice credentials.
+    /// </summary>
+    /// <remarks>
+    /// This registers the backoffice identity system (user manager, sign-in manager) and cookie authentication
+    /// schemes, but does NOT register OpenIddict, the Management API, or the backoffice SPA. It enables
+    /// <c>BasicAuthenticationMiddleware</c> to authenticate users via a standalone server-rendered login page.
+    /// <para>
+    /// Requires <c>AddCore()</c> to have been called first.
+    /// For full backoffice support, use <see cref="AddBackOffice"/> instead.
+    /// </para>
+    /// </remarks>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> to configure.</param>
+    /// <returns>The same <see cref="IUmbracoBuilder"/> instance.</returns>
+    public static IUmbracoBuilder AddBackOfficeSignIn(this IUmbracoBuilder builder) =>
+        builder
+            .AddBackOfficeIdentity()
+            .AddBackOfficeCookieAuthentication();
 
     /// <summary>
     /// Registers the essential services required for the Umbraco back office, including the back office path generator and the physical file system implementation.

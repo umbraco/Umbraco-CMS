@@ -1670,9 +1670,7 @@ public class ContentService : RepositoryService, IContentService
         {
             // Determine cultures publishing/unpublishing which will be based on previous calls to content.PublishCulture and ClearPublishInfo
             culturesUnpublishing = content.GetCulturesUnpublishing();
-            culturesPublishing = variesByCulture
-                ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
-                : null;
+            culturesPublishing = GetCulturesPublishing(content);
 
             // ensure that the document can be published, and publish handling events, business rules, etc
             publishResult = StrategyCanPublish(
@@ -1743,6 +1741,12 @@ public class ContentService : RepositoryService, IContentService
         // won't happen in a branch
         if (unpublishing)
         {
+            if (culturesUnpublishing is null)
+            {
+                culturesUnpublishing = content.GetCulturesUnpublishing();
+                culturesPublishing = GetCulturesPublishing(content);
+            }
+
             IContent? newest = GetById(content.Id); // ensure we have the newest version - in scope
             if (content.VersionId != newest?.VersionId)
             {
@@ -1805,12 +1809,13 @@ public class ContentService : RepositoryService, IContentService
                     var langs = GetLanguageDetailsForAuditEntry(allLangs, culturesUnpublishing);
                     Audit(AuditType.UnpublishVariant, userId, content.Id, $"Unpublished languages: {langs}", langs);
 
-                    if (publishResult == null)
+                    PublishResultType? publishResultType = publishResult?.Result ?? unpublishResult?.Result;
+                    if (publishResultType == null)
                     {
-                        throw new PanicException("publishResult == null - should not happen");
+                        throw new PanicException("publishResultType == null - should not happen");
                     }
 
-                    switch (publishResult.Result)
+                    switch (publishResultType)
                     {
                         case PublishResultType.FailedPublishMandatoryCultureMissing:
                             // Occurs when a mandatory culture was unpublished (which means we tried publishing the document without a mandatory culture)
@@ -2428,6 +2433,11 @@ public class ContentService : RepositoryService, IContentService
         return result;
     }
 
+    private IReadOnlyList<string>? GetCulturesPublishing(IContent content)
+        => content.ContentType.VariesByCulture()
+            ? content.PublishCultureInfos?.Values.Where(x => x.IsDirty()).Select(x => x.Culture).ToList()
+            : null;
+
     #endregion
 
     #region Delete
@@ -2925,6 +2935,10 @@ public class ContentService : RepositoryService, IContentService
                 copy.Published = false;
             }
 
+            // clear any per-culture published state copied from the source - the copy is unpublished,
+            // so no culture variations should be marked as published either (see #22540).
+            copy.ClearPublishInfos();
+
             copy.CreatorId = userId;
             copy.WriterId = userId;
 
@@ -2988,6 +3002,10 @@ public class ContentService : RepositoryService, IContentService
                         {
                             descendantCopy.Published = false;
                         }
+
+                        // clear any per-culture published state copied from the source - the copy is unpublished,
+                        // so no culture variations should be marked as published either (see #22540).
+                        descendantCopy.ClearPublishInfos();
 
                         descendantCopy.CreatorId = userId;
                         descendantCopy.WriterId = userId;

@@ -144,6 +144,8 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
         // For SQL Server: Convert existing invariant records to use NULL languageId and remove duplicates.
         // Invariant documents are those with ContentVariation.Nothing (variations = 0) in cmsContentType.
         // Note: ContentVariation.Culture = 1, ContentVariation.Segment = 2, so 0 means no variation (invariant).
+        // MAXDOP 1 prevents SQL Server from choosing parallel execution plans for these CTE queries,
+        // which can cause CXSYNC_PORT synchronization waits that hang indefinitely (see #22377).
         Execute.Sql($@"
             -- Identify invariant documents
             ;WITH InvariantDocs AS (
@@ -164,7 +166,8 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
             -- Delete duplicates (keep one per unique combination)
             DELETE du FROM [{Constants.DatabaseSchema.Tables.DocumentUrl}] du
             INNER JOIN InvariantDocs i ON du.uniqueId = i.uniqueId
-            WHERE du.id NOT IN (SELECT id FROM ToKeep);
+            WHERE NOT EXISTS (SELECT 1 FROM ToKeep tk WHERE tk.id = du.id)
+            OPTION (MAXDOP 1);
         ").Do();
 
         Execute.Sql($@"
@@ -179,7 +182,8 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
             )
             UPDATE du SET du.languageId = NULL
             FROM [{Constants.DatabaseSchema.Tables.DocumentUrl}] du
-            INNER JOIN InvariantDocs i ON du.uniqueId = i.uniqueId;
+            INNER JOIN InvariantDocs i ON du.uniqueId = i.uniqueId
+            OPTION (MAXDOP 1);
         ").Do();
     }
 
@@ -187,6 +191,7 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
     {
         // For SQL Server: Convert existing invariant alias records to use NULL languageId and remove duplicates.
         // Note: ContentVariation.Nothing = 0 (invariant), ContentVariation.Culture = 1 (variant).
+        // MAXDOP 1 prevents parallelism-related hangs (see #22377).
         Execute.Sql($@"
             -- Identify invariant documents with aliases
             ;WITH InvariantDocs AS (
@@ -207,7 +212,8 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
             -- Delete duplicates (keep one per unique combination)
             DELETE da FROM [{Constants.DatabaseSchema.Tables.DocumentUrlAlias}] da
             INNER JOIN InvariantDocs i ON da.uniqueId = i.uniqueId
-            WHERE da.id NOT IN (SELECT id FROM ToKeep);
+            WHERE NOT EXISTS (SELECT 1 FROM ToKeep tk WHERE tk.id = da.id)
+            OPTION (MAXDOP 1);
         ").Do();
 
         Execute.Sql($@"
@@ -222,7 +228,8 @@ public class OptimizeInvariantUrlRecords : AsyncMigrationBase
             )
             UPDATE da SET da.languageId = NULL
             FROM [{Constants.DatabaseSchema.Tables.DocumentUrlAlias}] da
-            INNER JOIN InvariantDocs i ON da.uniqueId = i.uniqueId;
+            INNER JOIN InvariantDocs i ON da.uniqueId = i.uniqueId
+            OPTION (MAXDOP 1);
         ").Do();
     }
 

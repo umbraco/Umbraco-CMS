@@ -6,10 +6,15 @@ import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controlle
 @customElement('test-my-controller-host')
 class UmbTestControllerHostElement extends UmbControllerHostElementMixin(HTMLElement) {}
 
-class UmbTestGuardManager extends UmbGuardManagerBase {}
+class UmbTestGuardManager extends UmbGuardManagerBase {
+	public readonly fallback = this._fallback;
+	public getFallback() {
+		return this._getFallback();
+	}
+}
 
 describe('UmbPermissionGuardManager', () => {
-	let manager: UmbGuardManagerBase;
+	let manager: UmbTestGuardManager;
 	const rule1: UmbGuardIncomingRuleBase = { unique: '1', message: 'Rule 1', permitted: true };
 	const rule2: UmbGuardIncomingRuleBase = { unique: '2', message: 'Rule 2', permitted: true };
 	const ruleFalse: UmbGuardIncomingRuleBase = { unique: '-1', message: 'Rule -1', permitted: false };
@@ -132,6 +137,49 @@ describe('UmbPermissionGuardManager', () => {
 					done();
 				})
 				.unsubscribe();
+		});
+	});
+
+	describe('Fallback', () => {
+		it('defaults to not permitted', () => {
+			expect(manager.getFallback()).to.equal(false);
+		});
+
+		it('fallbackToPermitted updates the current value', () => {
+			manager.fallbackToPermitted();
+			expect(manager.getFallback()).to.equal(true);
+		});
+
+		it('fallbackToNotPermitted updates the current value', () => {
+			manager.fallbackToPermitted();
+			manager.fallbackToNotPermitted();
+			expect(manager.getFallback()).to.equal(false);
+		});
+
+		it('emits late fallback updates to existing subscribers', () => {
+			const emitted: boolean[] = [];
+			const subscription = manager.fallback.subscribe((value) => emitted.push(value));
+
+			manager.fallbackToPermitted();
+			manager.fallbackToNotPermitted();
+			manager.fallbackToPermitted();
+
+			subscription.unsubscribe();
+
+			expect(emitted).to.deep.equal([false, true, false, true]);
+		});
+
+		it('does not emit when the fallback value does not change', () => {
+			const emitted: boolean[] = [];
+			const subscription = manager.fallback.subscribe((value) => emitted.push(value));
+
+			manager.fallbackToNotPermitted();
+			manager.fallbackToPermitted();
+			manager.fallbackToPermitted();
+
+			subscription.unsubscribe();
+
+			expect(emitted).to.deep.equal([false, true]);
 		});
 	});
 });

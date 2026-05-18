@@ -679,6 +679,7 @@ export default {
 		content: 'Inhoud',
 		continue: 'Doorgaan',
 		copy: 'Kopiëren',
+		copied: 'Gekopieerd!',
 		create: 'Aanmaken',
 		cropSection: 'Sectie bijsnijden',
 		database: 'Database',

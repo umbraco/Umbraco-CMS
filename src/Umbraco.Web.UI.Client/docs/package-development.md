@@ -63,15 +63,9 @@ declare global {
 }
 ```
 
-### Manifest Bubbling
+### Manifest Bundling
 
-Each sub-feature exports its own `manifests` array. The package-level `manifests.ts` aggregates them:
-
-```typescript
-import { manifests as sectionManifests } from './section/manifests.js';
-import { manifests as dashboardManifests } from './dashboard/manifests.js';
-export const manifests = [...sectionManifests, ...dashboardManifests];
-```
+Each sub-feature exports its own `manifests` array, aggregated up to the package root. See [Manifests & Aliases — Manifest Bundling](./manifests.md#manifest-bundling) for the pattern.
 
 ---
 
@@ -118,4 +112,4 @@ For step-by-step instructions on adding localization keys and using them in elem
 7. **Declare custom manifest types** on `UmbExtensionManifestMap` so other packages can extend yours.
 8. **No hardcoded UI strings** — use the localization system. See [Localization](#localization) above and the `general-add-localization` skill.
 9. **Element naming**: `umb-` prefix for core. Package developers use their own prefix.
-10. **Extension aliases**: Dot-separated namespace (`Umb.Section.Content`, `My.Dashboard.Analytics`).
+10. **Extension aliases**: Dot-separated namespace — see [Manifests & Aliases — Naming Convention](./manifests.md#naming-convention).

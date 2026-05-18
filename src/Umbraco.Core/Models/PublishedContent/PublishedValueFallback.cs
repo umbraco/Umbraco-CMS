@@ -13,14 +13,28 @@ public class PublishedValueFallback : IPublishedValueFallback
 {
     private readonly ILocalizationService? _localizationService;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PublishedValueFallback" /> class.
     /// </summary>
-    public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor)
+    /// <param name="serviceContext">The service context.</param>
+    /// <param name="variationContextAccessor">The variation context accessor.</param>
+    /// <param name="propertyRenderingContextAccessor">The property rendering context accessor.</param>
+    public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor, IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
     {
         _localizationService = serviceContext.LocalizationService;
         _variationContextAccessor = variationContextAccessor;
+        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PublishedValueFallback" /> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public PublishedValueFallback(ServiceContext serviceContext, IVariationContextAccessor variationContextAccessor)
+        : this(serviceContext, variationContextAccessor, StaticServiceProvider.Instance.GetRequiredService<IPropertyRenderingContextAccessor>())
+    {
     }
 
     /// <inheritdoc />
@@ -60,6 +74,10 @@ public class PublishedValueFallback : IPublishedValueFallback
                     }
 
                     break;
+                case Fallback.Ancestors:
+                    // Ancestors fallback only applies at IPublishedContent level (tree-aware).
+                    // Skip silently here so chained fallbacks still work and direct element calls don't throw.
+                    continue;
                 default:
                     throw NotSupportedFallbackMethod(f, "property");
             }
@@ -113,6 +131,10 @@ public class PublishedValueFallback : IPublishedValueFallback
                     }
 
                     break;
+                case Fallback.Ancestors:
+                    // Ancestors fallback only applies at IPublishedContent level (tree-aware).
+                    // Skip silently here so chained fallbacks still work and direct element calls don't throw.
+                    continue;
                 default:
                     throw NotSupportedFallbackMethod(f, "element");
             }
@@ -389,6 +411,36 @@ public class PublishedValueFallback : IPublishedValueFallback
         finally
         {
             _variationContextAccessor.VariationContext = current;
+        }
+    }
+
+    /// <inheritdoc />
+    public IDisposable? EnterFallbackScope(Fallback fallback)
+    {
+        // Short-circuit when no fallback policies are specified to avoid unnecessary allocations.
+        if (fallback.HasPolicies is false)
+        {
+            return null;
+        }
+
+        PropertyRenderingContext? current = _propertyRenderingContextAccessor.PropertyRenderingContext;
+        _propertyRenderingContextAccessor.PropertyRenderingContext = new PropertyRenderingContext(fallback);
+        return new FallbackScope(_propertyRenderingContextAccessor, current);
+    }
+
+    private sealed class FallbackScope(IPropertyRenderingContextAccessor accessor, PropertyRenderingContext? previous) : IDisposable
+    {
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            accessor.PropertyRenderingContext = previous;
         }
     }
 

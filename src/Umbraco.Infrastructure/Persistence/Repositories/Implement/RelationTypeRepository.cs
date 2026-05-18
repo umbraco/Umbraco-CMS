@@ -60,9 +60,18 @@ internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelati
 
     #region Overrides of RepositoryBase<int,RelationType>
 
-    protected override IRelationType? PerformGet(int id) =>
+    /// <summary>
+    /// Gets the cache policy as <see cref="FullDataSetRepositoryCachePolicy{TEntity, TId}"/> for predicate-based lookups.
+    /// Returns null when caching is disabled (e.g. <see cref="AppCaches.NoCache"/>).
+    /// </summary>
+    private FullDataSetRepositoryCachePolicy<IRelationType, int>? TypedCachePolicy
+        => CachePolicy as FullDataSetRepositoryCachePolicy<IRelationType, int>;
 
-        // use the underlying GetAll which will force cache all content types
+    // Note: PerformGet(int) is passed as a callback to the cache policy's Get(TId) method,
+    // but FullDataSetRepositoryCachePolicy.Get() never invokes it — it uses GetAllCached()
+    // internally and clones only the matched entity. This override exists only as a required
+    // implementation of the abstract base and as a fallback for non-FullDataSet policies.
+    protected override IRelationType? PerformGet(int id) =>
         GetMany()?.FirstOrDefault(x => x.Id == id);
 
     /// <summary>
@@ -71,16 +80,17 @@ internal sealed class RelationTypeRepository : EntityRepositoryBase<int, IRelati
     /// <param name="id">The unique identifier of the relation type.</param>
     /// <returns>The relation type matching the specified identifier, or null if not found.</returns>
     public IRelationType? Get(Guid id) =>
-
-        // use the underlying GetAll which will force cache all content types
-        GetMany()?.FirstOrDefault(x => x.Key == id);
+        TypedCachePolicy?.FindCached(x => x.Key == id, PerformGetAll)
+        ?? GetMany()?.FirstOrDefault(x => x.Key == id);
 
     /// <summary>
     /// Determines whether a relation type with the specified identifier exists.
     /// </summary>
     /// <param name="id">The unique identifier of the relation type.</param>
     /// <returns>True if the relation type exists; otherwise, false.</returns>
-    public bool Exists(Guid id) => Get(id) != null;
+    public bool Exists(Guid id) =>
+        TypedCachePolicy?.ExistsCached(x => x.Key == id, PerformGetAll)
+        ?? GetMany()?.Any(x => x.Key == id) == true;
 
     protected override IEnumerable<IRelationType> PerformGetAll(params int[]? ids)
     {

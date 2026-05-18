@@ -8,6 +8,7 @@ export const manifest: ManifestPropertyEditorUi = {
 	meta: {
 		label: 'Stylesheet Picker',
 		icon: 'icon-document',
-		group: 'common',
+		group: '#propertyEditorUIGroups_common',
+		keywords: ['css', 'style', 'theme'],
 	},
 };

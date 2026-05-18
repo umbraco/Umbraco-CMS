@@ -504,6 +504,7 @@ export default {
 		constrainProportions: 'Зберігати пропорції',
 		continue: 'Далі',
 		copy: 'Копіювати',
+		copied: 'Скопійовано!',
 		create: 'Створити',
 		database: 'База даних',
 		date: 'Дата',

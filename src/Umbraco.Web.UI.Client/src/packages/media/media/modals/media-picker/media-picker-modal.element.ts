@@ -755,6 +755,15 @@ export class UmbMediaPickerModalElement extends UmbPickerModalBaseElement<
 				--uui-button-content-align: left;
 				--uui-menu-item-flat-structure: 1;
 			}
+
+			umb-media-picker-folder-path {
+				overflow: hidden;
+				min-width: 0;
+				flex: 1 1 0%;
+			}
+			div[slot='actions'] {
+				flex-shrink: 0;
+			}
 		`,
 	];
 }

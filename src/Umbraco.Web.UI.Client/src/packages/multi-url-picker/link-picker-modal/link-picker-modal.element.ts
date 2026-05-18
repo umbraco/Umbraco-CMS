@@ -252,9 +252,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		if (this.value.link.url) {
 			await umbConfirmModal(this, {
 				color: 'danger',
-				headline: this.localize.term('linkPicker_resetUrlHeadline'),
-				content: this.localize.term('linkPicker_resetUrlMessage'),
-				confirmLabel: this.localize.term('linkPicker_resetUrlLabel'),
+				headline: '#linkPicker_resetUrlHeadline',
+				content: '#linkPicker_resetUrlMessage',
+				confirmLabel: '#linkPicker_resetUrlLabel',
 			});
 		}
 

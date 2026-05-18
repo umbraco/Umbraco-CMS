@@ -168,6 +168,15 @@ export class MediaUiHelper extends UiBaseLocators {
     await this.click(this.bulkMoveToBtn);
   }
 
+  async isMediaCardWithNameSelected(mediaName: string, isSelected: boolean = true) {
+    const mediaLocator = this.mediaCardItems.filter({hasText: mediaName});
+    if (isSelected) {
+      await expect(mediaLocator).toHaveAttribute('selected');
+    } else {
+      await expect(mediaLocator).not.toHaveAttribute('selected');
+    }
+  }
+
   async clickModalTextByName(name: string) {
     await this.click(this.sidebarModal.getByLabel(name, {exact: true}));
   }

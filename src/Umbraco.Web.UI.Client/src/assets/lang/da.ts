@@ -844,6 +844,7 @@ export default {
 		content: 'Indhold',
 		continue: 'Fortsæt',
 		copy: 'Kopiér',
+		copied: 'Kopieret!',
 		create: 'Opret',
 		cropSection: 'Beskær sektion',
 		database: 'Database',
@@ -852,6 +853,7 @@ export default {
 		delete: 'Slet',
 		deleted: 'Slettet',
 		deleting: 'Sletter...',
+		description: 'Beskrivelse',
 		design: 'Design',
 		details: 'Detaljer',
 		dictionary: 'Ordbog',
@@ -1757,6 +1759,7 @@ export default {
 		editorSettings: 'Input indstillinger',
 		searchResultSettings: 'Tilgængelige indstillinger',
 		searchResultEditors: 'Opret ny indstilling',
+		suggestedEditors: 'Forslag',
 		configuration: 'Konfiguration',
 		yesDelete: 'Ja, slet',
 		movedUnderneath: 'blev flyttet til',
@@ -2654,6 +2657,18 @@ export default {
 	propertyEditorPicker: {
 		title: 'Vælg Property Editor',
 		openPropertyEditorPicker: 'Vælg Property Editor',
+	},
+
+	propertyEditorUIGroups: {
+		advanced: 'Advanceret',
+		blocks: 'Bloks',
+		common: 'Generelt',
+		date: 'Dato og tid',
+		lists: 'Lister',
+		media: 'Medier',
+		people: 'Personer',
+		pickers: 'Vælgere',
+		richContent: 'Beriget indhold',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",

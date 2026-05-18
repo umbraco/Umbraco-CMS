@@ -94,6 +94,7 @@ public static partial class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
         builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
         builder.AddNotificationAsyncHandler<RuntimePremigrationsUpgradeNotification, PremigrationUpgrader>();
+        builder.Services.AddSingleton<IMigrationCoordinator, MigrationCoordinator>();
         builder.Services.AddHostedService<UnattendedUpgradeBackgroundService>();
 
         // Database availability check.
@@ -159,6 +160,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
         builder.Services.AddSingleton<IVariationContextAccessor, HybridVariationContextAccessor>();
+        builder.Services.AddSingleton<IPropertyRenderingContextAccessor, HybridPropertyRenderingContextAccessor>();
         builder.Services.AddSingleton<IBackOfficeVariationContextAccessor, HttpContextBackOfficeVariationContextAccessor>();
 
         // Config manipulator
@@ -430,6 +432,8 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationHandler<LanguageDeletedNotification, LanguageDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MemberSavedNotification, MemberSavedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<MemberDeletedNotification, MemberDeletedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ExternalMemberSavedNotification, ExternalMemberSavedDistributedCacheNotificationHandler>()
+            .AddNotificationHandler<ExternalMemberDeletedNotification, ExternalMemberDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<PublicAccessEntrySavedNotification, PublicAccessEntrySavedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<PublicAccessEntryDeletedNotification, PublicAccessEntryDeletedDistributedCacheNotificationHandler>()
             .AddNotificationHandler<UserSavedNotification, UserSavedDistributedCacheNotificationHandler>()
@@ -463,7 +467,11 @@ public static partial class UmbracoBuilderExtensions
             .AddNotificationAsyncHandler<UserSavedNotification, AuditNotificationsHandler>()
             .AddNotificationAsyncHandler<UserDeletedNotification, AuditNotificationsHandler>()
             .AddNotificationAsyncHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
-            .AddNotificationAsyncHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
+            .AddNotificationAsyncHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<ExternalMemberSavedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<ExternalMemberDeletedNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<AssignedExternalMemberRolesNotification, AuditNotificationsHandler>()
+            .AddNotificationAsyncHandler<RemovedExternalMemberRolesNotification, AuditNotificationsHandler>();
 
         // Handlers for publish warnings
         builder.AddNotificationHandler<ContentPublishedNotification, AddDomainWarningsWhenPublishingNotificationHandler>();
