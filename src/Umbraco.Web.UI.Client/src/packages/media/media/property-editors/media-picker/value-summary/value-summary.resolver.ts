@@ -1,9 +1,9 @@
 import type { UmbValueSummaryResolveResult, UmbValueSummaryResolver } from '@umbraco-cms/backoffice/value-summary';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
-import type { UmbMediaPickerValueModel } from '../../types';
-import type { UmbMediaItemModel } from '../../../types';
-import { UmbMediaItemRepository } from '../../../repository';
+import type { UmbMediaPickerValueModel } from '../../types.js';
+import type { UmbMediaItemModel } from '../../../types.js';
+import { UmbMediaItemRepository } from '../../../repository/index.js';
 
 export class UmbMediaPickerValueSummaryResolver
 	extends UmbControllerBase

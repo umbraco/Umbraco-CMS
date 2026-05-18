@@ -1,4 +1,4 @@
-import { customElement, css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 
 @customElement('umb-tags-value-summary')

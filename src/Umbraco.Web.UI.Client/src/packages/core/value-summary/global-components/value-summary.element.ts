@@ -1,5 +1,5 @@
 import type { ManifestValueSummary } from '../extensions/value-summary.extension.js';
-import { customElement, html, nothing, property, css } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-value-summary-extension')

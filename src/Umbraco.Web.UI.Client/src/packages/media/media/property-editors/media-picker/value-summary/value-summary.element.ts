@@ -1,6 +1,6 @@
 import { customElement, html, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
-import type { UmbMediaItemModel } from '../../../types';
+import type { UmbMediaItemModel } from '../../../types.js';
 
 @customElement('umb-media-picker-value-summary')
 export class UmbMediaPickerValueSummaryElement extends UmbValueSummaryElementBase<Array<UmbMediaItemModel>> {
