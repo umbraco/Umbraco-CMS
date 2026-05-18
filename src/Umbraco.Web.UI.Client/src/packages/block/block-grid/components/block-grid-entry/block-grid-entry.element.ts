@@ -181,11 +181,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
-	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel>>) {
-		this._blockViewProps = { ...this._blockViewProps, ...incoming };
-		this.requestUpdate('_blockViewProps');
-	}
-
 	@state()
 	private _isLibraryElement = false;
 
@@ -370,6 +365,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 			},
 			null,
 		);
+	}
+
+	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockGridLayoutModel>>) {
+		this._blockViewProps = { ...this._blockViewProps, ...incoming };
+		this.requestUpdate('_blockViewProps');
 	}
 
 	override connectedCallback(): void {

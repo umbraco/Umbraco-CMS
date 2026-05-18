@@ -280,19 +280,20 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		if (this._exposed || this._isReadOnly) {
 			return ext.component;
 		} else {
-			return html`<div>
-				${ext.component}
-				<umb-block-overlay-expose-button
-					.contentTypeName=${this._contentTypeName}
-					@click=${this.#expose}></umb-block-overlay-expose-button>
-			</div>`;
+			return html`
+				<div>
+					${ext.component}
+					<umb-block-overlay-expose-button
+						.contentTypeName=${this._contentTypeName}
+						@click=${this.#expose}></umb-block-overlay-expose-button>
+				</div>
+			`;
 		}
 	};
 
 	#renderBlock() {
 		return this.contentKey && this._contentTypeAlias
 			? html`
-					<div class="uui-text uui-font">
 					<div class="umb-block-rte__block uui-text uui-font">
 						<umb-entity-frame .label=${this._label}></umb-entity-frame>
 						<umb-extension-slot
@@ -326,14 +327,17 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 	};
 
 	#renderRefBlock() {
-		return html`<umb-ref-rte-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.index=${this._blockViewProps.index}
-			.unpublished=${!this._exposed}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			.config=${this._blockViewProps.config}></umb-ref-rte-block>`;
+		return html`
+			<umb-ref-rte-block
+				.label=${this._label}
+				.icon=${this._icon}
+				.index=${this._blockViewProps.index}
+				.unpublished=${!this._exposed}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				.config=${this._blockViewProps.config}>
+			</umb-ref-rte-block>
+		`;
 	}
 
 	override render() {
@@ -382,6 +386,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 			:host([drag-placeholder]) {
 				opacity: 0.2;
 			}
+
 			:host([is-reference]) {
 				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
 				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);

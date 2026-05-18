@@ -141,10 +141,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
-	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockSingleLayoutModel>>) {
-		this._blockViewProps = { ...this._blockViewProps, ...incoming };
-		this.requestUpdate('_blockViewProps');
-	}
 
 	@state()
 	private _isReadOnly = false;
@@ -153,6 +149,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		super();
 		this.#init();
 	}
+
 	#init() {
 		this.observe(
 			this.#context.showContentEdit,
@@ -289,6 +286,11 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		);
 	}
 
+	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockSingleLayoutModel>>) {
+		this._blockViewProps = { ...this._blockViewProps, ...incoming };
+		this.requestUpdate('_blockViewProps');
+	}
+
 	override connectedCallback(): void {
 		super.connectedCallback();
 		// element styling:
@@ -357,33 +359,39 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	};
 
 	#renderRefBlock() {
-		return html`<umb-ref-single-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.unpublished=${!this._exposed}
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-ref-single-block>`;
+		return html`
+			<umb-ref-single-block
+				.label=${this._label}
+				.icon=${this._icon}
+				.unpublished=${!this._exposed}
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}></umb-ref-single-block>
+		`;
 	}
 
 	#renderInlineBlock() {
-		return html`<umb-inline-single-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.unpublished=${!this._exposed}
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-inline-single-block>`;
+		return html`
+			<umb-inline-single-block
+				.label=${this._label}
+				.icon=${this._icon}
+				.unpublished=${!this._exposed}
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}></umb-inline-single-block>
+		`;
 	}
 
 	#renderUnsupportedBlock() {
-		return html`<umb-unsupported-single-block
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-unsupported-single-block>`;
+		return html`
+			<umb-unsupported-single-block
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}></umb-unsupported-single-block>
+		`;
 	}
 
 	#renderBuiltinBlockView = () => {
@@ -516,6 +524,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 				transition: opacity 50ms 16ms;
 				opacity: 0;
 			}
+
 			:host([is-reference]) {
 				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
 				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
