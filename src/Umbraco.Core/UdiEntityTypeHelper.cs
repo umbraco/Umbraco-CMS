@@ -111,6 +111,10 @@ public static class UdiEntityTypeHelper
                 return UmbracoObjectTypes.FormsDataSource;
             case Constants.UdiEntityType.Language:
                 return UmbracoObjectTypes.Language;
+            case Constants.UdiEntityType.Element:
+                return UmbracoObjectTypes.Element;
+            case Constants.UdiEntityType.ElementContainer:
+                return UmbracoObjectTypes.ElementContainer;
         }
 
         throw new NotSupportedException(
