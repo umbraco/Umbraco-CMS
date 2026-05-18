@@ -116,8 +116,6 @@ export class UmbCurrentUserHistoryUserProfileAppElement extends UmbLitElement {
 			}
 
 			uui-pagination {
-				display: flex;
-				justify-content: center;
 				margin-top: var(--uui-size-layout-1);
 			}
 		`,
