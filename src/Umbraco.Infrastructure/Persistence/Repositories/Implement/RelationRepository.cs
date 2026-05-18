@@ -79,12 +79,12 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
             cancellationToken);
 
     /// <inheritdoc />
-    public Task<IRelation?> GetByParentAndChildIdAsync(
+    public async Task<IRelation?> GetByParentAndChildIdAsync(
         int parentId,
         int childId,
         int relationTypeId,
         CancellationToken cancellationToken = default)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             RelationDto? dto = await BaseQuery(db)
                 .Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationType == relationTypeId)
@@ -102,13 +102,13 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
             cancellationToken);
 
     /// <inheritdoc />
-    public Task<bool> IsRelatedAsync(
+    public async Task<bool> IsRelatedAsync(
         int id,
         RelationDirectionFilter directionFilter,
         int[]? includeRelationTypeIds = null,
         int[]? excludeRelationTypeIds = null,
         CancellationToken cancellationToken = default)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             IQueryable<RelationDto> query = db.Relations.AsQueryable();
 
@@ -134,12 +134,12 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
         });
 
     /// <inheritdoc />
-    public Task<bool> AreRelatedAsync(
+    public async Task<bool> AreRelatedAsync(
         int parentId,
         int childId,
         int? relationTypeId = null,
         CancellationToken cancellationToken = default)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
             relationTypeId.HasValue
                 ? await db.Relations.AnyAsync(
                     x => x.ParentId == parentId && x.ChildId == childId && x.RelationType == relationTypeId.Value,
@@ -149,13 +149,13 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
                     cancellationToken));
 
     /// <inheritdoc />
-    public Task<PagedModel<IRelation>> GetPagedByRelationTypeIdAsync(
+    public async Task<PagedModel<IRelation>> GetPagedByRelationTypeIdAsync(
         int relationTypeId,
         int skip,
         int take,
         Ordering? ordering = null,
         CancellationToken cancellationToken = default)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             IQueryable<RelationDto> query = BaseQuery(db).Where(x => x.RelationType == relationTypeId);
 
@@ -169,13 +169,13 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
         });
 
     /// <inheritdoc />
-    public Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(
+    public async Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(
         Guid childKey,
         int skip,
         int take,
         string? relationTypeAlias,
         CancellationToken cancellationToken = default)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             IQueryable<RelationDto> query = BaseQuery(db)
                 .Where(x => x.ChildNode!.UniqueId == childKey);
@@ -334,24 +334,24 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
             "GetPagedChildEntitiesByParentIdAsync depends on EntityRepository being migrated to EF Core.");
 
     /// <inheritdoc />
-    protected override Task<IRelation?> PerformGetAsync(int key)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+    protected override async Task<IRelation?> PerformGetAsync(int key)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             RelationDto? dto = await BaseQuery(db).FirstOrDefaultAsync(x => x.Id == key);
             return dto is null ? null : await BuildEntityAsync(dto);
         });
 
     /// <inheritdoc />
-    protected override Task<IEnumerable<IRelation>?> PerformGetAllAsync()
-        => AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelation>?>(async db =>
+    protected override async Task<IEnumerable<IRelation>?> PerformGetAllAsync()
+        => await AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelation>?>(async db =>
         {
             List<RelationDto> dtos = await BaseQuery(db).OrderBy(x => x.RelationType).ToListAsync();
             return await BuildEntitiesAsync(dtos);
         });
 
     /// <inheritdoc />
-    protected override Task<IEnumerable<IRelation>?> PerformGetManyAsync(int[]? keys)
-        => AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelation>?>(async db =>
+    protected override async Task<IEnumerable<IRelation>?> PerformGetManyAsync(int[]? keys)
+        => await AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelation>?>(async db =>
         {
             if (keys is null || keys.Length == 0)
             {
@@ -366,8 +366,8 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
         });
 
     /// <inheritdoc />
-    protected override Task<bool> PerformExistsAsync(int key)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+    protected override async Task<bool> PerformExistsAsync(int key)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
             await db.Relations.AnyAsync(x => x.Id == key));
 
     /// <inheritdoc />
@@ -415,10 +415,10 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
             .Include(x => x.ParentNode)
             .Include(x => x.ChildNode);
 
-    private Task<IEnumerable<IRelation>> GetByFilterAsync(
+    private async Task<IEnumerable<IRelation>> GetByFilterAsync(
         Func<IQueryable<RelationDto>, IQueryable<RelationDto>> filter,
         CancellationToken cancellationToken)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             List<RelationDto> dtos = await filter(BaseQuery(db)).ToListAsync(cancellationToken);
             return await BuildEntitiesAsync(dtos);

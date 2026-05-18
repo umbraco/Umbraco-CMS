@@ -50,8 +50,8 @@ internal sealed class RelationTypeRepository : AsyncEntityRepositoryBase<int, IR
             /*expires:*/ true);
 
     /// <inheritdoc />
-    public Task<IRelationType?> GetAsync(Guid key, CancellationToken cancellationToken = default)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+    public async Task<IRelationType?> GetAsync(Guid key, CancellationToken cancellationToken = default)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             EFCoreRelationTypeDto? dto = await db.RelationTypes
                 .AsNoTracking()
@@ -60,8 +60,8 @@ internal sealed class RelationTypeRepository : AsyncEntityRepositoryBase<int, IR
         });
 
     /// <inheritdoc />
-    public Task<IRelationType?> GetByAliasAsync(string alias, CancellationToken cancellationToken = default)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+    public async Task<IRelationType?> GetByAliasAsync(string alias, CancellationToken cancellationToken = default)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             EFCoreRelationTypeDto? dto = await db.RelationTypes
                 .AsNoTracking()
@@ -70,8 +70,8 @@ internal sealed class RelationTypeRepository : AsyncEntityRepositoryBase<int, IR
         });
 
     /// <inheritdoc />
-    protected override Task<IRelationType?> PerformGetAsync(int key)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+    protected override async Task<IRelationType?> PerformGetAsync(int key)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             EFCoreRelationTypeDto? dto = await db.RelationTypes
                 .AsNoTracking()
@@ -80,8 +80,8 @@ internal sealed class RelationTypeRepository : AsyncEntityRepositoryBase<int, IR
         });
 
     /// <inheritdoc />
-    protected override Task<IEnumerable<IRelationType>?> PerformGetAllAsync()
-        => AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelationType>?>(async db =>
+    protected override async Task<IEnumerable<IRelationType>?> PerformGetAllAsync()
+        => await AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelationType>?>(async db =>
         {
             List<EFCoreRelationTypeDto> dtos = await db.RelationTypes
                 .AsNoTracking()
@@ -90,8 +90,8 @@ internal sealed class RelationTypeRepository : AsyncEntityRepositoryBase<int, IR
         });
 
     /// <inheritdoc />
-    protected override Task<IEnumerable<IRelationType>?> PerformGetManyAsync(int[]? keys)
-        => AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelationType>?>(async db =>
+    protected override async Task<IEnumerable<IRelationType>?> PerformGetManyAsync(int[]? keys)
+        => await AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelationType>?>(async db =>
         {
             if (keys is null || keys.Length == 0)
             {
@@ -107,8 +107,8 @@ internal sealed class RelationTypeRepository : AsyncEntityRepositoryBase<int, IR
         });
 
     /// <inheritdoc />
-    protected override Task<bool> PerformExistsAsync(int key)
-        => AmbientScope.ExecuteWithContextAsync(async db =>
+    protected override async Task<bool> PerformExistsAsync(int key)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
             await db.RelationTypes.AnyAsync(x => x.Id == key));
 
     /// <inheritdoc />
