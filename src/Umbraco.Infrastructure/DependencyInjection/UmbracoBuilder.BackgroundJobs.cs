@@ -40,6 +40,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton(RecurringBackgroundJobHostedService.CreateHostedServiceFactory);
         builder.Services.AddSingleton<RecurringBackgroundJobHostedServiceRunner>();
         builder.Services.AddHostedService(sp => sp.GetRequiredService<RecurringBackgroundJobHostedServiceRunner>());
+        builder.Services.AddSingleton(typeof(IRecurringBackgroundJobTrigger<>), typeof(RecurringBackgroundJobTrigger<>));
         builder.Services.AddHostedService<QueuedHostedService>();
         builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, NavigationInitializationNotificationHandler>();
         builder.AddNotificationAsyncHandler<PostRuntimePremigrationsUpgradeNotification, PublishStatusInitializationNotificationHandler>();
