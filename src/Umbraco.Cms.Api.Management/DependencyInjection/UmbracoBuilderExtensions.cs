@@ -1,9 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.Configuration;
 using Umbraco.Cms.Api.Common.DependencyInjection;
-using Umbraco.Cms.Api.Management.Configuration;
+using Umbraco.Cms.Api.Common.OpenApi;
 using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.Middleware;
+using Umbraco.Cms.Api.Management.OpenApi;
+using Umbraco.Cms.Api.Management.OpenApi.Transformers;
 using Umbraco.Cms.Api.Management.Routing;
 using Umbraco.Cms.Api.Management.Serialization;
 using Umbraco.Cms.Api.Management.Services;
@@ -100,10 +102,25 @@ public static partial class UmbracoBuilderExtensions
             // Configures the JSON options for the Open API schema generation (based on the back-office MVC JSON options)
             builder.Services.ConfigureOptions<ConfigureUmbracoBackofficeHttpJsonOptions>();
 
-            builder.AddUmbracoOpenApiDocument<ConfigureUmbracoManagementApiOpenApiOptions>(
+            builder.AddBackOfficeOpenApiDocument(
                 ManagementApiConfiguration.ApiName,
-                ManagementApiConfiguration.ApiTitle,
-                Constants.JsonOptionsNames.BackOffice);
+                document => document
+                    .WithTitle(ManagementApiConfiguration.ApiTitle)
+                    .WithBackOfficeAuthentication()
+                    .WithJsonOptions(Constants.JsonOptionsNames.BackOffice)
+                    .ConfigureOpenApiOptions(options =>
+                    {
+                        options.AddDocumentTransformer((doc, _, _) =>
+                        {
+                            doc.Info.Version = "Latest";
+                            doc.Info.Description = "This shows all APIs available in this version of Umbraco - including all the legacy apis that are available for backward compatibility";
+                            doc.Servers?.Clear();
+                            return Task.CompletedTask;
+                        });
+                        options.AddSchemaTransformer<FixFileReturnTypesTransformer>();
+                        options.AddOperationTransformer<ResponseHeaderTransformer>();
+                        options.AddOperationTransformer<NotificationHeaderTransformer>();
+                    }));
 
             services.Configure<UmbracoPipelineOptions>(options =>
             {

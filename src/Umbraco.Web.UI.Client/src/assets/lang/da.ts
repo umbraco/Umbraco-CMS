@@ -2705,6 +2705,18 @@ export default {
 		title: 'Vælg Property Editor',
 		openPropertyEditorPicker: 'Vælg Property Editor',
 	},
+
+	propertyEditorUIGroups: {
+		advanced: 'Advanceret',
+		blocks: 'Bloks',
+		common: 'Generelt',
+		date: 'Dato og tid',
+		lists: 'Lister',
+		media: 'Medier',
+		people: 'Personer',
+		pickers: 'Vælgere',
+		richContent: 'Beriget indhold',
+	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",
 		checkErrorMessageDifferentExpectedValue:

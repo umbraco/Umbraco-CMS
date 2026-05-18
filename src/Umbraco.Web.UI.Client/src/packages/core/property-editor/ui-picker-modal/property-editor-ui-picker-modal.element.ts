@@ -5,7 +5,7 @@ import type {
 } from './property-editor-ui-picker-modal.token.js';
 import { UmbPropertyEditorUISearchController } from './property-editor-ui-search.controller.js';
 import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
-import { debounce, fromCamelCase } from '@umbraco-cms/backoffice/utils';
+import { debounce, fromCamelCaseIfCamelCase } from '@umbraco-cms/backoffice/utils';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -81,9 +81,18 @@ export class UmbPropertyEditorUIPickerModalElement extends UmbModalBaseElement<
 		}
 	}
 
+	#resolveGroupName(group: string): string {
+		if (group.startsWith('#')) {
+			return this.localize.string(group);
+		}
+
+		// Backward compatibility: external packages may still register camelCase group names.
+		return fromCamelCaseIfCamelCase(group);
+	}
+
 	#groupPropertyEditorUIs(items: Array<ManifestPropertyEditorUi>) {
 		const grouped = Object.groupBy(items, (propertyEditorUi: ManifestPropertyEditorUi) =>
-			fromCamelCase(propertyEditorUi.meta.group),
+			this.#resolveGroupName(propertyEditorUi.meta.group),
 		);
 
 		this._groupedPropertyEditorUIs = Object.entries(grouped)
