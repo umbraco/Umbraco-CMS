@@ -27,4 +27,19 @@ public interface IPublishStatusRepository
     /// <param name="cancellationToken">A cancellation token to observe.</param>
     /// <returns>A dictionary mapping document keys to their published culture codes.</returns>
     Task<IDictionary<Guid, ISet<string>>> GetDescendantsOrSelfPublishStatusAsync(Guid rootDocumentKey, CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets the publish status for all elements.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token to observe.</param>
+    /// <returns>A dictionary mapping element keys to their published culture codes.</returns>
+    Task<IDictionary<Guid, ISet<string>>> GetAllElementPublishStatusAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    ///     Gets the publish status for a specific element.
+    /// </summary>
+    /// <param name="elementKey">The unique key of the element.</param>
+    /// <param name="cancellationToken">A cancellation token to observe.</param>
+    /// <returns>A set of culture codes for which the element is published.</returns>
+    Task<ISet<string>> GetElementPublishStatusAsync(Guid elementKey, CancellationToken cancellationToken);
 }

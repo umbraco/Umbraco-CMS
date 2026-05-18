@@ -55,6 +55,14 @@ public abstract class ContentTypeEditingModelBase<TPropertyType, TPropertyTypeCo
     public bool IsElement { get; set; }
 
     /// <summary>
+    ///     Gets or sets a value indicating whether this content type is allowed in the library.
+    /// </summary>
+    /// <remarks>
+    ///     This is only meaningful for element types (where <see cref="IsElement"/> is <c>true</c>).
+    /// </remarks>
+    public bool AllowedInLibrary { get; set; }
+
+    /// <summary>
     ///     Gets or sets the key of the list view data type associated with this content type.
     /// </summary>
     public Guid? ListView { get; set; }

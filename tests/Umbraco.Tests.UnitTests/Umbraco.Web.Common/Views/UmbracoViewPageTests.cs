@@ -293,7 +293,7 @@ public class UmbracoViewPageTests
     public class ContentType1 : PublishedContentWrapped
     {
         public ContentType1(IPublishedContent content, IPublishedValueFallback fallback)
-            : base(content, fallback)
+            : base(content)
         {
         }
     }

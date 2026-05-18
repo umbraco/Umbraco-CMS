@@ -129,6 +129,12 @@ public static partial class Constants
             public const string MediaSourcesCount = "Umbraco.Web.PublishedCache.NuCache.DataSource.MediaSourcesCount";
 
             /// <summary>
+            ///     The SQL template name for selecting element sources.
+            /// </summary>
+            public const string ElementSourcesSelect =
+                "Umbraco.Web.PublishedCache.NuCache.DataSource.ElementSourcesSelect";
+
+            /// <summary>
             ///     The SQL template name for filtering by object type excluding trashed items.
             /// </summary>
             public const string ObjectTypeNotTrashedFilter =

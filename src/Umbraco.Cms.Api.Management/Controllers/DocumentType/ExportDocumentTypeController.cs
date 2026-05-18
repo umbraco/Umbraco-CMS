@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -41,7 +42,7 @@ public class ExportDocumentTypeController : DocumentTypeControllerBase
     /// <returns>A <see cref="FileContentResult"/> containing the exported document type if found; otherwise, a 404 Not Found result.</returns>
     [HttpGet("{id:guid}/export")]
     [MapToApiVersion("1.0")]
-    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK, MediaTypeNames.Application.Octet)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [EndpointSummary("Exports a document type.")]
     [EndpointDescription("Exports the document type identified by the provided Id to a downloadable format.")]

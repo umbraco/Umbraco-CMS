@@ -16,28 +16,6 @@ public class RichTextBlockItem : IBlockReference<IPublishedElement, IPublishedEl
     /// <summary>
     ///     Initializes a new instance of the <see cref="RichTextBlockItem" /> class.
     /// </summary>
-    /// <param name="contentUdi">The content UDI.</param>
-    /// <param name="content">The content.</param>
-    /// <param name="settingsUdi">The settings UDI.</param>
-    /// <param name="settings">The settings.</param>
-    /// <exception cref="System.ArgumentNullException">
-    ///     contentUdi
-    ///     or
-    ///     content
-    /// </exception>
-    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
-    public RichTextBlockItem(Udi contentUdi, IPublishedElement content, Udi settingsUdi, IPublishedElement settings)
-        : this(
-            (contentUdi as GuidUdi)?.Guid ?? throw new ArgumentException(nameof(contentUdi)),
-            content,
-            (settingsUdi as GuidUdi)?.Guid,
-            settings)
-    {
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RichTextBlockItem" /> class.
-    /// </summary>
     /// <param name="contentKey">The content key.</param>
     /// <param name="content">The content.</param>
     /// <param name="settingsKey">The settings key.</param>
@@ -46,12 +24,8 @@ public class RichTextBlockItem : IBlockReference<IPublishedElement, IPublishedEl
     public RichTextBlockItem(Guid contentKey, IPublishedElement content, Guid? settingsKey, IPublishedElement? settings)
     {
         ContentKey = contentKey;
-        ContentUdi = new GuidUdi(Constants.UdiEntityType.Element, contentKey);
         Content = content ?? throw new ArgumentNullException(nameof(content));
         SettingsKey = settingsKey;
-        SettingsUdi = settingsKey.HasValue
-            ? new GuidUdi(Constants.UdiEntityType.Element, settingsKey.Value)
-            : null;
         Settings = settings;
     }
 
@@ -80,24 +54,6 @@ public class RichTextBlockItem : IBlockReference<IPublishedElement, IPublishedEl
     public IPublishedElement Content { get; }
 
     /// <summary>
-    ///     Gets the settings UDI.
-    /// </summary>
-    /// <value>
-    ///     The settings UDI.
-    /// </value>
-    [Obsolete("Use SettingsKey instead. Scheduled for removal in Umbraco 18.")]
-    public Udi? SettingsUdi { get; }
-
-    /// <summary>
-    ///     Gets the content UDI.
-    /// </summary>
-    /// <value>
-    ///     The content UDI.
-    /// </value>
-    [Obsolete("Use ContentKey instead. Scheduled for removal in Umbraco 18.")]
-    public Udi ContentUdi { get; }
-
-    /// <summary>
     ///     Gets the settings.
     /// </summary>
     /// <value>
@@ -114,18 +70,6 @@ public class RichTextBlockItem : IBlockReference<IPublishedElement, IPublishedEl
 public class RichTextBlockItem<T> : RichTextBlockItem
     where T : IPublishedElement
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RichTextBlockItem{T}" /> class.
-    /// </summary>
-    /// <param name="contentUdi">The content UDI.</param>
-    /// <param name="content">The content.</param>
-    /// <param name="settingsUdi">The settings UDI.</param>
-    /// <param name="settings">The settings.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
-    public RichTextBlockItem(Udi contentUdi, T content, Udi settingsUdi, IPublishedElement settings)
-        : base(contentUdi, content, settingsUdi, settings) =>
-        Content = content;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="RichTextBlockItem{T}" /> class.
     /// </summary>
@@ -156,18 +100,6 @@ public class RichTextBlockItem<TContent, TSettings> : RichTextBlockItem<TContent
     where TContent : IPublishedElement
     where TSettings : IPublishedElement
 {
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="RichTextBlockItem{TContent, TSettings}" /> class.
-    /// </summary>
-    /// <param name="contentUdi">The content udi.</param>
-    /// <param name="content">The content.</param>
-    /// <param name="settingsUdi">The settings udi.</param>
-    /// <param name="settings">The settings.</param>
-    [Obsolete("Use constructor that accepts GUIDs instead. Scheduled for removal in Umbraco 18.")]
-    public RichTextBlockItem(Udi contentUdi, TContent content, Udi settingsUdi, TSettings settings)
-        : base(contentUdi, content, settingsUdi, settings) =>
-        Settings = settings;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="RichTextBlockItem{TContent, TSettings}" /> class.
     /// </summary>

@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Tags',
 			propertyEditorSchemaAlias: 'Umbraco.Tags',
 			icon: 'icon-tags',
-			group: 'common',
+			group: '#propertyEditorUIGroups_common',
 			keywords: ['tag', 'label', 'category', 'keyword', 'metadata', 'topics', 'terms', 'taxonomy'],
 			supportsReadOnly: true,
 		},

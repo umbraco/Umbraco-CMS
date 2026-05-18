@@ -3,6 +3,7 @@ import type { UmbDocumentVariantOptionModel } from '../../types.js';
 import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from '../../workspace/constants.js';
 import type { UmbDocumentUrlModel } from '../repository/types.js';
 import { UmbDocumentUrlsDataResolver } from '../document-urls-data-resolver.js';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import {
 	css,
 	customElement,
@@ -18,7 +19,6 @@ import type { UmbEntityActionEvent } from '@umbraco-cms/backoffice/entity-action
 import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
-import { UmbDocumentVariantState } from '../../variant-state.js';
 import { debounce } from '@umbraco-cms/backoffice/utils';
 import { UMB_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/property';
 import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
@@ -282,12 +282,12 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 				&:is(a) {
 					cursor: pointer;
-					color: inherit;
 					text-decoration: none;
+					color: var(--uui-color-interactive);
 				}
 
 				&:is(a):hover {
-					background: var(--uui-color-divider);
+					color: var(--uui-color-interactive-emphasis);
 				}
 
 				& > span {
