@@ -7,8 +7,9 @@ export class UmbTiptapValueSummaryElement extends UmbValueSummaryElementBase<
 	UmbPropertyEditorRteValueType | undefined
 > {
 	override render() {
-		const text = this._value?.markup?.replace(/<[^>]*>/g, '').trim();
-		if (!text) return nothing;
+		const temp = document.createElement('div');
+		temp.innerHTML = this._value?.markup ?? '';
+		if (!temp.textContent?.trim()) return nothing;
 		return html`<uui-icon name="icon-document-html"></uui-icon>`;
 	}
 }
