@@ -530,19 +530,6 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
-	 * Transfer a local block's content to the library.
-	 * Removes the inline content and updates the layout to reference the new element.
-	 */
-	transferToLibrary(key: string, oldContentKey: string, newElementKey: string) {
-		this.#contents.removeOne(oldContentKey);
-		this.removeExposesOf(oldContentKey);
-		this._layouts.updateOne(key, {
-			contentKey: newElementKey,
-			isSharedContent: true,
-		} as Partial<BlockLayoutType>);
-	}
-
-	/**
 	 * Request to transfer a local block's content to the Element Library.
 	 * Opens the transfer modal for the user to name the new Element and pick a location,
 	 * then creates the Element and updates the block to reference it.
@@ -584,7 +571,12 @@ export abstract class UmbBlockManagerContext<
 		const { data: created } = await elementRepository.create(scaffold, result.parentUnique);
 		if (!created) return;
 
-		this.transferToLibrary(key, contentKey, created.unique);
+		this.#contents.removeOne(contentKey);
+		this.removeExposesOf(contentKey);
+		this._layouts.updateOne(key, {
+			contentKey: created.unique,
+			isSharedContent: true,
+		} as Partial<BlockLayoutType>);
 	}
 
 	/**
@@ -612,37 +604,25 @@ export abstract class UmbBlockManagerContext<
 		const { data: element } = await elementRepository.requestByUnique(elementKey);
 		if (!element) return;
 
-		this.disconnectFromLibrary(
-			key,
-			elementKey,
-			element.values.map((v) => ({
-				alias: v.alias,
-				editorAlias: v.editorAlias,
-				culture: v.culture,
-				segment: v.segment,
-				value: v.value,
-			})),
-			element.documentType.unique,
-		);
-	}
-
-	/**
-	 * Disconnect a block from the library, copying element content to local contentData.
-	 */
-	disconnectFromLibrary(
-		key: string,
-		elementKey: string,
-		values: Array<UmbBlockDataValueModel>,
-		contentTypeKey: string,
-	) {
-		const newKey = UmbId.new();
+		const contentTypeKey = element.documentType.unique;
 		const newContent: UmbBlockDataModel = {
-			key: newKey,
+			key: UmbId.new(),
 			contentTypeKey,
-			values,
+			values: element.values.map(
+				(v): UmbBlockDataValueModel => ({
+					alias: v.alias,
+					editorAlias: v.editorAlias,
+					culture: v.culture,
+					segment: v.segment,
+					value: v.value,
+				}),
+			),
 		};
 		this.#contents.appendOne(newContent);
-		this._layouts.updateOne(key, { contentKey: newKey, isSharedContent: undefined } as Partial<BlockLayoutType>);
+		this._layouts.updateOne(key, {
+			contentKey: newContent.key,
+			isSharedContent: undefined,
+		} as Partial<BlockLayoutType>);
 		this.#resolvedLibraryElements.removeOne(elementKey);
 		this.#resolvedLibraryElementVariants.removeOne(elementKey);
 		// Only set expose if the content type structure is loaded (it may not be for library elements
