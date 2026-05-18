@@ -35,7 +35,6 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	/**
 	 * Set the layout entry for this block.
 	 */
-	@property({ attribute: false })
 	public set layout(value: UmbBlockListLayoutModel | undefined) {
 		if (!value) return;
 		const key = value.key;
