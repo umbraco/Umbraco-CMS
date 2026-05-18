@@ -368,17 +368,6 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
-	/**
-	 * Imperatively triggers a fetch for a library element if the layout has isSharedContent set.
-	 * Called by block entry contexts when setContentKey() is invoked.
-	 */
-	ensureContentResolved(key: string) {
-		const layout = this._layouts.getValue().find((x) => x.contentKey === key);
-		if (layout?.isSharedContent) {
-			this.#fetchLibraryElement(key);
-		}
-	}
-
 	// TODO: [@madsrasmussen] Replace per-key fetches here with a batching manager that bundles multiple
 	// element requests into a single round-trip. Today this issues one request per shared block, which
 	// can become N+1 on pages with many references. The batching manager should also cache and dedupe.
@@ -551,7 +540,6 @@ export abstract class UmbBlockManagerContext<
 			contentKey: newElementKey,
 			isSharedContent: true,
 		} as Partial<BlockLayoutType>);
-		this.ensureContentResolved(newElementKey);
 	}
 
 	/**
