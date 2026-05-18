@@ -5,7 +5,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 /// DTO for the projected join used when reading relation items along with the related child node and content type metadata.
 /// </summary>
-[Obsolete("Remove this when TrackedReferenceRepository gets migrated to EFCore")]
 internal sealed class RelationItemDto
 {
     /// <summary>
