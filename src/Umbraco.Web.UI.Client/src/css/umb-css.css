@@ -4,6 +4,8 @@
 	--umb-section-sidebar-width: 300px;
 	--umb-card-medium-min-width: 160px;
 	--umb-card-large-min-width: 250px;
+	--umb-color-reference: #7532c8;
+	--umb-color-reference-contrast: var(--uui-color-surface, #fff);
 }
 
 @font-face {

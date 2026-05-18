@@ -293,6 +293,8 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 		return this.contentKey && this._contentTypeAlias
 			? html`
 					<div class="uui-text uui-font">
+					<div class="umb-block-rte__block uui-text uui-font">
+						<umb-entity-frame .label=${this._label}></umb-entity-frame>
 						<umb-extension-slot
 							type="blockEditorCustomView"
 							default-element="umb-ref-rte-block"
@@ -379,6 +381,19 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 			:host([drag-placeholder]) {
 				opacity: 0.2;
+			}
+			:host([is-reference]) {
+				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+			}
+
+			.umb-block-rte__block {
+				--umb-entity-frame-opacity: 0;
+
+				&:hover,
+				&:focus-within {
+					--umb-entity-frame-opacity: 1;
+				}
 			}
 		`,
 	];

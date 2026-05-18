@@ -445,6 +445,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 						this._isSortMode,
 						() => this.#renderRefBlock(),
 						() => html`
+							<umb-entity-frame .label=${this._label}></umb-entity-frame>
 							<umb-extension-slot
 								single
 								type="blockEditorCustomView"
@@ -564,8 +565,18 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 				opacity: 0;
 			}
 
-			:host([is-reference]:hover)::after {
-				border-color: var(--uui-color-violet);
+			:host([is-reference]) {
+				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+			}
+
+			.umb-block-list__block {
+				--umb-entity-frame-opacity: 0;
+
+				&:hover,
+				&:focus-within {
+					--umb-entity-frame-opacity: 1;
+				}
 			}
 		`,
 	];

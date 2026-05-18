@@ -400,6 +400,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		return this.contentKey && (this._contentTypeAlias || this._unsupported)
 			? html`
 					<div class="umb-block-single__block">
+						<umb-entity-frame .label=${this._label}></umb-entity-frame>
 						<umb-extension-slot
 							type="blockEditorCustomView"
 							default-element=${this._inlineEditingMode ? 'umb-inline-single-block' : 'umb-ref-single-block'}
@@ -514,6 +515,19 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			:host([drag-placeholder]) .umb-block-single__block {
 				transition: opacity 50ms 16ms;
 				opacity: 0;
+			}
+			:host([is-reference]) {
+				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+			}
+
+			.umb-block-single__block {
+				--umb-entity-frame-opacity: 0;
+
+				&:hover,
+				&:focus-within {
+					--umb-entity-frame-opacity: 1;
+				}
 			}
 		`,
 	];

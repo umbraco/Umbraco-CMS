@@ -524,6 +524,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						this._isSortMode,
 						() => this.#renderRefBlock(),
 						() => html`
+							<umb-entity-frame .label=${this._label}></umb-entity-frame>
 							<umb-extension-slot
 								single
 								type="blockEditorCustomView"
@@ -725,10 +726,6 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				right: calc(1px - (var(--umb-block-grid--column-gap, 0px) * 0.5));
 			}
 
-			.umb-block-grid__block {
-				height: 100%;
-			}
-
 			:host(:hover):not(:drop)::after {
 				display: block;
 				border-color: var(--uui-color-interactive-emphasis);
@@ -763,8 +760,20 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				z-index: 2;
 			}
 
-			:host([is-reference]:hover)::after {
-				border-color: var(--uui-color-violet);
+			:host([is-reference]) {
+				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
+				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
+			}
+
+			.umb-block-grid__block {
+				--umb-entity-frame-opacity: 0;
+
+				height: 100%;
+
+				&:hover,
+				&:focus-within {
+					--umb-entity-frame-opacity: 1;
+				}
 			}
 		`,
 	];
