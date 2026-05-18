@@ -36,6 +36,17 @@ public interface IRecurringBackgroundJob
     TimeSpan Delay => RecurringBackgroundJobBase.DefaultDelay; // TODO (V19): Remove the default implementation
 
     /// <summary>
+    /// Timespan to wait before re-evaluating execution conditions when an execution is ignored (e.g. runtime not ready, wrong server role or not main domain).
+    /// </summary>
+    /// <value>
+    /// The ignored delay.
+    /// </value>
+    /// <remarks>
+    /// This back-off prevents tight looping when <see cref="Period" /> is short (or <see cref="TimeSpan.Zero" />) and an execution is skipped without invoking <see cref="RunJobAsync(CancellationToken)" />.
+    /// </remarks>
+    TimeSpan IgnoredDelay => RecurringBackgroundJobBase.DefaultIgnoredDelay; // TODO (V19): Remove the default implementation
+
+    /// <summary>
     /// Gets the server roles the task executes on.
     /// </summary>
     /// <value>

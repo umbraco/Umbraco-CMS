@@ -48,6 +48,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     private readonly IEventAggregator _eventAggregator;
     private readonly IEventMessagesFactory _eventMessagesFactory;
     private readonly IRecurringBackgroundJob _job;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecurringBackgroundJobHostedService{TJob}" /> class, which manages the execution of a recurring background job.
@@ -78,6 +79,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         _eventAggregator = eventAggregator;
         _eventMessagesFactory = eventMessagesFactory;
         _job = job;
+        _timeProvider = timeProvider;
 
         _job.PeriodChanged += OnPeriodChanged;
     }
@@ -113,24 +115,21 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         {
             if (_runtimeState.Level != RuntimeLevel.Run)
             {
-                _logger.LogDebug("Job not running as runlevel not yet ready");
-                await _eventAggregator.PublishAsync(new RecurringBackgroundJobIgnoredNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
+                await IgnoreAndWaitAsync("Job not running as runlevel not yet ready", eventMessages, executingNotification, stoppingToken);
                 return;
             }
 
             // Don't run on replicas nor unknown role servers
             if (!_job.ServerRoles.Contains(_serverRoleAccessor.CurrentServerRole))
             {
-                _logger.LogDebug("Job not running on this server role");
-                await _eventAggregator.PublishAsync(new RecurringBackgroundJobIgnoredNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
+                await IgnoreAndWaitAsync("Job not running on this server role", eventMessages, executingNotification, stoppingToken);
                 return;
             }
 
             // Ensure we do not run if not main domain, but do NOT lock it
             if (!_mainDom.IsMainDom)
             {
-                _logger.LogDebug("Job not running as not MainDom");
-                await _eventAggregator.PublishAsync(new RecurringBackgroundJobIgnoredNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
+                await IgnoreAndWaitAsync("Job not running as not MainDom", eventMessages, executingNotification, stoppingToken);
                 return;
             }
 
@@ -195,4 +194,36 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void OnPeriodChanged(object? sender, EventArgs e)
         => ChangePeriod(_job.Period);
+
+    /// <summary>
+    /// Publishes the ignored notification and waits for <see cref="IRecurringBackgroundJob.IgnoredDelay" /> before allowing the next iteration, preventing tight looping when execution is skipped.
+    /// </summary>
+    /// <param name="message">The full debug message describing why the execution is ignored.</param>
+    /// <param name="eventMessages">The event messages for the notification.</param>
+    /// <param name="executingNotification">The originating executing notification to carry state from.</param>
+    /// <param name="stoppingToken">A cancellation token that is signaled when the host is shutting down.</param>
+    private async Task IgnoreAndWaitAsync(
+        string message,
+        EventMessages eventMessages,
+        RecurringBackgroundJobExecutingNotification executingNotification,
+        CancellationToken stoppingToken)
+    {
+        _logger.LogDebug(message);
+        await _eventAggregator.PublishAsync(new RecurringBackgroundJobIgnoredNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
+
+        TimeSpan ignoredDelay = _job.IgnoredDelay;
+        if (ignoredDelay <= TimeSpan.Zero)
+        {
+            return;
+        }
+
+        try
+        {
+            await Task.Delay(ignoredDelay, _timeProvider, stoppingToken);
+        }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            // Back-off interrupted by shutdown; the ignored notification has already been published, so do not also publish canceled.
+        }
+    }
 }

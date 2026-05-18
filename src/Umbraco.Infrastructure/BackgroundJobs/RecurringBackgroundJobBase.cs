@@ -19,6 +19,14 @@ public abstract class RecurringBackgroundJobBase : IRecurringBackgroundJob
     protected internal static readonly TimeSpan DefaultDelay = TimeSpan.FromMinutes(3);
 
     /// <summary>
+    /// The default back-off to use when an execution is ignored, before re-evaluating execution conditions.
+    /// </summary>
+    /// <remarks>
+    /// The default of 1 minute prevents tight looping when an execution is skipped (e.g. runtime not ready, wrong server role or not main domain) and the configured <see cref="IRecurringBackgroundJob.Period" /> is short or <see cref="TimeSpan.Zero" />.
+    /// </remarks>
+    protected internal static readonly TimeSpan DefaultIgnoredDelay = TimeSpan.FromMinutes(1);
+
+    /// <summary>
     /// The default server roles that recurring background jobs run on.
     /// </summary>
     /// <remarks>
@@ -31,6 +39,9 @@ public abstract class RecurringBackgroundJobBase : IRecurringBackgroundJob
 
     /// <inheritdoc />
     public virtual TimeSpan Delay => DefaultDelay;
+
+    /// <inheritdoc />
+    public virtual TimeSpan IgnoredDelay => DefaultIgnoredDelay;
 
     /// <inheritdoc />
     public virtual ServerRole[] ServerRoles => DefaultServerRoles;

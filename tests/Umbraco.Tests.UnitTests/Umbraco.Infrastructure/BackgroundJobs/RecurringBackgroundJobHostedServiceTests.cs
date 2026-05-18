@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
@@ -181,12 +182,89 @@ public class RecurringBackgroundJobHostedServiceTests
         mockEventAggregator.Verify(x => x.PublishAsync(It.IsAny<RecurringBackgroundJobStoppedNotification>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    [Test]
+    public async Task Waits_When_Execution_Is_Ignored()
+    {
+        var timeProvider = new FakeTimeProvider();
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.IgnoredDelay).Returns(TimeSpan.FromSeconds(30));
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false, timeProvider: timeProvider);
+        Task executeTask = sut.PerformExecuteAsync(CancellationToken.None);
+
+        // The notification publishes synchronously through the mocks; the back-off should keep PerformExecuteAsync pending.
+        Task completedFirst = await Task.WhenAny(executeTask, Task.Delay(TimeSpan.FromMilliseconds(100)));
+        Assert.AreNotSame(executeTask, completedFirst, "Back-off should keep execution pending until time advances");
+
+        timeProvider.Advance(TimeSpan.FromSeconds(30));
+        await executeTask.WaitAsync(TimeSpan.FromSeconds(5));
+    }
+
+    [Test]
+    public async Task Wait_Honors_Custom_IgnoredDelay_From_Job()
+    {
+        var timeProvider = new FakeTimeProvider();
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.IgnoredDelay).Returns(TimeSpan.FromMinutes(5));
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false, timeProvider: timeProvider);
+        Task executeTask = sut.PerformExecuteAsync(CancellationToken.None);
+
+        Task completedFirst = await Task.WhenAny(executeTask, Task.Delay(TimeSpan.FromMilliseconds(100)));
+        Assert.AreNotSame(executeTask, completedFirst, "Back-off should be in progress");
+
+        // Advance less than the configured IgnoredDelay — still pending.
+        timeProvider.Advance(TimeSpan.FromMinutes(4));
+        completedFirst = await Task.WhenAny(executeTask, Task.Delay(TimeSpan.FromMilliseconds(100)));
+        Assert.AreNotSame(executeTask, completedFirst, "Should still be backing off");
+
+        // Advance the remainder — back-off completes.
+        timeProvider.Advance(TimeSpan.FromMinutes(1));
+        await executeTask.WaitAsync(TimeSpan.FromSeconds(5));
+    }
+
+    [Test]
+    public async Task Skips_Wait_When_IgnoredDelay_Is_Zero()
+    {
+        var timeProvider = new FakeTimeProvider();
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.IgnoredDelay).Returns(TimeSpan.Zero);
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false, timeProvider: timeProvider);
+
+        // No time advance required — back-off is skipped entirely.
+        await sut.PerformExecuteAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5));
+    }
+
+    [Test]
+    public async Task Wait_Cancellation_Does_Not_Publish_Canceled_Notification()
+    {
+        var timeProvider = new FakeTimeProvider();
+        using var cts = new CancellationTokenSource();
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.IgnoredDelay).Returns(TimeSpan.FromHours(1));
+        var mockEventAggregator = new Mock<IEventAggregator>();
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false, mockEventAggregator: mockEventAggregator, timeProvider: timeProvider);
+        Task executeTask = sut.PerformExecuteAsync(cts.Token);
+
+        Task completedFirst = await Task.WhenAny(executeTask, Task.Delay(TimeSpan.FromMilliseconds(100)));
+        Assert.AreNotSame(executeTask, completedFirst, "Back-off should be in progress");
+
+        cts.Cancel();
+        await executeTask.WaitAsync(TimeSpan.FromSeconds(5));
+
+        mockEventAggregator.Verify(x => x.PublishAsync(It.IsAny<RecurringBackgroundJobIgnoredNotification>(), It.IsAny<CancellationToken>()), Times.Once);
+        mockEventAggregator.Verify(x => x.PublishAsync(It.IsAny<RecurringBackgroundJobCanceledNotification>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
     private RecurringBackgroundJobHostedService<IRecurringBackgroundJob> CreateRecurringBackgroundJobHostedService(
         Mock<IRecurringBackgroundJob> mockJob,
         RuntimeLevel runtimeLevel = RuntimeLevel.Run,
         ServerRole serverRole = ServerRole.Single,
         bool isMainDom = true,
-        Mock<IEventAggregator> mockEventAggregator = null)
+        Mock<IEventAggregator> mockEventAggregator = null,
+        TimeProvider timeProvider = null)
     {
         mockJob.Setup(x => x.Period).Returns(TimeSpan.FromMinutes(5));
         mockJob.Setup(x => x.Delay).Returns(TimeSpan.Zero);
@@ -214,6 +292,6 @@ public class RecurringBackgroundJobHostedServiceTests
             mockEventAggregator.Object,
             Mock.Of<IEventMessagesFactory>(f => f.Get() == new EventMessages()),
             mockJob.Object,
-            TimeProvider.System);
+            timeProvider ?? TimeProvider.System);
     }
 }
