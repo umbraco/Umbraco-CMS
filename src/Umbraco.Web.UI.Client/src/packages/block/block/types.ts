@@ -7,7 +7,7 @@ export interface UmbBlockLayoutBaseModel {
 	key: string;
 	contentKey: string;
 	settingsKey?: string | null;
-	isSharedContent?: boolean;
+	isSharedContent?: boolean; // TODO: [LK] Review the naming of this property, align with with team.
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -37,7 +37,8 @@ export interface UmbBlockValueDataPropertiesBaseType {
 	expose: Array<UmbBlockExposeModel>;
 }
 
-export interface UmbBlockValueType<BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel>
-	extends UmbBlockValueDataPropertiesBaseType {
+export interface UmbBlockValueType<
+	BlockLayoutType extends UmbBlockLayoutBaseModel = UmbBlockLayoutBaseModel,
+> extends UmbBlockValueDataPropertiesBaseType {
 	layout: { [key: string]: Array<BlockLayoutType> | undefined };
 }

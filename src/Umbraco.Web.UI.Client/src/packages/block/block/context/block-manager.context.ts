@@ -337,6 +337,7 @@ export abstract class UmbBlockManagerContext<
 		);
 	}
 
+	// TODO: [LK] Review the naming of this property, align with with team.
 	/**
 	 * Returns an observable that emits true when the layout for the given contentKey
 	 * has `isSharedContent` set (i.e., the block references a library element).
@@ -640,7 +641,12 @@ export abstract class UmbBlockManagerContext<
 	/**
 	 * Disconnect a block from the library, copying element content to local contentData.
 	 */
-	disconnectFromLibrary(key: string, elementKey: string, values: Array<UmbBlockDataValueModel>, contentTypeKey: string) {
+	disconnectFromLibrary(
+		key: string,
+		elementKey: string,
+		values: Array<UmbBlockDataValueModel>,
+		contentTypeKey: string,
+	) {
 		const newKey = UmbId.new();
 		const newContent: UmbBlockDataModel = {
 			key: newKey,
