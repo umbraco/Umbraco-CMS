@@ -4,7 +4,7 @@ import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summar
 @customElement('umb-member-group-picker-value-summary')
 export class UmbMemberGroupPickerValueSummaryElement extends UmbValueSummaryElementBase<Array<string>> {
 	override render() {
-		if (!this._value?.length) return nothing;
+		if (!Array.isArray(this._value) || !this._value.length) return nothing;
 		return html`<span class="name" title="${this._value.join(', ')}">${this._value.join(', ')}</span>`;
 	}
 
