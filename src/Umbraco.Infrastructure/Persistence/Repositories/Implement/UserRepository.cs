@@ -32,7 +32,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
 {
     private readonly IMapperCollection _mapperCollection;
     private readonly GlobalSettings _globalSettings;
-    private readonly UserPasswordConfigurationSettings _passwordConfiguration;
+    private readonly SecuritySettings _securitySettings;
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IRuntimeState _runtimeState;
     private string? _passwordConfigJson;
@@ -48,7 +48,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     /// <param name="logger">The logger.</param>
     /// <param name="mapperCollection">The mapper collection.</param>
     /// <param name="globalSettings">The global settings.</param>
-    /// <param name="passwordConfiguration">The password configuration.</param>
+    /// <param name="securitySettings">The password configuration.</param>
     /// <param name="jsonSerializer">The JSON serializer.</param>
     /// <param name="runtimeState">State of the runtime.</param>
     /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
@@ -67,7 +67,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
         ILogger<UserRepository> logger,
         IMapperCollection mapperCollection,
         IOptions<GlobalSettings> globalSettings,
-        IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
+        IOptions<SecuritySettings> securitySettings,
         IJsonSerializer jsonSerializer,
         IRuntimeState runtimeState,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -82,8 +82,8 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
     {
         _mapperCollection = mapperCollection ?? throw new ArgumentNullException(nameof(mapperCollection));
         _globalSettings = globalSettings.Value ?? throw new ArgumentNullException(nameof(globalSettings));
-        _passwordConfiguration =
-            passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
+        _securitySettings =
+            securitySettings.Value ?? throw new ArgumentNullException(nameof(securitySettings));
         _jsonSerializer = jsonSerializer;
         _runtimeState = runtimeState;
         _permissionMappers = permissionMappers.ToDictionary(x => x.Context);
@@ -103,7 +103,7 @@ internal sealed class UserRepository : EntityRepositoryBase<Guid, IUser>, IUserR
 
             var passwordConfig = new PersistedPasswordSettings
             {
-                HashAlgorithm = _passwordConfiguration.HashAlgorithmType
+                HashAlgorithm = _securitySettings.UserPassword.HashAlgorithmType
             };
 
             _passwordConfigJson = passwordConfig == null ? null : _jsonSerializer.Serialize(passwordConfig);
@@ -791,6 +791,15 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
                 entity.StartMediaIds);
         }
 
+        if (entity.IsPropertyDirty("StartElementIds"))
+        {
+            AddingOrUpdateStartNodes(
+                entity,
+                Enumerable.Empty<UserStartNodeDto>(),
+                UserStartNodeDto.StartNodeTypeValue.Element,
+                entity.StartElementIds);
+        }
+
         if (entity.IsPropertyDirty("Groups"))
         {
             // Lookup all assigned groups.
@@ -909,7 +918,7 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             Database.Update(userDto, changedCols);
         }
 
-        if (entity.IsPropertyDirty("StartContentIds") || entity.IsPropertyDirty("StartMediaIds"))
+        if (entity.IsPropertyDirty("StartContentIds") || entity.IsPropertyDirty("StartMediaIds") || entity.IsPropertyDirty("StartElementIds"))
         {
             Sql<ISqlContext> sql = SqlContext.Sql()
                 .SelectAll()
@@ -926,6 +935,11 @@ SELECT 4 AS {keyAlias}, COUNT(id) AS {valueAlias} FROM {userTableName}
             if (entity.IsPropertyDirty("StartMediaIds"))
             {
                 AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Media, entity.StartMediaIds);
+            }
+
+            if (entity.IsPropertyDirty("StartElementIds"))
+            {
+                AddingOrUpdateStartNodes(entity, assignedStartNodes, UserStartNodeDto.StartNodeTypeValue.Element, entity.StartElementIds);
             }
         }
 

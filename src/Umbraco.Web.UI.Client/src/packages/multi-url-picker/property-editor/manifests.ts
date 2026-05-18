@@ -11,7 +11,7 @@ export const manifests = [
 			label: 'Multi URL Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MultiUrlPicker',
 			icon: 'icon-link',
-			group: 'pickers',
+			group: '#propertyEditorUIGroups_pickers',
 			keywords: ['url', 'link', 'cta', 'links'],
 			supportsReadOnly: true,
 			settings: {

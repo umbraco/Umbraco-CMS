@@ -459,10 +459,6 @@
     <key alias="smtpMailSettingsHostNotConfigured">Nid oedd modd dod o hyd i'r ffurfweddiad 'Umbraco:CMS:Global:Smtp:Host'.</key>
     <key alias="smtpMailSettingsConnectionFail">Methwyd cyrraedd y gweinydd SMTP a ffurfweddwyd gyda gwesteiwr '%0%' a phorth '%1%'. Gwiriwch i sicrhau bod y gosodiadau SMTP yn y ffurfweddiad 'Umbraco:CMS:Global:Smtp' yn gywir.</key>
   </area>
-  <area alias="recycleBin">
-    <key alias="contentTrashed">Wedi chwalu cynnwys gyda Id: {0} yn berthnasol i gynnwys rhiant gwreiddiol gyda Id: {1}</key>
-    <key alias="mediaTrashed">Wedi chwalu cyfrwng gyda Id: {0} yn berthnasol i gyfrwng rhiant gwreiddiol gyda Id: {1}</key>
-  </area>
   <area alias="permissions">
     <key alias="FolderCreation">Creu ffolder</key>
     <key alias="FileWritingForPackages">Ysgrifennu ffeiliau ar gyfer pecynnau</key>

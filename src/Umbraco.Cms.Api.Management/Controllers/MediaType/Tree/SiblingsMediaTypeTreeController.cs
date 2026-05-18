@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -14,23 +13,11 @@ namespace Umbraco.Cms.Api.Management.Controllers.MediaType.Tree;
 public class SiblingsMediaTypeTreeController : MediaTypeTreeControllerBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="SiblingsMediaTypeTreeController"/> class, which manages API endpoints for retrieving sibling media types in the tree structure.
-    /// </summary>
-    /// <param name="entityService">The service used for entity operations.</param>
-    /// <param name="mediaTypeService">The service used for media type operations.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public SiblingsMediaTypeTreeController(IEntityService entityService, IMediaTypeService mediaTypeService)
-        : base(entityService, mediaTypeService)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="SiblingsMediaTypeTreeController"/> class.
     /// </summary>
     /// <param name="entityService">Service used for entity operations within the Umbraco CMS.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for tree nodes.</param>
     /// <param name="mediaTypeService">Service used for managing media types.</param>
-    [ActivatorUtilitiesConstructor]
     public SiblingsMediaTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IMediaTypeService mediaTypeService)
         : base(entityService, flagProviders, mediaTypeService)
     {

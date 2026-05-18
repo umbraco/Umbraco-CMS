@@ -8,7 +8,7 @@ import type {
 	MediaTypeResponseModel,
 	UpdateMediaTypeRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
-import type { UmbPropertyTypeContainerModel } from '@umbraco-cms/backoffice/content-type';
+import type { UmbPropertyContainerTypes } from '@umbraco-cms/backoffice/content-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 
 /**
@@ -105,6 +105,7 @@ export class UmbMediaTypeDetailServerDataSource
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
+			allowedInLibrary: false,
 			properties: model.properties.map((property) => {
 				return {
 					id: property.unique,
@@ -163,6 +164,7 @@ export class UmbMediaTypeDetailServerDataSource
 			variesByCulture: model.variesByCulture,
 			variesBySegment: model.variesBySegment,
 			isElement: model.isElement,
+			allowedInLibrary: false,
 			properties: model.properties.map((property) => {
 				return {
 					id: property.unique,
@@ -238,7 +240,15 @@ export class UmbMediaTypeDetailServerDataSource
 					appearance: property.appearance,
 				};
 			}),
-			containers: data.containers as UmbPropertyTypeContainerModel[],
+			containers: data.containers.map((container) => {
+				return {
+					id: container.id,
+					parent: container.parent ? { id: container.parent.id } : null,
+					name: container.name ?? '',
+					type: container.type as UmbPropertyContainerTypes, // TODO: check if the value is valid
+					sortOrder: container.sortOrder,
+				};
+			}),
 			allowedContentTypes: data.allowedMediaTypes.map((allowedMediaType) => {
 				return {
 					contentType: { unique: allowedMediaType.mediaType.id },

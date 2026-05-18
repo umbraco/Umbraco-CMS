@@ -86,6 +86,7 @@ public sealed class InternalPublishedContent : IPublishedContent
     public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _cultures ??= GetCultures();
 
     /// <inheritdoc />
+    [Obsolete("Please use GetUrlSegment() on IDocumentUrlService instead. Scheduled for removal in Umbraco 20.")]
     public string? UrlSegment { get; set; }
 
     /// <inheritdoc />
@@ -110,23 +111,16 @@ public sealed class InternalPublishedContent : IPublishedContent
     public PublishedItemType ItemType => PublishedItemType.Content;
 
     /// <inheritdoc />
-    [Obsolete("Please use TryGetParentKey() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
-    public IPublishedContent? Parent => this.Parent<IPublishedContent>(StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(), StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
-
-    /// <inheritdoc />
     public bool IsDraft(string? culture = null) => false;
 
     /// <inheritdoc />
     public bool IsPublished(string? culture = null) => true;
 
     /// <inheritdoc />
-    [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 18.")]
-    public IEnumerable<IPublishedContent> Children => this.Children(
+    [Obsolete("Please use TryGetChildrenKeys() on IDocumentNavigationQueryService or IMediaNavigationQueryService instead. Scheduled for removal in Umbraco 19.")]
+    public IEnumerable<IPublishedContent> ChildrenForAllCultures => this.Children(
         StaticServiceProvider.Instance.GetRequiredService<IDocumentNavigationQueryService>(),
         StaticServiceProvider.Instance.GetRequiredService<IPublishedContentStatusFilteringService>());
-
-    /// <inheritdoc />
-    public IEnumerable<IPublishedContent> ChildrenForAllCultures => Children;
 
     /// <inheritdoc />
     public IPublishedContentType ContentType { get; set; }

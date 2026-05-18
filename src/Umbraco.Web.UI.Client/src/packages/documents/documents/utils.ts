@@ -1,5 +1,5 @@
-import type { UmbDocumentVariantOptionModel } from './types.js';
 import { UmbDocumentVariantState } from './variant-state.js';
+import type { UmbDocumentVariantOptionModel } from './types.js';
 
 type VariantType = UmbDocumentVariantOptionModel;
 

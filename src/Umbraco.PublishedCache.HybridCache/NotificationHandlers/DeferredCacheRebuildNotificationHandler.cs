@@ -43,14 +43,27 @@ internal sealed class DeferredCacheRebuildNotificationHandler :
             return;
         }
 
-        var structuralChangeIds = notification.Changes
-            .Where(x => x.ChangeTypes.IsStructuralChange())
+        // Content type changes can affect both documents and elements — route based on IsElement
+        // so the appropriate cache is rebuilt (rebuilding document cache for element type changes
+        // would be a no-op and leave the element cache stale).
+        var documentStructuralIds = notification.Changes
+            .Where(x => x.ChangeTypes.IsStructuralChange() && x.Item.IsElement is false)
             .Select(x => x.Item.Id)
             .ToArray();
 
-        if (structuralChangeIds.Length > 0)
+        var elementStructuralIds = notification.Changes
+            .Where(x => x.ChangeTypes.IsStructuralChange() && x.Item.IsElement)
+            .Select(x => x.Item.Id)
+            .ToArray();
+
+        if (documentStructuralIds.Length > 0)
         {
-            _deferredCacheRebuildService.QueueContentTypeRebuild(structuralChangeIds);
+            _deferredCacheRebuildService.QueueContentTypeRebuild(documentStructuralIds);
+        }
+
+        if (elementStructuralIds.Length > 0)
+        {
+            _deferredCacheRebuildService.QueueElementTypeRebuild(elementStructuralIds);
         }
     }
 

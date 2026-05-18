@@ -1,6 +1,6 @@
 import { html, customElement, css, property, query, until, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UUIComboboxElement, UUIComboboxEvent } from '@umbraco-cms/backoffice/external/uui';
+import type { UUIComboboxElement, UUIComboboxEvent, UUISelectOption } from '@umbraco-cms/backoffice/external/uui';
 import type { UmbTimeZone } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -75,7 +75,7 @@ export class UmbInputTimeZonePickerElement extends UmbFormControlMixin<string, t
 		this.dispatchEvent(new UmbChangeEvent());
 	}
 
-	#renderTimeZoneOption = (option: Option) =>
+	#renderTimeZoneOption = (option: UUISelectOption) =>
 		html`<uui-combobox-list-option .value=${option.value} .displayValue=${option.name}>
 			${option.name}
 		</uui-combobox-list-option>`;

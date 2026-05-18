@@ -38,15 +38,6 @@ public class DomainsController : DocumentControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public DomainsController(IDomainService domainService, IUmbracoMapper umbracoMapper)
-        : this(
-            StaticServiceProvider.Instance.GetRequiredService<IAuthorizationService>(),
-            domainService,
-            umbracoMapper)
-    {
-    }
-
     /// <summary>
     /// Retrieves the list of domains and their associated culture settings assigned to the specified document.
     /// </summary>

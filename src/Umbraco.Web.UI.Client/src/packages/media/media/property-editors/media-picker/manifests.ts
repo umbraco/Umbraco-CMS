@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Media Picker',
 			propertyEditorSchemaAlias: 'Umbraco.MediaPicker3',
 			icon: 'icon-picture',
-			group: 'media',
+			group: '#propertyEditorUIGroups_media',
 			keywords: [
 				'select',
 				'image',

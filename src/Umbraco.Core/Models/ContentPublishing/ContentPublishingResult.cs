@@ -8,7 +8,7 @@ public sealed class ContentPublishingResult
     /// <summary>
     ///     Gets or initializes the content item that was published.
     /// </summary>
-    public IContent? Content { get; init; }
+    public IPublishableContentBase? Content { get; init; }
 
     /// <summary>
     ///     Gets or sets the collection of property aliases that failed validation.
