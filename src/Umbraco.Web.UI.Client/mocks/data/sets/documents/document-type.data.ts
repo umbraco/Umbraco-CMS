@@ -4,6 +4,7 @@ export const INVARIANT_DOCUMENT_TYPE_ID = 'variant-documents-invariant-document-
 export const VARIANT_DOCUMENT_TYPE_ID = 'variant-documents-variant-document-type-id';
 export const INVARIANT_DOCUMENT_TYPE_WITH_VARIANT_COMPOSITION_ID =
 	'variant-documents-invariant-document-type-with-variant-composition-id';
+export const SEGMENT_VARIANT_DOCUMENT_TYPE_ID = 'variant-documents-segment-variant-document-type-id';
 
 export const data: Array<UmbMockDocumentTypeModel> = [
 	{
@@ -147,6 +148,55 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 				dataType: { id: 'variant-documents-textstring-data-type-id' },
 				variesByCulture: true,
 				variesBySegment: false,
+				sortOrder: 0,
+				validation: {
+					mandatory: false,
+					mandatoryMessage: null,
+					regEx: null,
+					regExMessage: null,
+				},
+				appearance: {
+					labelOnTop: false,
+				},
+			},
+		],
+		containers: [],
+		allowedDocumentTypes: [],
+		compositions: [],
+		cleanup: {
+			preventCleanup: false,
+			keepAllVersionsNewerThanDays: null,
+			keepLatestVersionPerDayForDays: null,
+		},
+		flags: [],
+	},
+	{
+		// Segment-variant document type — exercises the default (null) segment, which is a valid bucket
+		// and must not be rejected by the setPropertyValue guard.
+		id: SEGMENT_VARIANT_DOCUMENT_TYPE_ID,
+		alias: 'segmentVariantDocumentType',
+		name: 'Segment Variant Document Type',
+		description: null,
+		icon: 'icon-document',
+		allowedTemplates: [],
+		defaultTemplate: null,
+		allowedAsRoot: true,
+		variesByCulture: false,
+		variesBySegment: true,
+		isElement: false,
+		hasChildren: false,
+		parent: null,
+		isFolder: false,
+		properties: [
+			{
+				id: 'variant-documents-segment-variant-prop-text-id',
+				container: null,
+				alias: 'segmentText',
+				name: 'Segment Text',
+				description: null,
+				dataType: { id: 'variant-documents-textstring-data-type-id' },
+				variesByCulture: false,
+				variesBySegment: true,
 				sortOrder: 0,
 				validation: {
 					mandatory: false,

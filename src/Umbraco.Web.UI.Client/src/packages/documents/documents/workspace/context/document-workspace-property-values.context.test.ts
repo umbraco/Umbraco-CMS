@@ -9,6 +9,7 @@ const INVARIANT_DOCUMENT_ID = 'variant-documents-invariant-document-id';
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
 const INVARIANT_WITH_VARIANT_COMPOSITION_DOCUMENT_ID =
 	'variant-documents-invariant-with-variant-composition-document-id';
+const SEGMENT_VARIANT_DOCUMENT_ID = 'variant-documents-segment-variant-document-id';
 
 describe('UmbDocumentWorkspaceContext', () => {
 	let hostElement: UmbTestDocumentWorkspaceHostElement;
@@ -160,6 +161,35 @@ describe('UmbDocumentWorkspaceContext', () => {
 			it('stores the value with a culture- and segment-invariant variantId', async () => {
 				await context.setPropertyValue('compositionVariantText', 'Updated composition value');
 				const entry = context.getValues()?.find((v) => v.alias === 'compositionVariantText');
+				expect(entry?.culture).to.be.null;
+				expect(entry?.segment).to.be.null;
+			});
+		});
+
+		describe('segment-variant document', () => {
+			beforeEach(async () => {
+				await context.load(SEGMENT_VARIANT_DOCUMENT_ID);
+			});
+
+			it('updates the default (null) segment property value', async () => {
+				const defaultSegment = UmbVariantId.Create({ culture: null, segment: null });
+				await context.setPropertyValue('segmentText', 'Updated default segment value', defaultSegment);
+				expect(context.getPropertyValue('segmentText', defaultSegment)).to.equal('Updated default segment value');
+			});
+
+			it('updates a named segment property value', async () => {
+				const s1 = UmbVariantId.Create({ culture: null, segment: 's1' });
+				await context.setPropertyValue('segmentText', 'Updated segment 1 value', s1);
+				expect(context.getPropertyValue('segmentText', s1)).to.equal('Updated segment 1 value');
+			});
+
+			it('stores the default-segment value with both culture and segment set to null', async () => {
+				const defaultSegment = UmbVariantId.Create({ culture: null, segment: null });
+				await context.setPropertyValue('segmentText', 'Updated default segment value', defaultSegment);
+				const entry = context
+					.getValues()
+					?.find((v) => v.alias === 'segmentText' && v.segment === null);
+				expect(entry?.value).to.equal('Updated default segment value');
 				expect(entry?.culture).to.be.null;
 				expect(entry?.segment).to.be.null;
 			});

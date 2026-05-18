@@ -2,6 +2,7 @@ import type { UmbMockDocumentModel } from '../../mock-data-set.types.js';
 import {
 	INVARIANT_DOCUMENT_TYPE_ID,
 	INVARIANT_DOCUMENT_TYPE_WITH_VARIANT_COMPOSITION_ID,
+	SEGMENT_VARIANT_DOCUMENT_TYPE_ID,
 	VARIANT_DOCUMENT_TYPE_ID,
 } from './document-type.data.js';
 import type { DocumentVariantResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
@@ -144,6 +145,51 @@ export const data: Array<UmbMockDocumentModel> = [
 				culture: null,
 				segment: null,
 				value: 'Initial composition value.',
+			},
+		],
+		flags: [],
+	},
+	{
+		id: 'variant-documents-segment-variant-document-id',
+		createDate: '2024-01-15T10:00:00.000Z',
+		parent: null,
+		ancestors: [],
+		documentType: {
+			id: SEGMENT_VARIANT_DOCUMENT_TYPE_ID,
+			icon: 'icon-document',
+		},
+		hasChildren: false,
+		noAccess: false,
+		isProtected: false,
+		isTrashed: false,
+		template: null,
+		variants: [
+			{
+				state: 'Draft' as UmbDocumentVariantState,
+				publishDate: null,
+				culture: null,
+				segment: null,
+				name: 'Segment Variant Document',
+				createDate: '2024-01-15T10:00:00.000Z',
+				updateDate: '2024-01-15T10:00:00.000Z',
+				id: 'variant-documents-segment-variant-document',
+				flags: [],
+			},
+		],
+		values: [
+			{
+				editorAlias: 'Umbraco.TextBox',
+				alias: 'segmentText',
+				culture: null,
+				segment: null,
+				value: 'Initial default-segment value.',
+			},
+			{
+				editorAlias: 'Umbraco.TextBox',
+				alias: 'segmentText',
+				culture: null,
+				segment: 's1',
+				value: 'Initial segment 1 value.',
 			},
 		],
 		flags: [],
