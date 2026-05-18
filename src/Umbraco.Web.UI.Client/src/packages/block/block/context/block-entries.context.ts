@@ -4,6 +4,7 @@ import type { UmbBlockDataObjectModel, UmbBlockManagerContext } from './block-ma
 import { UMB_BLOCK_ENTRIES_CONTEXT } from './block-entries.context-token.js';
 import { type Observable, UmbArrayState, UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbElementTypeStructureRepository } from '@umbraco-cms/backoffice/element';
 import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbModalRouteBuilder } from '@umbraco-cms/backoffice/router';
@@ -82,6 +83,18 @@ export abstract class UmbBlockEntriesContext<
 
 	public abstract getPathForCreateBlock(index: number): string | undefined;
 	public abstract getPathForClipboard(index: number): string | undefined;
+
+	/**
+	 * Returns the element type uniques allowed at the library root that overlap
+	 * with the given block types — used to filter the library picker in the
+	 * block catalogue modal.
+	 */
+	protected async _getLibraryAllowedElementTypeKeys(blockTypes: Array<BlockType>): Promise<Array<string>> {
+		const blockTypeKeys = new Set(blockTypes.map((bt) => bt.contentElementTypeKey));
+		const repo = new UmbElementTypeStructureRepository(this);
+		const { data: allowedTypes } = await repo.requestAllowedChildrenOf(null, null);
+		return allowedTypes?.items.filter((t) => t.unique && blockTypeKeys.has(t.unique)).map((t) => t.unique!) ?? [];
+	}
 
 	public abstract create(
 		contentElementTypeKey: string,

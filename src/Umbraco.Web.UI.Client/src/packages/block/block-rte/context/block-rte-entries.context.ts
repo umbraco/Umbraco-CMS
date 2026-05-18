@@ -10,7 +10,6 @@ import {
 } from '@umbraco-cms/backoffice/clipboard';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbElementTypeStructureRepository } from '@umbraco-cms/backoffice/element';
 import type { UmbPropertyEditorRteValueType } from '@umbraco-cms/backoffice/rte';
 import type { UmbBlockDataModel } from '@umbraco-cms/backoffice/block';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -78,12 +77,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 				const config = propertyContext.getConfig();
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
-				// Fetch element types allowed in the library, filtered to those matching block types
-				const blockTypeKeys = new Set(blockTypes.map((bt) => bt.contentElementTypeKey));
-				const elementTypeStructureRepo = new UmbElementTypeStructureRepository(this);
-				const { data: allowedTypes } = await elementTypeStructureRepo.requestAllowedChildrenOf(null, null);
-				const libraryAllowedElementTypeKeys =
-					allowedTypes?.items.filter((t) => t.unique && blockTypeKeys.has(t.unique)).map((t) => t.unique!) ?? [];
+				const libraryAllowedElementTypeKeys = await this._getLibraryAllowedElementTypeKeys(blockTypes);
 
 				return {
 					modal: { size: modalSize },

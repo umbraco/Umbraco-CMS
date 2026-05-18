@@ -29,7 +29,6 @@ import {
 	UmbClipboardPastePropertyValueTranslatorValueResolver,
 } from '@umbraco-cms/backoffice/clipboard';
 import { UMB_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/property';
-import { UmbElementTypeStructureRepository } from '@umbraco-cms/backoffice/element';
 import {
 	UMB_BLOCK_CATALOGUE_MODAL,
 	UmbBlockEntriesContext,
@@ -184,13 +183,7 @@ export class UmbBlockGridEntriesContext
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
 				const blockTypes = this.#allowedBlockTypes.getValue();
-
-				// Fetch element types allowed in the library, filtered to those matching block types
-				const blockTypeKeys = new Set(blockTypes.map((bt) => bt.contentElementTypeKey));
-				const elementTypeStructureRepo = new UmbElementTypeStructureRepository(this);
-				const { data: allowedTypes } = await elementTypeStructureRepo.requestAllowedChildrenOf(null, null);
-				const libraryAllowedElementTypeKeys =
-					allowedTypes?.items.filter((t) => t.unique && blockTypeKeys.has(t.unique)).map((t) => t.unique!) ?? [];
+				const libraryAllowedElementTypeKeys = await this._getLibraryAllowedElementTypeKeys(blockTypes);
 
 				const configuredSize = this._manager
 					.getEditorConfiguration()
