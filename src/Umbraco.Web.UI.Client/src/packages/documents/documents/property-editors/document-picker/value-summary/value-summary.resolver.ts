@@ -2,8 +2,8 @@ import type { UmbValueSummaryResolveResult, UmbValueSummaryResolver } from '@umb
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbDocumentItemRepository } from '@umbraco-cms/backoffice/document';
-import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
+import { UmbDocumentItemRepository } from '../../../item/repository/index.js';
+import type { UmbDocumentItemModel } from '../../../item/repository/types.js';
 
 export class UmbDocumentPickerValueSummaryResolver
 	extends UmbControllerBase

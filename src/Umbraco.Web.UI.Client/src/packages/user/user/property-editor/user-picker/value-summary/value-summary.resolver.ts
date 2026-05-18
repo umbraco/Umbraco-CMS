@@ -2,8 +2,7 @@ import type { UmbValueSummaryResolveResult, UmbValueSummaryResolver } from '@umb
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { createObservablePart } from '@umbraco-cms/backoffice/observable-api';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
-import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
-import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
+import { UmbUserItemRepository, type UmbUserItemModel } from '../../../repository/item/index.js';
 
 export class UmbUserPickerValueSummaryResolver
 	extends UmbControllerBase
