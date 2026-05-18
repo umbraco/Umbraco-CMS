@@ -118,6 +118,8 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	@state()
 	private _exposed?: boolean;
 
+	private _hasExpose?: boolean;
+
 	@state()
 	private _unsupported?: boolean;
 
@@ -141,6 +143,14 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
+	@state()
+	private _isLibraryElement = false;
+
+	@state()
+	private _sharedContentVariantState: string | null | undefined;
+
+	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
+	private _isReferenceAttr = false;
 
 	@state()
 	private _isReadOnly = false;
@@ -193,8 +203,25 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		this.observe(
 			this.#context.hasExpose,
 			(exposed) => {
-				this.#updateBlockViewProps({ unpublished: !exposed });
-				this._exposed = exposed;
+				this._hasExpose = exposed;
+				this.#updateExposedState();
+			},
+			null,
+		);
+		this.observe(
+			this.#context.isLibraryElement,
+			(isLibrary) => {
+				this._isLibraryElement = isLibrary;
+				this._isReferenceAttr = isLibrary;
+				this.#updateExposedState();
+			},
+			null,
+		);
+		this.observe(
+			this.#context.sharedContentVariantState,
+			(state) => {
+				this._sharedContentVariantState = state;
+				this.#updateExposedState();
 			},
 			null,
 		);
@@ -289,6 +316,13 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	#updateBlockViewProps(incoming: Partial<UmbBlockEditorCustomViewProperties<UmbBlockSingleLayoutModel>>) {
 		this._blockViewProps = { ...this._blockViewProps, ...incoming };
 		this.requestUpdate('_blockViewProps');
+	}
+
+	#updateExposedState() {
+		// Shared content blocks use the element's variant state; local blocks use the expose entry
+		const isExposed = this._isLibraryElement ? this._sharedContentVariantState !== 'Draft' : this._hasExpose;
+		this.#updateBlockViewProps({ unpublished: !isExposed });
+		this._exposed = isExposed;
 	}
 
 	override connectedCallback(): void {
