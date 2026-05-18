@@ -9,7 +9,7 @@ export interface UmbAuditLogModel<LogType = any> {
 	parameters?: string | null;
 	triggerSource?: string | null;
 	triggerOperation?: string | null;
-	typeAlias?: string | null;
+	logTypeAlias?: string | null;
 }
 
 export interface UmbAuditLogRequestArgs {

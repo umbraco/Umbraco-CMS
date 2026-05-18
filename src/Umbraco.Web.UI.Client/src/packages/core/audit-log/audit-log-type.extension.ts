@@ -1,19 +1,19 @@
 import type { ManifestBase } from '@umbraco-cms/backoffice/extension-api';
 
-export interface MetaAuditLogTypeStyle {
+export interface MetaAuditLogType {
 	look: 'default' | 'primary' | 'secondary' | 'outline' | 'placeholder';
 	color: 'default' | 'danger' | 'warning' | 'positive';
 	label: string;
 }
 
-export interface ManifestAuditLogTypeStyle extends ManifestBase {
-	type: 'auditLogTypeStyle';
-	forTypeAliases: string[];
-	meta: MetaAuditLogTypeStyle;
+export interface ManifestAuditLogType extends ManifestBase {
+	type: 'auditLogType';
+	forLogTypeAliases: string[];
+	meta: MetaAuditLogType;
 }
 
 declare global {
 	interface UmbExtensionManifestMap {
-		ManifestAuditLogTypeStyle: ManifestAuditLogTypeStyle;
+		ManifestAuditLogType: ManifestAuditLogType;
 	}
 }

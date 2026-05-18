@@ -9,7 +9,7 @@ import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbUserItemRepository } from '@umbraco-cms/backoffice/user';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_ENTITY_WORKSPACE_CONTEXT } from '@umbraco-cms/backoffice/workspace';
-import type { UmbAuditLogModel, UmbAuditLogRepository, ManifestAuditLogTypeStyle, MetaAuditLogTypeStyle, ManifestAuditLogTriggerStyle } from '@umbraco-cms/backoffice/audit-log';
+import type { UmbAuditLogModel, UmbAuditLogRepository, ManifestAuditLogType, MetaAuditLogType, ManifestAuditLogTrigger } from '@umbraco-cms/backoffice/audit-log';
 import type { UmbUserItemModel } from '@umbraco-cms/backoffice/user';
 import type { UUIPaginationEvent } from '@umbraco-cms/backoffice/external/uui';
 
@@ -45,7 +45,7 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 
 	#userMap = new Map<string, UmbUserItemModel>();
 
-	#typeStyleMap = new Map<string, MetaAuditLogTypeStyle>();
+	#typeMap = new Map<string, MetaAuditLogType>();
 
 	// Keyed by "source:operation" for exact matches, or "source" for fallback
 	#triggerLabelMap = new Map<string, string>();
@@ -60,12 +60,12 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 		this.observe(this.#pagination.totalPages, (number) => (this._totalPages = number));
 
 		this.observe(
-			umbExtensionsRegistry.byType('auditLogTypeStyle'),
+			umbExtensionsRegistry.byType('auditLogType'),
 			(manifests) => {
-				this.#typeStyleMap.clear();
-				for (const manifest of manifests as ManifestAuditLogTypeStyle[]) {
-					for (const alias of manifest.forTypeAliases) {
-						this.#typeStyleMap.set(alias, manifest.meta);
+				this.#typeMap.clear();
+				for (const manifest of manifests as ManifestAuditLogType[]) {
+					for (const alias of manifest.forLogTypeAliases) {
+						this.#typeMap.set(alias, manifest.meta);
 					}
 				}
 				this.requestUpdate('_items');
@@ -73,13 +73,13 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 		);
 
 		this.observe(
-			umbExtensionsRegistry.byType('auditLogTriggerStyle'),
+			umbExtensionsRegistry.byType('auditLogTrigger'),
 			(manifests) => {
 				this.#triggerLabelMap.clear();
-				for (const manifest of manifests as ManifestAuditLogTriggerStyle[]) {
+				for (const manifest of manifests as ManifestAuditLogTrigger[]) {
 					const source = manifest.forTriggerSource;
-					for (const mapping of manifest.meta.mappings) {
-						this.#triggerLabelMap.set(`${source}:${mapping.operation}`, mapping.label);
+					for (const label of manifest.meta.labels) {
+						this.#triggerLabelMap.set(`${source}:${label.operation}`, label.label);
 					}
 					if (manifest.meta.fallbackLabel) {
 						this.#triggerLabelMap.set(source, manifest.meta.fallbackLabel);
@@ -213,7 +213,7 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 
 	#renderHistoryItem(item: UmbAuditLogModel) {
 		const tagData = this.#auditLogRepository?.getTagStyleAndText?.(item.logType);
-		const typeStyle = item.typeAlias ? this.#typeStyleMap.get(item.typeAlias) : undefined;
+		const typeStyle = item.logTypeAlias ? this.#typeMap.get(item.logTypeAlias) : undefined;
 		const user = this.#userMap.get(item.user.unique);
 
 		const badgeLook = typeStyle?.look ?? tagData?.style.look ?? 'placeholder';

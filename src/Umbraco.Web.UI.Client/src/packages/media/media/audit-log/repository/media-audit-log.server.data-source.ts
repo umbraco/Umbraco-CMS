@@ -52,7 +52,7 @@ export class UmbMediaAuditLogServerDataSource implements UmbAuditLogDataSource<U
 					parameters: item.parameters,
 					triggerSource: item.triggerSource,
 					triggerOperation: item.triggerOperation,
-					typeAlias: item.typeAlias,
+					logTypeAlias: item.typeAlias,
 				};
 			});
 

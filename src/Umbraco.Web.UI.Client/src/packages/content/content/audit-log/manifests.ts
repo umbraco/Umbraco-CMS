@@ -6,12 +6,12 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...auditLogActionManifests,
 	...infoAppManifests,
 	{
-		type: 'auditLogTriggerStyle',
-		alias: 'Umb.AuditLogTriggerStyle.Core',
-		name: 'Core Audit Log Trigger Style',
+		type: 'auditLogTrigger',
+		alias: 'Umb.AuditLogTrigger.Core',
+		name: 'Core Audit Log Trigger',
 		forTriggerSource: 'Core',
 		meta: {
-			mappings: [
+			labels: [
 				{ operation: 'ScheduledPublish', label: 'Scheduled publish' },
 				{ operation: 'Rollback', label: 'Rollback' },
 				{ operation: 'Import', label: 'Imported' },
