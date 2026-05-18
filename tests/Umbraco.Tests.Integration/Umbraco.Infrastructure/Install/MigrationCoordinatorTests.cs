@@ -71,9 +71,10 @@ internal sealed class MigrationCoordinatorTests : UmbracoIntegrationTest
     [Test]
     public void TryBecomeLeaderAsync_WhenTwoCoordinatorsRaceConcurrently_ExactlyOneWins()
     {
-        // Both mocks start Upgrading and transition to Run on the first DetermineRuntimeLevel call.
-        // The coordinator that wins the claim returns true immediately without calling DetermineRuntimeLevel.
-        // The coordinator that loses calls DetermineRuntimeLevel once, sees Run, and returns false.
+        // Both mocks start Upgrading. The winner calls DetermineRuntimeLevel once (post-claim check)
+        // and sees Upgrading — migrations haven't run yet, so it continues as leader and returns true.
+        // The loser calls DetermineRuntimeLevel twice: the first poll keeps Upgrading (5 s sleep),
+        // the second transitions to Run, and the loser returns false.
         var runtimeState1 = CreateTransitioningRuntimeState();
         var runtimeState2 = CreateTransitioningRuntimeState();
 
@@ -168,8 +169,19 @@ internal sealed class MigrationCoordinatorTests : UmbracoIntegrationTest
     {
         var mock = new Mock<IRuntimeState>();
         mock.SetupGet(x => x.Level).Returns(RuntimeLevel.Upgrading);
+
+        // The winner calls DetermineRuntimeLevel() once from the post-claim check and should
+        // still see Upgrading (migrations haven't run yet). The loser calls it from the poll
+        // loop — first call keeps Upgrading, so it sleeps once; second call transitions to Run.
+        int callCount = 0;
         mock.Setup(x => x.DetermineRuntimeLevel())
-            .Callback(() => mock.SetupGet(x => x.Level).Returns(RuntimeLevel.Run));
+            .Callback(() =>
+            {
+                if (Interlocked.Increment(ref callCount) >= 2)
+                {
+                    mock.SetupGet(x => x.Level).Returns(RuntimeLevel.Run);
+                }
+            });
         return mock;
     }
 }
