@@ -48,6 +48,28 @@ internal sealed class MigrationCoordinator : IMigrationCoordinator
         {
             if (TryClaimLeadership(machineIdentifier))
             {
+                // Re-check after claiming: the previous leader may have finished between our last
+                // DetermineRuntimeLevel call and our successful claim of the now-empty lock.
+                try
+                {
+                    _runtimeState.DetermineRuntimeLevel();
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Could not re-determine runtime level after claiming leadership; proceeding as leader.");
+                }
+
+                if (_runtimeState.Level == RuntimeLevel.Run)
+                {
+                    ReleaseLeadership();
+                    _logger.LogInformation("Migrations completed by another server; proceeding as follower.");
+                    return false;
+                }
+
                 _logger.LogInformation("This server claimed migration leadership.");
                 return true;
             }

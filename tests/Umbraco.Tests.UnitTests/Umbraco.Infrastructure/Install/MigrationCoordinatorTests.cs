@@ -93,6 +93,38 @@ public class MigrationCoordinatorTests
     }
 
     [Test]
+    public async Task TryBecomeLeaderAsync_WhenLeaderFinishedBetweenPollAndClaim_ReleasesClaimAndReturnsFalse()
+    {
+        // Simulate TOCTOU: lock is empty (leader released between our last DetermineRuntimeLevel and our claim).
+        _keyValueServiceMock
+            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
+            .Returns((string?)null);
+
+        // DetermineRuntimeLevel transitions level to Run (leader already finished).
+        _runtimeStateMock.SetupGet(x => x.Level).Returns(RuntimeLevel.Upgrading);
+        _runtimeStateMock
+            .Setup(x => x.DetermineRuntimeLevel())
+            .Callback(() => _runtimeStateMock.SetupGet(x => x.Level).Returns(RuntimeLevel.Run));
+
+        string? capturedClaim = null;
+        _keyValueServiceMock
+            .Setup(x => x.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, It.IsAny<string>()))
+            .Callback<string, string>((_, v) => capturedClaim = v);
+        _keyValueServiceMock
+            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
+            .Returns(() => capturedClaim);
+
+        var sut = CreateSut();
+        var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
+
+        Assert.IsFalse(result);
+        // The claim was written then cleared by ReleaseLeadership.
+        _keyValueServiceMock.Verify(
+            x => x.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty),
+            Times.Once);
+    }
+
+    [Test]
     public async Task TryBecomeLeaderAsync_WhenOtherMachineHoldsClaim_PollsUntilRunLevelAndReturnsFalse()
     {
         var recentTimestamp = DateTimeOffset.UtcNow.AddMinutes(-1).ToString("O");
