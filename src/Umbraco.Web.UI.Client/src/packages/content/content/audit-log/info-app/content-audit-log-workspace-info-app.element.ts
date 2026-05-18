@@ -77,13 +77,10 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 			(manifests) => {
 				this.#triggerLabelMap.clear();
 				for (const manifest of manifests as ManifestAuditLogTrigger[]) {
-					const source = manifest.forTriggerSource;
-					for (const label of manifest.meta.labels) {
-						this.#triggerLabelMap.set(`${source}:${label.operation}`, label.label);
-					}
-					if (manifest.meta.fallbackLabel) {
-						this.#triggerLabelMap.set(source, manifest.meta.fallbackLabel);
-					}
+					const key = manifest.forTriggerOperation
+						? `${manifest.forTriggerSource}:${manifest.forTriggerOperation}`
+						: manifest.forTriggerSource;
+					this.#triggerLabelMap.set(key, manifest.meta.label);
 				}
 				this.requestUpdate('_items');
 			},
@@ -213,12 +210,13 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 
 	#renderHistoryItem(item: UmbAuditLogModel) {
 		const tagData = this.#auditLogRepository?.getTagStyleAndText?.(item.logType);
-		const typeStyle = item.logTypeAlias ? this.#typeMap.get(item.logTypeAlias) : undefined;
+		const typeStyle = this.#typeMap.get(item.logTypeAlias ?? item.logType);
 		const user = this.#userMap.get(item.user.unique);
 
 		const badgeLook = typeStyle?.look ?? tagData?.style.look ?? 'placeholder';
 		const badgeColor = typeStyle?.color ?? tagData?.style.color ?? 'default';
-		const badgeLabel = typeStyle?.label ?? this.localize.term(tagData?.text.label ?? item.logType, item.parameters);
+		const badgeLabel = this.localize.term(typeStyle?.label ?? tagData?.text.label ?? item.logType, item.parameters);
+		const descKey = typeStyle?.desc ?? tagData?.text.desc;
 
 		return html`
 			<tr>
@@ -234,7 +232,7 @@ export class UmbContentAuditLogWorkspaceInfoAppElement extends UmbLitElement {
 					<uui-tag look=${badgeLook} color=${badgeColor}>${badgeLabel}</uui-tag>
 				</td>
 				<td class="cell-trigger">${this.#renderTrigger(item)}</td>
-				<td class="cell-comment">${this.#renderComment(item, tagData?.text.desc)}</td>
+				<td class="cell-comment">${this.#renderComment(item, descKey)}</td>
 			</tr>
 		`;
 	}

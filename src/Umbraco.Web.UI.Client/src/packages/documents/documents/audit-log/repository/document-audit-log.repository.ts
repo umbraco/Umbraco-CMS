@@ -46,6 +46,7 @@ export class UmbDocumentAuditLogRepository
 	 * @param {string} logType
 	 * @returns {UmbAuditLogTagData}
 	 * @memberof UmbDocumentAuditLogRepository
+	 * @deprecated Scheduled for removal in Umbraco 19. Register an `auditLogType` extension manifest for the log type instead.
 	 */
 	getTagStyleAndText(logType: string): UmbAuditLogTagData {
 		return getDocumentHistoryTagStyleAndText(logType as UmbDocumentAuditLogType);
