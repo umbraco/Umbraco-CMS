@@ -736,6 +736,7 @@ export default {
 		content: 'محتوى',
 		continue: 'متابعة',
 		copy: 'نسخ',
+		copied: 'تم النسخ!',
 		create: 'إنشاء',
 		cropSection: 'قسم الاقتصاص',
 		database: 'قاعدة بيانات',
