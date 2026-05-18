@@ -155,6 +155,22 @@ public class RecurringBackgroundJobHostedServiceTests
     }
 
     [Test]
+    public async Task Waits_IgnoredDelay_When_Execution_Is_Ignored()
+    {
+        var ignoredDelay = TimeSpan.FromMilliseconds(200);
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.IgnoredDelay).Returns(ignoredDelay);
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false);
+
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        await sut.PerformExecuteAsync(null);
+        stopwatch.Stop();
+
+        Assert.GreaterOrEqual(stopwatch.Elapsed, ignoredDelay, "Should have waited at least IgnoredDelay before returning");
+    }
+
+    [Test]
     public async Task Publishes_Start_And_Stop_Notifications()
     {
         var mockJob = new Mock<IRecurringBackgroundJob>();

@@ -86,24 +86,21 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
 
             if (_runtimeState.Level != RuntimeLevel.Run)
             {
-                _logger.LogDebug("Job not running as runlevel not yet ready");
-                await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
+                await IgnoreAndWaitAsync("Job not running as runlevel not yet ready", executingNotification);
                 return;
             }
 
             // Don't run on replicas nor unknown role servers
             if (!_job.ServerRoles.Contains(_serverRoleAccessor.CurrentServerRole))
             {
-                _logger.LogDebug("Job not running on this server role");
-                await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
+                await IgnoreAndWaitAsync("Job not running on this server role", executingNotification);
                 return;
             }
 
             // Ensure we do not run if not main domain, but do NOT lock it
             if (!_mainDom.IsMainDom)
             {
-                _logger.LogDebug("Job not running as not MainDom");
-                await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
+                await IgnoreAndWaitAsync("Job not running as not MainDom", executingNotification);
                 return;
             }
 
@@ -119,6 +116,23 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
             _logger.LogError(ex, "Unhandled exception in recurring background job.");
         }
 
+    }
+
+    /// <summary>
+    /// Publishes the ignored notification and waits for <see cref="IRecurringBackgroundJob.IgnoredDelay" /> before returning, preventing tight looping when execution is skipped and <see cref="IRecurringBackgroundJob.Period" /> is short or <see cref="TimeSpan.Zero" />.
+    /// </summary>
+    /// <param name="message">The full debug message describing why the execution is ignored.</param>
+    /// <param name="executingNotification">The originating executing notification to carry state from.</param>
+    private async Task IgnoreAndWaitAsync(string message, Notifications.RecurringBackgroundJobExecutingNotification executingNotification)
+    {
+        _logger.LogDebug(message);
+        await _eventAggregator.PublishAsync(new Notifications.RecurringBackgroundJobIgnoredNotification(_job, new EventMessages()).WithStateFrom(executingNotification));
+
+        TimeSpan ignoredDelay = _job.IgnoredDelay;
+        if (ignoredDelay > TimeSpan.Zero)
+        {
+            await Task.Delay(ignoredDelay);
+        }
     }
 
     /// <summary>
