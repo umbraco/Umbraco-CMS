@@ -834,9 +834,9 @@ export abstract class UmbBlockEntryContext<
 
 	public delete() {
 		if (!this._entries) return;
-		const contentKey = this._layout.value?.contentKey;
-		if (!contentKey) return;
-		this._entries.delete(contentKey);
+		const key = this._layout.value?.key;
+		if (!key) return;
+		this._entries.delete(key);
 	}
 
 	public expose() {

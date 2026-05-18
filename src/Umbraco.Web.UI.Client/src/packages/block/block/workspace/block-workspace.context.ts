@@ -649,9 +649,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			// Did it exist before?
 			if (this.getIsNew() === true) {
 				// Remove the block?
-				const contentKey = this.#layout.value?.contentKey;
-				if (contentKey) {
-					this.#blockEntries?.delete(contentKey);
+				const key = this.#layout.value?.key;
+				if (key) {
+					this.#blockEntries?.delete(key);
 				}
 			} else {
 				// Revert the layout, content & settings data to the original state: [NL]
