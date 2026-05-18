@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
@@ -10,55 +11,85 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core;
 [TestFixture]
 public class UdiEntityTypeHelperTests
 {
-    [TestCase(UmbracoObjectTypes.Document, Constants.UdiEntityType.Document)]
-    [TestCase(UmbracoObjectTypes.DocumentBlueprint, Constants.UdiEntityType.DocumentBlueprint)]
-    [TestCase(UmbracoObjectTypes.DocumentBlueprintContainer, Constants.UdiEntityType.DocumentBlueprintContainer)]
-    [TestCase(UmbracoObjectTypes.Media, Constants.UdiEntityType.Media)]
-    [TestCase(UmbracoObjectTypes.Member, Constants.UdiEntityType.Member)]
-    [TestCase(UmbracoObjectTypes.Template, Constants.UdiEntityType.Template)]
-    [TestCase(UmbracoObjectTypes.DocumentType, Constants.UdiEntityType.DocumentType)]
-    [TestCase(UmbracoObjectTypes.DocumentTypeContainer, Constants.UdiEntityType.DocumentTypeContainer)]
-    [TestCase(UmbracoObjectTypes.MediaType, Constants.UdiEntityType.MediaType)]
-    [TestCase(UmbracoObjectTypes.MediaTypeContainer, Constants.UdiEntityType.MediaTypeContainer)]
-    [TestCase(UmbracoObjectTypes.DataType, Constants.UdiEntityType.DataType)]
-    [TestCase(UmbracoObjectTypes.DataTypeContainer, Constants.UdiEntityType.DataTypeContainer)]
-    [TestCase(UmbracoObjectTypes.MemberType, Constants.UdiEntityType.MemberType)]
-    [TestCase(UmbracoObjectTypes.MemberTypeContainer, Constants.UdiEntityType.MemberTypeContainer)]
-    [TestCase(UmbracoObjectTypes.MemberGroup, Constants.UdiEntityType.MemberGroup)]
-    [TestCase(UmbracoObjectTypes.RelationType, Constants.UdiEntityType.RelationType)]
-    [TestCase(UmbracoObjectTypes.FormsForm, Constants.UdiEntityType.FormsForm)]
-    [TestCase(UmbracoObjectTypes.FormsPreValue, Constants.UdiEntityType.FormsPreValue)]
-    [TestCase(UmbracoObjectTypes.FormsDataSource, Constants.UdiEntityType.FormsDataSource)]
-    [TestCase(UmbracoObjectTypes.Language, Constants.UdiEntityType.Language)]
-    public void FromUmbracoObjectType_ReturnsExpectedEntityType(UmbracoObjectTypes umbracoObjectType, string expected)
+    // UmbracoObjectTypes values that intentionally have no UDI mapping. Add to this list
+    // (with a reason) only if a new value genuinely should not round-trip via UdiEntityTypeHelper.
+    private static readonly UmbracoObjectTypes[] _unmappedUmbracoObjectTypes =
     {
-        string entityType = UdiEntityTypeHelper.FromUmbracoObjectType(umbracoObjectType);
-        Assert.AreEqual(expected, entityType);
+        UmbracoObjectTypes.Unknown,        // sentinel/default
+        UmbracoObjectTypes.ROOT,           // system root, not a UDI-addressable entity
+        UmbracoObjectTypes.RecycleBin,     // system folder, not a UDI-addressable entity
+        UmbracoObjectTypes.IdReservation,  // identifier reservation marker
+    };
+
+    [TestCaseSource(nameof(MappedUmbracoObjectTypes))]
+    public void FromUmbracoObjectType_RoundTripsThroughToUmbracoObjectType(UmbracoObjectTypes value, string udiType)
+        => Assert.AreEqual(value, UdiEntityTypeHelper.ToUmbracoObjectType(udiType));
+
+    [TestCaseSource(nameof(MappedUdiEntityTypes))]
+    public void ToUmbracoObjectType_RoundTripsThroughFromUmbracoObjectType(string udiType, UmbracoObjectTypes value)
+        => Assert.AreEqual(udiType, UdiEntityTypeHelper.FromUmbracoObjectType(value));
+
+    [TestCaseSource(nameof(AllUmbracoObjectTypes))]
+    public void UmbracoObjectType_HasUdiMappingOrIsExplicitlyExcluded(UmbracoObjectTypes value)
+    {
+        if (_unmappedUmbracoObjectTypes.Contains(value))
+        {
+            Assert.Throws<NotSupportedException>(
+                () => UdiEntityTypeHelper.FromUmbracoObjectType(value),
+                $"{value} is listed in {nameof(_unmappedUmbracoObjectTypes)} but FromUmbracoObjectType returned a value - remove it from the exclusion list.");
+            return;
+        }
+
+        Assert.DoesNotThrow(
+            () => UdiEntityTypeHelper.FromUmbracoObjectType(value),
+            $"{value} has no UDI mapping. Either wire it up in {nameof(UdiEntityTypeHelper)}, or add it to {nameof(_unmappedUmbracoObjectTypes)} with a reason.");
     }
 
-    [TestCase(Constants.UdiEntityType.Document, UmbracoObjectTypes.Document)]
-    [TestCase(Constants.UdiEntityType.DocumentBlueprint, UmbracoObjectTypes.DocumentBlueprint)]
-    [TestCase(Constants.UdiEntityType.DocumentBlueprintContainer, UmbracoObjectTypes.DocumentBlueprintContainer)]
-    [TestCase(Constants.UdiEntityType.Media, UmbracoObjectTypes.Media)]
-    [TestCase(Constants.UdiEntityType.Member, UmbracoObjectTypes.Member)]
-    [TestCase(Constants.UdiEntityType.Template, UmbracoObjectTypes.Template)]
-    [TestCase(Constants.UdiEntityType.DocumentType, UmbracoObjectTypes.DocumentType)]
-    [TestCase(Constants.UdiEntityType.DocumentTypeContainer, UmbracoObjectTypes.DocumentTypeContainer)]
-    [TestCase(Constants.UdiEntityType.MediaType, UmbracoObjectTypes.MediaType)]
-    [TestCase(Constants.UdiEntityType.MediaTypeContainer, UmbracoObjectTypes.MediaTypeContainer)]
-    [TestCase(Constants.UdiEntityType.DataType, UmbracoObjectTypes.DataType)]
-    [TestCase(Constants.UdiEntityType.DataTypeContainer, UmbracoObjectTypes.DataTypeContainer)]
-    [TestCase(Constants.UdiEntityType.MemberType, UmbracoObjectTypes.MemberType)]
-    [TestCase(Constants.UdiEntityType.MemberTypeContainer, UmbracoObjectTypes.MemberTypeContainer)]
-    [TestCase(Constants.UdiEntityType.MemberGroup, UmbracoObjectTypes.MemberGroup)]
-    [TestCase(Constants.UdiEntityType.RelationType, UmbracoObjectTypes.RelationType)]
-    [TestCase(Constants.UdiEntityType.FormsForm, UmbracoObjectTypes.FormsForm)]
-    [TestCase(Constants.UdiEntityType.FormsPreValue, UmbracoObjectTypes.FormsPreValue)]
-    [TestCase(Constants.UdiEntityType.FormsDataSource, UmbracoObjectTypes.FormsDataSource)]
-    [TestCase(Constants.UdiEntityType.Language, UmbracoObjectTypes.Language)]
-    public void ToUmbracoObjectType_ReturnsExpectedObjectType(string entityType, UmbracoObjectTypes expected)
+    private static IEnumerable<TestCaseData> AllUmbracoObjectTypes() =>
+        Enum.GetValues<UmbracoObjectTypes>()
+            .Select(value => new TestCaseData(value).SetName($"{nameof(UmbracoObjectTypes)}.{value}"));
+
+    private static IEnumerable<TestCaseData> MappedUmbracoObjectTypes()
     {
-        UmbracoObjectTypes umbracoObjectType = UdiEntityTypeHelper.ToUmbracoObjectType(entityType);
-        Assert.AreEqual(expected, umbracoObjectType);
+        foreach (UmbracoObjectTypes value in Enum.GetValues<UmbracoObjectTypes>())
+        {
+            string udiType;
+            try
+            {
+                udiType = UdiEntityTypeHelper.FromUmbracoObjectType(value);
+            }
+            catch (NotSupportedException)
+            {
+                continue;
+            }
+
+            yield return new TestCaseData(value, udiType).SetName($"{nameof(UmbracoObjectTypes)}.{value}");
+        }
+    }
+
+    private static IEnumerable<TestCaseData> MappedUdiEntityTypes()
+    {
+        foreach (FieldInfo field in typeof(Constants.UdiEntityType)
+            .GetFields(BindingFlags.Public | BindingFlags.Static))
+        {
+            if (field.IsLiteral is false || field.FieldType != typeof(string))
+            {
+                continue;
+            }
+
+            string udiType = (string)field.GetRawConstantValue()!;
+
+            UmbracoObjectTypes value;
+            try
+            {
+                value = UdiEntityTypeHelper.ToUmbracoObjectType(udiType);
+            }
+            catch (NotSupportedException)
+            {
+                continue;
+            }
+
+            yield return new TestCaseData(udiType, value).SetName($"{nameof(Constants.UdiEntityType)}.{field.Name}");
+        }
     }
 }
