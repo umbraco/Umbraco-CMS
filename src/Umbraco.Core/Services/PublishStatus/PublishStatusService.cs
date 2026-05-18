@@ -144,14 +144,14 @@ public PublishStatusService(
     {
         using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
         ISet<string> publishedCultures = await _publishStatusRepository.GetPublishStatusAsync(documentKey, cancellationToken);
-        _publishedCultures[documentKey] = publishedCultures;
+        UpdatePublishedCultures(documentKey, publishedCultures);
         scope.Complete();
     }
 
     /// <inheritdoc/>
     public Task RemoveAsync(Guid documentKey, CancellationToken cancellationToken)
     {
-        _publishedCultures.TryRemove(documentKey, out _);
+        RemovePublishedCultures(documentKey);
         return Task.CompletedTask;
     }
 
@@ -167,7 +167,22 @@ public PublishStatusService(
 
         foreach ((Guid documentKey, ISet<string> publishedCultures) in publishStatus)
         {
-            _publishedCultures[documentKey] = publishedCultures;
+            UpdatePublishedCultures(documentKey, publishedCultures);
         }
     }
+
+    private void UpdatePublishedCultures(Guid documentKey, ISet<string> publishedCultures)
+    {
+        if (publishedCultures.Count > 0)
+        {
+            _publishedCultures[documentKey] = publishedCultures;
+        }
+        else
+        {
+            RemovePublishedCultures(documentKey);
+        }
+    }
+
+    private void RemovePublishedCultures(Guid documentKey)
+        => _publishedCultures.TryRemove(documentKey, out _);
 }
