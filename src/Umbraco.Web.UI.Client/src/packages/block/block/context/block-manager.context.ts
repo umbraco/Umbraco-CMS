@@ -352,7 +352,7 @@ export abstract class UmbBlockManagerContext<
 	 * resolved against the manager's active variantId (culture/segment).
 	 * Emits the state string (e.g., 'Published', 'Draft') or null if not resolved yet.
 	 */
-	sharedContentVariantStateOf(key: string) {
+	elementStateOf(key: string) {
 		return mergeObservables(
 			[
 				this.#resolvedLibraryElementVariants.asObservablePart((source) => source.find((x) => x.key === key)),

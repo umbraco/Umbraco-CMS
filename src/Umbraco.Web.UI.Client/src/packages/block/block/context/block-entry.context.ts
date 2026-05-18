@@ -610,7 +610,7 @@ export abstract class UmbBlockEntryContext<
 
 		// Observe the variant state of shared content (published, draft, etc.)
 		this.observe(
-			this._manager.sharedContentVariantStateOf(contentKey),
+			this._manager.elementStateOf(contentKey),
 			(state) => {
 				this.#sharedContentVariantState.setValue(state ?? undefined);
 			},
