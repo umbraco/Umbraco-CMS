@@ -5,16 +5,8 @@ import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summar
 export class UmbTagsValueSummaryElement extends UmbValueSummaryElementBase<Array<string>> {
 	override render() {
 		if (!this._value?.length) return nothing;
-		return html`<div class="tags">${this._value.map((tag) => html`<uui-tag>${tag}</uui-tag>`)}</div>`;
+		return html`<uui-tag>${this._value.length}</uui-tag>`;
 	}
-
-	static override styles = css`
-		.tags {
-			display: flex;
-			flex-wrap: wrap;
-			gap: var(--uui-size-space-1);
-		}
-	`;
 }
 
 export { UmbTagsValueSummaryElement as element };
