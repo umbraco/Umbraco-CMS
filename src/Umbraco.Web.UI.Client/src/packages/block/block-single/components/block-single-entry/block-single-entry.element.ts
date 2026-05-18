@@ -143,14 +143,11 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		config: { showContentEdit: false, showSettingsEdit: false },
 	}; // Set to undefined cause it will be set before we render.
 
-	@state()
+	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
 	private _isLibraryElement = false;
 
 	@state()
 	private _sharedContentVariantState: string | null | undefined;
-
-	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
-	private _isReferenceAttr = false;
 
 	@state()
 	private _isReadOnly = false;
@@ -212,7 +209,6 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			this.#context.isLibraryElement,
 			(isLibrary) => {
 				this._isLibraryElement = isLibrary;
-				this._isReferenceAttr = isLibrary;
 				this.#updateExposedState();
 			},
 			null,
