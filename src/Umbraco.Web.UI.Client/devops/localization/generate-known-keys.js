@@ -76,33 +76,44 @@ function findDefaultExportObjectLiteral(source) {
 	throw new Error(`Could not find a default export object literal in ${sourcePath}`);
 }
 
+function getGroupObjectLiteral(groupProp) {
+	if (!ts.isPropertyAssignment(groupProp)) return null;
+	const name = getPropertyName(groupProp.name);
+	if (!name) return null;
+	const value = unwrapAs(groupProp.initializer);
+	if (!ts.isObjectLiteralExpression(value)) return null;
+	return { name, value };
+}
+
+function getKeyEntry(keyProp, groupName, source) {
+	if (!ts.isPropertyAssignment(keyProp)) return null;
+	const name = getPropertyName(keyProp.name);
+	if (!name) return null;
+	return {
+		key: `${groupName}_${name}`,
+		type: inferEntryType(unwrapAs(keyProp.initializer), source),
+	};
+}
+
 function collectEntries(objectLiteral, source) {
 	const entries = [];
 	const seen = new Set();
 	const duplicates = [];
 
 	for (const groupProp of objectLiteral.properties) {
-		if (!ts.isPropertyAssignment(groupProp)) continue;
-		const groupName = getPropertyName(groupProp.name);
-		if (!groupName) continue;
+		const group = getGroupObjectLiteral(groupProp);
+		if (!group) continue;
 
-		const groupValue = unwrapAs(groupProp.initializer);
-		if (!ts.isObjectLiteralExpression(groupValue)) continue;
+		for (const keyProp of group.value.properties) {
+			const entry = getKeyEntry(keyProp, group.name, source);
+			if (!entry) continue;
 
-		for (const keyProp of groupValue.properties) {
-			if (!ts.isPropertyAssignment(keyProp)) continue;
-			const keyName = getPropertyName(keyProp.name);
-			if (!keyName) continue;
-
-			const flatKey = `${groupName}_${keyName}`;
-			if (seen.has(flatKey)) {
-				duplicates.push(flatKey);
+			if (seen.has(entry.key)) {
+				duplicates.push(entry.key);
 				continue;
 			}
-			seen.add(flatKey);
-
-			const valueType = inferEntryType(unwrapAs(keyProp.initializer), source);
-			entries.push({ key: flatKey, type: valueType });
+			seen.add(entry.key);
+			entries.push(entry);
 		}
 	}
 
