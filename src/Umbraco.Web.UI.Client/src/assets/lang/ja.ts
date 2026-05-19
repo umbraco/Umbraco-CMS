@@ -382,6 +382,7 @@ export default {
 		constrainProportions: '縦横比',
 		continue: '続行',
 		copy: 'コピー',
+		copied: 'コピーしました！',
 		create: '新規作成',
 		database: 'データベース',
 		date: '日付',

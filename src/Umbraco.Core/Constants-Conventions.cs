@@ -36,6 +36,14 @@ public static partial class Constants
             ///     The key used to store the Umbraco pre-migrations upgrade plan state.
             /// </summary>
             public const string UmbracoUpgradePlanPremigrationsKey = KeyValuePrefix + UmbracoUpgradePlanPremigrationsName;
+
+            /// <summary>
+            ///     The key used to coordinate migration leadership across servers in a load-balanced
+            ///     environment. The value is either empty (no active leader) or
+            ///     <c>"{machineIdentifier}|{claimedAtUtc:O}"</c> when a server holds the claim,
+            ///     where <c>machineIdentifier</c> is the value returned by <see cref="Umbraco.Cms.Core.Factories.IMachineInfoFactory.GetMachineIdentifier"/>.
+            /// </summary>
+            public const string UpgradeLockKey = "Umbraco.Core.Upgrader.Lock";
         }
 
         /// <summary>

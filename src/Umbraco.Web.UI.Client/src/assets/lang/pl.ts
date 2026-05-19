@@ -460,6 +460,7 @@ export default {
 		constrainProportions: 'Zachowaj proporcje',
 		continue: 'Kontynuuj',
 		copy: 'Kopiuj',
+		copied: 'Skopiowano!',
 		create: 'Utwórz',
 		database: 'Baza danych',
 		date: 'Data',

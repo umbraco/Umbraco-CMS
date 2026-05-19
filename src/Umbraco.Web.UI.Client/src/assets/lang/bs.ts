@@ -709,6 +709,7 @@ export default {
 		content: 'Sadržaj',
 		continue: 'Nastavi',
 		copy: 'Kopiraj',
+		copied: 'Kopirano!',
 		create: 'Kreiraj',
 		database: 'Baza podataka',
 		date: 'Datum',
