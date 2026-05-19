@@ -1788,6 +1788,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Désactiver URL tracker',
 		enableUrlTracker: 'Activer URL tracker',
+		urlTrackerEnabled: 'Activé',
+		urlTrackerDisabled: 'Désactivé',
 		culture: 'Culture',
 		originalUrl: 'URL original',
 		redirectedTo: 'Redirigé Vers',

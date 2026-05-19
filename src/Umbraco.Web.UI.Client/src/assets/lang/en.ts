@@ -2364,6 +2364,8 @@ export default {
 		enableUrlTracker: 'Enable URL tracker',
 		enableUrlTrackerInstruction:
 			'Redirect URL tracking is configured through application settings. To enable tracking, set the following configuration key to false:',
+		urlTrackerEnabled: 'Enabled',
+		urlTrackerDisabled: 'Disabled',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Redirected To',
 		redirectUrlManagement: 'Redirect URL Management',

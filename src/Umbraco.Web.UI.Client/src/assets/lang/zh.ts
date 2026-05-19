@@ -1054,6 +1054,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: '禁用 URL 跟踪程序',
 		enableUrlTracker: '启用 URL 跟踪程序',
+		urlTrackerEnabled: '已启用',
+		urlTrackerDisabled: '已禁用',
 		originalUrl: '原始网址',
 		redirectedTo: '已重定向至',
 		noRedirects: '未进行重定向',

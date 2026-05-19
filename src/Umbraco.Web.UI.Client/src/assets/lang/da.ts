@@ -2246,6 +2246,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Slå URL tracker fra',
 		enableUrlTracker: 'Slå URL tracker til',
+		urlTrackerEnabled: 'Aktiveret',
+		urlTrackerDisabled: 'Deaktiveret',
 		culture: 'Kultur',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Viderestillet til',

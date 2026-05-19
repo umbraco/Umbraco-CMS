@@ -1042,6 +1042,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: '停止網址追蹤器',
 		enableUrlTracker: '啟動網址追蹤器',
+		urlTrackerEnabled: '已啟用',
+		urlTrackerDisabled: '已停用',
 		originalUrl: '原本網址',
 		redirectedTo: '轉址成',
 		noRedirects: '沒有任何轉址',

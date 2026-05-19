@@ -113,13 +113,14 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 		this.#getRedirectData(this._search.value);
 	}
 
-	async #onConfigureTracker(enable: boolean) {
+	async #showTrackerInfo() {
+		const isEnabled = this._trackerEnabled;
 		await umbInfoModal(this, {
-			headline: enable ? '#redirectUrls_enableUrlTracker' : '#redirectUrls_disableUrlTracker',
+			headline: isEnabled ? '#redirectUrls_disableUrlTracker' : '#redirectUrls_enableUrlTracker',
 			content: html`
 				<p>
 					${this.localize.term(
-						enable ? 'redirectUrls_enableUrlTrackerInstruction' : 'redirectUrls_disableUrlTrackerInstruction',
+						isEnabled ? 'redirectUrls_disableUrlTrackerInstruction' : 'redirectUrls_enableUrlTrackerInstruction',
 					)}
 				</p>
 				<p><code>Umbraco:CMS:WebRouting:DisableRedirectUrlTracking</code></p>
@@ -145,20 +146,23 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 								@click=${this.#onSearch}
 								.state=${this._buttonState}></uui-button>
 						</div>
-						<uui-button
-							look="outline"
-							label=${this.localize.term('redirectUrls_disableUrlTracker')}
-							@click=${() => this.#onConfigureTracker(false)}></uui-button>
 					`,
-					() => html`
-						<div></div>
-						<uui-button
-							color="positive"
-							look="outline"
-							label=${this.localize.term('redirectUrls_enableUrlTracker')}
-							@click=${() => this.#onConfigureTracker(true)}></uui-button>
-					`,
+					() => html`<div></div>`,
 				)}
+				<uui-button
+					id="tracker-status"
+					compact
+					label=${this.localize.term(
+						this._trackerEnabled ? 'redirectUrls_urlTrackerEnabled' : 'redirectUrls_urlTrackerDisabled',
+					)}
+					@click=${this.#showTrackerInfo}>
+					<uui-tag look="outline" color="default">
+						<umb-localize
+							key=${this._trackerEnabled
+								? 'redirectUrls_urlTrackerEnabled'
+								: 'redirectUrls_urlTrackerDisabled'}></umb-localize>
+					</uui-tag>
+				</uui-button>
 			</div>
 			${when(
 				this._redirectData?.length,
@@ -277,6 +281,15 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			#redirect-actions {
 				display: flex;
 				justify-content: space-between;
+			}
+
+			#tracker-status {
+				--uui-button-background-color: transparent;
+				--uui-button-background-color-hover: transparent;
+			}
+
+			uui-tag {
+				text-wrap: nowrap;
 			}
 
 			#search-wrapper {
