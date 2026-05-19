@@ -109,6 +109,15 @@ The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`
 
 If you're adding a new shell-like element (rare — most code lives inside `<umb-app>`), give it a `lang` attribute and the same subscribe-and-mirror pattern. For everything else, just use `this.localize` and the inherited context resolves the rest.
 
+### Default UI language vs fallback culture
+
+Two separate concepts — don't conflate them:
+
+- **Active UI locale** — `GlobalSettings.DefaultUILanguage` (default `en-US`). What Razor renders as `lang` on the shell, what `loadLanguage()` is called with. The locale users actually see.
+- **Fallback culture** — `en` (`UMB_DEFAULT_LOCALIZATION_CULTURE`). The culture the canonical `en.ts` dictionary ships under (`Umb.Localization.EN`). Always loaded *alongside* the active locale so any missing key falls back to English.
+
+A third-party language pack overriding canonical keys for a default install should declare `culture: 'en-US'` (matches active locale), not `culture: 'en'`. The keys come *from* `en.ts`, but the override extension's `culture` must match the active locale, otherwise the registry filters it out.
+
 ---
 
 ## Conventions & Rules
