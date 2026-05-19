@@ -305,7 +305,6 @@ export class UmbDataTypeWorkspaceContext
 		// We want to keep the existing data, if it is not in the default data, and if it is in the default data, then we want to keep the default data.
 		for (const property of this.#properties.getValue()) {
 			// We are matching on the alias, as we assume that the alias is unique for the data type.
-			// TODO: Consider if we should also match on the editorAlias just to be on the safe side [JOV]
 			const existingData = data.values?.find((x) => x.alias === property.alias);
 			if (existingData) {
 				values.push(existingData);
