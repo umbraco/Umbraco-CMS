@@ -83,25 +83,27 @@ internal sealed class WebhookPresentationFactory : IWebhookPresentationFactory
     {
         var webhookLogResponseModel = new WebhookLogResponseModel
         {
-            Date = webhookLog.Date, EventAlias = webhookLog.EventAlias, Key = webhookLog.Key, RequestBody = webhookLog.RequestBody ?? string.Empty,
+            Date = webhookLog.Date,
+            EventAlias = webhookLog.EventAlias,
+            Key = webhookLog.Key,
+            RequestBody = webhookLog.RequestBody ?? string.Empty,
             RetryCount = webhookLog.RetryCount,
             Url = webhookLog.Url,
             RequestHeaders = webhookLog.RequestHeaders,
             WebhookKey = webhookLog.WebhookKey,
-            IsSuccessStatusCode = webhookLog.IsSuccessStatusCode
+            IsSuccessStatusCode = webhookLog.IsSuccessStatusCode,
+            StatusCode = webhookLog.StatusCode,
+            ExceptionOccured = webhookLog.ExceptionOccured,
         };
 
         if (_hostingEnvironment.IsDebugMode)
         {
-            webhookLogResponseModel.ExceptionOccured = webhookLog.ExceptionOccured;
             webhookLogResponseModel.ResponseBody = webhookLog.ResponseBody;
             webhookLogResponseModel.ResponseHeaders = webhookLog.ResponseHeaders;
-            webhookLogResponseModel.StatusCode = webhookLog.StatusCode;
         }
         else
         {
             webhookLogResponseModel.ResponseBody = _localizedTextService.Localize("webhooks", "toggleDebug", Thread.CurrentThread.CurrentUICulture);
-            webhookLogResponseModel.StatusCode = webhookLog.StatusCode is "OK (200)" ? webhookLog.StatusCode : _localizedTextService.Localize("webhooks", "statusNotOk", Thread.CurrentThread.CurrentUICulture);
         }
 
         return webhookLogResponseModel;
