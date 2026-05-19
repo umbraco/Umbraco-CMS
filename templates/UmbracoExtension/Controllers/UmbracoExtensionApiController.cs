@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 #if IncludeExample
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Extension.ViewModels;
+using Umbraco.Extensions;
 #endif
 
 namespace Umbraco.Extension.Controllers
@@ -37,13 +39,31 @@ namespace Umbraco.Extension.Controllers
             // So we can see a long request in the dashboard with a spinning progress wheel
             Thread.Sleep(2000);
 
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             return currentUser?.Name ?? "I have no idea who you are";
         }
 
         [HttpGet("whoAmI")]
-        [ProducesResponseType<IUser>(StatusCodes.Status200OK)]
-        public IUser? WhoAmI() => _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+        [ProducesResponseType<WhoAmIResponseModel>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public ActionResult<WhoAmIResponseModel> WhoAmI()
+        {
+            IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
+            if (currentUser is null)
+            {
+                return NoContent();
+            }
+
+            return new WhoAmIResponseModel
+            {
+                Name = currentUser.Name,
+                Email = currentUser.Email,
+                Groups = currentUser.Groups
+                    .Select(group => group.Name)
+                    .WhereNotNull()
+                    .ToArray(),
+            };
+        }
 #endif
     }
 }
