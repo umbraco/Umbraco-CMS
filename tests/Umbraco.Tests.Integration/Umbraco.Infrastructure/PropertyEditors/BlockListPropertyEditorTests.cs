@@ -405,7 +405,7 @@ internal sealed class BlockListPropertyEditorTests : UmbracoIntegrationTest
     {
         var elementType = ContentTypeBuilder.CreateAllTypesContentType("myElementType", "My Element Type");
         elementType.IsElement = true;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.UpdateAsync(elementType, Constants.Security.SuperUserKey);
 
         var blockListContentType = await CreateBlockListContentType(elementType);
 

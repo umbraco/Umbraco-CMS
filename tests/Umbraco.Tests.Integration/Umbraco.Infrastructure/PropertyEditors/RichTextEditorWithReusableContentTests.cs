@@ -17,9 +17,9 @@ internal class RichTextEditorWithReusableContentTests : BlockEditorWithReusableC
     [Test]
     public async Task Can_Handle_Reusable_Element()
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var richTextDataType = await CreateRichTextDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, richTextDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, richTextDataType);
 
         var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
 

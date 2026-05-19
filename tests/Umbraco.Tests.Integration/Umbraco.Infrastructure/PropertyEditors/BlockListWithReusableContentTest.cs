@@ -20,9 +20,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     [Test]
     public async Task Can_Handle_Reusable_Element()
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
 
@@ -72,9 +72,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     [Test]
     public async Task Can_Contain_The_Same_Reusable_Element_Multiple_Times()
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
 
@@ -128,9 +128,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     [Test]
     public async Task Can_Handle_Reusable_Elements_With_Local_Settings()
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var localElementKey = Guid.NewGuid();
         var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
@@ -204,9 +204,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     [Test]
     public async Task Can_Handle_Invariant_Mixed_Local_And_Reusabe_Elements()
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var localElementKey = Guid.NewGuid();
         var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
@@ -282,9 +282,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     [Test]
     public async Task Can_Handle_Invariant_Mixed_Local_And_Reusable_Elements_With_Local_Settings()
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var localElementKey = Guid.NewGuid();
         var settingsForLocalElementKey = Guid.NewGuid();
@@ -400,9 +400,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     [Test]
     public async Task Can_Handle_Variant_Mixed_Local_And_Reusable_Elements()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
         var localElementKey = Guid.NewGuid();
         var reusableElementKey = await CreateAndPublishVariantReusableElement(elementType.Key, ["en-US", "da-DK"]);
@@ -520,9 +520,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     [Test]
     public async Task Can_Handle_Variant_Mixed_Local_And_Reusable_Elements_With_Block_Level_Variance()
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var localElementKey = Guid.NewGuid();
         var reusableElementKey = await CreateAndPublishVariantReusableElement(elementType.Key, ["en-US", "da-DK"]);
@@ -610,9 +610,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     [TestCase("da-DK")]
     public async Task Can_Handle_Variant_Reusable_Elements_For_Invariant_Content(string culture)
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var localElementKey = Guid.NewGuid();
         var reusableElementKey = await CreateAndPublishVariantReusableElement(elementType.Key, ["en-US", "da-DK"]);
@@ -716,9 +716,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
             elementCulturesToPublish.Add("da-DK");
         }
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var reusableElementKey = await CreateAndPublishVariantReusableElement(elementType.Key, elementCulturesToPublish.ToArray());
 
@@ -787,9 +787,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     [TestCase(false)]
     public async Task Can_Include_Invariant_Reusable_Elements_In_Search_Indexing(bool published)
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var reusableElementKey = await CreateAndPublishInvariantReusableElement(elementType.Key);
 
@@ -850,9 +850,9 @@ internal class BlockListWithReusableContentTest : BlockEditorWithReusableContent
     [TestCase(false)]
     public async Task Can_Include_Variant_Reusable_Elements_In_Search_Indexing(bool published)
     {
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var reusableElementKey = await CreateAndPublishVariantReusableElement(elementType.Key, ["en-US", "da-DK"]);
 
