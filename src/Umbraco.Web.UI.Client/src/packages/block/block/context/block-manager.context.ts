@@ -516,17 +516,11 @@ export abstract class UmbBlockManagerContext<
 	/**
 	 * Insert a block whose content is a library element reference.
 	 * Only creates a layout entry — no contentData entry is added.
-	 * Sets the initial block expose once the element content is resolved.
+	 * The layout observer handles fetching the element data.
 	 */
-	async insertLibraryElement(elementKey: string, _originData?: BlockOriginDataType) {
+	insertLibraryElement(elementKey: string, _originData?: BlockOriginDataType) {
 		const layout = { key: UmbId.new(), contentKey: elementKey, isSharedContent: true } as BlockLayoutType;
 		this._layouts.appendOne(layout);
-		await this.#fetchLibraryElement(elementKey);
-
-		const content = this.#resolvedLibraryElements.getValue().find((x) => x.key === elementKey);
-		if (content) {
-			this.#setInitialBlockExpose(content);
-		}
 	}
 
 	/**
