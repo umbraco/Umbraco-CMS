@@ -24,10 +24,6 @@ import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 type UmbBlockTypeItemWithGroupKey = UmbBlockTypeWithGroupKey & UmbDocumentTypeItemModel;
 
-// TODO: [LK] The Block catalogue is conceptually a Modal/Flow extension point — not a Workspace.
-// We don't yet have a name for this concept, but the Library tab here should ideally be an extensible
-// surface so other content sources (e.g. element library, clipboard) can plug in without forking this modal.
-
 @customElement('umb-block-catalogue-modal')
 export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	UmbBlockCatalogueModalData,
@@ -47,8 +43,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	@state()
 	private _activeView: 'create' | 'clipboard' | 'library' = 'create';
 
-	@state()
-	private _hasLibraryElements = false;
+	#hasLibraryElements = false;
 
 	@state()
 	private _workspacePath?: string;
@@ -102,7 +97,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		if (!this.data) return;
 
 		this._activeView = this.data.openClipboard ? 'clipboard' : 'create';
-		this._hasLibraryElements = (this.data.libraryAllowedElementTypeKeys?.length ?? 0) > 0;
+		this.#hasLibraryElements = (this.data.libraryAllowedElementTypeKeys?.length ?? 0) > 0;
 
 		this.#itemManager.setUniques(this.data.blocks.map((block) => block.contentElementTypeKey));
 	}
@@ -225,11 +220,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 			<uui-box>
 				<umb-tree
 					alias="Umb.Tree.Element"
-					.props=${{
-						hideTreeItemActions: true,
-						hideTreeRoot: true,
-						selectableFilter: this.#librarySelectableFilter,
-					}}
+					.props=${this.#libraryTreeProps}
 					@selected=${this.#onLibraryElementSelected}
 					@deselected=${this.#onLibraryElementDeselected}></umb-tree>
 			</uui-box>
@@ -237,11 +228,16 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 	}
 
 	#librarySelectableFilter = (item: any) => {
-		// Only elements (not folders) are selectable, filtered by allowed element type keys
 		if (item.isFolder) return false;
 		const allowedKeys = this.data?.libraryAllowedElementTypeKeys;
 		if (!allowedKeys?.length) return true;
 		return allowedKeys.includes(item.documentType?.unique);
+	};
+
+	#libraryTreeProps = {
+		hideTreeItemActions: true,
+		hideTreeRoot: true,
+		selectableFilter: this.#librarySelectableFilter,
 	};
 
 	#onLibraryElementSelected(event: UmbSelectedEvent) {
@@ -327,7 +323,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 					<uui-icon slot="icon" name="icon-add"></uui-icon>
 				</uui-tab>
 				${when(
-					this._hasLibraryElements,
+					this.#hasLibraryElements,
 					() => html`
 						<uui-tab
 							label=${this.localize.term('blockEditor_tabLibrary')}
