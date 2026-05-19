@@ -489,6 +489,7 @@ export default {
 		content: 'Innehåll',
 		continue: 'Fortsätt',
 		copy: 'Kopiera',
+		copied: 'Kopierat!',
 		create: 'Skapa',
 		database: 'Databas',
 		date: 'Datum',

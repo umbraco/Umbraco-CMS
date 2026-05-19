@@ -365,6 +365,7 @@ export default {
 		constrainProportions: '强制属性',
 		continue: '继续',
 		copy: '复制',
+		copied: '已复制！',
 		create: '创建',
 		database: '数据库',
 		date: '时间',

@@ -747,6 +747,7 @@ export default {
 		content: 'Cynnwys',
 		continue: 'Bwrw ymlaen',
 		copy: 'Copïo',
+		copied: 'Wedi gopïo!',
 		create: 'Creu',
 		cropSection: 'Adran tocio',
 		database: 'Cronfa ddata',

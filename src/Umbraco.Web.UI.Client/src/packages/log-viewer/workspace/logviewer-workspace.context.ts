@@ -197,8 +197,8 @@ export class UmbLogViewerWorkspaceContext extends UmbContextBase implements UmbW
 						query: 'Has(Duration) and Duration > 1000',
 					},
 					{
-						name: "Find all logs that are from the namespace 'Umbraco.Core'",
-						query: "StartsWith(SourceContext, 'Umbraco.Core')",
+						name: "Find all logs that are within the namespace 'Umbraco.Cms'",
+						query: "StartsWith(SourceContext, 'Umbraco.Cms')",
 					},
 					{
 						name: 'Find all logs that use a specific log message template',
