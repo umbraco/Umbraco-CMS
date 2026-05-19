@@ -3,7 +3,7 @@
 
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_4_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_17_5_0;
 
 /// <summary>
 /// Adds triggerSource, triggerOperation and logTypeAlias columns to the umbracoLog table
