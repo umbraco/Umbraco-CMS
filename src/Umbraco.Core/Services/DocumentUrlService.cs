@@ -154,7 +154,7 @@ public class DocumentUrlService : IDocumentUrlService
         IPublishStatusQueryService publishStatusQueryService,
         IDomainCacheService domainCacheService)
 #pragma warning disable CS0618 // Type or member is obsolete
-        :this(
+        : this(
             logger,
             documentUrlRepository,
             documentRepository,
