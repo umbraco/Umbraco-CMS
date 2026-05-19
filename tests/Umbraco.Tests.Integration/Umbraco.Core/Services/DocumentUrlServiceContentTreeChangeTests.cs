@@ -152,7 +152,9 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
         var rows = GetDbSegments(page.Key);
 
-        Assert.That(rows, Is.Not.Empty,
+        Assert.That(
+            rows,
+            Is.Not.Empty,
             "The ContentTreeChangeNotification handler must write URL segments to the database on publish.");
     }
 
@@ -170,9 +172,13 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
         var aliases = GetDbAliases(page.Key);
 
-        Assert.That(aliases, Is.Not.Empty,
+        Assert.That(
+            aliases,
+            Is.Not.Empty,
             "The ContentTreeChangeNotification handler must write URL aliases to the database on publish.");
-        Assert.That(aliases.Any(a => a.Alias == "my-integration-alias"), Is.True,
+        Assert.That(
+            aliases.Any(a => a.Alias == "my-integration-alias"),
+            Is.True,
             "The persisted alias value must match what was set on the content.");
     }
 
@@ -196,11 +202,17 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
         Assert.Multiple(() =>
         {
-            Assert.That(GetDbSegments(parent.Key), Is.Not.Empty,
+            Assert.That(
+                GetDbSegments(parent.Key),
+                Is.Not.Empty,
                 "Parent URL segments must be in the database after PublishBranch.");
-            Assert.That(GetDbSegments(child.Key), Is.Not.Empty,
+            Assert.That(
+                GetDbSegments(child.Key),
+                Is.Not.Empty,
                 "Child URL segments must be in the database after PublishBranch.");
-            Assert.That(GetDbSegments(grandchild.Key), Is.Not.Empty,
+            Assert.That(
+                GetDbSegments(grandchild.Key),
+                Is.Not.Empty,
                 "Grandchild URL segments must be in the database after PublishBranch.");
         });
     }
@@ -218,18 +230,25 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         ContentService.Publish(page, []);
 
         var rowsBefore = GetDbSegments(page.Key);
-        Assert.That(rowsBefore, Is.Not.Empty, "Pre-condition: publish must have written segments.");
+        Assert.That(
+            rowsBefore,
+            Is.Not.Empty,
+            "Pre-condition: publish must have written segments.");
 
         await DocumentUrlService.UpdateUrlSegmentCacheAsync(page.Key);
 
         var rowsAfter = GetDbSegments(page.Key);
 
-        Assert.That(rowsAfter.Count, Is.EqualTo(rowsBefore.Count),
+        Assert.That(
+            rowsAfter.Count,
+            Is.EqualTo(rowsBefore.Count),
             "UpdateUrlSegmentCacheAsync must not write additional rows to the database.");
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
         var segment = DocumentUrlService.GetUrlSegment(page.Key, isoCode, isDraft: false);
-        Assert.That(segment, Is.Not.Null,
+        Assert.That(
+            segment,
+            Is.Not.Null,
             "UpdateUrlSegmentCacheAsync must keep the in-memory cache populated.");
     }
 
@@ -250,7 +269,10 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
 
         var aliasesBefore = GetDbAliases(page.Key);
-        Assert.That(aliasesBefore, Is.Not.Empty, "Pre-condition: publish must have written aliases.");
+        Assert.That(
+            aliasesBefore,
+            Is.Not.Empty,
+            "Pre-condition: publish must have written aliases.");
 
         // Evict from cache so lookup fails.
         await DocumentUrlAliasService.DeleteAliasesFromCacheAsync(new[] { page.Key });
@@ -262,11 +284,15 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
         await DocumentUrlAliasService.UpdateAliasCacheAsync(page.Key);
 
         var aliasesAfter = GetDbAliases(page.Key);
-        Assert.That(aliasesAfter.Count, Is.EqualTo(aliasesBefore.Count),
+        Assert.That(
+            aliasesAfter.Count,
+            Is.EqualTo(aliasesBefore.Count),
             "UpdateAliasCacheAsync must not write additional alias rows to the database.");
 
         var result = await DocumentUrlAliasService.GetDocumentKeysByAliasAsync("cache-test-alias", isoCode);
-        Assert.That(result, Does.Contain(page.Key),
+        Assert.That(
+            result,
+            Does.Contain(page.Key),
             "UpdateAliasCacheAsync must restore the in-memory alias cache.");
     }
 
@@ -287,8 +313,14 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
         var parentRowsBefore = GetDbSegments(parent.Key);
         var childRowsBefore = GetDbSegments(child.Key);
-        Assert.That(parentRowsBefore, Is.Not.Empty, "Pre-condition: parent segments must be in DB.");
-        Assert.That(childRowsBefore, Is.Not.Empty, "Pre-condition: child segments must be in DB.");
+        Assert.That(
+            parentRowsBefore,
+            Is.Not.Empty,
+            "Pre-condition: parent segments must be in DB.");
+        Assert.That(
+            childRowsBefore,
+            Is.Not.Empty,
+            "Pre-condition: child segments must be in DB.");
 
         await DocumentUrlService.UpdateUrlSegmentCacheWithDescendantsAsync(parent.Key);
 
@@ -297,18 +329,26 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
         Assert.Multiple(() =>
         {
-            Assert.That(parentRowsAfter.Count, Is.EqualTo(parentRowsBefore.Count),
+            Assert.That(
+                parentRowsAfter.Count,
+                Is.EqualTo(parentRowsBefore.Count),
                 "UpdateUrlSegmentCacheWithDescendantsAsync must not write additional rows for the parent.");
-            Assert.That(childRowsAfter.Count, Is.EqualTo(childRowsBefore.Count),
+            Assert.That(
+                childRowsAfter.Count,
+                Is.EqualTo(childRowsBefore.Count),
                 "UpdateUrlSegmentCacheWithDescendantsAsync must not write additional rows for the child.");
         });
 
         var isoCode = (await LanguageService.GetDefaultLanguageAsync()).IsoCode;
         Assert.Multiple(() =>
         {
-            Assert.That(DocumentUrlService.GetUrlSegment(parent.Key, isoCode, isDraft: false), Is.Not.Null,
+            Assert.That(
+                DocumentUrlService.GetUrlSegment(parent.Key, isoCode, isDraft: false),
+                Is.Not.Null,
                 "Parent URL segment must still be resolvable from in-memory cache.");
-            Assert.That(DocumentUrlService.GetUrlSegment(child.Key, isoCode, isDraft: false), Is.Not.Null,
+            Assert.That(
+                DocumentUrlService.GetUrlSegment(child.Key, isoCode, isDraft: false),
+                Is.Not.Null,
                 "Child URL segment must still be resolvable from in-memory cache.");
         });
     }
@@ -334,8 +374,14 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
         var parentAliasesBefore = GetDbAliases(parent.Key);
         var childAliasesBefore = GetDbAliases(child.Key);
-        Assert.That(parentAliasesBefore, Is.Not.Empty, "Pre-condition: parent alias must be in DB.");
-        Assert.That(childAliasesBefore, Is.Not.Empty, "Pre-condition: child alias must be in DB.");
+        Assert.That(
+            parentAliasesBefore,
+            Is.Not.Empty,
+            "Pre-condition: parent alias must be in DB.");
+        Assert.That(
+            childAliasesBefore,
+            Is.Not.Empty,
+            "Pre-condition: child alias must be in DB.");
 
         // Evict both from cache.
         await DocumentUrlAliasService.DeleteAliasesFromCacheAsync(new[] { parent.Key, child.Key });
@@ -347,9 +393,13 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
         Assert.Multiple(() =>
         {
-            Assert.That(parentAliasesAfter.Count, Is.EqualTo(parentAliasesBefore.Count),
+            Assert.That(
+                parentAliasesAfter.Count,
+                Is.EqualTo(parentAliasesBefore.Count),
                 "UpdateAliasCacheWithDescendantsAsync must not write additional rows for the parent.");
-            Assert.That(childAliasesAfter.Count, Is.EqualTo(childAliasesBefore.Count),
+            Assert.That(
+                childAliasesAfter.Count,
+                Is.EqualTo(childAliasesBefore.Count),
                 "UpdateAliasCacheWithDescendantsAsync must not write additional rows for the child.");
         });
 
@@ -358,9 +408,13 @@ internal sealed class DocumentUrlServiceContentTreeChangeTests : UmbracoIntegrat
 
         Assert.Multiple(() =>
         {
-            Assert.That(parentResult, Does.Contain(parent.Key),
+            Assert.That(
+                parentResult,
+                Does.Contain(parent.Key),
                 "Parent alias must be resolvable after UpdateAliasCacheWithDescendantsAsync.");
-            Assert.That(childResult, Does.Contain(child.Key),
+            Assert.That(
+                childResult,
+                Does.Contain(child.Key),
                 "Child alias must be resolvable after UpdateAliasCacheWithDescendantsAsync.");
         });
     }

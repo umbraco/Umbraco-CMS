@@ -42,8 +42,8 @@ public class DocumentUrlServiceContentTreeChangeNotificationHandlerTests
     }
 
     private static ContentTreeChangeNotification SingleChange(IContent content, TreeChangeTypes changeType)
-        => new ContentTreeChangeNotification(
-            new[] { new TreeChange<IContent>(content, changeType) },
+        => new(
+            [new TreeChange<IContent>(content, changeType)],
             new EventMessages());
 
     [Test]
