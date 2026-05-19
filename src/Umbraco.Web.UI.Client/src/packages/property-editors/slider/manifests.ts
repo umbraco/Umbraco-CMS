@@ -18,7 +18,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Slider',
 			propertyEditorSchemaAlias: 'Umbraco.Slider',
 			icon: 'icon-navigation-horizontal',
-			group: 'common',
+			group: '#propertyEditorUIGroups_common',
 			keywords: [
 				'number',
 				'range',

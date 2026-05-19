@@ -477,6 +477,7 @@ export default {
 		constrainProportions: 'Mantener proporciones',
 		continue: 'Continuar',
 		copy: 'Copiar',
+		copied: '¡Copiado!',
 		create: 'Crear',
 		database: 'Base de datos',
 		date: 'Fecha',
