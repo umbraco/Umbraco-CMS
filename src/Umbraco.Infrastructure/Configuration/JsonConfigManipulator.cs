@@ -241,6 +241,14 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
 
         try
         {
+            if (File.Exists(jsonFilePath) is false)
+            {
+                // Backing file isn't on disk yet (e.g. an optional appsettings.Local.json registered by the
+                // template). Return an empty object so the caller can populate it; SaveJsonAsync will create
+                // the file on write.
+                return new JsonObject();
+            }
+
             using var streamReader = new StreamReader(jsonFilePath);
             return await JsonNode.ParseAsync(streamReader.BaseStream, documentOptions: _jsonDocumentOptions);
         }
@@ -278,11 +286,12 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
                 continue;
             }
 
-            // When targeting the last provider for writes, skip any JSON provider we can't actually read or write
-            // to as a file on disk: non-physical sources (in-memory, embedded) and physical sources whose file
-            // is missing (e.g. appsettings.Local.json registered as optional but not present when running in
-            // Debug from source). This makes the lookup fall through to the most-specific writable file.
-            if (preferLast && IsWritableJsonFile(jsonConfigurationProvider) is false)
+            // When targeting the last provider for writes, only skip JSON sources we can't write to a file on disk
+            // (in-memory or embedded providers). A physical source whose backing file doesn't yet exist is still
+            // acceptable — e.g. an optional appsettings.Local.json registered by the template; the file will be
+            // created on first save, keeping the connection string local-only rather than leaking into
+            // appsettings.{Environment}.json.
+            if (preferLast && HasPhysicalFileSource(jsonConfigurationProvider) is false)
             {
                 continue;
             }
@@ -293,16 +302,8 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
         return null;
     }
 
-    private static bool IsWritableJsonFile(JsonConfigurationProvider provider)
-    {
-        if (provider.Source.FileProvider is not PhysicalFileProvider physicalFileProvider ||
-            provider.Source.Path is null)
-        {
-            return false;
-        }
-
-        return File.Exists(Path.Combine(physicalFileProvider.Root, provider.Source.Path));
-    }
+    private static bool HasPhysicalFileSource(JsonConfigurationProvider provider) =>
+        provider.Source.FileProvider is PhysicalFileProvider && provider.Source.Path is not null;
 
     /// <summary>
     /// Finds the immediate child with the specified name, in a case insensitive manner.

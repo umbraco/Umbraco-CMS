@@ -4,6 +4,10 @@ using Umbraco.Cms.Web.UI.Extensions;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+#if DEBUG
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+#endif
+
 builder.CreateUmbracoBuilder()
     .AddBackOffice()
     .AddWebsite()

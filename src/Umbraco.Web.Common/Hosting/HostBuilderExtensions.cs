@@ -21,14 +21,6 @@ public static class HostBuilderExtensions
 
     internal static IHostBuilder ConfigureUmbracoDefaults(this IHostBuilder builder, bool addRuntimeHostedService)
     {
-#if DEBUG
-        builder.ConfigureAppConfiguration(config
-            => config.AddJsonFile(
-                "appsettings.Local.json",
-                true,
-                true));
-
-#endif
         builder.ConfigureLogging(x => x.ClearProviders());
 
         if (addRuntimeHostedService)

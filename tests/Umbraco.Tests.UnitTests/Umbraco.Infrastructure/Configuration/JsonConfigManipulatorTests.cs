@@ -95,7 +95,7 @@ public class JsonConfigManipulatorTests
     }
 
     [Test]
-    public async Task SaveConnectionStringAsync_FallsBackWhenLastProviderFileIsMissing()
+    public async Task SaveConnectionStringAsync_WhenLastProviderFileIsMissing_CreatesAndWritesToIt()
     {
         File.WriteAllText(_firstFilePath, "{}");
         File.WriteAllText(_secondFilePath, "{}");
@@ -116,8 +116,10 @@ public class JsonConfigManipulatorTests
         Assert.Multiple(() =>
         {
             Assert.IsNull(ReadConnectionString(_firstFilePath), "Connection string should not be written to the first JSON provider.");
-            Assert.AreEqual(ConnectionString, ReadConnectionString(_secondFilePath), "Connection string should fall back to the last existing JSON provider.");
-            Assert.IsFalse(File.Exists(missingOptionalFilePath), "Optional missing file should not be created by the installer.");
+            Assert.IsNull(ReadConnectionString(_secondFilePath), "Connection string should not be written to the middle JSON provider.");
+            Assert.IsTrue(File.Exists(missingOptionalFilePath), "Optional missing file should be created by the installer.");
+            Assert.AreEqual(ConnectionString, ReadConnectionString(missingOptionalFilePath), "Connection string should be written to the last (newly created) JSON provider.");
+            Assert.AreEqual(ProviderName, ReadProviderName(missingOptionalFilePath));
         });
     }
 
