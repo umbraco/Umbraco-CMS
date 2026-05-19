@@ -216,8 +216,8 @@ export class UmbContentTypeStructureManager<
 			async (dataTypeUniques) => {
 				if (dataTypeUniques && dataTypeUniques.length > 0) {
 					const { asObservable } = await this.#dataTypeDetailRepository.requestByUniques(dataTypeUniques);
-					// TODO: We should avoid this check, but architectural we are missing a way to cancel previous requests. [NL]
-					// It is not very likely that this happens, but we keep this check to avoid eventual race conditions. [NL]
+					// TODO: We should avoid this check, but architecturally, we currently lack a way to cancel previous requests. [NL]
+					// This is unlikely to happen, but we keep this check to avoid potential race conditions. [NL]
 					const currentDataTypeUniques = this.getContentTypeDataTypeUniques();
 					if (
 						dataTypeUniques.length !== currentDataTypeUniques.length ||
