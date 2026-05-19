@@ -53,13 +53,15 @@ Reusable elements for other packages. Must be registered as custom elements at s
 ```typescript
 @customElement('umb-feature')
 export class UmbFeatureElement extends UmbLitElement {
-  render() { return html`Feature Element`; }
+	render() {
+		return html`Feature Element`;
+	}
 }
 
 declare global {
-  interface HTMLElementTagNameMap {
-    ['umb-feature']: UmbFeatureElement;
-  }
+	interface HTMLElementTagNameMap {
+		['umb-feature']: UmbFeatureElement;
+	}
 }
 ```
 
@@ -80,11 +82,13 @@ Only export what constitutes the public contract — context tokens, types, cons
 To make a module importable by other packages:
 
 1. Add the subpath to `package.json` exports:
+
 ```json
 { "exports": { "./module": "./dist-cms/packages/package/module/index.js" } }
 ```
 
 2. Run the generators:
+
 ```bash
 npm i && npm run generate:tsconfig
 ```
@@ -114,9 +118,9 @@ If you're adding a new shell-like element (rare — most code lives inside `<umb
 Two separate concepts — don't conflate them:
 
 - **Active UI locale** — `GlobalSettings.DefaultUILanguage` (default `en-US`). What Razor renders as `lang` on the shell, what `loadLanguage()` is called with. The locale users actually see.
-- **Fallback culture** — `en` (`UMB_DEFAULT_LOCALIZATION_CULTURE`). The culture the canonical `en.ts` dictionary ships under (`Umb.Localization.EN`). Always loaded *alongside* the active locale so any missing key falls back to English.
+- **Fallback culture** — `en` (`UMB_DEFAULT_LOCALIZATION_CULTURE`). The culture the canonical `en.ts` dictionary ships under (`Umb.Localization.EN`). Always loaded _alongside_ the active locale so any missing key falls back to English.
 
-A third-party language pack overriding canonical keys for a default install should declare `culture: 'en-US'` (matches active locale), not `culture: 'en'`. The keys come *from* `en.ts`, but the override extension's `culture` must match the active locale, otherwise the registry filters it out.
+A third-party language pack overriding canonical keys for a default install should declare `culture: 'en-US'` (matches active locale), not `culture: 'en'`. The keys come _from_ `en.ts`, but the override extension's `culture` must match the active locale, otherwise the registry filters it out.
 
 ---
 
