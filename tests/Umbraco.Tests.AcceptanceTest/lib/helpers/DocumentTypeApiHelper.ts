@@ -752,7 +752,7 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
-  async createElementTypeWithPropertyInTab(elementName: string, tabName: string = 'ContentTab', groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, isMandatory: boolean = false) {
+  async createElementTypeWithPropertyInTab(elementName: string, tabName: string = 'ContentTab', groupName: string = 'TestGroup', dataTypeName: string = 'Textstring', dataTypeId: string, isMandatory: boolean = false, elementVariesByCulture: boolean = false, propertyVariesByCulture: boolean = false) {
     await this.ensureNameNotExists(elementName);
 
     const crypto = require('crypto');
@@ -763,6 +763,7 @@ export class DocumentTypeApiHelper {
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
+      .withVariesByCulture(elementVariesByCulture)
       .withIcon("icon-plugin")
       .addContainer()
         .withName(tabName)
@@ -781,6 +782,7 @@ export class DocumentTypeApiHelper {
         .withName(dataTypeName)
         .withDataTypeId(dataTypeId)
         .withMandatory(isMandatory)
+        .withVariesByCulture(propertyVariesByCulture)
         .done()
       .build();
     return await this.create(documentType);
@@ -1225,33 +1227,20 @@ export class DocumentTypeApiHelper {
   ) {
     const crypto = require('crypto');
     await this.ensureNameNotExists(documentTypeName);
-    await this.ensureNameNotExists(outerElementTypeName);
-    await this.ensureNameNotExists(innerElementTypeName);
     await this.api.dataType.ensureNameNotExists(outerBlockListDataTypeName);
     await this.api.dataType.ensureNameNotExists(innerBlockListDataTypeName);
 
     // 1. Inner Element Type (with Text property)
-    const innerElementContainerId = crypto.randomUUID();
-    const innerElementType = new DocumentTypeBuilder()
-      .withName(innerElementTypeName)
-      .withAlias(AliasHelper.toAlias(innerElementTypeName))
-      .withIsElement(true)
-      .withVariesByCulture(variance.innerElement)
-      .withIcon('icon-plugin')
-      .addContainer()
-        .withName('Content')
-        .withId(innerElementContainerId)
-        .withType('Group')
-        .done()
-      .addProperty()
-        .withContainerId(innerElementContainerId)
-        .withAlias(AliasHelper.toAlias(textPropertyName))
-        .withName(textPropertyName)
-        .withDataTypeId(textDataTypeId)
-        .withVariesByCulture(variance.text)
-        .done()
-      .build();
-    const innerElementTypeId = await this.create(innerElementType) as string;
+    const innerElementTypeId = await this.createElementTypeWithPropertyInTab(
+      innerElementTypeName,
+      undefined,
+      undefined,
+      textPropertyName,
+      textDataTypeId,
+      false,
+      variance.innerElement,
+      variance.text
+    ) as string;
 
     // 2. Inner Block List Data Type
     const innerBlockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithABlock(
@@ -1260,27 +1249,16 @@ export class DocumentTypeApiHelper {
     ) as string;
 
     // 3. Outer Element Type (with Inner Block List property)
-    const outerElementContainerId = crypto.randomUUID();
-    const outerElementType = new DocumentTypeBuilder()
-      .withName(outerElementTypeName)
-      .withAlias(AliasHelper.toAlias(outerElementTypeName))
-      .withIsElement(true)
-      .withVariesByCulture(variance.outerElement)
-      .withIcon('icon-plugin')
-      .addContainer()
-        .withName('Content')
-        .withId(outerElementContainerId)
-        .withType('Group')
-        .done()
-      .addProperty()
-        .withContainerId(outerElementContainerId)
-        .withAlias(AliasHelper.toAlias(innerBlockListDataTypeName))
-        .withName(innerBlockListDataTypeName)
-        .withDataTypeId(innerBlockListDataTypeId)
-        .withVariesByCulture(variance.innerBlockList)
-        .done()
-      .build();
-    const outerElementTypeId = await this.create(outerElementType) as string;
+    const outerElementTypeId = await this.createElementTypeWithPropertyInTab(
+      outerElementTypeName,
+      undefined,
+      undefined,
+      innerBlockListDataTypeName,
+      innerBlockListDataTypeId,
+      false,
+      variance.outerElement,
+      variance.innerBlockList
+    ) as string;
 
     // 4. Outer Block List Data Type
     const outerBlockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithABlock(
