@@ -13,6 +13,7 @@ import {
 } from '@umbraco-cms/backoffice/external/lit';
 import { transformServerPathToClientPath } from '@umbraco-cms/backoffice/utils';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
+import { UmbPickerContext } from '@umbraco-cms/backoffice/picker';
 import { UmbRepositoryItemsManager } from '@umbraco-cms/backoffice/repository';
 import { UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS } from '@umbraco-cms/backoffice/document-type';
 import { UMB_MODAL_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
@@ -34,6 +35,8 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		UMB_DOCUMENT_TYPE_ITEM_REPOSITORY_ALIAS,
 	);
 
+	#pickerContext = new UmbPickerContext(this);
+
 	#search = '';
 
 	#serverUrl = '';
@@ -42,6 +45,9 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _activeView: 'create' | 'clipboard' | 'library' = 'create';
+
+	@state()
+	private _searchQuery = '';
 
 	#hasLibraryElements = false;
 
@@ -89,6 +95,16 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 		this.observe(this.#itemManager.items, async (items) => {
 			this.#observeBlockTypes(items);
+		});
+
+		this.#pickerContext.search.updateConfig({ providerAlias: 'Umb.SearchProvider.Element' });
+		this.#pickerContext.selection.setMultiple(false);
+		this.observe(this.#pickerContext.search.query, (query) => {
+			this._searchQuery = query?.query ?? '';
+		});
+		this.observe(this.#pickerContext.selection.selection, (selection) => {
+			const elementKey = selection[0];
+			this.value = elementKey ? { library: { elementKey } } : undefined;
 		});
 	}
 
@@ -217,13 +233,20 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 
 	#renderLibrary() {
 		return html`
-			<uui-box>
-				<umb-tree
-					alias="Umb.Tree.Element"
-					.props=${this.#libraryTreeProps}
-					@selected=${this.#onLibraryElementSelected}
-					@deselected=${this.#onLibraryElementDeselected}></umb-tree>
-			</uui-box>
+			<umb-picker-search-field></umb-picker-search-field>
+			<umb-picker-search-result .pickableFilter=${this.#librarySelectableFilter}></umb-picker-search-result>
+			${when(
+				!this._searchQuery,
+				() => html`
+					<uui-box>
+						<umb-tree
+							alias="Umb.Tree.Element"
+							.props=${this.#libraryTreeProps}
+							@selected=${this.#onLibraryElementSelected}
+							@deselected=${this.#onLibraryElementDeselected}></umb-tree>
+					</uui-box>
+				`,
+			)}
 		`;
 	}
 
@@ -238,20 +261,17 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		hideTreeItemActions: true,
 		hideTreeRoot: true,
 		selectableFilter: this.#librarySelectableFilter,
+		selectionManager: this.#pickerContext.selection,
 	};
 
 	#onLibraryElementSelected(event: UmbSelectedEvent) {
 		event.stopPropagation();
-		const elementKey = event.unique;
-		if (!elementKey) return;
-		this.value = {
-			library: { elementKey },
-		};
+		if (event.unique) this.#pickerContext.selection.select(event.unique);
 	}
 
 	#onLibraryElementDeselected(event: UmbSelectedEvent) {
 		event.stopPropagation();
-		this.value = undefined;
+		if (event.unique) this.#pickerContext.selection.deselect(event.unique);
 	}
 
 	#renderCreateEmpty() {
