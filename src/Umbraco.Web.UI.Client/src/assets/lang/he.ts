@@ -262,6 +262,7 @@ export default {
 		constrainProportions: 'שמור על פרופורציות',
 		continue: 'המשך',
 		copy: 'העתק',
+		copied: 'הועתק!',
 		create: 'צור',
 		database: 'בסיס נתונים',
 		date: 'תאריך',
