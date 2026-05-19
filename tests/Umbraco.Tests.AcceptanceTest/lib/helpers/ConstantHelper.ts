@@ -323,6 +323,7 @@
     documentSearch: '/umbraco/management/api/v1/item/document/search',
     mediaSearch: '/umbraco/management/api/v1/item/media/search',
     memberSearch: '/umbraco/management/api/v1/item/member/search',
+    elementSearch: '/umbraco/management/api/v1/item/element/search',
     element: '/umbraco/management/api/v1/element',
     elementFolder: '/umbraco/management/api/v1/element/folder',
     treeElementRoot: '/umbraco/management/api/v1/tree/element/root',
