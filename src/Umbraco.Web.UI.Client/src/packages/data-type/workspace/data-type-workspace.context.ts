@@ -260,7 +260,8 @@ export class UmbDataTypeWorkspaceContext
 		const aliasSet = new Set<string>();
 		for (const setting of mergedSettings) {
 			if (aliasSet.has(setting.alias)) {
-				throw new Error(`There is a duplicate alias "${setting.alias}" in the Property Editor configuration.`);
+				console.error(`There is a duplicate alias "${setting.alias}" in the Property Editor configuration.`);
+				continue;
 			}
 			aliasSet.add(setting.alias);
 		}
