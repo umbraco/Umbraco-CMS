@@ -13,7 +13,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 */
 import type { UmbLocalizationConsumer, UmbLocalizationSetBase, UmbLocalizationSetKey } from './localization.manager.js';
 import { umbLocalizationManager } from './localization.manager.js';
-import type { UmbKnownLocalizationSet } from './known-keys.generated.js';
+// Side-effect import: registers the global `UmbKnownLocalizationSet` / `UmbKnownLocalizationKey`
+// declarations so plugins can extend the interface via plain `declare global { … }` blocks.
+import './known-keys.generated.js';
 import { unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import type { LitElement } from '@umbraco-cms/backoffice/external/lit';

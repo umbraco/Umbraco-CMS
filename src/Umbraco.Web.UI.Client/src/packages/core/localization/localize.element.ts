@@ -1,6 +1,8 @@
 import { css, customElement, html, property, state, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
-import type { UmbKnownLocalizationKey } from '@umbraco-cms/backoffice/localization-api';
+// Side-effect import: ensures the global `UmbKnownLocalizationKey` declaration is loaded so the
+// `key` property below picks up plugin-augmented entries from `declare global` blocks.
+import '@umbraco-cms/backoffice/localization-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**

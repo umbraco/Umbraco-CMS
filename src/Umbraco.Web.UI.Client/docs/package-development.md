@@ -113,7 +113,22 @@ npm run generate:localization-keys
 
 This walks `en.ts`, flattens `group: { key: value }` into `group_key`, and rewrites `src/libs/localization-api/known-keys.generated.ts` with an `UmbKnownLocalizationSet` interface — string entries stay typed as `string`, function entries forward their parameter types (so `term('user_languageNotFound', culture, baseCulture)` is checked against the underlying signature). The script also runs automatically as a `prebuild` hook, so production builds always see fresh keys.
 
-The signature keeps a `(string & {})` escape hatch alongside `keyof UmbKnownLocalizationSet`. That means autocomplete shows the canonical keys, typos like `localize.term('login_grreting0')` become compile errors, and dynamic keys like `` localize.term(`login_greeting${day}`) `` still work without a cast. Third-party packages can declare-merge into `UmbKnownLocalizationSet` to publish their own typed keys.
+The TypeScript signature on `term()` keeps a `(string & {})` escape hatch alongside `keyof UmbKnownLocalizationSet`. That means autocomplete shows the canonical keys and dynamic keys like `` localize.term(`login_greeting${day}`) `` still work without a cast. Typos in static string literals are caught by a local ESLint rule (`local-rules/no-unknown-localization-key`) that checks the literal against the generated runtime list — that runs in this repo only, so third-party plugins are unaffected.
+
+#### Adding plugin-specific keys
+
+`UmbKnownLocalizationSet` is declared globally (same pattern as `UmbExtensionManifestMap`), so any package can extend it by re-declaring the interface — no module-path boilerplate:
+
+```ts
+declare global {
+    interface UmbKnownLocalizationSet {
+        mypkg_anything: string;
+        mypkg_greeting: (name: string) => string;
+    }
+}
+```
+
+Once declared, those keys participate in autocomplete and argument-type inference exactly like the built-in ones. The plugin remains free to register the actual translations at runtime via the `localization` extension manifest.
 
 ### Active language
 
