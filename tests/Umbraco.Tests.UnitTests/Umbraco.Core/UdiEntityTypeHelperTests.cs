@@ -15,10 +15,11 @@ public class UdiEntityTypeHelperTests
     // (with a reason) only if a new value genuinely should not round-trip via UdiEntityTypeHelper.
     private static readonly UmbracoObjectTypes[] _unmappedUmbracoObjectTypes =
     {
-        UmbracoObjectTypes.Unknown,        // sentinel/default
-        UmbracoObjectTypes.ROOT,           // system root, not a UDI-addressable entity
-        UmbracoObjectTypes.RecycleBin,     // system folder, not a UDI-addressable entity
-        UmbracoObjectTypes.IdReservation,  // identifier reservation marker
+        UmbracoObjectTypes.Unknown,            // sentinel/default
+        UmbracoObjectTypes.ROOT,               // system root, not a UDI-addressable entity
+        UmbracoObjectTypes.RecycleBin,         // system folder, not a UDI-addressable entity
+        UmbracoObjectTypes.ElementRecycleBin,  // system folder, not a UDI-addressable entity
+        UmbracoObjectTypes.IdReservation,      // identifier reservation marker
     };
 
     [TestCaseSource(nameof(MappedUmbracoObjectTypes))]
