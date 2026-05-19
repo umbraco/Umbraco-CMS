@@ -11,11 +11,7 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-import type {
-	UmbLocalizationConsumer,
-	UmbLocalizationSetBase,
-	UmbLocalizationSetKey,
-} from './localization.manager.js';
+import type { UmbLocalizationConsumer, UmbLocalizationSetBase, UmbLocalizationSetKey } from './localization.manager.js';
 import { umbLocalizationManager } from './localization.manager.js';
 import type { UmbKnownLocalizationSet } from './known-keys.generated.js';
 import { unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
@@ -73,9 +69,9 @@ type LocalizationArgsOf<T, K> = K extends keyof T
  * }
  * ```
  */
-export class UmbLocalizationController<
-	LocalizationSetType extends UmbLocalizationSetBase = UmbKnownLocalizationSet,
-> implements UmbController, UmbLocalizationConsumer {
+export class UmbLocalizationController<LocalizationSetType extends UmbLocalizationSetBase = UmbKnownLocalizationSet>
+	implements UmbController, UmbLocalizationConsumer
+{
 	#host;
 	#hostEl?: HTMLElement & Partial<Pick<LitElement, 'requestUpdate'>>;
 	readonly controllerAlias = LocalizationControllerAlias;

@@ -56,6 +56,7 @@ export default [
 			'local-rules/enforce-manifest-alias': 'warn',
 			'local-rules/prefer-static-styles-last': 'warn',
 			'local-rules/no-unsafe-localize': 'error',
+			'local-rules/no-unknown-localization-key': 'error',
 			'local-rules/enforce-umbraco-external-imports': [
 				'error',
 				{

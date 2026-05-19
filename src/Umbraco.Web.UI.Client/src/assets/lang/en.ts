@@ -956,6 +956,7 @@ export default {
 		next: 'Next',
 		no: 'No',
 		nodeName: 'Node Name',
+		none: 'None',
 		notFound: 'Not found',
 		of: 'of',
 		off: 'Off',

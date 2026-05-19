@@ -1112,6 +1112,7 @@ export interface UmbKnownLocalizationSet extends UmbLocalizationSetBase {
 	general_no: string;
 	general_nodeName: string;
 	general_noItemsInList: string;
+	general_none: string;
 	general_notFound: string;
 	general_of: string;
 	general_off: string;
@@ -3800,6 +3801,7 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'general_no',
 	'general_nodeName',
 	'general_noItemsInList',
+	'general_none',
 	'general_notFound',
 	'general_of',
 	'general_off',
