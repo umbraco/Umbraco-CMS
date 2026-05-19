@@ -25,4 +25,5 @@ export {
 	throttleTime,
 	auditTime,
 	defer,
+	withLatestFrom,
 } from 'rxjs';

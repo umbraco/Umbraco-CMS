@@ -28,7 +28,7 @@ import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { map, firstValueFrom, withLatestFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbError } from '@umbraco-cms/backoffice/resources';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 
@@ -110,11 +110,6 @@ export class UmbContentTypeStructureManager<
 	async getContentTypeProperties() {
 		return await this.observe(this.contentTypeProperties).asPromise();
 	}
-	readonly contentTypeDataTypeUniques = this.#contentTypes.asObservablePart((contentTypes) => {
-		return contentTypes
-			.flatMap((x) => x.properties?.map((p) => p.dataType.unique) ?? [])
-			.filter(UmbFilterDuplicateStrings);
-	});
 
 	/**
 	 * Get an observable for the data type detail of a data type that is in use by this content type structure.
@@ -137,9 +132,24 @@ export class UmbContentTypeStructureManager<
 	readonly contentTypeLoaded = mergeObservables(
 		[this.contentTypeCompositions, this.contentTypeUniques],
 		([comps, uniques]) => {
-			return comps.every((x) => uniques.includes(x.contentType.unique));
+			return uniques.length > 0 && comps.every((x) => uniques.includes(x.contentType.unique));
 		},
 	);
+
+	// Use withLatestFrom, to ensure the latest value is given when contentTypeLoaded triggers. [NL]
+	readonly contentTypeDataTypeUniques = this.contentTypeLoaded.pipe(
+		withLatestFrom(this.contentTypeProperties),
+		map(([contentTypeLoaded, contentTypeProperties]) => {
+			if (!contentTypeLoaded || !contentTypeProperties) return [];
+			return (contentTypeProperties.map((p) => p.dataType.unique) ?? []).filter(UmbFilterDuplicateStrings);
+		}),
+	);
+	getContentTypeDataTypeUniques() {
+		return this.#contentTypes
+			.getValue()
+			.flatMap((x) => x.properties?.map((p) => p.dataType.unique) ?? [])
+			.filter(UmbFilterDuplicateStrings);
+	}
 
 	readonly variesByCulture = createObservablePart(this.ownerContentType, (x) => x?.variesByCulture);
 	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
@@ -200,11 +210,21 @@ export class UmbContentTypeStructureManager<
 		// Observe data type uniques and bulk load their details.
 		// Uses nested observation: outer watches which data types are needed,
 		// inner subscribes to the store-backed observable for reactivity.
+
 		this.observe(
 			this.contentTypeDataTypeUniques,
 			async (dataTypeUniques) => {
-				if (dataTypeUniques.length > 0) {
+				if (dataTypeUniques && dataTypeUniques.length > 0) {
 					const { asObservable } = await this.#dataTypeDetailRepository.requestByUniques(dataTypeUniques);
+					// TODO: We should avoid this check, but architectural we are missing a way to cancel previous requests. [NL]
+					// It is not very likely that this happens, but we keep this check to avoid eventual race conditions. [NL]
+					const currentDataTypeUniques = this.getContentTypeDataTypeUniques();
+					if (
+						dataTypeUniques.length !== currentDataTypeUniques.length ||
+						!dataTypeUniques.every((unique) => currentDataTypeUniques.includes(unique))
+					) {
+						return;
+					}
 					if (asObservable) {
 						this.observe(
 							asObservable(),
