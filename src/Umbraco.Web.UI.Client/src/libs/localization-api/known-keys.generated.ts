@@ -11,6 +11,16 @@
 
 import type { UmbLocalizationSetBase } from './localization.manager.js';
 
+/**
+ * Typed dictionary of every known Umbraco localization key derived from `assets/lang/en.ts`.
+ *
+ * Each property reflects the entry shape: string-valued keys are typed as `string`, function-valued
+ * keys forward their full parameter list so call sites are checked against the source signature.
+ *
+ * Augmentable via TypeScript declaration merging — third-party packages can publish their own typed
+ * keys by re-declaring the interface in a `declare module '@umbraco-cms/backoffice/localization-api'`
+ * block (see `docs/package-development.md` → Type-safe localization keys).
+ */
 export interface UmbKnownLocalizationSet extends UmbLocalizationSetBase {
 	actionCategories_administration: string;
 	actionCategories_content: string;
@@ -2688,6 +2698,10 @@ export interface UmbKnownLocalizationSet extends UmbLocalizationSetBase {
 	welcomeDashboard_umbracoForumHeadline: string;
 }
 
+/**
+ * Union of every known localization key from `UmbKnownLocalizationSet`, excluding the metadata
+ * fields inherited from `UmbLocalizationSetBase` (`$code`, `$dir`).
+ */
 export type UmbKnownLocalizationKey = Exclude<keyof UmbKnownLocalizationSet, keyof UmbLocalizationSetBase>;
 
 /**

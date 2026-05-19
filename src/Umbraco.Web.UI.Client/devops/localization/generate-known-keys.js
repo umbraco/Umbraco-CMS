@@ -6,7 +6,7 @@
  * `src/libs/localization-api/known-keys.generated.ts` containing the
  * `UmbKnownLocalizationSet` interface. The interface preserves whether each entry is a
  * plain string or a function — so `localize.term()` keeps its argument-type inference
- * via `FunctionParams<LocalizationSetType[K]>`.
+ * via `LocalizationArgsOf<LocalizationSetType, K>` in `localization.controller.ts`.
  *
  * Run via `npm run generate:localization-keys`. Also runs automatically before the
  * production build (`prebuild` hook).
@@ -59,11 +59,15 @@ function inferEntryType(initializer, source) {
 	return 'string';
 }
 
+const isWrapperExpression = (node) =>
+	ts.isAsExpression(node) || ts.isTypeAssertionExpression(node) || ts.isParenthesizedExpression(node);
+
 function unwrapAs(expr) {
-	while (ts.isAsExpression(expr) || ts.isTypeAssertionExpression(expr) || ts.isParenthesizedExpression(expr)) {
-		expr = expr.expression;
+	let current = expr;
+	while (isWrapperExpression(current)) {
+		current = current.expression;
 	}
-	return expr;
+	return current;
 }
 
 function findDefaultExportObjectLiteral(source) {
@@ -95,29 +99,33 @@ function getKeyEntry(keyProp, groupName, source) {
 	};
 }
 
-function collectEntries(objectLiteral, source) {
-	const entries = [];
-	const seen = new Set();
-	const duplicates = [];
-
-	for (const groupProp of objectLiteral.properties) {
+function flattenEntries(objectLiteral, source) {
+	return objectLiteral.properties.flatMap((groupProp) => {
 		const group = getGroupObjectLiteral(groupProp);
-		if (!group) continue;
+		if (!group) return [];
+		return group.value.properties
+			.map((keyProp) => getKeyEntry(keyProp, group.name, source))
+			.filter((entry) => entry !== null);
+	});
+}
 
-		for (const keyProp of group.value.properties) {
-			const entry = getKeyEntry(keyProp, group.name, source);
-			if (!entry) continue;
-
-			if (seen.has(entry.key)) {
-				duplicates.push(entry.key);
-				continue;
-			}
+function deduplicate(rawEntries) {
+	const entries = [];
+	const duplicates = [];
+	const seen = new Set();
+	for (const entry of rawEntries) {
+		if (seen.has(entry.key)) {
+			duplicates.push(entry.key);
+		} else {
 			seen.add(entry.key);
 			entries.push(entry);
 		}
 	}
-
 	return { entries, duplicates };
+}
+
+function collectEntries(objectLiteral, source) {
+	return deduplicate(flattenEntries(objectLiteral, source));
 }
 
 function keyLiteral(key) {
@@ -142,10 +150,24 @@ async function main() {
 		header,
 		"import type { UmbLocalizationSetBase } from './localization.manager.js';",
 		'',
+		'/**',
+		' * Typed dictionary of every known Umbraco localization key derived from `assets/lang/en.ts`.',
+		' *',
+		' * Each property reflects the entry shape: string-valued keys are typed as `string`, function-valued',
+		" * keys forward their full parameter list so call sites are checked against the source signature.",
+		' *',
+		" * Augmentable via TypeScript declaration merging — third-party packages can publish their own typed",
+		" * keys by re-declaring the interface in a `declare module '@umbraco-cms/backoffice/localization-api'`",
+		' * block (see `docs/package-development.md` → Type-safe localization keys).',
+		' */',
 		'export interface UmbKnownLocalizationSet extends UmbLocalizationSetBase {',
 		...entries.map((e) => `\t${keyLiteral(e.key)}: ${e.type};`),
 		'}',
 		'',
+		'/**',
+		" * Union of every known localization key from `UmbKnownLocalizationSet`, excluding the metadata",
+		" * fields inherited from `UmbLocalizationSetBase` (`$code`, `$dir`).",
+		' */',
 		"export type UmbKnownLocalizationKey = Exclude<keyof UmbKnownLocalizationSet, keyof UmbLocalizationSetBase>;",
 		'',
 		'/**',

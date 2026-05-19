@@ -41,6 +41,14 @@ export interface UmbLocalizationConsumer {
 export const UMB_DEFAULT_LOCALIZATION_CULTURE = 'en';
 
 export class UmbLocalizationManager {
+	/**
+	 * Internal registry of controllers the manager dispatches `keysChanged` / `documentUpdate` to.
+	 * Use `appendConsumer` / `removeConsumer` to mutate this set — external code should not iterate
+	 * it directly or assume the stored values are full `UmbLocalizationController` instances. The
+	 * element type was relaxed from `UmbLocalizationController<UmbLocalizationSetBase>` to the
+	 * smaller `UmbLocalizationConsumer` contract in v18.1 so that the manager doesn't pick up
+	 * variance from the controller's generic `term()` signature.
+	 */
 	connectedControllers = new Set<UmbLocalizationConsumer>();
 
 	#changedKeys: Set<UmbLocalizationSetKey> = new Set();

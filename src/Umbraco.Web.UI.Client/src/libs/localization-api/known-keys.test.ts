@@ -7,6 +7,12 @@ import { UMB_KNOWN_LOCALIZATION_KEYS } from './known-keys.generated.js';
  * committed (see `docs/package-development.md` → Type-safe localization keys), so without an
  * assertion like this a stale file would happily compile and only get caught the next time the
  * `prebuild` hook ran. By that point the PR may already be merged.
+ *
+ * **Scope:** this only validates the set of flat key NAMES, not the argument signatures the
+ * generator emits per entry. A key flipping between a plain string and a function (or a function
+ * gaining/losing parameters) in `en.ts` is invisible to this test — `tsc` catches those at the
+ * call sites that pass args, but if no call site uses the affected key the drift survives until
+ * the next regen. Worth a follow-up if it ever bites in practice.
  */
 describe('UmbKnownLocalizationSet generation', () => {
 	it('stays in sync with `assets/lang/en.ts`', () => {

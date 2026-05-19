@@ -24,23 +24,7 @@ import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 const LocalizationControllerAlias = Symbol();
-/**
- * The UmbLocalizationController enables localization for your element.
- * @see UmbLocalizeElement
- * @example
- * ```ts
- * import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
- *
- * \@customElement('my-element')
- * export class MyElement extends LitElement {
- *   private localize = new UmbLocalizationController(this);
- *
- *   render() {
- *     return html`<p>${this.localize.term('general_close')}</p>`;
- *   }
- * }
- * ```
- */
+
 /**
  * Resolves the union of valid keys for a localization set, excluding the metadata fields
  * declared on `UmbLocalizationSetBase` (`$code`, `$dir`). The `(string & {})` intersection
@@ -72,6 +56,23 @@ type LocalizationArgsOf<T, K> = K extends keyof T
 		: unknown[]
 	: unknown[];
 
+/**
+ * The UmbLocalizationController enables localization for your element.
+ * @see UmbLocalizeElement
+ * @example
+ * ```ts
+ * import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
+ *
+ * \@customElement('my-element')
+ * export class MyElement extends LitElement {
+ *   private localize = new UmbLocalizationController(this);
+ *
+ *   render() {
+ *     return html`<p>${this.localize.term('general_close')}</p>`;
+ *   }
+ * }
+ * ```
+ */
 export class UmbLocalizationController<
 	LocalizationSetType extends UmbLocalizationSetBase = UmbKnownLocalizationSet,
 > implements UmbController, UmbLocalizationConsumer {
@@ -196,8 +197,13 @@ export class UmbLocalizationController<
 
 	/**
 	 * Outputs a translated term.
-	 * @param {string} key - the localization key, the indicator of what localization entry you want to retrieve.
-	 * @param {unknown[]} args - the arguments to parse for this localization entry.
+	 * @param key The localization key to retrieve. Typed as `LocalizationKeyOf<LocalizationSetType>` —
+	 *            literal-key autocomplete from `UmbKnownLocalizationSet` plus a `(string & {})` escape
+	 *            hatch for dynamic keys.
+	 * @param args The arguments to parse for this localization entry. Resolved by
+	 *             `LocalizationArgsOf<LocalizationSetType, K>`: function-valued entries forward their
+	 *             parameter list (so `(name: string) => string` requires a `string` here); string-valued
+	 *             entries accept `unknown[]` for the runtime `%0%` / `{0}` substitution path.
 	 * @returns {string} - the translated term as a string.
 	 * @example
 	 * Retrieving a term without any arguments:
@@ -206,7 +212,7 @@ export class UmbLocalizationController<
 	 * ```
 	 * Retrieving a term with arguments:
 	 * ```ts
-	 * this.localize.term('general_greeting', ['John']);
+	 * this.localize.term('general_greeting', 'John');
 	 * ```
 	 */
 	term<K extends LocalizationKeyOf<LocalizationSetType>>(
@@ -226,9 +232,14 @@ export class UmbLocalizationController<
 	 * Returns the localized term for the given key, or the default value if not found.
 	 * This method follows the same resolution order as term() (primary → secondary → fallback),
 	 * but returns the provided defaultValue instead of the key when no translation is found.
-	 * @param {string} key - the localization key, the indicator of what localization entry you want to retrieve.
-	 * @param {string | null} defaultValue - the value to return if the key is not found in any localization set.
-	 * @param {unknown[]} args - the arguments to parse for this localization entry.
+	 * @param key The localization key to retrieve. Typed as `LocalizationKeyOf<LocalizationSetType>` —
+	 *            literal-key autocomplete from `UmbKnownLocalizationSet` plus a `(string & {})` escape
+	 *            hatch for dynamic keys.
+	 * @param defaultValue The value to return if the key is not found in any localization set.
+	 * @param args The arguments to parse for this localization entry. Resolved by
+	 *             `LocalizationArgsOf<LocalizationSetType, K>`: function-valued entries forward their
+	 *             parameter list; string-valued entries accept `unknown[]` for the runtime `%0%` / `{0}`
+	 *             substitution path.
 	 * @returns {string | null} - the translated term or the default value.
 	 * @example
 	 * Retrieving a term with fallback:
