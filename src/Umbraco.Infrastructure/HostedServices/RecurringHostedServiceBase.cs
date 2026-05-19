@@ -38,6 +38,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay, TimeProvider timeProvider)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(period, TimeSpan.Zero);
+        ArgumentOutOfRangeException.ThrowIfLessThan(delay, TimeSpan.Zero);
 
         _logger = logger;
         Interlocked.Exchange(ref _periodTicks, period.Ticks);
@@ -261,7 +262,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="newPeriod">The new period between tasks.</param>
     protected void ChangePeriod(TimeSpan newPeriod)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(newPeriod, TimeSpan.Zero);
+        ArgumentOutOfRangeException.ThrowIfLessThan(newPeriod, TimeSpan.Zero);
 
         Interlocked.Exchange(ref _periodTicks, newPeriod.Ticks);
 
@@ -297,6 +298,8 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="nextDelay">The target interval from execution start to the next execution. Execution time is subtracted to prevent drift.</param>
     protected internal void TriggerExecution(TimeSpan nextDelay)
     {
+        ArgumentOutOfRangeException.ThrowIfLessThan(nextDelay, TimeSpan.Zero);
+
         Interlocked.Exchange(ref _triggerState, new TriggerState(Delay: nextDelay));
         ReleaseSignal();
     }
