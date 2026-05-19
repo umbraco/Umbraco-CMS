@@ -14,7 +14,9 @@ public class RecurringHostedServiceBaseTests
     [TestCase(10_000, 15_000, 0, Description = "Returns zero when execution exceeds period")]
     [TestCase(10_000, 0, 10_000, Description = "Returns full period when elapsed is zero")]
     [TestCase(10_000, 10_000, 0, Description = "Returns zero when execution equals period")]
-    [TestCase(-1, 1_000, 0, Description = "Returns zero for negative period")]
+    [TestCase(-2, 1_000, 0, Description = "Returns zero for negative (non-infinite) period")]
+    [TestCase(-1, 1_000, -1, Description = "Preserves Timeout.InfiniteTimeSpan")]
+    [TestCase(-1, 0, -1, Description = "Preserves Timeout.InfiniteTimeSpan when elapsed is zero")]
     public void ComputeNextDelay_Returns_Expected_Result(long periodMs, long elapsedMs, long expectedMs)
     {
         var period = TimeSpan.FromMilliseconds(periodMs);
@@ -23,6 +25,112 @@ public class RecurringHostedServiceBaseTests
         TimeSpan result = RecurringHostedServiceBase.ComputeNextDelay(period, elapsed);
 
         Assert.AreEqual(TimeSpan.FromMilliseconds(expectedMs), result);
+    }
+
+    [TestCase(0)]
+    [TestCase(-2)]
+    public void Constructor_Throws_For_Negative_NonInfinite_Period(long periodMs)
+    {
+        if (periodMs == 0)
+        {
+            Assert.DoesNotThrow(() => _ = new TestRecurringHostedService(TimeSpan.Zero, TimeSpan.Zero, new FakeTimeProvider(), _ => Task.CompletedTask));
+        }
+        else
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => _ = new TestRecurringHostedService(TimeSpan.FromMilliseconds(periodMs), TimeSpan.Zero, new FakeTimeProvider(), _ => Task.CompletedTask));
+        }
+    }
+
+    [Test]
+    public void Constructor_Allows_Infinite_Period()
+    {
+        Assert.DoesNotThrow(() => _ = new TestRecurringHostedService(Timeout.InfiniteTimeSpan, TimeSpan.Zero, new FakeTimeProvider(), _ => Task.CompletedTask));
+    }
+
+    [Test]
+    public void ChangePeriod_Allows_Infinite()
+    {
+        var sut = new TestRecurringHostedService(TimeSpan.FromMinutes(1), TimeSpan.Zero, new FakeTimeProvider(), _ => Task.CompletedTask);
+
+        Assert.DoesNotThrow(() => sut.PublicChangePeriod(Timeout.InfiniteTimeSpan));
+    }
+
+    [Test]
+    public void TriggerExecution_NextDelay_Allows_Infinite()
+    {
+        var sut = new TestRecurringHostedService(TimeSpan.FromMinutes(1), TimeSpan.Zero, new FakeTimeProvider(), _ => Task.CompletedTask);
+
+        Assert.DoesNotThrow(() => sut.PublicTriggerExecutionWithDelay(Timeout.InfiniteTimeSpan));
+    }
+
+    [Test]
+    public async Task Infinite_Period_Waits_For_Trigger_Only()
+    {
+        var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
+        var sut = new TestRecurringHostedService(
+            period: Timeout.InfiniteTimeSpan,
+            delay: TimeSpan.Zero,
+            timeProvider: timeProvider,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        // First execution fires (delay = Zero — no initial wait)
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Initial execution should complete");
+        Assert.AreEqual(1, executionCount);
+
+        // Time advancing should not trigger another execution
+        timeProvider.Advance(TimeSpan.FromHours(24));
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute on its own when period is infinite");
+
+        // Manual trigger fires the next execution
+        sut.PublicTriggerExecution();
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered execution should complete");
+        Assert.AreEqual(2, executionCount);
+
+        // After the trigger, the next cycle should still wait for another trigger
+        timeProvider.Advance(TimeSpan.FromHours(24));
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should resume infinite wait after trigger");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
+    [Test]
+    public async Task ChangePeriod_From_Infinite_To_Finite_Resumes_Scheduling()
+    {
+        var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
+        var sut = new TestRecurringHostedService(
+            period: Timeout.InfiniteTimeSpan,
+            delay: TimeSpan.Zero,
+            timeProvider: timeProvider,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(1, executionCount);
+
+        // Switch to a 10-minute period — the in-flight infinite wait should be interrupted.
+        sut.PublicChangePeriod(TimeSpan.FromMinutes(10));
+
+        timeProvider.Advance(TimeSpan.FromMinutes(10));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Should execute on schedule after switching to finite period");
+        Assert.AreEqual(2, executionCount);
+
+        // Switch back to infinite — schedule disabled again.
+        sut.PublicChangePeriod(Timeout.InfiniteTimeSpan);
+        timeProvider.Advance(TimeSpan.FromHours(24));
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute after switching back to infinite");
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
     }
 
     [Test]

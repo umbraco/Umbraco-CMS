@@ -37,7 +37,11 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="timeProvider">The time provider used for scheduling and elapsed time measurement.</param>
     protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay, TimeProvider timeProvider)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(period, TimeSpan.Zero);
+        if (period != Timeout.InfiniteTimeSpan)
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(period, TimeSpan.Zero);
+        }
+
         ArgumentOutOfRangeException.ThrowIfLessThan(delay, TimeSpan.Zero);
 
         _logger = logger;
@@ -137,12 +141,12 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         bool skipOnOvershoot = _nextExecutionSkipOnOvershoot;
         _nextExecutionSkipOnOvershoot = false;
 
-        if (delay <= TimeSpan.Zero && skipOnOvershoot)
+        if (delay == TimeSpan.Zero && skipOnOvershoot)
         {
             delay = ComputeNextDelay(delayBasis + period, executionElapsed);
         }
 
-        if (delay <= TimeSpan.Zero)
+        if (delay == TimeSpan.Zero)
         {
             return period;
         }
@@ -168,7 +172,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
                 period = ReadPeriod();
                 TimeSpan totalElapsed = executionElapsed + _timeProvider.GetElapsedTime(waitStart);
                 delay = ComputeNextDelay(period, totalElapsed);
-                if (delay <= TimeSpan.Zero)
+                if (delay == TimeSpan.Zero)
                 {
                     return period;
                 }
@@ -196,7 +200,9 @@ public abstract class RecurringHostedServiceBase : BackgroundService
                     _nextExecutionSkipOnOvershoot = true;
                     return remaining;
                 case NextExecutionStrategy.Replace:
-                    return remaining + period;
+                    return remaining == Timeout.InfiniteTimeSpan || period == Timeout.InfiniteTimeSpan
+                        ? Timeout.InfiniteTimeSpan
+                        : remaining + period;
                 case NextExecutionStrategy.Reset:
                 default:
                     return period;
@@ -251,6 +257,11 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// </remarks>
     internal static TimeSpan ComputeNextDelay(TimeSpan period, TimeSpan elapsed)
     {
+        if (period == Timeout.InfiniteTimeSpan)
+        {
+            return Timeout.InfiniteTimeSpan;
+        }
+
         TimeSpan remaining = period - elapsed;
 
         return remaining < TimeSpan.Zero ? TimeSpan.Zero : remaining;
@@ -262,7 +273,10 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="newPeriod">The new period between tasks.</param>
     protected void ChangePeriod(TimeSpan newPeriod)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(newPeriod, TimeSpan.Zero);
+        if (newPeriod != Timeout.InfiniteTimeSpan)
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(newPeriod, TimeSpan.Zero);
+        }
 
         Interlocked.Exchange(ref _periodTicks, newPeriod.Ticks);
 
@@ -298,7 +312,10 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <param name="nextDelay">The target interval from execution start to the next execution. Execution time is subtracted to prevent drift.</param>
     protected internal void TriggerExecution(TimeSpan nextDelay)
     {
-        ArgumentOutOfRangeException.ThrowIfLessThan(nextDelay, TimeSpan.Zero);
+        if (nextDelay != Timeout.InfiniteTimeSpan)
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(nextDelay, TimeSpan.Zero);
+        }
 
         Interlocked.Exchange(ref _triggerState, new TriggerState(Delay: nextDelay));
         ReleaseSignal();
