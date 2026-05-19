@@ -44,13 +44,12 @@ namespace Umbraco.Extension.Controllers
 
         [HttpGet("whoAmI")]
         [ProducesResponseType<WhoAmIResponseModel>(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public ActionResult<WhoAmIResponseModel> WhoAmI()
         {
             IUser? currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
             if (currentUser is null)
             {
-                return NoContent();
+                return Unauthorized();
             }
 
             return new WhoAmIResponseModel

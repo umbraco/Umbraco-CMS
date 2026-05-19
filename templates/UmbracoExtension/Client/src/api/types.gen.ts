@@ -98,10 +98,6 @@ export type GetWhoAmIResponses = {
      * OK
      */
     200: WhoAmIResponseModel;
-    /**
-     * No Content
-     */
-    204: void;
 };
 
 export type GetWhoAmIResponse = GetWhoAmIResponses[keyof GetWhoAmIResponses];

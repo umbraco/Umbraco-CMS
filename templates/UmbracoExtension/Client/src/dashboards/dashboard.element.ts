@@ -54,25 +54,21 @@ export class ExampleDashboardElement extends UmbElementMixin(LitElement) {
 
     const { data, error } = await getWhoAmI();
 
-    if (error) {
+    if (error || !data) {
       buttonElement.state = "failed";
       console.error(error);
       return;
     }
 
-    if (data?.email) {
-      this._serverUserData = data;
-      buttonElement.state = "success";
-    }
+    this._serverUserData = data;
+    buttonElement.state = "success";
 
-    if (this.#notificationContext) {
-      this.#notificationContext.peek("warning", {
-        data: {
-          headline: `You are ${this._serverUserData?.name}`,
-          message: `Your email is ${this._serverUserData?.email}`,
-        },
-      });
-    }
+    this.#notificationContext?.peek("warning", {
+      data: {
+        headline: `You are ${data.name}`,
+        message: `Your email is ${data.email}`,
+      },
+    });
   };
 
   #onClickWhatsTheTimeMrWolf = async (ev: Event) => {
