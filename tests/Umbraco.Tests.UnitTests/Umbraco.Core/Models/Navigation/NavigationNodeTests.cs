@@ -150,6 +150,51 @@ public class NavigationNodeTests
     }
 
     [Test]
+    public void GetOrderedChildren_StaleAfterDirectSortOrderEdit_SelfHealsOnNextAddChild()
+    {
+        // Companion to GetOrderedChildren_WithoutInvalidation_StillReturnsOldOrderingAfterDirectSortOrderEdit.
+        // A third-party caller that mutates SortOrder directly on a NavigationNode (rather than
+        // going through ContentNavigationServiceBase.UpdateSortOrder) leaves the parent's ordered-
+        // children cache stale, but any subsequent structural mutation that flows through
+        // AddChild/RemoveChild on that parent will discard the stale array and rebuild against
+        // the current SortOrder values. This pins the self-healing recovery path that backs
+        // the "stale until next snapshot rebuild" comment in the PR https://github.com/umbraco/Umbraco-CMS/pull/22742
+        var structure = new ConcurrentDictionary<Guid, NavigationNode>();
+        Guid contentTypeKey = Guid.NewGuid();
+        NavigationNode parent = AddNode(structure, contentTypeKey);
+        Guid childA = AddChildOf(structure, parent, contentTypeKey);
+        Guid childB = AddChildOf(structure, parent, contentTypeKey);
+
+        // Prime, then mutate sort order directly (the misuse pattern).
+        IReadOnlyList<Guid> primed = parent.GetOrderedChildren(structure);
+        Assume.That(primed, Is.EqualTo(new[] { childA, childB }));
+        structure[childA].UpdateSortOrder(5);
+        structure[childB].UpdateSortOrder(1);
+
+        IReadOnlyList<Guid> stillStale = parent.GetOrderedChildren(structure);
+        Assume.That(stillStale, Is.SameAs(primed), "Cache must still be stale before the recovering mutation.");
+
+        // Now an unrelated structural change runs through the parent — AddChild on a new sibling.
+        // Its sort order (3) sits between the re-edited values, so a freshly-built ordering must
+        // place it between the two existing children. If the rebuild were to honour the stale
+        // cache, the new child would land at the end instead.
+        var newSibling = new NavigationNode(Guid.NewGuid(), contentTypeKey, sortOrder: 3);
+        structure[newSibling.Key] = newSibling;
+        parent.AddChild(structure, newSibling.Key);
+
+        IReadOnlyList<Guid> recovered = parent.GetOrderedChildren(structure);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(recovered, Is.Not.SameAs(primed), "Cache must rebuild rather than reuse the stale array.");
+            Assert.That(
+                recovered,
+                Is.EqualTo(new[] { childB, newSibling.Key, childA }),
+                "Rebuilt ordering must honour the current SortOrder values, including the directly-edited ones.");
+        });
+    }
+
+    [Test]
     public void GetOrderedChildren_ConcurrentFirstAccess_AllThreadsSeeSameInstance()
     {
         // The race we're guarding against: multiple threads reach BuildOrderedChildren before
