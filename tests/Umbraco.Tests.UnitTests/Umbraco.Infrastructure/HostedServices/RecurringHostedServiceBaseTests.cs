@@ -48,6 +48,12 @@ public class RecurringHostedServiceBaseTests
     }
 
     [Test]
+    public void Constructor_Allows_Infinite_Delay()
+    {
+        Assert.DoesNotThrow(() => _ = new TestRecurringHostedService(TimeSpan.FromMinutes(1), Timeout.InfiniteTimeSpan, new FakeTimeProvider(), _ => Task.CompletedTask));
+    }
+
+    [Test]
     public void ChangePeriod_Allows_Infinite()
     {
         var sut = new TestRecurringHostedService(TimeSpan.FromMinutes(1), TimeSpan.Zero, new FakeTimeProvider(), _ => Task.CompletedTask);
@@ -61,6 +67,73 @@ public class RecurringHostedServiceBaseTests
         var sut = new TestRecurringHostedService(TimeSpan.FromMinutes(1), TimeSpan.Zero, new FakeTimeProvider(), _ => Task.CompletedTask);
 
         Assert.DoesNotThrow(() => sut.PublicTriggerExecutionWithDelay(Timeout.InfiniteTimeSpan));
+    }
+
+    [Test]
+    public async Task Infinite_Delay_Skips_Initial_Execution_Until_Triggered()
+    {
+        var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
+        var sut = new TestRecurringHostedService(
+            period: TimeSpan.FromMinutes(10),
+            delay: Timeout.InfiniteTimeSpan,
+            timeProvider: timeProvider,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        // Advancing time does not fire the first execution — initial delay is infinite.
+        timeProvider.Advance(TimeSpan.FromHours(24));
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute on its own when initial delay is infinite");
+
+        // Manual trigger fires the first execution.
+        sut.PublicTriggerExecution();
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Triggered first execution should complete");
+        Assert.AreEqual(1, executionCount);
+
+        // After the first execution, the normal period applies — advance 10 min to fire the second.
+        timeProvider.Advance(TimeSpan.FromMinutes(10));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)), "Second execution should fire on Period after the triggered first run");
+        Assert.AreEqual(2, executionCount);
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
+    }
+
+    [Test]
+    public async Task Infinite_Delay_And_Infinite_Period_Runs_Only_When_Triggered()
+    {
+        var executionCount = 0;
+        var timeProvider = new FakeTimeProvider();
+        using var executed = new SemaphoreSlim(0);
+        var sut = new TestRecurringHostedService(
+            period: Timeout.InfiniteTimeSpan,
+            delay: Timeout.InfiniteTimeSpan,
+            timeProvider: timeProvider,
+            onExecute: _ => { Interlocked.Increment(ref executionCount); executed.Release(); return Task.CompletedTask; });
+
+        using var cts = new CancellationTokenSource();
+        await sut.StartAsync(cts.Token);
+
+        timeProvider.Advance(TimeSpan.FromHours(24));
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute without a trigger");
+
+        sut.PublicTriggerExecution();
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(1, executionCount);
+
+        // Period is infinite, so no further executions without another trigger.
+        timeProvider.Advance(TimeSpan.FromHours(24));
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute again without a trigger");
+
+        sut.PublicTriggerExecution();
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(2, executionCount);
+
+        cts.Cancel();
+        await sut.StopAsync(CancellationToken.None);
     }
 
     [Test]
@@ -387,7 +460,7 @@ public class RecurringHostedServiceBaseTests
     }
 
     [Test]
-    public async Task TriggerExecution_During_InitialDelay_Does_Not_Leak_Strategy()
+    public async Task TriggerExecution_During_InitialDelay_Honors_Custom_Delay()
     {
         var executionCount = 0;
         var timeProvider = new FakeTimeProvider();
@@ -404,20 +477,26 @@ public class RecurringHostedServiceBaseTests
         // Still in initial delay — no execution yet
         Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not have executed during initial delay");
 
-        // Trigger with a custom delay during the initial delay
+        // Trigger with a custom 5-minute next-delay during the initial delay
         sut.PublicTriggerExecutionWithDelay(TimeSpan.FromMinutes(5));
         Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
         Assert.AreEqual(1, executionCount, "Should have executed once after trigger interrupted delay");
 
-        // The custom delay should NOT be applied after the first execution —
-        // it was consumed when the initial delay was interrupted.
-        // Next wait should use the normal 1h period.
-        timeProvider.Advance(TimeSpan.FromMinutes(59));
-        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Custom delay should not leak — next wait uses normal period");
+        // The custom 5-minute delay applies to the next wait — consistent with TriggerExecution(TimeSpan) docs.
+        timeProvider.Advance(TimeSpan.FromMinutes(4));
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute before the custom next-delay elapses");
 
         timeProvider.Advance(TimeSpan.FromMinutes(1));
         Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
-        Assert.AreEqual(2, executionCount, "Should execute after normal period");
+        Assert.AreEqual(2, executionCount, "Second execution fires after the custom 5-minute delay");
+
+        // After the trigger's custom delay is consumed, the loop resumes the normal 1-hour period.
+        timeProvider.Advance(TimeSpan.FromMinutes(59));
+        Assert.IsFalse(await executed.WaitAsync(TimeSpan.FromMilliseconds(50)), "Should not execute before the normal period elapses");
+
+        timeProvider.Advance(TimeSpan.FromMinutes(1));
+        Assert.IsTrue(await executed.WaitAsync(TimeSpan.FromSeconds(5)));
+        Assert.AreEqual(3, executionCount, "Third execution fires after the normal 1-hour period");
 
         cts.Cancel();
         await sut.StopAsync(CancellationToken.None);

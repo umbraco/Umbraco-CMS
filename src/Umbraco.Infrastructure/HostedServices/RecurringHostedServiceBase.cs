@@ -32,8 +32,8 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// Initializes a new instance of the <see cref="RecurringHostedServiceBase" /> class.
     /// </summary>
     /// <param name="logger">Logger.</param>
-    /// <param name="period">Timespan representing how often the task should recur.</param>
-    /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs.</param>
+    /// <param name="period">Timespan representing how often the task should recur. Set to <see cref="Timeout.InfiniteTimeSpan" /> to disable automatic scheduling and only run when manually triggered via <see cref="TriggerExecution()" />.</param>
+    /// <param name="delay">Timespan representing the initial delay after application start-up before the first run of the task occurs. Set to <see cref="Timeout.InfiniteTimeSpan" /> to skip the automatic first run; the first execution then only occurs when manually triggered via <see cref="TriggerExecution()" />.</param>
     /// <param name="timeProvider">The time provider used for scheduling and elapsed time measurement.</param>
     protected RecurringHostedServiceBase(ILogger? logger, TimeSpan period, TimeSpan delay, TimeProvider timeProvider)
     {
@@ -42,7 +42,10 @@ public abstract class RecurringHostedServiceBase : BackgroundService
             ArgumentOutOfRangeException.ThrowIfLessThan(period, TimeSpan.Zero);
         }
 
-        ArgumentOutOfRangeException.ThrowIfLessThan(delay, TimeSpan.Zero);
+        if (delay != Timeout.InfiniteTimeSpan)
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(delay, TimeSpan.Zero);
+        }
 
         _logger = logger;
         Interlocked.Exchange(ref _periodTicks, period.Ticks);
@@ -79,17 +82,13 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         // Initial delay (also interruptible via signal)
-        if (_delay > TimeSpan.Zero)
+        bool signaled = false;
+        if (_delay != TimeSpan.Zero)
         {
             try
             {
-                bool signaled = await WaitForSignalAsync(_delay, CancellationToken.None, stoppingToken);
-                if (signaled)
-                {
-                    // Trigger interrupted the initial delay — consume the trigger state, so it doesn't leak into WaitForNextExecutionAsync after the first execution
-                    Interlocked.Exchange(ref _triggerState, TriggerState.Default);
-                    _nextExecutionSkipOnOvershoot = false;
-                }
+                // Do not cancel/signal the wait when the period changes during the initial delay
+                signaled = await WaitForSignalAsync(_delay, CancellationToken.None, stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -97,7 +96,19 @@ public abstract class RecurringHostedServiceBase : BackgroundService
             }
         }
 
+        // Honor a TriggerExecution(TimeSpan) issued during the initial delay on the first wait cycle.
+        // Strategy-only triggers (None/Reset/Replace) have no custom delay and collapse to the normal Period —
+        // there is no "next scheduled tick" yet for Replace to skip, and None/Reset reduce to "use Period" in this phase.
         TimeSpan nextDelayBasis = ReadPeriod();
+        if (signaled)
+        {
+            TriggerState initialTrigger = Interlocked.Exchange(ref _triggerState, TriggerState.Default);
+            if (initialTrigger.Delay.HasValue)
+            {
+                nextDelayBasis = initialTrigger.Delay.Value;
+            }
+        }
+
         while (!stoppingToken.IsCancellationRequested)
         {
             long startTimestamp = _timeProvider.GetTimestamp();
@@ -270,7 +281,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <summary>
     /// Change the period between operations. The new period takes effect immediately, interrupting the current wait if necessary.
     /// </summary>
-    /// <param name="newPeriod">The new period between tasks.</param>
+    /// <param name="newPeriod">The new period between tasks. Set to <see cref="Timeout.InfiniteTimeSpan" /> to (temporarily) disable automatic scheduling and turn the loop into a manually triggered one; change back to a finite period to resume scheduling.</param>
     protected void ChangePeriod(TimeSpan newPeriod)
     {
         if (newPeriod != Timeout.InfiniteTimeSpan)
@@ -309,7 +320,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// Signals the background loop to execute immediately.
     /// After the triggered execution, the next execution is scheduled after the specified delay (measured from execution start; execution time is subtracted to prevent drift).
     /// </summary>
-    /// <param name="nextDelay">The target interval from execution start to the next execution. Execution time is subtracted to prevent drift.</param>
+    /// <param name="nextDelay">The target interval from execution start to the next execution. Execution time is subtracted to prevent drift. Set to <see cref="Timeout.InfiniteTimeSpan" /> to leave the loop in manually triggered mode after this execution.</param>
     protected internal void TriggerExecution(TimeSpan nextDelay)
     {
         if (nextDelay != Timeout.InfiniteTimeSpan)

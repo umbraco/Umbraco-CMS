@@ -25,6 +25,9 @@ public interface IRecurringBackgroundJob
     /// <value>
     /// The period.
     /// </value>
+    /// <remarks>
+    /// Set to <see cref="Timeout.InfiniteTimeSpan" /> to (temporarily) disable automatic scheduling and turn the job into a manually triggered one (via <see cref="IRecurringBackgroundJobTrigger{TJob}" />). Raise <see cref="PeriodChanged" /> to switch back to a finite period at runtime.
+    /// </remarks>
     TimeSpan Period { get; }
 
     /// <summary>
@@ -33,6 +36,9 @@ public interface IRecurringBackgroundJob
     /// <value>
     /// The delay.
     /// </value>
+    /// <remarks>
+    /// Set to <see cref="Timeout.InfiniteTimeSpan" /> to skip the automatic first run entirely; the first execution then only occurs when manually triggered via <see cref="IRecurringBackgroundJobTrigger{TJob}" />.
+    /// </remarks>
     TimeSpan Delay => RecurringBackgroundJobBase.DefaultDelay; // TODO (V19): Remove the default implementation
 
     /// <summary>
@@ -43,6 +49,7 @@ public interface IRecurringBackgroundJob
     /// </value>
     /// <remarks>
     /// This back-off prevents tight looping when <see cref="Period" /> is short (or <see cref="TimeSpan.Zero" />) and an execution is skipped without invoking <see cref="RunJobAsync(CancellationToken)" />.
+    /// Must be a finite, non-negative value: <see cref="Timeout.InfiniteTimeSpan" /> is not allowed because the wait happens inside the execution step and would block the job from re-evaluating once the ignored condition (e.g. runtime level) changes.
     /// </remarks>
     TimeSpan IgnoredDelay => RecurringBackgroundJobBase.DefaultIgnoredDelay; // TODO (V19): Remove the default implementation
 
