@@ -62,6 +62,13 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
         }
 
         await SaveJsonAsync(provider, node);
+
+        // Force a synchronous reload so the new value is visible via IOptionsMonitor.CurrentValue
+        // before this method returns. The file watcher would normally trigger this asynchronously,
+        // but for newly-created files (e.g. an appsettings.Local.json that didn't exist at startup)
+        // the reload can race with IOptionsMonitor.OnChange — firing the callback with stale,
+        // pre-reload data and breaking the install flow that immediately reads CurrentValue.
+        ReloadConfiguration();
     }
 
     /// <inheritdoc />
@@ -304,6 +311,14 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
 
     private static bool HasPhysicalFileSource(JsonConfigurationProvider provider) =>
         provider.Source.FileProvider is PhysicalFileProvider && provider.Source.Path is not null;
+
+    private void ReloadConfiguration()
+    {
+        if (_configuration is IConfigurationRoot configurationRoot)
+        {
+            configurationRoot.Reload();
+        }
+    }
 
     /// <summary>
     /// Finds the immediate child with the specified name, in a case insensitive manner.
