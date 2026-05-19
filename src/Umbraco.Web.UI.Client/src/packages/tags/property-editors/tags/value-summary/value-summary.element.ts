@@ -5,7 +5,8 @@ import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summar
 export class UmbTagsPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<Array<string>> {
 	override render() {
 		if (!this._value?.length) return nothing;
-		return html`<uui-tag>${this._value.length}</uui-tag>`;
+		const text = this._value.join(', ');
+		return html`<span class="text" title="${text}">${text}</span>`;
 	}
 }
 

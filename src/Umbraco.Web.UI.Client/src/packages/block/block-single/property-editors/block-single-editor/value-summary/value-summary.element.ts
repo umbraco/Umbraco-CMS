@@ -8,7 +8,7 @@ export class UmbBlockSinglePropertyEditorValueSummaryElement extends UmbValueSum
 > {
 	override render() {
 		if (!this._value?.contentData?.length) return nothing;
-		return html`<uui-icon name="icon-shape-square"></uui-icon>`;
+		return html`<uui-icon name="icon-check"></uui-icon>`;
 	}
 }
 
