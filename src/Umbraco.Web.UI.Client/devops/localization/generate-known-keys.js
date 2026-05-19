@@ -137,6 +137,15 @@ async function main() {
 		'',
 		"export type UmbKnownLocalizationKey = Exclude<keyof UmbKnownLocalizationSet, keyof UmbLocalizationSetBase>;",
 		'',
+		'/**',
+		' * Runtime list of every known key. Exists for the staleness test in `known-keys.test.ts` —',
+		" * production code should reference `UmbKnownLocalizationKey` (the compile-time type) instead.",
+		' * Tree-shaken from the production bundle when nothing imports it at runtime.',
+		' */',
+		'export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [',
+		...entries.map((e) => `\t${JSON.stringify(e.key)},`),
+		'];',
+		'',
 	].join('\n');
 
 	const prettierConfig = (await resolveConfig(outputPath)) ?? {};
