@@ -16,7 +16,7 @@ public class UmbracoExtensionApiComposer : IComposer
             document => document
                 .WithTitle("Umbraco Extension Backoffice API")
                 .WithBackOfficeAuthentication()
-                .WithJsonOptions(Cms.Core.Constants.JsonOptionsNames.BackOffice)
+                .WithJsonOptions(Umbraco.Cms.Core.Constants.JsonOptionsNames.BackOffice)
                 .ConfigureOpenApiOptions(options =>
                     options.AddDocumentTransformer((doc, _, _) =>
                     {

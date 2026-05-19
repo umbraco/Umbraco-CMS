@@ -11,7 +11,7 @@ namespace Umbraco.Extension.Controllers
     [BackOfficeRoute("umbracoextension/api/v{version:apiVersion}")]
     [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
     [MapToApi(Constants.ApiName)]
-    [JsonOptionsName(Cms.Core.Constants.JsonOptionsNames.BackOffice)]
+    [JsonOptionsName(Umbraco.Cms.Core.Constants.JsonOptionsNames.BackOffice)]
     public class UmbracoExtensionApiControllerBase : ControllerBase
     {
     }

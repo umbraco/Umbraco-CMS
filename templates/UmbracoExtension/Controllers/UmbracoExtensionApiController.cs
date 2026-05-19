@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extension.ViewModels;
-using Umbraco.Extensions;
 #endif
 
 namespace Umbraco.Extension.Controllers
@@ -60,7 +59,7 @@ namespace Umbraco.Extension.Controllers
                 Email = currentUser.Email,
                 Groups = currentUser.Groups
                     .Select(group => group.Name)
-                    .WhereNotNull()
+                    .OfType<string>()
                     .ToArray(),
             };
         }
