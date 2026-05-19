@@ -59,12 +59,12 @@ test('can bulk publish multiple child content items from list view', async ({umb
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.clickContentCardWithName(firstChildContentName);
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSavedAndPublished);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickContentCardWithName(secondChildContentName);
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSavedAndPublished);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
