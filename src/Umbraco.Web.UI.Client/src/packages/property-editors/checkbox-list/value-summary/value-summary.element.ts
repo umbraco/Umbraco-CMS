@@ -1,11 +1,12 @@
-import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 
 @customElement('umb-checkbox-list-property-editor-value-summary')
 export class UmbCheckboxListPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<Array<string>> {
 	override render() {
 		if (!this._value?.length) return nothing;
-		return html`<uui-tag>${this._value.length}</uui-tag>`;
+		const text = this._value.join(', ');
+		return html`<span title="${text}">${text}</span>`;
 	}
 }
 
