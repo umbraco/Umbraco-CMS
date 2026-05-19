@@ -28,7 +28,7 @@ import { incrementString } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbExtensionApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry, type ManifestRepository } from '@umbraco-cms/backoffice/extension-registry';
-import { map, firstValueFrom, withLatestFrom } from '@umbraco-cms/backoffice/external/rxjs';
+import { firstValueFrom } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbError } from '@umbraco-cms/backoffice/resources';
 import { encodeFolderName } from '@umbraco-cms/backoffice/router';
 
@@ -136,13 +136,16 @@ export class UmbContentTypeStructureManager<
 		},
 	);
 
-	// Use withLatestFrom, to ensure the latest value is given when contentTypeLoaded triggers. [NL]
-	readonly contentTypeDataTypeUniques = this.contentTypeLoaded.pipe(
-		withLatestFrom(this.contentTypeProperties),
-		map(([contentTypeLoaded, contentTypeProperties]) => {
-			if (!contentTypeLoaded || !contentTypeProperties) return [];
-			return (contentTypeProperties.map((p) => p.dataType.unique) ?? []).filter(UmbFilterDuplicateStrings);
-		}),
+	// Derived from #contentTypes (single source) and gated on contentTypeLoaded, so property
+	// changes re-emit and properties can't lag behind loaded across separate microtasks. [NL]
+	readonly contentTypeDataTypeUniques = mergeObservables(
+		[this.contentTypeLoaded, this.contentTypes],
+		([loaded, contentTypes]) => {
+			if (!loaded) return [];
+			return contentTypes
+				.flatMap((x) => x.properties?.map((p) => p.dataType.unique) ?? [])
+				.filter(UmbFilterDuplicateStrings);
+		},
 	);
 	getContentTypeDataTypeUniques() {
 		return this.#contentTypes
