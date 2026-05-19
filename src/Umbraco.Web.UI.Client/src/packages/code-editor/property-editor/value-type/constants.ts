@@ -2,6 +2,6 @@ export const UMB_CODE_EDITOR_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.Plain.String'
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_CODE_EDITOR_PROPERTY_EDITOR_VALUE_TYPE]: string | undefined;
+		[UMB_CODE_EDITOR_PROPERTY_EDITOR_VALUE_TYPE]: string;
 	}
 }

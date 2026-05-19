@@ -2,6 +2,6 @@ export const UMB_DATE_ONLY_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.DateOnly' as co
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_DATE_ONLY_PROPERTY_EDITOR_VALUE_TYPE]: { date: string | null; timeZone: null } | undefined;
+		[UMB_DATE_ONLY_PROPERTY_EDITOR_VALUE_TYPE]: { date: string | null; timeZone: null };
 	}
 }

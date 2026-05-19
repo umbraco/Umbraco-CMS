@@ -4,6 +4,6 @@ export const UMB_BLOCK_SINGLE_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.SingleBlock'
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_BLOCK_SINGLE_PROPERTY_EDITOR_VALUE_TYPE]: UmbBlockSingleValueModel | undefined;
+		[UMB_BLOCK_SINGLE_PROPERTY_EDITOR_VALUE_TYPE]: UmbBlockSingleValueModel;
 	}
 }

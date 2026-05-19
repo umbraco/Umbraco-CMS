@@ -4,6 +4,6 @@ export const UMB_BLOCK_LIST_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.BlockList' as 
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_BLOCK_LIST_PROPERTY_EDITOR_VALUE_TYPE]: UmbBlockListValueModel | undefined;
+		[UMB_BLOCK_LIST_PROPERTY_EDITOR_VALUE_TYPE]: UmbBlockListValueModel;
 	}
 }

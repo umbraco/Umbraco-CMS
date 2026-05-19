@@ -4,6 +4,6 @@ export const UMB_UPLOAD_FIELD_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.UploadField'
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_UPLOAD_FIELD_PROPERTY_EDITOR_VALUE_TYPE]: UmbMediaValueType | undefined;
+		[UMB_UPLOAD_FIELD_PROPERTY_EDITOR_VALUE_TYPE]: UmbMediaValueType;
 	}
 }

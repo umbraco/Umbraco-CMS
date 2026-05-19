@@ -4,6 +4,6 @@ export const UMB_MEDIA_PICKER_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.MediaPicker3
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_MEDIA_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: UmbMediaPickerValueModel | undefined;
+		[UMB_MEDIA_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: UmbMediaPickerValueModel;
 	}
 }

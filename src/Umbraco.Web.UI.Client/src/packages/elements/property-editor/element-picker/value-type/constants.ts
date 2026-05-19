@@ -2,6 +2,6 @@ export const UMB_ELEMENT_PICKER_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.ElementPic
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_ELEMENT_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: Array<string> | undefined;
+		[UMB_ELEMENT_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: Array<string>;
 	}
 }

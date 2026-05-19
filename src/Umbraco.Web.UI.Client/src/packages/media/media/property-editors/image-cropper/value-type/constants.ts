@@ -4,6 +4,6 @@ export const UMB_IMAGE_CROPPER_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.ImageCroppe
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_IMAGE_CROPPER_PROPERTY_EDITOR_VALUE_TYPE]: UmbImageCropperPropertyEditorValue | undefined;
+		[UMB_IMAGE_CROPPER_PROPERTY_EDITOR_VALUE_TYPE]: UmbImageCropperPropertyEditorValue;
 	}
 }

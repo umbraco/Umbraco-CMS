@@ -2,6 +2,6 @@ export const UMB_MEMBER_GROUP_PICKER_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.Membe
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_MEMBER_GROUP_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: string | undefined;
+		[UMB_MEMBER_GROUP_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: string;
 	}
 }

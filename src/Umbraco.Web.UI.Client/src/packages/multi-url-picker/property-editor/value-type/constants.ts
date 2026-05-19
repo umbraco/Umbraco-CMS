@@ -4,6 +4,6 @@ export const UMB_MULTI_URL_PICKER_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.MultiUrl
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_MULTI_URL_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: Array<UmbLinkPickerLink> | undefined;
+		[UMB_MULTI_URL_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: Array<UmbLinkPickerLink>;
 	}
 }

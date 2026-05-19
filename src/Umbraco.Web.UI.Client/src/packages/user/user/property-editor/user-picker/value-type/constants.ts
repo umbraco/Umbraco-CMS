@@ -2,6 +2,6 @@ export const UMB_USER_PICKER_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.UserPicker' a
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_USER_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: string | undefined;
+		[UMB_USER_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: string;
 	}
 }

@@ -4,6 +4,6 @@ export const UMB_CONTENT_PICKER_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.MultiNodeT
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_CONTENT_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: Array<UmbReferenceByUniqueAndType> | undefined;
+		[UMB_CONTENT_PICKER_PROPERTY_EDITOR_VALUE_TYPE]: Array<UmbReferenceByUniqueAndType>;
 	}
 }

@@ -4,6 +4,6 @@ export const UMB_BLOCK_GRID_PROPERTY_EDITOR_VALUE_TYPE = 'Umbraco.BlockGrid' as 
 
 declare global {
 	interface UmbValueTypeMap {
-		[UMB_BLOCK_GRID_PROPERTY_EDITOR_VALUE_TYPE]: UmbBlockGridValueModel | undefined;
+		[UMB_BLOCK_GRID_PROPERTY_EDITOR_VALUE_TYPE]: UmbBlockGridValueModel;
 	}
 }
