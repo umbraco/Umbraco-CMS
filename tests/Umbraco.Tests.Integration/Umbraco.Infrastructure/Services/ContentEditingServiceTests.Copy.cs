@@ -251,7 +251,7 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.Success, result.Status);
 
         var relationService = GetRequiredService<IRelationService>();
-        var relations = relationService.GetByParentId(child.Id)!.ToArray();
+        var relations = (await relationService.GetByParentIdAsync(child.Id)).ToArray();
         Assert.AreEqual(1, relations.Length);
         Assert.AreEqual(result.Result!.Id, relations.First().ChildId);
     }

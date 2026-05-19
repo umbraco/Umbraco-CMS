@@ -92,13 +92,13 @@ internal sealed class ContentRelationsUpdate :
         using IScope scope = _scopeProvider.CreateScope();
         foreach (IContentBase entity in entities)
         {
-            PersistRelations(scope, entity);
+            PersistRelations(scope, entity).GetAwaiter().GetResult();
         }
 
         scope.Complete();
     }
 
-    private void PersistRelations(IScope scope, IContentBase entity)
+    private async Task PersistRelations(IScope scope, IContentBase entity)
     {
         // Get all references and automatic relation type aliases.
         ISet<UmbracoEntityReference> references = _dataValueReferenceFactories.GetAllReferences(entity.Properties, _propertyEditors);
@@ -107,14 +107,14 @@ internal sealed class ContentRelationsUpdate :
         if (references.Count == 0)
         {
             // Delete all relations using the automatic relation type aliases.
-            _relationRepository.DeleteByParent(entity.Id, automaticRelationTypeAliases.ToArray());
+            await _relationRepository.DeleteByParentAsync(entity.Id, automaticRelationTypeAliases.ToArray());
 
             // No need to add new references/relations
             return;
         }
 
         // Lookup all relation type IDs.
-        var relationTypeLookup = _relationTypeRepository.GetMany(Array.Empty<int>())
+        var relationTypeLookup = (await _relationTypeRepository.GetAllAsync(CancellationToken.None))
             .Where(x => automaticRelationTypeAliases.Contains(x.Alias))
             .ToDictionary(x => x.Alias, x => x.Id);
 
@@ -158,19 +158,21 @@ internal sealed class ContentRelationsUpdate :
             }
         }
 
-        // Get all existing relations (optimize for adding new and keeping existing relations).
-        IQuery<IRelation> query = scope.SqlContext.Query<IRelation>().Where(x => x.ParentId == entity.Id).WhereIn(x => x.RelationTypeId, relationTypeLookup.Values);
-        var existingRelations = _relationRepository.GetPagedRelationsByQuery(query, 0, int.MaxValue, out _, null)
-            .ToDictionary(x => (x.ChildId, x.RelationTypeId)); // Relations are unique by parent ID, child ID and relation type ID.
+        // Get existing relations for this parent and filter to the (small) set of automatic relation types.
+        // Relations are unique by parent ID, child ID and relation type ID.
+        var relationTypeIds = relationTypeLookup.Values.ToHashSet();
+        var existingRelations = (await _relationRepository.GetByParentIdAsync(entity.Id))
+            .Where(x => relationTypeIds.Contains(x.RelationTypeId))
+            .ToDictionary(x => (x.ChildId, x.RelationTypeId));
 
         // Add relations that don't exist yet.
         IEnumerable<ReadOnlyRelation> relationsToAdd = relations.Except(existingRelations.Keys).Select(x => new ReadOnlyRelation(entity.Id, x.ChildId, x.RelationTypeId));
-        _relationRepository.SaveBulk(relationsToAdd);
+        await _relationRepository.SaveBulkAsync(relationsToAdd);
 
         // Delete relations that don't exist anymore.
         foreach (IRelation relation in existingRelations.Where(x => !relations.Contains(x.Key)).Select(x => x.Value))
         {
-            _relationRepository.Delete(relation);
+            await _relationRepository.DeleteAsync(relation, CancellationToken.None);
         }
     }
 

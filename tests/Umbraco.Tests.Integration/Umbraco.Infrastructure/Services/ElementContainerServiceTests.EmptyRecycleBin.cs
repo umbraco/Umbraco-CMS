@@ -118,7 +118,7 @@ public partial class ElementContainerServiceTests
             // Mark every 5th element as referenced (one per page)
             if (i % testPageSize == 0)
             {
-                RelateElements(referencingElement, element);
+                await RelateElementsAsync(referencingElement, element);
                 referencedElements.Add(element);
             }
             else
@@ -164,11 +164,9 @@ public partial class ElementContainerServiceTests
             $"Should have {referencedElements.Count} referenced elements plus the container remaining in recycle bin");
     }
 
-    private void RelateElements(IElement parent, IElement child)
+    private async Task RelateElementsAsync(IElement parent, IElement child)
     {
-        var relatedContentRelType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
-
-        var relation = RelationService.Relate(parent.Id, child.Id, relatedContentRelType);
-        RelationService.Save(relation);
+        var relatedContentRelType = await RelationService.GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+        await RelationService.RelateAsync(parent.Id, child.Id, relatedContentRelType!);
     }
 }

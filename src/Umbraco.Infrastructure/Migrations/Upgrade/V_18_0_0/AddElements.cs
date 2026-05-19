@@ -214,7 +214,7 @@ public class AddElements : AsyncMigrationBase
         Guid? childObjectType,
         bool isDependency)
     {
-        IRelationType? relationType = _relationService.GetRelationTypeByAlias(alias);
+        IRelationType? relationType = _relationService.GetRelationTypeByAliasAsync(alias).GetAwaiter().GetResult();
         if (relationType != null)
         {
             return;
@@ -228,6 +228,6 @@ public class AddElements : AsyncMigrationBase
         {
             Key = key
         };
-        _relationService.Save(relationType);
+        _relationService.SaveAsync(relationType).GetAwaiter().GetResult();
     }
 }

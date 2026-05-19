@@ -24,7 +24,7 @@ public class AddRelationTypeForMembers : MigrationBase
     {
         Logger.LogDebug("Adding automatic relation type for members if it doesn't already exist");
 
-        IRelationType? relationType = _relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMemberAlias);
+        IRelationType? relationType = _relationService.GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelatedMemberAlias).GetAwaiter().GetResult();
         if (relationType != null)
         {
             Logger.LogDebug("Automatic relation type for members already exists.");
@@ -41,6 +41,6 @@ public class AddRelationTypeForMembers : MigrationBase
         {
             Key = key
         };
-        _relationService.Save(relationType);
+        _relationService.SaveAsync(relationType).GetAwaiter().GetResult();
     }
 }

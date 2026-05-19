@@ -38,7 +38,7 @@ public partial class ContentEditingServiceTests
     public async Task Cannot_Move_To_Recycle_Bin_When_Content_Is_Related_As_A_Child_And_DisableDeleteWhenReferenced_Is_True()
     {
         // Setup a relation where the page being deleted is related to another page as a child (e.g. the other page has a picker and has selected this page).
-        Relate(Subpage2, Subpage);
+        await RelateAsync(Subpage2, Subpage);
         var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
         Assert.IsFalse(moveAttempt.Success);
         Assert.AreEqual(ContentEditingOperationStatus.CannotMoveToRecycleBinWhenReferenced, moveAttempt.Status);
@@ -54,7 +54,7 @@ public partial class ContentEditingServiceTests
     public async Task Can_Move_To_Recycle_Bin_When_Content_Is_Related_And_DisableUnpublishWhenReferenced_Is_True()
     {
         // DisableUnpublishWhenReferenced should NOT block trashing — only unpublishing.
-        Relate(Subpage2, Subpage);
+        await RelateAsync(Subpage2, Subpage);
         var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(moveAttempt.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, moveAttempt.Status);
@@ -70,7 +70,7 @@ public partial class ContentEditingServiceTests
     public async Task Can_Move_To_Recycle_Bin_When_Content_Is_Related_As_A_Parent_And_Configured_To_Disable_When_Related()
     {
         // Setup a relation where the page being deleted is related to another page as a child (e.g. the other page has a picker and has selected this page).
-        Relate(Subpage, Subpage2);
+        await RelateAsync(Subpage, Subpage2);
         var moveAttempt = await ContentEditingService.MoveToRecycleBinAsync(Subpage.Key, Constants.Security.SuperUserKey);
         Assert.IsTrue(moveAttempt.Success);
         Assert.AreEqual(ContentEditingOperationStatus.Success, moveAttempt.Status);
