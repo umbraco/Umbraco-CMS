@@ -4,24 +4,35 @@ import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models
 import { UmbDocumentItemRepository, UMB_DOCUMENT_ENTITY_TYPE } from '@umbraco-cms/backoffice/document';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
 import { UmbMediaItemRepository, UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/backoffice/media';
+import type { UmbMediaItemModel } from '@umbraco-cms/backoffice/media';
 import { UmbMemberItemRepository, UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
+import type { UmbMemberItemModel } from '@umbraco-cms/backoffice/member';
 
 type ContentPickerValue = Array<UmbReferenceByUniqueAndType> | undefined;
 
+export type UmbContentPickerResolvedItem =
+	| { entityType: typeof UMB_DOCUMENT_ENTITY_TYPE; item: UmbDocumentItemModel }
+	| { entityType: typeof UMB_MEDIA_ENTITY_TYPE; item: UmbMediaItemModel }
+	| { entityType: typeof UMB_MEMBER_ENTITY_TYPE; item: UmbMemberItemModel };
+
 export class UmbContentPickerValueSummaryResolver
 	extends UmbControllerBase
-	implements UmbValueSummaryResolver<ContentPickerValue, Array<string>>
+	implements UmbValueSummaryResolver<ContentPickerValue, Array<UmbContentPickerResolvedItem>>
 {
 	#documentRepo = new UmbDocumentItemRepository(this);
 	#mediaRepo = new UmbMediaItemRepository(this);
 	#memberRepo = new UmbMemberItemRepository(this);
 
-	async resolveValues(values: ReadonlyArray<ContentPickerValue>): Promise<UmbValueSummaryResolveResult<Array<string>>> {
+	async resolveValues(
+		values: ReadonlyArray<ContentPickerValue>,
+	): Promise<UmbValueSummaryResolveResult<Array<UmbContentPickerResolvedItem>>> {
 		const allItems = values.flatMap((v) => v ?? []);
+		console.log(allItems);
 
 		const docKeys = [...new Set(allItems.filter((e) => e.type === UMB_DOCUMENT_ENTITY_TYPE).map((e) => e.unique))];
 		const mediaKeys = [...new Set(allItems.filter((e) => e.type === UMB_MEDIA_ENTITY_TYPE).map((e) => e.unique))];
 		const memberKeys = [...new Set(allItems.filter((e) => e.type === UMB_MEMBER_ENTITY_TYPE).map((e) => e.unique))];
+
 		if (!docKeys.length && !mediaKeys.length && !memberKeys.length) {
 			return { data: values.map(() => []) };
 		}
@@ -32,20 +43,43 @@ export class UmbContentPickerValueSummaryResolver
 			memberKeys.length ? this.#memberRepo.requestItems(memberKeys) : Promise.resolve({ data: [] }),
 		]);
 
-		const nameByKey = new Map<string, string>();
-
-		for (const item of (Array.isArray(docResult.data) ? docResult.data : []) as Array<UmbDocumentItemModel>) {
-			nameByKey.set(item.unique, item.variants[0]?.name ?? '');
-		}
-		for (const item of Array.isArray(mediaResult.data) ? mediaResult.data : []) {
-			nameByKey.set((item as { unique: string }).unique, (item as { name: string }).name);
-		}
-		for (const item of Array.isArray(memberResult.data) ? memberResult.data : []) {
-			nameByKey.set((item as { unique: string }).unique, (item as { name: string }).name);
-		}
+		const docsByKey = new Map(
+			(Array.isArray(docResult.data) ? (docResult.data as Array<UmbDocumentItemModel>) : []).map((item) => [
+				item.unique,
+				item,
+			]),
+		);
+		const mediaByKey = new Map(
+			(Array.isArray(mediaResult.data) ? (mediaResult.data as Array<UmbMediaItemModel>) : []).map((item) => [
+				item.unique,
+				item,
+			]),
+		);
+		const memberByKey = new Map(
+			(Array.isArray(memberResult.data) ? (memberResult.data as Array<UmbMemberItemModel>) : []).map((item) => [
+				item.unique,
+				item,
+			]),
+		);
 
 		return {
-			data: values.map((v) => (v ?? []).map((e) => nameByKey.get(e.unique)).filter((n): n is string => !!n)),
+			data: values.map((v) =>
+				(v ?? []).flatMap((e): Array<UmbContentPickerResolvedItem> => {
+					if (e.type === UMB_DOCUMENT_ENTITY_TYPE) {
+						const item = docsByKey.get(e.unique);
+						return item ? [{ entityType: UMB_DOCUMENT_ENTITY_TYPE, item }] : [];
+					}
+					if (e.type === UMB_MEDIA_ENTITY_TYPE) {
+						const item = mediaByKey.get(e.unique);
+						return item ? [{ entityType: UMB_MEDIA_ENTITY_TYPE, item }] : [];
+					}
+					if (e.type === UMB_MEMBER_ENTITY_TYPE) {
+						const item = memberByKey.get(e.unique);
+						return item ? [{ entityType: UMB_MEMBER_ENTITY_TYPE, item }] : [];
+					}
+					return [];
+				}),
+			),
 		};
 	}
 }

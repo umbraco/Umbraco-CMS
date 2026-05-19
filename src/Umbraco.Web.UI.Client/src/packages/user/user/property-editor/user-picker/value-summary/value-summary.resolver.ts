@@ -6,10 +6,13 @@ import { UmbUserItemRepository, type UmbUserItemModel } from '../../../repositor
 
 export class UmbUserPickerValueSummaryResolver
 	extends UmbControllerBase
-	implements UmbValueSummaryResolver<string | undefined, Array<string>>
+	implements UmbValueSummaryResolver<string | undefined, Array<UmbUserItemModel>>
 {
 	#repo = new UmbUserItemRepository(this);
-	async resolveValues(values: ReadonlyArray<string | undefined>): Promise<UmbValueSummaryResolveResult<Array<string>>> {
+
+	async resolveValues(
+		values: ReadonlyArray<string | undefined>,
+	): Promise<UmbValueSummaryResolveResult<Array<UmbUserItemModel>>> {
 		const allKeys = [...new Set(values.flatMap((v) => splitStringToArray(v)))];
 		if (!allKeys.length) return { data: values.map(() => []) };
 
@@ -27,12 +30,12 @@ export class UmbUserPickerValueSummaryResolver
 	#map(
 		values: ReadonlyArray<string | undefined>,
 		items: ReadonlyArray<UmbUserItemModel>,
-	): ReadonlyArray<Array<string>> {
-		const nameByKey = new Map(items.map((item) => [item.unique, item.name]));
+	): ReadonlyArray<Array<UmbUserItemModel>> {
+		const itemByKey = new Map(items.map((item) => [item.unique, item]));
 		return values.map((v) =>
 			splitStringToArray(v)
-				.map((key) => nameByKey.get(key))
-				.filter((n): n is string => !!n),
+				.map((key) => itemByKey.get(key))
+				.filter((item): item is UmbUserItemModel => !!item),
 		);
 	}
 }

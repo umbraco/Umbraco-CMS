@@ -1,11 +1,15 @@
 import { customElement, html, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
+import type { UmbMemberGroupItemModel } from '../../../types';
 
 @customElement('umb-member-group-picker-property-editor-value-summary')
-export class UmbMemberGroupPickerPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<Array<string>> {
+export class UmbMemberGroupPickerPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<
+	Array<UmbMemberGroupItemModel>
+> {
 	override render() {
 		if (!Array.isArray(this._value) || !this._value.length) return nothing;
-		return html`<span class="name" title="${this._value.join(', ')}">${this._value.join(', ')}</span>`;
+		const text = this._value.map((item) => item.name).join(', ');
+		return html`<span class="name" title="${text}">${text}</span>`;
 	}
 
 	static override styles = css`
