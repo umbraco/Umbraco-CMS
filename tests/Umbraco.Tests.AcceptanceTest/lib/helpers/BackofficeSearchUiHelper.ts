@@ -62,6 +62,10 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
     await this.searchForQuery(query, ConstantHelper.apiEndpoints.memberSearch);
   }
 
+  async searchForElement(query: string) {
+    await this.searchForQuery(query, ConstantHelper.apiEndpoints.elementSearch);
+  }
+
   async clickSearchProvider(providerName: string) {
     await this.click(this.providerByName(providerName));
   }
@@ -80,6 +84,10 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
 
   async isSearchProviderActive(providerName: string) {
     await this.hasText(this.activeProvider, providerName);
+  }
+
+  async isSearchProviderVisible(providerName: string, isVisible: boolean = true) {
+    await this.isVisible(this.providerByName(providerName), isVisible);
   }
 
   async isSearchResultWithNameVisible(name: string, isVisible: boolean = true) {
