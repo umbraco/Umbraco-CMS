@@ -1,8 +1,8 @@
 import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 
-@customElement('umb-eye-dropper-value-summary')
-export class UmbEyeDropperValueSummaryElement extends UmbValueSummaryElementBase<string> {
+@customElement('umb-eye-dropper-property-editor-value-summary')
+export class UmbEyeDropperPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<string> {
 	override render() {
 		if (!this._value) return nothing;
 		return html`<uui-color-swatch
@@ -12,10 +12,10 @@ export class UmbEyeDropperValueSummaryElement extends UmbValueSummaryElementBase
 	}
 }
 
-export { UmbEyeDropperValueSummaryElement as element };
+export { UmbEyeDropperPropertyEditorValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-eye-dropper-value-summary': UmbEyeDropperValueSummaryElement;
+		'umb-eye-dropper-property-editor-value-summary': UmbEyeDropperPropertyEditorValueSummaryElement;
 	}
 }

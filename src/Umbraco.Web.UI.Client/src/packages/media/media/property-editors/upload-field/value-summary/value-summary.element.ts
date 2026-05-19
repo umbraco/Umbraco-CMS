@@ -2,8 +2,8 @@ import type { UmbMediaValueType } from '../types.js';
 import { css, customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 
-@customElement('umb-upload-field-value-summary')
-export class UmbUploadFieldValueSummaryElement extends UmbValueSummaryElementBase<UmbMediaValueType> {
+@customElement('umb-upload-field-property-editor-value-summary')
+export class UmbUploadFieldPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<UmbMediaValueType> {
 	override render() {
 		if (!this._value?.src) return nothing;
 		const filename = this._value.src.split('/').pop() ?? this._value.src;
@@ -21,10 +21,10 @@ export class UmbUploadFieldValueSummaryElement extends UmbValueSummaryElementBas
 	`;
 }
 
-export { UmbUploadFieldValueSummaryElement as element };
+export { UmbUploadFieldPropertyEditorValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-upload-field-value-summary': UmbUploadFieldValueSummaryElement;
+		'umb-upload-field-property-editor-value-summary': UmbUploadFieldPropertyEditorValueSummaryElement;
 	}
 }

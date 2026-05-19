@@ -2,8 +2,8 @@ import { customElement, css, html, nothing } from '@umbraco-cms/backoffice/exter
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { UmbImageCropperPropertyEditorValue } from '../../../components/index.js';
 
-@customElement('umb-image-cropper-value-summary')
-export class UmbImageCropperValueSummaryElement extends UmbValueSummaryElementBase<UmbImageCropperPropertyEditorValue> {
+@customElement('umb-image-cropper-property-editor-value-summary')
+export class UmbImageCropperPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<UmbImageCropperPropertyEditorValue> {
 	override render() {
 		if (!this._value?.src) return nothing;
 		const filename = this._value.src.split('/').pop() ?? this._value;
@@ -21,10 +21,10 @@ export class UmbImageCropperValueSummaryElement extends UmbValueSummaryElementBa
 	`;
 }
 
-export { UmbImageCropperValueSummaryElement as element };
+export { UmbImageCropperPropertyEditorValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-image-cropper-value-summary': UmbImageCropperValueSummaryElement;
+		'umb-image-cropper-property-editor-value-summary': UmbImageCropperPropertyEditorValueSummaryElement;
 	}
 }

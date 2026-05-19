@@ -2,8 +2,10 @@ import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/l
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { UmbBlockListValueModel } from '../../../types.js';
 
-@customElement('umb-block-list-value-summary')
-export class UmbBlockListValueSummaryElement extends UmbValueSummaryElementBase<UmbBlockListValueModel | undefined> {
+@customElement('umb-block-list-property-editor-value-summary')
+export class UmbBlockListPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<
+	UmbBlockListValueModel | undefined
+> {
 	override render() {
 		const count = this._value?.contentData?.length ?? 0;
 		if (!count) return nothing;
@@ -11,10 +13,10 @@ export class UmbBlockListValueSummaryElement extends UmbValueSummaryElementBase<
 	}
 }
 
-export { UmbBlockListValueSummaryElement as element };
+export { UmbBlockListPropertyEditorValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-list-value-summary': UmbBlockListValueSummaryElement;
+		'umb-block-list-property-editor-value-summary': UmbBlockListPropertyEditorValueSummaryElement;
 	}
 }

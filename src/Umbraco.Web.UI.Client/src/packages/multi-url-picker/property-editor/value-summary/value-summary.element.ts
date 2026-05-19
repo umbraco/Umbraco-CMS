@@ -2,8 +2,10 @@ import { customElement, html, css, nothing } from '@umbraco-cms/backoffice/exter
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { UmbLinkPickerLink } from '../../link-picker-modal/index.js';
 
-@customElement('umb-multi-url-picker-value-summary')
-export class UmbMultiUrlPickerValueSummaryElement extends UmbValueSummaryElementBase<Array<UmbLinkPickerLink>> {
+@customElement('umb-multi-url-picker-property-editor-value-summary')
+export class UmbMultiUrlPickerPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<
+	Array<UmbLinkPickerLink>
+> {
 	override render() {
 		if (!this._value?.length) return nothing;
 		const labels = this._value.map((link) => link.name || link.url || '').filter(Boolean);
@@ -21,10 +23,10 @@ export class UmbMultiUrlPickerValueSummaryElement extends UmbValueSummaryElement
 	`;
 }
 
-export { UmbMultiUrlPickerValueSummaryElement as element };
+export { UmbMultiUrlPickerPropertyEditorValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-multi-url-picker-value-summary': UmbMultiUrlPickerValueSummaryElement;
+		'umb-multi-url-picker-property-editor-value-summary': UmbMultiUrlPickerPropertyEditorValueSummaryElement;
 	}
 }

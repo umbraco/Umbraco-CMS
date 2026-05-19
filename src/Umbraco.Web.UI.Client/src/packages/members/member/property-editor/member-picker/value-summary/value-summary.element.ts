@@ -1,8 +1,8 @@
 import { customElement, html, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 
-@customElement('umb-member-picker-value-summary')
-export class UmbMemberPickerValueSummaryElement extends UmbValueSummaryElementBase<Array<string>> {
+@customElement('umb-member-picker-property-editor-value-summary')
+export class UmbMemberPickerPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<Array<string>> {
 	override render() {
 		if (!this._value?.length) return nothing;
 		return html`<span class="name" title="${this._value[0]}">${this._value[0]}</span>`;
@@ -19,10 +19,10 @@ export class UmbMemberPickerValueSummaryElement extends UmbValueSummaryElementBa
 	`;
 }
 
-export { UmbMemberPickerValueSummaryElement as element };
+export { UmbMemberPickerPropertyEditorValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-member-picker-value-summary': UmbMemberPickerValueSummaryElement;
+		'umb-member-picker-property-editor-value-summary': UmbMemberPickerPropertyEditorValueSummaryElement;
 	}
 }

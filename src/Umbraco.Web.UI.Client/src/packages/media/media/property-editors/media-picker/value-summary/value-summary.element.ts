@@ -2,8 +2,10 @@ import { customElement, html, nothing, css } from '@umbraco-cms/backoffice/exter
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { UmbMediaItemModel } from '../../../types.js';
 
-@customElement('umb-media-picker-value-summary')
-export class UmbMediaPickerValueSummaryElement extends UmbValueSummaryElementBase<Array<UmbMediaItemModel>> {
+@customElement('umb-media-picker-property-editor-value-summary')
+export class UmbMediaPickerPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<
+	Array<UmbMediaItemModel>
+> {
 	override render() {
 		if (!this._value?.length) return nothing;
 		const names = this._value.map((item) => item.name).filter(Boolean);
@@ -21,10 +23,10 @@ export class UmbMediaPickerValueSummaryElement extends UmbValueSummaryElementBas
 	`;
 }
 
-export { UmbMediaPickerValueSummaryElement as element };
+export { UmbMediaPickerPropertyEditorValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-media-picker-value-summary': UmbMediaPickerValueSummaryElement;
+		'umb-media-picker-property-editor-value-summary': UmbMediaPickerPropertyEditorValueSummaryElement;
 	}
 }

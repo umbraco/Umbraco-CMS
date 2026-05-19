@@ -1,8 +1,8 @@
 import { customElement, html, nothing, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 
-@customElement('umb-multiple-text-string-value-summary')
-export class UmbMultipleTextStringValueSummaryElement extends UmbValueSummaryElementBase<Array<string>> {
+@customElement('umb-multiple-text-string-property-editor-value-summary')
+export class UmbMultipleTextStringPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<Array<string>> {
 	override render() {
 		if (!this._value?.length) return nothing;
 		const text = this._value.join(', ');
@@ -20,10 +20,10 @@ export class UmbMultipleTextStringValueSummaryElement extends UmbValueSummaryEle
 	`;
 }
 
-export { UmbMultipleTextStringValueSummaryElement as element };
+export { UmbMultipleTextStringPropertyEditorValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-multiple-text-string-value-summary': UmbMultipleTextStringValueSummaryElement;
+		'umb-multiple-text-string-property-editor-value-summary': UmbMultipleTextStringPropertyEditorValueSummaryElement;
 	}
 }

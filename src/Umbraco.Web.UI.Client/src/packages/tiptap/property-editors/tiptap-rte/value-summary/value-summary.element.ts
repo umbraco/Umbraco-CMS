@@ -2,8 +2,8 @@ import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/l
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { UmbPropertyEditorRteValueType } from '@umbraco-cms/backoffice/rte';
 
-@customElement('umb-tiptap-value-summary')
-export class UmbTiptapValueSummaryElement extends UmbValueSummaryElementBase<
+@customElement('umb-tiptap-property-editor-value-summary')
+export class UmbTiptapPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<
 	UmbPropertyEditorRteValueType | undefined
 > {
 	override render() {
@@ -14,10 +14,10 @@ export class UmbTiptapValueSummaryElement extends UmbValueSummaryElementBase<
 	}
 }
 
-export { UmbTiptapValueSummaryElement as element };
+export { UmbTiptapPropertyEditorValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tiptap-value-summary': UmbTiptapValueSummaryElement;
+		'umb-tiptap-property-editor-value-summary': UmbTiptapPropertyEditorValueSummaryElement;
 	}
 }

@@ -1,8 +1,8 @@
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 
-@customElement('umb-toggle-value-summary')
-export class UmbToggleValueSummaryElement extends UmbValueSummaryElementBase<boolean> {
+@customElement('umb-toggle-property-editor-value-summary')
+export class UmbTogglePropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<boolean> {
 	override render() {
 		if (this._value === undefined) return nothing;
 		return html`${this._value === true
@@ -11,10 +11,10 @@ export class UmbToggleValueSummaryElement extends UmbValueSummaryElementBase<boo
 	}
 }
 
-export { UmbToggleValueSummaryElement as element };
+export { UmbTogglePropertyEditorValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-toggle-value-summary': UmbToggleValueSummaryElement;
+		'umb-toggle-property-editor-value-summary': UmbTogglePropertyEditorValueSummaryElement;
 	}
 }

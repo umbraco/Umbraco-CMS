@@ -2,8 +2,8 @@ import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/l
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { UmbBlockSingleValueModel } from '../../../types.js';
 
-@customElement('umb-block-single-value-summary')
-export class UmbBlockSingleValueSummaryElement extends UmbValueSummaryElementBase<
+@customElement('umb-block-single-property-editor-value-summary')
+export class UmbBlockSinglePropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<
 	UmbBlockSingleValueModel | undefined
 > {
 	override render() {
@@ -12,10 +12,10 @@ export class UmbBlockSingleValueSummaryElement extends UmbValueSummaryElementBas
 	}
 }
 
-export { UmbBlockSingleValueSummaryElement as element };
+export { UmbBlockSinglePropertyEditorValueSummaryElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-single-value-summary': UmbBlockSingleValueSummaryElement;
+		'umb-block-single-property-editor-value-summary': UmbBlockSinglePropertyEditorValueSummaryElement;
 	}
 }
