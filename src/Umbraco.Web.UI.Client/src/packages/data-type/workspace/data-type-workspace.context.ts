@@ -256,6 +256,15 @@ export class UmbDataTypeWorkspaceContext
 
 		const mergedSettings = settings.flat();
 
+		// check if there is alias duplicates:
+		const aliasSet = new Set<string>();
+		for (const setting of mergedSettings) {
+			if (aliasSet.has(setting.alias)) {
+				throw new Error(`There is a duplicate alias "${setting.alias}" in the Property Editor configuration.`);
+			}
+			aliasSet.add(setting.alias);
+		}
+
 		if (mergedSettings) {
 			this.#properties.setValue(mergedSettings);
 
@@ -294,17 +303,17 @@ export class UmbDataTypeWorkspaceContext
 		const values: Array<UmbDataTypePropertyValueModel> = [];
 
 		// We want to keep the existing data, if it is not in the default data, and if it is in the default data, then we want to keep the default data.
-		for (const defaultDataItem of this.#properties.getValue()) {
+		for (const property of this.#properties.getValue()) {
 			// We are matching on the alias, as we assume that the alias is unique for the data type.
 			// TODO: Consider if we should also match on the editorAlias just to be on the safe side [JOV]
-			const existingData = data.values?.find((x) => x.alias === defaultDataItem.alias);
+			const existingData = data.values?.find((x) => x.alias === property.alias);
 			if (existingData) {
 				values.push(existingData);
 				continue;
 			}
 
 			// If the data is not in the existing data, then we want to add the default data if it exists.
-			const existingDefaultData = this.#settingsDefaultData.find((x) => x.alias === defaultDataItem.alias);
+			const existingDefaultData = this.#settingsDefaultData.find((x) => x.alias === property.alias);
 			if (existingDefaultData) {
 				values.push(existingDefaultData);
 			}
