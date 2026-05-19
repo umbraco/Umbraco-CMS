@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -97,15 +96,14 @@ public class UmbracoApplicationBuilder : IUmbracoApplicationBuilder, IUmbracoEnd
         AppBuilder.UseAuthentication();
         AppBuilder.UseAuthorization();
 
-        // Register output cache middleware if any feature (website, delivery API) has configured output caching.
-        // This must be called at most once per application — individual features register policies via
-        // AddOutputCache() (which is additive) but the middleware itself must only be added here.
+        // Register output cache middleware only when Umbraco itself has enabled output caching
+        // (via Website template caching or Delivery API caching configuration). Gating on
+        // IUmbracoManagedOutputCacheMarker rather than IOutputCacheStore ensures we don't
+        // duplicate UseOutputCache() when the application has called services.AddOutputCache(...)
+        // for its own purposes (which also registers IOutputCacheStore).
         // Placed after auth (policies may check preview/access state) but before antiforgery, localization,
         // and session so that cache hits bypass those middlewares for better throughput.
-        // NOTE: If the application has already registered UseOutputCache() elsewhere (e.g. in Program.cs),
-        // this will cause an InvalidOperationException at request time. Remove the external UseOutputCache()
-        // call when using Umbraco's managed output caching.
-        if (ApplicationServices.GetService<IOutputCacheStore>() is not null)
+        if (ApplicationServices.GetService<IUmbracoManagedOutputCacheMarker>() is not null)
         {
             AppBuilder.UseOutputCache();
         }
