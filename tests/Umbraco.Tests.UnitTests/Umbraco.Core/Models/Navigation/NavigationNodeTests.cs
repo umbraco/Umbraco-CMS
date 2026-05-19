@@ -152,13 +152,11 @@ public class NavigationNodeTests
     [Test]
     public void GetOrderedChildren_StaleAfterDirectSortOrderEdit_SelfHealsOnNextAddChild()
     {
-        // Companion to GetOrderedChildren_WithoutInvalidation_StillReturnsOldOrderingAfterDirectSortOrderEdit.
         // A third-party caller that mutates SortOrder directly on a NavigationNode (rather than
         // going through ContentNavigationServiceBase.UpdateSortOrder) leaves the parent's ordered-
         // children cache stale, but any subsequent structural mutation that flows through
         // AddChild/RemoveChild on that parent will discard the stale array and rebuild against
-        // the current SortOrder values. This pins the self-healing recovery path that backs
-        // the "stale until next snapshot rebuild" comment in the PR https://github.com/umbraco/Umbraco-CMS/pull/22742
+        // the current SortOrder values.
         var structure = new ConcurrentDictionary<Guid, NavigationNode>();
         Guid contentTypeKey = Guid.NewGuid();
         NavigationNode parent = AddNode(structure, contentTypeKey);
