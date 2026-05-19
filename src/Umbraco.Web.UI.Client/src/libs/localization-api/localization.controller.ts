@@ -11,13 +11,9 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-import type {
-	UmbLocalizationSet,
-	FunctionParams,
-	UmbLocalizationSetBase,
-	UmbLocalizationSetKey,
-} from './localization.manager.js';
+import type { UmbLocalizationSetBase, UmbLocalizationSetKey } from './localization.manager.js';
 import { umbLocalizationManager } from './localization.manager.js';
+import type { UmbKnownLocalizationSet } from './known-keys.generated.js';
 import { unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
@@ -41,7 +37,38 @@ const LocalizationControllerAlias = Symbol();
  * }
  * ```
  */
-export class UmbLocalizationController<LocalizationSetType extends UmbLocalizationSetBase = UmbLocalizationSet>
+/**
+ * Resolves the union of valid keys for a localization set, excluding the metadata fields
+ * declared on `UmbLocalizationSetBase` (`$code`, `$dir`). The `(string & {})` intersection
+ * preserves literal-key autocomplete while still accepting dynamic keys (e.g.,
+ * `` `login_greeting${day}` ``).
+ *
+ * If `LocalizationSetType` has an index signature (the legacy `UmbLocalizationSet` shape),
+ * `keyof` returns the index signature's key type and autocomplete falls back to free-form
+ * strings — no narrowing, no breakage. The default generic now points at
+ * `UmbKnownLocalizationSet`, which is the codegen output with literal keys, so callers get
+ * autocomplete out of the box.
+ */
+type LocalizationKeyOf<T> = (Exclude<keyof T, keyof UmbLocalizationSetBase> & string) | (string & {});
+
+/**
+ * Resolves the argument tuple for a localization key.
+ *
+ * - **Function entries** (e.g., `(name: string) => string`) forward their parameter list so the
+ *   call site is checked against the source signature.
+ * - **String entries** stay as `unknown[]` rather than `[]`. The runtime supports `%0%` and
+ *   `{0}` placeholder substitution on string values (see `#processTerm`), so passing args to a
+ *   string key is intentional, not an error.
+ * - **Dynamic-string escape hatch** (`(string & {})`) falls back to `unknown[]` so consumers
+ *   building a key on the fly (e.g., `` `login_greeting${day}` ``) aren't forced to cast.
+ */
+type LocalizationArgsOf<T, K> = K extends keyof T
+	? T[K] extends (...args: infer U) => string
+		? U
+		: unknown[]
+	: unknown[];
+
+export class UmbLocalizationController<LocalizationSetType extends UmbLocalizationSetBase = UmbKnownLocalizationSet>
 	implements UmbController
 {
 	#host;
@@ -178,8 +205,11 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * this.localize.term('general_greeting', ['John']);
 	 * ```
 	 */
-	term<K extends keyof LocalizationSetType>(key: K, ...args: FunctionParams<LocalizationSetType[K]>): string {
-		const term = this.#lookupTerm(key);
+	term<K extends LocalizationKeyOf<LocalizationSetType>>(
+		key: K,
+		...args: LocalizationArgsOf<LocalizationSetType, K>
+	): string {
+		const term = this.#lookupTerm(key as keyof LocalizationSetType);
 
 		if (term === null) {
 			return String(key);
@@ -210,12 +240,12 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * this.localize.termOrDefault('general_close', null);
 	 * ```
 	 */
-	termOrDefault<K extends keyof LocalizationSetType, D extends string | null>(
+	termOrDefault<K extends LocalizationKeyOf<LocalizationSetType>, D extends string | null>(
 		key: K,
 		defaultValue: D,
-		...args: FunctionParams<LocalizationSetType[K]>
+		...args: LocalizationArgsOf<LocalizationSetType, K>
 	): string | D {
-		const term = this.#lookupTerm(key);
+		const term = this.#lookupTerm(key as keyof LocalizationSetType);
 
 		if (term === null) {
 			return defaultValue;

@@ -103,6 +103,18 @@ No hardcoded UI-facing strings. All user-visible text must go through the locali
 
 For step-by-step instructions on adding localization keys and using them in elements or controllers, use the `general-add-localization` skill.
 
+### Type-safe localization keys
+
+`this.localize.term()`, `termOrDefault()`, and the `<umb-localize key="…">` element are typed against the canonical `en.ts` dictionary. After adding or renaming a key in `en.ts`, run:
+
+```bash
+npm run generate:localization-keys
+```
+
+This walks `en.ts`, flattens `group: { key: value }` into `group_key`, and rewrites `src/libs/localization-api/known-keys.generated.ts` with an `UmbKnownLocalizationSet` interface — string entries stay typed as `string`, function entries forward their parameter types (so `term('user_languageNotFound', culture, baseCulture)` is checked against the underlying signature). The script also runs automatically as a `prebuild` hook, so production builds always see fresh keys.
+
+The signature keeps a `(string & {})` escape hatch alongside `keyof UmbKnownLocalizationSet`. That means autocomplete shows the canonical keys, typos like `localize.term('login_grreting0')` become compile errors, and dynamic keys like `` localize.term(`login_greeting${day}`) `` still work without a cast. Third-party packages can declare-merge into `UmbKnownLocalizationSet` to publish their own typed keys.
+
 ### Active language
 
 The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`, not by `<html lang>`:

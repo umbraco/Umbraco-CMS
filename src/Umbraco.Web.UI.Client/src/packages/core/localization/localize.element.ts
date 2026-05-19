@@ -1,5 +1,6 @@
 import { css, customElement, html, property, state, unsafeHTML, when } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
+import type { UmbKnownLocalizationKey } from '@umbraco-cms/backoffice/localization-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 /**
@@ -11,11 +12,15 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 export class UmbLocalizeElement extends UmbLitElement {
 	/**
 	 * The key to localize. The key is case sensitive.
+	 *
+	 * Typed as `UmbKnownLocalizationKey | (string & {})` so that property bindings get
+	 * autocomplete for the canonical `en.ts` dictionary while still accepting dynamic
+	 * keys (e.g., `` `login_greeting${day}` ``) and third-party-augmented entries.
 	 * @attr
 	 * @example key="general_ok"
 	 */
 	@property()
-	key!: string;
+	key!: UmbKnownLocalizationKey | (string & {});
 
 	/**
 	 * The values to forward to the localization function (must be JSON compatible).

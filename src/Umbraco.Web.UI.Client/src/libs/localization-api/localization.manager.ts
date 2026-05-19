@@ -31,7 +31,7 @@ export interface UmbLocalizationSet extends UmbLocalizationSetBase {
 export const UMB_DEFAULT_LOCALIZATION_CULTURE = 'en';
 
 export class UmbLocalizationManager {
-	connectedControllers = new Set<UmbLocalizationController<UmbLocalizationSetBase>>();
+	connectedControllers = new Set<UmbLocalizationController<any>>();
 
 	#changedKeys: Set<UmbLocalizationSetKey> = new Set();
 	#requestUpdateChangedKeysId?: number = undefined;
@@ -51,11 +51,11 @@ export class UmbLocalizationManager {
 		return this.localizations.get(UMB_DEFAULT_LOCALIZATION_CULTURE) as UmbLocalizationSet;
 	}
 
-	appendConsumer(consumer: UmbLocalizationController<UmbLocalizationSetBase>) {
+	appendConsumer(consumer: UmbLocalizationController<any>) {
 		if (this.connectedControllers.has(consumer)) return;
 		this.connectedControllers.add(consumer);
 	}
-	removeConsumer(consumer: UmbLocalizationController<UmbLocalizationSetBase>) {
+	removeConsumer(consumer: UmbLocalizationController<any>) {
 		this.connectedControllers.delete(consumer);
 	}
 
