@@ -78,8 +78,10 @@ public sealed class UserCacheRefresher : PayloadCacheRefresherBase<UserCacheRefr
             userCache.Result?.Clear(RepositoryCacheKeys.GetKey<IUser, int>(p.Id));
             userCache.Result?.ClearByKey(CacheKeys.UserContentStartNodePathsPrefix + p.Key);
             userCache.Result?.ClearByKey(CacheKeys.UserMediaStartNodePathsPrefix + p.Key);
+            userCache.Result?.ClearByKey(CacheKeys.UserElementStartNodePathsPrefix + p.Key);
             userCache.Result?.ClearByKey(CacheKeys.UserAllContentStartNodesPrefix + p.Key);
             userCache.Result?.ClearByKey(CacheKeys.UserAllMediaStartNodesPrefix + p.Key);
+            userCache.Result?.ClearByKey(CacheKeys.UserAllElementStartNodesPrefix + p.Key);
         }
     }
 }

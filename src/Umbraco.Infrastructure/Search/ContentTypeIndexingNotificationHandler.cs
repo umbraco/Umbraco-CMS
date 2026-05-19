@@ -24,39 +24,11 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
     private readonly IMediaService _mediaService;
     private readonly IMemberService _memberService;
     private readonly IMemberTypeService _memberTypeService;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly IUmbracoIndexingHandler _umbracoIndexingHandler;
     private readonly IOptionsMonitor<IndexingSettings> _indexingSettings;
     private readonly IDeferredSearchReindexService _deferredSearchReindexService;
     private readonly IOptionsMonitor<CacheSettings> _cacheSettings;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ContentTypeIndexingNotificationHandler"/> class.
-    /// </summary>
-    /// <param name="umbracoIndexingHandler">The handler responsible for managing Umbraco content indexing operations.</param>
-    /// <param name="contentService">Service used to manage and query content items.</param>
-    /// <param name="memberService">Service used to manage and query member entities.</param>
-    /// <param name="mediaService">Service used to manage and query media items.</param>
-    /// <param name="memberTypeService">Service used to manage and query member types.</param>
-    [Obsolete("Please use the non-obsolete constructor. Scheduled for removal in Umbraco 18.")]
-#pragma warning disable CS0618 // Type or member is obsolete
-    public ContentTypeIndexingNotificationHandler(
-        IUmbracoIndexingHandler umbracoIndexingHandler,
-        IContentService contentService,
-        IMemberService memberService,
-        IMediaService mediaService,
-        IMemberTypeService memberTypeService)
-        : this(
-            umbracoIndexingHandler,
-            contentService,
-            memberService,
-            mediaService,
-            memberTypeService,
-            StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>(),
-            StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<IndexingSettings>>())
-    {
-    }
-#pragma warning restore CS0618 // Type or member is obsolete
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContentTypeIndexingNotificationHandler"/> class.
@@ -75,7 +47,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
         IMemberService memberService,
         IMediaService mediaService,
         IMemberTypeService memberTypeService,
-        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         IOptionsMonitor<IndexingSettings> indexingSettings)
         : this(
             umbracoIndexingHandler,
@@ -108,7 +80,7 @@ public sealed class ContentTypeIndexingNotificationHandler : INotificationHandle
         IMemberService memberService,
         IMediaService mediaService,
         IMemberTypeService memberTypeService,
-        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         IOptionsMonitor<IndexingSettings> indexingSettings,
         IDeferredSearchReindexService deferredSearchReindexService,
         IOptionsMonitor<CacheSettings> cacheSettings)

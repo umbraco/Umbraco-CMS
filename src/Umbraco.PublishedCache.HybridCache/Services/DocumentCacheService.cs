@@ -31,7 +31,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     private readonly IEnumerable<IDocumentSeedKeyProvider> _seedKeyProviders;
     private readonly IPublishedModelFactory _publishedModelFactory;
     private readonly IPreviewService _previewService;
-    private readonly IPublishStatusQueryService _publishStatusQueryService;
+    private readonly IDocumentPublishStatusQueryService _publishStatusQueryService;
     private readonly CacheSettings _cacheSettings;
     private readonly ILogger<DocumentCacheService> _logger;
     private HashSet<Guid>? _seedKeys;
@@ -69,7 +69,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         IOptions<CacheSettings> cacheSettings,
         IPublishedModelFactory publishedModelFactory,
         IPreviewService previewService,
-        IPublishStatusQueryService publishStatusQueryService,
+        IDocumentPublishStatusQueryService publishStatusQueryService,
         ILogger<DocumentCacheService> logger)
     {
         _databaseCacheRepository = databaseCacheRepository;
@@ -151,7 +151,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         async Task<(ContentCacheNode? Node, bool AncestorCheckFailed)> GetContentCacheNodeFromRepo()
         {
             using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-            ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetContentSourceAsync(key, preview);
+            ContentCacheNode? contentCacheNode = await _databaseCacheRepository.GetDocumentSourceAsync(key, preview);
 
             // If we can resolve the content cache node, we still need to check if the ancestor path is published.
             // This does cost some performance, but it's necessary to ensure that the content is actually published.
@@ -198,7 +198,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         scope.ReadLock(Constants.Locks.ContentTree);
 
-        (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = await _databaseCacheRepository.GetContentSourceForPublishStatesAsync(key);
+        (ContentCacheNode? draftNode, ContentCacheNode? publishedNode) = await _databaseCacheRepository.GetDocumentSourceForPublishStatesAsync(key);
 
         if (draftNode is not null)
         {
@@ -267,11 +267,11 @@ internal sealed class DocumentCacheService : IDocumentCacheService
 
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-            IEnumerable<ContentCacheNode> cacheNodes = await _databaseCacheRepository.GetContentSourcesAsync(uncachedKeys);
+            List<ContentCacheNode> cacheNodes = (await _databaseCacheRepository.GetDocumentSourcesAsync(uncachedKeys)).ToList();
 
             scope.Complete();
 
-            _logger.LogDebug("Document nodes to cache {NodeCount}", cacheNodes.Count());
+            _logger.LogDebug("Document nodes to cache {NodeCount}", cacheNodes.Count);
 
             foreach (ContentCacheNode cacheNode in cacheNodes)
             {
@@ -343,16 +343,17 @@ internal sealed class DocumentCacheService : IDocumentCacheService
         // We have nodes seperate in the cache, cause 99% of the time, you are only using one
         // and thus we won't get too much data when retrieving from the cache.
         var draftCacheNode = _cacheNodeFactory.ToContentCacheNode(content, true);
-        await _databaseCacheRepository.RefreshContentAsync(draftCacheNode);
+        await _databaseCacheRepository.RefreshDocumentAsync(draftCacheNode);
+
 
         if (content.PublishedState is PublishedState.Publishing)
         {
             var publishedCacheNode = _cacheNodeFactory.ToContentCacheNode(content, false);
-            await _databaseCacheRepository.RefreshContentAsync(publishedCacheNode);
+            await _databaseCacheRepository.RefreshDocumentAsync(publishedCacheNode);
         }
         else if (content.PublishedState is PublishedState.Unpublishing)
         {
-            await _databaseCacheRepository.RemovePublishedContentAsync(content.Id);
+            await _databaseCacheRepository.RemovePublishedDocumentAsync(content.Id);
             await ClearPublishedCacheAsync(content.Key);
         }
 
@@ -391,6 +392,7 @@ internal sealed class DocumentCacheService : IDocumentCacheService
     public void Rebuild(IReadOnlyCollection<int> contentTypeIds)
         => _databaseCacheRepository.Rebuild(
             contentTypeIds.ToList(),
+            null,
             null,
             null,
             action =>

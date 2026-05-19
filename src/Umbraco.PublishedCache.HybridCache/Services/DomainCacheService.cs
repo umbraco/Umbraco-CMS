@@ -119,7 +119,7 @@ public class DomainCacheService : IDomainCacheService
         using (ICoreScope scope = _coreScopeProvider.CreateCoreScope())
         {
             scope.ReadLock(Constants.Locks.Domains);
-            IEnumerable<IDomain> domains = _domainService.GetAll(true);
+            IEnumerable<IDomain> domains = _domainService.GetAllAsync(true).GetAwaiter().GetResult();
             foreach (Domain domain in domains
                          .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
                          .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId!.Value, x.LanguageIsoCode!, x.IsWildcard, x.SortOrder)))

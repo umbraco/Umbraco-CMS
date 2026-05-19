@@ -616,6 +616,7 @@ export class DocumentTypeApiHelper {
       .withName(elementTypeName)
       .withAlias(AliasHelper.toAlias(elementTypeName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .withIcon("icon-plugin")
       .build();
 
@@ -683,6 +684,7 @@ export class DocumentTypeApiHelper {
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .addContainer()
         .withName(groupName)
         .withId(containerId)
@@ -709,6 +711,7 @@ export class DocumentTypeApiHelper {
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .withVariesByCulture(elementTypeVaryByCulture)
       .addContainer()
         .withName(groupName)
@@ -736,6 +739,7 @@ export class DocumentTypeApiHelper {
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .addContainer()
         .withName(groupName)
         .withId(containerId)
@@ -1043,6 +1047,7 @@ export class DocumentTypeApiHelper {
       .withName(elementTypeName)
       .withAlias(AliasHelper.toAlias(elementTypeName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .withVariesByCulture(elementTypeVaryByCulture)
       .withIcon("icon-plugin")
       .addContainer()
@@ -1083,6 +1088,7 @@ export class DocumentTypeApiHelper {
       .withName(elementName)
       .withAlias(AliasHelper.toAlias(elementName))
       .withIsElement(true)
+      .withAllowedInLibrary(true)
       .withVariesByCulture(true)  // Element varies by culture
       .addContainer()
         .withName(groupName)

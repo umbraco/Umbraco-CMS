@@ -12,16 +12,6 @@ public sealed class SystemTextWebhookJsonSerializer : SystemTextJsonSerializerBa
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="SystemTextConfigurationEditorJsonSerializer" /> class.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public SystemTextWebhookJsonSerializer()
-        : this(
-              StaticServiceProvider.Instance.GetRequiredService<IJsonSerializerEncoderFactory>())
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="SystemTextWebhookJsonSerializer" /> class.
     /// </summary>
     /// <param name="jsonSerializerEncoderFactory">Factory used to create JSON serializer encoders for webhook payload serialization.</param>

@@ -31,6 +31,7 @@ public static class WebhookEventCollectionBuilderExtensions
                     .AddDataType(payloadType)
                     .AddDictionary(payloadType)
                     .AddDomain(payloadType)
+                    .AddElement(onlyDefault, payloadType)
                     .AddFile(payloadType)
                     .AddHealthCheck(payloadType)
                     .AddLanguage(payloadType)
