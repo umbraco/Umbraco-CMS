@@ -112,7 +112,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
         await runner.StopAsync(cts.Token);
     }
 
-    private class TestJobA : RecurringBackgroundJobBase
+    private class TestJobA : RecurringBackgroundJobBase, ITriggerableRecurringBackgroundJob
     {
         private readonly Func<CancellationToken, Task>? _onExecute;
 
@@ -126,7 +126,7 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
             => _onExecute?.Invoke(cancellationToken) ?? Task.CompletedTask;
     }
 
-    private class TestJobB : RecurringBackgroundJobBase
+    private class TestJobB : RecurringBackgroundJobBase, ITriggerableRecurringBackgroundJob
     {
         public override TimeSpan Period => TimeSpan.FromSeconds(30);
 

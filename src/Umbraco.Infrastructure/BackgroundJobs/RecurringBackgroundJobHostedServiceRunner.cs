@@ -112,7 +112,7 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
     ///   <c>true</c> if the job was found and triggered; <c>false</c> if no hosted service is running for this job type.
     /// </returns>
     internal bool TriggerExecution<TJob>(NextExecutionStrategy strategy)
-        where TJob : IRecurringBackgroundJob
+        where TJob : ITriggerableRecurringBackgroundJob
     {
         if (FindHostedService<TJob>() is not { } hostedService)
         {
@@ -134,7 +134,7 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
     ///   <c>true</c> if the job was found and triggered; <c>false</c> if no hosted service is running for this job type.
     /// </returns>
     internal bool TriggerExecution<TJob>(TimeSpan nextDelay)
-        where TJob : IRecurringBackgroundJob
+        where TJob : ITriggerableRecurringBackgroundJob
     {
         if (FindHostedService<TJob>() is not { } hostedService)
         {
@@ -147,6 +147,6 @@ public class RecurringBackgroundJobHostedServiceRunner : IHostedService
     }
 
     private RecurringHostedServiceBase? FindHostedService<TJob>()
-        where TJob : IRecurringBackgroundJob
+        where TJob : ITriggerableRecurringBackgroundJob
         => _hostedServices.TryGetValue(typeof(TJob), out IHostedService? service) ? service as RecurringHostedServiceBase : null;
 }
