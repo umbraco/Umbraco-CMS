@@ -1,5 +1,5 @@
 import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
-import { type CSSResultGroup, css, html, nothing, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { type CSSResultGroup, css, html, nothing, customElement, property, query, state, type PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
 import { UMB_AUTH_CONTEXT } from '../../contexts';
@@ -53,6 +53,39 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
       this._passwordPattern = pattern;
     });
   }
+
+  protected firstUpdated(_changedProperties: PropertyValues): void {
+    super.firstUpdated(_changedProperties);
+
+    if(!this.passwordElement || !this.confirmPasswordElement) return;
+    
+    this.passwordElement.addEventListener('input', () =>{
+      this.handlePasswordInput(this.passwordElement);
+    });
+
+    this.confirmPasswordElement.addEventListener('input', () =>{
+      this.handlePasswordInput(this.confirmPasswordElement);  
+    });
+
+    this.passwordElement.addEventListener('invalid', () =>{
+      this.handlePasswordInvalid(this.passwordElement);
+    });
+
+    this.confirmPasswordElement.addEventListener('invalid', () =>{
+      this.handlePasswordInvalid(this.confirmPasswordElement);
+    });
+  }
+
+  private handlePasswordInput = (input: UUIInputPasswordElement): void => {
+    input.setCustomValidity('');
+  };
+
+  private handlePasswordInvalid = (input: UUIInputPasswordElement): void => {
+    if(input.validity?.patternMismatch) {
+      const passwordValidityText = this.localize.term('login_invalidPasswordMessage') ?? 'The password is not strong enough.';
+      input.setCustomValidity(passwordValidityText);
+    }
+  };
 
   #onSubmit(event: Event) {
     event.preventDefault();
