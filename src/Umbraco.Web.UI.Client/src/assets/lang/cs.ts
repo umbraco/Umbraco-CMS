@@ -639,6 +639,7 @@ export default {
 		content: 'Obsah',
 		continue: 'Pokračovat',
 		copy: 'Kopírovat',
+		copied: 'Zkopírováno!',
 		create: 'Vytvořit',
 		database: 'Databáze',
 		date: 'Datum',
@@ -1730,6 +1731,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Zakázat sledování URL',
 		enableUrlTracker: 'Povolit sledování URL',
+		urlTrackerEnabled: 'Povoleno',
+		urlTrackerDisabled: 'Zakázáno',
 		culture: 'Jazyk',
 		originalUrl: 'Originální URL',
 		redirectedTo: 'Přesměrováno na',
