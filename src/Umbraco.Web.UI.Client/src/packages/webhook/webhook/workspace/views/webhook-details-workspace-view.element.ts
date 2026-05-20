@@ -107,7 +107,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 					mandatory
 					label=${this.localize.term('webhooks_url')}
 					description=${this.localize.term('webhooks_urlDescription')}>
-					<uui-input @input=${this.#onUrlChange} .value=${this._webhook.url} slot="editor" required="true"></uui-input>
+					<uui-input @input=${this.#onUrlChange} label=${this.localize.term('webhooks_url')} .value=${this._webhook.url} slot="editor" required="true"></uui-input>
 				</umb-property-layout>
 				<umb-property-layout
 					mandatory
@@ -122,7 +122,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 				<umb-property-layout
 					label=${this.localize.term('webhooks_enabled')}
 					description=${this.localize.term('webhooks_enabledDescription')}>
-					<uui-toggle slot="editor" .checked=${this._webhook.enabled} @change=${this.#onEnabledChange}></uui-toggle>
+					<uui-toggle slot="editor" label=${this.localize.term('webhooks_enabled')} .checked=${this._webhook.enabled} @change=${this.#onEnabledChange}></uui-toggle>
 				</umb-property-layout>
 				<umb-property-layout
 					label=${this.localize.term('webhooks_headers')}
