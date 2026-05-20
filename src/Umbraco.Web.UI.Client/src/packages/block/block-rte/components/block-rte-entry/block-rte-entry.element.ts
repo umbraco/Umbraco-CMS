@@ -387,13 +387,14 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 				opacity: 0.2;
 			}
 
-			:host([is-reference]) {
+			:host([is-reference]) .umb-block-rte__block {
 				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
 				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
 			}
 
 			.umb-block-rte__block {
 				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
 
 				&:hover,
 				&:focus-within {

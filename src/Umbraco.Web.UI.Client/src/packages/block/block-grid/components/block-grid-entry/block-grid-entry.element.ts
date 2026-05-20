@@ -756,13 +756,14 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 				z-index: 2;
 			}
 
-			:host([is-reference]) {
+			:host([is-reference]) .umb-block-grid__block {
 				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
 				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
 			}
 
 			.umb-block-grid__block {
 				--umb-entity-frame-opacity: 0;
+				--umb-entity-frame-color: var(--uui-color-interactive-emphasis);
 
 				height: 100%;
 
