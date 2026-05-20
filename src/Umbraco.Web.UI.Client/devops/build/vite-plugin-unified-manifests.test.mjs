@@ -34,3 +34,10 @@ test('produces deterministic output (stable order)', () => {
 	]);
 	assert.equal(a, b);
 });
+
+test('encodes Windows-style backslash paths so Rollup sees them as plain strings', () => {
+	const src = buildEntrySource([{ name: 'block', path: 'D:\\a\\1\\s\\block\\manifests.ts' }]);
+	// JSON.stringify escapes each backslash: D:\a\1\s\block\manifests.ts → "D:\\a\\1\\s\\block\\manifests.ts"
+	assert.ok(src.includes('from "D:\\\\a\\\\1\\\\s\\\\block\\\\manifests.ts"'));
+	assert.ok(!src.includes('"D:\\a\\1'));
+});

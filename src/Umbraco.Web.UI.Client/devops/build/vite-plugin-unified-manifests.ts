@@ -21,7 +21,9 @@ function toIdentifier(pkgDir: string): string {
  */
 export function buildEntrySource(packages: PackageEntry[]): string {
 	const idented = packages.map((p) => ({ id: toIdentifier(p.name), path: p.path }));
-	const imports = idented.map((p) => `import { manifests as ${p.id} } from "${p.path}";`).join('\n');
+	// JSON.stringify so absolute Windows paths like `D:\a\1\…` don't emit invalid
+	// escape sequences (e.g. `\a`, `\1`) inside the generated TypeScript source.
+	const imports = idented.map((p) => `import { manifests as ${p.id} } from ${JSON.stringify(p.path)};`).join('\n');
 	const spreads = idented.map((p) => `\t...${p.id},`).join('\n');
 	return `${imports}\n\nexport const allManifests = [\n${spreads}\n];\n`;
 }
