@@ -9,6 +9,7 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 public interface IRecurringBackgroundJob
 {
     static readonly TimeSpan DefaultDelay = System.TimeSpan.FromMinutes(3);
+    static readonly TimeSpan DefaultIgnoredDelay = System.TimeSpan.FromMinutes(1);
     static readonly ServerRole[] DefaultServerRoles = new[] { ServerRole.Single, ServerRole.SchedulingPublisher };
 
     /// <summary>
@@ -21,6 +22,14 @@ public interface IRecurringBackgroundJob
     /// occurs.
     /// </summary>
     TimeSpan Delay { get => DefaultDelay; }
+
+    /// <summary>
+    /// Timespan to wait before re-evaluating execution conditions when an execution is ignored (e.g. runtime not ready, wrong server role or not main domain).
+    /// </summary>
+    /// <remarks>
+    /// This back-off prevents tight looping when <see cref="Period" /> is short (or <see cref="TimeSpan.Zero" />) and an execution is skipped without invoking <see cref="RunJobAsync" />.
+    /// </remarks>
+    TimeSpan IgnoredDelay { get => DefaultIgnoredDelay; }
 
     /// <summary>
     /// Gets the server roles for which this recurring background job is intended.
