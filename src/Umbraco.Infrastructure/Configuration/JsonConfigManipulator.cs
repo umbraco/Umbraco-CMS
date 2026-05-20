@@ -104,6 +104,7 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     }
 
     /// <inheritdoc />
+    [Obsolete("This method is no longer used by Umbraco. Set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead. Scheduled for removal in Umbraco 19.")]
     public async Task SaveDisableRedirectUrlTrackingAsync(bool disable)
         => await CreateOrUpdateConfigValueAsync(DisableRedirectUrlTrackingPath, disable);
 

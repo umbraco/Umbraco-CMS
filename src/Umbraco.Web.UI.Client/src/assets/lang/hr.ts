@@ -1968,6 +1968,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Onemogući URL praćenje',
 		enableUrlTracker: 'Omogući URL praćenje',
+		urlTrackerEnabled: 'Omogućeno',
+		urlTrackerDisabled: 'Onemogućeno',
 		originalUrl: 'Originalni URL',
 		redirectedTo: 'Preusmjerno na',
 		redirectUrlManagement: 'Preusmjeravanje URL-ova',
