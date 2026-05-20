@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -19,6 +18,7 @@ public sealed class AuditService : RepositoryService, IAuditService
     private readonly IUserIdKeyResolver _userIdKeyResolver;
     private readonly IAuditRepository _auditRepository;
     private readonly IEntityService _entityService;
+    private readonly IAuditTriggerAccessor _auditTriggerAccessor;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="AuditService" /> class.
@@ -29,13 +29,48 @@ public sealed class AuditService : RepositoryService, IAuditService
         IEventMessagesFactory eventMessagesFactory,
         IAuditRepository auditRepository,
         IUserIdKeyResolver userIdKeyResolver,
-        IEntityService entityService)
+        IEntityService entityService,
+        IAuditTriggerAccessor auditTriggerAccessor)
         : base(provider, loggerFactory, eventMessagesFactory)
     {
         _auditRepository = auditRepository;
         _userIdKeyResolver = userIdKeyResolver;
         _entityService = entityService;
+        _auditTriggerAccessor = auditTriggerAccessor;
     }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="AuditService" /> class.
+    /// </summary>
+    [Obsolete("Please use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public AuditService(
+        ICoreScopeProvider provider,
+        ILoggerFactory loggerFactory,
+        IEventMessagesFactory eventMessagesFactory,
+        IAuditRepository auditRepository,
+        IUserIdKeyResolver userIdKeyResolver,
+        IEntityService entityService)
+        : this(
+            provider,
+            loggerFactory,
+            eventMessagesFactory,
+            auditRepository,
+            userIdKeyResolver,
+            entityService,
+            StaticServiceProvider.Instance.GetRequiredService<IAuditTriggerAccessor>())
+    {
+    }
+
+    /// <inheritdoc />
+    [Obsolete("Use the overload accepting typeAlias. Scheduled for removal in Umbraco 19.")]
+    public Task<Attempt<AuditLogOperationStatus>> AddAsync(
+        AuditType type,
+        Guid userKey,
+        int objectId,
+        string? entityType,
+        string? comment,
+        string? parameters)
+        => AddAsync(type, userKey, objectId, entityType, comment, parameters, typeAlias: null);
 
     /// <inheritdoc />
     public async Task<Attempt<AuditLogOperationStatus>> AddAsync(
@@ -44,7 +79,8 @@ public sealed class AuditService : RepositoryService, IAuditService
         int objectId,
         string? entityType,
         string? comment = null,
-        string? parameters = null)
+        string? parameters = null,
+        string? typeAlias = null)
     {
         int? userId = await _userIdKeyResolver.TryGetAsync(userKey) is { Success: true } userIdAttempt
             ? userIdAttempt.Result
@@ -54,7 +90,7 @@ public sealed class AuditService : RepositoryService, IAuditService
             return Attempt.Fail(AuditLogOperationStatus.UserNotFound);
         }
 
-        return AddInner(type, userId.Value, objectId, entityType, comment, parameters);
+        return AddInner(type, userId.Value, objectId, entityType, comment, parameters, typeAlias);
     }
 
     /// <inheritdoc />
@@ -338,10 +374,33 @@ public sealed class AuditService : RepositoryService, IAuditService
         int objectId,
         string? entityType,
         string? comment = null,
-        string? parameters = null)
+        string? parameters = null,
+        string? typeAlias = null)
     {
+        AuditTrigger? trigger = _auditTriggerAccessor.Current;
+
+        // Suppress the trigger when the caller has declared it redundant for this audit type.
+        // e.g. a Rollback trigger on a RollBack audit entry (the type already conveys the action),
+        // while the nested Save entry still carries the trigger which provides useful context.
+        if (trigger?.SuppressForAuditTypes?.Contains(type) is true)
+        {
+            trigger = null;
+        }
+
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        _auditRepository.Save(new AuditItem(objectId, type, userId, entityType, comment, parameters));
+
+        _auditRepository.Save(new AuditItem(
+            objectId,
+            type,
+            userId,
+            entityType,
+            comment,
+            parameters,
+            createDate: null,
+            triggerSource: trigger?.Source,
+            triggerOperation: trigger?.Operation,
+            typeAlias: typeAlias));
+
         scope.Complete();
 
         return Attempt.Succeed(AuditLogOperationStatus.Success);

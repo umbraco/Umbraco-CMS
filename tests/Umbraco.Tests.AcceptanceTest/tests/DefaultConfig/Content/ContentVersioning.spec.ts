@@ -33,7 +33,7 @@ test('can rollback content to a previous published version', {tag: '@smoke'}, as
   await umbracoUi.content.doesDocumentPropertyHaveValue(dataTypeName, originalText);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentRolledBack);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
@@ -126,5 +126,5 @@ test('cancelling the rollback modal leaves the content unchanged', async ({umbra
   await umbracoApi.document.doesDocumentWithCultureHaveValue(documentId, updatedText, null);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSavedAndPublished);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
 });

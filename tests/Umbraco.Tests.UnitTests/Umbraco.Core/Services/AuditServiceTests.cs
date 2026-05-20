@@ -6,7 +6,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -24,6 +23,7 @@ public class AuditServiceTests
     private Mock<IAuditRepository> _auditRepositoryMock;
     private Mock<IEntityService> _entityServiceMock;
     private Mock<IUserIdKeyResolver> _userIdKeyResolverMock;
+    private Mock<IAuditTriggerAccessor> _auditTriggerAccessorMock;
 
     [SetUp]
     public void Setup()
@@ -32,6 +32,10 @@ public class AuditServiceTests
         _auditRepositoryMock = new Mock<IAuditRepository>(MockBehavior.Strict);
         _entityServiceMock = new Mock<IEntityService>(MockBehavior.Strict);
         _userIdKeyResolverMock = new Mock<IUserIdKeyResolver>(MockBehavior.Strict);
+        _auditTriggerAccessorMock = new Mock<IAuditTriggerAccessor>(MockBehavior.Strict);
+
+        // Default: no trigger set
+        _auditTriggerAccessorMock.Setup(x => x.Current).Returns((AuditTrigger?)null);
 
         _auditService = new AuditService(
             _scopeProviderMock.Object,
@@ -39,7 +43,8 @@ public class AuditServiceTests
             Mock.Of<IEventMessagesFactory>(MockBehavior.Strict),
             _auditRepositoryMock.Object,
             _userIdKeyResolverMock.Object,
-            _entityServiceMock.Object);
+            _entityServiceMock.Object,
+            _auditTriggerAccessorMock.Object);
     }
 
     [TestCase(AuditType.Publish, 33, null, null, null)]
@@ -52,15 +57,19 @@ public class AuditServiceTests
             .Callback<IAuditItem>(item =>
             {
                 Assert.AreEqual(type, item.AuditType);
+#pragma warning disable CS0618 // Type or member is obsolete
                 Assert.AreEqual(Constants.Security.SuperUserId, item.UserId);
+#pragma warning restore CS0618 // Type or member is obsolete
                 Assert.AreEqual(objectId, item.Id);
                 Assert.AreEqual(entityType, item.EntityType);
                 Assert.AreEqual(comment, item.Comment);
                 Assert.AreEqual(parameters, item.Parameters);
             });
 
+#pragma warning disable CS0618 // Type or member is obsolete
         _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
             .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserId));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         var result = await _auditService.AddAsync(
             type,
@@ -216,6 +225,178 @@ public class AuditServiceTests
         _auditRepositoryMock.Verify(x => x.CleanLogs(It.IsAny<int>()), Times.Once);
     }
 
+    [Test]
+    public async Task AddAsync_Includes_Trigger_When_Set()
+    {
+        SetupScopeProviderMock();
+
+        var trigger = new AuditTrigger("Core", "ScheduledPublish");
+        _auditTriggerAccessorMock.Setup(x => x.Current).Returns(trigger);
+
+        _auditRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditItem>()));
+
+        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
+#pragma warning disable CS0618 // Type or member is obsolete
+            .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserId));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        var result = await _auditService.AddAsync(
+            AuditType.Publish,
+            Constants.Security.SuperUserKey,
+            1,
+            "Document",
+            "Published");
+
+        Assert.IsTrue(result.Success);
+        _auditRepositoryMock.Verify(
+            x => x.Save(It.Is<IAuditItem>(item => item.TriggerSource == "Core" && item.TriggerOperation == "ScheduledPublish")),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task AddAsync_Suppresses_Trigger_When_Type_Is_In_SuppressForAuditTypes()
+    {
+        SetupScopeProviderMock();
+
+        // Trigger declares it's redundant on RollBack entries.
+        var trigger = new AuditTrigger(
+            Constants.Audit.TriggerSources.Core,
+            Constants.Audit.TriggerOperations.Rollback,
+            SuppressForAuditTypes: [AuditType.RollBack]);
+        _auditTriggerAccessorMock.Setup(x => x.Current).Returns(trigger);
+
+        _auditRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditItem>()));
+
+        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
+#pragma warning disable CS0618 // Type or member is obsolete
+            .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserId));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        var result = await _auditService.AddAsync(
+            AuditType.RollBack,
+            Constants.Security.SuperUserKey,
+            1,
+            "Document",
+            "Rolled back");
+
+        Assert.IsTrue(result.Success);
+        _auditRepositoryMock.Verify(
+            x => x.Save(It.Is<IAuditItem>(item => item.TriggerSource == null && item.TriggerOperation == null)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task AddAsync_Keeps_Trigger_When_Type_Is_Not_In_SuppressForAuditTypes()
+    {
+        SetupScopeProviderMock();
+
+        // Rollback trigger on a Save audit entry is NOT suppressed — it tells us the save happened as part of a rollback.
+        var trigger = new AuditTrigger(
+            Constants.Audit.TriggerSources.Core,
+            Constants.Audit.TriggerOperations.Rollback,
+            SuppressForAuditTypes: [AuditType.RollBack]);
+        _auditTriggerAccessorMock.Setup(x => x.Current).Returns(trigger);
+
+        _auditRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditItem>()));
+
+        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
+#pragma warning disable CS0618 // Type or member is obsolete
+            .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserId));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        var result = await _auditService.AddAsync(
+            AuditType.Save,
+            Constants.Security.SuperUserKey,
+            1,
+            "Document",
+            "Saved");
+
+        Assert.IsTrue(result.Success);
+        _auditRepositoryMock.Verify(
+            x => x.Save(It.Is<IAuditItem>(item =>
+                item.TriggerSource == Constants.Audit.TriggerSources.Core
+                && item.TriggerOperation == Constants.Audit.TriggerOperations.Rollback)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task AddAsync_Has_Null_Trigger_When_Not_Set()
+    {
+        SetupScopeProviderMock();
+
+        _auditRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditItem>()));
+
+        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
+#pragma warning disable CS0618 // Type or member is obsolete
+            .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserId));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        var result = await _auditService.AddAsync(
+            AuditType.Save,
+            Constants.Security.SuperUserKey,
+            1,
+            "Document",
+            "Saved");
+
+        Assert.IsTrue(result.Success);
+        _auditRepositoryMock.Verify(
+            x => x.Save(It.Is<IAuditItem>(item => item.TriggerSource == null && item.TriggerOperation == null)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task AddAsync_With_TypeAlias_Includes_TypeAlias()
+    {
+        SetupScopeProviderMock();
+
+        _auditRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditItem>()));
+
+        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
+#pragma warning disable CS0618 // Type or member is obsolete
+            .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserId));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        var result = await _auditService.AddAsync(
+            AuditType.Custom,
+            Constants.Security.SuperUserKey,
+            1,
+            "Document",
+            "Approved by editor",
+            null,
+            "Umb.Workflow.Approved");
+
+        Assert.IsTrue(result.Success);
+        _auditRepositoryMock.Verify(
+            x => x.Save(It.Is<IAuditItem>(item =>
+                item.AuditType == AuditType.Custom && item.TypeAlias == "Umb.Workflow.Approved" && item.Comment == "Approved by editor")),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task AddAsync_Without_TypeAlias_Has_Null_TypeAlias()
+    {
+        SetupScopeProviderMock();
+
+        _auditRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditItem>()));
+
+        _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
+#pragma warning disable CS0618 // Type or member is obsolete
+            .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserId));
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        var result = await _auditService.AddAsync(
+            AuditType.Save,
+            Constants.Security.SuperUserKey,
+            1,
+            "Document",
+            "Saved");
+
+        Assert.IsTrue(result.Success);
+        _auditRepositoryMock.Verify(
+            x => x.Save(It.Is<IAuditItem>(item => item.TypeAlias == null)),
+            Times.Once);
+    }
+
     private void SetupScopeProviderMock() =>
         _scopeProviderMock
             .Setup(x => x.CreateCoreScope(
@@ -226,5 +407,7 @@ public class AuditServiceTests
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
+#pragma warning disable CS0618 // Type or member is obsolete
             .Returns(Mock.Of<IScope>());
+#pragma warning restore CS0618 // Type or member is obsolete
 }

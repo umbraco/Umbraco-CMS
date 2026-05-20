@@ -459,7 +459,7 @@ test('can move content with move to permission enabled', {tag: '@release'}, asyn
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.goToContentWithName(childDocumentOneName);
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
@@ -504,11 +504,11 @@ test('can sort children with sort children permission enabled', {tag: '@release'
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.goToContentWithName(childDocumentOneName);
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.sort);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSorted);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
   await umbracoUi.content.goToContentWithName(childDocumentTwoName);
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.sort);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSorted);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
 
@@ -626,7 +626,7 @@ test('can rollback content with rollback permission enabled', {tag: '@release'},
   // Verify audit trail
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.rollback);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentRolledBack);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });

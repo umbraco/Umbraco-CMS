@@ -197,8 +197,8 @@ export default {
 		delete: 'Content deleted',
 		unpublish: 'Content unpublished',
 		unpublishvariant: 'Content unpublished for languages: %0%',
-		publish: 'Content saved and Published',
-		publishvariant: 'Content saved and published for languages: %0%',
+		publish: 'Content published',
+		publishvariant: 'Content published for languages: %0%',
 		save: 'Content saved',
 		savevariant: 'Content saved for languages: %0%',
 		move: 'Content moved',
@@ -228,6 +228,7 @@ export default {
 		smallContentVersionPreventCleanup: 'Save',
 		smallContentVersionEnableCleanup: 'Save',
 		historyIncludingVariants: 'History (all variants)',
+		trigger: 'Trigger',
 	},
 	codefile: {
 		createFolderIllegalChars: 'The folder name cannot contain illegal characters.',

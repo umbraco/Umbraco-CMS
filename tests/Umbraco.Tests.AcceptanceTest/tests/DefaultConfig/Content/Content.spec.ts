@@ -81,7 +81,7 @@ test('can create content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryHaveCount(1);
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSaved);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
@@ -106,7 +106,7 @@ test('can rename content', async ({umbracoApi, umbracoUi}) => {
   // Verify audit trail
   await umbracoUi.content.doesHistoryHaveCount(2);
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSaved);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
@@ -133,7 +133,7 @@ test('can update content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryHaveCount(2);
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSaved);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
@@ -159,7 +159,7 @@ test('can publish invariant content node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentSavedAndPublished);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
@@ -186,7 +186,7 @@ test('can unpublish content', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.unpublish);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentUnpublished);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });
@@ -239,7 +239,7 @@ test('can duplicate a content node to root', async ({umbracoApi, umbracoUi}) => 
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.copy);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentCopied);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 
@@ -308,7 +308,7 @@ test('can restore a content item from the recycle bin', {tag: '@release'}, async
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
 });

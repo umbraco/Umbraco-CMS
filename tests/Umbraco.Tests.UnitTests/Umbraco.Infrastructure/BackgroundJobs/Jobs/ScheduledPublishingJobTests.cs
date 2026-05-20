@@ -2,21 +2,18 @@
 // See LICENSE for more details.
 
 using System.Data;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure;
-using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 using Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
-using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackgroundJobs.Jobs;
 
@@ -25,6 +22,7 @@ public class ScheduledPublishingJobTests
 {
     private Mock<IContentService> _mockContentService;
     private Mock<ILogger<ScheduledPublishingJob>> _mockLogger;
+    private Mock<IAuditTriggerAccessor> _mockAuditTriggerAccessor;
 
     [Test]
     public async Task Does_Not_Execute_When_Not_Enabled()
@@ -40,6 +38,26 @@ public class ScheduledPublishingJobTests
         var sut = CreateScheduledPublishing();
         await sut.ExecuteAsync();
         VerifyScheduledPublishingPerformed();
+    }
+
+    [Test]
+    public async Task Executes_And_Sets_ScheduledPublish_Trigger()
+    {
+        var sut = CreateScheduledPublishing();
+        await sut.ExecuteAsync();
+        _mockAuditTriggerAccessor.Verify(
+            x => x.Set(It.Is<AuditTrigger>(t =>
+                t.Source == Constants.Audit.TriggerSources.Core &&
+                t.Operation == Constants.Audit.TriggerOperations.ScheduledPublish)),
+            Times.Once);
+    }
+
+    [Test]
+    public async Task Does_Not_Set_Trigger_When_Not_Enabled()
+    {
+        var sut = CreateScheduledPublishing(enabled: false);
+        await sut.ExecuteAsync();
+        _mockAuditTriggerAccessor.Verify(x => x.Set(It.IsAny<AuditTrigger>()), Times.Never);
     }
 
     private ScheduledPublishingJob CreateScheduledPublishing(
@@ -74,7 +92,9 @@ public class ScheduledPublishingJobTests
                 It.IsAny<bool?>(),
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
-            .Returns(Mock.Of<IScope>());
+            .Returns(Mock.Of<ICoreScope>());
+
+        _mockAuditTriggerAccessor = new Mock<IAuditTriggerAccessor>();
 
         return new ScheduledPublishingJob(
             _mockContentService.Object,
@@ -82,7 +102,8 @@ public class ScheduledPublishingJobTests
             _mockLogger.Object,
             mockServerMessenger.Object,
             mockScopeProvider.Object,
-            TimeProvider.System);
+            TimeProvider.System,
+            _mockAuditTriggerAccessor.Object);
     }
 
     private void VerifyScheduledPublishingNotPerformed() => VerifyScheduledPublishingPerformed(Times.Never());

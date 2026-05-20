@@ -39534,6 +39534,18 @@
           "parameters": {
             "type": "string",
             "nullable": true
+          },
+          "triggerSource": {
+            "type": "string",
+            "nullable": true
+          },
+          "triggerOperation": {
+            "type": "string",
+            "nullable": true
+          },
+          "typeAlias": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

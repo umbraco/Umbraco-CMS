@@ -2,7 +2,6 @@ using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.AuditLog;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Factories;
@@ -40,6 +39,9 @@ public class AuditLogPresentationFactory : IAuditLogPresentationFactory
             LogType = auditItem.AuditType,
             Parameters = auditItem.Parameters,
             Timestamp = auditItem.CreateDate,
+            TriggerSource = auditItem.TriggerSource,
+            TriggerOperation = auditItem.TriggerOperation,
+            TypeAlias = auditItem.TypeAlias,
             User = auditItem.UserId switch
             {
                 Constants.Security.UnknownUserId => new ReferenceByIdModel(),
