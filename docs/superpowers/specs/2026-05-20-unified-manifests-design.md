@@ -3,7 +3,7 @@
 **ADO:** #63380 ("Fix import leaks, bundle manifests/contexts, add lazy loading")
 **Branch:** `v17/improvement/63380-unified-manifests-boot`
 **Date:** 2026-05-20
-**Status:** Draft for review
+**Status:** Infrastructure landed; runtime switch deferred (see "Known issue: custom-element duplication" at the bottom).
 
 ## Goal
 
@@ -184,3 +184,47 @@ the per-workspace builds or the bundle initializer.
   stubs or remove them entirely (they would become dead code after the
   `app.element.ts` change). Recommend keeping them for one release as
   reachable-but-unused files, then removing in the following major.
+
+## Known issue: custom-element duplication (runtime switch deferred)
+
+When the runtime switch was attempted (single import of
+`@umbraco-cms/backoffice/manifests-all` replacing `CORE_PACKAGES`), the
+backoffice failed to boot with `NotSupportedError: Failed to execute 'define'
+on 'CustomElementRegistry': the name "umb-block-action-list" has already
+been used with this registry`.
+
+**Root cause.** The merged manifests-all Rollup graph statically reaches the
+implementation source of many custom elements (via the manifest sub-tree of
+each package — e.g. `block/manifests.ts` → sub-feature manifests → store /
+context-token modules → element side-effect imports). Rollup bundles those
+element sources into chunks under `dist-cms/manifests-all/`. The per-workspace
+builds **also** emit the same elements into `dist-cms/packages/<pkg>/`. At
+runtime, when something in the merged graph hits an externalised
+`@umbraco-cms/backoffice/block` import, the importmap resolves it to the
+per-workspace chunk, which calls `customElements.define(...)`. Then the
+merged graph's own copy fires the same define and crashes.
+
+**Why it's hard.** Fixing this requires either:
+
+1. Externalising relative imports beyond the manifest boundary in the merged
+   build (so element implementation source is not bundled twice). The
+   "boundary" is fuzzy — manifest literals reach by-value class refs which
+   reach element classes — and expressing it in Rollup config is brittle.
+2. Skipping per-workspace builds for content that lands in manifests-all —
+   breaks the cross-workspace plugin contract.
+3. Reverting to bundle-indirection (Step 1 of the original brainstorm): the
+   merged file holds bundle wrappers only, and `manifests.ts` continues to
+   load per-workspace via the bundle initializer's `js()` callback. Smaller
+   win (saves one wave, not both) but no duplication.
+
+**Decision for this PR.** Land Tasks 1–3 (plugin, build config, importmap
+exposure, plus the type stub) as additive infrastructure. The artifact is
+built and reachable at `@umbraco-cms/backoffice/manifests-all` but nothing
+imports it at runtime. The runtime switch (Task 4) is reverted and tracked
+as follow-up work that has to resolve the duplication first.
+
+The normalisation of three packages whose `umbraco-package.ts` had inlined
+`backofficeEntryPoint` extensions (media, property-editors, templating)
+**is kept** — those declarations now live in their respective `manifests.ts`
+files, which is a cleaner location regardless of whether the runtime switch
+ever lands. The bundle initializer continues to load them per-workspace.

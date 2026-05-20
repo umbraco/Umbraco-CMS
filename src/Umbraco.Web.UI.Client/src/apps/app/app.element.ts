@@ -14,10 +14,15 @@ import type { Guard, UmbRoute } from '@umbraco-cms/backoffice/router';
 import { pathWithoutBasePath } from '@umbraco-cms/backoffice/router';
 import { RuntimeLevelModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbContextDebugController } from '@umbraco-cms/backoffice/debug';
-import { UmbBundleExtensionInitializer, UmbServerExtensionRegistrator } from '@umbraco-cms/backoffice/extension-api';
+import {
+	UmbBundleExtensionInitializer,
+	UmbServerExtensionRegistrator,
+	type ManifestBase,
+} from '@umbraco-cms/backoffice/extension-api';
 import {
 	UmbAppEntryPointExtensionInitializer,
 	umbExtensionsRegistry,
+	type UmbExtensionManifestKind,
 } from '@umbraco-cms/backoffice/extension-registry';
 import { redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
@@ -26,6 +31,46 @@ import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import './app-logo.element.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
+
+const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>> = [
+	import('../../packages/block/umbraco-package.js'),
+	import('../../packages/clipboard/umbraco-package.js'),
+	import('../../packages/code-editor/umbraco-package.js'),
+	import('../../packages/content/umbraco-package.js'),
+	import('../../packages/data-type/umbraco-package.js'),
+	import('../../packages/dictionary/umbraco-package.js'),
+	import('../../packages/documents/umbraco-package.js'),
+	import('../../packages/embedded-media/umbraco-package.js'),
+	import('../../packages/extension-insights/umbraco-package.js'),
+	import('../../packages/health-check/umbraco-package.js'),
+	import('../../packages/help/umbraco-package.js'),
+	import('../../packages/language/umbraco-package.js'),
+	import('../../packages/log-viewer/umbraco-package.js'),
+	import('../../packages/management-api/umbraco-package.js'),
+	import('../../packages/markdown-editor/umbraco-package.js'),
+	import('../../packages/media/umbraco-package.js'),
+	import('../../packages/members/umbraco-package.js'),
+	import('../../packages/models-builder/umbraco-package.js'),
+	import('../../packages/multi-url-picker/umbraco-package.js'),
+	import('../../packages/packages/umbraco-package.js'),
+	import('../../packages/performance-profiling/umbraco-package.js'),
+	import('../../packages/property-editors/umbraco-package.js'),
+	import('../../packages/publish-cache/umbraco-package.js'),
+	import('../../packages/relations/umbraco-package.js'),
+	import('../../packages/rte/umbraco-package.js'),
+	import('../../packages/settings/umbraco-package.js'),
+	import('../../packages/static-file/umbraco-package.js'),
+	import('../../packages/sysinfo/umbraco-package.js'),
+	import('../../packages/tags/umbraco-package.js'),
+	import('../../packages/telemetry/umbraco-package.js'),
+	import('../../packages/templating/umbraco-package.js'),
+	import('../../packages/tiptap/umbraco-package.js'),
+	import('../../packages/translation/umbraco-package.js'),
+	import('../../packages/ufm/umbraco-package.js'),
+	import('../../packages/umbraco-news/umbraco-package.js'),
+	import('../../packages/user/umbraco-package.js'),
+	import('../../packages/webhook/umbraco-package.js'),
+];
 
 @customElement('umb-app')
 export class UmbAppElement extends UmbLitElement {
@@ -140,7 +185,7 @@ export class UmbAppElement extends UmbLitElement {
 	#bundleInitializer: UmbBundleExtensionInitializer;
 
 	#currentUser?: typeof UMB_CURRENT_USER_CONTEXT.TYPE;
-	#allManifestsLoaded?: Promise<void>;
+	#packageModules?: Promise<Array<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>>;
 
 	constructor() {
 		super();
@@ -275,34 +320,29 @@ export class UmbAppElement extends UmbLitElement {
 	}
 
 	async #registerExtensions() {
-		if (this.#allManifestsLoaded === undefined) {
-			this.#allManifestsLoaded = import('@umbraco-cms/backoffice/manifests-all').then(
-				(mod) => {
-					umbExtensionsRegistry.registerMany(mod.allManifests);
-					this.#loadCurrentUser();
-				},
-				(err) => {
-					// Surface the underlying import failure for plugin devs before the
-					// generic "Extensions failed loading" page swallows it via Promise.allSettled.
-					console.error('[UmbAppElement] Failed to load unified manifests:', err);
-					throw err;
-				},
-			);
+		if (this.#packageModules === undefined) {
+			this.#packageModules = Promise.all(CORE_PACKAGES);
+			this.#packageModules.then(() => {
+				this.#loadCurrentUser();
+			});
 		}
-		await this.#allManifestsLoaded;
+
+		umbExtensionsRegistry.registerMany((await this.#packageModules).flatMap((modules) => modules.extensions));
 	}
 
 	// TODO (V18): Unregister extensions on sign-out. [NL]
 	/*
 		async #unregisterExtensions() {
-			if (!this.#allManifestsLoaded) return;
-			const { allManifests } = await import('@umbraco-cms/backoffice/manifests-all');
-			umbExtensionsRegistry.unregisterMany(allManifests.map((extension) => extension.alias));
+			if (!this.#packageModules) return;
+			(await this.#packageModules).forEach((packageModule) => {
+				const aliases = packageModule.extensions.map((extension) => extension.alias);
+				umbExtensionsRegistry.unregisterMany(aliases);
+			});
 		}
 	*/
 
 	#loadCurrentUser() {
-		if (!this.#currentUser || !this.#allManifestsLoaded) return;
+		if (!this.#currentUser || !this.#packageModules) return;
 		this.#currentUser.load();
 	}
 
