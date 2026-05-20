@@ -99,6 +99,16 @@ No hardcoded UI-facing strings. All user-visible text must go through the locali
 
 For step-by-step instructions on adding localization keys and using them in elements or controllers, use the `general-add-localization` skill.
 
+### Active language
+
+The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`, not by `<html lang>`:
+
+- Razor sets `lang` on the shell element from `GlobalSettings.DefaultUILanguage`. The shell reads its own `lang` on connect and calls `umbLocalizationRegistry.loadLanguage(this.lang)`.
+- After login, `current-user.context` calls `loadLanguage(user.languageIsoCode)` and the shell mirrors the new value back onto its own `lang` attribute via `umbLocalizationRegistry.currentLanguage`.
+- `<html lang>` is the static `"en"` for the noscript fallback text. Don't conflate it with the dynamic UI language.
+
+If you're adding a new shell-like element (rare — most code lives inside `<umb-app>`), give it a `lang` attribute and the same subscribe-and-mirror pattern. For everything else, just use `this.localize` and the inherited context resolves the rest.
+
 ---
 
 ## Conventions & Rules

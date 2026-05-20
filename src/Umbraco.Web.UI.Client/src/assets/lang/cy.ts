@@ -2088,6 +2088,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Analluogi olinydd URL',
 		enableUrlTracker: 'Galluogi olinydd URL',
+		urlTrackerEnabled: "Wedi'i alluogi",
+		urlTrackerDisabled: "Wedi'i analluogi",
 		culture: 'Diwylliant',
 		originalUrl: 'URL gwreiddiol',
 		redirectedTo: 'Ailgyfeirwyd I',

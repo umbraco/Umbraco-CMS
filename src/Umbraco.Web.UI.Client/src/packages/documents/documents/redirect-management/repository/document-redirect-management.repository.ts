@@ -2,6 +2,7 @@ import type { UmbDocumentRedirectFilterArgs } from './types.js';
 import { UmbDocumentRedirectManagementServerDataSource } from './document-redirect-management.server.data-source.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbApi } from '@umbraco-cms/backoffice/extension-api';
+import { UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 
 /**
  * Repository for managing document redirect URLs.
@@ -25,8 +26,18 @@ export class UmbDocumentRedirectManagementRepository extends UmbControllerBase i
 	 * @param {boolean} enabled - Whether the tracker should be enabled.
 	 * @returns {*}
 	 * @memberof UmbDocumentRedirectManagementRepository
+	 * @deprecated Deprecated since v17. The backend endpoint is now a no-op; set the
+	 *   `Umbraco:CMS:WebRouting:DisableRedirectUrlTracking` configuration key instead.
+	 *   Scheduled for removal in Umbraco 19.
 	 */
 	async setStatus(enabled: boolean) {
+		new UmbDeprecation({
+			deprecated: 'UmbDocumentRedirectManagementRepository.setStatus()',
+			removeInVersion: '19.0.0',
+			solution:
+				'The backend endpoint is now a no-op. Set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead.',
+		}).warn();
+
 		return this.#dataSource.setStatus(enabled);
 	}
 

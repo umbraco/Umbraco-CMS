@@ -6,28 +6,35 @@ namespace Umbraco.Cms.Core.Configuration;
 public interface IConfigManipulator
 {
     /// <summary>
-    /// Saves the Umbraco database connection string to the most specific JSON configuration source available
-    /// (typically <c>appsettings.{Environment}.json</c>), so the value lives alongside the environment it applies to.
-    /// Falls back to <c>appsettings.json</c> when no environment-specific source is present.
+    /// Saves the Umbraco database connection string to the most specific JSON configuration source available (typically <c>appsettings.{Environment}.json</c>),
+    /// so the value lives alongside the environment it applies to. Falls back to <c>appsettings.json</c> when no environment-specific source is present.
     /// </summary>
     /// <param name="connectionString">The connection string to save.</param>
     /// <param name="providerName">The optional provider name to save alongside the connection string.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     Task SaveConnectionStringAsync(string connectionString, string? providerName);
 
     /// <summary>
-    /// Removes the Umbraco database connection string from the most specific JSON configuration source that contains it
-    /// (typically <c>appsettings.{Environment}.json</c>).
+    /// Removes the Umbraco database connection string from the most specific JSON configuration source that contains it (typically <c>appsettings.{Environment}.json</c>).
     /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     Task RemoveConnectionStringAsync();
 
     /// <summary>
     /// Updates an existing value in the base JSON configuration source (typically <c>appsettings.json</c>).
     /// </summary>
+    /// <param name="itemPath">The path to update, using <c>:</c> as the separator.</param>
+    /// <param name="value">The new value.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     /// <remarks>
     /// Will only update an existing key; if the key is not already present, nothing is saved.
     /// </remarks>
-    /// <param name="itemPath">The path to update, using <c>:</c> as the separator.</param>
-    /// <param name="value">The new value.</param>
     [Obsolete("This method is no longer used by Umbraco. Scheduled for removal in Umbraco 19.")]
     Task SaveConfigValueAsync(string itemPath, object value);
 
@@ -36,6 +43,10 @@ public interface IConfigManipulator
     /// since the value applies across all environments. Creates the node if it does not already exist.
     /// </summary>
     /// <param name="disable">The value to save.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
+    [Obsolete("This method is no longer used by Umbraco. Set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead. Scheduled for removal in Umbraco 19.")]
     Task SaveDisableRedirectUrlTrackingAsync(bool disable);
 
     /// <summary>
@@ -43,6 +54,9 @@ public interface IConfigManipulator
     /// since the value applies across all environments. Creates the node if it does not already exist.
     /// </summary>
     /// <param name="id">The identifier to save.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     Task SetGlobalIdAsync(string id);
 
     /// <summary>
@@ -50,7 +64,9 @@ public interface IConfigManipulator
     /// since the value is recommended to be the same across all environments. Creates the node if it does not already exist.
     /// </summary>
     /// <param name="base64Key">The base64-encoded key to save.</param>
-    // TODO (V18): Remove the default implementation.
+    /// <returns>
+    /// A task representing the asynchronous operation.
+    /// </returns>
     Task SetImagingHmacSecretKeyAsync(string base64Key)
-        => Task.CompletedTask;
+        => Task.CompletedTask; // TODO (V18): Remove the default implementation
 }

@@ -24,8 +24,19 @@ public sealed class MediaCache : IPublishedMediaCache
 
     public IPublishedContent? GetById(bool preview, int contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
 
-    public IPublishedContent? GetById(bool preview, Guid contentId) =>
-        GetByIdAsync(contentId).GetAwaiter().GetResult();
+    public IPublishedContent? GetById(bool preview, Guid contentId)
+    {
+        // Sync fast path: when the converted-content L0 cache already holds the item we can
+        // return it without spinning up an async state machine. This is the dominant case on
+        // a warm site and is hit per-key by the FilterAvailable lazy chain. On a miss we fall
+        // through to the async path which handles HybridCache (L1/L2) and database lookups.
+        if (_mediaCacheService.TryGetCached(contentId, out IPublishedContent? cached))
+        {
+            return cached;
+        }
+
+        return GetByIdAsync(contentId).GetAwaiter().GetResult();
+    }
 
 
     public IPublishedContent? GetById(int contentId) => GetByIdAsync(contentId).GetAwaiter().GetResult();
