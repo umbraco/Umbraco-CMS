@@ -156,7 +156,8 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 						this._trackerEnabled ? 'redirectUrls_urlTrackerEnabled' : 'redirectUrls_urlTrackerDisabled',
 					)}
 					@click=${this.#showTrackerInfo}>
-					<uui-tag look="outline" color="default">
+					<uui-tag color="default">
+						<uui-icon name="icon-info"></uui-icon>
 						<umb-localize
 							key=${this._trackerEnabled
 								? 'redirectUrls_urlTrackerEnabled'
@@ -289,6 +290,9 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 			}
 
 			uui-tag {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--uui-size-1);
 				text-wrap: nowrap;
 			}
 
