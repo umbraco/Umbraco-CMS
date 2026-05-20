@@ -40,6 +40,7 @@ const tsConfigBase = {
 		strict: true,
 		noFallthroughCasesInSwitch: true,
 		noImplicitReturns: true,
+		types: ['mocha', 'chai'],
 	},
 	include: [
 		'src/**/*.ts',
