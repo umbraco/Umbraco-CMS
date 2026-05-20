@@ -11,19 +11,49 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-import type {
-	UmbLocalizationSet,
-	FunctionParams,
-	UmbLocalizationSetBase,
-	UmbLocalizationSetKey,
-} from './localization.manager.js';
+import type { UmbLocalizationConsumer, UmbLocalizationSetBase, UmbLocalizationSetKey } from './localization.manager.js';
 import { umbLocalizationManager } from './localization.manager.js';
+// Side-effect import: registers the global `UmbKnownLocalizationSet` / `UmbKnownLocalizationKey`
+// declarations so plugins can extend the interface via plain `declare global { … }` blocks.
+import './known-keys.generated.js';
 import { unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
 import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 const LocalizationControllerAlias = Symbol();
+
+/**
+ * Resolves the union of valid keys for a localization set, excluding the metadata fields
+ * declared on `UmbLocalizationSetBase` (`$code`, `$dir`). The `(string & {})` intersection
+ * preserves literal-key autocomplete while still accepting dynamic keys (e.g.,
+ * `` `login_greeting${day}` ``).
+ *
+ * If `LocalizationSetType` has an index signature (the legacy `UmbLocalizationSet` shape),
+ * `keyof` returns the index signature's key type and autocomplete falls back to free-form
+ * strings — no narrowing, no breakage. The default generic now points at
+ * `UmbKnownLocalizationSet`, which is the codegen output with literal keys, so callers get
+ * autocomplete out of the box.
+ */
+type LocalizationKeyOf<T> = (Exclude<keyof T, keyof UmbLocalizationSetBase> & string) | (string & {});
+
+/**
+ * Resolves the argument tuple for a localization key.
+ *
+ * - **Function entries** (e.g., `(name: string) => string`) forward their parameter list so the
+ *   call site is checked against the source signature.
+ * - **String entries** stay as `unknown[]` rather than `[]`. The runtime supports `%0%` and
+ *   `{0}` placeholder substitution on string values (see `#processTerm`), so passing args to a
+ *   string key is intentional, not an error.
+ * - **Dynamic-string escape hatch** (`(string & {})`) falls back to `unknown[]` so consumers
+ *   building a key on the fly (e.g., `` `login_greeting${day}` ``) aren't forced to cast.
+ */
+type LocalizationArgsOf<T, K> = K extends keyof T
+	? T[K] extends (...args: infer U) => string
+		? U
+		: unknown[]
+	: unknown[];
+
 /**
  * The UmbLocalizationController enables localization for your element.
  * @see UmbLocalizeElement
@@ -41,8 +71,8 @@ const LocalizationControllerAlias = Symbol();
  * }
  * ```
  */
-export class UmbLocalizationController<LocalizationSetType extends UmbLocalizationSetBase = UmbLocalizationSet>
-	implements UmbController
+export class UmbLocalizationController<LocalizationSetType extends UmbLocalizationSetBase = UmbKnownLocalizationSet>
+	implements UmbController, UmbLocalizationConsumer
 {
 	#host;
 	#hostEl?: HTMLElement & Partial<Pick<LitElement, 'requestUpdate'>>;
@@ -165,8 +195,13 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 
 	/**
 	 * Outputs a translated term.
-	 * @param {string} key - the localization key, the indicator of what localization entry you want to retrieve.
-	 * @param {unknown[]} args - the arguments to parse for this localization entry.
+	 * @param key The localization key to retrieve. Typed as `LocalizationKeyOf<LocalizationSetType>` —
+	 *            literal-key autocomplete from `UmbKnownLocalizationSet` plus a `(string & {})` escape
+	 *            hatch for dynamic keys.
+	 * @param args The arguments to parse for this localization entry. Resolved by
+	 *             `LocalizationArgsOf<LocalizationSetType, K>`: function-valued entries forward their
+	 *             parameter list (so `(name: string) => string` requires a `string` here); string-valued
+	 *             entries accept `unknown[]` for the runtime `%0%` / `{0}` substitution path.
 	 * @returns {string} - the translated term as a string.
 	 * @example
 	 * Retrieving a term without any arguments:
@@ -175,11 +210,14 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * ```
 	 * Retrieving a term with arguments:
 	 * ```ts
-	 * this.localize.term('general_greeting', ['John']);
+	 * this.localize.term('general_greeting', 'John');
 	 * ```
 	 */
-	term<K extends keyof LocalizationSetType>(key: K, ...args: FunctionParams<LocalizationSetType[K]>): string {
-		const term = this.#lookupTerm(key);
+	term<K extends LocalizationKeyOf<LocalizationSetType>>(
+		key: K,
+		...args: LocalizationArgsOf<LocalizationSetType, K>
+	): string {
+		const term = this.#lookupTerm(key as keyof LocalizationSetType);
 
 		if (term === null) {
 			return String(key);
@@ -192,9 +230,14 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * Returns the localized term for the given key, or the default value if not found.
 	 * This method follows the same resolution order as term() (primary → secondary → fallback),
 	 * but returns the provided defaultValue instead of the key when no translation is found.
-	 * @param {string} key - the localization key, the indicator of what localization entry you want to retrieve.
-	 * @param {string | null} defaultValue - the value to return if the key is not found in any localization set.
-	 * @param {unknown[]} args - the arguments to parse for this localization entry.
+	 * @param key The localization key to retrieve. Typed as `LocalizationKeyOf<LocalizationSetType>` —
+	 *            literal-key autocomplete from `UmbKnownLocalizationSet` plus a `(string & {})` escape
+	 *            hatch for dynamic keys.
+	 * @param defaultValue The value to return if the key is not found in any localization set.
+	 * @param args The arguments to parse for this localization entry. Resolved by
+	 *             `LocalizationArgsOf<LocalizationSetType, K>`: function-valued entries forward their
+	 *             parameter list; string-valued entries accept `unknown[]` for the runtime `%0%` / `{0}`
+	 *             substitution path.
 	 * @returns {string | null} - the translated term or the default value.
 	 * @example
 	 * Retrieving a term with fallback:
@@ -210,12 +253,12 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 	 * this.localize.termOrDefault('general_close', null);
 	 * ```
 	 */
-	termOrDefault<K extends keyof LocalizationSetType, D extends string | null>(
+	termOrDefault<K extends LocalizationKeyOf<LocalizationSetType>, D extends string | null>(
 		key: K,
 		defaultValue: D,
-		...args: FunctionParams<LocalizationSetType[K]>
+		...args: LocalizationArgsOf<LocalizationSetType, K>
 	): string | D {
-		const term = this.#lookupTerm(key);
+		const term = this.#lookupTerm(key as keyof LocalizationSetType);
 
 		if (term === null) {
 			return defaultValue;

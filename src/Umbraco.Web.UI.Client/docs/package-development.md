@@ -103,6 +103,76 @@ No hardcoded UI-facing strings. All user-visible text must go through the locali
 
 For step-by-step instructions on adding localization keys and using them in elements or controllers, use the `general-add-localization` skill.
 
+### Type-safe localization keys
+
+`this.localize.term()`, `termOrDefault()`, and the `<umb-localize key="…">` element are typed against the canonical `en.ts` dictionary. After adding or renaming a key in `en.ts`, run:
+
+```bash
+npm run generate:localization-keys
+```
+
+This walks `en.ts`, flattens `group: { key: value }` into `group_key`, and rewrites `src/libs/localization-api/known-keys.generated.ts` with an `UmbKnownLocalizationSet` interface — string entries stay typed as `string`, function entries forward their parameter types (so `term('user_languageNotFound', culture, baseCulture)` is checked against the underlying signature). The script also runs automatically as a `prebuild` hook, so production builds always see fresh keys.
+
+The TypeScript signature on `term()` keeps a `(string & {})` escape hatch alongside `keyof UmbKnownLocalizationSet`. That means autocomplete shows the canonical keys and dynamic keys like `` localize.term(`login_greeting${day}`) `` still work without a cast. Typos in static string literals are caught by a local ESLint rule (`local-rules/no-unknown-localization-key`) that checks the literal against the generated runtime list — that runs in this repo only, so third-party plugins are unaffected.
+
+#### Adding plugin-specific keys
+
+A plugin that wants its own typed localization keys needs two pieces — runtime registration and (optionally) type declaration. They're decoupled: register-only works fine, the type declaration just enables autocomplete and arg-type inference on the plugin's own keys.
+
+**1. Register the strings at runtime** via a `localization` extension. The runtime registers them under the active culture, flattens `group.key` into `group_key`, and merges into the dictionary the controller looks up.
+
+Inline form (best for small overrides):
+
+```json
+// umbraco-package.json
+{
+    "alias": "mypkg.extensions",
+    "name": "MyPkg",
+    "extensions": [
+        {
+            "type": "localization",
+            "alias": "Mypkg.Localize.EnUS",
+            "name": "English",
+            "meta": {
+                "culture": "en-US",
+                "localizations": {
+                    "mypkg": {
+                        "anything": "Some string",
+                        "greeting": "Hello, %0%!"
+                    }
+                }
+            }
+        }
+    ]
+}
+```
+
+For larger packs, point `js` at a separate JavaScript file (e.g. `"js": "/App_Plugins/MyPkg/en-us.js"`) that default-exports the same `{ group: { key: value } }` shape. The JS file form supports function entries that take typed arguments — string entries use the runtime `%0%` / `{0}` placeholder pattern.
+
+**2. Declare the matching types globally** (optional, recommended) — same pattern as `UmbExtensionManifestMap`, plain interface merging, no module-path boilerplate:
+
+```ts
+// types.d.ts (or anywhere in the plugin's source tree)
+declare global {
+    interface UmbKnownLocalizationSet {
+        mypkg_anything: string;
+        mypkg_greeting: (name: string) => string;
+    }
+}
+```
+
+Plugin authors typically drop this in a single `types.d.ts` at the package root and ship it alongside the npm package — consumers of the plugin get autocomplete on the augmented keys automatically, with no extra config.
+
+**3. Use them like built-in keys:**
+
+```ts
+this.localize.term('mypkg_anything');           // autocompletes alongside the built-ins
+this.localize.term('mypkg_greeting', 'Alice');  // 'Alice: string' inferred from the declaration
+html`<umb-localize key="mypkg_anything"></umb-localize>`;
+```
+
+Plugins that skip step 2 still work — their keys hit the `(string & {})` escape hatch in `term()`'s signature, so `localize.term('mypkg_anything')` compiles. They just lose autocomplete and arg-type inference on those keys.
+
 ### Active language
 
 The active language is driven by the shell elements `<umb-app>` and `<umb-auth>`, not by `<html lang>`:

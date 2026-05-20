@@ -52,6 +52,7 @@ TypeScript/Lit web components library for the Umbraco CMS backoffice. Published 
 | Work with auth or security | [docs/security.md](./docs/security.md) + [docs/edge-cases.md](./docs/edge-cases.md) |
 | Scaffold a new package or module | [docs/package-development.md](./docs/package-development.md) |
 | Write or change observers / `Umb*State` usage | [docs/state-system.md](./docs/state-system.md) — states already deduplicate; do not add "is this a re-emit?" guards |
+| Add, rename, or remove a key in `src/assets/lang/en.ts` | [docs/package-development.md](./docs/package-development.md#type-safe-localization-keys) — also run `npm run generate:localization-keys` (or `npm run build`, which triggers the `prebuild` hook) and commit the updated `known-keys.generated.ts`. `known-keys.test.ts` + the `local-rules/no-unknown-localization-key` ESLint rule catch drift, but regenerating up front saves a CI cycle |
 
 This is not optional. Skipping these leads to convention violations that are caught in review.
 
