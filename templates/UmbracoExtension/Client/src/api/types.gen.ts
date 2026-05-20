@@ -4,161 +4,100 @@ export type ClientOptions = {
     baseUrl: 'https://localhost:44339/' | (string & {});
 };
 
-export type IGranularPermission = {
-    context?: null | string;
-    key?: null | string;
-    permission?: string;
+export type WhoAmIResponseModel = {
+    name: null | string;
+    email: string;
+    groups: Array<string>;
 };
 
-export type IProfile = {
-    id?: number | string;
-    name?: null | string;
-};
-
-export type IReadOnlyUserGroup = {
-    name?: null | string;
-    alias?: null | string;
-    description?: null | string;
-    icon?: null | string;
-    id?: number | string;
-    key?: string;
-    startContentId?: null | number | string;
-    startMediaId?: null | number | string;
-    startElementId?: null | number | string;
-    hasAccessToAllLanguages?: boolean;
-    permissions?: null | Array<string>;
-    granularPermissions?: null | Array<IGranularPermission>;
-    allowedSections?: null | Array<string>;
-    allowedLanguages?: null | Array<number | string>;
-};
-
-export type Iuser = {
-    userState?: UserState;
-    name?: null | string;
-    sessionTimeout?: number | string;
-    startContentIds?: null | Array<number | string>;
-    startMediaIds?: null | Array<number | string>;
-    startElementIds?: null | Array<number | string>;
-    language?: null | string;
-    invitedDate?: null | string;
-    groups?: null | Array<IReadOnlyUserGroup>;
-    allowedSections?: null | Array<string>;
-    profileData?: IProfile;
-    avatar?: null | string;
-    kind?: UserKind;
-    username?: string;
-    email?: string;
-    emailConfirmedDate?: null | string;
-    rawPasswordValue?: null | string;
-    passwordConfiguration?: null | string;
-    comments?: null | string;
-    isApproved?: boolean;
-    isLockedOut?: boolean;
-    lastLoginDate?: null | string;
-    lastPasswordChangeDate?: null | string;
-    lastLockoutDate?: null | string;
-    failedPasswordAttempts?: number | string;
-    securityStamp?: null | string;
-    id?: number | string;
-    key?: string;
-    createDate?: string;
-    updateDate?: string;
-    deleteDate?: null | string;
-    hasIdentity?: boolean;
-};
-
-export type UserKind = number;
-
-export type UserState = number;
-
-export type PingData = {
+export type GetPingData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/umbraco/umbracoextension/api/v1/ping';
 };
 
-export type PingErrors = {
+export type GetPingErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type PingResponses = {
+export type GetPingResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type PingResponse = PingResponses[keyof PingResponses];
+export type GetPingResponse = GetPingResponses[keyof GetPingResponses];
 
-export type WhatsTheTimeMrWolfData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/umbraco/umbracoextension/api/v1/whatsTheTimeMrWolf';
-};
-
-export type WhatsTheTimeMrWolfErrors = {
-    /**
-     * The resource is protected and requires an authentication token
-     */
-    401: unknown;
-};
-
-export type WhatsTheTimeMrWolfResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type WhatsTheTimeMrWolfResponse = WhatsTheTimeMrWolfResponses[keyof WhatsTheTimeMrWolfResponses];
-
-export type WhatsMyNameData = {
+export type GetWhatsMyNameData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/umbraco/umbracoextension/api/v1/whatsMyName';
 };
 
-export type WhatsMyNameErrors = {
+export type GetWhatsMyNameErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type WhatsMyNameResponses = {
+export type GetWhatsMyNameResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type WhatsMyNameResponse = WhatsMyNameResponses[keyof WhatsMyNameResponses];
+export type GetWhatsMyNameResponse = GetWhatsMyNameResponses[keyof GetWhatsMyNameResponses];
 
-export type WhoAmIData = {
+export type GetWhatsTheTimeMrWolfData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/umbraco/umbracoextension/api/v1/whoAmI';
+    url: '/umbraco/umbracoextension/api/v1/whatsTheTimeMrWolf';
 };
 
-export type WhoAmIErrors = {
+export type GetWhatsTheTimeMrWolfErrors = {
     /**
      * The resource is protected and requires an authentication token
      */
     401: unknown;
 };
 
-export type WhoAmIResponses = {
+export type GetWhatsTheTimeMrWolfResponses = {
     /**
      * OK
      */
-    200: null | Iuser;
+    200: string;
 };
 
-export type WhoAmIResponse = WhoAmIResponses[keyof WhoAmIResponses];
+export type GetWhatsTheTimeMrWolfResponse = GetWhatsTheTimeMrWolfResponses[keyof GetWhatsTheTimeMrWolfResponses];
+
+export type GetWhoAmIData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/umbraco/umbracoextension/api/v1/whoAmI';
+};
+
+export type GetWhoAmIErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
+};
+
+export type GetWhoAmIResponses = {
+    /**
+     * OK
+     */
+    200: WhoAmIResponseModel;
+};
+
+export type GetWhoAmIResponse = GetWhoAmIResponses[keyof GetWhoAmIResponses];
