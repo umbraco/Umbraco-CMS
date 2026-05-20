@@ -6,7 +6,7 @@ export * from './common/disconnect-from-library/constants.js';
 export * from './common/edit-content/constants.js';
 export * from './common/edit-settings/constants.js';
 export * from './common/expose-content/constants.js';
-export * from './common/transfer-to-library/constants.js';
+export * from './common/transfer-to-element-library/constants.js';
 export * from './default/default.action.kind.js';
 
 export type * from './types.js';

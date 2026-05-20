@@ -1,16 +1,16 @@
 import type {
-	UmbBlockTransferToLibraryModalData,
-	UmbBlockTransferToLibraryModalValue,
-} from './transfer-to-library-modal.token.js';
+	UmbBlockTransferToElementLibraryModalData,
+	UmbBlockTransferToElementLibraryModalValue,
+} from './transfer-to-element-library-modal.token.js';
 import { css, customElement, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
-@customElement('umb-block-transfer-to-library-modal')
-export class UmbBlockTransferToLibraryModalElement extends UmbModalBaseElement<
-	UmbBlockTransferToLibraryModalData,
-	UmbBlockTransferToLibraryModalValue
+@customElement('umb-block-transfer-to-element-library-modal')
+export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseElement<
+	UmbBlockTransferToElementLibraryModalData,
+	UmbBlockTransferToElementLibraryModalValue
 > {
 	@state()
 	private _name = '';
@@ -44,7 +44,7 @@ export class UmbBlockTransferToLibraryModalElement extends UmbModalBaseElement<
 
 	override render() {
 		return html`
-			<umb-body-layout headline=${this.localize.term('blockEditor_transferToLibrary')}>
+			<umb-body-layout headline=${this.localize.term('blockEditor_transferToElementLibrary')}>
 				<uui-box>
 					<uui-form>
 						<uui-form-layout-item>
@@ -71,7 +71,7 @@ export class UmbBlockTransferToLibraryModalElement extends UmbModalBaseElement<
 				<div slot="actions">
 					<uui-button label=${this.localize.term('general_cancel')} @click=${this._rejectModal}></uui-button>
 					<uui-button
-						label=${this.localize.term('blockEditor_transferToLibrary')}
+						label=${this.localize.term('blockEditor_transferToElementLibrary')}
 						look="primary"
 						color="positive"
 						?disabled=${!this._name.trim() || !this._hasSelectedLocation}
@@ -90,10 +90,10 @@ export class UmbBlockTransferToLibraryModalElement extends UmbModalBaseElement<
 	];
 }
 
-export default UmbBlockTransferToLibraryModalElement;
+export default UmbBlockTransferToElementLibraryModalElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-block-transfer-to-library-modal': UmbBlockTransferToLibraryModalElement;
+		'umb-block-transfer-to-element-library-modal': UmbBlockTransferToElementLibraryModalElement;
 	}
 }

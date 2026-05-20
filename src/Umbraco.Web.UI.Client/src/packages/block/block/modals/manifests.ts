@@ -7,8 +7,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 	{
 		type: 'modal',
-		alias: 'Umb.Modal.BlockTransferToLibrary',
-		name: 'Block Transfer To Library Modal',
-		element: () => import('./transfer-to-library/transfer-to-library-modal.element.js'),
+		alias: 'Umb.Modal.BlockTransferToElementLibrary',
+		name: 'Transfer Block To Element Library Modal',
+		element: () => import('./transfer-to-element-library/transfer-to-element-library-modal.element.js'),
 	},
 ];

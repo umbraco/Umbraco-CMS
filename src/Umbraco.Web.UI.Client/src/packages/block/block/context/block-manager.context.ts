@@ -32,7 +32,7 @@ import {
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbDataTypeDetailRepository } from '@umbraco-cms/backoffice/data-type';
 import { UmbElementDetailRepository } from '@umbraco-cms/backoffice/element';
-import { UMB_BLOCK_TRANSFER_TO_LIBRARY_MODAL } from '../modals/transfer-to-library/transfer-to-library-modal.token.js';
+import { UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL } from '../modals/transfer-to-element-library/transfer-to-element-library-modal.token.js';
 import { UMB_MODAL_MANAGER_CONTEXT, umbConfirmModal } from '@umbraco-cms/backoffice/modal';
 
 export type UmbBlockDataObjectModel<LayoutEntryType extends UmbBlockLayoutBaseModel> = {
@@ -529,7 +529,7 @@ export abstract class UmbBlockManagerContext<
 	 * then creates the Element and updates the block to reference it.
 	 * @param {string} key the block layout key.
 	 */
-	async requestTransferToLibrary(key: string) {
+	async requestTransferToElementLibrary(key: string) {
 		const layout = this._layouts.getValue().find((x) => x.key === key);
 		if (!layout) return;
 		const contentKey = layout.contentKey;
@@ -539,7 +539,7 @@ export abstract class UmbBlockManagerContext<
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT).catch(() => undefined);
 		if (!modalManager) return;
 		const result = await modalManager
-			.open(this, UMB_BLOCK_TRANSFER_TO_LIBRARY_MODAL, { data: {} })
+			.open(this, UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL, { data: {} })
 			.onSubmit()
 			.catch(() => undefined);
 		if (!result) return;
