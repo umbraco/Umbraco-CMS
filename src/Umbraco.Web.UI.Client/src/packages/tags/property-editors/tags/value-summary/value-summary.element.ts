@@ -6,7 +6,7 @@ export class UmbTagsPropertyEditorValueSummaryElement extends UmbValueSummaryEle
 	override render() {
 		if (!this._value?.length) return nothing;
 		const text = this._value.join(', ');
-		return html`<span class="text" title="${text}">${text}</span>`;
+		return html`<span title="${text}">${text}</span>`;
 	}
 }
 

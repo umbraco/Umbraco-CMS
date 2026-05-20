@@ -1,4 +1,4 @@
-import { customElement, html, nothing, css } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { UmbMemberItemModel } from '../../../types';
 
@@ -8,18 +8,8 @@ export class UmbMemberPickerPropertyEditorValueSummaryElement extends UmbValueSu
 > {
 	override render() {
 		if (!this._value?.length) return nothing;
-		return html`<span class="name">${this._value[0].name}</span>`;
+		return html`<span>${this._value[0].name}</span>`;
 	}
-
-	static override styles = css`
-		.name {
-			display: block;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			max-width: 20ch;
-		}
-	`;
 }
 
 export { UmbMemberPickerPropertyEditorValueSummaryElement as element };

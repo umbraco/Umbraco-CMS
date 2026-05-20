@@ -1,5 +1,5 @@
 import type { ManifestValueSummary } from '../extensions/value-summary.extension.js';
-import { customElement, html, nothing, property } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, property, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-value-summary-extension')
@@ -27,12 +27,19 @@ export class UmbValueSummaryExtensionElement extends UmbLitElement {
 			single
 			.filter=${this.#filter}
 			.apiProps=${{ valueType: this.valueType, rawValue: this.value }}
-			.fallbackRenderMethod=${() =>
-				html`<span style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:20ch;"
-					>${this.value}</span
-				>`}>
+			.fallbackRenderMethod=${() => html`<span>${this.value}</span>`}>
 		</umb-extension-with-api-slot>`;
 	}
+
+	static override styles = css`
+		:host {
+			display: block;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			max-width: 20ch;
+		}
+	`;
 }
 
 export { UmbValueSummaryExtensionElement as element };

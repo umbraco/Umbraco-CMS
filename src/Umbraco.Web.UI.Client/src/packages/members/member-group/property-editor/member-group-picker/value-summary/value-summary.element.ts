@@ -1,4 +1,4 @@
-import { customElement, html, nothing, css } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { UmbMemberGroupItemModel } from '../../../types';
 
@@ -9,18 +9,8 @@ export class UmbMemberGroupPickerPropertyEditorValueSummaryElement extends UmbVa
 	override render() {
 		if (!Array.isArray(this._value) || !this._value.length) return nothing;
 		const text = this._value.map((item) => item.name).join(', ');
-		return html`<span class="name" title="${text}">${text}</span>`;
+		return html`<span title="${text}">${text}</span>`;
 	}
-
-	static override styles = css`
-		.name {
-			display: block;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			max-width: 20ch;
-		}
-	`;
 }
 
 export { UmbMemberGroupPickerPropertyEditorValueSummaryElement as element };

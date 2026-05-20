@@ -27,7 +27,6 @@ export class UmbContentPickerValueSummaryResolver
 		values: ReadonlyArray<ContentPickerValue>,
 	): Promise<UmbValueSummaryResolveResult<Array<UmbContentPickerResolvedItem>>> {
 		const allItems = values.flatMap((v) => v ?? []);
-		console.log(allItems);
 
 		const docKeys = [...new Set(allItems.filter((e) => e.type === UMB_DOCUMENT_ENTITY_TYPE).map((e) => e.unique))];
 		const mediaKeys = [...new Set(allItems.filter((e) => e.type === UMB_MEDIA_ENTITY_TYPE).map((e) => e.unique))];

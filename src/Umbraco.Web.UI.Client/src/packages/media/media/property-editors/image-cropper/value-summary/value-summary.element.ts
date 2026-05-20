@@ -1,4 +1,4 @@
-import { customElement, css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import type { UmbImageCropperPropertyEditorValue } from '../../../components/index.js';
 
@@ -7,18 +7,8 @@ export class UmbImageCropperPropertyEditorValueSummaryElement extends UmbValueSu
 	override render() {
 		if (!this._value?.src) return nothing;
 		const filename = this._value.src.split('/').pop() ?? this._value;
-		return html`<span class="filename" title="${filename}">${filename}</span>`;
+		return html`<span title="${filename}">${filename}</span>`;
 	}
-
-	static override styles = css`
-		.filename {
-			display: block;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			max-width: 20ch;
-		}
-	`;
 }
 
 export { UmbImageCropperPropertyEditorValueSummaryElement as element };

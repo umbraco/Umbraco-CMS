@@ -1,4 +1,4 @@
-import { customElement, nothing, html, css, state } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, nothing, html, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import { UMB_DOCUMENT_ENTITY_TYPE, UmbDocumentItemDataResolver } from '@umbraco-cms/backoffice/document';
 import type { UmbDocumentItemModel } from '@umbraco-cms/backoffice/document';
@@ -24,7 +24,6 @@ export class UmbContentPickerPropertyEditorValueSummaryElement extends UmbValueS
 
 	#syncResolvers() {
 		const value = this._value ?? [];
-		console.log('Syncing resolvers for value:', value);
 		const docEntries = value.filter((e) => e.entityType === UMB_DOCUMENT_ENTITY_TYPE);
 
 		for (const unique of this.#documentResolvers.keys()) {
@@ -68,18 +67,8 @@ export class UmbContentPickerPropertyEditorValueSummaryElement extends UmbValueS
 		if (!this._value?.length) return nothing;
 		const text = this._names.filter(Boolean).join(', ');
 		if (!text) return nothing;
-		return html`<span class="name" title="${text}">${text}</span>`;
+		return html`<span title="${text}">${text}</span>`;
 	}
-
-	static override styles = css`
-		.name {
-			display: block;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			max-width: 20ch;
-		}
-	`;
 }
 
 export { UmbContentPickerPropertyEditorValueSummaryElement as element };

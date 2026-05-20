@@ -1,4 +1,4 @@
-import { customElement, html, nothing, state, css } from '@umbraco-cms/backoffice/external/lit';
+import { customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
 import { UmbDocumentItemDataResolver } from '../../../item/document-item-data-resolver.js';
 import type { UmbDocumentItemModel } from '../../../item/repository/types.js';
@@ -27,18 +27,8 @@ export class UmbDocumentPickerPropertyEditorValueSummaryElement extends UmbValue
 
 	override render() {
 		if (!this._value?.length || !this._name) return nothing;
-		return html`<span class="name" title="${this._name}">${this._name}</span>`;
+		return html`<span title="${this._name}">${this._name}</span>`;
 	}
-
-	static override styles = css`
-		.name {
-			display: block;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			max-width: 20ch;
-		}
-	`;
 }
 
 export { UmbDocumentPickerPropertyEditorValueSummaryElement as element };
