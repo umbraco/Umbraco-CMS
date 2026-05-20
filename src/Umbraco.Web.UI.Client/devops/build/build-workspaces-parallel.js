@@ -2,7 +2,8 @@
 // Cross-platform parallel runner for `vite build` across every workspace
 // under src/{libs,packages,external}. Drop-in replacement for
 // `npm run build:workspaces` (which runs serially). On jov's M-series Mac the
-// serial baseline is ~49s; this script finishes in ~28s using -P 8.
+// serial baseline is ~49s; this Node fan-out measured ~37s, versus ~28s for
+// a separate `xargs -P 8` run.
 
 import { spawn } from 'child_process';
 import { cpus } from 'os';
@@ -13,7 +14,11 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const clientRoot = path.resolve(__dirname, '../../');
 
-const concurrency = Number(process.env.UMB_BUILD_CONCURRENCY) || Math.min(8, Math.max(2, cpus().length));
+const defaultConcurrency = Math.min(8, Math.max(2, cpus().length));
+const configuredConcurrency = Number(process.env.UMB_BUILD_CONCURRENCY);
+const concurrency = Number.isFinite(configuredConcurrency)
+	? Math.max(1, Math.floor(configuredConcurrency))
+	: defaultConcurrency;
 
 const groups = ['src/libs', 'src/packages', 'src/external'];
 const workspaces = [];
