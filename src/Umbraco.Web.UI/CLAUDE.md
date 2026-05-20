@@ -221,17 +221,7 @@ Razor compilation is disabled for InMemoryAuto mode (`RazorCompileOnBuild=false`
 
 ---
 
-## 6. ICU Globalization
-
-### App-Local ICU (csproj lines 39-40)
-
-Uses app-local ICU (`Microsoft.ICU.ICU4C.Runtime` v72.1.0.3) for consistent globalization across platforms.
-
-**Note**: Ensure ICU version matches between package reference and runtime option. Changes must also be made to `Umbraco.Templates`.
-
----
-
-## 7. Project-Specific Notes
+## 6. Project-Specific Notes
 
 ### Development vs Production
 
@@ -249,7 +239,6 @@ This project is for **development only**:
 Does NOT use central package management. Versions specified directly:
 - `Microsoft.EntityFrameworkCore.Design` - For EF Core migrations tooling
 - `Microsoft.Build.Tasks.Core` - Security fix for EFCore.Design dependency
-- `Microsoft.ICU.ICU4C.Runtime` - Globalization
 
 ### Umbraco Targets Import (csproj lines 19-20)
 
