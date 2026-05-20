@@ -5,7 +5,8 @@ import { UMB_BLOCK_ENTRY_CONTEXT } from '../../../context/block-entry.context-to
 export class UmbTransferToElementLibraryBlockAction extends UmbBlockActionBase<MetaBlockActionDefaultKind> {
 	override async execute() {
 		const context = await this.getContext(UMB_BLOCK_ENTRY_CONTEXT);
-		await context?.requestTransferToElementLibrary();
+		const name = context?.getName();
+		await context?.requestTransferToElementLibrary(name);
 	}
 }
 

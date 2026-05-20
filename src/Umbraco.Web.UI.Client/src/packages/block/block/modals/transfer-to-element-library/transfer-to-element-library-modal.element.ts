@@ -6,6 +6,7 @@ import { css, customElement, html, state } from '@umbraco-cms/backoffice/externa
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbSelectedEvent, UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
+import { umbFocus } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-block-transfer-to-element-library-modal')
 export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseElement<
@@ -20,6 +21,13 @@ export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseEl
 
 	@state()
 	private _hasSelectedLocation = false;
+
+	override connectedCallback() {
+		super.connectedCallback();
+		if (this.data?.name) {
+			this._name = this.data.name;
+		}
+	}
 
 	#onNameInput(e: UUIInputEvent) {
 		this._name = e.target.value as string;
@@ -43,40 +51,41 @@ export class UmbBlockTransferToElementLibraryModalElement extends UmbModalBaseEl
 	}
 
 	override render() {
+		const treeProps = { hideTreeItemActions: true, foldersOnly: true };
 		return html`
 			<umb-body-layout headline=${this.localize.term('blockEditor_transferToElementLibrary')}>
 				<uui-box>
-					<uui-form>
-						<uui-form-layout-item>
-							<uui-label slot="label" required>${this.localize.term('general_name')}</uui-label>
-							<uui-input
-								.value=${this._name}
-								@input=${this.#onNameInput}
-								label=${this.localize.term('general_name')}
-								required></uui-input>
-						</uui-form-layout-item>
-						<uui-form-layout-item>
-							<uui-label slot="label">${this.localize.term('general_location')}</uui-label>
-							<umb-tree
-								alias="Umb.Tree.Element"
-								.props=${{
-									hideTreeItemActions: true,
-									foldersOnly: true,
-								}}
-								@selected=${this.#onFolderSelected}
-								@deselected=${this.#onFolderDeselected}></umb-tree>
-						</uui-form-layout-item>
-					</uui-form>
+					<umb-property-layout label="#general_name" orientation="vertical" mandatory>
+						<uui-input
+							slot="editor"
+							required
+							label=${this.localize.term('general_name')}
+							.value=${this._name}
+							@input=${this.#onNameInput}
+							${umbFocus()}>
+						</uui-input>
+					</umb-property-layout>
+					<umb-property-layout label="#general_choose" orientation="vertical" mandatory>
+						<umb-tree
+							slot="editor"
+							alias="Umb.Tree.Element"
+							.props=${treeProps}
+							@selected=${this.#onFolderSelected}
+							@deselected=${this.#onFolderDeselected}>
+						</umb-tree>
+					</umb-property-layout>
 				</uui-box>
-				<div slot="actions">
-					<uui-button label=${this.localize.term('general_cancel')} @click=${this._rejectModal}></uui-button>
-					<uui-button
-						label=${this.localize.term('blockEditor_transferToElementLibrary')}
-						look="primary"
-						color="positive"
-						?disabled=${!this._name.trim() || !this._hasSelectedLocation}
-						@click=${this.#onTransfer}></uui-button>
-				</div>
+				<uui-button
+					slot="actions"
+					label=${this.localize.term('general_cancel')}
+					@click=${this._rejectModal}></uui-button>
+				<uui-button
+					slot="actions"
+					label=${this.localize.term('blockEditor_transferToElementLibrary')}
+					look="primary"
+					color="positive"
+					?disabled=${!this._name.trim() || !this._hasSelectedLocation}
+					@click=${this.#onTransfer}></uui-button>
 			</umb-body-layout>
 		`;
 	}

@@ -529,7 +529,7 @@ export abstract class UmbBlockManagerContext<
 	 * then creates the Element and updates the block to reference it.
 	 * @param {string} key the block layout key.
 	 */
-	async requestTransferToElementLibrary(key: string) {
+	async requestTransferToElementLibrary(key: string, name?: string) {
 		const layout = this._layouts.getValue().find((x) => x.key === key);
 		if (!layout) return;
 		const contentKey = layout.contentKey;
@@ -539,7 +539,7 @@ export abstract class UmbBlockManagerContext<
 		const modalManager = await this.getContext(UMB_MODAL_MANAGER_CONTEXT).catch(() => undefined);
 		if (!modalManager) return;
 		const result = await modalManager
-			.open(this, UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL, { data: {} })
+			.open(this, UMB_BLOCK_TRANSFER_TO_ELEMENT_LIBRARY_MODAL, { data: { name } })
 			.onSubmit()
 			.catch(() => undefined);
 		if (!result) return;

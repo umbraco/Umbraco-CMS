@@ -822,9 +822,9 @@ export abstract class UmbBlockEntryContext<
 		this.delete();
 	}
 
-	async requestTransferToElementLibrary() {
+	async requestTransferToElementLibrary(name?: string) {
 		if (!this.#key) return;
-		await this._manager?.requestTransferToElementLibrary(this.#key);
+		await this._manager?.requestTransferToElementLibrary(this.#key, name);
 	}
 
 	async requestDisconnectFromLibrary() {
