@@ -225,41 +225,6 @@ test('can edit invariant text property inside a variant block in non-default lan
   await umbracoUi.content.isBlockPropertyEditable(secondTextName, true);
 });
 
-// This test fails due to the issue: https://github.com/umbraco/Umbraco-CMS/issues/22001
-test.skip('can edit variant text property inside invariant block in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
-  // Arrange
-  const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithVariantAndInvariantBlockLists(
-    documentTypeName,
-    firstTextName,
-    textStringDataType.id,
-    secondTextName,
-    textStringDataType.id,
-    firstBlockListName,
-    secondBlockListName,
-    firstBlockElementTypeName,
-    secondBlockElementTypeName
-  );
-  await umbracoApi.document.createDocumentWithMultipleVariantsWithSharedProperty(englishContentName, documentTypeId, AliasHelper.toAlias(secondTextName), textStringEditorAlias, cultures, '');
-  await umbracoUi.goToBackOffice();
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
-
-  // Act
-  await umbracoUi.content.goToContentWithName(englishContentName);
-  await umbracoUi.content.clickAddBlockListElementWithName(secondBlockListName);
-  await umbracoUi.content.clickBlockElementWithName(firstBlockElementTypeName);
-  await umbracoUi.content.enterBlockPropertyValue(firstTextName, 'Text1 in invariant block');
-  await umbracoUi.content.enterBlockPropertyValue(secondTextName, 'Text2 in invariant block');
-  await umbracoUi.content.clickCreateModalButton();
-  await umbracoUi.content.clickSaveAndPublishButton();
-  await umbracoUi.content.clickContainerSaveAndPublishButton();
-  await umbracoUi.content.isSuccessNotificationVisible();
-  await umbracoUi.content.switchLanguage(secondCulture);
-  await umbracoUi.content.clickBlockElementWithName(firstBlockElementTypeName);
-
-  // Assert
-  await umbracoUi.content.isBlockPropertyEditable(firstTextName, true);
-});
-
 test('cannot edit invariant text property inside an invariant block in non-default language when AllowEditInvariantFromNonDefault is false', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithVariantAndInvariantBlockLists(
