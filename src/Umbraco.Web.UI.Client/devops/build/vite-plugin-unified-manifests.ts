@@ -62,12 +62,34 @@ export interface UnifiedManifestsPluginOptions {
 	packagesRoot: string;
 }
 
+interface ManifestCache {
+	entries: PackageEntry[];
+	source: string;
+}
+
+/**
+ * Produce the next cache after a manifests.ts edit. If the edited file is
+ * already in `current.entries`, only the source needs rebuilding; otherwise a
+ * new file appeared and we re-walk the packages root.
+ */
+function nextCacheForChange(
+	current: ManifestCache | null,
+	changedFile: string,
+	packagesRoot: string,
+): ManifestCache {
+	if (current && current.entries.some((e) => e.path === changedFile)) {
+		return { entries: current.entries, source: buildEntrySource(current.entries) };
+	}
+	const entries = discoverPackages(packagesRoot);
+	return { entries, source: buildEntrySource(entries) };
+}
+
 /**
  * Vite plugin that exposes a virtual module aggregating every package's
  * `manifests` export into a single `allManifests` array.
  */
 export function unifiedManifestsPlugin(opts: UnifiedManifestsPluginOptions): Plugin {
-	let cache: { entries: PackageEntry[]; source: string } | null = null;
+	let cache: ManifestCache | null = null;
 	const rediscover = () => {
 		const entries = discoverPackages(opts.packagesRoot);
 		cache = { entries, source: buildEntrySource(entries) };
@@ -95,16 +117,9 @@ export function unifiedManifestsPlugin(opts: UnifiedManifestsPluginOptions): Plu
 		handleHotUpdate(ctx) {
 			// Vite normalises ctx.file to forward-slash separators on all platforms.
 			if (!ctx.file.endsWith('/manifests.ts')) return;
-			const known = cache?.entries.some((e) => e.path === ctx.file) ?? false;
-			const prevSource = cache?.source ?? null;
-			if (known) {
-				// Same set of packages — only the content may have shifted identifiers.
-				if (cache) cache.source = buildEntrySource(cache.entries);
-			} else {
-				// New manifests.ts appeared — re-walk the directory.
-				rediscover();
-			}
-			if (cache?.source === prevSource) return;
+			const previousSource = cache?.source;
+			cache = nextCacheForChange(cache, ctx.file, opts.packagesRoot);
+			if (cache.source === previousSource) return;
 			const mod = ctx.server.moduleGraph.getModuleById(RESOLVED_VIRTUAL_ID);
 			if (mod) return [mod];
 		},
