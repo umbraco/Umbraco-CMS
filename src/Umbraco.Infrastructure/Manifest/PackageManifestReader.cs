@@ -45,80 +45,83 @@ internal class PackageManifestReader : IPackageManifestReader
     /// <exception cref="System.ArgumentNullException">Thrown if the file provider cannot be created.</exception>
     public async Task<IEnumerable<PackageManifest>> ReadPackageManifestsAsync()
     {
+        const string extensionFileName = "umbraco-package.json";
+
         IFileProvider? fileProvider = _packageManifestFileProviderFactory.Create();
         if (fileProvider is null)
         {
             throw new ArgumentNullException(nameof(fileProvider));
         }
 
-        IFileInfo[] files = GetAllPackageManifestFiles(fileProvider, _appPluginsPath).ToArray();
-        return await ParsePackageManifestFiles(files);
-    }
+        var packageManifests = new List<PackageManifest>();
 
-    private static IEnumerable<IFileInfo> GetAllPackageManifestFiles(IFileProvider fileProvider, string path)
-    {
-        const string extensionFileName = "umbraco-package.json";
-
-        foreach (IFileInfo fileInfo in fileProvider.GetDirectoryContents(path))
+        foreach (IFileInfo fileInfo in fileProvider.GetDirectoryContents(_appPluginsPath))
         {
+            PackageManifest? packageManifest = null;
             if (fileInfo.IsDirectory)
             {
                 // find all extension package configuration files one level deep
-                var virtualPath = WebPath.Combine(path, fileInfo.Name);
-                IDirectoryContents subDirectoryContents = fileProvider.GetDirectoryContents(virtualPath);
+                var virtualPath = WebPath.Combine(_appPluginsPath, fileInfo.Name);
+                IFileInfo[] subDirectoryContents = fileProvider.GetDirectoryContents(virtualPath).ToArray();
                 IFileInfo? subManifest = subDirectoryContents
                     .FirstOrDefault(x => !x.IsDirectory && x.Name.InvariantEquals(extensionFileName));
-                if (subManifest != null)
+                if (subManifest is not null)
                 {
-                    yield return subManifest;
+                    // default package manifests take precedence over other manifests per folder
+                    packageManifest = await ParsePackageManifestAsync(subManifest);
+                }
+                else
+                {
+                    // let the concrete reader attempt to parse different manifests (e.g. bundles)
+                    packageManifest = await ParsePackageManifestFromDirectoryAsync(fileProvider, fileInfo, subDirectoryContents);
                 }
             }
             else if (fileInfo.Name.InvariantEquals(extensionFileName))
             {
-                yield return fileInfo;
-            }
-        }
-    }
-
-    private async Task<IEnumerable<PackageManifest>> ParsePackageManifestFiles(IFileInfo[] files)
-    {
-        var packageManifests = new List<PackageManifest>();
-        foreach (IFileInfo fileInfo in files)
-        {
-            string fileContent;
-            await using (Stream stream = fileInfo.CreateReadStream())
-            {
-                using (var reader = new StreamReader(stream, Encoding.UTF8))
-                {
-                    fileContent = await reader.ReadToEndAsync();
-                }
+                packageManifest = await ParsePackageManifestAsync(fileInfo);
             }
 
-            if (fileContent.IsNullOrWhiteSpace())
+            if (packageManifest is not null)
             {
-                continue;
-            }
-
-            try
-            {
-                PackageManifest? packageManifest = _jsonSerializer.Deserialize<PackageManifest>(fileContent);
-                if (packageManifest != null)
-                {
-                    packageManifests.Add(packageManifest);
-                }
-            }
-            catch (JsonException ex)
-            {
-                throw new InvalidOperationException(
-                    $"The package manifest file {fileInfo.PhysicalPath} could not be parsed as it does not contain valid JSON. Please see the inner exception for details.", ex);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException(
-                    $"The package manifest file {fileInfo.PhysicalPath} could not be parsed due to an unexpected error. Please see the inner exception for details.", ex);
+                packageManifests.Add(packageManifest);
             }
         }
 
         return packageManifests;
+    }
+
+    protected virtual Task<PackageManifest?> ParsePackageManifestFromDirectoryAsync(IFileProvider fileProvider, IFileInfo directory, IFileInfo[] directoryContents)
+        => Task.FromResult<PackageManifest?>(null);
+
+    private async Task<PackageManifest?> ParsePackageManifestAsync(IFileInfo fileInfo)
+    {
+        var fileContent = await ReadFileContent(fileInfo);
+
+        if (fileContent.IsNullOrWhiteSpace())
+        {
+            return null;
+        }
+
+        try
+        {
+            return _jsonSerializer.Deserialize<PackageManifest>(fileContent);
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidOperationException(
+                $"The package manifest file {fileInfo.PhysicalPath} could not be parsed as it does not contain valid JSON. Please see the inner exception for details.", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                $"The package manifest file {fileInfo.PhysicalPath} could not be parsed due to an unexpected error. Please see the inner exception for details.", ex);
+        }
+    }
+
+    private static async Task<string> ReadFileContent(IFileInfo fileInfo)
+    {
+        await using Stream stream = fileInfo.CreateReadStream();
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        return await reader.ReadToEndAsync();
     }
 }

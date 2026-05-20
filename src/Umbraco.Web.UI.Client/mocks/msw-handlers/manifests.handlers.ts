@@ -101,6 +101,17 @@ const privateManifests: UmbPackageManifestResponse = [
 			},
 		],
 	},
+	{
+		name: 'Decorator Test',
+		extensions: [
+			{
+				type: 'bundle',
+				alias: 'My.DecoratorTest.Bundle',
+				name: 'Decorator Test Bundle',
+				js: '/App_Plugins/decorator-dashboard.js',
+			},
+		],
+	},
 ];
 
 const publicManifests: UmbPackageManifestResponse = [

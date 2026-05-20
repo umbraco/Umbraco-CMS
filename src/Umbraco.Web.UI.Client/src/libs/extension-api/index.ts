@@ -1,5 +1,6 @@
 export type * from './condition/index.js';
 export * from './controller/index.js';
+export * from './decorators/index.js';
 export * from './functions/index.js';
 export * from './initializers/index.js';
 export * from './registry/extension.registry.js';
