@@ -27,6 +27,7 @@ import {
 import { redirectToStoredPath } from '@umbraco-cms/backoffice/utils';
 import { umbHttpClient } from '@umbraco-cms/backoffice/http-client';
 import { UmbViewContext } from '@umbraco-cms/backoffice/view';
+import { umbLocalizationRegistry } from '@umbraco-cms/backoffice/localization';
 
 import './app-logo.element.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
@@ -211,6 +212,16 @@ export class UmbAppElement extends UmbLitElement {
 
 	override connectedCallback(): void {
 		super.connectedCallback();
+
+		// The host's `lang` attribute is set by Razor from GlobalSettings.DefaultUILanguage.
+		// Use it as the initial active language; current-user.context overrides it after login.
+		if (this.lang) {
+			umbLocalizationRegistry.loadLanguage(this.lang);
+		}
+		this.observe(umbLocalizationRegistry.currentLanguage, (lang) => {
+			if (lang) this.lang = lang;
+		});
+
 		this.#setup();
 	}
 

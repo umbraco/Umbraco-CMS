@@ -653,6 +653,7 @@ export default {
 		content: 'İçerik',
 		continue: 'Devam et',
 		copy: 'Kopyala',
+		copied: 'Kopyalandı!',
 		create: 'Oluştur',
 		cropSection: 'Bölümü kırp',
 		database: 'Veritabanı',

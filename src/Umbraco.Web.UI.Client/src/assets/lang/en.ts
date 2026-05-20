@@ -887,6 +887,7 @@ export default {
 		content: 'Content',
 		continue: 'Continue',
 		copy: 'Copy',
+		copied: 'Copied!',
 		create: 'Create',
 		database: 'Database',
 		date: 'Date',

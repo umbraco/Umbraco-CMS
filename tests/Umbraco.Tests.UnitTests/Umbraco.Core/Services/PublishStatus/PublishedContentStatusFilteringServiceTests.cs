@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.PublishStatus;
 
 [TestFixture]
-public partial class PublishedContentStatusFilteringServiceTests
+public class PublishedContentStatusFilteringServiceTests
 {
     [Test]
     public void FilterAvailable_Invariant_ForNonPreview_YieldsPublishedItems()
@@ -301,6 +301,110 @@ public partial class PublishedContentStatusFilteringServiceTests
             Assert.AreEqual(8, children[8].Id);
             Assert.AreEqual(9, children[9].Id);
         }
+    }
+
+    [Test]
+    public void FilterAvailable_IsLazy_TakeOnlyFetchesRequestedItemsFromCache()
+    {
+        var (sut, items, cacheMock, _) = SetupCounting(forPreview: true);
+
+        IPublishedContent[] taken = sut.FilterAvailable(items.Keys, null).Take(3).ToArray();
+
+        Assert.AreEqual(3, taken.Length);
+        cacheMock.Verify(c => c.GetById(true, It.IsAny<Guid>()), Times.Exactly(3));
+    }
+
+    [Test]
+    public void FilterAvailable_IsLazy_FirstOrDefaultOnlyFetchesOneItemFromCache()
+    {
+        var (sut, items, cacheMock, _) = SetupCounting(forPreview: true);
+
+        IPublishedContent? first = sut.FilterAvailable(items.Keys, null).FirstOrDefault();
+
+        Assert.IsNotNull(first);
+        cacheMock.Verify(c => c.GetById(true, It.IsAny<Guid>()), Times.Once);
+    }
+
+    [Test]
+    public void FilterAvailable_IsLazy_NonPreviewTakeShortCircuitsPublishStatusQueries()
+    {
+        var (sut, items, cacheMock, statusMock) = SetupCounting(forPreview: false);
+
+        IPublishedContent[] taken = sut.FilterAvailable(items.Keys, null).Take(3).ToArray();
+
+        Assert.AreEqual(3, taken.Length);
+
+        // GetById is reached only for keys that pass the publish-status filter, so exactly 3 cache lookups.
+        cacheMock.Verify(c => c.GetById(false, It.IsAny<Guid>()), Times.Exactly(3));
+
+        // Publish status must short-circuit before the full candidate set is enumerated.
+        statusMock.Verify(
+            s => s.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()),
+            Times.AtMost(items.Count - 1));
+    }
+
+    [Test]
+    public void FilterAvailable_IsLazy_FullEnumerationFetchesAllItemsFromCache()
+    {
+        var (sut, items, cacheMock, _) = SetupCounting(forPreview: true);
+
+        IPublishedContent[] all = sut.FilterAvailable(items.Keys, null).ToArray();
+
+        Assert.AreEqual(items.Count, all.Length);
+        cacheMock.Verify(c => c.GetById(true, It.IsAny<Guid>()), Times.Exactly(items.Count));
+    }
+
+    // sets up invariant data with mocks exposed so tests can verify per-call counts.
+    // - 10 invariant documents with IDs 0 through 9
+    // - even IDs are published, odd are not (relevant only for non-preview)
+    private (
+        PublishedContentStatusFilteringService Service,
+        Dictionary<Guid, IPublishedContent> Items,
+        Mock<IPublishedContentCache> CacheMock,
+        Mock<IDocumentPublishStatusQueryService> StatusMock)
+        SetupCounting(bool forPreview)
+    {
+        var contentType = new Mock<IPublishedContentType>();
+        contentType.SetupGet(c => c.Variations).Returns(ContentVariation.Nothing);
+
+        var items = new Dictionary<Guid, IPublishedContent>();
+        for (var i = 0; i < 10; i++)
+        {
+            var content = new Mock<IPublishedContent>();
+            var key = Guid.NewGuid();
+            content.SetupGet(c => c.Key).Returns(key);
+            content.SetupGet(c => c.ContentType).Returns(contentType.Object);
+            content.SetupGet(c => c.Cultures).Returns(new Dictionary<string, PublishedCultureInfo>());
+            content.SetupGet(c => c.Id).Returns(i);
+            items[key] = content.Object;
+        }
+
+        var cacheMock = new Mock<IPublishedContentCache>();
+        cacheMock
+            .Setup(c => c.GetById(forPreview, It.IsAny<Guid>()))
+            .Returns((bool _, Guid key) => items.TryGetValue(key, out IPublishedContent? item) ? item : null);
+
+        var statusMock = new Mock<IDocumentPublishStatusQueryService>();
+        statusMock
+            .Setup(s => s.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Returns((Guid key, string _) => items.TryGetValue(key, out IPublishedContent? item) && item.Id % 2 == 0);
+        statusMock
+            .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Returns(true);
+
+        var previewService = new Mock<IPreviewService>();
+        previewService.Setup(p => p.IsInPreview()).Returns(forPreview);
+
+        var variationContextAccessor = new Mock<IVariationContextAccessor>();
+        variationContextAccessor.SetupGet(v => v.VariationContext).Returns(new VariationContext(null));
+
+        var service = new PublishedContentStatusFilteringService(
+            variationContextAccessor.Object,
+            statusMock.Object,
+            previewService.Object,
+            cacheMock.Object);
+
+        return (service, items, cacheMock, statusMock);
     }
 
     // sets up invariant test data:
