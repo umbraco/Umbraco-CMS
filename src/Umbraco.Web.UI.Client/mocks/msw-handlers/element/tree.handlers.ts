@@ -9,7 +9,12 @@ export const treeHandlers = [
 		const url = new URL(request.url);
 		const skip = Number(url.searchParams.get('skip'));
 		const take = Number(url.searchParams.get('take'));
+		const foldersOnly = url.searchParams.get('foldersOnly') === 'true';
 		const response = umbElementMockDb.tree.getRoot({ skip, take });
+		if (foldersOnly) {
+			response.items = response.items.filter((item: any) => item.isFolder);
+			response.total = response.items.length;
+		}
 		return HttpResponse.json(response);
 	}),
 
@@ -19,7 +24,12 @@ export const treeHandlers = [
 		if (!parentId) return;
 		const skip = Number(url.searchParams.get('skip'));
 		const take = Number(url.searchParams.get('take'));
+		const foldersOnly = url.searchParams.get('foldersOnly') === 'true';
 		const response = umbElementMockDb.tree.getChildrenOf({ parentId, skip, take });
+		if (foldersOnly) {
+			response.items = response.items.filter((item: any) => item.isFolder);
+			response.total = response.items.length;
+		}
 		return HttpResponse.json(response);
 	}),
 

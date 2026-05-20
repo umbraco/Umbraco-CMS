@@ -56,6 +56,7 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 				const valueResolver = new UmbClipboardPastePropertyValueTranslatorValueResolver(this);
 
 				const blockTypes = this._manager.getBlockTypes() ?? [];
+				const libraryAllowedElementTypeKeys = await this._getLibraryAllowedElementTypeKeys(blockTypes);
 
 				const configuredSize = this._manager
 					.getEditorConfiguration()
@@ -73,6 +74,7 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 						blocks: blockTypes,
 						blockGroups: [],
 						openClipboard: routingInfo.view === 'clipboard',
+						libraryAllowedElementTypeKeys,
 						clipboardFilter: async (clipboardEntryDetail) => {
 							const hasSupportedPasteTranslator = clipboardContext.hasSupportedPasteTranslator(
 								pasteTranslatorManifests,
@@ -104,7 +106,7 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 				};
 			})
 			.onSubmit(async (value, data) => {
-				if (value?.create && data) {
+				if (value && 'create' in value && data) {
 					const created = await this.create(
 						value.create.contentElementTypeKey,
 						{},
@@ -120,7 +122,9 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 					} else {
 						throw new Error('Failed to create block');
 					}
-				} else if (value?.clipboard && value.clipboard.selection?.length && data) {
+				} else if (value && 'library' in value) {
+					this._manager?.insertLibraryElement(value.library.elementKey);
+				} else if (value && 'clipboard' in value && value.clipboard.selection?.length && data) {
 					const clipboardContext = await this.getContext(UMB_CLIPBOARD_PROPERTY_CONTEXT);
 					if (!clipboardContext) {
 						throw new Error('Clipboard context not found');
@@ -196,7 +200,7 @@ export class UmbBlockSingleEntriesContext extends UmbBlockEntriesContext<
 
 	async create(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<UmbBlockSingleLayoutModel, 'contentKey'>,
+		partialLayoutEntry?: Omit<UmbBlockSingleLayoutModel, 'contentKey' | 'key'>,
 		originData?: UmbBlockSingleWorkspaceOriginData,
 	) {
 		await this._retrieveManager;

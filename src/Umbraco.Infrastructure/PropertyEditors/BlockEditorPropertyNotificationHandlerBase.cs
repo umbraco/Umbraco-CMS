@@ -110,10 +110,10 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
 
     private void TraverseObject(JsonObject obj)
     {
-        // we'll assume that the object is a data representation of a block based editor if it contains "contentData" and "settingsData".
-        if (obj["contentData"] is JsonArray contentData && obj["settingsData"] is JsonArray settingsData)
+        // we'll assume that the object is a data representation of a block based editor if it contains "contentData", "settingsData" and "layout".
+        if (obj["contentData"] is JsonArray contentData && obj["settingsData"] is JsonArray settingsData && obj["layout"] is JsonObject layoutData)
         {
-            ParseKeys(contentData, settingsData);
+            ParseKeys(contentData, settingsData, layoutData);
             return;
         }
 
@@ -123,12 +123,46 @@ public abstract class BlockEditorPropertyNotificationHandlerBase<TBlockLayoutIte
         }
     }
 
-    private void ParseKeys(JsonArray contentData, JsonArray settingsData)
+    private void ParseKeys(JsonArray contentData, JsonArray settingsData, JsonObject layoutData)
     {
-        // grab all keys from the objects of contentData and settingsData
-        var keys = contentData.Select(c => c?["key"])
-            .Union(settingsData.Select(s => s?["key"]))
-            .Select(keyToken => keyToken?.GetValue<string>().NullOrWhiteSpaceAsNull())
+        // recurse a JSON object to find all contained block editor layouts
+        List<JsonObject> GetLayoutItemsRecursively(JsonObject jsonObject)
+        {
+            var layoutItems = new List<JsonObject>();
+            if (jsonObject.ContainsKey("key") && jsonObject.ContainsKey("contentKey"))
+            {
+                // assume it's a layout if it has "key" and "contentKey"
+                layoutItems.Add(jsonObject);
+            }
+
+            foreach (JsonNode property in jsonObject.Select(v => v.Value).WhereNotNull())
+            {
+                IEnumerable<JsonObject> childrenToRecurse = property is JsonObject jsonObjectChild
+                    ? [jsonObjectChild]
+                    : property is JsonArray jsonArrayChild
+                        ? jsonArrayChild.OfType<JsonObject>()
+                        : [];
+                layoutItems.AddRange(childrenToRecurse.SelectMany(GetLayoutItemsRecursively));
+            }
+
+            return layoutItems;
+        }
+
+        // grab keys applicable for replacement from all the layouts - that is:
+        // - the key of the layout itself ("key").
+        // - the key of the content item ("contentKey").
+        //   - ONLY for local content; do NOT replace content item keys for shared content.
+        // - the key of the settings item ("settingsKey") if present.
+        List<JsonObject> layoutItems = GetLayoutItemsRecursively(layoutData);
+        var keys = layoutItems.SelectMany(layoutItem => new[]
+            {
+                layoutItem["key"]?.GetValue<string>(),
+                layoutItem["isSharedContent"]?.GetValue<bool>() is not true
+                    ? layoutItem["contentKey"]?.GetValue<string>()
+                    : null,
+                layoutItem["settingsKey"]?.GetValue<string>(),
+            })
+            .WhereNotNull()
             .ToArray();
 
         // the following is solely for avoiding functionality wise breakage. we should consider removing it eventually, but for the time being it's harmless.

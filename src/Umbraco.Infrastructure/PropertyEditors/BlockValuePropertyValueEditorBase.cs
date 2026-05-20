@@ -287,9 +287,27 @@ public abstract class BlockValuePropertyValueEditorBase<TValue, TLayout> : DataV
 
     protected void MapBlockValueToEditor(IProperty property, TValue blockValue, string? culture, string? segment)
     {
+        EnsureLayoutItemKeys(blockValue);
+
         MapBlockItemDataToEditor(property, blockValue.ContentData, culture, segment);
         MapBlockItemDataToEditor(property, blockValue.SettingsData, culture, segment);
         _blockEditorVarianceHandler.AlignExposeVariance(blockValue);
+    }
+
+    // Ensures that all layout items have a key (for backwards data format compatability).
+    private static void EnsureLayoutItemKeys(TValue blockValue)
+    {
+        if (!blockValue.Layout.TryGetValue(blockValue.PropertyEditorAlias, out IEnumerable<IBlockLayoutItem>? layout))
+        {
+            return;
+        }
+
+        // All layout items with an empty key will be assigned the content key of the layout item.
+        // This ensures data consistency across multiple sessions.
+        foreach (IBlockLayoutItem layoutItem in layout.Where(layoutItem => layoutItem.Key == Guid.Empty))
+        {
+            layoutItem.Key = layoutItem.ContentKey;
+        }
     }
 
     protected IEnumerable<Guid> ConfiguredElementTypeKeys(IBlockConfiguration configuration)

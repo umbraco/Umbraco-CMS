@@ -28,7 +28,7 @@ export class UmbBlockSingleManagerContext<
 	 */
 	async createWithPresets(
 		contentElementTypeKey: string,
-		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey'>,
+		partialLayoutEntry?: Omit<BlockLayoutType, 'contentKey' | 'key'>,
 		// This property is used by some implementations, but not used in this. Do not remove. [NL]
 
 		_originData?: UmbBlockSingleWorkspaceOriginData,

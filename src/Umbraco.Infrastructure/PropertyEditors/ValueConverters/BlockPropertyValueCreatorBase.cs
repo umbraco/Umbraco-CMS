@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -21,6 +22,7 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
     private readonly BlockEditorVarianceHandler _blockEditorVarianceHandler;
     private readonly ILanguageService _languageService;
+    private readonly IElementCacheService _elementCacheService;
 
     /// <summary>
     /// Creates a specific data converter for the block property implementation.
@@ -64,13 +66,14 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
     /// <returns></returns>
     protected delegate TBlockItemModel? EnrichBlockItemModelFromConfiguration(TBlockItemModel item, TBlockLayoutItem layoutItem, TBlockConfiguration configuration, CreateBlockItemModelFromLayout blockItemModelCreator);
 
-    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter, IVariationContextAccessor variationContextAccessor, IPropertyRenderingContextAccessor propertyRenderingContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler, ILanguageService languageService)
+    protected BlockPropertyValueCreatorBase(BlockEditorConverter blockEditorConverter, IVariationContextAccessor variationContextAccessor, IPropertyRenderingContextAccessor propertyRenderingContextAccessor, BlockEditorVarianceHandler blockEditorVarianceHandler, ILanguageService languageService, IElementCacheService elementCacheService)
     {
         BlockEditorConverter = blockEditorConverter;
         _variationContextAccessor = variationContextAccessor;
         _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
         _blockEditorVarianceHandler = blockEditorVarianceHandler;
         _languageService = languageService;
+        _elementCacheService = elementCacheService;
     }
 
     protected BlockEditorConverter BlockEditorConverter { get; }
@@ -121,17 +124,14 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
         CreateBlockModelFromItems createModelFromItems,
         EnrichBlockItemModelFromConfiguration? enrichBlockItem = null)
     {
-        if (converted.BlockValue.ContentData.Count == 0)
+        if (converted.Layout is null || converted.Layout.Any() is false)
         {
             return createEmptyModel();
         }
 
-        if (converted.Layout is null)
-        {
-            return createEmptyModel();
-        }
-
-        var blockConfigMap = blockConfigurations.ToDictionary(bc => bc.ContentElementTypeKey);
+        TBlockConfiguration[] blockConfigurationsAsArray = blockConfigurations as TBlockConfiguration[] ?? blockConfigurations.ToArray();
+        var blockConfigMap = blockConfigurationsAsArray.ToDictionary(bc => bc.ContentElementTypeKey);
+        var blockContentDataMap = converted.BlockValue.ContentData.ToDictionary(b => b.Key);
         VariationContext variationContext = _variationContextAccessor.VariationContext ?? new VariationContext();
         var languagesByIsoCode = (await _languageService.GetAllAsync())
             .ToDictionary(l => l.IsoCode, StringComparer.OrdinalIgnoreCase);
@@ -139,15 +139,29 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
 
         // Convert the content data
         var contentPublishedElements = new Dictionary<Guid, IPublishedElement>();
-        foreach (BlockItemData data in converted.BlockValue.ContentData)
+        IBlockLayoutItem[] allLayouts = converted
+            .Layout
+            .SelectMany(layout => new[] { layout }.Union(layout.GetContainedLayouts()))
+            .ToArray();
+        foreach (var layout in allLayouts)
         {
-            if (!blockConfigMap.ContainsKey(data.ContentTypeKey))
+            IPublishedElement? element = null;
+            BlockItemData? data = null;
+            if (layout.IsSharedContent)
             {
-                continue;
+                element = _elementCacheService.GetByKeyAsync(layout.ContentKey, preview).GetAwaiter().GetResult();
+
+                if (preview is false && element?.IsPublished(variationContext.Culture) is false)
+                {
+                    element = null;
+                }
+            }
+            else if (blockContentDataMap.TryGetValue(layout.ContentKey, out data))
+            {
+                element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
             }
 
-            IPublishedElement? element = BlockEditorConverter.ConvertToElement(owner, data, referenceCacheLevel, preview);
-            if (element == null)
+            if (element is null)
             {
                 continue;
             }
@@ -162,15 +176,19 @@ internal abstract class BlockPropertyValueCreatorBase<TBlockModel, TBlockItemMod
                 ? variationContext.Segment.NullOrWhiteSpaceAsNull()
                 : null;
 
-            Fallback fallback = _propertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
-            if (BlockExposeFallbackHelper.IsBlockExposed(expose, element.Key, expectedBlockVariationCulture, expectedBlockVariationSegment, fallback, languagesByIsoCode, defaultIsoCode, out var resolvedCulture) is false)
+            string? resolvedCulture = null;
+            if (layout.IsSharedContent is false)
             {
-                continue;
+                Fallback fallback = _propertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
+                if (BlockExposeFallbackHelper.IsBlockExposed(expose, element.Key, expectedBlockVariationCulture, expectedBlockVariationSegment, fallback, languagesByIsoCode, defaultIsoCode, out resolvedCulture) is false)
+                {
+                    continue;
+                }
             }
 
             // If the block was exposed via fallback to a different culture, recreate the element
             // with that culture's variation context so its property values come from the resolved culture.
-            if (resolvedCulture is not null && resolvedCulture.InvariantEquals(expectedBlockVariationCulture) is false)
+            if (resolvedCulture is not null && resolvedCulture.InvariantEquals(expectedBlockVariationCulture) is false && data is not null)
             {
                 VariationContext? originalContext = _variationContextAccessor.VariationContext;
                 try

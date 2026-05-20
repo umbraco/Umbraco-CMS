@@ -27,7 +27,7 @@ public class SingleBlockPropertyEditor : DataEditor
 {
     private readonly IJsonSerializer _jsonSerializer;
     private readonly IIOHelper _ioHelper;
-    private readonly IBlockValuePropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
+    private readonly ISingleBlockPropertyIndexValueFactory _blockValuePropertyIndexValueFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SingleBlockPropertyEditor"/> class.
@@ -40,7 +40,7 @@ public class SingleBlockPropertyEditor : DataEditor
         IDataValueEditorFactory dataValueEditorFactory,
         IJsonSerializer jsonSerializer,
         IIOHelper ioHelper,
-        IBlockValuePropertyIndexValueFactory blockValuePropertyIndexValueFactory)
+        ISingleBlockPropertyIndexValueFactory blockValuePropertyIndexValueFactory)
         : base(dataValueEditorFactory)
     {
         _jsonSerializer = jsonSerializer;

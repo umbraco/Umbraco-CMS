@@ -94,7 +94,7 @@ public sealed class BlockEditorConverter
             Key = data.Key,
         };
 
-        return _blockElementService.BuildElementAsync(alignedData, preview).GetAwaiter().GetResult();
+        return _blockElementService.BuildElementAsync(owner, alignedData, preview).GetAwaiter().GetResult();
     }
 
     /// <summary>
