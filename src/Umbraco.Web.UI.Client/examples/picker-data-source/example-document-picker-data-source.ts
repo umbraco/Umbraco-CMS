@@ -1,11 +1,13 @@
 import { getConfigValue } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import {
+	UmbDocumentItemDataResolver,
 	UmbDocumentItemRepository,
 	UmbDocumentSearchRepository,
 	UmbDocumentTreeRepository,
 	UMB_DOCUMENT_ENTITY_TYPE,
 } from '@umbraco-cms/backoffice/document';
+import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type {
@@ -20,6 +22,7 @@ import type {
 	UmbPickerSearchableDataSource,
 	UmbPickerTreeDataSource,
 } from '@umbraco-cms/backoffice/picker-data-source';
+import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbReferenceByUnique } from '@umbraco-cms/backoffice/models';
 import type { UmbSearchRequestArgs } from '@umbraco-cms/backoffice/search';
 import type { UmbTreeAncestorsOfRequestArgs } from '@umbraco-cms/backoffice/tree';
@@ -82,6 +85,10 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 
 	requestItems(uniques: Array<string>) {
 		return this.#item.requestItems(uniques);
+	}
+
+	createItemDataResolver(host: UmbControllerHost): UmbItemDataResolver {
+		return new UmbDocumentItemDataResolver(host);
 	}
 
 	search(args: UmbSearchRequestArgs) {

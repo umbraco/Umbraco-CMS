@@ -45,6 +45,18 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 		super(host, UMB_ENTITY_DATA_PICKER_ITEM_REPOSITORY_ALIAS);
 	}
 
+	protected override async _requestItemName(unique: string): Promise<string> {
+		const item = this.getSelectedItemByUnique(unique);
+		if (item && this.#dataSourceApi?.createItemDataResolver) {
+			const resolver = this.#dataSourceApi.createItemDataResolver(this);
+			resolver.setData(item);
+			const name = await resolver.getName();
+			this.removeUmbController(resolver);
+			return name ?? '#general_notFound';
+		}
+		return item?.name ?? '#general_notFound';
+	}
+
 	/**
 	 * Sets the data source API for the input context and updates the modal token accordingly.
 	 * @param {UmbPickerDataSource | undefined} api The data source API to set for the input context.
