@@ -1,8 +1,10 @@
 import { UMB_BACKOFFICE_CONTEXT } from '../backoffice.context.js';
 import type { UmbBackofficeContext } from '../backoffice.context.js';
-import { css, customElement, html, ifDefined, repeat, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import type { ManifestSection } from '@umbraco-cms/backoffice/section';
+import { ensureSlash } from '@umbraco-cms/backoffice/router';
+import { UUITabElement } from '@umbraco-cms/backoffice/external/uui';
 
 @customElement('umb-backoffice-header-sections')
 export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
@@ -59,6 +61,7 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 	#onSectionClick(event: PointerEvent, manifest: ManifestSection | undefined) {
 		// Let the browser handle the click if the Ctrl or Meta key is pressed
 		if (event.ctrlKey || event.metaKey) {
+			this.requestUpdate();
 			return;
 		}
 
@@ -100,22 +103,27 @@ export class UmbBackofficeHeaderSectionsElement extends UmbLitElement {
 		return html`
 			<uui-tab-group id="tabs" data-mark="section-links">
 				${repeat(
-					this._sections,
-					(section) => section.alias,
-					(section) => this.#renderItem(section),
-				)}
+			this._sections,
+			(section) => section.alias,
+			(section) => this.#renderItem(section),
+		)}
 			</uui-tab-group>
 		`;
 	}
 
 	#renderItem(manifest: ManifestSection) {
 		const label = this.localize.string(manifest?.meta.label || manifest?.name);
-		return html`<uui-tab
-			data-mark="section-link:${manifest.alias}"
-			.href=${this.#getSectionPath(manifest)}
-			label=${ifDefined(label)}
-			?active=${this._currentSectionAlias === manifest.alias}
-			@click=${(event: PointerEvent) => this.#onSectionClick(event, manifest)}></uui-tab>`;
+		const href = this.#getSectionPath(manifest)
+		const location = ensureSlash(window.location.pathname);
+		const compareHref = ensureSlash(href);
+		const isActive = location.includes(compareHref);
+		const tab = new UUITabElement();
+		tab.dataset.mark = `section-link:${manifest.alias}`;
+		tab.href = href;
+		tab.label = label;
+		tab.active = isActive;
+		tab.onclick = (event: PointerEvent) => this.#onSectionClick(event, manifest);
+		return tab;
 	}
 
 	static override readonly styles = [
