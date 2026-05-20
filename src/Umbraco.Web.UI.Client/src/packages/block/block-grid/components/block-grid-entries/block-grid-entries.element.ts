@@ -121,6 +121,7 @@ const SORTER_CONFIG: UmbSorterConfig<UmbBlockGridLayoutModel, UmbBlockGridEntryE
 	identifier: 'block-grid-editor',
 	itemSelector: 'umb-block-grid-entry',
 	containerSelector: '.umb-block-grid__layout-container',
+	touchEnabled: true,
 };
 
 /**
