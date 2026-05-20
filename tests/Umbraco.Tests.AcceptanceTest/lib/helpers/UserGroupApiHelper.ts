@@ -1181,6 +1181,93 @@ export class UserGroupApiHelper {
     return await this.create(userGroup);
   }
 
+  // Element folder (container) permission methods
+  async createUserGroupWithReadElementFolderPermission(name: string, enabled: boolean = true) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.library)
+      .withElementRootAccess(true)
+      .addFallbackPermission()
+        .withReadElementContainerPermission(enabled)
+        .withReadElementPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
+  async createUserGroupWithCreateElementFolderPermission(name: string, enabled: boolean = true) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.library)
+      .withElementRootAccess(true)
+      .addFallbackPermission()
+        .withCreateElementContainerPermission(enabled)
+        .withReadElementContainerPermission(true)
+        .withReadElementPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
+  async createUserGroupWithUpdateElementFolderPermission(name: string, enabled: boolean = true) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.library)
+      .withElementRootAccess(true)
+      .addFallbackPermission()
+        .withUpdateElementContainerPermission(enabled)
+        .withReadElementContainerPermission(true)
+        .withReadElementPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
+  async createUserGroupWithDeleteElementFolderPermission(name: string, enabled: boolean = true) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.library)
+      .withElementRootAccess(true)
+      .addFallbackPermission()
+        .withDeleteElementContainerPermission(enabled)
+        .withDeleteElementPermission(enabled)
+        .withReadElementContainerPermission(true)
+        .withReadElementPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
+  async createUserGroupWithMoveElementFolderPermission(name: string, enabled: boolean = true) {
+    await this.ensureNameNotExists(name);
+
+    const userGroup = new UserGroupBuilder()
+      .withName(name)
+      .addSection(ConstantHelper.sectionAliases.library)
+      .withElementRootAccess(true)
+      .addFallbackPermission()
+        .withMoveElementContainerPermission(enabled)
+        .withCreateElementContainerPermission(enabled)
+        .withReadElementContainerPermission(true)
+        .withReadElementPermission(true)
+        .done()
+      .build();
+
+    return await this.create(userGroup);
+  }
+
   async doesUserGroupContainElementStartNodeId(userGroupName: string, elementStartNodeId: string) {
     const userGroup = await this.getByName(userGroupName);
     if (userGroup.elementStartNode === null) {
