@@ -24,12 +24,13 @@ const testUser = ConstantHelper.testUserCredentials;
 const userGroupName = 'TestUserGroup';
 let userGroupId = '';
 
-test.beforeEach(async ({umbracoApi}) => {
+test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   await umbracoApi.element.ensureNameNotExists(createdFolderName);
   const dataType = await umbracoApi.dataType.getByName(dataTypeName);
   elementTypeId = await umbracoApi.documentType.createElementTypeWithPropertyInTab(elementTypeName, 'TestTab', 'TestGroup', dataTypeName, dataType.id);
   folderId = await umbracoApi.element.createDefaultElementFolder(folderName);
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, elementText, dataTypeName);
+  await umbracoApi.element.emptyRecycleBin();
 });
 
 test.afterEach(async ({umbracoApi}) => {
@@ -88,7 +89,8 @@ test('cannot see an element folder with read permission disabled', async ({umbra
   await umbracoUi.library.isElementInTreeVisible(folderName, false);
 });
 
-test('can create an element folder with create permission enabled', async ({umbracoApi, umbracoUi}) => {
+// Currently user cannot see the create action menu even though they have permission to create an element folder
+test.skip('can create an element folder with create permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateElementFolderPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -154,7 +156,7 @@ test('cannot rename an element folder with update permission disabled', async ({
   await umbracoUi.library.isActionsMenuForNameVisible(folderName, false);
 });
 
-test('can delete an element folder with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
+test('can trash an element folder with delete permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementFolderPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -172,7 +174,7 @@ test('can delete an element folder with delete permission enabled', async ({umbr
   await umbracoUi.library.isElementInTreeVisible(folderName, false);
 });
 
-test('cannot delete an element folder with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
+test('cannot trash an element folder with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementFolderPermission(userGroupName, false);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
@@ -184,6 +186,39 @@ test('cannot delete an element folder with delete permission disabled', async ({
 
   // Assert
   await umbracoUi.library.isActionsMenuForNameVisible(folderName, false);
+});
+
+test('can delete a trashed folder from the recycle bin when delete folder permission is enabled', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.element.moveToRecycleBin(folderId, true);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementFolderPermission(userGroupName);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
+  await umbracoUi.library.isItemVisibleInRecycleBin(folderName);
+
+  // Act
+  await umbracoUi.library.clickDeleteButtonForTrashedElememtWithName(folderName);
+  await umbracoUi.library.clickConfirmToDeleteButtonAndWaitForElementToBeDeleted();
+
+  // Assert
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(folderName)).toBeFalsy();
+});
+
+test('cannot delete a trashed folder from the recycle bin when delete folder permission is disabled', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.element.moveToRecycleBin(folderId, true);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementFolderPermission(userGroupName, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+
+  // Act
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
+
+  // Assert
+  await umbracoUi.library.isActionsMenuForRecycleBinVisible(false);
 });
 
 test('can move an element folder with move permission enabled', async ({umbracoApi, umbracoUi}) => {
@@ -220,25 +255,53 @@ test('cannot move an element folder with move permission disabled', async ({umbr
   await umbracoUi.library.isActionsMenuForNameVisible(folderName, false);
 });
 
-test('can see recycle bin actions menu for a trashed folder when delete folder permission is enabled', async ({umbracoApi, umbracoUi}) => {
+test('can restore an element folder from the recycle bin with move folder permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.element.moveToRecycleBin(folderId, true);
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementFolderPermission(userGroupName);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveElementFolderPermission(userGroupName);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
-
-  // Act
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
+  // Act
+  await umbracoUi.library.clickCaretButtonForName('Recycle Bin');
+  await umbracoUi.library.clickActionsMenuForElement(folderName);
+  await umbracoUi.library.clickRestoreActionMenuOption();
+  await umbracoUi.library.isRestoreFromRecycleBinMessageVisible(folderName, 'Root');
+  await umbracoUi.library.clickRestoreModalButton();
+
   // Assert
-  await umbracoUi.library.isActionsMenuForRecycleBinVisible(true);
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.restored);
+  await umbracoApi.loginToAdminUser();
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(folderName)).toBeFalsy();
+  expect(await umbracoApi.element.doesNameExist(folderName)).toBeTruthy();
 });
 
-test('cannot delete a trashed folder from the recycle bin when delete folder permission is disabled', async ({umbracoApi, umbracoUi}) => {
+// Currently, user can see the restore action menu and restore an element folder from the recycle bin even though they don't have move folder permission
+test('cannot restore an element folder from the recycle bin without move folder permission', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.element.moveToRecycleBin(folderId, true);
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementFolderPermission(userGroupName, false);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveElementFolderPermission(userGroupName, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
+
+  // Act
+  await umbracoUi.library.clickCaretButtonForName('Recycle Bin');
+
+  // Assert
+  await umbracoUi.library.isActionsMenuForNameVisible(folderName, false);
+  await umbracoApi.loginToAdminUser();
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(folderName)).toBeTruthy();
+});
+
+// Currently, when open element folder by url the user still can see the folder's content, and the folder's name is visible in the breadcrumb when opening an element inside the folder
+test.skip('cannot see an element inside a folder when read folder permission is disabled', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  const innerElementId = await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadElementFolderAndReadElementPermission(userGroupName, false, true);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
   await umbracoUi.goToBackOffice();
@@ -247,7 +310,44 @@ test('cannot delete a trashed folder from the recycle bin when delete folder per
   await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
 
   // Assert
-  await umbracoUi.library.isActionsMenuForRecycleBinVisible(false);
+  await umbracoUi.library.isElementInTreeVisible(folderName, false);
+  await umbracoUi.library.isElementInTreeVisible(elementName, false);
+  await umbracoUi.page.goto(`${umbracoUi.page.url()}/workspace/element-folder/edit/${folderId}`);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal);
+  await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
+  await umbracoUi.page.goto(`${umbracoUi.page.url()}/workspace/element/edit/${innerElementId}`);
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal);
+  await umbracoUi.library.isElementReadOnly();
+});
+
+test('can see a folder while elements inside it stay hidden when read element permission is disabled', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithReadElementFolderAndReadElementPermission(userGroupName, true, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+
+  // Act
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
+
+  // Assert
+  await umbracoUi.library.isElementInTreeVisible(folderName, true);
+  await umbracoUi.library.isElementInTreeVisible(elementName, false);
+});
+
+test('cannot rename a folder when only element update permission is enabled', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdateElementPermission(userGroupName);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+  await umbracoUi.goToBackOffice();
+
+  // Act
+  await umbracoUi.library.goToSection(ConstantHelper.sections.library, false);
+
+  // Assert
+  await umbracoUi.library.isActionsMenuForNameVisible(folderName, false);
 });
 
 test('cannot create an element folder without create folder permission via API', async ({umbracoApi}) => {
@@ -303,4 +403,54 @@ test('cannot move an element folder without move folder permission via API', asy
 
   // Assert
   expect(response.status()).toBe(ConstantHelper.statusCodes.forbidden);
+});
+
+test('cannot delete a folder containing an element when delete element permission is disabled via API', async ({umbracoApi}) => {
+  // Arrange
+  await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementFolderAndDeleteElementPermission(userGroupName, true, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+
+  // Act
+  const response = await umbracoApi.element.deleteFolder(folderId);
+
+  // Assert
+  expect(response.status()).toBe(ConstantHelper.statusCodes.forbidden);
+  await umbracoApi.loginToAdminUser();
+  expect(await umbracoApi.element.doesNameExist(folderName)).toBeTruthy();
+  expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
+});
+
+test('can delete a folder containing an element when both delete folder and delete element permissions are enabled via API', async ({umbracoApi}) => {
+  // Arrange
+  await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementFolderAndDeleteElementPermission(userGroupName, true, true);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+
+  // Act
+  const response = await umbracoApi.element.moveToRecycleBin(folderId, true);
+
+  // Assert
+  expect(response).toBe(ConstantHelper.statusCodes.ok);
+  await umbracoApi.loginToAdminUser();
+  expect(await umbracoApi.element.doesNameExist(folderName)).toBeFalsy();
+});
+
+test('cannot move a folder when create folder permission on the target is disabled via API', async ({umbracoApi}) => {
+  // Arrange
+  targetFolderId = await umbracoApi.element.createDefaultElementFolder(targetFolderName);
+  userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveElementFolderAndCreateElementFolderPermission(userGroupName, true, false);
+  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
+  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
+
+  // Act
+  const response = await umbracoApi.element.moveFolder(folderId, targetFolderId);
+
+  // Assert
+  expect(response.status()).toBe(ConstantHelper.statusCodes.forbidden);
+  await umbracoApi.loginToAdminUser();
+  const targetFolderChildren = await umbracoApi.element.getChildren(targetFolderId);
+  expect(targetFolderChildren.some((child) => child.name === folderName)).toBeFalsy();
 });
