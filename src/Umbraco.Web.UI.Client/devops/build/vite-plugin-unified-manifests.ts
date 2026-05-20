@@ -1,4 +1,4 @@
-import { readdirSync, existsSync, statSync } from 'node:fs';
+import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import type { Plugin } from 'vite';
 
@@ -10,7 +10,7 @@ export interface PackageEntry {
 }
 
 /** Convert a kebab-case package directory name into a JS identifier. */
-export function toIdentifier(pkgDir: string): string {
+function toIdentifier(pkgDir: string): string {
 	return pkgDir.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 }
 
@@ -20,10 +20,9 @@ export function toIdentifier(pkgDir: string): string {
  * named `allManifests`.
  */
 export function buildEntrySource(packages: PackageEntry[]): string {
-	const imports = packages
-		.map((p) => `import { manifests as ${toIdentifier(p.name)} } from "${p.path}";`)
-		.join('\n');
-	const spreads = packages.map((p) => `\t...${toIdentifier(p.name)},`).join('\n');
+	const idented = packages.map((p) => ({ id: toIdentifier(p.name), path: p.path }));
+	const imports = idented.map((p) => `import { manifests as ${p.id} } from "${p.path}";`).join('\n');
+	const spreads = idented.map((p) => `\t...${p.id},`).join('\n');
 	return `${imports}\n\nexport const allManifests = [\n${spreads}\n];\n`;
 }
 
@@ -33,15 +32,23 @@ export function buildEntrySource(packages: PackageEntry[]): string {
  * so the generated entry-source (and therefore the `allManifests` spread
  * order) is deterministic across builds and machines.
  */
-export function discoverPackages(packagesRoot: string): PackageEntry[] {
-	if (!existsSync(packagesRoot)) return [];
+function discoverPackages(packagesRoot: string): PackageEntry[] {
+	let dirents;
+	try {
+		dirents = readdirSync(packagesRoot, { withFileTypes: true });
+	} catch {
+		return [];
+	}
 	const entries: PackageEntry[] = [];
-	for (const dir of readdirSync(packagesRoot).sort()) {
-		const abs = path.join(packagesRoot, dir);
-		if (!statSync(abs).isDirectory()) continue;
-		const manifestPath = path.join(abs, 'manifests.ts');
-		if (!existsSync(manifestPath)) continue;
-		entries.push({ name: dir, path: manifestPath });
+	for (const dirent of dirents.sort((a, b) => a.name.localeCompare(b.name))) {
+		if (!dirent.isDirectory()) continue;
+		const manifestPath = path.join(packagesRoot, dirent.name, 'manifests.ts');
+		try {
+			statSync(manifestPath);
+		} catch {
+			continue;
+		}
+		entries.push({ name: dirent.name, path: manifestPath });
 	}
 	return entries;
 }
@@ -60,17 +67,16 @@ export interface UnifiedManifestsPluginOptions {
  * `manifests` export into a single `allManifests` array.
  */
 export function unifiedManifestsPlugin(opts: UnifiedManifestsPluginOptions): Plugin {
-	let discovered: PackageEntry[] = [];
-	let cachedSource: string | null = null;
-	const refresh = () => {
-		discovered = discoverPackages(opts.packagesRoot);
-		cachedSource = buildEntrySource(discovered);
+	let cache: { entries: PackageEntry[]; source: string } | null = null;
+	const rediscover = () => {
+		const entries = discoverPackages(opts.packagesRoot);
+		cache = { entries, source: buildEntrySource(entries) };
 	};
 
 	return {
 		name: 'umbraco:unified-manifests',
 		buildStart() {
-			refresh();
+			rediscover();
 		},
 		resolveId(id) {
 			if (id === VIRTUAL_ID || id === PUBLIC_ID) return RESOLVED_VIRTUAL_ID;
@@ -78,18 +84,27 @@ export function unifiedManifestsPlugin(opts: UnifiedManifestsPluginOptions): Plu
 		},
 		load(id) {
 			if (id !== RESOLVED_VIRTUAL_ID) return null;
-			if (cachedSource === null) refresh();
-			// Track each discovered manifest as a watched file so the dev server's
-			// HMR + Rollup's rebuild graph see edits AND additions to the source set.
-			// Without this, a brand-new package's manifests.ts wouldn't be in any
-			// import chain at startup, so its edits wouldn't fire `handleHotUpdate`.
-			for (const entry of discovered) this.addWatchFile(entry.path);
-			return cachedSource;
+			if (cache === null) rediscover();
+			// Track every discovered manifest so the dev server sees edits AND
+			// additions to the source set. Without addWatchFile, a brand-new
+			// package's manifests.ts wouldn't be in any import chain at startup
+			// and its edits wouldn't fire handleHotUpdate.
+			for (const entry of cache!.entries) this.addWatchFile(entry.path);
+			return cache!.source;
 		},
 		handleHotUpdate(ctx) {
 			// Vite normalises ctx.file to forward-slash separators on all platforms.
 			if (!ctx.file.endsWith('/manifests.ts')) return;
-			refresh();
+			const known = cache?.entries.some((e) => e.path === ctx.file) ?? false;
+			const prevSource = cache?.source ?? null;
+			if (known) {
+				// Same set of packages — only the content may have shifted identifiers.
+				if (cache) cache.source = buildEntrySource(cache.entries);
+			} else {
+				// New manifests.ts appeared — re-walk the directory.
+				rediscover();
+			}
+			if (cache?.source === prevSource) return;
 			const mod = ctx.server.moduleGraph.getModuleById(RESOLVED_VIRTUAL_ID);
 			if (mod) return [mod];
 		},

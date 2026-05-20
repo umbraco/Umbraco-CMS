@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import type { OutputOptions } from 'rollup';
 import path from 'node:path';
 import { getDefaultConfig } from '../../src/vite-config-base';
 import { unifiedManifestsPlugin } from './vite-plugin-unified-manifests';
@@ -7,10 +8,9 @@ const root = path.resolve(__dirname, '../..');
 const dist = path.resolve(root, 'dist-cms/manifests-all');
 
 const baseConfig = getDefaultConfig({ dist });
-
-const baseOutput = Array.isArray(baseConfig.build?.rollupOptions?.output)
-	? {}
-	: (baseConfig.build?.rollupOptions?.output ?? {});
+// getDefaultConfig always returns a single-object output (not an array); the
+// cast tells TypeScript what its return contract guarantees.
+const baseOutput = (baseConfig.build?.rollupOptions?.output ?? {}) as OutputOptions;
 
 export default defineConfig({
 	...baseConfig,
