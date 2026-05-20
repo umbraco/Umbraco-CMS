@@ -179,4 +179,25 @@ describe('UmbEntityWorkspaceDataManager', () => {
 			expect(manager.getPersisted()).to.be.undefined;
 		});
 	});
+
+	describe('after destroy', () => {
+		it('getCurrent returns undefined instead of throwing', () => {
+			manager.setCurrent({ name: 'test' });
+			manager.destroy();
+			expect(manager.getCurrent()).to.be.undefined;
+		});
+
+		it('getPersisted returns undefined instead of throwing', () => {
+			manager.setPersisted({ name: 'test' });
+			manager.destroy();
+			expect(manager.getPersisted()).to.be.undefined;
+		});
+
+		it('getHasUnpersistedChanges returns false instead of throwing', () => {
+			manager.setPersisted({ name: 'test' });
+			manager.setCurrent({ name: 'changed' });
+			manager.destroy();
+			expect(manager.getHasUnpersistedChanges()).to.be.false;
+		});
+	});
 });

@@ -42,7 +42,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	getPersisted() {
-		return this._persisted.getValue();
+		return this._persisted?.getValue();
 	}
 
 	/**
@@ -80,7 +80,7 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	getCurrent() {
-		return this._current.getValue();
+		return this._current?.getValue();
 	}
 
 	/**
@@ -130,8 +130,8 @@ export class UmbEntityWorkspaceDataManager<ModelType>
 	 * @memberof UmbSubmittableWorkspaceDataManager
 	 */
 	getHasUnpersistedChanges() {
-		const persisted = this._persisted.getValue();
-		const current = this._current.getValue();
+		const persisted = this._persisted?.getValue();
+		const current = this._current?.getValue();
 		const result = jsonStringComparison(persisted, current) === false;
 		// TODO: Implement developer-mode
 		if (result) {

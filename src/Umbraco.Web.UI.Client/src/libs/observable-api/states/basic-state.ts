@@ -64,7 +64,7 @@ export class UmbBasicState<T> {
 	 * console.log("Value is: ", myState.value);
 	 */
 	public getValue(): T {
-		return this._subject.getValue();
+		return this._subject?.getValue() as T;
 	}
 
 	/**

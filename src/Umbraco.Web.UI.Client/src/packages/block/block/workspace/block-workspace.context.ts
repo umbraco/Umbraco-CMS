@@ -280,6 +280,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		// Await one animation frame:
 		await new Promise((resolve) => requestAnimationFrame(() => resolve(true)));
+		// destroy() nulls #name; bail if the workspace was torn down during the frame.
+		if (!this.#name) return;
 		const prefix = this.getIsNew() === true ? '#general_add' : '#general_edit';
 		const label = this.#labelRender.toString();
 		const title = `${prefix} ${label}`;
