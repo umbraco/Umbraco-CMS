@@ -46,6 +46,29 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 	}
 
 	/**
+	 * Resolves the display name for a picked item. If the data source provides a
+	 * {@link UmbPickerDataSource.createItemDataResolver | createItemDataResolver} factory, the resolver is
+	 * instantiated with this context as the host so it can reach local DOM contexts
+	 * (e.g. UMB_VARIANT_CONTEXT).
+	 * @param {string} unique The unique identifier of the item.
+	 * @returns {Promise<string>} The resolved display name.
+	 * @memberof UmbEntityDataPickerInputContext
+	 */
+	protected override async _requestItemName(unique: string): Promise<string> {
+		const item = this.getSelectedItemByUnique(unique);
+		if (item && this.#dataSourceApi?.createItemDataResolver) {
+			const resolver = this.#dataSourceApi.createItemDataResolver(this);
+			resolver.setData(item);
+			const name = await resolver.getName();
+			this.removeUmbController(resolver);
+			if (name) {
+				return name;
+			}
+		}
+		return super._requestItemName(unique);
+	}
+
+	/**
 	 * Sets the data source API for the input context and updates the modal token accordingly.
 	 * @param {UmbPickerDataSource | undefined} api The data source API to set for the input context.
 	 * @memberof UmbEntityDataPickerInputContext
