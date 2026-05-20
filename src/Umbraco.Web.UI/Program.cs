@@ -1,8 +1,19 @@
+#if false
+// This file is shared with the `dotnet new umbraco` template. Wrap any #if directive that isn't a
+// declared template parameter (see templates/UmbracoProject/.template.config/template.json) with
+// //-:cnd:noEmit / //+:cnd:noEmit so the template engine emits it verbatim instead of stripping it.
+#endif
 #if UseDocumentedCsp
 using Umbraco.Cms.Web.UI.Extensions;
 #endif
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+//-:cnd:noEmit
+#if DEBUG
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+#endif
+//+:cnd:noEmit
 
 builder.CreateUmbracoBuilder()
     .AddBackOffice()
