@@ -5,6 +5,7 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -349,7 +350,10 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 
 	#updateExposedState() {
 		// Shared content blocks use the element's variant state; local blocks use the expose entry
-		const isExposed = this._isLibraryElement ? this._sharedContentVariantState !== 'Draft' : this._hasExpose;
+		const isExposed = this._isLibraryElement
+			? this._sharedContentVariantState === UmbElementVariantState.PUBLISHED ||
+				this._sharedContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
+			: this._hasExpose;
 		this.#updateBlockViewProps({ unpublished: !isExposed });
 		this._exposed = isExposed;
 	}
@@ -377,12 +381,14 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 		if (this._exposed || this._isReadOnly) {
 			return ext.component;
 		} else {
-			return html`<div style="min-height: var(--uui-size-16);">
-				${ext.component}
-				<umb-block-overlay-expose-button
-					.contentTypeName=${this._contentTypeName}
-					@click=${this.#expose}></umb-block-overlay-expose-button>
-			</div>`;
+			return html`
+				<div style="min-height: var(--uui-size-16);">
+					${ext.component}
+					<umb-block-overlay-expose-button
+						.contentTypeName=${this._contentTypeName}
+						@click=${this.#expose}></umb-block-overlay-expose-button>
+				</div>
+			`;
 		}
 	};
 
@@ -403,23 +409,29 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	}
 
 	#renderInlineBlock() {
-		return html`<umb-inline-list-block
-			.label=${this._label}
-			.icon=${this._icon}
-			.index=${this._blockViewProps.index}
-			.unpublished=${!this._exposed}
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-inline-list-block>`;
+		return html`
+			<umb-inline-list-block
+				.label=${this._label}
+				.icon=${this._icon}
+				.index=${this._blockViewProps.index}
+				.unpublished=${!this._exposed}
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
+			</umb-inline-list-block>
+		`;
 	}
 
 	#renderUnsupportedBlock() {
-		return html`<umb-unsupported-list-block
-			.config=${this._blockViewProps.config}
-			.content=${this._blockViewProps.content}
-			.settings=${this._blockViewProps.settings}
-			${umbDestroyOnDisconnect()}></umb-unsupported-list-block>`;
+		return html`
+			<umb-unsupported-list-block
+				.config=${this._blockViewProps.config}
+				.content=${this._blockViewProps.content}
+				.settings=${this._blockViewProps.settings}
+				${umbDestroyOnDisconnect()}>
+			</umb-unsupported-list-block>
+		`;
 	}
 
 	#renderBuiltinBlockView = () => {
@@ -464,7 +476,7 @@ export class UmbBlockListEntryElement extends UmbLitElement implements UmbProper
 	#renderActionBar() {
 		if (this._isSortMode) return nothing;
 		if (!this._showActions) return nothing;
-		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_LIST}></umb-block-action-list>`;
+		return html`<umb-block-action-list id="actions" .blockEditor=${UMB_BLOCK_LIST}></umb-block-action-list>`;
 	}
 
 	override render() {

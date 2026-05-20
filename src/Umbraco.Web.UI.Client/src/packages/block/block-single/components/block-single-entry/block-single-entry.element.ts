@@ -5,6 +5,7 @@ import { css, customElement, html, nothing, property, state } from '@umbraco-cms
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
+import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type {
@@ -316,7 +317,10 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 
 	#updateExposedState() {
 		// Shared content blocks use the element's variant state; local blocks use the expose entry
-		const isExposed = this._isLibraryElement ? this._sharedContentVariantState !== 'Draft' : this._hasExpose;
+		const isExposed = this._isLibraryElement
+			? this._sharedContentVariantState === UmbElementVariantState.PUBLISHED ||
+				this._sharedContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
+			: this._hasExpose;
 		this.#updateBlockViewProps({ unpublished: !isExposed });
 		this._exposed = isExposed;
 	}
@@ -397,7 +401,8 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
-				${umbDestroyOnDisconnect()}></umb-ref-single-block>
+				${umbDestroyOnDisconnect()}>
+			</umb-ref-single-block>
 		`;
 	}
 
@@ -410,7 +415,8 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
-				${umbDestroyOnDisconnect()}></umb-inline-single-block>
+				${umbDestroyOnDisconnect()}>
+			</umb-inline-single-block>
 		`;
 	}
 
@@ -420,7 +426,8 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 				.config=${this._blockViewProps.config}
 				.content=${this._blockViewProps.content}
 				.settings=${this._blockViewProps.settings}
-				${umbDestroyOnDisconnect()}></umb-unsupported-single-block>
+				${umbDestroyOnDisconnect()}>
+			</umb-unsupported-single-block>
 		`;
 	}
 
@@ -458,7 +465,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 
 	#renderActionBar() {
 		if (!this._showActions) return nothing;
-		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_SINGLE}></umb-block-action-list>`;
+		return html`<umb-block-action-list id="actions" .blockEditor=${UMB_BLOCK_SINGLE}></umb-block-action-list>`;
 	}
 
 	override render() {

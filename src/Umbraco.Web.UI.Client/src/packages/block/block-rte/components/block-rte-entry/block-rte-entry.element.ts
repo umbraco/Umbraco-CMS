@@ -315,7 +315,7 @@ export class UmbBlockRteEntryElement extends UmbLitElement implements UmbPropert
 
 	#renderActionBar() {
 		if (!this._showActions) return nothing;
-		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
+		return html`<umb-block-action-list id="actions" .blockEditor=${UMB_BLOCK_RTE}></umb-block-action-list>`;
 	}
 
 	#renderBuiltinBlockView = () => {

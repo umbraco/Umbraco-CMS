@@ -5,6 +5,7 @@ import { css, customElement, html, nothing, property, state, when } from '@umbra
 import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
 import { umbDestroyOnDisconnect, UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbElementVariantState } from '@umbraco-cms/backoffice/element';
 import { UmbObserveValidationStateController } from '@umbraco-cms/backoffice/validation';
 import { UUIBlinkAnimationValue, UUIBlinkKeyframes } from '@umbraco-cms/backoffice/external/uui';
 import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
@@ -431,7 +432,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	};
 
 	#updateExposedState() {
-		const isExposed = this._isLibraryElement ? this._sharedContentVariantState !== 'Draft' : this._hasExpose;
+		// Shared content blocks use the element's variant state; local blocks use the expose entry
+		const isExposed = this._isLibraryElement
+			? this._sharedContentVariantState === UmbElementVariantState.PUBLISHED ||
+				this._sharedContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
+			: this._hasExpose;
 		this.#updateBlockViewProps({ unpublished: !isExposed });
 		this._exposed = isExposed;
 	}
@@ -643,7 +648,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 	#renderActionBar() {
 		if (this._isSortMode) return nothing;
 		if (!this._showActions) return nothing;
-		return html`<umb-block-action-list id="actions" block-editor=${UMB_BLOCK_GRID}></umb-block-action-list>`;
+		return html`<umb-block-action-list id="actions" .blockEditor=${UMB_BLOCK_GRID}></umb-block-action-list>`;
 	}
 
 	static override styles = [
