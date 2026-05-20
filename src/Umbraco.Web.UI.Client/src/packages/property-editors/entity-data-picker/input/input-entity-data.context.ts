@@ -45,6 +45,15 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 		super(host, UMB_ENTITY_DATA_PICKER_ITEM_REPOSITORY_ALIAS);
 	}
 
+	/**
+	 * Resolves the display name for a picked item. If the data source provides a
+	 * {@link UmbPickerDataSource.createItemDataResolver | createItemDataResolver} factory, the resolver is
+	 * instantiated with this context as the host so it can reach local DOM contexts
+	 * (e.g. UMB_VARIANT_CONTEXT).
+	 * @param {string} unique The unique identifier of the item.
+	 * @returns {Promise<string>} The resolved display name.
+	 * @memberof UmbEntityDataPickerInputContext
+	 */
 	protected override async _requestItemName(unique: string): Promise<string> {
 		const item = this.getSelectedItemByUnique(unique);
 		if (item && this.#dataSourceApi?.createItemDataResolver) {

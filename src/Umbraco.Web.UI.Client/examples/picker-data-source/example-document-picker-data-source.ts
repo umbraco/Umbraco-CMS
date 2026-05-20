@@ -87,6 +87,13 @@ export class ExampleDocumentPickerPropertyEditorDataSource
 		return this.#item.requestItems(uniques);
 	}
 
+	/**
+	 * Creates a document item data resolver bound to the given host.
+	 * The resolver reads variant-based names and icons using UMB_VARIANT_CONTEXT,
+	 * so the host must be the element or context that owns the picker in the DOM.
+	 * @param {UmbControllerHost} host The controller host of the picker consumer.
+	 * @returns {UmbItemDataResolver} A resolver that provides language-context-aware metadata for document items.
+	 */
 	createItemDataResolver(host: UmbControllerHost): UmbItemDataResolver {
 		return new UmbDocumentItemDataResolver(host);
 	}
