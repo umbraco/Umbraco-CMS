@@ -837,6 +837,7 @@ export default {
 		content: 'Nội dung',
 		continue: 'Tiếp tục',
 		copy: 'Sao chép',
+		copied: 'Đã sao chép!',
 		create: 'Tạo mới',
 		database: 'Cơ sở dữ liệu',
 		date: 'Ngày',

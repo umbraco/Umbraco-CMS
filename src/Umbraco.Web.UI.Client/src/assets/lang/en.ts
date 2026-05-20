@@ -868,6 +868,7 @@ export default {
 		content: 'Content',
 		continue: 'Continue',
 		copy: 'Copy',
+		copied: 'Copied!',
 		create: 'Create',
 		database: 'Database',
 		date: 'Date',
@@ -1425,6 +1426,17 @@ export default {
 	propertyEditorPicker: {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
+	},
+	propertyEditorUIGroups: {
+		advanced: 'Advanced',
+		blocks: 'Blocks',
+		common: 'Common',
+		date: 'Date',
+		lists: 'Lists',
+		media: 'Media',
+		people: 'People',
+		pickers: 'Pickers',
+		richContent: 'Rich Content',
 	},
 	relatedlinks: {
 		enterExternal: 'enter external link',

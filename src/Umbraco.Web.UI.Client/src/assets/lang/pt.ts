@@ -831,6 +831,7 @@ export default {
 		content: 'Conteúdo',
 		continue: 'Continuar',
 		copy: 'Copiar',
+		copied: 'Copiado!',
 		create: 'Criar',
 		database: 'Base de dados',
 		date: 'Data',
