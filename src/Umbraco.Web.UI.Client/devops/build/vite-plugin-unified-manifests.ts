@@ -45,6 +45,7 @@ export function discoverPackages(packagesRoot: string): PackageEntry[] {
 }
 
 const VIRTUAL_ID = 'virtual:unified-manifests';
+const PUBLIC_ID = '@umbraco-cms/backoffice/manifests-all';
 const RESOLVED_VIRTUAL_ID = '\0' + VIRTUAL_ID;
 
 export interface UnifiedManifestsPluginOptions {
@@ -68,7 +69,7 @@ export function unifiedManifestsPlugin(opts: UnifiedManifestsPluginOptions): Plu
 			refresh();
 		},
 		resolveId(id) {
-			if (id === VIRTUAL_ID) return RESOLVED_VIRTUAL_ID;
+			if (id === VIRTUAL_ID || id === PUBLIC_ID) return RESOLVED_VIRTUAL_ID;
 			return null;
 		},
 		load(id) {

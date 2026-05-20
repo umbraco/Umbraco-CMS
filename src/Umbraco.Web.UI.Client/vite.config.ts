@@ -1,8 +1,13 @@
 import { defineConfig, PluginOption } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import viteTSConfigPaths from 'vite-tsconfig-paths';
+import path from 'node:path';
+import { unifiedManifestsPlugin } from './devops/build/vite-plugin-unified-manifests';
 
 export const plugins: PluginOption[] = [
+	unifiedManifestsPlugin({
+		packagesRoot: path.resolve(__dirname, 'src/packages'),
+	}),
 	viteStaticCopy({
 		targets: [
 			{
