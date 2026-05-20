@@ -276,10 +276,18 @@ export class UmbAppElement extends UmbLitElement {
 
 	async #registerExtensions() {
 		if (this.#allManifestsLoaded === undefined) {
-			this.#allManifestsLoaded = import('@umbraco-cms/backoffice/manifests-all').then((mod) => {
-				umbExtensionsRegistry.registerMany(mod.allManifests);
-				this.#loadCurrentUser();
-			});
+			this.#allManifestsLoaded = import('@umbraco-cms/backoffice/manifests-all').then(
+				(mod) => {
+					umbExtensionsRegistry.registerMany(mod.allManifests);
+					this.#loadCurrentUser();
+				},
+				(err) => {
+					// Surface the underlying import failure for plugin devs before the
+					// generic "Extensions failed loading" page swallows it via Promise.allSettled.
+					console.error('[UmbAppElement] Failed to load unified manifests:', err);
+					throw err;
+				},
+			);
 		}
 		await this.#allManifestsLoaded;
 	}

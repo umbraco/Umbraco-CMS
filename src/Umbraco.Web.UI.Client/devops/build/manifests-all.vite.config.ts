@@ -22,6 +22,9 @@ export default defineConfig({
 		rollupOptions: {
 			...baseConfig.build?.rollupOptions,
 			input: { index: 'virtual:unified-manifests' },
+			// Required so Rollup keeps the named `allManifests` export on the entry chunk;
+			// without this Rollup can elide re-exports when it judges them unused and
+			// `import('.../manifests-all').then(mod => mod.allManifests)` returns undefined.
 			preserveEntrySignatures: 'exports-only',
 			output: {
 				...baseOutput,

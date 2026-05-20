@@ -29,7 +29,9 @@ export function buildEntrySource(packages: PackageEntry[]): string {
 
 /**
  * Walk a `packages` root directory and return one PackageEntry per child
- * directory that contains a top-level `manifests.ts`.
+ * directory that contains a top-level `manifests.ts`. Sorted alphabetically
+ * so the generated entry-source (and therefore the `allManifests` spread
+ * order) is deterministic across builds and machines.
  */
 export function discoverPackages(packagesRoot: string): PackageEntry[] {
 	if (!existsSync(packagesRoot)) return [];
@@ -58,9 +60,11 @@ export interface UnifiedManifestsPluginOptions {
  * `manifests` export into a single `allManifests` array.
  */
 export function unifiedManifestsPlugin(opts: UnifiedManifestsPluginOptions): Plugin {
+	let discovered: PackageEntry[] = [];
 	let cachedSource: string | null = null;
 	const refresh = () => {
-		cachedSource = buildEntrySource(discoverPackages(opts.packagesRoot));
+		discovered = discoverPackages(opts.packagesRoot);
+		cachedSource = buildEntrySource(discovered);
 	};
 
 	return {
@@ -75,6 +79,11 @@ export function unifiedManifestsPlugin(opts: UnifiedManifestsPluginOptions): Plu
 		load(id) {
 			if (id !== RESOLVED_VIRTUAL_ID) return null;
 			if (cachedSource === null) refresh();
+			// Track each discovered manifest as a watched file so the dev server's
+			// HMR + Rollup's rebuild graph see edits AND additions to the source set.
+			// Without this, a brand-new package's manifests.ts wouldn't be in any
+			// import chain at startup, so its edits wouldn't fire `handleHotUpdate`.
+			for (const entry of discovered) this.addWatchFile(entry.path);
 			return cachedSource;
 		},
 		handleHotUpdate(ctx) {
