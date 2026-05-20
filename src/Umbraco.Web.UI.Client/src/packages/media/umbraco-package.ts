@@ -1,5 +1,3 @@
-import * as entryPointModule from './entry-point.js';
-
 export const name = 'Umbraco.Core.MediaManagement';
 export const extensions = [
 	{
@@ -7,11 +5,5 @@ export const extensions = [
 		alias: 'Umb.Bundle.MediaManagement',
 		type: 'bundle',
 		js: () => import('./manifests.js'),
-	},
-	{
-		name: 'Media Management Entry Point',
-		alias: 'Umb.EntryPoint.MediaManagement',
-		type: 'backofficeEntryPoint',
-		js: entryPointModule,
 	},
 ];

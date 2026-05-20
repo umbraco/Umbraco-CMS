@@ -1,3 +1,4 @@
+import * as entryPointModule from './entry-point.js';
 import { manifest as acceptedType } from './accepted-types/manifests.js';
 import { manifest as colorEditor } from './color-swatches-editor/manifests.js';
 import { manifest as dimensions } from './dimensions/manifest.js';
@@ -56,4 +57,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 	select,
 	valueType,
 	timeZonePicker,
+	{
+		name: 'Property Editors Entry Point',
+		alias: 'Umb.EntryPoint.PropertyEditors',
+		type: 'backofficeEntryPoint',
+		js: entryPointModule,
+	},
 ];

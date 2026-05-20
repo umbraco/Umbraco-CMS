@@ -1,3 +1,7 @@
+// Side-effect import: registers the media-package custom components at module
+// load. Replaces the side effect previously performed by the package's
+// `backofficeEntryPoint` extension when the package was loaded via CORE_PACKAGES.
+import './media/components/index.js';
 import { manifests as mediaManifests } from './media/manifests.js';
 import { manifests as mediaSectionManifests } from './media-section/manifests.js';
 import { manifests as mediaTypesManifests } from './media-types/manifests.js';
