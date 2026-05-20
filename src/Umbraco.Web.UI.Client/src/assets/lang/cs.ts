@@ -1731,6 +1731,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Zakázat sledování URL',
 		enableUrlTracker: 'Povolit sledování URL',
+		urlTrackerEnabled: 'Povoleno',
+		urlTrackerDisabled: 'Zakázáno',
 		culture: 'Jazyk',
 		originalUrl: 'Originální URL',
 		redirectedTo: 'Přesměrováno na',
