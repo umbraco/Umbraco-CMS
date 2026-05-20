@@ -940,6 +940,7 @@ stages:
     # failure deliberately blocks the npm release.
     condition: and(in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
     dependsOn:
+      - Build
       - Deploy_NuGet
     variables:
       # Empty for stable releases; non-empty (e.g. "-beta.1", "-rc.2") for prereleases.
@@ -968,13 +969,15 @@ stages:
               # For prereleases (beta/rc) publish under the `next` dist-tag so `npm install`
               # without a version still resolves to the most recent stable on `latest`.
               files=( ./*.tgz )
-              if [ -n "$(npmPrereleaseVersion)" ]; then
+              if [ -n "$NPM_PRERELEASE_VERSION" ]; then
                 npm publish "${files[0]}" --tag next
               else
                 npm publish "${files[0]}"
               fi
             displayName: Push to npm
             workingDirectory: $(Pipeline.Workspace)/npm
+            env:
+              NPM_PRERELEASE_VERSION: $(npmPrereleaseVersion)
       - job: PublishTestHelpers
         displayName: Push Test Helpers to NPM
         steps:
@@ -997,13 +1000,15 @@ stages:
               # For prereleases (beta/rc) publish under the `next` dist-tag so `npm install`
               # without a version still resolves to the most recent stable on `latest`.
               files=( ./*.tgz )
-              if [ -n "$(npmPrereleaseVersion)" ]; then
+              if [ -n "$NPM_PRERELEASE_VERSION" ]; then
                 npm publish "${files[0]}" --tag next
               else
                 npm publish "${files[0]}"
               fi
             displayName: Push test helpers to npm
             workingDirectory: $(Pipeline.Workspace)/npm-testhelpers
+            env:
+              NPM_PRERELEASE_VERSION: $(npmPrereleaseVersion)
 
   - stage: Upload_API_Docs
     pool:
