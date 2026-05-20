@@ -120,6 +120,7 @@ public class JsonConfigManipulatorTests
             Assert.IsTrue(File.Exists(missingOptionalFilePath), "Optional missing file should be created by the installer.");
             Assert.AreEqual(ConnectionString, ReadConnectionString(missingOptionalFilePath), "Connection string should be written to the last (newly created) JSON provider.");
             Assert.AreEqual(ProviderName, ReadProviderName(missingOptionalFilePath));
+            Assert.AreEqual("./appsettings-schema.json", ReadJsonValue(missingOptionalFilePath, "$schema"), "Newly created config file should include the $schema reference.");
         });
     }
 

@@ -251,9 +251,12 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
             if (File.Exists(jsonFilePath) is false)
             {
                 // Backing file isn't on disk yet (e.g. an optional appsettings.Local.json registered by the
-                // template). Return an empty object so the caller can populate it; SaveJsonAsync will create
-                // the file on write.
-                return new JsonObject();
+                // template). Return an object pre-populated with the $schema reference so the file we create
+                // gets IntelliSense/validation in editors; SaveJsonAsync will create the file on write.
+                return new JsonObject
+                {
+                    ["$schema"] = "./appsettings-schema.json",
+                };
             }
 
             using var streamReader = new StreamReader(jsonFilePath);
