@@ -578,16 +578,16 @@ export abstract class UmbBlockManagerContext<
 	 * Asks for user confirmation, then copies the element content into local contentData.
 	 * @param {string} key the block layout key.
 	 */
-	async requestDisconnectFromLibrary(key: string) {
+	async requestDisconnectFromElementLibrary(key: string) {
 		const layout = this._layouts.getValue().find((x) => x.key === key);
 		if (!layout) return;
 		const elementKey = layout.contentKey;
 
 		try {
 			await umbConfirmModal(this, {
-				headline: '#blockEditor_disconnectFromLibrary',
-				content: '#blockEditor_disconnectFromLibraryConfirm',
-				confirmLabel: '#blockEditor_disconnectFromLibrary',
+				headline: '#blockEditor_disconnectFromElementLibrary',
+				content: '#blockEditor_disconnectFromElementLibraryConfirm',
+				confirmLabel: '#blockEditor_disconnectFromElementLibrary',
 				color: 'warning',
 			});
 		} catch {

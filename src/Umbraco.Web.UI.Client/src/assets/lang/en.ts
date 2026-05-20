@@ -2930,8 +2930,8 @@ export default {
 			'This content is no longer supported in this Editor. If you are missing this content, please contact your administrator. Otherwise delete it.',
 		tabLibrary: 'Library',
 		transferToElementLibrary: 'Transfer to Library',
-		disconnectFromLibrary: 'Disconnect from Library',
-		disconnectFromLibraryConfirm:
+		disconnectFromElementLibrary: 'Disconnect from Library',
+		disconnectFromElementLibraryConfirm:
 			'This will create a local copy of the Element content. The Library Element will not be affected.',
 		elementUsedByCount: (count: number) => `This Element is referenced by ${count} item(s).`,
 		blockVariantConfigurationNotSupported:
