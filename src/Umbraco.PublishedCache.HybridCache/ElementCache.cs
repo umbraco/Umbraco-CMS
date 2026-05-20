@@ -22,4 +22,20 @@ public sealed class ElementCache : IPublishedElementCache
     /// <inheritdoc />
     public async Task<IPublishedElement?> GetByIdAsync(Guid key, bool? preview = null)
         => await _elementCacheService.GetByKeyAsync(key, preview);
+
+    /// <inheritdoc />
+    public IPublishedElement? GetById(bool preview, Guid key)
+    {
+        // Sync fast path: when the converted-element L0 cache already holds the item we can
+        // return it without spinning up an async state machine. This is the dominant case for
+        // property value converters (e.g. ElementPicker) that run sync-over-async on the
+        // render hot path. On a miss we fall through to the async path which handles
+        // HybridCache (L1/L2) and database lookups.
+        if (_elementCacheService.TryGetCached(key, preview, out IPublishedElement? cached))
+        {
+            return cached;
+        }
+
+        return GetByIdAsync(key, preview).GetAwaiter().GetResult();
+    }
 }

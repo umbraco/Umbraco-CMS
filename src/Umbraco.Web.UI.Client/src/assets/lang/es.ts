@@ -1432,6 +1432,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Desactivar URL tracker',
 		enableUrlTracker: 'Activar URL tracker',
+		urlTrackerEnabled: 'Activado',
+		urlTrackerDisabled: 'Desactivado',
 		originalUrl: 'URL Original',
 		redirectedTo: 'Redirigido a To',
 		noRedirects: 'No se ha creado ninguna redirección',

@@ -82,6 +82,18 @@ internal sealed class ElementCacheService : IElementCacheService
         return await GetNodeAsync(key, calculatedPreview);
     }
 
+    public bool TryGetCached(Guid key, bool preview, out IPublishedElement? element)
+    {
+        // Mirror the L0 (published element cache) fast path in GetNodeAsync.
+        if (preview is false && _publishedElementCache.TryGetValue(GetCacheKey(key, preview), out element))
+        {
+            return true;
+        }
+
+        element = null;
+        return false;
+    }
+
     private async Task<IPublishedElement?> GetNodeAsync(Guid key, bool preview)
     {
         var cacheKey = GetCacheKey(key, preview);

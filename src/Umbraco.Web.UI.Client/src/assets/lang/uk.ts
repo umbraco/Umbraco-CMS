@@ -982,6 +982,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Зупинити відстеження URL',
 		enableUrlTracker: 'Запустити відстеження URL',
+		urlTrackerEnabled: 'Увімкнено',
+		urlTrackerDisabled: 'Вимкнено',
 		originalUrl: 'Початковий URL',
 		redirectedTo: 'Перенаправлено в',
 		noRedirects: 'На даний момент немає жодного перенаправлення',
