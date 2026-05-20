@@ -34,9 +34,22 @@ export class UmbWorkspaceActionMenuItemElement<
 	async #onClickLabel(event: UUIMenuItemEvent) {
 		if (!this._href) {
 			event.stopPropagation();
+			// WebKit/Safari: Close the popover before opening a modal to prevent toggle state lock.
+			this.#hideParentPopover();
 			await this.#api?.execute().catch(() => {});
 		}
 		this.dispatchEvent(new UmbActionExecutedEvent());
+	}
+
+	#hideParentPopover() {
+		const popover = this.closest('[popover]') as HTMLElement;
+		if (popover && typeof popover.hidePopover === 'function') {
+			try {
+				popover.hidePopover();
+			} catch {
+				// Ignore if popover is already hidden
+			}
+		}
 	}
 
 	// TODO: we need to stop the regular click event from bubbling up to the table so it doesn't select the row.
