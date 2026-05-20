@@ -68,6 +68,7 @@
 		"./localization": "./dist-cms/packages/core/localization/index.js",
 		"./log-viewer": "./dist-cms/packages/log-viewer/index.js",
 		"./management-api": "./dist-cms/packages/management-api/index.js",
+		"./manifests-all": "./dist-cms/manifests-all/index.js",
 		"./markdown-editor": "./dist-cms/packages/markdown-editor/index.js",
 		"./media-type": "./dist-cms/packages/media/media-types/index.js",
 		"./media": "./dist-cms/packages/media/media/index.js",
