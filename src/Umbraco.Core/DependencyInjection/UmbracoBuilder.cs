@@ -271,9 +271,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services
                 .AddNotificationAsyncHandler<MemberGroupSavingNotification, PublicAccessHandler>()
-                .AddNotificationHandler<MemberGroupSavedNotification, PublicAccessHandler>()
+                .AddNotificationAsyncHandler<MemberGroupSavedNotification, PublicAccessHandler>()
                 .AddNotificationAsyncHandler<MemberGroupDeletingNotification, PublicAccessHandler>()
-                .AddNotificationHandler<MemberGroupDeletedNotification, PublicAccessHandler>();
+                .AddNotificationAsyncHandler<MemberGroupDeletedNotification, PublicAccessHandler>();
 
             Services.AddSingleton<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>();
 

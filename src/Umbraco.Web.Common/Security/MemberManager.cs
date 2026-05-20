@@ -193,19 +193,19 @@ public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswo
     /// <remarks>
     ///     this is a cached call
     /// </remarks>
-    public virtual Task<bool> IsProtectedAsync(string path) => Task.FromResult(_publicAccessService.IsProtected(path).Success);
+    public virtual async Task<bool> IsProtectedAsync(string path) => (await _publicAccessService.IsProtectedAsync(path)).Success;
 
     /// <inheritdoc />
-    public virtual Task<IReadOnlyDictionary<string, bool>> IsProtectedAsync(IEnumerable<string> paths)
+    public virtual async Task<IReadOnlyDictionary<string, bool>> IsProtectedAsync(IEnumerable<string> paths)
     {
         var result = new Dictionary<string, bool>();
         foreach (var path in paths)
         {
             // this is a cached call
-            result[path] = _publicAccessService.IsProtected(path).Success;
+            result[path] = (await _publicAccessService.IsProtectedAsync(path)).Success;
         }
 
-        return Task.FromResult((IReadOnlyDictionary<string, bool>)result);
+        return result;
     }
 
     /// <inheritdoc />

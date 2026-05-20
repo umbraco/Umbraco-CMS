@@ -560,7 +560,7 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             {
                 using ICoreScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
 
-                var protectedContentIds = publicAccessService.GetAll().Select(entry => entry.ProtectedNodeId).ToArray();
+                var protectedContentIds = publicAccessService.GetAllAsync().GetAwaiter().GetResult().Select(entry => entry.ProtectedNodeId).ToArray();
                 if (protectedContentIds.Any() is false)
                 {
                     return Task.CompletedTask;

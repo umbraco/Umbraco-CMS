@@ -97,7 +97,7 @@ internal sealed class DocumentPresentationFactory
             IsTrashed = entity.Trashed,
             Parent = parentKeyAttempt.Success ? new ReferenceByIdModel { Id = parentKeyAttempt.Result } : null,
             HasChildren = entity.HasChildren,
-            IsProtected = _publicAccessService.IsProtected(entity.Path),
+            IsProtected = (await _publicAccessService.IsProtectedAsync(entity.Path)).Success,
             DocumentType = CreateDocumentTypeReferenceResponseModel(entity),
             Variants = await CreateVariantsItemResponseModelsAsync(entity),
         };

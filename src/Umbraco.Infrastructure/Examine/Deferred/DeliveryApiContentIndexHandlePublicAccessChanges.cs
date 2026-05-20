@@ -76,7 +76,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
 
     private void EnsureProtectedContentIsRemovedFromIndex(IIndex index)
     {
-        var protectedContentIds = _publicAccessService.GetAll().Select(entry => entry.ProtectedNodeId).ToArray();
+        var protectedContentIds = _publicAccessService.GetAllAsync().GetAwaiter().GetResult().Select(entry => entry.ProtectedNodeId).ToArray();
         if (protectedContentIds.Any() is false)
         {
             return;
@@ -103,7 +103,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
 
         // then we have to re-index any protected content items that were not part of the first operation.
         var unhandledProtectedContentIds = _publicAccessService
-            .GetAll()
+            .GetAllAsync().GetAwaiter().GetResult()
             .Select(entry => entry.ProtectedNodeId)
             .Except(protectedContentIdsInIndex)
             .ToArray();
