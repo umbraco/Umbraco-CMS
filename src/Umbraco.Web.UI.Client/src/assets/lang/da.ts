@@ -962,6 +962,7 @@ export default {
 		username: 'Brugernavn',
 		value: 'Værdi',
 		view: 'Vis',
+		weight: 'Vægt',
 		welcome: 'Velkommen...',
 		width: 'Bredde',
 		yes: 'Ja',
