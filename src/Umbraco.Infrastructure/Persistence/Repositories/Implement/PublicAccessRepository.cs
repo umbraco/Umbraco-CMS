@@ -1,19 +1,19 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NPoco;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Cache;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
-internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
+internal sealed class PublicAccessRepository : AsyncEntityRepositoryBase<Guid, PublicAccessEntry>, IPublicAccessRepository
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="PublicAccessRepository"/> class.
@@ -24,7 +24,7 @@ internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, Public
     /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
     /// <param name="cacheSyncService">Service responsible for synchronizing cache across distributed environments.</param>
     public PublicAccessRepository(
-        IScopeAccessor scopeAccessor,
+        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches cache,
         ILogger<PublicAccessRepository> logger,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -38,60 +38,43 @@ internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, Public
     {
     }
 
-    protected override IRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy() =>
-        new FullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityId, /*expires:*/ false);
+    /// <inheritdoc/>
+    protected override IAsyncRepositoryCachePolicy<PublicAccessEntry, Guid> CreateCachePolicy() =>
+        new AsyncFullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityKey, /*expires:*/ false);
 
-    protected override PublicAccessEntry? PerformGet(Guid id) =>
+    /// <inheritdoc/>
+    protected override async Task<PublicAccessEntry?> PerformGetAsync(Guid id)
+        => await GetAsync(id, CancellationToken.None);
 
-        // return from GetAll - this will be cached as a collection
-        GetMany().FirstOrDefault(x => x.Key == id);
 
-    protected override IEnumerable<PublicAccessEntry> PerformGetAll(params Guid[]? ids)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false);
-
-        if (ids?.Any() ?? false)
+    /// <inheritdoc/>
+    protected override async Task<IEnumerable<PublicAccessEntry>?> PerformGetManyAsync(Guid[]? keys) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            sql.WhereIn<AccessDto>(x => x.Id, ids);
-        }
+            AccessDto[] dtos = await db.Access
+                .Include(x => x.Rules)
+                .Where(x => keys!.Contains(x.Id))
+                .OrderBy(x => x.NodeId)
+                .ToArrayAsync();
 
-        sql.OrderBy<AccessDto>(x => x.NodeId);
+            return dtos.Select(PublicAccessEntryFactory.BuildEntity);
+        });
 
-        List<AccessDto>? dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
-        return dtos.Select(PublicAccessEntryFactory.BuildEntity);
-    }
-
-    protected override IEnumerable<PublicAccessEntry> PerformGetByQuery(IQuery<PublicAccessEntry> query)
-    {
-        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
-        var translator = new SqlTranslator<PublicAccessEntry>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate();
-
-        List<AccessDto>? dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
-        return dtos.Select(PublicAccessEntryFactory.BuildEntity);
-    }
-
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount) =>
-        Sql()
-            .SelectAll()
-            .From<AccessDto>()
-            .LeftJoin<AccessRuleDto>()
-            .On<AccessDto, AccessRuleDto>(left => left.Id, right => right.AccessId);
-
-    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Access)}.id = @id";
-
-    protected override IEnumerable<string> GetDeleteClauses()
-    {
-        var list = new List<string>
+    /// <inheritdoc/>
+    protected override async Task<IEnumerable<PublicAccessEntry>?> PerformGetAllAsync() =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            $@"DELETE FROM {QuoteTableName("umbracoAccessRule")}
-                WHERE {QuoteColumnName("accessId")} = @id",
-            $"DELETE FROM {QuoteTableName("umbracoAccess")} WHERE id = @id",
-        };
-        return list;
-    }
+            AccessDto[] dtos = await db.Access
+                .Include(x => x.Rules)
+                .OrderBy(x => x.NodeId)
+                .ToArrayAsync();
 
-    protected override void PersistNewItem(PublicAccessEntry entity)
+            return dtos.Select(PublicAccessEntryFactory.BuildEntity);
+        });
+
+
+    /// <inheritdoc/>
+    protected override async Task PersistNewItemAsync(PublicAccessEntry entity)
     {
         entity.AddingEntity();
         foreach (PublicAccessRule rule in entity.Rules)
@@ -101,27 +84,32 @@ internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, Public
 
         AccessDto dto = PublicAccessEntryFactory.BuildDto(entity);
 
-        Database.Insert(dto);
-
-        // update the id so HasEntity is correct
-        entity.Id = entity.Key.GetHashCode();
-
-        foreach (AccessRuleDto rule in dto.Rules)
+        await AmbientScope.ExecuteWithContextAsync<AccessDto>(async db =>
         {
-            rule.AccessId = entity.Key;
-            Database.Insert(rule);
-        }
+            db.Access.Add(dto);
 
-        // update the id so HasEntity is correct
-        foreach (PublicAccessRule rule in entity.Rules)
-        {
-            rule.Id = rule.Key.GetHashCode();
-        }
+            // update the id so HasEntity is correct
+            entity.Id = entity.Key.GetHashCode();
 
-        entity.ResetDirtyProperties();
+            foreach (AccessRuleDto rule in dto.Rules)
+            {
+                rule.AccessId = entity.Key;
+                db.AccessRules.Add(rule);
+            }
+
+            // update the id so HasEntity is correct
+            foreach (PublicAccessRule rule in entity.Rules)
+            {
+                rule.Id = rule.Key.GetHashCode();
+            }
+
+            await db.SaveChangesAsync();
+            entity.ResetDirtyProperties();
+        });
     }
 
-    protected override void PersistUpdatedItem(PublicAccessEntry entity)
+    /// <inheritdoc/>
+    protected override async Task PersistUpdatedItemAsync(PublicAccessEntry entity)
     {
         entity.UpdatingEntity();
         foreach (PublicAccessRule rule in entity.Rules)
@@ -138,42 +126,50 @@ internal sealed class PublicAccessRepository : EntityRepositoryBase<Guid, Public
 
         AccessDto dto = PublicAccessEntryFactory.BuildDto(entity);
 
-        Database.Update(dto);
-
-        foreach (Guid removedRule in entity.RemovedRules)
+        await AmbientScope.ExecuteWithContextAsync<AccessDto>(async db =>
         {
-            Database.Delete<AccessRuleDto>("WHERE id=@Id", new { Id = removedRule });
-        }
+            await db.Access
+                .Where(x => x.Id == dto.Id)
+                .ExecuteUpdateAsync(setter => setter
+                    .SetProperty(x => x.NodeId, dto.NodeId)
+                    .SetProperty(x => x.LoginNodeId, dto.LoginNodeId)
+                    .SetProperty(x => x.NoAccessNodeId, dto.NoAccessNodeId)
+                    .SetProperty(x => x.CreateDate, dto.CreateDate)
+                    .SetProperty(x => x.UpdateDate, dto.UpdateDate));
 
-        foreach (PublicAccessRule rule in entity.Rules)
-        {
-            if (rule.HasIdentity)
+            foreach (Guid removedRule in entity.RemovedRules)
             {
-                var count = Database.Update(dto.Rules.Single(x => x.Id == rule.Key));
-                if (count == 0)
+                await db.AccessRules
+                    .Where(x => x.Id == removedRule)
+                    .ExecuteDeleteAsync();
+            }
+
+            foreach (PublicAccessRule rule in entity.Rules)
+            {
+                AccessRuleDto ruleDto = dto.Rules.Single(x => x.Id == rule.Key);
+
+                if (rule.HasIdentity)
                 {
-                    throw new InvalidOperationException("No rows were updated for the access rule");
+                    await db.AccessRules
+                        .Where(x => x.Id == ruleDto.Id)
+                        .ExecuteUpdateAsync(setter => setter
+                            .SetProperty(x => x.RuleValue, ruleDto.RuleValue)
+                            .SetProperty(x => x.RuleType, ruleDto.RuleType)
+                            .SetProperty(x => x.UpdateDate, ruleDto.UpdateDate));
+                }
+                else
+                {
+                    db.AccessRules.Add(ruleDto);
+                    await db.SaveChangesAsync();
+
+                    // update the id so HasEntity is correct
+                    rule.Id = rule.Key.GetHashCode();
                 }
             }
-            else
-            {
-                Database.Insert(new AccessRuleDto
-                {
-                    Id = rule.Key,
-                    AccessId = dto.Id,
-                    RuleValue = rule.RuleValue,
-                    RuleType = rule.RuleType,
-                    CreateDate = rule.CreateDate,
-                    UpdateDate = rule.UpdateDate,
-                });
 
-                // update the id so HasEntity is correct
-                rule.Id = rule.Key.GetHashCode();
-            }
-        }
-
-        entity.ResetDirtyProperties();
+            entity.ResetDirtyProperties();
+        });
     }
 
-    protected override Guid GetEntityId(PublicAccessEntry entity) => entity.Key;
+    protected override Guid GetEntityKey(PublicAccessEntry entity) => entity.Key;
 }
