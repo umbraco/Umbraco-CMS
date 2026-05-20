@@ -10,6 +10,10 @@ using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.Configuration;
 
+/// <summary>
+/// Default <see cref="IConfigManipulator" /> implementation that persists configuration values back to the
+/// underlying JSON files registered as <see cref="JsonConfigurationProvider" /> sources on the applications <see cref="IConfigurationRoot" />.
+/// </summary>
 internal sealed class JsonConfigManipulator : IConfigManipulator
 {
     private const string ConnectionStringObjectName = "ConnectionStrings";
@@ -37,9 +41,39 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     }
 
     /// <inheritdoc />
+    public async Task SaveConnectionStringAsync(string connectionString, string? providerName)
+    {
+        // Target the last JSON provider so connection strings land in the most specific (environment-overriding) file
+        // — typically appsettings.{Environment}.json — instead of the shared appsettings.json.
+        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(preferLast: true);
+        JsonNode? node = await GetJsonNodeAsync(provider);
+
+        if (node is null)
+        {
+            _logger.LogWarning("Was unable to load the configuration file to save the connection string");
+            return;
+        }
+
+        CreateOrUpdateJsonNode(node, UmbracoConnectionStringPath, connectionString);
+        if (providerName is not null)
+        {
+            CreateOrUpdateJsonNode(node, UmbracoConnectionStringProviderNamePath, providerName);
+        }
+
+        await SaveJsonAsync(provider, node);
+
+        // Force a synchronous reload so the new value is visible via IOptionsMonitor.CurrentValue
+        // before this method returns. The file watcher would normally trigger this asynchronously,
+        // but for newly-created files (e.g. an appsettings.Local.json that didn't exist at startup)
+        // the reload can race with IOptionsMonitor.OnChange — firing the callback with stale,
+        // pre-reload data and breaking the install flow that immediately reads CurrentValue.
+        ReloadConfiguration();
+    }
+
+    /// <inheritdoc />
     public async Task RemoveConnectionStringAsync()
     {
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(UmbracoConnectionStringPath);
+        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(preferLast: true);
 
         JsonNode? jsonNode = await GetJsonNodeAsync(provider);
 
@@ -56,27 +90,7 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     }
 
     /// <inheritdoc />
-    public async Task SaveConnectionStringAsync(string connectionString, string? providerName)
-    {
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
-        JsonNode? node = await GetJsonNodeAsync(provider);
-
-        if (node is null)
-        {
-            _logger.LogWarning("Was unable to load the configuration file to save the connection string");
-            return;
-        }
-
-        CreateOrUpdateJsonNode(node, UmbracoConnectionStringPath, connectionString);
-        if (providerName is not null)
-        {
-            CreateOrUpdateJsonNode(node, UmbracoConnectionStringProviderNamePath, providerName);
-        }
-
-        await SaveJsonAsync(provider, node);
-    }
-
-    /// <inheritdoc />
+    [Obsolete("This method is no longer used by Umbraco. Scheduled for removal in Umbraco 19.")]
     public async Task SaveConfigValueAsync(string itemPath, object value)
     {
         JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
@@ -234,6 +248,17 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
 
         try
         {
+            if (File.Exists(jsonFilePath) is false)
+            {
+                // Backing file isn't on disk yet (e.g. an optional appsettings.Local.json registered by the
+                // template). Return an object pre-populated with the $schema reference so the file we create
+                // gets IntelliSense/validation in editors; SaveJsonAsync will create the file on write.
+                return new JsonObject
+                {
+                    ["$schema"] = "./appsettings-schema.json",
+                };
+            }
+
             using var streamReader = new StreamReader(jsonFilePath);
             return await JsonNode.ParseAsync(streamReader.BaseStream, documentOptions: _jsonDocumentOptions);
         }
@@ -248,23 +273,54 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
         }
     }
 
-    private JsonConfigurationProvider? GetJsonConfigurationProvider(string? requiredKey = null)
+    private JsonConfigurationProvider? GetJsonConfigurationProvider(string? requiredKey = null, bool preferLast = false)
     {
         if (_configuration is not IConfigurationRoot configurationRoot)
         {
             return null;
         }
 
-        foreach (IConfigurationProvider provider in configurationRoot.Providers)
+        IEnumerable<IConfigurationProvider> providers = preferLast
+            ? configurationRoot.Providers.Reverse()
+            : configurationRoot.Providers;
+
+        foreach (IConfigurationProvider provider in providers)
         {
-            if (provider is JsonConfigurationProvider jsonConfigurationProvider &&
-                (requiredKey is null || provider.TryGet(requiredKey, out _)))
+            if (provider is not JsonConfigurationProvider jsonConfigurationProvider)
             {
-                return jsonConfigurationProvider;
+                continue;
             }
+
+            if (requiredKey is not null && provider.TryGet(requiredKey, out _) is false)
+            {
+                continue;
+            }
+
+            // When targeting the last provider for writes, only skip JSON sources we can't write to a file on disk
+            // (in-memory or embedded providers). A physical source whose backing file doesn't yet exist is still
+            // acceptable — e.g. an optional appsettings.Local.json registered by the template; the file will be
+            // created on first save, keeping the connection string local-only rather than leaking into
+            // appsettings.{Environment}.json.
+            if (preferLast && HasPhysicalFileSource(jsonConfigurationProvider) is false)
+            {
+                continue;
+            }
+
+            return jsonConfigurationProvider;
         }
 
         return null;
+    }
+
+    private static bool HasPhysicalFileSource(JsonConfigurationProvider provider) =>
+        provider.Source.FileProvider is PhysicalFileProvider && provider.Source.Path is not null;
+
+    private void ReloadConfiguration()
+    {
+        if (_configuration is IConfigurationRoot configurationRoot)
+        {
+            configurationRoot.Reload();
+        }
     }
 
     /// <summary>
