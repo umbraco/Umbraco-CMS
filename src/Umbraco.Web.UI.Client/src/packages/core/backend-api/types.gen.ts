@@ -2238,6 +2238,11 @@ export type PagedModelElementItemResponseModel = {
     total: number;
 };
 
+export type PagedDictionaryItemResponseModel = {
+    items: Array<DictionaryItemResponseModel>;
+    total: number;
+};
+
 export type PagedModelMediaItemResponseModel = {
     items: Array<MediaItemResponseModel>;
     total: number;
@@ -4742,6 +4747,33 @@ export type PutUmbracoManagementApiV11DocumentByIdValidate11Data = {
     };
     query?: never;
     url: '/umbraco/management/api/v1.1/document/{id}/validate';
+};
+
+export type GetItemDictionarySearchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        query?: string;
+        skip?: number;
+        take?: number;
+    };
+    url: '/umbraco/management/api/v1/item/dictionary/search';
+};
+
+export type GetItemDictionarySearchResponses = {
+    /**
+     * OK
+     */
+    200: PagedDictionaryItemResponseModel;
+};
+
+export type GetItemDictionarySearchResponse = GetItemDictionarySearchResponses[keyof GetItemDictionarySearchResponses];
+
+export type GetItemDictionarySearchErrors = {
+    /**
+     * The resource is protected and requires an authentication token
+     */
+    401: unknown;
 };
 
 export type PutUmbracoManagementApiV11DocumentByIdValidate11Errors = {

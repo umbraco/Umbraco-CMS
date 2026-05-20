@@ -211,4 +211,9 @@ public enum UmbracoObjectTypes
     [UmbracoObjectType(Constants.ObjectTypes.Strings.ElementRecycleBin)]
     [FriendlyName("Element Recycle Bin")]
     ElementRecycleBin,
+
+    [UmbracoObjectType(Constants.ObjectTypes.Strings.DictionaryItem, typeof(IDictionaryItem))]
+    [FriendlyName("Dictionary Item")]
+    [UmbracoUdiType(Constants.UdiEntityType.DictionaryItem)]
+    DictionaryItem
 }

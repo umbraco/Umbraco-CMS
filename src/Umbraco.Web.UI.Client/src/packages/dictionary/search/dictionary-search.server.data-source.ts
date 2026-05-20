@@ -31,9 +31,9 @@ export class UmbDictionarySearchServerDataSource implements UmbSearchDataSource<
 	async search(args: UmbSearchRequestArgs) {
 		const { data, error } = await tryExecute(
 			this.#host,
-			DictionaryService.getDictionary({
+			DictionaryService.getItemDictionarySearch({
 				query: {
-					filter: args.query,
+					query: args.query,
 					skip: args.paging?.skip,
 					take: args.paging?.take,
 				},

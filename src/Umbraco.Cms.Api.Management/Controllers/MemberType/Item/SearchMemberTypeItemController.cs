@@ -45,7 +45,13 @@ public class SearchMemberTypeItemController : MemberTypeItemControllerBase
             return Task.FromResult<IActionResult>(Ok(new PagedModel<MemberTypeItemResponseModel> { Total = searchResult.Total }));
         }
 
-        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(searchResult.Items.Select(item => item.Key).ToArray());
+        Guid[] keys = searchResult.Items.Select(item => item.Key).ToArray();
+
+        var memberTypeByKeys = _memberTypeService.GetMany(keys).ToDictionary(memberType => memberType.Key);
+        IEnumerable<IMemberType> memberTypes = keys.Where(memberTypeByKeys.ContainsKey)
+            .Select(key => memberTypeByKeys[key])
+            .ToArray();
+
         var result = new PagedModel<MemberTypeItemResponseModel>
         {
             Items = _mapper.MapEnumerable<IMemberType, MemberTypeItemResponseModel>(memberTypes),

@@ -57,9 +57,14 @@ public class SearchElementItemController : ElementItemControllerBase
         }
 
         Guid[] keys = searchResult.Items.Select(item => item.Key).ToArray();
-        IElementEntitySlim[] elements = _entityService
+
+        var elementsByKey = _entityService
             .GetAll(UmbracoObjectTypes.Element, keys)
             .OfType<IElementEntitySlim>()
+            .ToDictionary(e => e.Key);
+        IElementEntitySlim[] elements = keys
+            .Where(elementsByKey.ContainsKey)
+            .Select(key => elementsByKey[key])
             .ToArray();
 
         ElementItemResponseModel[] items = await Task.WhenAll(elements.Select(_elementPresentationFactory.CreateItemResponseModelAsync));
