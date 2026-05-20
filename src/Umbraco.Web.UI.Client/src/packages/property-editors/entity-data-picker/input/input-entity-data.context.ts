@@ -61,9 +61,11 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 			resolver.setData(item);
 			const name = await resolver.getName();
 			this.removeUmbController(resolver);
-			return name ?? '#general_notFound';
+			if (name) {
+				return name;
+			}
 		}
-		return item?.name ?? '#general_notFound';
+		return super._requestItemName(unique);
 	}
 
 	/**
