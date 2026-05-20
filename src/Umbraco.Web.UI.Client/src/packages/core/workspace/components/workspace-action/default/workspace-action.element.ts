@@ -2,6 +2,7 @@ import type {
 	ManifestWorkspaceAction,
 	ManifestWorkspaceActionMenuItem,
 	MetaWorkspaceActionDefaultKind,
+	UmbWorkspaceAction,
 	UmbWorkspaceActionArgs,
 	UmbWorkspaceActionDefaultKind,
 } from '../../../types.js';
@@ -56,6 +57,7 @@ export class UmbWorkspaceActionElement<
 		});
 
 		this.#observeIsDisabled();
+		this.#observeIsExecuting();
 	}
 	public get api(): ApiType | undefined {
 		return this.#api;
@@ -81,6 +83,12 @@ export class UmbWorkspaceActionElement<
 	protected _items: Array<UmbExtensionElementAndApiInitializer<ManifestWorkspaceActionMenuItem>> = [];
 
 	#buttonStateResetTimeoutId: number | null = null;
+
+	// When the api exposes an `isExecuting` observable we wait for it to flip
+	// true before showing the waiting state, so the spinner only appears once
+	// real work begins (after any preceding modal/dialog). When absent we fall
+	// back to setting waiting eagerly on click for backwards compatibility.
+	#executionStarted = false;
 
 	/**
 	 * Create a list of original and overwritten aliases of workspace actions for the action.
@@ -109,28 +117,44 @@ export class UmbWorkspaceActionElement<
 	async #onClick(event: MouseEvent) {
 		if (this._href) {
 			event.stopPropagation();
-		}
-		// If its a link or has additional options, then we do not want to display state on the button. [NL]
-		if (!this._href) {
-			if (!this._additionalOptions) {
-				this._buttonState = 'waiting';
-			}
-
-			try {
-				const api = this._actionApi ?? this.#api;
-				if (!api) throw new Error('No api defined');
-				await api.execute();
-				this._buttonState = 'success';
-				this.#initButtonStateReset();
-			} catch (reason) {
-				if (reason) {
-					console.warn(reason);
-				}
-				this._buttonState = 'failed';
-				this.#initButtonStateReset();
-			}
+		} else {
+			// _actionApi is typed as the narrower UmbAction; widen to UmbWorkspaceAction
+			// here so we can probe the optional isExecuting observable.
+			const api = (this._actionApi ?? this.#api) as UmbWorkspaceAction<UmbWorkspaceActionArgs<MetaType>> | undefined;
+			await this.#runApiAction(api);
 		}
 		this.dispatchEvent(new UmbActionExecutedEvent());
+	}
+
+	async #runApiAction(api: UmbWorkspaceAction<UmbWorkspaceActionArgs<MetaType>> | undefined) {
+		this.#executionStarted = false;
+
+		// If the api does not expose an isExecuting observable, fall back to
+		// showing the waiting state immediately (legacy behaviour).
+		if (!api?.isExecuting) {
+			this._buttonState = 'waiting';
+			this.#executionStarted = true;
+		}
+
+		try {
+			if (!api) throw new Error('No api defined');
+			await api.execute();
+			// Only show success if real work actually started. A modal-aware
+			// action that the user cancelled will resolve without ever signalling
+			// execution - in that case we leave the button idle.
+			if (this.#executionStarted) {
+				this._buttonState = 'success';
+				this.#initButtonStateReset();
+			}
+		} catch (reason) {
+			if (reason) {
+				console.warn(reason);
+			}
+			// Always communicate failures, even if they happen before any work
+			// would have started (e.g. context missing in sync prep).
+			this._buttonState = 'failed';
+			this.#initButtonStateReset();
+		}
 	}
 
 	#observeIsDisabled() {
@@ -143,9 +167,20 @@ export class UmbWorkspaceActionElement<
 		);
 	}
 
+	#observeIsExecuting() {
+		this.observe(
+			this.#api?.isExecuting,
+			(isExecuting) => {
+				if (isExecuting) {
+					this._buttonState = 'waiting';
+					this.#executionStarted = true;
+				}
+			},
+			'isExecutingObserver',
+		);
+	}
+
 	#initButtonStateReset() {
-		/* When the button has additional options, we do not show the waiting state.
-    Therefore, we need to ensure the button state is reset, so we are able to show the success state again. */
 		this.#clearButtonStateResetTimeout();
 
 		this.#buttonStateResetTimeoutId = window.setTimeout(() => {
