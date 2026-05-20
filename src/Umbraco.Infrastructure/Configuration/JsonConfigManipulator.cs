@@ -11,9 +11,8 @@ using Umbraco.Cms.Core.Configuration.Models;
 namespace Umbraco.Cms.Infrastructure.Configuration;
 
 /// <summary>
-/// Default <see cref="IConfigManipulator"/> implementation that persists configuration values back to the
-/// underlying JSON files registered as <see cref="JsonConfigurationProvider"/> sources on the application's
-/// <see cref="IConfigurationRoot"/>.
+/// Default <see cref="IConfigManipulator" /> implementation that persists configuration values back to the
+/// underlying JSON files registered as <see cref="JsonConfigurationProvider" /> sources on the applications <see cref="IConfigurationRoot" />.
 /// </summary>
 internal sealed class JsonConfigManipulator : IConfigManipulator
 {
@@ -74,7 +73,7 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     /// <inheritdoc />
     public async Task RemoveConnectionStringAsync()
     {
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(UmbracoConnectionStringPath, preferLast: true);
+        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(preferLast: true);
 
         JsonNode? jsonNode = await GetJsonNodeAsync(provider);
 
