@@ -46,11 +46,8 @@ public class SearchTemplateItemController : TemplateItemControllerBase
         }
 
         Guid[] orderedKeys = searchResult.Items.Select(x => x.Key).ToArray();
-        Dictionary<Guid, int> orderMap = orderedKeys.Select((key, index) => new { key, index }).ToDictionary(x => x.key, x => x.index);
-
         IEnumerable<ITemplate> templates = await _templateService.GetAllAsync(orderedKeys);
-        // reorder as searchResult
-        IEnumerable<ITemplate> orderedTemplates = templates.OrderBy(x => orderMap[x.Key]);
+        IEnumerable<ITemplate> orderedTemplates = OrderByRequestedIds(templates, orderedKeys);
 
         var result = new PagedModel<TemplateItemResponseModel>
         {

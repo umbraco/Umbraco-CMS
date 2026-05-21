@@ -47,10 +47,8 @@ public class SearchMemberTypeItemController : MemberTypeItemControllerBase
 
         Guid[] keys = searchResult.Items.Select(item => item.Key).ToArray();
 
-        var memberTypeByKeys = _memberTypeService.GetMany(keys).ToDictionary(memberType => memberType.Key);
-        IEnumerable<IMemberType> memberTypes = keys.Where(memberTypeByKeys.ContainsKey)
-            .Select(key => memberTypeByKeys[key])
-            .ToArray();
+        var memberTypeByKeys = _memberTypeService.GetMany(keys);
+        IEnumerable<IMemberType> memberTypes = OrderByRequestedIds(memberTypeByKeys, keys);
 
         var result = new PagedModel<MemberTypeItemResponseModel>
         {
