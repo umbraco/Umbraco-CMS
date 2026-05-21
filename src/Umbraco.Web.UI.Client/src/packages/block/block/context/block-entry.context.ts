@@ -58,6 +58,8 @@ export abstract class UmbBlockEntryContext<
 	#contentKey?: string;
 	#unsupported = new UmbBooleanState(undefined);
 	readonly unsupported = this.#unsupported.asObservable();
+	/** True when unsupported was set by a structural fault (missing block type or element type structure). Prevents the content observer from resetting the flag. */
+	#structurallyUnsupported = false;
 
 	protected readonly localize = new UmbLocalizationController(this);
 
@@ -380,6 +382,20 @@ export abstract class UmbBlockEntryContext<
 			null,
 		);
 
+		// Re-observe content when the layout's contentKey changes (e.g., after Transfer to Element Library
+		// assigns a new element UUID — the old content observer would otherwise keep watching the stale key).
+		// NOTE: this.#contentKey is updated by #observeLayout() AFTER _layout.setValue() emits, so we
+		// must sync it here before calling #observeContentData() which reads it.
+		this.observe(
+			this.contentKey,
+			(contentKey) => {
+				if (!contentKey) return;
+				this.#contentKey = contentKey;
+				this.#observeContentData();
+			},
+			null,
+		);
+
 		// Observe contentElementTypeKey:
 		this.observe(
 			this.contentTypeKey,
@@ -600,7 +616,7 @@ export abstract class UmbBlockEntryContext<
 			),
 			({ content, isLibrary }) => {
 				this.#isLibraryElement.setValue(isLibrary);
-				if (this.#unsupported.getValue() !== true) {
+				if (!this.#structurallyUnsupported) {
 					this.#unsupported.setValue(!content && !isLibrary);
 				}
 				this.#content.setValue(content);
@@ -705,7 +721,8 @@ export abstract class UmbBlockEntryContext<
 		this.#contentStructurePromiseResolve?.();
 
 		if (!this.#contentStructure) {
-			// If we got no content structure, then this is element type did not load and there for it is not supported any longer.
+			// If we got no content structure, then this element type did not load and the block is not supported any longer.
+			this.#structurallyUnsupported = true;
 			this.#unsupported.setValue(true);
 		}
 
@@ -751,6 +768,7 @@ export abstract class UmbBlockEntryContext<
 				this._blockType.setValue(blockType as BlockType);
 				if (!blockType) {
 					// If the block type is undefined, then we do not have this Block Type and the Block is then unsupported. [NL]
+					this.#structurallyUnsupported = true;
 					this.#unsupported.setValue(true);
 				}
 			},
