@@ -573,7 +573,12 @@ public interface IContentService : IContentServiceBase<IContent>
     /// <param name="content">The document to publish.</param>
     /// <param name="culturesToPublish">The cultures to publish.</param>
     /// <param name="userId">The identifier of the user performing the action.</param>
-    PublishResult SaveAndPublish(IContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId);
+    // TODO (V19): Remove the default implementation when the method is no longer new.
+    PublishResult SaveAndPublish(IContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
+    {
+        Save(content, userId);
+        return Publish(content, culturesToPublish, userId);
+    }
 
     /// <summary>
     ///     Publishes a document branch.
