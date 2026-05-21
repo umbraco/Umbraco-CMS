@@ -20,7 +20,7 @@ const views: Array<ManifestCollectionView> = [
 		meta: {
 			label: '1',
 			icon: 'icon-list',
-			pathName: '1',
+			pathname: '1',
 		},
 	},
 	{
@@ -30,7 +30,7 @@ const views: Array<ManifestCollectionView> = [
 		meta: {
 			label: '2',
 			icon: 'icon-list',
-			pathName: '2',
+			pathname: '2',
 		},
 	},
 ];
@@ -120,8 +120,8 @@ describe('UmbCollectionViewManager', () => {
 		it('includes the views as routes', (done) => {
 			manager.routes.subscribe((value) => {
 				setTimeout(() => {
-					expect(value[0].path).to.equal(views[0].meta.pathName);
-					expect(value[1].path).to.equal(views[1].meta.pathName);
+					expect(value[0].path).to.equal(views[0].meta.pathname);
+					expect(value[1].path).to.equal(views[1].meta.pathname);
 					done();
 				}, 60);
 			});

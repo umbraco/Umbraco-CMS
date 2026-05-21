@@ -25,7 +25,7 @@ export interface MetaCollectionView {
 	/**
 	 * The URL pathname for this collection view that can be deep linked to by sharing the url
 	 */
-	pathName: string;
+	pathname: string;
 }
 
 /**

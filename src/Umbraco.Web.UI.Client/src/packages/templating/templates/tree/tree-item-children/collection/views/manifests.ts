@@ -11,7 +11,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		meta: {
 			label: 'Table',
 			icon: 'icon-table',
-			pathName: 'table',
+			pathname: 'table',
 		},
 		conditions: [
 			{

@@ -14,7 +14,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 			meta: {
 				label: 'Table',
 				icon: 'icon-table',
-				pathName: 'table',
+				pathname: 'table',
 			},
 		},
 	},

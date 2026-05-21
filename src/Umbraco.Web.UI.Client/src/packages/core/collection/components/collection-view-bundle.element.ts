@@ -13,7 +13,7 @@ interface UmbCollectionViewLayout {
 	alias: string;
 	label: string;
 	icon: string;
-	pathName: string;
+	pathname: string;
 }
 
 @customElement('umb-collection-view-bundle')
@@ -90,7 +90,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 					alias: viewManifest.alias,
 					label: viewLayout.name ?? viewManifest.meta.label,
 					icon: viewLayout.icon ?? viewManifest.meta.icon,
-					pathName: viewManifest.meta.pathName,
+					pathname: viewManifest.meta.pathname,
 				});
 			});
 
@@ -102,7 +102,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 			alias: manifest.alias,
 			label: manifest.meta.label,
 			icon: manifest.meta.icon,
-			pathName: manifest.meta.pathName,
+			pathname: manifest.meta.pathname,
 		}));
 	}
 
@@ -143,7 +143,7 @@ export class UmbCollectionViewBundleElement extends UmbLitElement {
 		return html`
 			<uui-menu-item
 				label=${view.label}
-				href="${this._collectionRootPathName}/${view.pathName}"
+				href="${this._collectionRootPathName}/${view.pathname}"
 				@click-label=${() => this.#onClick(view)}
 				?active=${view.alias === this._currentView?.alias}>
 				<umb-icon slot="icon" name=${view.icon}></umb-icon>
