@@ -59,10 +59,13 @@ export class UmbEntityDataPickerInputContext extends UmbPickerInputContext<
 		if (item && this.#dataSourceApi?.createItemDataResolver) {
 			const resolver = this.#dataSourceApi.createItemDataResolver(this);
 			resolver.setData(item);
-			const name = await resolver.getName();
-			this.removeUmbController(resolver);
-			if (name) {
-				return name;
+			try {
+				const name = await resolver.getName();
+				if (name) {
+					return name;
+				}
+			} finally {
+				this.removeUmbController(resolver);
 			}
 		}
 		return super._requestItemName(unique);
