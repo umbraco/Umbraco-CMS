@@ -37,40 +37,48 @@ export class UmbElementTreePickerDataSource extends UmbControllerBase implements
 		});
 	}
 
-	createItemDataResolver: (host: UmbControllerHost) => UmbItemDataResolver = (host) =>
-		this.#folderOnly ? new UmbElementFolderItemDataResolver(host) : new UmbElementItemDataResolver(host);
+	createItemDataResolver(host: UmbControllerHost): UmbItemDataResolver {
+		return this.#folderOnly ? new UmbElementFolderItemDataResolver(host) : new UmbElementItemDataResolver(host);
+	}
 
 	setConfig(config: UmbConfigCollectionModel | undefined) {
 		this.#folderOnly = Boolean(getConfigValue(config, 'folderOnly'));
 		this.#startNode = getConfigValue(config, 'startNode');
 	}
 
-	requestTreeStartNode = async () => this.#startNode ?? undefined;
+	async requestTreeStartNode() {
+		return this.#startNode ?? undefined;
+	}
 
-	requestTreeRoot = () => this.#tree.requestTreeRoot();
+	requestTreeRoot() {
+		return this.#tree.requestTreeRoot();
+	}
 
-	requestTreeRootItems = (args: UmbTreeRootItemsRequestArgs) => {
+	requestTreeRootItems(args: UmbTreeRootItemsRequestArgs) {
 		const typedArgs: UmbElementTreeRootItemsRequestArgs = {
 			...args,
 			foldersOnly: this.#folderOnly,
 			dataType: this.#dataType,
 		};
 		return this.#tree.requestTreeRootItems(typedArgs);
-	};
+	}
 
-	requestTreeItemsOf = (args: UmbTreeChildrenOfRequestArgs) => {
+	requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
 		const typedArgs: UmbElementTreeChildrenOfRequestArgs = {
 			...args,
 			foldersOnly: this.#folderOnly,
 			dataType: this.#dataType,
 		};
 		return this.#tree.requestTreeItemsOf(typedArgs);
-	};
+	}
 
-	requestTreeItemAncestors = (args: UmbTreeAncestorsOfRequestArgs) => this.#tree.requestTreeItemAncestors(args);
+	requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
+		return this.#tree.requestTreeItemAncestors(args);
+	}
 
-	requestItems = (uniques: Array<string>) =>
-		this.#folderOnly ? this.#folderItem.requestItems(uniques) : this.#elementItem.requestItems(uniques);
+	requestItems(uniques: Array<string>) {
+		return this.#folderOnly ? this.#folderItem.requestItems(uniques) : this.#elementItem.requestItems(uniques);
+	}
 
-	treePickableFilter: (treeItem: UmbTreeItemModel) => boolean = (treeItem) => treeItem.isFolder === this.#folderOnly;
+	treePickableFilter = (treeItem: UmbTreeItemModel): boolean => treeItem.isFolder === this.#folderOnly;
 }
