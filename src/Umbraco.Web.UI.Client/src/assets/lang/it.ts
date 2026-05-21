@@ -1998,6 +1998,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Disabilita tracciamento degli URL',
 		enableUrlTracker: 'Abilita tracciamento degli URL',
+		urlTrackerEnabled: 'Abilitato',
+		urlTrackerDisabled: 'Disabilitato',
 		culture: 'Cultura',
 		originalUrl: 'URL originale',
 		redirectedTo: 'Reindirizzato a',

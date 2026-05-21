@@ -1857,6 +1857,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL tracker uitschakelen',
 		enableUrlTracker: 'URL tracker inschakelen',
+		urlTrackerEnabled: 'Ingeschakeld',
+		urlTrackerDisabled: 'Uitgeschakeld',
 		culture: 'Cultuur',
 		originalUrl: 'Originele URL',
 		redirectedTo: 'Doorgestuurd naar',

@@ -1913,6 +1913,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL-Änderungsaufzeichnung abschalten',
 		enableUrlTracker: 'URL-Änderungsaufzeichnung einschalten',
+		urlTrackerEnabled: 'Aktiviert',
+		urlTrackerDisabled: 'Deaktiviert',
 		culture: 'Kultur',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Weiterleiten zu',
