@@ -196,12 +196,12 @@ public abstract class RecurringHostedServiceBase : BackgroundService
                 return period; // Normal timeout — next wait uses normal period.
             }
 
-            return ApplyTriggerState(delay, waitStart, period);
+            return ComputeNextDelayFromTriggerState(delay, waitStart, period);
         }
     }
 
     /// <summary>
-    /// Consumes the pending <see cref="TriggerState" /> and returns the delay basis to use for the next wait cycle.
+    /// Computes the next wait cycle's delay basis from the pending <see cref="TriggerState" />, consuming it in the process.
     /// </summary>
     /// <param name="delay">The delay that was being waited on when the trigger arrived.</param>
     /// <param name="waitStart">The timestamp at which the wait started, used to measure how much of <paramref name="delay" /> remains.</param>
@@ -209,7 +209,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
     /// <returns>
     /// The delay basis for the next wait cycle.
     /// </returns>
-    private TimeSpan ApplyTriggerState(TimeSpan delay, long waitStart, TimeSpan period)
+    private TimeSpan ComputeNextDelayFromTriggerState(TimeSpan delay, long waitStart, TimeSpan period)
     {
         TriggerState triggerState = Interlocked.Exchange(ref _triggerState, TriggerState.Default);
         if (triggerState.Delay.HasValue)
