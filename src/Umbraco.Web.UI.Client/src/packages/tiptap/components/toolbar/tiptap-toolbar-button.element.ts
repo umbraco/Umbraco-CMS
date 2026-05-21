@@ -51,7 +51,10 @@ export class UmbTiptapToolbarButtonElement<
 				label=${label}
 				title=${label}
 				?disabled=${this.api?.isDisabled(this.editor)}
-				@click=${() => this.api?.execute(this.editor)}>
+				@click=${() => {
+					this.api?.execute(this.editor);
+					this.#onEditorUpdate();
+				}}>
 				${when(
 					this.manifest?.meta.icon,
 					(icon) => html`<umb-icon name=${icon}></umb-icon>`,
