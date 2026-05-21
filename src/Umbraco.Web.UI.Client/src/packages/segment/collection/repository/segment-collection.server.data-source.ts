@@ -22,7 +22,10 @@ export class UmbSegmentCollectionServerDataSource
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbSegmentCollectionFilterModel) {
-		const { data, error } = await tryExecute(this, SegmentService.getSegment({ query: filter }));
+		const { data, error } = await tryExecute(
+			this,
+			SegmentService.getSegment({ query: { skip: filter.skip, take: filter.take } }),
+		);
 
 		if (data) {
 			const items = data.items.map((item) => {
