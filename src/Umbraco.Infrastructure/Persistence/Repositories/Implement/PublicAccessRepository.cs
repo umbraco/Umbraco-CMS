@@ -43,8 +43,15 @@ internal sealed class PublicAccessRepository : AsyncEntityRepositoryBase<Guid, P
         new AsyncFullDataSetRepositoryCachePolicy<PublicAccessEntry, Guid>(GlobalIsolatedCache, ScopeAccessor,  RepositoryCacheVersionService, CacheSyncService, GetEntityKey, /*expires:*/ false);
 
     /// <inheritdoc/>
-    protected override async Task<PublicAccessEntry?> PerformGetAsync(Guid id)
-        => await GetAsync(id, CancellationToken.None);
+    protected override async Task<PublicAccessEntry?> PerformGetAsync(Guid id) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            AccessDto? dto = await db.Access
+                .Include(x => x.Rules)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            return dto is null ? null : PublicAccessEntryFactory.BuildEntity(dto);
+        });
 
 
     /// <inheritdoc/>
@@ -171,5 +178,19 @@ internal sealed class PublicAccessRepository : AsyncEntityRepositoryBase<Guid, P
         });
     }
 
+    /// <inheritdoc/>
+    protected override async Task PersistDeletedItemAsync(PublicAccessEntry entity) =>
+        await AmbientScope.ExecuteWithContextAsync<AccessDto>(async db =>
+        {
+            await db.AccessRules
+                .Where(x => x.AccessId == entity.Key)
+                .ExecuteDeleteAsync();
+
+            await db.Access
+                .Where(x => x.Id == entity.Key)
+                .ExecuteDeleteAsync();
+        });
+
+    /// <inheritdoc/>
     protected override Guid GetEntityKey(PublicAccessEntry entity) => entity.Key;
 }
