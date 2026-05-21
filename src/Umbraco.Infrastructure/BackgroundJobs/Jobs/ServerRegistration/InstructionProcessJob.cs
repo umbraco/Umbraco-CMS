@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
@@ -13,28 +12,24 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 /// <summary>
 ///     Implements periodic database instruction processing as a hosted service.
 /// </summary>
-public class InstructionProcessJob : IRecurringBackgroundJob
+public class InstructionProcessJob : RecurringBackgroundJobBase
 {
+    private readonly TimeSpan _period;
+
     /// <summary>
     /// Gets the interval between executions of the instruction process job.
     /// </summary>
-    public TimeSpan Period { get; }
+    public override TimeSpan Period => _period;
 
     /// <summary>
     /// Gets the delay time before the job is executed. The delay is fixed at one minute.
     /// </summary>
-    public TimeSpan Delay { get => TimeSpan.FromMinutes(1); }
+    public override TimeSpan Delay => TimeSpan.FromMinutes(1);
 
     /// <summary>
     /// Gets an array containing all possible values of the <see cref="ServerRole"/> enumeration.
     /// </summary>
-    public ServerRole[] ServerRoles { get => Enum.GetValues<ServerRole>(); }
-
-    /// <summary>
-    /// Event that is raised when the execution period of the <see cref="InstructionProcessJob"/> is changed.
-    /// </summary>
-    /// <remarks>No-op event as the period never changes on this job</remarks>
-    public event EventHandler PeriodChanged { add { } remove { } }
+    public override ServerRole[] ServerRoles => Enum.GetValues<ServerRole>();
 
     private readonly ILogger<InstructionProcessJob> _logger;
     private readonly IServerMessenger _messenger;
@@ -53,15 +48,18 @@ public class InstructionProcessJob : IRecurringBackgroundJob
         _messenger = messenger;
         _logger = logger;
 
-        Period = globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations;
+        _period = globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations;
     }
 
     /// <summary>
     /// Executes the instruction processing job asynchronously by synchronizing messages using the messenger service.
     /// Logs an error if the synchronization fails, but always completes the task.
     /// </summary>
-    /// <returns>A completed task representing the asynchronous operation.</returns>
-    public Task RunJobAsync()
+    /// <param name="cancellationToken">A cancellation token that is signaled when the host is shutting down.</param>
+    /// <returns>
+    /// A completed task representing the asynchronous operation.
+    /// </returns>
+    public override Task RunJobAsync(CancellationToken cancellationToken)
     {
         try
         {
