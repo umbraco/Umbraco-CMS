@@ -2147,12 +2147,12 @@ internal sealed partial class ContentServiceTests : UmbracoIntegrationTestWithCo
             false));
         Assert.IsNotNull(RelationService.Relate(content1, content2, "test"));
 
-        PublicAccessService.Save(new PublicAccessEntry(
+        await PublicAccessService.SaveAsync(new PublicAccessEntry(
             content1,
             content2,
             content2,
             new List<PublicAccessRule> { new() { RuleType = "test", RuleValue = "test" } }));
-        Assert.IsTrue(PublicAccessService.AddRule(content1, "test2", "test2").Success);
+        Assert.IsTrue((await PublicAccessService.AddRuleAsync(content1, "test2", "test2")).Success);
 
         var user = await UserService.GetAsync(Constants.Security.SuperUserKey);
         var userGroup = await UserGroupService.GetAsync(user.Groups.First().Alias);

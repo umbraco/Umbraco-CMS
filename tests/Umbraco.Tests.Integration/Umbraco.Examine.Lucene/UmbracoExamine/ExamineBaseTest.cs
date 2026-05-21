@@ -87,15 +87,15 @@ public abstract class ExamineBaseTest : UmbracoIntegrationTest
         if (publishedValuesOnly)
         {
             var publicAccessServiceMock = new Mock<IPublicAccessService>();
-            publicAccessServiceMock.Setup(x => x.IsProtected(It.IsAny<string>()))
-                .Returns((string path) =>
+            publicAccessServiceMock.Setup(x => x.IsProtectedAsync(It.IsAny<string>()))
+                .ReturnsAsync((string path) =>
                 {
                     if (path.EndsWith("," + ExamineDemoDataContentService.ProtectedNode))
                     {
-                        return Attempt<PublicAccessEntry>.Succeed();
+                        return Attempt<PublicAccessEntry?>.Succeed();
                     }
 
-                    return Attempt<PublicAccessEntry>.Fail();
+                    return Attempt<PublicAccessEntry?>.Fail();
                 });
 
             var scopeProviderMock = new Mock<IScopeProvider>();

@@ -124,8 +124,8 @@ public class PublicAccessCheckerTests
     {
         var sut = CreateSut(memberManager, publicAccessService, contentService, out var httpContext);
 
-        Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(It.IsAny<IContent>()))
-            .Returns(new PublicAccessEntry(
+        Mock.Get(publicAccessService).Setup(x => x.GetEntryForContentAsync(It.IsAny<IContent>()))
+            .ReturnsAsync(new PublicAccessEntry(
                 protectedNode,
                 loginNode,
                 noAccessNode,
@@ -211,7 +211,7 @@ public class PublicAccessCheckerTests
         MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = true });
         MockGetRolesAsync(memberManager);
         Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
-        Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content)).Returns((PublicAccessEntry)null);
+        Mock.Get(publicAccessService).Setup(x => x.GetEntryForContentAsync(content)).ReturnsAsync((PublicAccessEntry)null);
 
         var result = await sut.HasMemberAccessToContentAsync(123);
         Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
@@ -230,8 +230,8 @@ public class PublicAccessCheckerTests
         MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
         MockGetRolesAsync(memberManager);
         Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
-        Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content))
-            .Returns(GetPublicAccessEntry(string.Empty, string.Empty));
+        Mock.Get(publicAccessService).Setup(x => x.GetEntryForContentAsync(content))
+            .ReturnsAsync(GetPublicAccessEntry(string.Empty, string.Empty));
 
         var result = await sut.HasMemberAccessToContentAsync(123);
         Assert.AreEqual(PublicAccessStatus.AccessDenied, result);
@@ -250,8 +250,8 @@ public class PublicAccessCheckerTests
         MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
         MockGetRolesAsync(memberManager);
         Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
-        Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content))
-            .Returns(GetPublicAccessEntry("MyUsername", string.Empty));
+        Mock.Get(publicAccessService).Setup(x => x.GetEntryForContentAsync(content))
+            .ReturnsAsync(GetPublicAccessEntry("MyUsername", string.Empty));
 
         var result = await sut.HasMemberAccessToContentAsync(123);
         Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
@@ -270,8 +270,8 @@ public class PublicAccessCheckerTests
         MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
         MockGetRolesAsync(memberManager);
         Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
-        Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content))
-            .Returns(GetPublicAccessEntry(string.Empty, "role1"));
+        Mock.Get(publicAccessService).Setup(x => x.GetEntryForContentAsync(content))
+            .ReturnsAsync(GetPublicAccessEntry(string.Empty, "role1"));
 
         var result = await sut.HasMemberAccessToContentAsync(123);
         Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
