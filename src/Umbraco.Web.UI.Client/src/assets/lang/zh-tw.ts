@@ -362,6 +362,7 @@ export default {
 		constrainProportions: '強制屬性',
 		continue: '繼續',
 		copy: '複製',
+		copied: '已複製！',
 		create: '創建',
 		database: '資料庫',
 		date: '時間',

@@ -261,6 +261,7 @@ export default {
 		constrainProportions: '비율 맞추기',
 		continue: '계속',
 		copy: '복사',
+		copied: '복사됨!',
 		create: '생성',
 		database: '데이타베이스',
 		date: '날짜',

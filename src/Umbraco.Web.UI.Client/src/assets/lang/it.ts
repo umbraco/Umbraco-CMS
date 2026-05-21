@@ -721,6 +721,7 @@ export default {
 		content: 'Contenuto',
 		continue: 'Continua',
 		copy: 'Copia',
+		copied: 'Copiato!',
 		create: 'Crea',
 		cropSection: 'Selezione di ritaglio',
 		database: 'Database',
