@@ -15,36 +15,37 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 /// <summary>
 ///     Implements periodic server "touching" (to mark as active/deactive) as a hosted service.
 /// </summary>
-public class TouchServerJob : IRecurringBackgroundJob
+public class TouchServerJob : RecurringBackgroundJobBase
 {
+    private TimeSpan _period;
+
     /// <summary>
     /// Gets the period that defines how often the server should be touched.
     /// </summary>
-    public TimeSpan Period { get; private set; }
+    public override TimeSpan Period => _period;
 
     /// <summary>
     /// Gets the fixed delay interval of 15 seconds between executions of the touch server job.
     /// This interval determines how often the server registration is updated.
     /// </summary>
-    public TimeSpan Delay { get => TimeSpan.FromSeconds(15); }
+    public override TimeSpan Delay => TimeSpan.FromSeconds(15);
 
     /// <summary>
     /// Gets all server roles on which this job runs. This property returns every possible <see cref="ServerRole"/> value, indicating the job runs on all server roles.
     /// </summary>
     /// <remarks>Runs on all servers</remarks>
-    public ServerRole[] ServerRoles { get => Enum.GetValues<ServerRole>(); }
+    public override ServerRole[] ServerRoles => Enum.GetValues<ServerRole>();
 
     private event EventHandler? _periodChanged;
 
     /// <summary>
     /// Occurs when the period of the TouchServerJob changes.
     /// </summary>
-    public event EventHandler PeriodChanged
+    public override event EventHandler PeriodChanged
     {
         add { _periodChanged += value; }
         remove { _periodChanged -= value; }
     }
-
 
     private readonly IHostingEnvironment _hostingEnvironment;
     private readonly ILogger<TouchServerJob> _logger;
@@ -67,18 +68,17 @@ public class TouchServerJob : IRecurringBackgroundJob
         IOptionsMonitor<GlobalSettings> globalSettings,
         IServerRoleAccessor serverRoleAccessor)
     {
-        _serverRegistrationService = serverRegistrationService ??
-                                     throw new ArgumentNullException(nameof(serverRegistrationService));
+        _serverRegistrationService = serverRegistrationService ?? throw new ArgumentNullException(nameof(serverRegistrationService));
         _hostingEnvironment = hostingEnvironment;
         _logger = logger;
         _globalSettings = globalSettings.CurrentValue;
         _serverRoleAccessor = serverRoleAccessor;
 
-        Period = _globalSettings.DatabaseServerRegistrar.WaitTimeBetweenCalls;
+        _period = _globalSettings.DatabaseServerRegistrar.WaitTimeBetweenCalls;
         globalSettings.OnChange(x =>
         {
             _globalSettings = x;
-            Period = x.DatabaseServerRegistrar.WaitTimeBetweenCalls;
+            _period = x.DatabaseServerRegistrar.WaitTimeBetweenCalls;
 
             _periodChanged?.Invoke(this, EventArgs.Empty);
         });
@@ -88,8 +88,11 @@ public class TouchServerJob : IRecurringBackgroundJob
     /// Executes the job that updates the server registration by touching the server record in the database.
     /// This keeps the server's registration active and ensures its status remains current.
     /// </summary>
-    /// <returns>A completed task when the job has finished running.</returns>
-    public Task RunJobAsync()
+    /// <param name="cancellationToken">A cancellation token that is signaled when the host is shutting down.</param>
+    /// <returns>
+    /// A completed task when the job has finished running.
+    /// </returns>
+    public override Task RunJobAsync(CancellationToken cancellationToken)
     {
 
         // If the IServerRoleAccessor has been changed away from ElectedServerRoleAccessor this task no longer makes sense,
