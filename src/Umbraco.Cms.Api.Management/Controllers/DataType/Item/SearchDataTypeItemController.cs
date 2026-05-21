@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
+using static NPoco.SqlBuilder;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType.Item;
 
@@ -53,10 +54,15 @@ public class SearchDataTypeItemController : DatatypeItemControllerBase
             return Ok(new PagedModel<DataTypeItemResponseModel> { Total = searchResult.Total });
         }
 
-        IEnumerable<IDataType> dataTypes = await _dataTypeService.GetAllAsync(searchResult.Items.Select(item => item.Key).ToArray());
+        Guid[] orderedKeys = searchResult.Items.Select(x => x.Key).ToArray();
+        Dictionary<Guid, int> orderMap = orderedKeys.Select((key, index) => new { key, index }).ToDictionary(x => x.key, x => x.index);
+        IEnumerable<IDataType> dataTypes = await _dataTypeService.GetAllAsync(orderedKeys);
+        // reorder as searchResult
+        IEnumerable<IDataType> orderedDataTypes = dataTypes.OrderBy(x => orderMap[x.Key]);
+
         var result = new PagedModel<DataTypeItemResponseModel>
         {
-            Items = _mapper.MapEnumerable<IDataType, DataTypeItemResponseModel>(dataTypes),
+            Items = _mapper.MapEnumerable<IDataType, DataTypeItemResponseModel>(orderedDataTypes),
             Total = searchResult.Total
         };
 
