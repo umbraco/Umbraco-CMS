@@ -237,6 +237,25 @@ public class RecurringBackgroundJobHostedServiceTests
     }
 
     [Test]
+    public async Task Falls_Back_To_Default_When_IgnoredDelay_Is_Infinite()
+    {
+        var timeProvider = new FakeTimeProvider();
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.IgnoredDelay).Returns(Timeout.InfiniteTimeSpan);
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false, timeProvider: timeProvider);
+        Task executeTask = sut.PerformExecuteAsync(CancellationToken.None);
+
+        // Back-off should be in progress using the default ignored delay, not skipped and not waiting forever.
+        Task completedFirst = await Task.WhenAny(executeTask, Task.Delay(TimeSpan.FromMilliseconds(100)));
+        Assert.AreNotSame(executeTask, completedFirst, "Back-off should keep execution pending until the default delay elapses");
+
+        // Advancing by the default ignored delay should complete the back-off.
+        timeProvider.Advance(RecurringBackgroundJobBase.DefaultIgnoredDelay);
+        await executeTask.WaitAsync(TimeSpan.FromSeconds(5));
+    }
+
+    [Test]
     public async Task Wait_Cancellation_Does_Not_Publish_Canceled_Notification()
     {
         var timeProvider = new FakeTimeProvider();
