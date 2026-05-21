@@ -132,9 +132,13 @@ public class LocalLinkProcessor
             // If the anchor tag carries a data-anchor attribute and that value is not already part
             // of the href (e.g. when migrating older content that stored the anchor only in data-anchor),
             // append it to the href so the link resolves correctly in the v15+ RTE (#22860).
+            // When the href already contains a different fragment, we trust the href and skip the append
+            // rather than producing an invalid URL with two '#' separators.
             var newTrailingHrefContent = existingTrailingHrefContent;
             var anchorFromAttribute = ExtractDataAnchorValue(input, tagHrefIndex);
-            if (anchorFromAttribute is not null && existingTrailingHrefContent.Contains(anchorFromAttribute, StringComparison.Ordinal) is false)
+            if (anchorFromAttribute is not null
+                && existingTrailingHrefContent.Contains(anchorFromAttribute, StringComparison.Ordinal) is false
+                && existingTrailingHrefContent.Contains('#') is false)
             {
                 newTrailingHrefContent += anchorFromAttribute;
             }
@@ -149,12 +153,22 @@ public class LocalLinkProcessor
     }
 
     // Searches for a non-empty data-anchor attribute within the opening anchor tag that contains the
-    // local link href at tagHrefIndex. Returns the attribute value (e.g. "#section" or "?foo=bar"),
+    // local link href at tagHrefIndex. Returns the attribute value (e.g. "#" or "#section-1"),
     // or null when no usable data-anchor is present.
+    // The legacy local link pattern matches any href attribute (not just anchors), so this check
+    // is scoped to elements whose tag name is "a" — data-anchor on other elements is not relevant.
     private static string? ExtractDataAnchorValue(string input, int tagHrefIndex)
     {
         var tagStartIndex = input.LastIndexOf('<', tagHrefIndex);
-        if (tagStartIndex < 0)
+        if (tagStartIndex < 0 || tagStartIndex + 2 >= input.Length)
+        {
+            return null;
+        }
+
+        // Verify the surrounding element is an anchor tag: "<a" followed by whitespace.
+        // (An href attribute always implies at least one whitespace separator after the tag name.)
+        var nameChar = input[tagStartIndex + 1];
+        if ((nameChar != 'a' && nameChar != 'A') || char.IsWhiteSpace(input[tagStartIndex + 2]) is false)
         {
             return null;
         }
