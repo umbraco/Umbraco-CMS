@@ -562,7 +562,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 				opacity: 0;
 			}
 
-			:host([is-reference]).umb-block-single__block {
+			:host([is-reference]) .umb-block-single__block {
 				--umb-entity-frame-color: var(--umb-color-reference, #7532c8);
 				--umb-entity-frame-contrast-color: var(--umb-color-reference-contrast, #ffffff);
 			}
