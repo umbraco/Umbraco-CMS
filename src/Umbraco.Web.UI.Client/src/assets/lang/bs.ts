@@ -1895,6 +1895,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Onemogući URL tragač',
 		enableUrlTracker: 'Omogući URL tragač',
+		urlTrackerEnabled: 'Omogućen',
+		urlTrackerDisabled: 'Onemogućen',
 		originalUrl: 'Originalni URL',
 		redirectedTo: 'Preusmjeri na',
 		redirectUrlManagement: 'Preusmjeravanje URL-ova',

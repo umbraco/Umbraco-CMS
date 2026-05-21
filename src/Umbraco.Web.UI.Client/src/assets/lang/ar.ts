@@ -2026,6 +2026,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'تعطيل تتبع URL',
 		enableUrlTracker: 'تمكين تتبع URL',
+		urlTrackerEnabled: 'ممكّن',
+		urlTrackerDisabled: 'معطّل',
 		culture: 'الثقافة',
 		originalUrl: 'URL الأصلي',
 		redirectedTo: 'تم إعادة التوجيه إلى',
