@@ -360,6 +360,12 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		this.#layoutContainerResizeObserver = undefined;
 	}
 
+	override destroy(): void {
+		this.#layoutContainerResizeObserver?.disconnect();
+		this.#layoutContainerResizeObserver = undefined;
+		super.destroy();
+	}
+
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('_blockViewProps') || _changedProperties.has('_columnSpan')) {
