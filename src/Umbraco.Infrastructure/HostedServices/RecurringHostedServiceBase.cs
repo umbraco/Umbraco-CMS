@@ -177,7 +177,7 @@ public abstract class RecurringHostedServiceBase : BackgroundService
                 return ReadPeriod();
             }
 
-            if (!signaled && periodChangeToken.IsCancellationRequested)
+            if (signaled is false && periodChangeToken.IsCancellationRequested)
             {
                 // Period changed — re-read and recalculate remaining delay with the new period.
                 period = ReadPeriod();
@@ -191,33 +191,47 @@ public abstract class RecurringHostedServiceBase : BackgroundService
                 continue;
             }
 
-            if (!signaled)
+            if (signaled is false)
             {
-                return period; // Normal timeout — next wait uses normal period
+                return period; // Normal timeout — next wait uses normal period.
             }
 
-            TriggerState triggerState = Interlocked.Exchange(ref _triggerState, TriggerState.Default);
-            if (triggerState.Delay.HasValue)
-            {
-                return triggerState.Delay.Value;
-            }
+            return ApplyTriggerState(delay, waitStart, period);
+        }
+    }
 
-            TimeSpan waitElapsed = _timeProvider.GetElapsedTime(waitStart);
-            TimeSpan remaining = ComputeNextDelay(delay, waitElapsed);
+    /// <summary>
+    /// Consumes the pending <see cref="TriggerState" /> and returns the delay basis to use for the next wait cycle.
+    /// </summary>
+    /// <param name="delay">The delay that was being waited on when the trigger arrived.</param>
+    /// <param name="waitStart">The timestamp at which the wait started, used to measure how much of <paramref name="delay" /> remains.</param>
+    /// <param name="period">The current period, used by the <see cref="NextExecutionStrategy.Reset" /> and <see cref="NextExecutionStrategy.Replace" /> strategies.</param>
+    /// <returns>
+    /// The delay basis for the next wait cycle.
+    /// </returns>
+    private TimeSpan ApplyTriggerState(TimeSpan delay, long waitStart, TimeSpan period)
+    {
+        TriggerState triggerState = Interlocked.Exchange(ref _triggerState, TriggerState.Default);
+        if (triggerState.Delay.HasValue)
+        {
+            return triggerState.Delay.Value;
+        }
 
-            switch (triggerState.Strategy)
-            {
-                case NextExecutionStrategy.None:
-                    _nextExecutionSkipOnOvershoot = true;
-                    return remaining;
-                case NextExecutionStrategy.Replace:
-                    return remaining == Timeout.InfiniteTimeSpan || period == Timeout.InfiniteTimeSpan
-                        ? Timeout.InfiniteTimeSpan
-                        : remaining + period;
-                case NextExecutionStrategy.Reset:
-                default:
-                    return period;
-            }
+        TimeSpan waitElapsed = _timeProvider.GetElapsedTime(waitStart);
+        TimeSpan remaining = ComputeNextDelay(delay, waitElapsed);
+
+        switch (triggerState.Strategy)
+        {
+            case NextExecutionStrategy.None:
+                _nextExecutionSkipOnOvershoot = true;
+                return remaining;
+            case NextExecutionStrategy.Replace:
+                return remaining == Timeout.InfiniteTimeSpan || period == Timeout.InfiniteTimeSpan
+                    ? Timeout.InfiniteTimeSpan
+                    : remaining + period;
+            case NextExecutionStrategy.Reset:
+            default:
+                return period;
         }
     }
 
