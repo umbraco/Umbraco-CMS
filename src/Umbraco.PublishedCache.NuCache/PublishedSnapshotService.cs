@@ -410,6 +410,11 @@ internal class PublishedSnapshotService : IPublishedSnapshotService
 
             _publishedContentService.Rebuild(contentTypeIds, mediaTypeIds, memberTypeIds);
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while rebuilding the database cache.");
+            throw;
+        }
         finally
         {
             ClearIsRebuilding();
