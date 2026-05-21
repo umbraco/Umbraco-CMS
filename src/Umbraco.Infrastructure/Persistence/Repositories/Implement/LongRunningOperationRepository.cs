@@ -56,10 +56,9 @@ internal class LongRunningOperationRepository : AsyncRepositoryBase, ILongRunnin
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             LongRunningOperationDto? dto = await db.LongRunningOperations
-                .Where(x => x.Id == id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-            return dto == null ? null : MapDtoToEntity(dto);
+            return dto is null ? null : MapDtoToEntity(dto);
         });
 
     /// <inheritdoc />
@@ -67,10 +66,9 @@ internal class LongRunningOperationRepository : AsyncRepositoryBase, ILongRunnin
         await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             LongRunningOperationDto? dto = await db.LongRunningOperations
-                .Where(x => x.Id == id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-            return dto == null ? null : MapDtoToEntity<T>(dto);
+            return dto is null ? null : MapDtoToEntity<T>(dto);
         });
 
     /// <inheritdoc/>
