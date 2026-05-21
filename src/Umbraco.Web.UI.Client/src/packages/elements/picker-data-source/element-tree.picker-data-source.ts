@@ -4,6 +4,7 @@ import { UmbElementTreeRepository } from '../tree/element-tree.repository.js';
 import type { UmbElementTreeChildrenOfRequestArgs, UmbElementTreeRootItemsRequestArgs } from '../tree/types.js';
 import { getConfigValue } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbElementFolderItemDataResolver } from '../folder/data-resolver/element-folder-item-data-resolver.js';
 import { UmbElementItemDataResolver } from '../item/data-resolver/element-item-data-resolver.js';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
 import type {
@@ -37,7 +38,7 @@ export class UmbElementTreePickerDataSource extends UmbControllerBase implements
 	}
 
 	createItemDataResolver: (host: UmbControllerHost) => UmbItemDataResolver = (host) =>
-		new UmbElementItemDataResolver(host);
+		this.#folderOnly ? new UmbElementFolderItemDataResolver(host) : new UmbElementItemDataResolver(host);
 
 	setConfig(config: UmbConfigCollectionModel | undefined) {
 		this.#folderOnly = Boolean(getConfigValue(config, 'folderOnly'));
