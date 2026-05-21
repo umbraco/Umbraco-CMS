@@ -46,7 +46,7 @@ class UmbTestItemDataResolver extends UmbControllerBase implements UmbItemDataRe
 	}
 
 	async getName(): Promise<string | undefined> {
-		return this.observe(this.name).asPromise();
+		return this.#name.getValue();
 	}
 
 	async getIcon(): Promise<string | undefined> {
