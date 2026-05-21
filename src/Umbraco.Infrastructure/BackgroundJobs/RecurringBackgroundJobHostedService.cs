@@ -159,7 +159,19 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         var startingNotification = new RecurringBackgroundJobStartingNotification(_job, eventMessages);
         await _eventAggregator.PublishAsync(startingNotification, cancellationToken);
 
-        await base.StartAsync(cancellationToken);
+        // Suppress execution context flow around base.StartAsync so the fire-and-forget ExecuteAsync loop
+        // does not capture AsyncLocal state from the host — in particular Umbraco's static AmbientScopeStack,
+        // which uses a ConcurrentStack<IScope> reference that, once non-null, would be shared across every
+        // hosted service that inherits this ExecutionContext. Without this, concurrent scope pushes/pops
+        // across recurring loops and other hosted services interleave and trigger "not the ambient scope"
+        // errors at Scope.Dispose (see DistributedJobService.EnsureJobsAsync for the original repro).
+        Task startTask;
+        using (ExecutionContext.IsFlowSuppressed() ? null : (IDisposable?)ExecutionContext.SuppressFlow())
+        {
+            startTask = base.StartAsync(cancellationToken);
+        }
+
+        await startTask;
 
         await _eventAggregator.PublishAsync(new RecurringBackgroundJobStartedNotification(_job, eventMessages).WithStateFrom(startingNotification), cancellationToken);
     }

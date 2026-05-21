@@ -79,22 +79,6 @@ public abstract class RecurringHostedServiceBase : BackgroundService
         => BackgroundJobs.DelayCalculator.GetDelay(firstRunTime, cronTabParser, logger, defaultDelay);
 
     /// <inheritdoc />
-    /// <remarks>
-    /// Suppresses execution context flow around the call that creates <see cref="BackgroundService.ExecuteTask" />
-    /// so the fire-and-forget loop does not inherit AsyncLocal state — in particular Umbraco's static
-    /// <c>AmbientScopeStack</c>. Without this, multiple hosted services started from the same host context
-    /// can end up sharing the same <see cref="System.Collections.Concurrent.ConcurrentStack{T}" /> reference for
-    /// ambient scopes, leading to "not the ambient scope" errors when scopes are disposed concurrently.
-    /// </remarks>
-    public override Task StartAsync(CancellationToken cancellationToken)
-    {
-        using (ExecutionContext.IsFlowSuppressed() ? null : (IDisposable?)ExecutionContext.SuppressFlow())
-        {
-            return base.StartAsync(cancellationToken);
-        }
-    }
-
-    /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         // Initial delay (also interruptible via signal)
