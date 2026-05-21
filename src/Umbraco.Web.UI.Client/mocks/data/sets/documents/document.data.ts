@@ -126,7 +126,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		template: null,
 		variants: [
 			{
-				state: 'Published' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.PUBLISHED,
 				publishDate: '2024-01-15T10:05:00.000Z',
 				culture: null,
 				segment: null,
@@ -137,7 +137,7 @@ export const data: Array<UmbMockDocumentModel> = [
 				flags: [],
 			},
 			{
-				state: 'Draft' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: null,
 				culture: null,
 				segment: 's1',
@@ -189,7 +189,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		template: null,
 		variants: [
 			{
-				state: 'Draft' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: null,
 				culture: null,
 				segment: null,
@@ -234,7 +234,7 @@ export const data: Array<UmbMockDocumentModel> = [
 		template: null,
 		variants: [
 			{
-				state: 'Draft' as UmbDocumentVariantState,
+				state: DocumentVariantStateModel.DRAFT,
 				publishDate: null,
 				culture: null,
 				segment: null,
