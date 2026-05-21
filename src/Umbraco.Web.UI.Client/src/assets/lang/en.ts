@@ -1270,6 +1270,7 @@ export default {
 		requiredPasswordValidationMessage: 'Please fill in a password',
 		showPassword: 'Show password',
 		hidePassword: 'Hide password',
+		invalidPasswordMessage: 'The password is not strong enough.',
 	},
 	main: {
 		dashboard: 'Dashboard',
