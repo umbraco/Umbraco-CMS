@@ -265,4 +265,18 @@ export class UserGroupUiHelper extends UiBaseLocators {
   async clickUserCardWithName(userName: string) {
     await this.click(this.page.locator('uui-card-user', {hasText: userName}));
   }
+
+  async clickChooseModalButtonAndWaitForGroupUsersUpdate() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.userGroup, this.clickChooseModalButton(), ConstantHelper.statusCodes.ok);
+  }
+
+  async clickConfirmRemoveButtonAndWaitForGroupUsersUpdate() {
+    return await this.waitForResponseAfterExecutingPromise(ConstantHelper.apiEndpoints.userGroup, this.clickConfirmRemoveButton(), ConstantHelper.statusCodes.ok);
+  }
+
+  async waitForPendingGroupUsersUpdate() {
+    await this.page.waitForResponse(
+      (resp) => resp.url().includes(ConstantHelper.apiEndpoints.userGroup) && resp.status() === ConstantHelper.statusCodes.ok,
+    );
+  }
 }

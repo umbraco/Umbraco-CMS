@@ -34,6 +34,7 @@ test('can view existing users in a user group', {tag: '@smoke'}, async ({umbraco
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
 
   // Assert
+  expect(await umbracoUi.userGroup.getUsersInGroupCount()).toBe(2);
   await umbracoUi.userGroup.isUserVisibleInGroupUsers(userA.name);
   await umbracoUi.userGroup.isUserVisibleInGroupUsers(userB.name);
 });
@@ -61,8 +62,7 @@ test('can add a user to an existing user group from the workspace', {tag: '@smok
   // Act
   await umbracoUi.userGroup.clickChooseUserButton();
   await umbracoUi.userGroup.clickUserCardWithName(userA.name);
-  await umbracoUi.userGroup.clickChooseModalButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+  await umbracoUi.userGroup.clickChooseModalButtonAndWaitForGroupUsersUpdate();
 
   // Assert
   await umbracoUi.userGroup.isUserVisibleInGroupUsers(userA.name);
@@ -84,8 +84,7 @@ test('can add multiple users to an existing user group at once', async ({umbraco
   await umbracoUi.userGroup.clickUserCardWithName(userA.name);
   await umbracoUi.userGroup.clickUserCardWithName(userB.name);
   await umbracoUi.userGroup.clickUserCardWithName(userC.name);
-  await umbracoUi.userGroup.clickChooseModalButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+  await umbracoUi.userGroup.clickChooseModalButtonAndWaitForGroupUsersUpdate();
 
   // Assert
   await umbracoUi.userGroup.isUserVisibleInGroupUsers(userA.name);
@@ -109,8 +108,7 @@ test('can add a new user via the picker without removing existing users', async 
   // Act
   await umbracoUi.userGroup.clickChooseUserButton();
   await umbracoUi.userGroup.clickUserCardWithName(userC.name);
-  await umbracoUi.userGroup.clickChooseModalButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+  await umbracoUi.userGroup.clickChooseModalButtonAndWaitForGroupUsersUpdate();
 
   // Assert
   await umbracoUi.userGroup.isUserVisibleInGroupUsers(userA.name);
@@ -131,8 +129,7 @@ test('can remove a user from a user group', {tag: '@smoke'}, async ({umbracoApi,
 
   // Act
   await umbracoUi.userGroup.clickRemoveButtonForUserWithName(userA.name);
-  await umbracoUi.userGroup.clickConfirmRemoveButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+  await umbracoUi.userGroup.clickConfirmRemoveButtonAndWaitForGroupUsersUpdate();
 
   // Assert
   await umbracoUi.userGroup.isUserVisibleInGroupUsers(userA.name, false);
@@ -151,11 +148,9 @@ test('can remove all users from a user group', async ({umbracoApi, umbracoUi}) =
 
   // Act
   await umbracoUi.userGroup.clickRemoveButtonForUserWithName(userA.name);
-  await umbracoUi.userGroup.clickConfirmRemoveButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+  await umbracoUi.userGroup.clickConfirmRemoveButtonAndWaitForGroupUsersUpdate();
   await umbracoUi.userGroup.clickRemoveButtonForUserWithName(userB.name);
-  await umbracoUi.userGroup.clickConfirmRemoveButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+  await umbracoUi.userGroup.clickConfirmRemoveButtonAndWaitForGroupUsersUpdate();
 
   // Assert
   expect(await umbracoUi.userGroup.getUsersInGroupCount()).toBe(0);
@@ -174,11 +169,9 @@ test('can add and then remove the same user in the same session', async ({umbrac
   // Act
   await umbracoUi.userGroup.clickChooseUserButton();
   await umbracoUi.userGroup.clickUserCardWithName(userA.name);
-  await umbracoUi.userGroup.clickChooseModalButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+  await umbracoUi.userGroup.clickChooseModalButtonAndWaitForGroupUsersUpdate();
   await umbracoUi.userGroup.clickRemoveButtonForUserWithName(userA.name);
-  await umbracoUi.userGroup.clickConfirmRemoveButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+  await umbracoUi.userGroup.clickConfirmRemoveButtonAndWaitForGroupUsersUpdate();
 
   // Assert
   expect(await umbracoUi.userGroup.getUsersInGroupCount()).toBe(0);
@@ -194,8 +187,7 @@ test('can persist user additions after navigating away from and returning to the
   await umbracoUi.userGroup.clickUserGroupWithName(userGroupName);
   await umbracoUi.userGroup.clickChooseUserButton();
   await umbracoUi.userGroup.clickUserCardWithName(userA.name);
-  await umbracoUi.userGroup.clickChooseModalButton();
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+  await umbracoUi.userGroup.clickChooseModalButtonAndWaitForGroupUsersUpdate();
 
   // Act
   await umbracoUi.userGroup.clickUserGroupsButton();
@@ -222,7 +214,7 @@ test('can add users while creating a new user group and saving persists them', {
   await umbracoUi.userGroup.clickChooseModalButton();
   const userGroupId = await umbracoUi.userGroup.clickSaveButtonAndWaitForUserGroupToBeCreated();
   // Wait for the deferred user persistence to fire after the group transitions from new to persisted.
-  await umbracoUi.waitForTimeout(ConstantHelper.wait.medium);
+  await umbracoUi.userGroup.waitForPendingGroupUsersUpdate();
 
   // Assert
   expect(await umbracoApi.userGroup.doesExist(userGroupId)).toBe(true);
