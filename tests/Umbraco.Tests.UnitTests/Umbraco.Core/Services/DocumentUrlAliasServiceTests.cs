@@ -745,7 +745,7 @@ public class DocumentUrlAliasServiceTests
             new PublishedDocumentUrlAlias
             {
                 DocumentKey = documentKey,
-                NullableLanguageId = null,
+                LanguageId = null,
                 Alias = "my-alias",
             },
         };
