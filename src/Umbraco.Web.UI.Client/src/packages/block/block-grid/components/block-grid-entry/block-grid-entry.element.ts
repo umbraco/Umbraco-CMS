@@ -355,11 +355,11 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
-		this.#layoutContainerResizeObserver?.disconnect();
+		this.#layoutContainerResizeObserver.disconnect();
 	}
 
 	override destroy(): void {
-		this.#layoutContainerResizeObserver?.disconnect();
+		this.#layoutContainerResizeObserver.disconnect();
 		super.destroy();
 	}
 
