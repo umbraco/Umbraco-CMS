@@ -76,11 +76,6 @@ public static partial class Constants
         ///     The GUID identifier for the element object type.
         /// </summary>
         public static readonly Guid Element = new(Strings.Element);
-        /// <summary>
-        /// The GUID identifier for the dictionary item object type.
-        /// </summary>
-
-        public static readonly Guid DictionaryItem = new(Strings.DictionaryItem);
 
         /// <summary>
         ///     The GUID identifier for the element container object type.
@@ -322,11 +317,6 @@ public static partial class Constants
             ///     The string GUID for the ID reservation object type.
             /// </summary>
             public const string IdReservation = "92849B1E-3904-4713-9356-F646F87C25F4";
-
-            /// <summary>
-            /// The string GUID for the ID Dictionary object type.
-            /// </summary>
-            public const string DictionaryItem = "D8C2B39A-71E5-46F4-B83A-28B6A752C8F3";
 
             // ReSharper restore MemberHidesStaticFromOuterClass
         }
