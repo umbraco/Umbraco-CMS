@@ -1812,9 +1812,11 @@ declare global {
 		redirectUrls_disabledConfirm: string;
 		redirectUrls_disableError: string;
 		redirectUrls_disableUrlTracker: string;
+		redirectUrls_disableUrlTrackerInstruction: string;
 		redirectUrls_enabledConfirm: string;
 		redirectUrls_enableError: string;
 		redirectUrls_enableUrlTracker: string;
+		redirectUrls_enableUrlTrackerInstruction: string;
 		redirectUrls_noRedirects: string;
 		redirectUrls_noRedirectsDescription: string;
 		redirectUrls_noRedirectsForSearch: string;
@@ -1826,6 +1828,8 @@ declare global {
 		redirectUrls_redirectRemoveError: string;
 		redirectUrls_redirectRemoveWarning: string;
 		redirectUrls_redirectUrlManagement: string;
+		redirectUrls_urlTrackerDisabled: string;
+		redirectUrls_urlTrackerEnabled: string;
 		references_DataTypeNoReferences: string;
 		references_deleteDisabledWarning: string;
 		references_deleteWarning: string;
@@ -4503,9 +4507,11 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'redirectUrls_disabledConfirm',
 	'redirectUrls_disableError',
 	'redirectUrls_disableUrlTracker',
+	'redirectUrls_disableUrlTrackerInstruction',
 	'redirectUrls_enabledConfirm',
 	'redirectUrls_enableError',
 	'redirectUrls_enableUrlTracker',
+	'redirectUrls_enableUrlTrackerInstruction',
 	'redirectUrls_noRedirects',
 	'redirectUrls_noRedirectsDescription',
 	'redirectUrls_noRedirectsForSearch',
@@ -4517,6 +4523,8 @@ export const UMB_KNOWN_LOCALIZATION_KEYS: readonly UmbKnownLocalizationKey[] = [
 	'redirectUrls_redirectRemoveError',
 	'redirectUrls_redirectRemoveWarning',
 	'redirectUrls_redirectUrlManagement',
+	'redirectUrls_urlTrackerDisabled',
+	'redirectUrls_urlTrackerEnabled',
 	'references_DataTypeNoReferences',
 	'references_deleteDisabledWarning',
 	'references_deleteWarning',
