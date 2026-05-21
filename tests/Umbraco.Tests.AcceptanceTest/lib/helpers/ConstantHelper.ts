@@ -283,7 +283,8 @@
 
   public static readonly statusCodes = {
     ok: 200,
-    created: 201
+    created: 201,
+    forbidden: 403
   }
 
   public static readonly apiEndpoints = {
@@ -346,6 +347,14 @@
     6: ['Duplicate', 'Allow access to duplicate an element', 'Umb.Element.Duplicate'],
     7: ['Move', 'Allow access to move an element', 'Umb.Element.Move'],
     8: ['Rollback', 'Allow access to rollback an element to a previous state', 'Umb.Element.Rollback']
+  }
+
+  public static readonly userGroupElementFolderPermissionsSettings = {
+    0: ['Read', 'Allow access to read an element folder', 'Umb.ElementContainer.Read'],
+    1: ['Create', 'Allow access to create an element folder', 'Umb.ElementContainer.Create'],
+    2: ['Delete', 'Allow access to delete an element folder', 'Umb.ElementContainer.Delete'],
+    3: ['Update', 'Allow access to save an element folder', 'Umb.ElementContainer.Update'],
+    4: ['Move', 'Allow access to move an element folder', 'Umb.ElementContainer.Move']
   }
 
   public static readonly healthCheckMessages = {

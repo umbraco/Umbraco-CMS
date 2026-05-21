@@ -74,6 +74,7 @@ export class UiBaseLocators extends BasePage {
   public readonly containerSaveAndPublishBtn: Locator;
   public readonly createModalBtn: Locator;
   public readonly copyModalBtn: Locator;
+  public readonly restoreModalBtn: Locator;
 
   // Document Type & Property Editor
   public readonly documentTypeNode: Locator;
@@ -347,6 +348,7 @@ export class UiBaseLocators extends BasePage {
       exact: true,
     });
     this.copyModalBtn = this.sidebarModal.getByLabel("Copy", { exact: true });
+    this.restoreModalBtn = this.sidebarModal.getByLabel("Restore", { exact: true });
 
     // Document Type & Property Editor
     this.documentTypeNode = page.locator("uui-ref-node-document-type");
@@ -1021,6 +1023,10 @@ export class UiBaseLocators extends BasePage {
 
   async clickCopyModalButton() {
     await this.click(this.copyModalBtn);
+  }
+
+  async clickRestoreModalButton() {
+    await this.click(this.restoreModalBtn);
   }
 
   // Container Methods
