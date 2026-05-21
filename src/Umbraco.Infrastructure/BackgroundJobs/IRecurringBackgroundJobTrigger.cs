@@ -1,19 +1,18 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 
 /// <summary>
 /// Provides methods to signal a specific recurring background job to execute immediately.
 /// </summary>
-/// <typeparam name="TJob">
-/// The concrete type of the recurring background job to trigger, as registered via <c>AddRecurringBackgroundJob&lt;TJob&gt;()</c>. Must implement <see cref="ITriggerableRecurringBackgroundJob" />.
-/// Specifying a base class or interface rather than the registered concrete type will cause <c>TriggerExecution</c> to return <c>false</c>, since the runner indexes hosted services by their concrete <see cref="Type" />.
-/// </typeparam>
+/// <typeparam name="TJob">The type of the recurring background job to trigger, as registered via <see cref="ServiceCollectionExtensions.AddRecurringBackgroundJob{TJob}(IServiceCollection)" />.</typeparam>
 public interface IRecurringBackgroundJobTrigger<TJob>
-    where TJob : ITriggerableRecurringBackgroundJob
+    where TJob : class, ITriggerableRecurringBackgroundJob
 {
     /// <summary>
     /// Signals the background loop to execute immediately.
