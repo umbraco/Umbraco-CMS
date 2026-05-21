@@ -145,6 +145,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: true,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: true,
 		isElement: false,
@@ -202,6 +203,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 	{
 		id: COMPOSED_FOLDER_ID,
@@ -212,6 +214,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: true,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -228,6 +231,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 	{
 		id: COMPOSITION_INVARIANT_DOCUMENT_TYPE_ID,
@@ -238,6 +242,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: false,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -275,6 +280,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 	{
 		// Culture-variant composition — composed onto invariant doc types to produce a property
@@ -287,6 +293,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: false,
+		allowedInLibrary: false,
 		variesByCulture: true,
 		variesBySegment: false,
 		isElement: false,
@@ -344,6 +351,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 	{
 		id: COMPOSITION_SEGMENT_VARIANT_DOCUMENT_TYPE_ID,
@@ -354,6 +362,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: false,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: true,
 		isElement: false,
@@ -411,6 +420,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 	{
 		// Invariant With Culture Variant Composition composes COMPOSITION_CULTURE_VARIANT_DOCUMENT_TYPE_ID.
@@ -424,6 +434,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: true,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -445,6 +456,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 	{
 		// Invariant With Segment Variant Composition composes COMPOSITION_SEGMENT_VARIANT_DOCUMENT_TYPE_ID.
@@ -458,6 +470,7 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 		allowedTemplates: [],
 		defaultTemplate: null,
 		allowedAsRoot: true,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -479,5 +492,6 @@ export const data: Array<UmbMockDocumentTypeModel> = [
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	},
 ];
