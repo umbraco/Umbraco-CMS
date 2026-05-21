@@ -18,7 +18,6 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 		{
 			name: this.localize.term('validation_validateNothing'),
 			value: '!NOVALIDATION!',
-			selected: true,
 		},
 		{
 			name: this.localize.term('validation_validateAsEmail'),
@@ -58,7 +57,14 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 		this.consumeContext(UMB_PROPERTY_TYPE_WORKSPACE_CONTEXT, (instance) => {
 			this.#context = instance;
-			this.observe(instance?.data, (data) => (this._data = data), 'observeData');
+			this.observe(
+				instance?.data,
+				(data) => {
+					this._data = data;
+					this.#syncCustomValidationSelection(data?.validation?.regEx ?? null);
+				},
+				'observeData',
+			);
 			this.observe(instance?.isNew, (isNew) => (this._isNew = isNew), '_observeIsNew');
 		});
 
@@ -133,6 +139,29 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 
 	#onToggleIsSensitiveData(e: UUIBooleanInputEvent) {
 		this.updateValue({ isSensitive: e.target.checked });
+	}
+
+	// The <uui-select> binds only via each option's `selected` flag, so this must be
+	// called whenever loaded data changes — otherwise the dropdown shows "No validation"
+	// for any saved regEx until the user manually edits the regex input.
+	#syncCustomValidationSelection(regEx: string | null) {
+		const noValidationIndex = 0;
+		const customIndex = this._customValidationOptions.length - 1;
+
+		let targetIndex: number;
+		if (!regEx) {
+			targetIndex = noValidationIndex;
+		} else {
+			const presetIndex = this._customValidationOptions.findIndex(
+				(option, i) => i !== noValidationIndex && i !== customIndex && option.value === regEx,
+			);
+			targetIndex = presetIndex >= 0 ? presetIndex : customIndex;
+		}
+
+		this._customValidationOptions = this._customValidationOptions.map((option, i) => ({
+			...option,
+			selected: i === targetIndex,
+		}));
 	}
 
 	#onCustomValidationChange(event: UUISelectEvent) {
