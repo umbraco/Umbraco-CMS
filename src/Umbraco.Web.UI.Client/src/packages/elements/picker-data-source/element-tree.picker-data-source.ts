@@ -4,8 +4,8 @@ import { UmbElementTreeRepository } from '../tree/element-tree.repository.js';
 import type { UmbElementTreeChildrenOfRequestArgs, UmbElementTreeRootItemsRequestArgs } from '../tree/types.js';
 import { getConfigValue } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbElementItemDataResolver } from '../item/data-resolver/element-item-data-resolver.js';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
-import type { UmbPickerTreeDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
@@ -15,6 +15,8 @@ import type {
 } from '@umbraco-cms/backoffice/tree';
 import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
+import type { UmbPickerTreeDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 
 export class UmbElementTreePickerDataSource extends UmbControllerBase implements UmbPickerTreeDataSource {
 	#dataType?: { unique: string };
@@ -33,6 +35,9 @@ export class UmbElementTreePickerDataSource extends UmbControllerBase implements
 			});
 		});
 	}
+
+	createItemDataResolver: (host: UmbControllerHost) => UmbItemDataResolver = (host) =>
+		new UmbElementItemDataResolver(host);
 
 	setConfig(config: UmbConfigCollectionModel | undefined) {
 		this.#folderOnly = Boolean(getConfigValue(config, 'folderOnly'));
