@@ -56,14 +56,14 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
 
   protected override firstUpdated(_changedProperties: PropertyValues): void {
     super.firstUpdated(_changedProperties);
-    if(!this.passwordElement || !this.confirmPasswordElement) return;
+    if (!this.passwordElement || !this.confirmPasswordElement) return;
     this.passwordElement.addEventListener('invalid', this.#handlePasswordInvalid);
     this.confirmPasswordElement.addEventListener('invalid', this.#handlePasswordInvalid);
   }
 
   override disconnectedCallback(): void {
-    this.passwordElement?.removeEventListener( 'invalid', this.#handlePasswordInvalid);
-    this.confirmPasswordElement?.removeEventListener( 'invalid', this.#handlePasswordInvalid);
+    this.passwordElement?.removeEventListener('invalid', this.#handlePasswordInvalid);
+    this.confirmPasswordElement?.removeEventListener('invalid', this.#handlePasswordInvalid);
     super.disconnectedCallback();
   }
 
@@ -74,7 +74,7 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
 
   #handlePasswordInvalid = (event: Event): void => {
     const input = event.currentTarget as UUIInputPasswordElement;
-    if(input.validity?.patternMismatch) {
+    if (input.validity?.patternMismatch) {
       const passwordValidityText = this.localize.term('login_invalidPasswordMessage') ?? 'The password is not strong enough.';
       input.setCustomValidity(passwordValidityText);
     }
