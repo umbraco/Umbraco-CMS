@@ -15,3 +15,4 @@ export type * from './submittable-tree-entity-workspace-context.interface.js';
 export type * from './submittable-workspace-context.interface.js';
 export type * from './saveable-workspace-context.interface.js';
 export type * from './variant-dataset-workspace-context.interface.js';
+export type * from './workspace-action-execution-options.interface.js';

@@ -19,12 +19,6 @@ export abstract class UmbWorkspaceActionBase<ArgsMetaType = never>
 	protected _isDisabled = new UmbBooleanState(false);
 	public isDisabled = this._isDisabled.asObservable();
 
-	// Lazy: only created when a subclass opts in via setExecuting(). Subclasses that
-	// represent a modal-aware/async flow should call `setExecuting(false)` from their
-	// constructor so the observable is exposed before the workspace-action element
-	// reads `api.isExecuting`. Subclasses that don't opt in keep `isExecuting`
-	// undefined, which signals the element to fall back to its legacy eager
-	// waiting-state behaviour.
 	protected _isExecuting?: UmbBooleanState<boolean>;
 	public isExecuting?: Observable<boolean>;
 

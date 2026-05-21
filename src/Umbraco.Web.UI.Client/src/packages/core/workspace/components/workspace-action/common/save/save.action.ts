@@ -52,7 +52,6 @@ export class UmbSaveWorkspaceAction<
 	}
 
 	override async execute() {
-		this.setExecuting(false);
 		try {
 			await this._retrieveWorkspaceContext;
 			await this._workspaceContext?.requestSave({

@@ -47,7 +47,6 @@ export class UmbDocumentSaveAndPublishWorkspaceAction extends UmbWorkspaceAction
 	}
 
 	override async execute() {
-		this.setExecuting(false);
 		try {
 			const workspaceContext = await this.getContext(UMB_DOCUMENT_PUBLISHING_WORKSPACE_CONTEXT);
 			if (!workspaceContext) {
