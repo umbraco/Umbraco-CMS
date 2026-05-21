@@ -237,21 +237,23 @@ public class RecurringBackgroundJobHostedServiceTests
     }
 
     [Test]
-    public async Task Falls_Back_To_Default_When_IgnoredDelay_Is_Infinite()
+    public async Task Waits_Until_Shutdown_When_IgnoredDelay_Is_Infinite()
     {
         var timeProvider = new FakeTimeProvider();
+        using var cts = new CancellationTokenSource();
         var mockJob = new Mock<IRecurringBackgroundJob>();
         mockJob.Setup(x => x.IgnoredDelay).Returns(Timeout.InfiniteTimeSpan);
 
         var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false, timeProvider: timeProvider);
-        Task executeTask = sut.PerformExecuteAsync(CancellationToken.None);
+        Task executeTask = sut.PerformExecuteAsync(cts.Token);
 
-        // Back-off should be in progress using the default ignored delay, not skipped and not waiting forever.
+        // Advancing time arbitrarily must not complete the back-off — infinite means "wait until shutdown".
+        timeProvider.Advance(TimeSpan.FromDays(1));
         Task completedFirst = await Task.WhenAny(executeTask, Task.Delay(TimeSpan.FromMilliseconds(100)));
-        Assert.AreNotSame(executeTask, completedFirst, "Back-off should keep execution pending until the default delay elapses");
+        Assert.AreNotSame(executeTask, completedFirst, "Back-off should remain pending regardless of elapsed time");
 
-        // Advancing by the default ignored delay should complete the back-off.
-        timeProvider.Advance(RecurringBackgroundJobBase.DefaultIgnoredDelay);
+        // Only cancellation releases the wait.
+        cts.Cancel();
         await executeTask.WaitAsync(TimeSpan.FromSeconds(5));
     }
 

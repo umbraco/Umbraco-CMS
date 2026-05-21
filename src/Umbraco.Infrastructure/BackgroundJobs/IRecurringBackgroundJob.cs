@@ -49,7 +49,7 @@ public interface IRecurringBackgroundJob
     /// </value>
     /// <remarks>
     /// This back-off prevents tight looping when <see cref="Period" /> is short (or <see cref="TimeSpan.Zero" />) and an execution is skipped without invoking <see cref="RunJobAsync(CancellationToken)" />.
-    /// Must be a finite, non-negative value: <see cref="Timeout.InfiniteTimeSpan" /> is not allowed because the wait happens inside the execution step and would block the job from re-evaluating once the ignored condition (e.g. runtime level) changes.
+    /// Set to <see cref="Timeout.InfiniteTimeSpan" /> to disable the job for the remaining application lifecycle once an ignored condition is encountered — useful when the condition is known not to change (e.g. a server role that will not be promoted on this instance).
     /// </remarks>
     TimeSpan IgnoredDelay => RecurringBackgroundJobBase.DefaultIgnoredDelay; // TODO (V19): Remove the default implementation
 

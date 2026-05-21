@@ -224,17 +224,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         await _eventAggregator.PublishAsync(new RecurringBackgroundJobIgnoredNotification(_job, eventMessages).WithStateFrom(executingNotification), stoppingToken);
 
         TimeSpan ignoredDelay = _job.IgnoredDelay;
-        if (ignoredDelay == Timeout.InfiniteTimeSpan)
-        {
-            // Waiting forever inside the execution step would block the job from re-evaluating once
-            // the ignored condition (e.g. runtime level) changes. Fall back to the default back-off.
-            _logger.LogWarning(
-                "IgnoredDelay on {JobTypeName} is Timeout.InfiniteTimeSpan, which is not supported. Falling back to {DefaultIgnoredDelay}.",
-                _job.GetType().Name,
-                RecurringBackgroundJobBase.DefaultIgnoredDelay);
-            ignoredDelay = RecurringBackgroundJobBase.DefaultIgnoredDelay;
-        }
-        else if (ignoredDelay <= TimeSpan.Zero)
+        if (ignoredDelay == TimeSpan.Zero)
         {
             return;
         }
