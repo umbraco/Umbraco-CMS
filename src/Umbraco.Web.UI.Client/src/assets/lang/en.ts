@@ -1204,6 +1204,7 @@ export default {
 		instruction: 'Sign in to Umbraco',
 		signInWith: 'Sign in with {0}',
 		timeout: 'Your session has timed out. Please sign in again below.',
+		invalidPasswordMessage: 'The password is not strong enough.',
 	},
 	main: {
 		dashboard: 'Dashboard',
