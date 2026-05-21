@@ -29,16 +29,23 @@ public class UmbracoOperationIdTransformer : IOpenApiOperationTransformer
         OpenApiOperationTransformerContext context,
         CancellationToken cancellationToken)
     {
-        operation.OperationId = GenerateOperationId(context);
+        var operationId = GenerateOperationId(context);
+        if (operationId is not null)
+        {
+            operation.OperationId = operationId;
+        }
+
         return Task.CompletedTask;
     }
 
-    private static string GenerateOperationId(OpenApiOperationTransformerContext context)
+    private static string? GenerateOperationId(OpenApiOperationTransformerContext context)
     {
         ApiDescription apiDescription = context.Description;
         if (apiDescription.ActionDescriptor is not ControllerActionDescriptor controllerActionDescriptor)
         {
-            throw new ArgumentException($"This handler operates only on {nameof(ControllerActionDescriptor)}.");
+            // Minimal APIs and other non-MVC endpoints don't carry a ControllerActionDescriptor; leave their
+            // operation ID untouched so the framework's default applies.
+            return null;
         }
 
         ApiVersion defaultVersion = context.ApplicationServices.GetRequiredService<IOptions<ApiVersioningOptions>>().Value.DefaultApiVersion;

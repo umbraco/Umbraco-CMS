@@ -1,5 +1,5 @@
+using System.Net.Mime;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
 using Umbraco.Extensions;
@@ -7,11 +7,31 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Api.Common.OpenApi;
 
 /// <summary>
-/// Removes unwanted MIME types from OpenAPI operations, keeping only the content types
-/// declared by <c>[Consumes]</c> for request bodies or <c>application/json</c> as the default.
+/// Trims redundant JSON-equivalent media types from OpenAPI operations.
 /// </summary>
+/// <remarks>
+/// <para>
+/// ASP.NET Core's content negotiation populates operations with several media types that all serialize to JSON
+/// (<c>text/json</c>, <c>application/*+json</c>, and <c>text/plain</c> alongside <c>application/json</c>).
+/// When <c>application/json</c> is present on a response or request body, this transformer strips those
+/// equivalents so OpenAPI consumers and generated SDKs aren't burdened with variants that produce identical
+/// payloads. Non-JSON media types (e.g. <c>application/xml</c>, <c>application/octet-stream</c>) are preserved.
+/// </para>
+/// <para>
+/// Request bodies additionally honour <c>[Consumes]</c>: when the attribute is present, the request content is
+/// replaced entirely with the declared content types, taking precedence over the
+/// JSON-equivalent stripping above.
+/// </para>
+/// </remarks>
 internal class MimeTypesTransformer : IOpenApiOperationTransformer
 {
+    private static readonly string[] _jsonEquivalentMimeTypes =
+    [
+        MediaTypeNames.Text.Plain,
+        "application/*+json",
+        "text/json"
+    ];
+
     /// <inheritdoc/>
     public Task TransformAsync(
         OpenApiOperation operation,
@@ -40,29 +60,29 @@ internal class MimeTypesTransformer : IOpenApiOperationTransformer
             }
             else
             {
-                RemoveNonJsonMimeTypes(requestContent);
+                RemoveJsonEquivalentMimeTypes(requestContent);
             }
         }
 
-        // For responses, always keep only application/json.
+        // For responses, drop JSON-equivalent media types when application/json is present.
         foreach (IOpenApiResponse response in (operation.Responses ?? []).Values)
         {
             if (response is OpenApiResponse openApiResponse)
             {
-                RemoveNonJsonMimeTypes(openApiResponse.Content);
+                RemoveJsonEquivalentMimeTypes(openApiResponse.Content);
             }
         }
 
         return Task.CompletedTask;
     }
 
-    private static void RemoveNonJsonMimeTypes(IDictionary<string, OpenApiMediaType>? content)
+    private static void RemoveJsonEquivalentMimeTypes(IDictionary<string, OpenApiMediaType>? content)
     {
-        if (content?.ContainsKey("application/json") != true)
+        if (content?.ContainsKey(MediaTypeNames.Application.Json) != true)
         {
             return;
         }
 
-        content.RemoveAll(r => r.Key != "application/json");
+        content.RemoveAll(r => _jsonEquivalentMimeTypes.Contains(r.Key, StringComparer.OrdinalIgnoreCase));
     }
 }
