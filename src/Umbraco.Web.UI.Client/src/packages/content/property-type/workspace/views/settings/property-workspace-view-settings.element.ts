@@ -145,22 +145,19 @@ export class UmbPropertyTypeWorkspaceViewSettingsElement extends UmbLitElement i
 	// called whenever loaded data changes — otherwise the dropdown shows "No validation"
 	// for any saved regEx until the user manually edits the regex input.
 	#syncCustomValidationSelection(regEx: string | null) {
-		const noValidationIndex = 0;
-		const customIndex = this._customValidationOptions.length - 1;
-
-		let targetIndex: number;
+		let targetValue: string;
 		if (!regEx) {
-			targetIndex = noValidationIndex;
+			targetValue = '!NOVALIDATION!';
 		} else {
-			const presetIndex = this._customValidationOptions.findIndex(
-				(option, i) => i !== noValidationIndex && i !== customIndex && option.value === regEx,
+			const preset = this._customValidationOptions.find(
+				(option) => option.value !== '!NOVALIDATION!' && option.value !== '.+' && option.value === regEx,
 			);
-			targetIndex = presetIndex >= 0 ? presetIndex : customIndex;
+			targetValue = preset ? preset.value : '.+';
 		}
 
-		this._customValidationOptions = this._customValidationOptions.map((option, i) => ({
+		this._customValidationOptions = this._customValidationOptions.map((option) => ({
 			...option,
-			selected: i === targetIndex,
+			selected: option.value === targetValue,
 		}));
 	}
 

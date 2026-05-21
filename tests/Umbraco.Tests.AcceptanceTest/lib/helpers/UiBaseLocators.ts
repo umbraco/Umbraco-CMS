@@ -1354,7 +1354,7 @@ export class UiBaseLocators extends BasePage {
   }
 
   async doesSelectedValidationOptionHaveValue(value: string) {
-    await expect(this.validation).toHaveValue(value);
+    await this.hasValue(this.validation, value);
   }
 
   // Composition & Structure Methods
