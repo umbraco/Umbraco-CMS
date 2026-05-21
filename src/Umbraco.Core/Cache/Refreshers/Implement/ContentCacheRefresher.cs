@@ -345,15 +345,15 @@ public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCac
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode))
         {
             Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
-            _documentUrlService.CreateOrUpdateUrlSegmentsAsync(key).GetAwaiter().GetResult();
-            _documentUrlAliasService.CreateOrUpdateAliasesAsync(key).GetAwaiter().GetResult();
+            _documentUrlService.UpdateUrlSegmentCacheAsync(key).GetAwaiter().GetResult();
+            _documentUrlAliasService.UpdateAliasCacheAsync(key).GetAwaiter().GetResult();
         }
 
         if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch))
         {
             Guid key = payload.Key ?? _idKeyMap.GetKeyForId(payload.Id, UmbracoObjectTypes.Document).Result;
-            _documentUrlService.CreateOrUpdateUrlSegmentsWithDescendantsAsync(key).GetAwaiter().GetResult();
-            _documentUrlAliasService.CreateOrUpdateAliasesWithDescendantsAsync(key).GetAwaiter().GetResult();
+            _documentUrlService.UpdateUrlSegmentCacheWithDescendantsAsync(key).GetAwaiter().GetResult();
+            _documentUrlAliasService.UpdateAliasCacheWithDescendantsAsync(key).GetAwaiter().GetResult();
         }
     }
 
