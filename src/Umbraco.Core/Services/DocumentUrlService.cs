@@ -519,7 +519,35 @@ public class DocumentUrlService : IDocumentUrlService
     }
 
     /// <inheritdoc/>
-    public async Task CreateOrUpdateUrlSegmentsAsync(IEnumerable<IContent> documentsEnumerable)
+    public async Task CreateOrUpdateUrlSegmentsAsync(IEnumerable<IContent> documents)
+        => await CreateOrUpdateUrlSegmentsInternalAsync(documents, skipDatabaseWrite: false);
+
+    /// <inheritdoc/>
+    public async Task UpdateUrlSegmentCacheAsync(Guid key)
+    {
+        IContent? content = _contentService.GetById(key);
+        if (content is not null)
+        {
+            await CreateOrUpdateUrlSegmentsInternalAsync(content.Yield(), skipDatabaseWrite: true);
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task UpdateUrlSegmentCacheWithDescendantsAsync(Guid key)
+    {
+        var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
+        IContent? item = _contentService.GetById(id);
+        if (item is null)
+        {
+            _logger.LogDebug("Skipping URL segment cache update for document with key {DocumentKey} — document not found.", key);
+            return;
+        }
+
+        IEnumerable<IContent> descendants = _contentService.GetPagedDescendants(id, 0, int.MaxValue, out _);
+        await CreateOrUpdateUrlSegmentsInternalAsync(new List<IContent>(descendants) { item }, skipDatabaseWrite: true);
+    }
+
+    private async Task CreateOrUpdateUrlSegmentsInternalAsync(IEnumerable<IContent> documentsEnumerable, bool skipDatabaseWrite)
     {
         IEnumerable<IContent> documents = documentsEnumerable as IContent[] ?? documentsEnumerable.ToArray();
         if (documents.Any() is false)
@@ -579,7 +607,7 @@ public class DocumentUrlService : IDocumentUrlService
             }
         }
 
-        if (toSave.Count > 0 && SkipDatabaseWrites() is false)
+        if (!skipDatabaseWrite && toSave.Count > 0 && SkipDatabaseWrites() is false)
         {
             scope.WriteLock(Constants.Locks.DocumentUrls);
             _documentUrlRepository.Save(toSave);
