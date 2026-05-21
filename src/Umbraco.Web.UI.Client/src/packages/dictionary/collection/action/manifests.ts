@@ -1,6 +1,6 @@
 import { UMB_DICTIONARY_ROOT_ENTITY_TYPE } from '../../entity.js';
 import { UMB_CREATE_DICTIONARY_WORKSPACE_PATH_PATTERN } from '../../workspace/index.js';
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/collection';
 
 const createPath = UMB_CREATE_DICTIONARY_WORKSPACE_PATH_PATTERN.generateAbsolute({
 	parentEntityType: UMB_DICTIONARY_ROOT_ENTITY_TYPE,
@@ -20,7 +20,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				alias: UMB_COLLECTION_CONDITION_ALIAS,
 				match: 'Umb.Collection.Dictionary',
 			},
 		],

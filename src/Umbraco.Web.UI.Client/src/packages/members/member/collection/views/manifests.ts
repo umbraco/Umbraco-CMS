@@ -1,4 +1,4 @@
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/collection';
 
 export const UMB_MEMBER_TABLE_COLLECTION_VIEW_ALIAS = 'Umb.CollectionView.Member.Table';
 
@@ -15,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				alias: UMB_COLLECTION_CONDITION_ALIAS,
 				match: 'Umb.Collection.Member',
 			},
 		],

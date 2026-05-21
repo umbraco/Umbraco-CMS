@@ -1,6 +1,6 @@
 import { UMB_CLIPBOARD_COLLECTION_ALIAS } from '../constants.js';
 import { UMB_CLIPBOARD_TABLE_COLLECTION_VIEW_ALIAS } from './table/index.js';
-import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_COLLECTION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/collection';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -15,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		},
 		conditions: [
 			{
-				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				alias: UMB_COLLECTION_CONDITION_ALIAS,
 				match: UMB_CLIPBOARD_COLLECTION_ALIAS,
 			},
 		],
