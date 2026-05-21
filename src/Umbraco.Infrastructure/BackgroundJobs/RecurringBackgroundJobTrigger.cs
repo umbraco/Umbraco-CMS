@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs;
 /// </summary>
 /// <typeparam name="TJob">The type of the recurring background job to trigger.</typeparam>
 internal sealed class RecurringBackgroundJobTrigger<TJob> : IRecurringBackgroundJobTrigger<TJob>
-    where TJob : ITriggerableRecurringBackgroundJob
+    where TJob : class, ITriggerableRecurringBackgroundJob
 {
     private readonly RecurringBackgroundJobHostedServiceRunner _runner;
 
