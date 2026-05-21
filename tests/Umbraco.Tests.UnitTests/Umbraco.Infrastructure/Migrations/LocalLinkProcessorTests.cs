@@ -496,6 +496,62 @@ public class LocalLinkProcessorTests
             result);
     }
 
+    /// <summary>
+    /// When the v13 source has a <c>data-anchor</c> attribute but no fragment in the href
+    /// (the case reported in #22860), the anchor value should be appended to the href so
+    /// the link resolves correctly in the v15+ RTE. The user-reported case has <c>data-anchor="#"</c>.
+    /// </summary>
+    [Test]
+    public void ProcessStringValue_DataAnchorWithEmptyHash_NoFragmentInHref_AppendsHashToHref()
+    {
+        var processor = CreateProcessor();
+
+        var input = @"<a href=""/{localLink:umb://document/99fdc05492b5458c859f91ebaaaa4775}"" title=""Page title"" data-anchor=""#"">Link text</a>";
+
+        var result = processor.ProcessStringValue(input);
+
+        Assert.AreEqual(
+            @"<a href=""/{localLink:99fdc054-92b5-458c-859f-91ebaaaa4775}#"" type=""document"" title=""Page title"" data-anchor=""#"">Link text</a>",
+            result);
+    }
+
+    /// <summary>
+    /// When the v13 source has a non-empty <c>data-anchor</c> value but the fragment is not
+    /// present in the href, the migration should append the data-anchor value to the href so
+    /// the link resolves correctly in the v15+ RTE.
+    /// </summary>
+    [Test]
+    public void ProcessStringValue_DataAnchorAttribute_FragmentNotInHref_AppendsFragmentToHref()
+    {
+        var processor = CreateProcessor();
+
+        var input = @"<a href=""/{localLink:umb://document/ac2038d9dfc24294b7787edf90d1a178}"" title=""My Page"" data-anchor=""#section"">link</a>";
+
+        var result = processor.ProcessStringValue(input);
+
+        Assert.AreEqual(
+            @"<a href=""/{localLink:ac2038d9-dfc2-4294-b778-7edf90d1a178}#section"" type=""document"" title=""My Page"" data-anchor=""#section"">link</a>",
+            result);
+    }
+
+    /// <summary>
+    /// When the v13 source already has the data-anchor value present in the href fragment,
+    /// the migration should not duplicate it.
+    /// </summary>
+    [Test]
+    public void ProcessStringValue_DataAnchorMatchesHrefFragment_DoesNotDuplicateFragment()
+    {
+        var processor = CreateProcessor();
+
+        var input = @"<a href=""/{localLink:umb://document/ac2038d9dfc24294b7787edf90d1a178}#section"" title=""My Page"" data-anchor=""#section"">link</a>";
+
+        var result = processor.ProcessStringValue(input);
+
+        Assert.AreEqual(
+            @"<a href=""/{localLink:ac2038d9-dfc2-4294-b778-7edf90d1a178}#section"" type=""document"" title=""My Page"" data-anchor=""#section"">link</a>",
+            result);
+    }
+
 #pragma warning disable CS0618 // Type or member is obsolete
     private LocalLinkProcessor CreateProcessor(IIdKeyMap? idKeyMap = null)
     {
