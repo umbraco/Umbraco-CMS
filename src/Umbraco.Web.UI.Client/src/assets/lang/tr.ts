@@ -1726,6 +1726,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL izleyiciyi devre dışı bırakın',
 		enableUrlTracker: 'URL izleyiciyi etkinleştir',
+		urlTrackerEnabled: 'Etkin',
+		urlTrackerDisabled: 'Devre Dışı',
 		originalUrl: 'Orijinal URL',
 		redirectedTo: 'Yönlendirildi',
 		redirectUrlManagement: 'URL Yönetimini Yeniden Yönlendir',

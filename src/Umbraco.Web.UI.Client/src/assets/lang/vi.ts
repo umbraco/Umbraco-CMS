@@ -2291,6 +2291,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Tắt theo dõi URL',
 		enableUrlTracker: 'Bật theo dõi URL',
+		urlTrackerEnabled: 'Đã bật',
+		urlTrackerDisabled: 'Đã tắt',
 		originalUrl: 'URL gốc',
 		redirectedTo: 'Chuyển hướng đến',
 		redirectUrlManagement: 'Quản lý URL chuyển hướng',
