@@ -156,7 +156,11 @@ public class PropertyCacheLevelTests
 
             var contentNode = CreateContentNode("Set 1", 1234, setType1, new Dictionary<string, object> { { "prop1", "1234" } });
             var propertyRenderingContextAccessor = new TestPropertyRenderingContextAccessor { PropertyRenderingContext = new(default) };
-            var unused = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
+            var element = new PublishedElement(contentNode, false, elementsCache, variationContextAccessor, propertyRenderingContextAccessor);
+
+            // Property wrappers are materialized lazily, so a property access is required
+            // to surface the invalid PropertyCacheLevel.Unknown.
+            _ = element.Value(Mock.Of<IPublishedValueFallback>(), "prop1");
         });
     }
 
