@@ -15,6 +15,10 @@ export class UmbSaveWorkspaceAction<
 	constructor(host: UmbControllerHost, args: UmbSaveWorkspaceActionArgs<ArgsMetaType, WorkspaceContextType>) {
 		super(host, args);
 
+		// Opt in to isExecuting feedback so the workspace-action element waits
+		// for the save modal (when present) before showing the spinner.
+		this.setExecuting(false);
+
 		this._retrieveWorkspaceContext = this.consumeContext(
 			args.workspaceContextToken ?? UMB_SAVEABLE_WORKSPACE_CONTEXT,
 			(context) => {
@@ -49,9 +53,13 @@ export class UmbSaveWorkspaceAction<
 
 	override async execute() {
 		this.setExecuting(false);
-		await this._retrieveWorkspaceContext;
-		await this._workspaceContext?.requestSave({
-			onActionStarting: () => this.setExecuting(true),
-		});
+		try {
+			await this._retrieveWorkspaceContext;
+			await this._workspaceContext?.requestSave({
+				onActionStarting: () => this.setExecuting(true),
+			});
+		} finally {
+			this.setExecuting(false);
+		}
 	}
 }

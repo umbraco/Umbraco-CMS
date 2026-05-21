@@ -57,7 +57,6 @@ export class UmbWorkspaceActionElement<
 		});
 
 		this.#observeIsDisabled();
-		this.#observeIsExecuting();
 	}
 	public get api(): ApiType | undefined {
 		return this.#api;
@@ -129,7 +128,22 @@ export class UmbWorkspaceActionElement<
 	async #runApiAction(api: UmbWorkspaceAction<UmbWorkspaceActionArgs<MetaType>> | undefined) {
 		this.#executionStarted = false;
 
-		// If the api does not expose an isExecuting observable, fall back to
+		// Observe isExecuting on the api we're about to invoke - which may be
+		// _actionApi (set dynamically by subclasses like save-and-preview) or #api.
+		// The shared alias replaces any previous observation so re-clicks track
+		// the right api each time.
+		this.observe(
+			api?.isExecuting,
+			(isExecuting) => {
+				if (isExecuting) {
+					this._buttonState = 'waiting';
+					this.#executionStarted = true;
+				}
+			},
+			'isExecutingObserver',
+		);
+
+		// If the api doesn't opt in to isExecuting feedback, fall back to
 		// showing the waiting state immediately (legacy behaviour).
 		if (!api?.isExecuting) {
 			this._buttonState = 'waiting';
@@ -164,19 +178,6 @@ export class UmbWorkspaceActionElement<
 				this._isDisabled = isDisabled || false;
 			},
 			'isDisabledObserver',
-		);
-	}
-
-	#observeIsExecuting() {
-		this.observe(
-			this.#api?.isExecuting,
-			(isExecuting) => {
-				if (isExecuting) {
-					this._buttonState = 'waiting';
-					this.#executionStarted = true;
-				}
-			},
-			'isExecutingObserver',
 		);
 	}
 

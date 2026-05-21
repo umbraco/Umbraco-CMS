@@ -2,6 +2,7 @@ import type { UmbWorkspaceActionArgs } from './types.js';
 import type { UmbWorkspaceAction } from './workspace-action.interface.js';
 import { UmbBooleanState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbActionBase } from '@umbraco-cms/backoffice/action';
+import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 /**
  * Base class for an workspace action.
@@ -18,8 +19,14 @@ export abstract class UmbWorkspaceActionBase<ArgsMetaType = never>
 	protected _isDisabled = new UmbBooleanState(false);
 	public isDisabled = this._isDisabled.asObservable();
 
-	protected _isExecuting = new UmbBooleanState(false);
-	public isExecuting = this._isExecuting.asObservable();
+	// Lazy: only created when a subclass opts in via setExecuting(). Subclasses that
+	// represent a modal-aware/async flow should call `setExecuting(false)` from their
+	// constructor so the observable is exposed before the workspace-action element
+	// reads `api.isExecuting`. Subclasses that don't opt in keep `isExecuting`
+	// undefined, which signals the element to fall back to its legacy eager
+	// waiting-state behaviour.
+	protected _isExecuting?: UmbBooleanState<boolean>;
+	public isExecuting?: Observable<boolean>;
 
 	/**
 	 * By specifying the href, the action will act as a link.
@@ -58,13 +65,25 @@ export abstract class UmbWorkspaceActionBase<ArgsMetaType = never>
 
 	/**
 	 * Signals whether `execute()` is currently performing real work. Subclasses
-	 * should call this with `true` once any preceding modal has been confirmed
-	 * and the actual work is about to begin, and reset to `false` at the start
-	 * of the next `execute()` call.
-	 * @param {boolean} value - `true` when real work has started; `false` otherwise.
+	 * that opt in to modal-aware execution feedback should:
+	 *
+	 * 1. Call `this.setExecuting(false)` in their constructor so `isExecuting`
+	 *    is exposed before the workspace-action element observes it.
+	 * 2. Call `this.setExecuting(true)` once any preceding modal has been
+	 *    confirmed and real work is about to begin.
+	 * 3. Wrap the work in `try/finally` and call `this.setExecuting(false)` on
+	 *    completion so the observable honours its contract.
+	 *
+	 * Subclasses that never call this method keep `isExecuting` undefined,
+	 * which signals consumers to fall back to legacy eager-feedback behaviour.
+	 * @param {boolean} value - `true` while real work is in flight; `false` otherwise.
 	 * @memberof UmbWorkspaceActionBase
 	 */
 	protected setExecuting(value: boolean): void {
+		if (!this._isExecuting) {
+			this._isExecuting = new UmbBooleanState(false);
+			this.isExecuting = this._isExecuting.asObservable();
+		}
 		this._isExecuting.setValue(value);
 	}
 }
