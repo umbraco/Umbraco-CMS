@@ -1,7 +1,7 @@
 import { css, customElement, html, property, LitElement } from '@umbraco-cms/backoffice/external/lit';
 
 /**
- * A passive overlay that frames its parent with a rounded border and shows a label tab
+ * An overlay that frames its parent with a rounded border and shows a label tab
  * just above the parent's top-right corner. Visibility is controlled by the consumer via
  * `--umb-entity-frame-opacity` (defaults to `1`); the typical pattern is for the parent
  * container to set it to `0` by default and toggle to `1` on `:hover` and/or `:focus-within`.
@@ -29,7 +29,7 @@ export class UmbEntityFrameElement extends LitElement {
 	override render() {
 		return html`
 			<div class="border" aria-hidden="true"></div>
-			<div class="tab" aria-hidden="true"><slot>${this.label}</slot></div>
+			<div class="tab"><slot>${this.label}</slot></div>
 		`;
 	}
 

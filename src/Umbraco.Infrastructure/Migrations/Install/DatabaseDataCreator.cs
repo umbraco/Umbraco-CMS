@@ -52,8 +52,8 @@ internal sealed class DatabaseDataCreator
         },
         new()
         {
-            Name = "Find all logs that are from the namespace 'Umbraco.Core'",
-            Query = "StartsWith(SourceContext, 'Umbraco.Core')",
+            Name = "Find all logs that are within the namespace 'Umbraco.Cms'",
+            Query = "StartsWith(SourceContext, 'Umbraco.Cms')",
         },
         new()
         {

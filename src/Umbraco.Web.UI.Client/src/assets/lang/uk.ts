@@ -504,6 +504,7 @@ export default {
 		constrainProportions: 'Зберігати пропорції',
 		continue: 'Далі',
 		copy: 'Копіювати',
+		copied: 'Скопійовано!',
 		create: 'Створити',
 		database: 'База даних',
 		date: 'Дата',
@@ -981,6 +982,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Зупинити відстеження URL',
 		enableUrlTracker: 'Запустити відстеження URL',
+		urlTrackerEnabled: 'Увімкнено',
+		urlTrackerDisabled: 'Вимкнено',
 		originalUrl: 'Початковий URL',
 		redirectedTo: 'Перенаправлено в',
 		noRedirects: 'На даний момент немає жодного перенаправлення',

@@ -423,8 +423,8 @@ export const savedSearches: Array<SavedLogSearchResponseModel> = [
 		query: 'Has(Duration) and Duration > 1000',
 	},
 	{
-		name: "Find all logs that are from the namespace 'Umbraco.Core'",
-		query: "StartsWith(SourceContext, 'Umbraco.Core')",
+		name: "Find all logs that are within the namespace 'Umbraco.Cms'",
+		query: "StartsWith(SourceContext, 'Umbraco.Cms')",
 	},
 ];
 

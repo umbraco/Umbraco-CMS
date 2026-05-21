@@ -887,6 +887,7 @@ export default {
 		content: 'Content',
 		continue: 'Continue',
 		copy: 'Copy',
+		copied: 'Copied!',
 		create: 'Create',
 		database: 'Database',
 		date: 'Date',
@@ -2483,7 +2484,13 @@ export default {
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Disable URL tracker',
+		disableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To disable tracking, set the following configuration key to true:',
 		enableUrlTracker: 'Enable URL tracker',
+		enableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To enable tracking, set the following configuration key to false:',
+		urlTrackerEnabled: 'Enabled',
+		urlTrackerDisabled: 'Disabled',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Redirected To',
 		redirectUrlManagement: 'Redirect URL Management',

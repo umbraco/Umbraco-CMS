@@ -837,6 +837,7 @@ export default {
 		content: 'Nội dung',
 		continue: 'Tiếp tục',
 		copy: 'Sao chép',
+		copied: 'Đã sao chép!',
 		create: 'Tạo mới',
 		database: 'Cơ sở dữ liệu',
 		date: 'Ngày',
@@ -2290,6 +2291,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Tắt theo dõi URL',
 		enableUrlTracker: 'Bật theo dõi URL',
+		urlTrackerEnabled: 'Đã bật',
+		urlTrackerDisabled: 'Đã tắt',
 		originalUrl: 'URL gốc',
 		redirectedTo: 'Chuyển hướng đến',
 		redirectUrlManagement: 'Quản lý URL chuyển hướng',

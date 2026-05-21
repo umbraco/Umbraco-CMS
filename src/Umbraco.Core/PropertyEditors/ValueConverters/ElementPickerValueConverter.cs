@@ -74,7 +74,7 @@ internal sealed class ElementPickerValueConverter : PropertyValueConverterBase, 
         }
 
         IEnumerable<IPublishedElement> elements = keys
-            .Select(key => _publishedElementCache.GetByIdAsync(key, preview).GetAwaiter().GetResult())
+            .Select(key => _publishedElementCache.GetById(preview, key))
             .WhereNotNull();
 
         if (preview is false && _variationContextAccessor.VariationContext?.Culture is not null)
