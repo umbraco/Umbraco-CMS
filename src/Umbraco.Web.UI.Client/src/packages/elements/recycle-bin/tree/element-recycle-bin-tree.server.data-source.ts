@@ -1,4 +1,5 @@
 import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { UmbElementVariantState } from '../../variant-state.js';
 import { UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
 import type { UmbElementRecycleBinTreeItemModel } from '../types.js';
 import type { UmbElementTreeItemVariantModel } from '../../tree/types.js';
@@ -79,21 +80,24 @@ const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinT
 		entityType: item.isFolder ? UMB_ELEMENT_FOLDER_ENTITY_TYPE : UMB_ELEMENT_ENTITY_TYPE,
 		icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
 		isTrashed: true,
+		noAccess: false,
 		hasChildren: item.hasChildren,
 		documentType: {
 			unique: item.documentType?.id ?? '',
 			icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
 			collection: null,
 		},
-		variants: item.variants.map((variant): UmbElementTreeItemVariantModel => {
-			return {
-				name: variant.name,
-				culture: variant.culture || null,
-				segment: null, // TODO: add segment to the backend API?
-				state: variant.state,
-				flags: variant.flags,
-			};
-		}),
+		variants: item.isFolder
+			? [{ name: item.name, culture: null, segment: null, state: UmbElementVariantState.PUBLISHED, flags: [] }]
+			: item.variants.map((variant): UmbElementTreeItemVariantModel => {
+					return {
+						name: variant.name,
+						culture: variant.culture || null,
+						segment: null, // TODO: add segment to the backend API?
+						state: variant.state,
+						flags: variant.flags,
+					};
+				}),
 		// TODO: this is not correct. We need to get it from the variants. This is a temp solution. [LK]
 		name: item.isFolder ? item.name : item.variants[0]?.name,
 		isFolder: item.isFolder,

@@ -282,12 +282,12 @@ export class UmbDocumentLinksWorkspaceInfoAppElement extends UmbLitElement {
 
 				&:is(a) {
 					cursor: pointer;
-					color: inherit;
 					text-decoration: none;
+					color: var(--uui-color-interactive);
 				}
 
 				&:is(a):hover {
-					background: var(--uui-color-divider);
+					color: var(--uui-color-interactive-emphasis);
 				}
 
 				& > span {

@@ -709,6 +709,7 @@ export default {
 		content: 'Sadržaj',
 		continue: 'Nastavi',
 		copy: 'Kopiraj',
+		copied: 'Kopirano!',
 		create: 'Kreiraj',
 		database: 'Baza podataka',
 		date: 'Datum',
@@ -984,8 +985,6 @@ export default {
 		instruction: 'Prijavite se ispod',
 		signInWith: 'Prijavite se sa',
 		timeout: 'Isteklo je vrijeme sesije',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ',
 		forgottenPassword: 'Zaboravljena lozinka?',
 		forgottenPasswordInstruction: 'E-mail će biti poslan na adresu navedenu sa vezom za reset\n       lozinke\n    ',
 		requestPasswordResetConfirmation:
@@ -996,17 +995,6 @@ export default {
 		setPasswordInstruction: 'Molimo unesite novu lozinku',
 		setPasswordConfirmation: 'Vaša lozinka je ažurirana',
 		resetCodeExpired: 'Link na koji ste kliknuli je nevažeći ili je istekao',
-		resetPasswordEmailCopySubject: 'Umbraco: Reset lozinke',
-		resetPasswordEmailCopyFormat:
-			"\n        <html>\n\t\t\t<head>\n\t\t\t\t<meta name='viewport' content='width=device-width'>\n\t\t\t\t<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n\t\t\t</head>\n\t\t\t<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>\n\t\t\t\t<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>\n\t\t\t\t<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"body\" style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;\" bgcolor=\"#1d1333\">\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;\" valign=\"top\">\n\t\t\t\t\t\t\t<table style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;\">\n\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t<td background=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" bgcolor=\"#1d1333\" width=\"28\" height=\"28\" valign=\"top\" style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\">\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:30px;height:30px;\"> <v:fill type=\"tile\" src=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" color=\"#1d1333\" /> <v:textbox inset=\"0,0,0,0\"> <![endif]-->\n<div></div>\n<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->\n</td>\n<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\" valign=\"top\"></td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>\n<tr>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>\n<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>\n<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>\n<br>\n<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>\n<tr>\n<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>\n<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>\n<tr>\n<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>\n<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tZatraženo je ponovno postavljanje lozinke\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</h1>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tVaše korisničko ime za prijavu na Umbraco backoffice je: <strong>%0%</strong>\n</p>\n<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>\n<tbody>\n<tr>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>\n<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tKliknite na ovaj link da poništite lozinku\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</a>\n</td>\n</tr>\n</tbody>\n</table>\n</p>\n<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Ukoliko ne možete kliknuti na link, kopirajte i zalijepite ovaj URL u prozor vašeg pretraživača:</p>\n<table border='0' cellpadding='0' cellspacing='0'>\n<tr>\n<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>\n<font style=\"-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;\">\n<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>\n</font>\n</td>\n</tr>\n</table>\n</p>\n</td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n<br><br><br>\n</div>\n</td>\n<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'></td>\n</tr>\n</table>\n</body>\n</html>\n\t",
-		mfaSecurityCodeSubject: 'Umbraco: Sigurnosni kod',
-		mfaSecurityCodeMessage: 'Vaš sigurnosni kod je: %0%',
-		'2faTitle': 'Poslednji korak',
-		'2faText': 'Omogućili ste 2-faktorsku autentifikaciju i morate potvrditi svoj identitet.',
-		'2faMultipleText': 'Molimo odaberite 2-faktor provajdera',
-		'2faCodeInput': 'Verifikacijski kod',
-		'2faCodeInputHelp': 'Unesite verifikacioni kod',
-		'2faInvalidCode': 'Unesen je nevažeći kod',
 	},
 	main: {
 		dashboard: 'Kontrolna tabla',
@@ -1907,6 +1895,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Onemogući URL tragač',
 		enableUrlTracker: 'Omogući URL tragač',
+		urlTrackerEnabled: 'Omogućen',
+		urlTrackerDisabled: 'Onemogućen',
 		originalUrl: 'Originalni URL',
 		redirectedTo: 'Preusmjeri na',
 		redirectUrlManagement: 'Preusmjeravanje URL-ova',

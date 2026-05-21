@@ -323,7 +323,9 @@
     elementFolder: '/umbraco/management/api/v1/element/folder',
     treeElementRoot: '/umbraco/management/api/v1/tree/element/root',
     treeElementChildren: '/umbraco/management/api/v1/tree/element/children',
-    revoke: '/umbraco/management/api/v1/security/back-office/revoke'
+    revoke: '/umbraco/management/api/v1/security/back-office/revoke',
+    currentUserProfile: '/umbraco/management/api/v1/user/current/profile',
+    currentUserAvatar: '/umbraco/management/api/v1/user/current/avatar'
   }
 
   public static readonly userGroupDescriptionValues = {

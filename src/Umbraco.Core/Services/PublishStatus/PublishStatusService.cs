@@ -100,7 +100,16 @@ public abstract class PublishStatusService
     /// <param name="key">The item's key.</param>
     /// <param name="publishedCultures">The set of culture codes for which the item is published.</param>
     protected void SetStatus(Guid key, ISet<string> publishedCultures)
-        => _publishedCultures[key] = publishedCultures;
+    {
+        if (publishedCultures.Count > 0)
+        {
+            _publishedCultures[key] = publishedCultures;
+        }
+        else
+        {
+            RemoveStatus(key);
+        }
+    }
 
     /// <summary>
     /// Removes an item from the publish status cache.
