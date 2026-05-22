@@ -1,5 +1,6 @@
 import type { UmbContentTreeItemModel } from '../../types.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbSortChildrenOfModalElement } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-sort-children-of-content-modal')
@@ -11,6 +12,24 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 		hour: 'numeric',
 		minute: '2-digit',
 	};
+
+	#appCulture?: string;
+
+	constructor() {
+		super();
+		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
+			this.observe(
+				context?.appLanguageCulture,
+				(appCulture) => {
+					this.#appCulture = appCulture;
+					if (this._children.length > 0) {
+						this._createTableItems();
+					}
+				},
+				'umbObserveAppLanguageCulture',
+			);
+		});
+	}
 
 	protected override _setTableColumns() {
 		this._tableColumns = [
@@ -29,15 +48,14 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 
 	protected override _createTableItems() {
 		this._tableItems = this._children.map((treeItem) => {
-			// TODO: implement ItemDataResolver for document and media
-			// This will fix both the icon and the variant name
+			// TODO: implement ItemDataResolver for document and media. This will also fix the hard-coded icon.
 			return {
 				id: treeItem.unique,
 				icon: 'icon-document',
 				data: [
 					{
 						columnAlias: 'name',
-						value: treeItem.name,
+						value: this.#resolveName(treeItem),
 					},
 					{
 						columnAlias: 'createDate',
@@ -46,6 +64,32 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 				],
 			};
 		});
+	}
+
+	#resolveName(treeItem: UmbContentTreeItemModel): string {
+		// Documents carry a variants array; media (which uses the same modal) does not, so the cast stays local here.
+		const variants = (
+			treeItem as UmbContentTreeItemModel & { variants?: Array<{ name?: string; culture: string | null }> }
+		).variants;
+		if (!variants?.length) {
+			return treeItem.name;
+		}
+
+		// Invariant content: the only variant has culture === null — use treeItem.name.
+		if (variants[0].culture === null) {
+			return treeItem.name;
+		}
+
+		const currentVariant = this.#appCulture
+			? variants.find((variant) => variant.culture === this.#appCulture)
+			: undefined;
+		if (currentVariant?.name) {
+			return currentVariant.name;
+		}
+
+		// No name in the current language — fall back to any named variant, parenthesised so it's visibly a fallback.
+		const fallbackName = variants.find((variant) => variant.name)?.name ?? treeItem.name;
+		return fallbackName ? `(${fallbackName})` : treeItem.name;
 	}
 
 	protected override _sortCompare(columnAlias: string, valueA: unknown, valueB: unknown): number {
