@@ -134,7 +134,7 @@ public sealed class ImageSharpImageUrlTokenGenerator : IImageUrlTokenGenerator, 
 
     private static string BuildUrl(string pathPart, CommandCollection commands)
     {
-        if (!commands.Keys.Any())
+        if (commands.Keys.Any() is false)
         {
             return pathPart;
         }
@@ -162,7 +162,7 @@ public sealed class ImageSharpImageUrlTokenGenerator : IImageUrlTokenGenerator, 
         }
 
         var withQuery = QueryHelpers.AddQueryString(pathPart, dict);
-        if (!entityEncodeSeparators)
+        if (entityEncodeSeparators is false)
         {
             return withQuery;
         }
