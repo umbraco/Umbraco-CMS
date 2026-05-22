@@ -1,4 +1,4 @@
-import { UmbModalToken } from '../../modal/token/index.js';
+import { UmbModalToken } from '@umbraco-cms/backoffice/modal';
 import type { UmbUserLoginState } from '../types.js';
 
 export type UmbModalAppAuthConfig = {
