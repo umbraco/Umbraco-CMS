@@ -3,7 +3,7 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
 
 export interface UmbBuildMediaWorkspaceRoutesArgs {
-	variants: ReadonlyArray<UmbMediaVariantOptionModel>;
+	getVariants: () => ReadonlyArray<UmbMediaVariantOptionModel>;
 	splitViewComponent: HTMLElement;
 	splitView: UmbWorkspaceSplitViewManager | undefined;
 	getIsForbidden: () => boolean;
@@ -15,6 +15,10 @@ export interface UmbBuildMediaWorkspaceRoutesArgs {
  * Media types currently hardcode `ContentVariation.Nothing`, so the variant routes are dead in
  * production today. The dynamic-route scaffolding is kept in sync with the document editor so
  * the n² split-view route table cannot reappear here if media gains variants later.
+ *
+ * Inputs that can change at runtime (variants) are passed as a getter because umb-router-slot's
+ * routes setter skips re-applying routes when only callbacks change — the resolvers must read
+ * fresh values at call time rather than relying on captured closures.
  * @param {UmbBuildMediaWorkspaceRoutesArgs} args - the inputs needed to construct the routes.
  * @returns {Array<UmbRoute>} the routes to install on the workspace router slot.
  */
@@ -29,17 +33,18 @@ export function buildMediaWorkspaceRoutes(args: UmbBuildMediaWorkspaceRoutesArgs
 		component: notFoundComponent,
 	};
 
-	if (args.variants.length === 0 || !args.splitView) {
+	if (args.getVariants().length === 0 || !args.splitView) {
 		return [catchAllRoute];
 	}
 
-	const { splitView, variants, splitViewComponent } = args;
+	const { splitView, splitViewComponent } = args;
 
 	return [
 		{
 			// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 			path: ':variantPath',
 			resolve: async (info) => {
+				const variants = args.getVariants();
 				const consumed = info.match.fragments.consumed;
 
 				const parts = consumed.split('_&_');
@@ -70,7 +75,15 @@ export function buildMediaWorkspaceRoutes(args: UmbBuildMediaWorkspaceRoutesArgs
 		{
 			path: '',
 			pathMatch: 'full',
-			redirectTo: variants[0]?.unique,
+			resolve: async (info) => {
+				const workspaceRoute = info.slot.constructAbsolutePath('');
+				if (!workspaceRoute) return;
+
+				const variants = args.getVariants();
+				if (variants.length === 0) return;
+
+				history.replaceState({}, '', `${workspaceRoute}/${variants[0].unique}`);
+			},
 		},
 		catchAllRoute,
 	];

@@ -68,7 +68,7 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 
 	private _generateRoutes() {
 		this._routes = buildMediaWorkspaceRoutes({
-			variants: this.#variants ?? [],
+			getVariants: () => this.#variants ?? [],
 			splitViewComponent: this._splitViewElement,
 			splitView: this.#workspaceContext?.splitView,
 			getIsForbidden: () => this.#isForbidden,

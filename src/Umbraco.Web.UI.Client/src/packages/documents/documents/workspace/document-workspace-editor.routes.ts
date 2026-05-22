@@ -3,8 +3,8 @@ import type { UmbRoute } from '@umbraco-cms/backoffice/router';
 import type { UmbWorkspaceSplitViewManager } from '@umbraco-cms/backoffice/workspace';
 
 export interface UmbBuildDocumentWorkspaceRoutesArgs {
-	variants: ReadonlyArray<UmbDocumentVariantOptionModel>;
-	appCulture: string | undefined;
+	getVariants: () => ReadonlyArray<UmbDocumentVariantOptionModel>;
+	getAppCulture: () => string | undefined;
 	splitViewComponent: HTMLElement;
 	splitView: UmbWorkspaceSplitViewManager | undefined;
 	getWorkspaceRoute: () => string | undefined;
@@ -18,6 +18,10 @@ export interface UmbBuildDocumentWorkspaceRoutesArgs {
  * the split-view component for known variants and the NotFound element for unknown ones, without
  * altering the URL. Routes stay a fixed handful of entries regardless of how many variants the
  * document has.
+ *
+ * Inputs that can change at runtime (variants, appCulture) are passed as getters because
+ * umb-router-slot's routes setter skips re-applying routes when only callbacks change — the
+ * resolvers must read fresh values at call time rather than relying on captured closures.
  * @param {UmbBuildDocumentWorkspaceRoutesArgs} args - the inputs needed to construct the routes.
  * @returns {Array<UmbRoute>} the routes to install on the workspace router slot.
  */
@@ -32,11 +36,11 @@ export function buildDocumentWorkspaceRoutes(args: UmbBuildDocumentWorkspaceRout
 		component: notFoundComponent,
 	};
 
-	if (args.variants.length === 0 || !args.appCulture || !args.splitView) {
+	if (args.getVariants().length === 0 || !args.getAppCulture() || !args.splitView) {
 		return [catchAllRoute];
 	}
 
-	const { splitView, variants, appCulture, splitViewComponent } = args;
+	const { splitView, splitViewComponent } = args;
 
 	return [
 		{
@@ -44,6 +48,7 @@ export function buildDocumentWorkspaceRoutes(args: UmbBuildDocumentWorkspaceRout
 			path: ':variantPath',
 			preserveQuery: true,
 			resolve: async (info) => {
+				const variants = args.getVariants();
 				const consumed = info.match.fragments.consumed;
 
 				const parts = consumed.split('_&_');
@@ -76,18 +81,22 @@ export function buildDocumentWorkspaceRoutes(args: UmbBuildDocumentWorkspaceRout
 			path: '',
 			preserveQuery: true,
 			pathMatch: 'full',
-			resolve: async () => {
-				const workspaceRoute = args.getWorkspaceRoute();
-				if (!workspaceRoute) {
-					throw new Error('Workspace route is not available when resolving the default route.');
-				}
+			resolve: async (info) => {
+				// Workspace route may not yet be populated on the wrapper element on initial load (the
+				// init event fires after the first navigation); info.slot knows its base path at this
+				// point. Return silently rather than throwing — the next navigation will re-resolve
+				// once state is fully wired up.
+				const workspaceRoute = info.slot.constructAbsolutePath('') || args.getWorkspaceRoute();
+				if (!workspaceRoute) return;
+
+				const variants = args.getVariants();
+				if (variants.length === 0) return;
+
+				const appCulture = args.getAppCulture();
+				const target = variants.find((v) => v.unique === appCulture)?.unique ?? variants[0].unique;
 
 				const urlSearchParams = new URLSearchParams(window.location.search);
 				const openCollection = urlSearchParams.has('openCollection');
-
-				const target = variants.find((v) => v.unique === appCulture)?.unique ?? variants[0]?.unique;
-
-				if (!target) return;
 
 				history.replaceState({}, '', `${workspaceRoute}/${target}${openCollection ? '/view/collection' : ''}`);
 			},

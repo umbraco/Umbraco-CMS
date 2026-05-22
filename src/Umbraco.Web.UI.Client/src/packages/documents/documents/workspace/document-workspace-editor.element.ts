@@ -107,8 +107,8 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 
 	#generateRoutes() {
 		this._routes = buildDocumentWorkspaceRoutes({
-			variants: this.#variants ?? [],
-			appCulture: this.#appCulture,
+			getVariants: () => this.#variants ?? [],
+			getAppCulture: () => this.#appCulture,
 			splitViewComponent: this._splitViewElement,
 			splitView: this.#workspaceContext?.splitView,
 			getWorkspaceRoute: () => this.#workspaceRoute,
