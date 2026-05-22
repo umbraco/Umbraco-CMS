@@ -338,7 +338,6 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<UmbracoRequestMiddleware>();
         builder.Services.AddSingleton<BootFailedMiddleware>();
         builder.Services.AddSingleton<ProtectRecycleBinMediaMiddleware>();
-        builder.Services.AddSingleton<UmbracoBackOfficeCacheHeadersMiddleware>();
 
         builder.Services.AddHealthChecks()
             .AddCheck<UmbracoReadinessHealthCheck>("umbraco-ready", tags: [UmbracoReadinessHealthCheck.ReadyTag]);

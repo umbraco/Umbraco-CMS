@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Web.Common.Hosting;
+using Umbraco.Cms.Web.Common.Middleware;
 
 namespace Umbraco.Extensions;
 
@@ -68,6 +69,7 @@ public static partial class UmbracoBuilderExtensions
         builder.Services.AddSingleton<IBackOfficeEnabledMarker, BackOfficeEnabledMarker>();
 
         builder.Services.AddUnique<IBackOfficePathGenerator, UmbracoBackOfficePathGenerator>();
+        builder.Services.AddSingleton<UmbracoBackOfficeCacheHeadersMiddleware>();
         builder.Services.AddUnique<IPhysicalFileSystem>(factory =>
         {
             var path = "~/";
