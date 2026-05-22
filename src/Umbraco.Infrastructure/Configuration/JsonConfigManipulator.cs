@@ -16,13 +16,17 @@ namespace Umbraco.Cms.Infrastructure.Configuration;
 /// </summary>
 internal sealed class JsonConfigManipulator : IConfigManipulator
 {
-    private const string ConnectionStringObjectName = "ConnectionStrings";
-    private const string UmbracoConnectionStringPath = $"{ConnectionStringObjectName}:{Constants.System.UmbracoConnectionName}";
+    private const string ConnectionStringsObjectName = "ConnectionStrings";
+    private const string UmbracoConnectionStringPath = $"{ConnectionStringsObjectName}:{Constants.System.UmbracoConnectionName}";
     private const string UmbracoConnectionStringProviderNamePath = UmbracoConnectionStringPath + ConnectionStrings.ProviderNamePostfix;
-    private const string CmsObjectPath = "Umbraco:CMS";
-    private const string GlobalIdPath = $"{CmsObjectPath}:Global:Id";
-    private const string DisableRedirectUrlTrackingPath = $"{CmsObjectPath}:WebRouting:DisableRedirectUrlTracking";
-    private const string ImagingHmacSecretKeyPath = $"{CmsObjectPath}:Imaging:HMACSecretKey";
+    private const string DisableRedirectUrlTrackingPath = Constants.Configuration.ConfigWebRouting + ":DisableRedirectUrlTracking";
+    private const string ImagingHmacSecretKeyPath = Constants.Configuration.ConfigImaging + ":HMACSecretKey";
+
+    // Allowlist of filenames created on first write when the source is registered but missing on disk.
+    private static readonly string[] _creatableFileNames =
+    [
+        "appsettings.Local.json",
+    ];
 
     private readonly JsonDocumentOptions _jsonDocumentOptions = new() { CommentHandling = JsonCommentHandling.Skip };
     private readonly IConfiguration _configuration;
@@ -43,60 +47,48 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     /// <inheritdoc />
     public async Task SaveConnectionStringAsync(string connectionString, string? providerName)
     {
-        // Target the last JSON provider so connection strings land in the most specific (environment-overriding) file
-        // — typically appsettings.{Environment}.json — instead of the shared appsettings.json.
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(preferLast: true);
-        JsonNode? node = await GetJsonNodeAsync(provider);
-
-        if (node is null)
+        if (await LoadJsonAsync(preferLast: true) is not (var provider, var node))
         {
             _logger.LogWarning("Was unable to load the configuration file to save the connection string");
             return;
         }
 
-        CreateOrUpdateJsonNode(node, UmbracoConnectionStringPath, connectionString);
+        SetJsonValue(node, UmbracoConnectionStringPath, connectionString);
         if (providerName is not null)
         {
-            CreateOrUpdateJsonNode(node, UmbracoConnectionStringProviderNamePath, providerName);
+            SetJsonValue(node, UmbracoConnectionStringProviderNamePath, providerName);
         }
 
-        await SaveJsonAsync(provider, node);
+        await WriteJsonAsync(provider, node);
 
-        // Force a synchronous reload so the new value is visible via IOptionsMonitor.CurrentValue
-        // before this method returns. The file watcher would normally trigger this asynchronously,
-        // but for newly-created files (e.g. an appsettings.Local.json that didn't exist at startup)
-        // the reload can race with IOptionsMonitor.OnChange — firing the callback with stale,
-        // pre-reload data and breaking the install flow that immediately reads CurrentValue.
-        ReloadConfiguration();
+        // Reload synchronously so IOptionsMonitor.CurrentValue sees the new value before this returns —
+        // the file watcher reload races with OnChange callbacks reading stale data.
+        if (_configuration is IConfigurationRoot configurationRoot)
+        {
+            configurationRoot.Reload();
+        }
     }
 
     /// <inheritdoc />
     public async Task RemoveConnectionStringAsync()
     {
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider(preferLast: true);
-
-        JsonNode? jsonNode = await GetJsonNodeAsync(provider);
-
-        if (jsonNode is null)
+        if (await LoadJsonAsync(preferLast: true) is not (var provider, var node))
         {
             _logger.LogWarning("Failed to remove connection string from JSON configuration");
             return;
         }
 
-        RemoveJsonNode(jsonNode, UmbracoConnectionStringPath);
-        RemoveJsonNode(jsonNode, UmbracoConnectionStringProviderNamePath);
+        RemoveJsonValue(node, UmbracoConnectionStringPath);
+        RemoveJsonValue(node, UmbracoConnectionStringProviderNamePath);
 
-        await SaveJsonAsync(provider, jsonNode);
+        await WriteJsonAsync(provider, node);
     }
 
     /// <inheritdoc />
     [Obsolete("This method is no longer used by Umbraco. Scheduled for removal in Umbraco 19.")]
     public async Task SaveConfigValueAsync(string itemPath, object value)
     {
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
-        JsonNode? node = await GetJsonNodeAsync(provider);
-
-        if (node is null)
+        if (await LoadJsonAsync(preferLast: false) is not (var provider, var node))
         {
             _logger.LogWarning("Failed to save configuration key \"{Key}\" in JSON configuration", itemPath);
             return;
@@ -114,59 +106,43 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
         }
 
         propertyNode.ReplaceWith(value);
-        await SaveJsonAsync(provider, node);
+        await WriteJsonAsync(provider, node);
     }
 
     /// <inheritdoc />
     [Obsolete("This method is no longer used by Umbraco. Set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead. Scheduled for removal in Umbraco 19.")]
-    public async Task SaveDisableRedirectUrlTrackingAsync(bool disable)
-        => await CreateOrUpdateConfigValueAsync(DisableRedirectUrlTrackingPath, disable);
+    public Task SaveDisableRedirectUrlTrackingAsync(bool disable)
+        => SetConfigValueAsync(DisableRedirectUrlTrackingPath, disable);
 
     /// <inheritdoc />
-    public async Task SetGlobalIdAsync(string id)
-        => await CreateOrUpdateConfigValueAsync(GlobalIdPath, id);
+    public Task SetGlobalIdAsync(string id)
+        => SetConfigValueAsync(Constants.Configuration.ConfigGlobalId, id);
 
     /// <inheritdoc />
-    public async Task SetImagingHmacSecretKeyAsync(string base64Key)
-        => await CreateOrUpdateConfigValueAsync(ImagingHmacSecretKeyPath, base64Key);
+    public Task SetImagingHmacSecretKeyAsync(string base64Key)
+        => SetConfigValueAsync(ImagingHmacSecretKeyPath, base64Key);
 
     /// <summary>
-    /// Creates or updates a config value at the specified path.
-    /// <remarks>This causes a rewrite of the configuration file.</remarks>
+    /// Creates or updates a configuration value at the specified path in the base JSON configuration source.
     /// </summary>
-    /// <param name="itemPath">Path to update, uses : as the separator.</param>
-    /// <param name="value">The value of the node.</param>
-    private async Task CreateOrUpdateConfigValueAsync(string itemPath, object value)
+    private async Task SetConfigValueAsync(string itemPath, object value)
     {
-        JsonConfigurationProvider? provider = GetJsonConfigurationProvider();
-        JsonNode? node = await GetJsonNodeAsync(provider);
-
-        if (node is null)
+        if (await LoadJsonAsync(preferLast: false) is not (var provider, var node))
         {
             _logger.LogWarning("Failed to save configuration key \"{Key}\" in JSON configuration", itemPath);
             return;
         }
 
-        CreateOrUpdateJsonNode(node, itemPath, value);
-        await SaveJsonAsync(provider, node);
+        SetJsonValue(node, itemPath, value);
+        await WriteJsonAsync(provider, node);
     }
 
     /// <summary>
-    /// Updates or creates a json node at the specified path.
-    /// <remarks>
-    /// Will also create any missing nodes in the path.
-    /// </remarks>
+    /// Creates or updates a JSON value at the specified path, creating intermediate object nodes as needed.
     /// </summary>
-    /// <param name="node">Node to create or update.</param>
-    /// <param name="itemPath">Path to create or update, uses : as the separator.</param>
-    /// <param name="value">The value of the node.</param>
-    private static void CreateOrUpdateJsonNode(JsonNode node, string itemPath, object value)
+    private static void SetJsonValue(JsonNode node, string itemPath, object value)
     {
-        // This is required because System.Text.Json has no merge function, and doesn't support patch
-        // this is a problem because we don't know if the key(s) exists yet, so we can't simply update it,
-        // we may have to create one ore more json objects.
-
-        // First we find the inner most child that already exists.
+        // System.Text.Json has no merge/patch support, so we walk the tree manually.
         var propertyNames = itemPath.Split(':');
         JsonNode propertyNode = node;
         var index = 0;
@@ -182,26 +158,24 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
             index++;
         }
 
-
-        // We can now use the index to go through the remaining keys, creating them as we go.
         while (index < propertyNames.Length)
         {
-            var propertyName = propertyNames[index];
             var newNode = new JsonObject();
-            propertyNode.AsObject()[propertyName] = newNode;
+            propertyNode.AsObject()[propertyNames[index]] = newNode;
             propertyNode = newNode;
             index++;
         }
 
-        // System.Text.Json doesn't like just setting an Object as a value, so instead we first create the node,
-        // and then replace the value
         propertyNode.ReplaceWith(value);
     }
 
-    private static void RemoveJsonNode(JsonNode node, string key)
+    /// <summary>
+    /// Removes the JSON value at the specified path, if it exists.
+    /// </summary>
+    private static void RemoveJsonValue(JsonNode node, string itemPath)
     {
         JsonNode? propertyNode = node;
-        foreach (var propertyName in key.Split(':'))
+        foreach (var propertyName in itemPath.Split(':'))
         {
             propertyNode = FindChildNode(propertyNode, propertyName);
         }
@@ -209,71 +183,12 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
         propertyNode?.Parent?.AsObject().Remove(propertyNode.GetPropertyName());
     }
 
-    private async Task SaveJsonAsync(JsonConfigurationProvider? provider, JsonNode jsonNode)
-    {
-        if (provider?.Source.FileProvider is not PhysicalFileProvider physicalFileProvider)
-        {
-            return;
-        }
-
-        await _lock.WaitAsync();
-
-        try
-        {
-            var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path!);
-            await using var jsonConfigStream = new FileStream(jsonFilePath, FileMode.Create);
-            await using var writer = new Utf8JsonWriter(jsonConfigStream, new JsonWriterOptions { Indented = true });
-            jsonNode.WriteTo(writer);
-        }
-        finally
-        {
-            _lock.Release();
-        }
-    }
-
-    private async Task<JsonNode?> GetJsonNodeAsync(JsonConfigurationProvider? provider)
-    {
-        if (provider is null)
-        {
-            return null;
-        }
-
-        await _lock.WaitAsync();
-        if (provider.Source.FileProvider is not PhysicalFileProvider physicalFileProvider)
-        {
-            return null;
-        }
-
-        var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path!);
-
-        try
-        {
-            if (File.Exists(jsonFilePath) is false)
-            {
-                // Backing file isn't on disk yet (e.g. an optional appsettings.Local.json registered by the
-                // template). Return an object pre-populated with the $schema reference so the file we create
-                // gets IntelliSense/validation in editors; SaveJsonAsync will create the file on write.
-                return new JsonObject
-                {
-                    ["$schema"] = "./appsettings-schema.json",
-                };
-            }
-
-            using var streamReader = new StreamReader(jsonFilePath);
-            return await JsonNode.ParseAsync(streamReader.BaseStream, documentOptions: _jsonDocumentOptions);
-        }
-        catch (IOException exception)
-        {
-            _logger.LogWarning(exception, "JSON configuration could not be read: {Path}", jsonFilePath);
-            return null;
-        }
-        finally
-        {
-            _lock.Release();
-        }
-    }
-
-    private JsonConfigurationProvider? GetJsonConfigurationProvider(string? requiredKey = null, bool preferLast = false)
+    /// <summary>
+    /// Locates the first or last writable JSON configuration provider and loads its content as a <see cref="JsonNode"/> tree.
+    /// </summary>
+    /// <param name="preferLast">If true, walks providers in reverse order to find the most specific override.</param>
+    /// <returns>The provider/node pair, or null when no writable JSON source is available or its file cannot be read.</returns>
+    private async Task<(JsonConfigurationProvider Provider, JsonNode Node)?> LoadJsonAsync(bool preferLast)
     {
         if (_configuration is not IConfigurationRoot configurationRoot)
         {
@@ -284,60 +199,113 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
             ? configurationRoot.Providers.Reverse()
             : configurationRoot.Providers;
 
-        foreach (IConfigurationProvider provider in providers)
+        foreach (IConfigurationProvider configurationProvider in providers)
         {
-            if (provider is not JsonConfigurationProvider jsonConfigurationProvider)
+            if (configurationProvider is not JsonConfigurationProvider jsonProvider)
             {
                 continue;
             }
 
-            if (requiredKey is not null && provider.TryGet(requiredKey, out _) is false)
+            if (TryGetFilePath(jsonProvider, out var jsonFilePath) is false ||
+                (File.Exists(jsonFilePath) is false && IsCreatableFile(jsonFilePath) is false))
             {
                 continue;
             }
 
-            // When targeting the last provider for writes, only skip JSON sources we can't write to a file on disk
-            // (in-memory or embedded providers). A physical source whose backing file doesn't yet exist is still
-            // acceptable — e.g. an optional appsettings.Local.json registered by the template; the file will be
-            // created on first save, keeping the connection string local-only rather than leaking into
-            // appsettings.{Environment}.json.
-            if (preferLast && HasPhysicalFileSource(jsonConfigurationProvider) is false)
-            {
-                continue;
-            }
+            JsonNode? node = await ReadJsonAsync(jsonFilePath);
 
-            return jsonConfigurationProvider;
+            return node is null
+                ? null
+                : (jsonProvider, node);
         }
 
         return null;
-    }
 
-    private static bool HasPhysicalFileSource(JsonConfigurationProvider provider) =>
-        provider.Source.FileProvider is PhysicalFileProvider && provider.Source.Path is not null;
-
-    private void ReloadConfiguration()
-    {
-        if (_configuration is IConfigurationRoot configurationRoot)
+        async Task<JsonNode?> ReadJsonAsync(string jsonFilePath)
         {
-            configurationRoot.Reload();
+            await _lock.WaitAsync();
+
+            try
+            {
+                if (File.Exists(jsonFilePath) is false)
+                {
+                    return new JsonObject
+                    {
+                        ["$schema"] = "./appsettings-schema.json",
+                    };
+                }
+
+                await using var jsonConfigStream = File.OpenRead(jsonFilePath);
+
+                return await JsonNode.ParseAsync(jsonConfigStream, documentOptions: _jsonDocumentOptions);
+            }
+            catch (IOException exception)
+            {
+                _logger.LogWarning(exception, "JSON configuration could not be read: {Path}", jsonFilePath);
+
+                return null;
+            }
+            finally
+            {
+                _lock.Release();
+            }
         }
     }
 
     /// <summary>
-    /// Finds the immediate child with the specified name, in a case insensitive manner.
+    /// Writes the JSON node back to the file backing the specified provider.
     /// </summary>
-    /// <remarks>
-    /// This is required since keys are case insensitive in IConfiguration.
-    /// But not in JsonNode.
-    /// </remarks>
-    /// <param name="node">The node to search.</param>
-    /// <param name="key">The key to search for.</param>
-    /// <returns>The found node, null if no match is found.</returns>
+    private async Task WriteJsonAsync(JsonConfigurationProvider provider, JsonNode node)
+    {
+        if (TryGetFilePath(provider, out var jsonFilePath) is false)
+        {
+            return;
+        }
+
+        await _lock.WaitAsync();
+
+        try
+        {
+            await using var jsonConfigStream = new FileStream(jsonFilePath, FileMode.Create);
+            await using var writer = new Utf8JsonWriter(jsonConfigStream, new JsonWriterOptions { Indented = true });
+            node.WriteTo(writer);
+        }
+        finally
+        {
+            _lock.Release();
+        }
+    }
+
+    /// <summary>
+    /// Resolves the absolute file path for a JSON configuration provider backed by a <see cref="PhysicalFileProvider"/>.
+    /// </summary>
+    private static bool TryGetFilePath(JsonConfigurationProvider provider, out string filePath)
+    {
+        if (provider.Source is { FileProvider: PhysicalFileProvider physicalFileProvider, Path: { } sourcePath })
+        {
+            filePath = Path.Combine(physicalFileProvider.Root, sourcePath);
+            return true;
+        }
+
+        filePath = string.Empty;
+        return false;
+    }
+
+    /// <summary>
+    /// Returns true when the file is allowlisted to be created on first write (see <see cref="_creatableFileNames"/>).
+    /// </summary>
+    private static bool IsCreatableFile(string filePath) =>
+        _creatableFileNames.Contains(Path.GetFileName(filePath), StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Finds the immediate child with the specified name, in a case-insensitive manner.
+    /// </summary>
+    /// <remarks>This is required since keys are case-insensitive in <see cref="IConfiguration"/> but not in <see cref="JsonNode"/>.</remarks>
     private static JsonNode? FindChildNode(JsonNode? node, string key)
     {
         if (node is null)
         {
-            return node;
+            return null;
         }
 
         foreach (KeyValuePair<string, JsonNode?> property in node.AsObject())

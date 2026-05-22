@@ -94,20 +94,24 @@ public class JsonConfigManipulatorTests
         });
     }
 
-    [Test]
-    public async Task SaveConnectionStringAsync_WhenLastProviderFileIsMissing_CreatesAndWritesToIt()
+    [TestCase("secrets.json", TestName = "SaveConnectionStringAsync_SkipsMissingUserSecretsFileAndFallsThroughToAppsettings")]
+    [TestCase("appsettings.Production.json", TestName = "SaveConnectionStringAsync_SkipsMissingAppsettingsFileAndFallsThroughToAppsettings")]
+    public async Task SaveConnectionStringAsync_SkipsMissingSources(string strayFileName)
     {
+        // Any JSON source whose backing file doesn't already exist on disk must be skipped (unless
+        // explicitly allowlisted in CreatableFileNames) so we never accidentally create files in the
+        // project tree. Covers un-initialized user secrets (secrets.json) and a regular
+        // appsettings.{Environment}.json that hasn't been created yet.
         File.WriteAllText(_firstFilePath, "{}");
         File.WriteAllText(_secondFilePath, "{}");
-        var missingOptionalFileName = "appsettings.Local.json";
-        var missingOptionalFilePath = Path.Combine(_tempPath, missingOptionalFileName);
-        Assert.IsFalse(File.Exists(missingOptionalFilePath), "Precondition: optional file should not exist on disk.");
+        var strayFilePath = Path.Combine(_tempPath, strayFileName);
+        Assert.IsFalse(File.Exists(strayFilePath), "Precondition: stray file must not already exist.");
 
         IConfigurationRoot configuration = new ConfigurationBuilder()
             .SetBasePath(_tempPath)
             .AddJsonFile(FirstFileName, optional: false, reloadOnChange: false)
             .AddJsonFile(SecondFileName, optional: false, reloadOnChange: false)
-            .AddJsonFile(missingOptionalFileName, optional: true, reloadOnChange: false)
+            .AddJsonFile(strayFileName, optional: true, reloadOnChange: false)
             .Build();
         var sut = new JsonConfigManipulator(configuration, Mock.Of<ILogger<JsonConfigManipulator>>());
 
@@ -115,12 +119,42 @@ public class JsonConfigManipulatorTests
 
         Assert.Multiple(() =>
         {
+            Assert.IsFalse(File.Exists(strayFilePath), $"Connection string must not be written to a non-existent {strayFileName} (no new files should be created).");
             Assert.IsNull(ReadConnectionString(_firstFilePath), "Connection string should not be written to the first JSON provider.");
-            Assert.IsNull(ReadConnectionString(_secondFilePath), "Connection string should not be written to the middle JSON provider.");
-            Assert.IsTrue(File.Exists(missingOptionalFilePath), "Optional missing file should be created by the installer.");
-            Assert.AreEqual(ConnectionString, ReadConnectionString(missingOptionalFilePath), "Connection string should be written to the last (newly created) JSON provider.");
-            Assert.AreEqual(ProviderName, ReadProviderName(missingOptionalFilePath));
-            Assert.AreEqual("./appsettings-schema.json", ReadJsonValue(missingOptionalFilePath, "$schema"), "Newly created config file should include the $schema reference.");
+            Assert.AreEqual(ConnectionString, ReadConnectionString(_secondFilePath), "Connection string should fall through to the last writable JSON provider.");
+            Assert.AreEqual(ProviderName, ReadProviderName(_secondFilePath));
+        });
+    }
+
+    [Test]
+    public async Task SaveConnectionStringAsync_WhenAppsettingsLocalIsMissing_CreatesFileWithSchemaReference()
+    {
+        // appsettings.Local.json is allowlisted in CreatableFileNames so the install can materialize it
+        // on first write (it's gitignored, so a fresh clone doesn't have it on disk).
+        File.WriteAllText(_firstFilePath, "{}");
+        File.WriteAllText(_secondFilePath, "{}");
+        const string LocalFileName = "appsettings.Local.json";
+        var localFilePath = Path.Combine(_tempPath, LocalFileName);
+        Assert.IsFalse(File.Exists(localFilePath), "Precondition: appsettings.Local.json must not exist before the install runs.");
+
+        IConfigurationRoot configuration = new ConfigurationBuilder()
+            .SetBasePath(_tempPath)
+            .AddJsonFile(FirstFileName, optional: false, reloadOnChange: false)
+            .AddJsonFile(SecondFileName, optional: false, reloadOnChange: false)
+            .AddJsonFile(LocalFileName, optional: true, reloadOnChange: false)
+            .Build();
+        var sut = new JsonConfigManipulator(configuration, Mock.Of<ILogger<JsonConfigManipulator>>());
+
+        await sut.SaveConnectionStringAsync(ConnectionString, ProviderName);
+
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(File.Exists(localFilePath), "appsettings.Local.json should be created on first write because it's allowlisted.");
+            Assert.IsNull(ReadConnectionString(_firstFilePath), "Connection string should not be written to the first JSON provider.");
+            Assert.IsNull(ReadConnectionString(_secondFilePath), "Connection string should not fall through to appsettings.Development.json when the allowlisted source accepts the write.");
+            Assert.AreEqual(ConnectionString, ReadConnectionString(localFilePath));
+            Assert.AreEqual(ProviderName, ReadProviderName(localFilePath));
+            Assert.AreEqual("./appsettings-schema.json", ReadJsonValue(localFilePath, "$schema"), "Newly created appsettings.Local.json should include the $schema reference.");
         });
     }
 
