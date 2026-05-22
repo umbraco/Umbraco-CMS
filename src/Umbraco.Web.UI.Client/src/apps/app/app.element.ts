@@ -33,7 +33,7 @@ import './app-logo.element.js';
 import { UMB_CURRENT_USER_CONTEXT } from '@umbraco-cms/backoffice/current-user';
 
 const CORE_PACKAGES: Array<Promise<{ name: string; extensions: Array<ManifestBase | UmbExtensionManifestKind> }>> = [
-	import('../../packages/block/index.js'),
+	import('../../packages/block/umbraco-package.js'),
 	import('../../packages/clipboard/umbraco-package.js'),
 	import('../../packages/code-editor/umbraco-package.js'),
 	import('../../packages/content/umbraco-package.js'),
