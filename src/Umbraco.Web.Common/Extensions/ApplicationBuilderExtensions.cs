@@ -244,8 +244,12 @@ public static class ApplicationBuilderExtensions
     ///         contains a content hash.
     ///     </para>
     ///     <para>
-    ///         In debug mode the cache-busting hash changes on every request, so the header is set to
-    ///         <c>no-cache</c> to avoid filling the browser disk cache with single-use entries.
+    ///         In debug mode the underlying built assets may change while the app is running (typically
+    ///         from a developer rebuilding the backoffice without restarting the host). The header is
+    ///         therefore set to <c>no-cache</c>, which still allows the browser to store the response
+    ///         but forces an <c>If-None-Match</c> revalidation on the next request — yielding fast 304s
+    ///         when nothing has changed and full 200s when the file on disk has been rebuilt.
+    ///         <c>no-store</c> would force a full re-download on every request, which is unnecessary.
     ///     </para>
     ///     <para>
     ///         This middleware is non-destructive to consumer customisation:
