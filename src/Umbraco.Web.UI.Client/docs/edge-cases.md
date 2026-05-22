@@ -703,6 +703,6 @@ const defaultRoute = routes[0]; // or whichever is the landing route
 routes.push({ ...defaultRoute, path: '', pathMatch: 'full' });
 ```
 
-`umb-workspace-editor` uses this pattern (`workspace-editor.element.ts:142`). The content-type design editor was fixed to follow it in #22855.
+`umb-workspace-editor` uses this pattern — see the `// Duplicate first workspace and use it for the empty path scenario.` block in `workspace-editor.element.ts`.
 
 

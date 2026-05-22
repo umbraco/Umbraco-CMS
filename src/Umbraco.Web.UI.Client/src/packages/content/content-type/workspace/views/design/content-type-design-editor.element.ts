@@ -104,6 +104,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 	#tabsStructureHelper = new UmbContentTypeContainerStructureHelper<UmbContentTypeModel>(this);
 	#currentTabComponent?: UmbContentTypeDesignEditorTabElement;
 	#processingTabId?: string;
+	#landingLocalPath?: string;
 
 	set manifest(value: ManifestWorkspaceViewContentTypeDesignEditorKind) {
 		this._compositionRepositoryAlias = value.meta.compositionRepositoryAlias;
@@ -177,6 +178,13 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 			// the tabs helper subscribes to populated containers and #createRoutes runs against
 			// actual tabs/groups rather than the empty initial emissions of the underlying state.
 			await workspaceContext.structure.whenLoaded();
+			if (workspaceContext !== this.#workspaceContext) return; // stale, superseded by newer context
+
+			// Ensure root-group state is correct before the first route set is generated. #createRoutes() can
+			// run synchronously when setStructureManager attaches observers, and umb-router-slot does not
+			// re-match the URL when routes are replaced.
+			this._hasRootGroups = (await workspaceContext.structure.getRootContainers('Group')).length > 0;
+			if (workspaceContext !== this.#workspaceContext) return; // stale, superseded by newer context
 
 			this.#tabsStructureHelper.setStructureManager(workspaceContext.structure);
 			this.#observeRootGroups();
@@ -241,6 +249,7 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		// otherwise the first tab.
 		const defaultRoute =
 			this._hasRootGroups || this._hasRootProperties || this._tabs.length === 0 ? routes[routes.length - 1] : routes[0];
+		this.#landingLocalPath = defaultRoute.path;
 		routes.push({
 			...defaultRoute,
 			path: '',
@@ -481,7 +490,14 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 								this._routerPath = event.target.absoluteRouterPath;
 							}}
 							@change=${(event: UmbRouterSlotChangeEvent) => {
-								this._activePath = event.target.absoluteActiveViewPath ?? '';
+								let activePath = event.target.absoluteActiveViewPath ?? '';
+								// When the duplicated empty-path landing route is active, the router reports
+								// the absolute path as `${routerPath}/` with no local segment. Map it back to
+								// the canonical landing path so tab-navigation highlight and rename UI work.
+								if (this.#landingLocalPath && activePath === this._routerPath + '/') {
+									activePath = this._routerPath + '/' + this.#landingLocalPath;
+								}
+								this._activePath = activePath;
 							}}>
 						</umb-router-slot>`
 					: nothing}
