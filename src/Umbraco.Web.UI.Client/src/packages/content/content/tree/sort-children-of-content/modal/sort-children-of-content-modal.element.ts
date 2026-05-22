@@ -22,8 +22,9 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 				context?.appLanguageCulture,
 				(appCulture) => {
 					this.#appCulture = appCulture;
-					if (this._children.length > 0) {
-						this._createTableItems();
+					if (this._tableItems.length > 0) {
+						// Patch names in-place so any user drag-sort or column-order is preserved.
+						this.#updateTableItemNames();
 					}
 				},
 				'umbObserveAppLanguageCulture',
@@ -66,8 +67,21 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 		});
 	}
 
+	#updateTableItemNames() {
+		this._tableItems = this._tableItems.map((tableItem) => {
+			const treeItem = this._children.find((child) => child.unique === tableItem.id);
+			if (!treeItem) return tableItem;
+			return {
+				...tableItem,
+				data: tableItem.data.map((column) =>
+					column.columnAlias === 'name' ? { ...column, value: this.#resolveName(treeItem) } : column,
+				),
+			};
+		});
+	}
+
 	#resolveName(treeItem: UmbContentTreeItemModel): string {
-		// Documents carry a variants array; media (which uses the same modal) does not, so the cast stays local here.
+		// The shared UmbContentTreeItemModel type used by this modal does not declare variants, so the cast stays local here.
 		const variants = (
 			treeItem as UmbContentTreeItemModel & { variants?: Array<{ name?: string; culture: string | null }> }
 		).variants;
