@@ -12,6 +12,7 @@ using Microsoft.Net.Http.Headers;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Web.Common.Hosting;
+using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
@@ -122,6 +123,7 @@ public class UseUmbracoBackOfficeCacheHeadersTests
                             g.BackOfficeAssetsPath == Prefix));
                         services.AddSingleton(Mock.Of<IHostingEnvironment>(e =>
                             e.IsDebugMode == isDebug));
+                        services.AddSingleton<UmbracoBackOfficeCacheHeadersMiddleware>();
                     })
                     .Configure(app =>
                     {
