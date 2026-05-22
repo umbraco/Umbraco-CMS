@@ -1,5 +1,5 @@
-using System.Collections.Concurrent;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using SixLabors.ImageSharp.Web;
@@ -18,6 +18,8 @@ namespace Umbraco.Cms.Imaging.ImageSharp.Media;
 /// Computed tokens are cached in-process keyed by the canonical, sanitised URL (path + only the
 /// query parameters that contribute to the HMAC). Cache-buster parameters such as <c>v</c> or
 /// <c>rnd</c> are stripped from the cache key so they do not bloat memory when used per-request.
+/// The cache is bounded with an entry cap and sliding expiration so stale entries (e.g. for
+/// deleted media or unused crop variants) cannot accumulate indefinitely.
 /// </para>
 /// <para>
 /// The secret key is captured at construction via <see cref="IOptions{TOptions}"/>, mirroring
@@ -25,11 +27,11 @@ namespace Umbraco.Cms.Imaging.ImageSharp.Media;
 /// requires an application restart.
 /// </para>
 /// </remarks>
-public sealed class ImageSharpImageUrlTokenGenerator : IImageUrlTokenGenerator
+public sealed class ImageSharpImageUrlTokenGenerator : IImageUrlTokenGenerator, IDisposable
 {
     private readonly RequestAuthorizationUtilities? _requestAuthorizationUtilities;
     private readonly ImageSharpMiddlewareOptions _options;
-    private readonly ConcurrentDictionary<string, string> _tokenCache = new(StringComparer.Ordinal);
+    private readonly MemoryCache _tokenCache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ImageSharpImageUrlTokenGenerator"/> class.
@@ -42,6 +44,13 @@ public sealed class ImageSharpImageUrlTokenGenerator : IImageUrlTokenGenerator
     {
         _requestAuthorizationUtilities = requestAuthorizationUtilities;
         _options = options.Value;
+
+        // 10k entries × ~500 bytes per CacheEntry (canonical URL ~250 chars, 64-char token,
+        // dictionary overhead) caps the in-process token cache around 5 MB.
+        _tokenCache = new MemoryCache(new MemoryCacheOptions
+        {
+            SizeLimit = 10_000,
+        });
     }
 
     /// <inheritdoc />
@@ -75,7 +84,12 @@ public sealed class ImageSharpImageUrlTokenGenerator : IImageUrlTokenGenerator
         var canonicalUrl = BuildUrl(split.Path, canonicalCommands);
 
         // Sign over the already-sanitised URL; no need for ImageSharp.Web to sanitise again.
-        var token = _tokenCache.GetOrAdd(canonicalUrl, ComputeToken);
+        var token = _tokenCache.GetOrCreate(canonicalUrl, entry =>
+        {
+            entry.Size = 1;
+            entry.SlidingExpiration = TimeSpan.FromHours(24);
+            return ComputeToken(canonicalUrl);
+        }) ?? string.Empty;
 
         if (string.IsNullOrEmpty(token) is false)
         {
@@ -84,6 +98,9 @@ public sealed class ImageSharpImageUrlTokenGenerator : IImageUrlTokenGenerator
 
         return BuildOutputUrl(split.Path, outputParams, split.HadEntityEncoding);
     }
+
+    /// <inheritdoc />
+    public void Dispose() => _tokenCache.Dispose();
 
     /// <summary>
     /// Splits a URL into its path and a parsable query, normalising HTML-entity-encoded
