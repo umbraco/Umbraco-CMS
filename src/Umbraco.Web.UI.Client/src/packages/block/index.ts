@@ -19,3 +19,16 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...blockTypeManifests,
 	modalManifest,
 ];
+
+export const name = 'Umbraco.Core.BlockManagement';
+
+export const extensions = [
+	{
+		name: 'Block Management Bundle',
+		alias: 'Umb.Bundle.BlockManagement',
+		type: 'bundle',
+		js: {
+			manifests,
+		},
+	},
+];
