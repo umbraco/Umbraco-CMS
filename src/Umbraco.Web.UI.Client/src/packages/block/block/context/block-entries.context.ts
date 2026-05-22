@@ -38,6 +38,10 @@ export abstract class UmbBlockEntriesContext<
 		return this._layoutEntries.getValue().length;
 	}
 
+	getLayouts() {
+		return this._layoutEntries.getValue();
+	}
+
 	constructor(host: UmbControllerHost, blockManagerContextToken: BlockManagerContextTokenType) {
 		super(host, UMB_BLOCK_ENTRIES_CONTEXT);
 

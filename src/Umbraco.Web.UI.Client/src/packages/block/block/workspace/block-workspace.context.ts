@@ -107,6 +107,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
+			// Re-render the label now that we can resolve `$index` from the entries context.
+			this.#renderLabel(this.content.getValues(), this.settings.getValues());
 		}).asPromise({ preventTimeout: true });
 
 		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
@@ -273,8 +275,26 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			valueObject['$settings'] = settingsValues;
 		}
 
-		// TODO: Look to add support for `$index`, requires wiring up the block-entry with the workspace. [LK]
-		//valueObject['$index'] = 0;
+		const contentKey = this.#layout.value?.contentKey;
+		let index: number | undefined;
+
+		if (contentKey && this.#blockEntries) {
+			const found = this.#blockEntries.getLayouts().findIndex((x) => x.contentKey === contentKey);
+			if (found !== -1) {
+				index = found;
+			}
+		}
+
+		if (index === undefined && this.#originData && 'index' in this.#originData) {
+			const originIndex = (this.#originData as { index?: number }).index;
+			if (typeof originIndex === 'number' && originIndex !== -1) {
+				index = originIndex;
+			}
+		}
+
+		if (index !== undefined) {
+			valueObject['$index'] = index;
+		}
 
 		this.#labelRender.value = valueObject;
 
