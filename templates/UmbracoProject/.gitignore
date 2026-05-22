@@ -459,7 +459,7 @@ $RECYCLE.BIN/
 ## Umbraco CMS
 ##
 
-# Local appsettings overrides (loaded in Debug builds)
+# Local appsettings.json override
 appsettings.Local.json
 
 # JSON schema files for appsettings.json

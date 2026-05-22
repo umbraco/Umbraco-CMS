@@ -23,7 +23,7 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
     private const string ImagingHmacSecretKeyPath = Constants.Configuration.ConfigImaging + ":HMACSecretKey";
 
     // Allowlist of filenames created on first write when the source is registered but missing on disk.
-    private static readonly string[] _creatableFileNames =
+    internal static readonly string[] CreatableFileNames =
     [
         "appsettings.Local.json",
     ];
@@ -207,7 +207,8 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
             }
 
             if (TryGetFilePath(jsonProvider, out var jsonFilePath) is false ||
-                (File.Exists(jsonFilePath) is false && IsCreatableFile(jsonFilePath) is false))
+                (File.Exists(jsonFilePath) is false &&
+                 CreatableFileNames.Contains(Path.GetFileName(jsonFilePath), StringComparer.OrdinalIgnoreCase) is false))
             {
                 continue;
             }
@@ -290,12 +291,6 @@ internal sealed class JsonConfigManipulator : IConfigManipulator
         filePath = string.Empty;
         return false;
     }
-
-    /// <summary>
-    /// Returns true when the file is allowlisted to be created on first write (see <see cref="_creatableFileNames"/>).
-    /// </summary>
-    private static bool IsCreatableFile(string filePath) =>
-        _creatableFileNames.Contains(Path.GetFileName(filePath), StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Finds the immediate child with the specified name, in a case-insensitive manner.
