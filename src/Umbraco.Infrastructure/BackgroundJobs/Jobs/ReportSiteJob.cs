@@ -1,7 +1,5 @@
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Telemetry;
@@ -12,33 +10,23 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 /// <summary>
 /// Represents a background job that collects and reports information about the current Umbraco site, typically for analytics, diagnostics, or telemetry purposes.
 /// </summary>
-public class ReportSiteJob : IRecurringBackgroundJob
+public class ReportSiteJob : RecurringBackgroundJobBase
 {
     /// <summary>
     /// Gets the period at which the report site job runs.
     /// </summary>
-    public TimeSpan Period => TimeSpan.FromDays(1);
+    public override TimeSpan Period => TimeSpan.FromDays(1);
 
     /// <summary>
     /// Gets the time interval to wait between executions of the <see cref="ReportSiteJob"/>.
     /// The delay is set to 5 minutes.
     /// </summary>
-    public TimeSpan Delay => TimeSpan.FromMinutes(5);
+    public override TimeSpan Delay => TimeSpan.FromMinutes(5);
 
     /// <summary>
     /// Gets an array containing all possible values of the <see cref="ServerRole"/> enumeration.
     /// </summary>
-    public ServerRole[] ServerRoles => Enum.GetValues<ServerRole>();
-
-    /// <summary>
-    /// Event that is triggered when the reporting period for the site job is changed.
-    /// </summary>
-    /// <remarks>No-op event as the period never changes on this job</remarks>
-    public event EventHandler PeriodChanged
-    {
-        add { }
-        remove { }
-    }
+    public override ServerRole[] ServerRoles => Enum.GetValues<ServerRole>();
 
     private readonly ILogger<ReportSiteJob> _logger;
     private readonly ITelemetryService _telemetryService;
@@ -67,8 +55,11 @@ public class ReportSiteJob : IRecurringBackgroundJob
     /// <summary>
     /// Executes the background job that sends the anonymous site ID to the telemetry service.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task RunJobAsync()
+    /// <param name="cancellationToken">A cancellation token that is signaled when the host is shutting down.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation.
+    /// </returns>
+    public override async Task RunJobAsync(CancellationToken cancellationToken)
     {
         TelemetryReportData? telemetryReportData = await _telemetryService.GetTelemetryReportDataAsync().ConfigureAwait(false);
         if (telemetryReportData is null)
@@ -100,7 +91,7 @@ public class ReportSiteJob : IRecurringBackgroundJob
             // Make a HTTP Post to telemetry service
             // https://telemetry.umbraco.com/installs/
             // Fire & Forget, do not need to know if its a 200, 500 etc
-            using (await httpClient.SendAsync(request))
+            using (await httpClient.SendAsync(request, cancellationToken))
             { }
         }
         catch

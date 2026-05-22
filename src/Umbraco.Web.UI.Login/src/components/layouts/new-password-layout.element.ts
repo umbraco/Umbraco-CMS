@@ -1,5 +1,5 @@
 import type { UUIButtonState, UUIInputPasswordElement } from '@umbraco-cms/backoffice/external/uui';
-import { type CSSResultGroup, css, html, nothing, customElement, property, query, state } from '@umbraco-cms/backoffice/external/lit';
+import { type CSSResultGroup, css, html, nothing, customElement, property, query, state, type PropertyValues } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from "@umbraco-cms/backoffice/lit-element";
 
 import { UMB_AUTH_CONTEXT } from '../../contexts';
@@ -53,6 +53,32 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
       this._passwordPattern = pattern;
     });
   }
+
+  protected override firstUpdated(_changedProperties: PropertyValues): void {
+    super.firstUpdated(_changedProperties);
+    if (!this.passwordElement || !this.confirmPasswordElement) return;
+    this.passwordElement.addEventListener('invalid', this.#handlePasswordInvalid);
+    this.confirmPasswordElement.addEventListener('invalid', this.#handlePasswordInvalid);
+  }
+
+  override disconnectedCallback(): void {
+    this.passwordElement?.removeEventListener('invalid', this.#handlePasswordInvalid);
+    this.confirmPasswordElement?.removeEventListener('invalid', this.#handlePasswordInvalid);
+    super.disconnectedCallback();
+  }
+
+  #handlePasswordInput = (event: Event): void => {
+    const input = event.target as UUIInputPasswordElement;
+    input.setCustomValidity('');
+  };
+
+  #handlePasswordInvalid = (event: Event): void => {
+    const input = event.currentTarget as UUIInputPasswordElement;
+    if (input.validity?.patternMismatch) {
+      const passwordValidityText = this.localize.term('login_invalidPasswordMessage') ?? 'The password is not strong enough.';
+      input.setCustomValidity(passwordValidityText);
+    }
+  };
 
   #onSubmit(event: Event) {
     event.preventDefault();
@@ -162,6 +188,7 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
               name="password"
               autocomplete="new-password"
               pattern="${this._passwordPattern}"
+              @input=${this.#handlePasswordInput}
               .minlength=${this._passwordConfiguration?.minimumPasswordLength}
               .minlengthMessage=${this.localize.term('login_passwordMinLength', this._passwordConfiguration?.minimumPasswordLength ?? 10)}
               .label=${this.localize.term('login_newPassword')}
@@ -180,6 +207,7 @@ export default class UmbNewPasswordLayoutElement extends UmbLitElement {
               name="confirmPassword"
               autocomplete="new-password"
               pattern="${this._passwordPattern}"
+              @input=${this.#handlePasswordInput}
               .minlength=${this._passwordConfiguration?.minimumPasswordLength}
               .minlengthMessage=${this.localize.term('login_passwordMinLength', this._passwordConfiguration?.minimumPasswordLength ?? 10)}
               .label=${this.localize.term('login_confirmNewPassword')}

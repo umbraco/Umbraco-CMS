@@ -677,11 +677,11 @@ export abstract class UmbContentDetailWorkspaceContextBase<
 				throw new Error(`Property alias "${alias}" not found.`);
 			}
 
-			if (
-				(property.variesByCulture && variantId.isCultureInvariant()) ||
-				(property.variesBySegment && variantId.isSegmentInvariant())
-			) {
-				throw new Error(`Property alias "${alias}" requires a variantId.`);
+			// Effective variance is the intersection: a variant property on an invariant content type is treated as invariant.
+			// A null segment is the default segment, so segment-variance is not guarded here.
+			const contentTypeVariesByCulture = this.getVariesByCulture() ?? false;
+			if (property.variesByCulture && contentTypeVariesByCulture && variantId.isCultureInvariant()) {
+				throw new Error(`Property alias "${alias}" requires a culture variantId.`);
 			}
 
 			// the getItemByUnique is a async method that first resolves once the item is loaded.
