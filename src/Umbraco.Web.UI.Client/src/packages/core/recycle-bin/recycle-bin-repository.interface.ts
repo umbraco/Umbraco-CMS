@@ -1,4 +1,4 @@
-import type { UmbRepositoryBase } from '../repository/repository-base.js';
+import type { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import type {
 	UmbRecycleBinOriginalParentRequestArgs,
 	UmbRecycleBinRestoreRequestArgs,
