@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -10,6 +11,7 @@ internal sealed class PackageManifestService : IPackageManifestService
 {
     private readonly IEnumerable<IPackageManifestReader> _packageManifestReaders;
     private readonly IAppPolicyCache _cache;
+    private readonly ILogger<PackageManifestService> _logger;
     private RuntimeSettings _runtimeSettings;
 
 
@@ -19,13 +21,16 @@ internal sealed class PackageManifestService : IPackageManifestService
     /// <param name="packageManifestReaders">A collection of <see cref="IPackageManifestReader"/> instances used to read package manifests.</param>
     /// <param name="appCaches">The <see cref="AppCaches"/> instance used for caching manifest data.</param>
     /// <param name="runtimeSettingsOptionsMonitor">An <see cref="IOptionsMonitor{RuntimeSettings}"/> used to monitor runtime configuration settings.</param>
+    /// <param name="logger">The logger used for diagnostic messages.</param>
     public PackageManifestService(
         IEnumerable<IPackageManifestReader> packageManifestReaders,
         AppCaches appCaches,
-        IOptionsMonitor<RuntimeSettings> runtimeSettingsOptionsMonitor)
+        IOptionsMonitor<RuntimeSettings> runtimeSettingsOptionsMonitor,
+        ILogger<PackageManifestService> logger)
     {
         _packageManifestReaders = packageManifestReaders;
         _cache = appCaches.RuntimeCache;
+        _logger = logger;
         _runtimeSettings = runtimeSettingsOptionsMonitor.CurrentValue;
         runtimeSettingsOptionsMonitor.OnChange(runtimeSettings => _runtimeSettings = runtimeSettings);
     }
@@ -93,5 +98,52 @@ internal sealed class PackageManifestService : IPackageManifestService
             Imports = importDict,
             Scopes = scopesDict,
         };
+    }
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Preload entries are alias keys that must resolve against the merged <see cref="PackageManifestImportmap.Imports" />.
+    ///     Entries that do not resolve are skipped with a warning so a plugin typo can never break the backoffice boot.
+    /// </remarks>
+    public async Task<IReadOnlyList<string>> GetPackageManifestPreloadAsync()
+    {
+        IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
+        var manifests = packageManifests.Select(x => x.Importmap).WhereNotNull().ToList();
+
+        // Build merged imports up front so a plugin can declare a preload that resolves
+        // against another manifest's imports (e.g., a plugin preloading a core alias it
+        // already depends on).
+        var mergedImports = manifests
+            .SelectMany(x => x.Imports)
+            .GroupBy(x => x.Key)
+            .ToDictionary(g => g.Key, g => g.Last().Value);
+
+        var result = new List<string>();
+        var seen = new HashSet<string>();
+        foreach (PackageManifestImportmap manifest in manifests)
+        {
+            if (manifest.Preload is null)
+            {
+                continue;
+            }
+
+            foreach (string alias in manifest.Preload)
+            {
+                if (!mergedImports.TryGetValue(alias, out string? url))
+                {
+                    _logger.LogWarning(
+                        "Package manifest preload alias '{Alias}' does not resolve to any importmap entry and will be skipped.",
+                        alias);
+                    continue;
+                }
+
+                if (seen.Add(url))
+                {
+                    result.Add(url);
+                }
+            }
+        }
+
+        return result;
     }
 }

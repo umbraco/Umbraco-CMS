@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
@@ -74,4 +75,42 @@ public static class HtmlHelperBackOfficeExtensions
             backOfficePathGenerator,
             packageManifestService,
             StaticServiceProvider.Instance.GetRequiredService<ICspNonceService>());
+
+    /// <summary>
+    ///     Outputs <c>&lt;link rel="modulepreload"&gt;</c> tags for the merged BackOffice preload list.
+    /// </summary>
+    /// <remarks>
+    ///     Each entry comes from a package manifest's <see cref="PackageManifestImportmap.Preload" />. The resolved
+    ///     URLs are run through the same <c>%CACHE_BUSTER%</c> and base-path substitution as the importmap, so the
+    ///     preload list and the importmap stay in sync.
+    /// </remarks>
+    /// <param name="html">The HTML helper instance.</param>
+    /// <param name="backOfficePathGenerator">The path generator for BackOffice assets and cache busting.</param>
+    /// <param name="packageManifestService">The service used to retrieve the merged preload list.</param>
+    /// <returns>A <see cref="Task" /> containing the rendered <c>&lt;link&gt;</c> tags, or an empty fragment if the list is empty.</returns>
+    public static async Task<IHtmlContent> BackOfficePreloadLinksAsync(
+        this IHtmlHelper html,
+        IBackOfficePathGenerator backOfficePathGenerator,
+        IPackageManifestService packageManifestService)
+    {
+        IReadOnlyList<string> preloads = await packageManifestService.GetPackageManifestPreloadAsync();
+        if (preloads.Count == 0)
+        {
+            return HtmlString.Empty;
+        }
+
+        var sb = new StringBuilder();
+        foreach (string rawUrl in preloads)
+        {
+            var url = rawUrl
+                .Replace(backOfficePathGenerator.BackOfficeVirtualDirectory, backOfficePathGenerator.BackOfficeAssetsPath)
+                .Replace(Constants.Web.CacheBusterToken, backOfficePathGenerator.BackOfficeCacheBustHash);
+
+            sb.Append("<link rel=\"modulepreload\" href=\"");
+            sb.Append(HtmlEncoder.Default.Encode(url));
+            sb.AppendLine("\" />");
+        }
+
+        return html.Raw(sb.ToString());
+    }
 }

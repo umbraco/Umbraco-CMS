@@ -28,4 +28,22 @@ public interface IPackageManifestService
     /// </summary>
     /// <returns>A task that represents the asynchronous operation containing the merged <see cref="PackageManifestImportmap"/>.</returns>
     Task<PackageManifestImportmap> GetPackageManifestImportmapAsync();
+
+    /// <summary>
+    ///     Gets the merged list of importmap entries that should be preloaded
+    ///     via <c>&lt;link rel="modulepreload"&gt;</c> at boot.
+    /// </summary>
+    /// <returns>
+    ///     A task containing a de-duplicated <see cref="IReadOnlyList{T}"/> of resolved URLs (each preload alias
+    ///     resolved against its source manifest's <see cref="PackageManifestImportmap.Imports"/>),
+    ///     preserving the order packages were loaded in.
+    /// </returns>
+    /// <remarks>
+    ///     The default implementation returns an empty list, so any existing
+    ///     <see cref="IPackageManifestService" /> implementation continues to compile and run.
+    ///     The shipped implementation is provided by the framework.
+    ///     Scheduled to become a required member in Umbraco 19.
+    /// </remarks>
+    Task<IReadOnlyList<string>> GetPackageManifestPreloadAsync()
+        => Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());
 }

@@ -78,6 +78,16 @@ export interface UmbracoPackageImportmap {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap#scopes
 	 */
 	scopes?: UmbracoPackageImportmapScopes;
+
+	/**
+	 * @title Alias keys (from {@link UmbracoPackageImportmap.imports}) to preload at boot.
+	 * @description The Umbraco backoffice renders a `<link rel="modulepreload">` tag for each entry,
+	 * causing the browser to start fetching the module in parallel with the HTML parse.
+	 * Use sparingly — declare only modules that are statically reachable from your boot path,
+	 * otherwise you waste bytes on chunks that may never load.
+	 * @examples [["@my/plugin/manifests"]]
+	 */
+	preload?: string[];
 }
 
 export interface UmbracoPackageImportmapScopes {

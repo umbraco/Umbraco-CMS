@@ -19,4 +19,15 @@ public class PackageManifestImportmap
     /// </summary>
     [DataMember(Name = "scopes")]
     public Dictionary<string, Dictionary<string, string>>? Scopes { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the list of import alias keys that should be preloaded eagerly via
+    ///     <c>&lt;link rel="modulepreload"&gt;</c> in the backoffice index page.
+    /// </summary>
+    /// <remarks>
+    ///     Each entry must be a key declared in <see cref="Imports" /> on the same manifest.
+    ///     Entries that do not resolve are skipped with a warning; they never throw.
+    /// </remarks>
+    [DataMember(Name = "preload")]
+    public string[]? Preload { get; set; }
 }

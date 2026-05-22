@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -35,7 +36,8 @@ public class PackageManifestServiceTests
         _service = new PackageManifestService(
             new[] { _readerMock.Object },
             appCaches,
-            new TestOptionsMonitor<RuntimeSettings>(new RuntimeSettings { Mode = RuntimeMode.Production }));
+            new TestOptionsMonitor<RuntimeSettings>(new RuntimeSettings { Mode = RuntimeMode.Production }),
+            NullLogger<PackageManifestService>.Instance);
     }
 
     [Test]

@@ -1,4 +1,5 @@
 import type { BuildOptions, UserConfig, LibraryOptions } from 'vite';
+import { chunkGraphPlugin } from './vite-chunk-graph-plugin.js';
 
 interface UmbViteDefaultConfigArgs {
 	base?: string;
@@ -39,7 +40,7 @@ export const getDefaultConfig = (args: UmbViteDefaultConfigArgs): UserConfig => 
 				},
 			},
 		},
-		plugins: args.plugins,
+		plugins: [chunkGraphPlugin(), ...(args.plugins ?? [])],
 		base: args.base,
 	};
 };
