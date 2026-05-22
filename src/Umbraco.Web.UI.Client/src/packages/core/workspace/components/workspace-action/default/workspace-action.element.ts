@@ -164,10 +164,14 @@ export class UmbWorkspaceActionElement<
 			if (reason) {
 				console.warn(reason);
 			}
-			// Always communicate failures, even if they happen before any work
-			// would have started (e.g. context missing in sync prep).
-			this._buttonState = 'failed';
-			this.#initButtonStateReset();
+			// Only communicate failures once real work has started. Pre-flight
+			// rejections (e.g. user cancelling a variant-picker modal) leave the
+			// button idle - matching the silent-cancel path of actions that simply
+			// return without rejecting.
+			if (this.#executionStarted) {
+				this._buttonState = 'failed';
+				this.#initButtonStateReset();
+			}
 		}
 	}
 
