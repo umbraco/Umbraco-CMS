@@ -2,11 +2,13 @@ using Dazinator.Extensions.FileProviders.PrependBasePath;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using Serilog.Context;
 using StackExchange.Profiling;
 using Umbraco.Cms.Core;
@@ -227,6 +229,77 @@ public static class ApplicationBuilderExtensions
         }
 
         return app;
+    }
+
+    /// <summary>
+    ///     Sets the default <c>Cache-Control</c> response header on requests served from the cache-busted
+    ///     BackOffice assets path (<c>/umbraco/backoffice/&lt;hash&gt;/...</c>).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The path prefix contains a deployment-wide hash derived from the Umbraco version
+    ///         (see <see cref="IBackOfficePathGenerator.BackOfficeCacheBustHash"/>). Because the URL itself
+    ///         changes whenever the version changes, all responses served under that prefix are safe to mark
+    ///         as <c>immutable</c> with a long <c>max-age</c>, regardless of whether the on-disk filename
+    ///         contains a content hash.
+    ///     </para>
+    ///     <para>
+    ///         In debug mode the cache-busting hash changes on every request, so the header is set to
+    ///         <c>no-cache</c> to avoid filling the browser disk cache with single-use entries.
+    ///     </para>
+    ///     <para>
+    ///         This middleware is non-destructive to consumer customisation:
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 The header is only set when no <c>Cache-Control</c> value is already present on the
+    ///                 response, so synchronous overrides written upstream (including
+    ///                 <c>StaticFileOptions.OnPrepareResponse</c>) take precedence.
+    ///             </item>
+    ///             <item>
+    ///                 The header is set via <c>HttpResponse.OnStarting</c>; consumer callbacks registered
+    ///                 later in the pipeline fire first (LIFO) and can therefore override the default.
+    ///             </item>
+    ///             <item>
+    ///                 Non-2xx responses (e.g. 404) are not marked as immutable to avoid long-lived caching
+    ///                 of error responses.
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Must be registered before <see cref="UseUmbracoBackOfficeRewrites"/> so that the original
+    ///         request path (still containing the cache-bust hash) can be matched.
+    ///     </para>
+    /// </remarks>
+    public static IApplicationBuilder UseUmbracoBackOfficeCacheHeaders(this IApplicationBuilder builder)
+    {
+        IBackOfficePathGenerator backOfficePathGenerator = builder.ApplicationServices.GetRequiredService<IBackOfficePathGenerator>();
+        IHostingEnvironment hostingEnvironment = builder.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+
+        // BackOfficeAssetsPath looks like "/umbraco/backoffice/<hash>" (no trailing slash).
+        var prefix = "/" + backOfficePathGenerator.BackOfficeAssetsPath.TrimStart('/').TrimEnd('/');
+        var headerValue = hostingEnvironment.IsDebugMode
+            ? "no-cache"
+            : "public, max-age=31536000, immutable";
+
+        return builder.Use(async (context, next) =>
+        {
+            if (context.Request.Path.StartsWithSegments(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                context.Response.OnStarting(static state =>
+                {
+                    (HttpResponse response, string value) = ((HttpResponse, string))state;
+                    if (response.StatusCode is >= 200 and < 300
+                        && !response.Headers.ContainsKey(HeaderNames.CacheControl))
+                    {
+                        response.Headers[HeaderNames.CacheControl] = value;
+                    }
+
+                    return Task.CompletedTask;
+                }, (context.Response, headerValue));
+            }
+
+            await next();
+        });
     }
 
     /// <summary>
