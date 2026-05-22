@@ -12,7 +12,6 @@ export default defineConfig({
 		dist,
 		entry: {
 			'package/index': 'package/index.ts',
-			manifests: 'manifests.ts',
 			'umbraco-package': 'umbraco-package.ts',
 		},
 	}),
