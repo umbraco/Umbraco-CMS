@@ -11,11 +11,13 @@ import type { Plugin } from 'vite';
 export const chunkGraphPlugin = (): Plugin => ({
 	name: 'umb-chunk-graph',
 	generateBundle(_, bundle) {
+		// Only the fields the preload walker needs. `facadeModuleId` is omitted on
+		// purpose — it's an absolute filesystem path that could leak build-agent
+		// paths if `chunk-graph.json` ever escapes the build-time cleanup.
 		const graph: Record<
 			string,
 			{
 				isEntry: boolean;
-				facadeModuleId: string | null;
 				imports: string[];
 				dynamicImports: string[];
 			}
@@ -25,7 +27,6 @@ export const chunkGraphPlugin = (): Plugin => ({
 			if (chunk.type !== 'chunk') continue;
 			graph[fileName] = {
 				isEntry: chunk.isEntry,
-				facadeModuleId: chunk.facadeModuleId,
 				imports: chunk.imports,
 				dynamicImports: chunk.dynamicImports,
 			};

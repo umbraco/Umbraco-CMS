@@ -37,7 +37,7 @@
     <link rel="stylesheet" href="@backOfficeAssetsPath/css/uui-css.css" />
     @* Importmap must precede the modulepreload tags below — the browser resolves the alias-bearing imports inside each preloaded chunk against the importmap, which must already be parsed by the time those chunks reach the module-loader. *@
     @await Html.BackOfficeImportMapScriptAsync(JsonSerializer, BackOfficePathGenerator, PackageManifestService, CspNonceService)
-    @await Html.BackOfficePreloadLinksAsync(BackOfficePathGenerator, PackageManifestService)
+    @await Html.BackOfficePreloadLinksAsync(BackOfficePathGenerator, PackageManifestService, CspNonceService)
     <script type="module" src="@backOfficeAssetsPath/apps/app/app.element.js" asp-csp-nonce></script>
 </head>
 

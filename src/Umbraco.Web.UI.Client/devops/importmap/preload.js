@@ -32,7 +32,6 @@ const IMPORT_PATTERN = /(?:^|\s|;)import\s+(?:[^"']*?\sfrom\s+)?["']([^"']+)["']
  */
 export const createPreloadList = ({ rootDir = ROOT_DIR } = {}) => {
 	const aliasToUrl = buildAliasMap(rootDir);
-	const urlToAlias = invert(aliasToUrl);
 	const chunkGraphs = loadChunkGraphs();
 
 	// Seed: external alias imports parsed directly from the TSC-compiled entry source.
@@ -92,13 +91,6 @@ const buildAliasMap = (rootDir) => {
 		map[alias] = url;
 	}
 	return map;
-};
-
-const invert = (map) => {
-	/** @type {Record<string, string>} */
-	const inv = {};
-	for (const [k, v] of Object.entries(map)) inv[v] = k;
-	return inv;
 };
 
 const loadChunkGraphs = () => {

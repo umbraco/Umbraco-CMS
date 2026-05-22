@@ -82,22 +82,29 @@ public static class HtmlHelperBackOfficeExtensions
     /// <remarks>
     ///     Each entry comes from a package manifest's <see cref="PackageManifestImportmap.Preload" />. The resolved
     ///     URLs are run through the same <c>%CACHE_BUSTER%</c> and base-path substitution as the importmap, so the
-    ///     preload list and the importmap stay in sync.
+    ///     preload list and the importmap stay in sync. When a CSP nonce is available, it is added to each link tag
+    ///     because browsers gate <c>modulepreload</c> fetches via <c>script-src</c> (per CSP3) — without the nonce
+    ///     a strict-nonce policy would block the preloads.
     /// </remarks>
     /// <param name="html">The HTML helper instance.</param>
     /// <param name="backOfficePathGenerator">The path generator for BackOffice assets and cache busting.</param>
     /// <param name="packageManifestService">The service used to retrieve the merged preload list.</param>
+    /// <param name="cspNonceService">The service that provides the per-request CSP nonce, if any.</param>
     /// <returns>A <see cref="Task" /> containing the rendered <c>&lt;link&gt;</c> tags, or an empty fragment if the list is empty.</returns>
     public static async Task<IHtmlContent> BackOfficePreloadLinksAsync(
         this IHtmlHelper html,
         IBackOfficePathGenerator backOfficePathGenerator,
-        IPackageManifestService packageManifestService)
+        IPackageManifestService packageManifestService,
+        ICspNonceService cspNonceService)
     {
         IReadOnlyList<string> preloads = await packageManifestService.GetPackageManifestPreloadAsync();
         if (preloads.Count == 0)
         {
             return HtmlString.Empty;
         }
+
+        var nonce = cspNonceService.GetNonce();
+        var nonceAttribute = string.IsNullOrEmpty(nonce) ? string.Empty : $" nonce=\"{HtmlEncoder.Default.Encode(nonce)}\"";
 
         var sb = new StringBuilder();
         foreach (string rawUrl in preloads)
@@ -108,7 +115,9 @@ public static class HtmlHelperBackOfficeExtensions
 
             sb.Append("<link rel=\"modulepreload\" href=\"");
             sb.Append(HtmlEncoder.Default.Encode(url));
-            sb.AppendLine("\" />");
+            sb.Append('"');
+            sb.Append(nonceAttribute);
+            sb.AppendLine(" />");
         }
 
         return html.Raw(sb.ToString());

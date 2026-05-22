@@ -237,6 +237,24 @@ export const manifests = [...sectionManifests, ...dashboardManifests];
 
 External packages use a `umbraco-package.json` file — a static JSON manifest discovered by the server.
 
+#### `importmap.preload` — preloading boot-critical chunks
+
+If your package ships an importmap (`importmap.imports`), you can opt boot-critical modules into `<link rel="modulepreload">` by listing their alias keys in `importmap.preload`. The backoffice emits a preload tag for each entry in the index HTML, so the browser starts fetching those chunks during HTML parse instead of discovering them serially once your bundle executes.
+
+Entries must be alias keys that exist in the same manifest's `imports`. Only list modules that are statically reachable on the boot path — preloading something the browser never imports just wastes bytes.
+
+```json
+{
+  "name": "My.Package",
+  "importmap": {
+    "imports": {
+      "@my/plugin/manifests": "/App_Plugins/MyPackage/dist/manifests.js"
+    },
+    "preload": ["@my/plugin/manifests"]
+  }
+}
+```
+
 ### Runtime Registration
 
 For dynamic or programmatic registration:

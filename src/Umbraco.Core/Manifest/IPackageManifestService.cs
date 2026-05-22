@@ -34,15 +34,17 @@ public interface IPackageManifestService
     ///     via <c>&lt;link rel="modulepreload"&gt;</c> at boot.
     /// </summary>
     /// <returns>
-    ///     A task containing a de-duplicated <see cref="IReadOnlyList{T}"/> of resolved URLs (each preload alias
-    ///     resolved against its source manifest's <see cref="PackageManifestImportmap.Imports"/>),
-    ///     preserving the order packages were loaded in.
+    ///     A task containing a de-duplicated <see cref="IReadOnlyList{T}" /> of resolved URLs. Each preload alias is
+    ///     resolved against the merged <see cref="PackageManifestImportmap.Imports" /> of every registered
+    ///     manifest, so a plugin can preload an alias declared by another package without redeclaring it.
+    ///     Order follows the order packages were loaded in; aliases that do not resolve to any importmap entry
+    ///     are skipped with a warning.
     /// </returns>
     /// <remarks>
     ///     The default implementation returns an empty list, so any existing
     ///     <see cref="IPackageManifestService" /> implementation continues to compile and run.
     ///     The shipped implementation is provided by the framework.
-    ///     Scheduled to become a required member in Umbraco 19.
+    ///     TODO (V19): Remove the default implementation when this becomes a required member.
     /// </remarks>
     Task<IReadOnlyList<string>> GetPackageManifestPreloadAsync()
         => Task.FromResult<IReadOnlyList<string>>(Array.Empty<string>());

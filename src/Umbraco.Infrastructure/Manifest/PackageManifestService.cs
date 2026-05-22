@@ -83,19 +83,16 @@ internal sealed class PackageManifestService : IPackageManifestService
     /// </returns>
     public async Task<PackageManifestImportmap> GetPackageManifestImportmapAsync()
     {
-        IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
-        var manifests = packageManifests.Select(x => x.Importmap).WhereNotNull().ToList();
+        IReadOnlyList<PackageManifestImportmap> manifests = await GetImportmapsAsync();
 
-        var importDict = manifests
-            .SelectMany(x => x.Imports)
-            .ToDictionary(x => x.Key, x => x.Value);
         var scopesDict = manifests
             .SelectMany(x => x.Scopes ?? new Dictionary<string, Dictionary<string, string>>())
-            .ToDictionary(x => x.Key, x => x.Value);
+            .GroupBy(x => x.Key)
+            .ToDictionary(g => g.Key, g => g.Last().Value);
 
         return new PackageManifestImportmap
         {
-            Imports = importDict,
+            Imports = MergeImports(manifests),
             Scopes = scopesDict,
         };
     }
@@ -107,16 +104,8 @@ internal sealed class PackageManifestService : IPackageManifestService
     /// </remarks>
     public async Task<IReadOnlyList<string>> GetPackageManifestPreloadAsync()
     {
-        IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
-        var manifests = packageManifests.Select(x => x.Importmap).WhereNotNull().ToList();
-
-        // Build merged imports up front so a plugin can declare a preload that resolves
-        // against another manifest's imports (e.g., a plugin preloading a core alias it
-        // already depends on).
-        var mergedImports = manifests
-            .SelectMany(x => x.Imports)
-            .GroupBy(x => x.Key)
-            .ToDictionary(g => g.Key, g => g.Last().Value);
+        IReadOnlyList<PackageManifestImportmap> manifests = await GetImportmapsAsync();
+        Dictionary<string, string> mergedImports = MergeImports(manifests);
 
         var result = new List<string>();
         var seen = new HashSet<string>();
@@ -146,4 +135,21 @@ internal sealed class PackageManifestService : IPackageManifestService
 
         return result;
     }
+
+    private async Task<IReadOnlyList<PackageManifestImportmap>> GetImportmapsAsync()
+    {
+        IEnumerable<PackageManifest> packageManifests = await GetAllPackageManifestsAsync();
+        return packageManifests.Select(x => x.Importmap).WhereNotNull().ToList();
+    }
+
+    /// <summary>
+    ///     Merges the <see cref="PackageManifestImportmap.Imports" /> from every manifest using last-write-wins
+    ///     semantics. Shared by <see cref="GetPackageManifestImportmapAsync" /> and
+    ///     <see cref="GetPackageManifestPreloadAsync" /> so they always agree on which URL a given alias resolves to.
+    /// </summary>
+    private static Dictionary<string, string> MergeImports(IEnumerable<PackageManifestImportmap> manifests)
+        => manifests
+            .SelectMany(x => x.Imports)
+            .GroupBy(x => x.Key)
+            .ToDictionary(g => g.Key, g => g.Last().Value);
 }

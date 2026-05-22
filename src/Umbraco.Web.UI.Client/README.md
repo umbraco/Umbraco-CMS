@@ -178,3 +178,5 @@ Finally add an umbraco-package.json file in the root of your package folder `my-
 	]
 }
 ```
+
+`umbraco-package.json` also accepts an `importmap` with optional `preload` — list alias keys from `importmap.imports` to preload boot-critical chunks. See [Manifests — `importmap.preload`](./docs/manifests.md#importmappreload--preloading-boot-critical-chunks).
