@@ -122,7 +122,7 @@ export class UmbWebhookDetailsWorkspaceViewElement extends UmbLitElement impleme
 				<umb-property-layout
 					label=${this.localize.term('webhooks_enabled')}
 					description=${this.localize.term('webhooks_enabledDescription')}>
-					<uui-toggle slot="editor" label=${this.localize.term('webhooks_enabled')} .checked=${this._webhook.enabled} @change=${this.#onEnabledChange}></uui-toggle>
+					<uui-toggle slot="editor" aria-label=${this.localize.term('webhooks_enabled')} .checked=${this._webhook.enabled} @change=${this.#onEnabledChange}></uui-toggle>
 				</umb-property-layout>
 				<umb-property-layout
 					label=${this.localize.term('webhooks_headers')}
