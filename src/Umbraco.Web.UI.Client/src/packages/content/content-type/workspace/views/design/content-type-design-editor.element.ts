@@ -246,14 +246,16 @@ export class UmbContentTypeDesignEditorElement extends UmbLitElement implements 
 		// router-slot library only applies `redirectTo` on navigation events, not on the initial
 		// route attachment, so an empty-path redirect would leave the view stuck. The landing
 		// route is `root` when the content type has root properties/groups (or has no tabs),
-		// otherwise the first tab.
+		// otherwise the first tab. Note: we deliberately do NOT set `pathMatch: 'full'`, because
+		// the modal sub-router appends paths like `/add-property/...` to the active local path;
+		// with `path: ''` matching prefix-wise (regex `/^/`), the tab stays mounted and the
+		// modal-router can match the appended segment.
 		const defaultRoute =
 			this._hasRootGroups || this._hasRootProperties || this._tabs.length === 0 ? routes[routes.length - 1] : routes[0];
 		this.#landingLocalPath = defaultRoute.path;
 		routes.push({
 			...defaultRoute,
 			path: '',
-			pathMatch: 'full',
 			guards: [() => this.#processingTabId === undefined],
 		});
 

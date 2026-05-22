@@ -700,9 +700,11 @@ routes.push({ path: '', pathMatch: 'full', redirectTo: 'tab/settings' });
 
 // ✅ Duplicate the landing route directly under the empty path
 const defaultRoute = routes[0]; // or whichever is the landing route
-routes.push({ ...defaultRoute, path: '', pathMatch: 'full' });
+routes.push({ ...defaultRoute, path: '' });
 ```
 
 `umb-workspace-editor` uses this pattern — see the `// Duplicate first workspace and use it for the empty path scenario.` block in `workspace-editor.element.ts`.
+
+Do **not** add `pathMatch: 'full'` to the duplicated empty-path route. The modal sub-router appends modal paths (e.g. `/add-property/-1/container-root`) to the current active local path. With `path: ''` matching prefix-wise (regex `/^/`), the main route stays matched and the modal-router can resolve the appended segment. With `pathMatch: 'full'`, the empty-path route only matches an exactly-empty URL — modal URLs fall through to the catch-all, the route component unmounts, the modal registration is torn down, and the modal never opens.
 
 
