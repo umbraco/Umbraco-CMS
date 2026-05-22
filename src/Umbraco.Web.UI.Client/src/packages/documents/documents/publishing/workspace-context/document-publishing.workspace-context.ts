@@ -26,6 +26,8 @@ import {
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
+import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
 import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
@@ -128,6 +130,8 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		const { options, selected } = await this.#determineVariantOptions();
 
+		const ancestorPublishedCultures = await this.#getAncestorPublishedCultures(unique);
+
 		const result = await umbOpenModal(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
 			data: {
 				options,
@@ -140,6 +144,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 						unpublishTime: option.variant?.scheduledUnpublishDate,
 					},
 				})),
+				ancestorPublishedCultures,
 			},
 		}).catch(() => undefined);
 
@@ -418,6 +423,59 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 			this.#eventContext?.dispatchEvent(event);
 		}
+	}
+
+	/**
+	 * Computes which cultures are published across the entire ancestor chain of the
+	 * current document, so the schedule dialog can warn for child variants that won't
+	 * become visible because an ancestor isn't yet published in that culture.
+	 *
+	 * For a scheduled publish to take effect, every ancestor must be published in the
+	 * scheduled culture — so the result is the intersection of each ancestor's published
+	 * cultures.
+	 * @param unique The unique of the document being scheduled.
+	 * @returns `undefined` for root documents or when the lookup is unavailable;
+	 *  `[null]` when every ancestor is published in the invariant variant (covers all child cultures);
+	 *  otherwise the list of cultures published in every ancestor.
+	 */
+	async #getAncestorPublishedCultures(unique: string): Promise<Array<string | null> | undefined> {
+		const { data, error } = await tryExecute(
+			this,
+			DocumentService.getItemDocumentAncestors({ query: { id: [unique] } }),
+		);
+		if (error || !data) return undefined;
+
+		const ancestors = data.find((entry) => entry.id === unique)?.ancestors ?? [];
+		if (ancestors.length === 0) return undefined; // root document — nothing above to block publishing
+
+		// Start as "covers all cultures" (covered = undefined) and intersect each ancestor's published cultures.
+		let covered: Set<string | null> | undefined;
+
+		for (const ancestor of ancestors) {
+			const ancestorPublished: Array<string | null> = ancestor.variants
+				.filter(
+					(variant) =>
+						variant.state === UmbDocumentVariantState.PUBLISHED ||
+						variant.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES,
+				)
+				.map((variant) => variant.culture ?? null);
+
+			// An invariant-published ancestor (null entry) covers every child culture — no constraint added.
+			if (ancestorPublished.includes(null)) continue;
+
+			const ancestorSet = new Set<string | null>(ancestorPublished);
+			if (covered === undefined) {
+				covered = ancestorSet;
+			} else {
+				const intersection = new Set<string | null>();
+				for (const culture of covered) {
+					if (ancestorSet.has(culture)) intersection.add(culture);
+				}
+				covered = intersection;
+			}
+		}
+
+		return covered === undefined ? [null] : Array.from(covered);
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {
