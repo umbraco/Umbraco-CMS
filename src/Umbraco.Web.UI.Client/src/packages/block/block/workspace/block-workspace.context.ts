@@ -5,6 +5,7 @@ import { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
 import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
 import { UmbBlockLanguageAccessWorkspaceController } from './block-workspace-language-access.controller.js';
+import { umbResolveBlockWorkspaceLabelIndex } from './block-workspace-label-index.function.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -47,6 +48,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	setOriginData(data: UmbBlockWorkspaceOriginData) {
 		this.#originData = data;
 	}
+	// Cached index of this block in its parent layout list, recomputed only when layouts or contentKey change.
+	#index: number | undefined;
 	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;
 
@@ -107,8 +110,22 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
-			// Re-render the label now that we can resolve `$index` from the entries context.
-			this.#renderLabel(this.content.getValues(), this.settings.getValues());
+			if (context) {
+				this.observe(
+					observeMultiple([context.layoutEntries, this.contentKey]),
+					([layouts, contentKey]) => {
+						const found = contentKey ? layouts.findIndex((x) => x.contentKey === contentKey) : -1;
+						const newIndex = found !== -1 ? found : undefined;
+						if (newIndex !== this.#index) {
+							this.#index = newIndex;
+							this.#renderLabel(this.content.getValues(), this.settings.getValues());
+						}
+					},
+					'observeLayoutIndex',
+				);
+			} else {
+				this.#index = undefined;
+			}
 		}).asPromise({ preventTimeout: true });
 
 		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
@@ -275,22 +292,11 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			valueObject['$settings'] = settingsValues;
 		}
 
-		const contentKey = this.#layout.value?.contentKey;
-		let index: number | undefined;
-
-		if (contentKey && this.#blockEntries) {
-			const found = this.#blockEntries.getLayouts().findIndex((x) => x.contentKey === contentKey);
-			if (found !== -1) {
-				index = found;
-			}
-		}
-
-		if (index === undefined && this.#originData && 'index' in this.#originData) {
-			const originIndex = (this.#originData as { index?: number }).index;
-			if (typeof originIndex === 'number' && originIndex !== -1) {
-				index = originIndex;
-			}
-		}
+		const index = umbResolveBlockWorkspaceLabelIndex(
+			this.#index,
+			this.#originData,
+			this.#blockEntries?.getLayouts().length,
+		);
 
 		if (index !== undefined) {
 			valueObject['$index'] = index;
