@@ -1,0 +1,88 @@
+name: "SonarQube Cloud analysis"
+
+on:
+  push:
+    branches:
+      - main
+      - "v*/dev"
+      - "v*/main"
+      - "release/*"
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+      - "v*/dev"
+      - "v*/main"
+      - "release/*"
+  workflow_dispatch:
+
+env:
+  SONAR_ORGANIZATION: "umbraco"
+  SONAR_PROJECT_KEY: "umbraco_Umbraco-CMS"
+
+jobs:
+  sonarqube:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET from global.json
+        uses: actions/setup-dotnet@v5
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Install tools
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+          dotnet tool install --global nbgv
+          dotnet tool install --global dotnet-coverage
+
+      - name: Get project version
+        run: |
+          PUBLIC_RELEASE=$(nbgv get-version -v PublicRelease)
+          if [ "$PUBLIC_RELEASE" = "True" ]; then
+            echo "PROJECT_VERSION=$(nbgv get-version -v NuGetPackageVersion)" >> $GITHUB_ENV
+          fi
+
+      - name: Set branch name
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "BRANCH_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Begin analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          dotnet-sonarscanner begin \
+            /k:"${{ env.SONAR_PROJECT_KEY }}" \
+            /o:"${{ env.SONAR_ORGANIZATION }}" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.cs.vscoveragexml.reportsPaths="TestResults/coverage.xml" \
+            ${BRANCH_NAME:+/d:sonar.branch.name="$BRANCH_NAME"} \
+            ${PROJECT_VERSION:+/d:sonar.projectVersion="$PROJECT_VERSION"}
+
+      - name: Restore
+        run: dotnet restore umbraco.sln
+
+      - name: Build solution
+        run: dotnet build umbraco.sln --no-restore -clp:ErrorsOnly
+
+      - name: Run unit tests with coverage
+        run: |
+          dotnet-coverage collect \
+            "dotnet test tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj --no-build" \
+            --output TestResults/coverage.xml \
+            --output-format xml
+
+      - name: End analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
