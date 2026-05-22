@@ -12,34 +12,53 @@ export interface UmbBuildMediaWorkspaceRoutesArgs {
 /**
  * Build the routes for the media workspace editor.
  *
- * Media does not currently support variants (MediaType.Variations is hardcoded to Nothing), so
- * in practice this only produces the forbidden catch-all today. The dynamic-route scaffolding is
- * kept in sync with the document editor so the n² split-view loop cannot regress here if media
- * gains variants later.
+ * Media types currently hardcode `ContentVariation.Nothing`, so the variant routes are dead in
+ * production today. The dynamic-route scaffolding is kept in sync with the document editor so
+ * the n² split-view route table cannot reappear here if media gains variants later.
  * @param {UmbBuildMediaWorkspaceRoutesArgs} args - the inputs needed to construct the routes.
  * @returns {Array<UmbRoute>} the routes to install on the workspace router slot.
  */
 export function buildMediaWorkspaceRoutes(args: UmbBuildMediaWorkspaceRoutesArgs): Array<UmbRoute> {
-	const forbiddenRoute: UmbRoute = {
+	const notFoundComponent = async () => {
+		const router = await import('@umbraco-cms/backoffice/router');
+		return args.getIsForbidden() ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+	};
+
+	const catchAllRoute: UmbRoute = {
 		path: '**',
-		component: async () => {
-			const router = await import('@umbraco-cms/backoffice/router');
-			return args.getIsForbidden() ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
-		},
+		component: notFoundComponent,
 	};
 
 	if (args.variants.length === 0 || !args.splitView) {
-		return [forbiddenRoute];
+		return [catchAllRoute];
 	}
 
 	const { splitView, variants, splitViewComponent } = args;
 
 	return [
 		{
+			// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
 			path: ':variantPath',
-			component: splitViewComponent,
-			setup: (_component, info) => {
+			resolve: async (info) => {
 				const consumed = info.match.fragments.consumed;
+
+				const parts = consumed.split('_&_');
+				const allKnown = parts.every((part) => variants.some((v) => v.unique === part));
+
+				if (!allKnown) {
+					// Unknown variant unique in the URL. Render NotFound (or Forbidden) in place — the
+					// URL is left untouched so stale bookmarks stay visible to the user.
+					const router = await import('@umbraco-cms/backoffice/router');
+					const NotFoundCtor = args.getIsForbidden() ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+					if (!(info.slot.firstChild instanceof NotFoundCtor)) {
+						info.slot.replaceChildren(new NotFoundCtor());
+					}
+					return;
+				}
+
+				if (info.slot.firstChild !== splitViewComponent) {
+					info.slot.replaceChildren(splitViewComponent);
+				}
 				if (consumed.includes('_&_')) {
 					splitView.setVariantParts(consumed);
 				} else {
@@ -53,6 +72,6 @@ export function buildMediaWorkspaceRoutes(args: UmbBuildMediaWorkspaceRoutesArgs
 			pathMatch: 'full',
 			redirectTo: variants[0]?.unique,
 		},
-		forbiddenRoute,
+		catchAllRoute,
 	];
 }

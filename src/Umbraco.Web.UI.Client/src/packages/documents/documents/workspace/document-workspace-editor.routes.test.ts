@@ -33,10 +33,13 @@ function findDefaultRoute(routes: Array<UmbRoute>): UmbRoute {
 	return route;
 }
 
-function callSetup(route: UmbRoute, consumed: string) {
-	const info = { match: { fragments: { consumed, rest: '' }, params: {}, match: [] as unknown, route } } as any;
-	const setup = (route as unknown as { setup: (component: any, info: any) => void }).setup;
-	setup(undefined, info);
+async function callResolve(route: UmbRoute, consumed: string, slot: HTMLElement) {
+	const info = {
+		slot,
+		match: { fragments: { consumed, rest: '' }, params: {}, match: [] as unknown, route },
+	} as any;
+	const resolve = (route as unknown as { resolve: (info: any) => Promise<void> }).resolve;
+	await resolve(info);
 }
 
 describe('buildDocumentWorkspaceRoutes', () => {
@@ -76,7 +79,7 @@ describe('buildDocumentWorkspaceRoutes', () => {
 			expect(large.length).to.equal(3);
 		});
 
-		it('does not generate any "_&_" route paths (regression guard for split-view pairs)', () => {
+		it('does not generate any "_&_" route paths', () => {
 			const variants = Array.from({ length: 50 }, (_v, i) => makeVariant(`v${i}`, `c${i}`));
 			const routes = buildDocumentWorkspaceRoutes({
 				variants,
@@ -107,21 +110,18 @@ describe('buildDocumentWorkspaceRoutes', () => {
 			expect(dynamic.path).to.equal(':variantPath');
 		});
 
-		it('reuses the supplied split-view component instance', () => {
-			expect((dynamic as { component?: unknown }).component).to.equal(splitViewComponent);
-		});
-
 		it('has preserveQuery true', () => {
 			expect((dynamic as { preserveQuery?: boolean }).preserveQuery).to.equal(true);
 		});
 
-		it('has a setup callback', () => {
-			expect(typeof (dynamic as unknown as { setup?: unknown }).setup).to.equal('function');
+		it('has a resolve callback (resolver route, not a component route)', () => {
+			expect(typeof (dynamic as unknown as { resolve?: unknown }).resolve).to.equal('function');
+			expect((dynamic as unknown as { component?: unknown }).component).to.be.undefined;
 		});
 	});
 
-	describe('setup callback', () => {
-		it('treats a single-variant fragment as single-view (removeActiveVariant(1) then handleVariantFolderPart(0, fragment))', () => {
+	describe('resolve callback — valid variants', () => {
+		it('mounts the split-view component and calls handleVariantFolderPart for a single-variant path', async () => {
 			const splitView = createSplitViewStub();
 			const routes = buildDocumentWorkspaceRoutes({
 				variants: [makeVariant('en', 'en')],
@@ -131,15 +131,17 @@ describe('buildDocumentWorkspaceRoutes', () => {
 				getWorkspaceRoute: () => '/x',
 				getIsForbidden: () => false,
 			});
-			callSetup(findDynamicRoute(routes), 'en');
+			const slot = document.createElement('div');
+			await callResolve(findDynamicRoute(routes), 'en', slot);
 
+			expect(slot.firstChild).to.equal(splitViewComponent);
 			expect(splitView.calls).to.deep.equal([
 				{ method: 'removeActiveVariant', args: [1] },
 				{ method: 'handleVariantFolderPart', args: [0, 'en'] },
 			]);
 		});
 
-		it('treats a "_&_" fragment as split-view (setVariantParts with the consumed fragment)', () => {
+		it('mounts the split-view component and calls setVariantParts for a "_&_" path', async () => {
 			const splitView = createSplitViewStub();
 			const routes = buildDocumentWorkspaceRoutes({
 				variants: [makeVariant('en', 'en'), makeVariant('da', 'da')],
@@ -149,12 +151,32 @@ describe('buildDocumentWorkspaceRoutes', () => {
 				getWorkspaceRoute: () => '/x',
 				getIsForbidden: () => false,
 			});
-			callSetup(findDynamicRoute(routes), 'en_&_da');
+			const slot = document.createElement('div');
+			await callResolve(findDynamicRoute(routes), 'en_&_da', slot);
 
+			expect(slot.firstChild).to.equal(splitViewComponent);
 			expect(splitView.calls).to.deep.equal([{ method: 'setVariantParts', args: ['en_&_da'] }]);
 		});
 
-		it('handles segment-suffixed uniques on both sides of the delimiter', () => {
+		it('reuses the split-view component when it is already mounted', async () => {
+			const splitView = createSplitViewStub();
+			const routes = buildDocumentWorkspaceRoutes({
+				variants: [makeVariant('en', 'en'), makeVariant('da', 'da')],
+				appCulture: 'en',
+				splitViewComponent,
+				splitView,
+				getWorkspaceRoute: () => '/x',
+				getIsForbidden: () => false,
+			});
+			const slot = document.createElement('div');
+			slot.appendChild(splitViewComponent);
+			await callResolve(findDynamicRoute(routes), 'da', slot);
+
+			expect(slot.firstChild).to.equal(splitViewComponent);
+			expect(slot.children).to.have.lengthOf(1);
+		});
+
+		it('handles segment-suffixed uniques on both sides of the delimiter', async () => {
 			const splitView = createSplitViewStub();
 			const routes = buildDocumentWorkspaceRoutes({
 				variants: [makeVariant('en_segA', 'en', 'segA'), makeVariant('da_segB', 'da', 'segB')],
@@ -164,9 +186,79 @@ describe('buildDocumentWorkspaceRoutes', () => {
 				getWorkspaceRoute: () => '/x',
 				getIsForbidden: () => false,
 			});
-			callSetup(findDynamicRoute(routes), 'en_segA_&_da_segB');
+			const slot = document.createElement('div');
+			await callResolve(findDynamicRoute(routes), 'en_segA_&_da_segB', slot);
 
 			expect(splitView.calls).to.deep.equal([{ method: 'setVariantParts', args: ['en_segA_&_da_segB'] }]);
+		});
+	});
+
+	describe('resolve callback — unknown variants (URL is NOT changed)', () => {
+		it('mounts UmbRouteNotFoundElement when the consumed fragment is unknown', async () => {
+			const splitView = createSplitViewStub();
+			const routes = buildDocumentWorkspaceRoutes({
+				variants: [makeVariant('en', 'en'), makeVariant('da', 'da')],
+				appCulture: 'en',
+				splitViewComponent,
+				splitView,
+				getWorkspaceRoute: () => '/x',
+				getIsForbidden: () => false,
+			});
+			const slot = document.createElement('div');
+			await callResolve(findDynamicRoute(routes), 'nonsense', slot);
+
+			expect((slot.firstChild as Element | null)?.localName).to.equal('umb-route-not-found');
+			expect(splitView.calls).to.deep.equal([]);
+		});
+
+		it('mounts UmbRouteForbiddenElement when isForbidden is true', async () => {
+			const splitView = createSplitViewStub();
+			const routes = buildDocumentWorkspaceRoutes({
+				variants: [makeVariant('en', 'en')],
+				appCulture: 'en',
+				splitViewComponent,
+				splitView,
+				getWorkspaceRoute: () => '/x',
+				getIsForbidden: () => true,
+			});
+			const slot = document.createElement('div');
+			await callResolve(findDynamicRoute(routes), 'nonsense', slot);
+
+			expect((slot.firstChild as Element | null)?.localName).to.equal('umb-route-forbidden');
+		});
+
+		it('mounts NotFound when only one side of a split-view path is unknown', async () => {
+			const splitView = createSplitViewStub();
+			const routes = buildDocumentWorkspaceRoutes({
+				variants: [makeVariant('en', 'en'), makeVariant('da', 'da')],
+				appCulture: 'en',
+				splitViewComponent,
+				splitView,
+				getWorkspaceRoute: () => '/x',
+				getIsForbidden: () => false,
+			});
+			const slot = document.createElement('div');
+			await callResolve(findDynamicRoute(routes), 'en_&_nonsense', slot);
+
+			expect((slot.firstChild as Element | null)?.localName).to.equal('umb-route-not-found');
+			expect(splitView.calls).to.deep.equal([]);
+		});
+
+		it('reuses an already-mounted NotFound element', async () => {
+			const routes = buildDocumentWorkspaceRoutes({
+				variants: [makeVariant('en', 'en')],
+				appCulture: 'en',
+				splitViewComponent,
+				splitView: createSplitViewStub(),
+				getWorkspaceRoute: () => '/x',
+				getIsForbidden: () => false,
+			});
+			const slot = document.createElement('div');
+			await callResolve(findDynamicRoute(routes), 'nonsense', slot);
+			const firstNotFound = slot.firstChild;
+			await callResolve(findDynamicRoute(routes), 'still-nonsense', slot);
+
+			expect(slot.firstChild).to.equal(firstNotFound);
 		});
 	});
 
@@ -215,24 +307,7 @@ describe('buildDocumentWorkspaceRoutes', () => {
 			expect(replaceStateCalls[0].url).to.equal('/workspace/document/edit/x/en');
 		});
 
-		it('falls back to the first variant when only segment-suffixed variants exist for the app culture', async () => {
-			// app culture "en" but there is no variant with unique==="en" — only "en_segA".
-			const routes = buildDocumentWorkspaceRoutes({
-				variants: [makeVariant('en_segA', 'en', 'segA'), makeVariant('da', 'da')],
-				appCulture: 'en',
-				splitViewComponent,
-				splitView: createSplitViewStub(),
-				getWorkspaceRoute: () => '/workspace/document/edit/x',
-				getIsForbidden: () => false,
-			});
-			await (findDefaultRoute(routes) as unknown as { resolve: () => Promise<void> }).resolve();
-
-			expect(replaceStateCalls[0].url).to.equal('/workspace/document/edit/x/en_segA');
-		});
-
 		it('appends "/view/collection" when ?openCollection is set on the URL', async () => {
-			// Use the real history.pushState to put ?openCollection on the URL; history.replaceState
-			// is stubbed in beforeEach so the resolve() call won't actually navigate.
 			const originalUrl = window.location.href;
 			history.pushState({}, '', '?openCollection');
 			try {
@@ -271,7 +346,7 @@ describe('buildDocumentWorkspaceRoutes', () => {
 	});
 
 	describe('catch-all fallback', () => {
-		it('returns only the forbidden catch-all when no variants are available', () => {
+		it('returns only the catch-all when no variants are available', () => {
 			const routes = buildDocumentWorkspaceRoutes({
 				variants: [],
 				appCulture: 'en',
@@ -284,7 +359,7 @@ describe('buildDocumentWorkspaceRoutes', () => {
 			expect(routes[0].path).to.equal('**');
 		});
 
-		it('returns only the forbidden catch-all when no app culture is set yet', () => {
+		it('returns only the catch-all when no app culture is set yet', () => {
 			const routes = buildDocumentWorkspaceRoutes({
 				variants: [makeVariant('en', 'en')],
 				appCulture: undefined,
@@ -297,7 +372,7 @@ describe('buildDocumentWorkspaceRoutes', () => {
 			expect(routes[0].path).to.equal('**');
 		});
 
-		it('returns only the forbidden catch-all when no split view manager is available', () => {
+		it('returns only the catch-all when no split view manager is available', () => {
 			const routes = buildDocumentWorkspaceRoutes({
 				variants: [makeVariant('en', 'en')],
 				appCulture: 'en',

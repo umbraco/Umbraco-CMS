@@ -27,17 +27,20 @@ function findDynamicRoute(routes: Array<UmbRoute>): UmbRoute {
 	return route;
 }
 
-function callSetup(route: UmbRoute, consumed: string) {
-	const info = { match: { fragments: { consumed, rest: '' }, params: {}, match: [] as unknown, route } } as any;
-	const setup = (route as unknown as { setup: (component: any, info: any) => void }).setup;
-	setup(undefined, info);
+async function callResolve(route: UmbRoute, consumed: string, slot: HTMLElement) {
+	const info = {
+		slot,
+		match: { fragments: { consumed, rest: '' }, params: {}, match: [] as unknown, route },
+	} as any;
+	const resolve = (route as unknown as { resolve: (info: any) => Promise<void> }).resolve;
+	await resolve(info);
 }
 
 describe('buildMediaWorkspaceRoutes', () => {
 	const splitViewComponent = document.createElement('div');
 
 	describe('production behaviour today (no variants on media types)', () => {
-		it('returns only the forbidden catch-all when variants is empty', () => {
+		it('returns only the catch-all when variants is empty', () => {
 			const routes = buildMediaWorkspaceRoutes({
 				variants: [],
 				splitViewComponent,
@@ -48,7 +51,7 @@ describe('buildMediaWorkspaceRoutes', () => {
 			expect(routes[0].path).to.equal('**');
 		});
 
-		it('returns only the forbidden catch-all when no split view manager is available', () => {
+		it('returns only the catch-all when no split view manager is available', () => {
 			const routes = buildMediaWorkspaceRoutes({
 				variants: [makeVariant('en', 'en')],
 				splitViewComponent,
@@ -61,7 +64,7 @@ describe('buildMediaWorkspaceRoutes', () => {
 	});
 
 	describe('future-proof variant routes', () => {
-		it('returns exactly three routes regardless of variant count (regression guard for n²)', () => {
+		it('returns the same constant route count regardless of variant count (regression guard for n²)', () => {
 			const small = buildMediaWorkspaceRoutes({
 				variants: [makeVariant('en', 'en')],
 				splitViewComponent,
@@ -90,27 +93,19 @@ describe('buildMediaWorkspaceRoutes', () => {
 			}
 		});
 
-		it('dynamic route reuses the supplied split-view component instance', () => {
+		it('dynamic route is a resolver (has resolve, no component)', () => {
 			const routes = buildMediaWorkspaceRoutes({
 				variants: [makeVariant('en', 'en')],
 				splitViewComponent,
 				splitView: createSplitViewStub(),
 				getIsForbidden: () => false,
 			});
-			expect((findDynamicRoute(routes) as { component?: unknown }).component).to.equal(splitViewComponent);
+			const dynamic = findDynamicRoute(routes);
+			expect(typeof (dynamic as unknown as { resolve?: unknown }).resolve).to.equal('function');
+			expect((dynamic as unknown as { component?: unknown }).component).to.be.undefined;
 		});
 
-		it('dynamic route does not set preserveQuery (matches existing media behaviour)', () => {
-			const routes = buildMediaWorkspaceRoutes({
-				variants: [makeVariant('en', 'en')],
-				splitViewComponent,
-				splitView: createSplitViewStub(),
-				getIsForbidden: () => false,
-			});
-			expect((findDynamicRoute(routes) as { preserveQuery?: boolean }).preserveQuery).to.be.oneOf([undefined, false]);
-		});
-
-		it('setup treats a single-variant fragment as single-view', () => {
+		it('mounts the split-view component for a single-variant path', async () => {
 			const splitView = createSplitViewStub();
 			const routes = buildMediaWorkspaceRoutes({
 				variants: [makeVariant('en', 'en')],
@@ -118,14 +113,17 @@ describe('buildMediaWorkspaceRoutes', () => {
 				splitView,
 				getIsForbidden: () => false,
 			});
-			callSetup(findDynamicRoute(routes), 'en');
+			const slot = document.createElement('div');
+			await callResolve(findDynamicRoute(routes), 'en', slot);
+
+			expect(slot.firstChild).to.equal(splitViewComponent);
 			expect(splitView.calls).to.deep.equal([
 				{ method: 'removeActiveVariant', args: [1] },
 				{ method: 'handleVariantFolderPart', args: [0, 'en'] },
 			]);
 		});
 
-		it('setup treats a "_&_" fragment as split-view', () => {
+		it('mounts the split-view component for a "_&_" path', async () => {
 			const splitView = createSplitViewStub();
 			const routes = buildMediaWorkspaceRoutes({
 				variants: [makeVariant('en', 'en'), makeVariant('da', 'da')],
@@ -133,8 +131,26 @@ describe('buildMediaWorkspaceRoutes', () => {
 				splitView,
 				getIsForbidden: () => false,
 			});
-			callSetup(findDynamicRoute(routes), 'en_&_da');
+			const slot = document.createElement('div');
+			await callResolve(findDynamicRoute(routes), 'en_&_da', slot);
+
+			expect(slot.firstChild).to.equal(splitViewComponent);
 			expect(splitView.calls).to.deep.equal([{ method: 'setVariantParts', args: ['en_&_da'] }]);
+		});
+
+		it('mounts UmbRouteNotFoundElement for an unknown variant (URL is not changed)', async () => {
+			const splitView = createSplitViewStub();
+			const routes = buildMediaWorkspaceRoutes({
+				variants: [makeVariant('en', 'en')],
+				splitViewComponent,
+				splitView,
+				getIsForbidden: () => false,
+			});
+			const slot = document.createElement('div');
+			await callResolve(findDynamicRoute(routes), 'nonsense', slot);
+
+			expect((slot.firstChild as Element | null)?.localName).to.equal('umb-route-not-found');
+			expect(splitView.calls).to.deep.equal([]);
 		});
 
 		it('default route redirects to the first variant', () => {

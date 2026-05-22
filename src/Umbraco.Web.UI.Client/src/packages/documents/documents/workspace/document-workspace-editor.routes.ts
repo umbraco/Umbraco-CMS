@@ -14,34 +14,56 @@ export interface UmbBuildDocumentWorkspaceRoutesArgs {
 /**
  * Build the routes for the document workspace editor.
  *
- * One dynamic route handles every single-variant and split-view path. The split-view manager
- * already parses '_&_' itself, so the route table stays at three entries regardless of how many
- * cultures/segments the document has.
+ * One dynamic resolver route covers every single-variant and split-view path. The resolver mounts
+ * the split-view component for known variants and the NotFound element for unknown ones, without
+ * altering the URL. Routes stay a fixed handful of entries regardless of how many variants the
+ * document has.
  * @param {UmbBuildDocumentWorkspaceRoutesArgs} args - the inputs needed to construct the routes.
  * @returns {Array<UmbRoute>} the routes to install on the workspace router slot.
  */
 export function buildDocumentWorkspaceRoutes(args: UmbBuildDocumentWorkspaceRoutesArgs): Array<UmbRoute> {
-	const forbiddenRoute: UmbRoute = {
+	const notFoundComponent = async () => {
+		const router = await import('@umbraco-cms/backoffice/router');
+		return args.getIsForbidden() ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+	};
+
+	const catchAllRoute: UmbRoute = {
 		path: '**',
-		component: async () => {
-			const router = await import('@umbraco-cms/backoffice/router');
-			return args.getIsForbidden() ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
-		},
+		component: notFoundComponent,
 	};
 
 	if (args.variants.length === 0 || !args.appCulture || !args.splitView) {
-		return [forbiddenRoute];
+		return [catchAllRoute];
 	}
 
 	const { splitView, variants, appCulture, splitViewComponent } = args;
 
 	return [
 		{
+			// TODO: When implementing Segments, be aware if using the unique still is URL Safe, cause its most likely not... [NL]
 			path: ':variantPath',
 			preserveQuery: true,
-			component: splitViewComponent,
-			setup: (_component, info) => {
+			resolve: async (info) => {
 				const consumed = info.match.fragments.consumed;
+
+				const parts = consumed.split('_&_');
+				const allKnown = parts.every((part) => variants.some((v) => v.unique === part));
+
+				if (!allKnown) {
+					// Unknown variant unique in the URL. Render NotFound (or Forbidden) in place — the
+					// URL is left untouched so stale bookmarks stay visible to the user.
+					const router = await import('@umbraco-cms/backoffice/router');
+					const NotFoundCtor = args.getIsForbidden() ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
+					if (!(info.slot.firstChild instanceof NotFoundCtor)) {
+						info.slot.replaceChildren(new NotFoundCtor());
+					}
+					return;
+				}
+
+				// Mount (or reuse) the split-view component, then push the active variants into the manager.
+				if (info.slot.firstChild !== splitViewComponent) {
+					info.slot.replaceChildren(splitViewComponent);
+				}
 				if (consumed.includes('_&_')) {
 					splitView.setVariantParts(consumed);
 				} else {
@@ -63,8 +85,6 @@ export function buildDocumentWorkspaceRoutes(args: UmbBuildDocumentWorkspaceRout
 				const urlSearchParams = new URLSearchParams(window.location.search);
 				const openCollection = urlSearchParams.has('openCollection');
 
-				// Prefer the variant whose unique matches the app culture (the default segment for that
-				// culture); otherwise fall back to the first variant.
 				const target = variants.find((v) => v.unique === appCulture)?.unique ?? variants[0]?.unique;
 
 				if (!target) return;
@@ -72,6 +92,6 @@ export function buildDocumentWorkspaceRoutes(args: UmbBuildDocumentWorkspaceRout
 				history.replaceState({}, '', `${workspaceRoute}/${target}${openCollection ? '/view/collection' : ''}`);
 			},
 		},
-		forbiddenRoute,
+		catchAllRoute,
 	];
 }
