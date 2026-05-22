@@ -120,10 +120,10 @@ export class UmbBodyLayoutElement extends LitElement {
 			</div>
 
 			<!-- This div should be changed for the uui-scroll-container when it gets updated -->
-			<div id="main">
+			<uui-scroll-container id="main">
 				${this.loading ? html`<uui-loader-bar></uui-loader-bar>` : nothing}
 				<slot></slot>
-			</div>
+			</uui-scroll-container>
 
 			<slot name="footer"></slot>
 			<umb-footer-layout style="display:${this._footerSlotHasChildren || this._actionsSlotHasChildren ? '' : 'none'}">
@@ -223,7 +223,6 @@ export class UmbBodyLayoutElement extends LitElement {
 				display: block;
 				flex: 1;
 				flex-direction: column;
-				overflow-y: auto;
 				padding: var(--uui-size-layout-1);
 			}
 
