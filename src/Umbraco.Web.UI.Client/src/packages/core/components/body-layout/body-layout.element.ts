@@ -119,7 +119,6 @@ export class UmbBodyLayoutElement extends LitElement {
 					}}></slot>
 			</div>
 
-			<!-- This div should be changed for the uui-scroll-container when it gets updated -->
 			<uui-scroll-container id="main">
 				${this.loading ? html`<uui-loader-bar></uui-loader-bar>` : nothing}
 				<slot></slot>
