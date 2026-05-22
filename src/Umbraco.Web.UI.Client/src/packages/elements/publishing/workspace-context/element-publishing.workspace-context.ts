@@ -20,9 +20,13 @@ import { UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice
 import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_NOTIFICATION_CONTEXT } from '@umbraco-cms/backoffice/notification';
+import { notifyWorkspaceActionStarting } from '@umbraco-cms/backoffice/workspace';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
-import type { UmbPublishableWorkspaceContext } from '@umbraco-cms/backoffice/workspace';
+import type {
+	UmbPublishableWorkspaceContext,
+	UmbWorkspaceActionExecutionOptions,
+} from '@umbraco-cms/backoffice/workspace';
 
 export class UmbElementPublishingWorkspaceContext extends UmbContextBase implements UmbPublishableWorkspaceContext {
 	/**
@@ -90,16 +94,17 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 	/**
 	 * Save and publish the element
+	 * @param {UmbWorkspaceActionExecutionOptions} [options] - Optional execution options (e.g. `onActionStarting` invoked after the variant-picker modal closes).
 	 * @returns {Promise<void>}
 	 * @memberof UmbElementPublishingWorkspaceContext
 	 */
-	public async saveAndPublish(): Promise<void> {
+	public async saveAndPublish(options?: UmbWorkspaceActionExecutionOptions): Promise<void> {
 		const elementStyle = (this.getHostElement() as HTMLElement).style;
 		elementStyle.removeProperty('--uui-color-invalid');
 		elementStyle.removeProperty('--uui-color-invalid-emphasis');
 		elementStyle.removeProperty('--uui-color-invalid-standalone');
 		elementStyle.removeProperty('--uui-color-invalid-contrast');
-		return this.#handleSaveAndPublish();
+		return this.#handleSaveAndPublish(options);
 	}
 
 	/**
@@ -280,7 +285,7 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		return date.toISOString();
 	}
 
-	async #handleSaveAndPublish() {
+	async #handleSaveAndPublish(executionOptions?: UmbWorkspaceActionExecutionOptions) {
 		await this.#init;
 		if (!this.#elementWorkspaceContext) throw new Error('Element workspace context is missing');
 
@@ -312,6 +317,9 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 
 			variantIds = result?.selection.map((x) => UmbVariantId.FromString(x)) ?? [];
 		}
+
+		// User has committed to publishing (modal closed with a selection, or no modal needed).
+		notifyWorkspaceActionStarting(executionOptions);
 
 		const saveData = await this.#elementWorkspaceContext.constructSaveData(variantIds);
 		await this.#elementWorkspaceContext.runMandatoryValidationForSaveData(saveData, variantIds);
