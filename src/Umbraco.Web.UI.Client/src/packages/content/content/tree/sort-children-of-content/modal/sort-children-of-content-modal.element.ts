@@ -85,15 +85,16 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 		const variants = (
 			treeItem as UmbContentTreeItemModel & { variants?: Array<{ name?: string; culture: string | null }> }
 		).variants;
-		if (!variants?.length) {
+
+		// No variants, or invariant content (culture === null) — use the tree item's own name as-is.
+		if (!variants?.length || variants[0].culture === null) {
 			return treeItem.name;
 		}
 
-		// Invariant content: the only variant has culture === null — use treeItem.name.
-		if (variants[0].culture === null) {
-			return treeItem.name;
-		}
+		return this.#pickVariantName(variants, treeItem.name);
+	}
 
+	#pickVariantName(variants: Array<{ name?: string; culture: string | null }>, defaultName: string): string {
 		const currentVariant = this.#appCulture
 			? variants.find((variant) => variant.culture === this.#appCulture)
 			: undefined;
@@ -102,8 +103,8 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 		}
 
 		// No name in the current language — fall back to any named variant, parenthesised so it's visibly a fallback.
-		const fallbackName = variants.find((variant) => variant.name)?.name ?? treeItem.name;
-		return fallbackName ? `(${fallbackName})` : treeItem.name;
+		const fallbackName = variants.find((variant) => variant.name)?.name ?? defaultName;
+		return fallbackName ? `(${fallbackName})` : defaultName;
 	}
 
 	protected override _sortCompare(columnAlias: string, valueA: unknown, valueB: unknown): number {
