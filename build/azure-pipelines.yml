@@ -108,7 +108,6 @@ stages:
 
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
-            condition: ne(variables.CACHE_RESTORED, true)
             inputs:
               command: restore
               projects: $(solution)
