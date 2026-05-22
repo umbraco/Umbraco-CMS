@@ -74,6 +74,7 @@ variables:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   npm_config_cache: $(Pipeline.Workspace)/.npm_client
   NODE_OPTIONS: --max_old_space_size=16384
+  NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
 
 stages:
   ###############################################
@@ -95,11 +96,23 @@ stages:
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
+          - task: Cache@2
+            displayName: Cache NuGet packages
+            inputs:
+              key: 'nuget | "$(Agent.OS)" | **/packages.lock.json,!**/bin/**,!**/obj/**'
+              restoreKeys: |
+                nuget | "$(Agent.OS)"
+                nuget
+              path: $(NUGET_PACKAGES)
+              cacheHitVar: CACHE_RESTORED
+
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
+            condition: ne(variables.CACHE_RESTORED, true)
             inputs:
               command: restore
               projects: $(solution)
+              arguments: "--locked-mode"
           - task: DotNetCoreCLI@2
             name: build
             displayName: Run dotnet build and generate NuGet packages
