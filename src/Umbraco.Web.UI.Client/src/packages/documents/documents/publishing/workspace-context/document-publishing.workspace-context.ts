@@ -6,6 +6,7 @@ import type {
 } from '../../types.js';
 import { UmbDocumentPublishingRepository } from '../repository/index.js';
 import { UmbDocumentPublishedPendingChangesManager } from '../pending-changes/index.js';
+import { computeAncestorPublishedCultures } from '../utils.js';
 import { UMB_DOCUMENT_SCHEDULE_MODAL } from '../schedule-publish/constants.js';
 import { UMB_DOCUMENT_PUBLISH_WITH_DESCENDANTS_MODAL } from '../publish-with-descendants/constants.js';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../publish/constants.js';
@@ -128,9 +129,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		const { options, selected } = await this.#determineVariantOptions();
-
-		const ancestorPublishedCultures = await this.#getAncestorPublishedCultures(unique);
+		const [{ options, selected }, ancestorPublishedCultures] = await Promise.all([
+			this.#determineVariantOptions(),
+			this.#getAncestorPublishedCultures(unique),
+		]);
 
 		const result = await umbOpenModal(this, UMB_DOCUMENT_SCHEDULE_MODAL, {
 			data: {
@@ -426,17 +428,10 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	}
 
 	/**
-	 * Computes which cultures are published across the entire ancestor chain of the
-	 * current document, so the schedule dialog can warn for child variants that won't
-	 * become visible because an ancestor isn't yet published in that culture.
-	 *
-	 * For a scheduled publish to take effect, every ancestor must be published in the
-	 * scheduled culture — so the result is the intersection of each ancestor's published
-	 * cultures.
+	 * Fetches the ancestor chain of the current document and delegates to
+	 * {@link computeAncestorPublishedCultures} to derive which cultures are
+	 * published across every ancestor.
 	 * @param unique The unique of the document being scheduled.
-	 * @returns `undefined` for root documents or when the lookup is unavailable;
-	 *  `[null]` when every ancestor is published in the invariant variant (covers all child cultures);
-	 *  otherwise the list of cultures published in every ancestor.
 	 */
 	async #getAncestorPublishedCultures(unique: string): Promise<Array<string | null> | undefined> {
 		const { data, error } = await tryExecute(
@@ -446,36 +441,14 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		if (error || !data) return undefined;
 
 		const ancestors = data.find((entry) => entry.id === unique)?.ancestors ?? [];
-		if (ancestors.length === 0) return undefined; // root document — nothing above to block publishing
-
-		// Start as "covers all cultures" (covered = undefined) and intersect each ancestor's published cultures.
-		let covered: Set<string | null> | undefined;
-
-		for (const ancestor of ancestors) {
-			const ancestorPublished: Array<string | null> = ancestor.variants
-				.filter(
-					(variant) =>
-						variant.state === UmbDocumentVariantState.PUBLISHED ||
-						variant.state === UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES,
-				)
-				.map((variant) => variant.culture ?? null);
-
-			// An invariant-published ancestor (null entry) covers every child culture — no constraint added.
-			if (ancestorPublished.includes(null)) continue;
-
-			const ancestorSet = new Set<string | null>(ancestorPublished);
-			if (covered === undefined) {
-				covered = ancestorSet;
-			} else {
-				const intersection = new Set<string | null>();
-				for (const culture of covered) {
-					if (ancestorSet.has(culture)) intersection.add(culture);
-				}
-				covered = intersection;
-			}
-		}
-
-		return covered === undefined ? [null] : Array.from(covered);
+		return computeAncestorPublishedCultures(
+			ancestors.map((ancestor) => ({
+				variants: ancestor.variants.map((variant) => ({
+					culture: variant.culture ?? null,
+					state: variant.state,
+				})),
+			})),
+		);
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {

@@ -244,6 +244,9 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 		if (ancestorPublishedCultures === undefined) return true;
 		// `null` entry means every ancestor is published in the invariant variant — covers all child cultures.
 		if (ancestorPublishedCultures.includes(null)) return true;
+		// An invariant child option is served wherever its ancestors are published, so any
+		// non-empty culture coverage means the schedule will take effect somewhere.
+		if (option.culture === null) return ancestorPublishedCultures.length > 0;
 		return ancestorPublishedCultures.includes(option.culture);
 	}
 
@@ -499,6 +502,7 @@ export class UmbDocumentScheduleModalElement extends UmbModalBaseElement<
 				padding: var(--uui-size-space-2) var(--uui-size-space-3);
 				background-color: var(--uui-color-warning);
 				color: var(--uui-color-warning-contrast);
+				border: 1px solid var(--uui-color-warning-standalone);
 				border-radius: var(--uui-border-radius);
 			}
 		`,
