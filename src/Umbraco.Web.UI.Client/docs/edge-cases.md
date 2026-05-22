@@ -651,3 +651,58 @@ if (state.held?.some((l) => l.name === 'umb:token-refresh')) {
 Note: there is a TOCTOU gap between `query()` and `request()`. If the lock releases between the two calls, `request()` acquires and releases immediately — this is harmless.
 
 
+### Routing (`umb-router-slot` + dynamic routes)
+
+When a view owns an `umb-router-slot` and computes its routes from observable data (e.g. workspace/design editors), three behaviours of the slot must be respected. Getting any one of them wrong leaves the view stuck on a path it cannot recover from.
+
+**Guard the slot until routes are populated**
+
+If `umb-router-slot` mounts with `routes = undefined` (or an early/empty array), it fires `init`/`change` against whatever the URL currently is, settles on that local path, and does **not** re-match the URL when the routes array is replaced later. Always wrap the slot:
+
+```typescript
+// ❌ Slot mounts with undefined routes, locks in the wrong active path
+return html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`;
+
+// ✅ Slot only mounts once real routes are in hand
+return html`
+	${this._routes
+		? html`<umb-router-slot .routes=${this._routes}></umb-router-slot>`
+		: nothing}
+`;
+```
+
+`umb-workspace-editor` (`packages/core/workspace/components/workspace-editor/workspace-editor.element.ts`) uses this guard; views that build their own router-slot must do the same.
+
+**Don't compute routes against not-yet-loaded data**
+
+Helpers like `UmbContentTypeContainerStructureHelper.childContainers` ship with `[]` as their initial value, so the first observer callback fires synchronously with empty data. If `#createRoutes()` runs at that point, the slot sees a wrong route set first. Await the structure load before wiring the helper:
+
+```typescript
+this.consumeContext(UMB_CONTENT_TYPE_WORKSPACE_CONTEXT, async (workspaceContext) => {
+	this.#workspaceContext = workspaceContext;
+	if (!workspaceContext) return;
+
+	// Block route generation until real containers are loaded
+	await workspaceContext.structure.whenLoaded();
+
+	this.#tabsStructureHelper.setStructureManager(workspaceContext.structure);
+	this.#observeRootGroups();
+});
+```
+
+**`redirectTo` doesn't fire on the initial route attachment**
+
+The router-slot library only applies `redirectTo` on navigation events, not when routes are first attached. A `path: ''` route with `redirectTo: 'foo'` will leave the slot sitting on the empty local path forever. Use **route duplication** instead — copy the target route onto the empty path:
+
+```typescript
+// ❌ Redirect never fires when the slot mounts late (e.g. inside a modal workspace)
+routes.push({ path: '', pathMatch: 'full', redirectTo: 'tab/settings' });
+
+// ✅ Duplicate the landing route directly under the empty path
+const defaultRoute = routes[0]; // or whichever is the landing route
+routes.push({ ...defaultRoute, path: '', pathMatch: 'full' });
+```
+
+`umb-workspace-editor` uses this pattern (`workspace-editor.element.ts:142`). The content-type design editor was fixed to follow it in #22855.
+
+
