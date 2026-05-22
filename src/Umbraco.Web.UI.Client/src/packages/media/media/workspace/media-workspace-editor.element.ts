@@ -1,6 +1,7 @@
 import type { UmbMediaVariantOptionModel } from '../types.js';
 import { UmbMediaWorkspaceSplitViewElement } from './media-workspace-split-view.element.js';
 import { UMB_MEDIA_WORKSPACE_CONTEXT } from './media-workspace.context-token.js';
+import { buildMediaWorkspaceRoutes } from './media-workspace-editor.routes.js';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
@@ -65,72 +66,12 @@ export class UmbMediaWorkspaceEditorElement extends UmbLitElement {
 		);
 	}
 
-	private async _generateRoutes() {
-		if (!this.#variants || this.#variants.length === 0) {
-			this._routes = [];
-			this.#ensureForbiddenRoute(this._routes);
-			return;
-		}
-
-		// Generate split view routes for all available routes
-		const routes: Array<UmbRoute> = [];
-
-		// Split view routes:
-		this.#variants?.forEach((variantA) => {
-			this.#variants?.forEach((variantB) => {
-				routes.push({
-					// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
-					path: variantA.unique + '_&_' + variantB.unique,
-					component: this._splitViewElement,
-					setup: (_component, info) => {
-						// Set split view/active info..
-						this.#workspaceContext?.splitView.setVariantParts(info.match.fragments.consumed);
-					},
-				});
-			});
-		});
-
-		// Single view:
-		this.#variants?.forEach((variant) => {
-			routes.push({
-				// TODO: When implementing Segments, be aware if using the unique is URL Safe... [NL]
-				path: variant.unique,
-				component: this._splitViewElement,
-				setup: (_component, info) => {
-					// cause we might come from a split-view, we need to reset index 1.
-					this.#workspaceContext?.splitView.removeActiveVariant(1);
-					this.#workspaceContext?.splitView.handleVariantFolderPart(0, info.match.fragments.consumed);
-				},
-			});
-		});
-
-		if (routes.length !== 0 && this.#variants?.length) {
-			// Using first single view as the default route for now (hence the math below):
-			routes.push({
-				path: '',
-				pathMatch: 'full',
-				redirectTo: routes[this.#variants.length * this.#variants.length]?.path,
-			});
-		}
-
-		this.#ensureForbiddenRoute(routes);
-
-		this._routes = routes;
-	}
-
-	/**
-	 * Ensure that there is a route to handle forbidden access.
-	 * This route will display a forbidden message when the user does not have permission to access certain resources.
-	 * Also handles not found routes.
-	 * @param {Array<UmbRoute>} routes - The array of routes to append the forbidden route to
-	 */
-	#ensureForbiddenRoute(routes: Array<UmbRoute> = []) {
-		routes.push({
-			path: '**',
-			component: async () => {
-				const router = await import('@umbraco-cms/backoffice/router');
-				return this.#isForbidden ? router.UmbRouteForbiddenElement : router.UmbRouteNotFoundElement;
-			},
+	private _generateRoutes() {
+		this._routes = buildMediaWorkspaceRoutes({
+			variants: this.#variants ?? [],
+			splitViewComponent: this._splitViewElement,
+			splitView: this.#workspaceContext?.splitView,
+			getIsForbidden: () => this.#isForbidden,
 		});
 	}
 
