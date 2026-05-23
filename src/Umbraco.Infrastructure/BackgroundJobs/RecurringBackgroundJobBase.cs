@@ -56,7 +56,7 @@ public abstract class RecurringBackgroundJobBase : IRecurringBackgroundJob, IDis
 
     /// <inheritdoc />
     /// <remarks>
-    /// Setting this property to a different value raises <see cref="PeriodChanged" />.
+    /// Setting this property to a different value raises <see cref="PeriodChanged" />. The initial value passed to the constructor is stored without raising the event.
     /// </remarks>
     public virtual TimeSpan Period
     {
@@ -83,7 +83,7 @@ public abstract class RecurringBackgroundJobBase : IRecurringBackgroundJob, IDis
 
     /// <inheritdoc />
     /// <remarks>
-    /// Setting this property to a different value raises <see cref="IgnoredDelayChanged" />.
+    /// Setting this property to a different value raises <see cref="IgnoredDelayChanged" />. The initial value (<see cref="DefaultIgnoredDelay" />) is set without raising the event.
     /// </remarks>
     public virtual TimeSpan IgnoredDelay
     {

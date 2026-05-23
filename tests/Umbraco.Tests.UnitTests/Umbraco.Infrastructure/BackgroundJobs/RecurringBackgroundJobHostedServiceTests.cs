@@ -237,6 +237,19 @@ public class RecurringBackgroundJobHostedServiceTests
     }
 
     [Test]
+    public async Task Skips_Wait_When_IgnoredDelay_Is_Negative()
+    {
+        var timeProvider = new FakeTimeProvider();
+        var mockJob = new Mock<IRecurringBackgroundJob>();
+        mockJob.Setup(x => x.IgnoredDelay).Returns(TimeSpan.FromSeconds(-5));
+
+        var sut = CreateRecurringBackgroundJobHostedService(mockJob, isMainDom: false, timeProvider: timeProvider);
+
+        // Negative (and not Timeout.InfiniteTimeSpan) is treated like zero — back-off is skipped, no hang or tight loop.
+        await sut.PerformExecuteAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5));
+    }
+
+    [Test]
     public async Task Waits_Until_Shutdown_When_IgnoredDelay_Is_Infinite()
     {
         var timeProvider = new FakeTimeProvider();
