@@ -50,6 +50,9 @@ public abstract class RecurringBackgroundJobBase : IRecurringBackgroundJob
     public virtual event EventHandler PeriodChanged { add { } remove { } }
 
     /// <inheritdoc />
+    public virtual event EventHandler IgnoredDelayChanged { add { } remove { } }
+
+    /// <inheritdoc />
     [Obsolete("Use RunJobAsync(CancellationToken) instead. Scheduled for removal in Umbraco 19.")]
     public Task RunJobAsync() => RunJobAsync(CancellationToken.None);
 

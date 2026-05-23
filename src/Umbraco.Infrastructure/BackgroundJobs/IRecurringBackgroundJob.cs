@@ -64,7 +64,16 @@ public interface IRecurringBackgroundJob
     /// <summary>
     /// This event should be raised when the <see cref="Period" /> property changes to notify the background job manager to update the schedule for this job.
     /// </summary>
-    event EventHandler PeriodChanged;
+    event EventHandler PeriodChanged; // TODO (V19): Change to `event EventHandler? PeriodChanged;` so implementations can use field-like event syntax without manual backing-delegate accessors.
+
+    /// <summary>
+    /// This event should be raised when the <see cref="IgnoredDelay" /> property changes (e.g. from <see cref="Timeout.InfiniteTimeSpan" /> back to a finite value) to interrupt any in-progress ignored back-off and re-read the new value.
+    /// </summary>
+    event EventHandler IgnoredDelayChanged
+    {
+        add { }
+        remove { }
+    } // TODO (V19): Remove the default implementation and change to `event EventHandler? IgnoredDelayChanged;` so implementations can use field-like event syntax without manual backing-delegate accessors.
 
     /// <summary>
     /// Runs the background job.
