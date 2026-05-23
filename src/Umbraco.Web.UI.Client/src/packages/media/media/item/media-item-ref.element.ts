@@ -58,10 +58,6 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 	}
 
 	#getHref(item: UmbMediaItemModel) {
-		// No `_editPath` means the modal route registration couldn't reach a parent route context
-		// (e.g. this ref is rendered inside a non-routable modal). Skip rendering an href so we
-		// don't produce a broken `/edit/<guid>` link. Consumers that know they will be in such a
-		// context should also pass `readonly` so the ref isn't styled as clickable.
 		if (!this._editPath) return;
 		const path = UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
 		return `${this._editPath}/${path}`;
