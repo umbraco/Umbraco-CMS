@@ -58,9 +58,6 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 	}
 
 	#getHref(item: UmbMemberItemModel) {
-		// No `_editPath` means the modal route registration couldn't reach a parent route context
-		// (e.g. this ref is rendered inside a non-routable modal). The render method also applies
-		// `readonly` in this state so the card is not styled as clickable.
 		if (!this._editPath) return;
 		const path = UMB_EDIT_MEMBER_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
 		return `${this._editPath}/${path}`;
@@ -73,7 +70,7 @@ export class UmbMemberItemRefElement extends UmbLitElement {
 			<uui-ref-node-member
 				name=${this.item.name}
 				href=${ifDefined(this.#getHref(this.item))}
-				?readonly=${this.readonly || !this._userHasSectionAccess || !this._editPath}
+				?readonly=${this.readonly || !this._userHasSectionAccess}
 				?standalone=${this.standalone}>
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}

@@ -183,7 +183,10 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			switch (type) {
 				case 'document': {
 					await this.#loadPickedDocumentItem(unique);
-					if (this._documentItem && this.#documentItemDataResolver) {
+					if (this._documentItem) {
+						this.#documentItemDataResolver?.destroy();
+						this.#documentItemDataResolver = new UmbDocumentItemDataResolver(this);
+						this.#documentItemDataResolver.setData(this._documentItem);
 						icon = await this.#documentItemDataResolver.getIcon();
 						name = await this.#documentItemDataResolver.getName();
 						url = await this.#getUrlForDocument(unique);
@@ -225,12 +228,6 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 		this.#documentItemRepository ??= new UmbDocumentItemRepository(this);
 		const { data: documentItems } = await this.#documentItemRepository.requestItems([unique]);
 		this._documentItem = documentItems?.[0];
-
-		if (this._documentItem) {
-			this.#documentItemDataResolver?.destroy();
-			this.#documentItemDataResolver = new UmbDocumentItemDataResolver(this);
-			this.#documentItemDataResolver.setData(this._documentItem);
-		}
 	}
 
 	async #getUrlForDocument(unique: string) {
