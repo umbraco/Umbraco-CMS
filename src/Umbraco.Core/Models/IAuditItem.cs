@@ -31,4 +31,24 @@ public interface IAuditItem : IEntity
     ///     Gets optional additional data parameters.
     /// </summary>
     string? Parameters { get; }
+
+    // TODO (V18): Remove the default implementations.
+
+    /// <summary>
+    ///     Gets the source of the trigger that initiated the audited action (e.g. "Core", "Umbraco.Workflow"),
+    ///     or <c>null</c> if no trigger context was set.
+    /// </summary>
+    string? TriggerSource => null;
+
+    /// <summary>
+    ///     Gets the operation of the trigger that initiated the audited action (e.g. "ScheduledPublish", "Rollback", "FinalApproval"),
+    ///     or <c>null</c> if no trigger context was set.
+    /// </summary>
+    string? TriggerOperation => null;
+
+    /// <summary>
+    ///     Gets the type alias for custom audit entries (e.g. "Umb.Workflow.Approved"),
+    ///     or <c>null</c> for built-in audit types.
+    /// </summary>
+    string? TypeAlias => null;
 }

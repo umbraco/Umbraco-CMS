@@ -81,4 +81,28 @@ internal sealed class LogDto
     [NullSetting(NullSetting = NullSettings.Null)]
     [Length(4000)]
     public string? Parameters { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the source of the trigger that initiated the audited action (e.g. "Core", "Umbraco.Workflow").
+    /// </summary>
+    [Column("triggerSource")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [Length(Constants.Audit.TriggerFieldLength)]
+    public string? TriggerSource { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the operation of the trigger that initiated the audited action (e.g. "ScheduledPublish", "Rollback", "FinalApproval").
+    /// </summary>
+    [Column("triggerOperation")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [Length(Constants.Audit.TriggerFieldLength)]
+    public string? TriggerOperation { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the type alias for custom audit entries (e.g. "Umb.Workflow.Approved").
+    /// </summary>
+    [Column("logTypeAlias")]
+    [NullSetting(NullSetting = NullSettings.Null)]
+    [Length(Constants.Audit.TypeAliasLength)]
+    public string? LogTypeAlias { get; set; }
 }

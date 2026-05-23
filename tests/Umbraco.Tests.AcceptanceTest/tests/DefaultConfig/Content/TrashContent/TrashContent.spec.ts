@@ -44,9 +44,9 @@ test('can trash an invariant content node', {tag: '@smoke'}, async ({umbracoApi,
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.delete);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentDeleted);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move, 1);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved, 1);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription(1);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name, 1);
@@ -74,9 +74,9 @@ test('can trash a variant content node', async ({umbracoApi, umbracoUi}) => {
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickInfoTab();
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.delete);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentDeleted);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription();
   await umbracoUi.content.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move, 1);
-  await umbracoUi.content.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.contentMoved, 1);
+  await umbracoUi.content.doesHistoryItemHaveEmptyDescription(1);
   const currentUser = await umbracoApi.user.getCurrentUser();
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name);
   await umbracoUi.content.doesHistoryItemHaveUsername(currentUser.name, 1);

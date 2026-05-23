@@ -253,7 +253,7 @@ export class ContentUiHelper extends UiBaseLocators {
     // Info tab
     this.infoTab = page.getByTestId('workspace:view-link:Umb.WorkspaceView.Document.Info');
     this.linkContent = page.locator('umb-document-links-workspace-info-app');
-    this.historyItems = page.locator('umb-history-item');
+    this.historyItems = page.locator('table.log-table tbody > tr');
     this.generalItem = page.locator('.general-item');
     this.documentState = this.generalItem.locator('uui-tag');
     this.createdDate = this.generalItem.filter({hasText: 'Created'}).locator('umb-localize-date');
@@ -537,17 +537,17 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async doesHistoryItemHaveTag(tagText: string, index: number = 0) {
-    const tag = this.historyItems.nth(index).locator('.log-type uui-tag');
+    const tag = this.historyItems.nth(index).locator('.cell-action uui-tag');
     await this.containsText(tag, tagText);
   }
 
-  async doesHistoryItemHaveDescription(descriptionText: string, index: number = 0) {
-    const description = this.historyItems.nth(index).locator('.log-type span');
-    await this.hasText(description, descriptionText);
+  async doesHistoryItemHaveEmptyDescription(index: number = 0) {
+    const description = this.historyItems.nth(index).locator('.cell-comment');
+    await this.waitForEmpty(description);
   }
 
   async doesHistoryItemHaveUsername(usernameText: string, index: number = 0) {
-    const username = this.historyItems.nth(index).locator('.user-info .name');
+    const username = this.historyItems.nth(index).locator('.cell-user .user-name');
     await this.containsText(username, usernameText);
   }
 
