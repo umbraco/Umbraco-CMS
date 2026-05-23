@@ -221,7 +221,8 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     {
         // Rotate without disposing — the wait loop may still be registering against the old token.
         // The old CTS is small once cancelled and will be collected by the GC.
-        CancellationTokenSource oldCts = Interlocked.Exchange(ref _ignoredDelayChangeCts, new CancellationTokenSource());
+        var newCts = new CancellationTokenSource();
+        CancellationTokenSource oldCts = Interlocked.Exchange(ref _ignoredDelayChangeCts, newCts);
 
         try
         {
@@ -229,7 +230,8 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         }
         catch (ObjectDisposedException)
         {
-            // Race during shutdown: Dispose disposed the CTS between this in-flight handler reading it and calling Cancel. Safe to swallow — the wait loop is already torn down.
+            // Lost the shutdown race — newCts will not be observed.
+            newCts.Dispose();
         }
     }
 
@@ -255,7 +257,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
         {
             TimeSpan ignoredDelay = _job.IgnoredDelay;
 
-            // Skip the back-off for zero and any other non-positive value (other than Timeout.InfiniteTimeSpan, which means "wait until shutdown / IgnoredDelayChanged"). Validating here defends against direct IRecurringBackgroundJob implementations or property overrides that bypass the RecurringBackgroundJobBase setter validation.
+            // Skip back-off for zero/negative; Timeout.InfiniteTimeSpan means wait until shutdown or IgnoredDelayChanged.
             if (ignoredDelay != Timeout.InfiniteTimeSpan && ignoredDelay <= TimeSpan.Zero)
             {
                 return;
