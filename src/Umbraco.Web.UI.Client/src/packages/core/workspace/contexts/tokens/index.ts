@@ -1,4 +1,5 @@
 export * from './entity-workspace.context-token.js';
+export * from './notify-workspace-action-starting.function.js';
 export * from './publishable-workspace.context-token.js';
 export * from './routable-workspace.context-token.js';
 export * from './submittable-tree-entity-workspace.context-token.js';
@@ -14,3 +15,4 @@ export type * from './submittable-tree-entity-workspace-context.interface.js';
 export type * from './submittable-workspace-context.interface.js';
 export type * from './saveable-workspace-context.interface.js';
 export type * from './variant-dataset-workspace-context.interface.js';
+export type * from './workspace-action-execution-options.interface.js';
