@@ -59,8 +59,9 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 
 	#getHref(item: UmbMediaItemModel) {
 		// No `_editPath` means the modal route registration couldn't reach a parent route context
-		// (e.g. this ref is rendered inside a non-routable modal). The render method also applies
-		// `readonly` in this state so the card is not styled as clickable.
+		// (e.g. this ref is rendered inside a non-routable modal). Skip rendering an href so we
+		// don't produce a broken `/edit/<guid>` link. Consumers that know they will be in such a
+		// context should also pass `readonly` so the ref isn't styled as clickable.
 		if (!this._editPath) return;
 		const path = UMB_EDIT_MEDIA_WORKSPACE_PATH_PATTERN.generateLocal({ unique: item.unique });
 		return `${this._editPath}/${path}`;
@@ -73,7 +74,7 @@ export class UmbMediaItemRefElement extends UmbLitElement {
 			<uui-ref-node
 				name=${this.item.name}
 				href=${ifDefined(this.#getHref(this.item))}
-				?readonly=${this.readonly || !this._userHasSectionAccess || !this._editPath}
+				?readonly=${this.readonly || !this._userHasSectionAccess}
 				?standalone=${this.standalone}>
 				<slot name="actions" slot="actions"></slot>
 				${this.#renderIcon(this.item)}
