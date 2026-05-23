@@ -417,17 +417,6 @@ internal sealed class ContentEditingService
         try
         {
             var currentUserId = await GetUserIdAsync(userKey);
-            // PublishResult publishResult = ((ContentService)ContentService).SaveAndPublish(content);
-            // if (publishResult.Success)
-            // {
-            //     return ContentEditingOperationStatus.Success;
-            // }
-            //
-            // return publishResult.Result switch
-            // {
-            //     PublishResultType.FailedPublishCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
-            //     _ => ContentEditingOperationStatus.Unknown,
-            // };
             OperationResult saveResult = ContentService.Save(content, currentUserId);
             return saveResult.Result switch
             {
@@ -436,7 +425,7 @@ internal sealed class ContentEditingService
                 OperationResultType.FailedCancelledByEvent => ContentEditingOperationStatus.CancelledByNotification,
 
                 // for any other state we'll return "unknown" so we know that we need to amend this
-                _ => ContentEditingOperationStatus.Unknown
+                _ => ContentEditingOperationStatus.Unknown,
             };
         }
         catch (Exception ex)

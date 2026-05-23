@@ -48,9 +48,9 @@ public interface IContentEditingService
     /// <param name="culturesToPublish">The cultures to publish.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the creation result or an error status.</returns>
-    // TODO (V18): Remove default implementation.
+    // TODO (V19): Remove default implementation.
     Task<Attempt<ContentCreateResult, ContentEditingOperationStatus>> CreateAndPublishAsync(ContentCreateModel createModel, string[] culturesToPublish, Guid userKey)
-        => Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.Unknown, new ContentCreateResult()));
+        => throw new NotImplementedException();
 
     /// <summary>
     ///     Updates an existing content item.
@@ -69,9 +69,9 @@ public interface IContentEditingService
     /// <param name="culturesToPublish">The cultures to publish.</param>
     /// <param name="userKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the update result or an error status.</returns>
-    // TODO (V18): Remove default implementation.
+    // TODO (V19): Remove default implementation.
     Task<Attempt<ContentUpdateResult, ContentEditingOperationStatus>> UpdateAndPublishAsync(Guid key, ContentUpdateModel updateModel, string[] culturesToPublish, Guid userKey)
-        => Task.FromResult(Attempt.FailWithStatus(ContentEditingOperationStatus.Unknown, new ContentUpdateResult()));
+        => throw new NotImplementedException();
 
     /// <summary>
     ///     Moves a content item to the recycle bin.
