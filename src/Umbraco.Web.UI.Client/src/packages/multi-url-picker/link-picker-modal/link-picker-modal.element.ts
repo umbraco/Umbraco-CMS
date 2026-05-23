@@ -183,9 +183,9 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 			switch (type) {
 				case 'document': {
 					await this.#loadPickedDocumentItem(unique);
-					if (this._documentItem && this.#documentItemDataResolver) {
-						icon = await this.#documentItemDataResolver.getIcon();
-						name = await this.#documentItemDataResolver.getName();
+					if (this._documentItem) {
+						icon = await this.#documentItemDataResolver?.getIcon();
+						name = await this.#documentItemDataResolver?.getName();
 						url = await this.#getUrlForDocument(unique);
 					}
 					break;
