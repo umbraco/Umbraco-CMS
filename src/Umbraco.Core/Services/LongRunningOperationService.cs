@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Scoping.EFCore;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Core.Services;
@@ -13,7 +14,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
 {
     private readonly IOptions<LongRunningOperationsSettings> _options;
     private readonly ILongRunningOperationRepository _repository;
-    private readonly ICoreScopeProvider _scopeProvider;
+    private readonly IScopeProvider _scopeProvider;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<LongRunningOperationService> _logger;
 
@@ -28,7 +29,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
     public LongRunningOperationService(
         IOptions<LongRunningOperationsSettings> options,
         ILongRunningOperationRepository repository,
-        ICoreScopeProvider scopeProvider,
+        IScopeProvider scopeProvider,
         TimeProvider timeProvider,
         ILogger<LongRunningOperationService> logger)
     {
@@ -70,8 +71,11 @@ internal class LongRunningOperationService : ILongRunningOperationService
     /// <inheritdoc/>
     public async Task<LongRunningOperationStatus?> GetStatusAsync(Guid operationId)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return await _repository.GetStatusAsync(operationId);
+        using ICoreScope scope = _scopeProvider.CreateScope();
+        LongRunningOperationStatus? status = await _repository.GetStatusAsync(operationId);
+        scope.Complete();
+
+        return status;
     }
 
     /// <inheritdoc/>
@@ -81,19 +85,24 @@ internal class LongRunningOperationService : ILongRunningOperationService
         int take,
         LongRunningOperationStatus[]? statuses = null)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
-        return await _repository.GetByTypeAsync(
+        using ICoreScope scope = _scopeProvider.CreateScope();
+        PagedModel<LongRunningOperation> operation = await _repository.GetByTypeAsync(
                 type,
                 statuses ?? [LongRunningOperationStatus.Enqueued, LongRunningOperationStatus.Running],
                 skip,
                 take);
+
+        scope.Complete();
+        return operation;
     }
 
     /// <inheritdoc />
     public async Task<Attempt<TResult?, LongRunningOperationResultStatus>> GetResultAsync<TResult>(Guid operationId)
     {
-        using ICoreScope scope = _scopeProvider.CreateCoreScope(autoComplete: true);
+        using ICoreScope scope = _scopeProvider.CreateScope();
         LongRunningOperation<TResult>? operation = await _repository.GetAsync<TResult>(operationId);
+
+        scope.Complete();
         if (operation?.Status is not LongRunningOperationStatus.Success)
         {
             return Attempt.FailWithStatus<TResult?, LongRunningOperationResultStatus>(
@@ -117,13 +126,13 @@ internal class LongRunningOperationService : ILongRunningOperationService
         bool runInBackground = true,
         CancellationToken cancellationToken = default)
     {
-        if (!runInBackground && _scopeProvider.Context is not null)
+        if (!runInBackground && _scopeProvider.AmbientScopeContext is not null)
         {
             throw new InvalidOperationException("Long running operations cannot be executed in the foreground within an existing scope.");
         }
 
         Guid operationId;
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        using (ICoreScope scope = _scopeProvider.CreateScope())
         {
             if (allowConcurrentExecution is false)
             {
@@ -210,7 +219,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
             {
                 // Update the status in the database and increase the expiration time.
                 // That way, even if the status has not changed, we know that the operation is still being processed.
-                using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+                using (ICoreScope scope = _scopeProvider.CreateScope())
                 {
                     await _repository.UpdateStatusAsync(operationId, LongRunningOperationStatus.Running, _timeProvider.GetUtcNow() + _options.Value.ExpirationTime);
                     scope.Complete();
@@ -223,7 +232,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
         {
             // If an exception occurs, we update the status to Failed and rethrow the exception.
             _logger.LogDebug("Finished long-running operation {Type} with id {OperationId} and status {Status}.", type, operationId, LongRunningOperationStatus.Failed);
-            using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+            using (ICoreScope scope = _scopeProvider.CreateScope())
             {
                 await _repository.UpdateStatusAsync(operationId, LongRunningOperationStatus.Failed, _timeProvider.GetUtcNow() + _options.Value.ExpirationTime);
                 scope.Complete();
@@ -234,7 +243,7 @@ internal class LongRunningOperationService : ILongRunningOperationService
 
         _logger.LogDebug("Finished long-running operation {Type} with id {OperationId} and status {Status}.", type, operationId, LongRunningOperationStatus.Success);
 
-        using (ICoreScope scope = _scopeProvider.CreateCoreScope())
+        using (ICoreScope scope = _scopeProvider.CreateScope())
         {
             await _repository.UpdateStatusAsync(operationId, LongRunningOperationStatus.Success, _timeProvider.GetUtcNow() + _options.Value.ExpirationTime);
             if (operationTask.Result != null)
