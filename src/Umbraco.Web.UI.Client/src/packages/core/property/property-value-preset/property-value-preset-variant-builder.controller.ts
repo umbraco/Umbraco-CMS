@@ -1,4 +1,4 @@
-import { UmbVariantId } from '../../variant/variant-id.class.js';
+import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { UmbPropertyValuePresetBuilderController } from './property-value-preset-builder.controller.js';
 import type {
 	UmbPropertyTypePresetModel,
