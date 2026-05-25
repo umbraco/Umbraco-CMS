@@ -1165,7 +1165,19 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.rollbackBtn, {force: true});
   }
 
-  async clickRollbackContainerButton() {
+  async clickRollbackContainerButton(documentId?: string) {
+    // When the rollback is triggered from within an open document workspace, the workspace
+    // re-fetches the document after the rollback event is dispatched. Pass the documentId so
+    // the test waits for that GET to complete before asserting on the property values —
+    // otherwise the assertion races the async reload that follows the success notification.
+    if (documentId) {
+      await this.waitForResponseAfterExecutingPromise(
+        `${ConstantHelper.apiEndpoints.document}/${documentId}`,
+        this.click(this.rollbackContainerBtn),
+        ConstantHelper.statusCodes.ok,
+      );
+      return;
+    }
     await this.click(this.rollbackContainerBtn);
   }
 
