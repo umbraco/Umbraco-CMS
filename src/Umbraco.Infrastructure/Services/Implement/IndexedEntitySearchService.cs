@@ -135,7 +135,8 @@ internal sealed class IndexedEntitySearchService : IIndexedEntitySearchService
 
             orderedItems = _entityService
                 .GetAll(objectType, keys)
-                .OrderBy(entity => keyOrder.TryGetValue(entity.Key, out var index) ? index : int.MaxValue);
+                .OrderBy(entity => keyOrder.TryGetValue(entity.Key, out var index) ? index : int.MaxValue)
+                .ToArray();
         }
         else
         {

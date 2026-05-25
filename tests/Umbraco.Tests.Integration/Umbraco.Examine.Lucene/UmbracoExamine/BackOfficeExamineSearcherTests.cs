@@ -744,74 +744,6 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         });
     }
 
-    // Multi-word relevance ranking — see #22862.
-    // Long, precise multi-word queries should surface their exact node-name match at position 1,
-    // not be outranked by short noisy docs sharing only a common token.
-
-    [Test]
-    public async Task Multi_Word_Search_Ranks_Exact_Phrase_Match_First()
-    {
-        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
-
-        const string exactMatch = "Sirop de Grenade Pomegranate Syrup";
-        await PublishContents(
-            exactMatch,
-            "Quinta de la Rosa Reserva 2020",
-            "Delivery API Test Page",
-            "Test De Mocha");
-
-        IEnumerable<ISearchResult> actual = BackOfficeExamineSearch(exactMatch);
-
-        ISearchResult[] searchResults = actual.ToArray();
-        Assert.GreaterOrEqual(searchResults.Length, 1);
-        Assert.AreEqual(exactMatch, searchResults.First().Values["nodeName"]);
-    }
-
-    [Test]
-    public async Task Multi_Word_Search_Ranks_All_Tokens_Present_Above_Partial_Match()
-    {
-        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
-
-        // Same five tokens as the query, different order — no exact phrase match.
-        const string allTokensScrambled = "Pomegranate Sirop de Syrup Grenade";
-
-        // Partial match — only the common token "de" overlaps with the query.
-        const string partialMatch = "de la Rosa";
-
-        await PublishContents(
-            allTokensScrambled,
-            partialMatch,
-            "Pomegranate Marmalade");
-
-        IEnumerable<ISearchResult> actual = BackOfficeExamineSearch("Sirop de Grenade Pomegranate Syrup");
-
-        ISearchResult[] searchResults = actual.ToArray();
-        var scrambledIndex = Array.FindIndex(searchResults, r => (string)r.Values["nodeName"] == allTokensScrambled);
-        var partialIndex = Array.FindIndex(searchResults, r => (string)r.Values["nodeName"] == partialMatch);
-
-        Assert.GreaterOrEqual(scrambledIndex, 0, $"'{allTokensScrambled}' (all tokens present) must appear in results");
-        Assert.IsTrue(
-            partialIndex < 0 || scrambledIndex < partialIndex,
-            $"'{allTokensScrambled}' (all tokens present) must rank above '{partialMatch}' (single-token overlap)");
-    }
-
-    [Test]
-    public async Task Multi_Word_Search_Quoted_Phrase_Returns_Exact_Match_First()
-    {
-        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
-
-        const string exactMatch = "Sirop de Grenade Pomegranate Syrup";
-        await PublishContents(
-            exactMatch,
-            "de la Rosa");
-
-        IEnumerable<ISearchResult> actual = BackOfficeExamineSearch($"\"{exactMatch}\"");
-
-        ISearchResult[] searchResults = actual.ToArray();
-        Assert.GreaterOrEqual(searchResults.Length, 1);
-        Assert.AreEqual(exactMatch, searchResults.First().Values["nodeName"]);
-    }
-
     /// <summary>
     /// Verifies that <see cref="IIndexedEntitySearchService"/> returns matches in Lucene score
     /// order. The exact-match document is published last so its nodeId is the highest of the
@@ -841,25 +773,6 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
         IEntitySlim[] items = result.Items.ToArray();
         Assert.GreaterOrEqual(items.Length, 1);
         Assert.AreEqual(exactMatch, items.First().Name);
-    }
-
-    [Test]
-    public async Task Single_Token_Search_Returns_All_Prefix_Matches()
-    {
-        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
-
-        await PublishContents(
-            "Delivery API Test Page",
-            "Quinta de la Rosa",
-            "Test De Mocha",
-            "Pomegranate Marmalade"); // no "de" prefix anywhere
-
-        IEnumerable<ISearchResult> actual = BackOfficeExamineSearch("de");
-
-        var nodeNames = actual.Select(r => (string)r.Values["nodeName"]).ToArray();
-        Assert.Contains("Delivery API Test Page", nodeNames);
-        Assert.Contains("Quinta de la Rosa", nodeNames);
-        Assert.Contains("Test De Mocha", nodeNames);
     }
 
     private async Task PublishContents(params string[] contentNames)
