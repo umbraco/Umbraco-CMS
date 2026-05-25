@@ -15,8 +15,10 @@ public class UmbracoApplicationRoot : IApplicationRoot
         => _hostingEnvironment = hostingEnvironment;
 
     public DirectoryInfo ApplicationRoot
+#pragma warning disable CS0618 // The IHostEnvironment.MapPathContentRoot extension changes which environment abstraction is used; preserve existing behaviour intentionally.
         => new(
             Path.Combine(
                 _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData),
                 "ExamineIndexes"));
+#pragma warning restore CS0618
 }

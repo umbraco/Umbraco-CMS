@@ -55,7 +55,9 @@ public class LuceneIndexDiagnostics : IIndexDiagnostics
             Directory luceneDir = Index.GetLuceneDirectory();
             var d = new Dictionary<string, object?>
             {
+#pragma warning disable CS0618 // CommitCount is obsolete but retained in diagnostics metadata to preserve existing behaviour.
                 [nameof(UmbracoExamineIndex.CommitCount)] = Index.CommitCount,
+#pragma warning restore CS0618
                 [nameof(UmbracoExamineIndex.DefaultAnalyzer)] = Index.DefaultAnalyzer.GetType().Name,
                 ["LuceneDirectory"] = luceneDir.GetType().Name
             };

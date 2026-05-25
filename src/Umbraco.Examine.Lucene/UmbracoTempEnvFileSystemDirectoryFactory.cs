@@ -9,6 +9,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
     /// </summary>
     public class UmbracoTempEnvFileSystemDirectoryFactory : FileSystemDirectoryFactory
     {
+#pragma warning disable CS0618 // The non-obsolete base constructor alters directory behaviour; preserve existing behaviour intentionally.
         public UmbracoTempEnvFileSystemDirectoryFactory(
             IApplicationIdentifier applicationIdentifier,
             ILockFactory lockFactory,
@@ -16,6 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             : base(new DirectoryInfo(GetTempPath(applicationIdentifier, hostingEnvironment)), lockFactory)
         {
         }
+#pragma warning restore CS0618
 
         public static string GetTempPath(IApplicationIdentifier applicationIdentifier, IHostingEnvironment hostingEnvironment)
         {
