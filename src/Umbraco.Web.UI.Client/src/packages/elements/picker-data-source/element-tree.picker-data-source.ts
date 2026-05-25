@@ -4,8 +4,9 @@ import { UmbElementTreeRepository } from '../tree/element-tree.repository.js';
 import type { UmbElementTreeChildrenOfRequestArgs, UmbElementTreeRootItemsRequestArgs } from '../tree/types.js';
 import { getConfigValue } from '@umbraco-cms/backoffice/utils';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import { UmbElementFolderItemDataResolver } from '../folder/data-resolver/element-folder-item-data-resolver.js';
+import { UmbElementItemDataResolver } from '../item/data-resolver/element-item-data-resolver.js';
 import { UMB_PROPERTY_TYPE_BASED_PROPERTY_CONTEXT } from '@umbraco-cms/backoffice/content';
-import type { UmbPickerTreeDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 import type {
 	UmbTreeAncestorsOfRequestArgs,
 	UmbTreeChildrenOfRequestArgs,
@@ -15,6 +16,8 @@ import type {
 } from '@umbraco-cms/backoffice/tree';
 import type { UmbConfigCollectionModel } from '@umbraco-cms/backoffice/utils';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
+import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
+import type { UmbPickerTreeDataSource } from '@umbraco-cms/backoffice/picker-data-source';
 
 export class UmbElementTreePickerDataSource extends UmbControllerBase implements UmbPickerTreeDataSource {
 	#dataType?: { unique: string };
@@ -34,37 +37,48 @@ export class UmbElementTreePickerDataSource extends UmbControllerBase implements
 		});
 	}
 
+	createItemDataResolver(host: UmbControllerHost): UmbItemDataResolver {
+		return this.#folderOnly ? new UmbElementFolderItemDataResolver(host) : new UmbElementItemDataResolver(host);
+	}
+
 	setConfig(config: UmbConfigCollectionModel | undefined) {
 		this.#folderOnly = Boolean(getConfigValue(config, 'folderOnly'));
 		this.#startNode = getConfigValue(config, 'startNode');
 	}
 
-	requestTreeStartNode = async () => this.#startNode ?? undefined;
+	async requestTreeStartNode() {
+		return this.#startNode ?? undefined;
+	}
 
-	requestTreeRoot = () => this.#tree.requestTreeRoot();
+	requestTreeRoot() {
+		return this.#tree.requestTreeRoot();
+	}
 
-	requestTreeRootItems = (args: UmbTreeRootItemsRequestArgs) => {
+	requestTreeRootItems(args: UmbTreeRootItemsRequestArgs) {
 		const typedArgs: UmbElementTreeRootItemsRequestArgs = {
 			...args,
 			foldersOnly: this.#folderOnly,
 			dataType: this.#dataType,
 		};
 		return this.#tree.requestTreeRootItems(typedArgs);
-	};
+	}
 
-	requestTreeItemsOf = (args: UmbTreeChildrenOfRequestArgs) => {
+	requestTreeItemsOf(args: UmbTreeChildrenOfRequestArgs) {
 		const typedArgs: UmbElementTreeChildrenOfRequestArgs = {
 			...args,
 			foldersOnly: this.#folderOnly,
 			dataType: this.#dataType,
 		};
 		return this.#tree.requestTreeItemsOf(typedArgs);
-	};
+	}
 
-	requestTreeItemAncestors = (args: UmbTreeAncestorsOfRequestArgs) => this.#tree.requestTreeItemAncestors(args);
+	requestTreeItemAncestors(args: UmbTreeAncestorsOfRequestArgs) {
+		return this.#tree.requestTreeItemAncestors(args);
+	}
 
-	requestItems = (uniques: Array<string>) =>
-		this.#folderOnly ? this.#folderItem.requestItems(uniques) : this.#elementItem.requestItems(uniques);
+	requestItems(uniques: Array<string>) {
+		return this.#folderOnly ? this.#folderItem.requestItems(uniques) : this.#elementItem.requestItems(uniques);
+	}
 
-	treePickableFilter: (treeItem: UmbTreeItemModel) => boolean = (treeItem) => treeItem.isFolder === this.#folderOnly;
+	treePickableFilter = (treeItem: UmbTreeItemModel): boolean => treeItem.isFolder === this.#folderOnly;
 }
