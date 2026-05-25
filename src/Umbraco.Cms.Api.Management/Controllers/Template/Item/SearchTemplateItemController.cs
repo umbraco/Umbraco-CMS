@@ -45,10 +45,13 @@ public class SearchTemplateItemController : TemplateItemControllerBase
             return Ok(new PagedModel<TemplateItemResponseModel> { Total = searchResult.Total });
         }
 
-        IEnumerable<ITemplate> templates = await _templateService.GetAllAsync(searchResult.Items.Select(item => item.Key).ToArray());
+        Guid[] keys = searchResult.Items.Select(x => x.Key).ToArray();
+        IEnumerable<ITemplate> templates = await _templateService.GetAllAsync(keys);
+        IEnumerable<ITemplate> orderedTemplates = OrderByRequestedIds(templates, keys);
+
         var result = new PagedModel<TemplateItemResponseModel>
         {
-            Items = _mapper.MapEnumerable<ITemplate, TemplateItemResponseModel>(templates),
+            Items = _mapper.MapEnumerable<ITemplate, TemplateItemResponseModel>(orderedTemplates),
             Total = searchResult.Total
         };
 

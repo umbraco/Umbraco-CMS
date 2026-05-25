@@ -45,10 +45,13 @@ public class SearchMemberTypeItemController : MemberTypeItemControllerBase
             return Task.FromResult<IActionResult>(Ok(new PagedModel<MemberTypeItemResponseModel> { Total = searchResult.Total }));
         }
 
-        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(searchResult.Items.Select(item => item.Key).ToArray());
+        Guid[] keys = searchResult.Items.Select(item => item.Key).ToArray();
+        IEnumerable<IMemberType> memberTypes = _memberTypeService.GetMany(keys);
+        IEnumerable<IMemberType> orderedMemberTypes = OrderByRequestedIds(memberTypes, keys);
+
         var result = new PagedModel<MemberTypeItemResponseModel>
         {
-            Items = _mapper.MapEnumerable<IMemberType, MemberTypeItemResponseModel>(memberTypes),
+            Items = _mapper.MapEnumerable<IMemberType, MemberTypeItemResponseModel>(orderedMemberTypes),
             Total = searchResult.Total
         };
 
