@@ -15,6 +15,12 @@ export const manifest: ManifestPropertyEditorSchema = {
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 					config: [{ alias: 'min', value: 0 }],
 				},
+				{
+					alias: 'placeholder',
+					label: 'Placeholder',
+					description: 'Placeholder text shown inside the textarea when empty',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+				},
 			],
 		},
 	},

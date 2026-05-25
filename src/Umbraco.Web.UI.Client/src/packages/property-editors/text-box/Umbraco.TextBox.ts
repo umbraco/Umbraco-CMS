@@ -18,11 +18,27 @@ export const manifest: ManifestPropertyEditorSchema = {
 						{ alias: 'placeholder', value: '512' },
 					],
 				},
+				{
+					alias: 'autocomplete',
+					label: 'Autocomplete',
+					description: 'Controls browser autocomplete behaviour',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+				},
+				{
+					alias: 'placeholder',
+					label: 'Placeholder',
+					description: 'Placeholder text shown inside the input when empty',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+				},
 			],
 			defaultData: [
 				{
 					alias: 'maxChars',
 					value: 512,
+				},
+				{
+					alias: 'autocomplete',
+					value: false,
 				},
 			],
 		},

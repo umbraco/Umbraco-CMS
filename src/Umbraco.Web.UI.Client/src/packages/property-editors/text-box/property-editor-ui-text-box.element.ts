@@ -59,6 +59,9 @@ export class UmbPropertyEditorUITextBoxElement
 	@state()
 	private _placeholder?: string;
 
+	@state()
+	private _autocomplete?: string;
+
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		if (!config) return;
 
@@ -66,6 +69,7 @@ export class UmbPropertyEditorUITextBoxElement
 		this._inputMode = config.getValueByAlias<UUIInputMode>('inputMode') || this.#defaultInputMode;
 		this._maxChars = this.#parseNumber(config.getValueByAlias('maxChars'));
 		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
+		this._autocomplete = config.getValueByAlias<boolean>('autocomplete') ? 'on' : 'off';
 	}
 
 	protected override firstUpdated(): void {
@@ -118,10 +122,11 @@ export class UmbPropertyEditorUITextBoxElement
 				.label=${this.localize.term('general_fieldFor', [this.name])}
 				.maxlength=${this._maxChars}
 				.maxlengthMessage=${this.#getMaxLengthMessage.bind(this)}
-				.placeholder=${this._placeholder ?? ''}
+				placeholder=${this._placeholder ?? ''}
 				.requiredMessage=${this.mandatoryMessage}
 				.type=${this._type}
 				.value=${this.value ?? ''}
+				autocomplete=${this._autocomplete}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
 				@input=${this.#onInput}>

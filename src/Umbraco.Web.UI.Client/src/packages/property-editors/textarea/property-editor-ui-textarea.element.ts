@@ -57,11 +57,15 @@ export class UmbPropertyEditorUITextareaElement
 	private _rows?: number;
 
 	@state()
+	private _placeholder?: string;
+
+	@state()
 	private _css: StyleInfo = {};
 
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._maxChars = Number(config?.getValueByAlias('maxChars')) || undefined;
 		this._rows = Number(config?.getValueByAlias('rows')) || undefined;
+		this._placeholder = config?.getValueByAlias<string>('placeholder');
 
 		this._css = {
 			'--uui-textarea-min-height': 'reset',
@@ -115,6 +119,7 @@ export class UmbPropertyEditorUITextareaElement
 				.autoHeight=${this._rows ? false : true}
 				maxlength=${ifDefined(this._maxChars)}
 				rows=${ifDefined(this._rows)}
+				placeholder=${ifDefined(this._placeholder)}
 				.value=${this.value ?? ''}
 				@input=${this.#onInput}
 				?required=${this.mandatory}
