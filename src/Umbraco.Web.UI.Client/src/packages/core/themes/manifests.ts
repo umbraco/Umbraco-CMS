@@ -1,13 +1,13 @@
-export const UMB_THEME_LIGHT_ALIAS = 'umb-light-theme';
-export const UMB_THEME_DARK_ALIAS = 'umb-dark-theme';
-export const UMB_THEME_HIGH_CONTRAST_ALIAS = 'umb-high-contrast-theme';
+import UmbThemeContext from './theme.context.js';
+import { UMB_THEME_LIGHT_ALIAS, UMB_THEME_DARK_ALIAS, UMB_THEME_HIGH_CONTRAST_ALIAS } from './constants.js';
+export { UMB_THEME_LIGHT_ALIAS, UMB_THEME_DARK_ALIAS, UMB_THEME_HIGH_CONTRAST_ALIAS };
 
 export const themes: Array<UmbExtensionManifest> = [
 	{
 		type: 'globalContext',
 		alias: 'Umb.GlobalContext.Theme',
 		name: 'Theme Context',
-		api: () => import('./theme.context.js'),
+		api: UmbThemeContext,
 	},
 	{
 		type: 'theme',
