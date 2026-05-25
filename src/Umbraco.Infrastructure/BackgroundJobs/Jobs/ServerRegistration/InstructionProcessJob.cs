@@ -14,13 +14,6 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.ServerRegistration;
 /// </summary>
 public class InstructionProcessJob : RecurringBackgroundJobBase
 {
-    private readonly TimeSpan _period;
-
-    /// <summary>
-    /// Gets the interval between executions of the instruction process job.
-    /// </summary>
-    public override TimeSpan Period => _period;
-
     /// <summary>
     /// Gets the delay time before the job is executed. The delay is fixed at one minute.
     /// </summary>
@@ -44,11 +37,10 @@ public class InstructionProcessJob : RecurringBackgroundJobBase
         IServerMessenger messenger,
         ILogger<InstructionProcessJob> logger,
         IOptions<GlobalSettings> globalSettings)
+        : base(globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations)
     {
         _messenger = messenger;
         _logger = logger;
-
-        _period = globalSettings.Value.DatabaseServerMessenger.TimeBetweenSyncOperations;
     }
 
     /// <summary>
