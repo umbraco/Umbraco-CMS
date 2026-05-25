@@ -1,4 +1,4 @@
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_VALIDATION_EMPTY_LOCALIZATION_KEY, UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
@@ -69,7 +69,8 @@ export class UmbPropertyEditorUITextBoxElement
 		this._inputMode = config.getValueByAlias<UUIInputMode>('inputMode') || this.#defaultInputMode;
 		this._maxChars = this.#parseNumber(config.getValueByAlias('maxChars'));
 		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
-		this._autocomplete = config.getValueByAlias<boolean>('autocomplete') ? 'on' : 'off';
+		const autoCompleteValue = config.getValueByAlias<boolean>('autocomplete');
+		this._autocomplete = autoCompleteValue === undefined ? undefined : autoCompleteValue ? 'on' : 'off';
 	}
 
 	protected override firstUpdated(): void {
@@ -126,7 +127,7 @@ export class UmbPropertyEditorUITextBoxElement
 				.requiredMessage=${this.mandatoryMessage}
 				.type=${this._type}
 				.value=${this.value ?? ''}
-				autocomplete=${this._autocomplete}
+				autocomplete=${ifDefined(this._autocomplete)}
 				?readonly=${this.readonly}
 				?required=${this.mandatory}
 				@input=${this.#onInput}>
