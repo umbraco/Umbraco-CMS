@@ -1,4 +1,5 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import UmbSectionSidebarMenuWithEntityActionsElement from './section-sidebar-menu-with-entity-actions.element.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -8,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		matchType: 'sectionSidebarApp',
 		manifest: {
 			type: 'sectionSidebarApp',
-			element: () => import('./section-sidebar-menu-with-entity-actions.element.js'),
+			element: UmbSectionSidebarMenuWithEntityActionsElement,
 		},
 	},
 ];

@@ -1,4 +1,5 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import UmbRoutableWorkspaceElement from './routable-workspace.element.js';
 
 export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -8,6 +9,6 @@ export const manifest: UmbExtensionManifestKind = {
 	manifest: {
 		type: 'workspace',
 		kind: 'routable',
-		element: () => import('./routable-workspace.element.js'),
+		element: UmbRoutableWorkspaceElement,
 	},
 };

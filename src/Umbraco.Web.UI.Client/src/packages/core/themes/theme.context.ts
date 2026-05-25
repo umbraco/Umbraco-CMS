@@ -1,4 +1,4 @@
-import { UMB_THEME_LIGHT_ALIAS } from './manifests.js';
+import { UMB_THEME_LIGHT_ALIAS } from './constants.js';
 import type { ManifestTheme } from './theme.extension.js';
 import { loadManifestPlainCss } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
