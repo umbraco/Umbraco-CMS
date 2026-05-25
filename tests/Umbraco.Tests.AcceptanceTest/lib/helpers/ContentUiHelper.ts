@@ -1168,11 +1168,16 @@ export class ContentUiHelper extends UiBaseLocators {
   async clickRollbackContainerButton(documentId?: string) {
     // Workspace re-fetches the document asynchronously after rollback; wait for that GET before asserting.
     if (documentId) {
-      await this.waitForResponseAfterExecutingPromise(
-        `${ConstantHelper.apiEndpoints.document}/${documentId}`,
+      const expectedPath = `${ConstantHelper.apiEndpoints.document}/${documentId}`;
+      await Promise.all([
+        this.waitForResponse(
+          (resp) =>
+            resp.request().method() === 'GET' &&
+            resp.status() === ConstantHelper.statusCodes.ok &&
+            new URL(resp.url()).pathname === expectedPath,
+        ),
         this.click(this.rollbackContainerBtn),
-        ConstantHelper.statusCodes.ok,
-      );
+      ]);
       return;
     }
     await this.click(this.rollbackContainerBtn);
