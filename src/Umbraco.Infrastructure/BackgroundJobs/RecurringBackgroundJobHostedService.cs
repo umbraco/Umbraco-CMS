@@ -218,22 +218,7 @@ public class RecurringBackgroundJobHostedService<TJob> : RecurringHostedServiceB
     /// <param name="sender">The sender.</param>
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void OnIgnoredDelayChanged(object? sender, EventArgs e)
-    {
-        // Rotate without disposing — the wait loop may still be registering against the old token.
-        // The old CTS is small once cancelled and will be collected by the GC.
-        var newCts = new CancellationTokenSource();
-        CancellationTokenSource oldCts = Interlocked.Exchange(ref _ignoredDelayChangeCts, newCts);
-
-        try
-        {
-            oldCts.Cancel();
-        }
-        catch (ObjectDisposedException)
-        {
-            // Lost the shutdown race — newCts will not be observed.
-            newCts.Dispose();
-        }
-    }
+        => CancellationTokenSourceRotation.RotateAndCancel(ref _ignoredDelayChangeCts);
 
     /// <summary>
     /// Publishes the ignored notification and waits for <see cref="IRecurringBackgroundJob.IgnoredDelay" /> before allowing the next iteration, preventing tight looping when execution is skipped.
