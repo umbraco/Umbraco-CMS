@@ -20,7 +20,7 @@ public class SqliteExceptionExtensionsTests
     [TestCase(raw.SQLITE_INTERRUPT, ExpectedResult = false)]
     [TestCase(raw.SQLITE_CORRUPT, ExpectedResult = false)]
     [TestCase(raw.SQLITE_FULL, ExpectedResult = false)]
-    public bool IsBusyOrLocked_returns_expected_result_for_error_code(int errorCode)
+    public bool Can_Detect_Busy_And_Locked_Codes(int errorCode)
     {
         // Build an exception with the desired primary error code. Microsoft.Data.Sqlite exposes
         // a constructor that takes the primary code directly — we never see the extended code

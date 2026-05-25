@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using SQLitePCL;
@@ -15,7 +16,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCoreSqlite;
 /// (BUSY / LOCKED) into successful operations via retry.
 /// </summary>
 /// <remarks>
-/// This is surmised to be the the scenario behind issue #22939 where OpenIddict token reads via
+/// This is potentially the scenario behind issue #22939 where OpenIddict token reads via
 /// EF Core failed while a long-running migration held a write lock. We parameterise across both
 /// read and write operations because the reported customer stack trace was a read
 /// (<c>SingleOrDefaultAsync</c> on the token table); the write path is included for symmetry.
@@ -71,7 +72,7 @@ public class SqliteRetryingExecutionStrategyTests : UmbracoIntegrationTest
 
     [TestCase(Operation.Read)]
     [TestCase(Operation.Write)]
-    public async Task Without_Retry_Strategy_Throws_When_Lock_Held_Longer_Than_Command_Timeout(Operation operation)
+    public async Task Cannot_Read_Or_Write_Via_EFCore_When_SQLite_Lock_Held_Beyond_Command_Timeout(Operation operation)
     {
         if (BaseTestDatabase.IsSqlite() is false)
         {
@@ -97,7 +98,7 @@ public class SqliteRetryingExecutionStrategyTests : UmbracoIntegrationTest
 
     [TestCase(Operation.Read)]
     [TestCase(Operation.Write)]
-    public async Task With_Retry_Strategy_Succeeds_When_Lock_Released_Within_Retry_Budget(Operation operation)
+    public async Task Can_Read_And_Write_Via_EFCore_When_SQLite_Lock_Released_Within_Retry_Budget(Operation operation)
     {
         if (BaseTestDatabase.IsSqlite() is false)
         {
@@ -115,10 +116,10 @@ public class SqliteRetryingExecutionStrategyTests : UmbracoIntegrationTest
     }
 
     /// <summary>
-    /// Runs a single EF Core operation that routes through <see cref="IExecutionStrategy"/>:
-    /// either a <see cref="EntityFrameworkQueryableExtensions.SingleOrDefaultAsync{TSource}"/>
-    /// read (matching OpenIddict's <c>FindByReferenceIdAsync</c> shape) or an
-    /// <see cref="RelationalQueryableExtensions.ExecuteUpdateAsync"/> write.
+    /// Runs a single EF Core operation that routes through the configured
+    /// <see cref="IExecutionStrategy"/>: either a <c>SingleOrDefaultAsync</c> read
+    /// (matching OpenIddict's <c>FindByReferenceIdAsync</c> shape) or an
+    /// <c>ExecuteUpdateAsync</c> write.
     /// </summary>
     private static async Task ExecuteAsync(DbSet<LockEntity> set, Operation operation)
     {
