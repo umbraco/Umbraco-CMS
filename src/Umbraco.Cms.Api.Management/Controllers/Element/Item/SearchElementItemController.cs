@@ -57,15 +57,13 @@ public class SearchElementItemController : ElementItemControllerBase
         }
 
         Guid[] keys = searchResult.Items.Select(item => item.Key).ToArray();
-
-        IElementEntitySlim[] elementsByKeys = _entityService
+        IElementEntitySlim[] elements = _entityService
             .GetAll(UmbracoObjectTypes.Element, keys)
             .OfType<IElementEntitySlim>()
             .ToArray();
+        List<IElementEntitySlim> orderedElements = OrderByRequestedIds(elements, keys);
 
-        var elements = OrderByRequestedIds(elementsByKeys, keys);
-
-        ElementItemResponseModel[] items = await Task.WhenAll(elements.Select(_elementPresentationFactory.CreateItemResponseModelAsync));
+        ElementItemResponseModel[] items = await Task.WhenAll(orderedElements.Select(_elementPresentationFactory.CreateItemResponseModelAsync));
 
         return Ok(
             new PagedModel<ElementItemResponseModel>

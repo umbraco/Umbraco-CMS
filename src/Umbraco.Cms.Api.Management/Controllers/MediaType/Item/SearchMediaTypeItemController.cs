@@ -55,13 +55,13 @@ public class SearchMediaTypeItemController : MediaTypeItemControllerBase
         }
 
         Guid[] keys = searchResult.Items.Select(item => item.Key).ToArray();
-        var mediaTypesByKey = _mediaTypeService.GetMany(keys.EmptyNull());
-        IEnumerable<IMediaType> mediaTypes = OrderByRequestedIds(mediaTypesByKey, keys);
+        IEnumerable<IMediaType> mediaTypes = _mediaTypeService.GetMany(keys.EmptyNull());
+        IEnumerable<IMediaType> orderedMediaTypes = OrderByRequestedIds(mediaTypes, keys);
 
         var result = new PagedModel<MediaTypeItemResponseModel>
         {
-            Items = _mapper.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(mediaTypes),
-            Total = searchResult.Total
+            Items = _mapper.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(orderedMediaTypes),
+            Total = searchResult.Total,
         };
 
         return Task.FromResult<IActionResult>(Ok(result));
