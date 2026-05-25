@@ -1,6 +1,7 @@
 using Examine;
+using Microsoft.Extensions.Hosting;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine;
 
@@ -9,9 +10,9 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </summary>
 public class UmbracoApplicationRoot : IApplicationRoot
 {
-    private readonly IHostingEnvironment _hostingEnvironment;
+    private readonly IHostEnvironment _hostingEnvironment;
 
-    public UmbracoApplicationRoot(IHostingEnvironment hostingEnvironment)
+    public UmbracoApplicationRoot(IHostEnvironment hostingEnvironment)
         => _hostingEnvironment = hostingEnvironment;
 
     public DirectoryInfo ApplicationRoot

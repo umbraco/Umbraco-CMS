@@ -55,7 +55,6 @@ public class LuceneIndexDiagnostics : IIndexDiagnostics
             Directory luceneDir = Index.GetLuceneDirectory();
             var d = new Dictionary<string, object?>
             {
-                [nameof(UmbracoExamineIndex.CommitCount)] = Index.CommitCount,
                 [nameof(UmbracoExamineIndex.DefaultAnalyzer)] = Index.DefaultAnalyzer.GetType().Name,
                 ["LuceneDirectory"] = luceneDir.GetType().Name
             };
