@@ -8488,7 +8488,7 @@ export class UserService {
     /**
      * Enables users.
      *
-     * Enables the user accounts identified by the provided Ids.
+     * Enables the user accounts identified by the provided Ids. The response contains the server-computed state of each enabled user, which may not be Active (e.g. Inactive for a user that has never logged in).
      */
     public static postUserEnable<ThrowOnError extends boolean = true>(options?: Options<PostUserEnableData, ThrowOnError>) {
         return (options?.client ?? client).post<PostUserEnableResponses, PostUserEnableErrors, ThrowOnError>({

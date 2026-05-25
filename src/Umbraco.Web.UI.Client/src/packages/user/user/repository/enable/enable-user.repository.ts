@@ -3,7 +3,6 @@ import { UmbUserItemRepository } from '../item/index.js';
 import { UmbEnableUserServerDataSource } from './enable-user.server.data-source.js';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
-import { UserStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 
 export class UmbEnableUserRepository extends UmbUserRepositoryBase {
 	#enableSource: UmbEnableUserServerDataSource;
@@ -25,9 +24,8 @@ export class UmbEnableUserRepository extends UmbUserRepositoryBase {
 			const { data: items } = await this.#userItemRepository.requestItems(ids);
 			if (!items) throw new Error('Could not load user item');
 
-			// TODO: get state from item when available
-			ids.forEach((id) => {
-				this.detailStore?.updateItem(id, { state: UserStateModel.ACTIVE });
+			data?.items.forEach((item) => {
+				this.detailStore?.updateItem(item.user.id, { state: item.state });
 			});
 
 			let message = this.#localize.term('speechBubbles_enableUsersSuccess', items.length);

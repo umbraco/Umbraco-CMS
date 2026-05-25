@@ -37785,7 +37785,7 @@
           "User"
         ],
         "summary": "Enables users.",
-        "description": "Enables the user accounts identified by the provided Ids.",
+        "description": "Enables the user accounts identified by the provided Ids. The response contains the server-computed state of each enabled user, which may not be Active (e.g. Inactive for a user that has never logged in).",
         "operationId": "PostUserEnable",
         "requestBody": {
           "content": {
@@ -37830,6 +37830,17 @@
                     "$ref": "#/components/schemas/NotificationHeaderModel"
                   },
                   "nullable": true
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BatchResponseModelUserStateResponseModel"
+                    }
+                  ]
                 }
               }
             }
@@ -39752,6 +39763,30 @@
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/MemberTypeResponseModel"
+                }
+              ]
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "BatchResponseModelUserStateResponseModel": {
+        "required": [
+          "items",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/UserStateResponseModel"
                 }
               ]
             }
@@ -53149,6 +53184,22 @@
           "All"
         ],
         "type": "string"
+      },
+      "UserStateResponseModel": {
+        "required": [
+          "state",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/ReferenceByIdModel"
+          },
+          "state": {
+            "$ref": "#/components/schemas/UserStateModel"
+          }
+        },
+        "additionalProperties": false
       },
       "UserTwoFactorProviderModel": {
         "required": [

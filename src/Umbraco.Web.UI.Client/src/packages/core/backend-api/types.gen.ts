@@ -112,6 +112,11 @@ export type BatchResponseModelMemberTypeResponseModel = {
     items: Array<MemberTypeResponseModel>;
 };
 
+export type BatchResponseModelUserStateResponseModel = {
+    total: number;
+    items: Array<UserStateResponseModel>;
+};
+
 export type CalculatedUserStartNodesResponseModel = {
     id: string;
     documentStartNodeIds: Array<ReferenceByIdModel>;
@@ -3164,6 +3169,11 @@ export enum UserStateModel {
     INACTIVE = 'Inactive',
     ALL = 'All'
 }
+
+export type UserStateResponseModel = {
+    user: ReferenceByIdModel;
+    state: UserStateModel;
+};
 
 export type UserTwoFactorProviderModel = {
     providerName: string;
@@ -17667,8 +17677,10 @@ export type PostUserEnableResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: BatchResponseModelUserStateResponseModel;
 };
+
+export type PostUserEnableResponse = PostUserEnableResponses[keyof PostUserEnableResponses];
 
 export type PostUserInviteData = {
     body?: InviteUserRequestModel;
