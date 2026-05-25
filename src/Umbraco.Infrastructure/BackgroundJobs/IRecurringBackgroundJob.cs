@@ -26,7 +26,7 @@ public interface IRecurringBackgroundJob
     /// The period.
     /// </value>
     /// <remarks>
-    /// Set to <see cref="Timeout.InfiniteTimeSpan" /> to (temporarily) disable automatic scheduling and turn the job into a manually triggered one (via <see cref="IRecurringBackgroundJobTrigger{TJob}" />). Raise <see cref="PeriodChanged" /> to switch back to a finite period at runtime.
+    /// Set to <see cref="Timeout.InfiniteTimeSpan" /> to (temporarily) disable automatic scheduling and turn the job into a manually triggered one (via <see cref="IRecurringBackgroundJobTrigger{TJob}" />). To change the period at runtime, subclasses of <see cref="RecurringBackgroundJobBase" /> assign the protected setter on <see cref="RecurringBackgroundJobBase.Period" /> (which auto-raises <see cref="PeriodChanged" />); direct implementors of this interface must raise <see cref="PeriodChanged" /> themselves after updating the backing value.
     /// </remarks>
     TimeSpan Period { get; }
 
@@ -49,7 +49,7 @@ public interface IRecurringBackgroundJob
     /// </value>
     /// <remarks>
     /// This back-off prevents tight looping when <see cref="Period" /> is short (or <see cref="TimeSpan.Zero" />) and an execution is skipped without invoking <see cref="RunJobAsync(CancellationToken)" />.
-    /// Set to <see cref="Timeout.InfiniteTimeSpan" /> to disable the job for the remaining application lifecycle once an ignored condition is encountered — useful when the condition is known not to change (e.g. a server role that will not be promoted on this instance).
+    /// Set to <see cref="Timeout.InfiniteTimeSpan" /> to disable the job for the remaining application lifecycle once an ignored condition is encountered — useful when the condition is known not to change (e.g. a server role that will not be promoted on this instance). To change the ignored delay at runtime, subclasses of <see cref="RecurringBackgroundJobBase" /> assign the protected setter on <see cref="RecurringBackgroundJobBase.IgnoredDelay" /> (which auto-raises <see cref="IgnoredDelayChanged" />); direct implementors of this interface must raise <see cref="IgnoredDelayChanged" /> themselves after updating the backing value.
     /// </remarks>
     TimeSpan IgnoredDelay => RecurringBackgroundJobBase.DefaultIgnoredDelay; // TODO (V19): Remove the default implementation
 
