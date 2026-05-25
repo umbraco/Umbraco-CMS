@@ -58,7 +58,8 @@ public class UmbracoBackOfficeCacheHeadersMiddleware : IMiddleware
         IBackOfficePathGenerator backOfficePathGenerator,
         IHostingEnvironment hostingEnvironment)
     {
-        // BackOfficeAssetsPath looks like "/umbraco/backoffice/<hash>" (no trailing slash).
+        // Normalise to a single leading slash, no trailing slash — defensive against any
+        // future change in IBackOfficePathGenerator's output shape.
         _prefix = "/" + backOfficePathGenerator.BackOfficeAssetsPath.TrimStart('/').TrimEnd('/');
         _headerValue = hostingEnvironment.IsDebugMode
             ? "no-cache"

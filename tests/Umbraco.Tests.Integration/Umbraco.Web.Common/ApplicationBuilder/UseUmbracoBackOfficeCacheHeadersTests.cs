@@ -16,7 +16,7 @@ using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ApplicationBuilder;
+namespace Umbraco.Tests.Integration.Umbraco.Web.Common.ApplicationBuilder;
 
 [TestFixture]
 public class UseUmbracoBackOfficeCacheHeadersTests
