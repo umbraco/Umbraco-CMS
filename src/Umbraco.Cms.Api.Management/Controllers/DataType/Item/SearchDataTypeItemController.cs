@@ -60,7 +60,7 @@ public class SearchDataTypeItemController : DatatypeItemControllerBase
         var result = new PagedModel<DataTypeItemResponseModel>
         {
             Items = _mapper.MapEnumerable<IDataType, DataTypeItemResponseModel>(orderedDataTypes),
-            Total = searchResult.Total
+            Total = searchResult.Total,
         };
 
         return Ok(result);

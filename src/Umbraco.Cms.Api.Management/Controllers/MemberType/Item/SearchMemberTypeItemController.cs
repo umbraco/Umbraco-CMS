@@ -32,6 +32,14 @@ public class SearchMemberTypeItemController : MemberTypeItemControllerBase
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Searches for member type items matching the specified query, with support for pagination.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="query">The search query used to filter member type items.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set (used for pagination).</param>
+    /// <param name="take">The maximum number of items to return in the result set (used for pagination).</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a <see cref="PagedModel{MemberTypeItemResponseModel}"/> containing the search results.</returns>
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<MemberTypeItemResponseModel>), StatusCodes.Status200OK)]
@@ -52,7 +60,7 @@ public class SearchMemberTypeItemController : MemberTypeItemControllerBase
         var result = new PagedModel<MemberTypeItemResponseModel>
         {
             Items = _mapper.MapEnumerable<IMemberType, MemberTypeItemResponseModel>(orderedMemberTypes),
-            Total = searchResult.Total
+            Total = searchResult.Total,
         };
 
         return Task.FromResult<IActionResult>(Ok(result));

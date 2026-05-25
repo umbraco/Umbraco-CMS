@@ -61,7 +61,7 @@ public class SearchMediaTypeItemController : MediaTypeItemControllerBase
         var result = new PagedModel<MediaTypeItemResponseModel>
         {
             Items = _mapper.MapEnumerable<IMediaType, MediaTypeItemResponseModel>(orderedMediaTypes),
-            Total = searchResult.Total
+            Total = searchResult.Total,
         };
 
         return Task.FromResult<IActionResult>(Ok(result));
