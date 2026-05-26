@@ -261,6 +261,7 @@ export default {
 		constrainProportions: '비율 맞추기',
 		continue: '계속',
 		copy: '복사',
+		copied: '복사됨!',
 		create: '생성',
 		database: '데이타베이스',
 		date: '날짜',
@@ -440,8 +441,6 @@ export default {
 		greeting4: '환영합니다',
 		greeting5: '환영합니다',
 		greeting6: '환영합니다',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',
 	},
 	main: {
 		dashboard: '대시보드',

@@ -736,6 +736,7 @@ export default {
 		content: 'محتوى',
 		continue: 'متابعة',
 		copy: 'نسخ',
+		copied: 'تم النسخ!',
 		create: 'إنشاء',
 		cropSection: 'قسم الاقتصاص',
 		database: 'قاعدة بيانات',
@@ -2025,6 +2026,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'تعطيل تتبع URL',
 		enableUrlTracker: 'تمكين تتبع URL',
+		urlTrackerEnabled: 'ممكّن',
+		urlTrackerDisabled: 'معطّل',
 		culture: 'الثقافة',
 		originalUrl: 'URL الأصلي',
 		redirectedTo: 'تم إعادة التوجيه إلى',

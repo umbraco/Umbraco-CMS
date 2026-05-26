@@ -2771,18 +2771,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
 		<key alias="characters_left"><![CDATA[<strong>%0%</strong> caratteri rimasti.]]></key>
 		<key alias="characters_exceed"><![CDATA[Massimo %0% caratteri, <strong>%1%</strong> di troppo.]]></key>
 	</area>
-	<area alias="recycleBin">
-		<key alias="contentTrashed">
-			Contenuto cestinato con Id: {0} relativo al contenuto principale originale con Id: {1}
-		</key>
-		<key alias="mediaTrashed">Media cestinato con Id: {0} relativo al media principale originale con Id: {1}</key>
-		<key alias="itemCannotBeRestored">Impossibile ripristinare automaticamente questo elemento</key>
-		<key alias="itemCannotBeRestoredHelpText">
-			Non esiste una posizione in cui questo elemento possa essere ripristinato
-			automaticamente. Puoi spostare l'elemento manualmente utilizzando l'albero sottostante.
-		</key>
-		<key alias="wasRestored"><![CDATA[è stato ripristinato sotto]]></key>
-	</area>
+
 	<area alias="relationType">
 		<key alias="direction">Direzione</key>
 		<key alias="parentToChild">Da genitore a figlio</key>

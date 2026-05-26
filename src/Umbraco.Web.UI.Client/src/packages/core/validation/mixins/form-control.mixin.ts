@@ -63,7 +63,6 @@ export interface UmbFormControlMixinInterface<ValueType> extends HTMLElement {
 	get validationMessage(): string;
 	get validity(): ValidityState;
 	setCustomValidity(error?: string): void;
-	submit(): void;
 	pristine: boolean;
 }
 
@@ -92,7 +91,6 @@ export declare abstract class UmbFormControlMixinElement<ValueType>
 	get validationMessage(): string;
 	get validity(): ValidityState;
 	setCustomValidity(error?: string): void;
-	submit(): void;
 	pristine: boolean;
 }
 
@@ -146,7 +144,6 @@ export function UmbFormControlMixin<
 		public set pristine(value: boolean) {
 			if (this._pristine !== value) {
 				this._pristine = value;
-				this._runValidators();
 			}
 		}
 		public get pristine(): boolean {
@@ -155,6 +152,7 @@ export function UmbFormControlMixin<
 		private _pristine: boolean = true;
 
 		#value: ValueType | DefaultValueType = defaultValue as unknown as DefaultValueType;
+		#valueOnFocus: ValueType | DefaultValueType = undefined as unknown as DefaultValueType;
 		protected _internals: ElementInternals;
 		#form: HTMLFormElement | null = null;
 		#validators: UmbFormControlValidatorConfig[] = [];
@@ -164,11 +162,14 @@ export function UmbFormControlMixin<
 			super(...args);
 			this._internals = this.attachInternals();
 
+			this.addEventListener('focus', () => {
+				this.#valueOnFocus = this.value;
+			});
 			this.addEventListener('blur', () => {
-				/*if (e.composedPath().some((x) => x === this)) {
-					return;
-				}*/
-				this.checkValidity();
+				if (this.#valueOnFocus !== this.value) {
+					this.checkValidity();
+				}
+				this.#valueOnFocus = undefined as unknown as ValueType | DefaultValueType;
 			});
 		}
 

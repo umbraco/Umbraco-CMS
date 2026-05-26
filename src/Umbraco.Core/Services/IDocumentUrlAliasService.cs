@@ -60,4 +60,20 @@ public interface IDocumentUrlAliasService
     /// </summary>
     /// <returns><c>true</c> if there are any aliases in the cache; otherwise, <c>false</c>.</returns>
     bool HasAny();
+
+    /// <summary>
+    /// Updates the in-memory alias cache for a single document without writing to the database.
+    /// </summary>
+    /// <param name="documentKey">The document key.</param>
+    // TODO (V19): Remove default implementation when external implementations have had time to adopt.
+    Task UpdateAliasCacheAsync(Guid documentKey)
+        => CreateOrUpdateAliasesAsync(documentKey);
+
+    /// <summary>
+    /// Updates the in-memory alias cache for a document and its descendants without writing to the database.
+    /// </summary>
+    /// <param name="documentKey">The document key.</param>
+    // TODO (V19): Remove default implementation when external implementations have had time to adopt.
+    Task UpdateAliasCacheWithDescendantsAsync(Guid documentKey)
+        => CreateOrUpdateAliasesWithDescendantsAsync(documentKey);
 }

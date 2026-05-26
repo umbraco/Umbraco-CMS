@@ -46,7 +46,7 @@ public static class UmbracoUserExtensions
             throw new ArgumentNullException(nameof(user));
         }
 
-        return user.Id == Constants.Security.SuperUserId;
+        return user.Key == Constants.Security.SuperUserKey;
     }
 
     /// <summary>

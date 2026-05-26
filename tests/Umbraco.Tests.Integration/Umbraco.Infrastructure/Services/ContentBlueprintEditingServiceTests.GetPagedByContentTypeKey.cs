@@ -10,7 +10,7 @@ public partial class ContentBlueprintEditingServiceTests
     [Test]
     public async Task Can_Get_Paged()
     {
-        var contentType = CreateInvariantContentType();
+        var contentType = await CreateInvariantContentType();
 
         for (var i = 1; i < 6; i++)
         {

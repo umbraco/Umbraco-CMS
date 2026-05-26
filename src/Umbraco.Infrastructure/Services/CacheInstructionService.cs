@@ -1,11 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
@@ -32,38 +30,6 @@ namespace Umbraco.Cms
             private readonly IRepositoryCacheVersionService _repositoryCacheVersionService;
             private readonly IProfilingLogger _profilingLogger;
             private readonly Lock _syncLock = new();
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
-            /// </summary>
-            /// <param name="provider">The <see cref="ICoreScopeProvider"/> used for managing database scopes.</param>
-            /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> used to create logger instances.</param>
-            /// <param name="eventMessagesFactory">The <see cref="IEventMessagesFactory"/> for creating event messages.</param>
-            /// <param name="cacheInstructionRepository">The <see cref="ICacheInstructionRepository"/> for accessing cache instructions.</param>
-            /// <param name="profilingLogger">The <see cref="IProfilingLogger"/> for profiling and logging operations.</param>
-            /// <param name="logger">The <see cref="ILogger{CacheInstructionService}"/> instance for logging.</param>
-            /// <param name="globalSettings">The <see cref="IOptions{GlobalSettings}"/> providing global configuration settings.</param>
-            [Obsolete("Use the overload that requires ILastSyncedManager and IRepositoryCacheVersionService. Scheduled for removal in Umbraco 18.")]
-            public CacheInstructionService(
-                ICoreScopeProvider provider,
-                ILoggerFactory loggerFactory,
-                IEventMessagesFactory eventMessagesFactory,
-                ICacheInstructionRepository cacheInstructionRepository,
-                IProfilingLogger profilingLogger,
-                ILogger<CacheInstructionService> logger,
-                IOptions<GlobalSettings> globalSettings)
-                 : this(
-                     provider,
-                     loggerFactory,
-                     eventMessagesFactory,
-                     cacheInstructionRepository,
-                     profilingLogger,
-                     logger,
-                     globalSettings,
-                     StaticServiceProvider.Instance.GetRequiredService<ILastSyncedManager>(),
-                     StaticServiceProvider.Instance.GetRequiredService<IRepositoryCacheVersionService>())
-            {
-            }
 
             /// <summary>
             /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.

@@ -1,4 +1,6 @@
-import '@umbraco-ui/uui-css/dist/uui-css.css';
+import lightCss from '@umbraco-ui/uui/themes/light.css?inline';
+import darkCss from '@umbraco-ui/uui/themes/dark.css?inline';
+import highContrastCss from '@umbraco-ui/uui/themes/high-contrast.css?inline';
 import '../src/css/umb-css.css';
 
 import 'element-internals-polyfill';
@@ -22,45 +24,45 @@ import icons from '../src/packages/core/icon-registry/icons';
 import '../src/libs/context-api/provide/context-provider.element';
 import '../src/packages/core/components';
 
-import { manifests as blockManifests } from '../src/packages/block/manifests';
-import { manifests as clipboardManifests } from '../src/packages/clipboard/manifests';
-import { manifests as codeEditorManifests } from '../src/packages/code-editor/manifests';
-import { manifests as contentManifests } from '../src/packages/content/manifests';
+import { manifests as blockManifests } from '../src/packages/block/umbraco-package';
+import { manifests as clipboardManifests } from '../src/packages/clipboard/umbraco-package';
+import { manifests as codeEditorManifests } from '../src/packages/code-editor/umbraco-package';
+import { manifests as contentManifests } from '../src/packages/content/umbraco-package';
 import { manifests as coreManifests } from '../src/packages/core/manifests';
-import { manifests as dataTypeManifests } from '../src/packages/data-type/manifests';
-import { manifests as dictionaryManifests } from '../src/packages/dictionary/manifests';
-import { manifests as documentManifests } from '../src/packages/documents/manifests';
-import { manifests as embeddedMediaManifests } from '../src/packages/embedded-media/manifests';
-import { manifests as extensionInsightsManifests } from '../src/packages/extension-insights/manifests';
-import { manifests as healthCheckManifests } from '../src/packages/health-check/manifests';
-import { manifests as helpManifests } from '../src/packages/help/manifests';
-import { manifests as languageManifests } from '../src/packages/language/manifests';
-import { manifests as logViewerManifests } from '../src/packages/log-viewer/manifests';
-import { manifests as markdownEditorManifests } from '../src/packages/markdown-editor/manifests';
-import { manifests as mediaManifests } from '../src/packages/media/manifests';
-import { manifests as memberManifests } from '../src/packages/members/manifests';
-import { manifests as modelsBuilderManifests } from '../src/packages/models-builder/manifests';
-import { manifests as multiUrlPickerManifests } from '../src/packages/multi-url-picker/manifests';
-import { manifests as packageManifests } from '../src/packages/packages/manifests';
-import { manifests as performanceProfilingManifests } from '../src/packages/performance-profiling/manifests';
-import { manifests as propertyEditorManifests } from '../src/packages/property-editors/manifests';
-import { manifests as publishCacheManifests } from '../src/packages/publish-cache/manifests';
-import { manifests as relationsManifests } from '../src/packages/relations/manifests';
-import { manifests as rteManifests } from '../src/packages/rte/manifests';
+import { manifests as dataTypeManifests } from '../src/packages/data-type/umbraco-package';
+import { manifests as dictionaryManifests } from '../src/packages/dictionary/umbraco-package';
+import { manifests as documentManifests } from '../src/packages/documents/umbraco-package';
+import { manifests as embeddedMediaManifests } from '../src/packages/embedded-media/umbraco-package';
+import { manifests as extensionInsightsManifests } from '../src/packages/extension-insights/umbraco-package';
+import { manifests as healthCheckManifests } from '../src/packages/health-check/umbraco-package';
+import { manifests as helpManifests } from '../src/packages/help/umbraco-package';
+import { manifests as languageManifests } from '../src/packages/language/umbraco-package';
+import { manifests as logViewerManifests } from '../src/packages/log-viewer/umbraco-package';
+import { manifests as markdownEditorManifests } from '../src/packages/markdown-editor/umbraco-package';
+import { manifests as mediaManifests } from '../src/packages/media/umbraco-package';
+import { manifests as memberManifests } from '../src/packages/members/umbraco-package';
+import { manifests as modelsBuilderManifests } from '../src/packages/models-builder/umbraco-package';
+import { manifests as multiUrlPickerManifests } from '../src/packages/multi-url-picker/umbraco-package';
+import { manifests as packageManifests } from '../src/packages/packages/umbraco-package';
+import { manifests as performanceProfilingManifests } from '../src/packages/performance-profiling/umbraco-package';
+import { manifests as propertyEditorManifests } from '../src/packages/property-editors/umbraco-package';
+import { manifests as publishCacheManifests } from '../src/packages/publish-cache/umbraco-package';
+import { manifests as relationsManifests } from '../src/packages/relations/umbraco-package';
+import { manifests as rteManifests } from '../src/packages/rte/umbraco-package';
 import { manifests as searchManifests } from '../src/packages/core/search/manifests';
-import { manifests as segmentManifests } from '../src/packages/segment/manifests';
-import { manifests as settingsManifests } from '../src/packages/settings/manifests';
-import { manifests as staticFileManifests } from '../src/packages/static-file/manifests';
-import { manifests as sysInfoManifests } from '../src/packages/sysinfo/manifests';
-import { manifests as tagManifests } from '../src/packages/tags/manifests';
-import { manifests as telemetryManifests } from '../src/packages/telemetry/manifests';
-import { manifests as templatingManifests } from '../src/packages/templating/manifests';
-import { manifests as tipTapManifests } from '../src/packages/tiptap/manifests';
-import { manifests as translationManifests } from '../src/packages/translation/manifests';
-import { manifests as ufmManifests } from '../src/packages/ufm/manifests';
-//import { manifests as umbracoNewsManifests } from '../src/packages/umbraco-news/manifests';
-import { manifests as userManifests } from '../src/packages/user/manifests';
-import { manifests as webhookManifests } from '../src/packages/webhook/manifests';
+import { manifests as segmentManifests } from '../src/packages/segment/umbraco-package';
+import { manifests as settingsManifests } from '../src/packages/settings/umbraco-package';
+import { manifests as staticFileManifests } from '../src/packages/static-file/umbraco-package';
+import { manifests as sysInfoManifests } from '../src/packages/sysinfo/umbraco-package';
+import { manifests as tagManifests } from '../src/packages/tags/umbraco-package';
+import { manifests as telemetryManifests } from '../src/packages/telemetry/umbraco-package';
+import { manifests as templatingManifests } from '../src/packages/templating/umbraco-package';
+import { manifests as tipTapManifests } from '../src/packages/tiptap/umbraco-package';
+import { manifests as translationManifests } from '../src/packages/translation/umbraco-package';
+import { manifests as ufmManifests } from '../src/packages/ufm/umbraco-package';
+//import { manifests as umbracoNewsManifests } from '../src/packages/umbraco-news/umbraco-package';
+import { manifests as userManifests } from '../src/packages/user/umbraco-package';
+import { manifests as webhookManifests } from '../src/packages/webhook/umbraco-package';
 
 import { UmbNotificationContext } from '../src/packages/core/notification';
 import { UmbContextBase } from '../src/libs/class-api/index';
@@ -69,6 +71,39 @@ import { UMB_APP_LANGUAGE_CONTEXT } from '../src/packages/language/constants';
 
 // MSW
 startMockServiceWorker({ serviceWorker: { url: (import.meta.env.VITE_BASE_PATH ?? '/') + 'mockServiceWorker.js' } });
+
+const themes = {
+	light: lightCss,
+	dark: darkCss,
+	'high-contrast': highContrastCss,
+};
+
+let themeStyleEl = null;
+
+export const globalTypes = {
+	theme: {
+		name: 'Theme',
+		defaultValue: 'light',
+		toolbar: {
+			icon: 'paintbrush',
+			items: [
+				{ value: 'light', title: 'Light' },
+				{ value: 'dark', title: 'Dark' },
+				{ value: 'high-contrast', title: 'High Contrast' },
+			],
+			dynamicTitle: true,
+		},
+	},
+};
+
+function applyTheme(theme) {
+	if (!themeStyleEl) {
+		themeStyleEl = document.createElement('style');
+		themeStyleEl.id = 'uui-theme';
+		document.head.appendChild(themeStyleEl);
+	}
+	themeStyleEl.textContent = themes[theme] ?? lightCss;
+}
 
 class UmbStoryBookAuthContext extends UmbContextBase {
 	#isAuthorized = new UmbBooleanState(true);
@@ -128,8 +163,6 @@ class UmbStoryBookElement extends UmbLitElement {
 		super();
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'globalContext', [this]);
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'store', [this]);
-		// TODO: Remove this in Umbraco 18, use the repository instead
-		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'treeStore', [this]);
 		new UmbExtensionsApiInitializer(this, umbExtensionsRegistry, 'itemStore', [this]);
 
 		this._umbIconRegistry.setIcons(icons);
@@ -163,10 +196,15 @@ class UmbStoryBookElement extends UmbLitElement {
 
 customElements.define('umb-storybook', UmbStoryBookElement);
 
+
+const themeProvider = (story, context) => {
+	applyTheme(context.globals['theme'] ?? 'light');
+	return story();
+};
 const storybookProvider = (story) => html` <umb-storybook>${story()}</umb-storybook> `;
 
 // Provide the MSW addon decorator globally
-export const decorators = [storybookProvider];
+export const decorators = [themeProvider, storybookProvider];
 
 export const parameters = {
 	docs: {
@@ -190,25 +228,25 @@ export const parameters = {
 		},
 	},
 	backgrounds: {
-        options: {
-            greyish: {
+		options: {
+			greyish: {
 				name: 'Greyish',
 				value: '#F3F3F5',
 			},
 
-            white: {
+			white: {
 				name: 'White',
 				value: '#ffffff',
 			}
-        }
-    },
+		}
+	},
 };
 
 setCustomElements(customElementManifests);
 export const tags = ['autodocs'];
 
 export const initialGlobals = {
-    backgrounds: {
-        value: 'greyish'
-    }
+	backgrounds: {
+		value: 'greyish'
+	}
 };

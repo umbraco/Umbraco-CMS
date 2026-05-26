@@ -5,9 +5,9 @@ import { umbDocumentMockDb } from '../../db/document.db.js';
 import { UMB_SLUG } from './slug.js';
 import type {
 	CreateDocumentRequestModel,
-	DefaultReferenceResponseModel,
 	GetDocumentByIdAvailableSegmentOptionsResponse,
 	GetDocumentByIdReferencedDescendantsResponse,
+	IReferenceResponseModel,
 	PagedIReferenceResponseModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
@@ -18,6 +18,11 @@ function getReferenceData() {
 }
 
 export const detailHandlers = [
+	http.post(umbracoPath(`${UMB_SLUG}/validate`), () => {
+		umbDocumentMockDb.detail.validate();
+		return new HttpResponse(null, { status: 200 });
+	}),
+
 	http.post(umbracoPath(`${UMB_SLUG}`), async ({ request }) => {
 		const requestBody = (await request.json()) as CreateDocumentRequestModel;
 		if (!requestBody) return new HttpResponse(null, { status: 400, statusText: 'no body found' });
@@ -50,7 +55,7 @@ export const detailHandlers = [
 		const skip = query.get('skip') ? parseInt(query.get('skip') as string, 10) : 0;
 		const take = query.get('take') ? parseInt(query.get('take') as string, 10) : 100;
 
-		let data: Array<DefaultReferenceResponseModel> = [];
+		let data: Array<IReferenceResponseModel> = [];
 
 		if (id === 'all-property-editors-document-id') {
 			data = getReferenceData();
@@ -131,6 +136,7 @@ export const detailHandlers = [
 			return new HttpResponse(null, { status: 403 });
 		}
 
+		umbDocumentMockDb.detail.validate(id);
 		return new HttpResponse(null, { status: 200 });
 	}),
 
@@ -141,8 +147,12 @@ export const detailHandlers = [
 			// Simulate a forbidden response
 			return new HttpResponse(null, { status: 403 });
 		}
-		const response = umbDocumentMockDb.detail.read(id);
-		return HttpResponse.json(response);
+		try {
+			const response = umbDocumentMockDb.detail.read(id);
+			return HttpResponse.json(response);
+		} catch {
+			return new HttpResponse(null, { status: 404 });
+		}
 	}),
 
 	http.put(umbracoPath(`${UMB_SLUG}/:id`), async ({ request, params }) => {

@@ -57,6 +57,12 @@ class UmbDocumentTypeMockDB extends UmbEntityMockDbBase<UmbMockDocumentTypeModel
 		return { items: mappedItems, total: mappedItems.length };
 	}
 
+	getAllowedInLibrary(): PagedAllowedDocumentTypeModel {
+		const mockItems = this.data.filter((item) => item.allowedInLibrary);
+		const mappedItems = mockItems.map((item) => allowedDocumentTypeMapper(item));
+		return { items: mappedItems, total: mappedItems.length };
+	}
+
 	getAllowedParents(id: string): DocumentTypeAllowedParentsResponseModel {
 		const allowedParentIds = this.data
 			.filter((item) =>
@@ -82,6 +88,7 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 		properties: [],
 		containers: [],
 		allowedAsRoot: false,
+		allowedInLibrary: false,
 		variesByCulture: false,
 		variesBySegment: false,
 		isElement: false,
@@ -96,6 +103,7 @@ const createMockDocumentTypeFolderMapper = (request: CreateFolderRequestModel): 
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	};
 };
 
@@ -109,6 +117,7 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 		properties: request.properties,
 		containers: request.containers,
 		allowedAsRoot: request.allowedAsRoot,
+		allowedInLibrary: request.allowedInLibrary,
 		variesByCulture: request.variesByCulture,
 		variesBySegment: request.variesBySegment,
 		isElement: request.isElement,
@@ -124,6 +133,7 @@ const createMockDocumentTypeMapper = (request: CreateDocumentTypeRequestModel): 
 			keepLatestVersionPerDayForDays: null,
 		},
 		flags: [],
+		noAccess: false,
 	};
 };
 
@@ -137,6 +147,7 @@ const documentTypeDetailMapper = (item: UmbMockDocumentTypeModel): DocumentTypeR
 		properties: item.properties,
 		containers: item.containers,
 		allowedAsRoot: item.allowedAsRoot,
+		allowedInLibrary: item.allowedInLibrary,
 		variesByCulture: item.variesByCulture,
 		variesBySegment: item.variesBySegment,
 		isElement: item.isElement,
@@ -158,6 +169,7 @@ const documentTypeTreeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTyp
 		icon: item.icon,
 		isElement: item.isElement,
 		flags: item.flags,
+		noAccess: item.noAccess,
 	};
 };
 
@@ -169,6 +181,7 @@ const documentTypeItemMapper = (item: UmbMockDocumentTypeModel): DocumentTypeIte
 		isElement: item.isElement,
 		description: item.description ?? undefined,
 		flags: item.flags,
+		allowedInLibrary: item.allowedInLibrary,
 	};
 };
 

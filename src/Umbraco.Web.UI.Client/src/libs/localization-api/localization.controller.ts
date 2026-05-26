@@ -18,6 +18,8 @@ import type {
 	UmbLocalizationSetKey,
 } from './localization.manager.js';
 import { umbLocalizationManager } from './localization.manager.js';
+import { unsafeHTML } from '@umbraco-cms/backoffice/external/lit';
+import { escapeHTML } from '@umbraco-cms/backoffice/utils';
 import type { LitElement } from '@umbraco-cms/backoffice/external/lit';
 import type { UmbController, UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
@@ -350,5 +352,25 @@ export class UmbLocalizationController<LocalizationSetType extends UmbLocalizati
 		});
 
 		return localizedText;
+	}
+
+	/**
+	 * Like {@link string}, but returns a Lit `unsafeHTML` directive with all arguments escaped via {@link escapeHTML}.
+	 * Use when the localized value itself contains HTML markup that must be rendered (otherwise prefer {@link string}, which Lit escapes natively).
+	 * Pass a `#key` to look up a term, or any string for inline replacement.
+	 * @param {string | undefined} text - text to translate (terms prefixed with `#`).
+	 * @param {unknown[]} args - arguments to interpolate. Each argument is HTML-escaped before being inserted into the term.
+	 * @returns {unknown} a Lit directive result that renders the localized HTML safely inline in a Lit template.
+	 * @example
+	 * ```ts
+	 * html`<p>${this.localize.htmlString('#defaultdialogs_confirmdelete', userControlledName)}</p>`
+	 * ```
+	 */
+	htmlString(text: string | undefined, ...args: unknown[]) {
+		// `escapeHTML` short-circuits on non-strings, so we stringify first to also escape values
+		// like `{ toString: () => '<script>...' }`. `undefined` is preserved so `string()` can
+		// keep the original placeholder unmatched (existing semantics).
+		const escapedArgs = args.map((a) => (typeof a === 'undefined' ? a : escapeHTML(String(a))));
+		return unsafeHTML(this.string(text, ...escapedArgs));
 	}
 }
