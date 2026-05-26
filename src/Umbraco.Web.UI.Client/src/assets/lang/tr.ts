@@ -653,6 +653,7 @@ export default {
 		content: 'İçerik',
 		continue: 'Devam et',
 		copy: 'Kopyala',
+		copied: 'Kopyalandı!',
 		create: 'Oluştur',
 		cropSection: 'Bölümü kırp',
 		database: 'Veritabanı',
@@ -1738,6 +1739,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL izleyiciyi devre dışı bırakın',
 		enableUrlTracker: 'URL izleyiciyi etkinleştir',
+		urlTrackerEnabled: 'Etkin',
+		urlTrackerDisabled: 'Devre Dışı',
 		originalUrl: 'Orijinal URL',
 		redirectedTo: 'Yönlendirildi',
 		redirectUrlManagement: 'URL Yönetimini Yeniden Yönlendir',

@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services.PublishStatus;
 
 [TestFixture]
-public partial class PublishedContentStatusFilteringServiceTests
+public class PublishedContentStatusFilteringServiceTests
 {
     [Test]
     public void FilterAvailable_Invariant_ForNonPreview_YieldsPublishedItems()
@@ -87,6 +87,91 @@ public partial class PublishedContentStatusFilteringServiceTests
     public void FilterAvailable_Variant_ForPreview_YieldsUnpublishedItemsInCulture(string culture, int expectedNumberOfChildren)
     {
         var (sut, items) = SetupVariant(true, culture == Constants.System.InvariantCulture ? "en-US" : culture);
+
+        var children = sut.FilterAvailable(items.Keys, culture).ToArray();
+        Assert.AreEqual(expectedNumberOfChildren, children.Length);
+
+        // IDs 0 through 3 exist in both en-US and da-DK
+        Assert.Multiple(() =>
+        {
+            Assert.AreEqual(0, children[0].Id);
+            Assert.AreEqual(1, children[1].Id);
+            Assert.AreEqual(2, children[2].Id);
+            Assert.AreEqual(3, children[3].Id);
+        });
+
+        // IDs 4 through 6 exist only in en-US
+        if (culture == "en-US")
+        {
+            Assert.AreEqual(4, children[4].Id);
+            Assert.AreEqual(5, children[5].Id);
+            Assert.AreEqual(6, children[6].Id);
+        }
+
+        // IDs 7 through 9 exist only in da-DK
+        if (culture == "da-DK")
+        {
+            Assert.AreEqual(7, children[4].Id);
+            Assert.AreEqual(8, children[5].Id);
+            Assert.AreEqual(9, children[6].Id);
+        }
+
+        if (culture == Constants.System.InvariantCulture)
+        {
+            Assert.AreEqual(4, children[4].Id);
+            Assert.AreEqual(5, children[5].Id);
+            Assert.AreEqual(6, children[6].Id);
+            Assert.AreEqual(7, children[7].Id);
+            Assert.AreEqual(8, children[8].Id);
+            Assert.AreEqual(9, children[9].Id);
+        }
+    }
+
+    [TestCase("da-DK", 1)]
+    [TestCase("en-US", 2)]
+    [TestCase("*", 3)]
+    public void FilterAvailable_Variant_ForNonPreview_YieldsOnlyItemsWithPublishedAncestorPath(string culture, int expectedNumberOfChildren)
+    {
+        var (sut, items) = SetupVariant(
+            false,
+            culture == Constants.System.InvariantCulture ? "en-US" : culture,
+            (key, _, allItems) => allItems.Keys.IndexOf(key) > 2);
+
+        var children = sut.FilterAvailable(items.Keys, culture).ToArray();
+        Assert.AreEqual(expectedNumberOfChildren, children.Length);
+
+        // IDs 0 through 3 exist in both en-US and da-DK, but none pass both the published and ancestor-path checks
+
+        // IDs 4 through 6 exist only in en-US - only even IDs are published
+        if (culture == "en-US")
+        {
+            Assert.AreEqual(4, children[0].Id);
+            Assert.AreEqual(6, children[1].Id);
+        }
+
+        // IDs 7 through 9 exist only in da-DK - only even IDs are published
+        if (culture == "da-DK")
+        {
+            Assert.AreEqual(8, children[0].Id);
+        }
+
+        if (culture == Constants.System.InvariantCulture)
+        {
+            Assert.AreEqual(4, children[0].Id);
+            Assert.AreEqual(6, children[1].Id);
+            Assert.AreEqual(8, children[2].Id);
+        }
+    }
+
+    [TestCase("da-DK", 7)]
+    [TestCase("en-US", 7)]
+    [TestCase("*", 10)]
+    public void FilterAvailable_Variant_ForPreview_IgnoresMissingPublishedAncestorPath(string culture, int expectedNumberOfChildren)
+    {
+        var (sut, items) = SetupVariant(
+            true,
+            culture == Constants.System.InvariantCulture ? "en-US" : culture,
+            (_, _, _) => false);
 
         var children = sut.FilterAvailable(items.Keys, culture).ToArray();
         Assert.AreEqual(expectedNumberOfChildren, children.Length);
@@ -218,6 +303,110 @@ public partial class PublishedContentStatusFilteringServiceTests
         }
     }
 
+    [Test]
+    public void FilterAvailable_IsLazy_TakeOnlyFetchesRequestedItemsFromCache()
+    {
+        var (sut, items, cacheMock, _) = SetupCounting(forPreview: true);
+
+        IPublishedContent[] taken = sut.FilterAvailable(items.Keys, null).Take(3).ToArray();
+
+        Assert.AreEqual(3, taken.Length);
+        cacheMock.Verify(c => c.GetById(true, It.IsAny<Guid>()), Times.Exactly(3));
+    }
+
+    [Test]
+    public void FilterAvailable_IsLazy_FirstOrDefaultOnlyFetchesOneItemFromCache()
+    {
+        var (sut, items, cacheMock, _) = SetupCounting(forPreview: true);
+
+        IPublishedContent? first = sut.FilterAvailable(items.Keys, null).FirstOrDefault();
+
+        Assert.IsNotNull(first);
+        cacheMock.Verify(c => c.GetById(true, It.IsAny<Guid>()), Times.Once);
+    }
+
+    [Test]
+    public void FilterAvailable_IsLazy_NonPreviewTakeShortCircuitsPublishStatusQueries()
+    {
+        var (sut, items, cacheMock, statusMock) = SetupCounting(forPreview: false);
+
+        IPublishedContent[] taken = sut.FilterAvailable(items.Keys, null).Take(3).ToArray();
+
+        Assert.AreEqual(3, taken.Length);
+
+        // GetById is reached only for keys that pass the publish-status filter, so exactly 3 cache lookups.
+        cacheMock.Verify(c => c.GetById(false, It.IsAny<Guid>()), Times.Exactly(3));
+
+        // Publish status must short-circuit before the full candidate set is enumerated.
+        statusMock.Verify(
+            s => s.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()),
+            Times.AtMost(items.Count - 1));
+    }
+
+    [Test]
+    public void FilterAvailable_IsLazy_FullEnumerationFetchesAllItemsFromCache()
+    {
+        var (sut, items, cacheMock, _) = SetupCounting(forPreview: true);
+
+        IPublishedContent[] all = sut.FilterAvailable(items.Keys, null).ToArray();
+
+        Assert.AreEqual(items.Count, all.Length);
+        cacheMock.Verify(c => c.GetById(true, It.IsAny<Guid>()), Times.Exactly(items.Count));
+    }
+
+    // sets up invariant data with mocks exposed so tests can verify per-call counts.
+    // - 10 invariant documents with IDs 0 through 9
+    // - even IDs are published, odd are not (relevant only for non-preview)
+    private (
+        PublishedContentStatusFilteringService Service,
+        Dictionary<Guid, IPublishedContent> Items,
+        Mock<IPublishedContentCache> CacheMock,
+        Mock<IPublishStatusQueryService> StatusMock)
+        SetupCounting(bool forPreview)
+    {
+        var contentType = new Mock<IPublishedContentType>();
+        contentType.SetupGet(c => c.Variations).Returns(ContentVariation.Nothing);
+
+        var items = new Dictionary<Guid, IPublishedContent>();
+        for (var i = 0; i < 10; i++)
+        {
+            var content = new Mock<IPublishedContent>();
+            var key = Guid.NewGuid();
+            content.SetupGet(c => c.Key).Returns(key);
+            content.SetupGet(c => c.ContentType).Returns(contentType.Object);
+            content.SetupGet(c => c.Cultures).Returns(new Dictionary<string, PublishedCultureInfo>());
+            content.SetupGet(c => c.Id).Returns(i);
+            items[key] = content.Object;
+        }
+
+        var cacheMock = new Mock<IPublishedContentCache>();
+        cacheMock
+            .Setup(c => c.GetById(forPreview, It.IsAny<Guid>()))
+            .Returns((bool _, Guid key) => items.TryGetValue(key, out IPublishedContent? item) ? item : null);
+
+        var statusMock = new Mock<IPublishStatusQueryService>();
+        statusMock
+            .Setup(s => s.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Returns((Guid key, string _) => items.TryGetValue(key, out IPublishedContent? item) && item.Id % 2 == 0);
+        statusMock
+            .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Returns(true);
+
+        var previewService = new Mock<IPreviewService>();
+        previewService.Setup(p => p.IsInPreview()).Returns(forPreview);
+
+        var variationContextAccessor = new Mock<IVariationContextAccessor>();
+        variationContextAccessor.SetupGet(v => v.VariationContext).Returns(new VariationContext(null));
+
+        var service = new PublishedContentStatusFilteringService(
+            variationContextAccessor.Object,
+            statusMock.Object,
+            previewService.Object,
+            cacheMock.Object);
+
+        return (service, items, cacheMock, statusMock);
+    }
+
     // sets up invariant test data:
     // - 10 documents with IDs 0 through 9
     // - even IDs (0, 2, ...) are published, odd are unpublished
@@ -260,7 +449,7 @@ public partial class PublishedContentStatusFilteringServiceTests
     // - IDs 4 through 6 exist only in en-US
     // - IDs 7 through 9 exist only in da-DK
     // - even IDs (0, 2, ...) are published, odd are unpublished
-    private (PublishedContentStatusFilteringService PublishedContentStatusFilteringService, Dictionary<Guid, IPublishedContent> Items) SetupVariant(bool forPreview, string requestCulture)
+    private (PublishedContentStatusFilteringService PublishedContentStatusFilteringService, Dictionary<Guid, IPublishedContent> Items) SetupVariant(bool forPreview, string requestCulture, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
     {
         var contentType = new Mock<IPublishedContentType>();
         contentType.SetupGet(c => c.Variations).Returns(ContentVariation.Culture);
@@ -287,7 +476,7 @@ public partial class PublishedContentStatusFilteringServiceTests
 
         var publishedContentCache = SetupPublishedContentCache(forPreview, items);
         var previewService = SetupPreviewService(forPreview);
-        var publishStatusQueryService = SetupPublishStatusQueryService(items);
+        var publishStatusQueryService = SetupPublishStatusQueryService(items, hasPublishedAncestorPath);
         var variationContextAccessor = SetupVariantContextAccessor(requestCulture);
 
         return (
@@ -353,10 +542,10 @@ public partial class PublishedContentStatusFilteringServiceTests
             items);
     }
 
-    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items)
-        => SetupPublishStatusQueryService(items, id => id % 2 == 0);
+    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
+        => SetupPublishStatusQueryService(items, id => id % 2 == 0, hasPublishedAncestorPath);
 
-    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<int, bool> idIsPublished)
+    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<int, bool> idIsPublished, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
     {
         var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
         publishStatusQueryService
@@ -366,8 +555,8 @@ public partial class PublishedContentStatusFilteringServiceTests
                                                    && idIsPublished(item.Id)
                                                    && (culture == Constants.System.InvariantCulture || item.ContentType.VariesByCulture() is false || item.Cultures.ContainsKey(culture)));
         publishStatusQueryService
-            .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>()))
-            .Returns(true);
+            .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Returns((Guid key, string culture) => hasPublishedAncestorPath?.Invoke(key, culture, items) ?? true);
         return publishStatusQueryService.Object;
     }
 

@@ -207,6 +207,75 @@ public class DataValueReferenceFactoryCollectionTests
         CollectionAssert.AreEquivalent(expected, result, "Result does not contain the expected relation type aliases.");
     }
 
+    [Test]
+    public void GetReferences_Does_Not_Throw_When_IDataValueReference_Editor_Throws()
+    {
+        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
+
+        var throwingEditor = new ThrowingDataEditor();
+        var result = collection.GetReferences(throwingEditor, "some incompatible value");
+
+        Assert.IsEmpty(result);
+    }
+
+    [Test]
+    public void GetReferences_Does_Not_Throw_When_IDataValueReferenceFactory_Throws()
+    {
+        var collection = new DataValueReferenceFactoryCollection(() => new ThrowingDataValueReferenceFactory().Yield(), new NullLogger<DataValueReferenceFactoryCollection>());
+
+        // label does not implement IDataValueReference, so only the factory path runs
+        var labelEditor = new LabelPropertyEditor(DataValueEditorFactory, IOHelper);
+
+        var result = collection.GetReferences(labelEditor, "some incompatible value");
+
+        Assert.IsEmpty(result);
+    }
+
+    [Test]
+    public void GetReferences_Continues_Processing_After_Throwing_Value()
+    {
+        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
+
+        var throwingEditor = new ThrowingDataEditor();
+
+        // ThrowingDataValueReference throws on values that are NOT valid UDIs,
+        // but returns a reference for valid UDIs.
+        var validUdi = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var result = collection.GetReferences(throwingEditor, "incompatible value", validUdi).ToArray();
+
+        Assert.AreEqual(1, result.Length);
+        Assert.AreEqual(validUdi, result[0].Udi.ToString());
+    }
+
+    [Test]
+    public void GetAllReferences_Does_Not_Throw_When_Editor_Throws_On_Incompatible_Value()
+    {
+        var collection = new DataValueReferenceFactoryCollection(() => Enumerable.Empty<IDataValueReferenceFactory>(), new NullLogger<DataValueReferenceFactoryCollection>());
+
+        var throwingEditor = new ThrowingDataEditor();
+        var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(() => ((IDataEditor)throwingEditor).Yield()));
+        var serializer = new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var validUdi = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
+        var property =
+            new Property(
+                new PropertyType(ShortStringHelper, new DataType(throwingEditor, serializer))
+                {
+                    Variations = ContentVariation.Nothing,
+                })
+            {
+                Values = new List<PropertyValue>
+                {
+                    new() { EditedValue = "incompatible block list JSON value" },
+                    new() { EditedValue = validUdi },
+                },
+            };
+        var properties = new PropertyCollection { property };
+        var result = collection.GetAllReferences(properties, propertyEditors).ToArray();
+
+        Assert.AreEqual(1, result.Length);
+        Assert.AreEqual(validUdi, result[0].Udi.ToString());
+    }
+
     private class TestDataValueReferenceFactory : IDataValueReferenceFactory
     {
         public IDataValueReference GetDataValueReference() => new TestMediaDataValueReference();
@@ -236,6 +305,55 @@ public class DataValueReferenceFactoryCollectionTests
                 "umbTest",
                 "umbTest", // Duplicate on purpose to test distinct aliases
             };
+        }
+    }
+
+    private class ThrowingDataValueReferenceFactory : IDataValueReferenceFactory
+    {
+        public IDataValueReference GetDataValueReference() => new ThrowingDataValueReference();
+
+        public bool IsForEditor(IDataEditor dataEditor) => dataEditor.Alias == Constants.PropertyEditors.Aliases.Label;
+    }
+
+    /// <summary>
+    /// A data editor whose value editor throws on incompatible values, simulating
+    /// the scenario where a property editor is changed and existing stored values
+    /// are not compatible with the new editor (e.g. Block List JSON fed to Multi URL Picker).
+    /// </summary>
+    [DataEditor("Test.ThrowingEditor")]
+    private class ThrowingDataEditor : DataEditor
+    {
+        public ThrowingDataEditor()
+            : base(Mock.Of<IDataValueEditorFactory>())
+        {
+        }
+
+        protected override IDataValueEditor CreateValueEditor() => new ThrowingDataValueReference();
+    }
+
+    private class ThrowingDataValueReference : DataValueEditor, IDataValueReference
+    {
+        public ThrowingDataValueReference()
+            : base(Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>(), Mock.Of<IIOHelper>(), new DataEditorAttribute("Test.ThrowingEditor"))
+        {
+        }
+
+        public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
+        {
+            var asString = value is string str ? str : value?.ToString();
+
+            if (string.IsNullOrEmpty(asString))
+            {
+                return Enumerable.Empty<UmbracoEntityReference>();
+            }
+
+            if (UdiParser.TryParse(asString, out var udi))
+            {
+                return new[] { new UmbracoEntityReference(udi) };
+            }
+
+            // Simulate what happens when e.g. Block List JSON is deserialized as a List<LinkDto>
+            throw new System.Text.Json.JsonException("Cannot deserialize incompatible property value");
         }
     }
 }

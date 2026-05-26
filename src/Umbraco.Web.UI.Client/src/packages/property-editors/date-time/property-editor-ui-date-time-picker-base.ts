@@ -325,7 +325,7 @@ export abstract class UmbPropertyEditorUiDateTimePickerElementBase
 		const previousDate = this._selectedDate;
 		this._selectedDate = newDate;
 
-		let timeZoneToStore = null;
+		let timeZoneToStore: string | null;
 		if (!this._displayTimeZone || !this._timeZoneMode) {
 			timeZoneToStore = null;
 		} else if (this._timeZoneMode === 'local') {

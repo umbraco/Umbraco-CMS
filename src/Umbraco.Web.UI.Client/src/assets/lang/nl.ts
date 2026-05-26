@@ -679,6 +679,7 @@ export default {
 		content: 'Inhoud',
 		continue: 'Doorgaan',
 		copy: 'Kopiëren',
+		copied: 'Gekopieerd!',
 		create: 'Aanmaken',
 		cropSection: 'Sectie bijsnijden',
 		database: 'Database',
@@ -1856,6 +1857,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL tracker uitschakelen',
 		enableUrlTracker: 'URL tracker inschakelen',
+		urlTrackerEnabled: 'Ingeschakeld',
+		urlTrackerDisabled: 'Uitgeschakeld',
 		culture: 'Cultuur',
 		originalUrl: 'Originele URL',
 		redirectedTo: 'Doorgestuurd naar',

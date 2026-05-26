@@ -365,6 +365,7 @@ export default {
 		constrainProportions: '强制属性',
 		continue: '继续',
 		copy: '复制',
+		copied: '已复制！',
 		create: '创建',
 		database: '数据库',
 		date: '时间',
@@ -1054,6 +1055,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: '禁用 URL 跟踪程序',
 		enableUrlTracker: '启用 URL 跟踪程序',
+		urlTrackerEnabled: '已启用',
+		urlTrackerDisabled: '已禁用',
 		originalUrl: '原始网址',
 		redirectedTo: '已重定向至',
 		noRedirects: '未进行重定向',

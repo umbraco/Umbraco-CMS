@@ -124,17 +124,20 @@ public static partial class UmbracoBuilderExtensions
                 new WebsiteOutputCachePolicy(settings.ContentDuration));
         });
 
-        builder.Services.Configure<UmbracoPipelineOptions>(options =>
-            options.AddFilter(new WebsiteOutputCachePipelineFilter("UmbracoWebsiteOutputCache")));
+        // Signal that Umbraco has enabled output caching so the application builder registers
+        // the output cache middleware. Gated via a marker rather than IOutputCacheStore so that
+        // applications calling services.AddOutputCache(...) for their own purposes are not
+        // affected by Umbraco's automatic middleware registration.
+        builder.Services.TryAddSingleton<IUmbracoManagedOutputCacheMarker, UmbracoManagedOutputCacheMarker>();
 
         // Register eviction handlers and providers.
-        builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, DocumentOutputCacheEvictionHandler>();
-        builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, MediaOutputCacheEvictionHandler>();
-        builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, MemberOutputCacheEvictionHandler>();
-        builder.Services.AddSingleton<IWebsiteOutputCacheTagProvider, ContentTypeOutputCacheTagProvider>();
-        builder.Services.AddSingleton<IWebsiteOutputCacheDurationProvider, DefaultWebsiteOutputCacheDurationProvider>();
-        builder.Services.AddSingleton<IWebsiteOutputCacheRequestFilter, DefaultWebsiteOutputCacheRequestFilter>();
-        builder.Services.AddSingleton<IWebsiteOutputCacheManager, WebsiteOutputCacheManager>();
+        builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, WebsiteDocumentOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, WebsiteMediaOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, WebsiteMemberOutputCacheEvictionHandler>();
+        builder.Services.AddSingleton<IWebsiteOutputCacheTagProvider, WebsiteContentTypeOutputCacheTagProvider>();
+        builder.Services.AddUnique<IWebsiteOutputCacheDurationProvider, DefaultWebsiteOutputCacheDurationProvider>();
+        builder.Services.AddUnique<IWebsiteOutputCacheRequestFilter, DefaultWebsiteOutputCacheRequestFilter>();
+        builder.Services.AddUnique<IWebsiteOutputCacheManager, WebsiteOutputCacheManager>();
 
         return builder;
     }

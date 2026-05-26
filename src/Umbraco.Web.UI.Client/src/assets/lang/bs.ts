@@ -709,6 +709,7 @@ export default {
 		content: 'Sadržaj',
 		continue: 'Nastavi',
 		copy: 'Kopiraj',
+		copied: 'Kopirano!',
 		create: 'Kreiraj',
 		database: 'Baza podataka',
 		date: 'Datum',
@@ -1907,6 +1908,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Onemogući URL tragač',
 		enableUrlTracker: 'Omogući URL tragač',
+		urlTrackerEnabled: 'Omogućen',
+		urlTrackerDisabled: 'Onemogućen',
 		originalUrl: 'Originalni URL',
 		redirectedTo: 'Preusmjeri na',
 		redirectUrlManagement: 'Preusmjeravanje URL-ova',

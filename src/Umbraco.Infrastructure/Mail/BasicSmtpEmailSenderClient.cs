@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Infrastructure.Mail
             using var client = new SmtpClient();
 
             await client.ConnectAsync(
-                _globalSettings.Smtp!.Host,
+                _globalSettings.Smtp!.Host!,
                 _globalSettings.Smtp.Port,
                 (SecureSocketOptions)(int)_globalSettings.Smtp.SecureSocketOptions);
 

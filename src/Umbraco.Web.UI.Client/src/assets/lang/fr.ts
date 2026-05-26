@@ -663,6 +663,7 @@ export default {
 		content: 'Contenu',
 		continue: 'Continuer',
 		copy: 'Copier',
+		copied: 'Copié !',
 		create: 'Créer',
 		database: 'Base de données',
 		date: 'Date',
@@ -1788,6 +1789,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Désactiver URL tracker',
 		enableUrlTracker: 'Activer URL tracker',
+		urlTrackerEnabled: 'Activé',
+		urlTrackerDisabled: 'Désactivé',
 		culture: 'Culture',
 		originalUrl: 'URL original',
 		redirectedTo: 'Redirigé Vers',

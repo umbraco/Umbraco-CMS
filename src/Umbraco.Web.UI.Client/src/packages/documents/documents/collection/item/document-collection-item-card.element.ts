@@ -22,7 +22,7 @@ import type {
 } from '@umbraco-cms/backoffice/collection';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
 import { UMB_DOCUMENT_TYPE_ENTITY_TYPE } from '@umbraco-cms/backoffice/document-type';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
+import { UmbDocumentVariantState } from '../../variant-state.js';
 import type { UUIInterfaceColor } from '@umbraco-cms/backoffice/external/uui';
 import { fromCamelCase } from '@umbraco-cms/backoffice/utils';
 
@@ -117,32 +117,32 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	}
 
 	#getPropertyValueByAlias(alias: string) {
-		if (!this.item) return '';
+		if (!this.item) return { value: '' };
 
 		switch (alias) {
 			case 'contentTypeAlias':
-				return this.item.documentType.alias;
+				return { value: this.item.documentType.alias };
 			case 'createDate':
-				return this._createDate?.toLocaleString();
+				return { value: this._createDate?.toLocaleString() };
 			case 'creator':
 			case 'owner':
-				return this.item.creator;
+				return { value: this.item.creator };
 			case 'name':
-				return this._name;
+				return { value: this._name };
 			case 'state':
-				return this._state ? fromCamelCase(this._state) : '';
+				return { value: this._state ? fromCamelCase(this._state) : '' };
 			case 'published':
-				return this._state !== DocumentVariantStateModel.DRAFT ? 'True' : 'False';
+				return { value: this._state !== UmbDocumentVariantState.DRAFT ? 'True' : 'False' };
 			case 'sortOrder':
-				return this.item.sortOrder;
+				return { value: this.item.sortOrder };
 			case 'updateDate':
-				return this._updateDate?.toLocaleString();
+				return { value: this._updateDate?.toLocaleString() };
 			case 'updater':
-				return this.item.updater;
+				return { value: this.item.updater };
 			default: {
 				const culture = this.#resolver.getCulture();
 				const prop = this.item.values.find((x) => x.alias === alias && (!x.culture || x.culture === culture));
-				return prop?.value ?? '';
+				return { value: prop?.value ?? '', editorAlias: prop?.editorAlias };
 			}
 		}
 	}
@@ -150,13 +150,13 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	#getStateTagConfig(): { color: UUIInterfaceColor; label: string } | undefined {
 		if (!this._state) return;
 		switch (this._state) {
-			case DocumentVariantStateModel.PUBLISHED:
+			case UmbDocumentVariantState.PUBLISHED:
 				return { color: 'positive', label: this.localize.term('content_published') };
-			case DocumentVariantStateModel.PUBLISHED_PENDING_CHANGES:
+			case UmbDocumentVariantState.PUBLISHED_PENDING_CHANGES:
 				return { color: 'warning', label: this.localize.term('content_publishedPendingChanges') };
-			case DocumentVariantStateModel.DRAFT:
+			case UmbDocumentVariantState.DRAFT:
 				return { color: 'default', label: this.localize.term('content_unpublished') };
-			case DocumentVariantStateModel.NOT_CREATED:
+			case UmbDocumentVariantState.NOT_CREATED:
 				return { color: 'danger', label: this.localize.term('content_notCreated') };
 			default:
 				return { color: 'danger', label: fromCamelCase(this._state) };
@@ -207,14 +207,17 @@ export class UmbDocumentCollectionItemCardElement extends UmbLitElement implemen
 	}
 
 	#renderProperty(column: UmbCollectionColumnConfiguration) {
-		const value = this.#getPropertyValueByAlias(column.alias);
+		const { value, editorAlias } = this.#getPropertyValueByAlias(column.alias);
 		return html`
 			<li>
 				<span>${this.localize.string(column.header)}:</span>
 				${when(
 					column.nameTemplate,
 					() => html`<umb-ufm-render inline .markdown=${column.nameTemplate} .value=${{ value }}></umb-ufm-render>`,
-					() => html`${value}`,
+					() =>
+						editorAlias
+							? html`<umb-value-summary-extension .valueType=${editorAlias} .value=${value}></umb-value-summary-extension>`
+							: html`${value}`,
 				)}
 			</li>
 		`;

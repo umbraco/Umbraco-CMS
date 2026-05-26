@@ -454,7 +454,24 @@ public static class ContentRepositoryExtensions
     ///     Clears all publish culture information from the content item.
     /// </summary>
     /// <param name="content">The content item to clear publish information from.</param>
-    public static void ClearPublishInfos(this IContent content) => content.PublishCultureInfos = null;
+    public static void ClearPublishInfos(this IContent content)
+    {
+        if (content.PublishCultureInfos is null)
+        {
+            return;
+        }
+
+        // Pass each published culture through ClearPublishInfo([culture]) to ensure correct change tracking.
+        var cultures = content.PublishCultureInfos.Values.Select(c => c.Culture).ToArray();
+        foreach (var culture in cultures)
+        {
+            content.ClearPublishInfo(culture);
+        }
+
+        // Following #22799 the explicit calls to `ClearPublishInfo` for each culture cause the unpublish in all cultures.
+        // `PublishCultureInfos` is set to null purely to retain previous behaviour at a property level.
+        content.PublishCultureInfos = null;
+    }
 
     /// <summary>
     ///     Returns false if the culture is already unpublished

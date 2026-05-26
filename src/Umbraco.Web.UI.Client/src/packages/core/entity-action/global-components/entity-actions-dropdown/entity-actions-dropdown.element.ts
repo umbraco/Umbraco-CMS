@@ -1,4 +1,4 @@
-import type { UmbDropdownElement } from '../../../components/dropdown/index.js';
+import type { UmbDropdownElement } from '@umbraco-cms/backoffice/components';
 import { UmbEntityActionListElement } from '../../entity-action-list.element.js';
 import { html, customElement, property, css, query } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

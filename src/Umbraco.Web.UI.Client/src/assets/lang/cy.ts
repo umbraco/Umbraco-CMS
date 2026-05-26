@@ -747,6 +747,7 @@ export default {
 		content: 'Cynnwys',
 		continue: 'Bwrw ymlaen',
 		copy: 'Copïo',
+		copied: 'Wedi gopïo!',
 		create: 'Creu',
 		cropSection: 'Adran tocio',
 		database: 'Cronfa ddata',
@@ -2087,6 +2088,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Analluogi olinydd URL',
 		enableUrlTracker: 'Galluogi olinydd URL',
+		urlTrackerEnabled: "Wedi'i alluogi",
+		urlTrackerDisabled: "Wedi'i analluogi",
 		culture: 'Diwylliant',
 		originalUrl: 'URL gwreiddiol',
 		redirectedTo: 'Ailgyfeirwyd I',
