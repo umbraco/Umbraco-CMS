@@ -186,5 +186,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddAuditDtos>("{2A1B0EAD-105F-4AB7-A033-17EE8E8E7357}");
         To<V_18_0_0.AddLongRunningOperationDto>("{DED2564D-59CD-4C75-8639-6A24D69E63DC}");
         To<V_18_0_0.AddRelationDtos>("{C8E2F7B4-5D3A-4F61-9E8C-1A2B3C4D5E6F}");
+        To<V_18_0_0.AddContentVersionCleanupPolicyDto>("{E3F7A9B2-1C4D-4E8F-A7B6-5C9D0E1F2A3B}");
     }
 }
