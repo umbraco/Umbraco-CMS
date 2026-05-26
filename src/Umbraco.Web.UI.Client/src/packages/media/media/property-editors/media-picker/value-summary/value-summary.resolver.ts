@@ -7,12 +7,12 @@ import { UmbMediaItemRepository } from '../../../repository/index.js';
 
 export class UmbMediaPickerValueSummaryResolver
 	extends UmbControllerBase
-	implements UmbValueSummaryResolver<UmbMediaPickerValueModel, Array<UmbMediaItemModel>>
+	implements UmbValueSummaryResolver<UmbMediaPickerValueModel | undefined, Array<UmbMediaItemModel>>
 {
 	#repo = new UmbMediaItemRepository(this);
 
 	async resolveValues(
-		values: ReadonlyArray<UmbMediaPickerValueModel>,
+		values: ReadonlyArray<UmbMediaPickerValueModel | undefined>,
 	): Promise<UmbValueSummaryResolveResult<Array<UmbMediaItemModel>>> {
 		const allKeys = [...new Set(values.flatMap((v) => (v ?? []).map((entry) => entry.mediaKey)))];
 
@@ -32,7 +32,7 @@ export class UmbMediaPickerValueSummaryResolver
 	}
 
 	#map(
-		values: ReadonlyArray<UmbMediaPickerValueModel>,
+		values: ReadonlyArray<UmbMediaPickerValueModel | undefined>,
 		items: ReadonlyArray<UmbMediaItemModel>,
 	): ReadonlyArray<Array<UmbMediaItemModel>> {
 		const itemByKey = new Map(items.map((item) => [item.unique, item]));
