@@ -390,10 +390,10 @@ using (ICoreScope scope = ScopeProvider.CreateCoreScope())
 
 SQL Server caps a single statement at 2100 parameters. When an `IN` clause is built from a collection sized by user data, that cap can be hit — and the symptom is a runtime `SqlException` (error 8003) on customer installs that nobody hit in dev.
 
-**The constant and helpers** (all in `Umbraco.Core`):
-- `Constants.Sql.MaxParameterCount = 2000` — the ceiling we target (2100 minus headroom for joined predicates already in the SQL).
-- `IEnumerable<T>.InGroupsOf(groupSize)` — extension method to batch a collection.
-- `Database.FetchByGroups<TDto, TKey>(keys, groupSize, sqlFactory)` — NPoco helper that batches a fetch.
+**The constant and helpers**:
+- `Constants.Sql.MaxParameterCount = 2000` (in `Umbraco.Core`, `Constants-Sql.cs`) — the ceiling we target (2100 minus headroom for joined predicates already in the SQL).
+- `IEnumerable<T>.InGroupsOf(groupSize)` (in `Umbraco.Core`, `Extensions/EnumerableExtensions.cs`) — extension method to batch a collection.
+- `Database.FetchByGroups<TResult, TSource>(source, groupSize, sqlFactory)` (in `Umbraco.Infrastructure`, `Persistence/NPocoDatabaseExtensions.cs`) — NPoco helper that batches a fetch.
 
 **The safe patterns** (use one of these any time the collection size is user-driven):
 
@@ -413,7 +413,7 @@ List<FooDto> dtos = Database.FetchByGroups<FooDto, int>(
 // Pattern 3: reserve headroom for other parameters in the same statement.
 foreach (IEnumerable<int> group in entityIds.InGroupsOf(Constants.Sql.MaxParameterCount - userGroupIds.Length))
 {
-    // statement uses entityIds + userGroupIds, so subtract one from the other's budget
+    // statement uses entityIds + userGroupIds, so subtract the other predicate's parameter count from the budget
 }
 ```
 
