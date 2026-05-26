@@ -437,7 +437,7 @@ The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime depende
 
 ### SQL Server 2100-parameter limit
 
-Any `WHERE IN (@0, @1, ...)` built from a runtime-sized collection risks hitting SQL Server's 2100-parameter ceiling and throwing `SqlException` 8003 in production. This has been a recurring source of customer-reported bugs (e.g. `DocumentUrlRepository.Save`, `DocumentUrlAliasRepository.Save`, `ContentVersionService.PerformContentVersionCleanup`, the user-search index build).
+Any `WHERE IN (@0, @1, ...)` built from a runtime-sized collection risks hitting SQL Server's 2100-parameter ceiling and throwing `SqlException` 8003 in production.
 
 Batch with `IEnumerable<T>.InGroupsOf(Constants.Sql.MaxParameterCount)` or `Database.FetchByGroups(...)` whenever the collection size is driven by user data — not just when it currently fits. Watch for products of two scaling dimensions (documents × languages, properties × versions) and config-tunable batch sizes whose defaults are safe but ceilings aren't.
 
