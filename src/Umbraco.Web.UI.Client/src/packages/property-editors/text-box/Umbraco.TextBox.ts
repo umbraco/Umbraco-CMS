@@ -22,7 +22,16 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'autocomplete',
 					label: 'Autocomplete',
 					description: 'Controls browser autocomplete behaviour',
-					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Toggle',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
+					config: [
+						{
+							alias: 'items',
+							value: [
+								{ name: 'On', value: 'on' },
+								{ name: 'Off', value: 'off' },
+							],
+						},
+					],
 				},
 				{
 					alias: 'placeholder',
@@ -35,11 +44,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'maxChars',
 					value: 512,
-				},
-				{
-					alias: 'autocomplete',
-					value: false,
-				},
+				}
 			],
 		},
 	},

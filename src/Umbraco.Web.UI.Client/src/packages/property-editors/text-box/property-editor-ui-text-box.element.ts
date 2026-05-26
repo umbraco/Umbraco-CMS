@@ -69,8 +69,8 @@ export class UmbPropertyEditorUITextBoxElement
 		this._inputMode = config.getValueByAlias<UUIInputMode>('inputMode') || this.#defaultInputMode;
 		this._maxChars = this.#parseNumber(config.getValueByAlias('maxChars'));
 		this._placeholder = this.localize.string(config.getValueByAlias<string>('placeholder') ?? '');
-		const autoCompleteValue = config.getValueByAlias<boolean>('autocomplete');
-		this._autocomplete = autoCompleteValue === undefined ? undefined : autoCompleteValue ? 'on' : 'off';
+		const autoCompleteValue = config.getValueByAlias<string>('autocomplete');
+		this._autocomplete = autoCompleteValue === undefined ? undefined : autoCompleteValue;
 	}
 
 	protected override firstUpdated(): void {
