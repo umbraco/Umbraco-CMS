@@ -115,60 +115,54 @@ public sealed class RelateOnTrashNotificationHandler :
 
     /// <inheritdoc />
     public void Handle(ContentMovedNotification notification)
-        => DeleteOriginalParentRelationsOnRestore(
+        => DeleteOriginalParentRelationsOnRestoreAsync(
             notification.MoveInfoCollection,
             Constants.System.RecycleBinContentString,
-            Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
+            Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias).GetAwaiter().GetResult();
 
     /// <inheritdoc />
-    public Task HandleAsync(ContentMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
-    {
-        CreateOriginalParentRelationOnTrash(
+    public async Task HandleAsync(ContentMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+        => await CreateOriginalParentRelationOnTrashAsync(
             notification.MoveInfoCollection,
             Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName,
             Constants.ObjectTypes.Document,
-            Constants.ObjectTypes.Document);
-        return Task.CompletedTask;
-    }
+            Constants.ObjectTypes.Document,
+            cancellationToken);
 
     /// <inheritdoc />
     public void Handle(MediaMovedNotification notification)
-        => DeleteOriginalParentRelationsOnRestore(
+        => DeleteOriginalParentRelationsOnRestoreAsync(
             notification.MoveInfoCollection,
             Constants.System.RecycleBinMediaString,
-            Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias);
+            Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias).GetAwaiter().GetResult();
 
     /// <inheritdoc />
-    public Task HandleAsync(MediaMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
-    {
-        CreateOriginalParentRelationOnTrash(
+    public async Task HandleAsync(MediaMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+        => await CreateOriginalParentRelationOnTrashAsync(
             notification.MoveInfoCollection,
             Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
             Constants.ObjectTypes.Media,
-            Constants.ObjectTypes.Media);
-        return Task.CompletedTask;
-    }
+            Constants.ObjectTypes.Media,
+            cancellationToken);
 
     /// <inheritdoc />
     public void Handle(ElementMovedNotification notification)
-        => DeleteOriginalParentRelationsOnRestore(
+        => DeleteOriginalParentRelationsOnRestoreAsync(
             notification.MoveInfoCollection,
             Constants.System.RecycleBinElementString,
-            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias);
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias).GetAwaiter().GetResult();
 
     /// <inheritdoc />
-    public Task HandleAsync(ElementMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
-    {
-        CreateOriginalParentRelationOnTrash(
+    public async Task HandleAsync(ElementMovedToRecycleBinNotification notification, CancellationToken cancellationToken)
+        => await CreateOriginalParentRelationOnTrashAsync(
             notification.MoveInfoCollection,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteName,
             Constants.ObjectTypes.ElementContainer,
-            Constants.ObjectTypes.Element);
-        return Task.CompletedTask;
-    }
+            Constants.ObjectTypes.Element,
+            cancellationToken);
 
     /// <inheritdoc />
     public void Handle(EntityContainerMovedNotification notification)
@@ -177,14 +171,14 @@ public sealed class RelateOnTrashNotificationHandler :
         IEnumerable<MoveEventInfo<EntityContainer>> elementContainerItems = notification.MoveInfoCollection
             .Where(x => x.Entity.ContainedObjectType == Constants.ObjectTypes.Element);
 
-        DeleteOriginalParentRelationsOnRestore(
+        DeleteOriginalParentRelationsOnRestoreAsync(
             elementContainerItems,
             Constants.System.RecycleBinElementString,
-            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias);
+            Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc />
-    public Task HandleAsync(
+    public async Task HandleAsync(
         EntityContainerMovedToRecycleBinNotification notification,
         CancellationToken cancellationToken)
     {
@@ -195,19 +189,19 @@ public sealed class RelateOnTrashNotificationHandler :
 
         if (elementContainerItems.Any() is false)
         {
-            return Task.CompletedTask;
+            return;
         }
 
-        CreateOriginalParentRelationOnTrash(
+        await CreateOriginalParentRelationOnTrashAsync(
             elementContainerItems,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteName,
             Constants.ObjectTypes.ElementContainer,
-            Constants.ObjectTypes.ElementContainer);
-        return Task.CompletedTask;
+            Constants.ObjectTypes.ElementContainer,
+            cancellationToken);
     }
 
-    private void DeleteOriginalParentRelationsOnRestore<T>(
+    private async Task DeleteOriginalParentRelationsOnRestoreAsync<T>(
         IEnumerable<MoveEventInfo<T>> moveInfoCollection,
         string recycleBinPathString,
         string originalParentRelationTypeAlias)
@@ -216,31 +210,32 @@ public sealed class RelateOnTrashNotificationHandler :
     {
         foreach (MoveEventInfo<T> item in moveInfoCollection.Where(x => x.OriginalPath.Contains(recycleBinPathString)))
         {
-            IEnumerable<IRelation> relations = _relationService.GetByChildId(item.Entity.Id);
+            IEnumerable<IRelation> relations = await _relationService.GetByChildIdAsync(item.Entity.Id);
             foreach (IRelation relation in relations.Where(x => x.RelationType.Alias.InvariantEquals(originalParentRelationTypeAlias)))
             {
-                _relationService.Delete(relation);
+                await _relationService.DeleteRelationAsync(relation);
             }
         }
     }
 
-    private void CreateOriginalParentRelationOnTrash<T>(
+    private async Task CreateOriginalParentRelationOnTrashAsync<T>(
         IEnumerable<MoveToRecycleBinEventInfo<T>> moveInfoCollection,
         string originalParentRelationTypeAlias,
         string originalParentRelationTypeName,
         Guid parentObjectType,
-        Guid childObjectType)
+        Guid childObjectType,
+        CancellationToken cancellationToken)
         where T : ITreeEntity
     {
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
 
-        IRelationType? relationType = _relationService.GetRelationTypeByAlias(originalParentRelationTypeAlias);
+        IRelationType? relationType = await _relationService.GetRelationTypeByAliasAsync(originalParentRelationTypeAlias, cancellationToken);
 
         // Check that the relation-type exists, if not, then recreate it
         if (relationType == null)
         {
             relationType = new RelationType(originalParentRelationTypeName, originalParentRelationTypeAlias, false, parentObjectType, childObjectType, false);
-            _relationService.Save(relationType);
+            await _relationService.SaveAsync(relationType, cancellationToken);
         }
 
         foreach (MoveToRecycleBinEventInfo<T> item in moveInfoCollection)
@@ -256,9 +251,9 @@ public sealed class RelateOnTrashNotificationHandler :
 
             // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
             IRelation relation =
-                _relationService.GetByParentAndChildId(originalParentId, item.Entity.Id, relationType) ??
+                await _relationService.GetByParentAndChildIdAsync(originalParentId, item.Entity.Id, relationType, cancellationToken) ??
                 new Relation(originalParentId, item.Entity.Id, relationType);
-            _relationService.Save(relation);
+            await _relationService.SaveAsync(relation, cancellationToken);
         }
 
         scope.Complete();

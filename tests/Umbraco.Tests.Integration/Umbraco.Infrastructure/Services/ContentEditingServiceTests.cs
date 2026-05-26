@@ -16,12 +16,10 @@ public partial class ContentEditingServiceTests : ContentEditingServiceTestsBase
     [SetUp]
     public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
-    public void Relate(IContent parent, IContent child, string relationTypeAlias = Constants.Conventions.RelationTypes.RelatedDocumentAlias)
+    public async Task RelateAsync(IContent parent, IContent child, string relationTypeAlias = Constants.Conventions.RelationTypes.RelatedDocumentAlias)
     {
-        var relatedContentRelType = RelationService.GetRelationTypeByAlias(relationTypeAlias);
-
-        var relation = RelationService.Relate(parent.Id, child.Id, relatedContentRelType);
-        RelationService.Save(relation);
+        var relatedContentRelType = await RelationService.GetRelationTypeByAliasAsync(relationTypeAlias);
+        await RelationService.RelateAsync(parent.Id, child.Id, relatedContentRelType!);
     }
 
     protected override void CustomTestSetup(IUmbracoBuilder builder)

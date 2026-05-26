@@ -1389,8 +1389,9 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
                 int[]? relateParentOnDeleteRelationTypeIds = null;
                 if (_contentSettings.DisableDeleteWhenReferenced)
                 {
-                    IRelationType? relateParentOnDeleteRelationType = _relationService.GetRelationTypeByAlias(
-                        Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias);
+                    IRelationType? relateParentOnDeleteRelationType = _relationService
+                        .GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias)
+                        .GetAwaiter().GetResult();
                     if (relateParentOnDeleteRelationType is not null)
                     {
                         relateParentOnDeleteRelationTypeIds = [relateParentOnDeleteRelationType.Id];
@@ -1399,7 +1400,10 @@ public class ContentService : PublishableContentServiceBase<IContent>, IContentS
 
                 foreach (IContent content in contents)
                 {
-                    if (_contentSettings.DisableDeleteWhenReferenced && _relationService.IsRelated(content.Id, RelationDirectionFilter.Child, excludeRelationTypeIds: relateParentOnDeleteRelationTypeIds))
+                    if (_contentSettings.DisableDeleteWhenReferenced
+                        && _relationService
+                            .IsRelatedAsync(content.Id, RelationDirectionFilter.Child, excludeRelationTypeIds: relateParentOnDeleteRelationTypeIds)
+                            .GetAwaiter().GetResult())
                     {
                         continue;
                     }

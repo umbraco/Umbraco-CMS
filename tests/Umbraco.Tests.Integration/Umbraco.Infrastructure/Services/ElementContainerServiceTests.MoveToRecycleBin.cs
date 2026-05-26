@@ -375,7 +375,7 @@ public partial class ElementContainerServiceTests
         var referencedElement = await CreateElement(elementType.Key, containerKey);
 
         // Set up a relation where referencingElement references referencedElement (inside the container).
-        RelationService.Relate(
+        await RelationService.RelateAsync(
             referencingElement.Id,
             referencedElement.Id,
             Constants.Conventions.RelationTypes.RelatedDocumentAlias);
@@ -404,7 +404,7 @@ public partial class ElementContainerServiceTests
         var referencedElement = await CreateElement(elementType.Key, containerKey);
 
         // Set up a relation where referencingElement references referencedElement (inside the container).
-        RelationService.Relate(
+        await RelationService.RelateAsync(
             referencingElement.Id,
             referencedElement.Id,
             Constants.Conventions.RelationTypes.RelatedDocumentAlias);

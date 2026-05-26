@@ -185,5 +185,6 @@ public class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddDomainKeyColumn>("{B7E4F2A1-3C5D-4E6F-8A9B-0C1D2E3F4A5B}");
         To<V_18_0_0.AddAuditDtos>("{2A1B0EAD-105F-4AB7-A033-17EE8E8E7357}");
         To<V_18_0_0.AddLongRunningOperationDto>("{DED2564D-59CD-4C75-8639-6A24D69E63DC}");
+        To<V_18_0_0.AddRelationDtos>("{C8E2F7B4-5D3A-4F61-9E8C-1A2B3C4D5E6F}");
     }
 }

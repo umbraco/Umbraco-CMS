@@ -81,7 +81,7 @@ internal sealed class TrackRelationsTests : UmbracoIntegrationTestWithContent
 
         ContentService.Save(c2);
 
-        var relations = RelationService.GetByParentId(c2.Id).ToList();
+        var relations = (await RelationService.GetByParentIdAsync(c2.Id)).ToList();
         Assert.AreEqual(4, relations.Count);
         Assert.AreEqual(Constants.Conventions.RelationTypes.RelatedMediaAlias, relations[0].RelationType.Alias);
         Assert.AreEqual(m1.Id, relations[0].ChildId);
