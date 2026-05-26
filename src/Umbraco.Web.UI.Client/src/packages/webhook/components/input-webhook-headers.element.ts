@@ -119,7 +119,9 @@ export class UmbInputWebhookHeadersElement extends UmbLitElement {
 	override render() {
 		return html`
 			${this.#renderGrid()}
-			<uui-button id="add" look="placeholder" @click=${this.#addHeader}>Add</uui-button>
+			<uui-button id="add" look="placeholder" label=${this.localize.term('general_add')} @click=${this.#addHeader}>
+				<umb-localize key="general_add">Add</umb-localize>
+			</uui-button>
 		`;
 	}
 
