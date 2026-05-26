@@ -1,5 +1,4 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
-import {expect} from '@playwright/test';
 
 test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();
@@ -12,24 +11,31 @@ test('can open and close the backoffice search modal', {tag: '@smoke'}, async ({
   // Assert
   await umbracoUi.backofficeSearch.isSearchModalVisible();
   await umbracoUi.backofficeSearch.isNavigationTipsVisible();
-
-  // Act
   await umbracoUi.backofficeSearch.clickOutsideToCloseModal();
-
-  // Assert
   await umbracoUi.backofficeSearch.isSearchModalVisible(false);
 });
 
-test('defaults to the documents provider when opened from the content section', async ({umbracoUi}) => {
-  // Arrange
-  await umbracoUi.content.goToSection(ConstantHelper.sections.content);
+const sectionDefaultProvider = [
+  {section: ConstantHelper.sections.content,    provider: 'Documents'},
+  {section: ConstantHelper.sections.media,      provider: 'Media'},
+  {section: ConstantHelper.sections.members,    provider: 'Members'},
+  {section: ConstantHelper.sections.library,    provider: 'Elements'},
+  {section: ConstantHelper.sections.settings,   provider: 'Document Types'},
+  {section: ConstantHelper.sections.dictionary, provider: 'Dictionary'},
+];
 
-  // Act
-  await umbracoUi.backofficeSearch.clickSearchHeaderButton();
+for (const {section, provider} of sectionDefaultProvider) {
+  test(`defaults to the ${provider} provider when opened from the ${section} section`, async ({umbracoUi}) => {
+    // Arrange
+    await umbracoUi.backofficeSearch.goToSection(section);
 
-  // Assert
-  await umbracoUi.backofficeSearch.isSearchProviderActive('Documents');
-});
+    // Act
+    await umbracoUi.backofficeSearch.clickSearchHeaderButton();
+
+    // Assert
+    await umbracoUi.backofficeSearch.isSearchProviderActive(provider);
+  });
+}
 
 test('can see the no results message when nothing matches', async ({umbracoUi}) => {
   // Arrange
@@ -41,7 +47,7 @@ test('can see the no results message when nothing matches', async ({umbracoUi}) 
 
   // Assert
   await umbracoUi.backofficeSearch.isNoResultsMessageVisible();
-  expect(await umbracoUi.backofficeSearch.getSearchResultsCount()).toBe(0);
+  await umbracoUi.backofficeSearch.doesSearchResultHaveCount(0);
 });
 
 test('search input is empty when re-opening search modal', async ({umbracoUi}) => {
@@ -55,5 +61,5 @@ test('search input is empty when re-opening search modal', async ({umbracoUi}) =
 
   // Assert
   await umbracoUi.backofficeSearch.isNavigationTipsVisible();
-  expect(await umbracoUi.backofficeSearch.getSearchResultsCount()).toBe(0);
+  await umbracoUi.backofficeSearch.doesSearchResultHaveCount(0);
 });

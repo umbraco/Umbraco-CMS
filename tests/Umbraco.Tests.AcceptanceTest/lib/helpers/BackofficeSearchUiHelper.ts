@@ -1,4 +1,4 @@
-import {Page, Locator} from "@playwright/test";
+import {Page, Locator, expect} from "@playwright/test";
 import {UiBaseLocators} from "./UiBaseLocators";
 import {ConstantHelper} from "./ConstantHelper";
 
@@ -32,9 +32,6 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   }
 
   async clickOutsideToCloseModal() {
-    // The modal closes when a click is dispatched anywhere outside of
-    // <umb-search-modal>. Coord (0, 0) of the viewport sits in the top-left,
-    // outside the centered modal, so the document click handler fires.
     await this.page.mouse.click(0, 0);
   }
 
@@ -63,13 +60,13 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   }
 
   async clickSearchProvider(providerName: string) {
-    await this.click(this.providerByName(providerName));
+    await this.click(this.searchModal.getByRole('button', {name: providerName, exact: true}));
   }
 
   async clickSearchProviderAndWaitForRerun(providerName: string, searchUrl: string) {
     await this.waitForResponseAfterExecutingPromise(
       searchUrl,
-      this.click(this.providerByName(providerName)),
+      this.click(this.searchModal.getByRole('button', {name: providerName, exact: true})),
       ConstantHelper.statusCodes.ok,
     );
   }
@@ -83,15 +80,15 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   }
 
   async isSearchResultWithNameVisible(name: string, isVisible: boolean = true) {
-    await this.isVisible(this.resultByName(name), isVisible);
+    await this.isVisible(this.results.filter({hasText: name}), isVisible);
   }
 
-  async getSearchResultsCount() {
-    return await this.results.count();
+  async doesSearchResultHaveCount(count: number) {
+    expect(await this.results.count()).toBe(count);
   }
 
   async clickSearchResult(name: string) {
-    await this.click(this.resultByName(name));
+    await this.click(this.results.filter({hasText: name}));
   }
 
   async isNoResultsMessageVisible(isVisible: boolean = true) {
@@ -114,13 +111,5 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
     await this.hasCount(this.activeResult, 1, ConstantHelper.timeout.short);
     const index = await this.activeResult.getAttribute('data-item-index');
     return index ? parseInt(index, 10) : -1;
-  }
-
-  private resultByName(name: string) {
-    return this.results.filter({hasText: name});
-  }
-
-  private providerByName(providerName: string) {
-    return this.searchModal.getByRole('button', {name: providerName, exact: true});
   }
 }

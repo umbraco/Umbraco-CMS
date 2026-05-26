@@ -389,4 +389,4 @@
     copy: 'Copy',
     unpublish: 'Unpublish'
   }
- }
+}
