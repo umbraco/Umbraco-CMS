@@ -82,5 +82,3 @@ export class UmbContentPickerValueSummaryResolver
 		};
 	}
 }
-
-export { UmbContentPickerValueSummaryResolver as valueResolver };

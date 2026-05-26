@@ -13,8 +13,6 @@ export class UmbMemberGroupPickerPropertyEditorValueSummaryElement extends UmbVa
 	}
 }
 
-export { UmbMemberGroupPickerPropertyEditorValueSummaryElement as element };
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-member-group-picker-property-editor-value-summary': UmbMemberGroupPickerPropertyEditorValueSummaryElement;

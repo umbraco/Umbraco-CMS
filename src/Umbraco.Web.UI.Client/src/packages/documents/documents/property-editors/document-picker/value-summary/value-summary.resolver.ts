@@ -41,5 +41,3 @@ export class UmbDocumentPickerValueSummaryResolver
 		);
 	}
 }
-
-export { UmbDocumentPickerValueSummaryResolver as valueResolver };

@@ -41,5 +41,3 @@ export class UmbMediaPickerValueSummaryResolver
 		);
 	}
 }
-
-export { UmbMediaPickerValueSummaryResolver as valueResolver };

@@ -7,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.ValueSummary.PropertyEditor.ContentPicker',
 		name: 'Content Picker Property Editor Value Summary',
 		forValueType: UMB_CONTENT_PICKER_PROPERTY_EDITOR_VALUE_TYPE,
-		element: () => import('./value-summary.element.js'),
-		valueResolver: () => import('./value-summary.resolver.js'),
+		element: () => import('./value-summary.js'),
+		valueResolver: () => import('./value-summary.js'),
 	},
 ];

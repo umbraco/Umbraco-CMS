@@ -13,8 +13,6 @@ export class UmbMediaPickerPropertyEditorValueSummaryElement extends UmbValueSum
 	}
 }
 
-export { UmbMediaPickerPropertyEditorValueSummaryElement as element };
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-media-picker-property-editor-value-summary': UmbMediaPickerPropertyEditorValueSummaryElement;

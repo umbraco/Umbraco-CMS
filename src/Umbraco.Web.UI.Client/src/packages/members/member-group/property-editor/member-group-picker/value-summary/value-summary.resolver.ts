@@ -41,5 +41,3 @@ export class UmbMemberGroupPickerValueSummaryResolver
 		);
 	}
 }
-
-export { UmbMemberGroupPickerValueSummaryResolver as valueResolver };
