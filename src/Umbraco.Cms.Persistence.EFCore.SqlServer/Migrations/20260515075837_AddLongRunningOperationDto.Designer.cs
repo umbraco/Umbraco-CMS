@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
@@ -11,9 +12,11 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    partial class UmbracoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260515075837_AddLongRunningOperationDto")]
+    partial class AddLongRunningOperationDto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -638,108 +641,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.ToTable("umbracoNode", (string)null);
                 });
 
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.RelationDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ChildId")
-                        .HasColumnType("int")
-                        .HasColumnName("childId");
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)")
-                        .HasColumnName("comment");
-
-                    b.Property<DateTime>("Datetime")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("datetime");
-
-                    b.Property<int>("ParentId")
-                        .HasColumnType("int")
-                        .HasColumnName("parentId");
-
-                    b.Property<int>("RelationType")
-                        .HasColumnType("int")
-                        .HasColumnName("relType");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChildId");
-
-                    b.HasIndex("RelationType");
-
-                    b.HasIndex("ParentId", "ChildId", "RelationType")
-                        .IsUnique()
-                        .HasDatabaseName("IX_umbracoRelation_parentChildType");
-
-                    b.ToTable("umbracoRelation", (string)null);
-                });
-
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.RelationTypeDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Alias")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("alias");
-
-                    b.Property<Guid?>("ChildObjectType")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("childObjectType");
-
-                    b.Property<bool>("Dual")
-                        .HasColumnType("bit")
-                        .HasColumnName("dual");
-
-                    b.Property<bool>("IsDependency")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("isDependency");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("name");
-
-                    b.Property<Guid?>("ParentObjectType")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("parentObjectType");
-
-                    b.Property<Guid>("UniqueId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("typeUniqueId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Alias")
-                        .IsUnique()
-                        .HasDatabaseName("IX_umbracoRelationType_alias");
-
-                    b.HasIndex("Name")
-                        .IsUnique()
-                        .HasDatabaseName("IX_umbracoRelationType_name");
-
-                    b.HasIndex("UniqueId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_umbracoRelationType_UniqueId");
-
-                    b.ToTable("umbracoRelationType", (string)null);
-                });
-
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.UserDto", b =>
                 {
                     b.Property<int>("Id")
@@ -994,35 +895,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.RelationDto", b =>
-                {
-                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", "ChildNode")
-                        .WithMany()
-                        .HasForeignKey("ChildId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("FK_umbracoRelation_umbracoNode1");
-
-                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", "ParentNode")
-                        .WithMany()
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("FK_umbracoRelation_umbracoNode");
-
-                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.RelationTypeDto", "RelationTypeDto")
-                        .WithMany()
-                        .HasForeignKey("RelationType")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("ChildNode");
-
-                    b.Navigation("ParentNode");
-
-                    b.Navigation("RelationTypeDto");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.Webhook2ContentTypeKeysDto", b =>
