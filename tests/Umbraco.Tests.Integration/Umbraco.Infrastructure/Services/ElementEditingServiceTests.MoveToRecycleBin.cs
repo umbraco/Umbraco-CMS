@@ -104,7 +104,7 @@ public partial class ElementEditingServiceTests
         var referencedElement = await CreateInvariantElement(contentTypeKey: elementType.Key);
 
         // Set up a relation where referencingElement references referencedElement.
-        RelationService.Relate(
+        await RelationService.RelateAsync(
             referencingElement.Id,
             referencedElement.Id,
             Constants.Conventions.RelationTypes.RelatedDocumentAlias);
@@ -133,7 +133,7 @@ public partial class ElementEditingServiceTests
         var referencedElement = await CreateInvariantElement(contentTypeKey: elementType.Key);
 
         // Set up a relation where referencingElement references referencedElement.
-        RelationService.Relate(
+        await RelationService.RelateAsync(
             referencingElement.Id,
             referencedElement.Id,
             Constants.Conventions.RelationTypes.RelatedDocumentAlias);

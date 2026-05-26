@@ -39,7 +39,7 @@ export default class UmbTiptapBlockPickerToolbarExtension extends UmbTiptapToolb
 			return;
 		}
 
-		let createPath: string | undefined = undefined;
+		let createPath: string | undefined;
 
 		if (this.#blocks?.length === 1) {
 			const elementKey = this.#blocks[0].contentElementTypeKey;

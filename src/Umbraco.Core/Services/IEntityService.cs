@@ -506,6 +506,11 @@ public interface IEntityService
     IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params Guid[] keys);
 
     /// <summary>
+    ///     Gets paths for entities.
+    /// </summary>
+    IEnumerable<TreeEntityPath> GetAllPaths(IEnumerable<UmbracoObjectTypes> objectTypes, params Guid[] keys);
+
+    /// <summary>
     ///     Reserves an identifier for a key.
     /// </summary>
     /// <param name="key">They key.</param>

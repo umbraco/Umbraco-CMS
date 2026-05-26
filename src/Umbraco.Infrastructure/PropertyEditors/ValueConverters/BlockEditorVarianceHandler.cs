@@ -123,7 +123,12 @@ public sealed class BlockEditorVarianceHandler
     /// <param name="element">The block element containing the property.</param>
     /// <returns>A task representing the asynchronous operation, with a result containing the aligned <see cref="BlockItemVariation"/> instances for the specified block element.</returns>
     /// <remarks>
-    /// Used for aligning block item variations according to variance (such as culture or segment) when rendering content.
+    /// <para>Used for aligning block item variations according to variance (such as culture or segment) when rendering content.</para>
+    /// <para>In case of mismatch in culture variation for block value variation:</para>
+    /// <list type="bullet">
+    /// <item><description>If the expected variation is by culture but all expose entries are invariant, assign the default culture.</description></item>
+    /// <item><description>If the expected variation is invariant but all expose entries have cultures, use the default culture entry as invariant.</description></item>
+    /// </list>
     /// </remarks>
     public async Task<IEnumerable<BlockItemVariation>> AlignedExposeVarianceAsync(BlockValue blockValue, IPublishedElement owner, IPublishedElement element)
     {
@@ -133,10 +138,9 @@ public sealed class BlockEditorVarianceHandler
             return blockVariations;
         }
 
-        // in case of mismatch in culture variation for block value variation:
-        // - if the expected variation is by culture, assign the default culture to all block variation
-        // - if the expected variation is not by culture, use all in block variation from the default culture as invariant
-
+        // In case of mismatch in culture variation for block value variation:
+        // - if the expected variation is by culture but all expose entries are invariant, assign the default culture
+        // - if the expected variation is invariant but all expose entries have cultures, use the default culture entry as invariant
         ContentVariation exposeVariation = owner.ContentType.Variations & element.ContentType.Variations;
         if (exposeVariation.VariesByCulture() && blockVariations.All(v => v.Culture is null))
         {

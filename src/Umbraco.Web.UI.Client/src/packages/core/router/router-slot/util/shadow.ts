@@ -37,5 +37,5 @@ export function queryParentRoots<T>($elem: Element, query: string, minRoots: num
 	}
 
 	// We continue the traversal if there was not matches
-	return queryParentRoots($rootRootNode.host, query, minRoots, ++roots);
+	return queryParentRoots($rootRootNode.host, query, minRoots, roots + 1);
 }

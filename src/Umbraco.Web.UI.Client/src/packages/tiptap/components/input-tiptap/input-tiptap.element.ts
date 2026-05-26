@@ -112,6 +112,13 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		await this.#loadEditor();
 	}
 
+	protected override updated(changedProperties: Map<string, unknown>) {
+		super.updated(changedProperties);
+		if (changedProperties.has('readonly')) {
+			this._editor?.setEditable(!this.readonly);
+		}
+	}
+
 	/**
 	 * Checks if the editor is empty.
 	 * @returns {boolean} returns true if the editor contains no markup
@@ -216,7 +223,10 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			onContentError: ({ error }) => {
 				console.error('contentError', [error.message, error.cause]);
 			},
-			onUpdate: ({ editor }) => {
+			onUpdate: ({ editor, transaction }) => {
+				// Tiptap also fires `update` for no-op transactions (e.g. setEditable),
+				// which would otherwise dirty the workspace with a phantom change.
+				if (!transaction.docChanged) return;
 				this.#value = editor.getHTML();
 				this._runValidators();
 				this.dispatchEvent(new UmbChangeEvent());
@@ -251,27 +261,25 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	#renderToolbar() {
-		if (!this.#hasToolbar) return;
+		if (!this.#hasToolbar || this.readonly) return;
 		return html`
 			<umb-tiptap-toolbar
 				data-mark="tiptap-toolbar"
 				.toolbar=${this._toolbar}
 				.editor=${this._editor}
-				.configuration=${this.configuration}
-				?readonly=${this.readonly}>
+				.configuration=${this.configuration}>
 			</umb-tiptap-toolbar>
 		`;
 	}
 
 	#renderStatusbar() {
-		if (!this.#hasStatusbar) return;
+		if (!this.#hasStatusbar || this.readonly) return;
 		return html`
 			<umb-tiptap-statusbar
 				data-mark="tiptap-statusbar"
 				.statusbar=${this._statusbar}
 				.editor=${this._editor}
 				.configuration=${this.configuration}
-				?readonly=${this.readonly}
 				${umbDestroyOnDisconnect()}>
 			</umb-tiptap-statusbar>
 		`;
@@ -304,8 +312,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 			}
 
 			:host([readonly]) {
-				pointer-events: none;
-
 				#editor {
 					background-color: var(--uui-color-surface-alt);
 				}

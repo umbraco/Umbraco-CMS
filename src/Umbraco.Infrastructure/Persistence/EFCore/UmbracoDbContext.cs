@@ -60,6 +60,18 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<NodeDto> Nodes { get; set; }
 
+    public required DbSet<LogDto> Logs { get; set; }
+
+    public required DbSet<UserDto> Users { get; set; }
+
+    public required DbSet<AuditEntryDto> AuditEntries { get; set; }
+
+    public required DbSet<LongRunningOperationDto> LongRunningOperations { get; set; }
+
+    public required DbSet<RelationDto> Relations { get; set; }
+
+    public required DbSet<RelationTypeDto> RelationTypes { get; set; }
+
     public required DbSet<ContentDto> Content { get; set; }
 
     public required DbSet<ContentVersionDto> ContentVersions { get; set; }

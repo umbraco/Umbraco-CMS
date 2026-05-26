@@ -254,7 +254,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 				@open=${() => this.#chooseBlock(block.contentElementTypeKey)}>
 				${when(
 					imgSrc,
-					(src) => html`<img src=${src} alt="" />`,
+					(src) => html`<img src=${src} alt="" decoding="async" />`,
 					() => html`<umb-icon name=${block.icon ?? ''} color=${ifDefined(block.iconColor)}></umb-icon>`,
 				)}
 				<slot name="actions" slot="actions"> </slot>

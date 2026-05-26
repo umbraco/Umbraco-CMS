@@ -1,4 +1,3 @@
-using System.Data;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -9,6 +8,7 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using IScopeProvider = Umbraco.Cms.Core.Scoping.EFCore.IScopeProvider;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
@@ -17,14 +17,14 @@ public class AuditEntryServiceTests
 {
     private static readonly Guid _testUserKey = Guid.NewGuid();
     private IAuditEntryService _auditEntryService;
-    private Mock<ICoreScopeProvider> _scopeProviderMock;
+    private Mock<IScopeProvider> _scopeProviderMock;
     private Mock<IAuditEntryRepository> _auditEntryRepositoryMock;
     private Mock<IUserIdKeyResolver> _userIdKeyResolverMock;
 
     [SetUp]
     public void Setup()
     {
-        _scopeProviderMock = new Mock<ICoreScopeProvider>(MockBehavior.Strict);
+        _scopeProviderMock = new Mock<IScopeProvider>(MockBehavior.Strict);
         _auditEntryRepositoryMock = new Mock<IAuditEntryRepository>(MockBehavior.Strict);
         _userIdKeyResolverMock = new Mock<IUserIdKeyResolver>(MockBehavior.Strict);
 
@@ -42,8 +42,9 @@ public class AuditEntryServiceTests
         SetupScopeProviderMock();
 
         var date = DateTime.UtcNow;
-        _auditEntryRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditEntry>()))
-            .Callback<IAuditEntry>(item =>
+        _auditEntryRepositoryMock
+            .Setup(x => x.SaveAsync(It.IsAny<IAuditEntry>(), It.IsAny<CancellationToken>()))
+            .Callback<IAuditEntry, CancellationToken>((item, _) =>
             {
                 Assert.AreEqual(Constants.Security.SuperUserId, item.PerformingUserId);
                 Assert.AreEqual(Constants.Security.SuperUserKey, item.PerformingUserKey);
@@ -55,7 +56,8 @@ public class AuditEntryServiceTests
                 Assert.AreEqual("affectedDetails", item.AffectedDetails);
                 Assert.AreEqual("umbraco/test", item.EventType);
                 Assert.AreEqual("eventDetails", item.EventDetails);
-            });
+            })
+            .Returns(Task.CompletedTask);
         _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
             .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserId));
 
@@ -69,7 +71,9 @@ public class AuditEntryServiceTests
             "umbraco/test",
             "eventDetails");
 
-        _auditEntryRepositoryMock.Verify(x => x.Save(It.IsAny<IAuditEntry>()), Times.Once);
+        _auditEntryRepositoryMock.Verify(
+            x => x.SaveAsync(It.IsAny<IAuditEntry>(), It.IsAny<CancellationToken>()),
+            Times.Once);
 
         Assert.NotNull(result);
         Assert.Multiple(() =>
@@ -142,13 +146,8 @@ public class AuditEntryServiceTests
 
     private void SetupScopeProviderMock() =>
         _scopeProviderMock
-            .Setup(x => x.CreateCoreScope(
-                It.IsAny<IsolationLevel>(),
+            .Setup(x => x.CreateScope(
                 It.IsAny<RepositoryCacheMode>(),
-                It.IsAny<IEventDispatcher>(),
-                It.IsAny<IScopedNotificationPublisher>(),
-                It.IsAny<bool?>(),
-                It.IsAny<bool>(),
-                It.IsAny<bool>()))
-            .Returns(Mock.Of<IScope>());
+                It.IsAny<bool?>()))
+            .Returns(Mock.Of<ICoreScope>());
 }

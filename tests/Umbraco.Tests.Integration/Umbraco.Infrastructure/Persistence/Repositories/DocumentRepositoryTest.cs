@@ -78,7 +78,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         _contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
         _contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> (_textpage.Id)
         _textpage = ContentBuilder.CreateSimpleContent(_contentType);
@@ -137,9 +137,9 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         var languageRepository =
             new LanguageRepository(efCoreScopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
-        var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        var relationTypeRepository = new RelationTypeRepository(efCoreScopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
-        var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        var relationRepository = new RelationRepository(efCoreScopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var propertyEditors =
             new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
         var dataValueReferences =
@@ -158,6 +158,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             propertyEditors,
             dataValueReferences,
             DataTypeService,
+            IdKeyMap,
             ConfigurationEditorJsonSerializer,
             Mock.Of<IEventAggregator>(),
             Mock.Of<IRepositoryCacheVersionService>(),
@@ -907,7 +908,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             p.Variations = ContentVariation.Nothing;
         }
 
-        ContentTypeService.Save(invariantCt);
+        await ContentTypeService.CreateAsync(invariantCt, Constants.Security.SuperUserKey);
 
         // One variant (by culture) content type named "umbVariantTextPage"
         // with properties, every 2nd one being variant (by culture), the other being invariant
@@ -920,11 +921,11 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             p.Variations = i % 2 == 0 ? ContentVariation.Culture : ContentVariation.Nothing;
         }
 
-        ContentTypeService.Save(variantCt);
+        await ContentTypeService.CreateAsync(variantCt, Constants.Security.SuperUserKey);
 
         invariantCt.AllowedContentTypes =
             new[] { new ContentTypeSort(invariantCt.Key, 0, invariantCt.Alias), new ContentTypeSort(variantCt.Key, 1, variantCt.Alias) };
-        ContentTypeService.Save(invariantCt);
+        await ContentTypeService.CreateAsync(invariantCt, Constants.Security.SuperUserKey);
 
         // Create content
         var root = ContentBuilder.CreateSimpleContent(invariantCt);

@@ -2,15 +2,12 @@
 // See LICENSE for more details.
 
 using System.Linq;
-using Microsoft.Extensions.Logging;
-using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -23,47 +20,47 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
     private IRelationType _relateContentToMedia;
 
     [SetUp]
-    public void SetUp() => CreateTestData();
+    public async Task SetUp() => await CreateTestDataAsync();
 
-    private RelationTypeRepository CreateRepository(ICoreScopeProvider provider) =>
-        new((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+    private RelationTypeRepository CreateRepository() =>
+        (RelationTypeRepository)GetRequiredService<IRelationTypeRepository>();
 
     [Test]
-    public void Can_Perform_Add_On_RelationTypeRepository()
+    public async Task Can_Perform_Add_On_RelationTypeRepository()
     {
         // Arrange
         ICoreScopeProvider provider = ScopeProvider;
         using (provider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
             var relateMemberToContent = new RelationType("Relate Member to Content", "relateMemberToContent", true, Constants.ObjectTypes.Member, Constants.ObjectTypes.Document, true);
 
-            repository.Save(relateMemberToContent);
+            await repository.SaveAsync(relateMemberToContent, CancellationToken.None);
 
             // Assert
             Assert.That(relateMemberToContent.HasIdentity, Is.True);
-            Assert.That(repository.Exists(relateMemberToContent.Id), Is.True);
+            Assert.That(await repository.ExistsAsync(relateMemberToContent.Id, CancellationToken.None), Is.True);
         }
     }
 
     [Test]
-    public void Can_Perform_Update_On_RelationTypeRepository()
+    public async Task Can_Perform_Update_On_RelationTypeRepository()
     {
         // Arrange
         ICoreScopeProvider provider = ScopeProvider;
         using (provider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var relationType = repository.Get(3);
+            var relationType = await repository.GetAsync(3, CancellationToken.None);
             relationType.Alias += "Updated";
             relationType.Name += " Updated";
-            repository.Save(relationType);
+            await repository.SaveAsync(relationType, CancellationToken.None);
 
-            var relationTypeUpdated = repository.Get(3);
+            var relationTypeUpdated = await repository.GetAsync(3, CancellationToken.None);
 
             // Assert
             Assert.That(relationTypeUpdated, Is.Not.Null);
@@ -74,19 +71,19 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Delete_On_RelationTypeRepository()
+    public async Task Can_Perform_Delete_On_RelationTypeRepository()
     {
         // Arrange
         ICoreScopeProvider provider = ScopeProvider;
         using (provider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var relationType = repository.Get(3);
-            repository.Delete(relationType);
+            var relationType = await repository.GetAsync(3, CancellationToken.None);
+            await repository.DeleteAsync(relationType, CancellationToken.None);
 
-            var exists = repository.Exists(3);
+            var exists = await repository.ExistsAsync(3, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.False);
@@ -94,16 +91,16 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Get_On_RelationTypeRepository()
+    public async Task Can_Perform_Get_On_RelationTypeRepository()
     {
         // Arrange
         ICoreScopeProvider provider = ScopeProvider;
         using (provider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var relationType = repository.Get(_relateContentToMedia.Id) as IRelationTypeWithIsDependency;
+            var relationType = await repository.GetAsync(_relateContentToMedia.Id, CancellationToken.None) as IRelationTypeWithIsDependency;
 
             // Assert
             Assert.That(relationType, Is.Not.Null);
@@ -118,16 +115,16 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_GetAll_On_RelationTypeRepository()
+    public async Task Can_Perform_GetAll_On_RelationTypeRepository()
     {
         // Arrange
         ICoreScopeProvider provider = ScopeProvider;
         using (provider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var relationTypes = repository.GetMany().ToArray();
+            var relationTypes = (await repository.GetAllAsync(CancellationToken.None)).ToArray();
 
             // Assert
             Assert.That(relationTypes, Is.Not.Null);
@@ -137,16 +134,16 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_GetAll_With_Params_On_RelationTypeRepository()
+    public async Task Can_Perform_GetMany_On_RelationTypeRepository()
     {
         // Arrange
         ICoreScopeProvider provider = ScopeProvider;
         using (provider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var relationTypes = repository.GetMany(2, 3).ToArray();
+            var relationTypes = (await repository.GetManyAsync(new[] { 2, 3 }, CancellationToken.None)).ToArray();
 
             // Assert
             Assert.That(relationTypes, Is.Not.Null);
@@ -157,17 +154,17 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Exists_On_RelationTypeRepository()
+    public async Task Can_Perform_Exists_On_RelationTypeRepository()
     {
         // Arrange
         ICoreScopeProvider provider = ScopeProvider;
         using (provider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var exists = repository.Exists(3);
-            var doesntExist = repository.Exists(99);
+            var exists = await repository.ExistsAsync(3, CancellationToken.None);
+            var doesntExist = await repository.ExistsAsync(99, CancellationToken.None);
 
             // Assert
             Assert.That(exists, Is.True);
@@ -176,46 +173,44 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Count_On_RelationTypeRepository()
+    public async Task Can_Get_By_Alias_On_RelationTypeRepository()
     {
         // Arrange
         ICoreScopeProvider provider = ScopeProvider;
         using (var scope = provider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var query = provider.CreateQuery<IRelationType>().Where(x => x.Alias.StartsWith("relate"));
-            var count = repository.Count(query);
+            var result = await repository.GetByAliasAsync("relateContentToMedia");
 
             // Assert
-            Assert.That(count, Is.EqualTo(8));
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Alias, Is.EqualTo("relateContentToMedia"));
+            Assert.That(result.ChildObjectType, Is.EqualTo(Constants.ObjectTypes.Media));
         }
     }
 
     [Test]
-    public void Can_Perform_GetByQuery_On_RelationTypeRepository()
+    public async Task Can_Get_By_Key_On_RelationTypeRepository()
     {
         // Arrange
         ICoreScopeProvider provider = ScopeProvider;
         using (var scope = provider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
 
             // Act
-            var childObjType = Constants.ObjectTypes.DocumentType;
-            var query = provider.CreateQuery<IRelationType>().Where(x => x.ChildObjectType == childObjType);
-            var result = repository.Get(query).ToArray();
+            var result = await repository.GetAsync(_relateContentToMedia.Key);
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Any(), Is.True);
-            Assert.That(result.Any(x => x == null), Is.False);
-            Assert.That(result.Count(), Is.EqualTo(1));
+            Assert.That(result.Id, Is.EqualTo(_relateContentToMedia.Id));
+            Assert.That(result.Alias, Is.EqualTo("relateContentToMedia"));
         }
     }
 
-    public void CreateTestData()
+    public async Task CreateTestDataAsync()
     {
         var relateContent = new RelationType(
             "Relate Content on Copy",
@@ -242,14 +237,67 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
         ICoreScopeProvider provider = ScopeProvider;
         using (var scope = provider.CreateCoreScope())
         {
-            var repository = new RelationTypeRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            var repository = GetRequiredService<IRelationTypeRepository>();
 
-            repository.Save(relateContent);
-            repository.Save(relateContentType);
-            repository.Save(relateContentMedia);
+            await repository.SaveAsync(relateContent, CancellationToken.None);
+            await repository.SaveAsync(relateContentType, CancellationToken.None);
+            await repository.SaveAsync(relateContentMedia, CancellationToken.None);
             scope.Complete();
         }
 
         _relateContentToMedia = relateContentMedia;
+    }
+
+    [Test]
+    public async Task Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        using (ScopeProvider.CreateCoreScope())
+        {
+            var repository = CreateRepository();
+            var relationType = new RelationType("Test Clone", "testClone", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
+            await repository.SaveAsync(relationType, CancellationToken.None);
+
+            var first = await repository.GetAsync(relationType.Key, CancellationToken.None);
+            var second = await repository.GetAsync(relationType.Key, CancellationToken.None);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public async Task Exists_By_Guid_Returns_Correct_Result()
+    {
+        using (ScopeProvider.CreateCoreScope())
+        {
+            var repository = CreateRepository();
+            var relationType = new RelationType("Test Exists", "testExists", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
+            await repository.SaveAsync(relationType, CancellationToken.None);
+
+            Assert.IsTrue(await repository.ExistsAsync(relationType.Id, CancellationToken.None));
+            Assert.IsNull(await repository.GetAsync(Guid.NewGuid(), CancellationToken.None));
+        }
+    }
+
+    [Test]
+    public async Task Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        using (ScopeProvider.CreateCoreScope())
+        {
+            var repository = CreateRepository();
+            var relationType = new RelationType("Test Mutation", "testMutation", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
+            await repository.SaveAsync(relationType, CancellationToken.None);
+
+            var first = await repository.GetAsync(relationType.Key, CancellationToken.None);
+            Assert.IsNotNull(first);
+            var originalName = first!.Name;
+            first.Name = "MUTATED_" + Guid.NewGuid();
+
+            var second = await repository.GetAsync(relationType.Key, CancellationToken.None);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
+        }
     }
 }

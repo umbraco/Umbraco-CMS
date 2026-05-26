@@ -14,6 +14,8 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Attributes;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -43,11 +45,9 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
+    private IStylesheetService StylesheetService => GetRequiredService<IStylesheetService>();
 
     private IDictionaryItemService DictionaryItemService => GetRequiredService<IDictionaryItemService>();
-
-    private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
 
     private IEntityXmlSerializer EntityXmlSerializer => GetRequiredService<IEntityXmlSerializer>();
 
@@ -67,15 +67,18 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
         ContentService,
         ContentTypeService,
         DataTypeService,
-        FileService,
-        LocalizationService,
+        TemplateService,
+        StylesheetService,
+        GetRequiredService<ILanguageRepository>(),
+        GetRequiredService<IDictionaryRepository>(),
+        GetRequiredService<IScopeProvider>(),
         HostingEnvironment,
         EntityXmlSerializer,
-        Options.Create(new GlobalSettings()),
         MediaService,
         MediaTypeService,
         MediaFileManager,
         FileSystems,
+        GetRequiredService<IIdKeyMap>(),
         "createdPackages.config",
 
         // temp paths
@@ -213,10 +216,10 @@ internal sealed class CreatedPackagesRepositoryTests : UmbracoIntegrationTest
 
     [Test]
     [LongRunning]
-    public void Export_Zip()
+    public async Task Export_Zip()
     {
         var mt = MediaTypeBuilder.CreateImageMediaType("testImage");
-        MediaTypeService.Save(mt);
+        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var m1 = MediaBuilder.CreateMediaFile(mt, -1);
         MediaService.Save(m1);
 

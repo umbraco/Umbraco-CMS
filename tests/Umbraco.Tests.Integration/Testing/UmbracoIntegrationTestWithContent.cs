@@ -23,8 +23,6 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
 
     protected IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
-    protected IFileService FileService => GetRequiredService<IFileService>();
-
     protected ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     protected ContentService ContentService => (ContentService)GetRequiredService<IContentService>();
@@ -53,7 +51,7 @@ public abstract class UmbracoIntegrationTestWithContent : UmbracoIntegrationTest
         ContentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
         ContentType.Key = new Guid(TextpageContentTypeKey);
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> 1053
         Textpage = ContentBuilder.CreateSimpleContent(ContentType, "Textpage");

@@ -194,14 +194,19 @@ public class ContentTypeEditingBuilder : ContentTypeEditingBaseBuilder<ContentTy
             .Build();
     }
 
-    public static ContentTypeCreateModel CreateContentTypeWithTwoPropertiesOneVariantAndOneInvariant(string alias = "test", string name = "TestName", string variantPropertyAlias = "variant", string variantPropertyName = "Variant", string invariantAlias = "invariant", string invariantName = "Invariant")
+    public static ContentTypeCreateModel CreateContentTypeWithTwoPropertiesOneVariantAndOneInvariant(
+        string alias = "test",
+        string name = "TestName",
+        string variantPropertyAlias = "variant",
+        string variantPropertyName = "Variant",
+        string invariantAlias = "invariant",
+        string invariantName = "Invariant",
+        bool isElement = false)
     {
         var containerKey = Guid.NewGuid();
-        var builder = new ContentTypeEditingBuilder();
-        return (ContentTypeCreateModel)builder
+        var builder = new ContentTypeEditingBuilder()
             .WithAlias(alias)
             .WithName(name)
-            .WithAllowAsRoot(true)
             .WithVariesByCulture(true)
             .AddPropertyGroup()
                 .WithName("Content")
@@ -217,7 +222,19 @@ public class ContentTypeEditingBuilder : ContentTypeEditingBaseBuilder<ContentTy
                 .WithAlias(invariantAlias)
                 .WithName(invariantName)
                 .WithContainerKey(containerKey)
-                .Done()
-            .Build();
+                .Done();
+
+        if (isElement)
+        {
+            builder
+                .WithIsElement(true)
+                .WithAllowedInLibrary(true);
+        }
+        else
+        {
+            builder.WithAllowAsRoot(true);
+        }
+
+        return (ContentTypeCreateModel)builder.Build();
     }
 }

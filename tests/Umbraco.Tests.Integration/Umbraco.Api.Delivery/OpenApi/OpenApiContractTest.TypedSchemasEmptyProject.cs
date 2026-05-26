@@ -1,0 +1,53 @@
+using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Api.Delivery.OpenApi;
+
+/// <summary>
+/// Tests the OpenAPI contract with <see cref="DeliveryApiSettings.OpenApiSettings.GenerateContentTypeSchemas"/> enabled.
+/// This produces typed schemas including Umbraco's built-in media types (File, Folder, Image, etc.).
+/// </summary>
+[TestFixture]
+internal sealed class OpenApiContractTestTypedSchemasEmptyProject : OpenApiContractTestBase
+{
+    private const string ExpectedContractFileName = "typed-schemas-empty-project.json";
+
+    public override void Setup()
+    {
+        // Enable content type schema generation
+        InMemoryConfiguration[$"{Constants.Configuration.ConfigDeliveryApi}:OpenApi:GenerateContentTypeSchemas"] = "true";
+        base.Setup();
+    }
+
+    [Test]
+    public async Task OpenApiDocument_IsValid()
+    {
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        await ValidateOpenApiSpecAsync(openApiSpec);
+    }
+
+    [Test]
+    public async Task OpenApiContract_MatchesExpected()
+    {
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        await ValidateContractAsync(openApiSpec, ExpectedContractFileName);
+    }
+
+    [Test]
+    public async Task OpenApiContract_HasExpectedSchemas()
+    {
+        var openApiSpec = await FetchOpenApiSpecAsync();
+        var openApiDocument = ParseOpenApiSpec(openApiSpec);
+
+        // Verify built-in media types are present in the schema
+        AssertSchemaExists(openApiDocument, "ImageMediaWithCropsResponseModel");
+        AssertSchemaExists(openApiDocument, "FileMediaWithCropsResponseModel");
+        AssertSchemaExists(openApiDocument, "FolderMediaWithCropsResponseModel");
+
+        // Verify the properties models for built-in media types
+        AssertSchemaExists(openApiDocument, "ImageMediaPropertiesModel");
+        AssertSchemaExists(openApiDocument, "FileMediaPropertiesModel");
+        AssertSchemaExists(openApiDocument, "FolderMediaPropertiesModel");
+    }
+}

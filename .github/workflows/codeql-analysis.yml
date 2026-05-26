@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # We use the setup-dotnet action to set up .NET Core, otherwise the CodeQL CLI will not work with preview versions.
       - name: Setup .NET from global.json

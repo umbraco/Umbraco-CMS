@@ -25,7 +25,12 @@ export class UmbPropertyEditorUIOverlaySizeElement extends UmbLitElement impleme
 	];
 
 	@property({ attribute: false })
-	public config?: UmbPropertyEditorConfigCollection;
+	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
+		const defaultOptionLabel = config?.getValueByAlias<string>('defaultOptionLabel') ?? 'Default';
+		this._list = this._list.map((option) =>
+			option.value === undefined ? { ...option, name: defaultOptionLabel } : option,
+		);
+	}
 
 	override firstUpdated() {
 		if (!this.value) return;

@@ -14,431 +14,226 @@ namespace Umbraco.Cms.Core.Services;
 public interface IRelationService : IService
 {
     /// <summary>
-    ///     Gets a <see cref="IRelation" /> by its Id
+    ///     Gets a <see cref="IRelation" /> by its Id.
     /// </summary>
-    /// <param name="id">Id of the <see cref="IRelation" /></param>
-    /// <returns>A <see cref="IRelation" /> object</returns>
-    IRelation? GetById(int id);
+    Task<IRelation?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets a <see cref="IRelationType" /> by its Id
+    ///     Gets a <see cref="IRelationType" /> by its Id.
     /// </summary>
-    /// <param name="id">Id of the <see cref="IRelationType" /></param>
-    /// <returns>A <see cref="IRelationType" /> object</returns>
-    IRelationType? GetRelationTypeById(int id);
+    Task<IRelationType?> GetRelationTypeByIdAsync(int id, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets a <see cref="IRelationType" /> by its Id
+    ///     Gets a <see cref="IRelationType" /> by its key.
     /// </summary>
-    /// <param name="id">Id of the <see cref="IRelationType" /></param>
-    /// <returns>A <see cref="IRelationType" /> object</returns>
-    IRelationType? GetRelationTypeById(Guid id);
+    Task<IRelationType?> GetRelationTypeByKeyAsync(Guid key, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets a <see cref="IRelationType" /> by its Alias
+    ///     Gets a <see cref="IRelationType" /> by its Alias.
     /// </summary>
-    /// <param name="alias">Alias of the <see cref="IRelationType" /></param>
-    /// <returns>A <see cref="IRelationType" /> object</returns>
-    IRelationType? GetRelationTypeByAlias(string alias);
+    Task<IRelationType?> GetRelationTypeByAliasAsync(string alias, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets all <see cref="IRelation" /> objects
+    ///     Gets all <see cref="IRelation" /> objects.
     /// </summary>
-    /// <param name="ids">Optional array of integer ids to return relations for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation> GetAllRelations(params int[] ids);
+    /// <param name="ids">Optional array of identifiers to filter on. Pass an empty array for all relations.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task<IEnumerable<IRelation>> GetAllRelationsAsync(int[] ids, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets all <see cref="IRelation" /> objects by their <see cref="IRelationType" />
+    ///     Gets all <see cref="IRelation" /> objects for the given <see cref="IRelationType" /> id.
     /// </summary>
-    /// <param name="relationType"><see cref="IRelation" /> to retrieve Relations for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation>? GetAllRelationsByRelationType(IRelationType relationType);
+    Task<IEnumerable<IRelation>> GetAllRelationsByRelationTypeAsync(int relationTypeId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets all <see cref="IRelation" /> objects by their <see cref="IRelationType" />'s Id
+    ///     Gets all <see cref="IRelationType" /> objects.
     /// </summary>
-    /// <param name="relationTypeId">Id of the <see cref="IRelationType" /> to retrieve Relations for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation>? GetAllRelationsByRelationType(int relationTypeId);
+    /// <param name="ids">Optional array of identifiers to filter on. Pass an empty array for all relation types.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    Task<IEnumerable<IRelationType>> GetAllRelationTypesAsync(int[] ids, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets all <see cref="IRelation" /> objects
+    ///     Gets a list of <see cref="IRelation" /> objects by their parent id, optionally filtered by relation type alias.
     /// </summary>
-    /// <param name="ids">Optional array of integer ids to return relationtypes for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelationType> GetAllRelationTypes(params int[] ids);
+    Task<IEnumerable<IRelation>> GetByParentIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by their parent Id
+    ///     Gets a list of <see cref="IRelation" /> objects by their child id, optionally filtered by relation type alias.
     /// </summary>
-    /// <param name="id">Id of the parent to retrieve relations for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation>? GetByParentId(int id);
+    Task<IEnumerable<IRelation>> GetByChildIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by their parent Id
+    ///     Gets a list of <see cref="IRelation" /> objects by parent or child id, optionally filtered by relation type alias.
     /// </summary>
-    /// <param name="id">Id of the parent to retrieve relations for</param>
-    /// <param name="relationTypeAlias">Alias of the type of relation to retrieve</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation>? GetByParentId(int id, string relationTypeAlias);
+    Task<IEnumerable<IRelation>> GetByParentOrChildIdAsync(int id, string? relationTypeAlias = null, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by their parent entity
+    ///     Gets a relation by the unique combination of parent id, child id, and relation type.
     /// </summary>
-    /// <param name="parent">Parent Entity to retrieve relations for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation>? GetByParent(IUmbracoEntity parent);
+    Task<IRelation?> GetByParentAndChildIdAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by their parent entity
+    ///     Gets a list of <see cref="IRelation" /> objects by the name of the relation type.
     /// </summary>
-    /// <param name="parent">Parent Entity to retrieve relations for</param>
-    /// <param name="relationTypeAlias">Alias of the type of relation to retrieve</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation> GetByParent(IUmbracoEntity parent, string relationTypeAlias);
+    Task<IEnumerable<IRelation>> GetByRelationTypeNameAsync(string relationTypeName, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by their child Id
+    ///     Gets a list of <see cref="IRelation" /> objects by the alias of the relation type.
     /// </summary>
-    /// <param name="id">Id of the child to retrieve relations for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation> GetByChildId(int id);
+    Task<IEnumerable<IRelation>> GetByRelationTypeAliasAsync(string relationTypeAlias, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by their child Id
+    ///     Gets a list of <see cref="IRelation" /> objects by the relation type id.
     /// </summary>
-    /// <param name="id">Id of the child to retrieve relations for</param>
-    /// <param name="relationTypeAlias">Alias of the type of relation to retrieve</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation> GetByChildId(int id, string relationTypeAlias);
+    Task<IEnumerable<IRelation>> GetByRelationTypeIdAsync(int relationTypeId, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by their child Entity
+    ///     Gets a paged result of <see cref="IRelation" /> filtered by relation type id.
     /// </summary>
-    /// <param name="child">Child Entity to retrieve relations for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation> GetByChild(IUmbracoEntity child);
+    Task<PagedModel<IRelation>> GetPagedByRelationTypeIdAsync(int relationTypeId, int skip, int take, Ordering? ordering = null, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by their child Entity
+    ///     Gets a paged result of <see cref="IRelation" />.
     /// </summary>
-    /// <param name="child">Child Entity to retrieve relations for</param>
-    /// <param name="relationTypeAlias">Alias of the type of relation to retrieve</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation> GetByChild(IUmbracoEntity child, string relationTypeAlias);
-
-    /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by their child or parent Id.
-    ///     Using this method will get you all relations regards of it being a child or parent relation.
-    /// </summary>
-    /// <param name="id">Id of the child or parent to retrieve relations for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation> GetByParentOrChildId(int id);
-
-    /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by their child or parent Id and relation type alias.
-    /// </summary>
-    /// <param name="id">Id of the child or parent to retrieve relations for.</param>
-    /// <param name="relationTypeAlias">Alias of the type of relation to retrieve.</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects.</returns>
-    IEnumerable<IRelation> GetByParentOrChildId(int id, string relationTypeAlias);
-
-    /// <summary>
-    ///     Gets a relation by the unique combination of parentId, childId and relationType.
-    /// </summary>
-    /// <param name="parentId">The id of the parent item.</param>
-    /// <param name="childId">The id of the child item.</param>
-    /// <param name="relationType">The RelationType.</param>
-    /// <returns>The relation or null</returns>
-    IRelation? GetByParentAndChildId(int parentId, int childId, IRelationType relationType);
-
-    /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by the Name of the <see cref="IRelationType" />
-    /// </summary>
-    /// <param name="relationTypeName">Name of the <see cref="IRelationType" /> to retrieve Relations for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation> GetByRelationTypeName(string relationTypeName);
-
-    /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by the Alias of the <see cref="IRelationType" />
-    /// </summary>
-    /// <param name="relationTypeAlias">Alias of the <see cref="IRelationType" /> to retrieve Relations for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation> GetByRelationTypeAlias(string relationTypeAlias);
-
-    /// <summary>
-    ///     Gets a list of <see cref="IRelation" /> objects by the Id of the <see cref="IRelationType" />
-    /// </summary>
-    /// <param name="relationTypeId">Id of the <see cref="IRelationType" /> to retrieve Relations for</param>
-    /// <returns>An enumerable list of <see cref="IRelation" /> objects</returns>
-    IEnumerable<IRelation>? GetByRelationTypeId(int relationTypeId);
-
-    /// <summary>
-    ///     Gets a paged result of <see cref="IRelation" />
-    /// </summary>
-    /// <param name="relationTypeId"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalRecords"></param>
-    /// <param name="ordering"></param>
-    /// <returns></returns>
-    IEnumerable<IRelation> GetPagedByRelationTypeId(int relationTypeId, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering = null);
-
-    /// <summary>
-    ///     Gets a paged result of <see cref="IRelation" />
-    /// </summary>
-    /// <param name="key"></param>
-    /// <param name="skip"></param>
-    /// <param name="take"></param>
-    /// <param name="ordering"></param>
-    /// <returns></returns>
     Task<Attempt<PagedModel<IRelation>, RelationOperationStatus>> GetPagedByRelationTypeKeyAsync(Guid key, int skip, int take, Ordering? ordering = null);
 
     /// <summary>
-    ///     Gets the Child object from a Relation as an <see cref="IUmbracoEntity" />
+    ///     Returns paged parent entities for a related child id.
     /// </summary>
-    /// <param name="relation">Relation to retrieve child object from</param>
-    /// <returns>An <see cref="IUmbracoEntity" /></returns>
-    IUmbracoEntity? GetChildEntityFromRelation(IRelation relation);
+    Task<PagedModel<IUmbracoEntity>> GetPagedParentEntitiesByChildIdAsync(int id, int skip, int take, UmbracoObjectTypes[]? entityTypes = null, CancellationToken cancellationToken = default);
 
     /// <summary>
-    ///     Gets the Parent object from a Relation as an <see cref="IUmbracoEntity" />
+    ///     Returns paged child entities for a related parent id.
     /// </summary>
-    /// <param name="relation">Relation to retrieve parent object from</param>
-    /// <returns>An <see cref="IUmbracoEntity" /></returns>
-    IUmbracoEntity? GetParentEntityFromRelation(IRelation relation);
-
-    /// <summary>
-    ///     Gets the Parent and Child objects from a Relation as a <see cref="Tuple" />"/> with <see cref="IUmbracoEntity" />.
-    /// </summary>
-    /// <param name="relation">Relation to retrieve parent and child object from</param>
-    /// <returns>Returns a Tuple with Parent (item1) and Child (item2)</returns>
-    Tuple<IUmbracoEntity, IUmbracoEntity>? GetEntitiesFromRelation(IRelation relation);
-
-    /// <summary>
-    ///     Gets the Child objects from a list of Relations as a list of <see cref="IUmbracoEntity" /> objects.
-    /// </summary>
-    /// <param name="relations">List of relations to retrieve child objects from</param>
-    /// <returns>An enumerable list of <see cref="IUmbracoEntity" /></returns>
-    IEnumerable<IUmbracoEntity> GetChildEntitiesFromRelations(IEnumerable<IRelation> relations);
-
-    /// <summary>
-    ///     Gets the Parent objects from a list of Relations as a list of <see cref="IUmbracoEntity" /> objects.
-    /// </summary>
-    /// <param name="relations">List of relations to retrieve parent objects from</param>
-    /// <returns>An enumerable list of <see cref="IUmbracoEntity" /></returns>
-    IEnumerable<IUmbracoEntity> GetParentEntitiesFromRelations(IEnumerable<IRelation> relations);
-
-    /// <summary>
-    ///     Returns paged parent entities for a related child id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalChildren"></param>
-    /// <param name="entityTypes"></param>
-    /// <returns>An enumerable list of <see cref="IUmbracoEntity" /></returns>
-    IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
-
-    /// <summary>
-    ///     Returns paged child entities for a related parent id
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="pageIndex"></param>
-    /// <param name="pageSize"></param>
-    /// <param name="totalChildren"></param>
-    /// <param name="entityTypes"></param>
-    /// <returns>An enumerable list of <see cref="IUmbracoEntity" /></returns>
-    IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int id, long pageIndex, int pageSize, out long totalChildren, params UmbracoObjectTypes[] entityTypes);
-
-    /// <summary>
-    ///     Gets the Parent and Child objects from a list of Relations as a list of <see cref="IUmbracoEntity" /> objects.
-    /// </summary>
-    /// <param name="relations">List of relations to retrieve parent and child objects from</param>
-    /// <returns>An enumerable list of <see cref="Tuple" /> with <see cref="IUmbracoEntity" /></returns>
-    IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations);
-
-    /// <summary>
-    ///     Relates two objects by their entity Ids.
-    /// </summary>
-    /// <param name="parentId">Id of the parent</param>
-    /// <param name="childId">Id of the child</param>
-    /// <param name="relationType">The type of relation to create</param>
-    /// <returns>The created <see cref="IRelation" /></returns>
-    IRelation Relate(int parentId, int childId, IRelationType relationType);
-
-    /// <summary>
-    ///     Relates two objects that are based on the <see cref="IUmbracoEntity" /> interface.
-    /// </summary>
-    /// <param name="parent">Parent entity</param>
-    /// <param name="child">Child entity</param>
-    /// <param name="relationType">The type of relation to create</param>
-    /// <returns>The created <see cref="IRelation" /></returns>
-    IRelation Relate(IUmbracoEntity parent, IUmbracoEntity child, IRelationType relationType);
-
-    /// <summary>
-    ///     Relates two objects by their entity Ids.
-    /// </summary>
-    /// <param name="parentId">Id of the parent</param>
-    /// <param name="childId">Id of the child</param>
-    /// <param name="relationTypeAlias">Alias of the type of relation to create</param>
-    /// <returns>The created <see cref="IRelation" /></returns>
-    IRelation Relate(int parentId, int childId, string relationTypeAlias);
-
-    /// <summary>
-    ///     Relates two objects that are based on the <see cref="IUmbracoEntity" /> interface.
-    /// </summary>
-    /// <param name="parent">Parent entity</param>
-    /// <param name="child">Child entity</param>
-    /// <param name="relationTypeAlias">Alias of the type of relation to create</param>
-    /// <returns>The created <see cref="IRelation" /></returns>
-    IRelation Relate(IUmbracoEntity parent, IUmbracoEntity child, string relationTypeAlias);
-
-    /// <summary>
-    ///     Checks whether any relations exists for the passed in <see cref="IRelationType" />.
-    /// </summary>
-    /// <param name="relationType"><see cref="IRelationType" /> to check for relations</param>
-    /// <returns>
-    ///     Returns <c>True</c> if any relations exists for the given <see cref="IRelationType" />, otherwise <c>False</c>
-    /// </returns>
-    bool HasRelations(IRelationType relationType);
-
-    /// <summary>
-    ///     Checks whether any relations exists for the passed in Id and direction.
-    /// </summary>
-    /// <param name="id">Id of an object to check relations for</param>
-    /// <param name="directionFilter">Indicates whether to check for relations as parent, child or in either direction.</param>
-    /// <param name="includeRelationTypeIds">A collection of relation type Ids to include consideration in the relation checks.</param>
-    /// <param name="excludeRelationTypeIds">A collection of relation type Ids to exclude from consideration in the relation checks.</param>
-    /// <remarks>If no relation type Ids are provided in includeRelationTypeIds or excludeRelationTypeIds, all relation type Ids are considered.</remarks>
-    /// <returns>Returns <c>True</c> if any relations exists with the given Id, otherwise <c>False</c>.</returns>
-    bool IsRelated(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null);
-
-    /// <summary>
-    ///     Checks whether two items are related
-    /// </summary>
-    /// <param name="parentId">Id of the Parent relation</param>
-    /// <param name="childId">Id of the Child relation</param>
-    /// <returns>Returns <c>True</c> if any relations exists with the given Ids, otherwise <c>False</c></returns>
-    bool AreRelated(int parentId, int childId);
-
-    /// <summary>
-    ///     Checks whether two items are related
-    /// </summary>
-    /// <param name="parent">Parent entity</param>
-    /// <param name="child">Child entity</param>
-    /// <returns>Returns <c>True</c> if any relations exist between the entities, otherwise <c>False</c></returns>
-    bool AreRelated(IUmbracoEntity parent, IUmbracoEntity child);
-
-    /// <summary>
-    ///     Checks whether two items are related
-    /// </summary>
-    /// <param name="parent">Parent entity</param>
-    /// <param name="child">Child entity</param>
-    /// <param name="relationTypeAlias">Alias of the type of relation to create</param>
-    /// <returns>Returns <c>True</c> if any relations exist between the entities, otherwise <c>False</c></returns>
-    bool AreRelated(IUmbracoEntity parent, IUmbracoEntity child, string relationTypeAlias);
-
-    /// <summary>
-    ///     Checks whether two items are related
-    /// </summary>
-    /// <param name="parentId">Id of the Parent relation</param>
-    /// <param name="childId">Id of the Child relation</param>
-    /// <param name="relationTypeAlias">Alias of the type of relation to create</param>
-    /// <returns>Returns <c>True</c> if any relations exist between the entities, otherwise <c>False</c></returns>
-    bool AreRelated(int parentId, int childId, string relationTypeAlias);
-
-    /// <summary>
-    ///     Saves a <see cref="IRelation" />
-    /// </summary>
-    /// <param name="relation">Relation to save</param>
-    void Save(IRelation relation);
-
-    /// <summary>
-    ///     Saves a collection of <see cref="IRelation" /> objects.
-    /// </summary>
-    /// <param name="relations">The collection of relations to save.</param>
-    void Save(IEnumerable<IRelation> relations);
-
-    /// <summary>
-    ///     Saves a <see cref="IRelationType" />
-    /// </summary>
-    /// <param name="relationType">RelationType to Save</param>
-    void Save(IRelationType relationType);
-
-    /// <summary>
-    ///     Saves a <see cref="IRelationType" />
-    /// </summary>
-    /// <param name="relationType">RelationType to Save</param>
-    /// <param name="userKey">Key of the user thats saving the relation type</param>
-    /// <returns>A <see cref="Attempt"/> with a status of whether the operations was a success or failure</returns>
-    Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, Guid userKey);
-
-    /// <summary>
-    ///     Saves a <see cref="IRelationType" />
-    /// </summary>
-    /// <param name="relationType">RelationType to Save</param>
-    /// <param name="userKey">Key of the user thats saving the relation type</param>
-    /// <returns>A <see cref="Attempt"/> with a status of whether the operations was a success or failure</returns>
-    Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, Guid userKey);
-
-    /// <summary>
-    ///     Deletes a <see cref="IRelation" />
-    /// </summary>
-    /// <param name="relation">Relation to Delete</param>
-    void Delete(IRelation relation);
-
-    /// <summary>
-    ///     Deletes a <see cref="IRelationType" />
-    /// </summary>
-    /// <param name="relationType">RelationType to Delete</param>
-    void Delete(IRelationType relationType);
-
-    /// <summary>
-    ///     Deletes a <see cref="IRelationType" />
-    /// </summary>
-    /// <param name="key">Key of the relation type to delete</param>
-    /// <param name="userKey">Key of the user that is deleting the relation type</param>
-    /// <returns><placeholder>A <see cref="Task"/> representing the asynchronous operation.</placeholder></returns>
-    Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, Guid userKey);
-
-    /// <summary>
-    ///     Deletes all <see cref="IRelation" /> objects based on the passed in <see cref="IRelationType" />
-    /// </summary>
-    /// <param name="relationType"><see cref="IRelationType" /> to Delete Relations for</param>
-    void DeleteRelationsOfType(IRelationType relationType);
-
-    /// <summary>
-    ///     Gets all allowed parent/child object types for a given <see cref="IRelationType" /> />
-    /// </summary>
-    /// <returns>All of the allowed <see cref="UmbracoObjectTypes"/>.</returns>
-    IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes();
+    Task<PagedModel<IUmbracoEntity>> GetPagedChildEntitiesByParentIdAsync(int id, int skip, int take, UmbracoObjectTypes[]? entityTypes = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets a paged result of <see cref="IRelation" /> objects by child key.
     /// </summary>
-    /// <param name="childKey">The unique key of the child entity.</param>
-    /// <param name="skip">The number of items to skip.</param>
-    /// <param name="take">The number of items to take.</param>
-    /// <param name="relationTypeAlias">Optional alias of the relation type to filter by.</param>
-    /// <returns>A paged model containing the relations.</returns>
     Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias);
+
+    /// <summary>
+    ///     Gets the Child object from a Relation as an <see cref="IUmbracoEntity" />.
+    /// </summary>
+    IUmbracoEntity? GetChildEntityFromRelation(IRelation relation);
+
+    /// <summary>
+    ///     Gets the Parent object from a Relation as an <see cref="IUmbracoEntity" />.
+    /// </summary>
+    IUmbracoEntity? GetParentEntityFromRelation(IRelation relation);
+
+    /// <summary>
+    ///     Gets the Parent and Child objects from a Relation as a tuple.
+    /// </summary>
+    Tuple<IUmbracoEntity, IUmbracoEntity>? GetEntitiesFromRelation(IRelation relation);
+
+    /// <summary>
+    ///     Gets the Child objects from a list of Relations.
+    /// </summary>
+    IEnumerable<IUmbracoEntity> GetChildEntitiesFromRelations(IEnumerable<IRelation> relations);
+
+    /// <summary>
+    ///     Gets the Parent objects from a list of Relations.
+    /// </summary>
+    IEnumerable<IUmbracoEntity> GetParentEntitiesFromRelations(IEnumerable<IRelation> relations);
+
+    /// <summary>
+    ///     Gets the Parent and Child objects from a list of Relations.
+    /// </summary>
+    IEnumerable<Tuple<IUmbracoEntity, IUmbracoEntity>> GetEntitiesFromRelations(IEnumerable<IRelation> relations);
+
+    /// <summary>
+    ///     Relates two objects by their entity ids.
+    /// </summary>
+    Task<IRelation> RelateAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Relates two objects by their entity ids using a relation type alias.
+    /// </summary>
+    Task<IRelation> RelateAsync(int parentId, int childId, string relationTypeAlias, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Checks whether any relations exist for the passed in <see cref="IRelationType" />.
+    /// </summary>
+    Task<bool> HasRelationsAsync(IRelationType relationType, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Checks whether any relations exist for the passed in id and direction.
+    /// </summary>
+    Task<bool> IsRelatedAsync(int id, RelationDirectionFilter directionFilter, int[]? includeRelationTypeIds = null, int[]? excludeRelationTypeIds = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Checks whether two items are related.
+    /// </summary>
+    Task<bool> AreRelatedAsync(int parentId, int childId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Checks whether two items are related under a specific relation type alias.
+    /// </summary>
+    Task<bool> AreRelatedAsync(int parentId, int childId, string relationTypeAlias, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Checks whether two items are related under a specific relation type.
+    /// </summary>
+    Task<bool> AreRelatedAsync(int parentId, int childId, IRelationType relationType, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Saves a <see cref="IRelation" />.
+    /// </summary>
+    Task SaveAsync(IRelation relation, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Saves a collection of <see cref="IRelation" /> objects.
+    /// </summary>
+    Task SaveAsync(IEnumerable<IRelation> relations, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Saves a <see cref="IRelationType" />.
+    /// </summary>
+    Task SaveAsync(IRelationType relationType, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Saves a <see cref="IRelationType" /> with user-attributed audit.
+    /// </summary>
+    Task<Attempt<IRelationType, RelationTypeOperationStatus>> CreateAsync(IRelationType relationType, Guid userKey);
+
+    /// <summary>
+    ///     Updates a <see cref="IRelationType" /> with user-attributed audit.
+    /// </summary>
+    Task<Attempt<IRelationType, RelationTypeOperationStatus>> UpdateAsync(IRelationType relationType, Guid userKey);
+
+    /// <summary>
+    ///     Deletes a <see cref="IRelation" />.
+    /// </summary>
+    Task DeleteRelationAsync(IRelation relation, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Deletes a <see cref="IRelationType" />.
+    /// </summary>
+    Task DeleteRelationTypeAsync(IRelationType relationType, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Deletes a <see cref="IRelationType" /> by key with user-attributed audit.
+    /// </summary>
+    Task<Attempt<IRelationType?, RelationTypeOperationStatus>> DeleteAsync(Guid key, Guid userKey);
+
+    /// <summary>
+    ///     Deletes all <see cref="IRelation" /> objects of the passed in <see cref="IRelationType" />.
+    /// </summary>
+    Task DeleteRelationsOfTypeAsync(IRelationType relationType, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Gets the total count of relation types.
     /// </summary>
-    /// <returns>The number of relation types.</returns>
-    int CountRelationTypes();
+    Task<int> CountRelationTypesAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Gets the Relation types in a paged manner.
-    /// Currently implements the paging in memory on the name attribute because the underlying repository does not support paging yet
+    ///     Gets the relation types in a paged manner.
     /// </summary>
-    /// <param name="skip"></param>
-    /// <param name="take"></param>
-    /// <param name="ids"></param>
-    /// <returns></returns>
     Task<PagedModel<IRelationType>> GetPagedRelationTypesAsync(int skip, int take, params int[] ids);
+
+    /// <summary>
+    ///     Gets all allowed parent/child object types for a given <see cref="IRelationType" />.
+    /// </summary>
+    IEnumerable<UmbracoObjectTypes> GetAllowedObjectTypes();
 }

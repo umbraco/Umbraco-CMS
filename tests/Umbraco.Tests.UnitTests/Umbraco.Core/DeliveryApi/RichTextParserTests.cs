@@ -162,6 +162,31 @@ public class RichTextParserTests : PropertyValueConverterTests
         Assert.AreEqual(nameof(LinkType.Content), link.Attributes["linkType"]);
     }
 
+    // PascalCase type — historic mis-cased values written by the (now fixed) ConvertLocalLinks migration for Umbraco 15 (see #22597).
+    [Test]
+    public void ParseElement_CanParseContentLinkWithPascalCaseTypeAttribute()
+    {
+        var parser = CreateRichTextElementParser();
+
+        var element = parser.Parse($"<p><a href=\"/{{localLink:{_contentKey:N}}}\" type=\"Document\"></a></p>", RichTextBlockModel.Empty) as RichTextRootElement;
+        Assert.IsNotNull(element);
+        var link = element.Elements.OfType<RichTextGenericElement>().Single().Elements.Single() as RichTextGenericElement;
+        Assert.IsNotNull(link);
+        Assert.AreEqual("a", link.Tag);
+
+        Assert.IsNotNull(link.Attributes["route"]);
+        var route = link.Attributes["route"] as IApiContentRoute;
+        Assert.IsNotNull(route);
+        Assert.AreEqual("/some-content-path", route.Path);
+
+        Assert.IsNotNull(link.Attributes["destinationId"]);
+        Assert.IsNotNull(link.Attributes["destinationType"]);
+        Assert.IsNotNull(link.Attributes["linkType"]);
+        Assert.AreEqual(_contentKey, Guid.Parse((link.Attributes["destinationId"] as string)!));
+        Assert.AreEqual(_contentType, link.Attributes["destinationType"]);
+        Assert.AreEqual(nameof(LinkType.Content), link.Attributes["linkType"]);
+    }
+
     [Test]
     public void ParseElement_CanParseMediaLink()
     {
@@ -741,7 +766,7 @@ public class RichTextParserTests : PropertyValueConverterTests
 
         var numberPropertyType = SetupPublishedPropertyType(new IntegerValueConverter(), "number", Constants.PropertyEditors.Aliases.Label);
         var propertyData = new PropertyData { Value = propertyValue, Culture = string.Empty, Segment = string.Empty };
-        var property = new PublishedProperty(numberPropertyType, element.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        var property = new PublishedProperty(numberPropertyType, element.Object, CreateVariationContextAccessor(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
 
         element.SetupGet(c => c.Properties).Returns(new[] { property });
         return element.Object;

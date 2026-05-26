@@ -1,8 +1,10 @@
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Notifications;
@@ -68,6 +70,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
         MediaUrlGeneratorCollection mediaUrlGenerators,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeService dataTypeService,
+        IIdKeyMap idKeyMap,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -82,6 +85,7 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             propertyEditorCollection,
             dataValueReferenceFactories,
             dataTypeService,
+            idKeyMap,
             eventAggregator,
             repositoryCacheVersionService,
             cacheSyncService)
@@ -98,6 +102,67 @@ public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepositor
             loggerFactory.CreateLogger<MediaByGuidReadRepository>(),
             repositoryCacheVersionService,
             cacheSyncService);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.MediaRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
+    /// <param name="cache">The application-level caches used for optimizing data retrieval and storage.</param>
+    /// <param name="logger">The logger instance for logging repository operations and errors.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
+    /// <param name="mediaTypeRepository">Repository for accessing and managing media types.</param>
+    /// <param name="tagRepository">Repository for managing tags associated with media items.</param>
+    /// <param name="languageRepository">Repository for accessing language information.</param>
+    /// <param name="relationRepository">Repository for managing relationships between entities.</param>
+    /// <param name="relationTypeRepository">Repository for managing types of relations between entities.</param>
+    /// <param name="propertyEditorCollection">Collection of property editors used for media properties.</param>
+    /// <param name="mediaUrlGenerators">Collection of generators for producing media URLs.</param>
+    /// <param name="dataValueReferenceFactories">Collection of factories for resolving data value references.</param>
+    /// <param name="dataTypeService">Service for managing data types used by media properties.</param>
+    /// <param name="serializer">The JSON serializer for serializing and deserializing data.</param>
+    /// <param name="eventAggregator">Publishes and subscribes to domain events.</param>
+    /// <param name="repositoryCacheVersionService">Service for managing cache versioning for repositories.</param>
+    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public MediaRepository(
+        IScopeAccessor scopeAccessor,
+        AppCaches cache,
+        ILogger<MediaRepository> logger,
+        ILoggerFactory loggerFactory,
+        IMediaTypeRepository mediaTypeRepository,
+        ITagRepository tagRepository,
+        ILanguageRepository languageRepository,
+        IRelationRepository relationRepository,
+        IRelationTypeRepository relationTypeRepository,
+        PropertyEditorCollection propertyEditorCollection,
+        MediaUrlGeneratorCollection mediaUrlGenerators,
+        DataValueReferenceFactoryCollection dataValueReferenceFactories,
+        IDataTypeService dataTypeService,
+        IJsonSerializer serializer,
+        IEventAggregator eventAggregator,
+        IRepositoryCacheVersionService repositoryCacheVersionService,
+        ICacheSyncService cacheSyncService)
+        : this(
+            scopeAccessor,
+            cache,
+            logger,
+            loggerFactory,
+            mediaTypeRepository,
+            tagRepository,
+            languageRepository,
+            relationRepository,
+            relationTypeRepository,
+            propertyEditorCollection,
+            mediaUrlGenerators,
+            dataValueReferenceFactories,
+            dataTypeService,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
+            serializer,
+            eventAggregator,
+            repositoryCacheVersionService,
+            cacheSyncService)
+    {
     }
 
     protected override MediaRepository This => this;

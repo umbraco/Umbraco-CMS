@@ -1,4 +1,3 @@
-using System.Data;
 using AutoFixture;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -6,13 +5,12 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using IScopeProvider = Umbraco.Cms.Core.Scoping.EFCore.IScopeProvider;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
@@ -20,7 +18,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 public class AuditServiceTests
 {
     private IAuditService _auditService;
-    private Mock<ICoreScopeProvider> _scopeProviderMock;
+    private Mock<IScopeProvider> _scopeProviderMock;
     private Mock<IAuditRepository> _auditRepositoryMock;
     private Mock<IEntityService> _entityServiceMock;
     private Mock<IUserIdKeyResolver> _userIdKeyResolverMock;
@@ -28,7 +26,7 @@ public class AuditServiceTests
     [SetUp]
     public void Setup()
     {
-        _scopeProviderMock = new Mock<ICoreScopeProvider>(MockBehavior.Strict);
+        _scopeProviderMock = new Mock<IScopeProvider>(MockBehavior.Strict);
         _auditRepositoryMock = new Mock<IAuditRepository>(MockBehavior.Strict);
         _entityServiceMock = new Mock<IEntityService>(MockBehavior.Strict);
         _userIdKeyResolverMock = new Mock<IUserIdKeyResolver>(MockBehavior.Strict);
@@ -48,8 +46,8 @@ public class AuditServiceTests
     {
         SetupScopeProviderMock();
 
-        _auditRepositoryMock.Setup(x => x.Save(It.IsAny<IAuditItem>()))
-            .Callback<IAuditItem>(item =>
+        _auditRepositoryMock.Setup(x => x.SaveAsync(It.IsAny<IAuditItem>(), It.IsAny<CancellationToken>()))
+            .Callback<IAuditItem, CancellationToken>((item, _) =>
             {
                 Assert.AreEqual(type, item.AuditType);
                 Assert.AreEqual(Constants.Security.SuperUserId, item.UserId);
@@ -57,7 +55,8 @@ public class AuditServiceTests
                 Assert.AreEqual(entityType, item.EntityType);
                 Assert.AreEqual(comment, item.Comment);
                 Assert.AreEqual(parameters, item.Parameters);
-            });
+            })
+            .Returns(Task.CompletedTask);
 
         _userIdKeyResolverMock.Setup(x => x.TryGetAsync(Constants.Security.SuperUserKey))
             .ReturnsAsync(Attempt.Succeed(Constants.Security.SuperUserId));
@@ -69,7 +68,7 @@ public class AuditServiceTests
             entityType,
             comment,
             parameters);
-        _auditRepositoryMock.Verify(x => x.Save(It.IsAny<IAuditItem>()), Times.Once);
+        _auditRepositoryMock.Verify(x => x.SaveAsync(It.IsAny<IAuditItem>(), It.IsAny<CancellationToken>()), Times.Once);
         Assert.IsTrue(result.Success);
         Assert.AreEqual(AuditLogOperationStatus.Success, result.Result);
     }
@@ -105,17 +104,18 @@ public class AuditServiceTests
 
         Fixture fixture = new Fixture();
         long totalRecords = 12;
-        _auditRepositoryMock.Setup(x => x.GetPagedResultsByQuery(
-                It.IsAny<IQuery<IAuditItem>>(),
-                2,
+        _auditRepositoryMock.Setup(x => x.GetPagedAsync(
+                10,
                 5,
-                out totalRecords,
                 Direction.Descending,
                 null,
-                null))
-            .Returns(fixture.CreateMany<AuditItem>(count: 2));
-
-        _scopeProviderMock.Setup(x => x.CreateQuery<IAuditItem>()).Returns(Mock.Of<IQuery<IAuditItem>>());
+                null,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PagedModel<IAuditItem>
+            {
+                Items = fixture.CreateMany<AuditItem>(count: 2),
+                Total = totalRecords,
+            });
 
         var result = await _auditService.GetItemsAsync(10, 5);
         Assert.AreEqual(totalRecords, result.Total);
@@ -152,18 +152,19 @@ public class AuditServiceTests
         Fixture fixture = new Fixture();
         long totalRecords = 12;
 
-        _auditRepositoryMock.Setup(x => x.GetPagedResultsByQuery(
-                It.IsAny<IQuery<IAuditItem>>(),
+        _auditRepositoryMock.Setup(x => x.GetPagedForEntityAsync(
                 2,
+                10,
                 5,
-                out totalRecords,
                 Direction.Descending,
                 null,
-                null))
-            .Returns(fixture.CreateMany<AuditItem>(count: 2));
-
-        _scopeProviderMock.Setup(x => x.CreateQuery<IAuditItem>())
-            .Returns(Mock.Of<IQuery<IAuditItem>>());
+                null,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PagedModel<IAuditItem>
+            {
+                Items = fixture.CreateMany<AuditItem>(count: 2),
+                Total = totalRecords,
+            });
 
         var result = await _auditService.GetItemsByKeyAsync(Guid.Empty, UmbracoObjectTypes.Document, 10, 5);
         Assert.AreEqual(totalRecords, result.Total);
@@ -189,18 +190,19 @@ public class AuditServiceTests
         Fixture fixture = new Fixture();
         long totalRecords = 12;
 
-        _auditRepositoryMock.Setup(x => x.GetPagedResultsByQuery(
-                It.IsAny<IQuery<IAuditItem>>(),
-                2,
+        _auditRepositoryMock.Setup(x => x.GetPagedForEntityAsync(
+                1,
+                10,
                 5,
-                out totalRecords,
                 Direction.Descending,
                 null,
-                null))
-            .Returns(fixture.CreateMany<AuditItem>(count: 2));
-
-        _scopeProviderMock.Setup(x => x.CreateQuery<IAuditItem>())
-            .Returns(Mock.Of<IQuery<IAuditItem>>());
+                null,
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new PagedModel<IAuditItem>
+            {
+                Items = fixture.CreateMany<AuditItem>(count: 2),
+                Total = totalRecords,
+            });
 
         var result = await _auditService.GetItemsByEntityAsync(1, 10, 5);
         Assert.AreEqual(totalRecords, result.Total);
@@ -211,20 +213,15 @@ public class AuditServiceTests
     public async Task CleanLogsAsync_Calls_Repository_With_Correct_Values()
     {
         SetupScopeProviderMock();
-        _auditRepositoryMock.Setup(x => x.CleanLogs(100));
+        _auditRepositoryMock.Setup(x => x.CleanLogsAsync(100)).Returns(Task.CompletedTask);
         await _auditService.CleanLogsAsync(100);
-        _auditRepositoryMock.Verify(x => x.CleanLogs(It.IsAny<int>()), Times.Once);
+        _auditRepositoryMock.Verify(x => x.CleanLogsAsync(It.IsAny<int>()), Times.Once);
     }
 
     private void SetupScopeProviderMock() =>
         _scopeProviderMock
-            .Setup(x => x.CreateCoreScope(
-                It.IsAny<IsolationLevel>(),
+            .Setup(x => x.CreateScope(
                 It.IsAny<RepositoryCacheMode>(),
-                It.IsAny<IEventDispatcher>(),
-                It.IsAny<IScopedNotificationPublisher>(),
-                It.IsAny<bool?>(),
-                It.IsAny<bool>(),
-                It.IsAny<bool>()))
-            .Returns(Mock.Of<IScope>());
+                It.IsAny<bool?>()))
+            .Returns(Mock.Of<ICoreScope>());
 }

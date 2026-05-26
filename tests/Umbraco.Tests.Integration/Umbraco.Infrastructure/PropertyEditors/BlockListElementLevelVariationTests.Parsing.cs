@@ -239,9 +239,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase("da-DK", false)]
     public async Task Can_Become_Variant_After_Publish(string culture, bool expectExposedBlocks)
     {
-        var elementType = CreateElementType(ContentVariation.Nothing);
+        var elementType = await CreateElementType(ContentVariation.Nothing);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -261,10 +261,10 @@ internal partial class BlockListElementLevelVariationTests
         // the content and element types are created invariant; now make them culture variant, and enable culture variance on the "variantText" property
         elementType.Variations = ContentVariation.Culture;
         elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = ContentVariation.Culture;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         contentType.Variations = ContentVariation.Culture;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         RefreshContentTypeCache(elementType, contentType);
 
@@ -325,9 +325,9 @@ internal partial class BlockListElementLevelVariationTests
         language!.IsDefault = true;
         await LanguageService.UpdateAsync(language, Constants.Security.SuperUserKey);
 
-        var elementType = CreateElementType(ContentVariation.Culture);
+        var elementType = await CreateElementType(ContentVariation.Culture);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -349,11 +349,11 @@ internal partial class BlockListElementLevelVariationTests
         // the content and element types are created as variant; now update the element type according to the test case
         elementType.Variations = elementVariationAfterPublish;
         elementType.PropertyTypes.First(pt => pt.Alias == "variantText").Variations = elementVariationAfterPublish;
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         // ...and make the content type invariant
         contentType.Variations = ContentVariation.Nothing;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         RefreshContentTypeCache(elementType, contentType);
 
@@ -406,9 +406,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase(ContentVariation.Segment, "da-DK", "Danish")]
     public async Task Can_Handle_Both_Content_And_Element_Level_Variation(ContentVariation elementVariation, string culture, string expectedStartsWith)
     {
-        var elementType = CreateElementType(elementVariation);
+        var elementType = await CreateElementType(elementVariation);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
+        var contentType = await CreateContentType(ContentVariation.Culture, blockListDataType, ContentVariation.Culture);
 
         var content = CreateContent(
             contentType,
@@ -494,9 +494,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase(ContentVariation.Segment, "da-DK", "Segment2")]
     public async Task Can_Handle_Variant_Element_For_Invariant_Content(ContentVariation elementVariation, string culture, string? segment)
     {
-        var elementType = CreateElementType(elementVariation);
+        var elementType = await CreateElementType(elementVariation);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.Nothing, blockListDataType);
+        var contentType = await CreateContentType(ContentVariation.Nothing, blockListDataType);
 
         var content = CreateContent(
             contentType,
@@ -583,9 +583,9 @@ internal partial class BlockListElementLevelVariationTests
     [TestCase("da-DK", "segment2")]
     public async Task Can_Combine_Element_Level_Segment_Variation_With_Document_Level_Language_Variation(string culture, string? segment)
     {
-        var elementType = CreateElementType(ContentVariation.Segment);
+        var elementType = await CreateElementType(ContentVariation.Segment);
         var blockListDataType = await CreateBlockListDataType(elementType);
-        var contentType = CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Culture);
+        var contentType = await CreateContentType(ContentVariation.CultureAndSegment, blockListDataType, ContentVariation.Culture);
 
         var content = CreateContent(
             contentType,
