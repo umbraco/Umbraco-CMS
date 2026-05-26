@@ -3,7 +3,7 @@
 {
 	"name": "C# (.NET) Umbraco & SMTP4Dev",
 
-	// List of images here: 
+	// List of images here:
 	// https://github.com/devcontainers/images/tree/main/src/dotnet
 	"image": "mcr.microsoft.com/devcontainers/dotnet:2-10.0-noble",
 	// Features to add to the dev container. More info: https://containers.dev/features.
@@ -14,29 +14,40 @@
 			"version": "latest"
 		},
 
-		// Node JS
+		// Node JS - pinned to 22 to match the >= 22.17.1 requirement in package.json
 		"ghcr.io/devcontainers/features/node:1": {
-			"version": "lts"
+			"version": "22"
 		},
 
 		// Adds SMTP4Dev to use as a local SMTP server with UI
-		// "ghcr.io/warrenbuckley/codespace-features/smtp4dev:1": {
-		// 	"autorun": true,
-		// 	"webport": "5050",
-		// 	"smtpport": "2525",
-		// 	"imapport": "143"
-		// },
+		// Web UI available on port 5050, SMTP on port 2525
+		"ghcr.io/warrenbuckley/codespace-features/smtp4dev:1": {
+			"autorun": true,
+			"webport": "5050",
+			"smtpport": "2525",
+			"imapport": "143"
+		},
 
 		// Adds SQLite feature from apt install
 		// Also adds the SQLite VSCode extension
 		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {}
 	},
-	
-	"forwardPorts": [5050],
+
+	"forwardPorts": [5050, 5173, 44339],
 	"portsAttributes": {
 		"5050": {
 			"label": "SMTP4Dev",
 			"protocol": "http",
+			"onAutoForward": "notify"
+		},
+		"5173": {
+			"label": "Backoffice (Vite dev server)",
+			"protocol": "http",
+			"onAutoForward": "notify"
+		},
+		"44339": {
+			"label": "Umbraco HTTPS",
+			"protocol": "https",
 			"onAutoForward": "notify"
 		}
 	},
@@ -65,15 +76,24 @@
 	// This command unshallows the clone to ensure the full history is available.
 	"initializeCommand": "git fetch --unshallow || true",
 
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "dotnet restore",
-
 	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
 	"updateContentCommand": "dotnet build umbraco.sln",
-	
+
+	// Runs once after the container is created (not part of the prebuild snapshot).
+	// Generates HTTPS dev cert and configures Codespaces-specific settings when needed.
+	"postCreateCommand": "bash .devcontainer/postCreate.sh",
+
 	"customizations": {
 		"vscode": {
-			"extensions": ["ms-dotnettools.csdevkit"]
+			"extensions": [
+				// C# debugging and IntelliSense
+				"ms-dotnettools.csdevkit",
+				// Frontend tooling
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"runem.lit-plugin",
+				"editorconfig.editorconfig"
+			]
 		},
 		"codespaces": {
 		  "openFiles": [
