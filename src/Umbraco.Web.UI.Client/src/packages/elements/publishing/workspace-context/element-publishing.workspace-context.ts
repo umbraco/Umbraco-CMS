@@ -477,7 +477,10 @@ export class UmbElementPublishingWorkspaceContext extends UmbContextBase impleme
 		// No need to check pending changes for new elements
 		if (this.#elementWorkspaceContext.getIsNew()) return;
 
-		const unique = this.#elementWorkspaceContext.getUnique();
+		// getUnique() guards against the window between unique being set and data loading
+		// starting (_getDataPromise being set). Fall back to #currentUnique, which is
+		// synchronously up-to-date from the unique observable.
+		const unique = this.#elementWorkspaceContext.getUnique() ?? this.#currentUnique;
 		if (!unique) throw new Error('Unique is missing');
 
 		// Only load the published data if the element is already published or has been published before
