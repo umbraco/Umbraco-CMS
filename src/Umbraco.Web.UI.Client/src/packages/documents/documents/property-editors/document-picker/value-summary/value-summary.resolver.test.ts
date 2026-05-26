@@ -28,7 +28,7 @@ describe('UmbDocumentPickerValueSummaryResolver', () => {
 	});
 
 	beforeEach(() => {
-		host = document.createElement('umb-test-value-summary-host') as UmbTestValueSummaryHostElement;
+		host = new UmbTestValueSummaryHostElement();
 		document.body.appendChild(host);
 		resolver = new UmbDocumentPickerValueSummaryResolver(host);
 	});
