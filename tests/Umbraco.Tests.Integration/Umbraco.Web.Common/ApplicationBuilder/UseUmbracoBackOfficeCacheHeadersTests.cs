@@ -13,10 +13,9 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Web.Common.Hosting;
 using Umbraco.Cms.Web.Common.Middleware;
-using Umbraco.Extensions;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Tests.Integration.Umbraco.Web.Common.ApplicationBuilder;
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Common.ApplicationBuilder;
 
 [TestFixture]
 public class UseUmbracoBackOfficeCacheHeadersTests
@@ -64,6 +63,60 @@ public class UseUmbracoBackOfficeCacheHeadersTests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
             Assert.That(GetCacheControl(response), Is.Null);
         });
+    }
+
+    [Test]
+    public async Task NotModifiedResponseUnderPrefix_SetsImmutable()
+    {
+        // CDNs/proxies use Cache-Control on a 304 response to update freshness for the
+        // cached body, so we deliberately include 304 alongside 2xx.
+        using var host = await StartHostAsync(isDebug: false, terminal: ctx =>
+        {
+            ctx.Response.StatusCode = StatusCodes.Status304NotModified;
+            return Task.CompletedTask;
+        });
+
+        using var response = await host.GetTestClient().GetAsync($"{Prefix}/css/app.css");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotModified));
+            Assert.That(GetCacheControl(response), Is.EqualTo(ImmutableValue));
+        });
+    }
+
+    [Test]
+    public async Task HeadRequestUnderPrefix_SetsImmutable()
+    {
+        using var host = await StartHostAsync(isDebug: false);
+
+        using var response = await host.GetTestClient().SendAsync(
+            new HttpRequestMessage(HttpMethod.Head, $"{Prefix}/css/app.css"));
+
+        Assert.That(GetCacheControl(response), Is.EqualTo(ImmutableValue));
+    }
+
+    [Test]
+    public async Task OptionsRequestUnderPrefix_DoesNotSetHeader()
+    {
+        // CORS preflight: tagging the response immutable would prevent the browser from
+        // re-issuing preflights when the cached preflight expires server-side.
+        using var host = await StartHostAsync(isDebug: false);
+
+        using var response = await host.GetTestClient().SendAsync(
+            new HttpRequestMessage(HttpMethod.Options, $"{Prefix}/css/app.css"));
+
+        Assert.That(GetCacheControl(response), Is.Null);
+    }
+
+    [Test]
+    public async Task PostRequestUnderPrefix_DoesNotSetHeader()
+    {
+        using var host = await StartHostAsync(isDebug: false);
+
+        using var response = await host.GetTestClient().PostAsync($"{Prefix}/css/app.css", new StringContent(string.Empty));
+
+        Assert.That(GetCacheControl(response), Is.Null);
     }
 
     [Test]

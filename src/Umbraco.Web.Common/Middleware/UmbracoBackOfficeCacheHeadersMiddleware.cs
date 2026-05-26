@@ -68,12 +68,18 @@ public class UmbracoBackOfficeCacheHeadersMiddleware : IMiddleware
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        if (context.Request.Path.StartsWithSegments(_prefix, StringComparison.OrdinalIgnoreCase))
+        // Only GET/HEAD: POST/PUT/DELETE responses aren't cacheable in the immutable sense and
+        // OPTIONS is used for CORS preflight, where a long cache lifetime would prevent the
+        // browser from re-issuing preflights when needed.
+        if ((HttpMethods.IsGet(context.Request.Method) || HttpMethods.IsHead(context.Request.Method))
+            && context.Request.Path.StartsWithSegments(_prefix, StringComparison.OrdinalIgnoreCase))
         {
             context.Response.OnStarting(static state =>
             {
                 (HttpResponse response, string value) = ((HttpResponse, string))state;
-                if (response.StatusCode is >= 200 and < 300
+                // Include 304 alongside 2xx: intermediate caches (CDNs, proxies) use the
+                // Cache-Control on the 304 response to update freshness for the cached body.
+                if (response.StatusCode is (>= 200 and < 300) or 304
                     && !response.Headers.ContainsKey(HeaderNames.CacheControl))
                 {
                     response.Headers[HeaderNames.CacheControl] = value;
