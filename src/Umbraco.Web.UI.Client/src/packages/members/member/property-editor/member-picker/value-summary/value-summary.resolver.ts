@@ -39,5 +39,3 @@ export class UmbMemberPickerValueSummaryResolver
 		);
 	}
 }
-
-export { UmbMemberPickerValueSummaryResolver as valueResolver };

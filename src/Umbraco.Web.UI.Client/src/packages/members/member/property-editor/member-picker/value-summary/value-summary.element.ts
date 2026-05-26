@@ -12,8 +12,6 @@ export class UmbMemberPickerPropertyEditorValueSummaryElement extends UmbValueSu
 	}
 }
 
-export { UmbMemberPickerPropertyEditorValueSummaryElement as element };
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-member-picker-property-editor-value-summary': UmbMemberPickerPropertyEditorValueSummaryElement;
