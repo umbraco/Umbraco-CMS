@@ -305,6 +305,11 @@ public class MyEntityCacheRefresher : CacheRefresherBase<MyEntityCacheRefresher>
    - `Attempt.Succeed(value)` / `Attempt.Fail<T>()`
    - `Attempt<Content, ContentEditingOperationStatus>` - typed result with status
 
+4. **Constants-Sql.cs** and **EnumerableExtensions.InGroupsOf**
+   - `Constants.Sql.MaxParameterCount = 2000` - the safe ceiling for parameterised IN/WHERE clauses (SQL Server's real limit is 2100; we leave headroom for joined predicates).
+   - `IEnumerable<T>.InGroupsOf(groupSize)` and NPoco's `Database.FetchByGroups(...)` are the canonical helpers for batching a query whose parameter count is driven by a runtime-sized collection.
+   - See "Avoiding the SQL Server 2100-parameter limit" in `/src/Umbraco.Infrastructure/CLAUDE.md` for when and how to apply them.
+
 ### Configuration
 
 Configuration models in `/Configuration/Models`:

@@ -435,6 +435,14 @@ When a PR changes Management API controllers or models, the `OpenApi.json` file 
 
 The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime dependencies are provided via importmap; npm peerDependencies provide types only. For full details on dependency hoisting, version range logic, and plugin development, see `/src/Umbraco.Web.UI.Client/CLAUDE.md` → "npm Package Publishing".
 
+### SQL Server 2100-parameter limit
+
+Any `WHERE IN (@0, @1, ...)` built from a runtime-sized collection risks hitting SQL Server's 2100-parameter ceiling and throwing `SqlException` 8003 in production. This has been a recurring source of customer-reported bugs (e.g. `DocumentUrlRepository.Save`, `DocumentUrlAliasRepository.Save`, `ContentVersionService.PerformContentVersionCleanup`, the user-search index build).
+
+Batch with `IEnumerable<T>.InGroupsOf(Constants.Sql.MaxParameterCount)` or `Database.FetchByGroups(...)` whenever the collection size is driven by user data — not just when it currently fits. Watch for products of two scaling dimensions (documents × languages, properties × versions) and config-tunable batch sizes whose defaults are safe but ceilings aren't.
+
+Full guidance, safe patterns and decision rule: see `/src/Umbraco.Infrastructure/CLAUDE.md` → "Avoiding the SQL Server 2100-parameter limit".
+
 ### Known Limitations
 
 1. **Circular Dependencies**: Avoided via `Lazy<T>` or event notifications
