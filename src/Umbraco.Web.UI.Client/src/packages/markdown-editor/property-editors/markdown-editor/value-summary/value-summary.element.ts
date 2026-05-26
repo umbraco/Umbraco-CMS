@@ -5,7 +5,7 @@ import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summar
 export class UmbMarkdownEditorPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<string | undefined> {
 	override render() {
 		if (!this._value?.trim()) return nothing;
-		return html`<uui-icon name="icon-document-html"></uui-icon>`;
+		return html`<uui-icon name="icon-check"></uui-icon>`;
 	}
 }
 

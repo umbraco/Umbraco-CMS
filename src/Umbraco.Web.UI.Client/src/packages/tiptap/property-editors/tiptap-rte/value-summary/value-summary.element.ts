@@ -10,7 +10,7 @@ export class UmbTiptapPropertyEditorValueSummaryElement extends UmbValueSummaryE
 		const temp = document.createElement('div');
 		temp.innerHTML = this._value?.markup ?? '';
 		if (!temp.textContent?.trim()) return nothing;
-		return html`<uui-icon name="icon-document-html"></uui-icon>`;
+		return html`<uui-icon name="icon-check"></uui-icon>`;
 	}
 }
 
