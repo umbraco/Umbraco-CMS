@@ -113,7 +113,7 @@ export class UmbMediaCreateOptionsModalElement extends UmbModalBaseElement<
 				<strong>Allowed child node types</strong> under <strong>Structure</strong>.
 			</umb-localize>
 			${when(
-				this._hasSettingsAccess,
+				this._hasSettingsAccess && this.data?.mediaType?.unique,
 				() => html`
 					<br />
 					<uui-button
