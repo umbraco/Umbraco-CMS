@@ -13,11 +13,6 @@ namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs;
 public class ReportSiteJob : RecurringBackgroundJobBase
 {
     /// <summary>
-    /// Gets the period at which the report site job runs.
-    /// </summary>
-    public override TimeSpan Period => TimeSpan.FromDays(1);
-
-    /// <summary>
     /// Gets the time interval to wait between executions of the <see cref="ReportSiteJob"/>.
     /// The delay is set to 5 minutes.
     /// </summary>
@@ -45,6 +40,7 @@ public class ReportSiteJob : RecurringBackgroundJobBase
         ITelemetryService telemetryService,
         IJsonSerializer jsonSerializer,
         IHttpClientFactory httpClientFactory)
+        : base(TimeSpan.FromDays(1))
     {
         _logger = logger;
         _telemetryService = telemetryService;

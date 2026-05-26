@@ -1,5 +1,7 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/property-action';
+import { UmbPropertySortModePropertyAction } from './property-sort-mode-property-action.js';
+import { UmbPropertySortModePropertyActionElement } from './property-sort-mode-property-action.element.js';
 
 export const UMB_PROPERTY_ACTION_SORT_MODE_KIND_MANIFEST: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -10,8 +12,8 @@ export const UMB_PROPERTY_ACTION_SORT_MODE_KIND_MANIFEST: UmbExtensionManifestKi
 		...UMB_PROPERTY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'propertyAction',
 		kind: 'sortMode',
-		api: () => import('./property-sort-mode-property-action.js'),
-		element: () => import('./property-sort-mode-property-action.element.js'),
+		api: UmbPropertySortModePropertyAction,
+		element: UmbPropertySortModePropertyActionElement,
 		meta: {
 			icon: 'icon-sort',
 			label: '#general_sort',
