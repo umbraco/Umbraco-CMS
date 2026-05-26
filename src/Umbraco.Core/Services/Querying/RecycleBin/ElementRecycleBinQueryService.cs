@@ -42,7 +42,7 @@ public class ElementRecycleBinQueryService : IElementRecycleBinQueryService
             UmbracoObjectTypes.ElementContainer,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias);
 
-    private Task<Attempt<IEntitySlim?, RecycleBinQueryResultType>> GetOriginalParentCoreAsync(
+    private async Task<Attempt<IEntitySlim?, RecycleBinQueryResultType>> GetOriginalParentCoreAsync(
         Guid trashedEntityId,
         UmbracoObjectTypes entityObjectType,
         string parentRelationTypeAlias)
@@ -52,39 +52,39 @@ public class ElementRecycleBinQueryService : IElementRecycleBinQueryService
         IEntitySlim? entity = _entityService.Get(trashedEntityId, entityObjectType);
         if (entity is null)
         {
-            return Task.FromResult(Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.NotFound));
+            return Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.NotFound);
         }
 
         if (entity.Trashed is false)
         {
-            return Task.FromResult(Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.NotTrashed));
+            return Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.NotTrashed);
         }
 
-        IEnumerable<IRelation> relationsByChild = _relationService.GetByChildId(entity.Id);
+        IEnumerable<IRelation> relationsByChild = await _relationService.GetByChildIdAsync(entity.Id);
         IRelation? parentRecycleRelation = relationsByChild
             .FirstOrDefault(r => r.RelationType.Alias == parentRelationTypeAlias);
 
         if (parentRecycleRelation is null)
         {
-            return Task.FromResult(Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.NoParentRecycleRelation));
+            return Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.NoParentRecycleRelation);
         }
 
         if (parentRecycleRelation.ParentId == Constants.System.Root)
         {
-            return Task.FromResult(Attempt<IEntitySlim?, RecycleBinQueryResultType>.Succeed(RecycleBinQueryResultType.ParentIsRoot, null));
+            return Attempt<IEntitySlim?, RecycleBinQueryResultType>.Succeed(RecycleBinQueryResultType.ParentIsRoot, null);
         }
 
         IEntitySlim? parent = _entityService.Get(parentRecycleRelation.ParentId, UmbracoObjectTypes.ElementContainer);
         if (parent is null)
         {
-            return Task.FromResult(Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.ParentNotFound));
+            return Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.ParentNotFound);
         }
 
         if (parent.Trashed)
         {
-            return Task.FromResult(Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.ParentIsTrashed, parent));
+            return Attempt<IEntitySlim?, RecycleBinQueryResultType>.Fail(RecycleBinQueryResultType.ParentIsTrashed, parent);
         }
 
-        return Task.FromResult(Attempt<IEntitySlim?, RecycleBinQueryResultType>.Succeed(RecycleBinQueryResultType.Success, parent));
+        return Attempt<IEntitySlim?, RecycleBinQueryResultType>.Succeed(RecycleBinQueryResultType.Success, parent);
     }
 }

@@ -15,7 +15,7 @@ export class UmbUserDetailStore extends UmbDetailStoreBase<UmbUserDetailModel> {
 	 * @memberof UmbUserDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_USER_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_USER_DETAIL_STORE_CONTEXT);
 	}
 }
 

@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using EFCoreRelationTypeDto = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.RelationTypeDto;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
@@ -31,6 +32,56 @@ internal static class RelationTypeFactory
         {
             entity.EnableChangeTracking();
         }
+    }
+
+    /// <summary>
+    /// Creates an <see cref="IRelationType"/> entity from the EF Core DTO.
+    /// </summary>
+    public static IRelationType BuildEntity(EFCoreRelationTypeDto dto)
+    {
+        var entity = new RelationType(dto.Name, dto.Alias, dto.Dual, dto.ParentObjectType, dto.ChildObjectType, dto.IsDependency);
+
+        try
+        {
+            entity.DisableChangeTracking();
+            entity.Id = dto.Id;
+            entity.Key = dto.UniqueId;
+            entity.ResetDirtyProperties(false);
+            return entity;
+        }
+        finally
+        {
+            entity.EnableChangeTracking();
+        }
+    }
+
+    /// <summary>
+    /// Creates an EF Core <see cref="EFCoreRelationTypeDto"/> from the specified <see cref="IRelationType"/> entity.
+    /// </summary>
+    public static EFCoreRelationTypeDto BuildEFCoreDto(IRelationType entity)
+    {
+        var isDependency = false;
+        if (entity is IRelationTypeWithIsDependency relationTypeWithIsDependency)
+        {
+            isDependency = relationTypeWithIsDependency.IsDependency;
+        }
+
+        var dto = new EFCoreRelationTypeDto
+        {
+            Alias = entity.Alias,
+            ChildObjectType = entity.ChildObjectType,
+            Dual = entity.IsBidirectional,
+            IsDependency = isDependency,
+            Name = entity.Name ?? string.Empty,
+            ParentObjectType = entity.ParentObjectType,
+            UniqueId = entity.Key,
+        };
+        if (entity.HasIdentity)
+        {
+            dto.Id = entity.Id;
+        }
+
+        return dto;
     }
 
     /// <summary>

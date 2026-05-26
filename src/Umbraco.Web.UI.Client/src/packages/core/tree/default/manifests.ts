@@ -1,4 +1,6 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDefaultTreeContext } from './default-tree.context.js';
+import UmbDefaultTreeElement from './default-tree.element.js';
 
 export const manifests: Array<UmbExtensionManifestKind> = [
 	{
@@ -8,8 +10,8 @@ export const manifests: Array<UmbExtensionManifestKind> = [
 		matchType: 'tree',
 		manifest: {
 			type: 'tree',
-			api: () => import('./default-tree.context.js'),
-			element: () => import('./default-tree.element.js'),
+			api: UmbDefaultTreeContext,
+			element: UmbDefaultTreeElement,
 		},
 	},
 ];

@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Controllers.Element;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Element;
 using Umbraco.Cms.Core;

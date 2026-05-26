@@ -35,9 +35,12 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         Root = InstallationSummary.ContentInstalled.First();
         ContentService.Publish(Root, Root.AvailableCultures.ToArray());
 
+        // Note: this SetUp must remain synchronous. EnsureUmbracoContext() below writes to an AsyncLocal
+        // (via HybridUmbracoContextAccessor) and AsyncLocal mutations made inside an awaited Task do not
+        // flow back to the test method's execution context.
         var cultures = new List<string>
         {
-            GetRequiredService<ILocalizationService>().GetDefaultLanguageIsoCode()
+            GetRequiredService<ILanguageService>().GetDefaultIsoCodeAsync().GetAwaiter().GetResult(),
         };
 
         foreach (var language in InstallationSummary.LanguagesInstalled)
@@ -294,6 +297,34 @@ internal sealed class DomainAndUrlsTests : UmbracoIntegrationTest
         Assert.IsTrue(domain.IsWildcard);
         Assert.AreEqual(culture, domain.LanguageIsoCode);
         Assert.AreEqual("*" + Root.Id, domain.DomainName);
+    }
+
+    [Test]
+    public async Task Cannot_Update_Domains_For_Non_Existent_Content()
+    {
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = new DomainModel { DomainName = "/domain", IsoCode = Cultures.First() }.Yield()
+        };
+
+        var result = await domainService.UpdateDomainsAsync(Guid.NewGuid(), updateModel);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DomainOperationStatus.ContentNotFound, result.Status);
+    }
+
+    [Test]
+    public async Task Cannot_Update_Domains_With_Unknown_Iso_Code()
+    {
+        var domainService = GetRequiredService<IDomainService>();
+        var updateModel = new DomainsUpdateModel
+        {
+            Domains = new DomainModel { DomainName = "/domain", IsoCode = "xx-XX" }.Yield()
+        };
+
+        var result = await domainService.UpdateDomainsAsync(Root.Key, updateModel);
+        Assert.IsFalse(result.Success);
+        Assert.AreEqual(DomainOperationStatus.LanguageNotFound, result.Status);
     }
 
     [TestCase("/domain")]

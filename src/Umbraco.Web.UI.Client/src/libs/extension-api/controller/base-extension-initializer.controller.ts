@@ -83,6 +83,7 @@ export abstract class UmbBaseExtensionInitializer<
 					this.#gotManifest(extensionManifest);
 				} else {
 					this.#manifest = undefined;
+					this._isConditionsPositive = undefined;
 					this.#clearPermittedState();
 					this.#overwrites = [];
 					this.#cleanConditions();
@@ -169,8 +170,8 @@ export abstract class UmbBaseExtensionInitializer<
 		}
 	}
 
-	#gotConditions = (manifests: ManifestCondition[]) => {
-		manifests.forEach(this.#gotCondition);
+	#gotConditions = (manifests: ManifestCondition[] | undefined) => {
+		manifests?.forEach(this.#gotCondition);
 	};
 
 	#gotCondition = async (conditionManifest: ManifestCondition) => {
@@ -237,12 +238,29 @@ export abstract class UmbBaseExtensionInitializer<
 		return undefined;
 	}
 
-	#conditionsAreInitialized() {
+	#checkConditionsAreGood() {
 		// Not good if we don't have a manifest.
+		if (this.#manifest === undefined) return false;
 		// Only good if conditions of manifest is equal to the amount of condition controllers (one for each condition). [NL]
-		return (
-			this.#manifest !== undefined && this.#conditionControllers.length === (this.#manifest.conditions ?? []).length
+		const hasAllConditions = (this.#manifest.conditions ?? []).length === this.#conditionControllers.length;
+		if (hasAllConditions === false) return false;
+		// Compare all manifest conditions with the condition controllers configs to be sure we have the right ones, as we might end up in a state where we have the same amount of controllers as conditions, but they are not the right ones. [NL]
+		const allConditionsHaveControllers = (this.#manifest.conditions ?? []).every((condition) =>
+			this.#conditionControllers.some((controller) => controller.config === condition),
 		);
+		if (allConditionsHaveControllers === false) return false;
+		// Only good if all the conditions are permitted:
+		return this.#conditionControllers.some((condition) => condition.permitted === false) === false;
+	}
+
+	// The currently-pending `_conditionsAreGood()` promise and manifest, to detect if we can reuse it.
+	#pendingGoodCall?: { manifest: ManifestType; promise: Promise<boolean>; abortController: AbortController };
+
+	#abortPendingGoodCall() {
+		if (this.#pendingGoodCall) {
+			this.#pendingGoodCall.abortController.abort();
+			this.#pendingGoodCall = undefined;
+		}
 	}
 
 	#onConditionsChangedCallback = async () => {
@@ -251,38 +269,55 @@ export abstract class UmbBaseExtensionInitializer<
 			// When writing this the only plausible case is a call from the conditionController to the onChange callback.
 			return;
 		}
+		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
+		const isPositive = this.#checkConditionsAreGood();
+
+		if (this._isConditionsPositive === isPositive) {
+			// No change in the conditions, so we don't need to do anything, this is an optimization to prevent multiple calls to the callback when there is no change. [NL]
+			return;
+		}
 		// We will collect old value here, but we need to re-collect it after a async method have been called, as it could have changed in the mean time. [NL]
 		let oldValue = this.#isPermitted ?? false;
-
-		// Find a condition that is not permitted (Notice how no conditions, means that this extension is permitted)
-		const isPositive =
-			this.#conditionsAreInitialized() &&
-			this.#conditionControllers.some((condition) => condition.permitted === false) === false;
 
 		this._isConditionsPositive = isPositive;
 
 		if (isPositive === true) {
 			if (this.#isPermitted !== true) {
-				const newPermission = await this._conditionsAreGood();
-				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time. [NL]
-				if (newPermission === false || this._isConditionsPositive === false) {
-					// Then we need to revert the above work:
-					this._conditionsAreBad();
+				let newPermission: boolean;
+				// check current pending _conditionsAreGood call: [NL]
+				let entry = this.#pendingGoodCall;
+				if (entry && entry.manifest === this.#manifest) {
+					newPermission = await entry.promise;
+				} else {
+					// Since this is a new call, then lets abort the pending call. [NL]
+					this.#abortPendingGoodCall();
+					await this._conditionsAreBad();
+					const abortController = new AbortController();
+					const promise = this._conditionsAreGood(abortController.signal);
+					entry = { manifest: this.#manifest, promise, abortController };
+					this.#pendingGoodCall = entry;
+					newPermission = await promise;
+				}
+				if (this.#pendingGoodCall !== entry) {
 					return;
+				} else {
+					this.#pendingGoodCall = undefined;
+				}
+
+				// Only set new permission if we are still positive, otherwise it means that we have been destroyed in the mean time, or we got destroyed. [NL]
+				if (newPermission === false || this._isConditionsPositive !== true) {
+					// Then we need to revert the above work. Sync call — see the note in
+					// the else-if branch on why we don't await. [NL]
+					this._conditionsAreBad();
+					newPermission = false;
 				}
 				// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time. [NL]
 				oldValue = this.#isPermitted ?? false;
 				this.#isPermitted = newPermission;
 			}
 		} else if (this.#isPermitted !== false) {
-			// Clean up:
-			await this._conditionsAreBad();
-
-			// Only continue if we are still negative, otherwise it means that something changed in the mean time. [NL]
-			if (this._isConditionsPositive === true) {
-				return;
-			}
-			// We update the oldValue as this point, cause in this way we are sure its the value at this point, when doing async code someone else might have changed the state in the mean time. [NL]
+			// clean-up any current [NL]
+			this._conditionsAreBad();
 			oldValue = this.#isPermitted ?? false;
 			this.#isPermitted = false;
 		}
@@ -295,7 +330,7 @@ export abstract class UmbBaseExtensionInitializer<
 		}
 	};
 
-	protected abstract _conditionsAreGood(): Promise<boolean>;
+	protected abstract _conditionsAreGood(signal: AbortSignal): Promise<boolean>;
 
 	protected abstract _conditionsAreBad(): Promise<void>;
 
@@ -335,9 +370,12 @@ export abstract class UmbBaseExtensionInitializer<
 		if (!this.#extensionRegistry) return;
 		this.#manifest = undefined;
 		this.#promiseResolvers = [];
+		// Abort any pending good-call so its subclass run refuses to commit (sees
+		// `signal.aborted`) instead of trying to assign into a destroyed initializer. [NL]
+		this.#abortPendingGoodCall();
 		this.#clearPermittedState(); // This fires the callback as not permitted, if it was permitted before. [NL]
 		this.#isPermitted = undefined;
-		this._isConditionsPositive = false;
+		this._isConditionsPositive = undefined;
 		this.#overwrites = [];
 		this.#cleanConditions();
 		this.#onPermissionChanged = undefined;

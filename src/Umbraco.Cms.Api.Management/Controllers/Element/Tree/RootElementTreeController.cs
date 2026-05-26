@@ -7,8 +7,6 @@ using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.Services.PermissionFilter;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.Tree;
@@ -23,13 +21,10 @@ public class RootElementTreeController : ElementTreeControllerBase
     public RootElementTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IElementStartNodeTreeFilterService treeFilterService,
         IElementPresentationFactory elementPresentationFactory,
         IElementPermissionFilterService elementPermissionFilterService)
-        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService, appCaches, backOfficeSecurityAccessor, elementPresentationFactory, elementPermissionFilterService)
+        : base(entityService, flagProviders, treeFilterService, elementPresentationFactory, elementPermissionFilterService)
     {
     }
 

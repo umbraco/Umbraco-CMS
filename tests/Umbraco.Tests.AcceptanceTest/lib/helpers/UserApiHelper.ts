@@ -1,6 +1,7 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
 import {UserBuilder} from "../builders";
 import {Page} from "@playwright/test";
+import {ConstantHelper} from "./ConstantHelper";
 
 export class UserApiHelper {
   api: ApiHelpers;
@@ -144,6 +145,17 @@ export class UserApiHelper {
       "userIds": ids.map(id => ({id}))
     };
     return await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/user/unlock', users);
+  }
+
+  async lockOutByFailedLogins(userEmail: string, attempts: number = 5) {
+    const loginUrl = this.api.baseUrl + '/umbraco/management/api/v1/security/back-office/login';
+    for (let i = 0; i < attempts; i++) {
+      await this.page.request.post(loginUrl, {
+        headers: {'Content-Type': 'application/json'},
+        data: {username: userEmail, password: 'WrongPassword!'},
+        ignoreHTTPSErrors: true
+      });
+    }
   }
 
   async getCurrentUser() {
@@ -335,5 +347,9 @@ export class UserApiHelper {
     }
 
     await this.update(user.id, userSetup);
+  }
+  async getCurrentUserStatus(){
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/user/current');
+    return response.status();
   }
 }

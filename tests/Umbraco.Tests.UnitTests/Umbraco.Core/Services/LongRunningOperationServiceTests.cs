@@ -1,15 +1,14 @@
-using System.Data;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using IScopeProvider = Umbraco.Cms.Core.Scoping.EFCore.IScopeProvider;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
@@ -17,7 +16,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 public class LongRunningOperationServiceTests
 {
     private ILongRunningOperationService _longRunningOperationService;
-    private Mock<ICoreScopeProvider> _scopeProviderMock;
+    private Mock<IScopeProvider> _scopeProviderMock;
     private Mock<ILongRunningOperationRepository> _longRunningOperationRepositoryMock;
     private Mock<TimeProvider> _timeProviderMock;
     private Mock<ICoreScope> _scopeMock;
@@ -25,7 +24,7 @@ public class LongRunningOperationServiceTests
     [SetUp]
     public void Setup()
     {
-        _scopeProviderMock = new Mock<ICoreScopeProvider>(MockBehavior.Strict);
+        _scopeProviderMock = new Mock<IScopeProvider>(MockBehavior.Strict);
         _longRunningOperationRepositoryMock = new Mock<ILongRunningOperationRepository>(MockBehavior.Strict);
         _timeProviderMock = new Mock<TimeProvider>(MockBehavior.Strict);
         _scopeMock = new Mock<ICoreScope>();
@@ -90,7 +89,7 @@ public class LongRunningOperationServiceTests
             .Returns(Task.CompletedTask)
             .Verifiable(Times.Once);
 
-        _scopeProviderMock.Setup(scopeProvider => scopeProvider.Context)
+        _scopeProviderMock.Setup(scopeProvider => scopeProvider.AmbientScopeContext)
             .Returns(default(IScopeContext?))
             .Verifiable(Times.Exactly(1));
 
@@ -131,7 +130,7 @@ public class LongRunningOperationServiceTests
     {
         SetupScopeProviderMock();
 
-        _scopeProviderMock.Setup(scopeProvider => scopeProvider.Context)
+        _scopeProviderMock.Setup(scopeProvider => scopeProvider.AmbientScopeContext)
             .Returns(new ScopeContext())
             .Verifiable(Times.Exactly(1));
 
@@ -403,14 +402,9 @@ public class LongRunningOperationServiceTests
 
     private void SetupScopeProviderMock() =>
         _scopeProviderMock
-            .Setup(x => x.CreateCoreScope(
-                It.IsAny<IsolationLevel>(),
+            .Setup(x => x.CreateScope(
                 It.IsAny<RepositoryCacheMode>(),
-                It.IsAny<IEventDispatcher>(),
-                It.IsAny<IScopedNotificationPublisher>(),
-                It.IsAny<bool?>(),
-                It.IsAny<bool>(),
-                It.IsAny<bool>()))
+                It.IsAny<bool?>()))
             .Returns(_scopeMock.Object);
 }
 

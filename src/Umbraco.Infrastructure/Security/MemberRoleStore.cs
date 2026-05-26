@@ -1,5 +1,7 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -19,19 +21,31 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         new() { Code = "IdentityMemberGroupNotFound", Description = "Member group not found" };
 
     private readonly IMemberGroupService _memberGroupService;
+    private readonly IIdKeyMap _idKeyMap;
 
     private bool _disposed;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Umbraco.Cms.Core.Security.MemberRoleStore"/> class.
+    /// Initializes a new instance of the <see cref="MemberRoleStore"/> class.
     /// </summary>
     /// <remarks>private const string genericIdentityErrorCode = "IdentityErrorUserStore";</remarks>
     /// <param name="memberGroupService">Service used to manage and retrieve member groups.</param>
     /// <param name="errorDescriber">Provides error messages for identity-related operations.</param>
-    public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
+    /// <param name="idKeyMap">The cached id-to-key map used to resolve int role IDs to GUID keys.</param>
+    public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber, IIdKeyMap idKeyMap)
     {
         _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
         ErrorDescriber = errorDescriber ?? throw new ArgumentNullException(nameof(errorDescriber));
+        _idKeyMap = idKeyMap ?? throw new ArgumentNullException(nameof(idKeyMap));
+    }
+
+    [Obsolete("Use the constructor with all parameters. Scheduled for removal in Umbraco 19.")]
+    public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
+        : this(
+            memberGroupService,
+            errorDescriber,
+            StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>())
+    {
     }
 
     /// <summary>
@@ -79,7 +93,7 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
             return IdentityResult.Failed(_intParseError);
         }
 
-        IMemberGroup? memberGroup = _memberGroupService.GetById(roleId);
+        IMemberGroup? memberGroup = await GetMemberGroupByIdAsync(roleId);
         if (memberGroup != null)
         {
             if (MapToMemberGroup(role, memberGroup))
@@ -94,7 +108,7 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
     }
 
     /// <inheritdoc />
-    public Task<IdentityResult> DeleteAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
+    public async Task<IdentityResult> DeleteAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ThrowIfDisposed();
@@ -109,17 +123,14 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
             throw new ArgumentException("The Id of the role is not an integer");
         }
 
-        IMemberGroup? memberGroup = _memberGroupService.GetById(roleId);
-        if (memberGroup != null)
+        IMemberGroup? memberGroup = await GetMemberGroupByIdAsync(roleId);
+        if (memberGroup == null)
         {
-            _memberGroupService.Delete(memberGroup);
-        }
-        else
-        {
-            return Task.FromResult(IdentityResult.Failed(_memberGroupNotFoundError));
+            return IdentityResult.Failed(_memberGroupNotFoundError);
         }
 
-        return Task.FromResult(IdentityResult.Success);
+        await _memberGroupService.DeleteAsync(memberGroup.Key);
+        return IdentityResult.Success;
     }
 
     /// <inheritdoc />
@@ -206,10 +217,24 @@ public class MemberRoleStore : IQueryableRoleStore<UmbracoIdentityRole>
         }
         else
         {
-            memberGroup = _memberGroupService.GetById(id);
+            memberGroup = await GetMemberGroupByIdAsync(id);
         }
 
         return memberGroup == null ? null : MapFromMemberGroup(memberGroup);
+    }
+
+    /// <summary>
+    ///     Resolves a member group by its integer id by mapping the id to its GUID key via the cached id-key map.
+    /// </summary>
+    private async Task<IMemberGroup?> GetMemberGroupByIdAsync(int id)
+    {
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.MemberGroup);
+        if (keyAttempt.Success is false)
+        {
+            return null;
+        }
+
+        return await _memberGroupService.GetAsync(keyAttempt.Result);
     }
 
     /// <inheritdoc />

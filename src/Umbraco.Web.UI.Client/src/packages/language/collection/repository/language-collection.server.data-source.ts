@@ -1,4 +1,4 @@
-import type { UmbLanguageCollectionFilterModel } from '../types.js';
+import type { UmbLanguageCollectionFilterModel, UmbLanguageCollectionItemModel } from '../types.js';
 import type { UmbLanguageDetailModel } from '../../types.js';
 import { UMB_LANGUAGE_ENTITY_TYPE } from '../../entity.js';
 import type { UmbCollectionDataSource } from '@umbraco-cms/backoffice/collection';
@@ -30,17 +30,21 @@ export class UmbLanguageCollectionServerDataSource implements UmbCollectionDataS
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbLanguageCollectionFilterModel) {
-		const { data, error } = await tryExecute(this.#host, LanguageService.getLanguage({ query: filter }));
+		const { data, error } = await tryExecute(
+			this.#host,
+			LanguageService.getLanguage({ query: { skip: filter.skip, take: filter.take } }),
+		);
 
 		if (data) {
 			const items = data.items.map((item) => {
-				const model: UmbLanguageDetailModel = {
+				const model: UmbLanguageCollectionItemModel = {
 					unique: item.isoCode,
 					name: item.name,
 					entityType: UMB_LANGUAGE_ENTITY_TYPE,
 					isDefault: item.isDefault,
 					isMandatory: item.isMandatory,
 					fallbackIsoCode: item.fallbackIsoCode || null,
+					icon: 'icon-globe',
 				};
 
 				return model;

@@ -57,6 +57,8 @@ public class SqlServerMigrationProvider : IMigrationProvider
             EFCoreMigration.AddLanguageDto => typeof(Migrations.AddLanguageDto),
             EFCoreMigration.AddDomainDto => typeof(Migrations.AddDomainDto),
             EFCoreMigration.AddAuditDtos => typeof(Migrations.AddAuditDtos),
+            EFCoreMigration.AddLongRunningOperationDto => typeof(Migrations.AddLongRunningOperationDto),
+            EFCoreMigration.AddRelationDtos => typeof(Migrations.AddRelationDtos),
             EFCoreMigration.AddPublicAccessDto => typeof(Migrations.AddPublicAccessDto),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };

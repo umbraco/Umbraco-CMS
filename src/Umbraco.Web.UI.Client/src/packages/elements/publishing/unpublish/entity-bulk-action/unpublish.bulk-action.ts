@@ -96,8 +96,8 @@ export class UmbElementUnpublishEntityBulkAction extends UmbEntityBulkActionBase
 
 				notificationContext?.peek('positive', {
 					data: {
-						headline: localize.term('speechBubbles_contentUnpublished'),
-						message: localize.term('speechBubbles_editMultiContentUnpublishedText', elementCnt),
+						headline: localize.term('speechBubbles_editElementUnpublishedHeader'),
+						message: localize.term('speechBubbles_editMultiElementUnpublishedText', elementCnt),
 					},
 				});
 
@@ -141,9 +141,9 @@ export class UmbElementUnpublishEntityBulkAction extends UmbEntityBulkActionBase
 
 			notificationContext?.peek('positive', {
 				data: {
-					headline: localize.term('speechBubbles_contentUnpublished'),
+					headline: localize.term('speechBubbles_editElementUnpublishedHeader'),
 					message: localize.term(
-						'speechBubbles_editMultiVariantUnpublishedText',
+						'speechBubbles_editMultiElementVariantUnpublishedText',
 						elementCnt,
 						localize.list(variantIds.map((v) => v.culture ?? '')),
 					),

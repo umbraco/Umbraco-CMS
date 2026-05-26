@@ -134,7 +134,7 @@ public partial class ElementPublishingServiceTests
             Constants.Security.SuperUserKey);
 
         // Setup a relation where referencingElement references referencedElement.
-        RelationService.Relate(referencingElement.Id, referencedElement.Id, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+        await RelationService.RelateAsync(referencingElement.Id, referencedElement.Id, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
 
         var unpublishAttempt = await ElementPublishingService.UnpublishAsync(
             referencedElement.Key,
@@ -163,7 +163,7 @@ public partial class ElementPublishingServiceTests
             Constants.Security.SuperUserKey);
 
         // Setup a relation where referencingElement references referencedElement.
-        RelationService.Relate(referencingElement.Id, referencedElement.Id, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
+        await RelationService.RelateAsync(referencingElement.Id, referencedElement.Id, Constants.Conventions.RelationTypes.RelatedDocumentAlias);
 
         var unpublishAttempt = await ElementPublishingService.UnpublishAsync(
             referencingElement.Key,

@@ -129,7 +129,7 @@ export class UmbContentTypeWorkspaceViewEditGroupElement extends UmbLitElement {
 					Are you sure you want to delete the group <strong>${this._group.name ?? this._group.ownerId}</strong>
 				</umb-localize>
 				</div>`,
-			confirmLabel: this.localize.term('actions_delete'),
+			confirmLabel: '#actions_delete',
 			color: 'danger',
 		});
 

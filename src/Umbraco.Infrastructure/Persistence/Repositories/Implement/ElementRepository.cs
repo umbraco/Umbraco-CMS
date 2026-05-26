@@ -3,6 +3,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -17,7 +18,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <summary>
 ///     Represents a repository for doing CRUD operations for <see cref="IElement" />.
 /// </summary>
-// TODO ELEMENTS: refactor and reuse code from DocumentRepository (note there is an NPoco issue with generics, so we have to live with a certain amount of code duplication)
 internal class ElementRepository : PublishableContentRepositoryBase<IElement, ElementRepository, ElementDto, ElementVersionDto, ElementCultureVariationDto>, IElementRepository
 {
     /// <summary>
@@ -52,6 +52,7 @@ internal class ElementRepository : PublishableContentRepositoryBase<IElement, El
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeService dataTypeService,
+        IIdKeyMap idKeyMap,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -68,6 +69,7 @@ internal class ElementRepository : PublishableContentRepositoryBase<IElement, El
             propertyEditors,
             dataValueReferenceFactories,
             dataTypeService,
+            idKeyMap,
             serializer,
             eventAggregator,
             repositoryCacheVersionService,
@@ -85,9 +87,7 @@ internal class ElementRepository : PublishableContentRepositoryBase<IElement, El
         => ContentBaseFactory.BuildEntity(entityDto, contentType);
 
     protected override void OnUowRefreshedEntity(IElement entity)
-    {
-        // TODO ELEMENTS: implement this for elements
-    }
+        => OnUowRefreshedEntity(new ElementRefreshNotification(entity, new EventMessages()));
 
     #region Repository Base
 

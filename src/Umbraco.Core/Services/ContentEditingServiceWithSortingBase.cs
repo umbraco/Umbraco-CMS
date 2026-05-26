@@ -56,8 +56,7 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
         IRelationService relationService,
         ContentTypeFilterCollection contentTypeFilters,
         ILanguageService languageService,
-        IUserService userService,
-        ILocalizationService localizationService)
+        IUserService userService)
         : base(
             contentService,
             contentTypeService,
@@ -71,8 +70,7 @@ internal abstract class ContentEditingServiceWithSortingBase<TContent, TContentT
             relationService,
             contentTypeFilters,
             languageService,
-            userService,
-            localizationService)
+            userService)
     {
         _logger = logger;
         _treeEntitySortingService = treeEntitySortingService;
