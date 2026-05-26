@@ -344,7 +344,7 @@ export default {
 		enterFolderName: 'Introduisez un nom de dossier',
 		updateData: 'Choisissez un type et un titre',
 		noDocumentTypes:
-			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous les <strong>Permissions</strong>.",
+			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous la <strong>Structure</strong>.",
 		noDocumentTypesAtRoot:
 			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>.",
 		noDocumentTypesWithNoSettingsAccess:
@@ -352,9 +352,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Modifier les permissions pour ce type de document',
 		noDocumentTypesCreateNew: 'Créer un nouveau type de document',
 		noDocumentTypesAllowedAtRoot:
-			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant l'option <strong>Autoriser comme racine</strong> sous les <strong>Permissions</strong>.",
+			"Il n'y a aucun type de document disponible pour créer du contenu ici. Vous devez d'abord les activer dans <strong>Types de documents</strong> sous la section <strong>Paramètres</strong>, en modifiant l'option <strong>Autoriser comme racine</strong> sous la <strong>Structure</strong>.",
 		noMediaTypes:
-			"Il n'y a aucun type de média disponible pour créer un media ici. Vous devez d'abord les activer dans <strong>Types de médias</strong> dans la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous les <strong>Permissions</strong>.",
+			"Il n'y a aucun type de média disponible pour créer un media ici. Vous devez d'abord les activer dans <strong>Types de médias</strong> dans la section <strong>Paramètres</strong>, en modifiant les <strong>Types de noeuds enfants autorisés</strong> sous la <strong>Structure</strong>.",
 		noMediaTypesWithNoSettingsAccess:
 			"Le media sélectionné dans l'arborescence n'autorise pas la création d'un autre media sous lui.",
 		noMediaTypesEditPermissions: 'Modifier les permissions pour ce type de media',
