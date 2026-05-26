@@ -831,6 +831,7 @@ export default {
 		content: 'Conteúdo',
 		continue: 'Continuar',
 		copy: 'Copiar',
+		copied: 'Copiado!',
 		create: 'Criar',
 		database: 'Base de dados',
 		date: 'Data',
@@ -2286,6 +2287,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Desativar Monitorizador de URLs',
 		enableUrlTracker: 'Ativar Monitorizador de URLs',
+		urlTrackerEnabled: 'Ativado',
+		urlTrackerDisabled: 'Desativado',
 		originalUrl: 'URL Original',
 		redirectedTo: 'Redirecionado Para',
 		redirectUrlManagement: 'Gestão de URL de Redirecionamento',

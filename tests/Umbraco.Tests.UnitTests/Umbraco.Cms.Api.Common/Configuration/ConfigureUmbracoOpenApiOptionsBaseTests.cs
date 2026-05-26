@@ -28,7 +28,7 @@ public class ConfigureUmbracoOpenApiOptionsBaseTests
         var jsonTypeInfo = _jsonOptions.GetTypeInfo(typeof(int));
 
         // Act
-        var result = ConfigureUmbracoOpenApiOptionsBase.CreateSchemaReferenceId(jsonTypeInfo);
+        var result = UmbracoSchemaIdGenerator.CreateSchemaReferenceId(jsonTypeInfo);
 
         // Assert
         Assert.IsNull(result);
@@ -42,7 +42,7 @@ public class ConfigureUmbracoOpenApiOptionsBaseTests
         var jsonTypeInfo = _jsonOptions.GetTypeInfo(typeof(TestAttribute));
 
         // Act
-        var result = ConfigureUmbracoOpenApiOptionsBase.CreateSchemaReferenceId(jsonTypeInfo);
+        var result = UmbracoSchemaIdGenerator.CreateSchemaReferenceId(jsonTypeInfo);
 
         // Assert - note: no "Model" suffix added for non-Umbraco types
         Assert.AreEqual("TestAttribute", result);
@@ -55,7 +55,7 @@ public class ConfigureUmbracoOpenApiOptionsBaseTests
         var jsonTypeInfo = _jsonOptions.GetTypeInfo(typeof(UmbracoSchemaIdGenerator));
 
         // Act
-        var result = ConfigureUmbracoOpenApiOptionsBase.CreateSchemaReferenceId(jsonTypeInfo);
+        var result = UmbracoSchemaIdGenerator.CreateSchemaReferenceId(jsonTypeInfo);
 
         // Assert
         Assert.AreEqual("UmbracoSchemaIdGeneratorModel", result);
@@ -68,7 +68,7 @@ public class ConfigureUmbracoOpenApiOptionsBaseTests
         var jsonTypeInfo = _jsonOptions.GetTypeInfo(typeof(Direction?));
 
         // Act
-        var result = ConfigureUmbracoOpenApiOptionsBase.CreateSchemaReferenceId(jsonTypeInfo);
+        var result = UmbracoSchemaIdGenerator.CreateSchemaReferenceId(jsonTypeInfo);
 
         // Assert
         Assert.AreEqual("DirectionModel", result);

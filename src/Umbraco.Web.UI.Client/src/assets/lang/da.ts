@@ -844,6 +844,7 @@ export default {
 		content: 'Indhold',
 		continue: 'Fortsæt',
 		copy: 'Kopiér',
+		copied: 'Kopieret!',
 		create: 'Opret',
 		cropSection: 'Beskær sektion',
 		database: 'Database',
@@ -2294,6 +2295,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Slå URL tracker fra',
 		enableUrlTracker: 'Slå URL tracker til',
+		urlTrackerEnabled: 'Aktiveret',
+		urlTrackerDisabled: 'Deaktiveret',
 		culture: 'Kultur',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Viderestillet til',
@@ -2704,6 +2707,18 @@ export default {
 	propertyEditorPicker: {
 		title: 'Vælg Property Editor',
 		openPropertyEditorPicker: 'Vælg Property Editor',
+	},
+
+	propertyEditorUIGroups: {
+		advanced: 'Advanceret',
+		blocks: 'Bloks',
+		common: 'Generelt',
+		date: 'Dato og tid',
+		lists: 'Lister',
+		media: 'Medier',
+		people: 'Personer',
+		pickers: 'Vælgere',
+		richContent: 'Beriget indhold',
 	},
 	healthcheck: {
 		checkSuccessMessage: "Value is set to the recommended value: '%0%'.",

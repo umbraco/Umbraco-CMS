@@ -120,7 +120,7 @@ test('can unpublish a specific element with unpublish permission enabled', async
 
 test('can update a specific element with update permission enabled', async ({umbracoApi, umbracoUi}) => {
   // Arrange
-  const newElementName = 'UpdatedElement';
+  const newElementName = 'FirstElementUpdated';
   userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdatePermissionForSpecificElement(userGroupName, firstElementId);
   await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);

@@ -887,6 +887,7 @@ export default {
 		content: 'Content',
 		continue: 'Continue',
 		copy: 'Copy',
+		copied: 'Copied!',
 		create: 'Create',
 		database: 'Database',
 		date: 'Date',
@@ -1270,6 +1271,7 @@ export default {
 		requiredPasswordValidationMessage: 'Please fill in a password',
 		showPassword: 'Show password',
 		hidePassword: 'Hide password',
+		invalidPasswordMessage: 'The password is not strong enough.',
 	},
 	main: {
 		dashboard: 'Dashboard',
@@ -1491,6 +1493,17 @@ export default {
 	propertyEditorPicker: {
 		title: 'Select a property editor',
 		openPropertyEditorPicker: 'Select a property editor UI',
+	},
+	propertyEditorUIGroups: {
+		advanced: 'Advanced',
+		blocks: 'Blocks',
+		common: 'Common',
+		date: 'Date',
+		lists: 'Lists',
+		media: 'Media',
+		people: 'People',
+		pickers: 'Pickers',
+		richContent: 'Rich Content',
 	},
 	relatedlinks: {
 		enterExternal: 'enter external link',
@@ -2472,7 +2485,13 @@ export default {
 	},
 	redirectUrls: {
 		disableUrlTracker: 'Disable URL tracker',
+		disableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To disable tracking, set the following configuration key to true:',
 		enableUrlTracker: 'Enable URL tracker',
+		enableUrlTrackerInstruction:
+			'Redirect URL tracking is configured through application settings. To enable tracking, set the following configuration key to false:',
+		urlTrackerEnabled: 'Enabled',
+		urlTrackerDisabled: 'Disabled',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Redirected To',
 		redirectUrlManagement: 'Redirect URL Management',

@@ -25,7 +25,8 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'minimumRange',
 					label: 'Minimum range',
-					description: '',
+					description:
+						'Minimum difference between the low and high values when range is enabled. Set to 0 to allow equal values.',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
 					config: [{ alias: 'step', value: '0.00001' }],
 				},

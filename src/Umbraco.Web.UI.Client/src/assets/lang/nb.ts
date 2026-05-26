@@ -455,6 +455,7 @@ export default {
 		content: 'Innhold',
 		continue: 'Fortsett',
 		copy: 'Kopier',
+		copied: 'Kopiert!',
 		create: 'Opprett',
 		cropSection: 'Utsnitt',
 		current: 'nåværende',

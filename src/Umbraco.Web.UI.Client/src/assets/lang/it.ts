@@ -721,6 +721,7 @@ export default {
 		content: 'Contenuto',
 		continue: 'Continua',
 		copy: 'Copia',
+		copied: 'Copiato!',
 		create: 'Crea',
 		cropSection: 'Selezione di ritaglio',
 		database: 'Database',
@@ -1992,6 +1993,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Disabilita tracciamento degli URL',
 		enableUrlTracker: 'Abilita tracciamento degli URL',
+		urlTrackerEnabled: 'Abilitato',
+		urlTrackerDisabled: 'Disabilitato',
 		culture: 'Cultura',
 		originalUrl: 'URL originale',
 		redirectedTo: 'Reindirizzato a',

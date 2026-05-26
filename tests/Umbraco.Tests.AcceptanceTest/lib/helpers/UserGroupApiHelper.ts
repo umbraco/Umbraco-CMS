@@ -1039,6 +1039,7 @@ export class UserGroupApiHelper {
       .withElementRootAccess(true)
       .addFallbackPermission()
         .withDeleteElementPermission(enabled)
+        .withDeleteElementContainerPermission(enabled)
         .withReadElementPermission(true)
         .done()
       .build();
@@ -1120,8 +1121,10 @@ export class UserGroupApiHelper {
       .withElementRootAccess(true)
       .addFallbackPermission()
         .withMoveElementPermission(enabled)
+        .withMoveElementContainerPermission(enabled)
         .withCreateElementPermission(enabled)
         .withReadElementPermission(true)
+        .withReadElementContainerPermission(true)
         .done()
       .build();
 
@@ -1201,6 +1204,7 @@ export class UserGroupApiHelper {
       .withElementStartNodeId(startNodeId)
       .addFallbackPermission()
         .withReadElementPermission(true)
+        .withReadElementContainerPermission(true)
         .done()
       .build();
 
@@ -1348,6 +1352,7 @@ export class UserGroupApiHelper {
       .addFallbackPermission()
         .withCreateElementPermission(true)
         .withReadElementPermission(true)
+        .withReadElementContainerPermission(true)
         .done()
       .addPermissions()
         .addElementPermission()
@@ -1413,6 +1418,7 @@ export class UserGroupApiHelper {
       .addSection(ConstantHelper.sectionAliases.library)
       .addFallbackPermission()
         .withReadElementPermission(true)
+        .withReadElementContainerPermission(true)
         .done()
       .build();
 
