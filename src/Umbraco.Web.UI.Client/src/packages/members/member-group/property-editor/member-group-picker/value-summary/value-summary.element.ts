@@ -1,6 +1,6 @@
 import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
-import type { UmbMemberGroupItemModel } from '../../../types';
+import type { UmbMemberGroupItemModel } from '../../../types.js';
 
 @customElement('umb-member-group-picker-property-editor-value-summary')
 export class UmbMemberGroupPickerPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<

@@ -1,6 +1,6 @@
 import { customElement, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbValueSummaryElementBase } from '@umbraco-cms/backoffice/value-summary';
-import type { UmbUserItemModel } from '../../../repository';
+import type { UmbUserItemModel } from '../../../repository/index.js';
 
 @customElement('umb-user-picker-property-editor-value-summary')
 export class UmbUserPickerPropertyEditorValueSummaryElement extends UmbValueSummaryElementBase<
