@@ -30,7 +30,10 @@
 
 		// Adds SQLite feature from apt install
 		// Also adds the SQLite VSCode extension
-		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {}
+		"ghcr.io/warrenbuckley/codespace-features/sqlite:1": {},
+
+		// Installs the Claude Code CLI for AI-assisted development in the terminal
+		"ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
 	},
 
 	"forwardPorts": [5050, 5173, 44339],
@@ -74,7 +77,9 @@
 	// Codespaces uses a shallow clone by default, which prevents Nerdbank.GitVersioning
 	// from calculating the version height by walking the commit history.
 	// This command unshallows the clone to ensure the full history is available.
-	"initializeCommand": "git fetch --unshallow || true",
+	// stderr is suppressed because git prints "fatal: --unshallow on a complete repository
+	// does not make sense" when the clone is already full — the || true handles the exit code.
+	"initializeCommand": "git fetch --unshallow 2>/dev/null || true",
 
 	// This is used in the prebuilds - so dotnet build (nuget restore and node stuff) is done
 	"updateContentCommand": "dotnet build umbraco.sln",
