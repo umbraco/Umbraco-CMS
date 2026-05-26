@@ -7,6 +7,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -741,5 +742,65 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
             Assert.AreEqual(searchResults.First().Values["__VariesByCulture"], contentTypeCultureVariations);
             Assert.AreEqual(searchResults.First().Values["__Icon"], contentNode.ContentType.Icon);
         });
+    }
+
+    /// <summary>
+    /// Verifies that <see cref="IIndexedEntitySearchService"/> returns matches in Lucene score
+    /// order. The exact-match document is published last so its nodeId is the highest of the
+    /// set, meaning a consumer that surfaces results in database order would put it last —
+    /// only a score-order-preserving consumer ranks it first.
+    /// </summary>
+    [Test]
+    public async Task IndexedEntitySearchService_Preserves_Score_Order_For_Multi_Word_Search()
+    {
+        await SetupUserIdentity(Constants.Security.SuperUserIdAsString);
+
+        const string exactMatch = "Sirop de Grenade Pomegranate Syrup";
+        await PublishContents(
+            "Quinta de la Rosa Reserva 2020",
+            "Delivery API Test Page",
+            "Test De Mocha",
+            exactMatch);
+
+        var indexedEntitySearchService = GetRequiredService<IIndexedEntitySearchService>();
+        PagedModel<IEntitySlim> result = await indexedEntitySearchService.SearchAsync(
+            UmbracoObjectTypes.Document,
+            exactMatch,
+            parentId: null,
+            contentTypeIds: null,
+            trashed: null);
+
+        IEntitySlim[] items = result.Items.ToArray();
+        Assert.GreaterOrEqual(items.Length, 1);
+        Assert.AreEqual(exactMatch, items.First().Name);
+    }
+
+    private async Task PublishContents(params string[] contentNames)
+    {
+        var contentType = new ContentTypeBuilder()
+            .WithId(0)
+            .Build();
+        await ExecuteAndWaitForIndexing(
+            () => ContentTypeService.Save(contentType),
+            Constants.UmbracoIndexes.InternalIndexName);
+
+        foreach (var name in contentNames)
+        {
+            var content = new ContentBuilder()
+                .WithId(0)
+                .WithName(name)
+                .WithContentType(contentType)
+                .Build();
+            await ExecuteAndWaitForIndexing(
+                () =>
+                {
+                    using var scope = ScopeProvider.CreateCoreScope();
+                    ContentService.Save(content);
+                    var result = ContentService.Publish(content, Array.Empty<string>());
+                    scope.Complete();
+                    return result;
+                },
+                Constants.UmbracoIndexes.InternalIndexName);
+        }
     }
 }
