@@ -4,7 +4,7 @@ using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 
 /// <summary>
-/// Provides helper methods for processing rich text editor (RTE) blocks containing local links during the upgrade to Umbraco version 15.0.0.
+/// Provides helper methods for processing rich text editor (RTE) block markup by rewriting block UDIs to keys.
 /// </summary>
 [Obsolete("Scheduled for removal in Umbraco 18.")]
 public static partial class RteBlockHelper

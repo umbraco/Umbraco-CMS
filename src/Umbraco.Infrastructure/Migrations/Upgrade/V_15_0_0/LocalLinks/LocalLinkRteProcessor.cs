@@ -51,7 +51,7 @@ public class LocalLinkRteProcessor : ITypedLocalLinkProcessor
 
         var newMarkup = processStringValue.Invoke(richTextValue.Markup);
 
-        // fix recursive hickup in ConvertRichTextEditorProperties
+        // fix recursive hiccup in ConvertRichTextEditorProperties
         newMarkup = RteBlockHelper.ConvertBlockUdisToKeys(newMarkup);
 
         if (newMarkup.Equals(richTextValue.Markup) == false)
