@@ -72,7 +72,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "sourceFileMap": {
-        "/Views": "${workspaceFolder}/Umbraco.Web.UI/Views"
+        "/Views": "${workspaceFolder}/src/Umbraco.Web.UI/Views"
       },
       "presentation": {
         "group": "3"
@@ -110,7 +110,7 @@
         "UMBRACO__CMS__SECURITY__BACKOFFICETOKENCOOKIE__SAMESITE": "None"
       },
       "sourceFileMap": {
-        "/Views": "${workspaceFolder}/Umbraco.Web.UI/Views"
+        "/Views": "${workspaceFolder}/src/Umbraco.Web.UI/Views"
       },
       "presentation": {
         "group": "3"
