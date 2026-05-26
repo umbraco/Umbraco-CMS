@@ -257,22 +257,30 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEFCoreScope<TDbContext>
         // Check if we are already in a transaction before starting one.
         if (_dbContext.Database.CurrentTransaction is null)
         {
-            // Walk up to the root scope to find the NPoco inner scope's transaction.
-            // Child scopes have _innerScope = null (only the root has it), but we need
-            // to share the NPoco connection so both ORMs participate in the same transaction.
-            DbTransaction? transaction = FindInnerScopeTransaction();
-
-            if (transaction is not null)
+            if (_shareUmbracoConnection)
             {
-                // Share the parent NPoco scope's connection so both ORMs participate
-                // in the same transaction. Note: SetDbConnection always nulls EF Core's
-                // internal _connectionString field, which we must restore before pool return
-                // (see DisposeEfCoreDatabase).
-                _dbContext.Database.SetDbConnection(transaction.Connection);
-                _dbContext.Database.UseTransaction(transaction);
+                // Walk up to the root scope to find the NPoco inner scope's transaction.
+                // Child scopes have _innerScope = null (only the root has it), but we need
+                // to share the NPoco connection so both ORMs participate in the same transaction.
+                DbTransaction? transaction = FindInnerScopeTransaction();
+
+                if (transaction is not null)
+                {
+                    // Share the parent NPoco scope's connection so both ORMs participate
+                    // in the same transaction. Note: SetDbConnection always nulls EF Core's
+                    // internal _connectionString field, which we must restore before pool return
+                    // (see DisposeEFCoreDatabase).
+                    _dbContext.Database.SetDbConnection(transaction.Connection);
+                    _dbContext.Database.UseTransaction(transaction);
+                }
+                else
+                {
+                    _dbContext.Database.BeginTransaction();
+                }
             }
             else
             {
+                // Separate database — use the DbContext's own configured connection.
                 _dbContext.Database.BeginTransaction();
             }
 

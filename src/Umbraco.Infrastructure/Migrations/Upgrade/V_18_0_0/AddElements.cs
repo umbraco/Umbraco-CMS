@@ -29,7 +29,7 @@ public class AddElements : AsyncMigrationBase
         => _relationService = relationService;
 
     /// <inheritdoc />
-    protected override Task MigrateAsync()
+    protected override async Task MigrateAsync()
     {
         EnsureElementTreeLock();
         EnsureElementTables();
@@ -37,8 +37,7 @@ public class AddElements : AsyncMigrationBase
         EnsureElementStartNodeColumn();
         EnsureAdminGroupElementAccess();
         EnsureAdminGroupElementPermissions();
-        EnsureElementRelationTypes();
-        return Task.CompletedTask;
+        await EnsureElementRelationTypesAsync();
     }
 
     private void EnsureElementTreeLock()
@@ -183,23 +182,23 @@ public class AddElements : AsyncMigrationBase
         Database.InsertBulk(permissionDtos);
     }
 
-    private void EnsureElementRelationTypes()
+    private async Task EnsureElementRelationTypesAsync()
     {
-        EnsureRelationType(
+        await EnsureRelationTypeAsync(
             Constants.Conventions.RelationTypes.RelatedElementAlias,
             Constants.Conventions.RelationTypes.RelatedElementName,
             parentObjectType: null,
             childObjectType: null,
             isDependency: true);
 
-        EnsureRelationType(
+        await EnsureRelationTypeAsync(
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteName,
             parentObjectType: Constants.ObjectTypes.ElementContainer,
             childObjectType: Constants.ObjectTypes.Element,
             isDependency: false);
 
-        EnsureRelationType(
+        await EnsureRelationTypeAsync(
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteAlias,
             Constants.Conventions.RelationTypes.RelateParentElementContainerOnContainerDeleteName,
             parentObjectType: Constants.ObjectTypes.ElementContainer,
@@ -207,14 +206,14 @@ public class AddElements : AsyncMigrationBase
             isDependency: false);
     }
 
-    private void EnsureRelationType(
+    private async Task EnsureRelationTypeAsync(
         string alias,
         string name,
         Guid? parentObjectType,
         Guid? childObjectType,
         bool isDependency)
     {
-        IRelationType? relationType = _relationService.GetRelationTypeByAliasAsync(alias).GetAwaiter().GetResult();
+        IRelationType? relationType = await _relationService.GetRelationTypeByAliasAsync(alias);
         if (relationType != null)
         {
             return;
@@ -228,6 +227,6 @@ public class AddElements : AsyncMigrationBase
         {
             Key = key
         };
-        _relationService.SaveAsync(relationType).GetAwaiter().GetResult();
+        await _relationService.SaveAsync(relationType);
     }
 }

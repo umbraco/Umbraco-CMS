@@ -6,7 +6,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Notifications;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -108,7 +107,7 @@ internal sealed class ContentRelationsUpdate :
         if (references.Count == 0)
         {
             // Query existing relations before deleting, so we can publish notifications.
-            IRelation[] deletedRelations = GetExistingAutomaticRelations(scope, entity.Id, automaticRelationTypeAliases);
+            IRelation[] deletedRelations = await GetExistingAutomaticRelationsAsync(entity.Id, automaticRelationTypeAliases);
 
             // Delete all relations using the automatic relation type aliases.
             await _relationRepository.DeleteByParentAsync(entity.Id, automaticRelationTypeAliases.ToArray());
@@ -173,7 +172,7 @@ internal sealed class ContentRelationsUpdate :
 
         // Get existing relations for this parent and filter to the (small) set of automatic relation types.
         // Relations are unique by parent ID, child ID and relation type ID.
-        var relationTypeIds = relationTypeLookup.Values.ToHashSet();
+        var relationTypeIds = relationTypeLookup.Values.Select(x => x.Id).ToHashSet();
         var existingRelations = (await _relationRepository.GetByParentIdAsync(entity.Id))
             .Where(x => relationTypeIds.Contains(x.RelationTypeId))
             .ToDictionary(x => (x.ChildId, x.RelationTypeId));
@@ -213,23 +212,21 @@ internal sealed class ContentRelationsUpdate :
         }
     }
 
-    private IRelation[] GetExistingAutomaticRelations(IScope scope, int entityId, ISet<string> automaticRelationTypeAliases)
+    private async Task<IRelation[]> GetExistingAutomaticRelationsAsync(int entityId, ISet<string> automaticRelationTypeAliases)
     {
-        int[] relationTypeIds = _relationTypeRepository.GetMany(Array.Empty<int>())
+        var relationTypeIds = (await _relationTypeRepository.GetAllAsync(CancellationToken.None))
             .Where(x => automaticRelationTypeAliases.Contains(x.Alias))
             .Select(x => x.Id)
-            .ToArray();
+            .ToHashSet();
 
-        if (relationTypeIds.Length == 0)
+        if (relationTypeIds.Count == 0)
         {
             return [];
         }
 
-        IQuery<IRelation> query = scope.SqlContext.Query<IRelation>()
-            .Where(x => x.ParentId == entityId)
-            .WhereIn(x => x.RelationTypeId, relationTypeIds);
-
-        return _relationRepository.GetPagedRelationsByQuery(query, 0, int.MaxValue, out _, null).ToArray();
+        return (await _relationRepository.GetByParentIdAsync(entityId))
+            .Where(x => relationTypeIds.Contains(x.RelationTypeId))
+            .ToArray();
     }
 
     private sealed class NodeIdKey

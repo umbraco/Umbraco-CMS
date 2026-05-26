@@ -56,7 +56,7 @@ public abstract class RelationOutputCacheEvictionHandlerBase
 
         foreach (var entityId in changedEntityIds)
         {
-            IEnumerable<IRelation> relations = _relationService.GetByChildId(entityId, relationTypeAlias);
+            IEnumerable<IRelation> relations = await _relationService.GetByChildIdAsync(entityId, relationTypeAlias);
             foreach (IRelation relation in relations)
             {
                 parentIds.Add(relation.ParentId);

@@ -402,7 +402,9 @@ public class PackagesRepository : ICreatedPackagesRepository
                     continue;
                 }
 
-                ILanguage? lang = _languageRepository.Get(outInt);
+#pragma warning disable CS0618 // obsolete int-based bridge, remove when EFCore migration is complete
+                ILanguage? lang = _languageRepository.GetAsync(outInt, CancellationToken.None).GetAwaiter().GetResult();
+#pragma warning restore CS0618
                 if (lang == null)
                 {
                     continue;

@@ -30,8 +30,8 @@ public class DeliveryApiMemberOutputCacheEvictionHandlerTests
 
         _relationServiceMock = new Mock<IRelationService>();
         _relationServiceMock
-            .Setup(r => r.GetByChildId(It.IsAny<int>(), It.IsAny<string>()))
-            .Returns(Enumerable.Empty<IRelation>());
+            .Setup(r => r.GetByChildIdAsync(It.IsAny<int>(), It.IsAny<string>()))
+            .ReturnsAsync(Enumerable.Empty<IRelation>());
 
         _idKeyMapMock = new Mock<IIdKeyMap>();
 
@@ -53,8 +53,8 @@ public class DeliveryApiMemberOutputCacheEvictionHandlerTests
         relation.Setup(r => r.ParentId).Returns(parentDocumentId);
 
         _relationServiceMock
-            .Setup(r => r.GetByChildId(memberId, Constants.Conventions.RelationTypes.RelatedMemberAlias))
-            .Returns(new[] { relation.Object });
+            .Setup(r => r.GetByChildIdAsync(memberId, Constants.Conventions.RelationTypes.RelatedMemberAlias))
+            .ReturnsAsync(new[] { relation.Object });
 
         _idKeyMapMock
             .Setup(m => m.GetKeyForId(parentDocumentId, UmbracoObjectTypes.Document))
@@ -92,8 +92,8 @@ public class DeliveryApiMemberOutputCacheEvictionHandlerTests
 
         // Both members reference the same parent document.
         _relationServiceMock
-            .Setup(r => r.GetByChildId(It.IsAny<int>(), Constants.Conventions.RelationTypes.RelatedMemberAlias))
-            .Returns(new[] { relation.Object });
+            .Setup(r => r.GetByChildIdAsync(It.IsAny<int>(), Constants.Conventions.RelationTypes.RelatedMemberAlias))
+            .ReturnsAsync(new[] { relation.Object });
 
         _idKeyMapMock
             .Setup(m => m.GetKeyForId(parentDocumentId, UmbracoObjectTypes.Document))

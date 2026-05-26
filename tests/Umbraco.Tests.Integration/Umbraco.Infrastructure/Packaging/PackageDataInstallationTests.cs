@@ -836,7 +836,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         using (var scope = ScopeProvider.CreateCoreScope())
         {
             packagingService.InstallCompiledPackageData(packageXml);
-            keyValueService.SetValue(canaryKey, "ok");
+            await keyValueService.SetValueAsync(canaryKey, "ok");
             scope.Complete();
         }
 
@@ -844,7 +844,7 @@ internal sealed class PackageDataInstallationTests : UmbracoIntegrationTestWithC
         var stylesheet = await stylesheetService.GetAsync("folder1/folder2/nested.css");
 
         // Canary must have survived the outer scope - covers (3).
-        var canary = keyValueService.GetValue(canaryKey);
+        var canary = await keyValueService.GetValueAsync(canaryKey);
 
         Assert.Multiple(() =>
         {

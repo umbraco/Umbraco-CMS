@@ -308,7 +308,6 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         }
 
         // Create media
-        var createdMedia = new List<IMedia>();
         var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
         await MediaTypeService.CreateAsync(imageType, Constants.Security.SuperUserKey);
         for (var i = 0; i < 3; i++)
@@ -321,7 +320,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         // Create members
         var memberType = MemberTypeBuilder.CreateSimpleMemberType("simple");
         await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var createdMembers.AddRange(MemberBuilder.CreateSimpleMembers(memberType, 3));
+        createdMembers.AddRange(MemberBuilder.CreateSimpleMembers(memberType, 3));
         GetMemberService().Save(createdMembers);
 
         var relatedMediaRelType =

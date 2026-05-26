@@ -242,12 +242,12 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
             Assert.IsNull(result);
 
             // Persist a canary in the same outer scope - this should survive scope.Complete().
-            KeyValueService.SetValue(canaryKey, "ok");
+            await KeyValueService.SetValueAsync(canaryKey, "ok");
             outer.Complete();
         }
 
         // If the outer scope was poisoned by the un-completed child, this returns null.
-        Assert.AreEqual("ok", KeyValueService.GetValue(canaryKey));
+        Assert.AreEqual("ok", await KeyValueService.GetValueAsync(canaryKey));
     }
 
     [Test]
@@ -267,11 +267,11 @@ internal sealed class PartialViewServiceTests : UmbracoIntegrationTest
                 Constants.Security.SuperUserKey);
             Assert.AreEqual(PartialViewOperationStatus.NotFound, result.Status);
 
-            KeyValueService.SetValue(canaryKey, "ok");
+            await KeyValueService.SetValueAsync(canaryKey, "ok");
             outer.Complete();
         }
 
-        Assert.AreEqual("ok", KeyValueService.GetValue(canaryKey));
+        Assert.AreEqual("ok", await KeyValueService.GetValueAsync(canaryKey));
     }
 
     private void DeleteAllPartialViewFiles()

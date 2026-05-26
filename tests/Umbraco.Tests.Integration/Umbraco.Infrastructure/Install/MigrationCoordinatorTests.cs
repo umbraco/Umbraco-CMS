@@ -32,7 +32,7 @@ internal sealed class MigrationCoordinatorTests : UmbracoIntegrationTest
 
         await coordinator.TryBecomeLeaderAsync(CancellationToken.None);
 
-        var claim = KeyValueService.GetValue(Constants.Conventions.Migrations.UpgradeLockKey);
+        var claim = await KeyValueService.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey);
         Assert.That(claim, Does.StartWith("machine-a|"));
     }
 
@@ -44,7 +44,7 @@ internal sealed class MigrationCoordinatorTests : UmbracoIntegrationTest
 
         coordinator.ReleaseLeadership();
 
-        var claim = KeyValueService.GetValue(Constants.Conventions.Migrations.UpgradeLockKey);
+        var claim = await KeyValueService.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey);
         Assert.That(claim, Is.Null.Or.Empty);
     }
 
@@ -54,7 +54,7 @@ internal sealed class MigrationCoordinatorTests : UmbracoIntegrationTest
     public async Task TryBecomeLeaderAsync_WhenExistingClaimIsStale_TakesOverLeadership()
     {
         var staleTimestamp = DateTimeOffset.UtcNow.AddHours(-3).ToString("O");
-        KeyValueService.SetValue(
+        await KeyValueService.SetValueAsync(
             Constants.Conventions.Migrations.UpgradeLockKey,
             $"crashed-server|{staleTimestamp}");
 
@@ -62,7 +62,7 @@ internal sealed class MigrationCoordinatorTests : UmbracoIntegrationTest
         var result = await coordinator.TryBecomeLeaderAsync(CancellationToken.None);
 
         Assert.IsTrue(result);
-        var claim = KeyValueService.GetValue(Constants.Conventions.Migrations.UpgradeLockKey);
+        var claim = await KeyValueService.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey);
         Assert.That(claim, Does.StartWith("machine-a|"));
     }
 
@@ -132,7 +132,7 @@ internal sealed class MigrationCoordinatorTests : UmbracoIntegrationTest
         Assert.AreNotEqual(result1, result2, "Exactly one coordinator should win leadership");
 
         var winnerId = result1 == true ? "machine-a" : "machine-b";
-        var claim = KeyValueService.GetValue(Constants.Conventions.Migrations.UpgradeLockKey);
+        var claim = KeyValueService.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey).GetAwaiter().GetResult();
         Assert.That(claim, Does.StartWith(winnerId + "|"));
     }
 

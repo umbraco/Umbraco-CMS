@@ -60,10 +60,4 @@ internal sealed partial class MediaEditingServiceTests : UmbracoIntegrationTest
         return result.Result.CreatedUser!;
     }
 
-    private void Relate(IMedia parent, IMedia child)
-    {
-        var relationType = RelationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelatedMediaAlias);
-        var relation = RelationService.Relate(parent.Id, child.Id, relationType);
-        RelationService.Save(relation);
-    }
 }

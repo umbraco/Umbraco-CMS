@@ -40,7 +40,7 @@ public class DocumentUrlAliasServiceTests
         // Return "1" (the service's CurrentRebuildValue constant) so ShouldRebuildAliases() returns false and
         // InitAsync skips the rebuild side-effect in tests that call InitAsync.
         var keyValueServiceMock = new Mock<IKeyValueService>();
-        keyValueServiceMock.Setup(x => x.GetValue(DocumentUrlAliasService.RebuildKey)).Returns("1");
+        keyValueServiceMock.Setup(x => x.GetValueAsync(DocumentUrlAliasService.RebuildKey)).ReturnsAsync("1");
 
         var documentNavigationQueryServiceMock = Mock.Of<IDocumentNavigationQueryService>();
 

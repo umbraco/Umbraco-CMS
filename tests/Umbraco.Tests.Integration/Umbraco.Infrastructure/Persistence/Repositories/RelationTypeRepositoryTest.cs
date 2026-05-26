@@ -249,17 +249,16 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    public async Task Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
     {
-        ICoreScopeProvider provider = ScopeProvider;
-        using (provider.CreateCoreScope())
+        using (ScopeProvider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
             var relationType = new RelationType("Test Clone", "testClone", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
-            repository.Save(relationType);
+            await repository.SaveAsync(relationType, CancellationToken.None);
 
-            var first = repository.Get(relationType.Key);
-            var second = repository.Get(relationType.Key);
+            var first = await repository.GetAsync(relationType.Key, CancellationToken.None);
+            var second = await repository.GetAsync(relationType.Key, CancellationToken.None);
 
             Assert.IsNotNull(first);
             Assert.IsNotNull(second);
@@ -269,36 +268,34 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Exists_By_Guid_Returns_Correct_Result()
+    public async Task Exists_By_Guid_Returns_Correct_Result()
     {
-        ICoreScopeProvider provider = ScopeProvider;
-        using (provider.CreateCoreScope())
+        using (ScopeProvider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
             var relationType = new RelationType("Test Exists", "testExists", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
-            repository.Save(relationType);
+            await repository.SaveAsync(relationType, CancellationToken.None);
 
-            Assert.IsTrue(repository.Exists(relationType.Key));
-            Assert.IsFalse(repository.Exists(Guid.NewGuid()));
+            Assert.IsTrue(await repository.ExistsAsync(relationType.Id, CancellationToken.None));
+            Assert.IsNull(await repository.GetAsync(Guid.NewGuid(), CancellationToken.None));
         }
     }
 
     [Test]
-    public void Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    public async Task Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
     {
-        ICoreScopeProvider provider = ScopeProvider;
-        using (provider.CreateCoreScope())
+        using (ScopeProvider.CreateCoreScope())
         {
-            var repository = CreateRepository(provider);
+            var repository = CreateRepository();
             var relationType = new RelationType("Test Mutation", "testMutation", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
-            repository.Save(relationType);
+            await repository.SaveAsync(relationType, CancellationToken.None);
 
-            var first = repository.Get(relationType.Key);
+            var first = await repository.GetAsync(relationType.Key, CancellationToken.None);
             Assert.IsNotNull(first);
             var originalName = first!.Name;
             first.Name = "MUTATED_" + Guid.NewGuid();
 
-            var second = repository.Get(relationType.Key);
+            var second = await repository.GetAsync(relationType.Key, CancellationToken.None);
             Assert.IsNotNull(second);
             Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
         }

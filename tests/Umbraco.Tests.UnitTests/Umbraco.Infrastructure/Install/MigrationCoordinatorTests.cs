@@ -40,15 +40,15 @@ public class MigrationCoordinatorTests
     public async Task TryBecomeLeaderAsync_WhenClaimKeyIsEmpty_ClaimsLeadershipAndReturnsTrue()
     {
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns((string?)null);
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .ReturnsAsync((string?)null);
 
         var sut = CreateSut();
         var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
 
         Assert.IsTrue(result);
         _keyValueServiceMock.Verify(
-            x => x.SetValue(
+            x => x.SetValueAsync(
                 Constants.Conventions.Migrations.UpgradeLockKey,
                 It.Is<string>(v => v.StartsWith(TestMachineIdentifier + "|"))),
             Times.Once);
@@ -59,15 +59,15 @@ public class MigrationCoordinatorTests
     {
         var staleTimestamp = DateTimeOffset.UtcNow.AddHours(-3).ToString("O");
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns($"{OtherMachineIdentifier}|{staleTimestamp}");
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .ReturnsAsync($"{OtherMachineIdentifier}|{staleTimestamp}");
 
         var sut = CreateSut(claimTimeout: TimeSpan.FromHours(2));
         var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
 
         Assert.IsTrue(result);
         _keyValueServiceMock.Verify(
-            x => x.SetValue(
+            x => x.SetValueAsync(
                 Constants.Conventions.Migrations.UpgradeLockKey,
                 It.Is<string>(v => v.StartsWith(TestMachineIdentifier + "|"))),
             Times.Once);
@@ -78,15 +78,15 @@ public class MigrationCoordinatorTests
     {
         var recentTimestamp = DateTimeOffset.UtcNow.AddMinutes(-1).ToString("O");
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns($"{TestMachineIdentifier}|{recentTimestamp}");
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .ReturnsAsync($"{TestMachineIdentifier}|{recentTimestamp}");
 
         var sut = CreateSut();
         var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
 
         Assert.IsTrue(result);
         _keyValueServiceMock.Verify(
-            x => x.SetValue(
+            x => x.SetValueAsync(
                 Constants.Conventions.Migrations.UpgradeLockKey,
                 It.Is<string>(v => v.StartsWith(TestMachineIdentifier + "|"))),
             Times.Once);
@@ -97,8 +97,8 @@ public class MigrationCoordinatorTests
     {
         // Simulate TOCTOU: lock is empty (leader released between our last DetermineRuntimeLevel and our claim).
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns((string?)null);
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .ReturnsAsync((string?)null);
 
         // DetermineRuntimeLevel transitions level to Run (leader already finished).
         _runtimeStateMock.SetupGet(x => x.Level).Returns(RuntimeLevel.Upgrading);
@@ -108,11 +108,11 @@ public class MigrationCoordinatorTests
 
         string? capturedClaim = null;
         _keyValueServiceMock
-            .Setup(x => x.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, It.IsAny<string>()))
+            .Setup(x => x.SetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey, It.IsAny<string>()))
             .Callback<string, string>((_, v) => capturedClaim = v);
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns(() => capturedClaim);
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .Returns(() => Task.FromResult(capturedClaim));
 
         var sut = CreateSut();
         var result = await sut.TryBecomeLeaderAsync(CancellationToken.None);
@@ -120,7 +120,7 @@ public class MigrationCoordinatorTests
         Assert.IsFalse(result);
         // The claim was written then cleared by ReleaseLeadership.
         _keyValueServiceMock.Verify(
-            x => x.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty),
+            x => x.SetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty),
             Times.Once);
     }
 
@@ -129,8 +129,8 @@ public class MigrationCoordinatorTests
     {
         var recentTimestamp = DateTimeOffset.UtcNow.AddMinutes(-1).ToString("O");
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns($"{OtherMachineIdentifier}|{recentTimestamp}");
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .ReturnsAsync($"{OtherMachineIdentifier}|{recentTimestamp}");
 
         _runtimeStateMock.SetupGet(x => x.Level).Returns(RuntimeLevel.Upgrading);
         _runtimeStateMock
@@ -148,8 +148,8 @@ public class MigrationCoordinatorTests
     {
         var recentTimestamp = DateTimeOffset.UtcNow.AddMinutes(-1).ToString("O");
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns($"{OtherMachineIdentifier}|{recentTimestamp}");
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .ReturnsAsync($"{OtherMachineIdentifier}|{recentTimestamp}");
 
         _runtimeStateMock.SetupGet(x => x.Level).Returns(RuntimeLevel.Upgrading);
         _runtimeStateMock
@@ -167,8 +167,8 @@ public class MigrationCoordinatorTests
     {
         var recentTimestamp = DateTimeOffset.UtcNow.AddMinutes(-1).ToString("O");
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns($"{OtherMachineIdentifier}|{recentTimestamp}");
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .ReturnsAsync($"{OtherMachineIdentifier}|{recentTimestamp}");
 
         // Level returns Run so the switch exits without sleeping; DetermineRuntimeLevel still throws.
         _runtimeStateMock.SetupGet(x => x.Level).Returns(RuntimeLevel.Run);
@@ -209,10 +209,10 @@ public class MigrationCoordinatorTests
     {
         string? capturedClaim = null;
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns(() => capturedClaim);
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .Returns(() => Task.FromResult(capturedClaim));
         _keyValueServiceMock
-            .Setup(x => x.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, It.IsAny<string>()))
+            .Setup(x => x.SetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey, It.IsAny<string>()))
             .Callback<string, string>((_, v) => capturedClaim = v);
 
         var sut = CreateSut();
@@ -221,7 +221,7 @@ public class MigrationCoordinatorTests
         sut.ReleaseLeadership();
 
         _keyValueServiceMock.Verify(
-            x => x.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty),
+            x => x.SetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty),
             Times.Once);
     }
 
@@ -229,21 +229,21 @@ public class MigrationCoordinatorTests
     public async Task ReleaseLeadership_WhenDatabaseValueDiffersFromLeaderClaim_DoesNotClearKey()
     {
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns((string?)null);
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .ReturnsAsync((string?)null);
 
         var sut = CreateSut();
         await sut.TryBecomeLeaderAsync(CancellationToken.None);
 
         // Another server has since taken over the claim.
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns($"{OtherMachineIdentifier}|{DateTimeOffset.UtcNow:O}");
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .ReturnsAsync($"{OtherMachineIdentifier}|{DateTimeOffset.UtcNow:O}");
 
         sut.ReleaseLeadership();
 
         _keyValueServiceMock.Verify(
-            x => x.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty),
+            x => x.SetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty),
             Times.Never);
     }
 
@@ -270,10 +270,10 @@ public class MigrationCoordinatorTests
     {
         string? capturedClaim = null;
         _keyValueServiceMock
-            .Setup(x => x.GetValue(Constants.Conventions.Migrations.UpgradeLockKey))
-            .Returns(() => capturedClaim);
+            .Setup(x => x.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey))
+            .Returns(() => Task.FromResult(capturedClaim));
         _keyValueServiceMock
-            .Setup(x => x.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, It.IsAny<string>()))
+            .Setup(x => x.SetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey, It.IsAny<string>()))
             .Callback<string, string>((_, v) => capturedClaim = v);
 
         var sut = CreateSut();

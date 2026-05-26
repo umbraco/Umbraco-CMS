@@ -46,7 +46,7 @@ internal sealed class MigrationCoordinator : IMigrationCoordinator
 
         while (cancellationToken.IsCancellationRequested is false)
         {
-            if (TryClaimLeadership(machineIdentifier))
+            if (await TryClaimLeadershipAsync(machineIdentifier))
             {
                 // Re-check after claiming: the previous leader may have finished between our last
                 // DetermineRuntimeLevel call and our successful claim of the now-empty lock.
@@ -126,10 +126,10 @@ internal sealed class MigrationCoordinator : IMigrationCoordinator
             using ICoreScope scope = _scopeProvider.CreateCoreScope();
             scope.WriteLock(Constants.Locks.KeyValues);
 
-            string? current = _keyValueService.GetValue(Constants.Conventions.Migrations.UpgradeLockKey);
+            string? current = _keyValueService.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey).GetAwaiter().GetResult();
             if (current == _leaderClaim)
             {
-                _keyValueService.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty);
+                _keyValueService.SetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey, string.Empty).GetAwaiter().GetResult();
             }
 
             scope.Complete();
@@ -150,16 +150,16 @@ internal sealed class MigrationCoordinator : IMigrationCoordinator
     }
 
     // Acquires WriteLock(KeyValues) so the read-then-write is serialized across all servers.
-    // Inner GetValue and SetValue calls create nested scopes that join the outer transaction;
+    // Inner GetValueAsync and SetValueAsync calls create nested scopes that join the outer transaction;
     // their internal WriteLock requests are no-ops because the lock is already held.
-    private bool TryClaimLeadership(string machineIdentifier)
+    private async Task<bool> TryClaimLeadershipAsync(string machineIdentifier)
     {
         TimeSpan timeout = _unattendedSettings.Value.MigrationClaimTimeout;
 
         using ICoreScope scope = _scopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.KeyValues);
 
-        string? current = _keyValueService.GetValue(Constants.Conventions.Migrations.UpgradeLockKey);
+        string? current = await _keyValueService.GetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey);
 
         bool canClaim = string.IsNullOrEmpty(current)
             || IsStale(current, timeout)
@@ -168,7 +168,7 @@ internal sealed class MigrationCoordinator : IMigrationCoordinator
         if (canClaim)
         {
             _leaderClaim = $"{machineIdentifier}|{DateTimeOffset.UtcNow:O}";
-            _keyValueService.SetValue(Constants.Conventions.Migrations.UpgradeLockKey, _leaderClaim);
+            await _keyValueService.SetValueAsync(Constants.Conventions.Migrations.UpgradeLockKey, _leaderClaim);
         }
 
         scope.Complete();

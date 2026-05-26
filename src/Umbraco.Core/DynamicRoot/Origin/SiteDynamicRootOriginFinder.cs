@@ -1,5 +1,4 @@
 using System.Globalization;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
 
@@ -50,9 +49,7 @@ public class SiteDynamicRootOriginFinder : RootDynamicRootOriginFinder
         for (int i = contentIdStrings.Length - 1; i >= 0; i--)
         {
             var contentId = int.Parse(contentIdStrings[i], NumberStyles.Integer, CultureInfo.InvariantCulture);
-            // TODO: Remove int-based overload when EFCore migration is completed.
-            IEnumerable<IDomain> domains = _domainService.GetAssignedDomainsAsync(contentId, true).GetAwaiter().GetResult();
-            if (!domains.Any())
+            if (contentIdsWithDomains.Contains(contentId) is false)
             {
                 continue;
             }

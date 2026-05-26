@@ -31,8 +31,8 @@ public class DeliveryApiMediaOutputCacheEvictionHandlerTests
 
         _relationServiceMock = new Mock<IRelationService>();
         _relationServiceMock
-            .Setup(r => r.GetByChildId(It.IsAny<int>(), It.IsAny<string>()))
-            .Returns(Enumerable.Empty<IRelation>());
+            .Setup(r => r.GetByChildIdAsync(It.IsAny<int>(), It.IsAny<string>()))
+            .ReturnsAsync(Enumerable.Empty<IRelation>());
 
         _idKeyMapMock = new Mock<IIdKeyMap>();
 
@@ -99,8 +99,8 @@ public class DeliveryApiMediaOutputCacheEvictionHandlerTests
         relation.Setup(r => r.ParentId).Returns(parentDocumentId);
 
         _relationServiceMock
-            .Setup(r => r.GetByChildId(mediaId, Constants.Conventions.RelationTypes.RelatedMediaAlias))
-            .Returns(new[] { relation.Object });
+            .Setup(r => r.GetByChildIdAsync(mediaId, Constants.Conventions.RelationTypes.RelatedMediaAlias))
+            .ReturnsAsync(new[] { relation.Object });
 
         _idKeyMapMock
             .Setup(m => m.GetKeyForId(parentDocumentId, UmbracoObjectTypes.Document))

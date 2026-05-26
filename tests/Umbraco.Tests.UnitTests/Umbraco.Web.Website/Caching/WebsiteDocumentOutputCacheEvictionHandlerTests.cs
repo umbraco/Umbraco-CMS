@@ -32,8 +32,8 @@ public class WebsiteDocumentOutputCacheEvictionHandlerTests
 
         _relationServiceMock = new Mock<IRelationService>();
         _relationServiceMock
-            .Setup(r => r.GetByChildId(It.IsAny<int>(), It.IsAny<string>()))
-            .Returns(Enumerable.Empty<IRelation>());
+            .Setup(r => r.GetByChildIdAsync(It.IsAny<int>(), It.IsAny<string>()))
+            .ReturnsAsync(Enumerable.Empty<IRelation>());
 
         _idKeyMapMock = new Mock<IIdKeyMap>();
 
@@ -211,8 +211,8 @@ public class WebsiteDocumentOutputCacheEvictionHandlerTests
         relation.Setup(r => r.ParentId).Returns(parentId);
 
         _relationServiceMock
-            .Setup(r => r.GetByChildId(changedId, global::Umbraco.Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentAlias))
-            .Returns(new[] { relation.Object });
+            .Setup(r => r.GetByChildIdAsync(changedId, global::Umbraco.Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentAlias))
+            .ReturnsAsync(new[] { relation.Object });
 
         _idKeyMapMock
             .Setup(m => m.GetKeyForId(parentId, UmbracoObjectTypes.Document))
@@ -243,8 +243,8 @@ public class WebsiteDocumentOutputCacheEvictionHandlerTests
 
         // Both changed items reference the same parent.
         _relationServiceMock
-            .Setup(r => r.GetByChildId(It.IsAny<int>(), global::Umbraco.Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentAlias))
-            .Returns(new[] { relation.Object });
+            .Setup(r => r.GetByChildIdAsync(It.IsAny<int>(), global::Umbraco.Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentAlias))
+            .ReturnsAsync(new[] { relation.Object });
 
         _idKeyMapMock
             .Setup(m => m.GetKeyForId(parentId, UmbracoObjectTypes.Document))
