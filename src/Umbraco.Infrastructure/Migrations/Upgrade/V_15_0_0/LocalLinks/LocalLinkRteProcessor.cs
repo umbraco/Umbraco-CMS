@@ -1,6 +1,6 @@
-using System.Text.RegularExpressions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
@@ -52,13 +52,7 @@ public class LocalLinkRteProcessor : ITypedLocalLinkProcessor
         var newMarkup = processStringValue.Invoke(richTextValue.Markup);
 
         // fix recursive hickup in ConvertRichTextEditorProperties
-        newMarkup = RteBlockHelper.BlockRegex().Replace(
-            newMarkup,
-            match => UdiParser.TryParse(match.Groups["udi"].Value, out GuidUdi? guidUdi)
-                ? match.Value
-                    .Replace(match.Groups["attribute"].Value, "data-content-key")
-                    .Replace(match.Groups["udi"].Value, guidUdi.Guid.ToString("D"))
-                : string.Empty);
+        newMarkup = RteBlockHelper.ConvertBlockUdisToKeys(newMarkup);
 
         if (newMarkup.Equals(richTextValue.Markup) == false)
         {
@@ -84,18 +78,4 @@ public class LocalLinkRteProcessor : ITypedLocalLinkProcessor
 
         return hasChanged;
     }
-}
-
-/// <summary>
-/// Provides helper methods for processing rich text editor (RTE) blocks containing local links during the upgrade to Umbraco version 15.0.0.
-/// </summary>
-[Obsolete("Scheduled for removal in Umbraco 18.")]
-public static partial class RteBlockHelper
-{
-    /// <summary>
-    /// Returns a <see cref="Regex"/> that matches <c>umb-rte-block</c> elements containing a <c>data-content-udi</c> attribute in the input HTML.
-    /// </summary>
-    /// <returns>A <see cref="Regex"/> instance for identifying <c>umb-rte-block</c> elements with a <c>data-content-udi</c> attribute.</returns>
-    [GeneratedRegex("<umb-rte-block.*(?<attribute>data-content-udi)=\"(?<udi>.[^\"]*)\".*<\\/umb-rte-block")]
-    public static partial Regex BlockRegex();
 }

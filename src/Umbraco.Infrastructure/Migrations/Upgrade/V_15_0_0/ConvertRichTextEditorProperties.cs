@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -8,6 +7,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 
@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 /// Migration responsible for converting rich text editor properties to the new format as part of the upgrade process to Umbraco version 15.0.0.
 /// </summary>
 [Obsolete("Scheduled for removal in Umbraco 18.")]
-public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropertiesBase
+public class ConvertRichTextEditorProperties : ConvertBlockEditorPropertiesBase
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ConvertRichTextEditorProperties"/> class.
@@ -62,13 +62,7 @@ public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropert
             return base.UpdateEditorValue(editorValue);
         }
 
-        richTextEditorValue.Markup = BlockRegex().Replace(
-            richTextEditorValue.Markup,
-            match => UdiParser.TryParse(match.Groups["udi"].Value, out GuidUdi? guidUdi)
-                ? match.Value
-                    .Replace(match.Groups["attribute"].Value, "data-content-key")
-                    .Replace(match.Groups["udi"].Value, guidUdi.Guid.ToString("D"))
-                : string.Empty);
+        richTextEditorValue.Markup = RteBlockHelper.ConvertBlockUdisToKeys(richTextEditorValue.Markup);
 
         return richTextEditorValue;
     }
@@ -100,7 +94,4 @@ public partial class ConvertRichTextEditorProperties : ConvertBlockEditorPropert
     protected override bool IsCandidateForMigration(IPropertyType propertyType, IDataType dataType)
         => dataType.ConfigurationObject is RichTextConfiguration richTextConfiguration
            && richTextConfiguration.Blocks?.Any() is true;
-
-    [GeneratedRegex("<umb-rte-block.*(?<attribute>data-content-udi)=\"(?<udi>.[^\"]*)\".*<\\/umb-rte-block")]
-    private static partial Regex BlockRegex();
 }
