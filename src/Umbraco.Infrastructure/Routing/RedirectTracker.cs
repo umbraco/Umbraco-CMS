@@ -309,7 +309,7 @@ internal sealed class RedirectTracker : IRedirectTracker
                 // to the original. We resolve this by removing any existing redirect that points to the new route.
                 RemoveSelfReferencingRedirect(contentKey, newRoute);
 
-                _redirectUrlService.Register(oldRoute, contentKey, culture);
+                _redirectUrlService.Register(oldRoute, newRoute, contentKey, culture);
             }
             catch (Exception ex)
             {
