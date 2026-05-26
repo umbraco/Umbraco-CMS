@@ -257,9 +257,9 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
                 .WhereNotNull();
         }
 
-        // Batch the WhereIn fetch so we never exceed SQL Server's 2100 parameter limit
-        // (even though EntityRepositoryBase.GetMany already groups, callers that invoke this
-        // method directly should not have to know about the limit).
+        // Batch the WhereIn fetch so we never exceed SQL Server's 2100 parameter limit.
+        // EntityRepositoryBase.GetMany already groups IDs, but we keep the batching here as
+        // a defensive measure for safety and consistency at the repository boundary.
         var dtos = new List<RedirectUrlDto>(ids.Length);
         foreach (IEnumerable<Guid> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
         {

@@ -207,8 +207,8 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetContentSourcesAsync(IEnumerable<Guid> keys, bool preview = false)
     {
-        // Batch the WHERE IN against the configurable seed batch size so that callers configuring
-        // CacheSettings.DocumentSeedBatchSize above MaxParameterCount don't hit SQL Server's 2100 parameter limit.
+        // Batch the WHERE IN to stay within SQL Server's parameter limit.
+        // The configurable document seed batch size is applied upstream; this method only enforces MaxParameterCount.
         Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
         var dtos = new List<ContentSourceDto>(keysArray.Length);
         foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
@@ -386,8 +386,8 @@ internal sealed class DatabaseCacheRepository : RepositoryBase, IDatabaseCacheRe
     /// <inheritdoc/>
     public async Task<IEnumerable<ContentCacheNode>> GetMediaSourcesAsync(IEnumerable<Guid> keys)
     {
-        // Batch the WHERE IN against the configurable seed batch size so that callers configuring
-        // CacheSettings.MediaSeedBatchSize above MaxParameterCount don't hit SQL Server's 2100 parameter limit.
+        // Batch the WHERE IN by Constants.Sql.MaxParameterCount so callers configuring
+        // CacheSettings.MediaSeedBatchSize above that limit do not hit SQL Server's 2100 parameter limit.
         Guid[] keysArray = keys as Guid[] ?? keys.ToArray();
         var dtos = new List<ContentSourceDto>(keysArray.Length);
         foreach (IEnumerable<Guid> group in keysArray.InGroupsOf(Constants.Sql.MaxParameterCount))
