@@ -531,6 +531,14 @@ Allowed, but cheap to write and cheaper to leave behind. Keep them short and tra
 
 ---
 
+## 9. Testing Practices
+
+### Tests for a bug fix must fail before the fix
+
+Verify any test you add for a bug fix actually catches the bug: either write the failing test first (TDD), or temporarily revert the production change and confirm the test fails before re-applying. A test that passes both ways proves nothing. Watch for coincidental passes — default seed/sort orders can make a buggy path produce the right answer for the test's specific inputs; construct inputs so the broken and fixed behaviours give visibly different results.
+
+---
+
 ## Quick Reference
 
 ### Essential Commands
