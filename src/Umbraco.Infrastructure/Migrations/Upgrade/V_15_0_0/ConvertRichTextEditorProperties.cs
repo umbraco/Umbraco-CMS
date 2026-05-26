@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0;
 

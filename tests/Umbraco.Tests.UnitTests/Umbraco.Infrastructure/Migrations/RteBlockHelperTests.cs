@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
-namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Upgrade.Common;
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations;
 
 /// <summary>
 /// Tests for <see cref="RteBlockHelper"/> — the helper used by the v15 RTE block migration

@@ -1,6 +1,5 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_15_0_0.LocalLinks;
 
@@ -51,7 +50,8 @@ public class LocalLinkRteProcessor : ITypedLocalLinkProcessor
 
         var newMarkup = processStringValue.Invoke(richTextValue.Markup);
 
-        // fix recursive hiccup in ConvertRichTextEditorProperties
+        // Re-apply block UDI→key conversion in case ConvertRichTextEditorProperties missed any
+        // (e.g. under recursive / nested block structures the primary migration could leave behind).
         newMarkup = RteBlockHelper.ConvertBlockUdisToKeys(newMarkup);
 
         if (newMarkup.Equals(richTextValue.Markup) == false)
