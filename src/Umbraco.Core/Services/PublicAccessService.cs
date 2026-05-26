@@ -157,7 +157,7 @@ internal sealed class PublicAccessService : AsyncRepositoryService, IPublicAcces
         }
 
         var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
-        if (scope.Notifications.PublishCancelable(savingNotifiation))
+        if (await scope.Notifications.PublishCancelableAsync(savingNotifiation))
         {
             scope.Complete();
             return OperationResult.Attempt.Cancel(evtMsgs, entry);

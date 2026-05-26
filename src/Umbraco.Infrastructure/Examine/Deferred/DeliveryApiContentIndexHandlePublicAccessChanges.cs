@@ -59,24 +59,24 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
     /// effort to handle public access changes. instead we have to grab all protected content definitions
     /// and handle every last one with every notification.
     /// </remarks>
-    public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(_ =>
+    public void Execute() => _backgroundTaskQueue.QueueBackgroundWorkItem(async _ =>
     {
         IIndex index = _deliveryApiIndexingHandler.GetIndex() ??
                        throw new InvalidOperationException("Could not obtain the delivery API content index");
 
         if (_deliveryApiSettings.MemberAuthorizationIsEnabled() is false)
         {
-            EnsureProtectedContentIsRemovedFromIndex(index);
-            return Task.CompletedTask;
+            await EnsureProtectedContentIsRemovedFromIndexAsync(index);
+            return;
         }
 
-        EnsureProtectedContentIsUpToDateInIndex(index);
-        return Task.CompletedTask;
+        await EnsureProtectedContentIsUpToDateInIndexAsync(index);
     });
 
-    private void EnsureProtectedContentIsRemovedFromIndex(IIndex index)
+    private async Task EnsureProtectedContentIsRemovedFromIndexAsync(IIndex index)
     {
-        var protectedContentIds = _publicAccessService.GetAllAsync().GetAwaiter().GetResult().Select(entry => entry.ProtectedNodeId).ToArray();
+        IEnumerable<PublicAccessEntry> entries = await _publicAccessService.GetAllAsync();
+        var protectedContentIds = entries.Select(entry => entry.ProtectedNodeId).ToArray();
         if (protectedContentIds.Any() is false)
         {
             return;
@@ -91,7 +91,7 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
         RemoveFromIndex(indexIds, index);
     }
 
-    private void EnsureProtectedContentIsUpToDateInIndex(IIndex index)
+    private async Task EnsureProtectedContentIsUpToDateInIndexAsync(IIndex index)
     {
         // first we need to re-index all the content items that are currently known to be protected in the index,
         // as their protection might have been revoked or altered.
@@ -102,8 +102,8 @@ internal sealed class DeliveryApiContentIndexHandlePublicAccessChanges : Deliver
         }
 
         // then we have to re-index any protected content items that were not part of the first operation.
-        var unhandledProtectedContentIds = _publicAccessService
-            .GetAllAsync().GetAwaiter().GetResult()
+        IEnumerable<PublicAccessEntry> entries = await _publicAccessService.GetAllAsync();
+        var unhandledProtectedContentIds = entries
             .Select(entry => entry.ProtectedNodeId)
             .Except(protectedContentIdsInIndex)
             .ToArray();

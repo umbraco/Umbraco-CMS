@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -28,7 +27,7 @@ internal sealed class PublicAccessRepositoryTest : UmbracoIntegrationTest
 
     private PublicAccessRepository CreateRepository() =>
         new(
-            StaticServiceProvider.Instance.GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
+            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
             AppCaches,
             LoggerFactory.CreateLogger<PublicAccessRepository>(),
             Mock.Of<IRepositoryCacheVersionService>(),

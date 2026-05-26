@@ -94,25 +94,16 @@ internal sealed class PublicAccessRepository : AsyncEntityRepositoryBase<Guid, P
         await AmbientScope.ExecuteWithContextAsync<AccessDto>(async db =>
         {
             db.Access.Add(dto);
-
-            // update the id so HasEntity is correct
-            entity.Id = entity.Key.GetHashCode();
-
-            foreach (AccessRuleDto rule in dto.Rules)
-            {
-                rule.AccessId = entity.Key;
-                db.AccessRules.Add(rule);
-            }
-
-            // update the id so HasEntity is correct
-            foreach (PublicAccessRule rule in entity.Rules)
-            {
-                rule.Id = rule.Key.GetHashCode();
-            }
-
             await db.SaveChangesAsync();
-            entity.ResetDirtyProperties();
         });
+
+        entity.Id = entity.Key.GetHashCode();
+        foreach (PublicAccessRule rule in entity.Rules)
+        {
+            rule.Id = rule.Key.GetHashCode();
+        }
+
+        entity.ResetDirtyProperties();
     }
 
     /// <inheritdoc/>
@@ -135,6 +126,7 @@ internal sealed class PublicAccessRepository : AsyncEntityRepositoryBase<Guid, P
 
         await AmbientScope.ExecuteWithContextAsync<AccessDto>(async db =>
         {
+            // Parent record.
             await db.Access
                 .Where(x => x.Id == dto.Id)
                 .ExecuteUpdateAsync(setter => setter
@@ -144,6 +136,7 @@ internal sealed class PublicAccessRepository : AsyncEntityRepositoryBase<Guid, P
                     .SetProperty(x => x.CreateDate, dto.CreateDate)
                     .SetProperty(x => x.UpdateDate, dto.UpdateDate));
 
+            // Deleted rules.
             foreach (Guid removedRule in entity.RemovedRules)
             {
                 await db.AccessRules
@@ -151,6 +144,8 @@ internal sealed class PublicAccessRepository : AsyncEntityRepositoryBase<Guid, P
                     .ExecuteDeleteAsync();
             }
 
+            // Existing rules: update in place.
+            // New rules: stage on the tracker, save once at the end.
             foreach (PublicAccessRule rule in entity.Rules)
             {
                 AccessRuleDto ruleDto = dto.Rules.Single(x => x.Id == rule.Key);
@@ -167,15 +162,24 @@ internal sealed class PublicAccessRepository : AsyncEntityRepositoryBase<Guid, P
                 else
                 {
                     db.AccessRules.Add(ruleDto);
-                    await db.SaveChangesAsync();
-
-                    // update the id so HasEntity is correct
-                    rule.Id = rule.Key.GetHashCode();
                 }
             }
 
-            entity.ResetDirtyProperties();
+            // Single round-trip for every newly-added rule in this update.
+            await db.SaveChangesAsync();
         });
+
+        // Mirror the legacy "Id from Key hash" contract for the just-inserted rules
+        // so HasIdentity is correct on the domain entity.
+        foreach (PublicAccessRule rule in entity.Rules)
+        {
+            if (rule.HasIdentity is false)
+            {
+                rule.Id = rule.Key.GetHashCode();
+            }
+        }
+
+        entity.ResetDirtyProperties();
     }
 
     /// <inheritdoc/>

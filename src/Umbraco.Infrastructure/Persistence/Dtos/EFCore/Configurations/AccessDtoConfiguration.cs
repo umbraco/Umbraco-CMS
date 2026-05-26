@@ -41,5 +41,23 @@ public class AccessDtoConfiguration : IEntityTypeConfiguration<AccessDto>
             .WithOne(x => x.Access)
             .HasForeignKey(x => x.AccessId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne<NodeDto>()
+            .WithMany()
+            .HasForeignKey(x => x.NodeId)
+            .HasConstraintName("FK_umbracoAccess_umbracoNode_id")
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne<NodeDto>()
+            .WithMany()
+            .HasForeignKey(x => x.LoginNodeId)
+            .HasConstraintName("FK_umbracoAccess_umbracoNode_id1")
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne<NodeDto>()
+            .WithMany()
+            .HasForeignKey(x => x.NoAccessNodeId)
+            .HasConstraintName("FK_umbracoAccess_umbracoNode_id2")
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

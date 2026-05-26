@@ -14,7 +14,7 @@ public class AddPublicAccessDto : AsyncMigrationBase
 
     protected override async Task MigrateAsync()
     {
-        // NO-OP migration to ensure that EF Core doesnt complain about missing migrations.
+        // NO-OP migration to ensure that EF Core doesn't complain about missing migrations.
         await _migrationExecutor.ExecuteSingleMigrationAsync(EFCoreMigration.AddPublicAccessDto);
     }
 }

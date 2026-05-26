@@ -105,7 +105,7 @@ public static class PublicAccessServiceExtensions
             throw new ArgumentException("Value cannot be null or whitespace.", "path");
         }
 
-        PublicAccessEntry? entry = await publicAccessService.GetEntryForContentAsync(path.EnsureEndsWith(path));
+        PublicAccessEntry? entry = await publicAccessService.GetEntryForContentAsync(path);
         if (entry == null)
         {
             return true;
