@@ -1,5 +1,6 @@
 import { UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST } from '@umbraco-cms/backoffice/entity-action';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbRestoreFromRecycleBinEntityAction } from './restore-from-recycle-bin.action.js';
 
 export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -10,7 +11,7 @@ export const manifest: UmbExtensionManifestKind = {
 		...UMB_ENTITY_ACTION_DEFAULT_KIND_MANIFEST.manifest,
 		type: 'entityAction',
 		kind: 'restoreFromRecycleBin',
-		api: () => import('./restore-from-recycle-bin.action.js'),
+		api: UmbRestoreFromRecycleBinEntityAction,
 		weight: 100,
 		forEntityTypes: [],
 		meta: {

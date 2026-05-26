@@ -116,9 +116,9 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
     {
         private readonly Func<CancellationToken, Task>? _onExecute;
 
-        public TestJobA(Func<CancellationToken, Task>? onExecute = null) => _onExecute = onExecute;
-
-        public override TimeSpan Period => TimeSpan.FromSeconds(30);
+        public TestJobA(Func<CancellationToken, Task>? onExecute = null)
+            : base(TimeSpan.FromSeconds(30))
+            => _onExecute = onExecute;
 
         public override TimeSpan Delay => TimeSpan.Zero;
 
@@ -128,7 +128,10 @@ public class RecurringBackgroundJobHostedServiceRunnerTests
 
     private class TestJobB : RecurringBackgroundJobBase, ITriggerableRecurringBackgroundJob
     {
-        public override TimeSpan Period => TimeSpan.FromSeconds(30);
+        public TestJobB()
+            : base(TimeSpan.FromSeconds(30))
+        {
+        }
 
         public override TimeSpan Delay => TimeSpan.Zero;
 
