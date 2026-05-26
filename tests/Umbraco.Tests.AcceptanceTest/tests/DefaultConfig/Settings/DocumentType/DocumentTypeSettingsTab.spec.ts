@@ -77,3 +77,69 @@ test('can disable history cleanup for a document type', async ({umbracoApi, umbr
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.cleanup.preventCleanup).toBeTruthy();
 });
+
+test('cannot see History Cleanup section in Settings tab for an Element Type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createEmptyElementType(documentTypeName);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickDocumentTypeSettingsTab();
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the UI to update after toggling Element Type
+
+  // Assert
+  await umbracoUi.documentType.isPreventCleanupButtonVisible(false);
+  await umbracoUi.documentType.isElementTypeNotApplicableMessageForPropertyWithNameVisible('History clean up');
+});
+
+test('can see History Cleanup section in Settings tab after toggling off Element Type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createEmptyElementType(documentTypeName);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickDocumentTypeSettingsTab();
+  await umbracoUi.documentType.clickTextButtonWithName('Element Type');
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
+
+  // Assert
+  await umbracoUi.documentType.isPreventCleanupButtonVisible(true);
+  await umbracoUi.documentType.doesElementTypeNotApplicableMessageExist(false);
+  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  expect(documentTypeData.isElement).toBeFalsy();
+});
+
+test('can see History Cleanup section in Settings tab after enabling Allow in Library', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createEmptyElementType(documentTypeName);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickStructureTab();
+  await umbracoUi.documentType.clickAllowInLibraryButton();
+  await umbracoUi.documentType.clickSaveButtonAndWaitForDocumentTypeToBeUpdated();
+
+  // Assert
+  await umbracoUi.documentType.clickDocumentTypeSettingsTab();
+  await umbracoUi.documentType.isPreventCleanupButtonVisible(true);
+  await umbracoUi.documentType.doesElementTypeNotApplicableMessageExist(false);
+  const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
+  expect(documentTypeData.isElement).toBeTruthy();
+});
+
+test('cannot see element type not applicable message in Settings tab for a Document Type', async ({umbracoApi, umbracoUi}) => {
+  // Arrange
+  await umbracoApi.documentType.createDefaultDocumentType(documentTypeName);
+  await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
+
+  // Act
+  await umbracoUi.documentType.goToDocumentType(documentTypeName);
+  await umbracoUi.documentType.clickDocumentTypeSettingsTab();
+
+  // Assert
+  await umbracoUi.documentType.doesElementTypeNotApplicableMessageExist(false);
+  await umbracoUi.documentType.isPreventCleanupButtonVisible(true);
+});
