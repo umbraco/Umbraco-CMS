@@ -1,3 +1,4 @@
+import { UmbElementVariantState } from '../variant-state.js';
 import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_ROOT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../entity.js';
 import type {
 	UmbElementTreeChildrenOfRequestArgs,
@@ -5,7 +6,6 @@ import type {
 	UmbElementTreeRootItemsRequestArgs,
 } from '../types.js';
 import { UmbManagementApiElementTreeDataRequestManager } from './element-tree.server.request-manager.js';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { ElementTreeItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import type { UmbTreeAncestorsOfRequestArgs, UmbTreeDataSource } from '@umbraco-cms/backoffice/tree';
@@ -54,7 +54,6 @@ export class UmbElementTreeServerDataSource
 		return { data: mappedData, error };
 	}
 
-	// TODO: Review the commented out properties. [LK:2026-01-14]
 	#mapItem(item: ElementTreeItemResponseModel): UmbElementTreeItemModel {
 		return {
 			unique: item.id,
@@ -66,6 +65,7 @@ export class UmbElementTreeServerDataSource
 			entityType: item.isFolder ? UMB_ELEMENT_FOLDER_ENTITY_TYPE : UMB_ELEMENT_ENTITY_TYPE,
 			hasChildren: item.hasChildren,
 			isTrashed: false,
+			noAccess: item.noAccess,
 			isFolder: item.isFolder,
 			documentType: {
 				unique: item.documentType?.id ?? '',
@@ -76,7 +76,7 @@ export class UmbElementTreeServerDataSource
 			flags: item.flags,
 			createDate: item.createDate,
 			variants: item.isFolder
-				? [{ name: item.name, culture: null, segment: null, state: DocumentVariantStateModel.PUBLISHED, flags: [] }]
+				? [{ name: item.name, culture: null, segment: null, state: UmbElementVariantState.PUBLISHED, flags: [] }]
 				: item.variants.map((variant) => ({
 						name: variant.name,
 						culture: variant.culture || null,

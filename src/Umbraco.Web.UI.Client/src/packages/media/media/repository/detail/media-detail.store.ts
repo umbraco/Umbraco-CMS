@@ -15,7 +15,7 @@ export class UmbMediaDetailStore extends UmbDetailStoreBase<UmbMediaDetailModel>
 	 * @memberof UmbMediaDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_MEDIA_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_MEDIA_DETAIL_STORE_CONTEXT);
 	}
 }
 

@@ -298,6 +298,16 @@ public static partial class Constants
         public const string ConfigDictionary = ConfigPrefix + "Dictionary";
 
         /// <summary>
+        ///     The configuration key for website settings.
+        /// </summary>
+        public const string ConfigWebsite = ConfigPrefix + "Website";
+
+        /// <summary>
+        ///     The configuration key for SignalR settings.
+        /// </summary>
+        public const string ConfigSignalR = ConfigPrefix + "SignalR";
+
+        /// <summary>
         ///     Contains constants for named options used in configuration.
         /// </summary>
         public static class NamedOptions

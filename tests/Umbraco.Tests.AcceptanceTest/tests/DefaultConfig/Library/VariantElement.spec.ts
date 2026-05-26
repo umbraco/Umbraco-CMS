@@ -69,19 +69,19 @@ test('can create element with multiple culture variants', async ({umbracoApi, um
   // Create element with English culture
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(variantElementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(variantElementTypeName);
   await umbracoUi.library.enterElementName(elementNameEnglish);
   await umbracoUi.library.enterTextstring(englishText);
-  await umbracoUi.library.clickSaveButtonAndWaitForElementToBeCreated();
+  await umbracoUi.library.clickSaveButton();
+  await umbracoUi.library.clickSaveModalButtonAndWaitForElementToBeCreated();
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // This wait is needed to ensure the element is created before adding a variant
   // Add Danish variant using variant selector
   await umbracoUi.library.clickSelectVariantButton();
   await umbracoUi.library.clickVariantAddModeButtonForLanguageName(danishLanguage);
   await umbracoUi.library.enterElementName(elementNameDanish);
   await umbracoUi.library.enterTextstring(danishText);
-  await umbracoUi.library.clickSaveButtonAndWaitForElementToBeUpdated();
+  await umbracoUi.library.clickSaveButton();
+  await umbracoUi.library.clickSaveModalButtonAndWaitForElementToBeUpdated();
 
   // Assert
   const elementData = await umbracoApi.element.getByName(elementNameEnglish);
@@ -112,20 +112,20 @@ test('can create element with invariant and variant properties', async ({umbraco
   // Create element with English culture
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(mixedElementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(mixedElementTypeName);
   await umbracoUi.library.enterElementName(elementNameEnglish);
   await umbracoUi.library.enterPropertyValue(variantPropertyName, englishText);
   await umbracoUi.library.enterPropertyValue(invariantPropertyName, invariantText);
-  await umbracoUi.library.clickSaveButtonAndWaitForElementToBeCreated();
+  await umbracoUi.library.clickSaveButton();
+  await umbracoUi.library.clickSaveModalButtonAndWaitForElementToBeCreated();
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short);
   // Add Danish variant
   await umbracoUi.library.clickSelectVariantButton();
   await umbracoUi.library.clickVariantAddModeButtonForLanguageName(danishLanguage);
   await umbracoUi.library.enterElementName(elementNameDanish);
   await umbracoUi.library.enterPropertyValue(variantPropertyName, danishText);
-  await umbracoUi.library.clickSaveButtonAndWaitForElementToBeUpdated();
+  await umbracoUi.library.clickSaveButton();
+  await umbracoUi.library.clickSaveModalButtonAndWaitForElementToBeUpdated();
 
   // Assert
   const elementData = await umbracoApi.element.getByName(elementNameEnglish);
@@ -235,7 +235,8 @@ test('can edit variant property for specific culture only', async ({umbracoApi, 
   // Act
   await umbracoUi.library.goToElementWithName(elementNameEnglish);
   await umbracoUi.library.enterTextstring(updatedEnglishText);
-  await umbracoUi.library.clickSaveButtonAndWaitForElementToBeUpdated();
+  await umbracoUi.library.clickSaveButton();
+  await umbracoUi.library.clickSaveModalButtonAndWaitForElementToBeUpdated();
 
   // Assert
   const elementData = await umbracoApi.element.getByName(elementNameEnglish);
@@ -270,7 +271,8 @@ test('can edit element name for specific culture only', async ({umbracoApi, umbr
   // Act
   await umbracoUi.library.goToElementWithName(elementNameEnglish);
   await umbracoUi.library.enterElementName(updatedEnglishName);
-  await umbracoUi.library.clickSaveButtonAndWaitForElementToBeUpdated();
+  await umbracoUi.library.clickSaveButton();
+  await umbracoUi.library.clickSaveModalButtonAndWaitForElementToBeUpdated();
 
   // Assert
   const elementData = await umbracoApi.element.getByName(updatedEnglishName);

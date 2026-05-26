@@ -34,7 +34,7 @@ export class UmbElementAuditLogServerDataSource implements UmbAuditLogDataSource
 			ElementService.getElementByIdAuditLog({
 				path: { id: args.unique },
 				query: {
-					orderDirection: args.orderDirection as DirectionModel, // TODO: Fix type cast
+					orderDirection: args.orderDirection as DirectionModel, // TODO: Fix type cast between `UmbDirectionType` and `DirectionModel`
 					sinceDate: args.sinceDate,
 					skip: args.skip,
 					take: args.take,
@@ -47,7 +47,7 @@ export class UmbElementAuditLogServerDataSource implements UmbAuditLogDataSource
 				return {
 					user: { unique: item.user.id },
 					timestamp: item.timestamp,
-					logType: item.logType as UmbElementAuditLogType, // TODO: Fix type cast
+					logType: item.logType as UmbElementAuditLogType, // TODO: Fix type cast between `AuditTypeModel` and `UmbElementAuditLogType`
 					comment: item.comment,
 					parameters: item.parameters,
 				};

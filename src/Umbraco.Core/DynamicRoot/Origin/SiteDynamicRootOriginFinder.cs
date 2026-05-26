@@ -41,6 +41,11 @@ public class SiteDynamicRootOriginFinder : RootDynamicRootOriginFinder
             return null;
         }
 
+        var contentIdsWithDomains = _domainService.GetAllAsync(true).GetAwaiter().GetResult()
+            .Where(d => d.RootContentId.HasValue)
+            .Select(d => d.RootContentId!.Value)
+            .ToHashSet();
+
         string[] contentIdStrings = entity.Path.Split(',');
         for (int i = contentIdStrings.Length - 1; i >= 0; i--)
         {

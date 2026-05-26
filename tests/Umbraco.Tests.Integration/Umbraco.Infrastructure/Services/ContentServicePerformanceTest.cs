@@ -66,7 +66,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
         var contentType1 = ContentTypeBuilder.CreateTextPageContentType("test1", "test1", template.Id);
         var contentType2 = ContentTypeBuilder.CreateTextPageContentType("test2", "test2", template.Id);
         var contentType3 = ContentTypeBuilder.CreateTextPageContentType("test3", "test3", template.Id);
-        ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
+        foreach (var ct in new[] { contentType1, contentType2, contentType3 })
+        {
+            await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
+        }
         contentType1.AllowedContentTypes = new[]
         {
             new ContentTypeSort(contentType2.Key, 0, contentType2.Alias),
@@ -82,7 +85,10 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
             new ContentTypeSort(contentType1.Key, 0, contentType1.Alias),
             new ContentTypeSort(contentType2.Key, 1, contentType2.Alias)
         };
-        ContentTypeService.Save(new[] { contentType1, contentType2, contentType3 });
+        foreach (var ct in new[] { contentType1, contentType2, contentType3 })
+        {
+            await ContentTypeService.UpdateAsync(ct, Constants.Security.SuperUserKey);
+        }
 
         var roots = ContentBuilder.CreateTextpageContent(contentType1, -1, 10);
         ContentService.Save(roots);
@@ -273,6 +279,6 @@ internal sealed class ContentServicePerformanceTest : UmbracoIntegrationTest
 
         // Create and Save ContentType "textpage" -> ContentType.Id
         ContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: template.Id);
-        ContentTypeService.Save(ContentType);
+        await ContentTypeService.CreateAsync(ContentType, Constants.Security.SuperUserKey);
     }
 }

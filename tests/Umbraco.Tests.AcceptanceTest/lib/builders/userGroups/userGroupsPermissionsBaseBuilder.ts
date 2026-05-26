@@ -31,6 +31,14 @@ export class UserGroupsPermissionsBaseBuilder {
   moveElement: boolean = false;
   rollbackElement: boolean = false;
 
+  // Element permissions
+  readElementContainer: boolean = false;
+  createElementContainer: boolean = false;
+  deleteElementContainer: boolean = false;
+  updateElementContainer: boolean = false;
+  moveElementContainer: boolean = false;
+  rollbackElementContainer: boolean = false;
+
   constructor(parentBuilder) {
     this.parentBuilder = parentBuilder;
   }
@@ -167,6 +175,32 @@ export class UserGroupsPermissionsBaseBuilder {
     return this;
   }
 
+  // Element Container permission methods
+  withReadElementContainerPermission(read: boolean) {
+    this.readElementContainer = read;
+    return this;
+  }
+
+  withCreateElementContainerPermission(create: boolean) {
+    this.createElementContainer = create;
+    return this;
+  }
+
+  withDeleteElementContainerPermission(deletePermission: boolean) {
+    this.deleteElementContainer = deletePermission;
+    return this;
+  }
+
+  withUpdateElementContainerPermission(update: boolean) {
+    this.updateElementContainer = update;
+    return this;
+  }
+
+  withMoveElementContainerPermission(move: boolean) {
+    this.moveElementContainer = move;
+    return this;
+  }
+
   done() {
     return this.parentBuilder;
   }
@@ -254,6 +288,23 @@ export class UserGroupsPermissionsBaseBuilder {
     }
     if (this.rollbackElement) {
       values.push('Umb.Element.Rollback');
+    }
+
+    // Element Container permissions
+    if (this.readElementContainer) {
+      values.push('Umb.ElementContainer.Read');
+    }
+    if (this.createElementContainer) {
+      values.push('Umb.ElementContainer.Create');
+    }
+    if (this.deleteElementContainer) {
+      values.push('Umb.ElementContainer.Delete');
+    }
+    if (this.updateElementContainer) {
+      values.push('Umb.ElementContainer.Update');
+    }
+    if (this.moveElementContainer) {
+      values.push('Umb.ElementContainer.Move');
     }
 
     return values;

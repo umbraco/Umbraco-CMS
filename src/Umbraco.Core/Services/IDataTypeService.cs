@@ -22,66 +22,7 @@ public interface IDataTypeService : IService
     /// The intention is that we align data type relations with these so they can be handled polymorphically at the management API
     /// and backoffice UI level.
     /// </remarks>
-    Task<PagedModel<RelationItemModel>> GetPagedRelationsAsync(Guid key, int skip, int take)
-        => Task.FromResult(new PagedModel<RelationItemModel>());
-
-    /// <summary>
-    ///     Creates a container for organizing data types.
-    /// </summary>
-    /// <param name="parentId">The parent container ID, or -1 for root.</param>
-    /// <param name="key">The unique key for the new container.</param>
-    /// <param name="name">The name of the container.</param>
-    /// <param name="userId">The ID of the user performing the action.</param>
-    /// <returns>An operation result containing the created container.</returns>
-    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult<OperationResultType, EntityContainer>?> CreateContainer(
-        int parentId,
-        Guid key,
-        string name,
-        int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Gets a container by its ID.
-    /// </summary>
-    /// <param name="containerId">The container ID.</param>
-    /// <returns>The container, or null if not found.</returns>
-    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
-    EntityContainer? GetContainer(int containerId);
-
-    /// <summary>
-    ///     Gets containers by name and level.
-    /// </summary>
-    /// <param name="folderName">The container name.</param>
-    /// <param name="level">The container level.</param>
-    /// <returns>A collection of matching containers.</returns>
-    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<EntityContainer> GetContainers(string folderName, int level);
-
-    /// <summary>
-    ///     Gets all ancestor containers for a data type.
-    /// </summary>
-    /// <param name="dataType">The data type.</param>
-    /// <returns>A collection of ancestor containers.</returns>
-    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<EntityContainer> GetContainers(IDataType dataType);
-
-    /// <summary>
-    ///     Gets containers by their IDs.
-    /// </summary>
-    /// <param name="containerIds">The container IDs.</param>
-    /// <returns>A collection of containers.</returns>
-    [Obsolete("Please use IDataTypeContainerService for all data type container operations. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<EntityContainer> GetContainers(int[] containerIds);
-
-    /// <summary>
-    ///     Gets a <see cref="IDataType" /> by its Id
-    /// </summary>
-    /// <param name="id">Id of the <see cref="IDataType" /></param>
-    /// <returns>
-    ///     <see cref="IDataType" />
-    /// </returns>
-    [Obsolete("Please use GetAsync. Scheduled for removal in Umbraco 18.")]
-    IDataType? GetDataType(int id);
+    Task<PagedModel<RelationItemModel>> GetPagedRelationsAsync(Guid key, int skip, int take);
 
     /// <summary>
     ///     Gets an <see cref="IDataType" /> by its Name
@@ -120,30 +61,6 @@ public interface IDataTypeService : IService
     Task<PagedModel<IDataType>> FilterAsync(string? name = null, string? editorUiAlias = null, string? editorAlias = null, int skip = 0, int take = 100);
 
     /// <summary>
-    ///     Gets all <see cref="IDataType" /> objects or those with the ids passed in
-    /// </summary>
-    /// <param name="ids">Optional array of Ids</param>
-    /// <returns>An enumerable list of <see cref="IDataType" /> objects</returns>
-    [Obsolete("Please use GetAllAsync. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IDataType> GetAll(params int[] ids);
-
-    /// <summary>
-    ///     Saves an <see cref="IDataType" />
-    /// </summary>
-    /// <param name="dataType"><see cref="IDataType" /> to save</param>
-    /// <param name="userId">Id of the user issuing the save</param>
-    [Obsolete("Please use CreateAsync or UpdateAsync. Scheduled for removal in Umbraco 18.")]
-    void Save(IDataType dataType, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Saves a collection of <see cref="IDataType" />
-    /// </summary>
-    /// <param name="dataTypeDefinitions"><see cref="IDataType" /> to save</param>
-    /// <param name="userId">Id of the user issuing the save</param>
-    [Obsolete("Please use CreateAsync or UpdateAsync. Scheduled for removal in Umbraco 18.")]
-    void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Creates a new <see cref="IDataType" />
     /// </summary>
     /// <param name="dataType"><see cref="IDataType" /> to create</param>
@@ -169,19 +86,11 @@ public interface IDataTypeService : IService
     Task<Attempt<IDataType?, DataTypeOperationStatus>> DeleteAsync(Guid id, Guid userKey);
 
     /// <summary>
-    ///     Gets a <see cref="IDataType" /> by its control Id
-    /// </summary>
-    /// <param name="propertyEditorAlias">Alias of the property editor</param>
-    /// <returns>Collection of <see cref="IDataType" /> objects with a matching control id</returns>
-    [Obsolete("Please use GetByEditorAliasAsync. Scheduled for removal in Umbraco 18.")]
-    IEnumerable<IDataType> GetByEditorAlias(string propertyEditorAlias);
-
-    /// <summary>
     ///     Gets all <see cref="IDataType" /> for a given property editor.
     /// </summary>
     /// <param name="propertyEditorAlias">Alias of the property editor.</param>
     /// <returns>Collection of <see cref="IDataType" /> configured for the property editor.</returns>
-    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias) => Task.FromResult(GetByEditorAlias(propertyEditorAlias));
+    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string propertyEditorAlias);
 
     /// <summary>
     ///     Gets all <see cref="IDataType" /> for a given editor UI alias.
@@ -220,5 +129,5 @@ public interface IDataTypeService : IService
     /// </summary>
     /// <param name="propertyEditorAlias">Aliases of the property editors.</param>
     /// <returns>Collection of <see cref="IDataType" /> configured for the property editors.</returns>
-    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias) => Task.FromResult(propertyEditorAlias.SelectMany(x=>GetByEditorAlias(x)));
+    Task<IEnumerable<IDataType>> GetByEditorAliasAsync(string[] propertyEditorAlias);
 }

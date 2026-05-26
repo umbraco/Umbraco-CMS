@@ -149,15 +149,23 @@ public class UserStartNodeEntitiesService : IUserStartNodeEntitiesService
         return ChildUserAccessEntities(allAllowedChildren, userStartNodePaths);
     }
 
-    private static List<int> GetAllowedIds(string[] userStartNodePaths, int parentId)
+    /// <summary>
+    /// For each user start node path that contains <paramref name="parentId"/>, collects the ID of
+    /// the segment immediately after the parent and returns the distinct set. E.g. given paths
+    /// ["-1,2,3,4,5", "-1,2,3,9,10"] and a parent ID of 3, the returned "next child IDs" are [4, 9].
+    /// </summary>
+    /// <param name="userStartNodePaths">The user's start node paths (comma-delimited integer IDs).</param>
+    /// <param name="parentId">The parent ID to locate within each path.</param>
+    /// <returns>The distinct "next child IDs" across all paths that contain the parent.</returns>
+    /// <remarks>
+    /// Internal rather than private so it can be unit-tested directly.
+    /// </remarks>
+    internal static List<int> GetAllowedIds(string[] userStartNodePaths, int parentId)
     {
-        // If one or more of the user start nodes are descendants of the requested parent, find the "next child IDs" in those user start node paths
-        // that are the final entries in the path.
-        // E.g. given the user start node path "-1,2,3,4,5", if the requested parent ID is 3, the "next child ID" is 4.
-        var userStartNodePathIds = userStartNodePaths.Select(path => path.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray()).ToArray();
+        var userStartNodePathIds = userStartNodePaths.Select(path => path.GetIdsFromPath()).ToArray();
         return userStartNodePathIds
             .Where(ids => ids.Contains(parentId))
-            .Select(ids => ids[ids.IndexOf(parentId) + 1]) // Given the previous checks, the parent ID can never be the last in the user start node path, so this is safe
+            .Select(ids => ids[ids.IndexOf(parentId) + 1]) // Given the previous checks, the parent ID can never be the last in the user start node path, so this is safe.
             .Distinct()
             .ToList();
     }

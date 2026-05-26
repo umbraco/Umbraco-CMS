@@ -29,10 +29,10 @@ internal sealed class EntityServiceTestsIsolated : UmbracoIntegrationTest
 
     [TestCase(false)]
     [TestCase(true)]
-    public void EntityService_Can_Count_Trashed_Content_Children_At_Root(bool useTrashed)
+    public async Task EntityService_Can_Count_Trashed_Content_Children_At_Root(bool useTrashed)
     {
         var contentType = ContentTypeBuilder.CreateSimpleContentType();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var root = ContentBuilder.CreateSimpleContent(contentType);
         ContentService.Save(root);

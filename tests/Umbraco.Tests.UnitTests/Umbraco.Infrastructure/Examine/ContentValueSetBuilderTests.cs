@@ -21,9 +21,6 @@ public class ContentValueSetBuilderTests
     private const string DefaultCulture = "en-US";
     private Mock<IUserService> _userService = null!;
     private Mock<ICoreScopeProvider> _scopeProvider = null!;
-#pragma warning disable CS0618 // Type or member is obsolete
-    private Mock<ILocalizationService> _localizationService = null!;
-#pragma warning restore CS0618 // Type or member is obsolete
     private Mock<IContentTypeService> _contentTypeService = null!;
     private Mock<IDocumentUrlService> _documentUrlService = null!;
     private Mock<ILanguageService> _languageService = null!;
@@ -47,10 +44,6 @@ public class ContentValueSetBuilderTests
                 It.IsAny<bool>(),
                 It.IsAny<bool>()))
             .Returns(Mock.Of<ICoreScope>());
-#pragma warning disable CS0618 // Type or member is obsolete
-        _localizationService = new Mock<ILocalizationService>();
-_localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns(DefaultCulture);
-#pragma warning restore CS0618 // Type or member is obsolete
         _contentTypeService = new Mock<IContentTypeService>();
         _contentTypeService.Setup(x => x.GetAll()).Returns(Array.Empty<IContentType>());
         _documentUrlService = new Mock<IDocumentUrlService>();
@@ -84,7 +77,6 @@ _localizationService.Setup(x => x.GetDefaultLanguageIsoCode()).Returns(DefaultCu
             _shortStringHelper.Object,
             _scopeProvider.Object,
             publishedValuesOnly,
-            _localizationService.Object,
             _contentTypeService.Object,
             NullLogger<ContentValueSetBuilder>.Instance,
             _documentUrlService.Object,

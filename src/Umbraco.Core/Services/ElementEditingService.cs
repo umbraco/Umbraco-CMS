@@ -45,7 +45,6 @@ internal sealed class ElementEditingService
         IIdKeyMap idKeyMap,
         ILanguageService languageService,
         IUserService userService,
-        ILocalizationService localizationService,
         IAuditService auditService)
         : base(
             elementService,
@@ -60,8 +59,7 @@ internal sealed class ElementEditingService
             relationService,
             contentTypeFilters,
             languageService,
-            userService,
-            localizationService)
+            userService)
     {
         _elementService = elementService;
         _logger = logger;
@@ -77,7 +75,7 @@ internal sealed class ElementEditingService
     protected override string RelateParentOnDeleteAlias
         => Constants.Conventions.RelationTypes.RelateParentElementContainerOnElementDeleteAlias;
 
-    public Task<IElement?> GetAsync(Guid key)
+    public override Task<IElement?> GetAsync(Guid key)
     {
         IElement? element = ContentService.GetById(key);
         return Task.FromResult(element);
@@ -138,9 +136,7 @@ internal sealed class ElementEditingService
         ContentEditingOperationStatus validationStatus = result.Status;
         ContentValidationResult validationResult = result.Result.ValidationResult;
 
-        // TODO ELEMENTS: we need a fix for this; see ContentEditingService
-        IElement element = result.Result.Content!;
-        // IElement element = await EnsureOnlyAllowedFieldsAreUpdated(result.Result.Content!, userKey);
+        IElement element = await EnsureOnlyAllowedFieldsAreUpdated(result.Result.Content!, userKey);
 
         ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
@@ -172,8 +168,7 @@ internal sealed class ElementEditingService
         ContentEditingOperationStatus validationStatus = result.Status;
         ContentValidationResult validationResult = result.Result.ValidationResult;
 
-        // TODO ELEMENTS: we need a fix for this; see ContentEditingService
-        // element = await EnsureOnlyAllowedFieldsAreUpdated(element, userKey);
+        element = await EnsureOnlyAllowedFieldsAreUpdated(element, userKey);
 
         ContentEditingOperationStatus saveStatus = await SaveAsync(element, userKey);
         return saveStatus == ContentEditingOperationStatus.Success
@@ -187,7 +182,7 @@ internal sealed class ElementEditingService
     public async Task<Attempt<IElement?, ContentEditingOperationStatus>> DeleteFromRecycleBinAsync(Guid key, Guid userKey)
         => await HandleDeleteAsync(key, userKey, true);
 
-    protected override IElement New(string? name, int parentId, IContentType contentType)
+    protected override IElement New(string name, int parentId, IContentType contentType)
         => new Element(name, parentId, contentType);
 
     protected override IContentType? TryGetAndValidateContentType(
@@ -321,12 +316,12 @@ internal sealed class ElementEditingService
             userKey,
             (elem, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, containerKey);
                 return new ElementMovingNotification(moveEventInfo, eventMessages);
             },
             (elem, eventMessages) =>
             {
-                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, parentId, containerKey);
+                var moveEventInfo = new MoveEventInfo<IElement>(elem, originalPath, containerKey);
                 return new ElementMovedNotification(moveEventInfo, eventMessages);
             });
 
@@ -339,8 +334,8 @@ internal sealed class ElementEditingService
         return Attempt.Succeed(ContentEditingOperationStatus.Success);
     }
 
-    public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? parentKey, Guid userKey)
-        => await HandleCopyAsync(key, parentKey, false, false, userKey);
+    public async Task<Attempt<IElement?, ContentEditingOperationStatus>> CopyAsync(Guid key, Guid? containerKey, Guid userKey)
+        => await HandleCopyAsync(key, containerKey, false, false, userKey);
 
     internal static async Task<bool> UnpublishTrashedElementOnRestore(IElement element, Guid userKey, IElementService elementService, IUserIdKeyResolver userIdKeyResolver, ILogger logger)
     {
@@ -489,7 +484,7 @@ internal sealed class ElementEditingService
     }
 
     protected override OperationResult? MoveToRecycleBin(IElement element, int userId)
-        => throw new NotImplementedException("TODO ELEMENTS: implement recycle bin");
+        => throw new NotImplementedException("Explicitly implemented elsewhere by this service");
 
     protected override OperationResult? Delete(IElement element, int userId)
         => ContentService.Delete(element, userId);

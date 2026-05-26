@@ -175,8 +175,8 @@ internal sealed class PublishedContentQueryTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(query.Content([contentId, 99]).Select(x => x.Id).ToArray(), Is.EqualTo(new[] { contentId }).AsCollection);
-            Assert.That(query.Content([contentKey, Guid.NewGuid()]).Select(x => x.Id).ToArray(), Is.EqualTo(new[] { contentId }).AsCollection);
+            CollectionAssert.AreEqual(new[] { contentId }, query.Content([contentId, 99]).Select(x => x.Id).ToArray());
+            CollectionAssert.AreEqual(new[] { contentId }, query.Content([contentKey, Guid.NewGuid()]).Select(x => x.Id).ToArray());
 
             var objectResults = query.Content(
                 [contentId, contentKey.ToString(), contentUdi.ToString(), "not-a-guid", new object()]).ToArray();
@@ -210,7 +210,7 @@ internal sealed class PublishedContentQueryTests
             contentCache: contentCache.Object,
             documentNavigationQueryService: navigationQueryService.Object);
 
-        Assert.That(query.ContentAtRoot().Select(x => x.Id).ToArray(), Is.EqualTo(new[] { 1, 2 }).AsCollection);
+        CollectionAssert.AreEqual(new[] { 1, 2 }, query.ContentAtRoot().Select(x => x.Id).ToArray());
     }
 
     [Test]
@@ -276,8 +276,8 @@ internal sealed class PublishedContentQueryTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(query.Media([mediaId, 99]).Select(x => x.Id).ToArray(), Is.EqualTo(new[] { mediaId }).AsCollection);
-            Assert.That(query.Media([mediaKey, Guid.NewGuid()]).Select(x => x.Id).ToArray(), Is.EqualTo(new[] { mediaId }).AsCollection);
+            CollectionAssert.AreEqual(new[] { mediaId }, query.Media([mediaId, 99]).Select(x => x.Id).ToArray());
+            CollectionAssert.AreEqual(new[] { mediaId }, query.Media([mediaKey, Guid.NewGuid()]).Select(x => x.Id).ToArray());
 
             var objectResults = query.Media(
                 [mediaId, mediaKey.ToString(), mediaUdi.ToString(), "not-a-guid", new object()]).ToArray();
@@ -304,7 +304,7 @@ internal sealed class PublishedContentQueryTests
             mediaCache: mediaCache.Object,
             mediaNavigationQueryService: mediaNavigationQueryService.Object);
 
-        Assert.That(query.MediaAtRoot().Select(x => x.Id).ToArray(), Is.EqualTo(new[] { 7 }).AsCollection);
+        CollectionAssert.AreEqual(new[] { 7 }, query.MediaAtRoot().Select(x => x.Id).ToArray());
         mediaCache.Verify(x => x.GetById(false, mediaKey), Times.Once);
         contentCache.VerifyNoOtherCalls();
     }
@@ -370,7 +370,7 @@ internal sealed class PublishedContentQueryTests
 
         var results = query.Search(queryExecutor).ToArray();
 
-        Assert.That(results.Select(x => x.Content.Id).ToArray(), Is.EqualTo(new[] { 11 }).AsCollection);
+        CollectionAssert.AreEqual(new[] { 11 }, results.Select(x => x.Content.Id).ToArray());
         Assert.AreEqual(1, queryExecutor.ExecuteCount);
         Assert.AreEqual(0, queryExecutor.LastQueryOptions.Skip);
         Assert.AreEqual(100, queryExecutor.LastQueryOptions.Take);
@@ -387,7 +387,7 @@ internal sealed class PublishedContentQueryTests
         var results = query.Search(queryExecutor, 3, 2, out var totalRecords).ToArray();
 
         Assert.AreEqual(44, totalRecords);
-        Assert.That(results.Select(x => x.Content.Id).ToArray(), Is.EqualTo(new[] { 12 }).AsCollection);
+        CollectionAssert.AreEqual(new[] { 12 }, results.Select(x => x.Content.Id).ToArray());
         Assert.AreEqual(3, queryExecutor.LastQueryOptions.Skip);
         Assert.AreEqual(2, queryExecutor.LastQueryOptions.Take);
     }
@@ -403,8 +403,10 @@ internal sealed class PublishedContentQueryTests
         var results = query.Search(ordering, 0, 0, out var totalRecords).ToArray();
 
         Assert.AreEqual(1, totalRecords);
-        Assert.That(ordering.SelectedFieldNames, Is.EquivalentTo(new[] { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName }));
-        Assert.That(results.Select(x => x.Content.Id).ToArray(), Is.EqualTo(new[] { 99 }).AsCollection);
+        CollectionAssert.AreEquivalent(
+            new[] { ExamineFieldNames.ItemIdFieldName, ExamineFieldNames.CategoryFieldName },
+            ordering.SelectedFieldNames);
+        CollectionAssert.AreEqual(new[] { 99 }, results.Select(x => x.Content.Id).ToArray());
     }
 
     [Test]
