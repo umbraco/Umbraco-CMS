@@ -14,6 +14,9 @@
 			"version": "latest"
 		},
 
+		// Adds the GitHub CLI for interacting with GitHub from the terminal
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+
 		// Node JS - pinned to 22 to match the >= 22.17.1 requirement in package.json
 		"ghcr.io/devcontainers/features/node:1": {
 			"version": "22"
