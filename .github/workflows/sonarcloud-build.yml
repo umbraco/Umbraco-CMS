@@ -1,4 +1,4 @@
-name: "SonarQube Cloud analysis"
+name: "SonarQube Cloud - Build"
 
 on:
   push:
@@ -23,10 +23,9 @@ env:
   SONAR_PROJECT_KEY: "umbraco_Umbraco-CMS"
 
 jobs:
-  sonarqube:
-    name: Build and analyze
+  build:
+    name: Build and collect analysis data
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v6
         with:
@@ -60,14 +59,17 @@ jobs:
         run: echo "BRANCH_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Begin analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           dotnet-sonarscanner begin \
             /k:"${{ env.SONAR_PROJECT_KEY }}" \
             /o:"${{ env.SONAR_ORGANIZATION }}" \
-            /d:sonar.token="$SONAR_TOKEN" \
             /d:sonar.cs.vscoveragexml.reportsPaths="TestResults/coverage.xml" \
+            /d:sonar.inclusions="src/**,templates/**,tools/**,tests/**" \
+            /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,**/lang/*.ts,**/mocks/**,**/wwwroot/**,**/dist-cms/**,**/*.generated.cs,src/Umbraco.Web.UI/umbraco/**,src/Umbraco.Cms.Persistence.EFCore.*/Migrations/**,src/Umbraco.Web.UI.Client/src/packages/core/backend-api/**" \
+            /d:sonar.test.inclusions="tests/**,**/*.test.ts,**/*.spec.ts" \
+            /d:sonar.coverage.exclusions="src/Umbraco.Web.UI.Client/**,src/Umbraco.Web.UI.Login/**" \
+            /d:sonar.typescript.tsconfigPaths="src/Umbraco.Web.UI.Client/tsconfig.json,src/Umbraco.Web.UI.Client/tsconfig.node.json,src/Umbraco.Web.UI.Login/tsconfig.json" \
+            /d:sonar.scm.disabled=true \
             ${BRANCH_NAME:+/d:sonar.branch.name="$BRANCH_NAME"} \
             ${PROJECT_VERSION:+/d:sonar.projectVersion="$PROJECT_VERSION"}
 
@@ -84,7 +86,12 @@ jobs:
             --output TestResults/coverage.xml \
             --output-format xml
 
-      - name: End analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
+      - name: Upload analysis artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonar-analysis-data
+          include-hidden-files: true
+          path: |
+            .sonarqube/
+            TestResults/
+          retention-days: 1

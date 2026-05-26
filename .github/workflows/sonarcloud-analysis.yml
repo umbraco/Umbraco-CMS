@@ -1,0 +1,41 @@
+name: "SonarQube Cloud - Analysis"
+
+on:
+  workflow_run:
+    workflows: ["SonarQube Cloud - Build"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Upload analysis
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Download analysis artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sonar-analysis-data
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .
+
+      - name: Setup .NET from global.json
+        uses: actions/setup-dotnet@v5
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Install sonarscanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: End analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
