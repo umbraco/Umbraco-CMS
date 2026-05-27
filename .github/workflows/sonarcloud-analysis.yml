@@ -1,15 +1,20 @@
 name: "SonarQube Cloud - Analysis"
 
-# This workflow runs after the build workflow completes. It downloads the
-# Roslyn analysis output and coverage data produced by the build, then uploads
-# them to SonarCloud using the SONAR_TOKEN secret. Because it is triggered via
-# workflow_run, it always runs in the base repository context - even for fork
-# PRs - giving it safe access to secrets.
+# This workflow runs without secrets so it is safe to trigger on fork PRs.
+# It compiles the solution, runs unit tests, and uploads the Roslyn analysis
+# output as an artifact. The upload workflow then picks it up and uploads
+# results to SonarCloud using the SONAR_TOKEN secret.
 
 on:
-  workflow_run:
-    workflows: ["SonarQube Cloud - Build"]
-    types: [completed]
+  push:
+    branches:
+      - main
+      - "v*/dev"
+      - "v*/main"
+      - "release/*"
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -18,24 +23,18 @@ env:
   SONAR_PROJECT_KEY: umbraco_Umbraco-CMS
   SONAR_ORGANIZATION: umbraco
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  analyze:
-    name: Upload analysis
+  build:
+    name: Build and collect analysis data
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success' # only run if the build succeeded
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.workflow_run.head_sha }} # checkout at the commit that triggered the build
           fetch-depth: 0
-
-      - name: Download analysis data
-        uses: actions/download-artifact@v8
-        with:
-          name: analysis-data
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: analysis-data
 
       - name: Setup .NET from global.json
         uses: actions/setup-dotnet@v5
@@ -47,52 +46,45 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
-      - name: Install sonarscanner
+      - name: Install tools
         run: |
           dotnet tool install --global dotnet-sonarscanner
-          dotnet tool install --global nbgv
+          dotnet tool install --global dotnet-coverage
 
-      - name: Set analysis context
+      - name: Load sonar params
         run: |
-          IS_FORK="${{ github.event.workflow_run.head_repository.full_name != github.repository }}"
-          if [ "$IS_FORK" = "true" ]; then
-            echo "SONARQUBE_SCANNER_PARAMS=$(git show origin/main:.github/workflows/sonarcloud/sonar-params.json | jq -c .)" | tee -a $GITHUB_ENV # read from main for fork PRs
+          if [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
+            # For fork PRs, read sonar params from main.
+            echo "SONARQUBE_SCANNER_PARAMS=$(git show origin/main:.github/workflows/sonarcloud/sonar-params.json | jq -c .)" >> $GITHUB_ENV
           else
-            echo "SONARQUBE_SCANNER_PARAMS=$(jq -c . .github/workflows/sonarcloud/sonar-params.json)" | tee -a $GITHUB_ENV
-            PUBLIC_RELEASE=$(nbgv get-version -v PublicRelease)
-            if [ "$PUBLIC_RELEASE" = "True" ]; then
-              echo "PROJECT_VERSION=$(nbgv get-version -v NuGetPackageVersion)" | tee -a $GITHUB_ENV # only set for official releases
-            fi
-          fi
-          if [ "${{ github.event.workflow_run.event }}" = "pull_request" ]; then
-            echo "PR_NUMBER=${{ github.event.workflow_run.pull_requests[0].number }}" | tee -a $GITHUB_ENV
-            echo "PR_HEAD_REF=${{ github.event.workflow_run.pull_requests[0].head.ref }}" | tee -a $GITHUB_ENV
-            echo "PR_BASE_REF=${{ github.event.workflow_run.pull_requests[0].base.ref }}" | tee -a $GITHUB_ENV
-          else
-            echo "BRANCH_NAME=${{ github.event.workflow_run.head_branch }}" | tee -a $GITHUB_ENV
+            echo "SONARQUBE_SCANNER_PARAMS=$(jq -c . .github/workflows/sonarcloud/sonar-params.json)" >> $GITHUB_ENV
           fi
 
       - name: Begin analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           dotnet-sonarscanner begin \
             /k:"$SONAR_PROJECT_KEY" \
-            /o:"$SONAR_ORGANIZATION" \
-            /d:sonar.token="$SONAR_TOKEN" \
-            ${BRANCH_NAME:+/d:sonar.branch.name="$BRANCH_NAME"} \
-            ${PROJECT_VERSION:+/d:sonar.projectVersion="$PROJECT_VERSION"} \
-            ${PR_NUMBER:+/d:sonar.pullrequest.key="$PR_NUMBER"} \
-            ${PR_HEAD_REF:+/d:sonar.pullrequest.branch="$PR_HEAD_REF"} \
-            ${PR_BASE_REF:+/d:sonar.pullrequest.base="$PR_BASE_REF"}
+            /o:"$SONAR_ORGANIZATION"
 
-      - name: Restore analysis data from build
+      - name: Restore
+        run: dotnet restore umbraco.sln
+
+      - name: Build solution
+        run: GITHUB_ENV=/dev/null dotnet build umbraco.sln --no-restore -clp:ErrorsOnly # prevent sonar MSBuild integration from writing malformed values to $GITHUB_ENV
+
+      - name: Run unit tests with coverage
         run: |
-          cp -r analysis-data/.sonarqube/out/. .sonarqube/out/
-          cp -r analysis-data/.sonarqube/conf/[0-9]* .sonarqube/conf/
-          cp -r analysis-data/TestResults TestResults
+          dotnet-coverage collect \
+            "dotnet test tests/Umbraco.Tests.UnitTests/Umbraco.Tests.UnitTests.csproj --no-build" \
+            --output TestResults/coverage.xml \
+            --output-format xml
 
-      - name: End analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
+      - name: Upload analysis data
+        uses: actions/upload-artifact@v7
+        with:
+          name: analysis-data
+          include-hidden-files: true # required to capture the .sonarqube directory
+          path: |
+            .sonarqube/
+            TestResults/
+          retention-days: 1
