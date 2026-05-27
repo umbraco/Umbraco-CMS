@@ -64,6 +64,13 @@ describe('toFriendlyName', () => {
 		expect(toFriendlyName('report.final draft')).to.eq('Report.Final Draft');
 	});
 
+	it('preserves the extension when trailing whitespace is part of the extension span', () => {
+		// Same StripFileExtension rule: trailing whitespace after the dot lands inside
+		// the extension span, so the dot is not treated as a delimiter and the
+		// title-cased extension survives into the output.
+		expect(toFriendlyName('  spaced-name.jpg  ')).to.eq('Spaced Name.Jpg');
+	});
+
 	it('handles Latin-extended letters as part of words', () => {
 		expect(toFriendlyName('école-maternelle.jpg')).to.eq('École Maternelle');
 	});
