@@ -576,8 +576,16 @@ public interface IContentService : IContentServiceBase<IContent>
     // TODO (V19): Remove the default implementation when the method is no longer new.
     PublishResult SaveAndPublish(IContent content, string[] culturesToPublish, int userId = Constants.Security.SuperUserId)
     {
-        Save(content, userId);
-        return Publish(content, culturesToPublish, userId);
+        OperationResult saveResult = Save(content, userId);
+        if (saveResult.Success)
+        {
+            return Publish(content, culturesToPublish, userId);
+        }
+
+        PublishResultType resultType = saveResult.Result == OperationResultType.FailedCancelledByEvent
+            ? PublishResultType.FailedPublishCancelledByEvent
+            : PublishResultType.FailedPublish;
+        return new PublishResult(resultType, saveResult.EventMessages, content);
     }
 
     /// <summary>
