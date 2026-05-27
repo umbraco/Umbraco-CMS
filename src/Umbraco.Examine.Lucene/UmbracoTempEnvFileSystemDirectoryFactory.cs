@@ -1,5 +1,9 @@
 using Examine;
+using Examine.Lucene;
 using Examine.Lucene.Directories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.DependencyInjection;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.Examine
@@ -9,15 +13,27 @@ namespace Umbraco.Cms.Infrastructure.Examine
     /// </summary>
     public class UmbracoTempEnvFileSystemDirectoryFactory : FileSystemDirectoryFactory
     {
-#pragma warning disable CS0618 // The non-obsolete base constructor alters directory behaviour; preserve existing behaviour intentionally.
+        [Obsolete("Use the constructor accepting IOptionsMonitor<LuceneDirectoryIndexOptions>. Scheduled for removal in Umbraco 20.")]
         public UmbracoTempEnvFileSystemDirectoryFactory(
             IApplicationIdentifier applicationIdentifier,
             ILockFactory lockFactory,
             IHostingEnvironment hostingEnvironment)
-            : base(new DirectoryInfo(GetTempPath(applicationIdentifier, hostingEnvironment)), lockFactory)
+            : this(
+                applicationIdentifier,
+                lockFactory,
+                hostingEnvironment,
+                StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<LuceneDirectoryIndexOptions>>())
         {
         }
-#pragma warning restore CS0618
+
+        public UmbracoTempEnvFileSystemDirectoryFactory(
+            IApplicationIdentifier applicationIdentifier,
+            ILockFactory lockFactory,
+            IHostingEnvironment hostingEnvironment,
+            IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions)
+            : base(new DirectoryInfo(GetTempPath(applicationIdentifier, hostingEnvironment)), lockFactory, indexOptions)
+        {
+        }
 
         public static string GetTempPath(IApplicationIdentifier applicationIdentifier, IHostingEnvironment hostingEnvironment)
         {

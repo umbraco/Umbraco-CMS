@@ -106,7 +106,7 @@ public interface IHostingEnvironment
     ///     content root are the same, however
     ///     in netcore the web root is /www therefore this will Map to a physical path within www.
     /// </remarks>
-    [Obsolete("Please use the MapPathWebRoot extension method on an instance of IWebHostEnvironment instead")]
+    [Obsolete("Please use the MapPathWebRoot extension method on an instance of IWebHostEnvironment instead. Scheduled for removal in Umbraco 20.")]
     string MapPathWebRoot(string path);
 
     /// <summary>
@@ -118,7 +118,7 @@ public interface IHostingEnvironment
     ///     in netcore the web root is /www therefore this will Map to a physical path within www.
     /// </remarks>
     [Obsolete(
-        "Please use the MapPathContentRoot extension method on an instance of IHostEnvironment (or IWebHostEnvironment) instead")]
+        "Please use the MapPathContentRoot extension method on an instance of IHostEnvironment (or IWebHostEnvironment) instead. Scheduled for removal in Umbraco 20.")]
     string MapPathContentRoot(string path);
 
     /// <summary>
