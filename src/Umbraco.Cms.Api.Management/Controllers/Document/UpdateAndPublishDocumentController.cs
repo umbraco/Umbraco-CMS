@@ -5,10 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
@@ -18,6 +22,7 @@ namespace Umbraco.Cms.Api.Management.Controllers.Document;
 [ApiVersion("1.0")]
 public class UpdateAndPublishDocumentController : UpdateDocumentControllerBase
 {
+    private readonly IAuthorizationService _authorizationService;
     private readonly IContentEditingService _contentEditingService;
     private readonly IDocumentEditingPresentationFactory _documentEditingPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
@@ -25,7 +30,7 @@ public class UpdateAndPublishDocumentController : UpdateDocumentControllerBase
     /// <summary>
     /// Initializes a new instance of the <see cref="UpdateAndPublishDocumentController"/> class.
     /// </summary>
-    /// <param name="authorizationService">Service for verifying user permissions.</param>
+    /// <param name="authorizationService">Service for verifying user permissions to update and publish.</param>
     /// <param name="contentEditingService">Service for managing content updates.</param>
     /// <param name="documentEditingPresentationFactory">Factory for creating document editing presentation models.</param>
     /// <param name="backOfficeSecurityAccessor">Accessor for the back office user security context.</param>
@@ -36,6 +41,7 @@ public class UpdateAndPublishDocumentController : UpdateDocumentControllerBase
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         : base(authorizationService)
     {
+        _authorizationService = authorizationService;
         _contentEditingService = contentEditingService;
         _documentEditingPresentationFactory = documentEditingPresentationFactory;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -61,6 +67,18 @@ public class UpdateAndPublishDocumentController : UpdateDocumentControllerBase
         UpdateAndPublishDocumentRequestModel requestModel)
         => await HandleRequest(id, requestModel, async () =>
         {
+            // The base HandleRequest verifies the user can update the document.
+            // Updating-and-publishing additionally requires publish permission, so we check that here.
+            AuthorizationResult publishAuthorizationResult = await _authorizationService.AuthorizeResourceAsync(
+                User,
+                ContentPermissionResource.WithKeys(ActionPublish.ActionLetter, id, requestModel.CulturesToPublish),
+                AuthorizationPolicies.ContentPermissionByResource);
+
+            if (publishAuthorizationResult.Succeeded is false)
+            {
+                return Forbidden();
+            }
+
             ContentUpdateModel model = _documentEditingPresentationFactory.MapUpdateModel(requestModel);
             Guid currentUserKey = CurrentUserKey(_backOfficeSecurityAccessor);
             Attempt<ContentUpdateResult, ContentEditingOperationStatus> result = await _contentEditingService.UpdateAndPublishAsync(id, model, requestModel.CulturesToPublish, currentUserKey);
