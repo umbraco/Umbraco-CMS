@@ -23,11 +23,15 @@ describe('UmbInputDateElement', () => {
 			element.value = '2026-05-27';
 			await element.updateComplete;
 
+			let inputEvents = 0;
+			element.addEventListener('input', () => inputEvents++);
+
 			const native = element.shadowRoot!.querySelector('input')!;
 			native.value = '';
 			native.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
 
 			expect(element.value).to.equal('2026-05-27');
+			expect(inputEvents).to.equal(0);
 		});
 
 		it('reflects a non-empty native value back via the input event', async () => {

@@ -52,12 +52,13 @@ export class UmbInputDateElement extends UUIInputElement {
 		// in a transiently invalid state (e.g. a single "0" typed into a segment before
 		// the second digit). Reflecting that empty value back via `this.value = ''` would
 		// trigger a re-render that writes `''` to the native input, which clears all
-		// segments visually and wipes the digit just typed. Skip the reflection here;
-		// focusout commits the final value.
-		if (target.value !== '') {
-			this.value = target.value;
+		// segments visually and wipes the digit just typed. Skip both the reflection and
+		// the input event in this case; focusout commits the final value.
+		if (target.value === '') {
+			return;
 		}
 
+		this.value = target.value;
 		this.dispatchEvent(new UUIInputEvent(UUIInputEvent.INPUT));
 	}
 
