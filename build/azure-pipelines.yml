@@ -49,7 +49,7 @@ parameters:
   - name: integrationReleaseTestFilter
     displayName: TestFilter used for release type builds
     type: string
-    default: ""
+    default: " "
   - name: nonWindowsIntegrationNonReleaseTestFilter
     displayName: TestFilter used for non-release type builds on non Windows agents
     type: string
@@ -57,7 +57,7 @@ parameters:
   - name: nonWindowsIntegrationReleaseTestFilter
     displayName: TestFilter used for release type builds on non Windows agents
     type: string
-    default: ""
+    default: " "
   - name: isNightly
     displayName: "Is nightly build (used for MyGet feed)"
     type: boolean
