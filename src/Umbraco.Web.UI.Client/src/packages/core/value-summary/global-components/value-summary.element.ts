@@ -30,16 +30,6 @@ export class UmbValueSummaryExtensionElement extends UmbLitElement {
 			.fallbackRenderMethod=${() => html`<span>${this.value}</span>`}>
 		</umb-extension-with-api-slot>`;
 	}
-
-	static override styles = css`
-		:host {
-			display: block;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			max-width: 20ch;
-		}
-	`;
 }
 
 export { UmbValueSummaryExtensionElement as element };
