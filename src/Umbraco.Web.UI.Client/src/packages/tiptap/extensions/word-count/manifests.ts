@@ -1,9 +1,10 @@
+import UmbTiptapWordCountExtensionApi from './word-count.tiptap-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.WordCount',
 		name: 'Word Count Tiptap Extension',
-		api: () => import('./word-count.tiptap-api.js'),
+		api: UmbTiptapWordCountExtensionApi,
 		meta: {
 			icon: 'icon-speed-gauge',
 			label: 'Word Count',

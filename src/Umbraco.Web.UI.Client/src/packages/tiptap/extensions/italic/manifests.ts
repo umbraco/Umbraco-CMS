@@ -1,9 +1,11 @@
+import UmbTiptapItalicExtensionApi from './italic.tiptap-api.js';
+import UmbTiptapToolbarItalicExtensionApi from './italic.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Italic',
 		name: 'Italic Tiptap Extension',
-		api: () => import('./italic.tiptap-api.js'),
+		api: UmbTiptapItalicExtensionApi,
 		meta: {
 			icon: 'icon-italic',
 			label: 'Italic',
@@ -15,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Italic',
 		name: 'Italic Tiptap Toolbar Extension',
-		api: () => import('./italic.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarItalicExtensionApi,
 		forExtensions: ['Umb.Tiptap.Italic'],
 		meta: {
 			alias: 'italic',

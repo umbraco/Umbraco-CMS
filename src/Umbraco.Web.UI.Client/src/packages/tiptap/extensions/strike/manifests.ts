@@ -1,9 +1,11 @@
+import UmbTiptapStrikeExtensionApi from './strike.tiptap-api.js';
+import UmbTiptapToolbarStrikeExtensionApi from './strike.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Strike',
 		name: 'Strike Tiptap Extension',
-		api: () => import('./strike.tiptap-api.js'),
+		api: UmbTiptapStrikeExtensionApi,
 		meta: {
 			icon: 'icon-strikethrough',
 			label: 'Strike',
@@ -15,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Strike',
 		name: 'Strike Tiptap Toolbar Extension',
-		api: () => import('./strike.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarStrikeExtensionApi,
 		forExtensions: ['Umb.Tiptap.Strike'],
 		meta: {
 			alias: 'strike',

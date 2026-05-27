@@ -1,10 +1,11 @@
+import UmbTiptapToolbarFontSizeExtensionApi from './font-size.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'menu',
 		alias: 'Umb.Tiptap.Toolbar.FontSize',
 		name: 'Font Size Tiptap Toolbar Extension',
-		api: () => import('./font-size.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarFontSizeExtensionApi,
 		forExtensions: ['Umb.Tiptap.HtmlAttributeStyle', 'Umb.Tiptap.HtmlTagSpan'],
 		items: [
 			{ label: '8pt', data: '8pt' },

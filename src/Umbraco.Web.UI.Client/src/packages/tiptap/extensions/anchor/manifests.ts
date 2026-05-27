@@ -1,3 +1,5 @@
+import UmbTiptapAnchorExtensionApi from './anchor.tiptap-api.js';
+import UmbTiptapToolbarAnchorExtensionApi from './anchor.tiptap-toolbar-api.js';
 import { UMB_TIPTAP_ANCHOR_MODAL_ALIAS } from './modals/constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -5,7 +7,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Anchor',
 		name: 'Anchor Tiptap Extension',
-		api: () => import('./anchor.tiptap-api.js'),
+		api: UmbTiptapAnchorExtensionApi,
 		meta: {
 			icon: 'icon-anchor',
 			label: '#tiptap_anchor',
@@ -17,7 +19,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Anchor',
 		name: 'Anchor Tiptap Toolbar Extension',
-		api: () => import('./anchor.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarAnchorExtensionApi,
 		forExtensions: ['Umb.Tiptap.Anchor'],
 		meta: {
 			alias: 'anchor',

@@ -1,3 +1,4 @@
+import UmbTiptapRichTextEssentialsExtensionApi from '../../extensions/core/rich-text-essentials.tiptap-api.js';
 import { Editor } from '../../externals.js';
 import { UmbTiptapRteContext } from '../../contexts/tiptap-rte.context.js';
 import type { AnyExtension } from '../../externals.js';
@@ -140,21 +141,23 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 		// Ensures that the "Rich Text Essentials" extension is always enabled. [LK]
 		if (!enabledExtensions.includes(TIPTAP_CORE_EXTENSION_ALIAS)) {
-			const { default: api } = await import('../../extensions/core/rich-text-essentials.tiptap-api.js');
-			this._extensions.push(new api(this));
+			this._extensions.push(new UmbTiptapRichTextEssentialsExtensionApi(this));
 		}
 
 		await new Promise<void>((resolve) => {
 			this.observe(umbExtensionsRegistry.byTypeAndAliases('tiptapExtension', enabledExtensions), async (manifests) => {
-				for (const manifest of manifests) {
-					if (manifest.api) {
+				const loaded = await Promise.all(
+					manifests.map(async (manifest) => {
+						if (!manifest.api) return null;
 						const extension = await loadManifestApi(manifest.api);
-						if (extension) {
-							const ext = new extension(this);
-							ext.manifest = manifest;
-							this._extensions.push(ext);
-						}
-					}
+						if (!extension) return null;
+						const ext = new extension(this);
+						ext.manifest = manifest;
+						return ext;
+					}),
+				);
+				for (const ext of loaded) {
+					if (ext) this._extensions.push(ext);
 				}
 				resolve();
 			});

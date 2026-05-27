@@ -1,10 +1,11 @@
+import UmbTiptapToolbarMediaPickerToolbarExtensionApi from './media-picker.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.MediaPicker',
 		name: 'Media Picker Tiptap Toolbar Extension',
-		api: () => import('./media-picker.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarMediaPickerToolbarExtensionApi,
 		forExtensions: ['Umb.Tiptap.Figure', 'Umb.Tiptap.Image'],
 		meta: {
 			alias: 'umbMedia',

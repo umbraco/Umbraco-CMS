@@ -1,3 +1,19 @@
+import UmbTableCellMergeAction from './actions/table-cell-merge.action.js';
+import UmbTableCellMergeSplitAction from './actions/table-cell-merge-split.action.js';
+import UmbTableCellSplitAction from './actions/table-cell-split.action.js';
+import UmbTableCellToggleHeaderAction from './actions/table-cell-toggle-header.action.js';
+import UmbTableColumnAddAfterAction from './actions/table-column-add-after.action.js';
+import UmbTableColumnAddBeforeAction from './actions/table-column-add-before.action.js';
+import UmbTableColumnDeleteAction from './actions/table-column-delete.action.js';
+import UmbTableColumnToggleHeaderAction from './actions/table-column-toggle-header.action.js';
+import UmbTableDeleteAction from './actions/table-delete.action.js';
+import UmbTablePropertiesAction from './actions/table-properties.action.js';
+import UmbTableRowAddAfterAction from './actions/table-row-add-after.action.js';
+import UmbTableRowAddBeforeAction from './actions/table-row-add-before.action.js';
+import UmbTableRowDeleteAction from './actions/table-row-delete.action.js';
+import UmbTableRowToggleHeaderAction from './actions/table-row-toggle-header.action.js';
+import UmbTiptapTableExtensionApi from './table.tiptap-api.js';
+import UmbTiptapToolbarTableExtensionApi from './table.tiptap-toolbar-api.js';
 import { UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS } from './modals/constants.js';
 
 const UMB_MENU_TIPTAP_TABLE_ALIAS = 'Umb.Menu.Tiptap.Table';
@@ -20,7 +36,7 @@ const coreExtensions: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Table',
 		name: 'Table Tiptap Extension',
-		api: () => import('./table.tiptap-api.js'),
+		api: UmbTiptapTableExtensionApi,
 		meta: {
 			icon: 'icon-table',
 			label: 'Table',
@@ -35,7 +51,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		kind: 'menu',
 		alias: 'Umb.Tiptap.Toolbar.Table',
 		name: 'Table Tiptap Extension',
-		api: () => import('./table.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarTableExtensionApi,
 		element: () => import('./components/table-toolbar-menu.element.js'),
 		forExtensions: ['Umb.Tiptap.Table'],
 		items: [
@@ -74,7 +90,7 @@ const tableMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableProperties',
 		name: 'Tiptap Table Menu Item: Table Properties',
-		api: () => import('./actions/table-properties.action.js'),
+		api: UmbTablePropertiesAction,
 		weight: 110,
 		meta: {
 			label: 'Table properties',
@@ -86,7 +102,7 @@ const tableMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableDelete',
 		name: 'Tiptap Table Menu Item: Delete Table',
-		api: () => import('./actions/table-delete.action.js'),
+		api: UmbTableDeleteAction,
 		weight: 100,
 		meta: {
 			label: 'Delete table',
@@ -107,7 +123,7 @@ const tableColumnMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableColumnAddBefore',
 		name: 'Tiptap Table Menu Item: Add Column Before',
-		api: () => import('./actions/table-column-add-before.action.js'),
+		api: UmbTableColumnAddBeforeAction,
 		weight: 120,
 		meta: {
 			label: 'Add column before',
@@ -120,7 +136,7 @@ const tableColumnMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableColumnAddAfter',
 		name: 'Tiptap Table Menu Item: Add Column After',
-		api: () => import('./actions/table-column-add-after.action.js'),
+		api: UmbTableColumnAddAfterAction,
 		weight: 110,
 		meta: {
 			label: 'Add column after',
@@ -133,7 +149,7 @@ const tableColumnMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableColumnDelete',
 		name: 'Tiptap Table Menu Item: Delete Column',
-		api: () => import('./actions/table-column-delete.action.js'),
+		api: UmbTableColumnDeleteAction,
 		weight: 100,
 		meta: {
 			label: 'Delete column',
@@ -146,7 +162,7 @@ const tableColumnMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableColumnToggleHeader',
 		name: 'Tiptap Table Menu Item: Toggle Header Column',
-		api: () => import('./actions/table-column-toggle-header.action.js'),
+		api: UmbTableColumnToggleHeaderAction,
 		weight: 90,
 		meta: {
 			label: 'Toggle header column',
@@ -166,7 +182,7 @@ const tableRowMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableRowAddBefore',
 		name: 'Tiptap Table Menu Item: Add Row Before',
-		api: () => import('./actions/table-row-add-before.action.js'),
+		api: UmbTableRowAddBeforeAction,
 		weight: 120,
 		meta: {
 			label: 'Add row before',
@@ -179,7 +195,7 @@ const tableRowMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableRowAddAfter',
 		name: 'Tiptap Table Menu Item: Add Row After',
-		api: () => import('./actions/table-row-add-after.action.js'),
+		api: UmbTableRowAddAfterAction,
 		weight: 110,
 		meta: {
 			label: 'Add row after',
@@ -192,7 +208,7 @@ const tableRowMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableRowDelete',
 		name: 'Tiptap Table Menu Item: Delete Row',
-		api: () => import('./actions/table-row-delete.action.js'),
+		api: UmbTableRowDeleteAction,
 		weight: 100,
 		meta: {
 			label: 'Delete row',
@@ -205,7 +221,7 @@ const tableRowMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableRowToggleHeader',
 		name: 'Tiptap Table Menu Item: Toggle Header Row',
-		api: () => import('./actions/table-row-toggle-header.action.js'),
+		api: UmbTableRowToggleHeaderAction,
 		weight: 90,
 		meta: {
 			label: 'Toggle header row',
@@ -225,7 +241,7 @@ const tableCellMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableCellMerge',
 		name: 'Tiptap Table Menu Item: Merge Cell',
-		api: () => import('./actions/table-cell-merge.action.js'),
+		api: UmbTableCellMergeAction,
 		weight: 120,
 		meta: {
 			label: 'Merge cells',
@@ -237,7 +253,7 @@ const tableCellMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableCellSplit',
 		name: 'Tiptap Table Menu Item: Split Cell',
-		api: () => import('./actions/table-cell-split.action.js'),
+		api: UmbTableCellSplitAction,
 		weight: 110,
 		meta: {
 			label: 'Split cell',
@@ -249,7 +265,7 @@ const tableCellMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableCellMergeSplit',
 		name: 'Tiptap Table Menu Item: Merge Or Split Cell',
-		api: () => import('./actions/table-cell-merge-split.action.js'),
+		api: UmbTableCellMergeSplitAction,
 		weight: 100,
 		meta: {
 			label: 'Merge or split',
@@ -261,7 +277,7 @@ const tableCellMenu: Array<UmbExtensionManifest> = [
 		kind: 'action',
 		alias: 'Umb.MenuItem.Tiptap.TableCellToggleHeader',
 		name: 'Tiptap Table Menu Item: Toggle Header Cell',
-		api: () => import('./actions/table-cell-toggle-header.action.js'),
+		api: UmbTableCellToggleHeaderAction,
 		weight: 90,
 		meta: {
 			label: 'Toggle header cell',

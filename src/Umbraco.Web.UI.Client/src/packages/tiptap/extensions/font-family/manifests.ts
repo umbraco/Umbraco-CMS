@@ -1,10 +1,11 @@
+import UmbTiptapToolbarFontFamilyExtensionApi from './font-family.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'menu',
 		alias: 'Umb.Tiptap.Toolbar.FontFamily',
 		name: 'Font Family Tiptap Toolbar Extension',
-		api: () => import('./font-family.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarFontFamilyExtensionApi,
 		forExtensions: ['Umb.Tiptap.HtmlAttributeStyle', 'Umb.Tiptap.HtmlTagSpan'],
 		items: [
 			{ label: 'Sans serif', appearance: { style: 'font-family: sans-serif;' }, data: 'sans-serif' },

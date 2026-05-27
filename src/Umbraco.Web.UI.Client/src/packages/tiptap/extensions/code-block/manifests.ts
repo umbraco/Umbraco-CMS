@@ -1,9 +1,11 @@
+import UmbTiptapCodeBlockExtensionApi from './code-block.tiptap-api.js';
+import UmbTiptapToolbarCodeBlockExtensionApi from './code-block.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.CodeBlock',
 		name: 'Code Block Tiptap Extension',
-		api: () => import('./code-block.tiptap-api.js'),
+		api: UmbTiptapCodeBlockExtensionApi,
 		meta: {
 			icon: 'icon-code',
 			label: 'Code Block',
@@ -15,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.CodeBlock',
 		name: 'Code Block Tiptap Toolbar Extension',
-		api: () => import('./code-block.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarCodeBlockExtensionApi,
 		forExtensions: ['Umb.Tiptap.CodeBlock'],
 		meta: {
 			alias: 'codeBlock',

@@ -1,9 +1,11 @@
+import UmbTiptapBoldExtensionApi from './bold.tiptap-api.js';
+import UmbTiptapToolbarBoldExtensionApi from './bold.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Bold',
 		name: 'Bold Tiptap Extension',
-		api: () => import('./bold.tiptap-api.js'),
+		api: UmbTiptapBoldExtensionApi,
 		meta: {
 			icon: 'icon-bold',
 			label: 'Bold',
@@ -15,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Bold',
 		name: 'Bold Tiptap Toolbar Extension',
-		api: () => import('./bold.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarBoldExtensionApi,
 		forExtensions: ['Umb.Tiptap.Bold'],
 		meta: {
 			alias: 'bold',

@@ -1,9 +1,11 @@
+import UmbTiptapBlockquoteExtensionApi from './blockquote.tiptap-api.js';
+import UmbTiptapToolbarBlockquoteExtensionApi from './blockquote.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Blockquote',
 		name: 'Blockquote Tiptap Extension',
-		api: () => import('./blockquote.tiptap-api.js'),
+		api: UmbTiptapBlockquoteExtensionApi,
 		meta: {
 			icon: 'icon-blockquote',
 			label: 'Blockquote',
@@ -15,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Blockquote',
 		name: 'Blockquote Tiptap Toolbar Extension',
-		api: () => import('./blockquote.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarBlockquoteExtensionApi,
 		forExtensions: ['Umb.Tiptap.Blockquote'],
 		meta: {
 			alias: 'blockquote',

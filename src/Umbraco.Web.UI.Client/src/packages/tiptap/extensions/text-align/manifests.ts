@@ -1,9 +1,14 @@
+import UmbTiptapTextAlignExtensionApi from './text-align.tiptap-api.js';
+import UmbTiptapToolbarTextAlignCenterExtensionApi from './text-align-center.tiptap-toolbar-api.js';
+import UmbTiptapToolbarTextAlignJustifyExtensionApi from './text-align-justify.tiptap-toolbar-api.js';
+import UmbTiptapToolbarTextAlignLeftExtensionApi from './text-align-left.tiptap-toolbar-api.js';
+import UmbTiptapToolbarTextAlignRightExtensionApi from './text-align-right.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.TextAlign',
 		name: 'Text Align Tiptap Extension',
-		api: () => import('./text-align.tiptap-api.js'),
+		api: UmbTiptapTextAlignExtensionApi,
 		meta: {
 			icon: 'icon-text-align-justify',
 			label: 'Text Align',
@@ -15,7 +20,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.TextAlignLeft',
 		name: 'Text Align Left Tiptap Toolbar Extension',
-		api: () => import('./text-align-left.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarTextAlignLeftExtensionApi,
 		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-left',
@@ -28,7 +33,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.TextAlignCenter',
 		name: 'Text Align Center Tiptap Toolbar Extension',
-		api: () => import('./text-align-center.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarTextAlignCenterExtensionApi,
 		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-center',
@@ -41,7 +46,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.TextAlignRight',
 		name: 'Text Align Right Tiptap Toolbar Extension',
-		api: () => import('./text-align-right.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarTextAlignRightExtensionApi,
 		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-right',
@@ -54,7 +59,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.TextAlignJustify',
 		name: 'Text Align Justify Tiptap Toolbar Extension',
-		api: () => import('./text-align-justify.tiptap-toolbar-api.js'),
+		api: UmbTiptapToolbarTextAlignJustifyExtensionApi,
 		forExtensions: ['Umb.Tiptap.TextAlign'],
 		meta: {
 			alias: 'text-align-justify',
