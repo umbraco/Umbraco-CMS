@@ -41,7 +41,9 @@ public class UpdateAndPublishDocumentController : UpdateDocumentControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
-    /// <summary>Updates the specified document with new details provided in the request model, and subsequently publishes the document in the cultures provided.</summary>
+    /// <summary>
+    /// Updates the specified document with new details provided in the request model, and subsequently publishes the document in the cultures provided.
+    /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <param name="id">The unique identifier of the document to update.</param>
     /// <param name="requestModel">The model containing the updated document details.</param>
