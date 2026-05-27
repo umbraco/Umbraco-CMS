@@ -156,8 +156,8 @@ internal sealed class PublicAccessService : AsyncRepositoryService, IPublicAcces
             return OperationResult.Attempt.Succeed(evtMsgs, entry);
         }
 
-        var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
-        if (await scope.Notifications.PublishCancelableAsync(savingNotifiation))
+        var savingNotification = new PublicAccessEntrySavingNotification(entry, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
             scope.Complete();
             return OperationResult.Attempt.Cancel(evtMsgs, entry);
@@ -168,7 +168,7 @@ internal sealed class PublicAccessService : AsyncRepositoryService, IPublicAcces
         scope.Complete();
 
         scope.Notifications.Publish(
-            new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
+            new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotification));
 
         return OperationResult.Attempt.Succeed(evtMsgs, entry);
     }
