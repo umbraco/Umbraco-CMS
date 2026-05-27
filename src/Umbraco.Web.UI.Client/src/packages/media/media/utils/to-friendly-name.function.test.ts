@@ -18,7 +18,7 @@ describe('toFriendlyName', () => {
 		expect(toFriendlyName('mixed_separator-name.docx')).to.eq('Mixed Separator Name');
 	});
 
-	it('lowercases all-lowercase words', () => {
+	it('treats each all-uppercase word as an acronym, including single-letter words', () => {
 		expect(toFriendlyName('JUST-A-FILE.jpg')).to.eq('JUST A FILE');
 	});
 
