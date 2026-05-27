@@ -57,7 +57,9 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 				this.#workspaceContext?.unique,
 				(value) => {
 					if (!value) return;
-					this.#requestStructure();
+					this.#requestStructure().catch(() => {
+						// Context may have been destroyed while the async request was in flight.
+					});
 				},
 				'observeUnique',
 			);
@@ -68,7 +70,9 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 					// Workspace has changed from new to existing
 					if (value === false && this.#isNew === true) {
 						// TODO: We do not need to request here as we already know the structure and unique
-						this.#requestStructure();
+						this.#requestStructure().catch(() => {
+							// Context may have been destroyed while the async request was in flight.
+						});
 					}
 					this.#isNew = value;
 				},
@@ -115,6 +119,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		const isRoot = entityType === root?.entityType;
 
 		// If the entity type is different from the root entity type, then we can request the ancestors.
+		let ancestorData: Array<UmbTreeItemModel> | undefined;
 		if (!isRoot) {
 			const { data } = await treeRepository.requestTreeItemAncestors({ treeItem: { unique, entityType } });
 
@@ -128,10 +133,17 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 					};
 				});
 
-				this.#setAncestorData(data);
+				ancestorData = data;
 
 				structureItems.push(...ancestorItems);
 			}
+		}
+
+		// Guard: this context may have been destroyed while the async requests were in flight.
+		if (!this._host) return;
+
+		if (ancestorData) {
+			this.#setAncestorData(ancestorData);
 		}
 
 		this.#structure.setValue(structureItems);
