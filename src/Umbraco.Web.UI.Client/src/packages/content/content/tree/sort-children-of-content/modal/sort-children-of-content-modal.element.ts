@@ -1,6 +1,6 @@
 import type { UmbContentTreeItemModel } from '../../types.js';
+import type { UmbSortChildrenOfContentModalData } from './sort-children-of-content-modal.token.js';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
-import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import { UmbSortChildrenOfModalElement } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-sort-children-of-content-modal')
@@ -12,25 +12,6 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 		hour: 'numeric',
 		minute: '2-digit',
 	};
-
-	#appCulture?: string;
-
-	constructor() {
-		super();
-		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (context) => {
-			this.observe(
-				context?.appLanguageCulture,
-				(appCulture) => {
-					this.#appCulture = appCulture;
-					if (this._tableItems.length > 0) {
-						// Patch names in-place so any user drag-sort or column-order is preserved.
-						this.#updateTableItemNames();
-					}
-				},
-				'umbObserveAppLanguageCulture',
-			);
-		});
-	}
 
 	protected override _setTableColumns() {
 		this._tableColumns = [
@@ -47,64 +28,38 @@ export class UmbSortChildrenOfContentModalElement extends UmbSortChildrenOfModal
 		];
 	}
 
-	protected override _createTableItems() {
-		this._tableItems = this._children.map((treeItem) => {
-			// TODO: implement ItemDataResolver for document and media. This will also fix the hard-coded icon.
-			return {
-				id: treeItem.unique,
-				icon: 'icon-document',
-				data: [
-					{
-						columnAlias: 'name',
-						value: this.#resolveName(treeItem),
-					},
-					{
-						columnAlias: 'createDate',
-						value: this.localize.date(treeItem.createDate, this.#localizeDateOptions),
-					},
-				],
-			};
-		});
-	}
+	protected override async _createTableItems() {
+		const itemDataResolver = (this.data as UmbSortChildrenOfContentModalData | undefined)?.itemDataResolver;
 
-	#updateTableItemNames() {
-		this._tableItems = this._tableItems.map((tableItem) => {
-			const treeItem = this._children.find((child) => child.unique === tableItem.id);
-			if (!treeItem) return tableItem;
-			return {
-				...tableItem,
-				data: tableItem.data.map((column) =>
-					column.columnAlias === 'name' ? { ...column, value: this.#resolveName(treeItem) } : column,
-				),
-			};
-		});
-	}
+		this._tableItems = await Promise.all(
+			this._children.map(async (treeItem) => {
+				let name = treeItem.name;
+				let icon = treeItem.icon ?? undefined;
 
-	#resolveName(treeItem: UmbContentTreeItemModel): string {
-		// The shared UmbContentTreeItemModel type used by this modal does not declare variants, so the cast stays local here.
-		const variants = (
-			treeItem as UmbContentTreeItemModel & { variants?: Array<{ name?: string; culture: string | null }> }
-		).variants;
+				if (itemDataResolver) {
+					const resolver = new itemDataResolver(this);
+					resolver.setData(treeItem);
+					name = (await resolver.getName()) || treeItem.name;
+					icon = (await resolver.getIcon()) ?? icon;
+					this.removeUmbController(resolver);
+				}
 
-		// No variants, or invariant content (culture === null) — use the tree item's own name as-is.
-		if (!variants?.length || variants[0].culture === null) {
-			return treeItem.name;
-		}
-
-		return this.#pickVariantName(variants, treeItem.name);
-	}
-
-	#pickVariantName(variants: Array<{ name?: string; culture: string | null }>, defaultName: string): string {
-		const currentVariant = this.#appCulture
-			? variants.find((variant) => variant.culture === this.#appCulture)
-			: undefined;
-		if (currentVariant?.name) {
-			return currentVariant.name;
-		}
-
-		// No name in the current language — fall back to any named variant, parenthesised so it's visibly a fallback.
-		const fallbackName = variants.find((variant) => variant.name)?.name ?? defaultName;
-		return fallbackName ? `(${fallbackName})` : defaultName;
+				return {
+					id: treeItem.unique,
+					icon: icon ?? 'icon-document',
+					data: [
+						{
+							columnAlias: 'name',
+							value: name,
+						},
+						{
+							columnAlias: 'createDate',
+							value: this.localize.date(treeItem.createDate, this.#localizeDateOptions),
+						},
+					],
+				};
+			}),
+		);
 	}
 
 	protected override _sortCompare(columnAlias: string, valueA: unknown, valueB: unknown): number {
@@ -128,6 +83,6 @@ export { UmbSortChildrenOfContentModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		['umb-sort-children-of-content-modal']: UmbSortChildrenOfContentModalElement;
+		'umb-sort-children-of-content-modal': UmbSortChildrenOfContentModalElement;
 	}
 }
