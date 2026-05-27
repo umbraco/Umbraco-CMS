@@ -50,8 +50,18 @@ describe('toFriendlyName', () => {
 		expect(toFriendlyName('   ')).to.eq('');
 	});
 
-	it('trims and collapses surrounding whitespace', () => {
-		expect(toFriendlyName('  spaced-name.jpg  ')).to.eq('Spaced Name');
+	it('collapses interior whitespace', () => {
+		expect(toFriendlyName('hello   world.jpg')).to.eq('Hello World');
+	});
+
+	it('strips a trailing dot (parity with StringExtensions.StripFileExtension)', () => {
+		expect(toFriendlyName('file.')).to.eq('File');
+	});
+
+	it('does not strip when the "extension" contains whitespace', () => {
+		// StringExtensions.StripFileExtension preserves these names rather than treating
+		// the last dot as an extension delimiter, so the dot survives into the output.
+		expect(toFriendlyName('report.final draft')).to.eq('Report.Final Draft');
 	});
 
 	it('handles Latin-extended letters as part of words', () => {
