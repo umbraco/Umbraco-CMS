@@ -1357,10 +1357,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(cultures));
         }
 
-        if (cultures.Any(c => c.IsNullOrWhiteSpace()) || cultures.Distinct().Count() != cultures.Length)
-        {
-            throw new ArgumentException("Cultures cannot be null or whitespace", nameof(cultures));
-        }
+        EnsureCulturesAreValid(cultures, nameof(cultures));
 
         cultures = cultures.Select(x => x.EnsureCultureCode()!).ToArray();
 
@@ -1374,12 +1371,7 @@ public class ContentService : RepositoryService, IContentService
 
         EnsureNameLengthIsValid(content);
 
-        PublishedState publishedState = content.PublishedState;
-        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
-        {
-            throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
-        }
+        EnsurePublishedStateAllowsPublish(content);
 
         // cannot accept invariant (null or empty) culture for variant content type
         // cannot accept a specific culture for invariant content type (but '*' is ok)
@@ -1443,13 +1435,32 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(culturesToPublish));
         }
 
+        // wildcards and nulls are not accepted here; cultures must be explicit
+        if (culturesToPublish.Any(x => x == null || x == "*"))
+        {
+            throw new InvalidOperationException(
+                "Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
+        }
+
+        EnsureCulturesAreValid(culturesToPublish, nameof(culturesToPublish));
+
+        culturesToPublish = culturesToPublish.Select(x => x.EnsureCultureCode()!).ToArray();
+
         EnsureNameLengthIsValid(content);
 
-        var varies = content.ContentType.VariesByCulture();
+        EnsurePublishedStateAllowsPublish(content);
 
-        if (culturesToPublish.Length == 0 && !varies)
+        var varies = content.ContentType.VariesByCulture();
+        if (varies is false)
         {
-            // No cultures specified and doesn't vary, so publish it, else nothing to publish
+            if (culturesToPublish.Length > 0)
+            {
+                throw new ArgumentException(
+                    "Cultures cannot be specified when publishing invariant content types.",
+                    nameof(culturesToPublish));
+            }
+
+            // doesn't vary; publish the invariant culture in a single scope alongside the save
             return SaveAndPublish(content, userId: userId);
         }
 
@@ -1464,12 +1475,6 @@ public class ContentService : RepositoryService, IContentService
         if (scope.Notifications.PublishCancelable(savingNotification))
         {
             return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
-        }
-
-        if (culturesToPublish.Any(x => x == null || x == "*"))
-        {
-            throw new InvalidOperationException(
-                "Only valid cultures are allowed to be used in this method, wildcards or nulls are not allowed");
         }
 
         IEnumerable<CultureImpact> impacts =
@@ -1491,12 +1496,7 @@ public class ContentService : RepositoryService, IContentService
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        PublishedState publishedState = content.PublishedState;
-        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
-        {
-            throw new InvalidOperationException(
-                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
-        }
+        EnsurePublishedStateAllowsPublish(content);
 
         // cannot accept invariant (null or empty) culture for variant content type
         // cannot accept a specific culture for invariant content type (but '*' is ok)
@@ -3358,6 +3358,24 @@ public class ContentService : RepositoryService, IContentService
         if (content.Name?.Length > MaxContentNameLength)
         {
             throw new InvalidOperationException($"Name cannot be more than {MaxContentNameLength} characters in length.");
+        }
+    }
+
+    private static void EnsureCulturesAreValid(string[] cultures, string paramName)
+    {
+        if (cultures.Any(c => c.IsNullOrWhiteSpace()) || cultures.Distinct().Count() != cultures.Length)
+        {
+            throw new ArgumentException("Cultures cannot be null or whitespace, and must be distinct.", paramName);
+        }
+    }
+
+    private static void EnsurePublishedStateAllowsPublish(IContent content)
+    {
+        PublishedState publishedState = content.PublishedState;
+        if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
+        {
+            throw new InvalidOperationException(
+                $"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(CommitDocumentChanges)} method.");
         }
     }
 

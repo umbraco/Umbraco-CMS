@@ -1917,6 +1917,32 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
     }
 
     [Test]
+    public void SaveAndPublish_Rejects_Whitespace_Cultures()
+    {
+        var content = CreateEnglishAndFrenchDocument(out _, out _, out _);
+
+        Assert.Throws<ArgumentException>(() => ContentService.SaveAndPublish(content, [string.Empty]));
+        Assert.Throws<ArgumentException>(() => ContentService.SaveAndPublish(content, ["   "]));
+        Assert.Throws<ArgumentException>(() => ContentService.SaveAndPublish(content, ["en-US", "   "]));
+    }
+
+    [Test]
+    public void SaveAndPublish_Rejects_Duplicate_Cultures()
+    {
+        var content = CreateEnglishAndFrenchDocument(out var langUk, out _, out _);
+
+        Assert.Throws<ArgumentException>(() => ContentService.SaveAndPublish(content, [langUk.IsoCode, langUk.IsoCode]));
+    }
+
+    [Test]
+    public void SaveAndPublish_Rejects_Cultures_On_Invariant_Content()
+    {
+        var content = ContentService.Create("Invariant", -1, "umbTextpage");
+
+        Assert.Throws<ArgumentException>(() => ContentService.SaveAndPublish(content, ["en-US"]));
+    }
+
+    [Test]
     public void SaveAndPublish_No_Cultures_On_Variant_Saves_But_Does_Not_Publish()
     {
         var content = CreateEnglishAndFrenchDocument(out var langUk, out var langFr, out _);
