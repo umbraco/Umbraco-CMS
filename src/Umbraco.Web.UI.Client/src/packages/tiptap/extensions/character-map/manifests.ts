@@ -1,5 +1,3 @@
-import { UmbCharacterMapModalElement } from './modals/character-map-modal.element.js';
-import UmbTiptapToolbarCharacterMapExtensionApi from './character-map.tiptap-toolbar-api.js';
 import { UMB_TIPTAP_CHARACTER_MAP_MODAL_ALIAS } from './constants.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
@@ -8,7 +6,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.CharacterMap',
 		name: 'Character Map Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarCharacterMapExtensionApi,
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarCharacterMapExtensionApi })),
 		meta: {
 			alias: 'umbCharacterMap',
 			icon: 'icon-omega',
@@ -19,6 +18,6 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'modal',
 		alias: UMB_TIPTAP_CHARACTER_MAP_MODAL_ALIAS,
 		name: 'Character Map Modal',
-		element: UmbCharacterMapModalElement,
+		element: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbCharacterMapModalElement })),
 	},
 ];

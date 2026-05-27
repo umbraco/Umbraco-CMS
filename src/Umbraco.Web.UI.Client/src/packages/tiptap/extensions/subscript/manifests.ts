@@ -1,12 +1,10 @@
-import UmbTiptapSubscriptExtensionApi from './subscript.tiptap-api.js';
-import UmbTiptapToolbarSubscriptExtensionApi from './subscript.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		kind: 'button',
 		alias: 'Umb.Tiptap.Subscript',
 		name: 'Subscript Tiptap Extension',
-		api: UmbTiptapSubscriptExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapSubscriptExtensionApi })),
 		meta: {
 			icon: 'icon-subscript',
 			label: 'Subscript',
@@ -18,7 +16,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Subscript',
 		name: 'Subscript Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarSubscriptExtensionApi,
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarSubscriptExtensionApi })),
 		forExtensions: ['Umb.Tiptap.Subscript'],
 		meta: {
 			alias: 'subscript',

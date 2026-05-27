@@ -1,4 +1,3 @@
-import { UmbTiptapToolbarButtonActionElement } from '../components/toolbar/tiptap-toolbar-button-action.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
@@ -7,6 +6,9 @@ export const manifest: UmbExtensionManifestKind = {
 	matchKind: 'actionButton',
 	matchType: 'tiptapToolbarExtension',
 	manifest: {
-		element: UmbTiptapToolbarButtonActionElement,
+		element: () =>
+			import('./extension-apis.bundle.js').then((m) => ({
+				default: m.UmbTiptapToolbarButtonActionElement,
+			})),
 	},
 };

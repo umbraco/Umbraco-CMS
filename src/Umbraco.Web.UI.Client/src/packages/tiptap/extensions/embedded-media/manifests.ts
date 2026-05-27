@@ -1,11 +1,9 @@
-import UmbTiptapEmbeddedMediaExtensionApi from './embedded-media.tiptap-api.js';
-import UmbTiptapToolbarEmbeddedMediaExtensionApi from './embedded-media.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Embed',
 		name: 'Embedded Media Tiptap Extension',
-		api: UmbTiptapEmbeddedMediaExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapEmbeddedMediaExtensionApi })),
 		meta: {
 			icon: 'icon-embed',
 			label: '#general_embed',
@@ -17,7 +15,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.EmbeddedMedia',
 		name: 'Embedded Media Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarEmbeddedMediaExtensionApi,
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarEmbeddedMediaExtensionApi })),
 		forExtensions: ['Umb.Tiptap.Embed'],
 		meta: {
 			alias: 'umbEmbeddedMedia',

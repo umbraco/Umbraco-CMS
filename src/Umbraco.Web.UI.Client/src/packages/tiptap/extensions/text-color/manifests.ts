@@ -1,12 +1,13 @@
-import UmbTiptapToolbarTextColorBackgroundExtensionApi from './text-color-background.tiptap-toolbar-api.js';
-import UmbTiptapToolbarTextColorForegroundExtensionApi from './text-color-foreground.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapToolbarExtension',
 		kind: 'colorPickerButton',
 		alias: 'Umb.Tiptap.Toolbar.TextColorBackground',
 		name: 'Text Color Background Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarTextColorBackgroundExtensionApi,
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({
+				default: m.UmbTiptapToolbarTextColorBackgroundExtensionApi,
+			})),
 		forExtensions: ['Umb.Tiptap.HtmlAttributeStyle', 'Umb.Tiptap.HtmlTagSpan'],
 		meta: {
 			alias: 'text-color-background',
@@ -19,7 +20,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'colorPickerButton',
 		alias: 'Umb.Tiptap.Toolbar.TextColorForeground',
 		name: 'Text Color Foreground Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarTextColorForegroundExtensionApi,
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({
+				default: m.UmbTiptapToolbarTextColorForegroundExtensionApi,
+			})),
 		forExtensions: ['Umb.Tiptap.HtmlAttributeStyle', 'Umb.Tiptap.HtmlTagSpan'],
 		meta: {
 			alias: 'text-color-foreground',

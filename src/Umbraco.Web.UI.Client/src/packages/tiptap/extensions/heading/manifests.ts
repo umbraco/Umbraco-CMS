@@ -1,16 +1,9 @@
-import UmbTiptapHeadingExtensionApi from './heading.tiptap-api.js';
-import UmbTiptapToolbarHeading1ExtensionApi from './heading1.tiptap-toolbar-api.js';
-import UmbTiptapToolbarHeading2ExtensionApi from './heading2.tiptap-toolbar-api.js';
-import UmbTiptapToolbarHeading3ExtensionApi from './heading3.tiptap-toolbar-api.js';
-import UmbTiptapToolbarHeading4ExtensionApi from './heading4.tiptap-toolbar-api.js';
-import UmbTiptapToolbarHeading5ExtensionApi from './heading5.tiptap-toolbar-api.js';
-import UmbTiptapToolbarHeading6ExtensionApi from './heading6.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Heading',
 		name: 'Headings Tiptap Extension',
-		api: UmbTiptapHeadingExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapHeadingExtensionApi })),
 		meta: {
 			icon: 'icon-heading',
 			label: 'Headings',
@@ -22,7 +15,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Heading1',
 		name: 'Heading 1 Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarHeading1ExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarHeading1ExtensionApi })),
 		forExtensions: ['Umb.Tiptap.Heading'],
 		meta: {
 			alias: 'heading1',
@@ -35,7 +28,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Heading2',
 		name: 'Heading 2 Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarHeading2ExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarHeading2ExtensionApi })),
 		forExtensions: ['Umb.Tiptap.Heading'],
 		meta: {
 			alias: 'heading2',
@@ -48,7 +41,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Heading3',
 		name: 'Heading 3 Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarHeading3ExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarHeading3ExtensionApi })),
 		forExtensions: ['Umb.Tiptap.Heading'],
 		meta: {
 			alias: 'heading3',
@@ -61,7 +54,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Heading4',
 		name: 'Heading 4 Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarHeading4ExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarHeading4ExtensionApi })),
 		forExtensions: ['Umb.Tiptap.Heading'],
 		meta: {
 			alias: 'heading4',
@@ -74,7 +67,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Heading5',
 		name: 'Heading 5 Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarHeading5ExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarHeading5ExtensionApi })),
 		forExtensions: ['Umb.Tiptap.Heading'],
 		meta: {
 			alias: 'heading5',
@@ -87,7 +80,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Heading6',
 		name: 'Heading 6 Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarHeading6ExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarHeading6ExtensionApi })),
 		forExtensions: ['Umb.Tiptap.Heading'],
 		meta: {
 			alias: 'heading6',

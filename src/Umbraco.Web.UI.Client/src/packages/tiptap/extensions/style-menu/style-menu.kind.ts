@@ -1,5 +1,3 @@
-import { UmbTiptapToolbarMenuElement } from '../../components/toolbar/tiptap-toolbar-menu.element.js';
-import UmbTiptapToolbarStyleMenuApi from './style-menu.tiptap-toolbar-api.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
@@ -8,7 +6,7 @@ export const manifest: UmbExtensionManifestKind = {
 	matchKind: 'styleMenu',
 	matchType: 'tiptapToolbarExtension',
 	manifest: {
-		api: UmbTiptapToolbarStyleMenuApi,
-		element: UmbTiptapToolbarMenuElement,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarStyleMenuApi })),
+		element: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarMenuElement })),
 	},
 };

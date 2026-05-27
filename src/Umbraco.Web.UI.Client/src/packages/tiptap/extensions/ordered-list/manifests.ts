@@ -1,11 +1,9 @@
-import UmbTiptapOrderedListExtensionApi from './ordered-list.tiptap-api.js';
-import UmbTiptapToolbarOrderedListExtensionApi from './ordered-list.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.OrderedList',
 		name: 'Ordered List Tiptap Extension',
-		api: UmbTiptapOrderedListExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapOrderedListExtensionApi })),
 		meta: {
 			icon: 'icon-ordered-list',
 			label: 'Ordered List',
@@ -17,7 +15,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.OrderedList',
 		name: 'Ordered List Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarOrderedListExtensionApi,
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarOrderedListExtensionApi })),
 		forExtensions: ['Umb.Tiptap.OrderedList'],
 		meta: {
 			alias: 'orderedList',

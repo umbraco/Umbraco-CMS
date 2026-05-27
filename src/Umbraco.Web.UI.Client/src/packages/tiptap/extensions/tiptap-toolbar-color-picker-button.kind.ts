@@ -1,4 +1,3 @@
-import { UmbTiptapToolbarColorPickerButtonElement } from '../components/toolbar/tiptap-toolbar-color-picker-button.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
@@ -7,6 +6,9 @@ export const manifest: UmbExtensionManifestKind = {
 	matchKind: 'colorPickerButton',
 	matchType: 'tiptapToolbarExtension',
 	manifest: {
-		element: UmbTiptapToolbarColorPickerButtonElement,
+		element: () =>
+			import('./extension-apis.bundle.js').then((m) => ({
+				default: m.UmbTiptapToolbarColorPickerButtonElement,
+			})),
 	},
 };

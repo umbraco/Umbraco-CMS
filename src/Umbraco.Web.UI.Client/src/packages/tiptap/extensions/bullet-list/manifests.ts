@@ -1,11 +1,9 @@
-import UmbTiptapBulletListExtensionApi from './bullet-list.tiptap-api.js';
-import UmbTiptapToolbarBulletListExtensionApi from './bullet-list.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.BulletList',
 		name: 'Bullet List Tiptap Extension',
-		api: UmbTiptapBulletListExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapBulletListExtensionApi })),
 		meta: {
 			icon: 'icon-bulleted-list',
 			label: 'Bullet List',
@@ -17,7 +15,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.BulletList',
 		name: 'Bullet List Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarBulletListExtensionApi,
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarBulletListExtensionApi })),
 		forExtensions: ['Umb.Tiptap.BulletList'],
 		meta: {
 			alias: 'bulletList',

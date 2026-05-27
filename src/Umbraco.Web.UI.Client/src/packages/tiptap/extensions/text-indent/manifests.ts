@@ -1,12 +1,9 @@
-import UmbTiptapTextIndentExtensionApi from './text-indent.tiptap-api.js';
-import UmbTiptapToolbarTextIndentExtensionApi from './text-indent.tiptap-toolbar-api.js';
-import UmbTiptapToolbarTextOutdentExtensionApi from './text-outdent.tiptap-toolbar-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.TextIndent',
 		name: 'Text Indent Tiptap Extension',
-		api: UmbTiptapTextIndentExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapTextIndentExtensionApi })),
 		meta: {
 			icon: 'icon-indent',
 			label: 'Text Indent',
@@ -18,7 +15,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.TextIndent',
 		name: 'Text Indent Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarTextIndentExtensionApi,
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarTextIndentExtensionApi })),
 		forExtensions: ['Umb.Tiptap.TextIndent'],
 		meta: {
 			alias: 'indent',
@@ -31,7 +29,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.TextOutdent',
 		name: 'Text Outdent Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarTextOutdentExtensionApi,
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarTextOutdentExtensionApi })),
 		forExtensions: ['Umb.Tiptap.TextIndent'],
 		meta: {
 			alias: 'outdent',

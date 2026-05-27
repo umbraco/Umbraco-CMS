@@ -1,12 +1,10 @@
-import UmbTiptapToolbarUnderlineExtensionApi from './underline.tiptap-toolbar-api.js';
-import UmbTiptapUnderlineExtensionApi from './underline.tiptap-api.js';
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		kind: 'button',
 		alias: 'Umb.Tiptap.Underline',
 		name: 'Underline Tiptap Extension',
-		api: UmbTiptapUnderlineExtensionApi,
+		api: () => import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapUnderlineExtensionApi })),
 		meta: {
 			icon: 'icon-underline',
 			label: 'Underline',
@@ -18,7 +16,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Underline',
 		name: 'Underline Tiptap Toolbar Extension',
-		api: UmbTiptapToolbarUnderlineExtensionApi,
+		api: () =>
+			import('../extension-apis.bundle.js').then((m) => ({ default: m.UmbTiptapToolbarUnderlineExtensionApi })),
 		forExtensions: ['Umb.Tiptap.Underline'],
 		meta: {
 			alias: 'underline',
