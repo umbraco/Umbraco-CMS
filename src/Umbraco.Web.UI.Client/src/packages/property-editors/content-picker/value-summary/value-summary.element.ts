@@ -27,7 +27,7 @@ export class UmbContentPickerPropertyEditorValueSummaryElement extends UmbValueS
 		const docEntries = value.filter((e) => e.entityType === UMB_DOCUMENT_ENTITY_TYPE);
 
 		for (const unique of this.#documentResolvers.keys()) {
-			if (!docEntries.find((e) => e.item.unique === unique)) {
+			if (!docEntries.find((e) => e.unique === unique)) {
 				this.#documentResolvers.get(unique)?.destroy();
 				this.#documentResolvers.delete(unique);
 				this.#resolvedDocNames.delete(unique);
@@ -35,18 +35,17 @@ export class UmbContentPickerPropertyEditorValueSummaryElement extends UmbValueS
 		}
 
 		for (const entry of docEntries) {
-			if (entry.entityType !== UMB_DOCUMENT_ENTITY_TYPE) continue;
-			if (!this.#documentResolvers.has(entry.item.unique)) {
+			if (!this.#documentResolvers.has(entry.unique)) {
 				const resolver = new UmbDocumentItemDataResolver<UmbDocumentItemModel>(this);
-				resolver.setData(entry.item);
-				this.#documentResolvers.set(entry.item.unique, resolver);
+				resolver.setData(entry);
+				this.#documentResolvers.set(entry.unique, resolver);
 				this.observe(
 					resolver.name,
 					(name) => {
-						this.#resolvedDocNames.set(entry.item.unique, name ?? '');
+						this.#resolvedDocNames.set(entry.unique, name ?? '');
 						this.#buildNames();
 					},
-					`doc-${entry.item.unique}`,
+					`doc-${entry.unique}`,
 				);
 			}
 		}
@@ -57,9 +56,9 @@ export class UmbContentPickerPropertyEditorValueSummaryElement extends UmbValueS
 	#buildNames() {
 		this._names = (this._value ?? []).map((entry) => {
 			if (entry.entityType === UMB_DOCUMENT_ENTITY_TYPE) {
-				return this.#resolvedDocNames.get(entry.item.unique) ?? '';
+				return this.#resolvedDocNames.get(entry.unique) ?? '';
 			}
-			return entry.item.name;
+			return entry.name;
 		});
 	}
 

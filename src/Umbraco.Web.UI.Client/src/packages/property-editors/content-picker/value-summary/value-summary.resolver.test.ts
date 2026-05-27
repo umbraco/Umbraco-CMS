@@ -70,8 +70,8 @@ describe('UmbContentPickerValueSummaryResolver', () => {
 		expect(result.data).to.have.length(1);
 		expect(result.data[0]).to.have.length(1);
 		expect(result.data[0][0].entityType).to.equal(UMB_DOCUMENT_ENTITY_TYPE);
-		expect(result.data[0][0].item.unique).to.equal(HOME_ID);
-		expect(result.data[0][0].item.variants[0].name).to.equal('Home');
+		expect(result.data[0][0].unique).to.equal(HOME_ID);
+		expect(result.data[0][0].variants[0].name).to.equal('Home');
 	});
 
 	it('resolves a media reference to its item with the correct entity type', async () => {
@@ -80,8 +80,8 @@ describe('UmbContentPickerValueSummaryResolver', () => {
 		expect(result.data).to.have.length(1);
 		expect(result.data[0]).to.have.length(1);
 		expect(result.data[0][0].entityType).to.equal(UMB_MEDIA_ENTITY_TYPE);
-		expect(result.data[0][0].item.unique).to.equal(PLACEHOLDER_73640_ID);
-		expect(result.data[0][0].item.variants[0].name).to.equal('Placeholder 73640');
+		expect(result.data[0][0].unique).to.equal(PLACEHOLDER_73640_ID);
+		expect(result.data[0][0].variants[0].name).to.equal('Placeholder 73640');
 	});
 
 	it('resolves a member reference to its item with the correct entity type', async () => {
@@ -90,8 +90,8 @@ describe('UmbContentPickerValueSummaryResolver', () => {
 		expect(result.data).to.have.length(1);
 		expect(result.data[0]).to.have.length(1);
 		expect(result.data[0][0].entityType).to.equal(UMB_MEMBER_ENTITY_TYPE);
-		expect(result.data[0][0].item.unique).to.equal(MEMBER_ONE_ID);
-		expect(result.data[0][0].item.variants[0].name).to.equal('Member One');
+		expect(result.data[0][0].unique).to.equal(MEMBER_ONE_ID);
+		expect(result.data[0][0].variants[0].name).to.equal('Member One');
 	});
 
 	it('resolves a value containing mixed document, media, and member references', async () => {
@@ -101,17 +101,17 @@ describe('UmbContentPickerValueSummaryResolver', () => {
 		expect(result.data[0]).to.have.length(3);
 
 		const byType = Object.fromEntries(result.data[0].map((r) => [r.entityType, r]));
-		expect(byType[UMB_DOCUMENT_ENTITY_TYPE].item.unique).to.equal(HOME_ID);
-		expect(byType[UMB_MEDIA_ENTITY_TYPE].item.unique).to.equal(PLACEHOLDER_73640_ID);
-		expect(byType[UMB_MEMBER_ENTITY_TYPE].item.unique).to.equal(MEMBER_ONE_ID);
+		expect(byType[UMB_DOCUMENT_ENTITY_TYPE].unique).to.equal(HOME_ID);
+		expect(byType[UMB_MEDIA_ENTITY_TYPE].unique).to.equal(PLACEHOLDER_73640_ID);
+		expect(byType[UMB_MEMBER_ENTITY_TYPE].unique).to.equal(MEMBER_ONE_ID);
 	});
 
 	it('resolves multiple separate values to their respective items', async () => {
 		const result = await resolver.resolveValues([[docRef(HOME_ID)], [docRef(COLOR_PICKER_ID)]]);
 
 		expect(result.data).to.have.length(2);
-		expect(result.data[0][0].item.unique).to.equal(HOME_ID);
-		expect(result.data[1][0].item.unique).to.equal(COLOR_PICKER_ID);
+		expect(result.data[0][0].unique).to.equal(HOME_ID);
+		expect(result.data[1][0].unique).to.equal(COLOR_PICKER_ID);
 	});
 
 	it('returns an empty array for an unknown reference', async () => {
@@ -129,15 +129,15 @@ describe('UmbContentPickerValueSummaryResolver', () => {
 
 		expect(result.data).to.have.length(2);
 		expect(result.data[0]).to.deep.equal([]);
-		expect(result.data[1][0].item.unique).to.equal(HOME_ID);
+		expect(result.data[1][0].unique).to.equal(HOME_ID);
 	});
 
 	it('deduplicates IDs of the same type used across multiple values when fetching', async () => {
 		const result = await resolver.resolveValues([[docRef(HOME_ID)], [docRef(HOME_ID)]]);
 
 		expect(result.data).to.have.length(2);
-		expect(result.data[0][0].item.unique).to.equal(HOME_ID);
-		expect(result.data[1][0].item.unique).to.equal(HOME_ID);
+		expect(result.data[0][0].unique).to.equal(HOME_ID);
+		expect(result.data[1][0].unique).to.equal(HOME_ID);
 	});
 
 	it('includes an asObservable function in the result when items are found', async () => {
@@ -156,7 +156,7 @@ describe('UmbContentPickerValueSummaryResolver', () => {
 
 		expect(observed[0]).to.have.length(2);
 		const byType = Object.fromEntries(observed[0].map((r) => [r.entityType, r]));
-		expect(byType[UMB_DOCUMENT_ENTITY_TYPE].item.unique).to.equal(HOME_ID);
-		expect(byType[UMB_MEMBER_ENTITY_TYPE].item.unique).to.equal(MEMBER_ONE_ID);
+		expect(byType[UMB_DOCUMENT_ENTITY_TYPE].unique).to.equal(HOME_ID);
+		expect(byType[UMB_MEMBER_ENTITY_TYPE].unique).to.equal(MEMBER_ONE_ID);
 	});
 });

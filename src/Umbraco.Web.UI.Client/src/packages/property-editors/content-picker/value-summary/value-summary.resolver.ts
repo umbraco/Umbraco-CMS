@@ -11,10 +11,7 @@ import { combineLatest, map, of, type Observable } from '@umbraco-cms/backoffice
 
 type ContentPickerValue = Array<UmbReferenceByUniqueAndType> | undefined;
 
-export type UmbContentPickerResolvedItem =
-	| { entityType: typeof UMB_DOCUMENT_ENTITY_TYPE; item: UmbDocumentItemModel }
-	| { entityType: typeof UMB_MEDIA_ENTITY_TYPE; item: UmbMediaItemModel }
-	| { entityType: typeof UMB_MEMBER_ENTITY_TYPE; item: UmbMemberItemModel };
+export type UmbContentPickerResolvedItem = UmbDocumentItemModel | UmbMediaItemModel | UmbMemberItemModel;
 
 export class UmbContentPickerValueSummaryResolver
 	extends UmbControllerBase
@@ -70,19 +67,19 @@ export class UmbContentPickerValueSummaryResolver
 		const mediaByKey = new Map(media.map((item) => [item.unique, item]));
 		const memberByKey = new Map(members.map((item) => [item.unique, item]));
 
-		return values.map((v) =>
-			(v ?? []).flatMap((e): Array<UmbContentPickerResolvedItem> => {
-				if (e.type === UMB_DOCUMENT_ENTITY_TYPE) {
-					const item = docsByKey.get(e.unique);
-					return item ? [{ entityType: UMB_DOCUMENT_ENTITY_TYPE, item }] : [];
+		return values.map((value) =>
+			(value ?? []).flatMap((entry): Array<UmbContentPickerResolvedItem> => {
+				if (entry.type === UMB_DOCUMENT_ENTITY_TYPE) {
+					const item = docsByKey.get(entry.unique);
+					return item ? [item] : [];
 				}
-				if (e.type === UMB_MEDIA_ENTITY_TYPE) {
-					const item = mediaByKey.get(e.unique);
-					return item ? [{ entityType: UMB_MEDIA_ENTITY_TYPE, item }] : [];
+				if (entry.type === UMB_MEDIA_ENTITY_TYPE) {
+					const item = mediaByKey.get(entry.unique);
+					return item ? [item] : [];
 				}
-				if (e.type === UMB_MEMBER_ENTITY_TYPE) {
-					const item = memberByKey.get(e.unique);
-					return item ? [{ entityType: UMB_MEMBER_ENTITY_TYPE, item }] : [];
+				if (entry.type === UMB_MEMBER_ENTITY_TYPE) {
+					const item = memberByKey.get(entry.unique);
+					return item ? [item] : [];
 				}
 				return [];
 			}),
