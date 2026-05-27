@@ -72,7 +72,9 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				this.#workspaceContext?.unique,
 				(value) => {
 					if (!value) return;
-					this.#requestStructure();
+					this.#requestStructure().catch(() => {
+						// Context may have been destroyed while the async request was in flight.
+					});
 				},
 				'observeUnique',
 			);
@@ -82,8 +84,9 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 				(value) => {
 					// Workspace has changed from new to existing
 					if (value === false && this.#isNew === true) {
-						// TODO: We do not need to request here as we already know the structure and unique
-						this.#requestStructure();
+						this.#requestStructure().catch(() => {
+							// Context may have been destroyed while the async request was in flight.
+						});
 					}
 					this.#isNew = value;
 				},
@@ -177,6 +180,10 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 			});
 
 			structureItems.push(...treeItemAncestors);
+
+			// Guard: this context may have been destroyed while the async requests were in flight
+			// (e.g. a condition such as IS_NOT_TRASHED flips before the API response arrives).
+			if (!this._host) return;
 
 			this.#structure.setValue(structureItems);
 			this.#setParentData(structureItems);
