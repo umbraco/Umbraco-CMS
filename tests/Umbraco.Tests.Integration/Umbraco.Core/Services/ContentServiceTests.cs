@@ -1733,8 +1733,6 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
         Assert.That(childSaved.Success, Is.True);
     }
 
-    #region SaveAndPublish (combined operation)
-
     [Test]
     public void Can_SaveAndPublish_Invariant_Content()
     {
@@ -2134,8 +2132,6 @@ internal sealed class ContentServiceTests : UmbracoIntegrationTestWithContent
             Assert.IsTrue(result.Content.Edited, "result.Content.Edited");
         });
     }
-
-    #endregion
 
     [Test]
     [LongRunning]
