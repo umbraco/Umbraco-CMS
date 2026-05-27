@@ -1,3 +1,5 @@
+import { UmbTiptapTablePropertiesModalElement } from './modals/table-properties-modal.element.js';
+import { UmbTiptapTableToolbarMenuElement } from './components/table-toolbar-menu.element.js';
 import UmbTableCellMergeAction from './actions/table-cell-merge.action.js';
 import UmbTableCellMergeSplitAction from './actions/table-cell-merge-split.action.js';
 import UmbTableCellSplitAction from './actions/table-cell-split.action.js';
@@ -26,7 +28,7 @@ const modals: Array<UmbExtensionManifest> = [
 		type: 'modal',
 		alias: UMB_TIPTAP_TABLE_PROPERTIES_MODAL_ALIAS,
 		name: 'Tiptap Table Properties Modal',
-		element: () => import('./modals/table-properties-modal.element.js'),
+		element: UmbTiptapTablePropertiesModalElement,
 	},
 ];
 
@@ -52,7 +54,7 @@ const toolbarExtensions: Array<UmbExtensionManifest> = [
 		alias: 'Umb.Tiptap.Toolbar.Table',
 		name: 'Table Tiptap Extension',
 		api: UmbTiptapToolbarTableExtensionApi,
-		element: () => import('./components/table-toolbar-menu.element.js'),
+		element: UmbTiptapTableToolbarMenuElement,
 		forExtensions: ['Umb.Tiptap.Table'],
 		items: [
 			{

@@ -1,3 +1,4 @@
+import { UmbTiptapToolbarMenuElement } from '../components/toolbar/tiptap-toolbar-menu.element.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
 
 export const manifest: UmbExtensionManifestKind = {
@@ -6,6 +7,6 @@ export const manifest: UmbExtensionManifestKind = {
 	matchKind: 'menu',
 	matchType: 'tiptapToolbarExtension',
 	manifest: {
-		element: () => import('../components/toolbar/tiptap-toolbar-menu.element.js'),
+		element: UmbTiptapToolbarMenuElement,
 	},
 };

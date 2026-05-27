@@ -144,12 +144,15 @@ export default class UmbTiptapBoldToolbarApi extends UmbTiptapToolbarElementApiB
 }
 
 // manifests.ts
+import UmbTiptapBoldExtensionApi from './bold.tiptap-api.js';
+import UmbTiptapBoldToolbarApi from './bold.tiptap-toolbar-api.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
 		alias: 'Umb.Tiptap.Bold',
 		name: 'Bold Tiptap Extension',
-		api: () => import('./bold.tiptap-api.js'),
+		api: UmbTiptapBoldExtensionApi,
 		meta: {
 			icon: 'icon-bold',
 			label: 'Bold',
@@ -161,7 +164,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'button',
 		alias: 'Umb.Tiptap.Toolbar.Bold',
 		name: 'Bold Tiptap Toolbar Extension',
-		api: () => import('./bold.tiptap-toolbar-api.js'),
+		api: UmbTiptapBoldToolbarApi,
 		forExtensions: ['Umb.Tiptap.Bold'],
 		meta: {
 			alias: 'bold',
@@ -171,6 +174,10 @@ export const manifests: Array<UmbExtensionManifest> = [
 	},
 ];
 ```
+
+> **Why a direct reference, not `api: () => import(...)`?** First-party Tiptap extensions register their APIs as **direct class references** so Vite can roll them into the same chunk as the rest of the Tiptap package. Using a dynamic loader produces a separate JS chunk per extension, which on a high-latency link results in many serial network round-trips on first load. The same applies to `element:` on element-bearing manifests/kinds (toolbar buttons, statusbar items, modals shared across the package).
+>
+> External (plugin-supplied) Tiptap extensions may still use the `() => import(...)` form when they want their API code in a separately fetched chunk — `loadManifestApi` accepts both forms.
 
 ### Extension with Custom Styles
 

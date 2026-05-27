@@ -1,4 +1,6 @@
 import UmbTiptapWordCountExtensionApi from './word-count.tiptap-api.js';
+import { UmbTiptapStatusbarWordCountElement } from './word-count.tiptap-statusbar-element.js';
+
 export const manifests: Array<UmbExtensionManifest> = [
 	{
 		type: 'tiptapExtension',
@@ -15,7 +17,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		type: 'tiptapStatusbarExtension',
 		alias: 'Umb.Tiptap.Statusbar.WordCount',
 		name: 'Word Count Tiptap Statusbar Extension',
-		element: () => import('./word-count.tiptap-statusbar-element.js'),
+		element: UmbTiptapStatusbarWordCountElement,
 		forExtensions: ['Umb.Tiptap.WordCount'],
 		meta: {
 			alias: 'wordCount',
