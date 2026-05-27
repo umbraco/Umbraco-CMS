@@ -89,7 +89,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#getHref() {
-		if (!this._unique) return;
+		if (!this._unique || !this._editPath) return;
 		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
 		return `${this._editPath}/${path}`;
 	}
@@ -111,7 +111,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 			<uui-ref-node
 				name=${this._name}
 				href=${ifDefined(this.#getHref())}
-				?readonly=${this.readonly}
+				?readonly=${this.readonly || !this._editPath}
 				?standalone=${this.standalone}
 				?select-only=${this.selectOnly}
 				?selectable=${this.selectable}
