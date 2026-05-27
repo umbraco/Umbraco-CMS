@@ -1233,11 +1233,7 @@ public class ContentService : RepositoryService, IContentService
                 $"Cannot save (un)publishing content with name: {content.Name} - and state: {content.PublishedState}, use the dedicated SavePublished method.");
         }
 
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException(
-                $"Content with the name {content.Name} cannot be more than 255 characters in length.");
-        }
+        EnsureNameLengthIsValid(content);
 
         EventMessages eventMessages = EventMessagesFactory.Get();
 
@@ -1376,10 +1372,7 @@ public class ContentService : RepositoryService, IContentService
             return new PublishResult(PublishResultType.FailedPublishUnsavedChanges, evtMsgs, content);
         }
 
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
-        }
+        EnsureNameLengthIsValid(content);
 
         PublishedState publishedState = content.PublishedState;
         if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
@@ -1450,10 +1443,7 @@ public class ContentService : RepositoryService, IContentService
             throw new ArgumentNullException(nameof(culturesToPublish));
         }
 
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
-        }
+        EnsureNameLengthIsValid(content);
 
         var varies = content.ContentType.VariesByCulture();
 
@@ -1526,10 +1516,7 @@ public class ContentService : RepositoryService, IContentService
             }
         }
 
-        if (content.Name != null && content.Name.Length > 255)
-        {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
-        }
+        EnsureNameLengthIsValid(content);
 
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         scope.WriteLock(Constants.Locks.ContentTree);
@@ -3363,6 +3350,16 @@ public class ContentService : RepositoryService, IContentService
     }
 
     private static bool HasUnsavedChanges(IContent content) => content.HasIdentity is false || content.IsDirty();
+
+    private const int MaxContentNameLength = 255;
+
+    private static void EnsureNameLengthIsValid(IContent content)
+    {
+        if (content.Name?.Length > MaxContentNameLength)
+        {
+            throw new InvalidOperationException($"Name cannot be more than {MaxContentNameLength} characters in length.");
+        }
+    }
 
     /// <summary>
     /// Checks the data integrity of the content tree and optionally fixes issues.
