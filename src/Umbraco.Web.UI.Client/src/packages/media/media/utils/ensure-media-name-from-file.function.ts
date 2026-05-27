@@ -14,7 +14,7 @@ import { UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT } from '@umbraco-cms/backoffice/p
  * @param {File} file - The uploaded file whose name should seed the media item name.
  */
 export async function ensureMediaNameFromFile(host: UmbClassInterface, file: File): Promise<void> {
-	const datasetContext = await host.getContext(UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT);
+	const datasetContext = await host.getContext(UMB_NAMEABLE_PROPERTY_DATASET_CONTEXT).catch(() => undefined);
 	if (!datasetContext || datasetContext.getEntityType() !== UMB_MEDIA_ENTITY_TYPE) return;
 
 	const currentName = datasetContext.getName();

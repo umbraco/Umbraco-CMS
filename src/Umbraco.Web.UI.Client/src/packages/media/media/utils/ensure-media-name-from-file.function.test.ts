@@ -82,4 +82,14 @@ describe('ensureMediaNameFromFile', () => {
 
 		expect(setNameCalls).to.deep.equal([]);
 	});
+
+	it('does not reject when getContext rejects (e.g. on timeout)', async () => {
+		const host = {
+			getContext: async () => {
+				throw new Error('context not found');
+			},
+		} as unknown as UmbClassInterface;
+
+		await ensureMediaNameFromFile(host, new File([''], 'photo.png'));
+	});
 });
