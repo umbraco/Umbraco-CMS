@@ -3,7 +3,7 @@ import type { UmbValidationMessageTranslator } from '../translators/index.js';
 import { UMB_VALIDATION_CONTEXT } from '../context/validation.context-token.js';
 import { type UmbValidationMessage, UmbValidationMessagesManager } from '../context/validation-messages.manager.js';
 import { ReplaceStartOfPath } from '../utils/replace-start-of-path.function.js';
-import type { UmbVariantId } from '../../variant/variant-id.class.js';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbContextProviderController } from '@umbraco-cms/backoffice/context-api';
 import { type UmbClassInterface, UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
