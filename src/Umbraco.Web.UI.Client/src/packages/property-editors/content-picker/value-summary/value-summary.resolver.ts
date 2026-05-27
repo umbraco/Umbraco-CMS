@@ -7,6 +7,7 @@ import { UmbMediaItemRepository, UMB_MEDIA_ENTITY_TYPE } from '@umbraco-cms/back
 import type { UmbMediaItemModel } from '@umbraco-cms/backoffice/media';
 import { UmbMemberItemRepository, UMB_MEMBER_ENTITY_TYPE } from '@umbraco-cms/backoffice/member';
 import type { UmbMemberItemModel } from '@umbraco-cms/backoffice/member';
+import { combineLatest, map, of, type Observable } from '@umbraco-cms/backoffice/external/rxjs';
 
 type ContentPickerValue = Array<UmbReferenceByUniqueAndType> | undefined;
 
@@ -37,48 +38,54 @@ export class UmbContentPickerValueSummaryResolver
 		}
 
 		const [docResult, mediaResult, memberResult] = await Promise.all([
-			docKeys.length ? this.#documentRepo.requestItems(docKeys) : Promise.resolve({ data: [] }),
-			mediaKeys.length ? this.#mediaRepo.requestItems(mediaKeys) : Promise.resolve({ data: [] }),
-			memberKeys.length ? this.#memberRepo.requestItems(memberKeys) : Promise.resolve({ data: [] }),
+			docKeys.length ? this.#documentRepo.requestItems(docKeys) : Promise.resolve(undefined),
+			mediaKeys.length ? this.#mediaRepo.requestItems(mediaKeys) : Promise.resolve(undefined),
+			memberKeys.length ? this.#memberRepo.requestItems(memberKeys) : Promise.resolve(undefined),
 		]);
 
-		const docsByKey = new Map(
-			(Array.isArray(docResult.data) ? (docResult.data as Array<UmbDocumentItemModel>) : []).map((item) => [
-				item.unique,
-				item,
-			]),
-		);
-		const mediaByKey = new Map(
-			(Array.isArray(mediaResult.data) ? (mediaResult.data as Array<UmbMediaItemModel>) : []).map((item) => [
-				item.unique,
-				item,
-			]),
-		);
-		const memberByKey = new Map(
-			(Array.isArray(memberResult.data) ? (memberResult.data as Array<UmbMemberItemModel>) : []).map((item) => [
-				item.unique,
-				item,
-			]),
-		);
+		const docs = (Array.isArray(docResult?.data) ? docResult?.data : []) as Array<UmbDocumentItemModel>;
+		const media = (Array.isArray(mediaResult?.data) ? mediaResult?.data : []) as Array<UmbMediaItemModel>;
+		const members = (Array.isArray(memberResult?.data) ? memberResult?.data : []) as Array<UmbMemberItemModel>;
+
+		const docObs: Observable<Array<UmbDocumentItemModel>> = docResult?.asObservable?.() ?? of(docs);
+		const mediaObs: Observable<Array<UmbMediaItemModel>> = mediaResult?.asObservable?.() ?? of(media);
+		const memberObs: Observable<Array<UmbMemberItemModel>> = memberResult?.asObservable?.() ?? of(members);
 
 		return {
-			data: values.map((v) =>
-				(v ?? []).flatMap((e): Array<UmbContentPickerResolvedItem> => {
-					if (e.type === UMB_DOCUMENT_ENTITY_TYPE) {
-						const item = docsByKey.get(e.unique);
-						return item ? [{ entityType: UMB_DOCUMENT_ENTITY_TYPE, item }] : [];
-					}
-					if (e.type === UMB_MEDIA_ENTITY_TYPE) {
-						const item = mediaByKey.get(e.unique);
-						return item ? [{ entityType: UMB_MEDIA_ENTITY_TYPE, item }] : [];
-					}
-					if (e.type === UMB_MEMBER_ENTITY_TYPE) {
-						const item = memberByKey.get(e.unique);
-						return item ? [{ entityType: UMB_MEMBER_ENTITY_TYPE, item }] : [];
-					}
-					return [];
-				}),
-			),
+			data: this.#map(values, docs, media, members),
+			asObservable: () =>
+				combineLatest([docObs, mediaObs, memberObs]).pipe(
+					map(([documents, mediaItems, memberItems]) => this.#map(values, documents, mediaItems, memberItems)),
+				),
 		};
+	}
+
+	#map(
+		values: ReadonlyArray<ContentPickerValue>,
+		docs: ReadonlyArray<UmbDocumentItemModel>,
+		media: ReadonlyArray<UmbMediaItemModel>,
+		members: ReadonlyArray<UmbMemberItemModel>,
+	): ReadonlyArray<Array<UmbContentPickerResolvedItem>> {
+		const docsByKey = new Map(docs.map((item) => [item.unique, item]));
+		const mediaByKey = new Map(media.map((item) => [item.unique, item]));
+		const memberByKey = new Map(members.map((item) => [item.unique, item]));
+
+		return values.map((v) =>
+			(v ?? []).flatMap((e): Array<UmbContentPickerResolvedItem> => {
+				if (e.type === UMB_DOCUMENT_ENTITY_TYPE) {
+					const item = docsByKey.get(e.unique);
+					return item ? [{ entityType: UMB_DOCUMENT_ENTITY_TYPE, item }] : [];
+				}
+				if (e.type === UMB_MEDIA_ENTITY_TYPE) {
+					const item = mediaByKey.get(e.unique);
+					return item ? [{ entityType: UMB_MEDIA_ENTITY_TYPE, item }] : [];
+				}
+				if (e.type === UMB_MEMBER_ENTITY_TYPE) {
+					const item = memberByKey.get(e.unique);
+					return item ? [{ entityType: UMB_MEMBER_ENTITY_TYPE, item }] : [];
+				}
+				return [];
+			}),
+		);
 	}
 }
