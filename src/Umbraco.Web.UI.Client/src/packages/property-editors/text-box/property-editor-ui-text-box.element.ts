@@ -123,7 +123,7 @@ export class UmbPropertyEditorUITextBoxElement
 				.label=${this.localize.term('general_fieldFor', [this.name])}
 				.maxlength=${this._maxChars}
 				.maxlengthMessage=${this.#getMaxLengthMessage.bind(this)}
-				placeholder=${this._placeholder ?? ''}
+				placeholder=${ifDefined(this._placeholder)}
 				.requiredMessage=${this.mandatoryMessage}
 				.type=${this._type}
 				.value=${this.value ?? ''}

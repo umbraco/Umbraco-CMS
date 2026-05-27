@@ -65,7 +65,7 @@ export class UmbPropertyEditorUITextareaElement
 	public set config(config: UmbPropertyEditorConfigCollection | undefined) {
 		this._maxChars = Number(config?.getValueByAlias('maxChars')) || undefined;
 		this._rows = Number(config?.getValueByAlias('rows')) || undefined;
-		this._placeholder = config?.getValueByAlias<string>('placeholder');
+		this._placeholder = this.localize.string(config?.getValueByAlias<string>('placeholder') ?? '');
 
 		this._css = {
 			'--uui-textarea-min-height': 'reset',

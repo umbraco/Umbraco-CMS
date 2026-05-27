@@ -10,7 +10,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 			properties: [
 				{
 					alias: 'maxChars',
-					label: 'Maximum allowed characters',
+					label: '#textbox_maxCharsLabel',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Integer',
 					config: [
 						{ alias: 'min', value: 1 },
@@ -20,8 +20,8 @@ export const manifest: ManifestPropertyEditorSchema = {
 				},
 				{
 					alias: 'autocomplete',
-					label: 'Autocomplete',
-					description: 'Controls browser autocomplete behaviour',
+					label: '#textbox_autocomplete',
+					description: 'Controls browser autocomplete behavior',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
 					config: [
 						{
@@ -35,7 +35,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				},
 				{
 					alias: 'placeholder',
-					label: 'Placeholder',
+					label: '#textbox_placeholder',
 					description: 'Placeholder text shown inside the input when empty',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
 				},
