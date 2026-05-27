@@ -99,14 +99,14 @@ internal sealed class SyntheticPublishedTreeFixture
             propertyRenderingContextAccessor,
             contentTypeCache);
 
-        var publishStatusMock = new Mock<IPublishStatusQueryService>();
-        publishStatusMock.Setup(x => x.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>())).Returns(true);
+        var publishStatusMock = new Mock<IDocumentPublishStatusQueryService>();
+        publishStatusMock.Setup(x => x.IsPublished(It.IsAny<Guid>(), It.IsAny<string>())).Returns(true);
         publishStatusMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>())).Returns(true);
         publishStatusMock.Setup(x => x.HasPublishedAncestorPath(It.IsAny<Guid>())).Returns(true);
 
         // Repository: never called because we pre-seed the cache, but provide a safe stub.
         var repoMock = new Mock<IDatabaseCacheRepository>();
-        repoMock.Setup(r => r.GetContentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
+        repoMock.Setup(r => r.GetDocumentSourceAsync(It.IsAny<Guid>(), It.IsAny<bool>()))
             .ReturnsAsync((ContentCacheNode?)null);
 
         var previewMock = new Mock<IPreviewService>();
@@ -177,13 +177,9 @@ internal sealed class SyntheticPublishedTreeFixture
         var dataType = new DataType(new VoidEditor(Mock.Of<IDataValueEditorFactory>()), jsonSerializer) { Id = 1 };
         var dataTypeServiceMock = new Mock<IDataTypeService>();
 
-        // PublishedContentTypeFactory.GetDataType calls the synchronous GetAll() overload (the obsolete
-        // params int[] one), so we must set up that one rather than the new GetAllAsync.
-#pragma warning disable CS0618
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { dataType });
-#pragma warning restore CS0618
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(new[] { dataType });
 
-        var factory = new PublishedContentTypeFactory(modelFactory, converters, dataTypeServiceMock.Object);
+        var factory = new PublishedContentTypeFactory(modelFactory, converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType contentType)
         {

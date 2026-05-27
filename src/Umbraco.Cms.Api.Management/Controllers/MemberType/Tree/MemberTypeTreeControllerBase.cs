@@ -28,20 +28,6 @@ public class MemberTypeTreeControllerBase : FolderTreeControllerBase<MemberTypeT
     /// <summary>
     /// Initializes a new instance of the <see cref="MemberTypeTreeControllerBase"/> class with the specified services.
     /// </summary>
-    /// <param name="entityService">Service for performing operations on entities.</param>
-    /// <param name="memberTypeService">Service for performing operations on member types.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public MemberTypeTreeControllerBase(IEntityService entityService, IMemberTypeService memberTypeService)
-        : this(
-              entityService,
-              StaticServiceProvider.Instance.GetRequiredService<FlagProviderCollection>(),
-              memberTypeService)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MemberTypeTreeControllerBase"/> class with the specified services.
-    /// </summary>
     /// <param name="entityService">Service used for entity operations.</param>
     /// <param name="flagProviders">A collection of providers that supply flags for entities.</param>
     /// <param name="memberTypeService">Service used for member type operations.</param>
@@ -70,21 +56,23 @@ public class MemberTypeTreeControllerBase : FolderTreeControllerBase<MemberTypeT
 
     protected override UmbracoObjectTypes FolderObjectType => UmbracoObjectTypes.MemberTypeContainer;
 
-    protected override MemberTypeTreeItemResponseModel[] MapTreeItemViewModels(Guid? parentKey, IEntitySlim[] entities)
+    protected override async Task<MemberTypeTreeItemResponseModel[]> MapTreeItemViewModelsAsync(Guid? parentKey, IEntitySlim[] entities)
     {
         var memberTypes = _memberTypeService
             .GetMany(entities.Select(entity => entity.Id).ToArray())
             .ToDictionary(contentType => contentType.Id);
 
-        return entities.Select(entity =>
+        IEnumerable<Task<MemberTypeTreeItemResponseModel>> tasks = entities.Select(async entity =>
         {
-            MemberTypeTreeItemResponseModel responseModel = MapTreeItemViewModel(parentKey, entity);
+            MemberTypeTreeItemResponseModel responseModel = await MapTreeItemViewModelAsync(parentKey, entity);
             if (memberTypes.TryGetValue(entity.Id, out IMemberType? memberType))
             {
                 responseModel.Icon = memberType.Icon ?? responseModel.Icon;
             }
 
             return responseModel;
-        }).ToArray();
+        });
+
+        return await Task.WhenAll(tasks);
     }
 }

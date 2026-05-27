@@ -46,7 +46,8 @@ Enterprise-grade CMS built on .NET 10.0. This repository contains 21 production 
 - **ASP.NET Core** - Web framework
 - **Entity Framework Core** - Modern ORM
 - **OpenIddict** - OAuth 2.0/OpenID Connect authentication
-- **Swashbuckle** - OpenAPI/Swagger documentation
+- **Microsoft.AspNetCore.OpenApi** - OpenAPI document generation
+- **Swashbuckle.AspNetCore.SwaggerUI** - Swagger UI for API documentation
 - **Lucene.NET** - Full-text search via Examine
 - **ImageSharp** - Image processing
 
@@ -366,15 +367,26 @@ public interface IMyService
 
 ### Centralized Package Management
 
-**All NuGet package versions** are centralized in `Directory.Packages.props`. Individual projects do NOT specify versions.
+**NuGet package versions** are centralized in `Directory.Packages.props`. There are two `Directory.Packages.props` files in the source tree, with multi-level merging enabled so the test file inherits from the root:
+
+| File | Scope |
+|------|-------|
+| `Directory.Packages.props` (root) | Production source code packages — referenced by all `src/**` projects |
+| `tests/Directory.Packages.props` | Test-only packages (NUnit, Moq, Bogus, BenchmarkDotNet, etc.) — adds entries on top of the inherited root file |
+
+When updating dependencies, decide which file the package belongs in:
+- A package used only by test projects → `tests/Directory.Packages.props`
+- A package used by any production project (or by both production and tests) → root `Directory.Packages.props`
 
 ```xml
 <!-- Individual projects reference WITHOUT version -->
-<PackageReference Include="Swashbuckle.AspNetCore" />
+<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
 
 <!-- Versions defined in Directory.Packages.props -->
-<PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+<PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
 ```
+
+**Opt-out**: `src/Umbraco.Web.UI/Umbraco.Web.UI.csproj` sets `<ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>` and specifies versions inline (for `Microsoft.EntityFrameworkCore.Design`, `Microsoft.Build.Tasks.Core`, `Microsoft.ICU.ICU4C.Runtime`, etc.). Update those versions directly in that csproj when bumping. Two further `Directory.Packages.props` files exist under `templates/` for the project/extension templates and have their own version sets — keep `Microsoft.AspNetCore.OpenApi` aligned between the root file and `templates/UmbracoExtension/`.
 
 ### Build Configuration
 
@@ -419,7 +431,8 @@ All APIs use **OpenIddict** (OAuth 2.0/OpenID Connect):
 APIs use `Asp.Versioning.Mvc`:
 - Management API: `/umbraco/management/api/v{version}/*`
 - Delivery API: `/umbraco/delivery/api/v{version}/*`
-- OpenAPI/Swagger docs per version
+- OpenAPI docs: `/umbraco/openapi/management.json`, `/umbraco/openapi/delivery.json`
+- Swagger UI: `/umbraco/openapi/`
 
 ### Updating `OpenApi.json` (Management API)
 

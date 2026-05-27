@@ -571,8 +571,6 @@ export default {
 		instruction: '在下方登录',
 		signInWith: '登录',
 		timeout: '会话超时',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ',
 		forgottenPassword: '忘记密码?',
 		forgottenPasswordInstruction: '电子邮件将发送到地址指定的链接, 以重置您的密码',
 		requestPasswordResetConfirmation: '如果电子邮件与我们的记录相符, 则将发送带有密码重置指令的邮件',
@@ -580,9 +578,6 @@ export default {
 		setPasswordInstruction: '请提供新密码',
 		setPasswordConfirmation: '您的密码已更新',
 		resetCodeExpired: '您单击的链接无效或已过期',
-		resetPasswordEmailCopySubject: 'Umbraco: 重置密码',
-		resetPasswordEmailCopyFormat:
-			'<p>您的用户名登录到 Umbraco 后台是: <strong>%0%</strong></p><p>点击 <a href="%1%"><strong>这里</strong></a> 重置密码，或复制链接粘贴到您的浏览器访问:</p><p><em>%1%</em></p>',
 	},
 	main: {
 		dashboard: '仪表板',

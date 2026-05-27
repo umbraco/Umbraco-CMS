@@ -339,7 +339,7 @@ public class PublishedContentStatusFilteringServiceTests
 
         // Publish status must short-circuit before the full candidate set is enumerated.
         statusMock.Verify(
-            s => s.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()),
+            s => s.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()),
             Times.AtMost(items.Count - 1));
     }
 
@@ -361,7 +361,7 @@ public class PublishedContentStatusFilteringServiceTests
         PublishedContentStatusFilteringService Service,
         Dictionary<Guid, IPublishedContent> Items,
         Mock<IPublishedContentCache> CacheMock,
-        Mock<IPublishStatusQueryService> StatusMock)
+        Mock<IDocumentPublishStatusQueryService> StatusMock)
         SetupCounting(bool forPreview)
     {
         var contentType = new Mock<IPublishedContentType>();
@@ -384,9 +384,9 @@ public class PublishedContentStatusFilteringServiceTests
             .Setup(c => c.GetById(forPreview, It.IsAny<Guid>()))
             .Returns((bool _, Guid key) => items.TryGetValue(key, out IPublishedContent? item) ? item : null);
 
-        var statusMock = new Mock<IPublishStatusQueryService>();
+        var statusMock = new Mock<IDocumentPublishStatusQueryService>();
         statusMock
-            .Setup(s => s.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Setup(s => s.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns((Guid key, string _) => items.TryGetValue(key, out IPublishedContent? item) && item.Id % 2 == 0);
         statusMock
             .Setup(s => s.HasPublishedAncestorPath(It.IsAny<Guid>(), It.IsAny<string>()))
@@ -542,14 +542,14 @@ public class PublishedContentStatusFilteringServiceTests
             items);
     }
 
-    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
+    private IDocumentPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
         => SetupPublishStatusQueryService(items, id => id % 2 == 0, hasPublishedAncestorPath);
 
-    private IPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<int, bool> idIsPublished, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
+    private IDocumentPublishStatusQueryService SetupPublishStatusQueryService(Dictionary<Guid, IPublishedContent> items, Func<int, bool> idIsPublished, Func<Guid, string, Dictionary<Guid, IPublishedContent>, bool>? hasPublishedAncestorPath = null)
     {
-        var publishStatusQueryService = new Mock<IPublishStatusQueryService>();
+        var publishStatusQueryService = new Mock<IDocumentPublishStatusQueryService>();
         publishStatusQueryService
-            .Setup(p => p.IsDocumentPublished(It.IsAny<Guid>(), It.IsAny<string>()))
+            .Setup(p => p.IsPublished(It.IsAny<Guid>(), It.IsAny<string>()))
             .Returns((Guid key, string culture) => items
                                                        .TryGetValue(key, out var item)
                                                    && idIsPublished(item.Id)

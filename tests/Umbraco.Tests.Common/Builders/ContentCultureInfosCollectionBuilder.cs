@@ -5,12 +5,12 @@ using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
 namespace Umbraco.Cms.Tests.Common.Builders;
 
-public class ContentCultureInfosCollectionBuilder : ChildBuilderBase<ContentBuilder, ContentCultureInfosCollection>,
+public class ContentCultureInfosCollectionBuilder : ChildBuilderBase<IBuildContentCultureInfosCollection, ContentCultureInfosCollection>,
     IBuildContentCultureInfosCollection
 {
     private readonly List<ContentCultureInfosBuilder> _cultureInfosBuilders;
 
-    public ContentCultureInfosCollectionBuilder(ContentBuilder parentBuilder) : base(parentBuilder) =>
+    public ContentCultureInfosCollectionBuilder(IBuildContentCultureInfosCollection parentBuilder) : base(parentBuilder) =>
         _cultureInfosBuilders = new List<ContentCultureInfosBuilder>();
 
     public ContentCultureInfosBuilder AddCultureInfos()

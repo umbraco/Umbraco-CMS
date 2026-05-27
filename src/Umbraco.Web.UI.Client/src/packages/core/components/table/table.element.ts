@@ -486,17 +486,6 @@ export class UmbTableElement extends UmbLitElement {
 				}
 			}
 
-			uui-table {
-				box-shadow: var(--uui-shadow-depth-1);
-			}
-
-			uui-table-head {
-				position: sticky;
-				top: 0;
-				z-index: 1;
-				background-color: var(--uui-color-surface, #fff);
-			}
-
 			uui-table-row uui-checkbox {
 				display: none;
 			}

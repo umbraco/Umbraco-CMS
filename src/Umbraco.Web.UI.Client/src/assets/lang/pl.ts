@@ -691,8 +691,6 @@ export default {
 		instruction: 'Zaloguj się poniżej',
 		signInWith: 'Zaloguj się z',
 		timeout: 'Sesja wygasła',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',
 		forgottenPassword: 'Zapomniałeś hasła?',
 		forgottenPasswordInstruction: 'E-mail z linkiem do zresetowania hasła zostanie wysłany na podany adres',
 		requestPasswordResetConfirmation:
@@ -701,9 +699,6 @@ export default {
 		setPasswordInstruction: 'Proszę wpisać nowe hasło',
 		setPasswordConfirmation: 'Twoje hasło zostało zmienione',
 		resetCodeExpired: 'Link, na który kliknąłeś jest niewłaściwy lub wygasł',
-		resetPasswordEmailCopySubject: 'Umbraco: Resetowanie hasła',
-		resetPasswordEmailCopyFormat:
-			'<p>Twoja nazwa użytkownika do zalogowania się w Umbraco backoffice to: <strong>%0%</strong></p><p>Kliknij <a href="%1%"><strong>tutaj</strong></a>, aby zresetować Twoje hasło lub kopiuj/wklej ten URL w przeglądarce:</p><p><em>%1%</em></p>',
 	},
 	main: {
 		dashboard: 'Panel zarządzania',

@@ -125,13 +125,9 @@ public class PublishedContentTests
         var dataType = new DataType(new VoidEditor(Mock.Of<IDataValueEditorFactory>()), jsonSerializer) { Id = 1 };
         var dataTypeServiceMock = new Mock<IDataTypeService>();
 
-        // PublishedContentTypeFactory.GetDataType uses the synchronous GetAll() overload
-        // (the obsolete params int[] one), so we must set up that one rather than GetAllAsync.
-#pragma warning disable CS0618
-        dataTypeServiceMock.Setup(x => x.GetAll()).Returns(new[] { dataType });
-#pragma warning restore CS0618
+        dataTypeServiceMock.Setup(x => x.GetAllAsync(It.IsAny<Guid[]>())).ReturnsAsync(new[] { dataType });
 
-        var typeFactory = new PublishedContentTypeFactory(modelFactory, converters, dataTypeServiceMock.Object);
+        var typeFactory = new PublishedContentTypeFactory(modelFactory, converters, dataTypeServiceMock.Object, Mock.Of<IIdKeyMap>());
 
         IEnumerable<IPublishedPropertyType> CreatePropertyTypes(IPublishedContentType ct)
         {

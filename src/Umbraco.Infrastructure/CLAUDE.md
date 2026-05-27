@@ -59,7 +59,7 @@ src/Umbraco.Infrastructure/
 │
 ├── Migrations/                    # Database migration system
 │   ├── Install/                   # Initial database schema
-│   ├── Upgrade/                   # Version upgrade migrations (21 versions)
+│   ├── Upgrade/                   # Version upgrade migrations (V17+)
 │   ├── PostMigrations/            # Post-upgrade data fixes
 │   ├── MigrationPlan.cs           # Migration orchestration
 │   └── MigrationPlanExecutor.cs   # Migration execution
@@ -187,7 +187,7 @@ dotnet build src/Umbraco.Infrastructure /p:TreatWarningsAsErrors=true
 This project contains the migration framework but **migrations are NOT run via EF Core**. Migrations run at application startup via `MigrationPlanExecutor`.
 
 To create a new migration:
-1. Create class inheriting `MigrationBase` in `Migrations/Upgrade/`
+1. Create class inheriting `AsyncMigrationBase` in `Migrations/Upgrade/`
 2. Add to `UmbracoPlan` migration plan
 3. Restart application - migration runs automatically
 
@@ -485,7 +485,7 @@ using (var outer = ScopeProvider.CreateCoreScope())
 **Data Migrations** - Can be slow:
 - Migrations run at startup (blocking)
 - Large data migrations (> 100k rows) should be chunked
-- Use `AsyncMigrationBase` for long-running operations
+- All migrations use `AsyncMigrationBase`
 
 ### Repository Edge Cases
 
@@ -553,9 +553,9 @@ using (var outer = ScopeProvider.CreateCoreScope())
 3. Which version does this target?
 
 **Workflow**:
-1. **Create Migration Class** in `Migrations/Upgrade/V{Version}/`
-   - Inherit from `MigrationBase` (schema) or `AsyncMigrationBase` (data)
-   - Implement `Migrate()` method
+1. **Create Migration Class** in `Migrations/Upgrade/V_{Version}/`
+   - Inherit from `AsyncMigrationBase`
+   - Implement `MigrateAsync()` method
 2. **Add to UmbracoPlan** in `Migrations/Upgrade/UmbracoPlan.cs`
    - Specify dependencies (runs after which migrations?)
 3. **Test Migration**:
@@ -588,7 +588,7 @@ using (var outer = ScopeProvider.CreateCoreScope())
 - 47 repositories × ~3 files each (repo, mapper, factory) = ~141 files
 - 75 property editors × ~2 files each = ~150 files
 - 80 DTOs for database tables = 80 files
-- 21 versions × ~5 migrations each = ~105 files
+- 7 version dirs (V17+) × ~5 migrations each = ~36 files
 - Remaining: services, background jobs, search, email, logging, etc.
 
 **Why NPoco + Custom Migrations?**
