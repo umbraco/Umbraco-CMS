@@ -1,5 +1,11 @@
 name: "SonarQube Cloud - Analysis"
 
+# This workflow runs after the build workflow completes. It downloads the
+# Roslyn analysis output and coverage data produced by the build, then uploads
+# them to SonarCloud using the SONAR_TOKEN secret. Because it is triggered via
+# workflow_run, it always runs in the base repository context - even for fork
+# PRs - giving it safe access to secrets.
+
 on:
   workflow_run:
     workflows: ["SonarQube Cloud - Build"]
@@ -8,19 +14,28 @@ on:
 permissions:
   contents: read
 
+env:
+  SONAR_PROJECT_KEY: umbraco_Umbraco-CMS
+  SONAR_ORGANIZATION: umbraco
+
 jobs:
   analyze:
     name: Upload analysis
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
+    if: github.event.workflow_run.conclusion == 'success' # only run if the build succeeded
     steps:
-      - name: Download analysis artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v6
         with:
-          name: sonar-analysis-data
+          ref: ${{ github.event.workflow_run.head_sha }} # checkout at the commit that triggered the build
+          fetch-depth: 0
+
+      - name: Download analysis data
+        uses: actions/download-artifact@v8
+        with:
+          name: analysis-data
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: .
+          path: analysis-data
 
       - name: Setup .NET from global.json
         uses: actions/setup-dotnet@v5
@@ -33,7 +48,49 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Install sonarscanner
-        run: dotnet tool install --global dotnet-sonarscanner
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+          dotnet tool install --global nbgv
+
+      - name: Set analysis context
+        run: |
+          IS_FORK="${{ github.event.workflow_run.head_repository.full_name != github.repository }}"
+          if [ "$IS_FORK" = "true" ]; then
+            echo "SONARQUBE_SCANNER_PARAMS=$(git show origin/main:.github/workflows/sonarcloud/sonar-params.json | jq -c .)" | tee -a $GITHUB_ENV # read from main for fork PRs
+          else
+            echo "SONARQUBE_SCANNER_PARAMS=$(jq -c . .github/workflows/sonarcloud/sonar-params.json)" | tee -a $GITHUB_ENV
+            PUBLIC_RELEASE=$(nbgv get-version -v PublicRelease)
+            if [ "$PUBLIC_RELEASE" = "True" ]; then
+              echo "PROJECT_VERSION=$(nbgv get-version -v NuGetPackageVersion)" | tee -a $GITHUB_ENV # only set for official releases
+            fi
+          fi
+          if [ "${{ github.event.workflow_run.event }}" = "pull_request" ]; then
+            echo "PR_NUMBER=${{ github.event.workflow_run.pull_requests[0].number }}" | tee -a $GITHUB_ENV
+            echo "PR_HEAD_REF=${{ github.event.workflow_run.pull_requests[0].head.ref }}" | tee -a $GITHUB_ENV
+            echo "PR_BASE_REF=${{ github.event.workflow_run.pull_requests[0].base.ref }}" | tee -a $GITHUB_ENV
+          else
+            echo "BRANCH_NAME=${{ github.event.workflow_run.head_branch }}" | tee -a $GITHUB_ENV
+          fi
+
+      - name: Begin analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          dotnet-sonarscanner begin \
+            /k:"$SONAR_PROJECT_KEY" \
+            /o:"$SONAR_ORGANIZATION" \
+            /d:sonar.token="$SONAR_TOKEN" \
+            ${BRANCH_NAME:+/d:sonar.branch.name="$BRANCH_NAME"} \
+            ${PROJECT_VERSION:+/d:sonar.projectVersion="$PROJECT_VERSION"} \
+            ${PR_NUMBER:+/d:sonar.pullrequest.key="$PR_NUMBER"} \
+            ${PR_HEAD_REF:+/d:sonar.pullrequest.branch="$PR_HEAD_REF"} \
+            ${PR_BASE_REF:+/d:sonar.pullrequest.base="$PR_BASE_REF"}
+
+      - name: Restore analysis data from build
+        run: |
+          cp -r analysis-data/.sonarqube/out/. .sonarqube/out/
+          cp -r analysis-data/.sonarqube/conf/[0-9]* .sonarqube/conf/
+          cp -r analysis-data/TestResults TestResults
 
       - name: End analysis
         env:

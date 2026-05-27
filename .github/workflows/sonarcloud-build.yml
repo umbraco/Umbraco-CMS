@@ -1,5 +1,10 @@
 name: "SonarQube Cloud - Build"
 
+# This workflow runs without secrets so it is safe to trigger on fork PRs.
+# It compiles the solution, runs unit tests, and uploads the Roslyn analysis
+# output as an artifact. The analysis workflow then picks it up and uploads
+# results to SonarCloud using the SONAR_TOKEN secret.
+
 on:
   push:
     branches:
@@ -14,13 +19,13 @@ on:
 permissions:
   contents: read
 
+env:
+  SONAR_PROJECT_KEY: umbraco_Umbraco-CMS
+  SONAR_ORGANIZATION: umbraco
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
-env:
-  SONAR_ORGANIZATION: "umbraco"
-  SONAR_PROJECT_KEY: "umbraco_Umbraco-CMS"
 
 jobs:
   build:
@@ -44,40 +49,28 @@ jobs:
       - name: Install tools
         run: |
           dotnet tool install --global dotnet-sonarscanner
-          dotnet tool install --global nbgv
           dotnet tool install --global dotnet-coverage
 
-      - name: Get project version
+      - name: Load sonar params
         run: |
-          PUBLIC_RELEASE=$(nbgv get-version -v PublicRelease)
-          if [ "$PUBLIC_RELEASE" = "True" ]; then
-            echo "PROJECT_VERSION=$(nbgv get-version -v NuGetPackageVersion)" >> $GITHUB_ENV
+          if [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
+            # For fork PRs, read sonar params from main.
+            echo "SONARQUBE_SCANNER_PARAMS=$(git show origin/main:.github/workflows/sonarcloud/sonar-params.json | jq -c .)" >> $GITHUB_ENV
+          else
+            echo "SONARQUBE_SCANNER_PARAMS=$(jq -c . .github/workflows/sonarcloud/sonar-params.json)" >> $GITHUB_ENV
           fi
-
-      - name: Set branch name
-        if: github.event_name == 'workflow_dispatch'
-        run: echo "BRANCH_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Begin analysis
         run: |
           dotnet-sonarscanner begin \
-            /k:"${{ env.SONAR_PROJECT_KEY }}" \
-            /o:"${{ env.SONAR_ORGANIZATION }}" \
-            /d:sonar.cs.vscoveragexml.reportsPaths="TestResults/coverage.xml" \
-            /d:sonar.inclusions="src/**,templates/**,tools/**,tests/**" \
-            /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,**/lang/*.ts,**/mocks/**,**/wwwroot/**,**/dist-cms/**,**/*.generated.cs,src/Umbraco.Web.UI/umbraco/**,src/Umbraco.Cms.Persistence.EFCore.*/Migrations/**,src/Umbraco.Web.UI.Client/src/packages/core/backend-api/**" \
-            /d:sonar.test.inclusions="tests/**,**/*.test.ts,**/*.spec.ts" \
-            /d:sonar.coverage.exclusions="src/Umbraco.Web.UI.Client/**,src/Umbraco.Web.UI.Login/**" \
-            /d:sonar.typescript.tsconfigPaths="src/Umbraco.Web.UI.Client/tsconfig.json,src/Umbraco.Web.UI.Client/tsconfig.node.json,src/Umbraco.Web.UI.Login/tsconfig.json" \
-            /d:sonar.scm.disabled=true \
-            ${BRANCH_NAME:+/d:sonar.branch.name="$BRANCH_NAME"} \
-            ${PROJECT_VERSION:+/d:sonar.projectVersion="$PROJECT_VERSION"}
+            /k:"$SONAR_PROJECT_KEY" \
+            /o:"$SONAR_ORGANIZATION"
 
       - name: Restore
         run: dotnet restore umbraco.sln
 
       - name: Build solution
-        run: dotnet build umbraco.sln --no-restore -clp:ErrorsOnly
+        run: GITHUB_ENV=/dev/null dotnet build umbraco.sln --no-restore -clp:ErrorsOnly # prevent sonar MSBuild integration from writing malformed values to $GITHUB_ENV
 
       - name: Run unit tests with coverage
         run: |
@@ -86,11 +79,11 @@ jobs:
             --output TestResults/coverage.xml \
             --output-format xml
 
-      - name: Upload analysis artifacts
-        uses: actions/upload-artifact@v4
+      - name: Upload analysis data
+        uses: actions/upload-artifact@v7
         with:
-          name: sonar-analysis-data
-          include-hidden-files: true
+          name: analysis-data
+          include-hidden-files: true # required to capture the .sonarqube directory
           path: |
             .sonarqube/
             TestResults/
