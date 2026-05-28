@@ -7,13 +7,7 @@ import {
 	ValidateInviteCodeResponse,
 	ValidatePasswordResetCodeResponse,
 } from '../types.js';
-import {
-	postSecurityForgotPassword,
-	postSecurityForgotPasswordReset,
-	postSecurityForgotPasswordVerify,
-	postUserInviteCreatePassword,
-	postUserInviteVerify,
-} from '../api/index.js';
+import { SecurityService, UserService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbRepositoryBase } from '@umbraco-cms/backoffice/repository';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { isProblemDetailsLike } from '@umbraco-cms/backoffice/resources';
@@ -98,100 +92,97 @@ export class UmbAuthRepository extends UmbRepositoryBase {
 	}
 
 	public async resetPassword(email: string): Promise<ResetPasswordResponse> {
-		const { error } = await postSecurityForgotPassword({
-			body: {
-				email,
-			},
-		});
+		try {
+			await SecurityService.postSecurityForgotPassword({
+				body: {
+					email,
+				},
+			});
 
-		if (error) {
+			return {};
+		} catch (error) {
 			return {
 				error: this.#getApiErrorDetailText(error, 'Could not reset the password'),
 			};
 		}
-
-		return {};
 	}
 
 	public async validatePasswordResetCode(
 		userId: string,
-		resetCode: string
+		resetCode: string,
 	): Promise<ValidatePasswordResetCodeResponse> {
-		const { data, error } = await postSecurityForgotPasswordVerify({
-			body: {
-				user: {
-					id: userId,
+		try {
+			const { data } = await SecurityService.postSecurityForgotPasswordVerify({
+				body: {
+					user: {
+						id: userId,
+					},
+					resetCode,
 				},
-				resetCode,
-			},
-		});
+			});
 
-		if (error || !data) {
+			return data;
+		} catch (error) {
 			return {
 				error: this.#getApiErrorDetailText(error, 'Could not validate the password reset code'),
 			};
 		}
-
-		return data;
 	}
 
 	public async newPassword(password: string, resetCode: string, userId: string): Promise<NewPasswordResponse> {
-		const { error } = await postSecurityForgotPasswordReset({
-			body: {
-				password,
-				resetCode,
-				user: {
-					id: userId,
+		try {
+			await SecurityService.postSecurityForgotPasswordReset({
+				body: {
+					password,
+					resetCode,
+					user: {
+						id: userId,
+					},
 				},
-			},
-		});
-
-		if (error) {
+			});
+			return {};
+		} catch (error) {
 			return {
 				error: this.#getApiErrorDetailText(error, 'Could not reset the password'),
 			};
 		}
-
-		return {};
 	}
 
 	public async validateInviteCode(token: string, userId: string): Promise<ValidateInviteCodeResponse> {
-		const { data, error } = await postUserInviteVerify({
-			body: {
-				token,
-				user: {
-					id: userId,
+		try {
+			const { data } = await UserService.postUserInviteVerify({
+				body: {
+					token,
+					user: {
+						id: userId,
+					},
 				},
-			},
-		});
-
-		if (error || !data) {
+			});
+			return data;
+		} catch (error) {
 			return {
 				error: this.#getApiErrorDetailText(error, 'Could not validate the invite code'),
 			};
 		}
-
-		return data;
 	}
 
 	public async newInvitedUserPassword(password: string, token: string, userId: string): Promise<NewPasswordResponse> {
-		const { error } = await postUserInviteCreatePassword({
-			body: {
-				password,
-				token,
-				user: {
-					id: userId,
+		try {
+			await UserService.postUserInviteCreatePassword({
+				body: {
+					password,
+					token,
+					user: {
+						id: userId,
+					},
 				},
-			},
-		});
-
-		if (error) {
+			});
+			return {};
+		} catch (error) {
 			return {
 				error: this.#getApiErrorDetailText(error, 'Could not create a password for the invited user'),
 			};
 		}
-
-		return {};
 	}
 
 	#getApiErrorDetailText(error: unknown, fallbackText?: string): string | undefined {

@@ -54,7 +54,7 @@ public static class UmbracoBuilderExtensions
                 .DeliveryApiContentIndexName)
             .ConfigureOptions<ConfigureIndexOptions>();
 
-        services.AddSingleton<IApplicationRoot, UmbracoApplicationRoot>();
+        services.AddSingleton<IApplicationRoot>(sp => ActivatorUtilities.CreateInstance<UmbracoApplicationRoot>(sp));
         services.AddSingleton<ILockFactory, UmbracoLockFactory>();
         services.AddSingleton<ConfigurationEnabledDirectoryFactory>();
 
