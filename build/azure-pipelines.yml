@@ -905,10 +905,10 @@ stages:
       - job: WaitForApproval
         displayName: Wait for manual approval
         pool: server
-        timeoutInMinutes: 4320 # 3 days
         steps:
           - task: ManualValidation@0
             displayName: Manual approval to push to NuGet
+            timeoutInMinutes: 4320 # 3 days
             inputs:
               notifyUsers: ''
               instructions: 'Approve to push the NuGet release.'
