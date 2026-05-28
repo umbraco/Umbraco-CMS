@@ -245,6 +245,11 @@ public partial class ElementContainerServiceTests
         });
 
         Assert.IsNull(await ElementContainerService.GetAsync(containerKey));
+
+        // The user's start node reference should have been cleared.
+        var updatedUser = userService.GetUserById(user.Id);
+        Assert.IsNotNull(updatedUser);
+        Assert.IsFalse(updatedUser!.StartElementIds?.Contains(container.Id) ?? false);
     }
 
     [Test]
