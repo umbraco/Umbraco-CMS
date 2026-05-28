@@ -47,7 +47,6 @@ import { manifests as propertyEditorManifests } from '../src/packages/property-e
 import { manifests as publishCacheManifests } from '../src/packages/publish-cache/umbraco-package';
 import { manifests as relationsManifests } from '../src/packages/relations/umbraco-package';
 import { manifests as rteManifests } from '../src/packages/rte/umbraco-package';
-import { manifests as searchManifests } from '../src/packages/core/search/manifests';
 import { manifests as segmentManifests } from '../src/packages/segment/umbraco-package';
 import { manifests as settingsManifests } from '../src/packages/settings/umbraco-package';
 import { manifests as staticFileManifests } from '../src/packages/static-file/umbraco-package';
@@ -108,7 +107,6 @@ class UmbStoryBookElement extends UmbLitElement {
 		...publishCacheManifests,
 		...relationsManifests,
 		...rteManifests,
-		...searchManifests,
 		...segmentManifests,
 		...settingsManifests,
 		...staticFileManifests,
