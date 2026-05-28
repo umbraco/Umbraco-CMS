@@ -20,6 +20,11 @@ import { Converter, ReflectionKind } from 'typedoc';
  * and we drop it from this class. Inherited member comments (methods, properties) are
  * intentionally left alone — those are usually useful.
  *
+ * Known limitation: only `sources[0]` is checked as the "own" file. Classes that span
+ * multiple declarations (e.g. declaration merging) where the comment lives on a
+ * secondary declaration would be incorrectly stripped. We don't merge class
+ * declarations anywhere in this codebase, so the risk is theoretical.
+ *
  * Runs at EVENT_END so it sees the final state after both inheritance phases.
  * @param {import('typedoc').Application} app - the TypeDoc application instance
  */
@@ -35,8 +40,8 @@ export function load(app) {
 			const commentSource = comment.sourcePath;
 			if (!ownSource || !commentSource) continue;
 
-			// Normalise both ends (sourcePath is repo-relative, fileName is too) and
-			// strip any trailing line/column information just in case.
+			// Both paths are repo-relative; one may be the suffix of the other depending
+			// on how TypeDoc resolved them, so check both directions.
 			if (!commentSource.endsWith(ownSource) && !ownSource.endsWith(commentSource)) {
 				reflection.comment = undefined;
 				stripped++;
