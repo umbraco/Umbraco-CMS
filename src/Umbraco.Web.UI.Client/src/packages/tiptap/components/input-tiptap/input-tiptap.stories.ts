@@ -1,5 +1,5 @@
 import type { UmbInputTiptapElement } from './input-tiptap.element.js';
-import { manifests as tiptapManifests } from '../../manifests.js';
+import { manifests as tiptapManifests } from '../../umbraco-package.js';
 import { html } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbPropertyEditorConfigCollection } from '@umbraco-cms/backoffice/property-editor';
