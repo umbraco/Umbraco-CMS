@@ -1,8 +1,10 @@
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Cms.Tests.Common.Attributes;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services;
 
@@ -215,5 +217,67 @@ public partial class ElementContainerServiceTests
             ElementNotificationHandler.DeletedElement = null;
             EntityContainerNotificationHandler.DeletedContainer = null;
         }
+    }
+
+    [Test]
+    public async Task Can_Delete_Container_Set_As_User_Start_Node_From_Recycle_Bin()
+    {
+        var userService = GetRequiredService<IUserService>();
+
+        var containerKey = Guid.NewGuid();
+        var container = (await ElementContainerService.CreateAsync(containerKey, "Start Node Container", null, Constants.Security.SuperUserKey)).Result;
+        Assert.IsNotNull(container);
+
+        var user = new UserBuilder()
+            .WithName("StartNodeUser")
+            .WithStartElementId(container!.Id)
+            .Build();
+        userService.Save(user);
+
+        await ElementContainerService.MoveToRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
+        await AssertContainerIsInRecycleBin(containerKey);
+
+        var deleteResult = await ElementContainerService.DeleteFromRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(deleteResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, deleteResult.Status);
+        });
+
+        Assert.IsNull(await ElementContainerService.GetAsync(containerKey));
+    }
+
+    [Test]
+    public async Task Can_Delete_Container_Set_As_User_Group_Start_Node_From_Recycle_Bin()
+    {
+        var userGroupService = GetRequiredService<IUserGroupService>();
+
+        var containerKey = Guid.NewGuid();
+        var container = (await ElementContainerService.CreateAsync(containerKey, "Start Node Container", null, Constants.Security.SuperUserKey)).Result;
+        Assert.IsNotNull(container);
+
+        var userGroup = new UserGroupBuilder()
+            .WithAlias(Guid.NewGuid().ToString("N"))
+            .WithStartElementId(container!.Id)
+            .Build();
+        var groupResult = await userGroupService.CreateAsync(userGroup, Constants.Security.SuperUserKey);
+        Assert.IsTrue(groupResult.Success);
+
+        await ElementContainerService.MoveToRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
+        await AssertContainerIsInRecycleBin(containerKey);
+
+        var deleteResult = await ElementContainerService.DeleteFromRecycleBinAsync(containerKey, Constants.Security.SuperUserKey);
+        Assert.Multiple(() =>
+        {
+            Assert.IsTrue(deleteResult.Success);
+            Assert.AreEqual(EntityContainerOperationStatus.Success, deleteResult.Status);
+        });
+
+        Assert.IsNull(await ElementContainerService.GetAsync(containerKey));
+
+        // The user group's start node reference should have been cleared.
+        var updatedGroup = await userGroupService.GetAsync(userGroup.Key);
+        Assert.IsNotNull(updatedGroup);
+        Assert.IsNull(updatedGroup!.StartElementId);
     }
 }
