@@ -230,6 +230,19 @@ public static class ApplicationBuilderExtensions
     }
 
     /// <summary>
+    ///     Registers <see cref="UmbracoBackOfficeCacheHeadersMiddleware"/> to set the default
+    ///     <c>Cache-Control</c> header on responses served from the cache-busted BackOffice assets path.
+    /// </summary>
+    /// <remarks>
+    ///     See <see cref="UmbracoBackOfficeCacheHeadersMiddleware"/> for behaviour, debug-mode semantics,
+    ///     and the precedence rules for consumer overrides. Must be registered before
+    ///     <see cref="UseUmbracoBackOfficeRewrites"/> so that the original request path (still containing
+    ///     the cache-bust hash) can be matched.
+    /// </remarks>
+    public static IApplicationBuilder UseUmbracoBackOfficeCacheHeaders(this IApplicationBuilder builder)
+        => builder.UseMiddleware<UmbracoBackOfficeCacheHeadersMiddleware>();
+
+    /// <summary>
     ///     Configure a virtual path with IApplicationBuilder.UseRewriter for BackOffice assets to allow cache-busting using the url
     ///     /umbraco/backoffice/!cache-busting-id!/assets/index.js => /umbraco/backoffice/assets/index.js.
     /// </summary>

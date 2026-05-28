@@ -11,8 +11,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'collectionAction',
 			kind: 'create',
-			element: UmbCollectionCreateActionButtonElement,
 			api: UmbCreateCollectionActionApi,
+			element: UmbCollectionCreateActionButtonElement,
 			weight: 1200,
 			meta: {
 				label: '#actions_createFor',
