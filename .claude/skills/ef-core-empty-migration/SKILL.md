@@ -1,6 +1,6 @@
 ---
 name: ef-core-empty-migration
-description: Generate empty (no-op) EF Core migration stubs for both SQL Server and SQLite providers in Umbraco CMS, create the Umbraco migration class that invokes it, add it to UmbracoPlan, and wire up the migration runner plumbing (enum + switch cases). Use this whenever you need to generate EF Core migrations after completing the DTO, configuration, DbSet, and customizer work — i.e., after completing Steps 1–4 of the EF Core DTO Migration Guide (Section 12 in Infrastructure CLAUDE.md). Also trigger this skill when the user mentions "dotnet ef migrations add", "adding an EF Core migration", "generating migrations for both providers", or "updating the migration runner plumbing".
+description: Generate empty (no-op) EF Core migration stubs for both SQL Server and SQLite providers in Umbraco CMS, create the Umbraco migration class that invokes it, add it to UmbracoPlan, and wire up the migration runner plumbing (enum + switch cases). Use this whenever you need to generate EF Core migrations after completing the DTO, configuration, and DbSet work — i.e., after completing Steps 1–3 of the EF Core DTO Migration Guide (Section 12 in Infrastructure CLAUDE.md). Also trigger this skill when the user mentions "dotnet ef migrations add", "adding an EF Core migration", "generating migrations for both providers", or "updating the migration runner plumbing".
 argument-hint: <MigrationName>
 ---
 
@@ -17,12 +17,12 @@ These migrations are intentionally no-ops — NPoco creates the actual database 
 
 ## Prerequisites Check
 
-Before running any commands, verify Steps 1–4 of the EF Core DTO Migration Guide are complete. Read the relevant files to confirm:
+Before running any commands, verify Steps 1–3 of the EF Core DTO Migration Guide are complete (Step 4, the SQL Server model customizer, is only needed if the NPoco DTO has `[IncludeColumns]` indexes). Read the relevant files to confirm:
 
 - EF Core DTO exists in `src/Umbraco.Infrastructure/Persistence/Dtos/EFCore/` with `[EntityTypeConfiguration(...)]` attribute
 - DTO configuration exists in `src/Umbraco.Infrastructure/Persistence/Dtos/EFCore/Configurations/`
 - `DbSet<FooDto>` is registered in `src/Umbraco.Infrastructure/Persistence/EFCore/UmbracoDbContext.cs`
-- SQL Server model customizer exists (only needed if the NPoco DTO has `[IncludeColumns]` indexes)
+- SQL Server model customizer exists in `src/Umbraco.Cms.Persistence.EFCore.SqlServer/DtoCustomization/` (only if the NPoco DTO has `[IncludeColumns]` indexes)
 
 If any are missing, tell the user which step is incomplete — do not run migration commands yet. The snapshot will silently omit the entity if the DbSet is missing.
 
@@ -117,16 +117,23 @@ Do NOT touch the `.Designer.cs` files or `UmbracoDbContextModelSnapshot.cs` — 
 
 ## Step 7: Create the Umbraco Migration Class
 
-The Umbraco migration class lives in the version-specific upgrade directory. These EF Core repository migrations target v19.
+Determine the target version directory by reading `version.json` in the repository root. Parse the major version number and add one — EF Core repository migrations ship in the **next** major release, not the current one.
 
-Check whether `src/Umbraco.Infrastructure/Migrations/Upgrade/V_19_0_0/` exists. If not, create the directory.
+```bash
+# Parse major version and compute target: e.g. "18.1.0-rc" → major=18 → V_19_0_0
+python3 -c "import json,re; v=json.load(open('version.json'))['version']; m=int(re.match(r'(\d+)',v).group(1)); print(f'V_{m+1}_0_0')"
+```
 
-Create `src/Umbraco.Infrastructure/Migrations/Upgrade/V_19_0_0/{MigrationName}.cs`:
+Store the result as `targetVersionDir` (e.g. `V_19_0_0`). All paths and namespace references below use this value.
+
+Check whether `src/Umbraco.Infrastructure/Migrations/Upgrade/{targetVersionDir}/` exists. If not, create the directory.
+
+Create `src/Umbraco.Infrastructure/Migrations/Upgrade/{targetVersionDir}/{MigrationName}.cs`:
 
 ```csharp
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.{targetVersionDir};
 
 public class {MigrationName} : AsyncMigrationBase
 {
@@ -155,13 +162,13 @@ File: `src/Umbraco.Infrastructure/Migrations/Upgrade/UmbracoPlan.cs`
 Read the file to find the last existing `To<>` call. Append a new call after it with a freshly generated GUID:
 
 ```csharp
-To<V_19_0_0.{MigrationName}>("{new-unique-guid}");
+To<{targetVersionDir}.{MigrationName}>("{new-unique-guid}");
 ```
 
-Generate the GUID and format it in uppercase with braces:
+Generate the GUID and format it in uppercase with braces (works cross-platform):
 
 ```bash
-uuidgen | tr '[:lower:]' '[:upper:]'
+python3 -c "import uuid; print(str(uuid.uuid4()).upper())"
 ```
 
 Verify the generated GUID does not already appear in `UmbracoPlan.cs` before using it.
@@ -232,7 +239,7 @@ When all steps are done, confirm each item:
 - [ ] SQL Server migration generated: `src/Umbraco.Cms.Persistence.EFCore.SqlServer/Migrations/*_{MigrationName}.cs`
 - [ ] SQLite migration generated: `src/Umbraco.Cms.Persistence.EFCore.Sqlite/Migrations/*_{MigrationName}.cs`
 - [ ] Both EF Core migration files have empty `Up()` and `Down()` methods
-- [ ] Umbraco migration class created: `src/Umbraco.Infrastructure/Migrations/Upgrade/V_19_0_0/{MigrationName}.cs`
+- [ ] Umbraco migration class created: `src/Umbraco.Infrastructure/Migrations/Upgrade/{targetVersionDir}/{MigrationName}.cs`
 - [ ] `UmbracoPlan.cs` — new `To<>` call added with a unique GUID
 - [ ] `EFCoreMigration.cs` — new enum value added
 - [ ] `SqlServerMigrationProvider.cs` — new switch case added
