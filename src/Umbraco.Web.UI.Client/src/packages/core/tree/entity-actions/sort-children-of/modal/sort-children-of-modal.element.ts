@@ -45,6 +45,9 @@ export class UmbSortChildrenOfModalElement<
 	private _sortable = false;
 
 	@state()
+	private _loading = false;
+
+	@state()
 	private _submitButtonState?: UUIButtonState;
 
 	protected _sortedUniques = new Set<string>();
@@ -87,25 +90,30 @@ export class UmbSortChildrenOfModalElement<
 		if (this.data?.unique === undefined) throw new Error('unique is required');
 		if (!this.data?.treeRepositoryAlias) throw new Error('treeRepositoryAlias is required');
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<TreeItemModelType>>(
-			this,
-			this.data.treeRepositoryAlias,
-		);
+		this._loading = true;
+		try {
+			const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<TreeItemModelType>>(
+				this,
+				this.data.treeRepositoryAlias,
+			);
 
-		const { data } = await treeRepository.requestTreeItemsOf({
-			parent: {
-				unique: this.data.unique,
-				entityType: this.data.entityType,
-			},
-			skip: this.#pagination.getSkip(),
-			take: this.#pagination.getPageSize(),
-		});
+			const { data } = await treeRepository.requestTreeItemsOf({
+				parent: {
+					unique: this.data.unique,
+					entityType: this.data.entityType,
+				},
+				skip: this.#pagination.getSkip(),
+				take: this.#pagination.getPageSize(),
+			});
 
-		if (data) {
-			this._children = [...this._children, ...data.items];
-			this.#pagination.setTotalItems(data.total);
-			this._sortable = this._children.length > 0;
-			await this._createTableItems();
+			if (data) {
+				this._children = [...this._children, ...data.items];
+				this.#pagination.setTotalItems(data.total);
+				this._sortable = this._children.length > 0;
+				await this._createTableItems();
+			}
+		} finally {
+			this._loading = false;
 		}
 	}
 
@@ -130,6 +138,7 @@ export class UmbSortChildrenOfModalElement<
 
 	protected _onLoadMore(event: PointerEvent) {
 		event.stopPropagation();
+		if (this._loading) return;
 		if (this._currentPage >= this._totalPages) return;
 		this.#pagination.setCurrentPageNumber(this._currentPage + 1);
 		this.#requestChildren();
@@ -258,7 +267,11 @@ export class UmbSortChildrenOfModalElement<
 
 			${this._hasMorePages()
 				? html`
-						<uui-button id="loadMoreButton" look="placeholder" @click=${this._onLoadMore}>
+						<uui-button
+							id="loadMoreButton"
+							look="placeholder"
+							?disabled=${this._loading}
+							@click=${this._onLoadMore}>
 							<umb-localize key="actions_loadMore">Load more</umb-localize> (${this._currentPage}/${this._totalPages})
 						</uui-button>
 					`
