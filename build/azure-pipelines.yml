@@ -64,7 +64,7 @@ parameters:
     default: false
 
 variables:
-  nodeVersion: 20
+  nodeVersion: 24
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -939,7 +939,8 @@ stages:
     # Inspect Deploy_NuGet.result directly so a MyGet failure (which is in the transitive ancestor graph)
     # doesn't cascade-skip this stage via succeeded(). Deploy_NuGet must itself have succeeded — a NuGet
     # failure deliberately blocks the npm release.
-    condition: and(in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.npmDeploy}}))
+    # Requires the npmDeploy parameter to be set explicitly at queue time — release/* pushes alone should not publish.
+    condition: and(in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues'), eq('${{ parameters.npmDeploy }}', 'True'))
     dependsOn:
       - Deploy_NuGet
     jobs:
@@ -1003,7 +1004,8 @@ stages:
     # Build_Docs must have produced artifacts (we won't upload anything otherwise) and Deploy_NuGet must
     # have succeeded — a NuGet failure deliberately blocks the docs upload. Direct result checks avoid
     # transitive succeeded()/failed() which would cascade-skip on a MyGet failure.
-    condition: and(in(dependencies.Build_Docs.result, 'Succeeded', 'SucceededWithIssues'), in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues'), or(eq(dependencies.Build.outputs['A.build.NBGV_PublicRelease'], 'True'), ${{parameters.uploadApiDocs}}))
+    # Requires the uploadApiDocs parameter to be set explicitly at queue time — release/* pushes alone should not upload.
+    condition: and(in(dependencies.Build_Docs.result, 'Succeeded', 'SucceededWithIssues'), in(dependencies.Deploy_NuGet.result, 'Succeeded', 'SucceededWithIssues'), eq('${{ parameters.uploadApiDocs }}', 'True'))
     jobs:
       - job:
         displayName: Upload C# Docs
