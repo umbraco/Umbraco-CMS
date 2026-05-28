@@ -18,10 +18,25 @@
     <!--#endif -->
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
+  <PropertyGroup>
+    <!--
+      Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms.
+      Defaults mirrors prior behaviour introduced in https://github.com/umbraco/Umbraco-CMS/pull/11276: enabled unless building on macOS without an explicit RuntimeIdentifier.
+      To override:
+        * Build/publish:   dotnet publish -p:UmbracoUseAppLocalIcu=false
+        * Post-publish:    edit System.Globalization.AppLocalIcu in the published *.runtimeconfig.json
+        * Runtime (.NET 9+): set env var DOTNET_SYSTEM_GLOBALIZATION_APPLOCALICU="" (or to a version)
+      Keep UmbracoAppLocalIcuVersion in sync with the referenced Microsoft.ICU.ICU4C.Runtime package version
+      and with the equivalent property in templates/UmbracoProject/UmbracoProject.csproj.
+    -->
+    <UmbracoUseAppLocalIcu Condition="'$(UmbracoUseAppLocalIcu)' == '' and ($(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx'))))">true</UmbracoUseAppLocalIcu>
+    <UmbracoUseAppLocalIcu Condition="'$(UmbracoUseAppLocalIcu)' == ''">false</UmbracoUseAppLocalIcu>
+    <UmbracoAppLocalIcuVersion Condition="'$(UmbracoAppLocalIcuVersion)' == ''">72.1.0.3</UmbracoAppLocalIcuVersion>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UmbracoUseAppLocalIcu)' == 'true'">
     <PackageReference Include="Microsoft.ICU.ICU4C.Runtime"/>
-    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="$(UmbracoAppLocalIcuVersion)" />
   </ItemGroup>
   <!--#endif -->
 
@@ -36,10 +51,25 @@
     <!--#endif -->
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms -->
-    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3"/>
-    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="72.1.0.3" Condition="$(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx')))" />
+  <PropertyGroup>
+    <!--
+      Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms.
+      Defaults mirrors prior behaviour introduced in https://github.com/umbraco/Umbraco-CMS/pull/11276: enabled unless building on macOS without an explicit RuntimeIdentifier.
+      To override:
+        * Build/publish:   dotnet publish -p:UmbracoUseAppLocalIcu=false
+        * Post-publish:    edit System.Globalization.AppLocalIcu in the published *.runtimeconfig.json
+        * Runtime (.NET 9+): set env var DOTNET_SYSTEM_GLOBALIZATION_APPLOCALICU="" (or to a version)
+      Keep UmbracoAppLocalIcuVersion in sync with the referenced Microsoft.ICU.ICU4C.Runtime package version
+      and with the equivalent property in templates/UmbracoProject/UmbracoProject.csproj.
+    -->
+    <UmbracoUseAppLocalIcu Condition="'$(UmbracoUseAppLocalIcu)' == '' and ($(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx'))))">true</UmbracoUseAppLocalIcu>
+    <UmbracoUseAppLocalIcu Condition="'$(UmbracoUseAppLocalIcu)' == ''">false</UmbracoUseAppLocalIcu>
+    <UmbracoAppLocalIcuVersion Condition="'$(UmbracoAppLocalIcuVersion)' == ''">72.1.0.3</UmbracoAppLocalIcuVersion>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(UmbracoUseAppLocalIcu)' == 'true'">
+    <PackageReference Include="Microsoft.ICU.ICU4C.Runtime" Version="$(UmbracoAppLocalIcuVersion)"/>
+    <RuntimeHostConfigurationOption Include="System.Globalization.AppLocalIcu" Value="$(UmbracoAppLocalIcuVersion)" />
   </ItemGroup>
   <!--#endif -->
 

@@ -192,7 +192,7 @@ Development-specific overrides:
 | Console logging | `Async` sink | Serilog console output |
 | Examine log levels | `Debug` | Detailed Examine logging |
 
-### Auto-Copy Build Target (csproj lines 65-73)
+### Auto-Copy Build Target
 
 MSBuild targets automatically copy template files if missing (appsettings.json and appsettings.Development.json).
 
@@ -215,7 +215,7 @@ umbraco/models/*.generated.cs    # Source files (for reference)
 umbraco/Data/TEMP/InMemoryAuto/  # Runtime compilation
 ```
 
-### Razor Compilation Settings (csproj lines 50-51)
+### Razor Compilation Settings
 
 Razor compilation is disabled for InMemoryAuto mode (`RazorCompileOnBuild=false`, `RazorCompileOnPublish=false`).
 
@@ -223,11 +223,22 @@ Razor compilation is disabled for InMemoryAuto mode (`RazorCompileOnBuild=false`
 
 ## 6. ICU Globalization
 
-### App-Local ICU (csproj lines 39-40)
+### App-Local ICU
 
-Uses app-local ICU (`Microsoft.ICU.ICU4C.Runtime` v72.1.0.3) for consistent globalization across platforms.
+Opts in to app-local ICU (`Microsoft.ICU.ICU4C.Runtime` v72.1.0.3) so globalization behaves consistently across Windows / Linux hosts (notably Windows Server 2016 and Windows 10 1703–1809, which otherwise fall back to NLS). Gated by the `UmbracoUseAppLocalIcu` MSBuild property, which defaults to `true` for non-macOS Linux/Windows builds and `false` otherwise — mirroring the prior `RuntimeIdentifier`-aware condition.
 
-**Note**: Ensure ICU version matches between package reference and runtime option. Changes must also be made to `Umbraco.Templates`.
+**Override paths**:
+
+| Scope | How |
+| --- | --- |
+| Build/publish | `dotnet publish -p:UmbracoUseAppLocalIcu=false` (or set the property in `.csproj` / `Directory.Build.props`) |
+| Post-publish, no rebuild | Edit the published `*.runtimeconfig.json` and remove (or change) `System.Globalization.AppLocalIcu` under `runtimeOptions.configProperties` |
+
+**Note on `DOTNET_SYSTEM_GLOBALIZATION_APPLOCALICU`**: this env var **cannot** override a value that's already in `runtimeconfig.json` — verified empirically on .NET 10. AppLocalIcu is read by the native host before the CLR boots, so the general .NET 9 env-var-precedence rule does not apply here. The env var is only honored when the runtimeconfig has no AppLocalIcu entry (i.e. either build with `-p:UmbracoUseAppLocalIcu=false` or strip the key from `runtimeconfig.json` first). Use one of the two paths above instead.
+
+**Other notes**:
+- Keep `UmbracoAppLocalIcuVersion` in sync with the `Microsoft.ICU.ICU4C.Runtime` package version.
+- Mirror any change here in `templates/UmbracoProject/UmbracoProject.csproj` (both the CPM and non-CPM branches).
 
 ---
 
@@ -249,19 +260,20 @@ This project is for **development only**:
 Does NOT use central package management. Versions specified directly:
 - `Microsoft.EntityFrameworkCore.Design` - For EF Core migrations tooling
 - `Microsoft.Build.Tasks.Core` - Security fix for EFCore.Design dependency
-- `Microsoft.ICU.ICU4C.Runtime` - Globalization
+- `Microsoft.CodeAnalysis.CSharp.Workspaces` / `Microsoft.CodeAnalysis.Workspaces.MSBuild` - Aligns transitive Microsoft.CodeAnalysis versions pulled in by EFCore.Design (fixes NU1107/NU1608)
+- `Microsoft.ICU.ICU4C.Runtime` - Globalization (gated by `UmbracoUseAppLocalIcu`, see §6)
 
-### Umbraco Targets Import (csproj lines 19-20)
+### Umbraco Targets Import
 
 Imports shared build configuration from `Umbraco.Cms.Targets` project (props and targets).
 
-### Excluded Views (csproj lines 55-57)
+### Excluded Views
 
 Three Umbraco views excluded from content (UmbracoInstall, UmbracoLogin, UmbracoBackOffice) as they come from `Umbraco.Cms.StaticAssets` RCL.
 
 ### Known Technical Debt
 
-1. **Warning Suppression** (csproj lines 12-16): `SA1119` - Unnecessary parenthesis to fix
+1. **Warning Suppression**: `SA1119` - Unnecessary parenthesis to fix
 
 ### Runtime Data (umbraco/ directory)
 
