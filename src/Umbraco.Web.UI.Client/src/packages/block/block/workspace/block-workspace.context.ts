@@ -5,7 +5,7 @@ import { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
 import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
 import { UmbBlockLanguageAccessWorkspaceController } from './block-workspace-language-access.controller.js';
-import { umbResolveBlockWorkspaceLabelIndex } from './block-workspace-label-index.function.js';
+import { resolveBlockWorkspaceLabelIndex } from './block-workspace-label-index.function.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -296,7 +296,7 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			valueObject['$settings'] = settingsValues;
 		}
 
-		const index = umbResolveBlockWorkspaceLabelIndex(
+		const index = resolveBlockWorkspaceLabelIndex(
 			this.#index,
 			this.#originData,
 			this.#blockEntries?.getLayouts().length,

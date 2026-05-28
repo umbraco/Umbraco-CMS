@@ -12,7 +12,7 @@ import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.
  * @param layoutsLength The current length of the parent layout list; used as the target when originData.index === -1.
  * @returns The resolved index, or undefined if no source yields one.
  */
-export function umbResolveBlockWorkspaceLabelIndex(
+export function resolveBlockWorkspaceLabelIndex(
 	cachedIndex: number | undefined,
 	originData: UmbBlockWorkspaceOriginData | undefined,
 	layoutsLength: number | undefined,
