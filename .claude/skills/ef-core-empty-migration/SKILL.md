@@ -117,23 +117,16 @@ Do NOT touch the `.Designer.cs` files or `UmbracoDbContextModelSnapshot.cs` — 
 
 ## Step 7: Create the Umbraco Migration Class
 
-Determine the target version directory by reading `version.json` in the repository root. Parse the major version number and add one — EF Core repository migrations ship in the **next** major release, not the current one.
+The Umbraco migration class lives in the version-specific upgrade directory. These EF Core repository migrations target v19.
 
-```bash
-# Parse major version and compute target: e.g. "18.1.0-rc" → major=18 → V_19_0_0
-python3 -c "import json,re; v=json.load(open('version.json'))['version']; m=int(re.match(r'(\d+)',v).group(1)); print(f'V_{m+1}_0_0')"
-```
+Check whether `src/Umbraco.Infrastructure/Migrations/Upgrade/V_19_0_0/` exists. If not, create the directory.
 
-Store the result as `targetVersionDir` (e.g. `V_19_0_0`). All paths and namespace references below use this value.
-
-Check whether `src/Umbraco.Infrastructure/Migrations/Upgrade/{targetVersionDir}/` exists. If not, create the directory.
-
-Create `src/Umbraco.Infrastructure/Migrations/Upgrade/{targetVersionDir}/{MigrationName}.cs`:
+Create `src/Umbraco.Infrastructure/Migrations/Upgrade/V_19_0_0/{MigrationName}.cs`:
 
 ```csharp
 using Umbraco.Cms.Persistence.EFCore.Migrations;
 
-namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.{targetVersionDir};
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_19_0_0;
 
 public class {MigrationName} : AsyncMigrationBase
 {
@@ -162,7 +155,7 @@ File: `src/Umbraco.Infrastructure/Migrations/Upgrade/UmbracoPlan.cs`
 Read the file to find the last existing `To<>` call. Append a new call after it with a freshly generated GUID:
 
 ```csharp
-To<{targetVersionDir}.{MigrationName}>("{new-unique-guid}");
+To<V_19_0_0.{MigrationName}>("{new-unique-guid}");
 ```
 
 Generate the GUID and format it in uppercase with braces (works cross-platform):
@@ -239,7 +232,7 @@ When all steps are done, confirm each item:
 - [ ] SQL Server migration generated: `src/Umbraco.Cms.Persistence.EFCore.SqlServer/Migrations/*_{MigrationName}.cs`
 - [ ] SQLite migration generated: `src/Umbraco.Cms.Persistence.EFCore.Sqlite/Migrations/*_{MigrationName}.cs`
 - [ ] Both EF Core migration files have empty `Up()` and `Down()` methods
-- [ ] Umbraco migration class created: `src/Umbraco.Infrastructure/Migrations/Upgrade/{targetVersionDir}/{MigrationName}.cs`
+- [ ] Umbraco migration class created: `src/Umbraco.Infrastructure/Migrations/Upgrade/V_19_0_0/{MigrationName}.cs`
 - [ ] `UmbracoPlan.cs` — new `To<>` call added with a unique GUID
 - [ ] `EFCoreMigration.cs` — new enum value added
 - [ ] `SqlServerMigrationProvider.cs` — new switch case added
