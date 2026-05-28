@@ -634,14 +634,15 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         /// <param name="examineUmbracoIndexingHandler">The indexing handler responsible for managing Examine indexes in Umbraco.</param>
         /// <param name="publicAccessService">The service used to determine which content is protected by public access rules.</param>
         public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IPublicAccessService publicAccessService)
-            => backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
+            => backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
             {
                 using ICoreScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
 
-                var protectedContentIds = publicAccessService.GetAll().Select(entry => entry.ProtectedNodeId).ToArray();
+                IEnumerable<PublicAccessEntry> entries = await publicAccessService.GetAllAsync();
+                var protectedContentIds = entries.Select(entry => entry.ProtectedNodeId).ToArray();
                 if (protectedContentIds.Any() is false)
                 {
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 foreach (IUmbracoContentIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
@@ -650,13 +651,11 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        return Task.CompletedTask;
+                        return;
                     }
 
                     index.DeleteFromIndex(protectedContentIds.Select(id => id.ToString()));
                 }
-
-                return Task.CompletedTask;
             });
     }
 

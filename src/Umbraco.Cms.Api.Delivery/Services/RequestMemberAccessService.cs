@@ -38,7 +38,7 @@ internal sealed class RequestMemberAccessService : IRequestMemberAccessService
 
     public async Task<PublicAccessStatus> MemberHasAccessToAsync(IPublishedContent content)
     {
-        PublicAccessEntry? publicAccessEntry = _publicAccessService.GetEntryForContent(content.Path);
+        PublicAccessEntry? publicAccessEntry = await _publicAccessService.GetEntryForContentAsync(content.Path);
         if (publicAccessEntry is null)
         {
             return PublicAccessStatus.AccessAccepted;
