@@ -781,7 +781,7 @@ internal sealed class BackOfficeExamineSearcherTests : ExamineBaseTest
             .WithId(0)
             .Build();
         await ExecuteAndWaitForIndexing(
-            () => ContentTypeService.Save(contentType),
+            async () => await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey),
             Constants.UmbracoIndexes.InternalIndexName);
 
         foreach (var name in contentNames)
