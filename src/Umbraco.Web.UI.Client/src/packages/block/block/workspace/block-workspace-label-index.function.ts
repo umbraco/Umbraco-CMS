@@ -7,10 +7,10 @@ import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.
  * 1. `cachedIndex` — the block's position in the parent layout list (existing blocks).
  * 2. `originData.index` — the insertion index carried by the catalogue modal (new blocks).
  *    The sentinel value `-1` means "append to end" and resolves to `layoutsLength`.
- * @param cachedIndex The position of this block in the parent layout list, or undefined if it isn't there yet.
- * @param originData The origin data captured from the workspace modal.
- * @param layoutsLength The current length of the parent layout list; used as the target when originData.index === -1.
- * @returns The resolved index, or undefined if no source yields one.
+ * @param {number | undefined} cachedIndex The position of this block in the parent layout list, or undefined if it isn't there yet.
+ * @param {UmbBlockWorkspaceOriginData | undefined} originData The origin data captured from the workspace modal.
+ * @param {number | undefined} layoutsLength The current length of the parent layout list; used as the target when originData.index === -1.
+ * @returns {number | undefined} The resolved index, or undefined if no source yields one.
  */
 export function resolveBlockWorkspaceLabelIndex(
 	cachedIndex: number | undefined,
