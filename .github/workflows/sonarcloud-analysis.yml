@@ -52,8 +52,10 @@ jobs:
           dotnet tool install --global dotnet-coverage
 
       - name: Load sonar params
+        env:
+          IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
         run: |
-          if [ "${{ github.event.pull_request.head.repo.fork }}" = "true" ]; then
+          if [ "$IS_FORK" = "true" ]; then
             # For fork PRs, read sonar params from main.
             echo "SONARQUBE_SCANNER_PARAMS=$(git show origin/main:.github/workflows/sonarcloud/sonar-params.json | jq -c .)" >> $GITHUB_ENV
           else
