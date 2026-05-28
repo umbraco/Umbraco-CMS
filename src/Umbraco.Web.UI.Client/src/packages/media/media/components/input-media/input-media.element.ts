@@ -281,11 +281,6 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 		// disabled so its open-part isn't styled as clickable. `uui-card-media` doesn't honour `readonly`,
 		// so `disabled` is the only way to suppress the hover/cursor/underline.
 		//
-		// IMPORTANT: this relies on `uui-card-media`'s current implementation scoping `pointer-events: none`
-		// to `#open-part` only (not the host). The Remove action in the `actions` slot stays interactive
-		// because of that scoping. If a future `uui-card-media` makes `disabled` host-wide, the Remove
-		// action would silently stop working — verify when bumping UUI.
-		//
 		// TODO: If `uui-card-media` supports `readonly`, switch this to `?readonly=${this.readonly || !this._editMediaPath}`
 		// for cleaner semantics and styling (no greyed-out display, no "disabled" screen-reader announcement) and visual
 		// consistency with document refs.
