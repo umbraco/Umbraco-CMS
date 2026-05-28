@@ -38,6 +38,11 @@ internal sealed class ElementContainerRepository : EntityContainerRepository, IE
 
     protected override void PersistDeletedItem(EntityContainer entity)
     {
+        if (entity == null)
+        {
+            throw new ArgumentNullException(nameof(entity));
+        }
+
         // Element containers can be referenced as start nodes on individual users (umbracoUserStartNode)
         // and on user groups (umbracoUserGroup.startElementId). Both reference umbracoNode.id via FK,
         // so we must clear those references before deleting the underlying node.
