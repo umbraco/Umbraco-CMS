@@ -21,13 +21,14 @@
   <PropertyGroup>
     <!--
       Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms.
-      Defaults mirrors prior behaviour introduced in https://github.com/umbraco/Umbraco-CMS/pull/11276: enabled unless building on macOS without an explicit RuntimeIdentifier.
+      Default mirrors prior behaviour introduced in https://github.com/umbraco/Umbraco-CMS/pull/11276: enabled unless building on macOS without an explicit RuntimeIdentifier.
       To override:
-        * Build/publish:   dotnet publish -p:UmbracoUseAppLocalIcu=false
-        * Post-publish:    edit System.Globalization.AppLocalIcu in the published *.runtimeconfig.json
-        * Runtime (.NET 9+): set env var DOTNET_SYSTEM_GLOBALIZATION_APPLOCALICU="" (or to a version)
-      Keep UmbracoAppLocalIcuVersion in sync with the referenced Microsoft.ICU.ICU4C.Runtime package version
-      and with the equivalent property in templates/UmbracoProject/UmbracoProject.csproj.
+        * Build/publish:  dotnet publish -p:UmbracoUseAppLocalIcu=false
+        * Post-publish:   edit System.Globalization.AppLocalIcu in the published *.runtimeconfig.json
+      Note: DOTNET_SYSTEM_GLOBALIZATION_APPLOCALICU is only honored when AppLocalIcu is absent from runtimeconfig.json
+      (verified on .NET 10) — the general .NET 9 env-var-precedence rule does not apply to this knob, since it is
+      resolved by the native host before the CLR boots. Use one of the two override paths above instead.
+      Keep UmbracoAppLocalIcuVersion in sync with the referenced Microsoft.ICU.ICU4C.Runtime package version.
     -->
     <UmbracoUseAppLocalIcu Condition="'$(UmbracoUseAppLocalIcu)' == '' and ($(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx'))))">true</UmbracoUseAppLocalIcu>
     <UmbracoUseAppLocalIcu Condition="'$(UmbracoUseAppLocalIcu)' == ''">false</UmbracoUseAppLocalIcu>
@@ -54,13 +55,14 @@
   <PropertyGroup>
     <!--
       Opt-in to app-local ICU to ensure consistent globalization APIs across different platforms.
-      Defaults mirrors prior behaviour introduced in https://github.com/umbraco/Umbraco-CMS/pull/11276: enabled unless building on macOS without an explicit RuntimeIdentifier.
+      Default mirrors prior behaviour introduced in https://github.com/umbraco/Umbraco-CMS/pull/11276: enabled unless building on macOS without an explicit RuntimeIdentifier.
       To override:
-        * Build/publish:   dotnet publish -p:UmbracoUseAppLocalIcu=false
-        * Post-publish:    edit System.Globalization.AppLocalIcu in the published *.runtimeconfig.json
-        * Runtime (.NET 9+): set env var DOTNET_SYSTEM_GLOBALIZATION_APPLOCALICU="" (or to a version)
-      Keep UmbracoAppLocalIcuVersion in sync with the referenced Microsoft.ICU.ICU4C.Runtime package version
-      and with the equivalent property in templates/UmbracoProject/UmbracoProject.csproj.
+        * Build/publish:  dotnet publish -p:UmbracoUseAppLocalIcu=false
+        * Post-publish:   edit System.Globalization.AppLocalIcu in the published *.runtimeconfig.json
+      Note: DOTNET_SYSTEM_GLOBALIZATION_APPLOCALICU is only honored when AppLocalIcu is absent from runtimeconfig.json
+      (verified on .NET 10) — the general .NET 9 env-var-precedence rule does not apply to this knob, since it is
+      resolved by the native host before the CLR boots. Use one of the two override paths above instead.
+      Keep UmbracoAppLocalIcuVersion in sync with the referenced Microsoft.ICU.ICU4C.Runtime package version.
     -->
     <UmbracoUseAppLocalIcu Condition="'$(UmbracoUseAppLocalIcu)' == '' and ($(RuntimeIdentifier.StartsWith('linux')) or $(RuntimeIdentifier.StartsWith('win')) or ('$(RuntimeIdentifier)' == '' and !$([MSBuild]::IsOSPlatform('osx'))))">true</UmbracoUseAppLocalIcu>
     <UmbracoUseAppLocalIcu Condition="'$(UmbracoUseAppLocalIcu)' == ''">false</UmbracoUseAppLocalIcu>
