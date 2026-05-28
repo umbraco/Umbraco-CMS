@@ -28,6 +28,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
 import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
+import { distinctUntilChanged, map } from '@umbraco-cms/backoffice/external/rxjs';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 
@@ -112,19 +113,22 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			this.#blockEntries = context;
 			if (context) {
 				this.observe(
-					observeMultiple([context.layoutEntries, this.contentKey]),
-					([layouts, contentKey]) => {
-						const found = contentKey ? layouts.findIndex((x) => x.contentKey === contentKey) : -1;
-						const newIndex = found !== -1 ? found : undefined;
-						if (newIndex !== this.#index) {
-							this.#index = newIndex;
-							this.#renderLabel(this.content.getValues(), this.settings.getValues());
-						}
+					observeMultiple([context.layoutEntries, this.contentKey]).pipe(
+						map(([layouts, contentKey]) => {
+							const found = contentKey ? layouts.findIndex((x) => x.contentKey === contentKey) : -1;
+							return found !== -1 ? found : undefined;
+						}),
+						distinctUntilChanged(),
+					),
+					(index) => {
+						this.#index = index;
+						this.#renderLabel(this.content.getValues(), this.settings.getValues());
 					},
 					'observeLayoutIndex',
 				);
 			} else {
 				this.#index = undefined;
+				this.removeUmbControllerByAlias('observeLayoutIndex');
 			}
 		}).asPromise({ preventTimeout: true });
 
