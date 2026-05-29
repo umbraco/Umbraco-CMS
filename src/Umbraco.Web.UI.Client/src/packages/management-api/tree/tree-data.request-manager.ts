@@ -1,10 +1,10 @@
+import type { UmbManagementApiInFlightRequestCache } from '../inflight-request/cache.js';
 import type {
 	UmbManagementApiTreeAncestorsOfRequestArgs,
 	UmbManagementApiTreeChildrenOfRequestArgs,
 	UmbManagementApiTreeRootItemsRequestArgs,
 	UmbManagementApiTreeSiblingsFromRequestArgs,
 } from './types.js';
-import type { UmbManagementApiInFlightRequestCache } from '../inflight-request/cache.js';
 import { isOffsetPaginationRequest, isTargetPaginationRequest } from '@umbraco-cms/backoffice/utils';
 import { tryExecute, UmbError, type UmbApiResponse } from '@umbraco-cms/backoffice/resources';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
@@ -34,6 +34,10 @@ export interface UmbManagementApiTreeDataRequestManagerArgs<
 	getSiblingsFrom: (
 		args: SiblingsFromRequestArgsType,
 	) => Promise<UmbApiResponse<{ data?: SiblingsFromDataResponseType }>>;
+	/**
+	 * Optional in-flight deduplication cache. When provided, concurrent identical requests
+	 * share a single in-flight call instead of each hitting the network independently.
+	 */
 	inflightRequestCache?: UmbManagementApiInFlightRequestCache<unknown>;
 }
 
@@ -77,22 +81,24 @@ export class UmbManagementApiTreeDataRequestManager<
 		this.#inflightRequestCache = args.inflightRequestCache;
 	}
 
-	// Coalesces concurrent identical requests so multiple consumers (tree menu,
-	// breadcrumb structure, pickers) share one in-flight call instead of each
-	// fetching the same data. In-flight only — the entry is removed once it settles.
-	async #coalesce<ResultType>(key: string, request: () => Promise<ResultType>): Promise<ResultType> {
+	// In-flight only — dedupes concurrent identical requests; entry removed on settle.
+	async #coalesce<ResultType extends UmbApiResponse<{ data?: unknown }>>(
+		keyFactory: () => string,
+		request: () => Promise<ResultType>,
+	): Promise<ResultType> {
 		const cache = this.#inflightRequestCache;
 		if (!cache) {
 			return request();
 		}
 
+		const key = keyFactory();
 		const existing = cache.get(key)?.requestPromise as Promise<ResultType> | undefined;
 		if (existing) {
 			return existing;
 		}
 
 		const promise = request();
-		cache.set(key, promise as Promise<UmbApiResponse<{ data?: unknown }>>);
+		cache.set(key, promise);
 		try {
 			return await promise;
 		} finally {
@@ -124,7 +130,7 @@ export class UmbManagementApiTreeDataRequestManager<
 			} as SiblingsFromRequestArgsType;
 
 			const { data: responseData, error: responseError } = await this.#coalesce(
-				`siblings:${JSON.stringify(requestArgs)}`,
+				() => `siblings:${JSON.stringify(requestArgs)}`,
 				() => tryExecute(this, this.#getSiblingsFrom(requestArgs)),
 			);
 
@@ -146,8 +152,9 @@ export class UmbManagementApiTreeDataRequestManager<
 			},
 		} as RootItemsRequestArgsType;
 
-		const { data, error } = await this.#coalesce(`root:${JSON.stringify(requestArgs)}`, () =>
-			tryExecute(this, this.#getRootItems(requestArgs)),
+		const { data, error } = await this.#coalesce(
+			() => `root:${JSON.stringify(requestArgs)}`,
+			() => tryExecute(this, this.#getRootItems(requestArgs)),
 		);
 
 		const mappedData = data
@@ -192,7 +199,7 @@ export class UmbManagementApiTreeDataRequestManager<
 			} as unknown as SiblingsFromRequestArgsType;
 
 			const { data: responseData, error: responseError } = await this.#coalesce(
-				`siblings:${JSON.stringify(requestArgs)}`,
+				() => `siblings:${JSON.stringify(requestArgs)}`,
 				() => tryExecute(this, this.#getSiblingsFrom(requestArgs)),
 			);
 
@@ -219,8 +226,9 @@ export class UmbManagementApiTreeDataRequestManager<
 			},
 		} as ChildrenOfRequestArgsType;
 
-		const { data, error } = await this.#coalesce(`children:${JSON.stringify(requestArgs)}`, () =>
-			tryExecute(this, this.#getChildrenOf(requestArgs)),
+		const { data, error } = await this.#coalesce(
+			() => `children:${JSON.stringify(requestArgs)}`,
+			() => tryExecute(this, this.#getChildrenOf(requestArgs)),
 		);
 
 		const mappedData = data
@@ -241,8 +249,9 @@ export class UmbManagementApiTreeDataRequestManager<
 			treeItem: args.treeItem,
 		} as AncestorsOfRequestArgsType;
 
-		return this.#coalesce(`ancestors:${JSON.stringify(requestArgs)}`, () =>
-			tryExecute(this, this.#getAncestorsOf(requestArgs)),
+		return this.#coalesce(
+			() => `ancestors:${JSON.stringify(requestArgs)}`,
+			() => tryExecute(this, this.#getAncestorsOf(requestArgs)),
 		);
 	}
 
