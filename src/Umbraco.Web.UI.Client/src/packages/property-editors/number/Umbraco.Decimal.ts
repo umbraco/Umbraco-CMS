@@ -15,6 +15,13 @@ export const manifests: Array<UmbExtensionManifest> = [
 						config: [{ alias: 'step', value: '0.000001' }],
 					},
 					{
+						alias: 'defaultValue',
+						label: 'Default value',
+						description: 'Enter the default value to use when a new property is created',
+						propertyEditorUiAlias: 'Umb.PropertyEditorUi.Decimal',
+						config: [{ alias: 'step', value: '0.000001' }],
+					},
+					{
 						alias: 'max',
 						label: 'Maximum',
 						description: 'Enter the maximum amount of number to be entered',

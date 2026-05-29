@@ -6,13 +6,26 @@ export class UmbDecimalPropertyValuePreset
 	implements UmbPropertyValuePreset<UmbDecimalPropertyEditorUiValue, UmbPropertyEditorConfig>
 {
 	async processValue(value: undefined | UmbDecimalPropertyEditorUiValue, config: UmbPropertyEditorConfig) {
-		const min = Number(config.find((x) => x.alias === 'min')?.value ?? 0);
-		const minVerified = isNaN(min) ? 0 : min;
+		const defaultValue = this.#parseConfiguredNumber(config, 'defaultValue');
+		if (defaultValue !== undefined) {
+			return value !== undefined ? value : defaultValue;
+		}
 
-		return value !== undefined ? value : minVerified;
+		const min = this.#parseConfiguredNumber(config, 'min') ?? 0;
+		return value !== undefined ? value : min;
 	}
 
 	destroy(): void {}
+
+	#parseConfiguredNumber(config: UmbPropertyEditorConfig, alias: string): number | undefined {
+		const rawValue = config.find((x) => x.alias === alias)?.value;
+		if (rawValue === undefined || rawValue === null || rawValue === '') {
+			return undefined;
+		}
+
+		const parsedValue = Number(rawValue);
+		return Number.isFinite(parsedValue) ? parsedValue : undefined;
+	}
 }
 
 export { UmbDecimalPropertyValuePreset as api };

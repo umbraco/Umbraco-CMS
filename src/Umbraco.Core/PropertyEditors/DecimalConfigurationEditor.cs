@@ -19,6 +19,11 @@ public class DecimalConfigurationEditor : ConfigurationEditor
 
         Fields.Add(new ConfigurationField(new DecimalValidator())
         {
+            Key = "defaultValue",
+        });
+
+        Fields.Add(new ConfigurationField(new DecimalValidator())
+        {
             Key = "step",
         });
 
