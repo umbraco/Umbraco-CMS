@@ -54,10 +54,11 @@ jobs:
       - name: Load sonar params
         env:
           IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           if [ "$IS_FORK" = "true" ]; then
-            # For fork PRs, read sonar params from main.
-            echo "SONARQUBE_SCANNER_PARAMS=$(git show origin/main:.github/workflows/sonarcloud/sonar-params.json | jq -c .)" >> $GITHUB_ENV
+            # For fork PRs, read sonar params from the default branch.
+            echo "SONARQUBE_SCANNER_PARAMS=$(git show origin/$DEFAULT_BRANCH:.github/workflows/sonarcloud/sonar-params.json | jq -c .)" >> $GITHUB_ENV
           else
             echo "SONARQUBE_SCANNER_PARAMS=$(jq -c . .github/workflows/sonarcloud/sonar-params.json)" >> $GITHUB_ENV
           fi
