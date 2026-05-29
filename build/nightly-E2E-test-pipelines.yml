@@ -41,7 +41,6 @@ variables:
   DOTNET_GENERATE_ASPNET_CERTIFICATE: false
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
-  npm_config_cache: $(Pipeline.Workspace)/.npm_client
   NODE_OPTIONS: --max_old_space_size=16384
 
 stages:
@@ -328,7 +327,6 @@ stages:
     dependsOn: [Build, Integration]
     condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
-      npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       # Enable console logging in Release mode
       SERILOG__WRITETO__0__NAME: Async
       SERILOG__WRITETO__0__ARGS__CONFIGURE__0__NAME: Console
@@ -395,7 +393,7 @@ stages:
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
-              npm_config_cache: ${{ variables.npm_config_cache }}
+
 
           - pwsh: |
               dotnet restore UmbracoProject
@@ -474,7 +472,7 @@ stages:
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
-              npm_config_cache: ${{ variables.npm_config_cache }}
+
 
           - pwsh: |
               dotnet restore UmbracoProject
@@ -509,7 +507,6 @@ stages:
     dependsOn: [Build, DefaultConfigE2E]
     condition: in(dependencies.Build.result, 'Succeeded', 'SucceededWithIssues')
     variables:
-      npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       ASPNETCORE_URLS: https://localhost:44331
       PlaywrightPassword: UmbracoAcceptance123!
       PlaywrightUserEmail: playwright@umbraco.com
@@ -628,7 +625,7 @@ stages:
               PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
               PlaywrightPassword: ${{ variables.PlaywrightPassword }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
-              npm_config_cache: ${{ variables.npm_config_cache }}
+
 
           # Install NuGet package if specified in the matrix
           - pwsh: |

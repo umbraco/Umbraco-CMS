@@ -72,7 +72,7 @@ variables:
   DOTNET_GENERATE_ASPNET_CERTIFICATE: false
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
-  npm_config_cache: $(Pipeline.Workspace)/.npm_client
+
   NODE_OPTIONS: --max_old_space_size=16384
 
 stages:
@@ -91,6 +91,10 @@ stages:
             lfs: false,
             fetchDepth: 500
           - template: templates/backoffice-install.yml
+          - script: npm run build:for:cms
+            displayName: Build backoffice (build:for:cms)
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - template: templates/login-install.yml
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
@@ -187,7 +191,6 @@ stages:
           - template: templates/e2e-install.yml
             parameters:
               nodeVersion: ${{ variables.nodeVersion }}
-              npm_config_cache: ${{ variables.npm_config_cache }}
           - template: templates/set-npm-version.yml
             parameters:
               workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -219,7 +222,6 @@ stages:
         - template: templates/e2e-install.yml
           parameters:
             nodeVersion: ${{ variables.nodeVersion }}
-            npm_config_cache: ${{ variables.npm_config_cache }}
         - powershell: |
             npm install --global @cyclonedx/cyclonedx-npm
             cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-e2e.xml --ignore-npm-errors --verbose
@@ -592,7 +594,6 @@ stages:
     displayName: E2E Tests
     dependsOn: Build
     variables:
-      npm_config_cache: $(Pipeline.Workspace)/.npm_e2e
       # Enable console logging in Release mode
       SERILOG__WRITETO__0__NAME: Async
       SERILOG__WRITETO__0__ARGS__CONFIGURE__0__NAME: Console
@@ -660,7 +661,7 @@ stages:
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
-              npm_config_cache: ${{ variables.npm_config_cache }}
+
 
           - pwsh: |
               dotnet restore UmbracoProject
@@ -739,7 +740,7 @@ stages:
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
-              npm_config_cache: ${{ variables.npm_config_cache }}
+
 
           - pwsh: |
               dotnet restore UmbracoProject

@@ -1,3 +1,8 @@
+parameters:
+  - name: npm_config_cache
+    type: string
+    default: $(Pipeline.Workspace)/.npm_client
+
 steps:
   - task: NodeTool@0
     displayName: Use Node.js
@@ -17,8 +22,10 @@ steps:
       restoreKeys: |
         "npm_client" | "$(Agent.OS)"
         "npm_client"
-      path: $(npm_config_cache)
+      path: ${{ parameters.npm_config_cache }}
 
   - script: npm ci --no-fund --no-audit --prefer-offline
     displayName: Run npm ci (Bellissima)
     workingDirectory: src/Umbraco.Web.UI.Client
+    env:
+      npm_config_cache: ${{ parameters.npm_config_cache }}

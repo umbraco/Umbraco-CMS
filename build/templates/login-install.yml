@@ -1,0 +1,31 @@
+parameters:
+  - name: npm_config_cache
+    type: string
+    default: $(Pipeline.Workspace)/.npm_login
+
+steps:
+  - task: NodeTool@0
+    displayName: Use Node.js
+    retryCountOnTaskFailure: 3
+    inputs:
+      versionSource: 'fromFile'
+      versionFilePath: src/Umbraco.Web.UI.Login/.nvmrc
+
+  - task: Cache@2
+    displayName: Cache NPM packages (login)
+    inputs:
+      key: 'npm_login | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Login/package-lock.json'
+      restoreKeys: |
+        npm_login | "$(Agent.OS)"
+        npm_login
+      path: ${{ parameters.npm_config_cache }}
+
+  - script: npm ci --no-fund --no-audit --prefer-offline
+    displayName: Restore NPM packages (login)
+    workingDirectory: src/Umbraco.Web.UI.Login
+    env:
+      npm_config_cache: ${{ parameters.npm_config_cache }}
+
+  - script: npm run build
+    displayName: Build login
+    workingDirectory: src/Umbraco.Web.UI.Login

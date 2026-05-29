@@ -1,9 +1,9 @@
 parameters:
-  - name: nodeVersion
-    type: string
-    default: ''
-
   - name: npm_config_cache
+    type: string
+    default: $(Pipeline.Workspace)/.npm_e2e
+
+  - name: nodeVersion
     type: string
     default: ''
 
@@ -47,6 +47,8 @@ steps:
   - script: npm ci --no-fund --no-audit --prefer-offline
     workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
     displayName: Restore NPM packages
+    env:
+      npm_config_cache: ${{ parameters.npm_config_cache }}
 
   - script: npm run build
     workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
