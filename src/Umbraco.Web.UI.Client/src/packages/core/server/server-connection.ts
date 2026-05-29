@@ -53,6 +53,7 @@ export class UmbServerConnection extends UmbControllerBase {
 		if (errors.length) {
 			throw errors.length === 1 ? errors[0] : new AggregateError(errors, 'Failed to connect to the Umbraco server');
 		}
+		this.#isConnected.setValue(true);
 		return this;
 	}
 
@@ -92,7 +93,6 @@ export class UmbServerConnection extends UmbControllerBase {
 			throw error;
 		}
 
-		this.#isConnected.setValue(true);
 		this.#status = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
 	}
 
