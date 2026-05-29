@@ -86,7 +86,7 @@ If the command fails, restore `originalProviderName` and stop. Show the full err
 
 ## Step 4: Generate SQLite Migration
 
-Set `umbracoDbDSN` to the SQLite placeholder and `umbracoDbDSN_ProviderName` to `Microsoft.Data.Sqlite` in `settingsFile`:
+Update `umbracoDbDSN_ProviderName` to `Microsoft.Data.Sqlite` in `settingsFile`. If `umbracoDbDSN` is missing or empty, add the SQLite placeholder:
 
 ```json
 {
