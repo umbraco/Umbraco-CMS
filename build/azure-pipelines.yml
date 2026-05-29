@@ -582,11 +582,11 @@ stages:
           # Stop SQL Server
           - pwsh: docker stop mssql
             displayName: Stop SQL Server Docker image (Linux)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+            condition: and(always(), eq(variables['Agent.OS'], 'Linux'))
 
           - pwsh: SqlLocalDB stop MSSQLLocalDB
             displayName: Stop SQL Server LocalDB (Windows)
-            condition: and(succeeded(), eq(variables['Agent.OS'], 'Windows_NT'))
+            condition: and(always(), eq(variables['Agent.OS'], 'Windows_NT'))
 
   - stage: E2E
     displayName: E2E Tests
