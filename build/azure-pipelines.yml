@@ -395,6 +395,7 @@ stages:
       # Integration Tests (SQLite)
       - job:
         timeoutInMinutes: 180
+        cancelTimeoutInMinutes: 5
         displayName: Integration Tests (SQLite)
         strategy:
           matrix:
@@ -465,6 +466,7 @@ stages:
       # Integration Tests (SQL Server)
       - job:
         timeoutInMinutes: 180
+        cancelTimeoutInMinutes: 5
         # condition: or(eq(stageDependencies.Build.A.outputs['build.NBGV_PublicRelease'], 'True'), ${{parameters.sqlServerIntegrationTests}}) # Outcommented due to timeouts
         condition: eq(${{parameters.sqlServerIntegrationTests}}, True)
         displayName: Integration Tests (SQL Server)
@@ -613,6 +615,7 @@ stages:
       # E2E Smoke Tests
       - job:
         displayName: E2E Smoke Tests (SQLite)
+        cancelTimeoutInMinutes: 5
         # currently disabled due to DB locks randomly occuring.
         condition: eq(${{parameters.sqliteAcceptanceTests}}, True)
         variables:
@@ -688,6 +691,7 @@ stages:
 
       - job:
         displayName: E2E Smoke Tests (SQL Server)
+        cancelTimeoutInMinutes: 5
         variables:
           # Connection string
           CONNECTIONSTRINGS__UMBRACODBDSN: Data Source=(localdb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Umbraco.mdf;Integrated Security=True
