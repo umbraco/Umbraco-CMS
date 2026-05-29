@@ -4,6 +4,5 @@
   "sonar.exclusions": "**/bin/**,**/obj/**,**/node_modules/**,**/lang/*.ts,**/mocks/**,**/wwwroot/**,**/dist-cms/**,**/*.generated.cs,src/Umbraco.Web.UI/umbraco/**,src/Umbraco.Cms.Persistence.EFCore.*/Migrations/**,src/Umbraco.Web.UI.Client/src/packages/core/backend-api/**,**/.nuget/**",
   "sonar.test.inclusions": "tests/**,**/*.test.ts,**/*.spec.ts",
   "sonar.typescript.tsconfigPaths": "src/Umbraco.Web.UI.Client/tsconfig.json,src/Umbraco.Web.UI.Client/tsconfig.node.json,src/Umbraco.Web.UI.Login/tsconfig.json",
-  "sonar.scm.disabled": "true",
   "sonar.scanner.skipJreProvisioning": "true"
 }
