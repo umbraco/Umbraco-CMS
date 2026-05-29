@@ -1,8 +1,18 @@
 import type { Editor, ProseMirrorNode } from '../../externals.js';
 import { NodeSelection } from '../../externals.js';
 
+/**
+ * The plain-object shape of a Tiptap/ProseMirror mark, suitable for passing to
+ * `insertContent` JSON. Distinct from the runtime `Mark` instance, which carries
+ * a `MarkType` reference and can't be inserted directly.
+ */
 export type UmbTiptapMarkInput = { type: string; attrs?: Record<string, unknown> };
 
+/**
+ * Data extracted from a `figure` enclosing the current selection: the inner
+ * image's attributes and marks, the figcaption text (if any), and the figure's
+ * document position so callers can replace it via `setNodeSelection` / `insertContent`.
+ */
 export type UmbFigureImageData = {
 	imageAttrs: Record<string, unknown>;
 	caption?: string;
