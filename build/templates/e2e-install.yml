@@ -21,7 +21,7 @@ parameters:
 
 steps:
   - task: NodeTool@0
-    displayName: Use Node.js $(nodeVersion)
+    displayName: E2E: Use Node.js $(nodeVersion)
     inputs:
       versionSpec: $(nodeVersion)
 
@@ -31,12 +31,12 @@ steps:
       URL=${{ parameters.ASPNETCORE_URLS }}
       STORAGE_STATE_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/playwright/.auth/user.json
       CONSOLE_ERRORS_PATH=$(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/console-errors.json" | Out-File .env
-    displayName: Generate .env
+    displayName: E2E: Generate .env
     workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
 
   # Cache and restore NPM packages
   - task: Cache@2
-    displayName: Cache NPM packages
+    displayName: E2E: Cache NPM packages
     inputs:
       key: 'npm_e2e | "$(Agent.OS)" | $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest/package-lock.json'
       restoreKeys: |
@@ -46,10 +46,10 @@ steps:
 
   - script: npm ci --no-fund --no-audit --prefer-offline
     workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
-    displayName: Restore NPM packages
+    displayName: E2E: Restore NPM packages
     env:
       npm_config_cache: ${{ parameters.npm_config_cache }}
 
   - script: npm run build
     workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
-    displayName: Build test helpers
+    displayName: E2E: Build test helpers
