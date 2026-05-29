@@ -818,4 +818,75 @@ public class DocumentUrlServiceTests
     }
 
     #endregion
+
+    #region UpdateUrlSegmentCache Tests
+
+    /// <summary>
+    /// <see cref="DocumentUrlService.UpdateUrlSegmentCacheAsync"/> must never call <c>Save</c> on the
+    /// repository, even when content exists and would produce segments. Its sole purpose is to refresh
+    /// the in-memory cache without a DB write.
+    /// </summary>
+    [Test]
+    public async Task UpdateUrlSegmentCacheAsync_DoesNotCallRepositorySave()
+    {
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(urlSegmentProviderCollection, languages);
+
+        // GetById returns null by default — no content, no segments, Save must never be called.
+        await service.UpdateUrlSegmentCacheAsync(Guid.NewGuid());
+
+        repositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
+            Times.Never,
+            "UpdateUrlSegmentCacheAsync must not write URL segments to the database.");
+    }
+
+    /// <summary>
+    /// Even when content exists and the service is a SchedulingPublisher (which would normally
+    /// write), <see cref="DocumentUrlService.UpdateUrlSegmentCacheAsync"/> must not call <c>Save</c>.
+    /// </summary>
+    [TestCase(ServerRole.Single)]
+    [TestCase(ServerRole.SchedulingPublisher)]
+    public async Task UpdateUrlSegmentCacheAsync_DoesNotCallRepositorySave_ForAnyPublisherRole(ServerRole role)
+    {
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(urlSegmentProviderCollection, languages, role);
+
+        await service.UpdateUrlSegmentCacheAsync(Guid.NewGuid());
+
+        repositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
+            Times.Never,
+            $"UpdateUrlSegmentCacheAsync must not write URL segments to the database even for {role}.");
+    }
+
+    /// <summary>
+    /// <see cref="DocumentUrlService.UpdateUrlSegmentCacheWithDescendantsAsync"/> must not call
+    /// <c>Save</c> on the repository — it is strictly a cache-warming operation.
+    /// </summary>
+    [Test]
+    public async Task UpdateUrlSegmentCacheWithDescendantsAsync_DoesNotCallRepositorySave()
+    {
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(urlSegmentProviderCollection, languages);
+
+        // GetById returns null by default — the method returns early without calling Save.
+        await service.UpdateUrlSegmentCacheWithDescendantsAsync(Guid.NewGuid());
+
+        repositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
+            Times.Never,
+            "UpdateUrlSegmentCacheWithDescendantsAsync must not write URL segments to the database.");
+    }
+
+    #endregion
 }
