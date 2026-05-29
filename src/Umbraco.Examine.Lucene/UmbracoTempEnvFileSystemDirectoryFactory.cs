@@ -1,5 +1,9 @@
 using Examine;
+using Examine.Lucene;
 using Examine.Lucene.Directories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.DependencyInjection;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Cms.Infrastructure.Examine
@@ -9,11 +13,25 @@ namespace Umbraco.Cms.Infrastructure.Examine
     /// </summary>
     public class UmbracoTempEnvFileSystemDirectoryFactory : FileSystemDirectoryFactory
     {
+        [Obsolete("Use the constructor accepting IOptionsMonitor<LuceneDirectoryIndexOptions>. Scheduled for removal in Umbraco 20.")]
         public UmbracoTempEnvFileSystemDirectoryFactory(
             IApplicationIdentifier applicationIdentifier,
             ILockFactory lockFactory,
             IHostingEnvironment hostingEnvironment)
-            : base(new DirectoryInfo(GetTempPath(applicationIdentifier, hostingEnvironment)), lockFactory)
+            : this(
+                applicationIdentifier,
+                lockFactory,
+                hostingEnvironment,
+                StaticServiceProvider.Instance.GetRequiredService<IOptionsMonitor<LuceneDirectoryIndexOptions>>())
+        {
+        }
+
+        public UmbracoTempEnvFileSystemDirectoryFactory(
+            IApplicationIdentifier applicationIdentifier,
+            ILockFactory lockFactory,
+            IHostingEnvironment hostingEnvironment,
+            IOptionsMonitor<LuceneDirectoryIndexOptions> indexOptions)
+            : base(new DirectoryInfo(GetTempPath(applicationIdentifier, hostingEnvironment)), lockFactory, indexOptions)
         {
         }
 

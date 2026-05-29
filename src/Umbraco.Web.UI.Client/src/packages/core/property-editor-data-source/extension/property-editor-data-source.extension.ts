@@ -1,4 +1,4 @@
-import type { PropertyEditorSettings } from '../../property-editor/extensions/types.js';
+import type { PropertyEditorSettings } from '@umbraco-cms/backoffice/property-editor';
 import type { ManifestApi } from '@umbraco-cms/backoffice/extension-api';
 
 // TODO: base ManifestApiType on dataSourceType

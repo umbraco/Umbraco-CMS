@@ -61,8 +61,9 @@ public class SearchElementItemController : ElementItemControllerBase
             .GetAll(UmbracoObjectTypes.Element, keys)
             .OfType<IElementEntitySlim>()
             .ToArray();
+        List<IElementEntitySlim> orderedElements = OrderByRequestedIds(elements, keys);
 
-        ElementItemResponseModel[] items = await Task.WhenAll(elements.Select(_elementPresentationFactory.CreateItemResponseModelAsync));
+        ElementItemResponseModel[] items = await Task.WhenAll(orderedElements.Select(_elementPresentationFactory.CreateItemResponseModelAsync));
 
         return Ok(
             new PagedModel<ElementItemResponseModel>
