@@ -5,14 +5,14 @@ parameters:
 
 steps:
   - task: NodeTool@0
-    displayName: Login: Use Node.js
+    displayName: "Login: Use Node.js"
     retryCountOnTaskFailure: 3
     inputs:
       versionSource: 'fromFile'
       versionFilePath: src/Umbraco.Web.UI.Login/.nvmrc
 
   - task: Cache@2
-    displayName: Login: Cache NPM packages
+    displayName: "Login: Cache NPM packages"
     inputs:
       key: 'npm_login | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Login/package-lock.json'
       restoreKeys: |
@@ -21,11 +21,11 @@ steps:
       path: ${{ parameters.npm_config_cache }}
 
   - script: npm ci --no-fund --no-audit --prefer-offline
-    displayName: Login: Restore NPM packages
+    displayName: "Login: Restore NPM packages"
     workingDirectory: src/Umbraco.Web.UI.Login
     env:
       npm_config_cache: ${{ parameters.npm_config_cache }}
 
   - script: npm run build
-    displayName: Login: Build
+    displayName: "Login: Build"
     workingDirectory: src/Umbraco.Web.UI.Login

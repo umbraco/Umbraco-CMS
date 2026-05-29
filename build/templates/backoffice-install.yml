@@ -5,7 +5,7 @@ parameters:
 
 steps:
   - task: NodeTool@0
-    displayName: Backoffice: Use Node.js
+    displayName: "Backoffice: Use Node.js"
     retryCountOnTaskFailure: 3
     inputs:
       versionSource: 'fromFile'
@@ -16,7 +16,7 @@ steps:
       workingDirectory: src/Umbraco.Web.UI.Client
 
   - task: Cache@2
-    displayName: Backoffice: Cache NPM packages
+    displayName: "Backoffice: Cache NPM packages"
     inputs:
       key: '"npm_client" | "$(Agent.OS)"| $(Build.SourcesDirectory)/src/Umbraco.Web.UI.Client/package-lock.json'
       restoreKeys: |
@@ -25,7 +25,7 @@ steps:
       path: ${{ parameters.npm_config_cache }}
 
   - script: npm ci --no-fund --no-audit --prefer-offline
-    displayName: Backoffice: Restore NPM packages
+    displayName: "Backoffice: Restore NPM packages"
     workingDirectory: src/Umbraco.Web.UI.Client
     env:
       npm_config_cache: ${{ parameters.npm_config_cache }}
