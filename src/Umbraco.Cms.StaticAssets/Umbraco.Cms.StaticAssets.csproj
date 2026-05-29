@@ -58,17 +58,15 @@
   <Target Name="BuildBackoffice" DependsOnTargets="RestoreBackoffice">
     <Message Importance="high" Text="Executing Backoffice NPM build script..." />
     <Exec Command="npm run build:for:cms" WorkingDirectory="$(BackofficeProjectDirectory)" />
-    <ItemGroup>
-      <_BackofficeAssetsBuildOutput Include="$(BackofficeAssetsPath)\**" />
-    </ItemGroup>
-    <WriteLinesToFile File="$(IntermediateOutputPath)backoffice.complete.txt" Lines="@(_BackofficeAssetsBuildOutput)" Overwrite="true" />
   </Target>
 
-  <Target Name="DefineBackofficeAssets" AfterTargets="BuildBackoffice" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+  <Target Name="DefineBackofficeAssets" AfterTargets="BuildStaticAssetsPreconditions" DependsOnTargets="ResolveStaticWebAssetsConfiguration" Condition="Exists('$(BackofficeAssetsPath)')">
     <ItemGroup>
+      <_BackofficeAssetsBuildOutput Include="$(BackofficeAssetsPath)\**" />
       <FileWrites Include="@(_BackofficeAssetsBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)backoffice.complete.txt" />
     </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)backoffice.complete.txt" Lines="@(_BackofficeAssetsBuildOutput)" Overwrite="true" />
     <DefineStaticWebAssets CandidateAssets="@(_BackofficeAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(ProjectDir)wwwroot" BasePath="$(StaticWebAssetBasePath)">
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>
@@ -116,17 +114,15 @@
   <Target Name="BuildLogin" DependsOnTargets="RestoreLogin;RestoreBackoffice">
     <Message Importance="high" Text="Executing Login NPM build script..." />
     <Exec Command="npm run build" WorkingDirectory="$(LoginProjectDirectory)" />
-    <ItemGroup>
-      <_LoginAssetsBuildOutput Include="$(LoginAssetsPath)\**" />
-    </ItemGroup>
-    <WriteLinesToFile File="$(IntermediateOutputPath)login.complete.txt" Lines="@(_LoginAssetsBuildOutput)" Overwrite="true" />
   </Target>
 
-  <Target Name="DefineLoginAssets" AfterTargets="BuildLogin" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+  <Target Name="DefineLoginAssets" AfterTargets="BuildLoginStaticAssetsPreconditions" DependsOnTargets="ResolveStaticWebAssetsConfiguration" Condition="Exists('$(LoginAssetsPath)')">
     <ItemGroup>
+      <_LoginAssetsBuildOutput Include="$(LoginAssetsPath)\**" />
       <FileWrites Include="@(_LoginAssetsBuildOutput)" />
       <FileWrites Include="$(IntermediateOutputPath)login.complete.txt" />
     </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)login.complete.txt" Lines="@(_LoginAssetsBuildOutput)" Overwrite="true" />
     <DefineStaticWebAssets CandidateAssets="@(_LoginAssetsBuildOutput)" SourceId="$(PackageId)" SourceType="Computed" ContentRoot="$(ProjectDir)wwwroot" BasePath="$(StaticWebAssetBasePath)">
       <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
     </DefineStaticWebAssets>
