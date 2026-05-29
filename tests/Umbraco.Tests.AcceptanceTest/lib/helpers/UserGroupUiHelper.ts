@@ -253,7 +253,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
     await this.click(this.workspaceUsersSection.locator('umb-entity-item-ref', {hasText: userName}).getByLabel('Remove'));
   }
 
-  async isUserVisibleInGroupUsers(userName: string, isVisible = true) {
+  async isUserVisibleInUserGroup(userName: string, isVisible = true) {
     await this.isVisible(this.workspaceUsersSection.locator('umb-entity-item-ref', {hasText: userName}), isVisible);
   }
 
