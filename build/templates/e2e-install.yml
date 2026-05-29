@@ -3,10 +3,6 @@ parameters:
     type: string
     default: $(Pipeline.Workspace)/.npm_e2e
 
-  - name: nodeVersion
-    type: string
-    default: ''
-
   - name: PlaywrightUserEmail
     type: string
     default: ''
@@ -21,9 +17,11 @@ parameters:
 
 steps:
   - task: NodeTool@0
-    displayName: "E2E: Use Node.js $(nodeVersion)"
+    displayName: "E2E: Use Node.js"
+    retryCountOnTaskFailure: 3
     inputs:
-      versionSpec: $(nodeVersion)
+      versionSource: fromFile
+      versionFilePath: tests/Umbraco.Tests.AcceptanceTest/.nvmrc
 
   - pwsh: |
       "UMBRACO_USER_LOGIN=${{ parameters.PlaywrightUserEmail }}

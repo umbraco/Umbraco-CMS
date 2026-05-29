@@ -33,7 +33,6 @@ parameters:
     default: true
 
 variables:
-  nodeVersion: 20
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -389,7 +388,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
@@ -468,7 +466,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
@@ -621,7 +618,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
               PlaywrightPassword: ${{ variables.PlaywrightPassword }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}

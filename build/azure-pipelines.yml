@@ -64,7 +64,6 @@ parameters:
     default: false
 
 variables:
-  nodeVersion: 20
   solution: umbraco.sln
   buildConfiguration: Release
   UMBRACO__CMS__GLOBAL__ID: 00000000-0000-0000-0000-000000000042
@@ -189,8 +188,6 @@ stages:
             lfs: false
             fetchDepth: 500
           - template: templates/e2e-install.yml
-            parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
           - template: templates/set-npm-version.yml
             parameters:
               workingDirectory: tests/Umbraco.Tests.AcceptanceTest
@@ -220,8 +217,6 @@ stages:
           lfs: false,
           fetchDepth: 500
         - template: templates/e2e-install.yml
-          parameters:
-            nodeVersion: ${{ variables.nodeVersion }}
         - powershell: |
             npm install --global @cyclonedx/cyclonedx-npm
             cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-e2e.xml --ignore-npm-errors --verbose
@@ -657,7 +652,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
@@ -736,7 +730,6 @@ stages:
           # Setup test environment Template
           - template: nightly-E2E-setup-template.yml
             parameters:
-              nodeVersion: ${{ variables.nodeVersion }}
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}

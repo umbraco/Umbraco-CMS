@@ -1,8 +1,4 @@
 parameters:
-  - name: nodeVersion
-    type: string
-    default: ''
-
   - name: PlaywrightUserEmail
     type: string
     default: ''
@@ -29,7 +25,6 @@ steps:
 
   - template: templates/e2e-install.yml
     parameters:
-      nodeVersion: ${{ parameters.nodeVersion }}
       PlaywrightUserEmail: ${{ parameters.PlaywrightUserEmail }}
       PlaywrightPassword: ${{ parameters.PlaywrightPassword }}
       ASPNETCORE_URLS: ${{ parameters.ASPNETCORE_URLS }}
