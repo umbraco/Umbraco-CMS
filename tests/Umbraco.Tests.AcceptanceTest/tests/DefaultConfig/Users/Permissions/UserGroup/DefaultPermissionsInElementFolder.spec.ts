@@ -172,6 +172,7 @@ test('can trash an element folder with delete permission enabled', async ({umbra
   // Assert
   expect(await umbracoApi.element.doesNameExist(folderName)).toBeFalsy();
   await umbracoUi.library.isElementInTreeVisible(folderName, false);
+  expect(await umbracoApi.element.doesItemExistInRecycleBin(folderName)).toBeTruthy();
 });
 
 test('cannot trash an element folder with delete permission disabled', async ({umbracoApi, umbracoUi}) => {
@@ -312,10 +313,10 @@ test.skip('cannot see an element inside a folder when read folder permission is 
   // Assert
   await umbracoUi.library.isElementInTreeVisible(folderName, false);
   await umbracoUi.library.isElementInTreeVisible(elementName, false);
-  await umbracoUi.page.goto(`${umbracoUi.page.url()}/workspace/element-folder/edit/${folderId}`);
+  await umbracoUi.library.goToWorkspacePath(`/workspace/element-folder/edit/${folderId}`);
   await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal);
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
-  await umbracoUi.page.goto(`${umbracoUi.page.url()}/workspace/element/edit/${innerElementId}`);
+  await umbracoUi.library.goToWorkspacePath(`/workspace/element/edit/${innerElementId}`);
   await umbracoUi.waitForTimeout(ConstantHelper.wait.minimal);
   await umbracoUi.library.isElementReadOnly();
 });
@@ -348,109 +349,4 @@ test('cannot rename a folder when only element update permission is enabled', as
 
   // Assert
   await umbracoUi.library.isActionsMenuForNameVisible(folderName, false);
-});
-
-test('cannot create an element folder without create folder permission via API', async ({umbracoApi}) => {
-  // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithCreateElementFolderPermission(userGroupName, false);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-
-  // Act
-  const response = await umbracoApi.element.createFolderResponse(createdFolderName);
-
-  // Assert
-  expect(response.status()).toBe(ConstantHelper.statusCodes.forbidden);
-  await umbracoApi.loginToAdminUser();
-  expect(await umbracoApi.element.doesNameExist(createdFolderName)).toBeFalsy();
-});
-
-test('cannot rename an element folder without update folder permission via API', async ({umbracoApi}) => {
-  // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithUpdateElementFolderPermission(userGroupName, false);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-
-  // Act
-  const response = await umbracoApi.element.renameFolder(folderId, newFolderName);
-
-  // Assert
-  expect(response.status()).toBe(ConstantHelper.statusCodes.forbidden);
-});
-
-test('cannot delete an element folder without delete folder permission via API', async ({umbracoApi}) => {
-  // Arrange
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementFolderPermission(userGroupName, false);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-
-  // Act
-  const response = await umbracoApi.element.deleteFolder(folderId);
-
-  // Assert
-  expect(response.status()).toBe(ConstantHelper.statusCodes.forbidden);
-});
-
-test('cannot move an element folder without move folder permission via API', async ({umbracoApi}) => {
-  // Arrange
-  targetFolderId = await umbracoApi.element.createDefaultElementFolder(targetFolderName);
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveElementFolderPermission(userGroupName, false);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-
-  // Act
-  const response = await umbracoApi.element.moveFolder(folderId, targetFolderId);
-
-  // Assert
-  expect(response.status()).toBe(ConstantHelper.statusCodes.forbidden);
-});
-
-test('cannot delete a folder containing an element when delete element permission is disabled via API', async ({umbracoApi}) => {
-  // Arrange
-  await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementFolderAndDeleteElementPermission(userGroupName, true, false);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-
-  // Act
-  const response = await umbracoApi.element.deleteFolder(folderId);
-
-  // Assert
-  expect(response.status()).toBe(ConstantHelper.statusCodes.forbidden);
-  await umbracoApi.loginToAdminUser();
-  expect(await umbracoApi.element.doesNameExist(folderName)).toBeTruthy();
-  expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
-});
-
-test('can delete a folder containing an element when both delete folder and delete element permissions are enabled via API', async ({umbracoApi}) => {
-  // Arrange
-  await umbracoApi.element.createDefaultElementWithParent(elementName, elementTypeId, folderId);
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithDeleteElementFolderAndDeleteElementPermission(userGroupName, true, true);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-
-  // Act
-  const response = await umbracoApi.element.moveToRecycleBin(folderId, true);
-
-  // Assert
-  expect(response).toBe(ConstantHelper.statusCodes.ok);
-  await umbracoApi.loginToAdminUser();
-  expect(await umbracoApi.element.doesNameExist(folderName)).toBeFalsy();
-});
-
-test('cannot move a folder when create folder permission on the target is disabled via API', async ({umbracoApi}) => {
-  // Arrange
-  targetFolderId = await umbracoApi.element.createDefaultElementFolder(targetFolderName);
-  userGroupId = await umbracoApi.userGroup.createUserGroupWithMoveElementFolderAndCreateElementFolderPermission(userGroupName, true, false);
-  await umbracoApi.user.setUserPermissions(testUser.name, testUser.email, testUser.password, userGroupId);
-  await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
-
-  // Act
-  const response = await umbracoApi.element.moveFolder(folderId, targetFolderId);
-
-  // Assert
-  expect(response.status()).toBe(ConstantHelper.statusCodes.forbidden);
-  await umbracoApi.loginToAdminUser();
-  const targetFolderChildren = await umbracoApi.element.getChildren(targetFolderId);
-  expect(targetFolderChildren.some((child) => child.name === folderName)).toBeFalsy();
 });

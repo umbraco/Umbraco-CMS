@@ -1072,6 +1072,10 @@ export class UiBaseLocators extends BasePage {
     );
   }
 
+  async goToWorkspacePath(path: string) {
+    await this.page.goto(`${this.page.url()}${path}`);
+  }
+
   async isSectionWithNameVisible(
     sectionName: string,
     isVisible: boolean = true,

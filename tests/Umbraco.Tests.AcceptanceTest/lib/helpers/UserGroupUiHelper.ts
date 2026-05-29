@@ -250,7 +250,7 @@ export class UserGroupUiHelper extends UiBaseLocators {
     await this.isVisible(this.elementFolderPermissionsGroups.locator('umb-input-user-permission-verb[label="' + permissionName + '"]').filter({has: this.iconChecked}), hasPermission);
   }
 
-  async doesUserGroupHaveElementFolderPermissionEnabled(permissionName: string[]) {
+  async doesUserGroupHaveElementFolderPermissionsEnabled(permissionName: string[]) {
     return await Promise.all(
       permissionName.map(permission => this.doesUserGroupHaveElementFolderPermission(permission))
     );
