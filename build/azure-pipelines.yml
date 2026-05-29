@@ -113,13 +113,9 @@ stages:
               command: restore
               projects: $(solution)
               arguments: "--locked-mode"
-          - task: DotNetCoreCLI@2
+          - script: dotnet build $(solution) --configuration $(buildConfiguration) --no-restore -clp:ErrorsOnly --property:ContinuousIntegrationBuild=true --property:WarningLevel=0 --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
             name: build
             displayName: Run dotnet build and generate NuGet packages
-            inputs:
-              command: build
-              projects: $(solution)
-              arguments: "--configuration $(buildConfiguration) --no-restore -clp:ErrorsOnly --property:ContinuousIntegrationBuild=true --property:WarningLevel=0 --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
           # Publish compiled DLLs for C# API documentation generation
           # Separate artifact to avoid increasing build_output size for all builds
           - task: PublishPipelineArtifact@1
