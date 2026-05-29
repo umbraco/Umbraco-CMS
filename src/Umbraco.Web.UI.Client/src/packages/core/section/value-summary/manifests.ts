@@ -1,4 +1,6 @@
 import { UMB_SECTION_ALIASES_VALUE_TYPE } from '../value-type/constants.js';
+import { UmbSectionAliasesValueSummaryElement } from './section-aliases-value-summary.element.js';
+import { UmbSectionAliasesValueSummaryResolver } from './section-aliases-value-summary.resolver.js';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest> = [
 		alias: 'Umb.ValueSummary.Section.Aliases',
 		name: 'Section Aliases Value Summary',
 		forValueType: UMB_SECTION_ALIASES_VALUE_TYPE,
-		element: () => import('./section-aliases-value-summary.js'),
-		valueResolver: () => import('./section-aliases-value-summary.js'),
+		element: UmbSectionAliasesValueSummaryElement,
+		valueResolver: UmbSectionAliasesValueSummaryResolver,
 	},
 ];

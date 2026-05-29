@@ -448,6 +448,14 @@ When a PR changes Management API controllers or models, the `OpenApi.json` file 
 
 The backoffice is published to npm as `@umbraco-cms/backoffice`. Runtime dependencies are provided via importmap; npm peerDependencies provide types only. For full details on dependency hoisting, version range logic, and plugin development, see `/src/Umbraco.Web.UI.Client/CLAUDE.md` → "npm Package Publishing".
 
+### SQL Server 2100-parameter limit
+
+Any `WHERE IN (@0, @1, ...)` built from a runtime-sized collection risks hitting SQL Server's 2100-parameter ceiling and throwing `SqlException` 8003 in production.
+
+Batch with `IEnumerable<T>.InGroupsOf(Constants.Sql.MaxParameterCount)` or `Database.FetchByGroups(...)` whenever the collection size is driven by user data — not just when it currently fits. Watch for products of two scaling dimensions (documents × languages, properties × versions) and config-tunable batch sizes whose defaults are safe but ceilings aren't.
+
+Full guidance, safe patterns and decision rule: see `/src/Umbraco.Infrastructure/CLAUDE.md` → "Avoiding the SQL Server 2100-parameter limit".
+
 ### Known Limitations
 
 1. **Circular Dependencies**: Avoided via `Lazy<T>` or event notifications
@@ -541,6 +549,14 @@ Write a comment only when **removing it would leave a future reader confused**. 
 ### TODOs
 
 Allowed, but cheap to write and cheaper to leave behind. Keep them short and trackable: `// TODO (V19): remove once obsolete overload is gone` or `// TODO: pagination [NL]`. A TODO should have an author or a version trigger.
+
+---
+
+## 9. Testing Practices
+
+### Tests for a bug fix must fail before the fix
+
+Verify any test you add for a bug fix actually catches the bug: either write the failing test first (TDD), or temporarily revert the production change and confirm the test fails before re-applying. A test that passes both ways proves nothing. Watch for coincidental passes — default seed/sort orders can make a buggy path produce the right answer for the test's specific inputs; construct inputs so the broken and fixed behaviours give visibly different results.
 
 ---
 

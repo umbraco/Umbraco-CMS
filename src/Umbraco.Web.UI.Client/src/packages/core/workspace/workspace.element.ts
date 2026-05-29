@@ -1,4 +1,5 @@
 import type { ManifestWorkspace } from './extensions/types.js';
+import { UmbDefaultWorkspaceContext } from './kinds/default/default-workspace.context.js';
 import { customElement, property, state, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import {
@@ -51,7 +52,7 @@ export class UmbWorkspaceElement extends UmbLitElement {
 			},
 			undefined, // We can leave the alias to undefined, as we destroy this our selfs.
 			undefined,
-			() => import('./kinds/default/default-workspace.context.js'),
+			UmbDefaultWorkspaceContext,
 			{ single: true },
 		);
 	}

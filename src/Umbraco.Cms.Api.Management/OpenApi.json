@@ -28924,8 +28924,8 @@
         "tags": [
           "Redirect Management"
         ],
-        "summary": "Sets the redirect URL tracking status.",
-        "description": "Updates the redirect URL tracking configuration according to the provided status.",
+        "summary": "Deprecated. No longer changes the redirect URL tracking status.",
+        "description": "This endpoint is deprecated and no longer modifies the configuration. To toggle redirect URL tracking, set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead.",
         "operationId": "PostRedirectManagementStatus",
         "parameters": [
           {

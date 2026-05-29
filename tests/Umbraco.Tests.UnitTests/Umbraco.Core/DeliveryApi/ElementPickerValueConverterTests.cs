@@ -68,6 +68,9 @@ public class ElementPickerValueConverterTests : PropertyValueConverterTests
         PublishedElementCacheMock
             .Setup(ecc => ecc.GetByIdAsync(key, false))
             .Returns(Task.FromResult(publishedElement.Object));
+        PublishedElementCacheMock
+            .Setup(ecc => ecc.GetById(false, key))
+            .Returns(publishedElement.Object);
 
         var valueConverter = CreateValueConverter();
         Assert.AreEqual(typeof(IEnumerable<IApiElement>), valueConverter.GetDeliveryApiPropertyValueType(publishedPropertyType.Object));

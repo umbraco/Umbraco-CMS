@@ -450,7 +450,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Rediger tilladelser for denne dokumenttype.',
 		noDocumentTypesCreateNew: 'Opret en ny dokumenttype',
 		noDocumentTypesAllowedAtRoot:
-			'Der er ingen tilladte Dokumenttyper tilgængelige for at lave indhold her. Du skal tillade dette i <strong>Dokumenttyper</strong> inde i <strong>Indstillinger</strong> sektionen, ved at ændre <strong>Tillad på rodniveau</strong> indestillingen under <strong>Permissions</strong>.',
+			'Der er ingen tilladte Dokumenttyper tilgængelige for at lave indhold her. Du skal tillade dette i <strong>Dokumenttyper</strong> inde i <strong>Indstillinger</strong> sektionen, ved at ændre <strong>Tillad på rodniveau</strong> indestillingen under <strong>Struktur</strong>.',
 		noMediaTypes:
 			'Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.',
 		noMediaTypesWithNoSettingsAccess: 'Det valgte medie i træet tillader ikke at medier oprettes under det.\n    ',
@@ -2295,6 +2295,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Slå URL tracker fra',
 		enableUrlTracker: 'Slå URL tracker til',
+		urlTrackerEnabled: 'Aktiveret',
+		urlTrackerDisabled: 'Deaktiveret',
 		culture: 'Kultur',
 		originalUrl: 'Original URL',
 		redirectedTo: 'Viderestillet til',

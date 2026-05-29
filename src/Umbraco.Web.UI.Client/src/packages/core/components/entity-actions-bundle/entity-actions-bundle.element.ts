@@ -1,4 +1,4 @@
-import { UmbEntityContext } from '../../entity/entity.context.js';
+import { UmbEntityContext } from '@umbraco-cms/backoffice/entity';
 import { css, customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { UmbExtensionsManifestInitializer, createExtensionApi } from '@umbraco-cms/backoffice/extension-api';

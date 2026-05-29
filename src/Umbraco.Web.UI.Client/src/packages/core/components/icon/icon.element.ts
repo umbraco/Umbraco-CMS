@@ -1,4 +1,4 @@
-import { extractUmbColorVariable } from '../../resources/extractUmbColorVariable.function.js';
+import { extractUmbColorVariable } from '@umbraco-cms/backoffice/resources';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { html, customElement, property, state, ifDefined, css } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';

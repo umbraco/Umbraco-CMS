@@ -377,7 +377,14 @@
     contentCopied: 'Content copied',
     contentDeleted: 'Content deleted',
     contentRolledBack: 'Content rolled back',
-    contentSorted: 'Sort child items performed by user'
+    contentSorted: 'Sort child items performed by user',
+    elementSaved: 'Element saved',
+    elementSavedAndPublished: 'Element saved and published',
+    elementUnpublished: 'Element unpublished',
+    elementMoved: 'Element moved',
+    elementCopied: 'Element copied',
+    elementDeleted: 'Element deleted',
+    elementRolledBack: 'Element rolled back'
   }
 
   public static readonly auditTrailTypes = {

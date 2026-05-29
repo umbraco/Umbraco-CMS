@@ -367,7 +367,7 @@ export default {
 		enterFolderName: 'Unesite naziv foldera',
 		updateData: 'Odaberite vrstu i naslov',
 		noDocumentTypes:
-			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Struktura</strong>.',
 		noDocumentTypesAtRoot:
 			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih kreirati u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -375,9 +375,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Uredi dozvole za ovaj tip dokumenta',
 		noDocumentTypesCreateNew: 'Kreiraj novi tip dokumenta',
 		noDocumentTypesAllowedAtRoot:
-			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih tipova dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Dokument Tip</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Struktura</strong>.',
 		noMediaTypes:
-			'Nema dozvoljenih tipova medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Media Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih tipova medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Media Tip</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljeni tipovi podređenih čvorova</strong> unutar <strong>Struktura</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			'Odabrani medij u stablu ne dopušta bilo koji drugi medij\n       kreiran ispod njega.\n    ',
 		noMediaTypesEditPermissions: 'Uredi dozvole za ovaj tip medija',
@@ -1895,6 +1895,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Onemogući URL tragač',
 		enableUrlTracker: 'Omogući URL tragač',
+		urlTrackerEnabled: 'Omogućen',
+		urlTrackerDisabled: 'Onemogućen',
 		originalUrl: 'Originalni URL',
 		redirectedTo: 'Preusmjeri na',
 		redirectUrlManagement: 'Preusmjeravanje URL-ova',
