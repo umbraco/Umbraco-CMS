@@ -84,7 +84,7 @@ stages:
       - job: A
         displayName: Build Umbraco CMS
         pool:
-          vmImage: "windows-latest"
+          vmImage: "ubuntu-latest"
         steps:
           - checkout: self
             submodules: false
@@ -115,13 +115,13 @@ stages:
             inputs:
               targetPath: $(Build.SourcesDirectory)/src/Umbraco.Cms/bin/Release
               artifactName: csharp-docs-dlls
-          - powershell: |
+          - bash: |
               dotnet tool install --global CycloneDX
               dotnet-CycloneDX $(solution) --spec-version 1.5 --output $(Build.ArtifactStagingDirectory)/bom --filename bom-dotnet.xml
             displayName: 'Generate Backend BOM'
-          - powershell: |
+          - bash: |
               npm install --global @cyclonedx/cyclonedx-npm
-              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)\bom\bom-login.xml --ignore-npm-errors --verbose
+              cyclonedx-npm -o $(Build.ArtifactStagingDirectory)/bom/bom-login.xml --ignore-npm-errors --verbose
             displayName: Generate Login UI BOM
             workingDirectory: src/Umbraco.Web.UI.Login
           - task: PublishPipelineArtifact@1
