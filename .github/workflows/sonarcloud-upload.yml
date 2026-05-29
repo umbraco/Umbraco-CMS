@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 env:
   SONAR_PROJECT_KEY: umbraco_Umbraco-CMS
