@@ -12,8 +12,6 @@ test('can open and close the backoffice search modal', {tag: '@smoke'}, async ({
   // Assert
   await umbracoUi.backofficeSearch.isSearchModalVisible();
   await umbracoUi.backofficeSearch.isNavigationTipsVisible();
-
-  // Act
   await umbracoUi.backofficeSearch.clickOutsideToCloseModal();
 
   // Assert
