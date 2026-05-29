@@ -1303,6 +1303,7 @@ export class UserGroupApiHelper {
       .withElementRootAccess(true)
       .addFallbackPermission()
         .withReadElementPermission(true)
+        .withReadElementFolderPermission(true)
         .done()
       .addPermissions()
         .addElementPermission()

@@ -39,6 +39,10 @@ export class UserGroupsPermissionsBaseBuilder {
   moveElementContainer: boolean = false;
   rollbackElementContainer: boolean = false;
 
+  // Element folder (container) permissions
+  readElementFolder: boolean = false;
+  deleteElementFolder: boolean = false;
+
   constructor(parentBuilder) {
     this.parentBuilder = parentBuilder;
   }
@@ -201,6 +205,17 @@ export class UserGroupsPermissionsBaseBuilder {
     return this;
   }
 
+  // Element folder (container) permission methods
+  withReadElementFolderPermission(read: boolean) {
+    this.readElementFolder = read;
+    return this;
+  }
+
+  withDeleteElementFolderPermission(deletePermission: boolean) {
+    this.deleteElementFolder = deletePermission;
+    return this;
+  }
+
   done() {
     return this.parentBuilder;
   }
@@ -305,6 +320,14 @@ export class UserGroupsPermissionsBaseBuilder {
     }
     if (this.moveElementContainer) {
       values.push('Umb.ElementContainer.Move');
+    }
+
+    // Element folder (container) permissions
+    if (this.readElementFolder) {
+      values.push('Umb.ElementContainer.Read');
+    }
+    if (this.deleteElementFolder) {
+      values.push('Umb.ElementContainer.Delete');
     }
 
     return values;
