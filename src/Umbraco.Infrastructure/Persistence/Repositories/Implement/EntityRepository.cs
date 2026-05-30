@@ -1254,6 +1254,9 @@ internal sealed class EntityRepository : RepositoryBase, IEntityRepositoryExtend
                 case "PATH":
                     orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "path");
                     break;
+                case "TEXT":
+                    orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "text");
+                    break;
                 case "NODEID":
                     orderBy = SqlSyntax.GetQuotedColumn(NodeDto.TableName, "id");
                     orderingIncludesNodeId = true;
