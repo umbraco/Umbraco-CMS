@@ -9,7 +9,7 @@
 - **Runtime**: Node.js >=22, npm >=10 (see `engines` in `package.json`)
 - **Language**: TypeScript 5.x (strict mode, ESM — all imports must use `.js` extensions)
 - **Framework**: **Lit 3** — Web Components with reactive templates, decorators, and `html`/`css` tagged template literals
-- **UI Library**: **@umbraco-ui/uui 2.x** — 80+ Web Components (`<uui-button>`, `<uui-input>`, `<uui-box>`, etc.). Always prefer UUI components over native HTML or custom implementations.
+- **UI Library**: **@umbraco-ui/uui 1.x** — 80+ Web Components (`<uui-button>`, `<uui-input>`, `<uui-box>`, etc.). Always prefer UUI components over native HTML or custom implementations.
 - **Rich Text**: **TipTap 3** — ProseMirror-based editor (see `src/packages/tiptap/`)
 - **Build**: Vite 7 (config in `vite.config.ts`)
 - **State**: RxJS 7 wrapped by UmbState classes — see [Core Primitives](./core-primitives.md)

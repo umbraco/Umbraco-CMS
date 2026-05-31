@@ -1808,29 +1808,4 @@ export class DocumentApiHelper {
       documentData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
     );
   }
-
-  async createPublishedDocumentWithTwoNameVersionsAndTwoTextVersions(originalName: string, updatedName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string) {
-    const dataTypeData = await this.api.dataType.getByName(dataTypeName);
-    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
-    const documentId = await this.createDocumentWithTextContent(originalName, documentTypeId, originalText, dataTypeName);
-    await this.publish(documentId);
-    const documentData = await this.get(documentId);
-    documentData.variants[0].name = updatedName;
-    documentData.values[0].value = updatedText;
-    await this.update(documentId, documentData);
-    await this.publish(documentId);
-    return documentId;
-  }
-
-  async doesDocumentWithCultureHaveValue(documentId: string, expectedValue: string, culture: string | null) {
-    const documentData = await this.get(documentId);
-    const valueEntry = documentData.values.find(v => v.culture === culture);
-    expect(valueEntry?.value).toBe(expectedValue);
-  }
-
-  async doesDocumentWithCultureHaveName(documentId: string, expectedName: string, culture: string | null) {
-    const documentData = await this.get(documentId);
-    const variantEntry = documentData.variants.find(v => v.culture === culture);
-    expect(variantEntry?.name).toBe(expectedName);
-  }
 }
