@@ -40,8 +40,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 
 	#hasStatusbar = false;
 
-	#stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
-
 	#stylesheetRootPath = DEFAULT_STYLESHEET_ROOT_PATH;
 
 	@property({ type: String })
@@ -82,6 +80,9 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	readonly = false;
 
 	@state()
+	private _stylesheets = new Set(['/umbraco/backoffice/css/rte-content.css']);
+
+	@state()
 	private _editor?: Editor;
 
 	@state()
@@ -107,7 +108,8 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	protected override async firstUpdated() {
-		await this.#loadStylesheetPath();
+		// no need to await loading of the stylesheet.
+		this.#loadStylesheetPath();
 		await this.#loadExtensions();
 		await this.#loadEditor();
 	}
@@ -128,11 +130,22 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	}
 
 	async #loadStylesheetPath() {
-		return this.observe(this.#context.stylesheetRootPath, (stylesheetRootPath) => {
+		await this.observe(this.#context.stylesheetRootPath, (stylesheetRootPath) => {
 			if (stylesheetRootPath) {
 				this.#stylesheetRootPath = stylesheetRootPath;
 			}
 		}).asPromise();
+
+		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
+		if (stylesheets?.length) {
+			stylesheets.forEach((stylesheet) => {
+				const linkHref =
+					stylesheet.startsWith('http') || stylesheet.startsWith(this.#stylesheetRootPath)
+						? stylesheet
+						: `${this.#stylesheetRootPath}${stylesheet}`;
+				this._stylesheets.add(linkHref);
+			});
+		}
 	}
 
 	async #loadExtensions() {
@@ -169,17 +182,6 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 	async #loadEditor() {
 		const element = this.shadowRoot?.querySelector('#editor');
 		if (!element) return;
-
-		const stylesheets = this.configuration?.getValueByAlias<Array<string>>('stylesheets');
-		if (stylesheets?.length) {
-			stylesheets.forEach((stylesheet) => {
-				const linkHref =
-					stylesheet.startsWith('http') || stylesheet.startsWith(this.#stylesheetRootPath)
-						? stylesheet
-						: `${this.#stylesheetRootPath}${stylesheet}`;
-				this.#stylesheets.add(linkHref);
-			});
-		}
 
 		const tiptapExtensions = new Map<string, AnyExtension>();
 		const collectedStyles: Array<CSSResultGroup> = [];
@@ -255,7 +257,7 @@ export class UmbInputTiptapElement extends UmbFormControlMixin<string, typeof Um
 		if (!this._extensionStyles) return;
 		return html`
 			${repeat(
-				this.#stylesheets,
+				this._stylesheets,
 				(stylesheet) => stylesheet,
 				(stylesheet) => html`<link rel="stylesheet" href=${stylesheet} />`,
 			)}
