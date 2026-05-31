@@ -177,6 +177,9 @@ export abstract class UmbEntityDetailWorkspaceContextBase<
 	 * @returns { string | undefined } The unique identifier
 	 */
 	getUnique(): UmbEntityUnique | undefined {
+		// Return undefined before load or create so callers can distinguish "not yet loaded".
+		// TODO: Remove this guard once UmbEntityContext accepts undefined as its initial value.
+		if (this.getData() === undefined && this._getDataPromise === undefined) return undefined;
 		return this.#entityContext.getUnique();
 	}
 

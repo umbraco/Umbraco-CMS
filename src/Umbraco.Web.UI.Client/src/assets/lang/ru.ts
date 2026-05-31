@@ -506,6 +506,7 @@ export default {
 		constrainProportions: 'Сохранять пропорции',
 		continue: 'Далее',
 		copy: 'Копировать',
+		copied: 'Скопировано!',
 		create: 'Создать',
 		database: 'База данных',
 		date: 'Дата',
@@ -988,6 +989,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Остановить отслеживание URL',
 		enableUrlTracker: 'Запустить отслеживание URL',
+		urlTrackerEnabled: 'Включено',
+		urlTrackerDisabled: 'Отключено',
 		originalUrl: 'Первоначальный URL',
 		redirectedTo: 'Перенаправлен в',
 		noRedirects: 'На данный момент нет ни одного перенаправления',

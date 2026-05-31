@@ -12,7 +12,8 @@ export const manifests: Array<UmbExtensionManifest> = [
 			label: 'Single Block',
 			propertyEditorSchemaAlias: UMB_BLOCK_SINGLE_PROPERTY_EDITOR_SCHEMA_ALIAS,
 			icon: 'icon-shape-square',
-			group: 'richContent',
+			group: '#propertyEditorUIGroups_richContent',
+			keywords: ['component', 'widget', 'banner', 'hero', 'cta', 'promo', 'cta', 'callout', 'spotlight', 'feature'],
 			supportsReadOnly: true,
 			settings: {
 				properties: [

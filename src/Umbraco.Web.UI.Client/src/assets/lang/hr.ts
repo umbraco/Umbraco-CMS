@@ -368,7 +368,7 @@ export default {
 		enterFolderName: 'Unesite naziv mape',
 		updateData: 'Odaberite vrstu i naslov',
 		noDocumentTypes:
-			'Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Vrste Dokumenta</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljene vrste podređenih čvorova</strong> unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Vrste Dokumenta</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljene vrste podređenih čvorova</strong> unutar <strong>Struktura</strong>.',
 		noDocumentTypesAtRoot:
 			'Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih kreirati u <strong>Vrste Dokumenata</strong> unutar sekcije <strong>Postavke</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -376,9 +376,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Uredi dozvole za ovu vrstu dokumenta',
 		noDocumentTypesCreateNew: 'Kreiraj novu vrstu dokumenta',
 		noDocumentTypesAllowedAtRoot:
-			'Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Vrste Dokumenta</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Vrste Dokumenta</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Struktura</strong>.',
 		noMediaTypes:
-			'Nema dozvoljenih vrsta medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Vrste Medija</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljene vrste podređenih čvorova</strong> unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih vrsta medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Vrste Medija</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljene vrste podređenih čvorova</strong> unutar <strong>Struktura</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			'Odabrani medij u stablu ne dopušta bilo koji drugi medij\n       kreiran ispod njega.\n    ',
 		noMediaTypesEditPermissions: 'Uredi dozvole za ovu vrstu medija',
@@ -711,6 +711,7 @@ export default {
 		content: 'Sadržaj',
 		continue: 'Nastavi',
 		copy: 'Kopiraj',
+		copied: 'Kopirano!',
 		create: 'Kreiraj',
 		database: 'Baza podataka',
 		date: 'Datum',
@@ -1967,6 +1968,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Onemogući URL praćenje',
 		enableUrlTracker: 'Omogući URL praćenje',
+		urlTrackerEnabled: 'Omogućeno',
+		urlTrackerDisabled: 'Onemogućeno',
 		originalUrl: 'Originalni URL',
 		redirectedTo: 'Preusmjerno na',
 		redirectUrlManagement: 'Preusmjeravanje URL-ova',

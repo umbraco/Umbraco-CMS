@@ -91,6 +91,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly sortChildrenBtn: Locator;
   private readonly rollbackBtn: Locator;
   private readonly rollbackContainerBtn: Locator;
+  private readonly rollbackCancelBtn: Locator;
   private readonly publicAccessBtn: Locator;
   private readonly uuiCheckbox: Locator;
   private readonly sortBtn: Locator;
@@ -187,6 +188,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly linkPickerTargetToggle: Locator;
   private readonly confirmToResetBtn: Locator;
   private readonly saveModal: Locator;
+  private readonly blockModal: Locator
   private readonly expandSegmentBtn: Locator;
   private readonly saveAndPreviewBtn: Locator;
   private readonly manualLinkRemoveBtn: Locator;
@@ -269,6 +271,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.hostnameComboBox = this.hostNameItem.locator('[label="Culture"]').locator('uui-combobox-list-option');
     this.saveModal = page.locator('umb-document-save-modal');
     this.saveModalBtn = this.saveModal.getByLabel('Save', {exact: true});
+    this.blockModal = page.getByTestId('workspace:block');
     this.resetFocalPointBtn = page.getByLabel('Reset focal point');
     this.addNewHostnameBtn = page.locator('umb-property-layout[label="Hostnames"]').locator('[label="Add new hostname"]');
     // List View
@@ -301,6 +304,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.sortChildrenBtn = page.getByRole('button', {name: 'Sort children'});
     this.rollbackBtn = this.documentWorkspace.getByRole('button', { name: /^Rollback(…)?$/ });
     this.rollbackContainerBtn = this.container.getByLabel('Rollback');
+    this.rollbackCancelBtn = page.locator('umb-content-rollback-modal').getByRole('button', {name: 'Cancel', exact: true});
     this.publicAccessBtn = page.getByRole('button', {name: 'Public Access'});
     this.uuiCheckbox = page.locator('uui-checkbox');
     this.sortBtn = page.getByLabel('Sort', {exact: true});
@@ -1161,12 +1165,34 @@ export class ContentUiHelper extends UiBaseLocators {
     await this.click(this.rollbackBtn, {force: true});
   }
 
-  async clickRollbackContainerButton() {
+  async clickRollbackContainerButton(documentId?: string) {
+    // Workspace re-fetches the document asynchronously after rollback; wait for that GET before asserting.
+    if (documentId) {
+      const expectedPath = `${ConstantHelper.apiEndpoints.document}/${documentId}`;
+      await Promise.all([
+        this.waitForResponse(
+          (resp) =>
+            resp.request().method() === 'GET' &&
+            resp.status() === ConstantHelper.statusCodes.ok &&
+            new URL(resp.url()).pathname === expectedPath,
+        ),
+        this.click(this.rollbackContainerBtn),
+      ]);
+      return;
+    }
     await this.click(this.rollbackContainerBtn);
   }
 
   async clickLatestRollBackItem() {
     await this.click(this.rollbackItem.last());
+  }
+
+  async waitForRollbackItems() {
+    await expect(this.rollbackItem).not.toHaveCount(0);
+  }
+
+  async clickRollbackCancelButton() {
+    await this.click(this.rollbackCancelBtn);
   }
 
   async clickPublicAccessButton() {
@@ -1259,8 +1285,8 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async clickCreateInModal(headline: string, options?: {waitForClose?: 'target' | 'any'}) {
-    const modalLocator = this.page.locator('[headline="' + headline + '"]');
-    await this.click(modalLocator.getByLabel('Create'));
+    const modalLocator = this.blockModal.filter({has: this.page.getByTestId('layout-headline').filter({hasText: headline}),});
+    await this.click(modalLocator.getByTestId('workspace-action:Umb.WorkspaceAction.Block.SubmitCreate'));
 
     if (options?.waitForClose === 'target') {
       await this.waitForHidden(modalLocator);
@@ -1558,7 +1584,7 @@ export class ContentUiHelper extends UiBaseLocators {
   }
 
   async doesBlockEditorModalContainEditorSize(editorSize: string, elementName: string) {
-    await this.isVisible(this.backofficeModalContainer.locator(`[size="${editorSize}"]`).locator(`[headline="Add ${elementName}"]`));
+    await this.isVisible(this.backofficeModalContainer.locator(`[size="${editorSize}"]`).getByTestId(`block-workspace:Add ${elementName}`));
   }
 
   async doesBlockEditorModalContainInline(richTextEditorAlias: string, elementName: string) {
@@ -1979,7 +2005,7 @@ export class ContentUiHelper extends UiBaseLocators {
   async isMemberGroupSelected(memberGroupName: string) {
     return await this.isVisible(this.page.locator('umb-input-member-group uui-ref-node[name="' + memberGroupName + '"]'));
   }
-  
+
   async clickRemoveProtectionButton() {
     await this.click(this.container.getByLabel('Remove protection'));
   }

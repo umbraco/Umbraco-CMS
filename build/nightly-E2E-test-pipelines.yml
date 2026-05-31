@@ -5,10 +5,10 @@ trigger: none
 
 schedules:
   - cron: '0 3 * * *'
-    displayName: Daily 3AM build (main)
+    displayName: Daily 3AM build (v17/dev)
     branches:
       include:
-        - main
+        - v17/dev
 
 parameters:
   - name: skipIntegrationTests

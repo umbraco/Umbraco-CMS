@@ -232,19 +232,32 @@ public class UnattendedUpgradeBackgroundServiceTests
     private static UnattendedUpgradeBackgroundService CreateSut(
         IRuntimeState runtimeState,
         IEventAggregator eventAggregator,
-        IHostApplicationLifetime? hostApplicationLifetime = null)
+        IHostApplicationLifetime? hostApplicationLifetime = null,
+        IMigrationCoordinator? coordinator = null)
     {
         var components = new ComponentCollection(
             () => Enumerable.Empty<IAsyncComponent>(),
             Mock.Of<IProfilingLogger>(),
             NullLogger<ComponentCollection>.Instance);
 
+        // Default coordinator acts as the migration leader so existing tests cover the leader path.
+        coordinator ??= CreateLeaderCoordinator();
+
         return new UnattendedUpgradeBackgroundService(
             runtimeState,
             eventAggregator,
             components,
             hostApplicationLifetime ?? CreateMockLifetime().Object,
+            coordinator,
             NullLogger<UnattendedUpgradeBackgroundService>.Instance);
+    }
+
+    private static IMigrationCoordinator CreateLeaderCoordinator()
+    {
+        var mock = new Mock<IMigrationCoordinator>();
+        mock.Setup(x => x.TryBecomeLeaderAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        return mock.Object;
     }
 
     private static Mock<IRuntimeState> CreateMockRuntimeState(
