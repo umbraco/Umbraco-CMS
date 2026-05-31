@@ -91,6 +91,7 @@ export class ContentUiHelper extends UiBaseLocators {
   private readonly sortChildrenBtn: Locator;
   private readonly rollbackBtn: Locator;
   private readonly rollbackContainerBtn: Locator;
+  private readonly rollbackCancelBtn: Locator;
   private readonly publicAccessBtn: Locator;
   private readonly uuiCheckbox: Locator;
   private readonly sortBtn: Locator;
@@ -388,6 +389,7 @@ export class ContentUiHelper extends UiBaseLocators {
     this.publishModalBtn = this.backofficeModalContainer.getByLabel('Publish', {exact: true});
     this.unpublishModalBtn = this.backofficeModalContainer.getByLabel('Unpublish', {exact: true});
     this.rollbackContainerBtn = this.container.getByLabel("Rollback");
+    this.rollbackCancelBtn = page.locator('umb-content-rollback-modal').getByRole('button', { name: 'Cancel', exact: true });
     this.publicAccessBtn = page.getByRole("button", { name: "Public Access" });
     this.uuiCheckbox = page.locator("uui-checkbox");
     this.sortBtn = page.getByLabel("Sort", { exact: true });
@@ -1524,6 +1526,14 @@ export class ContentUiHelper extends UiBaseLocators {
 
   async clickLatestRollBackItem() {
     await this.click(this.rollbackItem.last());
+  }
+
+  async waitForRollbackItems() {
+    await expect(this.rollbackItem).not.toHaveCount(0);
+  }
+
+  async clickRollbackCancelButton() {
+    await this.click(this.rollbackCancelBtn);
   }
 
   async clickPublicAccessButton() {
