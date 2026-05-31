@@ -1,4 +1,5 @@
-﻿import {AliasHelper} from "./AliasHelper";
+﻿import {expect} from "@playwright/test";
+import {AliasHelper} from "./AliasHelper";
 import {ApiHelpers} from "./ApiHelpers";
 import {DocumentBuilder, DocumentDomainBuilder} from "../builders";
 
@@ -44,7 +45,7 @@ export class DocumentApiHelper {
       segment: variant.segment,
       name: variant.name
     }));
-    
+
     const updateData = {
       values: document.values,
       variants: variantsData,
@@ -104,7 +105,7 @@ export class DocumentApiHelper {
       }
       if (child.hasChildren) {
         const result = await this.recurseChildren(name, child.id, toDelete);
-        if (result) { 
+        if (result) {
           return result;
         }
       }
@@ -124,7 +125,7 @@ export class DocumentApiHelper {
       }
       if (document.hasChildren) {
         const result = await this.recurseChildren(name, document.id, false);
-        if (result) { 
+        if (result) {
           return result;
         }
       }
@@ -233,6 +234,13 @@ export class DocumentApiHelper {
     return await this.create(document);
   }
 
+  async createPublishedDocumentForTemplate(documentName: string, documentTypeName: string, templateId: string) {
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithAllowedTemplate(documentTypeName, templateId, true);
+    const documentId = await this.createDocumentWithTemplate(documentName, documentTypeId, templateId);
+    await this.publish(documentId);
+    return documentId;
+  }
+
   async createDocumentWithContentPicker(documentName: string, documentTypeId: string, contentPickerId: string) {
     await this.ensureNameNotExists(documentName);
 
@@ -304,7 +312,7 @@ export class DocumentApiHelper {
         .withValue(memberId)
         .done()
       .build();
-      
+
     return await this.create(document);
   }
 
@@ -321,11 +329,11 @@ export class DocumentApiHelper {
         .withValue(tagsName)
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
-  async createDocumentWithExternalLinkURLPicker(documentName: string, documentTypeId: string, link: string, linkTitle: string) {
+  async createDocumentWithExternalLinkURLPicker(documentName: string, documentTypeId: string, dataTypeName: string, link: string, linkTitle: string) {
     await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
@@ -334,7 +342,7 @@ export class DocumentApiHelper {
         .withName(documentName)
         .done()
       .addValue()
-        .withAlias('multiUrlPicker')
+        .withAlias(AliasHelper.toAlias(dataTypeName))
         .addURLPickerValue()
           .withIcon('icon-link')
           .withName(linkTitle)
@@ -343,7 +351,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-      
+
     return await this.create(document);
   }
 
@@ -356,7 +364,7 @@ export class DocumentApiHelper {
   async updateDomains(id: string, domains) {
     return await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/domains', domains);
   }
-  
+
   // Image Media Picker
   async createDocumentWithImageMediaPicker(documentName: string, documentTypeId: string, propertyAlias: string, mediaKey: string, focalPoint: {left: number, top: number} = {left: 0, top: 0}) {
     await this.ensureNameNotExists(documentName);
@@ -377,7 +385,7 @@ export class DocumentApiHelper {
 
     return await this.create(document);
   }
-  
+
   async doesImageMediaPickerContainImage(id: string, propertyAlias: string, mediaKey: string) {
     const contentData = await this.getByName(id);
     return contentData.values.some(value =>
@@ -552,7 +560,7 @@ export class DocumentApiHelper {
     await this.publish(documentId, publishData);
     return documentId;
   }
-  
+
   async isDocumentPublished(id: string) {
     const document = await this.get(id);
     return document.variants[0].state === 'Published';
@@ -595,7 +603,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, dataTypeId, propertyName, templateId);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -652,7 +660,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, dataTypeId, propertyName, templateId);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -686,7 +694,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, dataTypeId, propertyName, templateId);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -720,7 +728,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, dataTypeId, propertyName, templateId);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -810,7 +818,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-      
+
     return await this.create(document);
   }
 
@@ -946,7 +954,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -999,7 +1007,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -1013,7 +1021,7 @@ export class DocumentApiHelper {
     } else {
       documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListDataTypeName, blockListDataTypeId, groupName) || '';
     }
-    
+
     await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
@@ -1042,7 +1050,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -1074,7 +1082,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-      
+
     return await this.create(document);
   }
 
@@ -1114,7 +1122,7 @@ export class DocumentApiHelper {
 
     return await this.create(document);
   }
-  
+
   async createDefaultDocumentWithABlockListEditorAndBlockWithTwoValues(documentName: string, documentTypeName: string, blockListDataTypeName: string, elementTypeId: string, elementTypePropertyAlias: string, elementTypePropertyValue: string, elementTypePropertyEditorAlias: string, groupName: string = 'TestGroup', secondElementTypePropertyValue: string, templateId?: string) {
     const crypto = require('crypto');
     const blockContentKey = crypto.randomUUID();
@@ -1122,7 +1130,7 @@ export class DocumentApiHelper {
     const blockListDataTypeId = await this.api.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, elementTypeId) || '';
     let documentTypeId: string;
     if (templateId) {
-      documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, blockListDataTypeId, blockListDataTypeName, templateId) || '';  
+      documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, blockListDataTypeId, blockListDataTypeName, templateId) || '';
     } else {
       documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, blockListDataTypeName, blockListDataTypeId, groupName) || '';
     }
@@ -1169,7 +1177,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -1222,7 +1230,7 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -1281,7 +1289,7 @@ export class DocumentApiHelper {
         .done()
       .done()
       .build();
-    
+
     return await this.create(document);
   }
 
@@ -1340,10 +1348,10 @@ export class DocumentApiHelper {
           .done()
         .done()
       .build();
-    
+
     return await this.create(document);
   }
-  
+
   async createDocumentWithABlockGridEditorWithABlockThatContainsABlockInAnArea(documentName: string, documentTypeId: string, blockGridDataTypeName: string, firstElementTypeKey: string, areaKey: string, secondElementTypeKey: string, elementTypePropertyAlias: string, elementTypePropertyValue: string, elementTypePropertyEditorAlias: string) {
     const crypto = require('crypto');
     const firstBlockContentKey = crypto.randomUUID();
@@ -1421,17 +1429,72 @@ export class DocumentApiHelper {
         .withIsoCode(secondIsoCode)
         .done()
       .build();
-    
+
     await this.updateDomains(contentId, domainData);
     return contentId;
   }
-  
+
   async doesTipTapDataTypeWithNameContainBlockWithValue(documentName: string, dataTypeAlias: string, elementTypeId: string, elementTypeDataTypeAlias: string, blockValue: string) {
     const document = await this.getByName(documentName);
     const tipTapDataType = document.values.find(value => value.alias === dataTypeAlias);
     const block = tipTapDataType.value.blocks.contentData.find(value => value.contentTypeKey === elementTypeId);
     const property = block.values.find(value => value.alias === elementTypeDataTypeAlias);
     return property.value === blockValue;
+  }
+
+  async createDocumentWithMultipleCulturesAndSegmentValues(documentName: string, documentTypeId: string, dataTypeName: string, editorAlias: string, cultures: string[], values: {value: string, culture: string, segment: string | null}[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const documentBuilder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId);
+    
+    for (const culture of cultures) {
+      documentBuilder.addVariant()
+        .withName(documentName)
+        .withCulture(culture)
+        .done();
+    }
+    
+    const alias = AliasHelper.toAlias(dataTypeName);
+    for (const value of values) {
+      const valueBuilder = documentBuilder.addValue()
+        .withAlias(alias)
+        .withValue(value.value)
+        .withCulture(value.culture)
+        .withEditorAlias(editorAlias);
+      if (value.segment) {
+        valueBuilder.withSegment(value.segment);
+      }
+      valueBuilder.done();
+    }
+
+    const document = documentBuilder.build();
+    return await this.create(document);
+  }
+
+  async createDocumentWithMultipleSegmentValues(documentName: string, documentTypeId: string, dataTypeName: string, editorAlias: string, values: {value: string, segment: string | null}[]) {
+    await this.ensureNameNotExists(documentName);
+
+    const documentBuilder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .addVariant()
+        .withName(documentName)
+        .done();
+
+    const alias = AliasHelper.toAlias(dataTypeName);
+    for (const value of values) {
+      const valueBuilder = documentBuilder.addValue()
+        .withAlias(alias)
+        .withValue(value.value)
+        .withEditorAlias(editorAlias);
+      if (value.segment) {
+        valueBuilder.withSegment(value.segment);
+      }
+      valueBuilder.done();
+    }
+
+    const document = documentBuilder.build();
+    return await this.create(document);
   }
 
   async publishDocumentWithCulture(id: string, culture: string) {
@@ -1442,7 +1505,7 @@ export class DocumentApiHelper {
         }
       ]
     };
-    
+
     return await this.publish(id, publishScheduleData);
   }
 
@@ -1484,7 +1547,7 @@ export class DocumentApiHelper {
 
     return await this.create(document);
   }
-  
+
   async doesBlockGridContainBlocksWithDataElementKeyInAreaWithKey(documentName: string, blockGridAlias:string ,blockContentKey: string, areaKey: string, blocksInAreas: string[]) {
     const document = await this.getByName(documentName);
     const documentValues = document.values.find(value => value.alias === blockGridAlias);
@@ -1492,7 +1555,7 @@ export class DocumentApiHelper {
     const area = parentBlock.areas.find(value => value.key === areaKey);
     return area.items.map(value => value.contentKey).every(value => blocksInAreas.includes(value));
   }
-  
+
   async emptyRecycleBin() {
     return await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/recycle-bin/document');
   }
@@ -1531,7 +1594,7 @@ export class DocumentApiHelper {
         .done()
       .build();
     const contentId = await this.create(document) || '';
-    
+
     const domainData = new DocumentDomainBuilder()
       .addDomain()
         .withDomainName(firstDomainName)
@@ -1556,7 +1619,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, multiURLPickerDataTypeName, dataTypeData.id);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -1588,7 +1651,7 @@ export class DocumentApiHelper {
     // Create document type
     let documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, multiURLPickerDataTypeName, dataTypeData.id);
     documentTypeId = documentTypeId === undefined ? '' : documentTypeId;
-    await this.ensureNameNotExists(documentName);   
+    await this.ensureNameNotExists(documentName);
 
     const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
@@ -1641,7 +1704,7 @@ export class DocumentApiHelper {
         .withDomainName(domain.domainName)
         .withIsoCode(domain.isoCode)
         .done();
-    } 
+    }
     const domainData = domainDataBuilder.build();
     return await this.updateDomains(documentId, domainData);
   }
@@ -1677,58 +1740,97 @@ export class DocumentApiHelper {
     return notifications.some((notification) => notification.actionId === actionId && notification.subscribed === true);
   }
 
-  async createDocumentWithMultipleCulturesAndSegmentValues(documentName: string, documentTypeId: string, dataTypeName: string, editorAlias: string, cultures: string[], values: {value: string, culture: string, segment: string | null}[]) {
+  async createDocumentWithElementPickers(documentName: string, documentTypeId: string, dataTypeName: string, elementPickerIds: string[]) {
     await this.ensureNameNotExists(documentName);
 
-    const documentBuilder = new DocumentBuilder()
-      .withDocumentTypeId(documentTypeId);
-
-    for (const culture of cultures) {
-      documentBuilder.addVariant()
-        .withName(documentName)
-        .withCulture(culture)
-        .done();
-    }
-
-    const alias = AliasHelper.toAlias(dataTypeName);
-    for (const value of values) {
-      const valueBuilder = documentBuilder.addValue()
-        .withAlias(alias)
-        .withValue(value.value)
-        .withCulture(value.culture)
-        .withEditorAlias(editorAlias);
-      if (value.segment) {
-        valueBuilder.withSegment(value.segment);
-      }
-      valueBuilder.done();
-    }
-
-    const document = documentBuilder.build();
-    return await this.create(document);
-  }
-
-  async createDocumentWithMultipleSegmentValues(documentName: string, documentTypeId: string, dataTypeName: string, editorAlias: string, values: {value: string, segment: string | null}[]) {
-    await this.ensureNameNotExists(documentName);
-
-    const documentBuilder = new DocumentBuilder()
+    const document = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
       .addVariant()
         .withName(documentName)
-        .done();
+        .done()
+      .addValue()
+        .withAlias(AliasHelper.toAlias(dataTypeName))
+        .withValue(elementPickerIds)
+        .done()
+      .build();
 
-    const alias = AliasHelper.toAlias(dataTypeName);
-    for (const value of values) {
-      const valueBuilder = documentBuilder.addValue()
-        .withAlias(alias)
-        .withValue(value.value)
-        .withEditorAlias(editorAlias);
-      if (value.segment) {
-        valueBuilder.withSegment(value.segment);
-      }
-      valueBuilder.done();
-    }
-
-    const document = documentBuilder.build();
+    // Create document
     return await this.create(document);
+  }
+
+  async setPublicAccessForDocument(documentId: string, memberGroupNames: string[], loginDocumentId: string, errorDocumentId: string) {
+    const body = {
+      memberGroupNames: memberGroupNames,
+      memberUserNames: [],
+      loginDocument: {id: loginDocumentId},
+      errorDocument: {id: errorDocumentId},
+    };
+    const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/document/' + documentId + '/public-access', body);
+    return response.status();
+  }
+
+  async deletePublicAccessForDocument(documentId: string) {
+    const response = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/document/' + documentId + '/public-access');
+    return response.status();
+  }
+
+  async getPublicAccessForDocument(documentId: string, includeAncestors: boolean = false) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + documentId + '/public-access?includeAncestors=' + includeAncestors);
+    return response.json();
+  }
+
+  async getPublicAccessStatusForDocument(documentId: string, includeAncestors: boolean = false) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/' + documentId + '/public-access?includeAncestors=' + includeAncestors);
+    return response.status();
+  }
+
+  async verifyPublicAccessForDocument(documentId: string, expectedMemberGroupName: string, expectedLoginDocumentId: string, expectedErrorDocumentId: string, expectedIsProtectedByAncestor: boolean, includeAncestors: boolean = false) {
+    const publicAccessData = await this.getPublicAccessForDocument(documentId, includeAncestors);
+    expect(publicAccessData.groups.some((g: {name: string}) => g.name === expectedMemberGroupName)).toBeTruthy();
+    expect(publicAccessData.loginDocument.id).toBe(expectedLoginDocumentId);
+    expect(publicAccessData.errorDocument.id).toBe(expectedErrorDocumentId);
+    expect(publicAccessData.isProtectedByAncestor).toBe(expectedIsProtectedByAncestor);
+  }
+
+  async getValueByAlias(documentName: string, alias: string, culture: string | null = null) {
+    const documentData = await this.getByName(documentName);
+    return documentData.values.find(v => v.alias === alias && v.culture === culture);
+  }
+
+  async getValuesByAliasAndCultures(documentName: string, alias: string, cultures: (string | null)[]) {
+    const documentData = await this.getByName(documentName);
+    return cultures.map(culture => documentData.values.find(v => v.alias === alias && v.culture === culture));
+  }
+
+  async getValuesByCultureAndSegmentForDocument(documentName: string, culturesAndSegments: {culture: string | null, segment: string | null}[]) {
+    const documentData = await this.getByName(documentName);
+    return culturesAndSegments.map(cs =>
+      documentData.values.find(v => v.culture === cs.culture && v.segment === cs.segment)
+    );
+  }
+
+  async createPublishedDocumentWithTwoNameVersionsAndTwoTextVersions(originalName: string, updatedName: string, documentTypeName: string, dataTypeName: string, originalText: string, updatedText: string) {
+    const dataTypeData = await this.api.dataType.getByName(dataTypeName);
+    const documentTypeId = await this.api.documentType.createDocumentTypeWithPropertyEditor(documentTypeName, dataTypeName, dataTypeData.id);
+    const documentId = await this.createDocumentWithTextContent(originalName, documentTypeId, originalText, dataTypeName);
+    await this.publish(documentId);
+    const documentData = await this.get(documentId);
+    documentData.variants[0].name = updatedName;
+    documentData.values[0].value = updatedText;
+    await this.update(documentId, documentData);
+    await this.publish(documentId);
+    return documentId;
+  }
+
+  async doesDocumentWithCultureHaveValue(documentId: string, expectedValue: string, culture: string | null) {
+    const documentData = await this.get(documentId);
+    const valueEntry = documentData.values.find(v => v.culture === culture);
+    expect(valueEntry?.value).toBe(expectedValue);
+  }
+
+  async doesDocumentWithCultureHaveName(documentId: string, expectedName: string, culture: string | null) {
+    const documentData = await this.get(documentId);
+    const variantEntry = documentData.variants.find(v => v.culture === culture);
+    expect(variantEntry?.name).toBe(expectedName);
   }
 }

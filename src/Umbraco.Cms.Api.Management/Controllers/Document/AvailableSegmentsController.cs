@@ -16,6 +16,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Provides API endpoints for retrieving and managing available segments associated with documents.
+/// </summary>
 [Obsolete("This controller is temporary. A more permanent solution will follow. Scheduled for removal in Umbraco 20.")]
 [ApiVersion("1.0")]
 public class AvailableSegmentsController : DocumentControllerBase
@@ -24,6 +27,12 @@ public class AvailableSegmentsController : DocumentControllerBase
     private readonly ISegmentService _segmentService;
     private readonly IUmbracoMapper _umbracoMapper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AvailableSegmentsController"/> class, which manages API endpoints for retrieving available document segments in Umbraco.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize access to controller actions.</param>
+    /// <param name="segmentService">Service for retrieving and managing document segments.</param>
+    /// <param name="umbracoMapper">The mapper used to convert between Umbraco domain models and API models.</param>
     public AvailableSegmentsController(
         IAuthorizationService authorizationService,
         ISegmentService segmentService,
@@ -34,6 +43,14 @@ public class AvailableSegmentsController : DocumentControllerBase
         _umbracoMapper = umbracoMapper;
     }
 
+    /// <summary>
+    /// Retrieves a paged collection of available content segments for a specified document.
+    /// </summary>
+    /// <param name="id">The unique identifier of the document for which to retrieve available segments.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="skip">The number of segments to skip before starting to collect the result set (used for paging).</param>
+    /// <param name="take">The maximum number of segments to return (used for paging).</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a <see cref="PagedViewModel{SegmentResponseModel}"/> representing the paged collection of available segments.</returns>
     [HttpGet("{id:guid}/available-segment-options")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<SegmentResponseModel>), StatusCodes.Status200OK)]

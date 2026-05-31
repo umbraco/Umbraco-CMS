@@ -10,6 +10,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Upgrade;
 
+/// <summary>
+/// Serves as the base controller for upgrade operations in the Umbraco CMS Management API.
+/// </summary>
 [RequireRuntimeLevel(RuntimeLevel.Upgrade)]
 [VersionedApiBackOfficeRoute("upgrade")]
 [ApiExplorerSettings(GroupName = "Upgrade")]

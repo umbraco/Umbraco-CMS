@@ -10,18 +10,35 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Item;
 
+/// <summary>
+/// Provides API endpoints for searching document type items within the management interface.
+/// </summary>
 [ApiVersion("1.0")]
 public class SearchDocumentTypeItemController : DocumentTypeItemControllerBase
 {
     private readonly IUmbracoMapper _mapper;
     private readonly IContentTypeSearchService _contentTypeSearchService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SearchDocumentTypeItemController"/> class.
+    /// </summary>
+    /// <param name="mapper">An instance of <see cref="IUmbracoMapper"/> used for mapping Umbraco objects.</param>
+    /// <param name="contentTypeSearchService">An instance of <see cref="IContentTypeSearchService"/> used to perform content type searches.</param>
     public SearchDocumentTypeItemController(IUmbracoMapper mapper, IContentTypeSearchService contentTypeSearchService)
     {
         _mapper = mapper;
         _contentTypeSearchService = contentTypeSearchService;
     }
 
+    /// <summary>
+    /// Searches for document type items matching the specified query, with optional filtering by element type and pagination.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="query">The search query string.</param>
+    /// <param name="isElement">Optional filter to include only element document types.</param>
+    /// <param name="skip">The number of items to skip (for pagination).</param>
+    /// <param name="take">The number of items to return (for pagination).</param>
+    /// <returns>A task that represents the asynchronous operation. The result contains an <see cref="IActionResult"/> with a paged list of matching document type items.</returns>
     [HttpGet("search")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedModel<DocumentTypeItemResponseModel>), StatusCodes.Status200OK)]

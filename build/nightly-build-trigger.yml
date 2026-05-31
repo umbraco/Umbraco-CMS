@@ -10,6 +10,7 @@ schedules:
     include:
     - v13/dev
     - v16/dev
+    - v18/dev
     - main
 
 steps:

@@ -5,9 +5,12 @@ using System.Net.Http.Json;
 using System.Net.Mime;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using OpenIddict.Abstractions;
 using Umbraco.Cms.Api.Management.Controllers;
@@ -32,9 +35,19 @@ namespace Umbraco.Cms.Tests.Integration.ManagementApi;
 public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     where T : ManagementApiControllerBase
 {
-
-    private static readonly Dictionary<string, TokenModel> _tokenCache = new();
+    private static readonly Dictionary<string, string> _tokenCache = new();
     private static readonly SHA256 _sha256 = SHA256.Create();
+
+    protected JsonSerializerOptions JsonSerializerOptions
+    {
+        get
+        {
+            var options = GetRequiredService<IOptionsMonitor<JsonOptions>>();
+            return options
+                .Get(Constants.JsonOptionsNames.BackOffice)
+                .JsonSerializerOptions;
+        }
+    }
 
     protected abstract Expression<Func<T, object>> MethodSelector { get; set; }
 
@@ -43,8 +56,6 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
     [SetUp]
     public override void Setup()
     {
-        InMemoryConfiguration["Umbraco:CMS:ModelsBuilder:ModelsMode"] = "Nothing";
-
         base.Setup();
         Client.DefaultRequestHeaders.Accept.Clear();
         Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
@@ -52,7 +63,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
 
     [SetUp]
     public override void SetUp_Logging() =>
-        TestContext.Out.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.FullName}");
+        TestContext.Out.Write($"Start test {GetNextTestCount()}: {TestContext.CurrentContext.Test.FullName}");
 
     [OneTimeTearDown]
     public void ClearCache() => _tokenCache.Clear();
@@ -126,8 +137,7 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
         // Check cache first
         if (!string.IsNullOrEmpty(cacheKey) && _tokenCache.TryGetValue(cacheKey, out var cachedToken))
         {
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", cachedToken.AccessToken);
+            SetTokenCookie(client, cachedToken);
             return;
         }
 
@@ -194,20 +204,32 @@ public abstract class ManagementApiTest<T> : UmbracoTestServerTestBase
                     backofficeOpenIddictApplicationDescriptor.RedirectUris.FirstOrDefault().AbsoluteUri,
             }));
 
-        var tokenModel = await tokenResponse.Content.ReadFromJsonAsync<TokenModel>();
+        CookieContainer cookies = new CookieContainer();
+        foreach (var cookieHeader in tokenResponse.Headers.GetValues("Set-Cookie"))
+        {
+            cookies.SetCookies(tokenResponse.RequestMessage!.RequestUri!, cookieHeader);
+        }
 
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenModel.AccessToken);
+        string cookieTokenValue = cookies.GetCookies(tokenResponse.RequestMessage!.RequestUri!).FirstOrDefault(c => c.Name == "__Host-umbAccessToken")!.Value;
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "[redacted]");
 
         // Cache the token if cache key provided
         if (!string.IsNullOrEmpty(cacheKey))
         {
-            _tokenCache[cacheKey] = tokenModel;
+            _tokenCache[cacheKey] = cookieTokenValue;
         }
     }
 
-    private class TokenModel
+    private void SetTokenCookie(HttpClient client, string token)
     {
-        [JsonPropertyName("access_token")]
-        public string AccessToken { get; set; }
+        if (client.DefaultRequestHeaders.Contains("Cookie"))
+        {
+            client.DefaultRequestHeaders.Remove("Cookie");
+        }
+
+        client.DefaultRequestHeaders.Add("Cookie", $"__Host-umbAccessToken={token}");
+        client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", "[redacted]");
     }
 }

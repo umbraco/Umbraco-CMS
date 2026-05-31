@@ -1,6 +1,6 @@
 import type { UmbDocumentVariantOptionModel } from '../types.js';
 import { UmbDocumentWorkspaceSplitViewElement } from './document-workspace-split-view.element.js';
-import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './document-workspace.context-token.js';
+import { UMB_DOCUMENT_WORKSPACE_CONTEXT } from './context/document-workspace.context-token.js';
 import { customElement, state, css, html } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
@@ -34,8 +34,10 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 		this.consumeContext(UMB_APP_LANGUAGE_CONTEXT, (instance) => {
 			this.#appLanguage = instance;
 			this.observe(this.#appLanguage?.appLanguageCulture, (appCulture) => {
+				const previousCulture = this.#appCulture;
 				this.#appCulture = appCulture;
 				this.#generateRoutes();
+				this.#syncUrlToCulture(previousCulture, appCulture);
 			});
 		});
 
@@ -67,6 +69,39 @@ export class UmbDocumentWorkspaceEditorElement extends UmbLitElement {
 				'_observeLoading',
 			);
 		});
+	}
+
+	#syncUrlToCulture(previousCulture: string | undefined, appCulture: string | undefined) {
+		if (!previousCulture || !appCulture || previousCulture === appCulture || !this.#workspaceRoute) return;
+
+		const currentPath = window.location.pathname;
+		const routePrefix = this.#workspaceRoute + '/';
+
+		if (!currentPath.startsWith(routePrefix)) return;
+
+		const remainingPath = currentPath.substring(routePrefix.length);
+
+		// Skip split-view paths
+		if (remainingPath.includes('_&_')) return;
+
+		// Separate the variant unique from any trailing path (e.g., /view/info)
+		const slashIndex = remainingPath.indexOf('/');
+		const variantUnique = slashIndex === -1 ? remainingPath : remainingPath.substring(0, slashIndex);
+		const pathSuffix = slashIndex === -1 ? '' : remainingPath.substring(slashIndex);
+
+		// Find the current variant to verify its culture matches the previous one
+		const currentVariant = this.#variants?.find((v) => v.unique === variantUnique);
+		if (currentVariant?.culture !== previousCulture) return;
+
+		// Find the equivalent variant with the new culture, preserving the segment
+		const newVariant = this.#variants?.find((v) => v.culture === appCulture && v.segment === currentVariant.segment);
+		if (!newVariant) return;
+
+		history.replaceState(
+			null,
+			'',
+			`${this.#workspaceRoute}/${newVariant.unique}${pathSuffix}${window.location.search}`,
+		);
 	}
 
 	#generateRoutes() {

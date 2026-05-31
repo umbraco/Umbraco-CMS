@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.BackgroundJobs.Jobs.DistributedJobs;
@@ -14,13 +16,12 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
     public string Name => "ContentVersionCleanupJob";
 
     /// <inheritdoc />
-    public TimeSpan Period { get => TimeSpan.FromHours(1); }
-
+    public TimeSpan Period => TimeSpan.FromHours(1);
 
     private readonly ILogger<ContentVersionCleanupJob> _logger;
-    private readonly IContentVersionService _service;
+    private readonly IContentVersionService _contentVersionService;
+    private readonly IElementVersionService _elementVersionService;
     private readonly IOptionsMonitor<ContentSettings> _settingsMonitor;
-
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ContentVersionCleanupJob" /> class.
@@ -28,11 +29,13 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
     public ContentVersionCleanupJob(
         ILogger<ContentVersionCleanupJob> logger,
         IOptionsMonitor<ContentSettings> settingsMonitor,
-        IContentVersionService service)
+        IContentVersionService contentVersionService,
+        IElementVersionService elementVersionService)
     {
         _logger = logger;
         _settingsMonitor = settingsMonitor;
-        _service = service;
+        _contentVersionService = contentVersionService;
+        _elementVersionService = elementVersionService;
     }
 
     /// <inheritdoc />
@@ -46,18 +49,25 @@ internal class ContentVersionCleanupJob : IDistributedBackgroundJob
             return Task.CompletedTask;
         }
 
+        DateTime asAtDate = DateTime.UtcNow;
 
-        var count = _service.PerformContentVersionCleanup(DateTime.UtcNow).Count;
+        CleanupVersions(Constants.UdiEntityType.Document, () => _contentVersionService.PerformContentVersionCleanup(asAtDate));
+        CleanupVersions(Constants.UdiEntityType.Element, () => _elementVersionService.PerformContentVersionCleanup(asAtDate));
 
-        if (count > 0)
+        return Task.CompletedTask;
+    }
+
+    private void CleanupVersions(string entityType, Func<IReadOnlyCollection<ContentVersionMeta>> cleanup)
+    {
+        IReadOnlyCollection<ContentVersionMeta> deletedVersions = cleanup();
+
+        if (deletedVersions.Count > 0)
         {
-            _logger.LogInformation("Deleted {count} ContentVersion(s)", count);
+            _logger.LogInformation("Deleted {Count} {EntityType} version(s)", deletedVersions.Count, entityType);
         }
         else
         {
-            _logger.LogDebug("Task complete, no items were Deleted");
+            _logger.LogDebug("Cleanup complete for {EntityType} versions, no items were deleted", entityType);
         }
-
-        return Task.CompletedTask;
     }
 }

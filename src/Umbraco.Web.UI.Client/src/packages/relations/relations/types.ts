@@ -1,4 +1,5 @@
 import type { UmbRelationEntityType } from './entity.js';
+export type * from './entity-actions/types.js';
 export type * from './global-components/types.js';
 export type * from './reference/types.js';
 

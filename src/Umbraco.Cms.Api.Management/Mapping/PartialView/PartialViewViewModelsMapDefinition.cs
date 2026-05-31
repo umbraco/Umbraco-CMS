@@ -1,4 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView;
 using Umbraco.Cms.Api.Management.ViewModels.PartialView.Folder;
@@ -12,8 +12,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.PartialView;
 
+/// <summary>
+/// Provides mapping configuration for view models related to Partial Views in the Umbraco CMS Management API.
+/// </summary>
 public class PartialViewViewModelsMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the mappings between partial view-related request and response models for the Umbraco API.
+    /// Registers the mapping definitions for partial views, partial view folders, and partial view snippets.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to define the mappings.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IPartialView, PartialViewResponseModel>((_, _) => new PartialViewResponseModel { Name = string.Empty, Path = string.Empty, Content = string.Empty }, Map);

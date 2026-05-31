@@ -17,6 +17,14 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
     private readonly TimeProvider _timeProvider;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataTypePresentationFactory"/> class, which is responsible for creating data type presentation models.
+    /// </summary>
+    /// <param name="dataTypeContainerService">Service used to manage data type containers.</param>
+    /// <param name="propertyEditorCollection">A collection containing all available property editors.</param>
+    /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
+    /// <param name="configurationEditorJsonSerializer">Serializer for configuration editor JSON data.</param>
+    /// <param name="timeProvider">Provides the current time for time-dependent operations.</param>
     public DataTypePresentationFactory(
         IDataTypeContainerService dataTypeContainerService,
         PropertyEditorCollection propertyEditorCollection,

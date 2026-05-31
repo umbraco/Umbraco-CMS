@@ -50,8 +50,8 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 		if (!this.data) return nothing;
 
 		return html`
-			<umb-body-layout headline="Duplicate">
-				<uui-box id="tree-box" headline="Duplicate to">
+			<umb-body-layout headline=${this.localize.term('general_copy')}>
+				<uui-box id="tree-box" headline=${this.localize.term('actions_copyTo')}>
 					<umb-tree
 						alias=${UMB_DOCUMENT_TREE_ALIAS}
 						.props=${{
@@ -61,8 +61,8 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
-				<uui-box headline="Options">
-					<umb-property-layout label="Relate to original" orientation="vertical"
+				<uui-box headline=${this.localize.term('general_options')}>
+					<umb-property-layout label=${this.localize.term('defaultdialogs_relateToOriginalLabel')} orientation="vertical"
 						><div slot="editor">
 							<uui-toggle
 								@change=${this.#onRelateToOriginalChange}
@@ -70,7 +70,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 						</div>
 					</umb-property-layout>
 
-					<umb-property-layout label="Include descendants" orientation="vertical"
+					<umb-property-layout label=${this.localize.term('defaultdialogs_includeDescendants')} orientation="vertical"
 						><div slot="editor">
 							<uui-toggle
 								@change=${this.#onIncludeDescendantsChange}
@@ -85,12 +85,12 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 
 	#renderActions() {
 		return html`
-			<uui-button slot="actions" label="Cancel" @click="${this._rejectModal}"></uui-button>
+			<uui-button slot="actions" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}"></uui-button>
 			<uui-button
 				slot="actions"
 				color="positive"
 				look="primary"
-				label="Duplicate"
+				label=${this.localize.term('general_copy')}
 				@click=${this._submitModal}
 				?disabled=${this._destinationUnique === undefined}></uui-button>
 		`;

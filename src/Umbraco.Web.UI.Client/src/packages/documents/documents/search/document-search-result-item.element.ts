@@ -1,4 +1,6 @@
-import type { UmbDocumentItemModel, UmbDocumentItemVariantModel } from '../item/repository/types.js';
+import { UmbDocumentVariantState } from '../variant-state.js';
+import type { UmbDocumentItemVariantModel } from '../item/repository/types.js';
+import type { UmbDocumentSearchItemModel } from './types.js';
 import {
 	classMap,
 	css,
@@ -9,7 +11,6 @@ import {
 	state,
 	when,
 } from '@umbraco-cms/backoffice/external/lit';
-import { DocumentVariantStateModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UMB_APP_LANGUAGE_CONTEXT } from '@umbraco-cms/backoffice/language';
 import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
@@ -17,7 +18,7 @@ import type { UmbSearchResultItemModel } from '@umbraco-cms/backoffice/search';
 @customElement('umb-document-search-result-item')
 export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 	@property({ type: Object })
-	item?: UmbSearchResultItemModel & UmbDocumentItemModel;
+	item?: UmbSearchResultItemModel & UmbDocumentSearchItemModel;
 
 	@state()
 	private _currentCulture?: string;
@@ -66,9 +67,21 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 	#getDraftState(): boolean {
 		if (this.item?.isTrashed) return false;
 		return (
-			this._variant?.state === DocumentVariantStateModel.DRAFT ||
-			this.item?.variants[0]?.state === DocumentVariantStateModel.DRAFT
+			this._variant?.state === UmbDocumentVariantState.DRAFT ||
+			this.item?.variants[0]?.state === UmbDocumentVariantState.DRAFT
 		);
+	}
+
+	#getAncestorPath() {
+		return this.item?.ancestors
+			?.map((a) => {
+				const variant =
+					a.variants.find((v) => v.culture === this._currentCulture) ??
+					a.variants.find((v) => v.culture === this._defaultCulture) ??
+					a.variants[0];
+				return variant?.name ?? '(Untitled)';
+			})
+			.join(' / ');
 	}
 
 	override render() {
@@ -88,7 +101,10 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 				(icon) => html`<umb-icon name=${icon}></umb-icon>`,
 				() => html`<uui-icon name="icon-document"></uui-icon>`,
 			)}
-			<span class=${classMap(classes)}>${label}</span>
+			<span class=${classMap(classes)}>
+				${label}
+				${when(this.item.ancestors?.length, () => html`<small class="ancestors">${this.#getAncestorPath()}</small>`)}
+			</span>
 			<div class="extra">
 				${when(
 					this.item.isTrashed,
@@ -125,6 +141,12 @@ export class UmbDocumentSearchResultItemElement extends UmbLitElement {
 
 					&.trashed {
 						text-decoration: line-through;
+					}
+					> .ancestors {
+						display: block;
+						opacity: 0.6;
+						font-size: 0.7rem;
+						font-weight: 400;
 					}
 				}
 			}

@@ -14,12 +14,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Controller that handles results of publishing a document and its descendants.
+/// </summary>
 [ApiVersion("1.0")]
 public class PublishDocumentWithDescendantsResultController : DocumentControllerBase
 {
     private readonly IAuthorizationService _authorizationService;
     private readonly IContentPublishingService _contentPublishingService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PublishDocumentWithDescendantsResultController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">An instance of <see cref="IAuthorizationService"/> used to check user permissions.</param>
+    /// <param name="contentPublishingService">An instance of <see cref="IContentPublishingService"/> used to publish content and its descendants.</param>
     public PublishDocumentWithDescendantsResultController(
         IAuthorizationService authorizationService,
         IContentPublishingService contentPublishingService)
@@ -28,6 +36,13 @@ public class PublishDocumentWithDescendantsResultController : DocumentController
         _contentPublishingService = contentPublishingService;
     }
 
+    /// <summary>
+    /// Retrieves the status and result of a publish operation for a document and its descendants.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="id">The unique identifier of the document being published.</param>
+    /// <param name="taskId">The unique identifier of the publish operation task.</param>
+    /// <returns>An <see cref="IActionResult"/> containing the status and details of the publish operation, including whether it is complete and any relevant results.</returns>
     [HttpGet("{id:guid}/publish-with-descendants/result/{taskId:guid}")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PublishWithDescendantsResultModel), StatusCodes.Status200OK)]

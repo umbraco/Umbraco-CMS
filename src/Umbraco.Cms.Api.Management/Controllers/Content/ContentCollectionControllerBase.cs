@@ -14,6 +14,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Content;
 
+/// <summary>
+/// Serves as a base controller for managing collections of content items, providing shared functionality for handling content collections and their variants.
+/// </summary>
+/// <typeparam name="TContent">The content entity type.</typeparam>
+/// <typeparam name="TCollectionResponseModel">The response model type for the content collection.</typeparam>
+/// <typeparam name="TValueResponseModelBase">The base type for value response models within the collection.</typeparam>
+/// <typeparam name="TVariantResponseModel">The response model type for content variants.</typeparam>
 public abstract class ContentCollectionControllerBase<TContent, TCollectionResponseModel, TValueResponseModelBase, TVariantResponseModel> : ManagementApiControllerBase
     where TContent : class, IContentBase
     where TCollectionResponseModel : ContentResponseModelBase<TValueResponseModelBase, TVariantResponseModel>

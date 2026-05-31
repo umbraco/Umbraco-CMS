@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services;
 
@@ -31,7 +32,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = documentKey,
                 IsDraft = false,
                 IsPrimary = true,
-                NullableLanguageId = 1,
+                LanguageId = 1,
                 UrlSegment = "test-segment",
             },
         };
@@ -57,7 +58,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = documentKey1,
                 IsDraft = false,
                 IsPrimary = true,
-                NullableLanguageId = 1,
+                LanguageId = 1,
                 UrlSegment = "test-segment",
             },
             new()
@@ -65,7 +66,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = documentKey2,
                 IsDraft = false,
                 IsPrimary = true,
-                NullableLanguageId = 1,
+                LanguageId = 1,
                 UrlSegment = "test-segment-2",
             },
         };
@@ -95,7 +96,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = documentKey,
                 IsDraft = false,
                 IsPrimary = true,
-                NullableLanguageId = 1,
+                LanguageId = 1,
                 UrlSegment = "test-segment",
             },
             new()
@@ -103,7 +104,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = documentKey,
                 IsDraft = false,
                 IsPrimary = false,
-                NullableLanguageId = 1,
+                LanguageId = 1,
                 UrlSegment = "test-segment-2",
             },
         };
@@ -128,7 +129,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = Guid.NewGuid(),
                 IsDraft = false,
                 IsPrimary = true,
-                NullableLanguageId = 1,
+                LanguageId = 1,
                 UrlSegment = $"test-segment-{x + 1}",
             });
         var cacheModels = DocumentUrlService.ConvertToCacheModel(segments).ToList();
@@ -152,7 +153,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = documentKey,
                 IsDraft = false,
                 IsPrimary = true,
-                NullableLanguageId = null, // Invariant content uses NULL
+                LanguageId = null, // Invariant content uses NULL
                 UrlSegment = "test-segment",
             },
         };
@@ -178,7 +179,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = invariantDocKey,
                 IsDraft = false,
                 IsPrimary = true,
-                NullableLanguageId = null, // Invariant content
+                LanguageId = null, // Invariant content
                 UrlSegment = "invariant-segment",
             },
             new()
@@ -186,7 +187,7 @@ public class DocumentUrlServiceTests
                 DocumentKey = variantDocKey,
                 IsDraft = false,
                 IsPrimary = true,
-                NullableLanguageId = 1, // Variant content
+                LanguageId = 1, // Variant content
                 UrlSegment = "variant-segment",
             },
         };
@@ -212,7 +213,8 @@ public class DocumentUrlServiceTests
     /// </summary>
     private static (DocumentUrlService Service, Mock<IDocumentUrlRepository> Repository) CreateDocumentUrlServiceWithMocks(
         UrlSegmentProviderCollection urlSegmentProviderCollection,
-        IEnumerable<ILanguage> languages)
+        IEnumerable<ILanguage> languages,
+        ServerRole serverRole = ServerRole.Single)
     {
         var loggerMock = Mock.Of<ILogger<DocumentUrlService>>();
         var documentUrlRepositoryMock = new Mock<IDocumentUrlRepository>();
@@ -227,9 +229,12 @@ public class DocumentUrlServiceTests
         var keyValueServiceMock = Mock.Of<IKeyValueService>();
         var idKeyMapMock = Mock.Of<IIdKeyMap>();
         var documentNavigationQueryServiceMock = Mock.Of<IDocumentNavigationQueryService>();
-        var publishStatusQueryServiceMock = Mock.Of<IPublishStatusQueryService>();
+        var publishStatusQueryServiceMock = Mock.Of<IDocumentPublishStatusQueryService>();
         var domainCacheServiceMock = Mock.Of<IDomainCacheService>();
         var defaultCultureAccessorMock = Mock.Of<IDefaultCultureAccessor>();
+
+        var serverRoleAccessorMock = new Mock<IServerRoleAccessor>();
+        serverRoleAccessorMock.Setup(x => x.CurrentServerRole).Returns(serverRole);
 
         var scopeContextMock = new Mock<IScopeContext>();
         var coreScopeMock = new Mock<ICoreScope>();
@@ -263,7 +268,8 @@ public class DocumentUrlServiceTests
             documentNavigationQueryServiceMock,
             publishStatusQueryServiceMock,
             domainCacheServiceMock,
-            defaultCultureAccessorMock);
+            defaultCultureAccessorMock,
+            serverRoleAccessorMock.Object);
 
         return (service, documentUrlRepositoryMock);
     }
@@ -363,12 +369,12 @@ public class DocumentUrlServiceTests
 
         // Verify all saved segments have specific language IDs (not NULL)
         Assert.That(
-            savedSegments!.All(s => s.NullableLanguageId.HasValue),
+            savedSegments!.All(s => s.LanguageId.HasValue),
             Is.True,
             "Variant content should have specific LanguageId values (not NULL)");
 
         // Should have segments for both languages
-        var languageIds = savedSegments.Select(s => s.NullableLanguageId).Distinct().ToList();
+        var languageIds = savedSegments.Select(s => s.LanguageId).Distinct().ToList();
         Assert.That(languageIds, Does.Contain(1), "Should have segments for en-US (language ID 1)");
         Assert.That(languageIds, Does.Contain(2), "Should have segments for fr-FR (language ID 2)");
     }
@@ -407,7 +413,7 @@ public class DocumentUrlServiceTests
 
         // Verify all saved segments have NULL language ID
         Assert.That(
-            savedSegments!.All(s => s.NullableLanguageId is null),
+            savedSegments!.All(s => s.LanguageId is null),
             Is.True,
             "Invariant content with identical segments should have NULL LanguageId");
     }
@@ -451,12 +457,12 @@ public class DocumentUrlServiceTests
 
         // Verify all saved segments have specific language IDs (not NULL)
         Assert.That(
-            savedSegments!.All(s => s.NullableLanguageId.HasValue),
+            savedSegments!.All(s => s.LanguageId.HasValue),
             Is.True,
             "Invariant content with different segments should have specific LanguageId values (not NULL)");
 
         // Should have segments for both languages
-        var languageIds = savedSegments.Select(s => s.NullableLanguageId).Distinct().ToList();
+        var languageIds = savedSegments.Select(s => s.LanguageId).Distinct().ToList();
         Assert.That(languageIds, Does.Contain(1), "Should have segments for en-US (language ID 1)");
         Assert.That(languageIds, Does.Contain(2), "Should have segments for fr-FR (language ID 2)");
     }
@@ -493,7 +499,7 @@ public class DocumentUrlServiceTests
 
         // Verify all saved segments have NULL language ID (single language optimization)
         Assert.That(
-            savedSegments!.All(s => s.NullableLanguageId is null),
+            savedSegments!.All(s => s.LanguageId is null),
             Is.True,
             "Invariant content with single language should have NULL LanguageId");
     }
@@ -544,6 +550,342 @@ public class DocumentUrlServiceTests
         // Assert - trashed content should not have any segments saved (cache is cleared instead)
         // The repository.Save is still called but with no segments that should be cached
         repositoryMock.Verify(x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()), Times.Never);
+    }
+
+    /// <summary>
+    /// On a Subscriber the scheduling publisher has already persisted URL segments before publishing the
+    /// cache-refresh instruction, so the subscriber must not re-persist them. Re-writing blows up on
+    /// subscribers configured against a read-only database (issue #22570).
+    /// </summary>
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsAsync_OnSubscriber_DoesNotCallRepositorySave()
+    {
+        // Arrange
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(
+            urlSegmentProviderCollection, languages, ServerRole.Subscriber);
+
+        var contentMock = CreateMockContent(Guid.NewGuid(), variesByCulture: false, isPublished: true);
+
+        // Act
+        await service.CreateOrUpdateUrlSegmentsAsync([contentMock.Object]);
+
+        // Assert
+        repositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
+            Times.Never,
+            "Subscribers must not persist URL segments — the publisher already has.");
+    }
+
+    /// <summary>
+    /// Regression guard for the subscriber guard: Single and SchedulingPublisher roles must still persist
+    /// URL segments as they did before the fix.
+    /// </summary>
+    [TestCase(ServerRole.Single)]
+    [TestCase(ServerRole.SchedulingPublisher)]
+    public async Task CreateOrUpdateUrlSegmentsAsync_OnSingleOrPublisher_CallsRepositorySave(ServerRole role)
+    {
+        // Arrange
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(
+            urlSegmentProviderCollection, languages, role);
+
+        var contentMock = CreateMockContent(Guid.NewGuid(), variesByCulture: false, isPublished: true);
+
+        // Act
+        await service.CreateOrUpdateUrlSegmentsAsync([contentMock.Object]);
+
+        // Assert
+        repositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
+            Times.Once,
+            $"The {role} role must continue to persist URL segments.");
+    }
+
+    /// <summary>
+    /// Even though a subscriber skips the database write, the in-memory URL cache must still be refreshed
+    /// so that URL resolution keeps working on the subscriber after the publisher renames a node. This
+    /// guards against over-zealous skipping of the deferred scope-context enlistments.
+    /// </summary>
+    [Test]
+    public async Task CreateOrUpdateUrlSegmentsAsync_OnSubscriber_StillPopulatesInMemoryCache()
+    {
+        // Arrange — initialize an empty subscriber service with immediate scope-context enlistment
+        // so deferred cache updates apply straight away.
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var service = await CreateInitializedDocumentUrlService(
+            segments: Array.Empty<PublishedDocumentUrlSegment>(),
+            languages: languages,
+            serverRole: ServerRole.Subscriber);
+
+        var documentKey = Guid.NewGuid();
+        var contentMock = CreateMockContent(documentKey, variesByCulture: false, isPublished: true);
+
+        // Act
+        await service.CreateOrUpdateUrlSegmentsAsync([contentMock.Object]);
+
+        // Assert — the in-memory lookup resolves even though we never wrote to the database.
+        var resolved = service.GetUrlSegment(documentKey, "en-US", isDraft: false);
+        Assert.AreEqual(
+            "test-segment",
+            resolved,
+            "Subscribers must still update the in-memory URL cache so routing keeps working locally.");
+    }
+
+    #endregion
+
+    #region GetUrlSegment Tests
+
+    /// <summary>
+    /// Creates a DocumentUrlService with its cache populated via <see cref="DocumentUrlService.InitAsync"/>,
+    /// suitable for testing <see cref="DocumentUrlService.GetUrlSegment"/> and related lookup methods.
+    /// </summary>
+    private static async Task<DocumentUrlService> CreateInitializedDocumentUrlService(
+        IEnumerable<PublishedDocumentUrlSegment> segments,
+        IEnumerable<ILanguage> languages,
+        ServerRole serverRole = ServerRole.Single)
+    {
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var loggerMock = Mock.Of<ILogger<DocumentUrlService>>();
+        var documentUrlRepositoryMock = new Mock<IDocumentUrlRepository>();
+        documentUrlRepositoryMock.Setup(x => x.GetAll()).Returns(segments);
+
+        var documentRepositoryMock = Mock.Of<IDocumentRepository>();
+        var globalSettingsMock = Options.Create(new GlobalSettings());
+        var webRoutingSettingsMock = Options.Create(new WebRoutingSettings());
+        var contentServiceMock = Mock.Of<IContentService>();
+
+        var languageServiceMock = new Mock<ILanguageService>();
+        languageServiceMock.Setup(x => x.GetAllAsync()).ReturnsAsync(languages);
+
+        // Return the provider type name so ShouldRebuildUrls() returns false (no rebuild needed).
+        var keyValueServiceMock = new Mock<IKeyValueService>();
+        keyValueServiceMock.Setup(x => x.GetValue(DocumentUrlService.RebuildKey))
+            .Returns(string.Join("|", urlSegmentProviderCollection.Select(x => x.GetType().Name)));
+
+        var idKeyMapMock = Mock.Of<IIdKeyMap>();
+        var documentNavigationQueryServiceMock = Mock.Of<IDocumentNavigationQueryService>();
+        var publishStatusQueryServiceMock = Mock.Of<IDocumentPublishStatusQueryService>();
+        var domainCacheServiceMock = Mock.Of<IDomainCacheService>();
+        var defaultCultureAccessorMock = Mock.Of<IDefaultCultureAccessor>();
+
+        // Set up scope context to immediately execute Enlist callbacks so the cache is populated.
+        var scopeContextMock = new Mock<IScopeContext>();
+        scopeContextMock.Setup(x => x.Enlist<bool>(
+                It.IsAny<string>(),
+                It.IsAny<Func<bool>>(),
+                It.IsAny<Action<bool, bool>?>(),
+                It.IsAny<int>()))
+            .Returns((string _, Func<bool> creator, Action<bool, bool>? _, int _) => creator());
+
+        var coreScopeMock = new Mock<ICoreScope>();
+        coreScopeMock.Setup(x => x.Complete());
+
+        var coreScopeProviderMock = new Mock<ICoreScopeProvider>();
+        coreScopeProviderMock.Setup(x => x.CreateCoreScope(
+                It.IsAny<IsolationLevel>(),
+                It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher?>(),
+                It.IsAny<IScopedNotificationPublisher?>(),
+                It.IsAny<bool?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()))
+            .Returns(coreScopeMock.Object);
+        coreScopeProviderMock.Setup(x => x.Context).Returns(scopeContextMock.Object);
+
+        var serverRoleAccessorMock = new Mock<IServerRoleAccessor>();
+        serverRoleAccessorMock.Setup(x => x.CurrentServerRole).Returns(serverRole);
+
+        var service = new DocumentUrlService(
+            loggerMock,
+            documentUrlRepositoryMock.Object,
+            documentRepositoryMock,
+            coreScopeProviderMock.Object,
+            globalSettingsMock,
+            webRoutingSettingsMock,
+            urlSegmentProviderCollection,
+            contentServiceMock,
+            new DefaultShortStringHelper(new DefaultShortStringHelperConfig()),
+            languageServiceMock.Object,
+            keyValueServiceMock.Object,
+            idKeyMapMock,
+            documentNavigationQueryServiceMock,
+            publishStatusQueryServiceMock,
+            domainCacheServiceMock,
+            defaultCultureAccessorMock,
+            serverRoleAccessorMock.Object);
+
+        await service.InitAsync(forceEmpty: false, CancellationToken.None);
+
+        return service;
+    }
+
+    /// <summary>
+    /// Verifies that <see cref="DocumentUrlService.GetUrlSegment"/> returns the correct segment for
+    /// invariant content when called with an empty culture string. Invariant content is stored with a
+    /// null language ID in the cache; passing an empty culture must still resolve to the invariant entry.
+    /// </summary>
+    [Test]
+    public async Task GetUrlSegment_InvariantContent_WithEmptyCulture_Returns_Segment()
+    {
+        var documentKey = Guid.NewGuid();
+        var segments = new List<PublishedDocumentUrlSegment>
+        {
+            new()
+            {
+                DocumentKey = documentKey,
+                IsDraft = false,
+                IsPrimary = true,
+                LanguageId = null, // Invariant content
+                UrlSegment = "invariant-page",
+            },
+        };
+
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var service = await CreateInitializedDocumentUrlService(segments, languages);
+
+        var result = service.GetUrlSegment(documentKey, string.Empty, isDraft: false);
+
+        Assert.AreEqual("invariant-page", result);
+    }
+
+    /// <summary>
+    /// Verifies that <see cref="DocumentUrlService.GetUrlSegment"/> returns the correct segment for
+    /// variant content when called with a valid culture code.
+    /// </summary>
+    [Test]
+    public async Task GetUrlSegment_VariantContent_WithCulture_Returns_Segment()
+    {
+        var documentKey = Guid.NewGuid();
+        var segments = new List<PublishedDocumentUrlSegment>
+        {
+            new()
+            {
+                DocumentKey = documentKey,
+                IsDraft = false,
+                IsPrimary = true,
+                LanguageId = 1,
+                UrlSegment = "english-page",
+            },
+        };
+
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var service = await CreateInitializedDocumentUrlService(segments, languages);
+
+        var result = service.GetUrlSegment(documentKey, "en-US", isDraft: false);
+
+        Assert.AreEqual("english-page", result);
+    }
+
+    /// <summary>
+    /// Verifies that <see cref="DocumentUrlService.GetUrlSegment"/> falls back to the invariant cache
+    /// entry when variant content doesn't have a culture-specific entry. This handles the case where
+    /// a valid culture is passed but the content is actually invariant.
+    /// </summary>
+    [Test]
+    public async Task GetUrlSegment_InvariantContent_WithValidCulture_Falls_Back_To_Invariant()
+    {
+        var documentKey = Guid.NewGuid();
+        var segments = new List<PublishedDocumentUrlSegment>
+        {
+            new()
+            {
+                DocumentKey = documentKey,
+                IsDraft = false,
+                IsPrimary = true,
+                LanguageId = null, // Stored as invariant
+                UrlSegment = "invariant-page",
+            },
+        };
+
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var service = await CreateInitializedDocumentUrlService(segments, languages);
+
+        // Pass a valid culture, but the content only has an invariant entry.
+        var result = service.GetUrlSegment(documentKey, "en-US", isDraft: false);
+
+        Assert.AreEqual("invariant-page", result);
+    }
+
+    #endregion
+
+    #region UpdateUrlSegmentCache Tests
+
+    /// <summary>
+    /// <see cref="DocumentUrlService.UpdateUrlSegmentCacheAsync"/> must never call <c>Save</c> on the
+    /// repository, even when content exists and would produce segments. Its sole purpose is to refresh
+    /// the in-memory cache without a DB write.
+    /// </summary>
+    [Test]
+    public async Task UpdateUrlSegmentCacheAsync_DoesNotCallRepositorySave()
+    {
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(urlSegmentProviderCollection, languages);
+
+        // GetById returns null by default — no content, no segments, Save must never be called.
+        await service.UpdateUrlSegmentCacheAsync(Guid.NewGuid());
+
+        repositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
+            Times.Never,
+            "UpdateUrlSegmentCacheAsync must not write URL segments to the database.");
+    }
+
+    /// <summary>
+    /// Even when content exists and the service is a SchedulingPublisher (which would normally
+    /// write), <see cref="DocumentUrlService.UpdateUrlSegmentCacheAsync"/> must not call <c>Save</c>.
+    /// </summary>
+    [TestCase(ServerRole.Single)]
+    [TestCase(ServerRole.SchedulingPublisher)]
+    public async Task UpdateUrlSegmentCacheAsync_DoesNotCallRepositorySave_ForAnyPublisherRole(ServerRole role)
+    {
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(urlSegmentProviderCollection, languages, role);
+
+        await service.UpdateUrlSegmentCacheAsync(Guid.NewGuid());
+
+        repositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
+            Times.Never,
+            $"UpdateUrlSegmentCacheAsync must not write URL segments to the database even for {role}.");
+    }
+
+    /// <summary>
+    /// <see cref="DocumentUrlService.UpdateUrlSegmentCacheWithDescendantsAsync"/> must not call
+    /// <c>Save</c> on the repository — it is strictly a cache-warming operation.
+    /// </summary>
+    [Test]
+    public async Task UpdateUrlSegmentCacheWithDescendantsAsync_DoesNotCallRepositorySave()
+    {
+        var languages = new List<ILanguage> { CreateMockLanguage(1, "en-US") };
+        var urlSegmentProvider = CreateFixedSegmentProvider("test-segment");
+        var urlSegmentProviderCollection = new UrlSegmentProviderCollection(() => [urlSegmentProvider]);
+
+        var (service, repositoryMock) = CreateDocumentUrlServiceWithMocks(urlSegmentProviderCollection, languages);
+
+        // GetById returns null by default — the method returns early without calling Save.
+        await service.UpdateUrlSegmentCacheWithDescendantsAsync(Guid.NewGuid());
+
+        repositoryMock.Verify(
+            x => x.Save(It.IsAny<IEnumerable<PublishedDocumentUrlSegment>>()),
+            Times.Never,
+            "UpdateUrlSegmentCacheWithDescendantsAsync must not write URL segments to the database.");
     }
 
     #endregion

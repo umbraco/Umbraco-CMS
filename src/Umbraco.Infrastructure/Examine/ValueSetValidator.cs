@@ -8,6 +8,13 @@ namespace Umbraco.Cms.Infrastructure.Examine;
 /// </summary>
 public class ValueSetValidator : IValueSetValidator
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValueSetValidator"/> class.
+    /// </summary>
+    /// <param name="includeItemTypes">Item types to include during validation.</param>
+    /// <param name="excludeItemTypes">Item types to exclude from validation.</param>
+    /// <param name="includeFields">Fields to include during validation.</param>
+    /// <param name="excludeFields">Fields to exclude from validation.</param>
     public ValueSetValidator(
         IEnumerable<string>? includeItemTypes,
         IEnumerable<string>? excludeItemTypes,
@@ -55,6 +62,14 @@ public class ValueSetValidator : IValueSetValidator
 
     protected virtual IEnumerable<string>? ValidIndexCategories { get; }
 
+    /// <summary>
+    /// Validates the specified <see cref="ValueSet"/> against the configured inclusion and exclusion rules for categories, item types, and fields.
+    /// </summary>
+    /// <param name="valueSet">The <see cref="ValueSet"/> to validate and filter.</param>
+    /// <returns>
+    /// A <see cref="ValueSetValidationResult"/> indicating whether the value set is valid for indexing, and containing a filtered <see cref="ValueSet"/> with only the allowed fields if valid.
+    /// If the value set does not meet the validation criteria, the result will indicate failure and contain the original value set.
+    /// </returns>
     public virtual ValueSetValidationResult Validate(ValueSet valueSet)
     {
         /* Notes on status on the result:

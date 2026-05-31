@@ -2,6 +2,9 @@ using Umbraco.Cms.Core.HealthChecks;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.HealthCheck;
 
+/// <summary>
+/// Represents a model used to return the result of a health check in the API response.
+/// </summary>
 public class HealthCheckResultResponseModel
 {
     /// <summary>

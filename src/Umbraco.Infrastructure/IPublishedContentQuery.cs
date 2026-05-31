@@ -8,36 +8,108 @@ namespace Umbraco.Cms.Core;
 /// </summary>
 public interface IPublishedContentQuery
 {
+    /// <summary>
+    /// Retrieves the published content item corresponding to the specified identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the content item to retrieve.</param>
+    /// <returns>The <see cref="IPublishedContent"/> instance if found; otherwise, <c>null</c>.</returns>
     IPublishedContent? Content(int id);
 
+    /// <summary>
+    /// Returns the published content item with the specified unique identifier.
+    /// </summary>
+    /// <param name="id">The unique <see cref="Guid"/> identifier of the content item.</param>
+    /// <returns>The <see cref="IPublishedContent"/> instance if found; otherwise, <c>null</c>.</returns>
     IPublishedContent? Content(Guid id);
 
+    /// <summary>
+    /// Retrieves the published content item with the specified unique document identifier (UDI).
+    /// </summary>
+    /// <param name="id">The unique document identifier (UDI) of the content item to retrieve.</param>
+    /// <returns>The <see cref="IPublishedContent"/> instance if found; otherwise, <c>null</c>.</returns>
     IPublishedContent? Content(Udi id);
 
+    /// <summary>
+    /// Gets the published content item with the specified identifier.
+    /// </summary>
+    /// <param name="id">The identifier of the content item to retrieve.</param>
+    /// <returns>The published content item if found; otherwise, null.</returns>
     IPublishedContent? Content(object id);
 
+    /// <summary>
+    /// Retrieves the published content items corresponding to the specified collection of content IDs.
+    /// </summary>
+    /// <param name="ids">A collection of content item IDs to look up.</param>
+    /// <returns>An enumerable of <see cref="IPublishedContent"/> instances matching the provided IDs. Items not found are omitted.</returns>
     IEnumerable<IPublishedContent> Content(IEnumerable<int> ids);
 
+    /// <summary>Gets the published content items for the specified unique identifiers.</summary>
+    /// <param name="ids">The unique identifiers of the content items to retrieve.</param>
+    /// <returns>An enumerable collection of published content items matching the specified identifiers.</returns>
     IEnumerable<IPublishedContent> Content(IEnumerable<Guid> ids);
 
+    /// <summary>
+    /// Retrieves the published content items corresponding to the specified IDs.
+    /// </summary>
+    /// <param name="ids">A collection of IDs identifying the content items to retrieve.</param>
+    /// <returns>An enumerable collection of <see cref="IPublishedContent"/> items matching the provided IDs.</returns>
     IEnumerable<IPublishedContent> Content(IEnumerable<object> ids);
 
+    /// <summary>Gets the published content items at the root level of the content tree.</summary>
+    /// <returns>An enumerable collection of root-level <see cref="Umbraco.Cms.Core.Models.IPublishedContent"/> items.</returns>
     IEnumerable<IPublishedContent> ContentAtRoot();
 
+    /// <summary>
+    /// Gets the media item with the specified identifier.
+    /// </summary>
+    /// <param name="id">The identifier of the media item.</param>
+    /// <returns>The media item if found; otherwise, null.</returns>
     IPublishedContent? Media(int id);
 
+    /// <summary>
+    /// Returns the media item with the specified unique identifier.
+    /// </summary>
+    /// <param name="id">The unique <see cref="Guid"/> identifier of the media item.</param>
+    /// <returns>The <see cref="IPublishedContent"/> representing the media item if found; otherwise, <c>null</c>.</returns>
     IPublishedContent? Media(Guid id);
 
+    /// <summary>
+    /// Retrieves a media item using its unique identifier (UDI).
+    /// </summary>
+    /// <param name="id">The unique identifier (UDI) of the media item.</param>
+    /// <returns>The <see cref="IPublishedContent"/> representing the media item if found; otherwise, <c>null</c>.</returns>
     IPublishedContent? Media(Udi id);
 
+    /// <summary>
+    /// Returns the media item corresponding to the specified identifier.
+    /// </summary>
+    /// <param name="id">The identifier of the media item to retrieve.</param>
+    /// <returns>The <see cref="IPublishedContent"/> representing the media item if found; otherwise, <c>null</c>.</returns>
     IPublishedContent? Media(object id);
 
+    /// <summary>Gets the media items corresponding to the specified IDs.</summary>
+    /// <param name="ids">The collection of media item IDs to retrieve.</param>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="Umbraco.Cms.Core.Models.IPublishedContent"/> representing the found media items.</returns>
     IEnumerable<IPublishedContent> Media(IEnumerable<int> ids);
 
+    /// <summary>
+    /// Retrieves media items corresponding to the specified identifiers.
+    /// </summary>
+    /// <param name="ids">A collection of identifiers for the media items to retrieve.</param>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="Umbraco.Cms.Core.Models.IPublishedContent"/> representing the found media items.</returns>
     IEnumerable<IPublishedContent> Media(IEnumerable<object> ids);
 
+    /// <summary>
+    /// Retrieves media items corresponding to the specified unique identifiers.
+    /// </summary>
+    /// <param name="ids">A collection of unique identifiers for the media items to retrieve.</param>
+    /// <returns>An enumerable collection of media items matching the provided identifiers.</returns>
     IEnumerable<IPublishedContent> Media(IEnumerable<Guid> ids);
 
+    /// <summary>
+    /// Returns all media items that are located at the root of the media library.
+    /// </summary>
+    /// <returns>An <see cref="IEnumerable{IPublishedContent}"/> containing the root-level media items.</returns>
     IEnumerable<IPublishedContent> MediaAtRoot();
 
     /// <summary>

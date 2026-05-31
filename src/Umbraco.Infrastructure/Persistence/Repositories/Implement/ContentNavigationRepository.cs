@@ -1,4 +1,5 @@
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -8,10 +9,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
+/// <summary>
+/// Represents a repository responsible for managing and persisting content navigation structures within the Umbraco CMS.
+/// This includes operations related to retrieving, storing, and updating navigation data for content items.
+/// </summary>
 public class ContentNavigationRepository : INavigationRepository
 {
     private readonly IScopeAccessor _scopeAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ContentNavigationRepository"/> class, which provides methods for content navigation persistence.
+    /// </summary>
+    /// <param name="scopeAccessor">An accessor for the current database scope, used to manage transactional operations within the repository.</param>
     public ContentNavigationRepository(IScopeAccessor scopeAccessor)
         => _scopeAccessor = scopeAccessor;
 
@@ -19,18 +28,37 @@ public class ContentNavigationRepository : INavigationRepository
 
     /// <inheritdoc />
     public IEnumerable<INavigationModel> GetContentNodesByObjectType(Guid objectTypeKey)
-        => FetchNavigationDtos(objectTypeKey, false);
+        => GetContentNodesByObjectType([objectTypeKey]);
 
     /// <inheritdoc />
     public IEnumerable<INavigationModel> GetTrashedContentNodesByObjectType(Guid objectTypeKey)
-        => FetchNavigationDtos(objectTypeKey, true);
+        => GetTrashedContentNodesByObjectType([objectTypeKey]);
 
-    private IEnumerable<INavigationModel> FetchNavigationDtos(Guid objectTypeKey, bool trashed)
+    /// <inheritdoc />
+    public IEnumerable<INavigationModel> GetContentNodesByObjectType(IEnumerable<Guid> objectTypeKeys)
+        => FetchNavigationDtos(objectTypeKeys, false);
+
+    /// <inheritdoc />
+    public IEnumerable<INavigationModel> GetTrashedContentNodesByObjectType(IEnumerable<Guid> objectTypeKeys)
+        => FetchNavigationDtos(objectTypeKeys, true);
+
+    private IEnumerable<INavigationModel> FetchNavigationDtos(IEnumerable<Guid> objectTypeKeys, bool trashed)
     {
         if (AmbientScope is null)
         {
             return Enumerable.Empty<NavigationDto>();
         }
+
+        Guid[] objectTypeKeysArray = objectTypeKeys.ToArray();
+        if (objectTypeKeysArray.Length == 0)
+        {
+            return Enumerable.Empty<NavigationDto>();
+        }
+
+        // Containers (e.g. element containers) don't have umbracoContent rows, so we need LEFT JOIN
+        // when the query includes them. Documents and media always have content rows, so INNER JOIN
+        // gives the query optimizer more information.
+        var includesContainerTypes = objectTypeKeysArray.Contains(Constants.ObjectTypes.ElementContainer);
 
         ISqlSyntaxProvider syntax = AmbientScope.SqlContext.SqlSyntax;
 
@@ -42,10 +70,24 @@ public class ContentNavigationRepository : INavigationRepository
                 $"n.{syntax.GetQuotedColumnName(NodeDto.ParentIdColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.ParentIdColumnName)}",
                 $"n.{syntax.GetQuotedColumnName(NodeDto.SortOrderColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.SortOrderColumnName)}",
                 $"n.{syntax.GetQuotedColumnName(NodeDto.TrashedColumnName)}  as  {syntax.GetQuotedColumnName(NodeDto.TrashedColumnName)}")
-            .From<NodeDto>("n")
-            .InnerJoin<ContentDto>("c").On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId, "n", "c")
-            .InnerJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn")
-            .Where<NodeDto>(n => n.NodeObjectType == objectTypeKey && n.Trashed == trashed, "n")
+            .From<NodeDto>("n");
+
+        if (includesContainerTypes)
+        {
+            sql = sql
+                .LeftJoin<ContentDto>("c").On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId, "n", "c")
+                .LeftJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn");
+        }
+        else
+        {
+            sql = sql
+                .InnerJoin<ContentDto>("c").On<NodeDto, ContentDto>((n, c) => n.NodeId == c.NodeId, "n", "c")
+                .InnerJoin<NodeDto>("ctn").On<ContentDto, NodeDto>((c, ctn) => c.ContentTypeId == ctn.NodeId, "c", "ctn");
+        }
+
+        sql = sql
+            .WhereIn<NodeDto>(n => n.NodeObjectType, objectTypeKeysArray, "n")
+            .Where<NodeDto>(n => n.Trashed == trashed, "n")
             .OrderBy<NodeDto>(n => n.Path, "n"); // make sure that we get the parent items first
 
         return AmbientScope.Database.Fetch<NavigationDto>(sql);

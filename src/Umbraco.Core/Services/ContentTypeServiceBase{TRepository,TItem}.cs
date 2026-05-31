@@ -400,33 +400,84 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             // property variation change?
             var hasAnyPropertyVariationChanged = contentType.WasPropertyTypeVariationChanged();
 
-            // main impact on properties?
+            // Detect all granular change types independently so that structural
+            // and non-structural changes can be detected in the same operation
+            // (e.g. removing a property AND adding another at the same time).
+            var hasAnyChange = false;
+
+            // --- Structural changes (each includes RefreshMain automatically) ---
+
+            if (hasAliasChanged)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.AliasChanged);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyPropertyChangedAlias)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyAliasChanged);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyPropertyBeenRemoved)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyRemoved);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyCompositionBeenRemoved)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.CompositionRemoved);
+                hasAnyChange = true;
+            }
+
+            if (hasAnyPropertyVariationChanged)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyVariationChanged);
+                hasAnyChange = true;
+            }
+
+            // Add VariationChanged flag if content type variation changed.
+            // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
+            if (hasContentTypeVariationChanged)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.VariationChanged);
+                hasAnyChange = true;
+            }
+
+            // main impact on properties? Propagate RefreshMain to composed types.
             var hasPropertyMainImpact = hasContentTypeVariationChanged || hasAnyPropertyVariationChanged
                                                                        || hasAnyCompositionBeenRemoved || hasAnyPropertyBeenRemoved || hasAnyPropertyChangedAlias;
-
-            if (hasAliasChanged || hasPropertyMainImpact)
+            if (hasPropertyMainImpact)
             {
-                // add that one, as a main change
-                AddChange(changes, contentType, ContentTypeChangeTypes.RefreshMain);
-
-                // Add VariationChanged flag if content type variation changed.
-                // This is used by DocumentUrlService to rebuild URL cache with correct languageId.
-                if (hasContentTypeVariationChanged)
+                foreach (TItem c in GetComposedOf(contentType.Id))
                 {
-                    AddChange(changes, contentType, ContentTypeChangeTypes.VariationChanged);
-                }
-
-                if (hasPropertyMainImpact)
-                {
-                    foreach (TItem c in GetComposedOf(contentType.Id))
-                    {
-                        AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
-                    }
+                    AddChange(changes, c, ContentTypeChangeTypes.RefreshMain);
                 }
             }
-            else
+
+            // --- Non-structural changes (each includes RefreshOther automatically) ---
+
+            // new properties added?
+            var hasAnyPropertyBeenAdded = contentType.PropertyTypes.Any(pt => pt.WasPropertyDirty("Id"));
+            if (hasAnyPropertyBeenAdded)
             {
-                // add that one, as an other change
+                AddChange(changes, contentType, ContentTypeChangeTypes.PropertyAdded);
+                hasAnyChange = true;
+            }
+
+            // compositions added?
+            var hasAnyCompositionBeenAdded = dirty.WasPropertyDirty("HasCompositionTypeBeenAdded");
+            if (hasAnyCompositionBeenAdded)
+            {
+                AddChange(changes, contentType, ContentTypeChangeTypes.CompositionAdded);
+                hasAnyChange = true;
+            }
+
+            // Fall back to bare RefreshOther if none of the specific checks matched
+            // (e.g. for changes we haven't categorized yet).
+            if (!hasAnyChange)
+            {
                 AddChange(changes, contentType, ContentTypeChangeTypes.RefreshOther);
             }
         }
@@ -672,119 +723,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
     #endregion
 
     #region Save
-
-    /// <inheritdoc />
-    public async Task SaveAsync(TItem item, Guid performingUserKey)
-    {
-        var userId = await _userIdKeyResolver.GetAsync(performingUserKey);
-        Save(item, userId);
-    }
-
-    /// <inheritdoc />
-    public void Save(TItem? item, int userId = Constants.Security.SuperUserId)
-    {
-        if (item is null)
-        {
-            return;
-        }
-
-        using ICoreScope scope = ScopeProvider.CreateCoreScope();
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        SavingNotification<TItem> savingNotification = GetSavingNotification(item, eventMessages);
-        if (scope.Notifications.PublishCancelable(savingNotification))
-        {
-            scope.Complete();
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(item.Name))
-        {
-            throw new ArgumentException("Cannot save item with empty name.");
-        }
-
-        if (item.Name != null && item.Name.Length > 255)
-        {
-            throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
-        }
-
-        scope.WriteLock(WriteLockIds);
-
-        // validate the DAG transform, within the lock
-        ValidateLocked(item); // throws if invalid
-
-        item.CreatorId = userId;
-        if (item.Description == string.Empty)
-        {
-            item.Description = null;
-        }
-
-        Repository.Save(item); // also updates content/media/member items
-
-        // figure out impacted content types
-        ContentTypeChange<TItem>[] changes = ComposeContentTypeChanges(item).ToArray();
-
-        // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
-        _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
-
-        scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
-
-        SavedNotification<TItem> savedNotification = GetSavedNotification(item, eventMessages);
-        savedNotification.WithStateFrom(savingNotification);
-        scope.Notifications.Publish(savedNotification);
-
-        Audit(AuditType.Save, userId, item.Id);
-        scope.Complete();
-    }
-
-    /// <inheritdoc />
-    public void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId)
-    {
-        TItem[] itemsA = items.ToArray();
-
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            EventMessages eventMessages = EventMessagesFactory.Get();
-            SavingNotification<TItem> savingNotification = GetSavingNotification(itemsA, eventMessages);
-            if (scope.Notifications.PublishCancelable(savingNotification))
-            {
-                scope.Complete();
-                return;
-            }
-
-            scope.WriteLock(WriteLockIds);
-
-            // all-or-nothing, validate them all first
-            foreach (TItem contentType in itemsA)
-            {
-                ValidateLocked(contentType); // throws if invalid
-            }
-            foreach (TItem contentType in itemsA)
-            {
-                contentType.CreatorId = userId;
-                if (contentType.Description == string.Empty)
-                {
-                    contentType.Description = null;
-                }
-
-                Repository.Save(contentType);
-            }
-
-            // figure out impacted content types
-            ContentTypeChange<TItem>[] changes = ComposeContentTypeChanges(itemsA).ToArray();
-
-            // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
-            _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
-
-            scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
-
-            SavedNotification<TItem> savedNotification = GetSavedNotification(itemsA, eventMessages);
-            savedNotification.WithStateFrom(savingNotification);
-            scope.Notifications.Publish(savedNotification);
-
-            Audit(AuditType.Save, userId, -1);
-            scope.Complete();
-        }
-    }
 
     /// <inheritdoc />
     public async Task<Attempt<ContentTypeOperationStatus>> CreateAsync(TItem item, Guid performingUserKey) => await InternalSaveAsync(item, performingUserKey);
@@ -1055,101 +993,22 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Copy
 
-    /// <summary>
-    /// Copies the specified content type to a new content type with the specified alias and name.
-    /// </summary>
-    /// <param name="original">The original content type to copy.</param>
-    /// <param name="alias">The alias for the new content type.</param>
-    /// <param name="name">The name for the new content type.</param>
-    /// <param name="parentId">The parent identifier for the new content type. Use -1 for root.</param>
-    /// <returns>The newly created content type copy.</returns>
-    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
-    public TItem Copy(TItem original, string alias, string name, int parentId = -1)
+    /// <inheritdoc />
+    public async Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> CopyAsync(Guid key, Guid? containerKey)
     {
-        TItem? parent = null;
-        if (parentId > 0)
+        TItem? toCopy = await GetAsync(key);
+        if (toCopy is null)
         {
-            parent = Get(parentId);
-            if (parent == null)
-            {
-                throw new InvalidOperationException("Could not find parent with id " + parentId);
-            }
-        }
-        return Copy(original, alias, name, parent);
-    }
-
-    /// <summary>
-    /// Copies the specified content type to a new content type with the specified alias, name, and parent.
-    /// </summary>
-    /// <param name="original">The original content type to copy.</param>
-    /// <param name="alias">The alias for the new content type.</param>
-    /// <param name="name">The name for the new content type.</param>
-    /// <param name="parent">The parent content type for the new content type. Use null for root.</param>
-    /// <returns>The newly created content type copy.</returns>
-    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
-    public TItem Copy(TItem original, string alias, string name, TItem? parent)
-    {
-        if (original == null)
-        {
-            throw new ArgumentNullException(nameof(original));
+            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.NotFound, toCopy);
         }
 
-        if (alias == null)
+        var containerId = GetContainerOrRootId(containerKey);
+
+        if (containerId is null)
         {
-            throw new ArgumentNullException(nameof(alias));
+            return Attempt.FailWithStatus<TItem?, ContentTypeStructureOperationStatus>(ContentTypeStructureOperationStatus.ContainerNotFound, toCopy);
         }
 
-        if (string.IsNullOrWhiteSpace(alias))
-        {
-            throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
-        }
-
-        if (parent != null && parent.HasIdentity == false)
-        {
-            throw new InvalidOperationException("Parent must have an identity.");
-        }
-
-        // this is illegal
-        //var originalb = (ContentTypeCompositionBase)original;
-        // but we *know* it has to be a ContentTypeCompositionBase anyways
-        var originalb = (ContentTypeCompositionBase) (object) original;
-        var clone = (TItem) (object) originalb.DeepCloneWithResetIdentities(alias);
-
-        clone.Name = name;
-
-        //remove all composition that is not it's current alias
-        var compositionAliases = clone.CompositionAliases().Except(new[] { alias }).ToList();
-        foreach (var a in CollectionsMarshal.AsSpan(compositionAliases))
-        {
-            clone.RemoveContentType(a);
-        }
-
-        //if a parent is specified set it's composition and parent
-        if (parent != null)
-        {
-            //add a new parent composition
-            clone.AddContentType(parent);
-            clone.ParentId = parent.Id;
-        }
-        else
-        {
-            //set to root
-            clone.ParentId = -1;
-        }
-
-        Save(clone);
-        return clone;
-    }
-
-    /// <summary>
-    /// Copies a content type to a specified container.
-    /// </summary>
-    /// <param name="copying">The content type to copy.</param>
-    /// <param name="containerId">The identifier of the target container. Use -1 for root.</param>
-    /// <returns>An attempt result containing the operation status and the copied content type.</returns>
-    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
-    public Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId)
-    {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
         TItem copy;
@@ -1159,23 +1018,18 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
             try
             {
-                if (containerId > 0)
+                if (containerId.Value > 0)
                 {
-                    EntityContainer? container = _containerRepository?.Get(containerId);
+                    EntityContainer? container = _containerRepository?.Get(containerId.Value);
                     if (container == null)
                     {
                         throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
                     }
                 }
 
-                var alias = Repository.GetUniqueAlias(copying.Alias);
+                var alias = Repository.GetUniqueAlias(toCopy.Alias);
 
-                // this is illegal
-                //var copyingb = (ContentTypeCompositionBase) copying;
-                // but we *know* it has to be a ContentTypeCompositionBase anyways
-
-                var copyingb = copying;
-                copy = (TItem)copyingb.DeepCloneWithResetIdentities(alias);
+                copy = (TItem)toCopy.DeepCloneWithResetIdentities(alias);
 
                 copy.Name = copy.Name + " (copy)"; // might not be unique
 
@@ -1190,13 +1044,13 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
                     }
                 }
 
-                copy.ParentId = containerId;
+                copy.ParentId = containerId.Value;
 
                 SavingNotification<TItem> savingNotification = GetSavingNotification(copy, eventMessages);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
-                    return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, eventMessages, copy);
+                    return MapStatusTypeToAttempt(copy, MoveOperationStatusType.FailedCancelledByEvent);
                 }
 
                 Repository.Save(copy);
@@ -1214,33 +1068,11 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             }
             catch (DataOperationException<MoveOperationStatusType> ex)
             {
-                return OperationResult.Attempt.Fail<MoveOperationStatusType, TItem>(ex.Operation, eventMessages); // causes rollback
+                return MapStatusTypeToAttempt(toCopy, ex.Operation); // causes rollback
             }
         }
 
-        return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages, copy);
-    }
-
-    /// <inheritdoc />
-    public async Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> CopyAsync(Guid key, Guid? containerKey)
-    {
-        TItem? toCopy = await GetAsync(key);
-        if (toCopy is null)
-        {
-            return Attempt.FailWithStatus(ContentTypeStructureOperationStatus.NotFound, toCopy);
-        }
-
-        var containerId = GetContainerOrRootId(containerKey);
-
-        if (containerId is null)
-        {
-            return Attempt.FailWithStatus<TItem?, ContentTypeStructureOperationStatus>(ContentTypeStructureOperationStatus.ContainerNotFound, toCopy);
-        }
-
-        // using obsolete method for version control while it still exists
-        Attempt<OperationResult<MoveOperationStatusType, TItem>?> result = Copy(toCopy, containerId.Value);
-
-        return MapStatusTypeToAttempt(result.Result?.Entity, result.Result?.Result);
+        return MapStatusTypeToAttempt(copy, MoveOperationStatusType.Success);
     }
 
     /// <summary>
@@ -1279,65 +1111,6 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
 
     #region Move
 
-    /// <summary>
-    /// Moves a content type to a specified container.
-    /// </summary>
-    /// <param name="moving">The content type to move.</param>
-    /// <param name="containerId">The identifier of the target container. Use -1 for root.</param>
-    /// <returns>An attempt result containing the operation status.</returns>
-    [Obsolete("Please use MoveAsync. Scheduled for removal in Umbraco 18.")]
-    public Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId)
-    {
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        if (moving.ParentId == containerId)
-        {
-            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages);
-        }
-
-        var moveInfo = new List<MoveEventInfo<TItem>>();
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
-        {
-            var moveEventInfo = new MoveEventInfo<TItem>(moving, moving.Path, containerId);
-            MovingNotification<TItem> movingNotification = GetMovingNotification(moveEventInfo, eventMessages);
-            if (scope.Notifications.PublishCancelable(movingNotification))
-            {
-                scope.Complete();
-                return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, eventMessages);
-            }
-
-            scope.WriteLock(WriteLockIds); // also for containers
-
-            try
-            {
-                EntityContainer? container = null;
-                if (containerId > 0)
-                {
-                    container = _containerRepository?.Get(containerId);
-                    if (container == null)
-                    {
-                        throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
-                    }
-                }
-                moveInfo.AddRange(Repository.Move(moving, container!));
-                scope.Complete();
-            }
-            catch (DataOperationException<MoveOperationStatusType> ex)
-            {
-                scope.Complete();
-                return OperationResult.Attempt.Fail(ex.Operation, eventMessages);
-            }
-
-            // note: not raising any Changed event here because moving a content type under another container
-            // has no impact on the published content types - would be entirely different if we were to support
-            // moving a content type under another content type.
-            MovedNotification<TItem> movedNotification = GetMovedNotification(moveInfo, eventMessages);
-            movedNotification.WithStateFrom(movingNotification);
-            scope.Notifications.Publish(movedNotification);
-        }
-
-        return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages);
-    }
-
     /// <inheritdoc />
     public async Task<Attempt<TItem?, ContentTypeStructureOperationStatus>> MoveAsync(Guid key, Guid? containerKey)
     {
@@ -1354,15 +1127,73 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
             return Attempt.FailWithStatus<TItem?, ContentTypeStructureOperationStatus>(ContentTypeStructureOperationStatus.ContainerNotFound, toMove);
         }
 
-        // using obsolete method for version control while it still exists
-        Attempt<OperationResult<MoveOperationStatusType>?> result = Move(toMove, containerId.Value);
+        EventMessages eventMessages = EventMessagesFactory.Get();
+        if (toMove.ParentId == containerId.Value)
+        {
+            return MapStatusTypeToAttempt(toMove, MoveOperationStatusType.Success);
+        }
 
-        return MapStatusTypeToAttempt(toMove, result.Result?.Result);
+        var moveInfo = new List<MoveEventInfo<TItem>>();
+        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        {
+            var moveEventInfo = new MoveEventInfo<TItem>(toMove, toMove.Path, containerKey);
+            MovingNotification<TItem> movingNotification = GetMovingNotification(moveEventInfo, eventMessages);
+            if (scope.Notifications.PublishCancelable(movingNotification))
+            {
+                scope.Complete();
+                return MapStatusTypeToAttempt(toMove, MoveOperationStatusType.FailedCancelledByEvent);
+            }
+
+            scope.WriteLock(WriteLockIds); // also for containers
+
+            try
+            {
+                EntityContainer? container = null;
+                if (containerId.Value > 0)
+                {
+                    container = _containerRepository?.Get(containerId.Value);
+                    if (container == null)
+                    {
+                        throw new DataOperationException<MoveOperationStatusType>(MoveOperationStatusType.FailedParentNotFound); // causes rollback
+                    }
+                }
+                moveInfo.AddRange(Repository.Move(toMove, container!));
+                scope.Complete();
+            }
+            catch (DataOperationException<MoveOperationStatusType> ex)
+            {
+                scope.Complete();
+                return MapStatusTypeToAttempt(toMove, ex.Operation);
+            }
+
+            // note: not raising any Changed event here because moving a content type under another container
+            // has no impact on the published content types - would be entirely different if we were to support
+            // moving a content type under another content type.
+            MovedNotification<TItem> movedNotification = GetMovedNotification(moveInfo, eventMessages);
+            movedNotification.WithStateFrom(movingNotification);
+            scope.Notifications.Publish(movedNotification);
+        }
+
+        return MapStatusTypeToAttempt(toMove, MoveOperationStatusType.Success);
     }
 
     #endregion
 
     #region Allowed types
+
+    /// <summary>
+    /// Gets the content types that are candidates for being allowed at root.
+    /// </summary>
+    /// <remarks>
+    /// Override this in derived classes to change the filtering behavior. For example,
+    /// member types override this to return all member types, since members are a flat list.
+    /// </remarks>
+    /// <returns>The content types allowed at root before additional filtering.</returns>
+    protected virtual IEnumerable<TItem> GetAllowedAtRootCandidates()
+    {
+        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
+        return Repository.Get(query).ToArray();
+    }
 
     /// <inheritdoc />
     public async Task<PagedModel<TItem>> GetAllAllowedAsRootAsync(int skip, int take)
@@ -1372,23 +1203,48 @@ public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeSe
         // that one is special because it works across content, media and member types
         scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
 
-        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.AllowedAsRoot);
-        IEnumerable<TItem> contentTypes = Repository.Get(query).ToArray();
+        IEnumerable<TItem> contentTypes = GetAllowedAtRootCandidates();
 
         foreach (IContentTypeFilter filter in _contentTypeFilters)
         {
             contentTypes = await filter.FilterAllowedAtRootAsync(contentTypes);
         }
 
+        TItem[] materialized = contentTypes.ToArray();
+
         var pagedModel = new PagedModel<TItem>
         {
-            Total = contentTypes.Count(),
-            Items = contentTypes.Skip(skip).Take(take)
+            Total = materialized.Length,
+            Items = materialized.Skip(skip).Take(take)
         };
 
         return pagedModel;
     }
 
+    /// <inheritdoc />
+    public async Task<PagedModel<TItem>> GetAllAllowedInLibraryAsync(int skip, int take)
+    {
+        using ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true);
+        scope.ReadLock(ReadLockIds);
+
+        IQuery<TItem> query = ScopeProvider.CreateQuery<TItem>().Where(x => x.IsElement && x.AllowedInLibrary);
+        IEnumerable<TItem> contentTypes = Repository.Get(query);
+
+        foreach (IContentTypeFilter filter in _contentTypeFilters)
+        {
+            contentTypes = await filter.FilterAllowedInLibraryAsync(contentTypes);
+        }
+
+        contentTypes = contentTypes.ToArray();
+
+        var pagedModel = new PagedModel<TItem>
+        {
+            Total = contentTypes.Count(),
+            Items = contentTypes.Skip(skip).Take(take),
+        };
+
+        return pagedModel;
+    }
 
     /// <inheritdoc />
     public async Task<Attempt<PagedModel<TItem>?, ContentTypeOperationStatus>> GetAllowedChildrenAsync(Guid key, int skip, int take)

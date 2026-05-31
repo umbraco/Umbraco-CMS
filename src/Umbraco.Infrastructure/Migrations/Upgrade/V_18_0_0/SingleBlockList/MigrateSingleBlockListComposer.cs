@@ -7,6 +7,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_18_0_0.SingleBlockList
 [Obsolete("Scheduled for removal in Umbraco 22.")] // Available in v17, activated in v18. Migration needs to work on LTS to LTS 17=>21
 internal class MigrateSingleBlockListComposer : IComposer
 {
+    /// <summary>
+    /// Registers the services required to support the migration of the single block list feature in Umbraco 18.0.0.
+    /// This includes processors for block list, block grid, and rich text editor (RTE) single block lists, as well as supporting configuration and caching services.
+    /// </summary>
+    /// <param name="builder">The <see cref="IUmbracoBuilder"/> used to register migration-related services.</param>
     public void Compose(IUmbracoBuilder builder)
     {
         builder.Services.AddSingleton<ITypedSingleBlockListProcessor, SingleBlockListBlockListProcessor>();

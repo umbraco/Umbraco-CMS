@@ -12,8 +12,21 @@ public class UnhandledExceptionLoggerMiddleware : IMiddleware
 {
     private readonly ILogger<UnhandledExceptionLoggerMiddleware> _logger;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UnhandledExceptionLoggerMiddleware"/> class.
+    /// </summary>
+    /// <param name="logger">The logger instance to log unhandled exceptions.</param>
     public UnhandledExceptionLoggerMiddleware(ILogger<UnhandledExceptionLoggerMiddleware> logger) => _logger = logger;
 
+    /// <summary>
+    /// Invokes the middleware to log any unhandled exceptions that occur during the request pipeline, except for client-side requests which are passed through without logging.
+    /// </summary>
+    /// <param name="context">The current HTTP context for the request.</param>
+    /// <param name="next">The delegate representing the next middleware in the pipeline.</param>
+    /// <returns>A task that represents the asynchronous operation of processing the HTTP request.</returns>
+    /// <remarks>
+    /// If an unhandled exception occurs (excluding client-side requests), it is logged and then rethrown to allow further handling upstream.
+    /// </remarks>
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         // If it's a client side request just call next and don't try to log anything

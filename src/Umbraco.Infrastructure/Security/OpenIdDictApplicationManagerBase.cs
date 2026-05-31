@@ -2,6 +2,9 @@ using OpenIddict.Abstractions;
 
 namespace Umbraco.Cms.Infrastructure.Security;
 
+/// <summary>
+/// Serves as the base class for managing OpenIddict application entities in Umbraco CMS, providing common functionality for application management operations.
+/// </summary>
 public abstract class OpenIdDictApplicationManagerBase
 {
     protected IOpenIddictApplicationManager ApplicationManager { get; }

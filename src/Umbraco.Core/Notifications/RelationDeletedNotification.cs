@@ -20,6 +20,7 @@ public class RelationDeletedNotification : DeletedNotification<IRelation>
         : base(target, messages)
     {
     }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="RelationDeletedNotification"/>.
     /// </summary>
@@ -33,4 +34,11 @@ public class RelationDeletedNotification : DeletedNotification<IRelation>
         : base(target, messages)
     {
     }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the relations were deleted automatically
+    ///     as a side-effect of content being saved (e.g. umbMedia, umbDocument, umbMember),
+    ///     rather than explicitly via <see cref="IRelationService"/>.
+    /// </summary>
+    public bool IsAutomatic { get; set; }
 }

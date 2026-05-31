@@ -352,7 +352,7 @@ public partial class ContentEditingServiceTests
         var contentType = await ContentTypeService.GetAsync(content.ContentType.Key)!;
         contentType.PropertyTypes.First(pt => pt.Alias == "title").Mandatory = true;
         contentType.PropertyTypes.First(pt => pt.Alias == "text").ValidationRegExp = "^\\d*$";
-        await ContentTypeService.SaveAsync(contentType, Constants.Security.SuperUserKey);
+        await ContentTypeService.UpdateAsync(contentType, Constants.Security.SuperUserKey);
 
         var titleValue = addValidProperties ? "The title value" : null;
         var textValue = addValidProperties ? "12345" : "This is not a number";
@@ -409,7 +409,7 @@ public partial class ContentEditingServiceTests
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
+        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch, result.Status);
 
         // re-get and validate
         content = await ContentEditingService.GetAsync(content.Key);
@@ -440,7 +440,7 @@ public partial class ContentEditingServiceTests
 
         var result = await ContentEditingService.UpdateAsync(content.Key, updateModel, Constants.Security.SuperUserKey);
         Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeNotFound, result.Status);
+        Assert.AreEqual(ContentEditingOperationStatus.PropertyTypeCultureVarianceMismatch, result.Status);
         Assert.IsNotNull(result.Result.Content);
 
         // re-get and validate

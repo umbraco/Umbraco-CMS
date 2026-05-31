@@ -1,4 +1,6 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDefaultCollectionTextFilterElement } from './default-collection-text-filter.element.js';
+import { UmbDefaultCollectionTextFilterApi } from './default-collection-text-filter.api.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -9,8 +11,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'collectionTextFilter',
 			kind: 'default',
-			element: () => import('./default-collection-text-filter.element.js'),
-			api: () => import('./default-collection-text-filter.api.js'),
+			element: UmbDefaultCollectionTextFilterElement,
+			api: UmbDefaultCollectionTextFilterApi,
 		},
 	},
 ];

@@ -7,11 +7,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.HealthCheck.Group;
 
+/// <summary>
+/// Controller responsible for checking the health of health check groups.
+/// </summary>
 [ApiVersion("1.0")]
 public class CheckHealthCheckGroupController : HealthCheckGroupControllerBase
 {
     private readonly IHealthCheckGroupPresentationFactory _healthCheckGroupPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CheckHealthCheckGroupController"/> class, responsible for handling health check group operations.
+    /// </summary>
+    /// <param name="healthCheckGroupPresentationFactory">Factory used to create health check group presentation models.</param>
     public CheckHealthCheckGroupController(IHealthCheckGroupPresentationFactory healthCheckGroupPresentationFactory)
         => _healthCheckGroupPresentationFactory = healthCheckGroupPresentationFactory;
 

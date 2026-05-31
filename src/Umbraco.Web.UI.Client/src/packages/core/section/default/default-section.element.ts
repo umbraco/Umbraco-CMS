@@ -1,6 +1,6 @@
 import type { ManifestSection, UmbSectionElement } from '../types.js';
 import type { ManifestSectionRoute } from '../extensions/section-route.extension.js';
-import type { UmbSectionMainViewElement } from '../section-main-views/section-main-views.element.js';
+import UmbSectionMainViewElement from '../section-main-views/section-main-views.element.js';
 import { aliasToPath } from '@umbraco-cms/backoffice/utils';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 import {
@@ -99,7 +99,7 @@ export class UmbDefaultSectionElement extends UmbLitElement implements UmbSectio
 			...routes,
 			{
 				path: '**',
-				component: () => import('../section-main-views/section-main-views.element.js'),
+				component: UmbSectionMainViewElement,
 				setup: (element) => {
 					(element as UmbSectionMainViewElement).sectionAlias = this.manifest?.alias;
 				},
@@ -172,9 +172,3 @@ declare global {
 		'umb-section-default': UmbDefaultSectionElement;
 	}
 }
-
-/**
- *
- * @deprecated Since 16. Use UmbDefaultSectionElement instead. UmbSectionDefaultElement will be removed in v18.
- */
-export { UmbDefaultSectionElement as UmbSectionDefaultElement };

@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +11,21 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media;
 
+/// <summary>
+/// Provides API endpoints for validating requests to create new media items in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class ValidateCreateMediaController : CreateMediaControllerBase
 {
     private readonly IMediaEditingService _mediaEditingService;
     private readonly IMediaEditingPresentationFactory _mediaEditingPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidateCreateMediaController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">The authorization service used to check user permissions.</param>
+    /// <param name="mediaEditingService">The media editing service used to perform media operations.</param>
+    /// <param name="mediaEditingPresentationFactory">The factory to create media editing presentation models.</param>
     public ValidateCreateMediaController(
         IAuthorizationService authorizationService,
         IMediaEditingService mediaEditingService,

@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Api.Management.ViewModels;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Api.Management.ViewModels.Dictionary;
@@ -6,8 +6,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Dictionary;
 
+/// <summary>
+/// Provides mapping configuration for dictionary entities in the Umbraco CMS Management API.
+/// </summary>
 public class DictionaryMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the object-object mapping definitions for dictionary-related models within the Umbraco API.
+    /// This includes mappings between domain entities and API response or request models for dictionary items and translations.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to register the mapping configurations.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IDictionaryItem, DictionaryItemResponseModel>((_, _) => new DictionaryItemResponseModel(), Map);

@@ -2,6 +2,9 @@ using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Cms.Api.Management.ViewModels.LogViewer;
 
+/// <summary>
+/// Response model containing details of a log message for the log viewer.
+/// </summary>
 public class LogMessageResponseModel
 {
     /// <summary>

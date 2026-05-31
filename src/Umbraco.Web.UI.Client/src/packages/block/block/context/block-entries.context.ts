@@ -39,7 +39,7 @@ export abstract class UmbBlockEntriesContext<
 	}
 
 	constructor(host: UmbControllerHost, blockManagerContextToken: BlockManagerContextTokenType) {
-		super(host, UMB_BLOCK_ENTRIES_CONTEXT.toString());
+		super(host, UMB_BLOCK_ENTRIES_CONTEXT);
 
 		// TODO: Observe Blocks of the layout entries of this component.
 		this._retrieveManager = this.consumeContext(blockManagerContextToken, (blockGridManager) => {

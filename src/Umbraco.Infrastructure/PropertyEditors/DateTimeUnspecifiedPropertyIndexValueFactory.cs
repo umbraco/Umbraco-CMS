@@ -15,6 +15,8 @@ internal class DateTimeUnspecifiedPropertyIndexValueFactory : DateTimePropertyIn
     /// <summary>
     /// Initializes a new instance of the <see cref="DateTimeUnspecifiedPropertyIndexValueFactory"/> class.
     /// </summary>
+    /// <param name="jsonSerializer">The serializer used for JSON operations.</param>
+    /// <param name="logger">The logger used for logging information and errors.</param>
     public DateTimeUnspecifiedPropertyIndexValueFactory(
         IJsonSerializer jsonSerializer,
         ILogger<DateTimeUnspecifiedPropertyIndexValueFactory> logger)

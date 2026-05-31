@@ -3,6 +3,9 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Extensions;
 
+/// <summary>
+/// Provides extension methods for configuring and working with Media Picker 3 settings in Umbraco.
+/// </summary>
 public static class MediaPicker3ConfigurationExtensions
 {
     /// <summary>

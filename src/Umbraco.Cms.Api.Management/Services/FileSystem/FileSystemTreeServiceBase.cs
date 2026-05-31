@@ -6,10 +6,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Services.FileSystem;
 
+/// <summary>
+/// Serves as a base class for services that manage file system trees in the Umbraco CMS Management API.
+/// </summary>
 public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
 {
     protected abstract IFileSystem FileSystem { get; }
 
+    /// <summary>
+    /// Retrieves the ancestor models for a given file system path, optionally including the model for the path itself.
+    /// </summary>
+    /// <param name="path">The file system path for which to retrieve ancestor models.</param>
+    /// <param name="includeSelf">If <c>true</c>, includes the model representing the specified path itself as the last element in the result; otherwise, only ancestors are included.</param>
+    /// <returns>
+    /// An array of <see cref="Umbraco.Cms.Api.Management.Services.FileSystem.FileSystemTreeItemPresentationModel"/> objects, each representing a directory in the ancestor chain of the specified path, ordered from the root to the specified path (if <paramref name="includeSelf"/> is <c>true</c>).
+    /// </returns>
     public FileSystemTreeItemPresentationModel[] GetAncestorModels(string path, bool includeSelf)
     {
         var directories = path.Split(Path.DirectorySeparatorChar).Take(Range.EndAt(Index.FromEnd(1))).ToArray();
@@ -26,6 +37,16 @@ public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
         return result.ToArray();
     }
 
+    /// <summary>
+    /// Retrieves a paged array of file system tree item presentation models for the specified virtual path.
+    /// </summary>
+    /// <param name="path">The virtual path from which to retrieve directory and file items.</param>
+    /// <param name="skip">The number of items to skip before starting to collect the result set (used for paging).</param>
+    /// <param name="take">The maximum number of items to return (used for paging).</param>
+    /// <param name="totalItems">When this method returns, contains the total number of items available at the specified path, before paging is applied.</param>
+    /// <returns>
+    /// An array of <see cref="FileSystemTreeItemPresentationModel"/> objects representing the directories and files at the specified path, limited by the paging parameters.
+    /// </returns>
     public FileSystemTreeItemPresentationModel[] GetPathViewModels(string path, int skip, int take, out long totalItems)
     {
         path = path.VirtualPathToSystemPath();
@@ -49,6 +70,15 @@ public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
             .ToArray();
     }
 
+    /// <summary>
+    /// Retrieves a range of sibling view models surrounding the item at the specified path.
+    /// </summary>
+    /// <param name="path">The path of the item whose siblings are to be retrieved.</param>
+    /// <param name="before">The number of sibling items to include before the target item (preceding siblings).</param>
+    /// <param name="after">The number of sibling items to include after the target item (following siblings).</param>
+    /// <param name="totalBefore">When this method returns, contains the total number of siblings before the returned range.</param>
+    /// <param name="totalAfter">When this method returns, contains the total number of siblings after the returned range.</param>
+    /// <returns>An array of <see cref="FileSystemTreeItemPresentationModel"/> representing the siblings before and after the specified item, including the item itself.</returns>
     public FileSystemTreeItemPresentationModel[] GetSiblingsViewModels(string path, int before, int after, out long totalBefore, out long totalAfter)
     {
         var filePath = Path.GetDirectoryName(path);
@@ -68,11 +98,21 @@ public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
             .ToArray();
     }
 
+    /// <summary>
+    /// Retrieves the names of all directories located at the specified path, ordered alphabetically.
+    /// </summary>
+    /// <param name="path">The file system path from which to retrieve directory names.</param>
+    /// <returns>An array of directory names found at the specified path, sorted alphabetically.</returns>
     public virtual string[] GetDirectories(string path) => FileSystem
         .GetDirectories(path)
         .OrderBy(directory => directory)
         .ToArray();
 
+    /// <summary>
+    /// Gets the files at the specified path, filtered using <see cref="FilterFile"/> and ordered alphabetically.
+    /// </summary>
+    /// <param name="path">The path from which to retrieve files.</param>
+    /// <returns>An array of file names that match the filter, ordered alphabetically.</returns>
     public virtual string[] GetFiles(string path) => FileSystem
         .GetFiles(path)
         .Where(FilterFile)
@@ -81,9 +121,20 @@ public abstract class FileSystemTreeServiceBase : IFileSystemTreeService
 
     protected virtual bool FilterFile(string file) => true;
 
+    /// <summary>
+    /// Determines whether the specified directory contains any files or subdirectories.
+    /// </summary>
+    /// <param name="path">The path of the directory to check.</param>
+    /// <returns><c>true</c> if the directory has any children; otherwise, <c>false</c>.</returns>
     public bool DirectoryHasChildren(string path)
         => FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
 
+    /// <summary>
+    /// Gets the name of the file system item from the specified path.
+    /// </summary>
+    /// <param name="isFolder">Indicates whether the item is a folder.</param>
+    /// <param name="itemPath">The path of the file system item.</param>
+    /// <returns>The name of the file system item.</returns>
     public string GetFileSystemItemName(bool isFolder, string itemPath) => isFolder
         ? Path.GetFileName(itemPath)
         : FileSystem.GetFileName(itemPath);

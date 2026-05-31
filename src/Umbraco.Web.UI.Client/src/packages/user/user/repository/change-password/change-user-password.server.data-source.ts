@@ -36,6 +36,7 @@ export class UmbChangeUserPasswordServerDataSource {
 					newPassword,
 				},
 			}),
+			{ disableNotifications: true },
 		);
 	}
 }

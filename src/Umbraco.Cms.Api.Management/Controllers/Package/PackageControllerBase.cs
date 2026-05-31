@@ -7,6 +7,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Package;
 
+/// <summary>
+/// Serves as the base controller for API endpoints that manage package-related operations in the Umbraco CMS.
+/// </summary>
 [VersionedApiBackOfficeRoute("package")]
 [ApiExplorerSettings(GroupName = "Package")]
 [Authorize(Policy = AuthorizationPolicies.SectionAccessPackages)]

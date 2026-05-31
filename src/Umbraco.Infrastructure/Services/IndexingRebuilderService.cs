@@ -24,6 +24,13 @@ public class IndexingRebuilderService : IIndexingRebuilderService
     private readonly ILongRunningOperationService _longRunningOperationService;
     private readonly IServerRoleAccessor _serverRoleAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="IndexingRebuilderService"/> class.
+    /// </summary>
+    /// <param name="indexRebuilder">An implementation of <see cref="IIndexRebuilder"/> used to rebuild indexes.</param>
+    /// <param name="logger">The <see cref="ILogger{IndexingRebuilderService}"/> used for logging operations.</param>
+    /// <param name="longRunningOperationService">The <see cref="ILongRunningOperationService"/> used for tracking status of long running operations/</param>
+    /// <param name="serverRoleAccessor">The <see cref="IServerRoleAccessor"/> used for determining the server role.</param>
     [ActivatorUtilitiesConstructor]
     public IndexingRebuilderService(
         IIndexRebuilder indexRebuilder,

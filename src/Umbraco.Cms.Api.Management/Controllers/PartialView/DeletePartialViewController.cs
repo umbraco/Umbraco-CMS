@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Extensions;
@@ -8,12 +8,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.PartialView;
 
+/// <summary>
+/// API controller responsible for handling requests to delete partial views in the Umbraco CMS.
+/// </summary>
 [ApiVersion("1.0")]
 public class DeletePartialViewController : PartialViewControllerBase
 {
     private readonly IPartialViewService _partialViewService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeletePartialViewController"/> class, responsible for handling requests to delete partial views.
+    /// </summary>
+    /// <param name="partialViewService">Service used to manage partial views.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public DeletePartialViewController(
         IPartialViewService partialViewService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor)

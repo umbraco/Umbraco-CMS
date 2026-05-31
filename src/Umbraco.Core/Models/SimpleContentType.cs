@@ -46,6 +46,7 @@ public class SimpleContentType : ISimpleContentType
         Name = contentType.Name;
         AllowedAsRoot = contentType.AllowedAsRoot;
         IsElement = contentType.IsElement;
+        AllowedInLibrary = contentType.AllowedInLibrary;
     }
 
     /// <inheritdoc />
@@ -77,6 +78,9 @@ public class SimpleContentType : ISimpleContentType
 
     /// <inheritdoc />
     public bool IsElement { get; }
+
+    /// <inheritdoc />
+    public bool AllowedInLibrary { get; }
 
     /// <inheritdoc />
     public bool SupportsPropertyVariation(string? culture, string segment, bool wildcards = false) =>

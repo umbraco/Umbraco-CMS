@@ -31,10 +31,10 @@ export class UmbDocumentPublicAccessRepository extends UmbControllerBase impleme
 		return { error };
 	}
 
-	async read(unique: string) {
+	async read(unique: string, includeAncestors: boolean = false) {
 		if (!unique) throw new Error('unique is missing');
 
-		const { data, error } = await this.#dataSource.read(unique);
+		const { data, error } = await this.#dataSource.read(unique, includeAncestors);
 		return { data, error };
 	}
 

@@ -9,6 +9,10 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Template;
 
+/// <summary>
+/// Serves as the base controller for template management operations in the Umbraco CMS API.
+/// Provides shared functionality for controllers handling template-related requests.
+/// </summary>
 [VersionedApiBackOfficeRoute(Constants.UdiEntityType.Template)]
 [ApiExplorerSettings(GroupName = nameof(Constants.UdiEntityType.Template))]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessTemplates)]
@@ -30,17 +34,17 @@ public class TemplateControllerBase : ManagementApiControllerBase
                 .WithTitle("Duplicate alias")
                 .WithDetail("A template with that alias already exists.")
                 .Build()),
-            TemplateOperationStatus.CircularMasterTemplateReference => BadRequest(problemDetailsBuilder
-                .WithTitle("Invalid master template")
-                .WithDetail("The master template referenced in the template leads to a circular reference.")
+            TemplateOperationStatus.CircularLayoutTemplateReference => BadRequest(problemDetailsBuilder
+                .WithTitle("Invalid layout template")
+                .WithDetail("The layout template referenced in the template leads to a circular reference.")
                 .Build()),
-            TemplateOperationStatus.MasterTemplateNotFound => BadRequest(problemDetailsBuilder
-                .WithTitle("Master template not found")
-                .WithDetail("The master template referenced in the template was not found.")
+            TemplateOperationStatus.LayoutTemplateNotFound => BadRequest(problemDetailsBuilder
+                .WithTitle("Layout template not found")
+                .WithDetail("The layout template referenced in the template was not found.")
                 .Build()),
-            TemplateOperationStatus.MasterTemplateCannotBeDeleted => BadRequest(problemDetailsBuilder
-                .WithTitle("Master template cannot be deleted")
-                .WithDetail("The master templates cannot be deleted. Please ensure the template is not a master template before you delete.")
+            TemplateOperationStatus.LayoutTemplateCannotBeDeleted => BadRequest(problemDetailsBuilder
+                .WithTitle("Layout template cannot be deleted")
+                .WithDetail("The layout template cannot be deleted. Please ensure the template is not a layout template before you delete.")
                 .Build()),
             TemplateOperationStatus.NotAllowedInProductionMode => BadRequest(problemDetailsBuilder
                 .WithTitle("Not allowed in production mode")

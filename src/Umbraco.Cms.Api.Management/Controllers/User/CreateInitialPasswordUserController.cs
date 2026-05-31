@@ -13,6 +13,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User;
 
+/// <summary>
+/// Controller responsible for creating a new user and assigning an initial password.
+/// Handles the logic for user creation with password setup in the management API.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.DenyLocalLoginIfConfigured)]
 public class CreateInitialPasswordUserController : UserControllerBase
@@ -20,12 +24,23 @@ public class CreateInitialPasswordUserController : UserControllerBase
     private readonly IUserService _userService;
     private readonly IOpenIddictTokenManager _tokenManager;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="CreateInitialPasswordUserController"/> class.
+    /// </summary>
+    /// <param name="userService">The <see cref="IUserService"/> to manage users.</param>
+    /// <param name="tokenManager">The <see cref="IOpenIddictTokenManager"/> for managing OpenIddict tokens.</param>
     public CreateInitialPasswordUserController(IUserService userService, IOpenIddictTokenManager tokenManager)
     {
         _userService = userService;
         _tokenManager = tokenManager;
     }
 
+    /// <summary>
+    /// Creates an initial password for a newly invited user using the provided token.
+    /// </summary>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
+    /// <param name="model">A <see cref="CreateInitialPasswordUserRequestModel"/> containing the user ID, invitation token, and the new password.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns <c>200 OK</c> if successful, or an error response if the operation fails.</returns>
     [AllowAnonymous]
     [HttpPost("invite/create-password")]
     [MapToApiVersion("1.0")]

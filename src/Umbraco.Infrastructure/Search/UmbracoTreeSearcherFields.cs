@@ -3,6 +3,9 @@ using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.Infrastructure.Search;
 
+/// <summary>
+/// Contains the constant field names used by the Umbraco tree searcher for indexing and querying content.
+/// </summary>
 public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
 {
     private readonly ISet<string> _backOfficeDocumentFieldsToLoad =
@@ -25,7 +28,7 @@ public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
         new HashSet<string> { UmbracoExamineFieldNames.UmbracoFileFieldName };
 
     private readonly ISet<string> _backOfficeMembersFieldsToLoad = new HashSet<string> { "email", "loginName" };
-    private readonly ILocalizationService _localizationService;
+    private readonly ILanguageService _languageService;
 
     private readonly IReadOnlyList<string> _backOfficeFields = new List<string>
     {
@@ -37,8 +40,12 @@ public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
 
     private readonly IReadOnlyList<string> _backOfficeMembersFields = new List<string> { "email", "loginName" };
 
-    public UmbracoTreeSearcherFields(ILocalizationService localizationService) =>
-        _localizationService = localizationService;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UmbracoTreeSearcherFields"/> class.
+    /// </summary>
+    /// <param name="languageService">The language service used for retrieving configured languages.</param>
+    public UmbracoTreeSearcherFields(ILanguageService languageService) =>
+        _languageService = languageService;
 
     /// <inheritdoc />
     public virtual IEnumerable<string> GetBackOfficeFields() => _backOfficeFields;
@@ -68,7 +75,7 @@ public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
 
         // We need to load all nodeName_* fields but we won't know those up front so need to get
         // all langs (this is cached)
-        foreach (var field in _localizationService.GetAllLanguages()
+        foreach (var field in _languageService.GetAllAsync().GetAwaiter().GetResult()
                      .Select(x => "nodeName_" + x.IsoCode.ToLowerInvariant()))
         {
             fields.Add(field);

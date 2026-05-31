@@ -58,7 +58,7 @@ export interface UmbPropertyTypeScaffoldModel extends Omit<UmbPropertyTypeModel,
 }
 
 export interface UmbPropertyTypeModel {
-	dataType: { unique: string };
+	dataType: UmbReferenceByUnique;
 	unique: string;
 	container?: { id: string } | null; // TODO: change to unique
 	sortOrder: number;

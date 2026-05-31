@@ -382,6 +382,7 @@ export default {
 		constrainProportions: '縦横比',
 		continue: '続行',
 		copy: 'コピー',
+		copied: 'コピーしました！',
 		create: '新規作成',
 		database: 'データベース',
 		date: '日付',
@@ -475,6 +476,7 @@ export default {
 		current: '現在',
 		embed: '埋め込み',
 		restore: '復元',
+		unnamed: '名称未設定',
 	},
 	colors: {
 		blue: 'ブルー',
@@ -600,8 +602,6 @@ export default {
 		greeting6: 'ようこそ',
 		instruction: 'ウェブサイトにログインします。',
 		timeout: 'セッションタイムアウトしました。',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ',
 	},
 	main: {
 		dashboard: 'ダッシュボード',
@@ -870,8 +870,9 @@ export default {
 	contentTypeEditor: {
 		compositions: '構成',
 		noGroups: 'タブが追加されていません',
+		addGroup: 'タブを追加',
 		inheritedFrom: '次から継承:',
-		addProperty: 'プロパティの追加',
+		addProperty: 'プロパティを追加',
 		requiredLabel: '必要なラベル',
 		enableListViewHeading: 'リスト ビューの有効化',
 		enableListViewDescription:
@@ -904,6 +905,8 @@ export default {
 		andAllDocuments: 'およびこのタイプを使用したすべてのドキュメント',
 		andAllMediaItems: 'およびこのタイプを使用したこのメディア アイテム',
 		andAllMembers: 'およびこのタイプを使用したすべてのメンバー',
+		addTab: 'タブを追加',
+		deleteTab: 'タブを削除',
 	},
 	templateEditor: {
 		alternativeField: '代替フィールド',

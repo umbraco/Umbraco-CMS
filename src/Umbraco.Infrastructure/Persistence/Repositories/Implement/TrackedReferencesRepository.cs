@@ -21,6 +21,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// <summary>
         /// Initializes a new instance of the <see cref="TrackedReferencesRepository"/> class.
         /// </summary>
+        /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+        /// <param name="umbracoMapper">The mapper used to map between Umbraco entities and models.</param>
         public TrackedReferencesRepository(IScopeAccessor scopeAccessor, IUmbracoMapper umbracoMapper)
         {
             _scopeAccessor = scopeAccessor;
@@ -69,20 +71,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             ISqlSyntaxProvider sx = _scopeAccessor.AmbientScope.Database.SqlContext.SqlSyntax;
-            string[] columns = [
-                    sx.ColumnWithAlias("x", "otherId", "nodeId"),
-                    sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
-                    sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
-                    sx.ColumnWithAlias("d", "published", "nodePublished"),
-                    sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
-                    sx.ColumnWithAlias("ct", "icon", "contentTypeIcon"),
-                    sx.ColumnWithAlias("ct", "alias", "contentTypeAlias"),
-                    sx.ColumnWithAlias("ctn", "text", "contentTypeName"),
-                    sx.ColumnWithAlias("x", "alias", "relationTypeAlias"),
-                    sx.ColumnWithAlias("x", "name", "relationTypeName"),
-                    sx.ColumnWithAlias("x", "isDependency", "relationTypeIsDependency"),
-                    sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
-                ];
+            string[] columns =
+            [
+                sx.ColumnWithAlias("x", "otherId", "nodeId"),
+                sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
+                sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
+                $"COALESCE({sx.ColumnWithAlias("d", "published")}, {sx.ColumnWithAlias("e", "published")}) AS nodePublished",
+                sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
+                sx.ColumnWithAlias("ct", "icon", "contentTypeIcon"),
+                sx.ColumnWithAlias("ct", "alias", "contentTypeAlias"),
+                sx.ColumnWithAlias("ctn", "text", "contentTypeName"),
+                sx.ColumnWithAlias("x", "alias", "relationTypeAlias"),
+                sx.ColumnWithAlias("x", "name", "relationTypeName"),
+                sx.ColumnWithAlias("x", "isDependency", "relationTypeIsDependency"),
+                sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
+            ];
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
             Sql<ISqlContext> sql = _scopeAccessor.AmbientScope.Database.SqlContext.Sql()
                 .SelectDistinct(columns)
@@ -109,6 +112,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     (left, right) => left.NodeId == right.NodeId,
                     aliasLeft: "n",
                     aliasRight: "d")
+                .LeftJoin<ElementDto>("e")
+                .On<NodeDto, ElementDto>(
+                    (left, right) => left.NodeId == right.NodeId,
+                    aliasLeft: "n",
+                    aliasRight: "e")
                 .Where(itemsFilter, "x");
 
 
@@ -289,21 +297,22 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .WhereLike<NodeDto>(x => x.Path, subsubQuery, ",%");
 
             ISqlSyntaxProvider sx = sqlContext.SqlSyntax;
-            string[] columns = [
-                    sx.ColumnWithAlias("x", "id", "nodeId"),
-                    sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
-                    sx.ColumnWithAlias("n", "text", "nodeName"),
-                    sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
-                    sx.ColumnWithAlias("d", "published", "nodePublished"),
-                    sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
-                    sx.ColumnWithAlias("ct", "icon", "contentTypeIcon"),
-                    sx.ColumnWithAlias("ct", "alias", "contentTypeAlias"),
-                    sx.ColumnWithAlias("ctn", "text", "contentTypeName"),
-                    sx.ColumnWithAlias("x", "alias", "relationTypeAlias"),
-                    sx.ColumnWithAlias("x", "name", "relationTypeName"),
-                    sx.ColumnWithAlias("x", "isDependency", "relationTypeIsDependency"),
-                    sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
-                ];
+            string[] columns =
+            [
+                sx.ColumnWithAlias("x", "id", "nodeId"),
+                sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
+                sx.ColumnWithAlias("n", "text", "nodeName"),
+                sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
+                $"COALESCE({sx.ColumnWithAlias("d", "published")}, {sx.ColumnWithAlias("e", "published")}) AS nodePublished",
+                sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),
+                sx.ColumnWithAlias("ct", "icon", "contentTypeIcon"),
+                sx.ColumnWithAlias("ct", "alias", "contentTypeAlias"),
+                sx.ColumnWithAlias("ctn", "text", "contentTypeName"),
+                sx.ColumnWithAlias("x", "alias", "relationTypeAlias"),
+                sx.ColumnWithAlias("x", "name", "relationTypeName"),
+                sx.ColumnWithAlias("x", "isDependency", "relationTypeIsDependency"),
+                sx.ColumnWithAlias("x", "dual", "relationTypeIsBidirectional")
+            ];
             Sql<ISqlContext> innerUnionSql = GetInnerUnionSql();
             Sql<ISqlContext> sql = sqlContext.Sql()
                 .SelectDistinct(columns)
@@ -330,6 +339,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     (left, right) => left.NodeId == right.NodeId,
                     aliasLeft: "n",
                     aliasRight: "d")
+                .LeftJoin<ElementDto>("e")
+                .On<NodeDto, ElementDto>(
+                    (left, right) => left.NodeId == right.NodeId,
+                    aliasLeft: "n",
+                    aliasRight: "e")
                 .WhereIn((Expression<Func<NodeDto, object?>>)(x => x.NodeId), subQuery, "n");
 
             if (filterMustBeIsDependency)
@@ -447,33 +461,63 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private sealed class UnionHelperDto
         {
+            /// <summary>
+            /// Gets or sets the unique identifier for the UnionHelperDto.
+            /// </summary>
             [Column("id")]
             public int Id { get; set; }
 
+            /// <summary>
+            /// Gets or sets the identifier for the related or referenced entity in the union operation.
+            /// </summary>
             [Column("otherId")]
             public int OtherId { get; set; }
 
+            /// <summary>
+            /// Gets or sets the unique identifier key.
+            /// </summary>
             [Column("key")]
             public Guid Key { get; set; }
 
+            /// <summary>
+            /// Gets or sets a value indicating whether the item is trashed.
+            /// </summary>
             [Column("trashed")]
             public bool Trashed { get; set; }
 
+            /// <summary>
+            /// Gets or sets the node object type identifier.
+            /// </summary>
             [Column("nodeObjectType")]
             public Guid NodeObjectType { get; set; }
 
+            /// <summary>
+            /// Gets or sets the GUID of the related entity in the tracked reference.
+            /// </summary>
             [Column("otherKey")]
             public Guid OtherKey { get; set; }
 
+            /// <summary>
+            /// Gets or sets the alias associated with the referenced entity.
+            /// </summary>
             [Column("alias")]
             public string? Alias { get; set; }
 
+            /// <summary>
+            /// Gets or sets the name associated with the tracked reference in the union helper DTO.
+            /// </summary>
             [Column("name")]
             public string? Name { get; set; }
 
+            /// <summary>
+            /// Gets or sets a value indicating whether this item is marked as a dependency.
+            /// </summary>
             [Column("isDependency")]
             public bool IsDependency { get; set; }
 
+            /// <summary>
+            /// Gets or sets a value indicating whether this instance represents a dual reference.
+            /// </summary>
             [Column("dual")]
             public bool Dual { get; set; }
         }

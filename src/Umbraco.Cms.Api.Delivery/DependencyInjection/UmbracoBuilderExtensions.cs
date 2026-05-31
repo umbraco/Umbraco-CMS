@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Api.Common.DependencyInjection;
 using Umbraco.Cms.Api.Delivery.Accessors;
@@ -18,6 +20,7 @@ using Umbraco.Cms.Api.Delivery.Security;
 using Umbraco.Cms.Api.Delivery.Services;
 using Umbraco.Cms.Api.Delivery.Services.QueryBuilders;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DeliveryApi;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -51,7 +54,7 @@ public static class UmbracoBuilderExtensions
             provider =>
             {
                 HttpContext? httpContext = provider.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                ApiVersion? apiVersion = httpContext?.GetRequestedApiVersion();
+                ApiVersion? apiVersion = httpContext?.RequestedApiVersion;
                 if (apiVersion is null)
                 {
                     return provider.GetRequiredService<RequestContextOutputExpansionStrategyV2>();
@@ -65,7 +68,6 @@ public static class UmbracoBuilderExtensions
             ServiceLifetime.Scoped);
 
         builder.Services.AddSingleton<IRequestCultureService, RequestCultureService>();
-        builder.Services.AddSingleton<IRequestSegmmentService, RequestSegmentService>();
         builder.Services.AddSingleton<IRequestSegmentService, RequestSegmentService>();
         builder.Services.AddSingleton<IRequestRoutingService, RequestRoutingService>();
         builder.Services.AddSingleton<IRequestRedirectService, RequestRedirectService>();
@@ -84,19 +86,27 @@ public static class UmbracoBuilderExtensions
         builder.Services.AddTransient<IRequestMemberAccessService, RequestMemberAccessService>();
         builder.Services.AddTransient<ICurrentMemberClaimsProvider, CurrentMemberClaimsProvider>();
 
-        builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryApiSwaggerGenOptions>();
-        builder.AddUmbracoApiOpenApiUI();
+        builder.AddUmbracoOpenApi();
+        builder.AddUmbracoOpenApiDocument<ConfigureUmbracoDeliveryApiOpenApiOptions>(
+            DeliveryApiConfiguration.ApiName,
+            DeliveryApiConfiguration.ApiTitle,
+            Constants.JsonOptionsNames.DeliveryApi);
 
         builder
             .Services
             .AddControllers()
-            .AddJsonOptions(Constants.JsonOptionsNames.DeliveryApi, options =>
-            {
-                // all Delivery API specific JSON options go here
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.TypeInfoResolver = new DeliveryApiJsonTypeResolver();
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+            .AddJsonOptions(
+                Constants.JsonOptionsNames.DeliveryApi,
+                options =>
+                {
+                    // all Delivery API specific JSON options go here
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.TypeInfoResolver = new DeliveryApiJsonTypeResolver();
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+
+        // Configures the JSON options for the Open API schema generation (based on the Delivery API MVC JSON options)
+        builder.Services.ConfigureOptions<ConfigureUmbracoDeliveryHttpJsonOptions>();
 
         builder.Services.AddAuthentication();
         builder.AddUmbracoOpenIddict();
@@ -105,6 +115,10 @@ public static class UmbracoBuilderExtensions
         builder.AddNotificationAsyncHandler<MemberDeletedNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<AssignedMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
         builder.AddNotificationAsyncHandler<RemovedMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ExternalMemberSavedNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<ExternalMemberDeletedNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<AssignedExternalMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
+        builder.AddNotificationAsyncHandler<RemovedExternalMemberRolesNotification, RevokeMemberAuthenticationTokensNotificationHandler>();
 
         // FIXME: remove this when Delivery API V1 is removed
         builder.Services.AddSingleton<MatcherPolicy, DeliveryApiItemsEndpointsMatcherPolicy>();
@@ -132,7 +146,7 @@ public static class UmbracoBuilderExtensions
             {
                 options.AddPolicy(
                     Constants.DeliveryApi.OutputCache.ContentCachePolicy,
-                    new DeliveryApiOutputCachePolicy(
+                    new DeliveryApiOutputCacheContentPolicy(
                         outputCacheSettings.ContentDuration,
                         new StringValues([Constants.DeliveryApi.HeaderNames.AcceptLanguage, Constants.DeliveryApi.HeaderNames.AcceptSegment, Constants.DeliveryApi.HeaderNames.StartItem])));
             }
@@ -141,13 +155,30 @@ public static class UmbracoBuilderExtensions
             {
                 options.AddPolicy(
                     Constants.DeliveryApi.OutputCache.MediaCachePolicy,
-                    new DeliveryApiOutputCachePolicy(
+                    new DeliveryApiOutputCacheMediaPolicy(
                         outputCacheSettings.MediaDuration,
                         Constants.DeliveryApi.HeaderNames.StartItem));
             }
         });
 
-        builder.Services.Configure<UmbracoPipelineOptions>(options => options.AddFilter(new OutputCachePipelineFilter("UmbracoDeliveryApiOutputCache")));
+        // Register eviction handlers.
+        builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, DeliveryApiDocumentOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<MediaCacheRefresherNotification, DeliveryApiMediaOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<MemberCacheRefresherNotification, DeliveryApiMemberOutputCacheEvictionHandler>();
+        builder.AddNotificationAsyncHandler<ElementCacheRefresherNotification, DeliveryApiElementOutputCacheEvictionHandler>();
+
+        // Register extension point default implementations.
+        builder.Services.AddSingleton<IDeliveryApiOutputCacheTagProvider, DeliveryApiContentTypeOutputCacheTagProvider>();
+        builder.Services.AddUnique<IDeliveryApiOutputCacheRequestFilter, DefaultDeliveryApiOutputCacheRequestFilter>();
+        builder.Services.AddUnique<IDeliveryApiOutputCacheManager, DeliveryApiOutputCacheManager>();
+
+        // Signal that Umbraco has enabled output caching so the application builder registers
+        // the output cache middleware. Gated via a marker rather than IOutputCacheStore so that
+        // applications calling services.AddOutputCache(...) for their own purposes are not
+        // affected by Umbraco's automatic middleware registration.
+        builder.Services.TryAddSingleton<IUmbracoManagedOutputCacheMarker, UmbracoManagedOutputCacheMarker>();
+
         return builder;
     }
+
 }

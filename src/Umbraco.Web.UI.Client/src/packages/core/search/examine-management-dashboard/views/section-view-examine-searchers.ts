@@ -5,7 +5,7 @@ import { css, html, nothing, customElement, state, query, property } from '@umbr
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_WORKSPACE_MODAL } from '@umbraco-cms/backoffice/workspace';
 import { UmbModalRouteRegistrationController } from '@umbraco-cms/backoffice/router';
-import { SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
+import { IndexerService, SearcherService } from '@umbraco-cms/backoffice/external/backend-api';
 import { UmbLitElement, umbFocus } from '@umbraco-cms/backoffice/lit-element';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
@@ -20,6 +20,12 @@ interface ExposedSearchResultField {
 export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 	@property()
 	searcherName!: string;
+
+	@property()
+	uniqueKeyFieldName?: string | null;
+
+	@state()
+	private _resolvedUniqueKeyFieldName: string = '__Key';
 
 	@state()
 	private _searchResults?: UmbSearchResultModel[];
@@ -71,6 +77,33 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 			.observeRouteBuilder((routeBuilder) => {
 				this._workspacePath = routeBuilder({ entityType: this.#entityType });
 			});
+	}
+
+	override connectedCallback() {
+		super.connectedCallback();
+		this.#resolveUniqueKeyFieldName();
+	}
+
+	override willUpdate(changedProperties: Map<string, unknown>) {
+		super.willUpdate(changedProperties);
+		if (changedProperties.has('uniqueKeyFieldName') && this.uniqueKeyFieldName) {
+			this._resolvedUniqueKeyFieldName = this.uniqueKeyFieldName;
+		}
+	}
+
+	async #resolveUniqueKeyFieldName() {
+		if (this.uniqueKeyFieldName) {
+			this._resolvedUniqueKeyFieldName = this.uniqueKeyFieldName;
+			return;
+		}
+
+		// When rendered standalone (via route), the searcher name typically matches the index name.
+		// If the index is not found (e.g. composite searchers), we fall back to '__Key'.
+		const { data } = await tryExecute(
+			this,
+			IndexerService.getIndexerByIndexName({ path: { indexName: this.searcherName } }),
+		);
+		this._resolvedUniqueKeyFieldName = data?.uniqueKeyFieldName ?? '__Key';
 	}
 
 	private async _onSearch() {
@@ -216,7 +249,7 @@ export class UmbDashboardExamineSearcherElement extends UmbLitElement {
 						${this._searchResults?.map((rowData) => {
 							const indexType = rowData.fields?.find((field) => field.name === '__IndexType')?.values?.join(', ') ?? '';
 							this.#entityType = this.#getEntityTypeFromIndexType(indexType);
-							const unique = rowData.fields?.find((field) => field.name === '__Key')?.values?.join(', ') ?? '';
+							const unique = rowData.fields?.find((field) => field.name === this._resolvedUniqueKeyFieldName)?.values?.join(', ') ?? '';
 
 							return html`<uui-table-row>
 								<uui-table-cell> ${rowData.score} </uui-table-cell>

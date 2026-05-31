@@ -10,11 +10,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// </summary>
 internal sealed class ScriptRepository : FileRepository<string, IScript>, IScriptRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ScriptRepository"/> class, which manages script files in the specified file systems.
+    /// </summary>
+    /// <param name="fileSystems">An instance of <see cref="FileSystems"/> that provides access to the file systems used by the repository.</param>
     public ScriptRepository(FileSystems fileSystems)
         : base(fileSystems.ScriptsFileSystem)
     {
     }
 
+    /// <summary>
+    /// Retrieves a script from the file system by its identifier.
+    /// </summary>
+    /// <param name="id">The relative identifier or path of the script to retrieve. If <c>null</c>, no script is returned.</param>
+    /// <returns>The <see cref="IScript"/> instance if found; otherwise, <c>null</c>.</returns>
     public override IScript? Get(string? id)
     {
         if (id is null || FileSystem is null)
@@ -53,6 +62,10 @@ internal sealed class ScriptRepository : FileRepository<string, IScript>, IScrip
         return script;
     }
 
+    /// <summary>
+    /// Saves the specified <see cref="IScript"/> entity to the script repository.
+    /// </summary>
+    /// <param name="entity">The script entity to save.</param>
     public override void Save(IScript entity)
     {
         // TODO: Casting :/ Review GetFileContent and it's usages, need to look into it later
@@ -67,6 +80,11 @@ internal sealed class ScriptRepository : FileRepository<string, IScript>, IScrip
         }
     }
 
+    /// <summary>
+    /// Retrieves multiple scripts by their identifiers. If no identifiers are specified, returns all available scripts.
+    /// </summary>
+    /// <param name="ids">The identifiers of the scripts to retrieve. If null or empty, all scripts will be returned.</param>
+    /// <returns>An enumerable collection of <see cref="IScript"/> objects matching the specified identifiers, or all scripts if no identifiers are provided.</returns>
     public override IEnumerable<IScript> GetMany(params string[]? ids)
     {
         // ensure they are de-duplicated, easy win if people don't do this as this can cause many excess queries

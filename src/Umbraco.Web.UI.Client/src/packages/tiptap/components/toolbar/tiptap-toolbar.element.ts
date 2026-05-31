@@ -1,3 +1,4 @@
+import UmbTiptapToolbarDefaultExtensionApi from '../../extensions/default-tiptap-toolbar-api.js';
 import type { Editor } from '../../externals.js';
 import type { UmbTiptapToolbarValue } from '../types.js';
 import { css, customElement, html, nothing, property, repeat } from '@umbraco-cms/backoffice/external/lit';
@@ -24,9 +25,6 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 	#extensionsController?: UmbExtensionsElementAndApiInitializer;
 
 	#lookup: Map<string, unknown> = new Map();
-
-	@property({ type: Boolean, reflect: true })
-	readonly = false;
 
 	@property({ attribute: false })
 	editor?: Editor;
@@ -71,7 +69,7 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 			},
 			undefined,
 			undefined,
-			() => import('../../extensions/default-tiptap-toolbar-api.js'),
+			UmbTiptapToolbarDefaultExtensionApi,
 		);
 
 		this.#extensionsController.apiProperties = { configuration: this.configuration };
@@ -100,11 +98,6 @@ export class UmbTiptapToolbarElement extends UmbLitElement {
 	}
 
 	static override readonly styles = css`
-		:host([readonly]) {
-			pointer-events: none;
-			background-color: var(--uui-color-surface-alt);
-		}
-
 		:host {
 			border-radius: var(--uui-border-radius);
 			border: 1px solid var(--uui-color-border);

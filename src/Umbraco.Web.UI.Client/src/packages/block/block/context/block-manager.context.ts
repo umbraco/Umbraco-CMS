@@ -177,25 +177,79 @@ export abstract class UmbBlockManagerContext<
 		this.observe(
 			this.blockTypes,
 			(blockTypes) => {
-				blockTypes.forEach((x) => {
-					this.#ensureContentType(x.contentElementTypeKey);
-					if (x.settingsElementTypeKey) {
-						this.#ensureContentType(x.settingsElementTypeKey);
-					}
-				});
+				this.#ensureContentTypes(blockTypes);
 			},
 			null,
 		);
 	}
 
-	async #ensureContentType(unique: string) {
-		if (this.#structures.find((x) => x.getOwnerContentTypeUnique() === unique)) return;
+	#ensureContentTypes(blockTypes: Array<BlockType>) {
+		// Collect all unique content type keys
+		const allUniques = new Set<string>();
+		blockTypes.forEach((x) => {
+			allUniques.add(x.contentElementTypeKey);
+			if (x.settingsElementTypeKey) {
+				allUniques.add(x.settingsElementTypeKey);
+			}
+		});
 
-		// Lets try to go with the UmbContentTypeModel, to make this as compatible with other ContentTypes as possible, but maybe if off with this as Blocks are always based on ElementTypes.. [NL]
-		const structure = new UmbContentTypeStructureManager<UmbContentTypeModel>(this, this.#contentTypeRepository);
-		const initialRequest = structure.loadType(unique);
-		this.#contentTypeRequests.push(initialRequest);
-		this.#structures.push(structure);
+		// Filter out already loaded types
+		const uniquesToFetch = [...allUniques].filter(
+			(unique) => !this.#structures.find((x) => x.getOwnerContentTypeUnique() === unique),
+		);
+
+		if (uniquesToFetch.length === 0) return;
+
+		// IMPORTANT: Create and register all structure managers SYNCHRONOUSLY first
+		// This ensures getStructure() can find them immediately, before any async operations
+		const structuresToInit: Array<{ structure: UmbContentTypeStructureManager<UmbContentTypeModel>; unique: string }> =
+			[];
+
+		for (const unique of uniquesToFetch) {
+			const structure = new UmbContentTypeStructureManager<UmbContentTypeModel>(this, this.#contentTypeRepository);
+			// Set the unique synchronously so getStructure() can find it immediately
+			structure.setOwnerContentTypeUnique(unique);
+			this.#structures.push(structure);
+			structuresToInit.push({ structure, unique });
+		}
+
+		// Now perform async initialization — push the promise synchronously so
+		// contentTypesLoaded (Promise.all(#contentTypeRequests)) properly waits.
+		this.#contentTypeRequests.push(this.#initializeStructures(structuresToInit));
+	}
+
+	async #initializeStructures(
+		structuresToInit: Array<{ structure: UmbContentTypeStructureManager<UmbContentTypeModel>; unique: string }>,
+	) {
+		const uniques = structuresToInit.map((x) => x.unique);
+
+		// Bulk fetch all content types if supported
+		const contentTypesMap = new Map<string, UmbContentTypeModel>();
+
+		if (this.#contentTypeRepository.requestByUniques) {
+			const { error, data } = await this.#contentTypeRepository.requestByUniques(uniques);
+			if (error || !data) {
+				throw error?.message ?? 'Repository could not request Content Types by Uniques.';
+			}
+			if (data) {
+				data.forEach((item) => contentTypesMap.set(item.unique, item));
+			}
+		}
+
+		// Initialize each structure with pre-fetched data or fall back to individual loading
+		const initPromises: Array<Promise<unknown>> = [];
+		for (const { structure, unique } of structuresToInit) {
+			const contentType = contentTypesMap.get(unique);
+
+			if (contentType) {
+				// Use pre-fetched data directly via setType to avoid re-fetching
+				initPromises.push(structure.setType(contentType));
+			} else {
+				// Fallback to individual load if not in bulk response
+				initPromises.push(structure.loadType(unique));
+			}
+		}
+		await Promise.all(initPromises);
 	}
 
 	getStructure(unique: string) {
@@ -388,7 +442,6 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	protected async _createBlockElementData(key: string, contentTypeKey: string) {
-		//
 		const appLanguage = await this.getContext(UMB_APP_LANGUAGE_CONTEXT);
 		if (!appLanguage) {
 			throw new Error('Could not retrieve app language context.');
@@ -399,13 +452,21 @@ export abstract class UmbBlockManagerContext<
 			throw new Error(`Cannot create Preset for Block, missing content structure for ${contentTypeKey}`);
 		}
 
-		// Set culture and segment for all values:
-		const cutlures = contentStructure.variesByCulture ? await appLanguage.getCultures() : [];
-		if (cutlures.length === 0) {
+		// Ensure the content type and all its compositions are fully loaded before reading properties.
+		// Without this, getContentTypeProperties() may return only the owner type's properties
+		// if compositions haven't finished loading yet.
+		await contentStructure.whenLoaded();
+
+		// Use the synchronous boolean getters, not the Observable properties (which are always truthy).
+		const hostVariesByCulture = contentStructure.getVariesByCulture() ?? false;
+		const hostVariesBySegment = contentStructure.getVariesBySegment() ?? false;
+
+		const cultures = hostVariesByCulture ? await appLanguage.getCultures() : [];
+		if (hostVariesByCulture && cultures.length === 0) {
 			throw new Error('Could not retrieve app cultures.');
 		}
 		// TODO: Receive the segments from somewhere. [NL]
-		const segments: Array<string> | undefined = contentStructure.variesBySegment ? [] : undefined;
+		const segments: Array<string> | undefined = hostVariesBySegment ? [] : undefined;
 
 		const repo = new UmbDataTypeDetailRepository(this);
 
@@ -428,15 +489,19 @@ export abstract class UmbBlockManagerContext<
 					propertyEditorSchemaAlias: dataType.editorAlias,
 					config: dataType.values,
 					typeArgs: {
-						variesByCulture: property.variesByCulture,
-						variesBySegment: property.variesBySegment,
+						// Normalize property variance against the host content type, mirroring the
+						// server-side logic in ContentTypeCompositionBase (propertyType.Variations &= Variations).
+						// Properties from compositions are loaded individually and carry their own variance flags,
+						// which may not match the host's effective variance (GH-22230).
+						variesByCulture: property.variesByCulture && hostVariesByCulture,
+						variesBySegment: property.variesBySegment && hostVariesBySegment,
 					} as UmbPropertyTypePresetModelTypeModel,
 				} as UmbPropertyTypePresetModel;
 			}),
 		);
 
 		const controller = new UmbPropertyValuePresetVariantBuilderController(this);
-		controller.setCultures(cutlures);
+		controller.setCultures(cultures);
 		if (segments) {
 			controller.setSegments(segments);
 		}
@@ -445,8 +510,6 @@ export abstract class UmbBlockManagerContext<
 			entityUnique: key,
 			entityTypeUnique: contentTypeKey,
 		});
-
-		// Set culture and segment for all values:
 
 		return {
 			key,

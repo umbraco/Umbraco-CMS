@@ -12,6 +12,10 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services;
 
+/// <summary>
+/// Provides services for validating, creating, updating, and deleting members, including support for member data
+/// validation, password management, role assignment, and two-factor authentication operations.
+/// </summary>
 internal sealed class MemberEditingService : IMemberEditingService
 {
     private readonly IMemberService _memberService;
@@ -23,7 +27,21 @@ internal sealed class MemberEditingService : IMemberEditingService
     private readonly ILogger<MemberEditingService> _logger;
     private readonly IMemberGroupService _memberGroupService;
     private readonly SecuritySettings _securitySettings;
+    private readonly IExternalMemberService _externalMemberService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MemberEditingService"/> class.
+    /// </summary>
+    /// <param name="memberService">The <see cref="IMemberService"/> used for member operations.</param>
+    /// <param name="memberTypeService">The <see cref="IMemberTypeService"/> used for member type operations.</param>
+    /// <param name="memberContentEditingService">The <see cref="IMemberContentEditingService"/> used for editing member content.</param>
+    /// <param name="memberManager">The <see cref="IMemberManager"/> for managing member authentication and identity.</param>
+    /// <param name="twoFactorLoginService">The <see cref="ITwoFactorLoginService"/> for handling two-factor authentication.</param>
+    /// <param name="passwordChanger">The <see cref="IPasswordChanger{MemberIdentityUser}"/> for changing member passwords.</param>
+    /// <param name="logger">The <see cref="ILogger{MemberEditingService}"/> for logging.</param>
+    /// <param name="memberGroupService">The <see cref="IMemberGroupService"/> for managing member groups.</param>
+    /// <param name="securitySettings">The <see cref="IOptions{SecuritySettings}"/> containing security configuration.</param>
+    /// <param name="externalMemberService">The <see cref="IExternalMemberService"/> for cross-store uniqueness validation.</param>
     public MemberEditingService(
         IMemberService memberService,
         IMemberTypeService memberTypeService,
@@ -33,7 +51,8 @@ internal sealed class MemberEditingService : IMemberEditingService
         IPasswordChanger<MemberIdentityUser> passwordChanger,
         ILogger<MemberEditingService> logger,
         IMemberGroupService memberGroupService,
-        IOptions<SecuritySettings> securitySettings)
+        IOptions<SecuritySettings> securitySettings,
+        IExternalMemberService externalMemberService)
     {
         _memberService = memberService;
         _memberTypeService = memberTypeService;
@@ -44,17 +63,34 @@ internal sealed class MemberEditingService : IMemberEditingService
         _logger = logger;
         _memberGroupService = memberGroupService;
         _securitySettings = securitySettings.Value;
+        _externalMemberService = externalMemberService;
     }
 
+    /// <summary>
+    /// Gets a member by its unique identifier asynchronously.
+    /// </summary>
+    /// <param name="key">The unique identifier of the member.</param>
+    /// <returns>The member if found; otherwise, null.</returns>
     public Task<IMember?> GetAsync(Guid key)
         => Task.FromResult(_memberService.GetById(key));
 
+    /// <summary>
+    /// Validates the creation of a member based on the provided create model.
+    /// </summary>
+    /// <param name="createModel">The model containing member creation details.</param>
+    /// <returns>A task that represents the asynchronous validation operation. The task result contains an attempt with the content validation result and operation status.</returns>
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateCreateAsync(
         MemberCreateModel createModel) =>
         await ValidateMember(createModel, null, createModel.Password, createModel.ContentTypeKey);
 
 
 
+    /// <summary>
+    /// Asynchronously validates an update operation for a member identified by the specified key, using the provided update model.
+    /// </summary>
+    /// <param name="key">The unique identifier (GUID) of the member to validate for update.</param>
+    /// <param name="updateModel">The <see cref="MemberUpdateModel"/> containing the updated member data.</param>
+    /// <returns>A <see cref="Task{TResult}"/> that, when completed, contains an <see cref="Attempt{ContentValidationResult, ContentEditingOperationStatus}"/> indicating whether the update is valid and, if not, the validation errors and status.</returns>
     public async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateUpdateAsync(Guid key, MemberUpdateModel updateModel)
     {
         IMember? member = _memberService.GetById(key);
@@ -66,6 +102,14 @@ internal sealed class MemberEditingService : IMemberEditingService
         return await ValidateMember(updateModel, key, updateModel.NewPassword, member.ContentType.Key);
     }
 
+    /// <summary>
+    /// Asynchronously creates a new member using the provided member creation model and user context.
+    /// </summary>
+    /// <param name="createModel">The model containing the data required to create the member, including username, email, password, and member type.</param>
+    /// <param name="user">The user performing the creation operation.</param>
+    /// <returns>
+    /// A <see cref="Task{TResult}"/> representing the asynchronous operation. The result is an <see cref="Attempt{MemberCreateResult, MemberEditingStatus}"/> indicating whether the member was created successfully, along with the creation result and status information describing any validation or processing issues.
+    /// </returns>
     public async Task<Attempt<MemberCreateResult, MemberEditingStatus>> CreateAsync(MemberCreateModel createModel, IUser user)
     {
         var status = new MemberEditingStatus();
@@ -122,6 +166,15 @@ internal sealed class MemberEditingService : IMemberEditingService
             : Attempt.FailWithStatus(status, new MemberCreateResult { Content = member });
     }
 
+    /// <summary>
+    /// Asynchronously updates a member with the specified data and user context.
+    /// </summary>
+    /// <param name="key">The unique identifier (GUID) of the member to update.</param>
+    /// <param name="updateModel">A <see cref="MemberUpdateModel"/> containing the updated member data and properties.</param>
+    /// <param name="user">The <see cref="IUser"/> performing the update operation, used for permissions and auditing.</param>
+    /// <returns>
+    /// A <see cref="Task{TResult}"/> representing the asynchronous operation. The result is an <see cref="Attempt{TResult, TStatus}"/>, where <c>TResult</c> is a <see cref="MemberUpdateResult"/> containing the updated member (and validation results), and <c>TStatus</c> is a <see cref="MemberEditingStatus"/> describing the outcome and any errors encountered during the update process.
+    /// </returns>
     public async Task<Attempt<MemberUpdateResult, MemberEditingStatus>> UpdateAsync(Guid key, MemberUpdateModel updateModel, IUser user)
     {
         var status = new MemberEditingStatus();
@@ -208,8 +261,37 @@ internal sealed class MemberEditingService : IMemberEditingService
             : Attempt.FailWithStatus(status, new MemberUpdateResult { Content = member });
     }
 
+    /// <summary>
+    /// Asynchronously deletes a member by its unique key.
+    /// Checks for external-only members first and routes to the external member service if found.
+    /// </summary>
+    /// <param name="key">The unique key (identifier) of the member to delete.</param>
+    /// <param name="userKey">The unique key (identifier) of the user performing the deletion.</param>
+    /// <returns>
+    /// A task representing the asynchronous operation. The result is an <see cref="Attempt{T, TStatus}"/> containing the deleted <see cref="IMember"/> (if successful) and a <see cref="MemberEditingStatus"/> indicating the outcome of the operation.
+    /// </returns>
     public async Task<Attempt<IMember?, MemberEditingStatus>> DeleteAsync(Guid key, Guid userKey)
     {
+        // Check if this is an external-only member and delete via the external service.
+        ExternalMemberIdentity? externalMember = await _externalMemberService.GetByKeyAsync(key);
+        if (externalMember is not null)
+        {
+            Attempt<ExternalMemberIdentity?, ExternalMemberOperationStatus> externalResult = await _externalMemberService.DeleteAsync(key);
+            return externalResult.Success
+                ? Attempt.SucceedWithStatus(
+                    new MemberEditingStatus
+                    {
+                        MemberEditingOperationStatus = MemberEditingOperationStatus.Success,
+                    },
+                    (IMember?)null)
+                : Attempt.FailWithStatus(
+                    new MemberEditingStatus
+                    {
+                        MemberEditingOperationStatus = MemberEditingOperationStatus.MemberNotFound,
+                    },
+                    (IMember?)null);
+        }
+
         Attempt<IMember?, ContentEditingOperationStatus> contentDeleteResult = await _memberContentEditingService.DeleteAsync(key, userKey);
         return contentDeleteResult.Success
             ? Attempt.SucceedWithStatus(
@@ -228,7 +310,19 @@ internal sealed class MemberEditingService : IMemberEditingService
                 contentDeleteResult.Result);
     }
 
-        private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateMember(MemberEditingModelBase model, Guid? memberKey, string? password, Guid memberTypeKey)
+    /// <summary>
+    /// Checks whether the specified key belongs to an external-only member.
+    /// </summary>
+    /// <param name="key">The unique key to check.</param>
+    /// <returns><c>true</c> if the key belongs to an external-only member; otherwise, <c>false</c>.</returns>
+    public async Task<bool> IsExternalMemberAsync(Guid key)
+        => await _externalMemberService.GetByKeyAsync(key) is not null;
+
+    /// <inheritdoc />
+    public async Task<ExternalMemberIdentity?> GetExternalMemberAsync(Guid key)
+        => await _externalMemberService.GetByKeyAsync(key);
+
+    private async Task<Attempt<ContentValidationResult, ContentEditingOperationStatus>> ValidateMember(MemberEditingModelBase model, Guid? memberKey, string? password, Guid memberTypeKey)
     {
         var validationErrors = new List<PropertyValidationError>();
         MemberEditingOperationStatus validationStatus = await ValidateMemberDataAsync(model, memberKey, password);
@@ -335,10 +429,24 @@ internal sealed class MemberEditingService : IMemberEditingService
             return MemberEditingOperationStatus.DuplicateUsername;
         }
 
+        // Cross-store uniqueness: also check external members for duplicate username.
+        ExternalMemberIdentity? externalByUsername = await _externalMemberService.GetByUsernameAsync(model.Username);
+        if (externalByUsername is not null && externalByUsername.Key != memberKey)
+        {
+            return MemberEditingOperationStatus.DuplicateUsername;
+        }
+
         if (_securitySettings.MemberRequireUniqueEmail)
         {
             IMember? byEmail = _memberService.GetByEmail(model.Email);
             if (byEmail is not null && byEmail.Key != memberKey)
+            {
+                return MemberEditingOperationStatus.DuplicateEmail;
+            }
+
+            // Cross-store uniqueness: also check external members for duplicate email.
+            ExternalMemberIdentity? externalByEmail = await _externalMemberService.GetByEmailAsync(model.Email);
+            if (externalByEmail is not null && externalByEmail.Key != memberKey)
             {
                 return MemberEditingOperationStatus.DuplicateEmail;
             }

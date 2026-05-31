@@ -24,10 +24,14 @@ export class NotificationConstantHelper {
     documentBlueprintCreated: 'Document Blueprint created',
     culturesAndHostnamesSaved: 'Cultures and hostnames saved',
     publicAccessSettingCreated: 'Public access setting created',
+    publicAccessSettingUpdated: 'Public access setting updated',
+    publicAccessSettingDeleted: 'Public access setting deleted',
     itemsSorted: 'Items sorted',
     passwordChanged: 'Password changed',
     schedulePublishingUpdated: 'A schedule for publishing has been updated',
-    publishWithDescendants: 'and subpages have been published'
+    publishWithDescendants: 'and subpages have been published',
+    elementPublished: 'Element published',
+    elementUnpublished: 'Element unpublished',
   }
 
   public static readonly error = {

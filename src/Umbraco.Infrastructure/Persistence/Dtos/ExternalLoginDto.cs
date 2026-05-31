@@ -19,14 +19,23 @@ internal sealed class ExternalLoginDto
     private const string ProviderKeyColumnName = "providerKey";
 
 
+    /// <summary>
+    /// Gets or sets the unique identifier for the external login.
+    /// </summary>
     [Column(PrimaryKeyColumnName)]
     [PrimaryKeyColumn]
     public int Id { get; set; }
 
+    /// <summary>
+    /// Gets or sets the user identifier associated with the external login.
+    /// </summary>
     [Obsolete("This only exists to ensure you can upgrade using external logins from umbraco version where this was used to the new where it is not used")]
     [ResultColumn(UserIdColumnName)]
     public int? UserId { get; set; }
 
+    /// <summary>
+    /// Gets or sets the unique key identifying the user or member associated with this external login.
+    /// </summary>
     [Column(UserOrMemberKeyColumnName)]
     [Index(IndexTypes.NonClustered)]
     public Guid UserOrMemberKey { get; set; }
@@ -49,6 +58,9 @@ internal sealed class ExternalLoginDto
     [Index(IndexTypes.NonClustered, ForColumns = $"{LoginProviderColumnName},{ProviderKeyColumnName}", Name = "IX_" + TableName + "_ProviderKey")]
     public string ProviderKey { get; set; } = null!;
 
+    /// <summary>
+    /// Gets or sets the date and time when the external login was created.
+    /// </summary>
     [Column("createDate")]
     [Constraint(Default = SystemMethods.CurrentUTCDateTime)]
     public DateTime CreateDate { get; set; }

@@ -15,6 +15,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, IAuditRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuditRepository"/> class.
+    /// </summary>
+    /// <param name="scopeAccessor">Provides access to the current database scope for repository operations.</param>
+    /// <param name="logger">The logger used to record diagnostic and audit information for this repository.</param>
+    /// <param name="repositoryCacheVersionService">Service responsible for managing cache versioning for repository data.</param>
+    /// <param name="cacheSyncService">Service used to synchronize cache state across distributed environments.</param>
     public AuditRepository(
         IScopeAccessor scopeAccessor,
         ILogger<AuditRepository> logger,
@@ -29,6 +36,12 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
     {
     }
 
+    /// <summary>
+    /// Retrieves a collection of audit items of the specified <paramref name="type"/>, filtered according to the provided <paramref name="query"/> criteria.
+    /// </summary>
+    /// <param name="type">The <see cref="AuditType"/> to filter audit items by.</param>
+    /// <param name="query">An <see cref="IQuery{IAuditItem}"/> used to further filter the audit items.</param>
+    /// <returns>An <see cref="IEnumerable{IAuditItem}"/> containing audit items that match the specified type and query.</returns>
     public IEnumerable<IAuditItem> Get(AuditType type, IQuery<IAuditItem> query)
     {
         Sql<ISqlContext>? sqlClause = GetBaseQuery(false)
@@ -42,6 +55,11 @@ internal sealed class AuditRepository : EntityRepositoryBase<int, IAuditItem>, I
         return AuditItemFactory.BuildEntities(dtos);
     }
 
+    /// <summary>
+    /// Removes audit log entries with a datestamp older than the specified maximum age, in minutes.
+    /// Only logs with headers "open" or "system" are affected.
+    /// </summary>
+    /// <param name="maximumAgeOfLogsInMinutes">The maximum age, in minutes, for logs to retain. Logs older than this will be deleted.</param>
     public void CleanLogs(int maximumAgeOfLogsInMinutes)
     {
         DateTime oldestPermittedLogEntry = DateTime.UtcNow.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));

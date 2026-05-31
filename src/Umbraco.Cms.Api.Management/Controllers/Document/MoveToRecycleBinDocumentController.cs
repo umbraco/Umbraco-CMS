@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +15,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Document;
 
+/// <summary>
+/// Controller for moving documents to the recycle bin.
+/// </summary>
 [ApiVersion("1.0")]
 public class MoveToRecycleBinDocumentController : DocumentControllerBase
 {
@@ -22,6 +25,12 @@ public class MoveToRecycleBinDocumentController : DocumentControllerBase
     private readonly IContentEditingService _contentEditingService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveToRecycleBinDocumentController"/> class.
+    /// </summary>
+    /// <param name="authorizationService">Service used to authorize user actions for moving documents to the recycle bin.</param>
+    /// <param name="contentEditingService">Service responsible for editing and managing content documents.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and user information.</param>
     public MoveToRecycleBinDocumentController(
         IAuthorizationService authorizationService,
         IContentEditingService contentEditingService,

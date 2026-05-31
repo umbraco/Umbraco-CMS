@@ -1,4 +1,4 @@
-﻿using Asp.Versioning;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Api.Management.Factories;
@@ -10,12 +10,20 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Member;
 
+/// <summary>
+/// Provides API endpoints for validating updates to member entities in the system.
+/// </summary>
 [ApiVersion("1.0")]
 public class ValidateUpdateMemberController : MemberControllerBase
 {
     private readonly IMemberEditingService _memberEditingService;
     private readonly IMemberEditingPresentationFactory _memberEditingPresentationFactory;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ValidateUpdateMemberController"/> class.
+    /// </summary>
+    /// <param name="memberEditingService">The <see cref="IMemberEditingService"/> used for member editing operations.</param>
+    /// <param name="memberEditingPresentationFactory">The <see cref="IMemberEditingPresentationFactory"/> used to create member editing presentations.</param>
     public ValidateUpdateMemberController(
         IMemberEditingService memberEditingService,
         IMemberEditingPresentationFactory memberEditingPresentationFactory)
@@ -36,6 +44,12 @@ public class ValidateUpdateMemberController : MemberControllerBase
         Guid id,
         UpdateMemberRequestModel requestModel)
     {
+        // External-only members cannot be updated through this endpoint.
+        if (await _memberEditingService.IsExternalMemberAsync(id))
+        {
+            return ExternalMemberCannotBeModified();
+        }
+
         MemberUpdateModel model = _memberEditingPresentationFactory.MapUpdateModel(requestModel);
         Attempt<ContentValidationResult, ContentEditingOperationStatus> result = await _memberEditingService.ValidateUpdateAsync(id, model);
 

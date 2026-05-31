@@ -39,15 +39,21 @@ public interface ISqlContext
     /// <summary>
     ///     Creates a new Sql expression.
     /// </summary>
+    /// <returns>A new Sql expression.</returns>
     Sql<ISqlContext> Sql();
 
     /// <summary>
-    ///     Creates a new Sql expression.
+    ///     Creates a new <see cref="Sql{ISqlContext}"/> expression from the specified SQL string and arguments.
     /// </summary>
+    /// <param name="sql">The SQL query string to create the expression from.</param>
+    /// <param name="args">The arguments to be used in the SQL query string.</param>
+    /// <returns>A new <see cref="Sql{ISqlContext}"/> expression representing the specified SQL query.</returns>
     Sql<ISqlContext> Sql(string sql, params object[] args);
 
     /// <summary>
-    ///     Creates a new query expression.
+    ///     Creates a new query expression for the specified type <typeparamref name="T"/>.
     /// </summary>
+    /// <typeparam name="T">The type of the entity to query.</typeparam>
+    /// <returns>A new query expression of type <see cref="IQuery{T}"/>.</returns>
     IQuery<T> Query<T>();
 }

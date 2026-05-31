@@ -204,7 +204,7 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 					},
 					value: {
 						crops: item.crops ?? [],
-						focalPoint: item.focalPoint ?? { left: 0.5, top: 0.5 },
+						focalPoint: item.focalPoint ?? null,
 						src: '',
 						key,
 						unique: item.mediaKey,
@@ -448,8 +448,9 @@ export class UmbInputRichMediaElement extends UmbFormControlMixin<
 		css`
 			:host {
 				position: relative;
-				display: block;
 				width: 100%;
+				display: flex;
+				flex-direction: column-reverse;
 			}
 			.container {
 				display: grid;

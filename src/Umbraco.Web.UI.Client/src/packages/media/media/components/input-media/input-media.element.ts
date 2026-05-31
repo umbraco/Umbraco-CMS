@@ -117,7 +117,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	includeTrashed = false;
 
 	@property({ type: String, attribute: 'folder-filter' })
-	folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_ONLY;
+	folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_AND_FOLDERS;
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
@@ -276,14 +276,15 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	#renderItem(item: UmbMediaCardItemModel) {
-		const href = this.readonly ? undefined : `${this._editMediaPath}edit/${item.unique}`;
+		const href = this.readonly || !this._editMediaPath ? undefined : `${this._editMediaPath}edit/${item.unique}`;
 		return html`
 			<uui-card-media
 				title=${ifDefined(item.name === null ? undefined : item.name)}
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				data-mark="${item.entityType}:${item.unique}"
 				href="${ifDefined(href)}"
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly}
+				?disabled=${!this._editMediaPath}>
 				<umb-imaging-thumbnail
 					unique=${item.unique}
 					alt=${item.name}

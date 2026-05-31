@@ -9,19 +9,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Serialization;
 
+/// <summary>
+/// Serves as a base class that provides common functionality for JSON serialization and deserialization
+/// operations using the <c>System.Text.Json</c> library.
+/// </summary>
 public abstract class SystemTextJsonSerializerBase : IJsonSerializer
 {
     private readonly IJsonSerializerEncoderFactory _jsonSerializerEncoderFactory;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="SystemTextJsonSerializerBase" /> class.
-    /// </summary>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    protected SystemTextJsonSerializerBase()
-        : this(
-              StaticServiceProvider.Instance.GetRequiredService<IJsonSerializerEncoderFactory>())
-    {
-    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SystemTextJsonSerializerBase"/> class.

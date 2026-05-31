@@ -4,6 +4,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence;
 
+/// <summary>
+/// Represents a template for generating SQL queries in the persistence layer.
+/// </summary>
 public class SqlTemplate
 {
     private readonly Dictionary<int, object>? _args;
@@ -30,9 +33,19 @@ public class SqlTemplate
     /// </summary>
     public static object Arg(string name) => new TemplateArg(name);
 
+    /// <summary>
+    /// Returns a new <see cref="Sql{ISqlContext}"/> instance initialized with the current SQL context and SQL string.
+    /// </summary>
+    /// <returns>A new <see cref="Sql{ISqlContext}"/> instance.</returns>
     public Sql<ISqlContext> Sql() => new Sql<ISqlContext>(_sqlContext, _sql);
 
-    // must pass the args, all of them, in the proper order, faster
+    /// <summary>
+    /// Creates a new SQL query from the template, using the specified arguments.
+    /// </summary>
+    /// <remarks>must pass the args, all of them, in the proper order, faster</remarks>
+    /// <param name="args">Arguments to be formatted into the SQL template.</param>
+    /// <returns>A new <see cref="Sql&lt;ISqlContext&gt;"/> instance representing the formatted SQL query.</returns>
+    ///
     public Sql<ISqlContext> Sql(params object[] args)
     {
         // if the type is an "unspeakable name" it is an anonymous compiler-generated object
@@ -58,8 +71,17 @@ public class SqlTemplate
         return new Sql<ISqlContext>(_sqlContext, isBuilt, _sql, args);
     }
 
-    // can pass named args, not necessary all of them, slower
-    // so, not much different from what Where(...) does (ie reflection)
+    /// <summary>
+    /// Creates a SQL query using named arguments provided via an object's properties.
+    /// </summary>
+    /// <param name="nargs">An object whose public properties are used as named arguments for the SQL query template.</param>
+    /// <returns>A <see cref="Sql&lt;ISqlContext&gt;" /> instance representing the constructed SQL query.</returns>
+    /// <remarks>
+    /// can pass named args, not necessary all of them, slower
+    /// so, not much different from what Where(...) does (ie reflection)
+    /// Throws <see cref="InvalidOperationException"/> if required arguments are missing or if unknown arguments are provided.
+    /// This method uses reflection to match property names to template argument names.
+    /// </remarks>
     public Sql<ISqlContext> SqlNamed(object nargs)
     {
         var isBuilt = true;
@@ -107,13 +129,19 @@ public class SqlTemplate
     }
 
     /// <summary>
-    ///     Gets a WHERE expression argument.
+    ///     Retrieves the value of a named argument used in a WHERE expression.
     /// </summary>
+    /// <param name="name">The name of the argument to retrieve.</param>
+    /// <typeparam name="T">The expected type of the argument value.</typeparam>
+    /// <returns>The argument value of type <typeparamref name="T"/> if found; otherwise, <c>null</c>.</returns>
     public static T? Arg<T>(string name) => default;
 
     /// <summary>
-    ///     Gets a WHERE IN expression argument.
+    ///     Returns an enumerable representing the argument for a SQL WHERE IN clause.
     /// </summary>
+    /// <param name="name">The name of the argument to be used in the SQL template.</param>
+    /// <typeparam name="T">The type of the elements in the argument list.</typeparam>
+    /// <returns>An <see cref="IEnumerable{T}"/> containing a single default value of type <typeparamref name="T"/>. This is used to ensure compatibility with NPoco when no values are provided.</returns>
     public static IEnumerable<T?> ArgIn<T>(string name) =>
 
         // don't return an empty enumerable, as it breaks NPoco
@@ -122,10 +150,21 @@ public class SqlTemplate
     // these are created in PocoToSqlExpressionVisitor
     internal sealed class TemplateArg
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Umbraco.Cms.Infrastructure.Persistence.SqlTemplate.TemplateArg"/> class.
+        /// </summary>
+        /// <param name="name">The name of the template argument, or <c>null</c> if not specified.</param>
         public TemplateArg(string? name) => Name = name;
 
+        /// <summary>
+        /// Gets the name of the template argument.
+        /// </summary>
         public string? Name { get; }
 
+        /// <summary>
+        /// Returns a string that represents the template argument, consisting of the argument name prefixed with '@'.
+        /// </summary>
+        /// <returns>A string representation of the template argument, prefixed with '@'.</returns>
         public override string ToString() => "@" + Name;
     }
 }

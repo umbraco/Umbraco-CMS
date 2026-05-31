@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.Services.OperationStatus;
 
 namespace Umbraco.Cms.Api.Management.Controllers.User.Filter;
 
+/// <summary>
+/// Provides API endpoints for filtering and retrieving user groups in the management interface.
+/// </summary>
 [ApiVersion("1.0")]
 public class FilterUserGroupFilterController : UserGroupFilterControllerBase
 {
@@ -20,6 +23,12 @@ public class FilterUserGroupFilterController : UserGroupFilterControllerBase
     private readonly IUserGroupPresentationFactory _userGroupPresentationFactory;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FilterUserGroupFilterController"/> class, responsible for handling user group filter operations in the management API.
+    /// </summary>
+    /// <param name="userGroupService">Service for managing user group data and operations.</param>
+    /// <param name="userGroupPresentationFactory">Factory for creating user group presentation models.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context and authentication.</param>
     public FilterUserGroupFilterController(
         IUserGroupService userGroupService,
         IUserGroupPresentationFactory userGroupPresentationFactory,
@@ -30,6 +39,14 @@ public class FilterUserGroupFilterController : UserGroupFilterControllerBase
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Retrieves a paginated and filtered list of user groups based on the specified criteria.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <param name="skip">The number of user groups to skip before starting to collect the result set.</param>
+    /// <param name="take">The maximum number of user groups to return.</param>
+    /// <param name="filter">An optional filter string to search or filter user groups by name or other criteria.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains an <see cref="IActionResult"/> with a <see cref="PagedViewModel{UserGroupResponseModel}"/> representing the filtered user groups.</returns>
     [HttpGet]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(typeof(PagedViewModel<UserGroupResponseModel>), StatusCodes.Status200OK)]

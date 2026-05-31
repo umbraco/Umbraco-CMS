@@ -12,6 +12,10 @@ internal sealed class AllowedApplicationHandler : MustSatisfyRequirementAuthoriz
 {
     private readonly IAuthorizationHelper _authorizationHelper;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AllowedApplicationHandler"/> class.
+    /// </summary>
+    /// <param name="authorizationHelper">An instance used to assist with authorization logic for user applications.</param>
     public AllowedApplicationHandler(IAuthorizationHelper authorizationHelper)
         => _authorizationHelper = authorizationHelper;
 

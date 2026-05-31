@@ -10,6 +10,7 @@ using Umbraco.Cms.Api.Management.DependencyInjection;
 using Umbraco.Cms.Api.Management.Filters;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Authorization;
@@ -18,6 +19,9 @@ using Umbraco.Cms.Web.Common.Filters;
 
 namespace Umbraco.Cms.Api.Management.Controllers;
 
+/// <summary>
+/// Serves as the base controller for management API endpoints in Umbraco CMS, providing shared functionality and services for derived controllers.
+/// </summary>
 [ApiController]
 [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
 [Authorize(Policy = AuthorizationPolicies.UmbracoFeatureEnabled)]
@@ -25,15 +29,14 @@ namespace Umbraco.Cms.Api.Management.Controllers;
 [JsonOptionsName(Constants.JsonOptionsNames.BackOffice)]
 [AppendEventMessages]
 [DisableBrowserCache]
-[Produces("application/json")]
 [MaintenanceModeActionFilter]
 public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
 {
     protected IActionResult CreatedAtId<T>(Expression<Func<T, string>> action, Guid id)
-        => CreatedAtAction(action, new { id = id }, id.ToString());
+        => CreatedAtAction(action, new { id }, id.ToString());
 
     protected IActionResult CreatedAtPath<T>(Expression<Func<T, string>> action, string path)
-        => CreatedAtAction(action, new { path = path }, path);
+        => CreatedAtAction(action, new { path }, path);
 
     protected IActionResult CreatedAtAction<T>(Expression<Func<T, string>> action, object routeValues, string resourceIdentifier)
     {
@@ -68,12 +71,23 @@ public abstract class ManagementApiControllerBase : Controller, IUmbracoFeature
         where TEnum : Enum
         => result(new ProblemDetailsBuilder().WithOperationStatus(status));
 
-    protected BadRequestObjectResult SkipTakeToPagingProblem() =>
-        BadRequest(new ProblemDetails
+    protected static BadRequestObjectResult SkipTakeToPagingProblem() =>
+        new(new ProblemDetails
         {
             Title = "Invalid skip/take",
             Detail = "Skip must be a multiple of take - i.e. skip = 10, take = 5",
             Status = StatusCodes.Status400BadRequest,
             Type = "Error",
         });
+
+    /// <summary>
+    /// Orders entities to match the order of the requested IDs.
+    /// </summary>
+    /// <typeparam name="TEntity">The entity type.</typeparam>
+    /// <param name="entities">The entities to order.</param>
+    /// <param name="requestedIds">The requested IDs in the desired order.</param>
+    /// <returns>A list of entities ordered by the requested IDs.</returns>
+    protected static List<TEntity> OrderByRequestedIds<TEntity>(IEnumerable<TEntity> entities, Guid[] requestedIds)
+        where TEntity : IEntity
+        => entities.OrderBy(e => Array.IndexOf(requestedIds, e.Key)).ToList();
 }

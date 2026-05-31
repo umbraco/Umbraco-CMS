@@ -12,6 +12,9 @@ using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umbraco.Cms.Api.Management.Controllers.DataType;
 
+/// <summary>
+/// Controller responsible for moving data types within the system.
+/// </summary>
 [ApiVersion("1.0")]
 [Authorize(Policy = AuthorizationPolicies.TreeAccessDataTypes)]
 public class MoveDataTypeController : DataTypeControllerBase
@@ -19,12 +22,25 @@ public class MoveDataTypeController : DataTypeControllerBase
     private readonly IDataTypeService _dataTypeService;
     private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MoveDataTypeController"/> class.
+    /// </summary>
+    /// <param name="dataTypeService">Service used to manage data types.</param>
+    /// <param name="backOfficeSecurityAccessor">Accessor for back office security context.</param>
     public MoveDataTypeController(IDataTypeService dataTypeService, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
     {
         _dataTypeService = dataTypeService;
         _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
     }
 
+    /// <summary>
+    /// Moves an existing data type identified by the specified <paramref name="id"/> to a different container.
+    /// The target container Id must be provided in the <paramref name="moveDataTypeRequestModel"/>.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+    /// <param name="id">The unique identifier of the data type to move.</param>
+    /// <param name="moveDataTypeRequestModel">The request model containing the target container information.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the move operation.</returns>
     [HttpPut("{id:guid}/move")]
     [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]

@@ -1,5 +1,6 @@
 import { UmbDocumentPublishingRepository } from '../../index.js';
-import { UmbDocumentVariantState, type UmbDocumentVariantOptionModel } from '../../../types.js';
+import { UmbDocumentVariantState } from '../../../variant-state.js';
+import type { UmbDocumentVariantOptionModel } from '../../../types.js';
 import type { UmbDocumentItemModel } from '../../../item/types.js';
 import { UMB_DOCUMENT_PUBLISH_MODAL } from '../../../constants.js';
 import { UMB_DOCUMENT_ENTITY_TYPE } from '../../../entity.js';
@@ -167,10 +168,10 @@ export class UmbDocumentPublishEntityBulkAction extends UmbEntityBulkActionBase<
 		// If there is only one language available, or all selected documents are invariant, we can skip the modal and publish directly:
 		if (options.length === 1 || allInvariant) {
 			const confirm = await umbConfirmModal(this, {
-				headline: localize.term('content_readyToPublish'),
-				content: localize.term('prompt_confirmListViewPublish'),
+				headline: '#content_readyToPublish',
+				content: '#prompt_confirmListViewPublish',
 				color: 'positive',
-				confirmLabel: localize.term('actions_publish'),
+				confirmLabel: '#actions_publish',
 			}).catch(() => false);
 
 			if (confirm !== false) {

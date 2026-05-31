@@ -1,4 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using Umbraco.Cms.Api.Management.Extensions;
 using Umbraco.Cms.Api.Management.ViewModels.Script;
 using Umbraco.Cms.Api.Management.ViewModels.Script.Folder;
@@ -10,8 +10,16 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Mapping.Script;
 
+/// <summary>
+/// Provides mapping configuration for view models related to scripts in the management API.
+/// </summary>
 public class ScriptViewModelsMapDefinition : IMapDefinition
 {
+    /// <summary>
+    /// Configures the object mappings between script-related domain models and their corresponding view models.
+    /// This includes mappings for scripts and script folders, as well as create, update, and rename operations.
+    /// </summary>
+    /// <param name="mapper">The <see cref="IUmbracoMapper"/> instance used to register the mapping definitions.</param>
     public void DefineMaps(IUmbracoMapper mapper)
     {
         mapper.Define<IScript, ScriptResponseModel>((_, _) => new ScriptResponseModel { Name = string.Empty, Path = string.Empty, Content = string.Empty }, Map);

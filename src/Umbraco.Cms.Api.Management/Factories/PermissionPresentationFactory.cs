@@ -5,12 +5,20 @@ using Umbraco.Cms.Core.Models.Membership.Permissions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Provides methods to create and configure permission presentation models used in the management API.
+/// </summary>
 public class PermissionPresentationFactory : IPermissionPresentationFactory
 {
     private readonly ILogger<PermissionPresentationFactory> _logger;
     private readonly IDictionary<string, IPermissionPresentationMapper> _permissionPresentationMappersByContext;
     private readonly Dictionary<Type, IPermissionPresentationMapper> _permissionPresentationMappersByType;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Umbraco.Cms.Api.Management.Factories.PermissionPresentationFactory"/> class with the specified permission presentation mappers and logger.
+    /// </summary>
+    /// <param name="permissionPresentationMappers">A collection of <see cref="IPermissionPresentationMapper"/> instances used to map permission data for presentation.</param>
+    /// <param name="logger">An <see cref="ILogger{PermissionPresentationFactory}"/> instance used for logging within the factory.</param>
     public PermissionPresentationFactory(IEnumerable<IPermissionPresentationMapper> permissionPresentationMappers, ILogger<PermissionPresentationFactory> logger)
     {
         _logger = logger;
@@ -51,6 +59,13 @@ public class PermissionPresentationFactory : IPermissionPresentationFactory
         return Task.FromResult<ISet<IPermissionPresentationModel>>(result);
     }
 
+    /// <summary>
+    /// Asynchronously creates a set of granular permissions by mapping the provided permission presentation models.
+    /// </summary>
+    /// <param name="permissions">The set of permission presentation models to be converted into granular permissions.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a set of <see cref="IGranularPermission"/> objects derived from the input models.
+    /// </returns>
     public Task<ISet<IGranularPermission>> CreatePermissionSetsAsync(ISet<IPermissionPresentationModel> permissions)
     {
         ISet<IGranularPermission> granularPermissions = new HashSet<IGranularPermission>();
