@@ -107,6 +107,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             var item = actual.Result.Items.FirstOrDefault();
             Assert.AreEqual(Root2.ContentType.Alias, item?.ContentTypeAlias);
             Assert.AreEqual(Root2.Key, item?.NodeKey);
+            Assert.AreEqual(Root2.Name, item?.NodeName);
         });
     }
 
@@ -140,6 +141,9 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             Assert.IsFalse(itemKeys.Contains(Root1.Key)); // Should not return the parent itself (see: https://github.com/umbraco/Umbraco-CMS/pull/21162)
             Assert.AreEqual(1, itemKeys.Count);
             Assert.IsTrue(itemKeys.Contains(Child1.Key));
+
+            var childItem = actual.Result.Items.FirstOrDefault(x => x.NodeKey == Child1.Key);
+            Assert.AreEqual(Child1.Name, childItem?.NodeName);
         });
     }
 
@@ -183,6 +187,7 @@ internal class TrackedReferencesServiceTests : UmbracoIntegrationTest
             var item = actual.Items.FirstOrDefault();
             Assert.AreEqual(Root2.ContentType.Alias, item?.ContentTypeAlias);
             Assert.AreEqual(Root2.Key, item?.NodeKey);
+            Assert.AreEqual(Root2.Name, item?.NodeName);
         });
     }
 }
