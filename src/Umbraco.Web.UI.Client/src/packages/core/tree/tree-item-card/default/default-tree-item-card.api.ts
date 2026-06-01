@@ -5,5 +5,3 @@ import { UmbTreeItemApiBase } from '../../tree-item/tree-item-base/tree-item-api
 export class UmbDefaultTreeItemCardApi<
 	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
 > extends UmbTreeItemApiBase<TreeItemType, ManifestTreeItemCard> {}
-
-export default UmbDefaultTreeItemCardApi;

@@ -1,4 +1,6 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbDefaultTreeItemCardElement } from './default-tree-item-card.element.js';
+import { UmbDefaultTreeItemCardApi } from './default-tree-item-card.api.js';
 
 export const manifest: UmbExtensionManifestKind = {
 	type: 'kind',
@@ -7,7 +9,7 @@ export const manifest: UmbExtensionManifestKind = {
 	matchType: 'treeItemCard',
 	manifest: {
 		type: 'treeItemCard',
-		element: () => import('../../default/default-tree-item-card.element.js'),
-		api: () => import('../../default/default-tree-item-card.api.js'),
+		element: UmbDefaultTreeItemCardElement,
+		api: UmbDefaultTreeItemCardApi,
 	},
 };

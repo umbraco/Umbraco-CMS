@@ -106,8 +106,6 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 	}
 }
 
-export default UmbDefaultTreeItemCardElement;
-
 declare global {
 	interface HTMLElementTagNameMap {
 		'umb-default-tree-item-card': UmbDefaultTreeItemCardElement;
