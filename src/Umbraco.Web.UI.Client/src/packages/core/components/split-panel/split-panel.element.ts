@@ -324,6 +324,11 @@ export class UmbSplitPanelElement extends UmbLitElement {
 			grid-template-columns: var(--_columns);
 		}
 
+		slot[name='end'] {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+
 		@media (max-width: ${UMB_MOBILE_BREAKPOINT}px) {
 			:host([connected]) #main {
 				display: flex;
