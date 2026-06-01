@@ -15,6 +15,10 @@ parameters:
     type: string
     default: ''
 
+  - name: runBuild
+    type: boolean
+    default: true
+
 steps:
   - task: NodeTool@0
     displayName: "E2E: Use Node.js"
@@ -48,6 +52,7 @@ steps:
     env:
       npm_config_cache: ${{ parameters.npm_config_cache }}
 
-  - script: npm run build
-    workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
-    displayName: "E2E: Build test helpers"
+  - ${{ if parameters.runBuild }}:
+    - script: npm run build
+      workingDirectory: $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest
+      displayName: "E2E: Build test helpers"
