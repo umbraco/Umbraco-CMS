@@ -54,9 +54,13 @@ export class UmbDefaultSectionElement extends UmbLitElement implements UmbSectio
 
 		this.consumeContext(UMB_BACKOFFICE_CONTEXT, (ctx) => {
 			this.#backofficeContext = ctx;
-			this.observe(ctx?.mobileSidebarOpen, (open) => {
-				this._sidebarOpen = open === true;
-			});
+			this.observe(
+				ctx?.mobileSidebarOpen,
+				(open) => {
+					this._sidebarOpen = open === true;
+				},
+				'_observeMobileSidebarOpen',
+			);
 		});
 
 		this.#observeRoutes();

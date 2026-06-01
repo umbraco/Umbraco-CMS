@@ -72,10 +72,18 @@ export class UmbBackofficeContext extends UmbContextBase {
 		this.#activeSectionAlias.setValue(alias);
 	}
 
+	/**
+	 * Toggles the mobile sidebar between open and closed.
+	 * Call this when the user taps the burger button in the header.
+	 */
 	public toggleMobileSidebar(): void {
 		this.#mobileSidebarOpen.setValue(!this.#mobileSidebarOpen.getValue());
 	}
 
+	/**
+	 * Explicitly sets the mobile sidebar open state.
+	 * Use this to close the sidebar on navigation or viewport changes.
+	 */
 	public setMobileSidebarOpen(open: boolean): void {
 		this.#mobileSidebarOpen.setValue(open);
 	}

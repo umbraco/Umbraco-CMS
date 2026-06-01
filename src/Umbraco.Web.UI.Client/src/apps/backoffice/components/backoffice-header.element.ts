@@ -8,10 +8,20 @@ import { UMB_MOBILE_BREAKPOINT } from '@umbraco-cms/backoffice/const';
 export class UmbBackofficeHeaderElement extends UmbLitElement {
 	#backofficeContext?: UmbBackofficeContext;
 
+	@state()
+	private _sidebarOpen = false;
+
 	constructor() {
 		super();
 		this.consumeContext(UMB_BACKOFFICE_CONTEXT, (ctx) => {
 			this.#backofficeContext = ctx;
+			this.observe(
+				ctx?.mobileSidebarOpen,
+				(open) => {
+					this._sidebarOpen = open === true;
+				},
+				'_observeMobileSidebarOpen',
+			);
 		});
 	}
 	#onBurgerClick() {
@@ -21,7 +31,11 @@ export class UmbBackofficeHeaderElement extends UmbLitElement {
 		return html`
 			<div id="appHeader">
 				<umb-backoffice-header-logo></umb-backoffice-header-logo>
-				<button id="burger-button" @click=${this.#onBurgerClick} aria-label="Toggle navigation">
+				<button
+					id="burger-button"
+					@click=${this.#onBurgerClick}
+					aria-label="Toggle navigation"
+					aria-expanded=${this._sidebarOpen}>
 					<uui-icon name="icon-list"></uui-icon>
 				</button>
 				<umb-backoffice-header-sections></umb-backoffice-header-sections>
