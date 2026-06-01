@@ -397,9 +397,14 @@ export class UmbDocumentWorkspaceContext
 
 	/**
 	 * Creates or updates the document and publishes the selected variants in a single server operation.
-	 * Mirrors the create/update event side-effects of the base save flow, but does not set the
-	 * persisted/current data state — that is handled by the subsequent reload and
-	 * {@link transferPublishedVariantsToCurrent}, which avoids a transient pending-changes flash.
+	 * Mirrors the create/update event side-effects of the base save flow, but does NOT set the
+	 * persisted/current data state.
+	 *
+	 * IMPORTANT: this leaves the workspace in an intermediate state. The caller MUST follow up with
+	 * `reload()` and {@link transferPublishedVariantsToCurrent} to bring the workspace back to a valid
+	 * state (persisted = full server document, current = published variants + retained unpublished edits).
+	 * It is split from the reload only to avoid a transient false-positive pending-changes flash — do not
+	 * call it standalone. See `UmbDocumentPublishingWorkspaceContext` `#performSaveAndPublish`.
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish
 	 * @param {UmbDocumentDetailModel} saveData - The data to save (constructed for the selected variants)
 	 * @returns {Promise<UmbDocumentDetailModel>} The re-read document after the operation
@@ -409,33 +414,45 @@ export class UmbDocumentWorkspaceContext
 		variantIds: Array<UmbVariantId>,
 		saveData: UmbDocumentDetailModel,
 	): Promise<UmbDocumentDetailModel> {
+		return this.getIsNew()
+			? this.#createAndPublish(variantIds, saveData)
+			: this.#updateAndPublish(variantIds, saveData);
+	}
+
+	async #createAndPublish(
+		variantIds: Array<UmbVariantId>,
+		saveData: UmbDocumentDetailModel,
+	): Promise<UmbDocumentDetailModel> {
 		if (!this._detailRepository) throw new Error('Detail repository is not set');
 
+		const parent = this._internal_getCreateUnderParent();
+		if (!parent) throw new Error('Parent is not set');
+
+		const { data, error } = await this._detailRepository.createAndPublish(saveData, variantIds, parent.unique);
+		if (!data || error) {
+			throw new Error('Error creating and publishing document');
+		}
+
+		this.setIsNew(false);
+
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
-		if (!eventContext) {
-			throw new Error('Event context is missing');
-		}
+		if (!eventContext) throw new Error('Event context is missing');
 
-		if (this.getIsNew()) {
-			const parent = this._internal_getCreateUnderParent();
-			if (!parent) throw new Error('Parent is not set');
+		eventContext.dispatchEvent(
+			new UmbRequestReloadStructureForEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
+		);
+		eventContext.dispatchEvent(
+			new UmbRequestReloadChildrenOfEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
+		);
 
-			const { data, error } = await this._detailRepository.createAndPublish(saveData, variantIds, parent.unique);
-			if (!data || error) {
-				throw new Error('Error creating and publishing document');
-			}
+		return data;
+	}
 
-			this.setIsNew(false);
-
-			eventContext.dispatchEvent(
-				new UmbRequestReloadStructureForEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
-			);
-			eventContext.dispatchEvent(
-				new UmbRequestReloadChildrenOfEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
-			);
-
-			return data;
-		}
+	async #updateAndPublish(
+		variantIds: Array<UmbVariantId>,
+		saveData: UmbDocumentDetailModel,
+	): Promise<UmbDocumentDetailModel> {
+		if (!this._detailRepository) throw new Error('Detail repository is not set');
 
 		const { data, error } = await this._detailRepository.updateAndPublish(saveData, variantIds);
 		if (!data || error) {
@@ -444,6 +461,9 @@ export class UmbDocumentWorkspaceContext
 
 		const unique = this.getUnique()!;
 		const entityType = this.getEntityType();
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) throw new Error('Event context is missing');
 
 		eventContext.dispatchEvent(new UmbRequestReloadStructureForEntityEvent({ unique, entityType }));
 		eventContext.dispatchEvent(
@@ -477,7 +497,7 @@ export class UmbDocumentWorkspaceContext
 		// When varying by segment we need to transfer all segments of the published cultures (and the
 		// invariant culture), mirroring how the save data is constructed.
 		if (this.getVariesBySegment()) {
-			const segments = serverData.values.map((x) => x.segment).filter((x) => x) as Array<string>;
+			const segments = [...new Set(serverData.values.map((x) => x.segment).filter((x) => x))] as Array<string>;
 			variantsToStore = [
 				...variantsToStore,
 				...segments.flatMap((segment) => variantsToStore.map((variant) => variant.toSegment(segment))),

@@ -3,6 +3,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbControllerHostElementMixin } from '@umbraco-cms/backoffice/controller-api';
 import { customElement } from '@umbraco-cms/backoffice/external/lit';
+import { UmbId } from '@umbraco-cms/backoffice/id';
 import { UmbDocumentServerDataSource } from './document-detail.server.data-source.js';
 
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
@@ -24,6 +25,23 @@ describe('UmbDocumentServerDataSource (create/update-and-publish)', () => {
 
 	afterEach(() => {
 		document.body.innerHTML = '';
+	});
+
+	describe('createAndPublish', () => {
+		it('creates a new document and publishes only the requested culture, re-reading the full model', async () => {
+			// Use an existing document as a valid model template, with a fresh unique so it is created anew.
+			const { data: template } = await dataSource.read(VARIANT_DOCUMENT_ID);
+			expect(template, 'precondition: template document loads').to.exist;
+			const newModel = { ...template!, unique: UmbId.new() };
+
+			const da = UmbVariantId.Create({ culture: 'da', segment: null });
+			const { data, error } = await dataSource.createAndPublish(newModel, [da], null);
+
+			expect(error).to.be.undefined;
+			expect(data, 'returns the re-read created document model').to.exist;
+			const daVariant = data!.variants.find((v) => v.culture === 'da');
+			expect(daVariant?.state, 'the requested culture (da) is Published').to.equal('Published');
+		});
 	});
 
 	describe('updateAndPublish', () => {

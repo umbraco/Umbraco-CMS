@@ -128,15 +128,7 @@ export class UmbDocumentServerDataSource
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 
-		// TODO: make data mapper to prevent errors
-		const body: CreateDocumentRequestModel = {
-			id: model.unique,
-			parent: parentUnique ? { id: parentUnique } : null,
-			documentType: { id: model.documentType.unique },
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
-		};
+		const body: CreateDocumentRequestModel = this.#mapCreateRequestBody(model, parentUnique);
 
 		const { data, error } = await tryExecute(
 			this,
@@ -161,12 +153,7 @@ export class UmbDocumentServerDataSource
 	async update(model: UmbDocumentDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
 
-		// TODO: make data mapper to prevent errors
-		const body: UpdateDocumentRequestModel = {
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
-		};
+		const body: UpdateDocumentRequestModel = this.#mapUpdateRequestBody(model);
 
 		const { error } = await tryExecute(
 			this,
@@ -199,14 +186,8 @@ export class UmbDocumentServerDataSource
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 
-		// TODO: make data mapper to prevent errors
 		const body: CreateAndPublishDocumentRequestModel = {
-			id: model.unique,
-			parent: parentUnique ? { id: parentUnique } : null,
-			documentType: { id: model.documentType.unique },
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
+			...this.#mapCreateRequestBody(model, parentUnique),
 			culturesToPublish: this.#mapCulturesToPublish(variantIds),
 		};
 
@@ -235,11 +216,8 @@ export class UmbDocumentServerDataSource
 	async updateAndPublish(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
 		if (!model.unique) throw new Error('Unique is missing');
 
-		// TODO: make data mapper to prevent errors
 		const body: UpdateAndPublishDocumentRequestModel = {
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
+			...this.#mapUpdateRequestBody(model),
 			culturesToPublish: this.#mapCulturesToPublish(variantIds),
 		};
 
@@ -268,6 +246,27 @@ export class UmbDocumentServerDataSource
 	 */
 	#mapCulturesToPublish(variantIds: Array<UmbVariantId>): Array<string> {
 		return [...new Set(variantIds.filter((x) => !x.isCultureInvariant()).map((x) => x.toCultureString()))];
+	}
+
+	// TODO: make data mapper to prevent errors
+	#mapCreateRequestBody(model: UmbDocumentDetailModel, parentUnique: string | null): CreateDocumentRequestModel {
+		return {
+			id: model.unique,
+			parent: parentUnique ? { id: parentUnique } : null,
+			documentType: { id: model.documentType.unique },
+			template: model.template ? { id: model.template.unique } : null,
+			values: model.values,
+			variants: model.variants,
+		};
+	}
+
+	// TODO: make data mapper to prevent errors
+	#mapUpdateRequestBody(model: UmbDocumentDetailModel): UpdateDocumentRequestModel {
+		return {
+			template: model.template ? { id: model.template.unique } : null,
+			values: model.values,
+			variants: model.variants,
+		};
 	}
 
 	/**

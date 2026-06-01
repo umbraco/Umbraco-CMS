@@ -20,7 +20,11 @@ export class UmbDocumentDetailRepository extends UmbDetailRepositoryBase<
 	 * @returns {*}
 	 * @memberof UmbDocumentDetailRepository
 	 */
-	async createAndPublish(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>, parentUnique: string | null) {
+	async createAndPublish(
+		model: UmbDocumentDetailModel,
+		variantIds: Array<UmbVariantId>,
+		parentUnique: string | null = null,
+	) {
 		return this.detailDataSource.createAndPublish(model, variantIds, parentUnique);
 	}
 
