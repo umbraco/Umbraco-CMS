@@ -1282,6 +1282,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Wyłącz śledzenie URL',
 		enableUrlTracker: 'Włącz śledzenie URL',
+		urlTrackerEnabled: 'Włączone',
+		urlTrackerDisabled: 'Wyłączone',
 		originalUrl: 'Oryginalny URL',
 		redirectedTo: 'Przekierowane do',
 		noRedirects: 'Nie stworzono żadnych przekierowań',

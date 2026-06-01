@@ -288,6 +288,85 @@ internal sealed class RedirectUrlRepositoryTests : UmbracoIntegrationTest
     }
 
     [Test]
+    public void GetMany_With_Ids_Returns_Matching_Redirects()
+    {
+        // The "happy path" — a handful of ids, well under the SQL parameter limit.
+        // Verifies that batching in PerformGetAll doesn't break the common case.
+        Guid id1, id2;
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var repo = CreateRepository(ScopeProvider);
+
+            var rurl1 = new RedirectUrl { ContentKey = _textpage.Key, Url = "a" };
+            repo.Save(rurl1);
+            id1 = rurl1.Key;
+
+            var rurl2 = new RedirectUrl
+            {
+                ContentKey = _subpage.Key,
+                Url = "b",
+                CreateDateUtc = rurl1.CreateDateUtc.AddSeconds(1)
+            };
+            repo.Save(rurl2);
+            id2 = rurl2.Key;
+
+            // Third redirect we deliberately don't pass to GetMany — it should not be returned.
+            var rurl3 = new RedirectUrl
+            {
+                ContentKey = _otherpage.Key,
+                Url = "c",
+                CreateDateUtc = rurl1.CreateDateUtc.AddSeconds(2)
+            };
+            repo.Save(rurl3);
+
+            scope.Complete();
+        }
+
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var repo = CreateRepository(ScopeProvider);
+            var rurls = repo.GetMany(id1, id2).ToArray();
+            scope.Complete();
+
+            Assert.That(rurls, Has.Length.EqualTo(2));
+            Assert.That(rurls.Select(r => r.Url), Is.EquivalentTo(new[] { "a", "b" }));
+        }
+    }
+
+    [Test]
+    public void GetMany_With_No_Ids_Returns_All_Redirects()
+    {
+        // When PerformGetAll is invoked with no ids (the FullDataSet cache-policy path), the repository
+        // should return every row rather than fall through to a `WHERE id IN ()` that returns nothing.
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var repo = CreateRepository(ScopeProvider);
+
+            var rurl1 = new RedirectUrl { ContentKey = _textpage.Key, Url = "x" };
+            repo.Save(rurl1);
+
+            var rurl2 = new RedirectUrl
+            {
+                ContentKey = _subpage.Key,
+                Url = "y",
+                CreateDateUtc = rurl1.CreateDateUtc.AddSeconds(1)
+            };
+            repo.Save(rurl2);
+
+            scope.Complete();
+        }
+
+        using (var scope = ScopeProvider.CreateScope())
+        {
+            var repo = CreateRepository(ScopeProvider);
+            var rurls = repo.GetMany().ToArray();
+            scope.Complete();
+
+            Assert.That(rurls.Select(r => r.Url), Is.SupersetOf(new[] { "x", "y" }));
+        }
+    }
+
+    [Test]
     public void Can_Search_Urls()
     {
         var provider = ScopeProvider;

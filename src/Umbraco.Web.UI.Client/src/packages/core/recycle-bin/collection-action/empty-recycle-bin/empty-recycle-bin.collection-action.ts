@@ -1,4 +1,4 @@
-import { UmbCollectionActionBase } from '../../../collection/action/collection-action-base.js';
+import { UmbCollectionActionBase } from '@umbraco-cms/backoffice/collection';
 import type { UmbRecycleBinRepository } from '../../recycle-bin-repository.interface.js';
 import type { ManifestCollectionActionEmptyRecycleBinKind } from './types.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';

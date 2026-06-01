@@ -6218,9 +6218,11 @@ export class RedirectManagementService {
     }
     
     /**
-     * Sets the redirect URL tracking status.
+     * Deprecated. No longer changes the redirect URL tracking status.
      *
-     * Updates the redirect URL tracking configuration according to the provided status.
+     * This endpoint is deprecated and no longer modifies the configuration. To toggle redirect URL tracking, set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead.
+     *
+     * @deprecated
      */
     public static postRedirectManagementStatus<ThrowOnError extends boolean = true>(options?: Options<PostRedirectManagementStatusData, ThrowOnError>) {
         return (options?.client ?? client).post<PostRedirectManagementStatusResponses, PostRedirectManagementStatusErrors, ThrowOnError>({
