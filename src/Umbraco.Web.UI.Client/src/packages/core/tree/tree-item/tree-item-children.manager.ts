@@ -275,15 +275,11 @@ export class UmbTreeItemChildrenManager<
 						unique: parent.unique,
 						entityType: parent.entityType,
 					},
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging || offsetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging || offsetPaging,
 					foldersOnly,
 					...additionalArgs,
@@ -385,10 +381,6 @@ export class UmbTreeItemChildrenManager<
 		}
 
 		if (data) {
-			if (data.totalBefore === undefined) {
-				throw new Error('totalBefore is missing in the response');
-			}
-
 			const items = data.items as Array<TreeItemType>;
 
 			// We have loaded previous items so we add them to the top of the array
@@ -432,26 +424,17 @@ export class UmbTreeItemChildrenManager<
 			takeAfter: this.targetPagination.getTakeSize(),
 		};
 
-		const offsetPaging: UmbOffsetPaginationRequestModel = {
-			skip: this.offsetPagination.getSkip(),
-			take: this.offsetPagination.getPageSize(),
-		};
-
 		const { data, error } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: {
 						unique: parent.unique,
 						entityType: parent.entityType,
 					},
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip, // including this for backward compatibility
-					take: offsetPaging.take, // including this for backward compatibility
 					paging: targetPaging,
 					foldersOnly,
 					...additionalArgs,
@@ -551,15 +534,11 @@ export class UmbTreeItemChildrenManager<
 		const { data } = parent?.unique
 			? await repository.requestTreeItemsOf({
 					parent: { unique: parent.unique, entityType: parent.entityType },
-					skip: offsetPaging.skip,
-					take: offsetPaging.take,
 					paging: offsetPaging,
 					foldersOnly,
 					...additionalArgs,
 				})
 			: await repository.requestTreeRootItems({
-					skip: offsetPaging.skip,
-					take: offsetPaging.take,
 					paging: offsetPaging,
 					foldersOnly,
 					...additionalArgs,

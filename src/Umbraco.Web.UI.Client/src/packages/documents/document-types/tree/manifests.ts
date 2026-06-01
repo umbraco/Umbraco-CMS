@@ -4,12 +4,10 @@ import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension
 import {
 	UMB_DOCUMENT_TYPE_TREE_ALIAS,
 	UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS,
-	UMB_DOCUMENT_TYPE_TREE_STORE_ALIAS,
 	UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
 	UMB_DOCUMENT_TYPE_FOLDER_WORKSPACE_ALIAS,
 	UMB_DOCUMENT_TYPE_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
 } from './constants.js';
-import { UmbDocumentTypeTreeStore } from './document-type.tree.store.js';
 import { manifests as folderManifests } from './folder/manifests.js';
 import { manifests as treeItemChildrenManifests } from './tree-item-children/manifests.js';
 import { manifests as viewManifests } from './views/manifests.js';
@@ -21,12 +19,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		alias: UMB_DOCUMENT_TYPE_TREE_REPOSITORY_ALIAS,
 		name: 'Document Type Tree Repository',
 		api: () => import('./document-type-tree.repository.js'),
-	},
-	{
-		type: 'treeStore',
-		alias: UMB_DOCUMENT_TYPE_TREE_STORE_ALIAS,
-		name: 'Document Type Tree Store',
-		api: UmbDocumentTypeTreeStore,
 	},
 	{
 		type: 'tree',

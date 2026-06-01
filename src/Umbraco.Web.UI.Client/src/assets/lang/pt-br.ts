@@ -285,8 +285,6 @@ export default {
 		renewSession: 'Renovar agora para salvar seu trabalho',
 	},
 	login: {
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',
 	},
 	main: {
 		dashboard: 'Painel',

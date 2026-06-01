@@ -1,7 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Api.Common.ViewModels.Pagination;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
@@ -16,23 +15,11 @@ namespace Umbraco.Cms.Api.Management.Controllers.DocumentType.Tree;
 public class ChildrenDocumentTypeTreeController : DocumentTypeTreeControllerBase
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ChildrenDocumentTypeTreeController"/> class, which manages the retrieval of child document types in the tree structure.
-    /// </summary>
-    /// <param name="entityService">Service used for entity operations within the Umbraco CMS.</param>
-    /// <param name="contentTypeService">Service used for managing content types in the Umbraco CMS.</param>
-    [Obsolete("Please use the constructor taking all parameters. Scheduled for removal in Umbraco 18.")]
-    public ChildrenDocumentTypeTreeController(IEntityService entityService, IContentTypeService contentTypeService)
-        : base(entityService, contentTypeService)
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="ChildrenDocumentTypeTreeController"/> class.
     /// </summary>
     /// <param name="entityService">The <see cref="IEntityService"/> used to manage entities.</param>
     /// <param name="flagProviders">The <see cref="FlagProviderCollection"/> containing flag providers for the tree.</param>
     /// <param name="contentTypeService">The <see cref="IContentTypeService"/> used to manage content types.</param>
-    [ActivatorUtilitiesConstructor]
     public ChildrenDocumentTypeTreeController(IEntityService entityService, FlagProviderCollection flagProviders, IContentTypeService contentTypeService)
         : base(entityService, flagProviders, contentTypeService)
     {

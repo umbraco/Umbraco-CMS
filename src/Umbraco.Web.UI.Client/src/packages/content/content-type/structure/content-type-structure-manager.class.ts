@@ -110,11 +110,6 @@ export class UmbContentTypeStructureManager<
 	async getContentTypeProperties() {
 		return await this.observe(this.contentTypeProperties).asPromise();
 	}
-	readonly contentTypeDataTypeUniques = this.#contentTypes.asObservablePart((contentTypes) => {
-		return contentTypes
-			.flatMap((x) => x.properties?.map((p) => p.dataType.unique) ?? [])
-			.filter(UmbFilterDuplicateStrings);
-	});
 
 	/**
 	 * Get an observable for the data type detail of a data type that is in use by this content type structure.
@@ -137,9 +132,27 @@ export class UmbContentTypeStructureManager<
 	readonly contentTypeLoaded = mergeObservables(
 		[this.contentTypeCompositions, this.contentTypeUniques],
 		([comps, uniques]) => {
-			return comps.every((x) => uniques.includes(x.contentType.unique));
+			return uniques.length > 0 && comps.every((x) => uniques.includes(x.contentType.unique));
 		},
 	);
+
+	// Derived from #contentTypes (single source) and gated on contentTypeLoaded, so property
+	// changes re-emit and properties can't lag behind loaded across separate microtasks. [NL]
+	readonly contentTypeDataTypeUniques = mergeObservables(
+		[this.contentTypeLoaded, this.contentTypes],
+		([loaded, contentTypes]) => {
+			if (!loaded) return [];
+			return contentTypes
+				.flatMap((x) => x.properties?.map((p) => p.dataType.unique) ?? [])
+				.filter(UmbFilterDuplicateStrings);
+		},
+	);
+	getContentTypeDataTypeUniques() {
+		return this.#contentTypes
+			.getValue()
+			.flatMap((x) => x.properties?.map((p) => p.dataType.unique) ?? [])
+			.filter(UmbFilterDuplicateStrings);
+	}
 
 	readonly variesByCulture = createObservablePart(this.ownerContentType, (x) => x?.variesByCulture);
 	readonly variesBySegment = createObservablePart(this.ownerContentType, (x) => x?.variesBySegment);
@@ -200,11 +213,21 @@ export class UmbContentTypeStructureManager<
 		// Observe data type uniques and bulk load their details.
 		// Uses nested observation: outer watches which data types are needed,
 		// inner subscribes to the store-backed observable for reactivity.
+
 		this.observe(
 			this.contentTypeDataTypeUniques,
 			async (dataTypeUniques) => {
-				if (dataTypeUniques.length > 0) {
+				if (dataTypeUniques && dataTypeUniques.length > 0) {
 					const { asObservable } = await this.#dataTypeDetailRepository.requestByUniques(dataTypeUniques);
+					// TODO: We should avoid this check, but architecturally, we currently lack a way to cancel previous requests. [NL]
+					// This is unlikely to happen, but we keep this check to avoid potential race conditions. [NL]
+					const currentDataTypeUniques = this.getContentTypeDataTypeUniques();
+					if (
+						dataTypeUniques.length !== currentDataTypeUniques.length ||
+						!dataTypeUniques.every((unique) => currentDataTypeUniques.includes(unique))
+					) {
+						return;
+					}
 					if (asObservable) {
 						this.observe(
 							asObservable(),

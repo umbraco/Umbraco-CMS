@@ -1,13 +1,12 @@
 import type { UmbSortChildrenOfRepository, UmbTreeItemModel } from '../../../types.js';
 import type { UmbTreeRepository } from '../../../data/index.js';
 import type { UmbSortChildrenOfModalData, UmbSortChildrenOfModalValue } from './sort-children-of-modal.token.js';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
-import { html, customElement, css, state, nothing } from '@umbraco-cms/backoffice/external/lit';
-import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
-import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { css, customElement, html, nothing, state } from '@umbraco-cms/backoffice/external/lit';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
-import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
 import { observeMultiple } from '@umbraco-cms/backoffice/observable-api';
+import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
+import { UmbPaginationManager } from '@umbraco-cms/backoffice/utils';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 import type { UUIButtonState } from '@umbraco-cms/backoffice/external/uui';
 import type {
 	UmbTableColumn,
@@ -18,9 +17,7 @@ import type {
 	UmbTableSortedEvent,
 } from '@umbraco-cms/backoffice/components';
 
-const elementName = 'umb-sort-children-of-modal';
-
-@customElement(elementName)
+@customElement('umb-sort-children-of-modal')
 export class UmbSortChildrenOfModalElement<
 	TreeItemModelType extends UmbTreeItemModel = UmbTreeItemModel,
 > extends UmbModalBaseElement<UmbSortChildrenOfModalData, UmbSortChildrenOfModalValue> {
@@ -46,6 +43,9 @@ export class UmbSortChildrenOfModalElement<
 
 	@state()
 	private _sortable = false;
+
+	@state()
+	private _loading = false;
 
 	@state()
 	private _submitButtonState?: UUIButtonState;
@@ -90,29 +90,36 @@ export class UmbSortChildrenOfModalElement<
 		if (this.data?.unique === undefined) throw new Error('unique is required');
 		if (!this.data?.treeRepositoryAlias) throw new Error('treeRepositoryAlias is required');
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<TreeItemModelType>>(
-			this,
-			this.data.treeRepositoryAlias,
-		);
+		this._loading = true;
+		try {
+			const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<TreeItemModelType>>(
+				this,
+				this.data.treeRepositoryAlias,
+			);
 
-		const { data } = await treeRepository.requestTreeItemsOf({
-			parent: {
-				unique: this.data.unique,
-				entityType: this.data.entityType,
-			},
-			skip: this.#pagination.getSkip(),
-			take: this.#pagination.getPageSize(),
-		});
+			const { data } = await treeRepository.requestTreeItemsOf({
+				parent: {
+					unique: this.data.unique,
+					entityType: this.data.entityType,
+				},
+				paging: {
+					skip: this.#pagination.getSkip(),
+					take: this.#pagination.getPageSize(),
+				},
+			});
 
-		if (data) {
-			this._children = [...this._children, ...data.items];
-			this.#pagination.setTotalItems(data.total);
-			this._sortable = this._children.length > 0;
-			this._createTableItems();
+			if (data) {
+				this._children = [...this._children, ...data.items];
+				this.#pagination.setTotalItems(data.total);
+				this._sortable = this._children.length > 0;
+				await this._createTableItems();
+			}
+		} finally {
+			this._loading = false;
 		}
 	}
 
-	protected _createTableItems() {
+	protected _createTableItems(): void | Promise<void> {
 		this._tableItems = this._children.map((treeItem) => {
 			return {
 				id: treeItem.unique,
@@ -133,6 +140,7 @@ export class UmbSortChildrenOfModalElement<
 
 	protected _onLoadMore(event: PointerEvent) {
 		event.stopPropagation();
+		if (this._loading) return;
 		if (this._currentPage >= this._totalPages) return;
 		this.#pagination.setCurrentPageNumber(this._currentPage + 1);
 		this.#requestChildren();
@@ -227,7 +235,10 @@ export class UmbSortChildrenOfModalElement<
 		return html`
 			<umb-body-layout headline=${this.localize.term('actions_sort')}>
 				${this._children.length === 0 ? this.#renderEmptyState() : this.#renderTable()}
-				<uui-button slot="actions" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}"></uui-button>
+				<uui-button
+					slot="actions"
+					label=${this.localize.term('general_cancel')}
+					@click="${this._rejectModal}"></uui-button>
 				<uui-button
 					slot="actions"
 					color="positive"
@@ -240,7 +251,9 @@ export class UmbSortChildrenOfModalElement<
 	}
 
 	#renderEmptyState() {
-		return html`<uui-label><umb-localize key="sort_sortEmptyState">This node has no child nodes to sort</umb-localize></uui-label>`;
+		return html`
+			<uui-label><umb-localize key="sort_sortEmptyState">This node has no child nodes to sort</umb-localize></uui-label>
+		`;
 	}
 
 	#renderTable() {
@@ -251,20 +264,24 @@ export class UmbSortChildrenOfModalElement<
 				.items=${this._tableItems}
 				.sortable=${this._sortable}
 				@sorted=${this.#onSorted}
-				@ordered=${this.#onOrdered}></umb-table>
+				@ordered=${this.#onOrdered}>
+			</umb-table>
 
 			${this._hasMorePages()
 				? html`
-						<uui-button id="loadMoreButton" look="placeholder" @click=${this._onLoadMore}
-							><umb-localize key="actions_loadMore">Load more</umb-localize> (${this._currentPage}/${this._totalPages})</uui-button
-						>
+						<uui-button
+							id="loadMoreButton"
+							look="placeholder"
+							?disabled=${this._loading}
+							@click=${this._onLoadMore}>
+							<umb-localize key="actions_loadMore">Load more</umb-localize> (${this._currentPage}/${this._totalPages})
+						</uui-button>
 					`
 				: nothing}
 		`;
 	}
 
 	static override styles = [
-		UmbTextStyles,
 		css`
 			#loadMoreButton {
 				width: 100%;
@@ -278,6 +295,6 @@ export { UmbSortChildrenOfModalElement as element };
 
 declare global {
 	interface HTMLElementTagNameMap {
-		[elementName]: UmbSortChildrenOfModalElement;
+		'umb-sort-children-of-modal': UmbSortChildrenOfModalElement;
 	}
 }
