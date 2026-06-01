@@ -24,8 +24,8 @@ import type { ManifestBase, UmbApi } from '@umbraco-cms/backoffice/extension-api
 export interface UmbTreeItemApi<
 	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
 	ManifestType extends ManifestBase = ManifestBase,
-> extends UmbApi,
-		UmbContextMinimal {
+>
+	extends UmbApi, UmbContextMinimal {
 	unique?: UmbEntityUnique;
 	entityType?: string;
 	manifest: ManifestType | undefined;
@@ -52,9 +52,9 @@ export interface UmbTreeItemApi<
  * can discover a tree item regardless of which tree view is active.
  */
 export abstract class UmbTreeItemApiBase<
-		TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
-		ManifestType extends ManifestBase = ManifestBase,
-	>
+	TreeItemType extends UmbTreeItemModel = UmbTreeItemModel,
+	ManifestType extends ManifestBase = ManifestBase,
+>
 	extends UmbContextBase
 	implements UmbTreeItemApi<TreeItemType, ManifestType>
 {
