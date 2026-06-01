@@ -145,7 +145,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 	}; // Set to undefined cause it will be set before we render.
 
 	@property({ type: Boolean, attribute: 'is-reference', reflect: true })
-	private _isLibraryElement = false;
+	private _isSharedContent = false;
 
 	@state()
 	private _sharedContentVariantState: string | null | undefined;
@@ -207,9 +207,9 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			null,
 		);
 		this.observe(
-			this.#context.isLibraryElement,
-			(isLibrary) => {
-				this._isLibraryElement = isLibrary;
+			this.#context.isSharedContent,
+			(isSharedContent) => {
+				this._isSharedContent = isSharedContent;
 				this.#updateExposedState();
 			},
 			null,
@@ -317,7 +317,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 
 	#updateExposedState() {
 		// Shared content blocks use the element's variant state; local blocks use the expose entry
-		const isExposed = this._isLibraryElement
+		const isExposed = this._isSharedContent
 			? this._sharedContentVariantState === UmbElementVariantState.PUBLISHED ||
 				this._sharedContentVariantState === UmbElementVariantState.PUBLISHED_PENDING_CHANGES
 			: this._hasExpose;
@@ -446,7 +446,7 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 			? html`
 					<div class="umb-block-single__block">
 						<umb-entity-frame>
-							${when(this._isLibraryElement, () => html`<uui-icon name="link"></uui-icon>`)} ${this._label}
+							${when(this._isSharedContent, () => html`<uui-icon name="link"></uui-icon>`)} ${this._label}
 						</umb-entity-frame>
 						<umb-extension-slot
 							type="blockEditorCustomView"

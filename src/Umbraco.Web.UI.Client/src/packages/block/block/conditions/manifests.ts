@@ -1,13 +1,13 @@
 import {
 	UMB_BLOCK_ENTRY_HAS_SETTINGS_CONDITION_ALIAS,
+	UMB_BLOCK_ENTRY_HAS_SHARED_CONTENT_CONDITION_ALIAS,
 	UMB_BLOCK_ENTRY_IS_EXPOSED_CONDITION_ALIAS,
-	UMB_BLOCK_ENTRY_IS_LIBRARY_ELEMENT_CONDITION_ALIAS,
 	UMB_BLOCK_ENTRY_IS_READ_ONLY_CONDITION_ALIAS,
 	UMB_BLOCK_WORKSPACE_HAS_CONTENT_CONDITION_ALIAS,
 } from './constants.js';
 import UmbBlockEntryHasSettingsCondition from './block-entry-has-settings.condition.js';
+import UmbBlockEntryHasSharedContentCondition from './block-entry-has-shared-content.condition.js';
 import UmbBlockEntryIsExposedCondition from './block-entry-is-exposed.condition.js';
-import UmbBlockEntryIsLibraryElementCondition from './block-entry-is-library-element.condition.js';
 import UmbBlockEntryIsReadOnlyCondition from './block-entry-is-read-only.condition.js';
 import UmbBlockEntryShowContentEditCondition from './block-entry-show-content-edit.condition.js';
 import UmbBlockWorkspaceHasContentCondition from './block-workspace-has-content.condition.js';
@@ -61,9 +61,9 @@ export const manifests: Array<ManifestCondition> = [
 	},
 	{
 		type: 'condition',
-		name: 'Block Entry Is Library Element Condition',
-		alias: UMB_BLOCK_ENTRY_IS_LIBRARY_ELEMENT_CONDITION_ALIAS,
-		api: UmbBlockEntryIsLibraryElementCondition,
+		name: 'Block Entry Has Shared Content Condition',
+		alias: UMB_BLOCK_ENTRY_HAS_SHARED_CONTENT_CONDITION_ALIAS,
+		api: UmbBlockEntryHasSharedContentCondition,
 	},
 	{
 		type: 'condition',

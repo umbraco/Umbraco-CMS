@@ -27,7 +27,7 @@ export interface BlockWorkspaceIsReadOnlyConditionConfig extends UmbConditionCon
 export type BlockEntryHasSettingsConditionConfig = UmbConditionConfigBase<'Umb.Condition.BlockEntryHasSettings'>;
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export interface BlockEntryIsLibraryElementConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryIsLibraryElement'> {
+export interface BlockEntryHasSharedContentConditionConfig extends UmbConditionConfigBase<'Umb.Condition.BlockEntryHasSharedContent'> {
 	match?: boolean;
 }
 
@@ -49,7 +49,7 @@ declare global {
 			| BlockWorkspaceHasSettingsConditionConfig
 			| BlockWorkspaceHasContentConditionConfig
 			| BlockEntryIsExposedConditionConfig
-			| BlockEntryIsLibraryElementConditionConfig
+			| BlockEntryHasSharedContentConditionConfig
 			| BlockWorkspaceIsReadOnlyConditionConfig
 			| BlockEntryIsReadOnlyConditionConfig
 			| BlockEntryHasSettingsConditionConfig

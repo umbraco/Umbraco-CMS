@@ -134,7 +134,7 @@ export class UmbBlockRteEntriesContext extends UmbBlockEntriesContext<
 						throw new Error('Failed to create block');
 					}
 				} else if (value && 'library' in value && data) {
-					await this._manager?.insertLibraryElement(
+					await this._manager?.insertSharedContent(
 						value.library.elementKey,
 						data.originData as UmbBlockRteWorkspaceOriginData,
 					);

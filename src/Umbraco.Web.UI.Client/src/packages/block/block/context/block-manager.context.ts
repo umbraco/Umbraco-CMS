@@ -83,8 +83,8 @@ export abstract class UmbBlockManagerContext<
 	readonly #contents = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
 	public readonly contents = this.#contents.asObservable();
 
-	readonly #resolvedLibraryElements = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
-	readonly #resolvedLibraryElementVariants = new UmbArrayState(
+	readonly #resolvedSharedContent = new UmbArrayState(<Array<UmbBlockDataModel>>[], (x) => x.key);
+	readonly #resolvedSharedContentVariants = new UmbArrayState(
 		<
 			Array<{ key: string; variants: Array<{ culture: string | null; segment: string | null; state: string | null }> }>
 		>[],
@@ -210,7 +210,7 @@ export abstract class UmbBlockManagerContext<
 			(layouts) => {
 				layouts.forEach((layout) => {
 					if (layout.isSharedContent && layout.contentKey) {
-						this.#fetchLibraryElement(layout.contentKey);
+						this.#fetchSharedContent(layout.contentKey);
 					}
 				});
 			},
@@ -331,16 +331,16 @@ export abstract class UmbBlockManagerContext<
 		return mergeObservables(
 			[
 				this.#contents.asObservablePart((source) => source.find((x) => x.key === key)),
-				this.#resolvedLibraryElements.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.#resolvedSharedContent.asObservablePart((source) => source.find((x) => x.key === key)),
 			],
-			([localContent, libraryContent]) => localContent ?? libraryContent ?? undefined,
+			([localContent, sharedContent]) => localContent ?? sharedContent ?? undefined,
 		);
 	}
 
 	// TODO: [LK] Review the naming of this property, align with with team.
 	/**
 	 * Returns an observable that emits true when the layout for the given contentKey
-	 * has `isSharedContent` set (i.e., the block references a library element).
+	 * has `isSharedContent` set (i.e., the block references shared content).
 	 */
 	isSharedContentOf(key: string) {
 		return this._layouts.asObservablePart(
@@ -349,14 +349,14 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
-	 * Returns an observable of the variant state for a shared/library element,
+	 * Returns an observable of the variant state for shared content,
 	 * resolved against the manager's active variantId (culture/segment).
 	 * Emits the state string (e.g., 'Published', 'Draft') or null if not resolved yet.
 	 */
 	elementStateOf(key: string) {
 		return mergeObservables(
 			[
-				this.#resolvedLibraryElementVariants.asObservablePart((source) => source.find((x) => x.key === key)),
+				this.#resolvedSharedContentVariants.asObservablePart((source) => source.find((x) => x.key === key)),
 				this.variantId,
 			],
 			([entry, variantId]) => {
@@ -371,9 +371,9 @@ export abstract class UmbBlockManagerContext<
 	// TODO: [@madsrasmussen] Replace per-key fetches here with a batching manager that bundles multiple
 	// element requests into a single round-trip. Today this issues one request per shared block, which
 	// can become N+1 on pages with many references. The batching manager should also cache and dedupe.
-	async #fetchLibraryElement(key: string) {
+	async #fetchSharedContent(key: string) {
 		if (this.#pendingElementFetches.has(key)) return;
-		if (this.#resolvedLibraryElements.getValue().some((x) => x.key === key)) return;
+		if (this.#resolvedSharedContent.getValue().some((x) => x.key === key)) return;
 		this.#pendingElementFetches.add(key);
 		try {
 			const { data } = await this.#elementRepository.requestByUnique(key);
@@ -391,8 +391,8 @@ export abstract class UmbBlockManagerContext<
 						}),
 					),
 				};
-				this.#resolvedLibraryElements.appendOne(blockData);
-				this.#resolvedLibraryElementVariants.appendOne({
+				this.#resolvedSharedContent.appendOne(blockData);
+				this.#resolvedSharedContentVariants.appendOne({
 					key: data.unique,
 					variants: data.variants.map((v) => ({
 						culture: v.culture ?? null,
@@ -468,7 +468,7 @@ export abstract class UmbBlockManagerContext<
 	getContentOf(contentKey: string) {
 		return (
 			this.#contents.value.find((x) => x.key === contentKey) ??
-			this.#resolvedLibraryElements.value.find((x) => x.key === contentKey)
+			this.#resolvedSharedContent.value.find((x) => x.key === contentKey)
 		);
 	}
 	getSettingsOf(settingsKey: string) {
@@ -514,11 +514,11 @@ export abstract class UmbBlockManagerContext<
 	}
 
 	/**
-	 * Insert a block whose content is a library element reference.
+	 * Insert a block whose content is a shared content reference.
 	 * Only creates a layout entry — no contentData entry is added.
 	 * The layout observer handles fetching the element data.
 	 */
-	insertLibraryElement(elementKey: string, _originData?: BlockOriginDataType) {
+	insertSharedContent(elementKey: string, _originData?: BlockOriginDataType) {
 		const layout = { key: UmbId.new(), contentKey: elementKey, isSharedContent: true } as BlockLayoutType;
 		this._layouts.appendOne(layout);
 	}
@@ -617,9 +617,9 @@ export abstract class UmbBlockManagerContext<
 			contentKey: newContent.key,
 			isSharedContent: undefined,
 		} as Partial<BlockLayoutType>);
-		this.#resolvedLibraryElements.removeOne(elementKey);
-		this.#resolvedLibraryElementVariants.removeOne(elementKey);
-		// Only set expose if the content type structure is loaded (it may not be for library elements
+		this.#resolvedSharedContent.removeOne(elementKey);
+		this.#resolvedSharedContentVariants.removeOne(elementKey);
+		// Only set expose if the content type structure is loaded (it may not be for shared content
 		// whose type was not in the block type list)
 		if (this.getStructure(contentTypeKey)) {
 			this.#setInitialBlockExpose(newContent);

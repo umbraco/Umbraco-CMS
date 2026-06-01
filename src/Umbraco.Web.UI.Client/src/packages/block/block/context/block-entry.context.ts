@@ -63,9 +63,9 @@ export abstract class UmbBlockEntryContext<
 
 	protected readonly localize = new UmbLocalizationController(this);
 
-	#isLibraryElement = new UmbBooleanState(false);
-	/** Observable that emits true when this block references shared content from the Element Library. */
-	readonly isLibraryElement = this.#isLibraryElement.asObservable();
+	#isSharedContent = new UmbBooleanState(false);
+	/** Observable that emits true when this block's content is shared (referenced from the Element Library) rather than local. */
+	readonly isSharedContent = this.#isSharedContent.asObservable();
 
 	#sharedContentVariantState = new UmbStringState(undefined);
 	/** Observable of the shared element's variant state (e.g. 'Published', 'Draft'), resolved for the active culture/segment. */
@@ -180,14 +180,14 @@ export abstract class UmbBlockEntryContext<
 	#workspacePath = new UmbStringState(undefined);
 	public readonly workspacePath = this.#workspacePath.asObservable();
 
-	#libraryElementWorkspacePath = new UmbStringState(undefined);
+	#sharedContentWorkspacePath = new UmbStringState(undefined);
 
 	public readonly workspaceEditContentPath = mergeObservables(
-		[this.contentKey, this.workspacePath, this.isLibraryElement, this.#libraryElementWorkspacePath.asObservable()],
-		([contentKey, path, isLibrary, libraryPath]) => {
+		[this.contentKey, this.workspacePath, this.isSharedContent, this.#sharedContentWorkspacePath.asObservable()],
+		([contentKey, path, isSharedContent, sharedContentPath]) => {
 			if (!contentKey) return '';
-			if (isLibrary && libraryPath) {
-				return libraryPath + UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: contentKey });
+			if (isSharedContent && sharedContentPath) {
+				return sharedContentPath + UMB_EDIT_ELEMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: contentKey });
 			}
 			return this.#generateWorkspaceEditContentPath(path, contentKey);
 		},
@@ -588,7 +588,7 @@ export abstract class UmbBlockEntryContext<
 		);
 
 		new UmbModalRouteRegistrationController(this, UMB_WORKSPACE_MODAL)
-			.addAdditionalPath('library-element')
+			.addAdditionalPath('library')
 			.addUniquePaths(['unique'])
 			.onSetup(() => {
 				return {
@@ -597,7 +597,7 @@ export abstract class UmbBlockEntryContext<
 				};
 			})
 			.observeRouteBuilder((routeBuilder) => {
-				this.#libraryElementWorkspacePath.setValue(routeBuilder({ entityType: UMB_ELEMENT_ENTITY_TYPE }));
+				this.#sharedContentWorkspacePath.setValue(routeBuilder({ entityType: UMB_ELEMENT_ENTITY_TYPE }));
 			});
 	}
 
@@ -607,18 +607,18 @@ export abstract class UmbBlockEntryContext<
 		const contentKey = this.#contentKey ?? this._layout.value?.contentKey;
 		if (!this._manager || !contentKey) return;
 
-		// Observe content and library state together to avoid race conditions.
+		// Observe content and shared-content state together to avoid race conditions.
 		// Both are evaluated in the same tick, preventing the unsupported flag
-		// from flashing true while library element content is being fetched.
+		// from flashing true while shared content is being fetched.
 		this.observe(
 			mergeObservables(
 				[this._manager.contentOf(contentKey), this._manager.isSharedContentOf(contentKey)],
-				([content, isLibrary]) => ({ content, isLibrary: isLibrary ?? false }),
+				([content, isSharedContent]) => ({ content, isSharedContent: isSharedContent ?? false }),
 			),
-			({ content, isLibrary }) => {
-				this.#isLibraryElement.setValue(isLibrary);
+			({ content, isSharedContent }) => {
+				this.#isSharedContent.setValue(isSharedContent);
 				if (!this.#structurallyUnsupported) {
-					this.#unsupported.setValue(!content && !isLibrary);
+					this.#unsupported.setValue(!content && !isSharedContent);
 				}
 				this.#content.setValue(content);
 			},

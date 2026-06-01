@@ -83,8 +83,8 @@ export class UmbBlockRteManagerContext<
 		return true;
 	}
 
-	override async insertLibraryElement(elementKey: string, originData?: UmbBlockRteWorkspaceOriginData) {
-		await super.insertLibraryElement(elementKey, originData);
+	override async insertSharedContent(elementKey: string, originData?: UmbBlockRteWorkspaceOriginData) {
+		await super.insertSharedContent(elementKey, originData);
 		if (originData) {
 			const layout = { key: UmbId.new(), contentKey: elementKey, isSharedContent: true } as BlockLayoutType;
 			this.notifyBlockInserted(layout, originData);
