@@ -147,7 +147,6 @@ test('cannot see element type not applicable message in Settings tab for a Docum
 test('cannot disable Element Type when element of that type exists', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementName = 'TestElement';
-  await umbracoApi.element.ensureNameNotExists(elementName);
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(documentTypeName, true);
   await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -170,7 +169,6 @@ test('cannot disable Element Type when element of that type exists', async ({umb
 test('can disable Element Type after deleting the element of that type', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const elementName = 'TestElement';
-  await umbracoApi.element.ensureNameNotExists(elementName);
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(documentTypeName, true);
   const elementId = await umbracoApi.element.createDefaultElement(elementName, elementTypeId);
   await umbracoApi.element.delete(elementId);
@@ -186,15 +184,11 @@ test('can disable Element Type after deleting the element of that type', async (
   await umbracoUi.documentType.isErrorNotificationVisible(false);
   const documentTypeData = await umbracoApi.documentType.getByName(documentTypeName);
   expect(documentTypeData.isElement).toBeFalsy();
-
-  // Clean
-  await umbracoApi.element.ensureNameNotExists(elementName);
 });
 
 test('cannot enable Element Type when document of that type exists', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const documentName = 'TestDocument';
-  await umbracoApi.document.ensureNameNotExists(documentName);
   const documentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(documentTypeName);
   await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
@@ -217,7 +211,6 @@ test('cannot enable Element Type when document of that type exists', async ({umb
 test('cannot disable Element Type when used in a block editor configuration', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const blockListDataTypeName = 'TestBlockListReferencingElement';
-  await umbracoApi.dataType.ensureNameNotExists(blockListDataTypeName);
   const elementTypeId = await umbracoApi.documentType.createEmptyElementType(documentTypeName);
   await umbracoApi.dataType.createBlockListDataTypeWithABlock(blockListDataTypeName, elementTypeId);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
