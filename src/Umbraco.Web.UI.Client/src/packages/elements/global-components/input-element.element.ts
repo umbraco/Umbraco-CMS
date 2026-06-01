@@ -1,9 +1,11 @@
 import { UmbElementTreePickerDataSource } from '../picker-data-source/element-tree.picker-data-source.js';
+import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
 import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-input-element')
@@ -15,6 +17,9 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 
 	@property({ type: Boolean })
 	folderOnly = false;
+
+	@property({ type: String })
+	allowedContentTypeIds?: string;
 
 	@property({ type: Number })
 	min = 0;
@@ -31,12 +36,12 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 	#selection: Array<string> = [];
 
 	@property({ type: Array })
-	public set selection(ids: Array<string>) {
-		this.#selection = ids;
-		super.value = ids.length > 0 ? ids.join(',') : undefined;
+	public set selection(ids: Array<UmbReferenceByUniqueAndType>) {
+		this.#selection = ids?.map((item) => item.unique) ?? [];
+		super.value = this.#selection.length > 0 ? this.#selection.join(',') : undefined;
 	}
-	public get selection(): Array<string> {
-		return this.#selection;
+	public get selection(): Array<UmbReferenceByUniqueAndType> {
+		return this.#selection.map((id) => ({ type: UMB_ELEMENT_ENTITY_TYPE, unique: id }));
 	}
 
 	@property({ type: Object, attribute: false })
@@ -68,6 +73,7 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 		const dataSourceConfig = [
 			{ alias: 'folderOnly', value: this.folderOnly },
 			{ alias: 'startNode', value: this.startNode },
+			{ alias: 'allowedContentTypeIds', value: this.allowedContentTypeIds },
 		];
 		return html`
 			<umb-input-entity-data
@@ -76,7 +82,7 @@ export class UmbInputElementElement extends UmbFormControlMixin<string | undefin
 				.dataSourceConfig=${dataSourceConfig}
 				.dataSourceApi=${this.#dataSourceApi}
 				.value=${this.value}
-				.selection=${this.selection}
+				.selection=${this.#selection}
 				.min=${this.min}
 				.max=${this.max}
 				?readonly=${this.readonly}

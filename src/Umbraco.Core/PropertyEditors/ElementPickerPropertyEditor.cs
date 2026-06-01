@@ -1,8 +1,14 @@
-﻿using Umbraco.Cms.Core.IO;
+using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors;
 
@@ -31,6 +37,8 @@ public class ElementPickerPropertyEditor : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<ElementPickerPropertyValueEditor>(Attribute!);
 
+    internal record ElementPickerValueModel(string Type, Guid Unique);
+
     internal sealed class ElementPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IJsonSerializer _jsonSerializer;
@@ -39,9 +47,17 @@ public class ElementPickerPropertyEditor : DataEditor
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
             IIOHelper ioHelper,
-            DataEditorAttribute attribute)
+            DataEditorAttribute attribute,
+            ILocalizedTextService localizedTextService,
+            IElementService elementService,
+            ICoreScopeProvider coreScopeProvider)
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
-            => _jsonSerializer = jsonSerializer;
+        {
+            _jsonSerializer = jsonSerializer;
+            Validators.Add(new TypedJsonValidatorRunner<ElementPickerValueModel[], ElementPickerConfiguration>(
+                jsonSerializer,
+                new AllowedTypeValidator(localizedTextService, elementService, coreScopeProvider)));
+        }
 
         public IEnumerable<UmbracoEntityReference> GetReferences(object? value)
         {
@@ -51,16 +67,91 @@ public class ElementPickerPropertyEditor : DataEditor
                 yield break;
             }
 
-            IEnumerable<Guid>? elementIds = _jsonSerializer.Deserialize<IEnumerable<Guid>>(asString);
-            if (elementIds is null)
+            IEnumerable<ElementPickerValueModel>? items = _jsonSerializer.Deserialize<IEnumerable<ElementPickerValueModel>>(asString);
+            if (items is null)
             {
                 yield break;
             }
 
-            foreach (Guid elementId in elementIds)
+            foreach (ElementPickerValueModel item in items)
             {
-                yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Element, elementId));
+                yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Element, item.Unique));
             }
+        }
+    }
+
+    internal sealed class AllowedTypeValidator : ITypedJsonValidator<ElementPickerValueModel[], ElementPickerConfiguration>
+    {
+        private readonly ILocalizedTextService _localizedTextService;
+        private readonly IElementService _elementService;
+        private readonly ICoreScopeProvider _coreScopeProvider;
+
+        public AllowedTypeValidator(
+            ILocalizedTextService localizedTextService,
+            IElementService elementService,
+            ICoreScopeProvider coreScopeProvider)
+        {
+            _localizedTextService = localizedTextService;
+            _elementService = elementService;
+            _coreScopeProvider = coreScopeProvider;
+        }
+
+        public IEnumerable<ValidationResult> Validate(
+            ElementPickerValueModel[]? value,
+            ElementPickerConfiguration? configuration,
+            string? valueType,
+            PropertyValidationContext validationContext)
+        {
+            if (value is null || value.Length == 0 || configuration is null)
+            {
+                return [];
+            }
+
+            HashSet<Guid> allowedContentTypeKeys = ParseAllowedContentTypeKeys(configuration.AllowedContentTypeIds);
+
+            // No filter configured — all element types are allowed.
+            if (allowedContentTypeKeys.Count == 0)
+            {
+                return [];
+            }
+
+            using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
+            IElement[] elements = _elementService.GetByIds(value.Select(v => v.Unique).Distinct()).ToArray();
+            scope.Complete();
+
+            foreach (IElement element in elements)
+            {
+                if (allowedContentTypeKeys.Contains(element.ContentType.Key) is false)
+                {
+                    return
+                    [
+                        new ValidationResult(
+                            _localizedTextService.Localize("validation", "invalidObjectType"),
+                            ["value"])
+                    ];
+                }
+            }
+
+            return [];
+        }
+
+        private static HashSet<Guid> ParseAllowedContentTypeKeys(string? configValue)
+        {
+            if (configValue.IsNullOrWhiteSpace())
+            {
+                return [];
+            }
+
+            var result = new HashSet<Guid>();
+            foreach (var entry in configValue.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (Guid.TryParse(entry, out Guid guid))
+                {
+                    result.Add(guid);
+                }
+            }
+
+            return result;
         }
     }
 }

@@ -3,13 +3,13 @@ import { customElement, html, property, state } from '@umbraco-cms/backoffice/ex
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin, UMB_VALIDATION_EMPTY_LOCALIZATION_KEY } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-import type { UmbNumberRangeValueType } from '@umbraco-cms/backoffice/models';
+import type { UmbNumberRangeValueType, UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbPropertyEditorUiElement } from '@umbraco-cms/backoffice/property-editor';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-element-picker-property-editor-ui')
 export class UmbElementPickerPropertyEditorUIElement
-	extends UmbFormControlMixin<Array<string> | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
+	extends UmbFormControlMixin<Array<UmbReferenceByUniqueAndType> | undefined, typeof UmbLitElement>(UmbLitElement, undefined)
 	implements UmbPropertyEditorUiElement
 {
 	@property({ type: Boolean })
@@ -40,6 +40,8 @@ export class UmbElementPickerPropertyEditorUIElement
 		this._startNode = startNodeId.length
 			? { unique: startNodeId[0], entityType: UMB_ELEMENT_FOLDER_ENTITY_TYPE }
 			: undefined;
+
+		this._allowedContentTypes = config.getValueByAlias('allowedContentTypes');
 	}
 
 	@state()
@@ -60,6 +62,9 @@ export class UmbElementPickerPropertyEditorUIElement
 	@state()
 	private _startNode?: UmbTreeStartNode;
 
+	@state()
+	private _allowedContentTypes?: string;
+
 	override focus() {
 		return this.shadowRoot?.querySelector('umb-input-element')?.focus();
 	}
@@ -77,7 +82,7 @@ export class UmbElementPickerPropertyEditorUIElement
 		}
 	}
 
-	#onChange(event: CustomEvent & { target: { selection: Array<string> } }) {
+	#onChange(event: CustomEvent & { target: { selection: Array<UmbReferenceByUniqueAndType> } }) {
 		this.value = event.target.selection;
 		this.dispatchEvent(new UmbChangeEvent());
 	}
@@ -91,6 +96,7 @@ export class UmbElementPickerPropertyEditorUIElement
 				.minMessage=${this._minMessage}
 				.max=${this._max}
 				.maxMessage=${this._maxMessage}
+				.allowedContentTypeIds=${this._allowedContentTypes}
 				?folderOnly=${this._folderOnly}
 				?readonly=${this.readonly}
 				@change=${this.#onChange}>

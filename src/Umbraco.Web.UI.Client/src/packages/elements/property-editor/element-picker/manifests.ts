@@ -1,4 +1,5 @@
-﻿import { manifest as schemaManifest } from './Umbraco.ElementPicker.js';
+﻿import { manifest as allowedElementTypesManifest } from './config/allowed-element-types/manifests.js';
+import { manifest as schemaManifest } from './Umbraco.ElementPicker.js';
 import type { ManifestPropertyEditorUi } from '@umbraco-cms/backoffice/property-editor';
 
 const propertyEditorUi: ManifestPropertyEditorUi = {
@@ -32,9 +33,16 @@ const propertyEditorUi: ManifestPropertyEditorUi = {
 					],
 					weight: 110,
 				},
+				{
+					alias: 'allowedContentTypes',
+					label: 'Allow items of type',
+					description: 'Select the applicable element types',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.ElementPicker.AllowedElementTypes',
+					weight: 120,
+				},
 			],
 		},
 	},
 };
 
-export const manifests: Array<UmbExtensionManifest> = [propertyEditorUi, schemaManifest];
+export const manifests: Array<UmbExtensionManifest> = [propertyEditorUi, allowedElementTypesManifest, schemaManifest];
