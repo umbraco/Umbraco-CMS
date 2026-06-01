@@ -89,6 +89,10 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 	}
 
 	#getHref() {
+		// No `_editPath` means the modal route registration couldn't reach a parent route context
+		// (e.g. this ref is rendered inside a non-routable modal). Skip rendering an href so we don't
+		// produce a broken `/edit/<guid>` link. Consumers that know they will be in such a context
+		// (like the link-picker modal) should also pass `readonly` so the ref isn't styled as clickable.
 		if (!this._unique || !this._editPath) return;
 		const path = UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN.generateLocal({ unique: this._unique });
 		return `${this._editPath}/${path}`;
@@ -111,7 +115,7 @@ export class UmbDocumentItemRefElement extends UmbLitElement {
 			<uui-ref-node
 				name=${this._name}
 				href=${ifDefined(this.#getHref())}
-				?readonly=${this.readonly || !this._editPath}
+				?readonly=${this.readonly}
 				?standalone=${this.standalone}
 				?select-only=${this.selectOnly}
 				?selectable=${this.selectable}
