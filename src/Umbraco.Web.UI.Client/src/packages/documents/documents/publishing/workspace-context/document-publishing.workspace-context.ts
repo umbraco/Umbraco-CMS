@@ -391,33 +391,36 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const entityType = this.#documentWorkspaceContext.getEntityType();
 		if (!entityType) throw new Error('Entity type is missing');
 
-		await this.#documentWorkspaceContext.performCreateOrUpdate(variantIds, saveData);
+		// Capture the current (draft) data before the operation, so variants that are not being published
+		// but still hold unsaved edits can be kept dirty after the reload below.
+		const dirtyData = this.#documentWorkspaceContext.getData();
 
-		const { error } = await this.#publishingRepository.publish(
-			unique,
-			variantIds.map((variantId) => ({ variantId })),
-		);
+		// Save and publish in a single server transaction (replaces the separate save + publish calls).
+		await this.#documentWorkspaceContext.performCreateOrUpdateAndPublish(variantIds, saveData);
 
-		if (!error) {
-			this.#notificationContext?.peek('positive', {
-				data: {
-					message: this.#localize.term('speechBubbles_editContentPublishedHeader'),
-				},
-			});
+		this.#notificationContext?.peek('positive', {
+			data: {
+				message: this.#localize.term('speechBubbles_editContentPublishedHeader'),
+			},
+		});
 
-			// Clear stale published data and pending changes state so the
-			// persistedData observer does not run a comparison against outdated
-			// data during reload, which would briefly show a false-positive
-			// "pending changes" state.
-			this.#clear();
+		// Clear stale published data and pending changes state so the
+		// persistedData observer does not run a comparison against outdated
+		// data during reload, which would briefly show a false-positive
+		// "pending changes" state.
+		this.#clear();
 
-			// reload the document so all states are updated after the publish operation
-			await this.#documentWorkspaceContext.reload();
-			await this.#loadAndProcessLastPublished();
+		// reload the document so all states are updated after the publish operation
+		await this.#documentWorkspaceContext.reload();
 
-			const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
-			this.#eventContext?.dispatchEvent(event);
-		}
+		// The reload resets the current data state to the full server document. Re-apply the edits of the
+		// variants that were not published, so they remain dirty (and the Discard-Changes guard fires).
+		await this.#documentWorkspaceContext.transferPublishedVariantsToCurrent(dirtyData, variantIds);
+
+		await this.#loadAndProcessLastPublished();
+
+		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
+		this.#eventContext?.dispatchEvent(event);
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {

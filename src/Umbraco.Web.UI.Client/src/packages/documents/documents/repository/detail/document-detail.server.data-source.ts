@@ -3,7 +3,9 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
+	CreateAndPublishDocumentRequestModel,
 	CreateDocumentRequestModel,
+	UpdateAndPublishDocumentRequestModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -11,6 +13,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentTypeDetailServerDataSource } from '@umbraco-cms/backoffice/document-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 
 /**
  * A data source for the Document that fetches data from the server
@@ -178,6 +181,93 @@ export class UmbDocumentServerDataSource
 		}
 
 		return { error };
+	}
+
+	/**
+	 * Creates and publishes a new Document on the server in a single operation
+	 * @param {UmbDocumentDetailModel} model - Document Model
+	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after creating
+	 * @param parentUnique
+	 * @returns {*}
+	 * @memberof UmbDocumentServerDataSource
+	 */
+	async createAndPublish(
+		model: UmbDocumentDetailModel,
+		variantIds: Array<UmbVariantId>,
+		parentUnique: string | null = null,
+	) {
+		if (!model) throw new Error('Document is missing');
+		if (!model.unique) throw new Error('Document unique is missing');
+
+		// TODO: make data mapper to prevent errors
+		const body: CreateAndPublishDocumentRequestModel = {
+			id: model.unique,
+			parent: parentUnique ? { id: parentUnique } : null,
+			documentType: { id: model.documentType.unique },
+			template: model.template ? { id: model.template.unique } : null,
+			values: model.values,
+			variants: model.variants,
+			culturesToPublish: this.#mapCulturesToPublish(variantIds),
+		};
+
+		const { data, error } = await tryExecute(
+			this,
+			DocumentService.postDocumentCreateAndPublish({
+				body: body,
+			}),
+		);
+
+		// The endpoint returns 201 Created with the key (no document body), so re-read to get the full model.
+		if (data) {
+			return this.read(data as any);
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Updates and publishes a Document on the server in a single operation
+	 * @param {UmbDocumentDetailModel} model - Document Model
+	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after updating
+	 * @returns {*}
+	 * @memberof UmbDocumentServerDataSource
+	 */
+	async updateAndPublish(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
+		if (!model.unique) throw new Error('Unique is missing');
+
+		// TODO: make data mapper to prevent errors
+		const body: UpdateAndPublishDocumentRequestModel = {
+			template: model.template ? { id: model.template.unique } : null,
+			values: model.values,
+			variants: model.variants,
+			culturesToPublish: this.#mapCulturesToPublish(variantIds),
+		};
+
+		const { error } = await tryExecute(
+			this,
+			DocumentService.putDocumentByIdUpdateAndPublish({
+				path: { id: model.unique },
+				body: body,
+			}),
+		);
+
+		// The endpoint returns 200 with a notification header (no document body), so re-read to get the full model.
+		if (!error) {
+			return this.read(model.unique);
+		}
+
+		return { error };
+	}
+
+	/**
+	 * Maps the selected variants to the culture codes accepted by the create/update-and-publish endpoints.
+	 * Invariant content types require an empty array (cultures cannot be specified), and the server rejects
+	 * `null`/`"*"` entries, so invariant variants are filtered out and only distinct culture codes remain.
+	 * @param {Array<UmbVariantId>} variantIds - The selected variants to publish
+	 * @returns {Array<string>} The distinct culture codes to publish
+	 */
+	#mapCulturesToPublish(variantIds: Array<UmbVariantId>): Array<string> {
+		return [...new Set(variantIds.filter((x) => !x.isCultureInvariant()).map((x) => x.toCultureString()))];
 	}
 
 	/**

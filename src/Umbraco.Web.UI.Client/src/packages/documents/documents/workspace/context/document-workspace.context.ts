@@ -19,7 +19,10 @@ import { UMB_DOCUMENT_CONFIGURATION_CONTEXT } from '../../index.js';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD, UMB_DOCUMENT_WORKSPACE_ALIAS } from '../constants.js';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { umbPeekError } from '@umbraco-cms/backoffice/notification';
-import { UmbContentDetailWorkspaceContextBase } from '@umbraco-cms/backoffice/content';
+import {
+	UmbContentDetailWorkspaceContextBase,
+	UmbMergeContentVariantDataController,
+} from '@umbraco-cms/backoffice/content';
 import { UmbDeprecation, type UmbVariantGuardRule } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentBlueprintDetailRepository } from '@umbraco-cms/backoffice/document-blueprint';
 import { UmbEntityContentTypeEntityContext } from '@umbraco-cms/backoffice/content-type';
@@ -39,6 +42,11 @@ import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import type { UmbDocumentTypeDetailModel } from '@umbraco-cms/backoffice/document-type';
 import type { UmbEntityModel } from '@umbraco-cms/backoffice/entity';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import {
+	UmbEntityUpdatedEvent,
+	UmbRequestReloadChildrenOfEntityEvent,
+	UmbRequestReloadStructureForEntityEvent,
+} from '@umbraco-cms/backoffice/entity-action';
 import { UmbLocalizationController } from '@umbraco-cms/backoffice/localization-api';
 import { UmbPreviewRepository } from '@umbraco-cms/backoffice/preview';
 
@@ -384,6 +392,109 @@ export class UmbDocumentWorkspaceContext
 			});
 			throw new Error(previewUrlData.message);
 		}
+	}
+
+	/**
+	 * Creates or updates the document and publishes the selected variants in a single server operation.
+	 * Mirrors the create/update event side-effects of the base save flow, but does not set the
+	 * persisted/current data state — that is handled by the subsequent reload and
+	 * {@link transferPublishedVariantsToCurrent}, which avoids a transient pending-changes flash.
+	 * @param {Array<UmbVariantId>} variantIds - The variants to publish
+	 * @param {UmbDocumentDetailModel} saveData - The data to save (constructed for the selected variants)
+	 * @returns {Promise<UmbDocumentDetailModel>} The re-read document after the operation
+	 * @memberof UmbDocumentWorkspaceContext
+	 */
+	public async performCreateOrUpdateAndPublish(
+		variantIds: Array<UmbVariantId>,
+		saveData: UmbDocumentDetailModel,
+	): Promise<UmbDocumentDetailModel> {
+		if (!this._detailRepository) throw new Error('Detail repository is not set');
+
+		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
+		if (!eventContext) {
+			throw new Error('Event context is missing');
+		}
+
+		if (this.getIsNew()) {
+			const parent = this._internal_getCreateUnderParent();
+			if (!parent) throw new Error('Parent is not set');
+
+			const { data, error } = await this._detailRepository.createAndPublish(saveData, variantIds, parent.unique);
+			if (!data || error) {
+				throw new Error('Error creating and publishing document');
+			}
+
+			this.setIsNew(false);
+
+			eventContext.dispatchEvent(
+				new UmbRequestReloadStructureForEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
+			);
+			eventContext.dispatchEvent(
+				new UmbRequestReloadChildrenOfEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
+			);
+
+			return data;
+		}
+
+		const { data, error } = await this._detailRepository.updateAndPublish(saveData, variantIds);
+		if (!data || error) {
+			throw new Error('Error updating and publishing document');
+		}
+
+		const unique = this.getUnique()!;
+		const entityType = this.getEntityType();
+
+		eventContext.dispatchEvent(new UmbRequestReloadStructureForEntityEvent({ unique, entityType }));
+		eventContext.dispatchEvent(
+			new UmbEntityUpdatedEvent({ unique, entityType, eventUnique: this._workspaceEventUnique }),
+		);
+
+		return data;
+	}
+
+	/**
+	 * Restores the current data state after a reload following save-and-publish.
+	 * The reload sets both persisted and current to the complete server document; this re-applies the
+	 * still-unpublished, edited variants from the pre-publish draft so they remain dirty (and the
+	 * Discard-Changes guard keeps firing), while the published variants stay as the clean server data.
+	 * @param {UmbDocumentDetailModel | undefined} dirtyData - The current data captured before the reload
+	 * @param {Array<UmbVariantId>} variantIds - The variants that were published
+	 * @returns {Promise<void>}
+	 * @memberof UmbDocumentWorkspaceContext
+	 */
+	public async transferPublishedVariantsToCurrent(
+		dirtyData: UmbDocumentDetailModel | undefined,
+		variantIds: Array<UmbVariantId>,
+	): Promise<void> {
+		const serverData = this._data.getPersisted();
+		if (!serverData || !dirtyData) return;
+
+		const invariantVariantId = UmbVariantId.CreateInvariant();
+		let selectedVariants = [...variantIds];
+		let variantsToStore = [...variantIds, invariantVariantId];
+
+		// When varying by segment we need to transfer all segments of the published cultures (and the
+		// invariant culture), mirroring how the save data is constructed.
+		if (this.getVariesBySegment()) {
+			const segments = serverData.values.map((x) => x.segment).filter((x) => x) as Array<string>;
+			variantsToStore = [
+				...variantsToStore,
+				...segments.flatMap((segment) => variantsToStore.map((variant) => variant.toSegment(segment))),
+			];
+			selectedVariants = [
+				...selectedVariants,
+				...segments.flatMap((segment) => selectedVariants.map((variant) => variant.toSegment(segment))),
+			];
+		}
+
+		const merged = await new UmbMergeContentVariantDataController(this).process(
+			dirtyData,
+			serverData,
+			selectedVariants,
+			variantsToStore,
+		);
+
+		this._data.setCurrent(merged);
 	}
 
 	public createPropertyDatasetContext(
