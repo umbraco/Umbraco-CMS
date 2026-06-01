@@ -502,6 +502,25 @@ export class LibraryUiHelper extends UiBaseLocators {
     await this.hasText(this.historyItems, text);
   }
 
+  async doesHistoryItemHaveTag(tagText: string, index: number = 0) {
+    const tag = this.historyItems.nth(index).locator('.log-type uui-tag');
+    await this.containsText(tag, tagText);
+  }
+
+  async doesHistoryItemHaveDescription(descriptionText: string, index: number = 0) {
+    const description = this.historyItems.nth(index).locator('.log-type span');
+    await this.hasText(description, descriptionText);
+  }
+
+  async doesHistoryItemHaveUsername(usernameText: string, index: number = 0) {
+    const username = this.historyItems.nth(index).locator('.user-info .name');
+    await this.containsText(username, usernameText);
+  }
+
+  async doesHistoryHaveCount(count: number) {
+    await this.hasCount(this.historyItems, count);
+  }
+
   async doesElementStateHaveText(text: string) {
     await this.hasText(this.elementState, text);
   }
