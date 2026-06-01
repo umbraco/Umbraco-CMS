@@ -1,4 +1,5 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import UmbClassicTreeViewElement from './classic-tree-view.element.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -8,7 +9,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		matchType: 'treeView',
 		manifest: {
 			type: 'treeView',
-			element: () => import('./classic-tree-view.element.js'),
+			element: UmbClassicTreeViewElement,
 			weight: 1000,
 			meta: {
 				label: '#tree_classicViewLabel',

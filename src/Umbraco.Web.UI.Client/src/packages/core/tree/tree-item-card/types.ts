@@ -9,3 +9,5 @@ export interface UmbTreeItemCardElement extends UmbControllerHostElement {
 	item: UmbTreeItemModel | undefined;
 	api: UmbTreeItemCardApi | undefined;
 }
+
+export type * from './tree-item-card.extension.js';

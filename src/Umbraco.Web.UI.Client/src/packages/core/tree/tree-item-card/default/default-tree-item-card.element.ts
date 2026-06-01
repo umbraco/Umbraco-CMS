@@ -1,8 +1,8 @@
 import type { UmbTreeItemModel } from '../../types.js';
-import type { UmbTreeItemCardApi } from '../tree-item-card.extension.js';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import type { UmbTreeItemCardApi } from '../types.js';
 
 @customElement('umb-default-tree-item-card')
 export class UmbDefaultTreeItemCardElement extends UmbLitElement {
