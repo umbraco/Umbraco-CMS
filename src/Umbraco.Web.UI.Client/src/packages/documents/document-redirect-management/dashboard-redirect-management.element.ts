@@ -294,6 +294,8 @@ export class UmbDashboardRedirectManagementElement extends UmbLitElement {
 				align-items: center;
 				gap: var(--uui-size-1);
 				text-wrap: nowrap;
+				background-color: transparent;
+				color: var(--uui-color-text);
 			}
 
 			#search-wrapper {

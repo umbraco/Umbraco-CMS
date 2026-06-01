@@ -30,7 +30,10 @@ export class UmbLanguageCollectionServerDataSource implements UmbCollectionDataS
 	 * @memberof UmbLanguageCollectionServerDataSource
 	 */
 	async getCollection(filter: UmbLanguageCollectionFilterModel) {
-		const { data, error } = await tryExecute(this.#host, LanguageService.getLanguage({ query: filter }));
+		const { data, error } = await tryExecute(
+			this.#host,
+			LanguageService.getLanguage({ query: { skip: filter.skip, take: filter.take } }),
+		);
 
 		if (data) {
 			const items = data.items.map((item) => {

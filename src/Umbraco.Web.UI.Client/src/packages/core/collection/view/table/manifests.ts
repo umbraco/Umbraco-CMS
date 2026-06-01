@@ -1,4 +1,5 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbTableCollectionViewElement } from './table-collection-view.element.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -9,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'collectionView',
 			kind: 'table',
-			element: () => import('./table-collection-view.element.js'),
+			element: UmbTableCollectionViewElement,
 			weight: 1000,
 			meta: {
 				label: 'Table',

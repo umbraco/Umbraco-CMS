@@ -364,7 +364,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Rechten aanpassen voor dit documenttype',
 		noDocumentTypesCreateNew: 'Nieuw documenttype aanmaken',
 		noDocumentTypesAllowedAtRoot:
-			'Er zijn geen toegestane ​​documenttypes beschikbaar om hier aan te maken. Je moet deze inschakelen bij <strong>Documenttypes</strong> in de sectie <strong>Instellingen</strong>, de optie <strong>Toestaan op root-niveau</strong> onder <strong>Rechten</strong>.',
+			'Er zijn geen toegestane ​​documenttypes beschikbaar om hier aan te maken. Je moet deze inschakelen bij <strong>Documenttypes</strong> in de sectie <strong>Instellingen</strong>, de optie <strong>Toestaan op root-niveau</strong> onder <strong>Structuur</strong>.',
 		noMediaTypes:
 			'Er zijn geen toegestande mediatypes beschikbaar. Schakel deze in in de sectie Instellingen onder <strong>"Mediatypes"</strong>.',
 		noMediaTypesWithNoSettingsAccess:

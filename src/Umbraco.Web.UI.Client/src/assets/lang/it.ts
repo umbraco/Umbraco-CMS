@@ -384,7 +384,7 @@ export default {
 		enterFolderName: 'Inserisci il nome della cartella',
 		updateData: 'Scegli il tipo ed il titolo',
 		noDocumentTypes:
-			'Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Permessi</strong>.',
+			'Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Struttura</strong>.',
 		noDocumentTypesAtRoot:
 			'Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi crearli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -392,9 +392,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Modifica permessi per questo tipo di documento',
 		noDocumentTypesCreateNew: 'Crea un nuovo tipo di documento',
 		noDocumentTypesAllowedAtRoot:
-			"Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, cambiando l'opzione <strong>Consenti come root</strong> sotto <strong>Permessi</strong>.",
+			"Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, cambiando l'opzione <strong>Consenti come root</strong> sotto <strong>Struttura</strong>.",
 		noMediaTypes:
-			'Non ci sono tipi di documento abilitati disponibili per creare un media qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Permessi</strong>.',
+			'Non ci sono tipi di documento abilitati disponibili per creare un media qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Struttura</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			'Il media selezionato non consente la creazione di altri media al di\n      sotto di esso.\n    ',
 		noMediaTypesEditPermissions: 'Modifica permessi per questo tipo di media',
