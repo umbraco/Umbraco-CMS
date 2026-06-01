@@ -373,7 +373,11 @@ export class UmbLinkPickerModalElement extends UmbModalBaseElement<UmbLinkPicker
 				?hidden=${!this.value.link.unique || this.value.link.type !== 'document' || !this._documentItem}
 				orientation=${this.#propertyLayoutOrientation}
 				label=${this.localize.term('general_content')}>
-				<umb-entity-item-ref slot="editor" .item=${this._documentItem} standalone>
+				<umb-entity-item-ref
+					slot="editor"
+					.item=${this._documentItem}
+					standalone
+					?readonly=${!this.modalContext?.router}>
 					<uui-action-bar slot="actions">
 						<uui-button
 							label=${this.localize.term('general_remove')}
