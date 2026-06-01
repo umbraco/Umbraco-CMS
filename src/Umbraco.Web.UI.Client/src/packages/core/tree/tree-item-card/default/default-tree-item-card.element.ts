@@ -1,15 +1,15 @@
 import type { UmbTreeItemModel } from '../../types.js';
-import type { UmbDefaultTreeItemCardApi } from './default-tree-item-card.api.js';
+import type { UmbTreeItemCardApi } from '../tree-item-card.extension.js';
 import { getItemFallbackIcon } from '@umbraco-cms/backoffice/entity-item';
 import { customElement, html, ifDefined, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 
 @customElement('umb-default-tree-item-card')
 export class UmbDefaultTreeItemCardElement extends UmbLitElement {
-	#api?: UmbDefaultTreeItemCardApi;
+	#api?: UmbTreeItemCardApi;
 
 	@property({ type: Object, attribute: false })
-	public set api(value: UmbDefaultTreeItemCardApi | undefined) {
+	public set api(value: UmbTreeItemCardApi | undefined) {
 		this.#api = value;
 		if (value) {
 			this.observe(value.isSelectable, (v) => (this._isSelectable = v), '_observeIsSelectable');
@@ -21,7 +21,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 			this.observe(value.hasActions, (v) => (this._hasActions = v), '_observeHasActions');
 		}
 	}
-	public get api(): UmbDefaultTreeItemCardApi | undefined {
+	public get api(): UmbTreeItemCardApi | undefined {
 		return this.#api;
 	}
 

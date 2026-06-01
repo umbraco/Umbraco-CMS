@@ -5,9 +5,8 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 
-@customElement('umb-tree-item-card')
-export class UmbTreeItemCardElement extends UmbLitElement {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+@customElement('umb-tree-item-card-extension')
+export class UmbTreeItemCardExtensionElement extends UmbLitElement {
 	#extensionsController?: any;
 	#item?: UmbTreeItemModel;
 
@@ -86,6 +85,6 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 
 declare global {
 	interface HTMLElementTagNameMap {
-		'umb-tree-item-card': UmbTreeItemCardElement;
+		'umb-tree-item-card-extension': UmbTreeItemCardExtensionElement;
 	}
 }

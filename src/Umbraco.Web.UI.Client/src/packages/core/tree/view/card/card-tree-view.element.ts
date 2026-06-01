@@ -2,7 +2,7 @@ import type { UmbTreeItemModel } from '../../types.js';
 import { UmbTreeViewElementBase } from '../tree-view-element-base.js';
 import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/backoffice/external/lit';
 
-import '../../tree-item-card/tree-item-card.element.js';
+import '../../tree-item-card/tree-item-card-extension.element.js';
 
 @customElement('umb-card-tree-view')
 export class UmbCardTreeViewElement extends UmbTreeViewElementBase {
@@ -29,7 +29,9 @@ export class UmbCardTreeViewElement extends UmbTreeViewElementBase {
 				${repeat(
 					this._items,
 					(item) => item.unique,
-					(item) => html` <umb-tree-item-card .entityType=${item.entityType} .item=${item}></umb-tree-item-card> `,
+					(item) => html`
+						<umb-tree-item-card-extension .entityType=${item.entityType} .item=${item}></umb-tree-item-card-extension>
+					`,
 				)}
 			</div>
 		`;
