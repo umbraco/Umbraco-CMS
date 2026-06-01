@@ -40,6 +40,19 @@ test('can bulk publish elements in a folder', async ({umbracoApi, umbracoUi}) =>
   await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the publish process to complete
   expect(await umbracoApi.element.isElementPublished(firstElementId)).toBeTruthy();
   expect(await umbracoApi.element.isElementPublished(secondElementId)).toBeTruthy();
+  // Verify audit trail
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.clickCaretButtonForElementName(elementFolderName);
+  await umbracoUi.library.goToElementWithName(firstElementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementSavedAndPublished);
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
+  await umbracoUi.library.goToElementWithName(secondElementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementSavedAndPublished);
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can bulk unpublish elements in a folder', async ({umbracoApi, umbracoUi}) => {
