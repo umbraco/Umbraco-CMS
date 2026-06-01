@@ -1,5 +1,6 @@
 import { manifest as kindManifest } from './restore-from-recycle-bin.action.kind.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import UmbRestoreFromRecycleBinModalElement from './modal/restore-from-recycle-bin-modal.element.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	kindManifest,
@@ -7,6 +8,6 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		type: 'modal',
 		alias: 'Umb.Modal.RecycleBin.Restore',
 		name: 'Restore From Recycle Bin Modal',
-		element: () => import('./modal/restore-from-recycle-bin-modal.element.js'),
+		element: UmbRestoreFromRecycleBinModalElement,
 	},
 ];

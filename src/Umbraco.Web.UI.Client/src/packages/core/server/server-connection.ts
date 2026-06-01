@@ -45,8 +45,15 @@ export class UmbServerConnection extends UmbControllerBase {
 	 * @memberof UmbServerConnection
 	 */
 	async connect() {
-		await this.#setStatus();
-		await this.#setServerConfiguration();
+		// Independent reads, but both are required for the backoffice to function.
+		const results = await Promise.allSettled([this.#setStatus(), this.#setServerConfiguration()]);
+		const errors = results
+			.filter((result): result is PromiseRejectedResult => result.status === 'rejected')
+			.map((result) => result.reason);
+		if (errors.length) {
+			throw errors.length === 1 ? errors[0] : new AggregateError(errors, 'Failed to connect to the Umbraco server');
+		}
+		this.#isConnected.setValue(true);
 		return this;
 	}
 
@@ -86,7 +93,6 @@ export class UmbServerConnection extends UmbControllerBase {
 			throw error;
 		}
 
-		this.#isConnected.setValue(true);
 		this.#status = data?.serverStatus ?? RuntimeLevelModel.UNKNOWN;
 	}
 

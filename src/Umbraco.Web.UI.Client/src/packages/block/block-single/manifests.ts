@@ -4,6 +4,7 @@ import { manifests as propertyEditorManifests } from './property-editors/manifes
 import { manifests as validationManifests } from './validation/manifests.js';
 import { manifests as workspaceManifests } from './workspace/manifests.js';
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { manifests as valueSummaryManifests } from './property-editors/block-single-editor/value-summary/manifests.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	...clipboardManifests,
@@ -11,4 +12,5 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 	...propertyEditorManifests,
 	...validationManifests,
 	...workspaceManifests,
+	...valueSummaryManifests,
 ];

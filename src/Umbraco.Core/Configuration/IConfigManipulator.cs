@@ -36,6 +36,7 @@ public interface IConfigManipulator
     /// </summary>
     /// <param name="disable">The value to save.</param>
     /// <returns></returns>
+    [Obsolete("This method is no longer used by Umbraco. Set the Umbraco:CMS:WebRouting:DisableRedirectUrlTracking configuration key instead. Scheduled for removal in Umbraco 19.")]
     Task SaveDisableRedirectUrlTrackingAsync(bool disable);
 
     /// <summary>

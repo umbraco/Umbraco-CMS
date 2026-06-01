@@ -1,4 +1,4 @@
-import type { UmbPartialSome } from '../../utils/type/index.js';
+import type { UmbPartialSome } from '@umbraco-cms/backoffice/utils';
 import type { UmbHint, UmbIncomingHintBase } from '../types.js';
 import { UMB_HINT_CONTEXT } from './hint.context-token.js';
 import { UmbControllerBase, type UmbClassInterface } from '@umbraco-cms/backoffice/class-api';
