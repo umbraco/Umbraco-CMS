@@ -81,6 +81,9 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	#exposed = new UmbBooleanState<undefined>(undefined);
 	readonly exposed = this.#exposed.asObservable();
 
+	#hasContent = new UmbBooleanState<undefined>(undefined);
+	readonly hasContent = this.#hasContent.asObservable();
+
 	public readonly readOnlyGuard = new UmbReadOnlyVariantGuardManager(this);
 
 	constructor(host: UmbControllerHost, workspaceArgs: { manifest: ManifestWorkspace }) {
@@ -233,18 +236,37 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			'observeVariantIds',
 		);
 
-		this.removeUmbControllerByAlias('observeHasExpose');
 		this.observe(
 			observeMultiple([this.contentKey, this.variantId]),
 			([contentKey, variantId]) => {
+				this.removeUmbControllerByAlias('observeExposeShared');
+				this.removeUmbControllerByAlias('observeHasExpose');
 				if (!contentKey || !variantId) return;
 
 				this.observe(
-					manager.hasExposeOf(contentKey, variantId),
-					(exposed) => {
-						this.#exposed.setValue(exposed ?? false);
+					manager.isSharedContentOf(contentKey),
+					(isSharedContent) => {
+						if (isSharedContent) {
+							// A library element references pre-existing shared content. It is never exposed
+							// per-variant the way local content is, so the expose lookup would always report
+							// false. The block already exists, so it is established — submit reads as "Update".
+							this.#exposed.setValue(true);
+							return;
+						}
+
+						const exposeObs = manager.hasExposeOf(contentKey, variantId);
+						this.#exposed.setValue(false);
+						if (!exposeObs) return;
+
+						this.observe(
+							exposeObs,
+							(exposed) => {
+								this.#exposed.setValue(exposed ?? false);
+							},
+							'observeHasExpose',
+						);
 					},
-					'observeHasExpose',
+					'observeExposeShared',
 				);
 			},
 			'observeContentKeyAndVariantId',
@@ -271,6 +293,23 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 				);
 			},
 			'observeContentTypeId',
+		);
+
+		this.observe(
+			this.contentKey,
+			(contentKey) => {
+				this.removeUmbControllerByAlias('observeHasContent');
+				if (!contentKey) {
+					this.#hasContent.setValue(false);
+					return;
+				}
+				this.observe(
+					manager.isSharedContentOf(contentKey),
+					(isSharedContent) => this.#hasContent.setValue(!isSharedContent),
+					'observeHasContent',
+				);
+			},
+			'observeContentKeyForHasContent',
 		);
 	}
 

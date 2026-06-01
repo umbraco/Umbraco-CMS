@@ -3,16 +3,26 @@ import type { UmbBlockActionArgs } from '../../types.js';
 import { UmbBlockActionBase } from '../../block-action-base.js';
 import { UmbDataPathBlockElementDataQuery } from '../../../validation/data-path-element-data-query.function.js';
 import { UMB_BLOCK_ENTRY_CONTEXT } from '../../../context/block-entry.context-token.js';
+import { UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
 /**
  * Block action that navigates to the block's settings editor workspace.
- * Exposes the workspace edit path via `getHref()` and the settings validation data path via `getValidationDataPath()`.
+ * Exposes the workspace edit path via `getHref()` / `hrefObservable` and the settings validation
+ * data path via `getValidationDataPath()` / `validationDataPathObservable`.
+ * The observable variants update reactively (e.g. after transfer to Element Library),
+ * whereas the promise variants resolve once for consumers that call them imperatively.
  */
 export class UmbEditSettingsBlockAction extends UmbBlockActionBase<MetaBlockActionDefaultKind> {
 	#context?: typeof UMB_BLOCK_ENTRY_CONTEXT.TYPE;
 	#contextReady: Promise<void>;
 	#resolveContext!: () => void;
+
+	readonly #href = new UmbStringState(undefined);
+	readonly hrefObservable = this.#href.asObservable();
+
+	readonly #validationDataPath = new UmbStringState(undefined);
+	readonly validationDataPathObservable = this.#validationDataPath.asObservable();
 
 	constructor(host: UmbControllerHost, args: UmbBlockActionArgs<MetaBlockActionDefaultKind>) {
 		super(host, args);
@@ -23,7 +33,20 @@ export class UmbEditSettingsBlockAction extends UmbBlockActionBase<MetaBlockActi
 
 		this.consumeContext(UMB_BLOCK_ENTRY_CONTEXT, (context) => {
 			this.#context = context;
+			if (!context) return;
 			this.#resolveContext();
+
+			this.observe(context.workspaceEditSettingsPath, (path) => this.#href.setValue(path || undefined), 'observeHref');
+
+			this.observe(
+				context.settingsKey,
+				(settingsKey) => {
+					this.#validationDataPath.setValue(
+						settingsKey ? `$.settingsData[${UmbDataPathBlockElementDataQuery({ key: settingsKey })}]` : undefined,
+					);
+				},
+				'observeValidationDataPath',
+			);
 		});
 	}
 
