@@ -1,4 +1,5 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbFolderCreateOptionAction } from './folder-entity-create-option-action.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -9,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'entityCreateOptionAction',
 			kind: 'folder',
-			api: () => import('./folder-entity-create-option-action.js'),
+			api: UmbFolderCreateOptionAction,
 			weight: 1,
 			forEntityTypes: [],
 			meta: {

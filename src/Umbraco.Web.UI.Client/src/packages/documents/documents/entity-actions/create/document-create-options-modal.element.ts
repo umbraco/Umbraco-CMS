@@ -20,6 +20,9 @@ import {
 	type UmbDocumentBlueprintItemBaseModel,
 } from '@umbraco-cms/backoffice/document-blueprint';
 import type { UmbEntityUnique } from '@umbraco-cms/backoffice/entity';
+import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
+import { UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS } from '@umbraco-cms/backoffice/section';
+import { UMB_SETTINGS_SECTION_ALIAS } from '@umbraco-cms/backoffice/settings';
 
 @customElement('umb-document-create-options-modal')
 export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
@@ -45,6 +48,24 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 
 	@state()
 	private _loading = true;
+
+	@state()
+	private _hasSettingsAccess = false;
+
+	constructor() {
+		super();
+
+		createExtensionApiByAlias(this, UMB_SECTION_USER_PERMISSION_CONDITION_ALIAS, [
+			{
+				config: {
+					match: UMB_SETTINGS_SECTION_ALIAS,
+				},
+				onChange: (permitted: boolean) => {
+					this._hasSettingsAccess = permitted;
+				},
+			},
+		]);
+	}
 
 	override async firstUpdated() {
 		const parentUnique = this.data?.parent.unique;
@@ -171,13 +192,18 @@ export class UmbDocumentCreateOptionsModalElement extends UmbModalBaseElement<
 					<strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the
 					<strong>Allowed child node types</strong> under <strong>Structure</strong>.
 				</umb-localize>
-				<br />
-				<uui-button
-					id="edit-permissions"
-					look="secondary"
-					href=${`/section/settings/workspace/document-type/edit/${this.data?.documentType?.unique}/view/structure`}
-					label=${this.localize.term('create_noDocumentTypesEditPermissions')}
-					@click=${() => this._rejectModal()}></uui-button>
+				${when(
+					this._hasSettingsAccess,
+					() => html`
+						<br />
+						<uui-button
+							id="edit-permissions"
+							look="secondary"
+							href=${`/section/settings/workspace/document-type/edit/${this.data?.documentType?.unique}/view/structure`}
+							label=${this.localize.term('create_noDocumentTypesEditPermissions')}
+							@click=${() => this._rejectModal()}></uui-button>
+					`,
+				)}
 			`;
 		} else {
 			return html`

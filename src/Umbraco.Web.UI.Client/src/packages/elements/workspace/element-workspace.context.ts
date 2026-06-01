@@ -25,6 +25,7 @@ import {
 	UmbWorkspaceIsNewRedirectController,
 	UmbWorkspaceIsNewRedirectControllerAlias,
 } from '@umbraco-cms/backoffice/workspace';
+import type { UmbWorkspaceActionExecutionOptions } from '@umbraco-cms/backoffice/workspace';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UMB_DOCUMENT_DETAIL_MODEL_VARIANT_SCAFFOLD } from '@umbraco-cms/backoffice/document';
 import type { UmbContentWorkspaceContext } from '@umbraco-cms/backoffice/content';
@@ -181,13 +182,13 @@ export class UmbElementWorkspaceContext
 		return new UmbElementWorkspacePropertyDatasetContext(host, this, variantId);
 	}
 
-	protected override async _handleSave() {
+	protected override async _handleSave(executionOptions?: UmbWorkspaceActionExecutionOptions) {
 		const elementStyle = (this.getHostElement() as HTMLElement).style;
 		elementStyle.setProperty('--uui-color-invalid', 'var(--uui-color-warning)');
 		elementStyle.setProperty('--uui-color-invalid-emphasis', 'var(--uui-color-warning-emphasis)');
 		elementStyle.setProperty('--uui-color-invalid-standalone', 'var(--uui-color-warning-standalone)');
 		elementStyle.setProperty('--uui-color-invalid-contrast', 'var(--uui-color-warning-contrast)');
-		await super._handleSave();
+		await super._handleSave(executionOptions);
 	}
 
 	override resetState(): void {
