@@ -161,11 +161,32 @@ export class DocumentApiHelper {
     return response.status();
   }
 
+  async publishWithCultures(id: string, cultures: string[]) {
+    const publishSchedulesData = {publishSchedules: cultures.map(culture => ({culture}))};
+    return await this.publish(id, publishSchedulesData);
+  }
+
+  async unpublish(id: string, cultures: string[] | null = null) {
+    if (id == null) {
+      return;
+    }
+    const response = await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/document/' + id + '/unpublish', {cultures});
+    return response.status();
+  }
+
   async getDocumentUrl(id: string) {
     const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/urls?id=' + id);
     const urls = await response.json();
 
     return urls[0].urlInfos[0].url;
+  }
+
+  async getDocumentUrlByCulture(id: string, culture: string) {
+    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/document/urls?id=' + id);
+    const urls = await response.json();
+    const urlInfo = urls[0].urlInfos.find(info => info.culture === culture);
+
+    return urlInfo ? urlInfo.url : null;
   }
 
   async moveToRecycleBin(id: string) {
@@ -1507,6 +1528,45 @@ export class DocumentApiHelper {
     };
 
     return await this.publish(id, publishScheduleData);
+  }
+
+  async createVariantDocumentWithTextContentAndParent(documentTypeId: string, templateId: string, dataTypeName: string, cultureVariants: {isoCode: string, name: string, value: string}[], parentId?: string) {
+    const documentBuilder = new DocumentBuilder()
+      .withDocumentTypeId(documentTypeId)
+      .withTemplateId(templateId);
+
+    if (parentId) {
+      documentBuilder.withParentId(parentId);
+    }
+
+    for (const variant of cultureVariants) {
+      documentBuilder
+        .addVariant()
+          .withName(variant.name)
+          .withCulture(variant.isoCode)
+          .done()
+        .addValue()
+          .withAlias(AliasHelper.toAlias(dataTypeName))
+          .withValue(variant.value)
+          .withCulture(variant.isoCode)
+          .withEditorAlias('Umbraco.TextBox')
+          .done();
+    }
+
+    return await this.create(documentBuilder.build());
+  }
+
+  async updateDomainsWithCultures(id: string, domains: {domainName: string, isoCode: string}[], defaultIsoCode: string | null = null) {
+    const domainBuilder = new DocumentDomainBuilder().withDefaultIsoCode(defaultIsoCode);
+    for (const domain of domains) {
+      domainBuilder
+        .addDomain()
+          .withDomainName(domain.domainName)
+          .withIsoCode(domain.isoCode)
+          .done();
+    }
+
+    return await this.updateDomains(id, domainBuilder.build());
   }
 
   async createDocumentWithTextContentAndParent(documentName: string, documentTypeId: string, textContent: string, dataTypeName: string, parentId: string) {
