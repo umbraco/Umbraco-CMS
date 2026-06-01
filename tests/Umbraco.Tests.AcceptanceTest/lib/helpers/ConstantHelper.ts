@@ -319,11 +319,15 @@
     domains: '/domains',
     notifications: '/notifications',
     currentUser: '/umbraco/management/api/v1/user/current',
+    revoke: '/umbraco/management/api/v1/security/back-office/revoke',
+    documentSearch: '/umbraco/management/api/v1/item/document/search',
+    mediaSearch: '/umbraco/management/api/v1/item/media/search',
+    memberSearch: '/umbraco/management/api/v1/item/member/search',
+    elementSearch: '/umbraco/management/api/v1/item/element/search',
     element: '/umbraco/management/api/v1/element',
     elementFolder: '/umbraco/management/api/v1/element/folder',
     treeElementRoot: '/umbraco/management/api/v1/tree/element/root',
     treeElementChildren: '/umbraco/management/api/v1/tree/element/children',
-    revoke: '/umbraco/management/api/v1/security/back-office/revoke',
     currentUserProfile: '/umbraco/management/api/v1/user/current/profile',
     currentUserAvatar: '/umbraco/management/api/v1/user/current/avatar'
   }
@@ -373,7 +377,14 @@
     contentCopied: 'Content copied',
     contentDeleted: 'Content deleted',
     contentRolledBack: 'Content rolled back',
-    contentSorted: 'Sort child items performed by user'
+    contentSorted: 'Sort child items performed by user',
+    elementSaved: 'Element saved',
+    elementSavedAndPublished: 'Element saved and published',
+    elementUnpublished: 'Element unpublished',
+    elementMoved: 'Element moved',
+    elementCopied: 'Element copied',
+    elementDeleted: 'Element deleted',
+    elementRolledBack: 'Element rolled back'
   }
 
   public static readonly auditTrailTypes = {
@@ -386,4 +397,4 @@
     copy: 'Copy',
     unpublish: 'Unpublish'
   }
-}
+ }
