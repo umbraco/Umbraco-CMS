@@ -49,6 +49,10 @@ export const manifest: ManifestPropertyEditorSchema = {
 					alias: 'maxChars',
 					value: 512,
 				},
+				{
+					alias: 'autocompleteSelection',
+					value: 'off',
+				},
 			],
 		},
 	},
