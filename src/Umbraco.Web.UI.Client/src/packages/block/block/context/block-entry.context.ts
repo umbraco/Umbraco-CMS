@@ -382,16 +382,17 @@ export abstract class UmbBlockEntryContext<
 			null,
 		);
 
-		// Re-observe content when the layout's contentKey changes (e.g., after Transfer to Element Library
-		// assigns a new element UUID — the old content observer would otherwise keep watching the stale key).
+		// Re-observe content and expose when the layout's contentKey changes (e.g., after Transfer to
+		// Element Library assigns a new element UUID, or Disconnect assigns a fresh local content key).
 		// NOTE: this.#contentKey is updated by #observeLayout() AFTER _layout.setValue() emits, so we
-		// must sync it here before calling #observeContentData() which reads it.
+		// must sync it here before calling the observe methods which read it.
 		this.observe(
 			this.contentKey,
 			(contentKey) => {
 				if (!contentKey) return;
 				this.#contentKey = contentKey;
 				this.#observeContentData();
+				this.#gotVariantId();
 			},
 			null,
 		);
