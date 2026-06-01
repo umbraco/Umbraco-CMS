@@ -27,37 +27,39 @@ describe('UmbDocumentServerDataSource (create/update-and-publish)', () => {
 		document.body.innerHTML = '';
 	});
 
+	// Note: the -and-publish methods do NOT re-read the document (the workspace reloads afterwards), so
+	// these tests verify the published outcome via a follow-up read() rather than the method's return.
 	describe('createAndPublish', () => {
-		it('creates a new document and publishes only the requested culture, re-reading the full model', async () => {
+		it('creates a new document and publishes only the requested culture', async () => {
 			// Use an existing document as a valid model template, with a fresh unique so it is created anew.
 			const { data: template } = await dataSource.read(VARIANT_DOCUMENT_ID);
 			expect(template, 'precondition: template document loads').to.exist;
-			const newModel = { ...template!, unique: UmbId.new() };
+			const newId = UmbId.new();
+			const newModel = { ...template!, unique: newId };
 
 			const da = UmbVariantId.Create({ culture: 'da', segment: null });
-			const { data, error } = await dataSource.createAndPublish(newModel, [da], null);
-
+			const { error } = await dataSource.createAndPublish(newModel, [da], null);
 			expect(error).to.be.undefined;
-			expect(data, 'returns the re-read created document model').to.exist;
-			const daVariant = data!.variants.find((v) => v.culture === 'da');
+
+			const { data: created } = await dataSource.read(newId);
+			const daVariant = created!.variants.find((v) => v.culture === 'da');
 			expect(daVariant?.state, 'the requested culture (da) is Published').to.equal('Published');
 		});
 	});
 
 	describe('updateAndPublish', () => {
-		it('publishes only the requested culture and re-reads the full document', async () => {
+		it('publishes only the requested culture', async () => {
 			const { data: model } = await dataSource.read(VARIANT_DOCUMENT_ID);
 			expect(model, 'precondition: document loads').to.exist;
 
 			// da starts as Draft; publishing only da should leave en-US untouched.
 			const daVariantId = UmbVariantId.Create({ culture: 'da', segment: null });
-			const { data, error } = await dataSource.updateAndPublish(model!, [daVariantId]);
-
+			const { error } = await dataSource.updateAndPublish(model!, [daVariantId]);
 			expect(error).to.be.undefined;
-			expect(data, 'returns the re-read document model').to.exist;
 
-			const da = data!.variants.find((v) => v.culture === 'da');
-			const enUs = data!.variants.find((v) => v.culture === 'en-US');
+			const { data: updated } = await dataSource.read(VARIANT_DOCUMENT_ID);
+			const da = updated!.variants.find((v) => v.culture === 'da');
+			const enUs = updated!.variants.find((v) => v.culture === 'en-US');
 			expect(da?.state, 'da becomes Published').to.equal('Published');
 			expect(enUs?.state, 'en-US is unaffected (was already Published)').to.equal('Published');
 		});
@@ -67,9 +69,11 @@ describe('UmbDocumentServerDataSource (create/update-and-publish)', () => {
 			const { data: model } = await dataSource.read(VARIANT_DOCUMENT_ID);
 			const enUs = UmbVariantId.Create({ culture: 'en-US', segment: null });
 
-			const { data } = await dataSource.updateAndPublish(model!, [enUs]);
+			const { error } = await dataSource.updateAndPublish(model!, [enUs]);
+			expect(error).to.be.undefined;
 
-			const da = data!.variants.find((v) => v.culture === 'da');
+			const { data: updated } = await dataSource.read(VARIANT_DOCUMENT_ID);
+			const da = updated!.variants.find((v) => v.culture === 'da');
 			expect(da?.state, 'da stays Draft when only en-US is published').to.equal('Draft');
 		});
 	});
@@ -80,10 +84,11 @@ describe('UmbDocumentServerDataSource (create/update-and-publish)', () => {
 			expect(model, 'precondition: invariant document loads').to.exist;
 
 			const invariant = UmbVariantId.CreateInvariant();
-			const { data, error } = await dataSource.updateAndPublish(model!, [invariant]);
-
+			const { error } = await dataSource.updateAndPublish(model!, [invariant]);
 			expect(error).to.be.undefined;
-			const variant = data!.variants.find((v) => v.culture === null);
+
+			const { data: updated } = await dataSource.read(INVARIANT_DOCUMENT_ID);
+			const variant = updated!.variants.find((v) => v.culture === null);
 			expect(variant?.state, 'the invariant variant is Published').to.equal('Published');
 		});
 	});

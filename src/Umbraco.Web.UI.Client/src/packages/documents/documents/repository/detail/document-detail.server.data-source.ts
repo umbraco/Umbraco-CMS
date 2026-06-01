@@ -198,12 +198,10 @@ export class UmbDocumentServerDataSource
 			}),
 		);
 
-		// The endpoint returns 201 Created with the key (no document body), so re-read to get the full model.
-		if (data) {
-			return this.read(data as any);
-		}
-
-		return { error };
+		// 201 Created returns only the key (no document body). The workspace reloads after this to refresh
+		// its state, so we deliberately do NOT re-read the full document here — that would be a redundant
+		// round-trip on top of the reload.
+		return { data, error };
 	}
 
 	/**
@@ -229,11 +227,9 @@ export class UmbDocumentServerDataSource
 			}),
 		);
 
-		// The endpoint returns 200 with a notification header (no document body), so re-read to get the full model.
-		if (!error) {
-			return this.read(model.unique);
-		}
-
+		// 200 returns only a notification header (no document body). The workspace reloads after this to
+		// refresh its state, so we deliberately do NOT re-read the full document here — that would be a
+		// redundant round-trip on top of the reload.
 		return { error };
 	}
 

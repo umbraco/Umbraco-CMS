@@ -407,29 +407,27 @@ export class UmbDocumentWorkspaceContext
 	 * call it standalone. See `UmbDocumentPublishingWorkspaceContext` `#performSaveAndPublish`.
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish
 	 * @param {UmbDocumentDetailModel} saveData - The data to save (constructed for the selected variants)
-	 * @returns {Promise<UmbDocumentDetailModel>} The re-read document after the operation
+	 * @returns {Promise<void>} Resolves when the server operation has completed (the workspace state is
+	 * refreshed by the subsequent reload, not by this method).
 	 * @memberof UmbDocumentWorkspaceContext
 	 */
 	public async performCreateOrUpdateAndPublish(
 		variantIds: Array<UmbVariantId>,
 		saveData: UmbDocumentDetailModel,
-	): Promise<UmbDocumentDetailModel> {
+	): Promise<void> {
 		return this.getIsNew()
 			? this.#createAndPublish(variantIds, saveData)
 			: this.#updateAndPublish(variantIds, saveData);
 	}
 
-	async #createAndPublish(
-		variantIds: Array<UmbVariantId>,
-		saveData: UmbDocumentDetailModel,
-	): Promise<UmbDocumentDetailModel> {
+	async #createAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
 		if (!this._detailRepository) throw new Error('Detail repository is not set');
 
 		const parent = this._internal_getCreateUnderParent();
 		if (!parent) throw new Error('Parent is not set');
 
-		const { data, error } = await this._detailRepository.createAndPublish(saveData, variantIds, parent.unique);
-		if (!data || error) {
+		const { error } = await this._detailRepository.createAndPublish(saveData, variantIds, parent.unique);
+		if (error) {
 			throw new Error('Error creating and publishing document');
 		}
 
@@ -444,18 +442,13 @@ export class UmbDocumentWorkspaceContext
 		eventContext.dispatchEvent(
 			new UmbRequestReloadChildrenOfEntityEvent({ entityType: parent.entityType, unique: parent.unique }),
 		);
-
-		return data;
 	}
 
-	async #updateAndPublish(
-		variantIds: Array<UmbVariantId>,
-		saveData: UmbDocumentDetailModel,
-	): Promise<UmbDocumentDetailModel> {
+	async #updateAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
 		if (!this._detailRepository) throw new Error('Detail repository is not set');
 
-		const { data, error } = await this._detailRepository.updateAndPublish(saveData, variantIds);
-		if (!data || error) {
+		const { error } = await this._detailRepository.updateAndPublish(saveData, variantIds);
+		if (error) {
 			throw new Error('Error updating and publishing document');
 		}
 
@@ -469,8 +462,6 @@ export class UmbDocumentWorkspaceContext
 		eventContext.dispatchEvent(
 			new UmbEntityUpdatedEvent({ unique, entityType, eventUnique: this._workspaceEventUnique }),
 		);
-
-		return data;
 	}
 
 	/**
