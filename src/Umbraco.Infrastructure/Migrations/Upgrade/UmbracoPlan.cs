@@ -118,4 +118,50 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddContentVersionCleanupPolicyDto>("{E3F7A9B2-1C4D-4E8F-A7B6-5C9D0E1F2A3B}");
         To<V_18_0_0.AddPublicAccessDto>("{58DA5EFB-8C47-4B51-BCFF-576CEACD202F}");
     }
+
+    /// <summary>
+    ///     Resolves the semantic version corresponding to a migration state in this plan.
+    /// </summary>
+    /// <remarks>
+    ///     Walks the transition chain from <see cref="MigrationPlan.InitialState"/> and extracts version
+    ///     numbers from migration type namespaces (convention: <c>V_{major}_{minor}_{patch}</c>).
+    /// </remarks>
+    /// <param name="state">The migration state to resolve.</param>
+    /// <returns>The semantic version for the state, or <c>null</c> if the state is not found.</returns>
+    public SemVersion? GetVersionForState(string? state)
+    {
+        if (string.IsNullOrWhiteSpace(state))
+        {
+            return null;
+        }
+
+        SemVersion? trackedVersion = InitialStateVersion;
+        var current = InitialState;
+
+        if (string.Equals(current, state, StringComparison.OrdinalIgnoreCase))
+        {
+            return InitialStateVersion;
+        }
+
+        while (Transitions.TryGetValue(current, out Transition? transition) && transition is not null)
+        {
+            Match match = MigrationStepVersionRegex().Match(transition.MigrationType.Namespace ?? string.Empty);
+            if (match.Success)
+            {
+                trackedVersion = new SemVersion(
+                    int.Parse(match.Groups[1].Value),
+                    int.Parse(match.Groups[2].Value),
+                    int.Parse(match.Groups[3].Value));
+            }
+
+            if (string.Equals(transition.TargetState, state, StringComparison.OrdinalIgnoreCase))
+            {
+                return trackedVersion;
+            }
+
+            current = transition.TargetState;
+        }
+
+        return null;
+    }
 }
