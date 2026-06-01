@@ -1,7 +1,7 @@
 import { UmbBlockSingleEntryContext } from '../../context/block-single-entry.context.js';
 import type { UmbBlockSingleLayoutModel } from '../../types.js';
 import { UMB_BLOCK_SINGLE } from '../../constants.js';
-import { css, customElement, html, nothing, property, state } from '@umbraco-cms/backoffice/external/lit';
+import { css, customElement, html, nothing, property, state, when } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement, umbDestroyOnDisconnect } from '@umbraco-cms/backoffice/lit-element';
 import { stringOrStringArrayContains, UmbDeprecation } from '@umbraco-cms/backoffice/utils';
 import { UmbDataPathBlockElementDataQuery } from '@umbraco-cms/backoffice/block';
@@ -445,7 +445,9 @@ export class UmbBlockSingleEntryElement extends UmbLitElement implements UmbProp
 		return this.contentKey && (this._contentTypeAlias || this._unsupported)
 			? html`
 					<div class="umb-block-single__block">
-						<umb-entity-frame .label=${this._label}></umb-entity-frame>
+						<umb-entity-frame>
+							${when(this._isLibraryElement, () => html`<uui-icon name="link"></uui-icon>`)} ${this._label}
+						</umb-entity-frame>
 						<umb-extension-slot
 							type="blockEditorCustomView"
 							default-element=${this._inlineEditingMode ? 'umb-inline-single-block' : 'umb-ref-single-block'}

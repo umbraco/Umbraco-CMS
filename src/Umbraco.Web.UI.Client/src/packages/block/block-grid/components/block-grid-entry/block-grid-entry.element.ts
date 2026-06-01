@@ -539,7 +539,9 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 						this._isSortMode,
 						() => this.#renderRefBlock(),
 						() => html`
-							<umb-entity-frame .label=${this._label}></umb-entity-frame>
+							<umb-entity-frame>
+								${when(this._isLibraryElement, () => html`<uui-icon name="link"></uui-icon>`)} ${this._label}
+							</umb-entity-frame>
 							<umb-extension-slot
 								single
 								type="blockEditorCustomView"
