@@ -19,9 +19,8 @@ export const manifest: ManifestPropertyEditorSchema = {
 					],
 				},
 				{
-					alias: 'autocomplete',
-					label: '#textbox_autocomplete',
-					description: 'Controls browser autocomplete behavior',
+					alias: 'autocompleteSelection',
+					label: '#textbox_autocompleteSelection',
 					propertyEditorUiAlias: 'Umb.PropertyEditorUi.Dropdown',
 					config: [
 						{
@@ -34,6 +33,11 @@ export const manifest: ManifestPropertyEditorSchema = {
 					],
 				},
 				{
+					alias: 'autocomplete',
+					label: '#textbox_autocomplete',
+					propertyEditorUiAlias: 'Umb.PropertyEditorUi.TextBox',
+				},
+				{
 					alias: 'placeholder',
 					label: '#textbox_placeholder',
 					description: 'Placeholder text shown inside the input when empty',
@@ -44,7 +48,7 @@ export const manifest: ManifestPropertyEditorSchema = {
 				{
 					alias: 'maxChars',
 					value: 512,
-				}
+				},
 			],
 		},
 	},
