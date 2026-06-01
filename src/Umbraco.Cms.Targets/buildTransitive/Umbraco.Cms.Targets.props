@@ -16,14 +16,14 @@
   </ItemGroup>
 
   <!--
-    The Razor editor in VS2026 and the C# extension for VS Code uses the Razor source generator
+    The Razor editor in modern Visual Studio and the C# extension for VS Code use the Razor source generator
     for IDE functionality. We need to add some things to make sure it works correctly, but we
     only do them for design time builds, so that we don't impact regular builds or CI.
-    We also have an escape hatch in case it does cause issues, users can set the appropriate property
+    We also have an escape hatch in case it does cause issues, users can set EnableCohostEditorCompatibility=false
     in their project file to disable this.
 
-    CompilerVisibleProperty is read by the generator at initialization (before any target runs),
-    so it stays in an evaluation-time ItemGroup. It has no duplicate-entry problem.
+    CompilerVisibleProperty is surfaced to generators via AnalyzerConfigOptionsProvider, not as a source-generator input file, 
+    so it doesn't enter the hintName-collision codepath that AdditionalFiles does. Keeping it at evaluation time is safe.
   -->
   <ItemGroup Condition="'$(DesignTimeBuild)' == 'true' and '$(EnableCohostEditorCompatibility)' != 'false'">
     <CompilerVisibleProperty Include="MSBuildProjectDirectory" />
@@ -39,9 +39,9 @@
     item Identity (slash form / relative vs absolute) and the generator then sees two inputs that
     derive the same hintName, which crashes it with CS8785 (see issue #22773).
 
-    Run as a target right before CoreCompile so the SDK's contribution is visible, then add only
-    the .cshtml files that are not already present. Both sides are normalized to %(FullPath) so
-    items with different Identity forms still compare equal.
+    Run as a target before CoreCompile (hot-reload path) and CompileDesignTime (IDE design-time path) 
+    so the SDK's contribution is visible in both cases. Then add only the .cshtml files that are not already 
+    present. Both sides are normalized to %(FullPath) so items with different Identity forms still compare equal.
 
     Set EnableCohostEditorCompatibility=false in a project to opt out entirely.
   -->
