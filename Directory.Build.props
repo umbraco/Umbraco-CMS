@@ -31,10 +31,6 @@
     <WarningsNotAsErrors>$(WarningsNotAsErrors),NU5104,SA1600</WarningsNotAsErrors>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(ContinuousIntegrationBuild)' == 'true'">
-    <WarningLevel>0</WarningLevel>
-  </PropertyGroup>
-
   <!-- SourceLink -->
   <PropertyGroup>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
