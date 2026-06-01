@@ -343,7 +343,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Oprávnění k úpravám pro tento typ dokumentu',
 		noDocumentTypesCreateNew: 'Vytvořit nový typ dokumentu',
 		noDocumentTypesAllowedAtRoot:
-			'Nejsou zde k dispozici žádné povolené typy dokumentů pro vytváření obsahu. Musíte je povolit v sekci <strong>Typy dokumentů</strong> v části <strong>Nastavení</strong> změnou možnosti <strong>Povolit jako root</strong> v části <strong>Oprávnění</strong>.',
+			'Nejsou zde k dispozici žádné povolené typy dokumentů pro vytváření obsahu. Musíte je povolit v sekci <strong>Typy dokumentů</strong> v části <strong>Nastavení</strong> změnou možnosti <strong>Povolit jako root</strong> v části <strong>Struktura</strong>.',
 		noMediaTypes:
 			'Nejsou dostupné žádné povolené typy medií. Tyto musíte povolit v sekci nastavení pod <strong>"typy medií"</strong>.',
 		noMediaTypesWithNoSettingsAccess: 'Vybraná média ve stromu neumožňuje vytváření pod nimi žádná další média.',
