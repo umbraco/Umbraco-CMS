@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.OperationStatus;
 
@@ -16,14 +15,13 @@ public interface IRedirectUrlService : IService
     /// <param name="contentKey">The content unique key.</param>
     /// <param name="culture">The culture.</param>
     /// <remarks>Is a proper Umbraco route eg /path/to/foo or 123/path/tofoo.</remarks>
-    [Obsolete("Use the Register overload that takes the new URL so notification handlers receive full context. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use RegisterWithStatus to support cancellation via notifications. Scheduled for removal in Umbraco 20.")]
     void Register(string url, Guid contentKey, string? culture = null);
 
     /// <summary>
     ///     Registers a redirect URL.
     /// </summary>
     /// <param name="oldUrl">The previous Umbraco URL route the redirect is being created from.</param>
-    /// <param name="newUrl">The current Umbraco URL route the redirect is being created to.</param>
     /// <param name="contentKey">The content unique key.</param>
     /// <param name="culture">The culture.</param>
     /// <returns>
@@ -31,8 +29,8 @@ public interface IRedirectUrlService : IService
     ///     <see cref="RedirectUrlOperationStatus.CancelledByNotification" /> if a notification handler
     ///     canceled the operation.
     /// </returns>
-    // TODO (V20): Remove the default implementation when the obsolete Register overload is removed.
-    Attempt<IRedirectUrl?, RedirectUrlOperationStatus> Register(string oldUrl, string? newUrl, Guid contentKey, string? culture = null)
+    // TODO (V20): Remove the default implementation, and rename this back to "Register" when the obsolete Register overload is removed.
+    Attempt<IRedirectUrl?, RedirectUrlOperationStatus> RegisterWithStatus(string oldUrl, Guid contentKey, string? culture = null)
     {
 #pragma warning disable CS0618 // Type or member is obsolete
         Register(oldUrl, contentKey, culture);
@@ -119,25 +117,7 @@ public interface IRedirectUrlService : IService
     /// <summary>
     ///     Deletes all redirect URLs.
     /// </summary>
-    [Obsolete("Use DeleteAllWithStatus to support cancellation via notifications. Scheduled for removal in Umbraco 20.")]
     void DeleteAll();
-
-    /// <summary>
-    ///     Deletes all redirect URLs, returning the operation status.
-    /// </summary>
-    /// <returns>
-    ///     <see cref="RedirectUrlOperationStatus.Success" /> on success, or
-    ///     <see cref="RedirectUrlOperationStatus.CancelledByNotification" /> if a notification handler
-    ///     canceled the operation.
-    /// </returns>
-    // TODO (V20): Remove the default implementation when the obsolete DeleteAll overload is removed.
-    RedirectUrlOperationStatus DeleteAllWithStatus()
-    {
-#pragma warning disable CS0618 // Type or member is obsolete
-        DeleteAll();
-#pragma warning restore CS0618 // Type or member is obsolete
-        return RedirectUrlOperationStatus.Success;
-    }
 
     /// <summary>
     ///     Gets the most recent redirect URLs corresponding to an Umbraco redirect URL route.

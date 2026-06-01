@@ -19,4 +19,9 @@ public enum RedirectUrlOperationStatus
     ///     The operation failed because the redirect URL could not be found.
     /// </summary>
     NotFound,
+
+    /// <summary>
+    ///     An unknown error occurred during the operation.
+    /// </summary>
+    Unknown,
 }

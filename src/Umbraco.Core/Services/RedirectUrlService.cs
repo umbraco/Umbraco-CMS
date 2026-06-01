@@ -29,10 +29,10 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
     /// <inheritdoc/>
     [Obsolete("Use the Register overload that takes newUrl. Scheduled for removal in Umbraco 20.")]
     public void Register(string url, Guid contentKey, string? culture = null)
-        => Register(url, newUrl: null, contentKey, culture);
+        => RegisterWithStatus(url, contentKey, culture);
 
     /// <inheritdoc/>
-    public Attempt<IRedirectUrl?, RedirectUrlOperationStatus> Register(string oldUrl, string? newUrl, Guid contentKey, string? culture = null)
+    public Attempt<IRedirectUrl?, RedirectUrlOperationStatus> RegisterWithStatus(string oldUrl, Guid contentKey, string? culture = null)
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
         IRedirectUrl? redir = _redirectUrlRepository.Get(oldUrl, contentKey, culture);
@@ -46,9 +46,9 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
         }
 
         EventMessages eventMessages = EventMessagesFactory.Get();
-        var creatingNotification = new RedirectUrlCreatingNotification(redir, newUrl, eventMessages);
+        var savingNotification = new RedirectUrlSavingNotification(redir, eventMessages);
 
-        if (scope.Notifications.PublishCancelable(creatingNotification))
+        if (scope.Notifications.PublishCancelable(savingNotification))
         {
             scope.Complete();
             return Attempt.FailWithStatus<IRedirectUrl?, RedirectUrlOperationStatus>(RedirectUrlOperationStatus.CancelledByNotification, redir);
@@ -56,8 +56,8 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
 
         _redirectUrlRepository.Save(redir);
 
-        scope.Notifications.Publish(new RedirectUrlCreatedNotification(redir, newUrl, eventMessages)
-                .WithStateFrom(creatingNotification));
+        scope.Notifications.Publish(new RedirectUrlSavedNotification(redir, eventMessages)
+                .WithStateFrom(savingNotification));
 
         scope.Complete();
         return Attempt.SucceedWithStatus<IRedirectUrl?, RedirectUrlOperationStatus>(RedirectUrlOperationStatus.Success, redir);
@@ -161,39 +161,11 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
     }
 
     /// <inheritdoc/>
-    [Obsolete("Use DeleteAllWithStatus instead. Scheduled for removal in Umbraco 20.")]
-    public void DeleteAll() => DeleteAllWithStatus();
-
-    /// <inheritdoc/>
-    public RedirectUrlOperationStatus DeleteAllWithStatus()
+    public void DeleteAll()
     {
         using ICoreScope scope = ScopeProvider.CreateCoreScope();
-
-        // Pull the entire set so handlers can inspect what is about to be deleted. Redirect URL tables
-        // are typically small, but if performance becomes an issue this could be paginated.
-        IRedirectUrl[] redirectUrls = _redirectUrlRepository.GetAllUrls(0, int.MaxValue, out _).ToArray();
-
-        if (redirectUrls.Length == 0)
-        {
-            scope.Complete();
-            return RedirectUrlOperationStatus.Success;
-        }
-
-        EventMessages eventMessages = EventMessagesFactory.Get();
-        var deletingNotification = new RedirectUrlDeletingNotification(redirectUrls, eventMessages);
-
-        if (scope.Notifications.PublishCancelable(deletingNotification))
-        {
-            scope.Complete();
-            return RedirectUrlOperationStatus.CancelledByNotification;
-        }
-
         _redirectUrlRepository.DeleteAll();
-
-        scope.Notifications.Publish(new RedirectUrlDeletedNotification(redirectUrls, eventMessages).WithStateFrom(deletingNotification));
-
         scope.Complete();
-        return RedirectUrlOperationStatus.Success;
     }
 
     /// <inheritdoc/>

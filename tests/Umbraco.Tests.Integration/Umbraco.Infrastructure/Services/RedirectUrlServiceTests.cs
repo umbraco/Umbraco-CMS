@@ -34,8 +34,8 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     private IRedirectUrlService RedirectUrlService => GetRequiredService<IRedirectUrlService>();
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
-        .AddNotificationHandler<RedirectUrlCreatingNotification, RedirectUrlNotificationHandler>()
-        .AddNotificationHandler<RedirectUrlCreatedNotification, RedirectUrlNotificationHandler>()
+        .AddNotificationHandler<RedirectUrlSavingNotification, RedirectUrlNotificationHandler>()
+        .AddNotificationHandler<RedirectUrlSavedNotification, RedirectUrlNotificationHandler>()
         .AddNotificationHandler<RedirectUrlDeletingNotification, RedirectUrlNotificationHandler>()
         .AddNotificationHandler<RedirectUrlDeletedNotification, RedirectUrlNotificationHandler>();
 
@@ -72,8 +72,8 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     [TearDown]
     public void ResetNotificationHandler()
     {
-        RedirectUrlNotificationHandler.Creating = null;
-        RedirectUrlNotificationHandler.Created = null;
+        RedirectUrlNotificationHandler.Saving = null;
+        RedirectUrlNotificationHandler.Saved = null;
         RedirectUrlNotificationHandler.Deleting = null;
         RedirectUrlNotificationHandler.Deleted = null;
     }
@@ -115,52 +115,50 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     }
 
     [Test]
-    public void Register_Publishes_Creating_And_Created_Notifications_With_New_Url()
+    public void Register_Publishes_Saving_And_Saved_Notifications()
     {
         const string OldUrl = "/old/url";
-        const string NewUrl = "/new/url";
 
-        RedirectUrlCreatingNotification? creatingCaptured = null;
-        RedirectUrlCreatedNotification? createdCaptured = null;
-        RedirectUrlNotificationHandler.Creating = n => creatingCaptured = n;
-        RedirectUrlNotificationHandler.Created = n => createdCaptured = n;
+        RedirectUrlSavingNotification? savingCaptured = null;
+        RedirectUrlSavedNotification? savedCaptured = null;
+        RedirectUrlNotificationHandler.Saving = n => savingCaptured = n;
+        RedirectUrlNotificationHandler.Saved = n => savedCaptured = n;
 
-        var result = RedirectUrlService.Register(OldUrl, NewUrl, _firstSubPage.Key, CultureEnglish);
+        var result = RedirectUrlService.RegisterWithStatus(OldUrl, _firstSubPage.Key, CultureEnglish);
 
         Assert.Multiple(() =>
         {
             Assert.IsTrue(result.Success);
             Assert.AreEqual(RedirectUrlOperationStatus.Success, result.Status);
 
-            Assert.IsNotNull(creatingCaptured);
-            Assert.AreEqual(_firstSubPage.Key, creatingCaptured!.ContentKey);
-            Assert.AreEqual(OldUrl, creatingCaptured.OldUrl);
-            Assert.AreEqual(NewUrl, creatingCaptured.NewUrl);
+            Assert.IsNotNull(savingCaptured);
+            IRedirectUrl savingEntity = savingCaptured!.SavedEntities.Single();
+            Assert.AreEqual(_firstSubPage.Key, savingEntity.ContentKey);
+            Assert.AreEqual(OldUrl, savingEntity.Url);
 
-            Assert.IsNotNull(createdCaptured);
-            Assert.AreEqual(_firstSubPage.Key, createdCaptured!.ContentKey);
-            Assert.AreEqual(OldUrl, createdCaptured.OldUrl);
-            Assert.AreEqual(NewUrl, createdCaptured.NewUrl);
+            Assert.IsNotNull(savedCaptured);
+            IRedirectUrl savedEntity = savedCaptured!.SavedEntities.Single();
+            Assert.AreEqual(_firstSubPage.Key, savedEntity.ContentKey);
+            Assert.AreEqual(OldUrl, savedEntity.Url);
         });
     }
 
     [Test]
-    public void Register_Returns_CancelledByNotification_When_Handler_Cancels_Creating()
+    public void Register_Returns_CancelledByNotification_When_Handler_Cancels_Saving()
     {
         const string OldUrl = "/cancelled/old";
-        const string NewUrl = "/cancelled/new";
 
-        var createdWasCalled = false;
-        RedirectUrlNotificationHandler.Creating = n => n.Cancel = true;
-        RedirectUrlNotificationHandler.Created = _ => createdWasCalled = true;
+        var savedWasCalled = false;
+        RedirectUrlNotificationHandler.Saving = n => n.Cancel = true;
+        RedirectUrlNotificationHandler.Saved = _ => savedWasCalled = true;
 
-        var result = RedirectUrlService.Register(OldUrl, NewUrl, _firstSubPage.Key, CultureEnglish);
+        var result = RedirectUrlService.RegisterWithStatus(OldUrl, _firstSubPage.Key, CultureEnglish);
 
         Assert.Multiple(() =>
         {
             Assert.IsFalse(result.Success);
             Assert.AreEqual(RedirectUrlOperationStatus.CancelledByNotification, result.Status);
-            Assert.IsFalse(createdWasCalled, "Created notification must not fire when Creating was cancelled.");
+            Assert.IsFalse(savedWasCalled, "Saved notification must not fire when Saving was cancelled.");
         });
 
         // Verify nothing was persisted.
@@ -209,22 +207,22 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     }
 
     internal sealed class RedirectUrlNotificationHandler :
-        INotificationHandler<RedirectUrlCreatingNotification>,
-        INotificationHandler<RedirectUrlCreatedNotification>,
+        INotificationHandler<RedirectUrlSavingNotification>,
+        INotificationHandler<RedirectUrlSavedNotification>,
         INotificationHandler<RedirectUrlDeletingNotification>,
         INotificationHandler<RedirectUrlDeletedNotification>
     {
-        public static Action<RedirectUrlCreatingNotification>? Creating { get; set; }
+        public static Action<RedirectUrlSavingNotification>? Saving { get; set; }
 
-        public static Action<RedirectUrlCreatedNotification>? Created { get; set; }
+        public static Action<RedirectUrlSavedNotification>? Saved { get; set; }
 
         public static Action<RedirectUrlDeletingNotification>? Deleting { get; set; }
 
         public static Action<RedirectUrlDeletedNotification>? Deleted { get; set; }
 
-        public void Handle(RedirectUrlCreatingNotification notification) => Creating?.Invoke(notification);
+        public void Handle(RedirectUrlSavingNotification notification) => Saving?.Invoke(notification);
 
-        public void Handle(RedirectUrlCreatedNotification notification) => Created?.Invoke(notification);
+        public void Handle(RedirectUrlSavedNotification notification) => Saved?.Invoke(notification);
 
         public void Handle(RedirectUrlDeletingNotification notification) => Deleting?.Invoke(notification);
 
