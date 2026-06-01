@@ -1,7 +1,7 @@
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbExtensionsRegistry } from '@umbraco-cms/backoffice/extension-registry';
 import { ServerService } from '@umbraco-cms/backoffice/external/backend-api';
-import { UmbBasicState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
+import { UmbBasicState, UmbBooleanState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import { UmbExtensionsManifestInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -21,6 +21,9 @@ export class UmbBackofficeContext extends UmbContextBase {
 
 	readonly #version = new UmbStringState(undefined);
 	public readonly version = this.#version.asObservable();
+
+	readonly #mobileSidebarOpen = new UmbBooleanState(false);
+	public readonly mobileSidebarOpen = this.#mobileSidebarOpen.asObservable();
 
 	constructor(host: UmbControllerHost) {
 		super(host, UMB_BACKOFFICE_CONTEXT);
@@ -67,6 +70,14 @@ export class UmbBackofficeContext extends UmbContextBase {
 
 	public setActiveSectionAlias(alias: string) {
 		this.#activeSectionAlias.setValue(alias);
+	}
+
+	public toggleMobileSidebar(): void {
+		this.#mobileSidebarOpen.setValue(!this.#mobileSidebarOpen.getValue());
+	}
+
+	public setMobileSidebarOpen(open: boolean): void {
+		this.#mobileSidebarOpen.setValue(open);
 	}
 
 	public async serverUpgradeCheck() {
