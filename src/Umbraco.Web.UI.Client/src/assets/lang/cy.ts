@@ -390,7 +390,7 @@ export default {
 		enterFolderName: 'Rhoi enw ffolder i mewn',
 		updateData: 'Dewiswch fath a theitl',
 		noDocumentTypes:
-			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Mathau o nod blentyn caniataol</strong> o dan <strong>Caniatadau</strong>",
+			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Mathau o nod blentyn caniataol</strong> o dan <strong>Strwythyr</strong>",
 		noDocumentTypesAtRoot:
 			'Nid oes unrhyw fathau o ddogfennau ar gael. Rhaid i chi creu rhain yn <strong>Mathau o Ddogfennau</strong> tu fewn y adran <strong>Gosodiadau</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -398,7 +398,7 @@ export default {
 		noDocumentTypesEditPermissions: 'Golygu caniatâd ar gyfer y math hwn o ddogfen',
 		noDocumentTypesCreateNew: 'Creu Math o Ddogfen newydd',
 		noDocumentTypesAllowedAtRoot:
-			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Caniatáu fel gwraidd</strong> o dan <strong>Caniatadau</strong>",
+			"Nid oes unrhyw fathau o ddogfennau caniataol ar gael am greu cynnwys fan hyn. Rhaid i chi alluogi'r rhain yn <strong>Mathau o Ddogfennau</strong> o fewn y adran <strong>Gosodiadau</strong>, gan olygu y opsiwn <strong>Caniatáu fel gwraidd</strong> o dan <strong>Strwythyr</strong>",
 		noMediaTypes:
 			'Nid oes unrhyw fathau o gyfrwng caniataol ar gael. Rhaid i chi alluogi\'r rhain yn yr adran gosodiadau o dan <strong>"mathau o gyfrwng"</strong>.',
 		noMediaTypesWithNoSettingsAccess:
@@ -2088,6 +2088,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Analluogi olinydd URL',
 		enableUrlTracker: 'Galluogi olinydd URL',
+		urlTrackerEnabled: "Wedi'i alluogi",
+		urlTrackerDisabled: "Wedi'i analluogi",
 		culture: 'Diwylliant',
 		originalUrl: 'URL gwreiddiol',
 		redirectedTo: 'Ailgyfeirwyd I',

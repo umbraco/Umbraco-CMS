@@ -20,8 +20,7 @@ src/packages/media/          <- package root
 │   ├── index.ts
 │   ├── manifests.ts
 │   └── ...
-├── manifests.ts             <- aggregates all module manifests
-└── umbraco-package.ts       <- bundle entry point
+└── umbraco-package.ts       <- aggregates module manifests + bundle entry point
 ```
 
 ### Public vs. Private Modules
@@ -65,7 +64,7 @@ declare global {
 
 ### Manifest Bundling
 
-Each sub-feature exports its own `manifests` array, aggregated up to the package root. See [Manifests & Aliases — Manifest Bundling](./manifests.md#manifest-bundling) for the pattern.
+Each sub-feature exports its own `manifests` array from its local `manifests.ts`. These bubble up to `umbraco-package.ts`, which assembles them and registers the bundle — there is no separate root-level `manifests.ts`. See [Manifests & Aliases — Package Bundles](./manifests.md#package-bundles-internal-packages) for the full pattern.
 
 ---
 

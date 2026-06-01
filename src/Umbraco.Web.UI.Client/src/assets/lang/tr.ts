@@ -339,7 +339,7 @@ export default {
 		enterFolderName: 'Bir klasör adı girin',
 		updateData: 'Bir tür ve başlık seçin',
 		noDocumentTypes:
-			"Burada içerik oluşturmak için izin verilen doküman türü yok. Bunları, <strong>İzinler</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmelisiniz.",
+			"Burada içerik oluşturmak için izin verilen doküman türü yok. Bunları, <strong>Yapı</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmelisiniz.",
 		noDocumentTypesAtRoot:
 			"Burada içerik oluşturmak için uygun bir belge türü yok. Öncelikle belge türlerini <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde oluşturmanız gerekiyor.",
 		noDocumentTypesWithNoSettingsAccess:
@@ -347,9 +347,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Şu belge türü için izinleri düzenleyin',
 		noDocumentTypesCreateNew: 'Yeni bir belge türü oluşturun',
 		noDocumentTypesAllowedAtRoot:
-			"Burada içerik oluşturmak için izin verilen belge türü yok. Bunları, <strong>İzinler</strong> altında <strong>Kök olarak izin ver</strong> seçeneğini değiştirerek, <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmeniz gerekir. ",
+			"Burada içerik oluşturmak için izin verilen belge türü yok. Bunları, <strong>Yapı</strong> altında <strong>Kök olarak izin ver</strong> seçeneğini değiştirerek, <strong>Ayarlar</strong> bölümündeki <strong>Belge Türleri</strong> 'nde etkinleştirmeniz gerekir. ",
 		noMediaTypes:
-			"Burada medya oluşturmak için izin verilen medya türü yok. Bunları, <strong>İzinler</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Medya Türleri</strong> 'nde etkinleştirmelisiniz. .",
+			"Burada medya oluşturmak için izin verilen medya türü yok. Bunları, <strong>Yapı</strong> altında <strong>İzin verilen alt düğüm türlerini</strong> düzenleyerek <strong>Ayarlar</strong> bölümündeki <strong>Medya Türleri</strong> 'nde etkinleştirmelisiniz. .",
 		noMediaTypesWithNoSettingsAccess: 'Ağaçtaki seçili ortam, altında başka bir ortamın oluşturulmasına izin vermiyor.',
 		noMediaTypesEditPermissions: 'Şu medya türü için izinleri düzenleyin:',
 		documentTypeWithoutTemplate: 'Şablonsuz Belge Türü',
@@ -1739,6 +1739,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'URL izleyiciyi devre dışı bırakın',
 		enableUrlTracker: 'URL izleyiciyi etkinleştir',
+		urlTrackerEnabled: 'Etkin',
+		urlTrackerDisabled: 'Devre Dışı',
 		originalUrl: 'Orijinal URL',
 		redirectedTo: 'Yönlendirildi',
 		redirectUrlManagement: 'URL Yönetimini Yeniden Yönlendir',
