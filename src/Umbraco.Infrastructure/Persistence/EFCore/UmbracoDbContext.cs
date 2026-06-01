@@ -74,6 +74,10 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<ContentVersionCleanupPolicyDto> ContentVersionCleanupPolicies { get; set; }
 
+    public required DbSet<AccessDto> Access { get; set; }
+
+    public required DbSet<AccessRuleDto> AccessRules { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var coreExtensions = options.FindExtension<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>();

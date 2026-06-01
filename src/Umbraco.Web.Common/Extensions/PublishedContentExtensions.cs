@@ -3,7 +3,6 @@ using Examine;
 using Examine.Search;
 using Microsoft.AspNetCore.Html;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;

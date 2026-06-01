@@ -36,9 +36,7 @@ test('can create element with the element picker data type', async ({umbracoApi,
   // Act
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(elementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(elementTypeName);
   await umbracoUi.library.enterElementName(elementName);
   await umbracoUi.library.clickSaveButtonAndWaitForElementToBeCreated();
 
@@ -145,8 +143,7 @@ test('can not publish a mandatory element picker with an empty value', async ({u
   expect(elementData.values[0].value).toContain(elementPickerId);
 });
 
-// Currently there is no validation message displayed
-test.fixme('can validate minimum amount in element picker', async ({umbracoApi, umbracoUi}) => {
+test('can validate minimum amount in element picker', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const minAmount = 2;
   const elementPickerDataTypeId = await umbracoApi.dataType.createDefaultElementPickerWithValidationLimit(elementPickerDataTypeName, minAmount);
@@ -164,7 +161,7 @@ test.fixme('can validate minimum amount in element picker', async ({umbracoApi, 
   await umbracoUi.library.clickSaveAndPublishButton();
 
   // Assert
-  await umbracoUi.library.isValidationMessageVisible('This field need more items');
+  await umbracoUi.library.isValidationMessageVisible('You need to add at least ' + minAmount + ' items');
   await umbracoUi.library.doesErrorNotificationHaveText(NotificationConstantHelper.error.documentCouldNotBePublished);
 });
 

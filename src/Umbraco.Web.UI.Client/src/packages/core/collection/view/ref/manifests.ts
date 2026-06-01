@@ -1,4 +1,5 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import { UmbRefCollectionViewElement } from './ref-collection-view.element.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -9,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'collectionView',
 			kind: 'ref',
-			element: () => import('./ref-collection-view.element.js'),
+			element: UmbRefCollectionViewElement,
 			weight: 800,
 			meta: {
 				label: 'List',

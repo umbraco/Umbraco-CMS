@@ -247,4 +247,57 @@ internal sealed class RelationTypeRepositoryTest : UmbracoIntegrationTest
 
         _relateContentToMedia = relateContentMedia;
     }
+
+    [Test]
+    public async Task Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        using (ScopeProvider.CreateCoreScope())
+        {
+            var repository = CreateRepository();
+            var relationType = new RelationType("Test Clone", "testClone", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
+            await repository.SaveAsync(relationType, CancellationToken.None);
+
+            var first = await repository.GetAsync(relationType.Key, CancellationToken.None);
+            var second = await repository.GetAsync(relationType.Key, CancellationToken.None);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public async Task Exists_By_Guid_Returns_Correct_Result()
+    {
+        using (ScopeProvider.CreateCoreScope())
+        {
+            var repository = CreateRepository();
+            var relationType = new RelationType("Test Exists", "testExists", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
+            await repository.SaveAsync(relationType, CancellationToken.None);
+
+            Assert.IsTrue(await repository.ExistsAsync(relationType.Id, CancellationToken.None));
+            Assert.IsNull(await repository.GetAsync(Guid.NewGuid(), CancellationToken.None));
+        }
+    }
+
+    [Test]
+    public async Task Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        using (ScopeProvider.CreateCoreScope())
+        {
+            var repository = CreateRepository();
+            var relationType = new RelationType("Test Mutation", "testMutation", true, Constants.ObjectTypes.Document, Constants.ObjectTypes.Document, false);
+            await repository.SaveAsync(relationType, CancellationToken.None);
+
+            var first = await repository.GetAsync(relationType.Key, CancellationToken.None);
+            Assert.IsNotNull(first);
+            var originalName = first!.Name;
+            first.Name = "MUTATED_" + Guid.NewGuid();
+
+            var second = await repository.GetAsync(relationType.Key, CancellationToken.None);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
+        }
+    }
 }

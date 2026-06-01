@@ -25,7 +25,7 @@ class UmbTestExtensionController extends UmbBaseExtensionInitializer {
 		this._init();
 	}
 
-	protected async _conditionsAreGood() {
+	protected async _conditionsAreGood(_signal: AbortSignal) {
 		return true;
 	}
 

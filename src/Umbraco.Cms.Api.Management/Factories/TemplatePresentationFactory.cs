@@ -29,7 +29,7 @@ public class TemplatePresentationFactory : ITemplatePresentationFactory
 
     /// <summary>
     /// Asynchronously creates a <see cref="Umbraco.Cms.Api.Management.Models.TemplateResponseModel" /> from the specified <see cref="Umbraco.Cms.Core.Models.ITemplate" />.
-    /// If the template has a master template, its reference will be included in the response model.
+    /// If the template has a layout template, its reference will be included in the response model.
     /// </summary>
     /// <param name="template">The template from which to create the response model.</param>
     /// <returns>
@@ -45,10 +45,10 @@ public class TemplatePresentationFactory : ITemplatePresentationFactory
             Content = template.Content
         };
 
-        if (template.MasterTemplateAlias is not null)
+        if (template.LayoutTemplateAlias is not null)
         {
-            ITemplate? parentTemplate = await _templateService.GetAsync(template.MasterTemplateAlias);
-            responseModel.MasterTemplate = ReferenceByIdModel.ReferenceOrNull(parentTemplate?.Key);
+            ITemplate? parentTemplate = await _templateService.GetAsync(template.LayoutTemplateAlias);
+            responseModel.LayoutTemplate = ReferenceByIdModel.ReferenceOrNull(parentTemplate?.Key);
         }
 
         return responseModel;

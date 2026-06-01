@@ -152,7 +152,7 @@ test('can add a section to a user group', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   await umbracoUi.userGroup.clickUserGroupsButton();
-  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Content');
+  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Content Section');
 })
 
 test('can add multiple sections to a user group', async ({umbracoApi, umbracoUi}) => {
@@ -167,8 +167,8 @@ test('can add multiple sections to a user group', async ({umbracoApi, umbracoUi}
 
   // Assert
   await umbracoUi.userGroup.clickUserGroupsButton();
-  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Content');
-  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Media');
+  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Content Section');
+  await umbracoUi.userGroup.doesUserGroupTableHaveSection(userGroupName, 'Media Section');
 });
 
 test('can remove a section from a user group', async ({umbracoApi, umbracoUi}) => {

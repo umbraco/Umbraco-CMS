@@ -41,7 +41,7 @@ internal sealed class AuditServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.IsNotNull(logs);
-            Assert.That(logs, Is.All.Not.Null);
+            CollectionAssert.AllItemsAreNotNull(logs);
             Assert.AreEqual(numberOfEntries, logs.Length);
             Assert.AreEqual(numberOfEntries, logs.Count(x => x.AuditType == AuditType.Unpublish));
         });

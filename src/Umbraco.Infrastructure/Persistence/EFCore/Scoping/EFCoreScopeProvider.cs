@@ -29,6 +29,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     private readonly FileSystems _fileSystems;
     private readonly IScopeProvider _scopeProvider;
     private readonly IDbContextFactory<TDbContext> _dbContextFactory;
+    private readonly bool _shareUmbracoConnection;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EFCoreScopeProvider{TDbContext}"/> class.
@@ -44,7 +45,8 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>(),
             StaticServiceProvider.Instance.GetRequiredService<FileSystems>(),
             StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDbContextFactory<TDbContext>>())
+            StaticServiceProvider.Instance.GetRequiredService<IDbContextFactory<TDbContext>>(),
+            StaticServiceProvider.Instance.GetRequiredService<EFCoreScopeConfiguration<TDbContext>>())
     {
     }
 
@@ -60,6 +62,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// <param name="fileSystems">The file systems.</param>
     /// <param name="scopeProvider">The scope provider.</param>
     /// <param name="dbContextFactory">The DbContext factory.</param>
+    /// <param name="scopeConfiguration">The per-DbContext scope configuration.</param>
     internal EFCoreScopeProvider(
         IAmbientEFCoreScopeStack<TDbContext> ambientEFCoreScopeStack,
         ILoggerFactory loggerFactory,
@@ -69,7 +72,8 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         IEventAggregator eventAggregator,
         FileSystems fileSystems,
         IScopeProvider scopeProvider,
-        IDbContextFactory<TDbContext> dbContextFactory)
+        IDbContextFactory<TDbContext> dbContextFactory,
+        EFCoreScopeConfiguration<TDbContext> scopeConfiguration)
     {
         _ambientEFCoreScopeStack = ambientEFCoreScopeStack;
         _loggerFactory = loggerFactory;
@@ -80,6 +84,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         _fileSystems = fileSystems;
         _scopeProvider = scopeProvider;
         _dbContextFactory = dbContextFactory;
+        _shareUmbracoConnection = scopeConfiguration.ShareUmbracoConnection;
         _fileSystems.IsScoped = () => efCoreScopeAccessor.AmbientScope != null && ((EFCoreScope<TDbContext>)efCoreScopeAccessor.AmbientScope).ScopedFileSystems;
     }
 
@@ -96,6 +101,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             null,
             _eventAggregator,
             _dbContextFactory,
+            _shareUmbracoConnection,
             repositoryCacheMode,
             scopeFileSystems);
 
@@ -203,6 +209,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
                 newContext,
                 _eventAggregator,
                 _dbContextFactory,
+                _shareUmbracoConnection,
                 repositoryCacheMode,
                 scopeFileSystems);
 
@@ -225,6 +232,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             null,
             _eventAggregator,
             _dbContextFactory,
+            _shareUmbracoConnection,
             repositoryCacheMode,
             scopeFileSystems);
 

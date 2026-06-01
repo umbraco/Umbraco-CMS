@@ -300,6 +300,13 @@ public interface ISqlSyntaxProvider
     string FormatDateTime(DateTime date, bool includeTime = true);
 
     /// <summary>
+    /// Formats a <see cref="Guid"/> value as a string suitable for use in SQL queries.
+    /// </summary>
+    /// <param name="guid">The guid.</param>
+    /// <returns>A string representation of the guid formatted for SQL.</returns>
+    string FormatGuid(Guid guid) => guid.ToString();
+
+    /// <summary>
     /// Formats a <see cref="TableDefinition"/> into its corresponding SQL statement.
     /// </summary>
     /// <param name="table">The <see cref="TableDefinition"/> to format.</param>

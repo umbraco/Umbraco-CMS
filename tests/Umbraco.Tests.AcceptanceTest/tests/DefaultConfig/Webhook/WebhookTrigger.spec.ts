@@ -33,7 +33,7 @@ test('can trigger when content is published', async ({umbracoApi, umbracoUi}) =>
   // Arrange
   const event = 'Content Published';
   await umbracoApi.webhook.createDefaultWebhook(webhookName, webhookSiteToken, event);
-  await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  const contentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
   await umbracoUi.goToBackOffice();
   await umbracoUi.webhook.goToSection(ConstantHelper.sections.content);
 
@@ -43,7 +43,7 @@ test('can trigger when content is published', async ({umbracoApi, umbracoUi}) =>
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
-  expect(webhookSiteData[0].content).toContain(documentName);
+  expect(webhookSiteData[0].content).toContain(contentId);
 });
 
 test('can trigger when content is deleted', async ({umbracoApi, umbracoUi}) => {
@@ -104,7 +104,6 @@ test('can trigger when media is saved', async ({umbracoApi, umbracoUi}) => {
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
-  expect(webhookSiteData[0].content).toContain(mediaName);
   expect(webhookSiteData[0].content).toContain(mediaId);
 });
 
@@ -164,9 +163,9 @@ test('can trigger the webhook for a specific content type', async ({umbracoApi, 
   const secondDocumentName = 'Second Test Webhook Content';
   const secondDocumentTypeName = 'SecondTestDocumentTypeForWebhook';
   const secondDocumentTypeId = await umbracoApi.documentType.createDefaultDocumentTypeWithAllowAsRoot(secondDocumentTypeName);
-  await umbracoApi.document.createDefaultDocument(secondDocumentName, secondDocumentTypeId);
+  const secondContentId = await umbracoApi.document.createDefaultDocument(secondDocumentName, secondDocumentTypeId);
   await umbracoApi.webhook.createWebhookForSpecificContentType(webhookName, webhookSiteToken, event, documentTypeName);
-  await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
+  const contentId = await umbracoApi.document.createDefaultDocument(documentName, documentTypeId);
 
   await umbracoUi.goToBackOffice();
   await umbracoUi.webhook.goToSection(ConstantHelper.sections.content);
@@ -183,8 +182,8 @@ test('can trigger the webhook for a specific content type', async ({umbracoApi, 
 
   // Assert
   const webhookSiteData = await umbracoApi.webhook.getWebhookSiteRequestResponse(webhookSiteToken);
-  expect(webhookSiteData[0].content).toContain(documentName);
-  expect(webhookSiteData[0].content).not.toContain(secondDocumentName);
+  expect(webhookSiteData[0].content).toContain(contentId);
+  expect(webhookSiteData[0].content).not.toContain(secondContentId);
 
   // Clean
   await umbracoApi.documentType.ensureNameNotExists(secondDocumentTypeName);

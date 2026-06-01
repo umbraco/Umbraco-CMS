@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.Filters;
 using Umbraco.Cms.Tests.Common.Builders;
@@ -16,7 +17,7 @@ internal sealed partial class ContentTypeServiceTests
     {
         var contentType = ContentTypeBuilder.CreateBasicElementType("allowedElement", "Allowed Element");
         contentType.AllowedInLibrary = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 
@@ -30,7 +31,7 @@ internal sealed partial class ContentTypeServiceTests
     {
         var contentType = ContentTypeBuilder.CreateBasicContentType("nonElement", "Non Element");
         contentType.AllowedInLibrary = true;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 
@@ -43,7 +44,7 @@ internal sealed partial class ContentTypeServiceTests
     {
         var contentType = ContentTypeBuilder.CreateBasicElementType("notAllowed", "Not Allowed Element");
         contentType.AllowedInLibrary = false;
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 
@@ -57,11 +58,11 @@ internal sealed partial class ContentTypeServiceTests
         // Create non-matching types
         var nonElement = ContentTypeBuilder.CreateBasicContentType("nonElement", "Non Element");
         nonElement.AllowedInLibrary = true;
-        ContentTypeService.Save(nonElement);
+        await ContentTypeService.CreateAsync(nonElement, Constants.Security.SuperUserKey);
 
         var elementNotAllowed = ContentTypeBuilder.CreateBasicElementType("notAllowed", "Not Allowed");
         elementNotAllowed.AllowedInLibrary = false;
-        ContentTypeService.Save(elementNotAllowed);
+        await ContentTypeService.CreateAsync(elementNotAllowed, Constants.Security.SuperUserKey);
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 
@@ -76,7 +77,7 @@ internal sealed partial class ContentTypeServiceTests
         {
             var contentType = ContentTypeBuilder.CreateBasicElementType($"allowed{i}", $"Allowed Element {i}");
             contentType.AllowedInLibrary = true;
-            ContentTypeService.Save(contentType);
+            await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         }
 
         var firstPage = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 2);
@@ -94,11 +95,11 @@ internal sealed partial class ContentTypeServiceTests
     {
         var allowed = ContentTypeBuilder.CreateBasicElementType("allowedElement", "Allowed Element");
         allowed.AllowedInLibrary = true;
-        ContentTypeService.Save(allowed);
+        await ContentTypeService.CreateAsync(allowed, Constants.Security.SuperUserKey);
 
         var other = ContentTypeBuilder.CreateBasicElementType("otherElement", "Other Element");
         other.AllowedInLibrary = true;
-        ContentTypeService.Save(other);
+        await ContentTypeService.CreateAsync(other, Constants.Security.SuperUserKey);
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 
@@ -112,11 +113,11 @@ internal sealed partial class ContentTypeServiceTests
     {
         var allowed = ContentTypeBuilder.CreateBasicElementType("allowedElement", "Allowed Element");
         allowed.AllowedInLibrary = true;
-        ContentTypeService.Save(allowed);
+        await ContentTypeService.CreateAsync(allowed, Constants.Security.SuperUserKey);
 
         var other = ContentTypeBuilder.CreateBasicElementType("otherElement", "Other Element");
         other.AllowedInLibrary = true;
-        ContentTypeService.Save(other);
+        await ContentTypeService.CreateAsync(other, Constants.Security.SuperUserKey);
 
         var result = await ContentTypeService.GetAllAllowedInLibraryAsync(0, 100);
 

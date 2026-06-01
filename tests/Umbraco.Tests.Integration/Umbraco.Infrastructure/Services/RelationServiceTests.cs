@@ -44,7 +44,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         // Create content
         var createdContent = new List<IContent>();
         var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         for (var i = 0; i < 3; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
@@ -55,7 +55,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         // Create media
         var createdMedia = new List<IMedia>();
         var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
-        MediaTypeService.Save(imageType);
+        await MediaTypeService.CreateAsync(imageType, Constants.Security.SuperUserKey);
         for (var i = 0; i < 3; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageType, -1);
@@ -95,13 +95,13 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     public async Task Return_List_Of_Content_Items_Where_Media_Item_Referenced()
     {
         var mt = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
-        MediaTypeService.Save(mt);
+        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
         var m1 = MediaBuilder.CreateSimpleMedia(mt, "hello 1", -1);
         MediaService.Save(m1);
 
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest");
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        ContentTypeService.Save(ct);
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
         void CreateContentWithMediaRefs()
         {
@@ -131,13 +131,13 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
     public async Task Return_List_Of_Content_Items_Where_Member_Item_Referenced()
     {
         var memberType = MemberTypeBuilder.CreateSimpleMemberType("testMemberType", "Test Member Type");
-        MemberTypeService.Save(memberType);
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
         var member = MemberBuilder.CreateSimpleMember(memberType, "Test Member", "test@test.com", "xxxxxxxx", "testMember");
         MemberService.Save(member);
 
         var ct = ContentTypeBuilder.CreateTextPageContentType("richTextTest");
         ct.AllowedTemplates = Enumerable.Empty<ITemplate>();
-        ContentTypeService.Save(ct);
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
         void CreateContentWithMemberRefs()
         {
@@ -269,10 +269,10 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         await rs.SaveAsync(rt);
 
         var ct = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(ct);
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
         var mt = MediaTypeBuilder.CreateImageMediaType("img");
-        MediaTypeService.Save(mt);
+        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
 
         var c1 = ContentBuilder.CreateBasicContent(ct);
         var c2 = MediaBuilder.CreateMediaImage(mt, -1);
@@ -298,10 +298,10 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         await rs.SaveAsync(rt);
 
         var ct = ContentTypeBuilder.CreateBasicContentType();
-        ContentTypeService.Save(ct);
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
         var mt = MediaTypeBuilder.CreateImageMediaType("img");
-        MediaTypeService.Save(mt);
+        await MediaTypeService.CreateAsync(mt, Constants.Security.SuperUserKey);
 
         return Enumerable.Range(1, count).Select(index =>
         {

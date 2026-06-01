@@ -1,5 +1,5 @@
 import { UmbMemberGroupCollectionRepository } from '../../collection/index.js';
-import type { UmbMemberGroupDetailModel } from '../../types.js';
+import type { UmbMemberGroupCollectionItemModel } from '../../collection/types.js';
 import type {
 	UmbMemberGroupPickerModalValue,
 	UmbMemberGroupPickerModalData,
@@ -17,7 +17,7 @@ export class UmbMemberGroupPickerModalElement extends UmbModalBaseElement<
 	UmbMemberGroupPickerModalValue
 > {
 	@state()
-	private _memberGroups: Array<UmbMemberGroupDetailModel> = [];
+	private _memberGroups: Array<UmbMemberGroupCollectionItemModel> = [];
 
 	@state()
 	private _currentPage: number = 1;

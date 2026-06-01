@@ -9,7 +9,19 @@ namespace Umbraco.Cms.Infrastructure.HybridCache;
 
 internal class PublishedElement : PublishableContentBase, IPublishedElement
 {
-    private IPublishedProperty[] _properties;
+    /// <summary>
+    /// Backing array of materialized properties for this element. Built lazily on first
+    /// access via <see cref="EnsureProperties"/>; <c>null</c> until then.
+    /// </summary>
+    /// <remarks>
+    /// Lazy construction avoids allocating a <see cref="PublishedProperty"/> wrapper per
+    /// property type for traversal-only operations (e.g. <c>Children().Count()</c>,
+    /// <c>Descendants()</c> without property reads), which is a significant slice of
+    /// allocation for tree traversals.
+    /// </remarks>
+    private IPublishedProperty[]? _properties;
+
+    private readonly IElementsCache _elementsCache;
     private IReadOnlyDictionary<string, PublishedCultureInfo>? _cultures;
     private readonly string? _urlSegment;
     private readonly IReadOnlyDictionary<string, CultureVariation>? _cultureInfos;
@@ -21,9 +33,11 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         ContentNode contentNode,
         bool preview,
         IElementsCache elementsCache,
-        IVariationContextAccessor variationContextAccessor)
+        IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor)
     {
         VariationContextAccessor = variationContextAccessor;
+        PropertyRenderingContextAccessor = propertyRenderingContextAccessor;
         ContentNode = contentNode;
         ContentData? contentData = preview ? ContentNode.DraftModel : ContentNode.PublishedModel;
         if (contentData is null)
@@ -32,22 +46,11 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         }
         ContentData = contentData;
 
+        _elementsCache = elementsCache;
         _cultureInfos = contentData.CultureInfos;
         _contentName = contentData.Name;
         _urlSegment = contentData.UrlSegment;
         _published = contentData.Published;
-
-        var properties = new IPublishedProperty[ContentNode.ContentType.PropertyTypes.Count()];
-        var i = 0;
-        foreach (IPublishedPropertyType propertyType in ContentNode.ContentType.PropertyTypes)
-        {
-            // add one property per property type - this is required, for the indexing to work
-            // if contentData supplies pdatas, use them, else use null
-            contentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? propertyDatas); // else will be null
-            properties[i++] = new PublishedProperty(propertyType, this, variationContextAccessor, preview, propertyDatas, elementsCache, propertyType.CacheLevel);
-        }
-
-        _properties = properties;
 
         _isPreviewing = preview;
 
@@ -68,7 +71,7 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
 
     public override Guid Key { get; }
 
-    public override IEnumerable<IPublishedProperty> Properties => _properties;
+    public override IEnumerable<IPublishedProperty> Properties => EnsureProperties();
 
     public override int Id { get; }
 
@@ -87,6 +90,8 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
 
     // Needed for publishedProperty
     internal IVariationContextAccessor VariationContextAccessor { get; }
+
+    internal IPropertyRenderingContextAccessor PropertyRenderingContextAccessor { get; }
 
     /// <inheritdoc />
     public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
@@ -131,15 +136,45 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
             return null; // happens when 'alias' does not match a content type property alias
         }
 
+        IPublishedProperty[] properties = EnsureProperties();
+
         // should never happen - properties array must be in sync with property type
-        if (index >= _properties.Length)
+        if (index >= properties.Length)
         {
             throw new IndexOutOfRangeException(
                 "Index points outside the properties array, which means the properties array is corrupt.");
         }
 
-        IPublishedProperty property = _properties[index];
-        return property;
+        return properties[index];
+    }
+
+    private IPublishedProperty[] EnsureProperties()
+    {
+        IPublishedProperty[]? properties = _properties;
+        if (properties is not null)
+        {
+            return properties;
+        }
+
+        return BuildProperties();
+    }
+
+    private IPublishedProperty[] BuildProperties()
+    {
+        IEnumerable<IPublishedPropertyType> propertyTypes = ContentNode.ContentType.PropertyTypes;
+        var newProperties = new IPublishedProperty[propertyTypes.Count()];
+        var i = 0;
+        foreach (IPublishedPropertyType propertyType in propertyTypes)
+        {
+            // add one property per property type - this is required for the indexing to work
+            // if ContentData supplies pdatas, use them, else use null
+            ContentData.Properties.TryGetValue(propertyType.Alias, out PropertyData[]? propertyDatas);
+            newProperties[i++] = new PublishedProperty(propertyType, this, VariationContextAccessor, PropertyRenderingContextAccessor, _isPreviewing, propertyDatas, _elementsCache, propertyType.CacheLevel);
+        }
+
+        // Use CompareExchange so concurrent first-access threads agree on a single canonical
+        // array — losers discard their newly built array and use the winner's.
+        return Interlocked.CompareExchange(ref _properties, newProperties, null) ?? newProperties;
     }
 
     public override bool IsDraft(string? culture = null)
@@ -174,14 +209,14 @@ internal class PublishedElement : PublishableContentBase, IPublishedElement
         if (!ContentNode.HasPublished)
         {
             // In preview mode, the ContentNode only has draft data loaded (published data
-            // is stored in a separate cache entry). Fall back to IPublishStatusQueryService
+            // is stored in a separate cache entry). Fall back to IDocumentPublishStatusQueryService
             // which is an in-memory service that tracks actual document publish status.
             if (_isPreviewing && ItemType == PublishedItemType.Content)
             {
                 culture ??= VariationContextAccessor.VariationContext?.Culture ?? string.Empty;
-                IPublishStatusQueryService publishStatusQueryService =
-                    StaticServiceProvider.Instance.GetRequiredService<IPublishStatusQueryService>();
-                return publishStatusQueryService.IsDocumentPublished(Key, culture);
+                IDocumentPublishStatusQueryService publishStatusQueryService =
+                    StaticServiceProvider.Instance.GetRequiredService<IDocumentPublishStatusQueryService>();
+                return publishStatusQueryService.IsPublished(Key, culture);
             }
 
             return false;

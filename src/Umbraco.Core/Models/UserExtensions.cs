@@ -224,14 +224,14 @@ public static class UserExtensions
     }
 
     /// <summary>
-    ///     Calculate start nodes, combining groups' and user's, and excluding what's in the bin
+    ///     Calculate the set of language ids the user is allowed to access, combining group permissions.
     /// </summary>
-    public static int[] CalculateAllowedLanguageIds(this IUser user, ILocalizationService localizationService)
+    public static async Task<int[]> CalculateAllowedLanguageIdsAsync(this IUser user, ILanguageService languageService)
     {
         var hasAccessToAllLanguages = user.Groups.Any(x => x.HasAccessToAllLanguages);
 
         return hasAccessToAllLanguages
-            ? localizationService.GetAllLanguages().Select(x => x.Id).ToArray()
+            ? (await languageService.GetAllAsync()).Select(x => x.Id).ToArray()
             : user.Groups.SelectMany(x => x.AllowedLanguages).Distinct().ToArray();
     }
 

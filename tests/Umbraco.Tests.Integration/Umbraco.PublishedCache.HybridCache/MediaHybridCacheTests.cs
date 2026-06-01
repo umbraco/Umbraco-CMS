@@ -165,6 +165,60 @@ internal sealed class MediaHybridCacheTests : UmbracoIntegrationTestWithMediaEdi
     }
 
     [Test]
+    public async Task Cannot_Get_Trashed_Media_By_Key()
+    {
+        // Arrange
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
+        Assert.IsNotNull(media, "Media should be in cache before trashing");
+
+        // Act
+        var trashResult = await MediaEditingService.MoveToRecycleBinAsync(SubImage.Key.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+
+        // Assert
+        var trashedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
+        Assert.IsNull(trashedMedia, "Trashed media should not be in cache");
+    }
+
+    [Test]
+    public async Task Cannot_Get_Trashed_Media_By_Id()
+    {
+        // Arrange
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
+        Assert.IsNotNull(media, "Media should be in cache before trashing");
+
+        // Act
+        var trashResult = await MediaEditingService.MoveToRecycleBinAsync(SubImage.Key.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+
+        // Assert
+        var trashedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImageId);
+        Assert.IsNull(trashedMedia, "Trashed media should not be in cache");
+    }
+
+    [Test]
+    public async Task Restored_Media_Is_Available_In_Cache()
+    {
+        // Arrange - Verify media is in cache, then trash it
+        var media = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
+        Assert.IsNotNull(media, "Media should be in cache before trashing");
+
+        var trashResult = await MediaEditingService.MoveToRecycleBinAsync(SubImage.Key.Value, Constants.Security.SuperUserKey);
+        Assert.IsTrue(trashResult.Success);
+
+        var trashedMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
+        Assert.IsNull(trashedMedia, "Trashed media should not be in cache");
+
+        // Act - Restore to root (original location)
+        var restoreResult = await MediaEditingService.RestoreAsync(SubImage.Key.Value, null, Constants.Security.SuperUserKey);
+        Assert.IsTrue(restoreResult.Success);
+
+        // Assert - Restored media should be back in the cache
+        var restoredMedia = await PublishedMediaHybridCache.GetByIdAsync(SubImage.Key.Value);
+        Assert.IsNotNull(restoredMedia, "Restored media should be in the cache");
+    }
+
+    [Test]
     public async Task Cannot_Get_Deleted_Media_By_Id()
     {
         // Arrange

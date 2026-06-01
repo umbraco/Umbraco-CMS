@@ -1,4 +1,4 @@
-using AutoFixture.NUnit4;
+using AutoFixture.NUnit3;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;

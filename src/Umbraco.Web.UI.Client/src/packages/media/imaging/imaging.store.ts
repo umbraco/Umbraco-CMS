@@ -16,7 +16,7 @@ export class UmbImagingStore extends UmbContextBase implements UmbApi {
 	#hasWarned = false;
 
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_IMAGING_STORE_CONTEXT.toString());
+		super(host, UMB_IMAGING_STORE_CONTEXT);
 	}
 
 	#warnDeprecation() {

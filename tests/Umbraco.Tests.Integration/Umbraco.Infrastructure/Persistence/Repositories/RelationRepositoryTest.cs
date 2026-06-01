@@ -221,7 +221,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     {
         // Create a media item and create a relationship between itself (parent -> child)
         var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
-        MediaTypeService.Save(imageType);
+        await MediaTypeService.CreateAsync(imageType, Constants.Security.SuperUserKey);
         var media = MediaBuilder.CreateMediaImage(imageType, -1);
         MediaService.Save(media);
         var relType = await RelationService.GetRelationTypeByAliasAsync(Constants.Conventions.RelationTypes.RelatedMediaAlias);
@@ -287,8 +287,10 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
     {
         // Create content
         var createdContent = new List<IContent>();
+        var createdMembers = new List<IMember>();
+        var createdMedia = new List<IMedia>();
         var contentType = ContentTypeBuilder.CreateBasicContentType("blah");
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
         for (var i = 0; i < 3; i++)
         {
             var c1 = ContentBuilder.CreateBasicContent(contentType);
@@ -306,9 +308,8 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
         }
 
         // Create media
-        var createdMedia = new List<IMedia>();
         var imageType = MediaTypeBuilder.CreateImageMediaType("myImage");
-        MediaTypeService.Save(imageType);
+        await MediaTypeService.CreateAsync(imageType, Constants.Security.SuperUserKey);
         for (var i = 0; i < 3; i++)
         {
             var c1 = MediaBuilder.CreateMediaImage(imageType, -1);
@@ -318,8 +319,8 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
 
         // Create members
         var memberType = MemberTypeBuilder.CreateSimpleMemberType("simple");
-        MemberTypeService.Save(memberType);
-        var createdMembers = MemberBuilder.CreateSimpleMembers(memberType, 3).ToList();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+        createdMembers.AddRange(MemberBuilder.CreateSimpleMembers(memberType, 3));
         GetMemberService().Save(createdMembers);
 
         var relatedMediaRelType =
@@ -541,7 +542,7 @@ internal sealed class RelationRepositoryTest : UmbracoIntegrationTest
             _contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
 
-            ContentTypeService.Save(_contentType);
+            await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
 
             // Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
             _textpage = ContentBuilder.CreateSimpleContent(_contentType);
