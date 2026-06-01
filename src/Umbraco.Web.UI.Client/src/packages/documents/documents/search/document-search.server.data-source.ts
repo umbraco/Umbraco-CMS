@@ -4,6 +4,7 @@ import type { UmbSearchDataSource } from '@umbraco-cms/backoffice/search';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { DocumentService, type DocumentItemResponseModel } from '@umbraco-cms/backoffice/external/backend-api';
 import { tryExecute } from '@umbraco-cms/backoffice/resources';
+import { UmbItemDataApiGetRequestController } from '@umbraco-cms/backoffice/entity-item';
 import type { UmbDocumentItemModel } from '../types.js';
 
 /**
@@ -27,10 +28,12 @@ export class UmbDocumentSearchServerDataSource
 
 	async #fetchAncestors(ids: Array<string>) {
 		if (!ids.length) return { data: new Map() };
-		const { data, error } = await tryExecute(
-			this.#host,
-			DocumentService.getItemDocumentAncestors({ query: { id: ids } }),
-		);
+
+		const requestController = new UmbItemDataApiGetRequestController(this.#host, {
+			uniques: ids,
+			api: ({ uniques }) => DocumentService.getItemDocumentAncestors({ query: { id: uniques } }),
+		});
+		const { data, error } = await requestController.request();
 
 		if (error) return { error };
 
