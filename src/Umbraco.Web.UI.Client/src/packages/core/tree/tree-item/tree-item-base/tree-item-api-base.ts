@@ -2,7 +2,7 @@ import type { UmbTreeItemModel } from '../../types.js';
 import { UMB_TREE_CONTEXT } from '../../tree.context.token.js';
 import { UMB_TREE_ITEM_API_CONTEXT } from '../tree-item.context.token.js';
 import { UmbTreeItemEntityActionManager } from '../tree-item-entity-action.manager.js';
-import { map } from '@umbraco-cms/backoffice/external/rxjs';
+import { combineLatest, map } from '@umbraco-cms/backoffice/external/rxjs';
 import { UmbBooleanState, UmbObjectState, UmbStringState } from '@umbraco-cms/backoffice/observable-api';
 import { UmbContextBase } from '@umbraco-cms/backoffice/class-api';
 import { UMB_WORKSPACE_EDIT_PATH_PATTERN } from '@umbraco-cms/backoffice/workspace';
@@ -96,7 +96,11 @@ export abstract class UmbTreeItemApiBase<
 	readonly hasActiveDescendant = this.#hasActiveDescendant.asObservable();
 
 	#treeItemEntityActionManager = new UmbTreeItemEntityActionManager(this);
-	readonly hasActions = this.#treeItemEntityActionManager.hasActions;
+	#hideTreeItemActions = new UmbBooleanState(false);
+	readonly hasActions = combineLatest([
+		this.#treeItemEntityActionManager.hasActions,
+		this.#hideTreeItemActions.asObservable(),
+	]).pipe(map(([has, hide]) => !hide && has));
 
 	protected readonly _selectOnly = new UmbBooleanState(false);
 	readonly selectOnly = this._selectOnly.asObservable();
@@ -218,6 +222,13 @@ export abstract class UmbTreeItemApiBase<
 	 */
 	protected _onTreeContextChanged(_context: typeof UMB_TREE_CONTEXT.TYPE): void {
 		this.#observeActive();
+		if (_context.hideTreeItemActions) {
+			this.observe(
+				_context.hideTreeItemActions,
+				(value) => this.#hideTreeItemActions.setValue(value ?? false),
+				'_observeHideTreeItemActions',
+			);
+		}
 	}
 
 	#observeActive() {
