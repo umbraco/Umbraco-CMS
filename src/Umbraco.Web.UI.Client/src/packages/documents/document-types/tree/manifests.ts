@@ -41,6 +41,17 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		],
 	},
 	{
+		type: 'treeItemCard',
+		kind: 'default',
+		alias: 'Umb.TreeItemCard.DocumentType',
+		name: 'Document Type Tree Item Card',
+		forEntityTypes: [
+			UMB_DOCUMENT_TYPE_ROOT_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_ENTITY_TYPE,
+			UMB_DOCUMENT_TYPE_FOLDER_ENTITY_TYPE,
+		],
+	},
+	{
 		type: 'workspaceView',
 		kind: 'collection',
 		alias: 'Umb.WorkspaceView.DocumentType.TreeItemChildrenCollection',

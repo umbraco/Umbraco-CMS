@@ -1,7 +1,5 @@
 import type { UmbTreeItemModel } from '../types.js';
 import type { ManifestTreeItemCard } from './tree-item-card.extension.js';
-import { UmbDefaultTreeItemCardElement } from './default/default-tree-item-card.element.js';
-import { UmbDefaultTreeItemCardApi } from './default/default-tree-item-card.api.js';
 import { css, customElement, html, property, state } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbExtensionsElementAndApiInitializer } from '@umbraco-cms/backoffice/extension-api';
@@ -12,7 +10,6 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	#extensionsController?: any;
 	#item?: UmbTreeItemModel;
-	#fallbackApi?: UmbDefaultTreeItemCardApi;
 
 	@state()
 	protected _component?: any;
@@ -27,7 +24,6 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 
 		if (this._component && value.entityType === oldValue?.entityType) {
 			this._component.item = value;
-			this.#fallbackApi?.setTreeItem(value);
 			return;
 		}
 
@@ -39,8 +35,6 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 
 	#createController(entityType: string) {
 		this.#extensionsController?.destroy();
-		this.#fallbackApi?.destroy();
-		this.#fallbackApi = undefined;
 
 		this.#extensionsController = new UmbExtensionsElementAndApiInitializer(
 			this,
@@ -54,13 +48,10 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 				}
 
 				const ctrl = extensionControllers[0];
+				if (!ctrl?.component || !ctrl?.api) return;
 
-				const component = ctrl?.component ?? new UmbDefaultTreeItemCardElement();
-				const api: UmbDefaultTreeItemCardApi | undefined = ctrl?.api ?? (() => {
-					const fallback = new UmbDefaultTreeItemCardApi(component);
-					this.#fallbackApi = fallback;
-					return fallback;
-				})();
+				const component = ctrl.component;
+				const api = ctrl.api;
 
 				component.item = this.#item;
 				component.api = api;
@@ -82,7 +73,6 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 
 	override destroy(): void {
 		this.#extensionsController?.destroy();
-		this.#fallbackApi?.destroy();
 		super.destroy();
 	}
 
@@ -93,8 +83,6 @@ export class UmbTreeItemCardElement extends UmbLitElement {
 		}
 	`;
 }
-
-export default UmbTreeItemCardElement;
 
 declare global {
 	interface HTMLElementTagNameMap {
