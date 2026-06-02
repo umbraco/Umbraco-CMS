@@ -35,6 +35,15 @@ test('can trash an element', async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeFalsy();
   expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeTruthy();
   await umbracoUi.library.isElementInTreeVisible(elementName, false);
+  await umbracoUi.library.isItemVisibleInRecycleBin(elementName);
+  // Verify audit trail
+  await umbracoUi.library.goToElementWithName(elementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementMoved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name, 1);
 });
 
 test('can trash an element folder with children', async ({umbracoApi, umbracoUi}) => {
@@ -186,6 +195,14 @@ test('can restore element from recycle bin', async ({umbracoApi, umbracoUi}) => 
   expect(await umbracoApi.element.doesItemExistInRecycleBin(elementName)).toBeFalsy();
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   await umbracoUi.library.isElementInTreeVisible(elementName);
+  // Verify audit trail
+  await umbracoUi.reloadPage();
+  await umbracoUi.library.goToElementWithName(elementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementMoved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can restore element folder from recycle bin', async ({umbracoApi, umbracoUi}) => {
