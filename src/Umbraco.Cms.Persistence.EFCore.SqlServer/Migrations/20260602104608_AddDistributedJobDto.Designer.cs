@@ -12,7 +12,7 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    [Migration("20260602080455_AddDistributedJobDto")]
+    [Migration("20260602104608_AddDistributedJobDto")]
     partial class AddDistributedJobDto
     {
         /// <inheritdoc />
@@ -716,8 +716,8 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("createDate");
 
-                    b.Property<short>("Level")
-                        .HasColumnType("smallint")
+                    b.Property<int>("Level")
+                        .HasColumnType("int")
                         .HasColumnName("level");
 
                     b.Property<Guid?>("NodeObjectType")
@@ -930,10 +930,10 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("key");
 
-                    b.Property<short>("Kind")
+                    b.Property<int>("Kind")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("smallint")
-                        .HasDefaultValue((short)0)
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
                         .HasColumnName("kind");
 
                     b.Property<DateTime?>("LastLockoutDate")
