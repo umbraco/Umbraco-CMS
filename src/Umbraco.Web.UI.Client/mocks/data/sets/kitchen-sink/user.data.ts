@@ -56,6 +56,35 @@ const rawData = [
 		userName: 'admin@example.com',
 		flags: [],
 	},
+	{
+		avatarUrls: [],
+		createDate: '2023-02-20 15:10:00',
+		documentStartNodeIds: [],
+		elementStartNodeIds: [],
+		email: 'editor@example.com',
+		failedLoginAttempts: 0,
+		hasDocumentRootAccess: true,
+		hasElementRootAccess: true,
+		hasMediaRootAccess: true,
+		id: '4a4f5f6c-7b8c-4d5e-9f0a-1b2c3d4e5f6a',
+		isAdmin: false,
+		kind: 'Default',
+		languageIsoCode: 'en-US',
+		lastLockoutDate: null,
+		lastLoginDate: null,
+		lastPasswordChangeDate: null,
+		mediaStartNodeIds: [],
+		name: 'Editor',
+		state: 'Active',
+		updateDate: '2023-02-20 15:10:00',
+		userGroupIds: [
+			{
+				id: '44dc260e-b4d4-4dd9-9081-eec5598f1641',
+			},
+		],
+		userName: 'editor@example.com',
+		flags: [],
+	},
 ];
 
 export const data: Array<UmbMockUserModel> = rawData.map((user) => ({
