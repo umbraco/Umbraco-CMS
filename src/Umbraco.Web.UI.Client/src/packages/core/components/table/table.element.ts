@@ -5,6 +5,7 @@ import {
 	html,
 	ifDefined,
 	keyed,
+	nothing,
 	property,
 	ref,
 	repeat,
@@ -21,6 +22,8 @@ export interface UmbTableItem {
 	entityType?: string;
 	data: Array<UmbTableItemData>;
 	selectable?: boolean;
+	active?: boolean;
+	hasChildren?: boolean;
 }
 
 export interface UmbTableItemData {
@@ -183,13 +186,37 @@ export class UmbTableElement extends UmbLitElement {
 	private _selectionMode = false;
 
 	#lastColumnKey = '';
+	#hasChildrenColumn = false;
 
 	#cellElementCache = new WeakMap<UmbTableItem, Map<string, UmbTableColumnLayoutElement>>();
+
+	#rowRenderedCallbacks = new Map<string, { fn: (el: Element | undefined) => void; current: UmbTableItem }>();
+
+	#getRowRenderedCallback(item: UmbTableItem): (el: Element | undefined) => void {
+		const existing = this.#rowRenderedCallbacks.get(item.id);
+		if (existing) {
+			existing.current = item;
+			return existing.fn;
+		}
+		const entry = {
+			current: item,
+			fn: (el: Element | undefined) => this.onRowRendered?.(el as HTMLElement | undefined, entry.current),
+		};
+		this.#rowRenderedCallbacks.set(item.id, entry);
+		return entry.fn;
+	}
 
 	override willUpdate(changedProperties: Map<string | number | symbol, unknown>) {
 		super.willUpdate(changedProperties);
 		if (changedProperties.has('selection')) {
 			this._selectionMode = this.selection.length > 0;
+		}
+		if (changedProperties.has('_items')) {
+			const currentIds = new Set(this._items.map((i) => i.id));
+			for (const id of this.#rowRenderedCallbacks.keys()) {
+				if (!currentIds.has(id)) this.#rowRenderedCallbacks.delete(id);
+			}
+			this.#hasChildrenColumn = this._items.some((i) => i.hasChildren);
 		}
 	}
 
@@ -210,7 +237,7 @@ export class UmbTableElement extends UmbLitElement {
 	}
 
 	#getColumnKey() {
-		return JSON.stringify(this.columns.map((column) => column.alias));
+		return JSON.stringify([this.#hasChildrenColumn, ...this.columns.map((column) => column.alias)]);
 	}
 
 	#sorter = new UmbSorterController<UmbTableItem>(this, {
@@ -316,8 +343,12 @@ export class UmbTableElement extends UmbLitElement {
 			this.#getColumnKey(),
 			html`
 				<uui-table class="uui-text">
+					${this.#hasChildrenColumn ? html`<uui-table-column style="width: 24px;"></uui-table-column>` : nothing}
 					<uui-table-column style=${ifDefined(style)}></uui-table-column>
 					<uui-table-head>
+						${this.#hasChildrenColumn
+							? html`<uui-table-head-cell class="children-indicator-cell"></uui-table-head-cell>`
+							: nothing}
 						${this._renderHeaderCheckboxCell()}
 						${repeat(
 							this.columns,
@@ -375,15 +406,19 @@ export class UmbTableElement extends UmbLitElement {
 		const isItemSelectable = this.#isSelectableItem(item);
 		return html`
 			<uui-table-row
-				${ref((el) => {
-					this.onRowRendered?.(el as HTMLElement | undefined, item);
-				})}
+				${ref(this.#getRowRenderedCallback(item))}
 				data-sortable-id=${item.id}
 				?selectable=${this.config.allowSelection && !this._sortable && isItemSelectable}
 				?select-only=${this._selectionMode || this.config.selectOnly}
 				?selected=${this._isSelected(item.id)}
+				?active=${item.active ?? false}
 				@selected=${() => this._selectRow(item)}
 				@deselected=${() => this._deselectRow(item)}>
+				${this.#hasChildrenColumn
+					? html`<uui-table-cell class="children-indicator-cell">
+							${item.hasChildren ? html`<uui-symbol-expand></uui-symbol-expand>` : nothing}
+						</uui-table-cell>`
+					: nothing}
 				${this._renderRowCheckboxCell(item)}
 				${repeat(
 					this.columns,
@@ -502,6 +537,12 @@ export class UmbTableElement extends UmbLitElement {
 			uui-table-row[selectable]:hover uui-checkbox,
 			uui-table-row[select-only] uui-checkbox {
 				display: inline-block;
+			}
+
+			.children-indicator-cell {
+				padding-right: 0;
+				display: flex;
+				align-items: center;
 			}
 
 			uui-table-head-cell:focus,
