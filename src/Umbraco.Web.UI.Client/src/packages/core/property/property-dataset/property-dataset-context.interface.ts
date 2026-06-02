@@ -1,4 +1,4 @@
-import type { UmbVariantId } from '../../variant/variant-id.class.js';
+import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UmbPropertyValueData } from '../types.js';
 import type { UmbContext } from '@umbraco-cms/backoffice/class-api';
 import type { Observable } from '@umbraco-cms/backoffice/external/rxjs';

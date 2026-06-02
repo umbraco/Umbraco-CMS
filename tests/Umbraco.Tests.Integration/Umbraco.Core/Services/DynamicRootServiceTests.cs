@@ -207,7 +207,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            Assert.That(result, Has.Member(startNodeSelector.Context.CurrentKey.Value));
+            CollectionAssert.Contains(result, startNodeSelector.Context.CurrentKey.Value);
         });
     }
 
@@ -328,7 +328,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            Assert.That(result, Has.Member(ContentActs2022.Key));
+            CollectionAssert.Contains(result, ContentActs2022.Key);
         });
     }
 
@@ -377,7 +377,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            Assert.That(result, Has.Member(contentNewActs.Key));
+            CollectionAssert.Contains(result, contentNewActs.Key);
         });
     }
 
@@ -416,7 +416,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            Assert.That(result, Has.Member(ContentStages2022.Key));
+            CollectionAssert.Contains(result, ContentStages2022.Key);
         });
     }
 
@@ -449,7 +449,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            Assert.That(result, Has.Member(startNodeSelector.Context.CurrentKey.Value));
+            CollectionAssert.Contains(result, startNodeSelector.Context.CurrentKey.Value);
         });
     }
 
@@ -475,7 +475,7 @@ internal sealed class DynamicRootServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(1, result.Count());
-            Assert.That(result, Has.Member(startNodeSelector.Context.ParentKey));
+            CollectionAssert.Contains(result, startNodeSelector.Context.ParentKey);
         });
     }
 

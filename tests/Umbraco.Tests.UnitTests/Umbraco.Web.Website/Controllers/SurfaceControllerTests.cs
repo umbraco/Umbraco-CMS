@@ -108,7 +108,7 @@ public class SurfaceControllerTests
         var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
 
         var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
-        var builder = new PublishedRequestBuilder(umbracoContext.CleanedUmbracoUrl, Mock.Of<IFileService>());
+        var builder = new PublishedRequestBuilder(umbracoContext.CleanedUmbracoUrl, Mock.Of<ITemplateService>());
         builder.SetPublishedContent(content);
         var publishedRequest = builder.Build();
 

@@ -4,7 +4,6 @@ using System.Collections.Specialized;
 using System.Runtime.Serialization;
 using Umbraco.Extensions;
 
-// TODO ELEMENTS: ensure property annotations ect. are up to date from Content
 public abstract class PublishableContentBase : ContentBase, IPublishableContentBase
 {
     private HashSet<string>? _editedCultures;
@@ -12,7 +11,7 @@ public abstract class PublishableContentBase : ContentBase, IPublishableContentB
     private PublishedState _publishedState;
     private ContentCultureInfosCollection? _publishInfos;
 
-    protected PublishableContentBase(string? name, int parentId, IContentTypeComposition? contentType, IPropertyCollection properties, string? culture = null)
+    protected PublishableContentBase(string name, int parentId, IContentTypeComposition? contentType, IPropertyCollection properties, string? culture = null)
         : base(name, parentId, contentType, properties, culture)
     {
         if (contentType == null)
@@ -24,7 +23,7 @@ public abstract class PublishableContentBase : ContentBase, IPublishableContentB
         PublishedVersionId = 0;
     }
 
-    protected PublishableContentBase(string? name, IContentBase? parent, IContentTypeComposition contentType, IPropertyCollection properties, string? culture = null)
+    protected PublishableContentBase(string name, IContentBase? parent, IContentTypeComposition contentType, IPropertyCollection properties, string? culture = null)
         : base(name, parent, contentType, properties, culture)
     {
         if (contentType == null)

@@ -9,7 +9,4 @@ public class CopyElementRequestModel
     /// Gets or sets the target location, specified by ID, where the element will be copied.
     /// </summary>
     public ReferenceByIdModel? Target { get; set; }
-
-    // TODO ELEMENTS: do we want a relate-to-original feature for elements?
-    // public bool RelateToOriginal { get; set; }
 }

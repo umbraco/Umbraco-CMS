@@ -458,10 +458,10 @@ public class UmbracoContentValueSetValidatorTests
     public void Non_Protected()
     {
         var publicAccessService = new Mock<IPublicAccessService>();
-        publicAccessService.Setup(x => x.IsProtected("-1,555"))
-            .Returns(Attempt.Succeed(new PublicAccessEntry(Guid.NewGuid(), 555, 444, 333, Enumerable.Empty<PublicAccessRule>())));
-        publicAccessService.Setup(x => x.IsProtected("-1,777"))
-            .Returns(Attempt.Fail<PublicAccessEntry>());
+        publicAccessService.Setup(x => x.IsProtectedAsync("-1,555"))
+            .ReturnsAsync(Attempt.Succeed<PublicAccessEntry?>(new PublicAccessEntry(Guid.NewGuid(), 555, 444, 333, Enumerable.Empty<PublicAccessRule>())));
+        publicAccessService.Setup(x => x.IsProtectedAsync("-1,777"))
+            .ReturnsAsync(Attempt.Fail<PublicAccessEntry?>());
         var validator = new ContentValueSetValidator(
             false,
             false,

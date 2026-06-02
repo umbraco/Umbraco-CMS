@@ -130,17 +130,17 @@ public class MultiNodeTreePickerValueConverterTests : PropertyValueConverterTest
 
         var propertyData = new PropertyData { Value = "n/a", Culture = "abc", Segment = string.Empty };
 
-        var prop1 = new PublishedProperty(DeliveryApiPropertyType, content.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
-        var prop2 = new PublishedProperty(DefaultPropertyType, content.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        var prop1 = new PublishedProperty(DeliveryApiPropertyType, content.Object, CreateVariationContextAccessor(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
+        var prop2 = new PublishedProperty(DefaultPropertyType, content.Object, CreateVariationContextAccessor(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), PropertyCacheLevel.None);
 
         var key = Guid.NewGuid();
         var urlSegment = "page-url-segment";
         var name = "The page";
-        ConfigurePublishedContentMock(content, key, name, urlSegment, PublishedContentType, new[] { prop1, prop2 });
+        ConfigurePublishedContentMock(content, key, name, PublishedContentType, new[] { prop1, prop2 });
 
         PublishedUrlProviderMock
             .Setup(p => p.GetUrl(content.Object, It.IsAny<UrlMode>(), It.IsAny<string?>(), It.IsAny<Uri?>()))
-            .Returns(content.Object.UrlSegment);
+            .Returns(urlSegment);
         PublishedContentCacheMock
             .Setup(pcc => pcc.GetById(false, key))
             .Returns(content.Object);

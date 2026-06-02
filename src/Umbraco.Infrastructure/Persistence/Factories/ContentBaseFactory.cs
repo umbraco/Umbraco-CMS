@@ -17,62 +17,10 @@ internal sealed class ContentBaseFactory
     /// <returns>A <see cref="Content"/> instance populated with data from the provided <paramref name="dto"/> and <paramref name="contentType"/>.</returns>
     public static Content BuildEntity(DocumentDto dto, IContentType? contentType)
     {
-        ContentDto contentDto = dto.ContentDto;
-        NodeDto nodeDto = contentDto.NodeDto;
-        DocumentVersionDto documentVersionDto = dto.ContentVersionDto;
-        ContentVersionDto contentVersionDto = documentVersionDto.ContentVersionDto;
-        DocumentVersionDto? publishedVersionDto = dto.PublishedVersionDto;
-
-        var content = new Content(nodeDto.Text, nodeDto.ParentId, contentType);
-
-        try
-        {
-            content.DisableChangeTracking();
-
-            content.Id = dto.NodeId;
-            content.Key = nodeDto.UniqueId;
-            content.VersionId = contentVersionDto.Id;
-
-            content.Name = contentVersionDto.Text;
-
-            content.Path = nodeDto.Path;
-            content.Level = nodeDto.Level;
-            content.ParentId = nodeDto.ParentId;
-            content.SortOrder = nodeDto.SortOrder;
-            content.Trashed = nodeDto.Trashed;
-
-            content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
-            content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-
-            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
-            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
-
-            content.Published = dto.Published;
-            content.Edited = dto.Edited;
-
-            if (publishedVersionDto != null)
-            {
-                // We need this to get the proper versionId to match to unpublished values.
-                // This is only needed if the content has been published before.
-                content.PublishedVersionId = publishedVersionDto.Id;
-                if (dto.Published)
-                {
-                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate.EnsureUtc();
-                    content.PublishName = publishedVersionDto.ContentVersionDto.Text;
-                    content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
-                }
-            }
-
-            // templates = ignored, managed by the repository
-
-            // reset dirty initial properties (U4-1946)
-            content.ResetDirtyProperties(false);
-            return content;
-        }
-        finally
-        {
-            content.EnableChangeTracking();
-        }
+        NodeDto nodeDto = dto.ContentDto.NodeDto;
+        return BuildPublishableEntity(
+            new Content(nodeDto.Text ?? throw new ArgumentException("The content did not have a name", nameof(dto)), nodeDto.ParentId, contentType),
+            dto);
     }
 
     /// <summary>
@@ -81,68 +29,14 @@ internal sealed class ContentBaseFactory
     /// <param name="dto">The <see cref="ElementDto"/> containing the data for the element.</param>
     /// <param name="contentType">The <see cref="IContentType"/> representing the type of the element, or <c>null</c> if not specified.</param>
     /// <returns>A <see cref="IElement"/> entity built from the specified DTO and content type.</returns>
-    // TODO ELEMENTS: refactor and reuse code from BuildEntity(DocumentDto dto, IContentType? contentType)
     public static IElement BuildEntity(ElementDto dto, IContentType? contentType)
     {
         ArgumentNullException.ThrowIfNull(contentType);
 
-        ContentDto contentDto = dto.ContentDto;
-        NodeDto nodeDto = contentDto.NodeDto;
-        ElementVersionDto elementVersionDto = dto.ContentVersionDto;
-        ContentVersionDto contentVersionDto = elementVersionDto.ContentVersionDto;
-        ElementVersionDto? publishedVersionDto = dto.PublishedVersionDto;
-
-        var content = new Element(
-            nodeDto.Text ?? throw new ArgumentException("The element did not have a name", nameof(dto)),
-            contentType);
-
-        try
-        {
-            content.DisableChangeTracking();
-
-            content.Id = dto.NodeId;
-            content.Key = nodeDto.UniqueId;
-            content.VersionId = contentVersionDto.Id;
-
-            content.Name = contentVersionDto.Text;
-
-            content.Path = nodeDto.Path;
-            content.Level = nodeDto.Level;
-            content.ParentId = nodeDto.ParentId;
-            content.SortOrder = nodeDto.SortOrder;
-            content.Trashed = nodeDto.Trashed;
-
-            content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
-            content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
-            content.CreateDate = nodeDto.CreateDate;
-            content.UpdateDate = contentVersionDto.VersionDate;
-
-            content.Published = dto.Published;
-            content.Edited = dto.Edited;
-
-            if (publishedVersionDto != null)
-            {
-                // We need this to get the proper versionId to match to unpublished values.
-                // This is only needed if the content has been published before.
-                content.PublishedVersionId = publishedVersionDto.Id;
-                if (dto.Published)
-                {
-                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate;
-                    content.PublishName = publishedVersionDto.ContentVersionDto.Text;
-                    content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
-                }
-            }
-
-            // templates = ignored, managed by the repository
-
-            // reset dirty initial properties (U4-1946)
-            content.ResetDirtyProperties(false);
-            return content;
-        }
-        finally
-        {
-            content.EnableChangeTracking();
-        }
+        NodeDto nodeDto = dto.ContentDto.NodeDto;
+        return BuildPublishableEntity(
+            new Element(nodeDto.Text ?? throw new ArgumentException("The element did not have a name", nameof(dto)), contentType),
+            dto);
     }
 
     /// <summary>
@@ -156,7 +50,10 @@ internal sealed class ContentBaseFactory
         NodeDto nodeDto = dto.NodeDto;
         ContentVersionDto contentVersionDto = dto.ContentVersionDto;
 
-        var content = new Core.Models.Media(nodeDto.Text, nodeDto.ParentId, contentType);
+        var content = new Core.Models.Media(
+            nodeDto.Text ?? throw new ArgumentException("The media did not have a name", nameof(dto)),
+            nodeDto.ParentId,
+            contentType);
 
         try
         {
@@ -199,7 +96,12 @@ internal sealed class ContentBaseFactory
         NodeDto nodeDto = dto.ContentDto.NodeDto;
         ContentVersionDto contentVersionDto = dto.ContentVersionDto;
 
-        var content = new Member(nodeDto.Text, dto.Email, dto.LoginName, dto.Password, contentType);
+        var content = new Member(
+            nodeDto.Text ?? throw new ArgumentException("The member did not have a name", nameof(dto)),
+            dto.Email,
+            dto.LoginName,
+            dto.Password,
+            contentType);
 
         try
         {
@@ -270,8 +172,11 @@ internal sealed class ContentBaseFactory
     }
 
     /// <summary>
-    ///     Builds a dto from an IElement item.
+    /// Creates an <see cref="ElementDto"/> instance from the specified <see cref="IElement"/> entity and object type identifier.
     /// </summary>
+    /// <param name="entity">The content entity to convert into a DTO.</param>
+    /// <param name="objectType">The unique identifier representing the object type.</param>
+    /// <returns>An <see cref="ElementDto"/> representing the specified content entity.</returns>
     public static ElementDto BuildDto(IElement entity, Guid objectType)
     {
         ContentDto contentDto = BuildContentDto(entity, objectType);
@@ -456,5 +361,63 @@ internal sealed class ContentBaseFactory
         };
 
         return dto;
+    }
+
+    private static TEntity BuildPublishableEntity<TEntity, TVersionDto>(TEntity content, IPublishableContentDto<TVersionDto> dto)
+        where TEntity : PublishableContentBase
+        where TVersionDto : class, IContentVersionDto
+    {
+        NodeDto nodeDto = dto.ContentDto.NodeDto;
+        ContentVersionDto contentVersionDto = dto.ContentVersionDto.ContentVersionDto;
+        TVersionDto? publishedVersionDto = dto.PublishedVersionDto;
+
+        try
+        {
+            content.DisableChangeTracking();
+
+            content.Id = dto.NodeId;
+            content.Key = nodeDto.UniqueId;
+            content.VersionId = contentVersionDto.Id;
+
+            content.Name = contentVersionDto.Text;
+
+            content.Path = nodeDto.Path;
+            content.Level = nodeDto.Level;
+            content.ParentId = nodeDto.ParentId;
+            content.SortOrder = nodeDto.SortOrder;
+            content.Trashed = nodeDto.Trashed;
+
+            content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
+            content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
+
+            content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+            content.UpdateDate = contentVersionDto.VersionDate.EnsureUtc();
+
+            content.Published = dto.Published;
+            content.Edited = dto.Edited;
+
+            if (publishedVersionDto != null)
+            {
+                // We need this to get the proper versionId to match to unpublished values.
+                // This is only needed if the content has been published before.
+                content.PublishedVersionId = publishedVersionDto.Id;
+                if (dto.Published)
+                {
+                    content.PublishDate = publishedVersionDto.ContentVersionDto.VersionDate.EnsureUtc();
+                    content.PublishName = publishedVersionDto.ContentVersionDto.Text;
+                    content.PublisherId = publishedVersionDto.ContentVersionDto.UserId;
+                }
+            }
+
+            // templates = ignored, managed by the repository
+
+            // reset dirty initial properties (U4-1946)
+            content.ResetDirtyProperties(false);
+            return content;
+        }
+        finally
+        {
+            content.EnableChangeTracking();
+        }
     }
 }

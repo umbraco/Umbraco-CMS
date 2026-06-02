@@ -32,25 +32,23 @@ export const UMB_DEFAULT_LOCALIZATION_CULTURE = 'en';
 
 export class UmbLocalizationManager {
 	connectedControllers = new Set<UmbLocalizationController<UmbLocalizationSetBase>>();
-	#documentElementObserver: MutationObserver;
 
 	#changedKeys: Set<UmbLocalizationSetKey> = new Set();
 	#requestUpdateChangedKeysId?: number = undefined;
 
 	localizations: Map<string, UmbLocalizationSetBase> = new Map();
-	documentDirection = document.documentElement.dir || 'ltr';
+
+	/**
+	 * The currently active language and direction. Read-only from a consumer perspective —
+	 * to change the active language, call `umbLocalizationRegistry.loadLanguage(locale)`.
+	 * The fields stay publicly writable for the registry's pipeline; consumers writing here
+	 * directly will only sync the field without loading the matching dictionaries.
+	 */
+	documentDirection: 'ltr' | 'rtl' = (document.documentElement.dir as 'ltr' | 'rtl') || 'ltr';
 	documentLanguage = document.documentElement.lang || navigator.language;
 
 	get fallback(): UmbLocalizationSet | undefined {
 		return this.localizations.get(UMB_DEFAULT_LOCALIZATION_CULTURE) as UmbLocalizationSet;
-	}
-
-	constructor() {
-		this.#documentElementObserver = new MutationObserver(this.updateAll);
-		this.#documentElementObserver.observe(document.documentElement, {
-			attributes: true,
-			attributeFilter: ['dir', 'lang'],
-		});
 	}
 
 	appendConsumer(consumer: UmbLocalizationController<UmbLocalizationSetBase>) {
@@ -87,29 +85,6 @@ export class UmbLocalizationManager {
 	registerManyLocalizations(translations: Array<UmbLocalizationSetBase>) {
 		translations.map(this.#registerLocalizationBind);
 	}
-
-	/** Updates all localized elements that are currently connected */
-	updateAll = () => {
-		const newDir = document.documentElement.dir || 'ltr';
-		const newLang = document.documentElement.lang || navigator.language;
-
-		if (this.documentDirection === newDir && this.documentLanguage === newLang) return;
-
-		// The document direction or language did changed, so lets move on:
-		this.documentDirection = newDir;
-		this.documentLanguage = newLang;
-
-		// Check if there was any changed.
-		this.connectedControllers.forEach((ctrl) => {
-			ctrl.documentUpdate();
-		});
-
-		if (this.#requestUpdateChangedKeysId) {
-			cancelAnimationFrame(this.#requestUpdateChangedKeysId);
-			this.#requestUpdateChangedKeysId = undefined;
-		}
-		this.#changedKeys.clear();
-	};
 
 	#updateChangedKeys = () => {
 		this.#requestUpdateChangedKeysId = undefined;

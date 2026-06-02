@@ -38,7 +38,7 @@ export class UmbServerContext extends UmbContextBase {
 	public readonly serverInformation = this.#serverInformation.asObservable();
 
 	constructor(host: UmbControllerHost, config: UmbServerContextConfig) {
-		super(host, UMB_SERVER_CONTEXT.toString());
+		super(host, UMB_SERVER_CONTEXT);
 		this.#serverUrl = config.serverUrl;
 		this.#backofficePath = config.backofficePath;
 		this.#serverConnection = config.serverConnection;

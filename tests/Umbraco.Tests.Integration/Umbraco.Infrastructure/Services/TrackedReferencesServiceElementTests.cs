@@ -261,12 +261,12 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(ElementType, Constants.Security.SuperUserKey);
 
         // Create Element1 (will be referenced by Element3)
-        Element1 = ElementService.Create("Element 1", ElementType.Alias);
+        Element1 = new Element("Element 1", ElementType);
         ElementService.Save(Element1);
         ElementService.Publish(Element1, ["*"]);
 
         // Create Element2 (will be referenced by Element3)
-        Element2 = ElementService.Create("Element 2", ElementType.Alias);
+        Element2 = new Element("Element 2", ElementType);
         ElementService.Save(Element2);
         ElementService.Publish(Element2, ["*"]);
 
@@ -291,7 +291,7 @@ internal class TrackedReferencesServiceElementTests : UmbracoIntegrationTest
         ElementService.Publish(ElementInFolder, ["*"]);
 
         // Create Element3 that references Element1, Element2 and the element in the folder
-        Element3 = ElementService.Create("Element 3", ElementType.Alias);
+        Element3 = new Element("Element 3", ElementType);
         Element3.SetValue("elementPicker", $"[\"{Element1.Key}\", \"{ElementInFolder.Key}\"]");
         Element3.SetValue("elementPicker2", $"[\"{Element2.Key}\"]");
         ElementService.Save(Element3);

@@ -99,4 +99,20 @@ public interface IDocumentUrlService
     /// Gets a value indicating whether any URLs have been cached.
     /// </summary>
     bool HasAny();
+
+    /// <summary>
+    /// Updates the in-memory URL segment cache for a single document without writing to the database.
+    /// </summary>
+    /// <param name="key">The document key.</param>
+    // TODO (V19): Remove default implementation when external implementations have had time to adopt.
+    Task UpdateUrlSegmentCacheAsync(Guid key)
+        => CreateOrUpdateUrlSegmentsAsync(key);
+
+    /// <summary>
+    /// Updates the in-memory URL segment cache for a document and its descendants without writing to the database.
+    /// </summary>
+    /// <param name="key">The document key.</param>
+    // TODO (V19): Remove default implementation when external implementations have had time to adopt.
+    Task UpdateUrlSegmentCacheWithDescendantsAsync(Guid key)
+        => CreateOrUpdateUrlSegmentsWithDescendantsAsync(key);
 }

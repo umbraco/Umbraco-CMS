@@ -391,12 +391,76 @@ public class StringExtensionsTests
 
     [TestCase(null, "")]
     [TestCase("", "")]
+    [TestCase("1,2,3,4,5", "1,2,3,4,5")]
+    [TestCase("1,2,x,4,5", "1,2,4,5")]
+    [TestCase("-1,1234,5678", "-1,1234,5678")]
+    public void GetIdsFromPath_ReturnsExpectedResult(string input, string expected)
+    {
+        var ids = input.GetIdsFromPath();
+        Assert.AreEqual(expected, string.Join(",", ids.Select(i => i.ToString(CultureInfo.InvariantCulture))));
+    }
+
+    [TestCase(null, "")]
+    [TestCase("", "")]
     [TestCase("1,2,3,4,5", "5,4,3,2,1")]
     [TestCase("1,2,x,4,5", "5,4,2,1")]
+    [TestCase("-1,1234,5678", "5678,1234,-1")]
     public void GetIdsFromPathReversed_ReturnsExpectedResult(string input, string expected)
     {
         var ids = input.GetIdsFromPathReversed();
-        Assert.AreEqual(expected, string.Join(",", ids));
+        Assert.AreEqual(expected, string.Join(",", ids.Select(i => i.ToString(CultureInfo.InvariantCulture))));
+    }
+
+    // Regression test for https://github.com/umbraco/Umbraco-CMS/issues/22610: under cultures whose
+    // NumberFormatInfo.NegativeSign is not the ASCII hyphen-minus (e.g. ar-EG under ICU, where
+    // NegativeSign is U+061C followed by a hyphen), int.Parse("-1") with no IFormatProvider throws
+    // because the parser uses CultureInfo.CurrentCulture. Content paths persist the root marker
+    // as ASCII "-1", so the path-id parsers must use invariant culture.
+    [Test]
+    public void GetIdsFromPath_And_Reversed_Parse_Root_Marker_Under_Culture_With_Non_Ascii_Negative_Sign()
+    {
+        var savedCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            // Mirrors ar-EG's NegativeSign under ICU (U+061C ARABIC LETTER MARK + ASCII hyphen).
+            // Using an explicit clone keeps the test deterministic regardless of which ICU version
+            // is installed on the test host.
+            var culture = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+            culture.NumberFormat.NegativeSign = "؜-";
+            CultureInfo.CurrentCulture = culture;
+
+            CollectionAssert.AreEqual(new[] { -1, 1234, 5678 }, "-1,1234,5678".GetIdsFromPath());
+            CollectionAssert.AreEqual(new[] { 5678, 1234, -1 }, "-1,1234,5678".GetIdsFromPathReversed());
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = savedCulture;
+        }
+    }
+
+    [TestCase("#")]
+    [TestCase("")]
+    [TestCase("123")]
+    [TestCase("abc")]
+    [TestCase("-")]
+    [TestCase("+")]
+    [TestCase("؜-")] // ar-EG's NegativeSign under ICU (U+061C ARABIC LETTER MARK + ASCII hyphen)
+    public void GetIdsFromPath_And_Reversed_Parse_Root_Marker_Under_Culture_With_Different_Negative_Sign(string negativeSign)
+    {
+        var savedCulture = CultureInfo.CurrentCulture;
+        try
+        {
+            var culture = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+            culture.NumberFormat.NegativeSign = negativeSign;
+            CultureInfo.CurrentCulture = culture;
+
+            CollectionAssert.AreEqual(new[] { -1, 1234, 5678 }, "-1,1234,5678".GetIdsFromPath());
+            CollectionAssert.AreEqual(new[] { 5678, 1234, -1 }, "-1,1234,5678".GetIdsFromPathReversed());
+        }
+        finally
+        {
+            CultureInfo.CurrentCulture = savedCulture;
+        }
     }
 
     [TestCase("-1,1234,5678", 1234)]

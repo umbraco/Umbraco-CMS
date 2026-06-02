@@ -2,6 +2,7 @@
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Services.Flags;
+using Umbraco.Cms.Api.Management.ViewModels.Content;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Collection;
 using Umbraco.Cms.Api.Management.ViewModels.Document.Item;
@@ -75,19 +76,19 @@ internal class HasDocumentScheduleFlagProviderTests
 
         var variant1 = new DocumentVariantItemResponseModel
         {
-            State = DocumentVariantState.Published,
+            State = PublishableVariantState.Published,
             Name = "Test1",
             Culture = "en-EN",
         };
         var variant2 = new DocumentVariantItemResponseModel
         {
-            State = DocumentVariantState.Published,
+            State = PublishableVariantState.Published,
             Name = "Test1",
             Culture = "da-DA",
         };
         var variant3 = new DocumentVariantItemResponseModel
         {
-            State = DocumentVariantState.PublishedPendingChanges,
+            State = PublishableVariantState.PublishedPendingChanges,
             Name = "Test",
         };
 
@@ -130,19 +131,19 @@ internal class HasDocumentScheduleFlagProviderTests
 
         var variant1 = new DocumentVariantResponseModel
         {
-            State = DocumentVariantState.Published,
+            State = PublishableVariantState.Published,
             Name = "Test1",
             Culture = "en-EN",
         };
         var variant2 = new DocumentVariantResponseModel
         {
-            State = DocumentVariantState.Published,
+            State = PublishableVariantState.Published,
             Name = "Test1",
             Culture = "da-DA",
         };
         var variant3 = new DocumentVariantResponseModel
         {
-            State = DocumentVariantState.PublishedPendingChanges,
+            State = PublishableVariantState.PublishedPendingChanges,
             Name = "Test",
         };
 
@@ -193,19 +194,19 @@ internal class HasDocumentScheduleFlagProviderTests
 
         var variant1 = new DocumentVariantItemResponseModel
         {
-            State = DocumentVariantState.Published,
+            State = PublishableVariantState.Published,
             Name = "Test1",
             Culture = "en-EN",
         };
         var variant2 = new DocumentVariantItemResponseModel
         {
-            State = DocumentVariantState.Published,
+            State = PublishableVariantState.Published,
             Name = "Test1",
             Culture = "da-DA",
         };
         var variant3 = new DocumentVariantItemResponseModel
         {
-            State = DocumentVariantState.PublishedPendingChanges,
+            State = PublishableVariantState.PublishedPendingChanges,
             Name = "Test",
         };
 
@@ -237,8 +238,8 @@ internal class HasDocumentScheduleFlagProviderTests
 
         var viewModels = new List<DocumentTreeItemResponseModel>
         {
-            new() { Id = key1, Variants = [new DocumentVariantItemResponseModel { State = DocumentVariantState.Published, Name = "Test1" }] },
-            new() { Id = key2, Variants = [new DocumentVariantItemResponseModel { State = DocumentVariantState.Published, Name = "Test2" }] },
+            new() { Id = key1, Variants = [new DocumentVariantItemResponseModel { State = PublishableVariantState.Published, Name = "Test1" }] },
+            new() { Id = key2, Variants = [new DocumentVariantItemResponseModel { State = PublishableVariantState.Published, Name = "Test2" }] },
         };
 
         await sut.PopulateFlagsAsync(viewModels);

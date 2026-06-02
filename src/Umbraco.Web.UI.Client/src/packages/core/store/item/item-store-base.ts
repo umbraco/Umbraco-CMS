@@ -1,5 +1,6 @@
 import { UmbStoreBase } from '../store-base.js';
 import type { UmbItemStore } from './item-store.interface.js';
+import type { UmbContextToken } from '@umbraco-cms/backoffice/context-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 import { UmbArrayState } from '@umbraco-cms/backoffice/observable-api';
 
@@ -19,7 +20,7 @@ export abstract class UmbItemStoreBase<T extends { unique: string }>
 	 * @param storeAlias
 	 * @memberof UmbItemStoreBase
 	 */
-	constructor(host: UmbControllerHost, storeAlias: string) {
+	constructor(host: UmbControllerHost, storeAlias: UmbContextToken<any> | string) {
 		super(host, storeAlias, new UmbArrayState<T>([], (x) => x.unique));
 	}
 

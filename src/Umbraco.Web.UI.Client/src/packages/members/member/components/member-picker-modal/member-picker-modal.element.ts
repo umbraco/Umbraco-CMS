@@ -127,7 +127,7 @@ export class UmbMemberPickerModalElement extends UmbModalBaseElement<
 				@selected=${() => this.#pickerContext.selection.select(item.unique)}
 				@deselected=${() => this.#pickerContext.selection.deselect(item.unique)}
 				?selected=${this.#pickerContext.selection.isSelected(item.unique)}>
-				<umb-icon slot="icon" name=${item.memberType.icon}></umb-icon>
+				<umb-icon slot="icon" name=${item.memberType.icon || 'icon-user'}></umb-icon>
 			</uui-menu-item>
 		`;
 	}

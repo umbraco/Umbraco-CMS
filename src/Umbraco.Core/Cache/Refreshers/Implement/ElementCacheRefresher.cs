@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Navigation;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache;
@@ -25,6 +26,7 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
     private readonly IIdKeyMap _idKeyMap;
     private readonly IElementCacheService _elementCacheService;
     private readonly ICacheManager _cacheManager;
+    private readonly IElementPublishStatusManagementService _publishStatusManagementService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ElementCacheRefresher"/> class.
@@ -36,13 +38,18 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
         IEventAggregator eventAggregator,
         ICacheRefresherNotificationFactory factory,
         IElementCacheService elementCacheService,
-        ICacheManager cacheManager)
+        ICacheManager cacheManager,
+        IElementPublishStatusManagementService publishStatusManagementService)
         : base(appCaches, serializer, eventAggregator, factory)
     {
         _idKeyMap = idKeyMap;
         _elementCacheService = elementCacheService;
+        _publishStatusManagementService = publishStatusManagementService;
 
-        // TODO ELEMENTS: Use IElementsCache instead of ICacheManager, see ContentCacheRefresher for more information.
+        // TODO: Ideally we should inject IElementsCache
+        // this interface is in infrastructure, and changing this is very breaking
+        // so as long as we have the cache manager, which casts the IElementsCache to a simple AppCache we might as well use that.
+        // see also ContentCacheRefresher.
         _cacheManager = cacheManager;
     }
 
@@ -124,13 +131,11 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
             // By INT Id
             isolatedCache.Clear(RepositoryCacheKeys.GetKey<IElement, int>(payload.Id));
 
-            // By GUID Key
-            isolatedCache.Clear(RepositoryCacheKeys.GetKey<IElement, Guid?>(payload.Key));
+            // By GUID Key (GUID-keyed read repository uses a separate "uRepoGuid_" prefix)
+            isolatedCache.Clear(RepositoryCacheKeys.GetGuidKey<IElement>(payload.Key));
 
             HandleMemoryCache(payload);
-
-            // TODO ELEMENTS: if we need published status caching for elements (e.g. for seeding purposes), make sure
-            //                it is kept in sync here (see ContentCacheRefresher)
+            HandlePublishStatusAsync(payload, CancellationToken.None).GetAwaiter().GetResult();
 
             if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
             {
@@ -168,6 +173,27 @@ public sealed class ElementCacheRefresher : PayloadCacheRefresherBase<ElementCac
             _elementCacheService.RemoveFromMemoryCacheAsync(payload.Key).GetAwaiter().GetResult();
         }
     }
+
+    private async Task HandlePublishStatusAsync(JsonPayload payload, CancellationToken cancellationToken)
+    {
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
+        {
+            await _publishStatusManagementService.InitializeAsync(cancellationToken);
+        }
+
+        if (payload.ChangeTypes.HasType(TreeChangeTypes.Remove))
+        {
+            await _publishStatusManagementService.RemoveAsync(payload.Key, cancellationToken);
+        }
+        else if ((payload.ChangeTypes.HasType(TreeChangeTypes.RefreshNode) || payload.ChangeTypes.HasType(TreeChangeTypes.RefreshBranch)) && HasPublishStatusUpdates(payload))
+        {
+            await _publishStatusManagementService.AddOrUpdateStatusAsync(payload.Key, cancellationToken);
+        }
+    }
+
+    private static bool HasPublishStatusUpdates(JsonPayload payload) =>
+        (payload.PublishedCultures is not null && payload.PublishedCultures.Length > 0) ||
+        (payload.UnpublishedCultures is not null && payload.UnpublishedCultures.Length > 0);
 
     // These events should never trigger. Everything should be PAYLOAD/JSON.
 

@@ -546,7 +546,7 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
     public virtual void AlterSequences(IUmbracoDatabase database, string tableName) => throw new NotSupportedException();
 
     /// <summary>
-    ///     This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
+    /// This is used ONLY if we need to format datetime without using SQL parameters (i.e. during migrations)
     /// </summary>
     /// <param name="date">The date to format.</param>
     /// <param name="includeTime">Whether to include the time component.</param>
@@ -559,6 +559,9 @@ public abstract class SqlSyntaxProviderBase<TSyntax> : ISqlSyntaxProvider
         // need CultureInfo.InvariantCulture because ":" here is the "time separator" and
         // may be converted to something else in different cultures (eg "." in DK).
         date.ToString(includeTime ? "yyyyMMdd HH:mm:ss" : "yyyyMMdd", CultureInfo.InvariantCulture);
+
+    /// <inheritdoc />
+    public virtual string FormatGuid(Guid guid) => guid.ToString();
 
     /// <summary>
     /// Formats a SQL create table statement for the specified table definition.

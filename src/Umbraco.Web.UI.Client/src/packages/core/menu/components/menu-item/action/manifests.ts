@@ -1,4 +1,6 @@
 import type { UmbExtensionManifestKind } from '@umbraco-cms/backoffice/extension-registry';
+import UmbActionMenuItemApi from './action-menu-item.api.js';
+import UmbActionMenuItemElement from './action-menu-item.element.js';
 
 export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> = [
 	{
@@ -9,8 +11,8 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'menuItem',
 			kind: 'action',
-			api: () => import('./action-menu-item.api.js'),
-			element: () => import('./action-menu-item.element.js'),
+			api: UmbActionMenuItemApi,
+			element: UmbActionMenuItemElement,
 		},
 	},
 ];

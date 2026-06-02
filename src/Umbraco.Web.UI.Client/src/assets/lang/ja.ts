@@ -382,6 +382,7 @@ export default {
 		constrainProportions: '縦横比',
 		continue: '続行',
 		copy: 'コピー',
+		copied: 'コピーしました！',
 		create: '新規作成',
 		database: 'データベース',
 		date: '日付',
@@ -601,8 +602,6 @@ export default {
 		greeting6: 'ようこそ',
 		instruction: 'ウェブサイトにログインします。',
 		timeout: 'セッションタイムアウトしました。',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.org</a></p> ',
 	},
 	main: {
 		dashboard: 'ダッシュボード',

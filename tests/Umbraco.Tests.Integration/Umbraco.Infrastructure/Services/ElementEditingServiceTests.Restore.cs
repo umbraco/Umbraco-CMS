@@ -222,7 +222,7 @@ public partial class ElementEditingServiceTests
         element = await ElementEditingService.GetAsync(element.Key);
         Assert.NotNull(element);
         Assert.IsTrue(element.Published);
-        Assert.That(element.PublishedCultures, Is.EquivalentTo(publishedCultures));
+        CollectionAssert.AreEquivalent(publishedCultures, element.PublishedCultures);
         Assert.IsTrue(element.Trashed);
 
         var restoreResult = await ElementEditingService.RestoreAsync(

@@ -186,7 +186,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             _contentType = ContentTypeBuilder.CreateSimpleContentType("whatever", "Whatever", defaultTemplateId: template.Id);
             _contentType.Key = Guid.NewGuid();
             await TemplateService.CreateAsync(_contentType.DefaultTemplate, Constants.Security.SuperUserKey);
-            ContentTypeService.Save(_contentType);
+            await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
         }
 
         private static IList<EventInstance> _events;
