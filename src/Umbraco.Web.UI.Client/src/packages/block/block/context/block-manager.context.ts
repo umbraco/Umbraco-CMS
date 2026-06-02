@@ -131,10 +131,7 @@ export abstract class UmbBlockManagerContext<
 	 */
 	setLayouts(layouts: Array<BlockLayoutType>) {
 		// Backwards compatibility: ensure all layouts have a key (persisted data may not have one)
-		layouts.forEach((l) => {
-			l.key ??= l.contentKey;
-		});
-		this._layouts.setValue(layouts);
+		this._layouts.setValue(layouts.map((layout) => (layout.key ? layout : { ...layout, key: layout.contentKey })));
 	}
 
 	/**

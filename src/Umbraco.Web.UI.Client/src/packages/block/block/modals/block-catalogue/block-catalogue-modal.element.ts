@@ -20,7 +20,7 @@ import { UMB_MODAL_CONTEXT, UmbModalBaseElement } from '@umbraco-cms/backoffice/
 import { UMB_SERVER_CONTEXT } from '@umbraco-cms/backoffice/server';
 import type { UmbBlockTypeGroup, UmbBlockTypeWithGroupKey } from '@umbraco-cms/backoffice/block-type';
 import type { UmbDocumentTypeItemModel } from '@umbraco-cms/backoffice/document-type';
-import type { UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbDeselectedEvent, UmbSelectedEvent, UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UUIInputEvent } from '@umbraco-cms/backoffice/external/uui';
 
 type UmbBlockTypeItemWithGroupKey = UmbBlockTypeWithGroupKey & UmbDocumentTypeItemModel;
@@ -254,7 +254,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		if (item.isFolder) return false;
 		const allowedKeys = this.data?.libraryAllowedElementTypeKeys;
 		if (!allowedKeys?.length) return true;
-		return allowedKeys.includes(item.documentType?.unique);
+		return allowedKeys.includes(item.documentType?.unique ?? '');
 	};
 
 	#libraryTreeProps = {
@@ -269,7 +269,7 @@ export class UmbBlockCatalogueModalElement extends UmbModalBaseElement<
 		if (event.unique) this.#pickerContext.selection.select(event.unique);
 	}
 
-	#onLibraryElementDeselected(event: UmbSelectedEvent) {
+	#onLibraryElementDeselected(event: UmbDeselectedEvent) {
 		event.stopPropagation();
 		if (event.unique) this.#pickerContext.selection.deselect(event.unique);
 	}
