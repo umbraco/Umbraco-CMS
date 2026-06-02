@@ -109,8 +109,6 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     /// <summary>Gets the event aggregator for publishing unit-of-work notifications.</summary>
     protected IEventAggregator EventAggregator { get; }
 
-    // --- IAsyncContentRepository ---
-
     /// <inheritdoc />
     public abstract Guid RecycleBinKey { get; }
 
@@ -412,8 +410,6 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
             nodesToRebuild[node.ParentId] = [node];
         }
     }
-
-    // --- Protected helpers ---
 
     /// <summary>
     ///     Gets the cache key used to cache the recycle bin contents for this entity type.
