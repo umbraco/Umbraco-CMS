@@ -115,6 +115,9 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddAuditDtos>("{2A1B0EAD-105F-4AB7-A033-17EE8E8E7357}");
         To<V_18_0_0.AddLongRunningOperationDto>("{DED2564D-59CD-4C75-8639-6A24D69E63DC}");
         To<V_18_0_0.AddRelationDtos>("{C8E2F7B4-5D3A-4F61-9E8C-1A2B3C4D5E6F}");
+        To<V_18_0_0.AddContentVersionCleanupPolicyDto>("{E3F7A9B2-1C4D-4E8F-A7B6-5C9D0E1F2A3B}");
+        To<V_18_0_0.AddPublicAccessDto>("{58DA5EFB-8C47-4B51-BCFF-576CEACD202F}");
+        To<V_18_0_0.AddDistributedJobDto>("{62FE7B44-AA9A-4B2F-8ECF-263E4E6C2AFA}");
         To<V_18_0_0.AddContentVersionKeyColumn>("{04DD2827-59B0-4A00-AC28-77C32F1CEE60}");
         To<V_18_0_0.AddDocumentRepositoryDtos>("{D7E8F9A0-B1C2-4D3E-A4F5-6B7C8D9E0F1A}");
     }

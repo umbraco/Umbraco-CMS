@@ -18,6 +18,9 @@ public enum EFCoreMigration
     AddAuditDtos = 10,
     AddLongRunningOperationDto = 11,
     AddRelationDtos = 12,
-    AddDocumentRepositoryDtos = 13,
-    AddContentVersionKeyColumn = 14,
+    AddContentVersionCleanupPolicyDto = 13,
+    AddPublicAccessDto = 14,
+    AddDistributedJobDto = 15,
+    AddDocumentRepositoryDtos = 16,
+    AddContentVersionKeyColumn = 17,
 }

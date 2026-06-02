@@ -21,9 +21,9 @@ namespace Umbraco.Cms.Core.Handlers;
 /// </remarks>
 public sealed class PublicAccessHandler :
     INotificationAsyncHandler<MemberGroupSavingNotification>,
-    INotificationHandler<MemberGroupSavedNotification>,
+    INotificationAsyncHandler<MemberGroupSavedNotification>,
     INotificationAsyncHandler<MemberGroupDeletingNotification>,
-    INotificationHandler<MemberGroupDeletedNotification>
+    INotificationAsyncHandler<MemberGroupDeletedNotification>
 {
     private readonly IPublicAccessService _publicAccessService;
     private readonly IMemberGroupService _memberGroupService;
@@ -48,10 +48,12 @@ public sealed class PublicAccessHandler :
         => await SaveStateAsync(notification.DeletedEntities, notification);
 
     /// <inheritdoc />
-    public void Handle(MemberGroupDeletedNotification notification) => Handle(notification.DeletedEntities, notification);
+    public Task HandleAsync(MemberGroupDeletedNotification notification, CancellationToken cancellationToken)
+        => HandleAsync(notification.DeletedEntities, notification);
 
     /// <inheritdoc />
-    public void Handle(MemberGroupSavedNotification notification) => Handle(notification.SavedEntities, notification);
+    public Task HandleAsync(MemberGroupSavedNotification notification, CancellationToken cancellationToken)
+        => HandleAsync(notification.SavedEntities, notification);
 
     /// <summary>
     ///     Saves the current member group names to the notification state for later comparison.
@@ -79,7 +81,7 @@ public sealed class PublicAccessHandler :
     /// </summary>
     /// <param name="affectedEntities">The member groups that were affected.</param>
     /// <param name="notification">The notification containing the saved state.</param>
-    private void Handle(IEnumerable<IMemberGroup> affectedEntities, IStatefulNotification notification)
+    private async Task HandleAsync(IEnumerable<IMemberGroup> affectedEntities, IStatefulNotification notification)
     {
         foreach (IMemberGroup grp in affectedEntities)
         {
@@ -92,7 +94,7 @@ public sealed class PublicAccessHandler :
                 continue;
             }
 
-            _publicAccessService.RenameMemberGroupRoleRules(previousName, grp.Name);
+            await _publicAccessService.RenameMemberGroupRoleRulesAsync(previousName, grp.Name);
         }
     }
 

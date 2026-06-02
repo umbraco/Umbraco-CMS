@@ -85,7 +85,8 @@ public class UserDtoConfiguration : IEntityTypeConfiguration<UserDto>
         builder.Property(x => x.Kind)
             .HasColumnName("kind")
             .HasDefaultValue<short>(0)
-            .IsRequired();
+            .IsRequired()
+            .HasConversion<int>();
 
         builder.Property(x => x.Avatar)
             .HasColumnName("avatar")

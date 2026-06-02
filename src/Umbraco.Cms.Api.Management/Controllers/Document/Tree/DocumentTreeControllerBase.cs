@@ -114,7 +114,7 @@ public abstract class DocumentTreeControllerBase : UserStartNodeTreeControllerBa
 
         if (entity is IDocumentEntitySlim documentEntitySlim)
         {
-            responseModel.IsProtected = _publicAccessService.IsProtected(entity.Path);
+            responseModel.IsProtected = (await _publicAccessService.IsProtectedAsync(entity.Path)).Success;
             responseModel.Ancestors = EntityService.GetPathKeys(entity, omitSelf: true)
                 .Select(x => new ReferenceByIdModel(x));
             responseModel.IsTrashed = entity.Trashed;

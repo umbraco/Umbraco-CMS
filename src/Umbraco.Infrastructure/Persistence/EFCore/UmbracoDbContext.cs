@@ -72,6 +72,14 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<RelationTypeDto> RelationTypes { get; set; }
 
+    public required DbSet<ContentVersionCleanupPolicyDto> ContentVersionCleanupPolicies { get; set; }
+
+    public required DbSet<AccessDto> Access { get; set; }
+
+    public required DbSet<AccessRuleDto> AccessRules { get; set; }
+
+    public required DbSet<DistributedJobDto> DistributedJob { get; set; }
+
     public required DbSet<ContentDto> Content { get; set; }
 
     public required DbSet<ContentVersionDto> ContentVersions { get; set; }
