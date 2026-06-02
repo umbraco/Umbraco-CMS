@@ -23,4 +23,5 @@ public enum EFCoreMigration
     AddDistributedJobDto = 15,
     AddDocumentRepositoryDtos = 16,
     AddContentVersionKeyColumn = 17,
+    AddContentTypeDtos = 18,
 }

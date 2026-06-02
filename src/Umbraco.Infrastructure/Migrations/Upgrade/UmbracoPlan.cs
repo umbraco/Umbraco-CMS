@@ -120,6 +120,7 @@ public partial class UmbracoPlan : MigrationPlan
         To<V_18_0_0.AddDistributedJobDto>("{62FE7B44-AA9A-4B2F-8ECF-263E4E6C2AFA}");
         To<V_18_0_0.AddContentVersionKeyColumn>("{04DD2827-59B0-4A00-AC28-77C32F1CEE60}");
         To<V_18_0_0.AddDocumentRepositoryDtos>("{D7E8F9A0-B1C2-4D3E-A4F5-6B7C8D9E0F1A}");
+        To<V_18_0_0.AddContentTypeDtos>("{32DA93C3-5CDD-481E-AE6B-30296329F4FD}");
     }
 
     /// <summary>

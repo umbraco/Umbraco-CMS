@@ -100,6 +100,18 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<ContentScheduleDto> ContentSchedules { get; set; }
 
+    public required DbSet<DataTypeDto> DataTypes { get; set; }
+
+    public required DbSet<ContentTypeDto> ContentTypes { get; set; }
+
+    public required DbSet<PropertyTypeGroupDto> PropertyTypeGroups { get; set; }
+
+    public required DbSet<PropertyTypeDto> PropertyTypes { get; set; }
+
+    public required DbSet<TagDto> Tags { get; set; }
+
+    public required DbSet<TagRelationshipDto> TagRelationships { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var coreExtensions = options.FindExtension<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>();
