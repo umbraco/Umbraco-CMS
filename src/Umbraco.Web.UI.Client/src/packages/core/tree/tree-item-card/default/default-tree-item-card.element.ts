@@ -67,7 +67,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 		this.#api?.deselect();
 	}
 
-	#onDblClick(e: MouseEvent) {
+	#onOpen(e: Event) {
 		if (!this._hasChildren) return;
 		e.stopPropagation();
 		this.#api?.open();
@@ -96,7 +96,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 				background-color="var(--uui-color-surface)"
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}
-				@dblclick=${this.#onDblClick}
+				@open=${this.#onOpen}
 				@keydown=${this.#onKeyDown}>
 				${this.#renderIcon(this.item)} ${this.#renderActions()}
 			</umb-figure-card>
