@@ -56,6 +56,28 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<LanguageDto> Language { get; set; }
 
+    public required DbSet<DomainDto> Domains { get; set; }
+
+    public required DbSet<NodeDto> Nodes { get; set; }
+
+    public required DbSet<LogDto> Logs { get; set; }
+
+    public required DbSet<UserDto> Users { get; set; }
+
+    public required DbSet<AuditEntryDto> AuditEntries { get; set; }
+
+    public required DbSet<LongRunningOperationDto> LongRunningOperations { get; set; }
+
+    public required DbSet<RelationDto> Relations { get; set; }
+
+    public required DbSet<RelationTypeDto> RelationTypes { get; set; }
+
+    public required DbSet<ContentVersionCleanupPolicyDto> ContentVersionCleanupPolicies { get; set; }
+
+    public required DbSet<AccessDto> Access { get; set; }
+
+    public required DbSet<AccessRuleDto> AccessRules { get; set; }
+
     public required DbSet<DistributedJobDto> DistributedJob { get; set; }
 
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)

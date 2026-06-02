@@ -9,13 +9,12 @@ import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
 import { UmbChangeEvent, UmbSelectedEvent } from '@umbraco-cms/backoffice/event';
 import { UMB_ENTITY_USER_PERMISSION_MODAL } from '@umbraco-cms/backoffice/user-permission';
 import { UMB_MODAL_MANAGER_CONTEXT } from '@umbraco-cms/backoffice/modal';
-import { UUIFormControlMixin } from '@umbraco-cms/backoffice/external/uui';
+import { UUIFormControlWithBasicsMixin } from '@umbraco-cms/backoffice/external/uui';
 import type { ManifestEntityUserPermission } from '@umbraco-cms/backoffice/user-permission';
-import type { UmbDeselectedEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbModalManagerContext } from '@umbraco-cms/backoffice/modal';
 
 @customElement('umb-input-element-granular-user-permission')
-export class UmbInputElementGranularUserPermissionElement extends UUIFormControlMixin(UmbLitElement, '') {
+export class UmbInputElementGranularUserPermissionElement extends UUIFormControlWithBasicsMixin(UmbLitElement, '') {
 	#permissions: Array<UmbElementUserPermissionModel> = [];
 	public get permissions(): Array<UmbElementUserPermissionModel> {
 		return this.#permissions;
@@ -88,9 +87,8 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 			},
 		});
 
-		this.#elementPickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbDeselectedEvent) => {
-			const selectedEvent = event as UmbSelectedEvent;
-			const unique = selectedEvent.unique;
+		this.#elementPickerModalContext?.addEventListener(UmbSelectedEvent.TYPE, async (event: UmbSelectedEvent) => {
+			const unique = event.unique;
 			if (!unique) return;
 
 			const elementItem = await this.#requestElementItem(unique);
@@ -189,7 +187,7 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 		if (!item.unique) return;
 		// TODO: get correct variant name
 		const name = item.variants[0]?.name;
-		const permissionNames = this.#getPermissionNamesForElement(item.unique);
+		const permissionNames = this.#getPermissionNamesForElement(item);
 
 		return html`
 			<uui-ref-node .name=${name} .detail=${permissionNames || ''}>
@@ -229,13 +227,16 @@ export class UmbInputElementGranularUserPermissionElement extends UUIFormControl
 		return this.#permissions?.find((permission) => permission.element.id === unique);
 	}
 
-	#getPermissionNamesForElement(unique: string) {
-		const permission = this.#getPermissionForElement(unique);
+	#getPermissionNamesForElement(item: UmbElementItemModel) {
+		const permission = this.#getPermissionForElement(item.unique);
 		if (!permission) return;
 
 		return umbExtensionsRegistry
-			.getByTypeAndFilter('entityUserPermission', (manifest) =>
-				manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
+			.getByTypeAndFilter(
+				'entityUserPermission',
+				(manifest) =>
+					manifest.forEntityTypes.includes(item.entityType) &&
+					manifest.meta.verbs.every((verb) => permission.verbs.includes(verb)),
 			)
 			.map((m) => {
 				const manifest = m as ManifestEntityUserPermission;

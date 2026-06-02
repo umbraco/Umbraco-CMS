@@ -23,9 +23,9 @@ const tree: ManifestTree = {
 const treeItems: Array<ManifestTreeItem> = [
 	{
 		type: 'treeItem',
-		kind: 'default',
 		alias: 'Umb.TreeItem.Element',
 		name: 'Element Tree Item',
+		element: () => import('./element-tree-item.element.js'),
 		api: () => import('./element-tree-item.context.js'),
 		forEntityTypes: [UMB_ELEMENT_ENTITY_TYPE],
 	},

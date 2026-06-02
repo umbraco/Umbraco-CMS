@@ -317,12 +317,12 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         string[] roleNames1 = { "TR1", "TR2" };
         MemberService.AssignRoles(new[] { member.Id }, roleNames1);
         var memberRoles = MemberService.GetAllRoles(member.Id);
-        Assert.That(memberRoles, Is.EquivalentTo(roleNames1));
+        CollectionAssert.AreEquivalent(roleNames1, memberRoles);
 
         string[] roleNames2 = { "TR3", "TR4" };
         MemberService.ReplaceRoles(new[] { member.Id }, roleNames2);
         memberRoles = MemberService.GetAllRoles(member.Id);
-        Assert.That(memberRoles, Is.EquivalentTo(roleNames2));
+        CollectionAssert.AreEquivalent(roleNames2, memberRoles);
     }
 
     [Test]
@@ -992,431 +992,6 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public async Task Get_By_Property_String_Value_Exact()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
-        MemberService.Save(members);
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "title", "hello member");
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(1, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_String_Value_Contains()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
-        MemberService.Save(members);
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "title", " member", StringPropertyMatchType.Contains);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(11, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_String_Value_Starts_With()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
-        MemberService.Save(members);
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "title", "Member No", StringPropertyMatchType.StartsWith);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(10, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_String_Value_Ends_With()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(memberType, 10);
-        MemberService.Save(members);
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        customMember.SetValue("title", "title of mine");
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "title", "mine", StringPropertyMatchType.EndsWith);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(1, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_Int_Value_Exact()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        memberType.AddPropertyType(
-            new PropertyType(
-                ShortStringHelper,
-                Constants.PropertyEditors.Aliases.Integer,
-                ValueStorageType.Integer,
-                "number")
-            {
-                Name = "Number",
-                DataTypeId =
-                    -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            },
-            "content",
-            "Content");
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members =
-            MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
-        MemberService.Save(members);
-
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        customMember.SetValue("number", 2);
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "number", 2);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(2, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_Int_Value_Greater_Than()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        memberType.AddPropertyType(
-            new PropertyType(
-                ShortStringHelper,
-                Constants.PropertyEditors.Aliases.Integer,
-                ValueStorageType.Integer,
-                "number")
-            {
-                Name = "Number",
-                DataTypeId =
-                    -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            },
-            "content",
-            "Content");
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members =
-            MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
-        MemberService.Save(members);
-
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        customMember.SetValue("number", 10);
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "number", 3, ValuePropertyMatchType.GreaterThan);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(7, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_Int_Value_Greater_Than_Equal_To()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        memberType.AddPropertyType(
-            new PropertyType(
-                ShortStringHelper,
-                Constants.PropertyEditors.Aliases.Integer,
-                ValueStorageType.Integer,
-                "number")
-            {
-                Name = "Number",
-                DataTypeId =
-                    -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            },
-            "content",
-            "Content");
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members =
-            MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
-        MemberService.Save(members);
-
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        customMember.SetValue("number", 10);
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "number", 3, ValuePropertyMatchType.GreaterThanOrEqualTo);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(8, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_Int_Value_Less_Than()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        memberType.AddPropertyType(
-            new PropertyType(
-                ShortStringHelper,
-                Constants.PropertyEditors.Aliases.DateTime,
-                ValueStorageType.Date,
-                "number")
-            {
-                Name = "Number",
-                DataTypeId =
-                    -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            },
-            "content",
-            "Content");
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members =
-            MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
-        MemberService.Save(members);
-
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        customMember.SetValue("number", 1);
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "number", 5, ValuePropertyMatchType.LessThan);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(6, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_Int_Value_Less_Than_Or_Equal()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        memberType.AddPropertyType(
-            new PropertyType(
-                ShortStringHelper,
-                Constants.PropertyEditors.Aliases.Integer,
-                ValueStorageType.Integer,
-                "number")
-            {
-                Name = "Number",
-                DataTypeId =
-                    -51 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            },
-            "content",
-            "Content");
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members =
-            MemberBuilder.CreateMultipleSimpleMembers(memberType, 10, (i, member) => member.SetValue("number", i));
-        MemberService.Save(members);
-
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        customMember.SetValue("number", 1);
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "number", 5, ValuePropertyMatchType.LessThanOrEqualTo);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(7, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_Date_Value_Exact()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        memberType.AddPropertyType(
-            new PropertyType(
-                ShortStringHelper,
-                Constants.PropertyEditors.Aliases.Integer,
-                ValueStorageType.Integer,
-                "date")
-            {
-                Name = "Date",
-                DataTypeId =
-                    -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            },
-            "content",
-            "Content");
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(
-            memberType,
-            10,
-            (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
-        MemberService.Save(members);
-
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 2, 0));
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "date", new DateTime(2013, 12, 20, 1, 2, 0));
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(2, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_Date_Value_Greater_Than()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        memberType.AddPropertyType(
-            new PropertyType(
-                ShortStringHelper,
-                Constants.PropertyEditors.Aliases.Integer,
-                ValueStorageType.Integer,
-                "date")
-            {
-                Name = "Date",
-                DataTypeId =
-                    -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            },
-            "content",
-            "Content");
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(
-            memberType,
-            10,
-            (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
-        MemberService.Save(members);
-
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 10, 0));
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "date", new DateTime(2013, 12, 20, 1, 3, 0), ValuePropertyMatchType.GreaterThan);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(7, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_Date_Value_Greater_Than_Equal_To()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        memberType.AddPropertyType(
-            new PropertyType(
-                ShortStringHelper,
-                Constants.PropertyEditors.Aliases.Integer,
-                ValueStorageType.Integer,
-                "date")
-            {
-                Name = "Date",
-                DataTypeId =
-                    -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            },
-            "content",
-            "Content");
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(
-            memberType,
-            10,
-            (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
-        MemberService.Save(members);
-
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 10, 0));
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "date", new DateTime(2013, 12, 20, 1, 3, 0), ValuePropertyMatchType.GreaterThanOrEqualTo);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(8, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_Date_Value_Less_Than()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        memberType.AddPropertyType(
-            new PropertyType(
-                ShortStringHelper,
-                Constants.PropertyEditors.Aliases.Integer,
-                ValueStorageType.Integer,
-                "date")
-            {
-                Name = "Date",
-                DataTypeId =
-                    -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            },
-            "content",
-            "Content");
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(
-            memberType,
-            10,
-            (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
-        MemberService.Save(members);
-
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 1, 0));
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "date", new DateTime(2013, 12, 20, 1, 5, 0), ValuePropertyMatchType.LessThan);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(6, found.Count());
-    }
-
-    [Test]
-    public async Task Get_By_Property_Date_Value_Less_Than_Or_Equal()
-    {
-        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
-        memberType.AddPropertyType(
-            new PropertyType(
-                ShortStringHelper,
-                Constants.PropertyEditors.Aliases.Integer,
-                ValueStorageType.Integer,
-                "date")
-            {
-                Name = "Date",
-                DataTypeId =
-                    -36 // NOTE: This is what really determines the db type - the above definition doesn't really do anything
-            },
-            "content",
-            "Content");
-        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
-        var members = MemberBuilder.CreateMultipleSimpleMembers(
-            memberType,
-            10,
-            (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
-        MemberService.Save(members);
-
-        var customMember = MemberBuilder.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
-        customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 1, 0));
-        MemberService.Save(customMember);
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        var found = MemberService.GetMembersByPropertyValue(
-            "date",
-            new DateTime(2013, 12, 20, 1, 5, 0),
-            ValuePropertyMatchType.LessThanOrEqualTo);
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        Assert.AreEqual(7, found.Count());
-    }
-
-    [Test]
     public async Task Count_All_Members()
     {
         IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
@@ -1540,7 +1115,7 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         Assert.Multiple(() =>
         {
             Assert.AreEqual(3, members.Length);
-            Assert.That(members.Select(m => m.Key).ToArray(), Is.EquivalentTo(new[] { memberA.Key, memberB.Key, memberC.Key }));
+            CollectionAssert.AreEquivalent(new [] { memberA.Key, memberB.Key, memberC.Key }, members.Select(m => m.Key).ToArray());
         });
     }
 
@@ -1602,5 +1177,38 @@ internal sealed class MemberServiceTests : UmbracoIntegrationTest
         // Sort by memberType descending: Beta (Charlie) before Alpha (Alice, Bob), secondary sort by name descending
         result = await MemberService.FilterAsync(filter, "memberType", Direction.Descending, skip: 0, take: 10);
         Assert.AreEqual(new[] { "Charlie", "Bob", "Alice" }, result.Items.Select(m => m.Name).ToArray());
+    }
+
+    [Test]
+    public async Task Can_FilterAsync_With_Combined_MemberType_And_MemberGroup()
+    {
+        // Create a member type.
+        IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+        await MemberTypeService.CreateAsync(memberType, Constants.Security.SuperUserKey);
+
+        // Create two members of that type.
+        IMember member1 = MemberBuilder.CreateSimpleMember(memberType, "Alice", "alice@test.com", "pass", "alice");
+        MemberService.Save(member1);
+
+        IMember member2 = MemberBuilder.CreateSimpleMember(memberType, "Bob", "bob@test.com", "pass", "bob");
+        MemberService.Save(member2);
+
+        // Create a member group and assign only the first member to it.
+        MemberService.AddRole("Test Group");
+        MemberService.AssignRoles([member1.Id], ["Test Group"]);
+
+        // Filter by both member type ID and member group name — this previously caused
+        // a SQL syntax error ("near INNER: syntax error") because a WHERE clause was
+        // inserted between JOIN blocks.
+        var filter = new MemberFilter
+        {
+            MemberTypeId = memberType.Key,
+            MemberGroupName = "Test Group",
+        };
+
+        var result = await MemberService.FilterAsync(filter, "name", Direction.Ascending, skip: 0, take: 10);
+
+        Assert.AreEqual(1, result.Total);
+        Assert.AreEqual("Alice", result.Items.First().Name);
     }
 }

@@ -29,7 +29,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-test('can bulk publish elements in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can bulk publish elements in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.library.selectElementWithNameInElementCollectionView(firstElementName);
   await umbracoUi.library.selectElementWithNameInElementCollectionView(secondElementName);
@@ -37,11 +37,25 @@ test('can bulk publish elements in a folder', {tag: '@smoke'}, async ({umbracoAp
   await umbracoUi.library.clickConfirmToPublishButtonAndWaitForElementToBePublished();
 
   // Assert
+  await umbracoUi.waitForTimeout(ConstantHelper.wait.short); // Wait for the publish process to complete
   expect(await umbracoApi.element.isElementPublished(firstElementId)).toBeTruthy();
   expect(await umbracoApi.element.isElementPublished(secondElementId)).toBeTruthy();
+  // Verify audit trail
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.clickCaretButtonForElementName(elementFolderName);
+  await umbracoUi.library.goToElementWithName(firstElementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementSavedAndPublished);
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
+  await umbracoUi.library.goToElementWithName(secondElementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementSavedAndPublished);
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });
 
-test('can bulk unpublish elements in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can bulk unpublish elements in a folder', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.element.publish(firstElementId);
   await umbracoApi.element.publish(secondElementId);
@@ -81,7 +95,7 @@ test('can bulk move elements to another folder', async ({umbracoApi, umbracoUi})
   await umbracoApi.element.ensureNameNotExists(targetFolderName);
 });
 
-test('can bulk trash elements in a folder', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can bulk trash elements in a folder', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.library.selectElementWithNameInElementCollectionView(firstElementName);
   await umbracoUi.library.selectElementWithNameInElementCollectionView(secondElementName);

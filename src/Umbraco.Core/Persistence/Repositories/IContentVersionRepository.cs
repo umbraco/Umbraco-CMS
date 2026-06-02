@@ -5,9 +5,12 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 public interface IContentVersionRepository : IRepository
 {
     /// <summary>
-    ///     Gets a list of all historic content versions.
+    ///     Gets content versions eligible for cleanup, filtered to those older than the
+    ///     specified date and limited to a maximum number of results, ordered oldest first.
     /// </summary>
-    IReadOnlyCollection<ContentVersionMeta> GetContentVersionsEligibleForCleanup();
+    /// <param name="olderThan">Only versions with a date earlier than this are returned.</param>
+    /// <param name="maxCount">The maximum number of versions to return, or <c>null</c> for no limit.</param>
+    IReadOnlyCollection<ContentVersionMeta> GetContentVersionsEligibleForCleanup(DateTime olderThan, int? maxCount);
 
     /// <summary>
     ///     Gets cleanup policy override settings per content type.

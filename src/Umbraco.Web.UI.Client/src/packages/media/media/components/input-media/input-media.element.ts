@@ -117,7 +117,7 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	includeTrashed = false;
 
 	@property({ type: String, attribute: 'folder-filter' })
-	folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_ONLY;
+	folderFilter: UmbMediaPickerFolderFilter = UmbMediaPickerFolderFilter.FILES_AND_FOLDERS;
 
 	@property({ type: Object, attribute: false })
 	startNode?: UmbTreeStartNode;
@@ -276,14 +276,23 @@ export class UmbInputMediaElement extends UmbFormControlMixin<string | undefined
 	}
 
 	#renderItem(item: UmbMediaCardItemModel) {
-		const href = this.readonly ? undefined : `${this._editMediaPath}edit/${item.unique}`;
+		// No `_editMediaPath` means the modal route registration couldn't reach a parent route context
+		// (e.g. this input is rendered inside a non-routable modal). Skip the href and mark the card
+		// disabled so its open-part isn't styled as clickable. `uui-card-media` doesn't honour `readonly`,
+		// so `disabled` is the only way to suppress the hover/cursor/underline.
+		//
+		// TODO: If `uui-card-media` supports `readonly`, switch this to `?readonly=${this.readonly || !this._editMediaPath}`
+		// for cleaner semantics and styling (no greyed-out display, no "disabled" screen-reader announcement) and visual
+		// consistency with document refs.
+		const href = this.readonly || !this._editMediaPath ? undefined : `${this._editMediaPath}edit/${item.unique}`;
 		return html`
 			<uui-card-media
 				title=${ifDefined(item.name === null ? undefined : item.name)}
 				name=${ifDefined(item.name === null ? undefined : item.name)}
 				data-mark="${item.entityType}:${item.unique}"
 				href="${ifDefined(href)}"
-				?readonly=${this.readonly}>
+				?readonly=${this.readonly}
+				?disabled=${!this._editMediaPath}>
 				<umb-imaging-thumbnail
 					unique=${item.unique}
 					alt=${item.name}

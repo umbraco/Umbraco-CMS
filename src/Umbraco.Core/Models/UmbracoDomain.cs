@@ -52,6 +52,9 @@ public class UmbracoDomain : EntityBase, IDomain
     public string? LanguageIsoCode { get; set; }
 
     /// <inheritdoc />
+    public Guid? RootContentKey { get; set; }
+
+    /// <inheritdoc />
     [DataMember]
     public int? RootContentId
     {

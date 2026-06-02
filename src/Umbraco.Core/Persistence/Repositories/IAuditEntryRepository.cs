@@ -5,10 +5,10 @@ namespace Umbraco.Cms.Core.Persistence.Repositories;
 /// <summary>
 ///     Represents a repository for <see cref="IAuditEntry" /> entities.
 /// </summary>
-public interface IAuditEntryRepository : IReadWriteQueryRepository<int, IAuditEntry>
+public interface IAuditEntryRepository : IAsyncReadWriteRepository<int, IAuditEntry>
 {
     /// <summary>
     ///     Gets a page of entries.
     /// </summary>
-    IEnumerable<IAuditEntry> GetPage(long pageIndex, int pageCount, out long records);
+    Task<PagedModel<IAuditEntry>> GetPageAsync(long pageIndex, int pageCount);
 }

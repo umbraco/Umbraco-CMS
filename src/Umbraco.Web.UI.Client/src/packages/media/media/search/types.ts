@@ -4,6 +4,7 @@ import type { UmbMediaTypeEntityType } from '@umbraco-cms/backoffice/media-type'
 
 export interface UmbMediaSearchItemModel extends UmbMediaItemModel {
 	href: string;
+	ancestors?: Array<UmbMediaItemModel>;
 }
 
 export interface UmbMediaSearchRequestArgs extends UmbSearchRequestArgs {

@@ -1,17 +1,16 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -21,212 +20,166 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 internal sealed class AuditRepositoryTest : UmbracoIntegrationTest
 {
+    private ILogger<AuditRepository> _logger;
+
     [SetUp]
     public void Prepare() => _logger = LoggerFactory.CreateLogger<AuditRepository>();
 
-    private ILogger<AuditRepository> _logger;
-
-    private IAuditRepository AuditRepository => GetRequiredService<IAuditRepository>();
-
     private IAuditItem GetAuditItem(int id) => new AuditItem(id, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail");
 
+    private AuditRepository CreateRepository() =>
+        new(
+            StaticServiceProvider.Instance.GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
+            _logger,
+            Mock.Of<IRepositoryCacheVersionService>(),
+            Mock.Of<ICacheSyncService>());
+
     [Test]
-    public void Can_Add_Audit_Entry()
+    public async Task Can_Add_Audit_Entry()
     {
-        var sp = ScopeProvider;
-        using (var scope = ScopeProvider.CreateScope())
-        {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
-            repo.Save(new AuditItem(-1, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail"));
+        using var scope = NewScopeProvider.CreateScope();
+        var repo = CreateRepository();
 
-            var dtos = ScopeAccessor.AmbientScope.Database.Fetch<LogDto>("WHERE id > -1");
+        await repo.SaveAsync(
+            new AuditItem(-1, AuditType.System, -1, UmbracoObjectTypes.Document.GetName(), "This is a System audit trail"),
+            CancellationToken.None);
 
-            Assert.That(dtos.Any(), Is.True);
-            Assert.That(dtos.First().Comment, Is.EqualTo("This is a System audit trail"));
-        }
+        var page = await repo.GetPagedAsync(0, 10, Direction.Descending);
+
+        Assert.That(page.Items.Any(), Is.True);
+        Assert.That(page.Items.First().Comment, Is.EqualTo("This is a System audit trail"));
+
+        scope.Complete();
     }
 
     [Test]
-    public void Has_Create_Date_When_Get_By_Id()
+    public async Task Has_Create_Date_When_Get_By_Id()
     {
-        using var scope = ScopeProvider.CreateScope();
+        using var scope = NewScopeProvider.CreateScope();
+        var repo = CreateRepository();
 
-        AuditRepository.Save(GetAuditItem(1));
-        var auditEntry = AuditRepository.Get(1);
-        Assert.That(auditEntry.CreateDate, Is.Not.EqualTo(default(DateTime)));
-    }
+        await repo.SaveAsync(GetAuditItem(1), CancellationToken.None);
+        var auditEntry = await repo.GetAsync(1, CancellationToken.None);
 
-    [Test]
-    public void Has_Create_Date_When_Get_By_Query()
-    {
-        using var scope = ScopeProvider.CreateScope();
-
-        AuditRepository.Save(GetAuditItem(1));
-        var auditEntry = AuditRepository.Get(AuditType.System, ScopeProvider.CreateQuery<IAuditItem>().Where(x => x.Id == 1)).FirstOrDefault();
         Assert.That(auditEntry, Is.Not.Null);
-        Assert.That(auditEntry.CreateDate, Is.Not.EqualTo(default(DateTime)));
+        Assert.That(auditEntry!.CreateDate, Is.Not.EqualTo(default(DateTime)));
+
+        scope.Complete();
     }
 
     [Test]
-    public void Has_Create_Date_When_Get_By_Paged_Query()
+    public async Task Has_Create_Date_When_Get_By_Paged_For_Entity()
     {
-        using var scope = ScopeProvider.CreateScope();
+        using var scope = NewScopeProvider.CreateScope();
+        var repo = CreateRepository();
 
-        AuditRepository.Save(GetAuditItem(1));
-        var auditEntry = AuditRepository.GetPagedResultsByQuery(ScopeProvider.CreateQuery<IAuditItem>().Where(x => x.Id == 1),0, 10, out long total, Direction.Ascending, null, null).FirstOrDefault();
+        await repo.SaveAsync(GetAuditItem(1), CancellationToken.None);
+
+        var page = await repo.GetPagedForEntityAsync(1, 0, 10, Direction.Ascending);
+        var auditEntry = page.Items.FirstOrDefault();
+
         Assert.That(auditEntry, Is.Not.Null);
-        Assert.That(auditEntry.CreateDate, Is.Not.EqualTo(default(DateTime)));
+        Assert.That(auditEntry!.CreateDate, Is.Not.EqualTo(default(DateTime)));
+
+        scope.Complete();
     }
 
     [Test]
-    public void Get_Paged_Items()
+    public async Task Get_Paged_Items()
     {
-        var sp = ScopeProvider;
-        using (var scope = sp.CreateScope())
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            var repo = CreateRepository();
 
             for (var i = 0; i < 100; i++)
             {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
+                await repo.SaveAsync(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"), CancellationToken.None);
+                await repo.SaveAsync(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"), CancellationToken.None);
             }
 
             scope.Complete();
         }
 
-        using (var scope = sp.CreateScope())
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            var repo = CreateRepository();
 
-            var page = repo.GetPagedResultsByQuery(sp.CreateQuery<IAuditItem>(), 0, 10, out var total, Direction.Descending, null, null);
+            var page = await repo.GetPagedAsync(0, 10, Direction.Descending);
 
-            Assert.AreEqual(10, page.Count());
-            Assert.AreEqual(200, total);
+            Assert.AreEqual(10, page.Items.Count());
+            Assert.AreEqual(200, page.Total);
+
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Get_Paged_Items_By_User_Id_With_Query_And_Filter()
+    public async Task Get_Paged_Items_For_User()
     {
-        var sp = ScopeProvider;
-        using (var scope = sp.CreateScope())
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            var repo = CreateRepository();
 
             for (var i = 0; i < 100; i++)
             {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
+                await repo.SaveAsync(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"), CancellationToken.None);
+                await repo.SaveAsync(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"), CancellationToken.None);
             }
 
             scope.Complete();
         }
 
-        using (var scope = sp.CreateScope())
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            var repo = CreateRepository();
 
-            var query = sp.CreateQuery<IAuditItem>().Where(x => x.UserId == -1);
+            var page = await repo.GetPagedForUserAsync(
+                userId: -1,
+                skip: 0,
+                take: 10,
+                orderDirection: Direction.Descending,
+                auditTypeFilter: new[] { AuditType.Publish });
 
-            try
-            {
-                ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
-                ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+            Assert.AreEqual(10, page.Items.Count());
+            Assert.AreEqual(100, page.Total);
 
-                var page = repo.GetPagedResultsByQuery(
-                    query,
-                    0,
-                    10,
-                    out var total,
-                    Direction.Descending,
-                    new[] { AuditType.Publish },
-                    sp.CreateQuery<IAuditItem>()
-                        .Where(x => x.UserId > -2));
-
-                Assert.AreEqual(10, page.Count());
-                Assert.AreEqual(100, total);
-            }
-            finally
-            {
-                ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
-                ScopeAccessor.AmbientScope.Database.AsUmbracoDatabase().EnableSqlCount = false;
-            }
+            scope.Complete();
         }
     }
 
     [Test]
-    public void Get_Paged_Items_With_AuditType_Filter()
+    public async Task Get_Paged_Items_With_AuditType_Filter()
     {
-        var sp = ScopeProvider;
-        using (var scope = sp.CreateScope())
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            var repo = CreateRepository();
 
             for (var i = 0; i < 100; i++)
             {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"));
+                await repo.SaveAsync(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} created"), CancellationToken.None);
+                await repo.SaveAsync(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), $"Content {i} published"), CancellationToken.None);
             }
 
             scope.Complete();
         }
 
-        using (var scope = sp.CreateScope())
+        using (var scope = NewScopeProvider.CreateScope())
         {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            var repo = CreateRepository();
 
-            var page = repo.GetPagedResultsByQuery(
-                    sp.CreateQuery<IAuditItem>(),
-                    0,
-                    9,
-                    out var total,
-                    Direction.Descending,
-                    new[] { AuditType.Publish },
-                    null)
-                .ToArray();
+            var page = await repo.GetPagedAsync(
+                skip: 0,
+                take: 9,
+                orderDirection: Direction.Descending,
+                auditTypeFilter: new[] { AuditType.Publish });
 
-            Assert.AreEqual(9, page.Length);
-            Assert.IsTrue(page.All(x => x.AuditType == AuditType.Publish));
-            Assert.AreEqual(100, total);
-        }
-    }
+            var items = page.Items.ToArray();
 
-    [Test]
-    public void Get_Paged_Items_With_Custom_Filter()
-    {
-        var sp = ScopeProvider;
-        using (var scope = sp.CreateScope())
-        {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
-
-            for (var i = 0; i < 100; i++)
-            {
-                repo.Save(new AuditItem(i, AuditType.New, -1, UmbracoObjectTypes.Document.GetName(), "Content created"));
-                repo.Save(new AuditItem(i, AuditType.Publish, -1, UmbracoObjectTypes.Document.GetName(), "Content published"));
-            }
+            Assert.AreEqual(9, items.Length);
+            Assert.IsTrue(items.All(x => x.AuditType == AuditType.Publish));
+            Assert.AreEqual(100, page.Total);
 
             scope.Complete();
-        }
-
-        using (var scope = sp.CreateScope())
-        {
-            var repo = new AuditRepository((IScopeAccessor)sp, _logger, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
-
-            var page = repo.GetPagedResultsByQuery(
-                    sp.CreateQuery<IAuditItem>(),
-                    0,
-                    8,
-                    out var total,
-                    Direction.Descending,
-                    null,
-                    sp.CreateQuery<IAuditItem>()
-                        .Where(item => item.Comment == "Content created"))
-                .ToArray();
-
-            Assert.AreEqual(8, page.Length);
-            Assert.IsTrue(page.All(x => x.Comment == "Content created"));
-            Assert.AreEqual(100, total);
         }
     }
 }

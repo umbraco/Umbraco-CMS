@@ -38,9 +38,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetUpData()
+    public async Task SetUpData()
     {
-        CreateTestData();
+        await CreateTestData();
 
         ContentRepositoryBase.ThrowOnWarning = true;
     }
@@ -58,9 +58,9 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
-
     private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
+
+    private ITemplateService TemplateService => GetRequiredService<ITemplateService>();
 
     private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
@@ -69,16 +69,16 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer =>
         GetRequiredService<IConfigurationEditorJsonSerializer>();
 
-    public void CreateTestData()
+    public async Task CreateTestData()
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         // Create and Save ContentType "umbTextpage" -> (_contentType.Id)
         _contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
         _contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
-        ContentTypeService.Save(_contentType);
+        await ContentTypeService.CreateAsync(_contentType, Constants.Security.SuperUserKey);
 
         // Create and Save Content "Homepage" based on "umbTextpage" -> (_textpage.Id)
         _textpage = ContentBuilder.CreateSimpleContent(_contentType);
@@ -137,9 +137,9 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         var languageRepository =
             new LanguageRepository(efCoreScopeAccessor, appCaches, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         contentTypeRepository = new ContentTypeRepository(scopeAccessor, appCaches, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
-        var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        var relationTypeRepository = new RelationTypeRepository(efCoreScopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
-        var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+        var relationRepository = new RelationRepository(efCoreScopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
         var propertyEditors =
             new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
         var dataValueReferences =
@@ -158,6 +158,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             propertyEditors,
             dataValueReferences,
             DataTypeService,
+            IdKeyMap,
             ConfigurationEditorJsonSerializer,
             Mock.Of<IEventAggregator>(),
             Mock.Of<IRepositoryCacheVersionService>(),
@@ -167,7 +168,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Retrievals_By_Id_And_Key_After_Save_Are_Cached()
+    public async Task Retrievals_By_Id_And_Key_After_Save_Are_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -184,7 +185,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         database.EnableSqlCount = false;
 
-        var content = CreateContent(repository, contentTypeRepository);
+        var content = await CreateContent(repository, contentTypeRepository);
 
         database.EnableSqlCount = true;
 
@@ -203,7 +204,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
+    public async Task Retrieval_By_Key_After_Retrieval_By_Id_Is_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -220,7 +221,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         database.EnableSqlCount = false;
 
-        var content = CreateContent(repository, contentTypeRepository);
+        var content = await CreateContent(repository, contentTypeRepository);
 
         database.EnableSqlCount = true;
 
@@ -244,7 +245,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
+    public async Task Retrieval_By_Id_After_Retrieval_By_Key_Is_Cached()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -261,7 +262,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
         database.EnableSqlCount = false;
 
-        var content = CreateContent(repository, contentTypeRepository);
+        var content = await CreateContent(repository, contentTypeRepository);
 
         database.EnableSqlCount = true;
 
@@ -284,10 +285,10 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         Assert.AreEqual(0, database.SqlCount);
     }
 
-    private Content CreateContent(DocumentRepository repository, ContentTypeRepository contentTypeRepository)
+    private async Task<Content> CreateContent(DocumentRepository repository, ContentTypeRepository contentTypeRepository)
     {
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         var contentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
 
@@ -298,7 +299,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void CreateVersions()
+    public async Task CreateVersions()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
@@ -306,7 +307,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
             var versions = new List<int>();
             var template = TemplateBuilder.CreateTextPageTemplate();
-            FileService.SaveTemplate(template);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
             var hasPropertiesContentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
 
@@ -505,13 +506,13 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     ///     To test, we have 3 content items, the first has properties, the second doesn't and the third does.
     /// </remarks>
     [Test]
-    public void PropertyDataAssignedCorrectly()
+    public async Task PropertyDataAssignedCorrectly()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var template = TemplateBuilder.CreateTextPageTemplate();
-            FileService.SaveTemplate(template);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, out DataTypeRepository _);
 
@@ -605,13 +606,13 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     //// }
 
     [Test]
-    public void SaveContent()
+    public async Task SaveContent()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var template = TemplateBuilder.CreateTextPageTemplate();
-            FileService.SaveTemplate(template);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);
@@ -661,14 +662,14 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
 
     // Covers issue U4-2791 and U4-2607
     [Test]
-    public void SaveContentWithAtSignInName()
+    public async Task SaveContentWithAtSignInName()
     {
         // Arrange
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var template = TemplateBuilder.CreateTextPageTemplate();
-            FileService.SaveTemplate(template);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
@@ -694,13 +695,13 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void SaveContentMultiple()
+    public async Task SaveContentMultiple()
     {
         var provider = ScopeProvider;
         using (var scope = provider.CreateScope())
         {
             var template = TemplateBuilder.CreateTextPageTemplate();
-            FileService.SaveTemplate(template);
+            await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
             var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository);
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage1", "Textpage", defaultTemplateId: template.Id);
@@ -893,13 +894,13 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetPagedResultsByQuery_With_Variant_Names()
+    public async Task GetPagedResultsByQuery_With_Variant_Names()
     {
         using var efCoreScope = NewScopeProvider.CreateScope();
 
         // One invariant content type named "umbInvariantTextPage"
         var template = TemplateBuilder.CreateTextPageTemplate();
-        FileService.SaveTemplate(template);
+        await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
         var invariantCt = ContentTypeBuilder.CreateSimpleContentType("umbInvariantTextpage", "Invariant Textpage", defaultTemplateId: template.Id);
         invariantCt.Variations = ContentVariation.Nothing;
         foreach (var p in invariantCt.PropertyTypes)
@@ -907,7 +908,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             p.Variations = ContentVariation.Nothing;
         }
 
-        ContentTypeService.Save(invariantCt);
+        await ContentTypeService.CreateAsync(invariantCt, Constants.Security.SuperUserKey);
 
         // One variant (by culture) content type named "umbVariantTextPage"
         // with properties, every 2nd one being variant (by culture), the other being invariant
@@ -920,11 +921,11 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
             p.Variations = i % 2 == 0 ? ContentVariation.Culture : ContentVariation.Nothing;
         }
 
-        ContentTypeService.Save(variantCt);
+        await ContentTypeService.CreateAsync(variantCt, Constants.Security.SuperUserKey);
 
         invariantCt.AllowedContentTypes =
             new[] { new ContentTypeSort(invariantCt.Key, 0, invariantCt.Alias), new ContentTypeSort(variantCt.Key, 1, variantCt.Alias) };
-        ContentTypeService.Save(invariantCt);
+        await ContentTypeService.CreateAsync(invariantCt, Constants.Security.SuperUserKey);
 
         // Create content
         var root = ContentBuilder.CreateSimpleContent(invariantCt);
@@ -1253,7 +1254,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
     /// the fix is applied.
     /// </remarks>
     [Test]
-    public void GetMany_By_Guid_With_Warm_Cache_Returns_All()
+    public async Task GetMany_By_Guid_With_Warm_Cache_Returns_All()
     {
         var realCache = new AppCaches(
             new ObjectCacheAppCache(),
@@ -1265,7 +1266,7 @@ internal sealed class DocumentRepositoryTest : UmbracoIntegrationTest
         using var scope = provider.CreateScope();
         var repository = CreateRepository((IScopeAccessor)provider, out var contentTypeRepository, realCache);
 
-        var content = CreateContent(repository, contentTypeRepository);
+        var content = await CreateContent(repository, contentTypeRepository);
 
         var guidRepo = (IReadRepository<Guid, IContent>)repository;
 

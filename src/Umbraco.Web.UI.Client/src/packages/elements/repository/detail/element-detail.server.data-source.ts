@@ -53,25 +53,6 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	}
 
 	/**
-	 * Creates a new variant scaffold.
-	 * @returns A new variant scaffold.
-	 */
-	/*
-	// TODO: remove if not used
-	createVariantScaffold(): UmbElementVariantModel {
-		return {
-			state: null,
-			culture: null,
-			segment: null,
-			name: '',
-			publishDate: null,
-			createDate: null,
-			updateDate: null,
-		};
-	}
-	*/
-
-	/**
 	 * Fetches an Element with the given id from the server
 	 * @param {string} unique
 	 * @returns {*}
@@ -164,7 +145,7 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 	async delete(unique: string) {
 		if (!unique) throw new Error('Unique is missing');
 
-		return tryExecute(this.#host, ElementService.deleteElementById({ path: { id: unique } }));
+		return tryExecute(this.#host, ElementService.deleteRecycleBinElementById({ path: { id: unique } }));
 	}
 
 	#createElementDetailModel(data: ElementResponseModel): UmbElementDetailModel {
@@ -191,12 +172,13 @@ export class UmbElementServerDataSource implements UmbDetailDataSource<UmbElemen
 					updateDate: variant.updateDate,
 					scheduledPublishDate: variant.scheduledPublishDate || null,
 					scheduledUnpublishDate: variant.scheduledUnpublishDate || null,
-					flags: [], //variant.flags,
+					flags: variant.flags,
 				};
 			}),
 			documentType: {
 				unique: data.documentType.id,
 				collection: null,
+				icon: data.documentType.icon,
 			},
 			isTrashed: data.isTrashed,
 			flags: data.flags,

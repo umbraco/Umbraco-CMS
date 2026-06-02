@@ -43,8 +43,8 @@ internal sealed class CreatedPackageSchemaTests : UmbracoIntegrationTest
 
         var loadedPackageDefinitions = CreatedPackageSchemaRepository.GetAll().ToList();
         scope.Complete();
-        Assert.That(loadedPackageDefinitions, Is.Not.Empty);
-        Assert.That(loadedPackageDefinitions, Is.Unique);
+        CollectionAssert.IsNotEmpty(loadedPackageDefinitions);
+        CollectionAssert.AllItemsAreUnique(loadedPackageDefinitions);
         Assert.AreEqual(loadedPackageDefinitions.Count, 3);
     }
 

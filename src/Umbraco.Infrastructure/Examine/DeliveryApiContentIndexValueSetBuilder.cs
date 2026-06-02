@@ -149,7 +149,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
 
     private string[] ProtectedAccessValue(IContent content, out bool isProtected)
     {
-        PublicAccessEntry? publicAccessEntry = _publicAccessService.GetEntryForContent(content.Path);
+        PublicAccessEntry? publicAccessEntry = _publicAccessService.GetEntryForContentAsync(content.Path).GetAwaiter().GetResult();
         isProtected = publicAccessEntry is not null;
 
         if (publicAccessEntry is null)
@@ -222,7 +222,7 @@ internal sealed class DeliveryApiContentIndexValueSetBuilder : IDeliveryApiConte
         }
 
         // is the content protected and Delivery API member authorization disabled?
-        if (_deliveryApiSettings.MemberAuthorizationIsEnabled() is false && _publicAccessService.IsProtected(content.Path).Success)
+        if (_deliveryApiSettings.MemberAuthorizationIsEnabled() is false && _publicAccessService.IsProtectedAsync(content.Path).GetAwaiter().GetResult().Success)
         {
             return false;
         }

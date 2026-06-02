@@ -21,15 +21,27 @@ public abstract class CopyingNotification<T> : CancelableObjectNotification<T>
     /// </summary>
     /// <param name="original">The original entity being copied.</param>
     /// <param name="copy">The copy of the entity.</param>
-    /// <param name="parentId">The ID of the new parent.</param>
     /// <param name="parentKey">The key of the new parent.</param>
     /// <param name="messages">The event messages collection.</param>
-    protected CopyingNotification(T original, T copy, int parentId, Guid? parentKey, EventMessages messages)
+    protected CopyingNotification(T original, T copy, Guid? parentKey, EventMessages messages)
         : base(original, messages)
     {
         Copy = copy;
-        ParentId = parentId;
         ParentKey = parentKey;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CopyingNotification{T}"/> class.
+    /// </summary>
+    /// <param name="original">The original entity being copied.</param>
+    /// <param name="copy">The copy of the entity.</param>
+    /// <param name="parentId">The ID of the new parent.</param>
+    /// <param name="parentKey">The key of the new parent.</param>
+    /// <param name="messages">The event messages collection.</param>
+    [Obsolete("Please use the constructor without parentId instead. Scheduled for removal in Umbraco 20.")]
+    protected CopyingNotification(T original, T copy, int parentId, Guid? parentKey, EventMessages messages)
+        : this (original, copy, parentKey, messages)
+    {
     }
 
     /// <summary>
@@ -41,12 +53,6 @@ public abstract class CopyingNotification<T> : CancelableObjectNotification<T>
     ///     Gets the copy of the entity.
     /// </summary>
     public T Copy { get; }
-
-    /// <summary>
-    ///     Gets the ID of the new parent.
-    /// </summary>
-    [Obsolete("Please use parent key instead. Scheduled for removal in Umbraco 18.")]
-    public int ParentId { get; }
 
     /// <summary>
     ///     Gets the key of the new parent.

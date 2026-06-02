@@ -15,9 +15,18 @@ namespace Umbraco.Cms.Core.PropertyEditors;
     ValueEditorIsReusable = true)]
 public class ElementPickerPropertyEditor : DataEditor
 {
-    public ElementPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory)
+    private readonly IIOHelper _ioHelper;
+
+    public ElementPickerPropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
         : base(dataValueEditorFactory)
-        => SupportsReadOnly = true;
+    {
+        _ioHelper = ioHelper;
+        SupportsReadOnly = true;
+    }
+
+    /// <inheritdoc />
+    protected override IConfigurationEditor CreateConfigurationEditor() =>
+        new ElementPickerConfigurationEditor(_ioHelper);
 
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<ElementPickerPropertyValueEditor>(Attribute!);

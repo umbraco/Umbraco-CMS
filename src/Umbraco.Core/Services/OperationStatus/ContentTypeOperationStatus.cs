@@ -130,4 +130,14 @@ public enum ContentTypeOperationStatus
     ///     Element types cannot vary by segment.
     /// </summary>
     InvalidSegmentVariationForElementType,
+
+    /// <summary>
+    ///     The alias of a system content type cannot be changed.
+    /// </summary>
+    SystemAliasChangeNotAllowed,
+
+    /// <summary>
+    ///     Cannot change the element flag because the element type has existing element instances.
+    /// </summary>
+    InvalidElementFlagElementHasContent,
 }

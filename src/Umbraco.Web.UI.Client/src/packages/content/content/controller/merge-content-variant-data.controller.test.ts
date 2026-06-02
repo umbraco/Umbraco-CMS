@@ -74,7 +74,7 @@ describe('UmbMergeContentVariantDataController', () => {
 						alias: 'test',
 						culture: null,
 						segment: null,
-						entityType: '',
+
 						value: {
 							nestedValue: {
 								editorAlias: 'some-editor',
@@ -95,7 +95,7 @@ describe('UmbMergeContentVariantDataController', () => {
 						alias: 'test',
 						culture: null,
 						segment: null,
-						entityType: '',
+
 						value: {
 							nestedValue: {
 								editorAlias: 'some-editor',
@@ -125,7 +125,7 @@ describe('UmbMergeContentVariantDataController', () => {
 						alias: 'test',
 						culture: null,
 						segment: null,
-						entityType: '',
+
 						value: {
 							nestedValue: {
 								editorAlias: 'some-editor',
@@ -146,7 +146,7 @@ describe('UmbMergeContentVariantDataController', () => {
 						alias: 'test',
 						culture: null,
 						segment: null,
-						entityType: '',
+
 						value: {
 							nestedValue: {
 								editorAlias: 'some-editor',

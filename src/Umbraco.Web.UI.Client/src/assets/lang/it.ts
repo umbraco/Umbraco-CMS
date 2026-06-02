@@ -384,7 +384,7 @@ export default {
 		enterFolderName: 'Inserisci il nome della cartella',
 		updateData: 'Scegli il tipo ed il titolo',
 		noDocumentTypes:
-			'Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Permessi</strong>.',
+			'Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Struttura</strong>.',
 		noDocumentTypesAtRoot:
 			'Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi crearli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -392,9 +392,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Modifica permessi per questo tipo di documento',
 		noDocumentTypesCreateNew: 'Crea un nuovo tipo di documento',
 		noDocumentTypesAllowedAtRoot:
-			"Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, cambiando l'opzione <strong>Consenti come root</strong> sotto <strong>Permessi</strong>.",
+			"Non ci sono tipi di documento abilitati disponibili per creare un contenuto qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, cambiando l'opzione <strong>Consenti come root</strong> sotto <strong>Struttura</strong>.",
 		noMediaTypes:
-			'Non ci sono tipi di documento abilitati disponibili per creare un media qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Permessi</strong>.',
+			'Non ci sono tipi di documento abilitati disponibili per creare un media qui. Devi abilitarli in <strong>Tipi di documento</strong> dentro la sezione <strong>Impostazioni</strong>, modificando <strong>Tipi di nodi figlio consentiti</strong> sotto <strong>Struttura</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			'Il media selezionato non consente la creazione di altri media al di\n      sotto di esso.\n    ',
 		noMediaTypesEditPermissions: 'Modifica permessi per questo tipo di media',
@@ -721,6 +721,7 @@ export default {
 		content: 'Contenuto',
 		continue: 'Continua',
 		copy: 'Copia',
+		copied: 'Copiato!',
 		create: 'Crea',
 		cropSection: 'Selezione di ritaglio',
 		database: 'Database',
@@ -995,8 +996,6 @@ export default {
 		instruction: 'Fai il login qui sotto',
 		signInWith: 'Fai il login con',
 		timeout: 'Sessione scaduta',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ',
 		forgottenPassword: 'Password dimenticata?',
 		forgottenPasswordInstruction:
 			"Una email verrà inviata all'indirizzo specificato con un link per il reset della password",
@@ -1008,9 +1007,6 @@ export default {
 		setPasswordInstruction: 'Inserisci una nuova password',
 		setPasswordConfirmation: 'La tua password è stata modificata',
 		resetCodeExpired: 'Il link su cui hai cliccato non è valido o è scaduto',
-		resetPasswordEmailCopySubject: 'Umbraco: Reset Password',
-		resetPasswordEmailCopyFormat:
-			"\n        <html>\n\t\t\t<head>\n\t\t\t\t<meta name='viewport' content='width=device-width'>\n\t\t\t\t<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>\n\t\t\t</head>\n\t\t\t<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'>\n\t\t\t\t<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style>\n\t\t\t\t<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"body\" style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;\" bgcolor=\"#1d1333\">\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;\" valign=\"top\">\n\t\t\t\t\t\t\t<table style=\"border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;\">\n\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t<td background=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" bgcolor=\"#1d1333\" width=\"28\" height=\"28\" valign=\"top\" style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\">\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:30px;height:30px;\"> <v:fill type=\"tile\" src=\"https://umbraco.com/umbraco/assets/img/application/logo.png\" color=\"#1d1333\" /> <v:textbox inset=\"0,0,0,0\"> <![endif]-->\n\t\t\t\t\t\t\t\t\t\t<div> </div>\n\t\t\t\t\t\t\t\t\t\t<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]-->\n\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t<td style=\"font-family: sans-serif; font-size: 14px; vertical-align: top;\" valign=\"top\"></td>\n\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t</td>\n\t\t\t\t\t</tr>\n\t\t\t\t</table>\n\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>\n\t\t\t\t\t<tr>\n\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n\t\t\t\t\t\t<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'>\n\t\t\t\t\t\t\t<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>\n\t\t\t\t\t\t\t\t<br>\n\t\t\t\t\t\t\t\t<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>\n\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>\n\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tReset della password richiesto\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</h1>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tIl tuo username per effettuare l'accesso al backoffice di Umbraco è: <strong>%0%</strong>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tbody>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tClicca questo link per resettare la password\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tbody>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Se non riesci a cliccare sul link, copia e incolla questo URL nella finestra del browser:</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<table border='0' cellpadding='0' cellspacing='0'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<font style=\"-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</font>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t\t\t</td>\n\t\t\t\t\t\t\t\t\t</tr>\n\t\t\t\t\t\t\t\t</table>\n\t\t\t\t\t\t\t\t<br><br><br>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</td>\n\t\t\t\t\t\t<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td>\n\t\t\t\t\t</tr>\n\t\t\t\t</table>\n\t\t\t</body>\n\t\t</html>\n\t",
 	},
 	main: {
 		dashboard: 'Dashboard',
@@ -1997,6 +1993,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Disabilita tracciamento degli URL',
 		enableUrlTracker: 'Abilita tracciamento degli URL',
+		urlTrackerEnabled: 'Abilitato',
+		urlTrackerDisabled: 'Disabilitato',
 		culture: 'Cultura',
 		originalUrl: 'URL originale',
 		redirectedTo: 'Reindirizzato a',
@@ -2074,7 +2072,8 @@ export default {
 		openBackofficeSearch: 'Apri la ricerca nel backoffice',
 		openCloseBackofficeHelp: "Apri/chiudi l'aiuto del backoffice",
 		openCloseBackofficeProfileOptions: 'Apri/chiudi le opzioni del tuo profilo',
-		profileOptions: 'Opzioni del profilo',
+		profileOptions: 'Profilo utente per %0% (%1%)',
+		profileOptionsDefault: 'Profilo utente',
 		assignDomainDescription: 'Imposta le Culture e gli Hostnames per %0%',
 		createDescription: 'Crea nuovo nodo sotto %0%',
 		protectDescription: 'Imposta le restrizioni di accesso per %0%',

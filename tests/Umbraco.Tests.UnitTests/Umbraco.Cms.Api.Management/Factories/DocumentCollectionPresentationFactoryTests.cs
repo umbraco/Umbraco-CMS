@@ -71,8 +71,8 @@ public class DocumentCollectionPresentationFactoryTests
             .Returns([responseModel1, responseModel2, responseModel3]);
 
         // Public access entries protect nodes 100 and 200 (ancestors of content1 and content2)
-        _publicAccessService.Setup(x => x.GetAll())
-            .Returns(new[]
+        _publicAccessService.Setup(x => x.GetAllAsync())
+            .ReturnsAsync(new[]
             {
                 CreatePublicAccessEntry(protectedNodeId: 100),
                 CreatePublicAccessEntry(protectedNodeId: 200),
@@ -90,9 +90,9 @@ public class DocumentCollectionPresentationFactoryTests
         Assert.IsTrue(result[1].IsProtected, "Content 2 should be protected (ancestor 200 is protected)");
         Assert.IsFalse(result[2].IsProtected, "Content 3 should not be protected (no protected ancestor)");
 
-        // Verify GetAll was called once (batched) and IsProtected was never called per-item
-        _publicAccessService.Verify(x => x.GetAll(), Times.Once);
-        _publicAccessService.Verify(x => x.IsProtected(It.IsAny<IContent>()), Times.Never);
+        // Verify GetAllAsync was called once (batched) and IsProtectedAsync was never called per-item
+        _publicAccessService.Verify(x => x.GetAllAsync(), Times.Once);
+        _publicAccessService.Verify(x => x.IsProtectedAsync(It.IsAny<IContent>()), Times.Never);
 
         // Verify ancestors are set for all items
         Assert.AreEqual(ancestorKey, result[0].Ancestors.First().Id);
@@ -125,8 +125,8 @@ public class DocumentCollectionPresentationFactoryTests
             .Returns([responseModel1, responseModel2]);
 
         // No public access entries exist
-        _publicAccessService.Setup(x => x.GetAll())
-            .Returns(Enumerable.Empty<PublicAccessEntry>());
+        _publicAccessService.Setup(x => x.GetAllAsync())
+            .ReturnsAsync(Enumerable.Empty<PublicAccessEntry>());
 
         _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
             .Returns(Array.Empty<Guid>());
@@ -164,8 +164,8 @@ public class DocumentCollectionPresentationFactoryTests
             .Returns([matchingResponseModel, orphanResponseModel]);
 
         // Node 100 is protected (ancestor of content)
-        _publicAccessService.Setup(x => x.GetAll())
-            .Returns(new[] { CreatePublicAccessEntry(protectedNodeId: 100) });
+        _publicAccessService.Setup(x => x.GetAllAsync())
+            .ReturnsAsync(new[] { CreatePublicAccessEntry(protectedNodeId: 100) });
 
         _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
             .Returns(Array.Empty<Guid>());
@@ -201,8 +201,8 @@ public class DocumentCollectionPresentationFactoryTests
             .Returns([responseModel]);
 
         // The item itself (node 42) is protected
-        _publicAccessService.Setup(x => x.GetAll())
-            .Returns(new[] { CreatePublicAccessEntry(protectedNodeId: 42) });
+        _publicAccessService.Setup(x => x.GetAllAsync())
+            .ReturnsAsync(new[] { CreatePublicAccessEntry(protectedNodeId: 42) });
 
         _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
             .Returns(Array.Empty<Guid>());
@@ -242,8 +242,8 @@ public class DocumentCollectionPresentationFactoryTests
                 It.IsAny<Action<MapperContext>>()))
             .Returns([responseModel1, responseModel2, responseModel3]);
 
-        _publicAccessService.Setup(x => x.GetAll())
-            .Returns(Enumerable.Empty<PublicAccessEntry>());
+        _publicAccessService.Setup(x => x.GetAllAsync())
+            .ReturnsAsync(Enumerable.Empty<PublicAccessEntry>());
 
         _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
             .Returns([ancestorKey]);
@@ -287,8 +287,8 @@ public class DocumentCollectionPresentationFactoryTests
                 new DocumentCollectionResponseModel { Id = contentKey3 },
             ]);
 
-        _publicAccessService.Setup(x => x.GetAll())
-            .Returns(Enumerable.Empty<PublicAccessEntry>());
+        _publicAccessService.Setup(x => x.GetAllAsync())
+            .ReturnsAsync(Enumerable.Empty<PublicAccessEntry>());
 
         _entityService.Setup(x => x.GetPathKeys(It.IsAny<ITreeEntity>(), true))
             .Returns(Array.Empty<Guid>());

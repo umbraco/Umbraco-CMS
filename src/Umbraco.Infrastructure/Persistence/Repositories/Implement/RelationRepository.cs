@@ -1,45 +1,40 @@
-
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
-using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-using Umbraco.Cms.Infrastructure.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 using Umbraco.Extensions;
-using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 /// <summary>
-///     Represents a repository for doing CRUD operations for <see cref="Relation" />
+///     Represents a repository for doing CRUD operations for <see cref="IRelation"/>.
 /// </summary>
-internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>, IRelationRepository
+internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelation>, IRelationRepository
 {
-    private readonly IEntityRepositoryExtended _entityRepository;
     private readonly IRelationTypeRepository _relationTypeRepository;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RelationRepository"/> class.
     /// </summary>
-    /// <param name="scopeAccessor">Provides access to the current database scope for transactional operations.</param>
-    /// <param name="logger">The logger used for logging repository operations and errors.</param>
+    /// <param name="scopeAccessor">Provides access to the current EF Core database scope.</param>
+    /// <param name="logger">The logger.</param>
     /// <param name="relationTypeRepository">Repository for managing relation types.</param>
-    /// <param name="entityRepository">Repository for accessing and managing entities with extended functionality.</param>
-    /// <param name="repositoryCacheVersionService">Service for managing cache versioning within the repository.</param>
-    /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
+    /// <param name="repositoryCacheVersionService">Service responsible for managing cache versioning for repository data.</param>
+    /// <param name="cacheSyncService">Service used to synchronize cache state across distributed environments.</param>
     public RelationRepository(
-        IScopeAccessor scopeAccessor,
+        IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         ILogger<RelationRepository> logger,
         IRelationTypeRepository relationTypeRepository,
-        IEntityRepositoryExtended entityRepository,
         IRepositoryCacheVersionService repositoryCacheVersionService,
         ICacheSyncService cacheSyncService)
         : base(
@@ -47,590 +42,481 @@ internal sealed class RelationRepository : EntityRepositoryBase<int, IRelation>,
             AppCaches.NoCache,
             logger,
             repositoryCacheVersionService,
-            cacheSyncService)
-    {
+            cacheSyncService) =>
         _relationTypeRepository = relationTypeRepository;
-        _entityRepository = entityRepository;
-    }
 
-    /// <summary>
-    /// Gets a paged collection of parent entities related to the specified child entity ID.
-    /// </summary>
-    /// <param name="childId">The ID of the child entity to find parents for.</param>
-    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
-    /// <param name="pageSize">The number of items per page.</param>
-    /// <param name="totalRecords">Outputs the total number of parent entities related to the child.</param>
-    /// <param name="entityTypes">Optional array of entity type GUIDs to filter the parent entities.</param>
-    /// <returns>An enumerable collection of parent entities implementing <see cref="IUmbracoEntity"/>.</returns>
-    public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
-        => GetPagedParentEntitiesByChildId(childId, pageIndex, pageSize, out totalRecords, [], entityTypes);
+    /// <inheritdoc />
+    public Task<IEnumerable<IRelation>> GetByParentIdAsync(
+        int parentId,
+        int? relationTypeId = null,
+        CancellationToken cancellationToken = default)
+        => GetByFilterAsync(
+            q => relationTypeId.HasValue
+                ? q.Where(x => x.ParentId == parentId && x.RelationType == relationTypeId.Value).OrderBy(x => x.RelationType)
+                : q.Where(x => x.ParentId == parentId).OrderBy(x => x.RelationType),
+            cancellationToken);
 
-    /// <summary>
-    /// Retrieves a paged collection of child entities for the specified parent entity ID.
-    /// </summary>
-    /// <param name="parentId">The ID of the parent entity.</param>
-    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
-    /// <param name="pageSize">The number of entities per page.</param>
-    /// <param name="totalRecords">When this method returns, contains the total number of child entities available.</param>
-    /// <param name="entityTypes">Optional. One or more entity type GUIDs to filter the child entities.</param>
-    /// <returns>An enumerable collection of child entities that match the specified criteria.</returns>
-    public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, params Guid[] entityTypes)
-        => GetPagedChildEntitiesByParentId(parentId, pageIndex, pageSize, out totalRecords, [], entityTypes);
+    /// <inheritdoc />
+    public Task<IEnumerable<IRelation>> GetByChildIdAsync(
+        int childId,
+        int? relationTypeId = null,
+        CancellationToken cancellationToken = default)
+        => GetByFilterAsync(
+            q => relationTypeId.HasValue
+                ? q.Where(x => x.ChildId == childId && x.RelationType == relationTypeId.Value).OrderBy(x => x.RelationType)
+                : q.Where(x => x.ChildId == childId).OrderBy(x => x.RelationType),
+            cancellationToken);
 
-    /// <summary>
-    /// Asynchronously retrieves a paged list of relations where the specified child key matches, optionally filtered by a relation type alias.
-    /// </summary>
-    /// <param name="childKey">The unique identifier (GUID) of the child entity to filter relations by.</param>
-    /// <param name="skip">The number of relations to skip before starting to collect the result set (used for paging).</param>
-    /// <param name="take">The maximum number of relations to return (used for paging).</param>
-    /// <param name="relationTypeAlias">An optional alias to filter relations by their type; if null or empty, all relation types are included.</param>
-    /// <returns>
-    /// A task representing the asynchronous operation. The result contains a <see cref="PagedModel{IRelation}"/> with the total number of matching relations and the current page of <see cref="IRelation"/> entities.
-    /// </returns>
-    public Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(Guid childKey, int skip, int take, string? relationTypeAlias)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false);
+    /// <inheritdoc />
+    public Task<IEnumerable<IRelation>> GetByParentOrChildIdAsync(
+        int id,
+        int? relationTypeId = null,
+        CancellationToken cancellationToken = default)
+        => GetByFilterAsync(
+            q => relationTypeId.HasValue
+                ? q.Where(x => (x.ParentId == id || x.ChildId == id) && x.RelationType == relationTypeId.Value).OrderBy(x => x.RelationType)
+                : q.Where(x => x.ParentId == id || x.ChildId == id).OrderBy(x => x.RelationType),
+            cancellationToken);
 
-        if (string.IsNullOrEmpty(relationTypeAlias) is false)
+    /// <inheritdoc />
+    public async Task<IRelation?> GetByParentAndChildIdAsync(
+        int parentId,
+        int childId,
+        int relationTypeId,
+        CancellationToken cancellationToken = default)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
+            RelationDto? dto = await BaseQuery(db)
+                .Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationType == relationTypeId)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            sql = sql.InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(umbracoRelation => umbracoRelation.RelationType, rt => rt.Id)
-                .Where<RelationTypeDto>(rt => rt.Alias == relationTypeAlias);
-        }
-        sql = sql.Where<NodeDto>(n => n.UniqueId == childKey, "uchild"); // "uchild" comes from the base query
+            return dto is null ? null : await BuildEntityAsync(dto);
+        });
 
+    /// <inheritdoc />
+    public Task<IEnumerable<IRelation>> GetByRelationTypeIdAsync(
+        int relationTypeId,
+        CancellationToken cancellationToken = default)
+        => GetByFilterAsync(
+            q => q.Where(x => x.RelationType == relationTypeId),
+            cancellationToken);
 
-        RelationDto[] pagedResult =
-            Database.SkipTake<RelationDto>(skip, take, sql).ToArray();
-        var totalRecords = Database.Count(sql);
-
-        return Task.FromResult(new PagedModel<IRelation>(totalRecords, DtosToEntities(pagedResult)));
-
-    }
-
-    /// <summary>
-    /// Saves a collection of relations by updating existing ones and performing bulk inserts for new relations.
-    /// Existing relations (those with an identity) are updated individually, while new relations are inserted in bulk for performance.
-    /// </summary>
-    /// <param name="relations">The collection of <see cref="IRelation"/> objects to save.</param>
-    public void Save(IEnumerable<IRelation> relations)
-    {
-        foreach (IGrouping<bool, IRelation> hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
+    /// <inheritdoc />
+    public async Task<bool> IsRelatedAsync(
+        int id,
+        RelationDirectionFilter directionFilter,
+        int[]? includeRelationTypeIds = null,
+        int[]? excludeRelationTypeIds = null,
+        CancellationToken cancellationToken = default)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            if (hasIdentityGroup.Key)
+            IQueryable<RelationDto> query = db.Relations.AsQueryable();
+
+            query = directionFilter switch
             {
-                // Do updates, we can't really do a bulk update so this is still a 1 by 1 operation
-                // however we can bulk populate the object types. It might be possible to bulk update
-                // with SQL but would be pretty ugly and we're not really too worried about that for perf,
-                // it's the bulk inserts we care about.
-                IRelation[] asArray = hasIdentityGroup.ToArray();
-                foreach (IRelation relation in hasIdentityGroup)
-                {
-                    relation.UpdatingEntity();
-                    RelationDto dto = RelationFactory.BuildDto(relation);
-                    Database.Update(dto);
-                }
+                RelationDirectionFilter.Parent => query.Where(x => x.ParentId == id),
+                RelationDirectionFilter.Child => query.Where(x => x.ChildId == id),
+                RelationDirectionFilter.Any => query.Where(x => x.ParentId == id || x.ChildId == id),
+                _ => throw new ArgumentOutOfRangeException(nameof(directionFilter)),
+            };
 
-                PopulateObjectTypes(asArray);
+            if (includeRelationTypeIds is { Length: > 0 })
+            {
+                query = query.Where(x => includeRelationTypeIds.Contains(x.RelationType));
             }
-            else
+
+            if (excludeRelationTypeIds is { Length: > 0 })
             {
-                // Do bulk inserts
-                var entitiesAndDtos = hasIdentityGroup.ToDictionary(
-                    r => // key = entity
+                query = query.Where(x => excludeRelationTypeIds.Contains(x.RelationType) == false);
+            }
+
+            return await query.AnyAsync(cancellationToken);
+        });
+
+    /// <inheritdoc />
+    public async Task<bool> AreRelatedAsync(
+        int parentId,
+        int childId,
+        int? relationTypeId = null,
+        CancellationToken cancellationToken = default)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
+            relationTypeId.HasValue
+                ? await db.Relations.AnyAsync(
+                    x => x.ParentId == parentId && x.ChildId == childId && x.RelationType == relationTypeId.Value,
+                    cancellationToken)
+                : await db.Relations.AnyAsync(
+                    x => x.ParentId == parentId && x.ChildId == childId,
+                    cancellationToken));
+
+    /// <inheritdoc />
+    public async Task<PagedModel<IRelation>> GetPagedByRelationTypeIdAsync(
+        int relationTypeId,
+        int skip,
+        int take,
+        Ordering? ordering = null,
+        CancellationToken cancellationToken = default)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            IQueryable<RelationDto> query = BaseQuery(db).Where(x => x.RelationType == relationTypeId);
+
+            int total = await query.CountAsync(cancellationToken);
+
+            query = ApplyOrdering(query, ordering);
+
+            List<RelationDto> page = await query.Skip(skip).Take(take).ToListAsync(cancellationToken);
+
+            return new PagedModel<IRelation>(total, await BuildEntitiesAsync(page));
+        });
+
+    /// <inheritdoc />
+    public async Task<PagedModel<IRelation>> GetPagedByChildKeyAsync(
+        Guid childKey,
+        int skip,
+        int take,
+        string? relationTypeAlias,
+        CancellationToken cancellationToken = default)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            IQueryable<RelationDto> query = BaseQuery(db)
+                .Where(x => x.ChildNode!.UniqueId == childKey);
+
+            if (string.IsNullOrEmpty(relationTypeAlias) is false)
+            {
+                query = query.Where(x => x.RelationTypeDto!.Alias == relationTypeAlias);
+            }
+
+            int total = await query.CountAsync(cancellationToken);
+
+            List<RelationDto> page = await query
+                .OrderBy(x => x.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync(cancellationToken);
+
+            return new PagedModel<IRelation>(total, await BuildEntitiesAsync(page));
+        });
+
+    /// <inheritdoc />
+    public async Task SaveManyAsync(IEnumerable<IRelation> relations, CancellationToken cancellationToken = default) =>
+        await AmbientScope.ExecuteWithContextAsync<RelationDto>(async db =>
+        {
+            foreach (IGrouping<bool, IRelation> hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
+            {
+                IRelation[] entities = hasIdentityGroup.ToArray();
+
+                if (hasIdentityGroup.Key)
+                {
+                    foreach (IRelation entity in entities)
                     {
-                        r.AddingEntity();
-                        return r;
-                    },
-                    RelationFactory.BuildDto); // value = DTO
+                        entity.UpdatingEntity();
+                        RelationDto dto = RelationFactory.BuildDto(entity);
+                        db.Relations.Update(dto);
+                    }
 
-                foreach (RelationDto dto in entitiesAndDtos.Values)
+                    await db.SaveChangesAsync(cancellationToken);
+                }
+                else
                 {
-                    Database.Insert(dto);
+                    var dtos = new List<RelationDto>(entities.Length);
+                    foreach (IRelation entity in entities)
+                    {
+                        entity.AddingEntity();
+                        dtos.Add(RelationFactory.BuildDto(entity));
+                    }
+
+                    await db.Relations.AddRangeAsync(dtos, cancellationToken);
+                    await db.SaveChangesAsync(cancellationToken);
+
+                    // Re-assign generated identifiers back onto the entities.
+                    for (int i = 0; i < entities.Length; i++)
+                    {
+                        entities[i].Id = dtos[i].Id;
+                    }
                 }
 
-                // All dtos now have IDs assigned
-                foreach (KeyValuePair<IRelation, RelationDto> de in entitiesAndDtos)
-                {
-                    // re-assign ID to the entity
-                    de.Key.Id = de.Value.Id;
-                }
+                await PopulateObjectTypesAsync(db, entities, cancellationToken);
 
-                PopulateObjectTypes(entitiesAndDtos.Keys.ToArray());
+                foreach (IRelation entity in entities)
+                {
+                    entity.ResetDirtyProperties();
+                }
             }
-        }
-    }
+        });
 
-    /// <summary>
-    /// Saves a collection of relations in bulk, updating existing relations and inserting new ones as needed.
-    /// Existing relations (those with an identity) are updated individually, while new relations are inserted in bulk for performance.
-    /// </summary>
-    /// <param name="relations">The collection of <see cref="ReadOnlyRelation"/> objects to save.</param>
-    public void SaveBulk(IEnumerable<ReadOnlyRelation> relations)
-    {
-        foreach (IGrouping<bool, ReadOnlyRelation> hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
+    /// <inheritdoc />
+    public async Task SaveBulkAsync(IEnumerable<ReadOnlyRelation> relations, CancellationToken cancellationToken = default) =>
+        await AmbientScope.ExecuteWithContextAsync<RelationDto>(async db =>
         {
-            if (hasIdentityGroup.Key)
+            foreach (IGrouping<bool, ReadOnlyRelation> hasIdentityGroup in relations.GroupBy(r => r.HasIdentity))
             {
-                // Do updates, we can't really do a bulk update so this is still a 1 by 1 operation
-                // however we can bulk populate the object types. It might be possible to bulk update
-                // with SQL but would be pretty ugly and we're not really too worried about that for perf,
-                // it's the bulk inserts we care about.
-                foreach (ReadOnlyRelation relation in hasIdentityGroup)
+                if (hasIdentityGroup.Key)
                 {
-                    RelationDto dto = RelationFactory.BuildDto(relation);
-                    Database.Update(dto);
+                    foreach (ReadOnlyRelation entity in hasIdentityGroup)
+                    {
+                        RelationDto dto = RelationFactory.BuildDto(entity);
+                        db.Relations.Update(dto);
+                    }
                 }
+                else
+                {
+                    IEnumerable<RelationDto> dtos = hasIdentityGroup.Select(RelationFactory.BuildDto);
+                    await db.Relations.AddRangeAsync(dtos, cancellationToken);
+                }
+            }
+
+            await db.SaveChangesAsync(cancellationToken);
+        });
+
+    /// <inheritdoc />
+    public async Task DeleteByParentAsync(
+        int parentId,
+        string[]? relationTypeAliases = null,
+        CancellationToken cancellationToken = default) =>
+        await AmbientScope.ExecuteWithContextAsync<RelationDto>(async db =>
+        {
+            if (relationTypeAliases is { Length: > 0 })
+            {
+                int[] matchingRelationTypeIds = await db.RelationTypes
+                    .Where(rt => relationTypeAliases.Contains(rt.Alias))
+                    .Select(rt => rt.Id)
+                    .ToArrayAsync(cancellationToken);
+
+                if (matchingRelationTypeIds.Length == 0)
+                {
+                    return;
+                }
+
+                await db.Relations
+                    .Where(x => x.ParentId == parentId && matchingRelationTypeIds.Contains(x.RelationType))
+                    .ExecuteDeleteAsync(cancellationToken);
             }
             else
             {
-                // Do bulk inserts
-                IEnumerable<RelationDto> dtos = hasIdentityGroup.Select(RelationFactory.BuildDto);
-
-                Database.InsertBulk(dtos);
+                await db.Relations
+                    .Where(x => x.ParentId == parentId)
+                    .ExecuteDeleteAsync(cancellationToken);
             }
-        }
-    }
+        });
 
-    /// <summary>
-    /// Retrieves a paged collection of relations matching the specified query, with support for paging and custom ordering.
-    /// </summary>
-    /// <param name="query">An optional query to filter the relations; if <c>null</c>, all relations are considered.</param>
-    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
-    /// <param name="pageSize">The number of items to include in each page.</param>
-    /// <param name="totalRecords">When this method returns, contains the total number of records matching the query.</param>
-    /// <param name="ordering">An optional ordering to apply to the results; if <c>null</c> or empty, defaults to ordering by relation ID.</param>
-    /// <returns>An enumerable collection of <see cref="IRelation"/> objects for the specified page.</returns>
-    public IEnumerable<IRelation> GetPagedRelationsByQuery(IQuery<IRelation>? query, long pageIndex, int pageSize, out long totalRecords, Ordering? ordering)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false);
+    /// <inheritdoc />
+    public async Task DeleteRelationsOfTypeAsync(int relationTypeId, CancellationToken cancellationToken = default) =>
+        await AmbientScope.ExecuteWithContextAsync<RelationDto>(async db =>
+            await db.Relations
+                .Where(x => x.RelationType == relationTypeId)
+                .ExecuteDeleteAsync(cancellationToken));
 
-        if (ordering == null || ordering.IsEmpty)
+    /// <inheritdoc />
+    /// <remarks>
+    ///     TODO: Implement when <see cref="EntityRepository"/> is migrated to EF Core. The current NPoco implementation
+    ///     paged across <c>umbracoNode</c> joined to relation rows; recreating that join over EF Core requires either
+    ///     duplicating the entity-slim projection or coordinating with the existing NPoco entity repository.
+    /// </remarks>
+    public Task<PagedModel<IUmbracoEntity>> GetPagedParentEntitiesByChildIdAsync(
+        int childId,
+        int skip,
+        int take,
+        Guid[]? entityTypes = null,
+        CancellationToken cancellationToken = default)
+        => throw new NotImplementedException(
+            "GetPagedParentEntitiesByChildIdAsync depends on EntityRepository being migrated to EF Core.");
+
+    /// <inheritdoc />
+    /// <remarks>
+    ///     TODO: Implement when <see cref="EntityRepository"/> is migrated to EF Core. See <see cref="GetPagedParentEntitiesByChildIdAsync"/>.
+    /// </remarks>
+    public Task<PagedModel<IUmbracoEntity>> GetPagedChildEntitiesByParentIdAsync(
+        int parentId,
+        int skip,
+        int take,
+        Guid[]? entityTypes = null,
+        CancellationToken cancellationToken = default)
+        => throw new NotImplementedException(
+            "GetPagedChildEntitiesByParentIdAsync depends on EntityRepository being migrated to EF Core.");
+
+    /// <inheritdoc />
+    protected override async Task<IRelation?> PerformGetAsync(int key)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
         {
-            ordering = Ordering.By(SqlSyntax.GetQuotedColumn(Constants.DatabaseSchema.Tables.Relation, "id"));
-        }
+            RelationDto? dto = await BaseQuery(db).FirstOrDefaultAsync(x => x.Id == key);
+            return dto is null ? null : await BuildEntityAsync(dto);
+        });
 
-        var translator = new SqlTranslator<IRelation>(sql, query);
-        sql = translator.Translate();
-
-        // apply ordering
-        ApplyOrdering(ref sql, ordering);
-
-        var pageIndexToFetch = pageIndex + 1;
-        Page<RelationDto>? page = Database.Page<RelationDto>(pageIndexToFetch, pageSize, sql);
-        List<RelationDto>? dtos = page.Items;
-        totalRecords = page.TotalItems;
-
-        var relTypes = _relationTypeRepository.GetMany(dtos.Select(x => x.RelationType).Distinct().ToArray())?
-            .ToDictionary(x => x.Id, x => x);
-
-        var result = dtos.Select(r =>
+    /// <inheritdoc />
+    protected override async Task<IEnumerable<IRelation>?> PerformGetAllAsync()
+        => await AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelation>?>(async db =>
         {
-            if (relTypes is null || !relTypes.TryGetValue(r.RelationType, out IRelationType? relType))
+            List<RelationDto> dtos = await BaseQuery(db).OrderBy(x => x.RelationType).ToListAsync();
+            return await BuildEntitiesAsync(dtos);
+        });
+
+    /// <inheritdoc />
+    protected override async Task<IEnumerable<IRelation>?> PerformGetManyAsync(int[]? keys)
+        => await AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelation>?>(async db =>
+        {
+            if (keys is null || keys.Length == 0)
             {
-                throw new InvalidOperationException(string.Format("RelationType with Id: {0} doesn't exist", r.RelationType));
-            }
-
-            return DtoToEntity(r, relType);
-        }).WhereNotNull().ToList();
-
-        return result;
-    }
-
-    /// <summary>
-    /// Deletes all relations for the specified parent entity, optionally filtered by relation type aliases.
-    /// </summary>
-    /// <param name="parentId">The ID of the parent entity whose relations will be deleted.</param>
-    /// <param name="relationTypeAliases">An optional array of relation type aliases. If specified, only relations of these types will be deleted; if omitted or empty, all relations for the parent will be deleted.</param>
-    public void DeleteByParent(int parentId, params string[] relationTypeAliases)
-    {
-        // HACK: SQLite - hard to replace this without provider specific repositories/another ORM.
-        if (Database.DatabaseType.IsSqlServer() is false)
-        {
-            Sql<ISqlContext>? query = Sql().Append($"DELETE FROM {QuoteTableName("umbracoRelation")}");
-
-            Sql<ISqlContext> subQuery = Sql().Select<RelationDto>(x => x.Id)
-                .From<RelationDto>()
-                .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                .Where<RelationDto>(x => x.ParentId == parentId);
-
-            if (relationTypeAliases.Length > 0)
-            {
-                subQuery.WhereIn<RelationTypeDto>(x => x.Alias, relationTypeAliases);
+                return Array.Empty<IRelation>();
             }
 
-            Sql<ISqlContext> fullQuery = query.WhereIn<RelationDto>(x => x.Id, subQuery);
+            List<RelationDto> dtos = await BaseQuery(db)
+                .Where(x => keys.Contains(x.Id))
+                .ToListAsync();
 
-            Database.Execute(fullQuery);
-        }
-        else
+            return await BuildEntitiesAsync(dtos);
+        });
+
+    /// <inheritdoc />
+    protected override async Task<bool> PerformExistsAsync(int key)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
+            await db.Relations.AnyAsync(x => x.Id == key));
+
+    /// <inheritdoc />
+    protected override async Task PersistNewItemAsync(IRelation item) =>
+        await AmbientScope.ExecuteWithContextAsync<RelationDto>(async db =>
         {
-            if (relationTypeAliases.Length > 0)
-            {
-                SqlTemplate template = SqlContext.Templates.Get(
-                    Constants.SqlTemplates.RelationRepository.DeleteByParentIn,
-                    tsql => Sql().Delete<RelationDto>()
-                            .From<RelationDto>()
-                            .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                            .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId"))
-                            .WhereIn<RelationTypeDto>(x => x.Alias, SqlTemplate.ArgIn<string>("relationTypeAliases")));
+            item.AddingEntity();
 
-                Sql<ISqlContext> sql = template.Sql(parentId, relationTypeAliases);
+            RelationDto dto = RelationFactory.BuildDto(item);
+            await db.Relations.AddAsync(dto);
+            await db.SaveChangesAsync();
 
-                Database.Execute(sql);
-            }
-            else
-            {
-                SqlTemplate template = SqlContext.Templates.Get(
-                    Constants.SqlTemplates.RelationRepository.DeleteByParentAll,
-                    tsql => Sql().Delete<RelationDto>()
-                            .From<RelationDto>()
-                            .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
-                            .Where<RelationDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId")));
+            item.Id = dto.Id;
+            await PopulateObjectTypesAsync(db, [item], CancellationToken.None);
+            item.ResetDirtyProperties();
+        });
 
-                Sql<ISqlContext> sql = template.Sql(parentId);
-
-                Database.Execute(sql);
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Used for joining the entity query with relations for the paging methods
-    /// </summary>
-    /// <param name="sql"></param>
-    private static void SqlJoinRelations(Sql<ISqlContext> sql)
-    {
-        // add left joins for relation tables (this joins on both child or parent, so beware that this will normally return entities for
-        // both sides of the relation type unless the IUmbracoEntity query passed in filters one side out).
-        sql.LeftJoin<RelationDto>()
-            .On<NodeDto, RelationDto>((left, right) => left.NodeId == right.ChildId || left.NodeId == right.ParentId);
-        sql.LeftJoin<RelationTypeDto>()
-            .On<RelationDto, RelationTypeDto>((left, right) => left.RelationType == right.Id);
-    }
-
-    /// <summary>
-    /// Retrieves a paged collection of parent entities related to the specified child entity.
-    /// </summary>
-    /// <param name="childId">The identifier of the child entity whose parents are to be retrieved.</param>
-    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
-    /// <param name="pageSize">The number of entities to include in a page.</param>
-    /// <param name="totalRecords">When this method returns, contains the total number of parent entities found.</param>
-    /// <param name="relationTypes">An array of relation type IDs to filter the parent-child relationships. Pass an empty array to include all relation types.</param>
-    /// <param name="entityTypes">A set of entity type GUIDs to filter the parent entities. This parameter is optional and supports passing multiple values.</param>
-    /// <returns>An enumerable collection of parent entities that match the specified criteria.</returns>
-    public IEnumerable<IUmbracoEntity> GetPagedParentEntitiesByChildId(int childId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes) =>
-
-        // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
-        // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
-        // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
-        // means that the SQL is less efficient and returns data that is probably not needed for what we need this lookup for. For the time being we
-        // will just return the bare minimum entity data.
-        _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize, out totalRecords, null, null, sql =>
-            {
-                SqlJoinRelations(sql);
-
-                sql.Where<RelationDto>(rel => rel.ChildId == childId);
-                sql.Where<RelationDto, NodeDto>((rel, node) => rel.ParentId == childId || node.NodeId != childId);
-
-                if (relationTypes != null && relationTypes.Any())
-                {
-                    sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
-                }
-            });
-
-    /// <summary>
-    /// Retrieves a paged collection of child entities related to the specified parent entity by its ID.
-    /// </summary>
-    /// <param name="parentId">The identifier of the parent entity.</param>
-    /// <param name="pageIndex">The zero-based index of the page to retrieve.</param>
-    /// <param name="pageSize">The number of child entities to include per page.</param>
-    /// <param name="totalRecords">When this method returns, contains the total number of child entities related to the parent.</param>
-    /// <param name="relationTypes">An optional array of relation type IDs to filter the relations. Pass an empty array to include all relation types.</param>
-    /// <param name="entityTypes">A set of entity type GUIDs to filter the child entities. This parameter is variadic (params).</param>
-    /// <returns>An enumerable collection of child entities that match the specified criteria.</returns>
-    public IEnumerable<IUmbracoEntity> GetPagedChildEntitiesByParentId(int parentId, long pageIndex, int pageSize, out long totalRecords, int[] relationTypes, params Guid[] entityTypes) =>
-
-        // var contentObjectTypes = new[] { Constants.ObjectTypes.Document, Constants.ObjectTypes.Media, Constants.ObjectTypes.Member }
-        // we could pass in the contentObjectTypes so that the entity repository sql is configured to do full entity lookups so that we get the full data
-        // required to populate content, media or members, else we get the bare minimum data needed to populate an entity. BUT if we do this it
-        // means that the SQL is less efficient and returns data that is probably not needed for what we need this lookup for. For the time being we
-        // will just return the bare minimum entity data.
-        _entityRepository.GetPagedResultsByQuery(Query<IUmbracoEntity>(), entityTypes, pageIndex, pageSize, out totalRecords, null, null, sql =>
-            {
-                SqlJoinRelations(sql);
-
-                sql.Where<RelationDto>(rel => rel.ParentId == parentId);
-                sql.Where<RelationDto, NodeDto>((rel, node) => rel.ChildId == parentId || node.NodeId != parentId);
-
-                if (relationTypes != null && relationTypes.Any())
-                {
-                    sql.WhereIn<RelationDto>(rel => rel.RelationType, relationTypes);
-                }
-            });
-
-    /// <summary>
-    ///     Used to populate the object types after insert/update
-    /// </summary>
-    /// <param name="entities"></param>
-    private void PopulateObjectTypes(params IRelation[] entities)
-    {
-        IEnumerable<int> entityIds =
-            entities.Select(x => x.ParentId).Concat(entities.Select(y => y.ChildId)).Distinct();
-
-        var nodes = Database.Fetch<NodeDto>(Sql().Select<NodeDto>().From<NodeDto>()
-                .WhereIn<NodeDto>(x => x.NodeId, entityIds))
-            .ToDictionary(x => x.NodeId, x => x.NodeObjectType);
-
-        foreach (IRelation e in entities)
+    /// <inheritdoc />
+    protected override async Task PersistUpdatedItemAsync(IRelation item) =>
+        await AmbientScope.ExecuteWithContextAsync<RelationDto>(async db =>
         {
-            if (nodes.TryGetValue(e.ParentId, out Guid? parentObjectType))
+            item.UpdatingEntity();
+
+            RelationDto dto = RelationFactory.BuildDto(item);
+            db.Relations.Update(dto);
+            await db.SaveChangesAsync();
+
+            await PopulateObjectTypesAsync(db, [item], CancellationToken.None);
+            item.ResetDirtyProperties();
+        });
+
+    /// <inheritdoc />
+    protected override async Task PersistDeletedItemAsync(IRelation entity) =>
+        await AmbientScope.ExecuteWithContextAsync<RelationDto>(async db =>
+        {
+            await db.Relations
+                .Where(x => x.Id == entity.Id)
+                .ExecuteDeleteAsync();
+
+            entity.DeleteDate = DateTime.UtcNow;
+        });
+
+    private static IQueryable<RelationDto> BaseQuery(UmbracoDbContext db)
+        => db.Relations
+            .Include(x => x.ParentNode)
+            .Include(x => x.ChildNode);
+
+    private async Task<IEnumerable<IRelation>> GetByFilterAsync(
+        Func<IQueryable<RelationDto>, IQueryable<RelationDto>> filter,
+        CancellationToken cancellationToken)
+        => await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            List<RelationDto> dtos = await filter(BaseQuery(db)).ToListAsync(cancellationToken);
+            return await BuildEntitiesAsync(dtos);
+        });
+
+    private async Task<IEnumerable<IRelation>> BuildEntitiesAsync(IReadOnlyCollection<RelationDto> dtos)
+    {
+        if (dtos.Count == 0)
+        {
+            return Array.Empty<IRelation>();
+        }
+
+        int[] relationTypeIds = dtos.Select(x => x.RelationType).Distinct().ToArray();
+        IEnumerable<IRelationType> relationTypeEntities = await _relationTypeRepository.GetManyAsync(relationTypeIds, CancellationToken.None);
+        Dictionary<int, IRelationType> relationTypes = relationTypeEntities.ToDictionary(x => x.Id, x => x);
+
+        var entities = new List<IRelation>(dtos.Count);
+        foreach (RelationDto dto in dtos)
+        {
+            if (relationTypes.TryGetValue(dto.RelationType, out IRelationType? relationType) is false)
             {
-                e.ParentObjectType = parentObjectType.GetValueOrDefault();
+                throw new InvalidOperationException($"RelationType with Id: {dto.RelationType} doesn't exist");
             }
 
-            if (nodes.TryGetValue(e.ChildId, out Guid? childObjectType))
-            {
-                e.ChildObjectType = childObjectType.GetValueOrDefault();
-            }
+            entities.Add(RelationFactory.BuildEntity(dto, relationType));
         }
+
+        return entities;
     }
 
-    private static void ApplyOrdering(ref Sql<ISqlContext> sql, Ordering ordering)
+    private async Task<IRelation> BuildEntityAsync(RelationDto dto)
     {
-        if (sql == null)
-        {
-            throw new ArgumentNullException(nameof(sql));
-        }
-
-        if (ordering == null)
-        {
-            throw new ArgumentNullException(nameof(ordering));
-        }
-
-        // TODO: although this works for name, it probably doesn't work for others without an alias of some sort
-        var orderBy = ordering.OrderBy;
-
-        if (ordering.Direction == Direction.Ascending)
-        {
-            sql.OrderBy(orderBy);
-        }
-        else
-        {
-            sql.OrderByDescending(orderBy);
-        }
-    }
-
-    #region Overrides of RepositoryBase<int,Relation>
-
-    protected override IRelation? PerformGet(int id)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false);
-        sql.Where(GetBaseWhereClause(), new { id });
-
-        RelationDto? dto = Database.FirstOrDefault<RelationDto>(sql);
-        if (dto == null)
-        {
-            return null;
-        }
-
-        IRelationType? relationType = _relationTypeRepository.Get(dto.RelationType);
-        if (relationType == null)
-        {
-            throw new InvalidOperationException(string.Format("RelationType with Id: {0} doesn't exist", dto.RelationType));
-        }
-
-        return DtoToEntity(dto, relationType);
-    }
-
-    protected override IEnumerable<IRelation> PerformGetAll(params int[]? ids)
-    {
-        Sql<ISqlContext> sql = GetBaseQuery(false);
-        if (ids?.Length > 0)
-        {
-            sql.WhereIn<RelationDto>(x => x.Id, ids);
-        }
-
-        sql.OrderBy<RelationDto>(x => x.RelationType);
-        List<RelationDto>? dtos = Database.Fetch<RelationDto>(sql);
-        return DtosToEntities(dtos);
-    }
-
-    protected override IEnumerable<IRelation> PerformGetByQuery(IQuery<IRelation> query)
-    {
-        Sql<ISqlContext> sqlClause = GetBaseQuery(false);
-        var translator = new SqlTranslator<IRelation>(sqlClause, query);
-        Sql<ISqlContext> sql = translator.Translate();
-        sql.OrderBy<RelationDto>(x => x.RelationType);
-        List<RelationDto>? dtos = Database.Fetch<RelationDto>(sql);
-        return DtosToEntities(dtos);
-    }
-
-    private IEnumerable<IRelation> DtosToEntities(IEnumerable<RelationDto> dtos) =>
-
-        // NOTE: This is N+1, BUT ALL relation types are cached so shouldn't matter
-        dtos.Select(x => DtoToEntity(x, _relationTypeRepository.Get(x.RelationType))).WhereNotNull().ToList();
-
-    private static IRelation? DtoToEntity(RelationDto dto, IRelationType? relationType)
-    {
+        IRelationType? relationType = await _relationTypeRepository.GetAsync(dto.RelationType, CancellationToken.None);
         if (relationType is null)
         {
-            return null;
+            throw new InvalidOperationException($"RelationType with Id: {dto.RelationType} doesn't exist");
         }
 
-        IRelation entity = RelationFactory.BuildEntity(dto, relationType);
-
-        // reset dirty initial properties (U4-1946)
-        entity.ResetDirtyProperties(false);
-
-        return entity;
+        return RelationFactory.BuildEntity(dto, relationType);
     }
 
-    #endregion
-
-    #region Overrides of EntityRepositoryBase<int,Relation>
-
-    protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
+    /// <summary>
+    ///     Populates the parent/child object types on the given relations after a save by querying the corresponding nodes.
+    /// </summary>
+    private static async Task PopulateObjectTypesAsync(
+        UmbracoDbContext db,
+        IReadOnlyCollection<IRelation> entities,
+        CancellationToken cancellationToken)
     {
-        if (isCount)
+        if (entities.Count == 0)
         {
-            return Sql().SelectCount().From<RelationDto>();
+            return;
         }
 
-        Sql<ISqlContext> sql = Sql().Select<RelationDto>()
-            .AndSelect<NodeDto>("uchild", x => Alias(x.NodeObjectType, "childObjectType"))
-            .AndSelect<NodeDto>("uparent", x => Alias(x.NodeObjectType, "parentObjectType"))
-            .From<RelationDto>()
-            .InnerJoin<NodeDto>("uchild")
-            .On<RelationDto, NodeDto>((rel, node) => rel.ChildId == node.NodeId, aliasRight: "uchild")
-            .InnerJoin<NodeDto>("uparent")
-            .On<RelationDto, NodeDto>((rel, node) => rel.ParentId == node.NodeId, aliasRight: "uparent");
+        int[] nodeIds = entities
+            .SelectMany(e => new[] { e.ParentId, e.ChildId })
+            .Distinct()
+            .ToArray();
 
-        return sql;
+        Dictionary<int, Guid?> objectTypes = await db.Nodes
+            .Where(n => nodeIds.Contains(n.NodeId))
+            .ToDictionaryAsync(n => n.NodeId, n => n.NodeObjectType, cancellationToken);
+
+        foreach (IRelation entity in entities)
+        {
+            if (objectTypes.TryGetValue(entity.ParentId, out Guid? parentObjectType))
+            {
+                entity.ParentObjectType = parentObjectType.GetValueOrDefault();
+            }
+
+            if (objectTypes.TryGetValue(entity.ChildId, out Guid? childObjectType))
+            {
+                entity.ChildObjectType = childObjectType.GetValueOrDefault();
+            }
+        }
     }
 
-    protected override string GetBaseWhereClause() => $"{QuoteTableName(Constants.DatabaseSchema.Tables.Relation)}.id = @id";
-
-    protected override IEnumerable<string> GetDeleteClauses()
+    private static IQueryable<RelationDto> ApplyOrdering(IQueryable<RelationDto> query, Ordering? ordering)
     {
-        var list = new List<string>
+        if (ordering is null || ordering.IsEmpty)
         {
-            $"DELETE FROM {QuoteTableName(Constants.DatabaseSchema.Tables.Relation)} WHERE id = @id"
+            return query.OrderBy(x => x.Id);
+        }
+
+        bool descending = ordering.Direction == Direction.Descending;
+
+        return ordering.OrderBy?.ToLowerInvariant() switch
+        {
+            "id" => descending ? query.OrderByDescending(x => x.Id) : query.OrderBy(x => x.Id),
+            "parentid" => descending ? query.OrderByDescending(x => x.ParentId) : query.OrderBy(x => x.ParentId),
+            "childid" => descending ? query.OrderByDescending(x => x.ChildId) : query.OrderBy(x => x.ChildId),
+            "reltype" or "relationtype" or "relationtypeid"
+                => descending ? query.OrderByDescending(x => x.RelationType) : query.OrderBy(x => x.RelationType),
+            "datetime" or "createdate"
+                => descending ? query.OrderByDescending(x => x.Datetime) : query.OrderBy(x => x.Datetime),
+            "comment"
+                => descending ? query.OrderByDescending(x => x.Comment) : query.OrderBy(x => x.Comment),
+            _ => query.OrderBy(x => x.Id),
         };
-        return list;
     }
-
-    #endregion
-
-    #region Unit of Work Implementation
-
-    protected override void PersistNewItem(IRelation entity)
-    {
-        entity.AddingEntity();
-
-        RelationDto dto = RelationFactory.BuildDto(entity);
-
-        var id = Convert.ToInt32(Database.Insert(dto));
-
-        entity.Id = id;
-        PopulateObjectTypes(entity);
-
-        entity.ResetDirtyProperties();
-    }
-
-    protected override void PersistUpdatedItem(IRelation entity)
-    {
-        entity.UpdatingEntity();
-
-        RelationDto dto = RelationFactory.BuildDto(entity);
-        Database.Update(dto);
-
-        PopulateObjectTypes(entity);
-
-        entity.ResetDirtyProperties();
-    }
-
-    #endregion
-}
-
-internal sealed class RelationItemDto
-{
-    /// <summary>
-    /// Gets or sets the identifier of the child node in the relation.
-    /// </summary>
-    [Column(Name = "nodeId")]
-    public int ChildNodeId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the unique key (GUID) of the child node in this relation.
-    /// </summary>
-    [Column(Name = "nodeKey")]
-    public Guid ChildNodeKey { get; set; }
-
-    /// <summary>
-    /// Gets or sets the name of the child node associated with this relation item.
-    /// This property is mapped to the 'nodeName' column in the database.
-    /// </summary>
-    [Column(Name = "nodeName")]
-    public string? ChildNodeName { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the child node is published.
-    /// </summary>
-    [Column(Name = "nodePublished")]
-    public bool? ChildNodePublished { get; set; }
-
-    /// <summary>
-    /// Gets or sets the object type identifier of the child node in the relation.
-    /// </summary>
-    [Column(Name = "nodeObjectType")]
-    public Guid ChildNodeObjectType { get; set; }
-
-    /// <summary>
-    /// Gets or sets the unique identifier (key) of the child content type.
-    /// </summary>
-    [Column(Name = "contentTypeKey")]
-    public Guid ChildContentTypeKey { get; set; }
-
-    /// <summary>
-    /// Gets or sets the icon associated with the child content type.
-    /// </summary>
-    [Column(Name = "contentTypeIcon")]
-    public string? ChildContentTypeIcon { get; set; }
-
-    /// <summary>
-    /// Gets or sets the alias of the child content type.
-    /// </summary>
-    [Column(Name = "contentTypeAlias")]
-    public string? ChildContentTypeAlias { get; set; }
-
-    /// <summary>
-    /// Gets or sets the name of the child content type.
-    /// </summary>
-    [Column(Name = "contentTypeName")]
-    public string? ChildContentTypeName { get; set; }
-
-    /// <summary>
-    /// Gets or sets the display name of the relation type associated with this relation item.
-    /// </summary>
-    [Column(Name = "relationTypeName")]
-    public string? RelationTypeName { get; set; }
-
-    /// <summary>
-    /// Gets or sets the alias of the relation type.
-    /// </summary>
-    [Column(Name = "relationTypeAlias")]
-    public string? RelationTypeAlias { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the relation type represents a dependency between related items.
-    /// </summary>
-    [Column(Name = "relationTypeIsDependency")]
-    public bool RelationTypeIsDependency { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the relation type is bidirectional.
-    /// </summary>
-    [Column(Name = "relationTypeIsBidirectional")]
-    public bool RelationTypeIsBidirectional { get; set; }
 }

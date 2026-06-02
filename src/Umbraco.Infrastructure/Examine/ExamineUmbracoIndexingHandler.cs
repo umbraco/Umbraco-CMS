@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.HostedServices;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
@@ -23,6 +24,7 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     private readonly ILogger<ExamineUmbracoIndexingHandler> _logger;
     private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
     private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
+    private readonly IValueSetBuilder<ExternalMemberIdentity> _externalMemberValueSetBuilder;
     private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
     private readonly ICoreScopeProvider _scopeProvider;
     private readonly ExamineIndexingMainDomHandler _mainDomHandler;
@@ -39,6 +41,7 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
     /// <param name="publishedContentValueSetBuilder">Builds value sets for published content items to be indexed.</param>
     /// <param name="mediaValueSetBuilder">Builds value sets for media items to be indexed.</param>
     /// <param name="memberValueSetBuilder">Builds value sets for member items to be indexed.</param>
+    /// <param name="externalMemberValueSetBuilder">Builds value sets for external member items to be indexed.</param>
     /// <param name="mainDomHandler">Handles main domain (MainDom) events for Examine indexing.</param>
     /// <param name="publicAccessService">Provides services for managing public access to content.</param>
     public ExamineUmbracoIndexingHandler(
@@ -50,6 +53,7 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
         IValueSetBuilder<IMedia> mediaValueSetBuilder,
         IValueSetBuilder<IMember> memberValueSetBuilder,
+        IValueSetBuilder<ExternalMemberIdentity> externalMemberValueSetBuilder,
         ExamineIndexingMainDomHandler mainDomHandler,
         IPublicAccessService publicAccessService)
     {
@@ -61,6 +65,7 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         _publishedContentValueSetBuilder = publishedContentValueSetBuilder;
         _mediaValueSetBuilder = mediaValueSetBuilder;
         _memberValueSetBuilder = memberValueSetBuilder;
+        _externalMemberValueSetBuilder = externalMemberValueSetBuilder;
         _mainDomHandler = mainDomHandler;
         _publicAccessService = publicAccessService;
         _enabled = new Lazy<bool>(IsEnabled);
@@ -136,6 +141,31 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         else
         {
             DeferredReIndexForMember.Execute(_backgroundTaskQueue, this, member);
+        }
+    }
+
+    /// <inheritdoc />
+    public void ReIndexForExternalMember(ExternalMemberIdentity member)
+    {
+        var actions = DeferredActions.Get(_scopeProvider);
+        if (actions != null)
+        {
+            actions.Add(new DeferredReIndexForExternalMember(_backgroundTaskQueue, this, member));
+        }
+        else
+        {
+            DeferredReIndexForExternalMember.Execute(_backgroundTaskQueue, this, member);
+        }
+    }
+
+    /// <inheritdoc />
+    public void DeleteExternalMemberFromIndex(int externalMemberId)
+    {
+        foreach (IUmbracoMemberIndex index in _examineManager.Indexes
+                     .OfType<IUmbracoMemberIndex>()
+                     .Where(x => x.EnableDefaultEventHandler))
+        {
+            index.DeleteFromIndex(externalMemberId.ToString(CultureInfo.InvariantCulture));
         }
     }
 
@@ -433,6 +463,54 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
             });
     }
 
+    /// <summary>
+    ///     Re-indexes an <see cref="ExternalMemberIdentity" /> item on a background thread
+    /// </summary>
+    private sealed class DeferredReIndexForExternalMember : IDeferredAction
+    {
+        private readonly IBackgroundTaskQueue _backgroundTaskQueue;
+        private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
+        private readonly ExternalMemberIdentity _member;
+
+        public DeferredReIndexForExternalMember(
+            IBackgroundTaskQueue backgroundTaskQueue,
+            ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
+            ExternalMemberIdentity member)
+        {
+            _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
+            _member = member;
+            _backgroundTaskQueue = backgroundTaskQueue;
+        }
+
+        public void Execute() => Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _member);
+
+        public static void Execute(
+            IBackgroundTaskQueue backgroundTaskQueue,
+            ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler,
+            ExternalMemberIdentity member) =>
+            backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
+            {
+                using ICoreScope scope =
+                    examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
+
+                var valueSet = examineUmbracoIndexingHandler._externalMemberValueSetBuilder.GetValueSets(member).ToList();
+
+                foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
+                             .OfType<IUmbracoMemberIndex>()
+                             .Where(x => x.EnableDefaultEventHandler))
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return Task.CompletedTask;
+                    }
+
+                    index.IndexItems(valueSet);
+                }
+
+                return Task.CompletedTask;
+            });
+    }
+
     private sealed class DeferredDeleteIndex : IDeferredAction
     {
         private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
@@ -556,14 +634,15 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
         /// <param name="examineUmbracoIndexingHandler">The indexing handler responsible for managing Examine indexes in Umbraco.</param>
         /// <param name="publicAccessService">The service used to determine which content is protected by public access rules.</param>
         public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IPublicAccessService publicAccessService)
-            => backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
+            => backgroundTaskQueue.QueueBackgroundWorkItem(async cancellationToken =>
             {
                 using ICoreScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateCoreScope(autoComplete: true);
 
-                var protectedContentIds = publicAccessService.GetAll().Select(entry => entry.ProtectedNodeId).ToArray();
+                IEnumerable<PublicAccessEntry> entries = await publicAccessService.GetAllAsync();
+                var protectedContentIds = entries.Select(entry => entry.ProtectedNodeId).ToArray();
                 if (protectedContentIds.Any() is false)
                 {
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 foreach (IUmbracoContentIndex index in examineUmbracoIndexingHandler._examineManager.Indexes
@@ -572,13 +651,11 @@ internal sealed class ExamineUmbracoIndexingHandler : IUmbracoIndexingHandler
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        return Task.CompletedTask;
+                        return;
                     }
 
                     index.DeleteFromIndex(protectedContentIds.Select(id => id.ToString()));
                 }
-
-                return Task.CompletedTask;
             });
     }
 

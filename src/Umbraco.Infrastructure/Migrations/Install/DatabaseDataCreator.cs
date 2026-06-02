@@ -52,8 +52,8 @@ internal sealed class DatabaseDataCreator
         },
         new()
         {
-            Name = "Find all logs that are from the namespace 'Umbraco.Core'",
-            Query = "StartsWith(SourceContext, 'Umbraco.Core')",
+            Name = "Find all logs that are within the namespace 'Umbraco.Cms'",
+            Query = "StartsWith(SourceContext, 'Umbraco.Cms')",
         },
         new()
         {
@@ -243,6 +243,11 @@ internal sealed class DatabaseDataCreator
                 ActionElementUnpublish.ActionLetter,
                 ActionElementBrowse.ActionLetter,
                 ActionElementRollback.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerDelete.ActionLetter,
+                ActionElementContainerMove.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
             [Constants.Security.EditorGroupKey] =
             [
@@ -273,6 +278,11 @@ internal sealed class DatabaseDataCreator
                 ActionElementUnpublish.ActionLetter,
                 ActionElementBrowse.ActionLetter,
                 ActionElementRollback.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerDelete.ActionLetter,
+                ActionElementContainerMove.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
             [Constants.Security.WriterGroupKey] =
             [
@@ -286,6 +296,9 @@ internal sealed class DatabaseDataCreator
                 ActionElementNew.ActionLetter,
                 ActionElementUpdate.ActionLetter,
                 ActionElementBrowse.ActionLetter,
+                ActionElementContainerNew.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
             [Constants.Security.TranslatorGroupKey] =
             [
@@ -295,6 +308,8 @@ internal sealed class DatabaseDataCreator
                 ActionDocumentPropertyWrite.ActionLetter,
                 ActionElementUpdate.ActionLetter,
                 ActionElementBrowse.ActionLetter,
+                ActionElementContainerUpdate.ActionLetter,
+                ActionElementContainerBrowse.ActionLetter,
             ],
         };
 
@@ -2051,6 +2066,44 @@ internal sealed class DatabaseDataCreator
                     Description = null,
                     Variations = (byte)ContentVariation.Nothing,
                 });
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
+                new PropertyTypeDto
+                {
+                    Id = 53,
+                    UniqueId = new Guid("5BC7E468-C53E-41A6-A522-2723F3B94514"),
+                    DataTypeId = Constants.DataTypes.LabelPixels,
+                    ContentTypeId = 1037,
+                    PropertyTypeGroupId = 55,
+                    Alias = Constants.Conventions.Media.Width,
+                    Name = "Width",
+                    SortOrder = 0,
+                    Mandatory = false,
+                    ValidationRegExp = null,
+                    Description = null,
+                    Variations = (byte)ContentVariation.Nothing,
+                });
+            _database.Insert(
+                Constants.DatabaseSchema.Tables.PropertyType,
+                "id",
+                false,
+                new PropertyTypeDto
+                {
+                    Id = 54,
+                    UniqueId = new Guid("9E4C2B59-6BC6-4648-BB71-B0F45DDBC274"),
+                    DataTypeId = Constants.DataTypes.LabelPixels,
+                    ContentTypeId = 1037,
+                    PropertyTypeGroupId = 55,
+                    Alias = Constants.Conventions.Media.Height,
+                    Name = "Height",
+                    SortOrder = 0,
+                    Mandatory = false,
+                    ValidationRegExp = null,
+                    Description = null,
+                    Variations = (byte)ContentVariation.Nothing,
+                });
         }
 
         // Membership property types.
@@ -2237,7 +2290,7 @@ internal sealed class DatabaseDataCreator
                     EditorAlias = Constants.PropertyEditors.Aliases.RichText,
                     EditorUiAlias = "Umb.PropertyEditorUi.Tiptap",
                     DbType = "Ntext",
-                    Configuration = "{\"extensions\": [\"Umb.Tiptap.RichTextEssentials\", \"Umb.Tiptap.Anchor\", \"Umb.Tiptap.Block\", \"Umb.Tiptap.Blockquote\", \"Umb.Tiptap.Bold\", \"Umb.Tiptap.BulletList\", \"Umb.Tiptap.CodeBlock\", \"Umb.Tiptap.Embed\", \"Umb.Tiptap.Figure\", \"Umb.Tiptap.Heading\", \"Umb.Tiptap.HorizontalRule\", \"Umb.Tiptap.HtmlAttributeClass\", \"Umb.Tiptap.HtmlAttributeDataset\", \"Umb.Tiptap.HtmlAttributeId\", \"Umb.Tiptap.HtmlAttributeStyle\", \"Umb.Tiptap.HtmlTagDiv\", \"Umb.Tiptap.HtmlTagSpan\", \"Umb.Tiptap.Image\", \"Umb.Tiptap.Italic\", \"Umb.Tiptap.Link\", \"Umb.Tiptap.MediaUpload\", \"Umb.Tiptap.OrderedList\", \"Umb.Tiptap.Strike\", \"Umb.Tiptap.Subscript\", \"Umb.Tiptap.Superscript\", \"Umb.Tiptap.Table\", \"Umb.Tiptap.TextAlign\", \"Umb.Tiptap.TextDirection\", \"Umb.Tiptap.TextIndent\", \"Umb.Tiptap.TrailingNode\", \"Umb.Tiptap.Underline\"], \"maxImageSize\": 500, \"overlaySize\": \"medium\", \"toolbar\": [[[\"Umb.Tiptap.Toolbar.SourceEditor\"], [\"Umb.Tiptap.Toolbar.Bold\", \"Umb.Tiptap.Toolbar.Italic\", \"Umb.Tiptap.Toolbar.Underline\"], [\"Umb.Tiptap.Toolbar.TextAlignLeft\", \"Umb.Tiptap.Toolbar.TextAlignCenter\", \"Umb.Tiptap.Toolbar.TextAlignRight\"], [\"Umb.Tiptap.Toolbar.BulletList\", \"Umb.Tiptap.Toolbar.OrderedList\"], [\"Umb.Tiptap.Toolbar.Blockquote\", \"Umb.Tiptap.Toolbar.HorizontalRule\"], [\"Umb.Tiptap.Toolbar.Link\", \"Umb.Tiptap.Toolbar.Unlink\"], [\"Umb.Tiptap.Toolbar.MediaPicker\", \"Umb.Tiptap.Toolbar.EmbeddedMedia\"]]]}",
+                    Configuration = "{\"extensions\": [\"Umb.Tiptap.RichTextEssentials\", \"Umb.Tiptap.Anchor\", \"Umb.Tiptap.Block\", \"Umb.Tiptap.Blockquote\", \"Umb.Tiptap.Bold\", \"Umb.Tiptap.BulletList\", \"Umb.Tiptap.CodeBlock\", \"Umb.Tiptap.Embed\", \"Umb.Tiptap.Figure\", \"Umb.Tiptap.Heading\", \"Umb.Tiptap.HorizontalRule\", \"Umb.Tiptap.HtmlAttributeClass\", \"Umb.Tiptap.HtmlAttributeDataset\", \"Umb.Tiptap.HtmlAttributeId\", \"Umb.Tiptap.HtmlAttributeStyle\", \"Umb.Tiptap.HtmlTagDiv\", \"Umb.Tiptap.HtmlTagSpan\", \"Umb.Tiptap.Image\", \"Umb.Tiptap.Italic\", \"Umb.Tiptap.Link\", \"Umb.Tiptap.MediaUpload\", \"Umb.Tiptap.OrderedList\", \"Umb.Tiptap.Strike\", \"Umb.Tiptap.Subscript\", \"Umb.Tiptap.Superscript\", \"Umb.Tiptap.Table\", \"Umb.Tiptap.TextAlign\", \"Umb.Tiptap.TextDirection\", \"Umb.Tiptap.TextIndent\", \"Umb.Tiptap.TrailingNode\", \"Umb.Tiptap.Underline\"], \"maxImageSize\": 500, \"overlaySize\": \"medium\", \"toolbar\": [[[\"Umb.Tiptap.Toolbar.SourceEditor\"], [\"Umb.Tiptap.Toolbar.Bold\", \"Umb.Tiptap.Toolbar.Italic\", \"Umb.Tiptap.Toolbar.Underline\"], [\"Umb.Tiptap.Toolbar.TextAlignLeft\", \"Umb.Tiptap.Toolbar.TextAlignCenter\", \"Umb.Tiptap.Toolbar.TextAlignRight\"], [\"Umb.Tiptap.Toolbar.BulletList\", \"Umb.Tiptap.Toolbar.OrderedList\"], [\"Umb.Tiptap.Toolbar.Blockquote\", \"Umb.Tiptap.Toolbar.HorizontalRule\"], [\"Umb.Tiptap.Toolbar.Link\", \"Umb.Tiptap.Toolbar.Unlink\"], [\"Umb.Tiptap.Toolbar.MediaPicker\", \"Umb.Tiptap.Toolbar.EmbeddedMedia\"]]], \"allowedMediaTypes\": \"" + Constants.MediaTypes.Guids.Image + "," + Constants.MediaTypes.Guids.Svg + "\"}",
                 });
         }
 

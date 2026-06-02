@@ -170,4 +170,12 @@ public interface IPublishedValueFallback
         T defaultValue,
         out T? value,
         out IPublishedProperty? noValueProperty);
+
+    /// <summary>
+    ///     Temporarily sets the fallback policy on the variation context so that property value converters
+    ///     can access it during value conversion.
+    /// </summary>
+    /// <param name="fallback">The fallback policy to set.</param>
+    /// <returns>A disposable that restores the previous variation context when disposed, or <c>null</c> if not supported.</returns>
+    IDisposable? EnterFallbackScope(Fallback fallback) => null;
 }

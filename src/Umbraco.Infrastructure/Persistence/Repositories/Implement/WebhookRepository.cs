@@ -33,7 +33,7 @@ public class WebhookRepository : IWebhookRepository
     /// <returns>A task representing the asynchronous operation. The task result contains a <see cref="PagedModel{IWebhook}"/> with the requested webhooks and the total count.</returns>
     public async Task<PagedModel<IWebhook>> GetAllAsync(int skip, int take)
     {
-        IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
+        IEFCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
                                                ?? throw new InvalidOperationException("No ambient EF Core scope is available.");
 
         List<WebhookDto> webhookDtos = await scope.ExecuteWithContextAsync<List<WebhookDto>>(async db =>
@@ -64,7 +64,7 @@ public class WebhookRepository : IWebhookRepository
     /// </returns>
     public async Task<IWebhook> CreateAsync(IWebhook webhook)
     {
-        IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
+        IEFCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
                                                ?? throw new InvalidOperationException("No ambient EF Core scope is available.");
 
         webhook.AddingEntity();
@@ -88,7 +88,7 @@ public class WebhookRepository : IWebhookRepository
     /// <returns>A task that represents the asynchronous operation. The task result contains the webhook entity if found; otherwise, null.</returns>
     public async Task<IWebhook?> GetAsync(Guid key)
     {
-        IEfCoreScope<UmbracoDbContext>? scope = _scopeAccessor.AmbientScope;
+        IEFCoreScope<UmbracoDbContext>? scope = _scopeAccessor.AmbientScope;
         if (scope is null)
         {
             return null;
@@ -116,7 +116,7 @@ public class WebhookRepository : IWebhookRepository
     /// </returns>
     public async Task<PagedModel<IWebhook>> GetByIdsAsync(IEnumerable<Guid> keys)
     {
-        IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
+        IEFCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
                                                ?? throw new InvalidOperationException("No ambient EF Core scope is available.");
 
         List<WebhookDto> webhookDtos = await scope.ExecuteWithContextAsync<List<WebhookDto>>(async db =>
@@ -146,7 +146,7 @@ public class WebhookRepository : IWebhookRepository
     /// </returns>
     public async Task<PagedModel<IWebhook>> GetByAliasAsync(string alias)
     {
-        IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
+        IEFCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
                                                 ?? throw new InvalidOperationException("No ambient EF Core scope is available.");
 
         List<WebhookDto> dtos = await scope.ExecuteWithContextAsync(async db =>
@@ -173,7 +173,7 @@ public class WebhookRepository : IWebhookRepository
     /// <returns>A task representing the asynchronous delete operation.</returns>
     public async Task DeleteAsync(IWebhook webhook)
     {
-        IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
+        IEFCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
                                                 ?? throw new InvalidOperationException("No ambient EF Core scope is available.");
 
         await scope.ExecuteWithContextAsync<Task>(async db =>
@@ -189,7 +189,7 @@ public class WebhookRepository : IWebhookRepository
     /// <returns>A task that represents the asynchronous update operation.</returns
     public async Task UpdateAsync(IWebhook webhook)
     {
-        IEfCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
+        IEFCoreScope<UmbracoDbContext> scope = _scopeAccessor.AmbientScope
             ?? throw new InvalidOperationException("No ambient EF Core scope is available.");
 
         webhook.UpdatingEntity();

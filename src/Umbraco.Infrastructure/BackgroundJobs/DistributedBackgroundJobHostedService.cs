@@ -97,7 +97,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
             {
                 try
                 {
-                    await RunRunnableJob();
+                    await RunRunnableJob(stoppingToken);
                 }
                 catch (Exception exception)
                 {
@@ -117,7 +117,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
         }
     }
 
-    private async Task RunRunnableJob()
+    private async Task RunRunnableJob(CancellationToken stoppingToken)
     {
         IDistributedBackgroundJob? job = await _distributedJobService.TryTakeRunnableAsync();
 
@@ -129,7 +129,7 @@ public class DistributedBackgroundJobHostedService : BackgroundService
 
         try
         {
-            await job.ExecuteAsync();
+            await job.ExecuteAsync(stoppingToken);
         }
         catch (Exception ex)
         {

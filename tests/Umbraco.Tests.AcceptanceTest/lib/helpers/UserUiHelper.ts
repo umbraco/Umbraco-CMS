@@ -12,8 +12,6 @@ export class UserUiHelper extends UiBaseLocators {
   private readonly openUserGroupsBtn: Locator;
   private readonly updatedNameOfTheUserTxt: Locator;
   private readonly changePasswordBtn: Locator;
-  private readonly changePhotoBtn: Locator;
-  private readonly removePhotoBtn: Locator;
   private readonly searchInUserSectionTxt: Locator;
   private readonly userSectionCard: Locator;
   private readonly statusBtn: Locator;
@@ -23,7 +21,6 @@ export class UserUiHelper extends UiBaseLocators {
   private readonly allowAccessToAllMediaToggle: Locator;
   private readonly mediaInput: Locator;
   private readonly chooseContainerBtn: Locator;
-  private readonly languageBtn: Locator;
   private readonly disabledTxt: Locator;
   private readonly activeTxt: Locator;
   private readonly orderByBtn: Locator;
@@ -48,8 +45,6 @@ export class UserUiHelper extends UiBaseLocators {
     this.chooseUserGroupsBtn = page.locator('umb-user-group-input').getByLabel('Choose');
     this.updatedNameOfTheUserTxt = page.locator('umb-workspace-header-name-editable').locator('input');
     this.changePasswordBtn = page.getByLabel('Change your password');
-    this.changePhotoBtn = page.getByLabel('Change photo');
-    this.removePhotoBtn = page.getByLabel('Remove photo');
     this.searchInUserSectionTxt = page.locator('umb-collection-filter-field #input');
     this.userSectionCard = page.locator('uui-card-user');
     this.statusBtn = page.locator('uui-button', {hasText: 'Status'});
@@ -58,7 +53,6 @@ export class UserUiHelper extends UiBaseLocators {
     this.allowAccessToAllMediaToggle = page.locator('umb-property-layout').filter({hasText: 'Allow access to all media'}).locator('#toggle');
     this.mediaInput = page.locator('umb-input-media');
     this.chooseContainerBtn = page.locator('#container').getByLabel('Choose');
-    this.languageBtn = page.locator('[label="UI Culture"] select');
     this.disabledTxt = page.getByText('Disabled', {exact: true});
     this.activeTxt = page.getByText('Active', {exact: true});
     this.orderByBtn = page.getByLabel('order by');
@@ -126,23 +120,8 @@ export class UserUiHelper extends UiBaseLocators {
     return await this.isVisible(this.page.getByText(name, {exact: true}), isVisible);
   }
 
-  async clickChangePhotoButton() {
-    await this.click(this.changePhotoBtn);
-  }
-
   async clickRemoveButtonForUserGroupWithName(userGroupName: string) {
     await this.click(this.page.locator('umb-user-group-ref', {hasText: userGroupName}).locator('[label="Remove"]'));
-  }
-
-  async clickRemovePhotoButton() {
-    await this.click(this.removePhotoBtn);
-  }
-
-  async changePhotoWithFileChooser(filePath: string) {
-    const fileChooserPromise = this.page.waitForEvent('filechooser');
-    await this.clickChangePhotoButton();
-    const fileChooser = await fileChooserPromise;
-    await fileChooser.setFiles(filePath);
   }
 
   async searchInUserSection(name: string) {
@@ -209,10 +188,6 @@ export class UserUiHelper extends UiBaseLocators {
 
   async clickChooseContainerButton() {
     await this.click(this.chooseContainerBtn);
-  }
-
-  async selectUserLanguage(language: string) {
-    await this.languageBtn.selectOption(language, {force: true});
   }
 
   async clickRemoveButtonForContentNodeWithName(name: string) {

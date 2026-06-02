@@ -5,6 +5,7 @@ const dataTypeName = 'List View - Media';
 let dataTypeDefaultData = null;
 const firstMediaFileName = 'FirstMediaFile';
 const secondMediaFileName = 'SecondMediaFile';
+
 test.beforeEach(async ({umbracoUi, umbracoApi}) => {
   dataTypeDefaultData = await umbracoApi.dataType.getByName(dataTypeName);
   await umbracoApi.media.ensureNameNotExists(firstMediaFileName);
@@ -134,4 +135,20 @@ test('can allow bulk move in the media section', async ({umbracoApi, umbracoUi})
 
   // Clean
   await umbracoApi.media.ensureNameNotExists(mediaFolderName);
+});
+
+test('can clear selection after selecting multiple media items', async ({umbracoApi, umbracoUi}) => {
+  // Act
+  await umbracoUi.media.goToSection(ConstantHelper.sections.media);
+  await umbracoUi.media.selectMediaWithName(firstMediaFileName);
+  await umbracoUi.media.selectMediaWithName(secondMediaFileName);
+  await umbracoUi.media.isCollectionSelectionActionsVisible();
+  await umbracoUi.media.clickClearSelectionButton();
+
+  // Assert
+  await umbracoUi.media.isCollectionSelectionActionsVisible(false);
+  await umbracoUi.media.isMediaCardWithNameSelected(firstMediaFileName, false);
+  await umbracoUi.media.isMediaCardWithNameSelected(secondMediaFileName, false);
+  expect(await umbracoApi.media.doesNameExist(firstMediaFileName)).toBeTruthy();
+  expect(await umbracoApi.media.doesNameExist(secondMediaFileName)).toBeTruthy();
 });

@@ -12,6 +12,12 @@ public class RichTextConfiguration : IIgnoreUserStartNodesConfig
     public RichTextBlockConfiguration[]? Blocks { get; set; } = Array.Empty<RichTextBlockConfiguration>();
 
     /// <summary>
+    /// Gets or sets the allowed media types for the media picker (comma-separated media type unique IDs).
+    /// </summary>
+    [ConfigurationField("allowedMediaTypes")]
+    public string? AllowedMediaTypes { get; set; }
+
+    /// <summary>
     /// Gets or sets the media parent ID for uploaded media.
     /// </summary>
     [ConfigurationField("mediaParentId")]

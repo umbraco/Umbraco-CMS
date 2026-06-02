@@ -41,7 +41,7 @@ public class CacheTests : DeliveryApiTests
 
         var propertyData = new PropertyData { Culture = "abc", Segment = string.Empty, Value = "n/a" };
 
-        var prop1 = new PublishedProperty(propertyType, element.Object, CreateVariationContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), cacheLevel);
+        var prop1 = new PublishedProperty(propertyType, element.Object, CreateVariationContextAccessor(), CreatePropertyRenderingContextAccessor(), false, [propertyData], new ElementsDictionaryAppCache(), cacheLevel);
 
         var results = new List<string>
         {

@@ -1,7 +1,6 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -391,7 +390,8 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
 
             // Act
             var template2 = new Template(ShortStringHelper, "test2", "test2");
-            template2.SetMasterTemplate(template);
+            template2.LayoutTemplateAlias = template.Alias;
+            template2.LayoutTemplateId = new Lazy<int>(() => template.Id);
             repository.Save(template2);
 
             // Assert
@@ -503,14 +503,14 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Perform_Delete_When_Assigned_To_Doc()
+    public async Task Can_Perform_Delete_When_Assigned_To_Doc()
     {
         // Arrange
         var newScopeAccessor = GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>();
         var provider = ScopeProvider;
         var scopeAccessor = (IScopeAccessor)provider;
         var dataTypeService = GetRequiredService<IDataTypeService>();
-        var fileService = GetRequiredService<IFileService>();
+        var templateService = GetRequiredService<ITemplateService>();
 
         using (provider.CreateScope())
         {
@@ -522,9 +522,9 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
                 new ContentTypeCommonRepository(scopeAccessor, templateRepository, AppCaches, ShortStringHelper);
             var languageRepository = new LanguageRepository(newScopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<LanguageRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
             var contentTypeRepository = new ContentTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<ContentTypeRepository>(), commonRepository, languageRepository, ShortStringHelper, Mock.Of<IRepositoryCacheVersionService>(), IdKeyMap, Mock.Of<ICacheSyncService>());
-            var relationTypeRepository = new RelationTypeRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            var relationTypeRepository = new RelationTypeRepository(newScopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<RelationTypeRepository>(), Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
             var entityRepository = new EntityRepository(scopeAccessor, AppCaches.Disabled);
-            var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
+            var relationRepository = new RelationRepository(newScopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, Mock.Of<IRepositoryCacheVersionService>(), Mock.Of<ICacheSyncService>());
             var propertyEditors =
                 new PropertyEditorCollection(new DataEditorCollection(() => Enumerable.Empty<IDataEditor>()));
             var dataValueReferences =
@@ -549,7 +549,7 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
                 Mock.Of<ICacheSyncService>());
 
             var template = TemplateBuilder.CreateTextPageTemplate();
-            fileService.SaveTemplate(template); // else, FK violation on contentType!
+            await templateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
             var contentType =
                 ContentTypeBuilder.CreateSimpleContentType("umbTextpage2", "Textpage", defaultTemplateId: template.Id);
@@ -586,10 +586,10 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             };
             var child = new Template(ShortStringHelper, "child", "child") { Content = @"<%@ Master Language=""C#"" %>" };
             var baby = new Template(ShortStringHelper, "baby", "baby") { Content = @"<%@ Master Language=""C#"" %>" };
-            child.MasterTemplateAlias = parent.Alias;
-            child.MasterTemplateId = new Lazy<int>(() => parent.Id);
-            baby.MasterTemplateAlias = child.Alias;
-            baby.MasterTemplateId = new Lazy<int>(() => child.Id);
+            child.LayoutTemplateAlias = parent.Alias;
+            child.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+            baby.LayoutTemplateAlias = child.Alias;
+            baby.LayoutTemplateId = new Lazy<int>(() => child.Id);
             repository.Save(parent);
             repository.Save(child);
             repository.Save(baby);
@@ -714,22 +714,22 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var toddler4 = new Template(ShortStringHelper, "toddler4", "toddler4");
             var baby2 = new Template(ShortStringHelper, "baby2", "baby2");
 
-            child1.MasterTemplateAlias = parent.Alias;
-            child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
-            child2.MasterTemplateAlias = parent.Alias;
-            child2.MasterTemplateId = new Lazy<int>(() => parent.Id);
-            toddler1.MasterTemplateAlias = child1.Alias;
-            toddler1.MasterTemplateId = new Lazy<int>(() => child1.Id);
-            toddler2.MasterTemplateAlias = child1.Alias;
-            toddler2.MasterTemplateId = new Lazy<int>(() => child1.Id);
-            toddler3.MasterTemplateAlias = child2.Alias;
-            toddler3.MasterTemplateId = new Lazy<int>(() => child2.Id);
-            toddler4.MasterTemplateAlias = child2.Alias;
-            toddler4.MasterTemplateId = new Lazy<int>(() => child2.Id);
-            baby1.MasterTemplateAlias = toddler2.Alias;
-            baby1.MasterTemplateId = new Lazy<int>(() => toddler2.Id);
-            baby2.MasterTemplateAlias = toddler4.Alias;
-            baby2.MasterTemplateId = new Lazy<int>(() => toddler4.Id);
+            child1.LayoutTemplateAlias = parent.Alias;
+            child1.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+            child2.LayoutTemplateAlias = parent.Alias;
+            child2.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+            toddler1.LayoutTemplateAlias = child1.Alias;
+            toddler1.LayoutTemplateId = new Lazy<int>(() => child1.Id);
+            toddler2.LayoutTemplateAlias = child1.Alias;
+            toddler2.LayoutTemplateId = new Lazy<int>(() => child1.Id);
+            toddler3.LayoutTemplateAlias = child2.Alias;
+            toddler3.LayoutTemplateId = new Lazy<int>(() => child2.Id);
+            toddler4.LayoutTemplateAlias = child2.Alias;
+            toddler4.LayoutTemplateId = new Lazy<int>(() => child2.Id);
+            baby1.LayoutTemplateAlias = toddler2.Alias;
+            baby1.LayoutTemplateId = new Lazy<int>(() => toddler2.Id);
+            baby2.LayoutTemplateAlias = toddler4.Alias;
+            baby2.LayoutTemplateId = new Lazy<int>(() => toddler4.Id);
 
             // Act
             repository.Save(parent);
@@ -772,14 +772,14 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var toddler1 = new Template(ShortStringHelper, "toddler1", "toddler1");
             var toddler2 = new Template(ShortStringHelper, "toddler2", "toddler2");
 
-            child1.MasterTemplateAlias = parent.Alias;
-            child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
-            child2.MasterTemplateAlias = parent.Alias;
-            child2.MasterTemplateId = new Lazy<int>(() => parent.Id);
-            toddler1.MasterTemplateAlias = child1.Alias;
-            toddler1.MasterTemplateId = new Lazy<int>(() => child1.Id);
-            toddler2.MasterTemplateAlias = child1.Alias;
-            toddler2.MasterTemplateId = new Lazy<int>(() => child1.Id);
+            child1.LayoutTemplateAlias = parent.Alias;
+            child1.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+            child2.LayoutTemplateAlias = parent.Alias;
+            child2.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+            toddler1.LayoutTemplateAlias = child1.Alias;
+            toddler1.LayoutTemplateId = new Lazy<int>(() => child1.Id);
+            toddler2.LayoutTemplateAlias = child1.Alias;
+            toddler2.LayoutTemplateId = new Lazy<int>(() => child1.Id);
 
             repository.Save(parent);
             repository.Save(child1);
@@ -788,7 +788,8 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             repository.Save(toddler2);
 
             // Act
-            toddler2.SetMasterTemplate(child2);
+            toddler2.LayoutTemplateAlias = child2.Alias;
+            toddler2.LayoutTemplateId = new Lazy<int>(() => child2.Id);
             repository.Save(toddler2);
 
             // Assert
@@ -809,15 +810,16 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var parent = new Template(ShortStringHelper, "parent", "parent");
             var child1 = new Template(ShortStringHelper, "child1", "child1")
             {
-                MasterTemplateAlias = parent.Alias,
-                MasterTemplateId = new Lazy<int>(() => parent.Id)
+                LayoutTemplateAlias = parent.Alias,
+                LayoutTemplateId = new Lazy<int>(() => parent.Id)
             };
 
             repository.Save(parent);
             repository.Save(child1);
 
             // Act
-            child1.SetMasterTemplate(null);
+            child1.LayoutTemplateAlias = null;
+            child1.LayoutTemplateId = new Lazy<int>(() => -1);
             repository.Save(child1);
 
             // Assert
@@ -884,6 +886,36 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
             var updatedContent = updatedReader.ReadToEnd();
             Assert.That(updatedContent, Does.Contain("original-content"));
             Assert.That(updatedContent, Does.Not.Contain("modified-content"));
+        }
+    }
+
+    [Test]
+    public void Delete_In_Production_Mode_Does_Not_Remove_File()
+    {
+        // Arrange - create template in development mode first.
+        var provider = ScopeProvider;
+
+        using (provider.CreateScope())
+        {
+            var developmentRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Development);
+            var developmentRepository = CreateRepository(provider, developmentRuntimeSettings);
+
+            var template = new Template(ShortStringHelper, "productionTestDelete", "productionTestDelete") { Content = "mock-content" };
+            developmentRepository.Save(template);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestDelete.cshtml"), Is.True);
+
+            // Act - try to delete in production mode.
+            var productionRuntimeSettings = CreateRuntimeSettingsMonitor(RuntimeMode.Production);
+            var productionRepository = CreateRepository(provider, productionRuntimeSettings);
+
+            var existingTemplate = productionRepository.Get("productionTestDelete");
+            Assert.IsNotNull(existingTemplate);
+
+            productionRepository.Delete(existingTemplate);
+
+            // Assert - database record should be removed but file should still exist.
+            Assert.That(productionRepository.Get("productionTestDelete"), Is.Null);
+            Assert.That(FileSystems.MvcViewsFileSystem.FileExists("productionTestDelete.cshtml"), Is.True);
         }
     }
 
@@ -955,26 +987,26 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         };
         var baby2 = new Template(ShortStringHelper, "baby2", "baby2") { Content = @"<%@ Master Language=""C#"" %>" };
 
-        child1.MasterTemplateAlias = parent.Alias;
-        child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
-        child2.MasterTemplateAlias = parent.Alias;
-        child2.MasterTemplateId = new Lazy<int>(() => parent.Id);
+        child1.LayoutTemplateAlias = parent.Alias;
+        child1.LayoutTemplateId = new Lazy<int>(() => parent.Id);
+        child2.LayoutTemplateAlias = parent.Alias;
+        child2.LayoutTemplateId = new Lazy<int>(() => parent.Id);
 
-        toddler1.MasterTemplateAlias = child1.Alias;
-        toddler1.MasterTemplateId = new Lazy<int>(() => child1.Id);
-        toddler2.MasterTemplateAlias = child1.Alias;
-        toddler2.MasterTemplateId = new Lazy<int>(() => child1.Id);
+        toddler1.LayoutTemplateAlias = child1.Alias;
+        toddler1.LayoutTemplateId = new Lazy<int>(() => child1.Id);
+        toddler2.LayoutTemplateAlias = child1.Alias;
+        toddler2.LayoutTemplateId = new Lazy<int>(() => child1.Id);
 
-        toddler3.MasterTemplateAlias = child2.Alias;
-        toddler3.MasterTemplateId = new Lazy<int>(() => child2.Id);
-        toddler4.MasterTemplateAlias = child2.Alias;
-        toddler4.MasterTemplateId = new Lazy<int>(() => child2.Id);
+        toddler3.LayoutTemplateAlias = child2.Alias;
+        toddler3.LayoutTemplateId = new Lazy<int>(() => child2.Id);
+        toddler4.LayoutTemplateAlias = child2.Alias;
+        toddler4.LayoutTemplateId = new Lazy<int>(() => child2.Id);
 
-        baby1.MasterTemplateAlias = toddler2.Alias;
-        baby1.MasterTemplateId = new Lazy<int>(() => toddler2.Id);
+        baby1.LayoutTemplateAlias = toddler2.Alias;
+        baby1.LayoutTemplateId = new Lazy<int>(() => toddler2.Id);
 
-        baby2.MasterTemplateAlias = toddler4.Alias;
-        baby2.MasterTemplateId = new Lazy<int>(() => toddler4.Id);
+        baby2.LayoutTemplateAlias = toddler4.Alias;
+        baby2.LayoutTemplateId = new Lazy<int>(() => toddler4.Id);
 
         repository.Save(parent);
         repository.Save(child1);
@@ -987,5 +1019,99 @@ internal sealed class TemplateRepositoryTest : UmbracoIntegrationTest
         repository.Save(baby2);
 
         return new[] { parent, child1, child2, toddler1, toddler2, toddler3, toddler4, baby1, baby2 };
+    }
+
+    [Test]
+    public void Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "deepCloneTest", "deepCloneTest");
+            repository.Save(template);
+
+            var first = repository.Get(template.Key);
+            var second = repository.Get(template.Key);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Get_By_Alias_Returns_Correct_Template()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "aliasLookupTest", "aliasLookupTest");
+            repository.Save(template);
+
+            // Case-insensitive alias lookup.
+            var result = repository.Get("ALIASLOOKUPTEST");
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(template.Id, result!.Id);
+        }
+    }
+
+    [Test]
+    public void Get_By_Alias_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "aliasCloneTest", "aliasCloneTest");
+            repository.Save(template);
+
+            var first = repository.Get("aliasCloneTest");
+            var second = repository.Get("aliasCloneTest");
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Exists_By_Guid_Returns_Correct_Result()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "existsTest", "existsTest");
+            repository.Save(template);
+
+            Assert.IsTrue(repository.Exists(template.Key));
+            Assert.IsFalse(repository.Exists(Guid.NewGuid()));
+        }
+    }
+
+    [Test]
+    public void Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        var provider = ScopeProvider;
+        using (provider.CreateScope())
+        {
+            var repository = CreateRepository(provider);
+            var template = new Template(ShortStringHelper, "mutationTest", "mutationTest");
+            repository.Save(template);
+
+            var first = repository.Get(template.Key);
+            Assert.IsNotNull(first);
+            var originalName = first!.Name;
+            first.Name = "MUTATED_" + Guid.NewGuid();
+
+            var second = repository.Get(template.Key);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
+        }
     }
 }

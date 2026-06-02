@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 {
     [SetUp]
-    public void SetUpData() => CreateTestData();
+    public async Task SetUpData() => await CreateTestData();
 
     private ContentType _simpleContentType;
     private ContentType _textpageContentType;
@@ -61,17 +61,17 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
     private ContentTypeRepository ContentTypeRepository =>
         (ContentTypeRepository)GetRequiredService<IContentTypeRepository>();
 
-    public void CreateTestData()
+    public async Task CreateTestData()
     {
         // Create and Save ContentType "umbTextpage" -> (_simpleContentType.Id)
         _simpleContentType =
             ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: 0);
 
-        ContentTypeService.Save(_simpleContentType);
+        await ContentTypeService.CreateAsync(_simpleContentType, Constants.Security.SuperUserKey);
 
         // Create and Save ContentType "textPage" -> (_textpageContentType.Id)
         _textpageContentType = ContentTypeBuilder.CreateTextPageContentType(defaultTemplateId: 0);
-        ContentTypeService.Save(_textpageContentType);
+        await ContentTypeService.CreateAsync(_textpageContentType, Constants.Security.SuperUserKey);
     }
 
     // TODO: Add test to verify SetDefaultTemplates updates both AllowedTemplates and DefaultTemplate(id).
@@ -1168,5 +1168,109 @@ internal sealed class ContentTypeRepositoryTest : UmbracoIntegrationTest
 
         Assert.AreEqual(4, userGroup.GranularPermissions.Count);
         return userGroup;
+    }
+
+    [Test]
+    public void Get_By_Guid_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            var first = repository.Get(_simpleContentType.Key);
+            var second = repository.Get(_simpleContentType.Key);
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Id, second.Id);
+
+            // Must be different object references (deep clones, not the cached original).
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Get_By_Alias_Returns_Correct_ContentType()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            // Case-insensitive alias lookup.
+            var result = repository.Get("UMBTEXTPAGE");
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(_simpleContentType.Id, result!.Id);
+            Assert.AreEqual("umbTextpage", result.Alias);
+        }
+    }
+
+    [Test]
+    public void Get_By_Alias_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            var first = repository.Get("umbTextpage");
+            var second = repository.Get("umbTextpage");
+
+            Assert.IsNotNull(first);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first!.Id, second!.Id);
+            Assert.AreNotSame(first, second);
+        }
+    }
+
+    [Test]
+    public void Exists_By_Guid_Returns_True_For_Existing_Type()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            var exists = repository.Exists(_simpleContentType.Key);
+
+            Assert.IsTrue(exists);
+        }
+    }
+
+    [Test]
+    public void Exists_By_Guid_Returns_False_For_NonExisting_Type()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            var exists = repository.Exists(Guid.NewGuid());
+
+            Assert.IsFalse(exists);
+        }
+    }
+
+    [Test]
+    public void Get_By_Guid_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        var provider = ScopeProvider;
+        using (var scope = provider.CreateScope())
+        {
+            var repository = ContentTypeRepository;
+
+            // Get a content type and mutate its name.
+            var first = repository.Get(_simpleContentType.Key);
+            Assert.IsNotNull(first);
+            var originalName = first!.Name;
+            first.Name = "MUTATED_NAME_" + Guid.NewGuid();
+
+            // A subsequent Get should return an unmodified clone.
+            var second = repository.Get(_simpleContentType.Key);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(originalName, second!.Name, "Mutation of a returned entity should not affect the cached copy");
+        }
     }
 }
