@@ -18,7 +18,7 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
     public IElementVersionService ElementVersionService => GetRequiredService<IElementVersionService>();
 
     [Test]
-    public void PerformElementVersionCleanup_WithNoKeepPeriods_DeletesEverythingExceptActive()
+    public async Task PerformElementVersionCleanup_WithNoKeepPeriods_DeletesEverythingExceptActive()
     {
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
 
@@ -27,7 +27,7 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
         elementType.HistoryCleanup.KeepAllVersionsNewerThanDays = 0;
         elementType.HistoryCleanup.KeepLatestVersionPerDayForDays = 0;
 
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         ElementService.Save(element);
@@ -60,14 +60,14 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void PerformElementVersionCleanup_WithPreventCleanup_DeletesNothing()
+    public async Task PerformElementVersionCleanup_WithPreventCleanup_DeletesNothing()
     {
         var elementType = ContentTypeBuilder.CreateSimpleElementType();
 
         // Retain all historic
         elementType.HistoryCleanup.PreventCleanup = true;
 
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         ElementService.Save(element);
@@ -110,7 +110,7 @@ internal class ElementVersionCleanupServiceTest : UmbracoIntegrationTest
         elementType.HistoryCleanup.KeepAllVersionsNewerThanDays = 0;
         elementType.HistoryCleanup.KeepLatestVersionPerDayForDays = 0;
 
-        ContentTypeService.Save(elementType);
+        await ContentTypeService.CreateAsync(elementType, Constants.Security.SuperUserKey);
 
         var element = ElementBuilder.CreateSimpleElement(elementType);
         ElementService.Save(element);

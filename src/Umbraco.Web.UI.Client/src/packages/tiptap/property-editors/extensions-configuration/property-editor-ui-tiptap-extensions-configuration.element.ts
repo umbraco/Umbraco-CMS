@@ -135,13 +135,11 @@ export class UmbPropertyEditorUiTiptapExtensionsConfigurationElement
 
 		const uncategorizedLabel = this.localize.term('tiptap_extGroup_unknown');
 
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-expect-error
 		const grouped = Object.groupBy(items, (item: UmbTiptapExtensionGroupItem) => item.group || uncategorizedLabel);
 
-		this._groups = Object.keys(grouped)
-			.sort((a, b) => a.localeCompare(b))
-			.map((key) => ({ group: key, extensions: grouped[key] }));
+		this._groups = Object.entries(grouped)
+			.sort(([a], [b]) => a.localeCompare(b))
+			.map(([key, items]) => ({ group: key, extensions: items ?? [] }));
 	}
 
 	override render() {

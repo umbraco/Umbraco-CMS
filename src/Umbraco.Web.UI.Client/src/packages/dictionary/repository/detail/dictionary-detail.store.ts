@@ -15,7 +15,7 @@ export class UmbDictionaryDetailStore extends UmbDetailStoreBase<UmbDictionaryDe
 	 * @memberof UmbDictionaryDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_DICTIONARY_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_DICTIONARY_DETAIL_STORE_CONTEXT);
 	}
 }
 

@@ -52,7 +52,7 @@ internal sealed class ContentCacheRefresherStaleCacheInstructionTests : UmbracoI
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
 
         var contentType = ContentTypeBuilder.CreateSimpleContentType(alias, alias, defaultTemplateId: template.Id);
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ContentBuilder.CreateSimpleContent(contentType, "Test Content");
         ContentService.Save(content);
@@ -122,11 +122,11 @@ internal sealed class ContentCacheRefresherStaleCacheInstructionTests : UmbracoI
     /// for media that has been deleted.
     /// </summary>
     [Test]
-    public void MediaCacheRefresher_Handles_Stale_RefreshBranch_Instruction_For_Deleted_Media()
+    public async Task MediaCacheRefresher_Handles_Stale_RefreshBranch_Instruction_For_Deleted_Media()
     {
         // Arrange - Create media
         var mediaType = MediaTypeBuilder.CreateSimpleMediaType("testMediaType", "Test Media Type");
-        MediaTypeService.Save(mediaType);
+        await MediaTypeService.CreateAsync(mediaType, Constants.Security.SuperUserKey);
 
         var media = MediaBuilder.CreateSimpleMedia(mediaType, "Test Media", -1);
         MediaService.Save(media);

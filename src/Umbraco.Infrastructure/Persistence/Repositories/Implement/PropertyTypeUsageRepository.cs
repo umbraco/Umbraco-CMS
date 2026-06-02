@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 /// <inheritdoc/>
 internal sealed class PropertyTypeUsageRepository : IPropertyTypeUsageRepository
 {
-    private static readonly List<Guid> _nodeObjectTypes =
+    private static readonly Guid[] _nodeObjectTypes =
     [
         Constants.ObjectTypes.DocumentType, Constants.ObjectTypes.MediaType, Constants.ObjectTypes.MemberType,
     ];

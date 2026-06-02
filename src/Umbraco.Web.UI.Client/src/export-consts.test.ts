@@ -6,7 +6,9 @@ describe('Export consts', () => {
 	it('all consts are exported', async () => {
 		const filteredConsts = foundConsts.filter(
 			(foundConst) =>
-				foundConst.path.indexOf('@umbraco-cms/backoffice/external') === -1 && foundConst.consts?.length > 0,
+				foundConst.path.indexOf('@umbraco-cms/backoffice/external') === -1 &&
+				foundConst.path.indexOf('@umbraco-cms/internal/') === -1 &&
+				foundConst.consts?.length > 0,
 		);
 
 		/*console.log(

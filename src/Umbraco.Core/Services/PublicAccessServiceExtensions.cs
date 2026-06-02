@@ -19,7 +19,7 @@ public static class PublicAccessServiceExtensions
     /// <param name="oldRolename">The old role name to find.</param>
     /// <param name="newRolename">The new role name to set.</param>
     /// <returns><c>true</c> if any rules were updated; otherwise, <c>false</c>.</returns>
-    public static bool RenameMemberGroupRoleRules(this IPublicAccessService publicAccessService, string? oldRolename, string? newRolename)
+    public static async Task<bool> RenameMemberGroupRoleRulesAsync(this IPublicAccessService publicAccessService, string? oldRolename, string? newRolename)
     {
         var hasChange = false;
         if (oldRolename == newRolename)
@@ -27,7 +27,7 @@ public static class PublicAccessServiceExtensions
             return false;
         }
 
-        IEnumerable<PublicAccessEntry> allEntries = publicAccessService.GetAll();
+        IEnumerable<PublicAccessEntry> allEntries = await publicAccessService.GetAllAsync();
 
         foreach (PublicAccessEntry entry in allEntries)
         {
@@ -46,7 +46,7 @@ public static class PublicAccessServiceExtensions
             if (save)
             {
                 hasChange = true;
-                publicAccessService.Save(entry);
+                await publicAccessService.SaveAsync(entry);
             }
         }
 
@@ -62,7 +62,7 @@ public static class PublicAccessServiceExtensions
     /// <param name="username">The username to check access for.</param>
     /// <param name="currentMemberRoles">The current member roles of the user.</param>
     /// <returns><c>true</c> if the user has access; otherwise, <c>false</c>.</returns>
-    public static bool HasAccess(this IPublicAccessService publicAccessService, int documentId, IContentService contentService, string username, IEnumerable<string> currentMemberRoles)
+    public static async Task<bool> HasAccessAsync(this IPublicAccessService publicAccessService, int documentId, IContentService contentService, string username, IEnumerable<string> currentMemberRoles)
     {
         IContent? content = contentService.GetById(documentId);
         if (content == null)
@@ -70,7 +70,7 @@ public static class PublicAccessServiceExtensions
             return true;
         }
 
-        PublicAccessEntry? entry = publicAccessService.GetEntryForContent(content);
+        PublicAccessEntry? entry = await publicAccessService.GetEntryForContentAsync(content);
         if (entry == null)
         {
             return true;
@@ -105,7 +105,7 @@ public static class PublicAccessServiceExtensions
             throw new ArgumentException("Value cannot be null or whitespace.", "path");
         }
 
-        PublicAccessEntry? entry = publicAccessService.GetEntryForContent(path.EnsureEndsWith(path));
+        PublicAccessEntry? entry = await publicAccessService.GetEntryForContentAsync(path);
         if (entry == null)
         {
             return true;

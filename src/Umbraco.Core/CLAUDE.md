@@ -263,7 +263,8 @@ public class MyEntityCacheRefresher : CacheRefresherBase<MyEntityCacheRefresher>
 - `IMediaService` - Media operations
 - `IDataTypeService` - Data type configuration
 - `IUserService` - User management
-- `ILocalizationService` - Languages and dictionary
+- `ILanguageService` - Languages
+- `IDictionaryItemService` - Dictionary items
 - `IRelationService` - Entity relationships
 
 #### Content Models
@@ -304,6 +305,8 @@ public class MyEntityCacheRefresher : CacheRefresherBase<MyEntityCacheRefresher>
    - Result pattern for operations that can fail
    - `Attempt.Succeed(value)` / `Attempt.Fail<T>()`
    - `Attempt<Content, ContentEditingOperationStatus>` - typed result with status
+
+> Writing or reviewing a query with a `WHERE IN` on a runtime-sized collection? See "Avoiding the SQL Server 2100-parameter limit" in `/src/Umbraco.Infrastructure/CLAUDE.md` — that's where the full helper list (`Constants.Sql.MaxParameterCount`, `InGroupsOf`, NPoco's `FetchByGroups`) and the decision rules live.
 
 ### Configuration
 

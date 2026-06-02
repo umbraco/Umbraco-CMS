@@ -116,18 +116,18 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
         }
 
         // TODO: this list somehow also exists in constants, see memberTypeRepository => remove duplicate!
-        private static readonly Dictionary<string, int> _builtinMemberProperties = new Dictionary<string, int>
-        {
-            { nameof(IMember.Email), Constants.DataTypes.Textbox },
-            { nameof(IMember.Username), Constants.DataTypes.Textbox },
-            { nameof(IMember.Comments), Constants.DataTypes.Textbox },
-            { nameof(IMember.IsApproved), Constants.DataTypes.Boolean },
-            { nameof(IMember.IsLockedOut), Constants.DataTypes.Boolean },
-            { nameof(IMember.LastLockoutDate), Constants.DataTypes.LabelDateTime },
-            { nameof(IMember.CreateDate), Constants.DataTypes.LabelDateTime },
-            { nameof(IMember.LastLoginDate), Constants.DataTypes.LabelDateTime },
-            { nameof(IMember.LastPasswordChangeDate), Constants.DataTypes.LabelDateTime },
-        };
+        private static readonly (string Alias, int DataTypeId)[] _builtinMemberProperties =
+        [
+            (nameof(IMember.Email), Constants.DataTypes.Textbox),
+            (nameof(IMember.Username), Constants.DataTypes.Textbox),
+            (nameof(IMember.Comments), Constants.DataTypes.Textbox),
+            (nameof(IMember.IsApproved), Constants.DataTypes.Boolean),
+            (nameof(IMember.IsLockedOut), Constants.DataTypes.Boolean),
+            (nameof(IMember.LastLockoutDate), Constants.DataTypes.LabelDateTime),
+            (nameof(IMember.CreateDate), Constants.DataTypes.LabelDateTime),
+            (nameof(IMember.LastLoginDate), Constants.DataTypes.LabelDateTime),
+            (nameof(IMember.LastPasswordChangeDate), Constants.DataTypes.LabelDateTime)
+        ];
 
         #region Content type
 

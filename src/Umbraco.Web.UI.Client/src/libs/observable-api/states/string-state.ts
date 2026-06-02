@@ -1,5 +1,3 @@
-import type { MappingFunction, MemoizationFunction } from '../types/index.js';
-import { createObservablePart, strictEqualityMemoization } from '../utils/index.js';
 import { UmbBasicState } from './basic-state.js';
 
 /**
@@ -10,12 +8,5 @@ import { UmbBasicState } from './basic-state.js';
 export class UmbStringState<T> extends UmbBasicState<T | string> {
 	constructor(initialData: T | string) {
 		super(initialData);
-	}
-
-	asObservablePart<ReturnType>(
-		mappingFunction: MappingFunction<T | string, ReturnType>,
-		memoizationFunction?: MemoizationFunction<ReturnType>,
-	) {
-		return createObservablePart(this._subject, mappingFunction, memoizationFunction ?? strictEqualityMemoization);
 	}
 }

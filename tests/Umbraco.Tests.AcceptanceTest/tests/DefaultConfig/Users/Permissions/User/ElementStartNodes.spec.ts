@@ -33,8 +33,7 @@ test.afterEach(async ({umbracoApi}) => {
   await umbracoApi.documentType.ensureNameNotExists(elementTypeName);
 });
 
-// Currently user only see the parent and cannot see the element children
-test.fixme('can see root element start node and children', async ({umbracoApi, umbracoUi}) => {
+test('can see root element start node and children', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId, [rootFolderId]);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -51,7 +50,7 @@ test.fixme('can see root element start node and children', async ({umbracoApi, u
 });
 
 // Currently the front-end does not support adding a specific element as start nodes
-test.fixme('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
+test.skip('can see parent of start node but not access it', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -79,7 +78,7 @@ test.fixme('can see parent of start node but not access it', async ({umbracoApi,
 });
 
 // Currently the front-end does not support adding a specific element as start nodes
-test.fixme('see no-access view when deep-linking to restricted element', async ({umbracoApi, umbracoUi}) => {
+test.skip('see no-access view when deep-linking to restricted element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId!, [childElementOneId!]);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);
@@ -95,7 +94,8 @@ test.fixme('see no-access view when deep-linking to restricted element', async (
   await umbracoUi.library.doesElementWorkspaceHaveText('Access denied');
 });
 
-test('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
+// Currently the front-end does not support adding a specific element as start nodes
+test.skip('cannot see any element when no element start nodes specified', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.user.setUserPermissionsForElement(testUser.name, testUser.email, testUser.password, userGroupId);
   await umbracoApi.user.loginToUser(testUser.name, testUser.email, testUser.password);

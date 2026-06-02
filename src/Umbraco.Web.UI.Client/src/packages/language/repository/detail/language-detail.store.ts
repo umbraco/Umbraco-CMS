@@ -15,7 +15,7 @@ export class UmbLanguageDetailStore extends UmbDetailStoreBase<UmbLanguageDetail
 	 * @memberof UmbLanguageDetailStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_LANGUAGE_DETAIL_STORE_CONTEXT.toString());
+		super(host, UMB_LANGUAGE_DETAIL_STORE_CONTEXT);
 	}
 }
 

@@ -71,6 +71,7 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
         PropertyEditorCollection propertyEditors,
         DataValueReferenceFactoryCollection dataValueReferenceFactories,
         IDataTypeService dataTypeService,
+        IIdKeyMap idKeyMap,
         IJsonSerializer serializer,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
@@ -88,6 +89,7 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
             propertyEditors,
             dataValueReferenceFactories,
             dataTypeService,
+            idKeyMap,
             serializer,
             eventAggregator,
             repositoryCacheVersionService,
@@ -136,6 +138,7 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
                 propertyEditors,
                 dataValueReferenceFactories,
                 dataTypeService,
+                StaticServiceProvider.Instance.GetRequiredService<IIdKeyMap>(),
                 serializer,
                 eventAggregator,
                 repositoryCacheVersionService,
@@ -183,9 +186,13 @@ internal class DocumentRepository : PublishableContentRepositoryBase<IContent, D
                 templateIds.Add(temp.Template1Id.Value);
             }
 
-            if (dto.Published)
+            // Defensive check: same inconsistent-state guard as in MapDtosToContent — if dto.Published is
+            // true but PublishedVersionDto is null, treat the document as unpublished and skip loading the
+            // published template to avoid a NRE.
+            // See https://github.com/umbraco/Umbraco-CMS/issues/22293.
+            if (dto.Published && dto.PublishedVersionDto is not null)
             {
-                temp.Template2Id = dto.PublishedVersionDto!.TemplateId;
+                temp.Template2Id = dto.PublishedVersionDto.TemplateId;
                 if (temp.Template2Id.HasValue)
                 {
                     templateIds.Add(temp.Template2Id.Value);

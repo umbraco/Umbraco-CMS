@@ -362,6 +362,7 @@ export default {
 		constrainProportions: '強制屬性',
 		continue: '繼續',
 		copy: '複製',
+		copied: '已複製！',
 		create: '創建',
 		database: '資料庫',
 		date: '時間',
@@ -571,8 +572,6 @@ export default {
 		instruction: '下方登入',
 		signInWith: '登入使用',
 		timeout: '連線時間過了',
-		bottomText:
-			'<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ',
 		forgottenPassword: '忘記密碼？',
 		forgottenPasswordInstruction: '一封內有重設密碼連結的電子郵件已經寄出給您',
 		requestPasswordResetConfirmation: '一封內有重設密碼連結的電子郵件已經寄到此信箱',
@@ -580,9 +579,6 @@ export default {
 		setPasswordInstruction: '請輸入新密碼',
 		setPasswordConfirmation: '您的密碼已經更新',
 		resetCodeExpired: '您點選的連結是無效或過期的',
-		resetPasswordEmailCopySubject: 'Umbraco：重設密碼',
-		resetPasswordEmailCopyFormat:
-			'<p>您登入到後台的使用者名稱是：<strong>%0%</strong></p><p>點選<a href="%1%"><strong>這裡</strong></a>來重設您的密碼或將此連結複製/貼上到您的瀏覽器：</p><p><em>%1%</em></p>',
 	},
 	main: {
 		dashboard: '儀錶板',
@@ -1042,6 +1038,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: '停止網址追蹤器',
 		enableUrlTracker: '啟動網址追蹤器',
+		urlTrackerEnabled: '已啟用',
+		urlTrackerDisabled: '已停用',
 		originalUrl: '原本網址',
 		redirectedTo: '轉址成',
 		noRedirects: '沒有任何轉址',

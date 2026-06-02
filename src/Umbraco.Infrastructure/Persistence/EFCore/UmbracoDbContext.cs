@@ -66,6 +66,20 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<AuditEntryDto> AuditEntries { get; set; }
 
+    public required DbSet<LongRunningOperationDto> LongRunningOperations { get; set; }
+
+    public required DbSet<RelationDto> Relations { get; set; }
+
+    public required DbSet<RelationTypeDto> RelationTypes { get; set; }
+
+    public required DbSet<ContentVersionCleanupPolicyDto> ContentVersionCleanupPolicies { get; set; }
+
+    public required DbSet<AccessDto> Access { get; set; }
+
+    public required DbSet<AccessRuleDto> AccessRules { get; set; }
+
+    public required DbSet<DistributedJobDto> DistributedJob { get; set; }
+
     public required DbSet<ConsentDto> Consents { get; set; }
 
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)

@@ -215,7 +215,9 @@ public class BlockGridPropertyValueConverterTests : BlockPropertyValueConverterT
             new ApiElementBuilder(Mock.Of<IOutputExpansionStrategyAccessor>()),
             new BlockGridPropertyValueConstructorCache(),
             Mock.Of<IVariationContextAccessor>(),
-            blockVarianceHandler);
+            blockVarianceHandler,
+            Mock.Of<ILanguageService>(),
+            Mock.Of<IPropertyRenderingContextAccessor>());
         return editor;
     }
 

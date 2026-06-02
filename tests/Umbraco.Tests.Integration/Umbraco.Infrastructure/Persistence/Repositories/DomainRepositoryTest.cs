@@ -378,4 +378,82 @@ internal sealed class DomainRepositoryTest : UmbracoIntegrationTest
 
         efCoreScope.Complete();
     }
+
+    [Test]
+    public async Task GetByName_Returns_Deep_Clone_Not_Cached_Instance()
+    {
+        var content = (await CreateTestDataAsync("en-AU")).Content;
+        using var efCoreScope = NewScopeProvider.CreateScope();
+        var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+
+        var domain = (IDomain)new UmbracoDomain("clone-test.com") { RootContentId = content.Id, LanguageId = lang!.Id };
+        await DomainRepository.SaveAsync(domain, CancellationToken.None);
+
+        var first = await DomainRepository.GetByNameAsync("clone-test.com");
+        var second = await DomainRepository.GetByNameAsync("clone-test.com");
+
+        Assert.IsNotNull(first);
+        Assert.IsNotNull(second);
+        Assert.AreEqual(first!.Id, second!.Id);
+        Assert.AreNotSame(first, second);
+
+        efCoreScope.Complete();
+    }
+
+    [Test]
+    public async Task Exists_By_Name_Returns_Correct_Result()
+    {
+        var content = (await CreateTestDataAsync("en-AU")).Content;
+        using var efCoreScope = NewScopeProvider.CreateScope();
+        var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+
+        var domain = (IDomain)new UmbracoDomain("exists-test.com") { RootContentId = content.Id, LanguageId = lang!.Id };
+        await DomainRepository.SaveAsync(domain, CancellationToken.None);
+
+        Assert.IsTrue(await DomainRepository.ExistsAsync("exists-test.com"));
+        Assert.IsFalse(await DomainRepository.ExistsAsync("nonexistent.com"));
+
+        efCoreScope.Complete();
+    }
+
+    [Test]
+    public async Task GetByName_Mutation_Does_Not_Affect_Subsequent_Get()
+    {
+        var content = (await CreateTestDataAsync("en-AU")).Content;
+        using var efCoreScope = NewScopeProvider.CreateScope();
+        var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+
+        var domain = (IDomain)new UmbracoDomain("mutation-test.com") { RootContentId = content.Id, LanguageId = lang!.Id };
+        await DomainRepository.SaveAsync(domain, CancellationToken.None);
+
+        var first = await DomainRepository.GetByNameAsync("mutation-test.com");
+        Assert.IsNotNull(first);
+        var originalName = first!.DomainName;
+        first.DomainName = "MUTATED_" + Guid.NewGuid();
+
+        var second = await DomainRepository.GetByNameAsync("mutation-test.com");
+        Assert.IsNotNull(second);
+        Assert.AreEqual(originalName, second!.DomainName, "Mutation of a returned entity should not affect the cached copy");
+
+        efCoreScope.Complete();
+    }
+
+    [Test]
+    public async Task GetAssignedDomains_Returns_Only_Matching_Domains()
+    {
+        var content = (await CreateTestDataAsync("en-AU")).Content;
+        using var efCoreScope = NewScopeProvider.CreateScope();
+        var lang = await LanguageRepository.GetByIsoCodeAsync("en-AU");
+
+        await DomainRepository.SaveAsync((IDomain)new UmbracoDomain("assigned1.com") { RootContentId = content.Id, LanguageId = lang!.Id }, CancellationToken.None);
+        await DomainRepository.SaveAsync((IDomain)new UmbracoDomain("assigned2.com") { RootContentId = content.Id, LanguageId = lang.Id }, CancellationToken.None);
+
+        var assigned = (await DomainRepository.GetAssignedDomainsAsync(content.Key, true)).ToArray();
+        Assert.AreEqual(2, assigned.Length);
+
+        var unassigned = (await DomainRepository.GetAssignedDomainsAsync(Guid.NewGuid(), true)).ToArray();
+        Assert.AreEqual(0, unassigned.Length);
+
+        efCoreScope.Complete();
+    }
 }

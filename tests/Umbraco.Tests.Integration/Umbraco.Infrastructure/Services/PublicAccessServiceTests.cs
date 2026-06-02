@@ -23,7 +23,7 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey); // else, FK violation on contentType!
 
         var ct = ContentTypeBuilder.CreateSimpleContentType("blah", "Blah", defaultTemplateId: template.Id);
-        ContentTypeService.Save(ct);
+        await ContentTypeService.CreateAsync(ct, Constants.Security.SuperUserKey);
 
         _content = ContentBuilder.CreateSimpleContent(ct, "Test");
         ContentService.Save(_content);
@@ -33,21 +33,19 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
 
     private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
-    private IFileService FileService => GetRequiredService<IFileService>();
-
     private IPublicAccessService PublicAccessService => GetRequiredService<IPublicAccessService>();
 
     private Content _content;
 
     [Test]
-    public void Can_Add_New_Entry()
+    public async Task Can_Add_New_Entry()
     {
         // Arrange
         PublicAccessRule[] rules = { new PublicAccessRule { RuleType = "TestType", RuleValue = "TestVal" } };
         var entry = new PublicAccessEntry(_content, _content, _content, rules);
 
         // Act
-        var result = PublicAccessService.Save(entry);
+        var result = await PublicAccessService.SaveAsync(entry);
 
         // Assert
         Assert.IsTrue(result.Success);
@@ -60,18 +58,18 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Add_Rule()
+    public async Task Can_Add_Rule()
     {
         // Arrange
         PublicAccessRule[] rules = { new PublicAccessRule { RuleType = "TestType", RuleValue = "TestVal" } };
         var entry = new PublicAccessEntry(_content, _content, _content, rules);
-        PublicAccessService.Save(entry);
+        await PublicAccessService.SaveAsync(entry);
 
         // Act
-        var updated = PublicAccessService.AddRule(_content, "TestType2", "AnotherVal");
+        var updated = await PublicAccessService.AddRuleAsync(_content, "TestType2", "AnotherVal");
 
         // re-get
-        entry = PublicAccessService.GetEntryForContent(_content);
+        entry = await PublicAccessService.GetEntryForContentAsync(_content);
 
         // Assert
         Assert.IsTrue(updated.Success);
@@ -80,19 +78,19 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Add_Multiple_Value_For_Same_Rule_Type()
+    public async Task Can_Add_Multiple_Value_For_Same_Rule_Type()
     {
         // Arrange
         PublicAccessRule[] rules = { new PublicAccessRule { RuleType = "TestType", RuleValue = "TestVal" } };
         var entry = new PublicAccessEntry(_content, _content, _content, rules);
-        PublicAccessService.Save(entry);
+        await PublicAccessService.SaveAsync(entry);
 
         // Act
-        var updated1 = PublicAccessService.AddRule(_content, "TestType", "AnotherVal1");
-        var updated2 = PublicAccessService.AddRule(_content, "TestType", "AnotherVal2");
+        var updated1 = await PublicAccessService.AddRuleAsync(_content, "TestType", "AnotherVal1");
+        var updated2 = await PublicAccessService.AddRuleAsync(_content, "TestType", "AnotherVal2");
 
         // re-get
-        entry = PublicAccessService.GetEntryForContent(_content);
+        entry = await PublicAccessService.GetEntryForContentAsync(_content);
 
         // Assert
         Assert.IsTrue(updated1.Success);
@@ -103,7 +101,7 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
     }
 
     [Test]
-    public void Can_Remove_Rule()
+    public async Task Can_Remove_Rule()
     {
         // Arrange
         PublicAccessRule[] rules =
@@ -112,13 +110,13 @@ internal sealed class PublicAccessServiceTests : UmbracoIntegrationTest
             new PublicAccessRule {RuleType = "TestType", RuleValue = "TestValue2"}
         };
         var entry = new PublicAccessEntry(_content, _content, _content, rules);
-        PublicAccessService.Save(entry);
+        await PublicAccessService.SaveAsync(entry);
 
         // Act
-        var removed = PublicAccessService.RemoveRule(_content, "TestType", "TestValue1");
+        var removed = await PublicAccessService.RemoveRuleAsync(_content, "TestType", "TestValue1");
 
         // re-get
-        entry = PublicAccessService.GetEntryForContent(_content);
+        entry = await PublicAccessService.GetEntryForContentAsync(_content);
 
         // Assert
         Assert.IsTrue(removed.Success);

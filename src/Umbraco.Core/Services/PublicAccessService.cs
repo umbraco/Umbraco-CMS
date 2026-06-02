@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Scoping.EFCore;
 using Umbraco.Cms.Core.Services.OperationStatus;
 using Umbraco.Extensions;
 
@@ -13,7 +14,7 @@ namespace Umbraco.Cms.Core.Services;
 /// <summary>
 ///     Implements <see cref="IPublicAccessService" /> providing operations for managing public access entries and rules.
 /// </summary>
-internal sealed class PublicAccessService : RepositoryService, IPublicAccessService
+internal sealed class PublicAccessService : AsyncRepositoryService, IPublicAccessService
 {
     private readonly IPublicAccessRepository _publicAccessRepository;
     private readonly IEntityService _entityService;
@@ -31,7 +32,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     /// <param name="contentService">The content service for content-related operations.</param>
     /// <param name="idKeyMap">The ID-key map for converting between IDs and keys.</param>
     public PublicAccessService(
-        ICoreScopeProvider provider,
+        IScopeProvider provider,
         ILoggerFactory loggerFactory,
         IEventMessagesFactory eventMessagesFactory,
         IPublicAccessRepository publicAccessRepository,
@@ -50,12 +51,13 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     ///     Gets all defined entries and associated rules
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<PublicAccessEntry> GetAll()
+    public async Task<IEnumerable<PublicAccessEntry>> GetAllAsync()
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
-        {
-            return _publicAccessRepository.GetMany();
-        }
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        IEnumerable<PublicAccessEntry> entries = await _publicAccessRepository.GetAllAsync(CancellationToken.None);
+        scope.Complete();
+
+        return entries;
     }
 
     /// <summary>
@@ -63,8 +65,8 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     /// </summary>
     /// <param name="content"></param>
     /// <returns>Returns null if no entry is found</returns>
-    public PublicAccessEntry? GetEntryForContent(IContent content) =>
-        GetEntryForContent(content.Path.EnsureEndsWith("," + content.Id));
+    public async Task<PublicAccessEntry?> GetEntryForContentAsync(IContent content) =>
+        await GetEntryForContentAsync(content.Path.EnsureEndsWith("," + content.Id));
 
     /// <summary>
     ///     Gets the entry defined for the content item based on a content path
@@ -74,27 +76,27 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     /// <remarks>
     ///     NOTE: This method get's called *very* often! This will return the results from cache
     /// </remarks>
-    public PublicAccessEntry? GetEntryForContent(string contentPath)
+    public async Task<PublicAccessEntry?> GetEntryForContentAsync(string contentPath)
     {
         // Get all ids in the path for the content item and ensure they all
         // parse to ints that are not -1.
         // Start with the deepest id.
         IEnumerable<int> ids = contentPath.GetIdsFromPathReversed().Where(x => x != -1);
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope(autoComplete: true))
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        // This will retrieve from cache!
+        var entries = (await _publicAccessRepository.GetAllAsync(CancellationToken.None)).ToList();
+        foreach (var id in ids)
         {
-            // This will retrieve from cache!
-            var entries = _publicAccessRepository.GetMany().ToList();
-            foreach (var id in ids)
+            PublicAccessEntry? found = entries.Find(x => x.ProtectedNodeId == id);
+            if (found != null)
             {
-                PublicAccessEntry? found = entries.Find(x => x.ProtectedNodeId == id);
-                if (found != null)
-                {
-                    return found;
-                }
+                scope.Complete();
+                return found;
             }
         }
 
+        scope.Complete();
         return null;
     }
 
@@ -103,9 +105,9 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     /// </summary>
     /// <param name="content"></param>
     /// <returns></returns>
-    public Attempt<PublicAccessEntry?> IsProtected(IContent content)
+    public async Task<Attempt<PublicAccessEntry?>> IsProtectedAsync(IContent content)
     {
-        PublicAccessEntry? result = GetEntryForContent(content);
+        PublicAccessEntry? result = await GetEntryForContentAsync(content);
         return Attempt.If(result != null, result);
     }
 
@@ -114,9 +116,9 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     /// </summary>
     /// <param name="contentPath"></param>
     /// <returns></returns>
-    public Attempt<PublicAccessEntry?> IsProtected(string contentPath)
+    public async Task<Attempt<PublicAccessEntry?>> IsProtectedAsync(string contentPath)
     {
-        PublicAccessEntry? result = GetEntryForContent(contentPath);
+        PublicAccessEntry? result = await GetEntryForContentAsync(contentPath);
         return Attempt.If(result != null, result);
     }
 
@@ -127,44 +129,46 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     /// <param name="ruleType"></param>
     /// <param name="ruleValue"></param>
     /// <returns></returns>
-    public Attempt<OperationResult<OperationResultType, PublicAccessEntry>?> AddRule(IContent content, string ruleType, string ruleValue)
+    public async Task<Attempt<OperationResult<OperationResultType, PublicAccessEntry>?>> AddRuleAsync(IContent content, string ruleType, string ruleValue)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
         PublicAccessEntry? entry;
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+
+        using ICoreScope scope = ScopeProvider.CreateScope();
+        entry = (await _publicAccessRepository.GetAllAsync(CancellationToken.None)).FirstOrDefault(x => x.ProtectedNodeId == content.Id);
+
+        if (entry == null)
         {
-            entry = _publicAccessRepository.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
-            if (entry == null)
-            {
-                return OperationResult.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback
-            }
-
-            PublicAccessRule? existingRule =
-                entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
-            if (existingRule == null)
-            {
-                entry.AddRule(ruleValue, ruleType);
-            }
-            else
-            {
-                // If they are both the same already then there's nothing to update, exit
-                return OperationResult.Attempt.Succeed(evtMsgs, entry);
-            }
-
-            var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotifiation))
-            {
-                scope.Complete();
-                return OperationResult.Attempt.Cancel(evtMsgs, entry);
-            }
-
-            _publicAccessRepository.Save(entry);
-
             scope.Complete();
-
-            scope.Notifications.Publish(
-                new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
+            return OperationResult.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback
         }
+
+        PublicAccessRule? existingRule =
+            entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
+        if (existingRule == null)
+        {
+            entry.AddRule(ruleValue, ruleType);
+        }
+        else
+        {
+            scope.Complete();
+            // If they are both the same already then there's nothing to update, exit
+            return OperationResult.Attempt.Succeed(evtMsgs, entry);
+        }
+
+        var savingNotification = new PublicAccessEntrySavingNotification(entry, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
+        {
+            scope.Complete();
+            return OperationResult.Attempt.Cancel(evtMsgs, entry);
+        }
+
+        await _publicAccessRepository.SaveAsync(entry, CancellationToken.None);
+
+        scope.Complete();
+
+        scope.Notifications.Publish(
+            new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotification));
 
         return OperationResult.Attempt.Succeed(evtMsgs, entry);
     }
@@ -175,40 +179,40 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     /// <param name="content"></param>
     /// <param name="ruleType"></param>
     /// <param name="ruleValue"></param>
-    public Attempt<OperationResult?> RemoveRule(IContent content, string ruleType, string ruleValue)
+    public async Task<Attempt<OperationResult?>> RemoveRuleAsync(IContent content, string ruleType, string ruleValue)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
-        PublicAccessEntry? entry;
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+
+        using ICoreScope scope = ScopeProvider.CreateScope();
+
+        PublicAccessEntry? entry = (await _publicAccessRepository.GetAllAsync(CancellationToken.None))
+            .FirstOrDefault(x => x.ProtectedNodeId == content.Id);
+        if (entry == null)
         {
-            entry = _publicAccessRepository.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
-            if (entry == null)
-            {
-                return Attempt<OperationResult?>.Fail(); // causes rollback // causes rollback
-            }
-
-            PublicAccessRule? existingRule =
-                entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
-            if (existingRule == null)
-            {
-                return Attempt<OperationResult?>.Fail(); // causes rollback // causes rollback
-            }
-
-            entry.RemoveRule(existingRule);
-
-            var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotifiation))
-            {
-                scope.Complete();
-                return OperationResult.Attempt.Cancel(evtMsgs);
-            }
-
-            _publicAccessRepository.Save(entry);
-            scope.Complete();
-
-            scope.Notifications.Publish(
-                new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
+            return Attempt<OperationResult?>.Fail(); // causes rollback
         }
+
+        PublicAccessRule? existingRule =
+            entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
+        if (existingRule == null)
+        {
+            return Attempt<OperationResult?>.Fail(); // causes rollback
+        }
+
+        entry.RemoveRule(existingRule);
+
+        var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotifiation))
+        {
+            scope.Complete();
+            return OperationResult.Attempt.Cancel(evtMsgs);
+        }
+
+        await _publicAccessRepository.SaveAsync(entry, CancellationToken.None);
+        scope.Complete();
+
+        scope.Notifications.Publish(
+            new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
 
         return OperationResult.Attempt.Succeed(evtMsgs);
     }
@@ -217,25 +221,24 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     ///     Saves the entry
     /// </summary>
     /// <param name="entry"></param>
-    public Attempt<OperationResult?> Save(PublicAccessEntry entry)
+    public async Task<Attempt<OperationResult?>> SaveAsync(PublicAccessEntry entry)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateScope();
+
+        var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotifiation))
         {
-            var savingNotifiation = new PublicAccessEntrySavingNotification(entry, evtMsgs);
-            if (scope.Notifications.PublishCancelable(savingNotifiation))
-            {
-                scope.Complete();
-                return OperationResult.Attempt.Cancel(evtMsgs);
-            }
-
-            _publicAccessRepository.Save(entry);
             scope.Complete();
-
-            scope.Notifications.Publish(
-                new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
+            return OperationResult.Attempt.Cancel(evtMsgs);
         }
+
+        await _publicAccessRepository.SaveAsync(entry, CancellationToken.None);
+        scope.Complete();
+
+        scope.Notifications.Publish(
+            new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
 
         return OperationResult.Attempt.Succeed(evtMsgs);
     }
@@ -256,7 +259,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
 
         var publicAccessEntry = new PublicAccessEntry(validationAttempt.Result.ProtectedNode!, validationAttempt.Result.LoginNode!, validationAttempt.Result.ErrorNode!, publicAccessRules);
 
-        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> attempt = await SaveAsync(publicAccessEntry);
+        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> attempt = await SaveEntryAsync(publicAccessEntry);
         return attempt.Success ? Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, attempt.Result!)
                 : Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(attempt.Status, null);
     }
@@ -266,25 +269,24 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     /// </summary>
     /// <param name="entry">The <see cref="PublicAccessEntry" /> to save.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="Attempt{TResult,TStatus}" /> with the saved entry and operation status.</returns>
-    private async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> SaveAsync(PublicAccessEntry entry)
+    private async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> SaveEntryAsync(PublicAccessEntry entry)
     {
         EventMessages eventMessages = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateScope();
+
+        var savingNotification = new PublicAccessEntrySavingNotification(entry, eventMessages);
+        if (await scope.Notifications.PublishCancelableAsync(savingNotification))
         {
-            var savingNotification = new PublicAccessEntrySavingNotification(entry, eventMessages);
-            if (await scope.Notifications.PublishCancelableAsync(savingNotification))
-            {
-                scope.Complete();
-                return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.CancelledByNotification, null);
-            }
-
-            _publicAccessRepository.Save(entry);
             scope.Complete();
-
-            scope.Notifications.Publish(
-                new PublicAccessEntrySavedNotification(entry, eventMessages).WithStateFrom(savingNotification));
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.CancelledByNotification, null);
         }
+
+        await _publicAccessRepository.SaveAsync(entry, CancellationToken.None);
+        scope.Complete();
+
+        scope.Notifications.Publish(
+            new PublicAccessEntrySavedNotification(entry, eventMessages).WithStateFrom(savingNotification));
 
         return Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry);
     }
@@ -351,7 +353,7 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
 
         PublicAccessEntry mappedEntry = MapToUpdatedEntry(entry, currentPublicAccessEntryAttempt.Result!);
 
-        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> attempt = await SaveAsync(mappedEntry);
+        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> attempt = await SaveEntryAsync(mappedEntry);
 
         return attempt.Success
             ? Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, mappedEntry)
@@ -362,46 +364,45 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     ///     Deletes the entry and all associated rules
     /// </summary>
     /// <param name="entry"></param>
-    public Attempt<OperationResult?> Delete(PublicAccessEntry entry)
+    public async Task<Attempt<OperationResult?>> DeleteAsync(PublicAccessEntry entry)
     {
         EventMessages evtMsgs = EventMessagesFactory.Get();
 
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateScope();
+
+        var deletingNotification = new PublicAccessEntryDeletingNotification(entry, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
         {
-            var deletingNotification = new PublicAccessEntryDeletingNotification(entry, evtMsgs);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return OperationResult.Attempt.Cancel(evtMsgs);
-            }
-
-            _publicAccessRepository.Delete(entry);
             scope.Complete();
-
-            scope.Notifications.Publish(
-                new PublicAccessEntryDeletedNotification(entry, evtMsgs).WithStateFrom(deletingNotification));
+            return OperationResult.Attempt.Cancel(evtMsgs);
         }
+
+        await _publicAccessRepository.DeleteAsync(entry, CancellationToken.None);
+        scope.Complete();
+
+        scope.Notifications.Publish(
+            new PublicAccessEntryDeletedNotification(entry, evtMsgs).WithStateFrom(deletingNotification));
 
         return OperationResult.Attempt.Succeed(evtMsgs);
     }
 
     /// <inheritdoc />
-    public Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyAsync(Guid key)
+    public async Task<Attempt<PublicAccessEntry?, PublicAccessOperationStatus>> GetEntryByContentKeyAsync(Guid key)
     {
         IEntitySlim? entity = _entityService.Get(key, UmbracoObjectTypes.Document);
         if (entity is null)
         {
-            return Task.FromResult(Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ContentNotFound, null));
+            return Attempt.FailWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.ContentNotFound, null);
         }
 
-        PublicAccessEntry? entry = GetEntryForContent(entity.Path.EnsureEndsWith("," + entity.Id));
+        PublicAccessEntry? entry = await GetEntryForContentAsync(entity.Path.EnsureEndsWith("," + entity.Id));
 
         if (entry is null)
         {
-            return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.EntryNotFound, null));
+            return Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.EntryNotFound, null);
         }
 
-        return Task.FromResult(Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry));
+        return Attempt.SucceedWithStatus<PublicAccessEntry?, PublicAccessOperationStatus>(PublicAccessOperationStatus.Success, entry);
     }
 
     /// <inheritdoc />
@@ -425,37 +426,35 @@ internal sealed class PublicAccessService : RepositoryService, IPublicAccessServ
     /// <inheritdoc />
     public async Task<Attempt<PublicAccessOperationStatus>> DeleteAsync(Guid key)
     {
-        using (ICoreScope scope = ScopeProvider.CreateCoreScope())
+        using ICoreScope scope = ScopeProvider.CreateScope();
+
+        Attempt<PublicAccessEntry?, PublicAccessOperationStatus> attempt = await GetEntryByContentKeyAsync(key);
+
+        if (attempt.Success is false)
         {
-            Attempt<PublicAccessEntry?, PublicAccessOperationStatus> attempt = await GetEntryByContentKeyAsync(key);
-
-            if (attempt.Success is false)
-            {
-                return Attempt.Fail(attempt.Status);
-            }
-
-            if (attempt.Result is null)
-            {
-                return Attempt.Fail(PublicAccessOperationStatus.EntryNotFound);
-            }
-
-            EventMessages evtMsgs = EventMessagesFactory.Get();
-
-
-            var deletingNotification = new PublicAccessEntryDeletingNotification(attempt.Result!, evtMsgs);
-            if (scope.Notifications.PublishCancelable(deletingNotification))
-            {
-                scope.Complete();
-                return Attempt.Fail(PublicAccessOperationStatus.CancelledByNotification);
-            }
-
-            _publicAccessRepository.Delete(attempt.Result!);
-
-            scope.Complete();
-
-            scope.Notifications.Publish(
-                new PublicAccessEntryDeletedNotification(attempt.Result!, evtMsgs).WithStateFrom(deletingNotification));
+            return Attempt.Fail(attempt.Status);
         }
+
+        if (attempt.Result is null)
+        {
+            return Attempt.Fail(PublicAccessOperationStatus.EntryNotFound);
+        }
+
+        EventMessages evtMsgs = EventMessagesFactory.Get();
+
+        var deletingNotification = new PublicAccessEntryDeletingNotification(attempt.Result!, evtMsgs);
+        if (await scope.Notifications.PublishCancelableAsync(deletingNotification))
+        {
+            scope.Complete();
+            return Attempt.Fail(PublicAccessOperationStatus.CancelledByNotification);
+        }
+
+        await _publicAccessRepository.DeleteAsync(attempt.Result!, CancellationToken.None);
+
+        scope.Complete();
+
+        scope.Notifications.Publish(
+            new PublicAccessEntryDeletedNotification(attempt.Result!, evtMsgs).WithStateFrom(deletingNotification));
 
         return Attempt.Succeed(PublicAccessOperationStatus.Success);
     }

@@ -39,7 +39,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(RelationTypeOperationStatus.Success, result.Status);
         });
 
-        AssertRelationTypesAreSame(relationType, result.Result);
+        await AssertRelationTypesAreSame(relationType, result.Result);
     }
 
     [Test]
@@ -63,7 +63,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
             Assert.IsTrue(result.Success);
             Assert.AreEqual(RelationTypeOperationStatus.Success, result.Status);
         });
-        AssertRelationTypesAreSame(relationType, result.Result);
+        await AssertRelationTypesAreSame(relationType, result.Result);
     }
 
     [Test]
@@ -106,7 +106,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
             Assert.IsTrue(string.Equals(key, result.Result.Key.ToString(), StringComparison.OrdinalIgnoreCase));
         });
 
-        AssertRelationTypesAreSame(relationType, result.Result);
+        await AssertRelationTypesAreSame(relationType, result.Result);
     }
 
     [Test]
@@ -145,7 +145,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
             Assert.IsNull(result.Result.ParentObjectType);
             Assert.IsNull(result.Result.ChildObjectType);
         });
-        AssertRelationTypesAreSame(relationType, result.Result);
+        await AssertRelationTypesAreSame(relationType, result.Result);
     }
 
     [Test]
@@ -164,7 +164,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
             Assert.AreEqual(RelationTypeOperationStatus.Success, updateResult.Status);
         });
 
-        IRelationType? persisted = RelationService.GetRelationTypeById(updateResult.Result.Key);
+        IRelationType? persisted = await RelationService.GetRelationTypeByKeyAsync(updateResult.Result.Key);
         Assert.IsNotNull(persisted);
         Assert.Multiple(() =>
         {
@@ -174,7 +174,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
         });
     }
 
-    private void AssertRelationTypesAreSame(IRelationTypeWithIsDependency relationType, IRelationType result)
+    private async Task AssertRelationTypesAreSame(IRelationTypeWithIsDependency relationType, IRelationType result)
     {
         Assert.Multiple(() =>
         {
@@ -185,7 +185,7 @@ internal sealed class RelationServiceTests : UmbracoIntegrationTest
             var asWithDependency = (IRelationTypeWithIsDependency)result;
             Assert.AreEqual(relationType.IsDependency, asWithDependency.IsDependency);
         });
-        var persistedRelationType = RelationService.GetRelationTypeById(result.Key);
+        var persistedRelationType = await RelationService.GetRelationTypeByKeyAsync(result.Key);
 
         Assert.AreEqual(result, persistedRelationType);
     }

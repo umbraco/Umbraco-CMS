@@ -2,12 +2,15 @@ using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Extensions;
 
 public static class FriendlyPublishedElementExtensions
 {
     private static IPublishedValueFallback? _publishedValueFallback;
+    private static IVariationContextAccessor? _variationContextAccessor;
+    private static IUserService? _userService;
 
     private static IPublishedValueFallback PublishedValueFallback
     {
@@ -18,7 +21,56 @@ public static class FriendlyPublishedElementExtensions
         }
     }
 
-    internal static void Reset() => _publishedValueFallback = null;
+    private static IVariationContextAccessor VariationContextAccessor
+    {
+        get
+        {
+            _variationContextAccessor ??= StaticServiceProvider.Instance.GetRequiredService<IVariationContextAccessor>();
+            return _variationContextAccessor;
+        }
+    }
+
+    private static IUserService UserService
+    {
+        get
+        {
+            _userService ??= StaticServiceProvider.Instance.GetRequiredService<IUserService>();
+            return _userService;
+        }
+    }
+
+    internal static void Reset()
+    {
+        _publishedValueFallback = null;
+        _variationContextAccessor = null;
+        _userService = null;
+    }
+
+    /// <summary>
+    ///     Gets the name of the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="culture">
+    ///     The specific culture to get the name for. If null is used the current culture is used (Default is
+    ///     null).
+    /// </param>
+    public static string Name(
+        this IPublishedElement content,
+        string? culture = null)
+        => content.Name(VariationContextAccessor, culture);
+
+    /// <summary>
+    ///     Gets the culture date of the content item.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    /// <param name="culture">
+    ///     The specific culture to get the name for. If null is used the current culture is used (Default is
+    ///     null).
+    /// </param>
+    public static DateTime CultureDate(
+        this IPublishedElement content,
+        string? culture = null)
+        => content.CultureDate(VariationContextAccessor, culture);
 
     /// <summary>
     ///     Gets the value of a content's property identified by its alias.
@@ -99,6 +151,20 @@ public static class FriendlyPublishedElementExtensions
     ///     the content is visible.
     /// </remarks>
     public static bool IsVisible(this IPublishedElement content) => content.IsVisible(PublishedValueFallback);
+
+    /// <summary>
+    ///     Gets the name of the content item creator.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    public static string? CreatorName(this IPublishedElement content) =>
+        content.CreatorName(UserService);
+
+    /// <summary>
+    ///     Gets the name of the content item writer.
+    /// </summary>
+    /// <param name="content">The content item.</param>
+    public static string? WriterName(this IPublishedElement content) =>
+        content.WriterName(UserService);
 
     /// <summary>
     ///     Gets the value of a property.

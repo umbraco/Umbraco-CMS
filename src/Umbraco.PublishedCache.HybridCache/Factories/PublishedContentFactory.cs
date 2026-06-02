@@ -12,6 +12,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
 {
     private readonly IElementsCache _elementsCache;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
     private readonly IPublishedContentTypeCache _publishedContentTypeCache;
 
     /// <summary>
@@ -20,10 +21,12 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     public PublishedContentFactory(
         IElementsCache elementsCache,
         IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         IPublishedContentTypeCache publishedContentTypeCache)
     {
         _elementsCache = elementsCache;
         _variationContextAccessor = variationContextAccessor;
+        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
         _publishedContentTypeCache = publishedContentTypeCache;
     }
 
@@ -32,7 +35,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
     {
         ContentNode contentNode = CreateContentNode(contentCacheNode, preview);
 
-        IPublishedContent? publishedContent = GetModel(contentNode, preview);
+        IPublishedContent? publishedContent = GetPublishedContent(contentNode, preview);
 
         if (preview)
         {
@@ -72,7 +75,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             null,
             contentCacheNode.Data);
 
-        return GetModel(contentNode, false);
+        return GetPublishedContent(contentNode, false);
     }
 
     /// <inheritdoc/>
@@ -102,7 +105,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
             contentType,
             null,
             contentData);
-        return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor);
+        return new PublishedMember(member, contentNode, _elementsCache, _variationContextAccessor, _propertyRenderingContextAccessor);
     }
 
     private ContentNode CreateContentNode(ContentCacheNode contentCacheNode, bool preview)
@@ -153,8 +156,7 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
         properties[alias] = new[] { new PropertyData { Value = value, Culture = string.Empty, Segment = string.Empty } };
     }
 
-    // TODO ELEMENTS: rename this to GetPublishedContent
-    private IPublishedContent? GetModel(ContentNode node, bool preview)
+    private IPublishedContent? GetPublishedContent(ContentNode node, bool preview)
     {
         ContentData? contentData = preview ? node.DraftModel : node.PublishedModel;
         return contentData == null
@@ -163,7 +165,8 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
                 node,
                 preview,
                 _elementsCache,
-                _variationContextAccessor);
+                _variationContextAccessor,
+                _propertyRenderingContextAccessor);
     }
 
     private IPublishedElement? GetPublishedElement(ContentNode node, bool preview)
@@ -175,7 +178,8 @@ internal sealed class PublishedContentFactory : IPublishedContentFactory
                 node,
                 preview,
                 _elementsCache,
-                _variationContextAccessor);
+                _variationContextAccessor,
+                _propertyRenderingContextAccessor);
     }
 
     private static IPublishedContent? GetPublishedContentAsDraft(IPublishedContent? content) =>
