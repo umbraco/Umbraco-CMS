@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -291,8 +292,126 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     public abstract Task<PagedModel<TEntity>> GetPagedRecycleBinAsync(long pageIndex, int pageSize, Ordering? ordering, CancellationToken cancellationToken);
 
     /// <inheritdoc />
-    public virtual Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(ContentDataIntegrityReportOptions options, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public virtual async Task<ContentDataIntegrityReport> CheckDataIntegrityAsync(
+        ContentDataIntegrityReportOptions options,
+        CancellationToken cancellationToken) =>
+        await AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            var report = new Dictionary<int, ContentDataIntegrityReportEntry>();
+            var nodesToRebuild = new Dictionary<int, List<NodeDto>>();
+            var validNodes = new Dictionary<int, NodeDto>();
+
+            int[] rootIds = [Constants.System.Root, Constants.System.RecycleBinContent, Constants.System.RecycleBinMedia];
+            var currentParentIds = new HashSet<int>(rootIds);
+            HashSet<int> prevParentIds = currentParentIds;
+            var lastLevel = -1;
+
+            List<NodeDto> nodes = await db.Nodes
+                .Where(n => n.NodeObjectType == NodeObjectTypeKey)
+                .OrderBy(n => n.Level)
+                .ThenBy(n => n.ParentId)
+                .ThenBy(n => n.SortOrder)
+                .ToListAsync(cancellationToken);
+
+            foreach (NodeDto node in nodes)
+            {
+                if (node.Level != lastLevel)
+                {
+                    prevParentIds = currentParentIds;
+                    currentParentIds = new HashSet<int>();
+                    lastLevel = node.Level;
+                }
+
+                currentParentIds.Add(node.NodeId);
+
+                string[] pathParts = node.Path
+                    .Split(Constants.CharArrays.Comma)
+                    .Where(x => !rootIds.Contains(int.Parse(x, CultureInfo.InvariantCulture)))
+                    .ToArray();
+
+                ContentDataIntegrityReport.IssueType? issue = null;
+                if (!prevParentIds.Contains(node.ParentId))
+                {
+                    issue = ContentDataIntegrityReport.IssueType.InvalidPathAndLevelByParentId;
+                }
+                else if (pathParts.Length == 0)
+                {
+                    issue = ContentDataIntegrityReport.IssueType.InvalidPathEmpty;
+                }
+                else if (pathParts.Length != node.Level)
+                {
+                    issue = ContentDataIntegrityReport.IssueType.InvalidPathLevelMismatch;
+                }
+                else if (pathParts[^1] != node.NodeId.ToString())
+                {
+                    issue = ContentDataIntegrityReport.IssueType.InvalidPathById;
+                }
+                else if (!rootIds.Contains(node.ParentId) && pathParts[^2] != node.ParentId.ToString())
+                {
+                    issue = ContentDataIntegrityReport.IssueType.InvalidPathByParentId;
+                }
+
+                if (issue.HasValue)
+                {
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(issue.Value));
+                    AppendNodeToRebuild(nodesToRebuild, node);
+                }
+                else if (options.FixIssues)
+                {
+                    validNodes.Add(node.NodeId, node);
+                }
+            }
+
+            if (options.FixIssues)
+            {
+                var updated = new List<NodeDto>();
+
+                foreach (var (nodeId, validNode) in validNodes)
+                {
+                    if (!nodesToRebuild.TryGetValue(nodeId, out List<NodeDto>? invalidNodes))
+                    {
+                        continue;
+                    }
+
+                    foreach (NodeDto invalidNode in invalidNodes)
+                    {
+                        invalidNode.Level = (short)(validNode.Level + 1);
+                        invalidNode.Path = validNode.Path + "," + invalidNode.NodeId;
+                        updated.Add(invalidNode);
+                    }
+                }
+
+                foreach (NodeDto node in updated)
+                {
+                    await db.Nodes
+                        .Where(n => n.NodeId == node.NodeId)
+                        .ExecuteUpdateAsync(
+                            s => s
+                                .SetProperty(n => n.Level, node.Level)
+                                .SetProperty(n => n.Path, node.Path),
+                            cancellationToken);
+
+                    if (report.TryGetValue(node.NodeId, out ContentDataIntegrityReportEntry? entry))
+                    {
+                        entry.Fixed = true;
+                    }
+                }
+            }
+
+            return new ContentDataIntegrityReport(report);
+        });
+
+    private static void AppendNodeToRebuild(Dictionary<int, List<NodeDto>> nodesToRebuild, NodeDto node)
+    {
+        if (nodesToRebuild.TryGetValue(node.ParentId, out List<NodeDto>? children))
+        {
+            children.Add(node);
+        }
+        else
+        {
+            nodesToRebuild[node.ParentId] = [node];
+        }
+    }
 
     // --- Protected helpers ---
 
