@@ -434,9 +434,7 @@ export class DocumentTypeApiHelper {
   }
 
 
-  async createVariantDocumentTypeWithPropertyEditorTemplateAndAllowedChildNode(documentTypeName: string, dataTypeName: string, dataTypeId: string, templateId: string, isAllowedAsRoot: boolean = false, allowedChildNodeId?: string, groupName: string = "TestGroup") {
-    const crypto = require('crypto');
-    const containerId = crypto.randomUUID();
+  async createVariantDocumentTypeWithTemplateAndAllowedChildNode(documentTypeName: string, templateId: string, isAllowedAsRoot: boolean = false, allowedChildNodeId?: string) {
     await this.ensureNameNotExists(documentTypeName);
 
     const documentTypeBuilder = new DocumentTypeBuilder()
@@ -444,18 +442,6 @@ export class DocumentTypeApiHelper {
       .withAlias(AliasHelper.toAlias(documentTypeName))
       .withAllowedAsRoot(isAllowedAsRoot)
       .withVariesByCulture(true)
-      .addContainer()
-        .withName(groupName)
-        .withId(containerId)
-        .withType("Group")
-        .done()
-      .addProperty()
-        .withContainerId(containerId)
-        .withAlias(AliasHelper.toAlias(dataTypeName))
-        .withName(dataTypeName)
-        .withDataTypeId(dataTypeId)
-        .withVariesByCulture(true)
-        .done()
       .addAllowedTemplateId()
         .withId(templateId)
         .done()

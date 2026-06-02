@@ -1530,7 +1530,7 @@ export class DocumentApiHelper {
     return await this.publish(id, publishScheduleData);
   }
 
-  async createVariantDocumentWithTextContentAndParent(documentTypeId: string, templateId: string, dataTypeName: string, cultureVariants: {isoCode: string, name: string, value: string}[], parentId?: string) {
+  async createVariantDocumentWithParent(documentTypeId: string, templateId: string, name: string, cultures: string[], parentId?: string) {
     const documentBuilder = new DocumentBuilder()
       .withDocumentTypeId(documentTypeId)
       .withTemplateId(templateId);
@@ -1539,34 +1539,11 @@ export class DocumentApiHelper {
       documentBuilder.withParentId(parentId);
     }
 
-    for (const variant of cultureVariants) {
-      documentBuilder
-        .addVariant()
-          .withName(variant.name)
-          .withCulture(variant.isoCode)
-          .done()
-        .addValue()
-          .withAlias(AliasHelper.toAlias(dataTypeName))
-          .withValue(variant.value)
-          .withCulture(variant.isoCode)
-          .withEditorAlias('Umbraco.TextBox')
-          .done();
+    for (const culture of cultures) {
+      documentBuilder.addVariant().withName(name).withCulture(culture).done();
     }
 
     return await this.create(documentBuilder.build());
-  }
-
-  async updateDomainsWithCultures(id: string, domains: {domainName: string, isoCode: string}[], defaultIsoCode: string | null = null) {
-    const domainBuilder = new DocumentDomainBuilder().withDefaultIsoCode(defaultIsoCode);
-    for (const domain of domains) {
-      domainBuilder
-        .addDomain()
-          .withDomainName(domain.domainName)
-          .withIsoCode(domain.isoCode)
-          .done();
-    }
-
-    return await this.updateDomains(id, domainBuilder.build());
   }
 
   async createDocumentWithTextContentAndParent(documentName: string, documentTypeId: string, textContent: string, dataTypeName: string, parentId: string) {

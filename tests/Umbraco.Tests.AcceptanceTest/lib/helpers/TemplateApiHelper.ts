@@ -235,23 +235,6 @@ export class TemplateApiHelper {
     return this.createTemplateWithDisplayingValue(name, templateContent);
   }
 
-  async createTemplateWithDisplayingContentPickerAncestors(name: string, valueAlias: string) {
-    const templateContent =
-      '\n@{' +
-      '\n\tIPublishedContent typedContentPicker = Model.Value<IPublishedContent>("' + valueAlias + '");' +
-      '\n\tif (typedContentPicker != null)' +
-      '\n\t{' +
-      '\n\t\tvar ancestors = typedContentPicker.Ancestors<IPublishedContent>();' +
-      '\n\t\tif (ancestors.Any())' +
-      '\n\t\t{' +
-      '\n\t\t\t<p>Parent:@ancestors.First().Id</p>' +
-      '\n\t\t}' +
-      '\n\t\t<p>Ancestors:@ancestors.Count()</p>' +
-      '\n\t}' +
-      '\n}';
-    return this.createTemplateWithDisplayingValue(name, templateContent);
-  }
-
   async createTemplateWithDisplayingUploadedFileValue(name: string, valueAlias: string) {
     const templateContent =
       '\n@using System.IO;' +
