@@ -887,6 +887,7 @@ export default {
 	},
 	sections: {
 		concierge: 'Conserje',
+		library: 'Biblioteca',
 		content: 'Contenido',
 		courier: 'Mensajero',
 		developer: 'Desarrollador',

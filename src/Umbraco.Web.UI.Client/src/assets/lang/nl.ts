@@ -1188,6 +1188,7 @@ export default {
 	},
 	sections: {
 		content: 'Inhoud',
+		library: 'Bibliotheek',
 		forms: 'Formulieren',
 		media: 'Media',
 		member: 'Leden',
