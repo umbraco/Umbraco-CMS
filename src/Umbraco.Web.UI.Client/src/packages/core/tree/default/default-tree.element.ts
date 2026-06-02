@@ -32,7 +32,11 @@ export class UmbDefaultTreeElement extends UmbLitElement {
 		this._api = value;
 		if (value?.view) {
 			this.observe(value.view.currentView, async (manifest) => {
-				this._viewElement = manifest ? await createExtensionElement(manifest) : null;
+				const element = manifest ? await createExtensionElement(manifest) : null;
+				if (element && 'manifest' in element) {
+					(element as HTMLElement & { manifest: unknown }).manifest = manifest;
+				}
+				this._viewElement = element;
 			});
 		}
 	}
