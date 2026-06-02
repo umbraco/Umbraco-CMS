@@ -88,7 +88,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 				name=${this.item.name}
 				href=${ifDefined(href)}
 				?selectable=${this._isSelectable}
-				?select-only=${this._selectOnly}
+				?select-only=${this._selectOnly || !this._hasChildren}
 				?selected=${this._isSelected}
 				?active=${this._isActive}
 				?has-children=${this._hasChildren}
