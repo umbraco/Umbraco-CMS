@@ -70,6 +70,11 @@ public class ElementPickerPropertyEditor : DataEditor
             {
                 yield break;
             }
+
+            foreach (Guid elementId in elementIds)
+            {
+                yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Element, elementId));
+            }
         }
     }
 
