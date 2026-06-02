@@ -27,7 +27,7 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
         _redirectUrlRepository = redirectUrlRepository;
 
     /// <inheritdoc/>
-    [Obsolete("Use the Register overload that takes newUrl. Scheduled for removal in Umbraco 20.")]
+    [Obsolete("Use RegisterWithStatus instead. Scheduled for removal in Umbraco 20.")]
     public void Register(string url, Guid contentKey, string? culture = null)
         => RegisterWithStatus(url, contentKey, culture);
 
@@ -45,7 +45,7 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
             redir = new RedirectUrl { Key = Guid.NewGuid(), Url = oldUrl, ContentKey = contentKey, Culture = culture };
         }
 
-        EventMessages eventMessages = EventMessagesFactory.Get();
+        var eventMessages = new EventMessages();
         var savingNotification = new RedirectUrlSavingNotification(redir, eventMessages);
 
         if (scope.Notifications.PublishCancelable(savingNotification))

@@ -103,19 +103,20 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     }
 
     [Test]
-    public void Can_Register_Redirect()
+    public void Can_RegisterWithStatus_Redirect()
     {
         const string TestUrl = "testUrl";
 
-        RedirectUrlService.Register(TestUrl, _firstSubPage.Key);
+        var status = RedirectUrlService.RegisterWithStatus(TestUrl, _firstSubPage.Key);
 
         var redirect = RedirectUrlService.GetMostRecentRedirectUrl(TestUrl, CultureEnglish);
 
         Assert.AreEqual(redirect.ContentId, _firstSubPage.Id);
+        Assert.AreEqual(status.Status, RedirectUrlOperationStatus.Success);
     }
 
     [Test]
-    public void Register_Publishes_Saving_And_Saved_Notifications()
+    public void RegisterWithStatus_Publishes_Saving_And_Saved_Notifications()
     {
         const string OldUrl = "/old/url";
 
@@ -144,7 +145,7 @@ internal sealed class RedirectUrlServiceTests : UmbracoIntegrationTestWithConten
     }
 
     [Test]
-    public void Register_Returns_CancelledByNotification_When_Handler_Cancels_Saving()
+    public void RegisterWithStatus_Returns_CancelledByNotification_When_Handler_Cancels_Saving()
     {
         const string OldUrl = "/cancelled/old";
 

@@ -341,7 +341,7 @@ internal sealed class RedirectTracker : IRedirectTracker
         {
             if (redirectUrl.Url == route)
             {
-                _redirectUrlService.Delete(redirectUrl.Key);
+                _redirectUrlService.DeleteWithStatus(redirectUrl.Key);
             }
         }
     }
