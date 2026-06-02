@@ -593,13 +593,14 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
-  async createElementTypeWithAComposition(elementTypeName: string, compositionId: string) {
+  async createElementTypeWithAComposition(elementTypeName: string, compositionId: string, isAllowedInLibrary: boolean = false) {
     await this.ensureNameNotExists(elementTypeName);
 
     const documentType = new DocumentTypeBuilder()
       .withName(elementTypeName)
       .withAlias(AliasHelper.toAlias(elementTypeName))
       .withIsElement(true)
+      .withAllowedInLibrary(isAllowedInLibrary)
       .withIcon("icon-plugin")
       .addComposition()
         .withDocumentTypeId(compositionId)
@@ -618,22 +619,6 @@ export class DocumentTypeApiHelper {
       .withIsElement(true)
       .withAllowedInLibrary(true)
       .withIcon("icon-plugin")
-      .build();
-
-    return await this.create(documentType);
-  }
-
-  async createElementTypeWithComposition(elementTypeName: string, compositionElementTypeId: string) {
-    await this.ensureNameNotExists(elementTypeName);
-
-    const documentType = new DocumentTypeBuilder()
-      .withName(elementTypeName)
-      .withAlias(AliasHelper.toAlias(elementTypeName))
-      .withIsElement(true)
-      .withAllowedInLibrary(true)
-      .addComposition()
-        .withDocumentTypeId(compositionElementTypeId)
-        .done()
       .build();
 
     return await this.create(documentType);

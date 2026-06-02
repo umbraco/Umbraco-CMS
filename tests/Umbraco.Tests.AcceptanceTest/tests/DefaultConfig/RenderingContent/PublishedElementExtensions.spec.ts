@@ -72,6 +72,7 @@ test('can render published element extension methods on an invariant element', a
   // Assert
   await umbracoUi.contentRender.doesContentRenderValueContainText('Name: ' + elementName);
   await umbracoUi.contentRender.doesContentRenderValueContainText('HasCultureEn: False');
+  await umbracoUi.contentRender.doesContentRenderValueContainText('HasCultureDa: False');
   await umbracoUi.contentRender.doesContentRenderValueContainText('IsDocumentType: True');
   await umbracoUi.contentRender.doesContentRenderValueContainText('NotDocumentType: False');
   await umbracoUi.contentRender.doesContentRenderValueContainText('CultureDate: ' + currentYear);
@@ -209,7 +210,7 @@ test('can render published element extensions on elements using composition', as
   const templateId = await umbracoApi.template.createTemplateWithDisplayingElementPickerCompositionMethods(templateName, propertyName, baseElementTypeAlias, childElementTypeAlias);
   const documentTypeId = await umbracoApi.documentType.createDocumentTypeWithPropertyEditorAndAllowedTemplate(documentTypeName, elementPickerDataTypeId, propertyName, templateId);
   const baseElementTypeId = await umbracoApi.documentType.createEmptyElementType(baseElementTypeName);
-  const childElementTypeId = await umbracoApi.documentType.createElementTypeWithComposition(childElementTypeName, baseElementTypeId);
+  const childElementTypeId = await umbracoApi.documentType.createElementTypeWithAComposition(childElementTypeName, baseElementTypeId, true);
   const elementId = await umbracoApi.element.createDefaultElement(composedElementName, childElementTypeId);
   await umbracoApi.element.publish(elementId);
   const contentId = await umbracoApi.document.createDocumentWithElementPickers(contentName, documentTypeId, propertyName, [elementId]);
