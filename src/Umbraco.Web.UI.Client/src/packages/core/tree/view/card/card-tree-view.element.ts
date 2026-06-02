@@ -5,7 +5,7 @@ import { css, customElement, html, nothing, repeat, state } from '@umbraco-cms/b
 import '../../tree-item-card/tree-item-card-extension.element.js';
 
 @customElement('umb-card-tree-view')
-export class UmbCardTreeViewElement extends UmbTreeViewElementBase {
+export class UmbCardTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemModel> {
 	@state()
 	private _items: UmbTreeItemModel[] = [];
 

@@ -85,7 +85,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 		const href = this._isSelectableContext ? undefined : this._path || undefined;
 		return html`
 			<umb-figure-card
-				name=${this.item.name}
+				name=${this.localize.string(this.item?.name ?? '')}
 				href=${ifDefined(href)}
 				?selectable=${this._isSelectable}
 				?select-only=${this._selectOnly || !this._hasChildren}
@@ -110,7 +110,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 
 	#renderActions() {
 		if (!this._hasActions) return nothing;
-		return html`<umb-entity-actions-bundle slot="actions" .label=${this.item?.name ?? ''}></umb-entity-actions-bundle>`;
+		return html`<umb-entity-actions-bundle slot="actions" .label=${this.localize.string(this.item?.name ?? '')}></umb-entity-actions-bundle>`;
 	}
 }
 

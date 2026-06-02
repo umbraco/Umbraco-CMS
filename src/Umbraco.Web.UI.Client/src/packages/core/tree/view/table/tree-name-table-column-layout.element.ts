@@ -25,17 +25,17 @@ export class UmbTreeNameTableColumnLayoutElement extends UmbLitElement implement
 	override render() {
 		if (!this.value) return nothing;
 
+		const name = this.localize.string(this.value.name);
+
 		if (this.value.href) {
-			return html`<uui-button compact label=${this.value.name} href=${this.value.href}>${this.value.name}</uui-button>`;
+			return html`<uui-button compact label=${name} href=${this.value.href}>${name}</uui-button>`;
 		}
 
 		if (this.value.onOpen) {
-			return html`<uui-button compact label=${this.value.name} @click=${this.#onOpenClick}
-				>${this.value.name}</uui-button
-			>`;
+			return html`<uui-button compact label=${name} @click=${this.#onOpenClick}>${name}</uui-button>`;
 		}
 
-		return html`<span>${this.value.name}</span>`;
+		return html`<span>${name}</span>`;
 	}
 
 	static override styles = [UmbTextStyles];

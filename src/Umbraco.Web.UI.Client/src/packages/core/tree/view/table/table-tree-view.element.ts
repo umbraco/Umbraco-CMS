@@ -39,9 +39,6 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 	private _hideTreeItemActions = false;
 
 	@state()
-	private _tableColumns: Array<UmbTableColumn> = [];
-
-	@state()
 	private _tableRows: Array<UmbTableItem> = [];
 
 	#manifest?: ManifestTreeViewTableKind;
@@ -109,6 +106,9 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			isActiveObserver: undefined!,
 		};
 
+		// Register before observers so synchronous emissions see the context.
+		this.#rowContexts.set(item.id, ctx);
+
 		ctx.noAccessObserver = this.observe(
 			api.noAccess,
 			(noAccess) => {
@@ -137,7 +137,6 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			`_observeIsActive_${item.id}`,
 		);
 
-		this.#rowContexts.set(item.id, ctx);
 	};
 
 	#updateRowSelectable(id: string) {
@@ -212,7 +211,7 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		);
 	}
 
-	#buildTableColumns() {
+	#buildTableColumns(): Array<UmbTableColumn> {
 		const nameColumn: UmbTableColumn = {
 			name: this.localize.term('general_name'),
 			alias: 'name',
@@ -231,59 +230,62 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 			elementName: 'umb-entity-actions-table-column-view',
 		};
 
-		this._tableColumns = [nameColumn, ...manifestColumns, ...(this._hideTreeItemActions ? [] : [entityActionsColumn])];
+		return [nameColumn, ...manifestColumns, ...(this._hideTreeItemActions ? [] : [entityActionsColumn])];
+	}
+
+	#toTableRow(item: UmbTreeItemModel): UmbTableItem {
+		const id = item.unique;
+		const icon = item.isFolder ? 'icon-folder' : (item.icon ?? getItemFallbackIcon());
+		const ctx = this.#rowContexts.get(id);
+		const noAccess = ctx?.currentNoAccess ?? false;
+		const href = this._selectable ? undefined : ctx?.currentPath || undefined;
+		const isActive = ctx?.currentIsActive ?? false;
+		const name = item.name;
+
+		const manifestColumnData = this.#manifestColumns.map((col) => {
+			const rawValue = (item as unknown as Record<string, unknown>)[col.field];
+			if (col.valueType) {
+				return {
+					columnAlias: col.field,
+					value: html`<umb-value-summary-extension
+						.valueType=${col.valueType}
+						.value=${rawValue}></umb-value-summary-extension>`,
+				};
+			}
+			return { columnAlias: col.field, value: rawValue };
+		});
+
+		return {
+			id,
+			icon,
+			entityType: item.entityType,
+			hasChildren: item.hasChildren,
+			selectable: !noAccess && this._isSelectableItem(item as UmbTreeItemModel),
+			active: isActive,
+			data: [
+				{
+					columnAlias: 'name',
+					value: {
+						name,
+						href,
+						onOpen: item.hasChildren ? () => this._treeContext?.open(item as UmbTreeItemModel) : undefined,
+					},
+				},
+				...manifestColumnData,
+				...(this._hideTreeItemActions ? [] : [{ columnAlias: 'entityActions', value: { name } }]),
+			],
+		};
 	}
 
 	#createTableRows() {
 		const items = this._items;
-		this.#buildTableColumns();
 
 		this.#itemMap.clear();
 		for (const item of items) {
 			this.#itemMap.set(item.unique, item);
 		}
 
-		this._tableRows = items.map((item) => {
-			const icon = item.isFolder ? 'icon-folder' : (item.icon ?? getItemFallbackIcon());
-			const ctx = this.#rowContexts.get(item.unique);
-			const noAccess = ctx?.currentNoAccess ?? false;
-			const href = this._selectable ? undefined : ctx?.currentPath || undefined;
-			const isActive = ctx?.currentIsActive ?? false;
-
-			const manifestColumnData = this.#manifestColumns.map((col) => {
-				const rawValue = (item as unknown as Record<string, unknown>)[col.field];
-				if (col.valueType) {
-					return {
-						columnAlias: col.field,
-						value: html`<umb-value-summary-extension
-							.valueType=${col.valueType}
-							.value=${rawValue}></umb-value-summary-extension>`,
-					};
-				}
-				return { columnAlias: col.field, value: rawValue };
-			});
-
-			return {
-				id: item.unique,
-				icon,
-				entityType: item.entityType,
-				hasChildren: item.hasChildren,
-				selectable: !noAccess && this._isSelectableItem(item),
-				active: isActive,
-				data: [
-					{
-						columnAlias: 'name',
-						value: {
-							name: item.name,
-							href,
-							onOpen: item.hasChildren ? () => this._treeContext?.open(item) : undefined,
-						},
-					},
-					...manifestColumnData,
-					...(this._hideTreeItemActions ? [] : [{ columnAlias: 'entityActions', value: { name: item.name } }]),
-				],
-			};
-		});
+		this._tableRows = items.map((item) => this.#toTableRow(item));
 
 		const currentIds = new Set(this._tableRows.map((row) => row.id));
 		for (const [id, ctx] of this.#rowContexts) {
@@ -347,7 +349,7 @@ export class UmbTableTreeViewElement extends UmbTreeViewElementBase<UmbTreeItemM
 		return html`
 			<umb-table
 				.config=${this.#tableConfig}
-				.columns=${this._tableColumns}
+				.columns=${this.#buildTableColumns()}
 				.items=${this._tableRows}
 				.selection=${this._selection}
 				.onRowRendered=${this.#onRowRendered}
