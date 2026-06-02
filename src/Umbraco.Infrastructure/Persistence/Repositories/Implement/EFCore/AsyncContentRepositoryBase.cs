@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -7,6 +8,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 
@@ -176,16 +178,105 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
     }
 
     /// <inheritdoc />
-    public virtual Task<int> CountAsync(string? contentTypeAlias, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public virtual Task<int> CountAsync(CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(db =>
+            db.Nodes
+                .Where(n => n.NodeObjectType == NodeObjectTypeKey)
+                .CountAsync(cancellationToken));
+
+    // TODO: replace raw SQL with LINQ join on ContentTypeDto DbSet once ContentTypeDto is migrated to EF Core
+    /// <inheritdoc />
+    public virtual Task<int> CountAsync(string contentTypeAlias, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(db =>
+            db.Database
+                .SqlQueryRaw<int>(
+                    $"SELECT COUNT(*) " +
+                    $"FROM {NodeDto.TableName} n " +
+                    $"INNER JOIN {ContentDto.TableName} c ON n.{NodeDto.IdColumnName} = c.{ContentDto.PrimaryKeyColumnName} " +
+                    $"INNER JOIN {Constants.DatabaseSchema.Tables.ContentType} ct ON c.{ContentDto.ContentTypeIdColumnName} = ct.{Constants.DatabaseSchema.Columns.NodeIdName} " +
+                    $"WHERE n.{NodeDto.NodeObjectTypeColumnName} = @p0 AND ct.alias = @p1",
+                    NodeObjectTypeKey,
+                    contentTypeAlias)
+                .SingleAsync(cancellationToken));
 
     /// <inheritdoc />
-    public virtual Task<int> CountChildrenAsync(Guid parentKey, string? contentTypeAlias, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public virtual Task<int> CountChildrenAsync(Guid parentKey, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            int parentNodeId = await db.Nodes
+                .Where(n => n.UniqueId == parentKey)
+                .Select(n => n.NodeId)
+                .SingleOrDefaultAsync(cancellationToken);
+
+            return await db.Nodes
+                .Where(n => n.NodeObjectType == NodeObjectTypeKey && n.ParentId == parentNodeId)
+                .CountAsync(cancellationToken);
+        });
+
+    // TODO: replace raw SQL with LINQ join on ContentTypeDto DbSet once ContentTypeDto is migrated to EF Core
+    /// <inheritdoc />
+    public virtual Task<int> CountChildrenAsync(Guid parentKey, string contentTypeAlias, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            int parentNodeId = await db.Nodes
+                .Where(n => n.UniqueId == parentKey)
+                .Select(n => n.NodeId)
+                .SingleOrDefaultAsync(cancellationToken);
+
+            return await db.Database
+                .SqlQueryRaw<int>(
+                    $"SELECT COUNT(*) " +
+                    $"FROM {NodeDto.TableName} n " +
+                    $"INNER JOIN {ContentDto.TableName} c ON n.{NodeDto.IdColumnName} = c.{ContentDto.PrimaryKeyColumnName} " +
+                    $"INNER JOIN {Constants.DatabaseSchema.Tables.ContentType} ct ON c.{ContentDto.ContentTypeIdColumnName} = ct.{Constants.DatabaseSchema.Columns.NodeIdName} " +
+                    $"WHERE n.{NodeDto.NodeObjectTypeColumnName} = @p0 AND n.{NodeDto.ParentIdColumnName} = @p1 AND ct.alias = @p2",
+                    NodeObjectTypeKey,
+                    parentNodeId,
+                    contentTypeAlias)
+                .SingleAsync(cancellationToken);
+        });
 
     /// <inheritdoc />
-    public virtual Task<int> CountDescendantsAsync(Guid parentKey, string? contentTypeAlias, CancellationToken cancellationToken) =>
-        throw new NotImplementedException();
+    public virtual Task<int> CountDescendantsAsync(Guid parentKey, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            int parentNodeId = await db.Nodes
+                .Where(n => n.UniqueId == parentKey)
+                .Select(n => n.NodeId)
+                .SingleOrDefaultAsync(cancellationToken);
+
+            string pathMatch = parentNodeId == -1 ? "-1," : $",{parentNodeId},";
+
+            return await db.Nodes
+                .Where(n => n.NodeObjectType == NodeObjectTypeKey && n.Path.Contains(pathMatch))
+                .CountAsync(cancellationToken);
+        });
+
+    // TODO: replace raw SQL with LINQ join on ContentTypeDto DbSet once ContentTypeDto is migrated to EF Core
+    /// <inheritdoc />
+    public virtual Task<int> CountDescendantsAsync(Guid parentKey, string contentTypeAlias, CancellationToken cancellationToken) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            int parentNodeId = await db.Nodes
+                .Where(n => n.UniqueId == parentKey)
+                .Select(n => n.NodeId)
+                .SingleOrDefaultAsync(cancellationToken);
+
+            string pathMatch = parentNodeId == -1 ? "-1," : $",{parentNodeId},";
+            string pathLikePattern = $"%{pathMatch}%";
+
+            return await db.Database
+                .SqlQueryRaw<int>(
+                    $"SELECT COUNT(*) " +
+                    $"FROM {NodeDto.TableName} n " +
+                    $"INNER JOIN {ContentDto.TableName} c ON n.{NodeDto.IdColumnName} = c.{ContentDto.PrimaryKeyColumnName} " +
+                    $"INNER JOIN {Constants.DatabaseSchema.Tables.ContentType} ct ON c.{ContentDto.ContentTypeIdColumnName} = ct.{Constants.DatabaseSchema.Columns.NodeIdName} " +
+                    $"WHERE n.{NodeDto.NodeObjectTypeColumnName} = @p0 AND n.{NodeDto.PathColumnName} LIKE @p1 AND ct.alias = @p2",
+                    NodeObjectTypeKey,
+                    pathLikePattern,
+                    contentTypeAlias)
+                .SingleAsync(cancellationToken);
+        });
 
     /// <inheritdoc />
     public abstract Task<PagedModel<TEntity>> GetChildrenAsync(Guid parentKey, long pageIndex, int pageSize, string[]? propertyAliases, Ordering? ordering, CancellationToken cancellationToken);
