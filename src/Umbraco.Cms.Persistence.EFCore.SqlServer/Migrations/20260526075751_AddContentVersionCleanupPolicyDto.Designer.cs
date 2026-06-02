@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 
@@ -11,13 +12,15 @@ using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
 {
     [DbContext(typeof(UmbracoDbContext))]
-    partial class UmbracoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260526075751_AddContentVersionCleanupPolicyDto")]
+    partial class AddContentVersionCleanupPolicyDto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.7")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -231,85 +234,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.HasIndex("ApplicationId", "Status", "Subject", "Type");
 
                     b.ToTable("umbracoOpenIddictTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.AccessDto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("createDate");
-
-                    b.Property<int>("LoginNodeId")
-                        .HasColumnType("int")
-                        .HasColumnName("loginNodeId");
-
-                    b.Property<int>("NoAccessNodeId")
-                        .HasColumnType("int")
-                        .HasColumnName("noAccessNodeId");
-
-                    b.Property<int>("NodeId")
-                        .HasColumnType("int")
-                        .HasColumnName("nodeId");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updateDate");
-
-                    b.HasKey("Id")
-                        .HasName("PK_umbracoAccess");
-
-                    b.HasIndex("LoginNodeId");
-
-                    b.HasIndex("NoAccessNodeId");
-
-                    b.HasIndex("NodeId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_umbracoAccess_nodeId");
-
-                    b.ToTable("umbracoAccess", (string)null);
-                });
-
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.AccessRuleDto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id");
-
-                    b.Property<Guid>("AccessId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("accessId");
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("createDate");
-
-                    b.Property<string>("RuleType")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("ruleType");
-
-                    b.Property<string>("RuleValue")
-                        .HasColumnType("nvarchar(450)")
-                        .HasColumnName("ruleValue");
-
-                    b.Property<DateTime>("UpdateDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updateDate");
-
-                    b.HasKey("Id")
-                        .HasName("PK_umbracoAccessRule");
-
-                    b.HasIndex("AccessId");
-
-                    b.HasIndex("RuleValue", "RuleType", "AccessId")
-                        .IsUnique()
-                        .HasDatabaseName("IX_umbracoAccessRule")
-                        .HasFilter("[ruleValue] IS NOT NULL AND [ruleType] IS NOT NULL");
-
-                    b.ToTable("umbracoAccessRule", (string)null);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.AuditEntryDto", b =>
@@ -1074,41 +998,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.Navigation("Authorization");
                 });
 
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.AccessDto", b =>
-                {
-                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
-                        .WithMany()
-                        .HasForeignKey("LoginNodeId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("FK_umbracoAccess_umbracoNode_id1");
-
-                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
-                        .WithMany()
-                        .HasForeignKey("NoAccessNodeId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("FK_umbracoAccess_umbracoNode_id2");
-
-                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", null)
-                        .WithMany()
-                        .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired()
-                        .HasConstraintName("FK_umbracoAccess_umbracoNode_id");
-                });
-
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.AccessRuleDto", b =>
-                {
-                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.AccessDto", "Access")
-                        .WithMany("Rules")
-                        .HasForeignKey("AccessId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Access");
-                });
-
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", b =>
                 {
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", "FallbackLanguage")
@@ -1210,11 +1099,6 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreAuthorization", b =>
                 {
                     b.Navigation("Tokens");
-                });
-
-            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.AccessDto", b =>
-                {
-                    b.Navigation("Rules");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.WebhookDto", b =>
