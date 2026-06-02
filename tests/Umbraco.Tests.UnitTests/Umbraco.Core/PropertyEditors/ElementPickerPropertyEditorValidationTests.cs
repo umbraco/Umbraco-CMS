@@ -105,9 +105,8 @@ public class ElementPickerPropertyEditorValidationTests
         ElementPickerPropertyEditor.ElementPickerPropertyValueEditor valueEditor,
         IEnumerable<Guid> elementKeys)
     {
-        IEnumerable<string> items = elementKeys.Select(k => $"{{\"type\":\"element\",\"unique\":\"{k}\"}}");
-        var json = $"[{string.Join(",", items)}]";
-        return valueEditor.Validate(json, false, null, PropertyValidationContext.Empty());
+        List<string> value = elementKeys.Select(k => k.ToString()).ToList();
+        return valueEditor.Validate(value, false, null, PropertyValidationContext.Empty());
     }
 
     private static IElement CreateElement(Guid elementKey, Guid contentTypeKey)

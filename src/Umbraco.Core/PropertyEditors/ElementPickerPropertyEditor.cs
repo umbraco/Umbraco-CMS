@@ -37,8 +37,6 @@ public class ElementPickerPropertyEditor : DataEditor
     protected override IDataValueEditor CreateValueEditor() =>
         DataValueEditorFactory.Create<ElementPickerPropertyValueEditor>(Attribute!);
 
-    internal record ElementPickerValueModel(string Type, Guid Unique);
-
     internal sealed class ElementPickerPropertyValueEditor : DataValueEditor, IDataValueReference
     {
         private readonly IJsonSerializer _jsonSerializer;
@@ -54,7 +52,7 @@ public class ElementPickerPropertyEditor : DataEditor
             : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
-            Validators.Add(new TypedJsonValidatorRunner<ElementPickerValueModel[], ElementPickerConfiguration>(
+            Validators.Add(new ElementPickerValidatorRunner(
                 jsonSerializer,
                 new AllowedTypeValidator(localizedTextService, elementService, coreScopeProvider)));
         }
@@ -67,20 +65,46 @@ public class ElementPickerPropertyEditor : DataEditor
                 yield break;
             }
 
-            IEnumerable<ElementPickerValueModel>? items = _jsonSerializer.Deserialize<IEnumerable<ElementPickerValueModel>>(asString);
+            IEnumerable<Guid>? items = _jsonSerializer.Deserialize<IEnumerable<Guid>>(asString);
             if (items is null)
             {
                 yield break;
             }
 
-            foreach (ElementPickerValueModel item in items)
+            foreach(Guid item in items)
             {
-                yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Element, item.Unique));
+                yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Element, item));
             }
         }
     }
 
-    internal sealed class AllowedTypeValidator : ITypedJsonValidator<ElementPickerValueModel[], ElementPickerConfiguration>
+    internal sealed class ElementPickerValidatorRunner : IValueValidator
+    {
+        private readonly AllowedTypeValidator _validator;
+
+        public ElementPickerValidatorRunner(IJsonSerializer jsonSerializer, AllowedTypeValidator validator)
+            => _validator = validator;
+
+        public IEnumerable<ValidationResult> Validate(
+            object? value,
+            string? valueType,
+            object? dataTypeConfiguration,
+            PropertyValidationContext validationContext)
+        {
+            if (dataTypeConfiguration is not ElementPickerConfiguration configuration)
+            {
+                return [];
+            }
+
+            Guid[]? guids = value is IEnumerable<string> strings
+                ? strings.Select(s => Guid.TryParse(s, out Guid g) ? g : (Guid?)null).Where(g => g.HasValue).Select(g => g!.Value).ToArray()
+                : null;
+
+            return _validator.Validate(guids, configuration, valueType, validationContext);
+        }
+    }
+
+    internal sealed class AllowedTypeValidator : ITypedJsonValidator<Guid[], ElementPickerConfiguration>
     {
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IElementService _elementService;
@@ -97,7 +121,7 @@ public class ElementPickerPropertyEditor : DataEditor
         }
 
         public IEnumerable<ValidationResult> Validate(
-            ElementPickerValueModel[]? value,
+            Guid[]? value,
             ElementPickerConfiguration? configuration,
             string? valueType,
             PropertyValidationContext validationContext)
@@ -116,7 +140,7 @@ public class ElementPickerPropertyEditor : DataEditor
             }
 
             using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
-            IElement[] elements = _elementService.GetByIds(value.Select(v => v.Unique).Distinct()).ToArray();
+            IElement[] elements = _elementService.GetByIds(value).ToArray();
             scope.Complete();
 
             foreach (IElement element in elements)
