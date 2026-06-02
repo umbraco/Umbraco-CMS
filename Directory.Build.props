@@ -64,4 +64,14 @@
       </_ProjectReferencesWithVersions>
     </ItemGroup>
   </Target>
+
+  <!-- Workaround for https://github.com/umbraco/Umbraco-CMS/issues/23018
+       Due to the amount of XML documentation in this solution, the OpenAPI XML documentation source generator produces
+       too many lines of code causing a StackOverflowException when running on IIS. For that reason we disable the analyzer.
+       See https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/openapi-comments?view=aspnetcore-10.0#disabling-xml-documentation-support -->
+  <Target Name="DisableCompileTimeOpenApiXmlGenerator" BeforeTargets="CoreCompile" Condition="'$(IsPackable)' != 'false' or '$(IsTestProject)' == 'true'">
+    <ItemGroup>
+      <Analyzer Remove="@(Analyzer)" Condition="'%(Filename)' == 'Microsoft.AspNetCore.OpenApi.SourceGenerators'" />
+    </ItemGroup>
+  </Target>
 </Project>
