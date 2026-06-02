@@ -58,6 +58,47 @@ export const data: Array<UmbMockUserGroupModel> = [
 				},
 				verbs: ['Umb.Document.Delete', 'Umb.Document.Read'],
 			},
+			// Element and element folder permissions for testing the combined condition
+			{
+				$type: 'ElementPermissionPresentationModel',
+				element: { id: 'permissions-element-read-only-id' },
+				verbs: ['Umb.Element.Read'],
+			},
+			{
+				$type: 'ElementContainerPermissionPresentationModel',
+				elementContainer: { id: 'permissions-element-read-only-id' },
+				verbs: ['Umb.ElementContainer.Create'],
+			},
+			{
+				$type: 'ElementPermissionPresentationModel',
+				element: { id: 'permissions-folder-read-only-id' },
+				verbs: ['Umb.Element.Create'],
+			},
+			{
+				$type: 'ElementContainerPermissionPresentationModel',
+				elementContainer: { id: 'permissions-folder-read-only-id' },
+				verbs: ['Umb.ElementContainer.Read'],
+			},
+			{
+				$type: 'ElementPermissionPresentationModel',
+				element: { id: 'permissions-both-read-id' },
+				verbs: ['Umb.Element.Read'],
+			},
+			{
+				$type: 'ElementContainerPermissionPresentationModel',
+				elementContainer: { id: 'permissions-both-read-id' },
+				verbs: ['Umb.ElementContainer.Read'],
+			},
+			{
+				$type: 'ElementPermissionPresentationModel',
+				element: { id: 'permissions-neither-read-id' },
+				verbs: ['Umb.Element.Create'],
+			},
+			{
+				$type: 'ElementContainerPermissionPresentationModel',
+				elementContainer: { id: 'permissions-neither-read-id' },
+				verbs: ['Umb.ElementContainer.Create'],
+			},
 		],
 		sections: [
 			'Umb.Section.Content',
