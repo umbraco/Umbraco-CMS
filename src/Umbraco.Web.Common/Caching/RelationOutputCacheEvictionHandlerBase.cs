@@ -65,7 +65,7 @@ public abstract class RelationOutputCacheEvictionHandlerBase
 
         foreach (var parentId in parentIds)
         {
-            Attempt<Guid> parentKeyAttempt = _idKeyMap.GetKeyForId(parentId, UmbracoObjectTypes.Document);
+            Attempt<Guid> parentKeyAttempt = await _idKeyMap.GetKeyForIdAsync(parentId, UmbracoObjectTypes.Document);
             if (parentKeyAttempt.Success)
             {
                 if (logger.IsEnabled(LogLevel.Debug))

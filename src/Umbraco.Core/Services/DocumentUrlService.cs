@@ -535,7 +535,9 @@ public class DocumentUrlService : IDocumentUrlService
     /// <inheritdoc/>
     public async Task UpdateUrlSegmentCacheWithDescendantsAsync(Guid key)
     {
-        var id = _idKeyMap.GetIdForKey(key, UmbracoObjectTypes.Document).Result;
+        Attempt<int> attempt = await _idKeyMap.GetIdForKeyAsync(key, UmbracoObjectTypes.Document);
+        var id = attempt.Result;
+
         IContent? item = _contentService.GetById(id);
         if (item is null)
         {
