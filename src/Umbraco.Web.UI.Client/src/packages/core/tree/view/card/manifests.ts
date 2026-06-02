@@ -10,7 +10,7 @@ export const manifests: Array<UmbExtensionManifest | UmbExtensionManifestKind> =
 		manifest: {
 			type: 'treeView',
 			element: UmbCardTreeViewElement,
-			weight: 900,
+			weight: 800,
 			meta: {
 				label: '#tree_cardViewLabel',
 				icon: 'icon-grid',
