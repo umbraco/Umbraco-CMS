@@ -39,7 +39,11 @@
 		"ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
 	},
 
-	"forwardPorts": [5050, 5173, 44339],
+	// Port 11000 is the HTTP Kestrel endpoint used by the Codespaces proxy (which talks
+	// plain HTTP to container ports — TLS is terminated at the *.app.github.dev edge).
+	// Port 44339 is the HTTPS endpoint for local development only; it is silenced here
+	// because the Codespaces forwarding agent cannot reach an HTTPS-only Kestrel socket.
+	"forwardPorts": [5050, 5173, 11000],
 	"portsAttributes": {
 		"5050": {
 			"label": "SMTP4Dev",
@@ -47,18 +51,27 @@
 			"onAutoForward": "notify"
 		},
 		"5173": {
-			"label": "Backoffice (Vite dev server)",
+			"label": "Backoffice (Vite)",
+			"protocol": "http",
+			"onAutoForward": "openBrowser"
+		},
+		"11000": {
+			"label": "Umbraco .NET backend",
 			"protocol": "http",
 			"onAutoForward": "notify"
 		},
 		"44339": {
-			"label": "Umbraco HTTPS",
-			"protocol": "https",
-			"onAutoForward": "notify"
+			"label": "Umbraco HTTPS (local dev only)",
+			"onAutoForward": "silent"
 		}
 	},
 
 	"containerEnv": {
+		// Tells ASP.NET Core to honour X-Forwarded-Proto / X-Forwarded-Host headers from the
+		// Codespaces proxy. Without this, the app sees plain HTTP internally and won't set the
+		// Secure flag on cookies — which breaks SameSite=None auth cookies in the browser.
+		"ASPNETCORE_FORWARDEDHEADERS_ENABLED": "true",
+
 		// Increases the Node.js V8 heap size limit from the default (~1.5GB on 64-bit) to 4GB.
 		// This is required to prevent "JavaScript heap out of memory" errors during the
 		// Umbraco frontend build (npm run build:for:cms).

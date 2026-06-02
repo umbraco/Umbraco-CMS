@@ -100,14 +100,15 @@
       "postDebugTask": "kill-umbraco-web-ui",
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "https://localhost:44339",
-        "UMBRACO__CMS__WEBROUTING__UMBRACOAPPLICATIONURL": "https://localhost:44339",
-        "UMBRACO__CMS__SECURITY__BACKOFFICEHOST": "http://localhost:5173",
-        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKPATHNAME": "/oauth_complete",
-        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKLOGOUTPATHNAME": "/logout",
-        "UMBRACO__CMS__SECURITY__AUTHORIZECALLBACKERRORPATHNAME": "/error",
-        "UMBRACO__CMS__SECURITY__KEEPUSERLOGGEDIN": "true",
-        "UMBRACO__CMS__SECURITY__BACKOFFICETOKENCOOKIE__SAMESITE": "None"
+        // Bind both HTTPS (for local dev) and HTTP (for the Codespaces forwarding proxy,
+        // which talks plain HTTP to container ports — TLS terminates at *.app.github.dev).
+        "ASPNETCORE_URLS": "https://localhost:44339;http://localhost:11000"
+        // BackOfficeHost, UmbracoApplicationUrl, and the Security/Cookie settings are
+        // intentionally absent here. They live in appsettings.Development.template.json
+        // (localhost defaults) and are overwritten by .devcontainer/postCreate.sh for
+        // devcontainer/Codespaces environments. Putting them here as env vars would cause
+        // them to override the postCreate.sh-generated appsettings in Codespaces, breaking
+        // the Codespaces setup. See .devcontainer/postCreate.sh for the Codespaces values.
       },
       "sourceFileMap": {
         "/Views": "${workspaceFolder}/src/Umbraco.Web.UI/Views"
