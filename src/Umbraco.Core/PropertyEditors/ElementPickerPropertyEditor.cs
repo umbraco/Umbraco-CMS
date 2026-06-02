@@ -65,15 +65,10 @@ public class ElementPickerPropertyEditor : DataEditor
                 yield break;
             }
 
-            IEnumerable<Guid>? items = _jsonSerializer.Deserialize<IEnumerable<Guid>>(asString);
-            if (items is null)
+            IEnumerable<Guid>? elementIds = _jsonSerializer.Deserialize<IEnumerable<Guid>>(asString);
+            if (elementIds is null)
             {
                 yield break;
-            }
-
-            foreach(Guid item in items)
-            {
-                yield return new UmbracoEntityReference(Udi.Create(Constants.UdiEntityType.Element, item));
             }
         }
     }
