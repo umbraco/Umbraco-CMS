@@ -45,7 +45,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
-        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        var keyAttempt = await IdKeyMap.GetKeyForIdAsync(dataTypeId, UmbracoObjectTypes.DataType);
         Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
         var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
@@ -72,7 +72,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
-        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        var keyAttempt = await IdKeyMap.GetKeyForIdAsync(dataTypeId, UmbracoObjectTypes.DataType);
         Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
         var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
@@ -107,7 +107,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         ContentService.Save(pickedContent);
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
-        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        var keyAttempt = await IdKeyMap.GetKeyForIdAsync(dataTypeId, UmbracoObjectTypes.DataType);
         Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
         var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;
@@ -163,7 +163,7 @@ internal sealed class RichTextPropertyEditorTests : UmbracoIntegrationTest
         await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var dataTypeId = contentType.PropertyTypes.First(propertyType => propertyType.Alias == "bodyText").DataTypeId;
-        var keyAttempt = IdKeyMap.GetKeyForId(dataTypeId, UmbracoObjectTypes.DataType);
+        var keyAttempt = await IdKeyMap.GetKeyForIdAsync(dataTypeId, UmbracoObjectTypes.DataType);
         Assert.IsTrue(keyAttempt.Success, $"Could not resolve a GUID key for data type id {dataTypeId}.");
         var dataType = (await DataTypeService.GetAsync(keyAttempt.Result))!;
         var editor = dataType.Editor!;

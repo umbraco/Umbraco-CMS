@@ -113,8 +113,8 @@ internal sealed class SyntheticPublishedTreeFixture
         previewMock.Setup(x => x.IsInPreview()).Returns(false);
 
         var idKeyMapMock = new Mock<IIdKeyMap>();
-        idKeyMapMock.Setup(x => x.GetKeyForId(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
-            .Returns(Attempt.Fail<Guid>());
+        idKeyMapMock.Setup(x => x.GetKeyForIdAsync(It.IsAny<int>(), It.IsAny<UmbracoObjectTypes>()))
+            .ReturnsAsync(Attempt.Fail<Guid>());
 
         var scopeMock = new Mock<ICoreScope>();
         var scopeProviderMock = new Mock<ICoreScopeProvider>();

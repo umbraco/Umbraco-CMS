@@ -1675,8 +1675,8 @@ internal sealed class ServerEventSenderTests
 
         var idKeyMapMock = new Mock<IIdKeyMap>();
         idKeyMapMock
-            .Setup(x => x.GetKeyForId(protectedNodeId, UmbracoObjectTypes.Document))
-            .Returns(Attempt<Guid>.Succeed(protectedDocumentKey));
+            .Setup(x => x.GetKeyForIdAsync(protectedNodeId, UmbracoObjectTypes.Document))
+            .ReturnsAsync(Attempt<Guid>.Succeed(protectedDocumentKey));
 
         var notifications = new[]
         {
