@@ -55,6 +55,7 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 
 	#context = new UmbBlockGridEntryContext(this);
 	#renderTimeout: number | undefined;
+	#layoutContainerResizeObserver = new ResizeObserver(() => this.#callUpdateInlineCreateButtons());
 
 	@state()
 	private _contentTypeAlias?: string;
@@ -347,6 +348,19 @@ export class UmbBlockGridEntryElement extends UmbLitElement implements UmbProper
 		);
 
 		this.#callUpdateInlineCreateButtons();
+		if (this.parentElement) {
+			this.#layoutContainerResizeObserver.observe(this.parentElement);
+		}
+	}
+
+	override disconnectedCallback(): void {
+		super.disconnectedCallback();
+		this.#layoutContainerResizeObserver.disconnect();
+	}
+
+	override destroy(): void {
+		this.#layoutContainerResizeObserver.disconnect();
+		super.destroy();
 	}
 
 	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {

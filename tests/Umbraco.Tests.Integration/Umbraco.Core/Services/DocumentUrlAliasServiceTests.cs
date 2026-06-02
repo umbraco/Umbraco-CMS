@@ -31,6 +31,8 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
 
     private IDocumentUrlAliasService DocumentUrlAliasService => GetRequiredService<IDocumentUrlAliasService>();
 
+    private IDocumentUrlService DocumentUrlService => GetRequiredService<IDocumentUrlService>();
+
     private IDocumentUrlAliasRepository DocumentUrlAliasRepository => GetRequiredService<IDocumentUrlAliasRepository>();
 
     private ICoreScopeProvider CoreScopeProvider => GetRequiredService<ICoreScopeProvider>();
@@ -65,6 +67,7 @@ internal sealed class DocumentUrlAliasServiceTests : UmbracoIntegrationTest
     [SetUp]
     public async Task SetupTestData()
     {
+        await DocumentUrlService.InitAsync(false, CancellationToken.None);
         await DocumentUrlAliasService.InitAsync(false, CancellationToken.None);
 
         // Create template

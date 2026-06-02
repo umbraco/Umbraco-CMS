@@ -75,6 +75,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             [
                 sx.ColumnWithAlias("x", "otherId", "nodeId"),
                 sx.ColumnWithAlias("n", "uniqueId", "nodeKey"),
+                sx.ColumnWithAlias("n", "text", "nodeName"),
                 sx.ColumnWithAlias("n", "nodeObjectType", "nodeObjectType"),
                 $"COALESCE({sx.ColumnWithAlias("d", "published")}, {sx.ColumnWithAlias("e", "published")}) AS nodePublished",
                 sx.ColumnWithAlias("ctn", "uniqueId", "contentTypeKey"),

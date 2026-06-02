@@ -5,6 +5,7 @@ import { UmbBlockElementManager } from './block-element-manager.js';
 import type { UmbBlockWorkspaceOriginData } from './block-workspace.modal-token.js';
 import { UMB_BLOCK_WORKSPACE_VIEW_CONTENT, UMB_BLOCK_WORKSPACE_VIEW_SETTINGS } from './constants.js';
 import { UmbBlockLanguageAccessWorkspaceController } from './block-workspace-language-access.controller.js';
+import { resolveBlockWorkspaceLabelIndex } from './block-workspace-label-index.function.js';
 import {
 	UmbSubmittableWorkspaceContextBase,
 	type UmbRoutableWorkspaceContext,
@@ -27,6 +28,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import type { UUIModalSidebarSize } from '@umbraco-cms/backoffice/external/uui';
 import { UmbUfmVirtualRenderController } from '@umbraco-cms/backoffice/ufm';
 import { UMB_IS_TRASHED_ENTITY_CONTEXT } from '@umbraco-cms/backoffice/recycle-bin';
+import { distinctUntilChanged, map } from '@umbraco-cms/backoffice/external/rxjs';
 
 export type UmbBlockWorkspaceElementManagerNames = 'content' | 'settings';
 
@@ -47,6 +49,8 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 	setOriginData(data: UmbBlockWorkspaceOriginData) {
 		this.#originData = data;
 	}
+	// Cached index of this block in its parent layout list, recomputed only when layouts or contentKey change.
+	#index: number | undefined;
 	#modalContext?: typeof UMB_MODAL_CONTEXT.TYPE;
 	#retrieveModalContext;
 
@@ -107,6 +111,25 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 
 		this.#retrieveBlockEntries = this.consumeContext(UMB_BLOCK_ENTRIES_CONTEXT, (context) => {
 			this.#blockEntries = context;
+			if (context) {
+				this.observe(
+					observeMultiple([context.layoutEntries, this.contentKey]).pipe(
+						map(([layouts, contentKey]) => {
+							const found = contentKey ? layouts.findIndex((x) => x.contentKey === contentKey) : -1;
+							return found !== -1 ? found : undefined;
+						}),
+						distinctUntilChanged(),
+					),
+					(index) => {
+						this.#index = index;
+						this.#renderLabel(this.content.getValues(), this.settings.getValues());
+					},
+					'observeLayoutIndex',
+				);
+			} else {
+				this.#index = undefined;
+				this.removeUmbControllerByAlias('observeLayoutIndex');
+			}
 		}).asPromise({ preventTimeout: true });
 
 		this.consumeContext(UMB_IS_TRASHED_ENTITY_CONTEXT, (context) => {
@@ -273,8 +296,15 @@ export class UmbBlockWorkspaceContext<LayoutDataType extends UmbBlockLayoutBaseM
 			valueObject['$settings'] = settingsValues;
 		}
 
-		// TODO: Look to add support for `$index`, requires wiring up the block-entry with the workspace. [LK]
-		//valueObject['$index'] = 0;
+		const index = resolveBlockWorkspaceLabelIndex(
+			this.#index,
+			this.#originData,
+			this.#blockEntries?.getLayouts().length,
+		);
+
+		if (index !== undefined) {
+			valueObject['$index'] = index;
+		}
 
 		this.#labelRender.value = valueObject;
 
