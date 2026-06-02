@@ -95,6 +95,7 @@ export abstract class UmbTreeItemElementBase<
 				'_observeIsSelectableContext',
 			);
 			this.observe(this.#api.isSelectable, (value) => (this._isSelectable = value), '_observeIsSelectable');
+			this.observe(this.#api.selectOnly, (value) => (this._selectOnly = value), '_observeSelectOnly');
 			this.observe(this.#api.isSelected, (value) => (this._isSelected = value), '_observeIsSelected');
 			this.observe(this.#api.path, (value) => (this._href = value), '_observePath');
 			this.observe(this.#api.pagination.currentPage, (value) => (this._currentPage = value), '_observeCurrentPage');
@@ -149,6 +150,9 @@ export abstract class UmbTreeItemElementBase<
 
 	@state()
 	private _isSelectable = false;
+
+	@state()
+	private _selectOnly = false;
 
 	@state()
 	protected _isSelected = false;
@@ -248,7 +252,7 @@ export abstract class UmbTreeItemElementBase<
 				@selected=${this._handleSelectedItem}
 				@deselected=${this._handleDeselectedItem}
 				?active=${this._isActive}
-				?disabled=${(this._isSelectableContext && !this._isSelectable) || this._noAccess}
+				?disabled=${this._noAccess}
 				?selectable=${this._isSelectable}
 				?selected=${this._isSelected}
 				.loading=${this._isLoading}

@@ -32,7 +32,6 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 		multiple: false,
 		selectable: true,
 		selection: [],
-		selectOnly: true,
 	};
 
 	@state()

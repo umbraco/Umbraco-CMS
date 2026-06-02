@@ -74,7 +74,6 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 
 	override render() {
 		if (!this.item) return nothing;
-		// When in selection mode, clear href so clicking navigates to select rather than route
 		const href = this._isSelectableContext ? undefined : this._path || undefined;
 		return html`
 			<umb-figure-card
@@ -84,7 +83,6 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 				?select-only=${this._selectOnly}
 				?selected=${this._isSelected}
 				?active=${this._isActive}
-				?disabled=${this._isSelectableContext && !this._isSelectable}
 				background-color="var(--uui-color-surface)"
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}
