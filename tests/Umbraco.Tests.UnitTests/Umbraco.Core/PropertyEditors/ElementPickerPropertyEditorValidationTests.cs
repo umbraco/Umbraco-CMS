@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors;
 public class ElementPickerPropertyEditorValidationTests
 {
     [Test]
-    public void Allowed_Type_Passes_When_No_Filter_Configured()
+    public void Can_Pass_Validation_When_No_Allowed_Type_Filter_Configured()
     {
         var elementKey = Guid.NewGuid();
         var (valueEditor, elementServiceMock) = CreateValueEditor();
@@ -37,7 +37,7 @@ public class ElementPickerPropertyEditorValidationTests
     }
 
     [Test]
-    public void Allowed_Type_Passes_When_Element_Matches_Allowed_Type()
+    public void Can_Pass_Validation_When_Element_Matches_Allowed_Type()
     {
         var elementKey = Guid.NewGuid();
         var contentTypeKey = Guid.NewGuid();
@@ -58,7 +58,7 @@ public class ElementPickerPropertyEditorValidationTests
     }
 
     [Test]
-    public void Allowed_Type_Fails_When_Element_Does_Not_Match_Allowed_Type()
+    public void Cannot_Pass_Validation_When_Element_Does_Not_Match_Allowed_Type()
     {
         var elementKey = Guid.NewGuid();
         var allowedContentTypeKey = Guid.NewGuid();
@@ -80,7 +80,7 @@ public class ElementPickerPropertyEditorValidationTests
     }
 
     [Test]
-    public void Allowed_Type_Passes_With_Multiple_Allowed_Types_When_Element_Matches_One()
+    public void Can_Pass_Validation_When_Element_Matches_One_Of_Multiple_Allowed_Types()
     {
         var elementKey = Guid.NewGuid();
         var allowedTypeA = Guid.NewGuid();
