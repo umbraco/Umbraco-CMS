@@ -17,6 +17,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 			this.observe(value.selectOnly, (v) => (this._selectOnly = v), '_observeSelectOnly');
 			this.observe(value.isSelected, (v) => (this._isSelected = v), '_observeIsSelected');
 			this.observe(value.isActive, (v) => (this._isActive = v), '_observeIsActive');
+			this.observe(value.hasChildren, (v) => (this._hasChildren = v), '_observeHasChildren');
 			this.observe(value.noAccess, (v) => (this._noAccess = v), '_observeNoAccess');
 			this.observe(value.path, (v) => (this._path = v), '_observePath');
 			this.observe(value.hasActions, (v) => (this._hasActions = v), '_observeHasActions');
@@ -45,6 +46,9 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 	private _isActive = false;
 
 	@state()
+	private _hasChildren = false;
+
+	@state()
 	private _noAccess = false;
 
 	@state()
@@ -64,13 +68,13 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 	}
 
 	#onDblClick(e: MouseEvent) {
-		if (!this.item?.hasChildren) return;
+		if (!this._hasChildren) return;
 		e.stopPropagation();
 		this.#api?.open();
 	}
 
 	#onKeyDown(e: KeyboardEvent) {
-		if (e.key === 'ArrowRight' && this.item?.hasChildren) {
+		if (e.key === 'ArrowRight' && this._hasChildren) {
 			e.stopPropagation();
 			this.#api?.open();
 		}
@@ -87,6 +91,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 				?select-only=${this._selectOnly}
 				?selected=${this._isSelected}
 				?active=${this._isActive}
+				?has-children=${this._hasChildren}
 				?disabled=${this._noAccess}
 				background-color="var(--uui-color-surface)"
 				@selected=${this.#onSelected}

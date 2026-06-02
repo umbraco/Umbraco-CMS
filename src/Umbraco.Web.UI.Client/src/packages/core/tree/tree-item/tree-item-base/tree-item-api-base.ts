@@ -35,6 +35,7 @@ export interface UmbTreeItemApi<
 	readonly selectOnly: Observable<boolean>;
 	readonly isSelected: Observable<boolean>;
 	readonly isActive: Observable<boolean>;
+	readonly hasChildren: Observable<boolean>;
 	readonly hasActions: Observable<boolean>;
 	readonly noAccess: Observable<boolean>;
 	readonly path: Observable<string>;
@@ -93,6 +94,8 @@ export abstract class UmbTreeItemApiBase<
 
 	protected readonly _isActive = new UmbBooleanState(false);
 	readonly isActive = this._isActive.asObservable();
+
+	readonly hasChildren = this._treeItem.asObservablePart((item) => item?.hasChildren ?? false);
 
 	#hasActiveDescendant = new UmbBooleanState(undefined);
 	readonly hasActiveDescendant = this.#hasActiveDescendant.asObservable();
