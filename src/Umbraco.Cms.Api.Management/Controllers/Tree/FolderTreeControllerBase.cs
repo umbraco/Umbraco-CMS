@@ -230,7 +230,7 @@ public abstract class FolderTreeControllerBase<TItem> : NamedEntityTreeControlle
             }
         }
 
-        Attempt<Guid> itemKeyAttempt = IdKeyMap.GetKeyForIdAsync(entity.ParentId, ItemObjectType).GetAwaiter().GetResult();
+        Attempt<Guid> itemKeyAttempt = await IdKeyMap.GetKeyForIdAsync(entity.ParentId, ItemObjectType);
         if (itemKeyAttempt.Success)
         {
             return itemKeyAttempt.Result;
