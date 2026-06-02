@@ -22,14 +22,18 @@
 			"version": "22"
 		},
 
-		// Adds SMTP4Dev to use as a local SMTP server with UI
-		// Web UI available on port 5050, SMTP on port 2525
-		"ghcr.io/warrenbuckley/codespace-features/smtp4dev:1": {
-			"autorun": true,
-			"webport": "5050",
-			"smtpport": "2525",
-			"imapport": "143"
-		},
+		// TEMPORARILY DISABLED: smtp4dev fails to install because its postinstall script calls
+		// setcap on /usr/local/dotnet-tools/smtp4dev, which is a symlink. setcap requires a
+		// real ELF binary and refuses to operate on symlinks. Fix needed in the upstream feature:
+		// use `readlink -f` to resolve the symlink before calling setcap. Since smtpport is 2525
+		// (above 1024) the setcap call is not required at all for this configuration.
+		// Re-enable once https://github.com/warrenbuckley/codespace-features is updated.
+		// "ghcr.io/warrenbuckley/codespace-features/smtp4dev:1": {
+		// 	"autorun": true,
+		// 	"webport": "5050",
+		// 	"smtpport": "2525",
+		// 	"imapport": "143"
+		// },
 
 		// Adds SQLite feature from apt install
 		// Also adds the SQLite VSCode extension
@@ -43,12 +47,13 @@
 	// plain HTTP to container ports — TLS is terminated at the *.app.github.dev edge).
 	// Port 44339 is the HTTPS endpoint for local development only; it is silenced here
 	// because the Codespaces forwarding agent cannot reach an HTTPS-only Kestrel socket.
-	"forwardPorts": [5050, 5173, 11000],
+	// 5050 (SMTP4Dev) removed from forwardPorts until the feature is re-enabled.
+	"forwardPorts": [5173, 11000],
 	"portsAttributes": {
 		"5050": {
-			"label": "SMTP4Dev",
+			"label": "SMTP4Dev (disabled)",
 			"protocol": "http",
-			"onAutoForward": "notify"
+			"onAutoForward": "silent"
 		},
 		"5173": {
 			"label": "Backoffice (Vite)",
