@@ -61,6 +61,7 @@ public class SqliteMigrationProvider : IMigrationProvider
             EFCoreMigration.AddRelationDtos => typeof(Migrations.AddRelationDtos),
             EFCoreMigration.AddContentVersionCleanupPolicyDto => typeof(Migrations.AddContentVersionCleanupPolicyDto),
             EFCoreMigration.AddPublicAccessDto => typeof(Migrations.AddPublicAccessDto),
+            EFCoreMigration.AddDistributedJobDto => typeof(Migrations.AddDistributedJobDto),
             _ => throw new ArgumentOutOfRangeException(nameof(migration), $@"Not expected migration value: {migration}")
         };
 }
