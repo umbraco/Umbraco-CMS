@@ -406,6 +406,51 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.ToTable("umbracoCacheInstruction", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ConsentDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)")
+                        .HasColumnName("action");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("comment");
+
+                    b.Property<string>("Context")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .HasColumnName("context");
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("createDate");
+
+                    b.Property<bool>("Current")
+                        .HasColumnType("bit")
+                        .HasColumnName("current");
+
+                    b.Property<string>("Source")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)")
+                        .HasColumnName("source");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int")
+                        .HasColumnName("state");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("umbracoConsent", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentVersionCleanupPolicyDto", b =>
                 {
                     b.Property<int>("ContentTypeId")

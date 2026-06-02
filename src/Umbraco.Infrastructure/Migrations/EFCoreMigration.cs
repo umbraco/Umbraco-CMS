@@ -21,4 +21,5 @@ public enum EFCoreMigration
     AddContentVersionCleanupPolicyDto = 13,
     AddPublicAccessDto = 14,
     AddDistributedJobDto = 15,
+    AddConsentDto = 16,
 }

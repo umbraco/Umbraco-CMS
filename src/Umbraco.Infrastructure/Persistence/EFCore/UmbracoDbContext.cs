@@ -80,6 +80,8 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<DistributedJobDto> DistributedJob { get; set; }
 
+    public required DbSet<ConsentDto> Consents { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var coreExtensions = options.FindExtension<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>();
