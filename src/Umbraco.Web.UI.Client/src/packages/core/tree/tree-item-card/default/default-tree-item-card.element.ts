@@ -17,6 +17,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 			this.observe(value.selectOnly, (v) => (this._selectOnly = v), '_observeSelectOnly');
 			this.observe(value.isSelected, (v) => (this._isSelected = v), '_observeIsSelected');
 			this.observe(value.isActive, (v) => (this._isActive = v), '_observeIsActive');
+			this.observe(value.noAccess, (v) => (this._noAccess = v), '_observeNoAccess');
 			this.observe(value.path, (v) => (this._path = v), '_observePath');
 			this.observe(value.hasActions, (v) => (this._hasActions = v), '_observeHasActions');
 		}
@@ -42,6 +43,9 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 
 	@state()
 	private _isActive = false;
+
+	@state()
+	private _noAccess = false;
 
 	@state()
 	private _path = '';
@@ -83,6 +87,7 @@ export class UmbDefaultTreeItemCardElement extends UmbLitElement {
 				?select-only=${this._selectOnly}
 				?selected=${this._isSelected}
 				?active=${this._isActive}
+				?disabled=${this._noAccess}
 				background-color="var(--uui-color-surface)"
 				@selected=${this.#onSelected}
 				@deselected=${this.#onDeselected}

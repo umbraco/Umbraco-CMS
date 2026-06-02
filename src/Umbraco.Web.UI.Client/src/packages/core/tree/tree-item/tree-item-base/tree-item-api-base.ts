@@ -36,6 +36,7 @@ export interface UmbTreeItemApi<
 	readonly isSelected: Observable<boolean>;
 	readonly isActive: Observable<boolean>;
 	readonly hasActions: Observable<boolean>;
+	readonly noAccess: Observable<boolean>;
 	readonly path: Observable<string>;
 	setTreeItem(item: TreeItemType | undefined): void;
 	getTreeItem(): TreeItemType | undefined;
@@ -98,6 +99,10 @@ export abstract class UmbTreeItemApiBase<
 
 	#treeItemEntityActionManager = new UmbTreeItemEntityActionManager(this);
 	#hideTreeItemActions = new UmbBooleanState(false);
+
+	protected readonly _noAccess = new UmbBooleanState(false);
+	readonly noAccess = this._noAccess.asObservable();
+
 	readonly hasActions = combineLatest([
 		this.#treeItemEntityActionManager.hasActions,
 		this.#hideTreeItemActions.asObservable(),
