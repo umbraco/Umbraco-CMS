@@ -404,7 +404,9 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		const dirtyData = this.#documentWorkspaceContext.getData();
 
 		// Save and publish in a single server transaction (replaces the separate save + publish calls).
-		await this.#documentWorkspaceContext.performCreateOrUpdateAndPublish(variantIds, saveData);
+		// The HTTP lives in the publishing domain; the document workspace context applies the create/update
+		// lifecycle (isNew, tree events, persisted reconcile) via its finalize* methods.
+		await this.#createOrUpdateAndPublish(variantIds, saveData);
 
 		this.#notificationContext?.peek('positive', {
 			data: {
@@ -429,6 +431,33 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 
 		const event = new UmbRequestReloadStructureForEntityEvent({ unique, entityType });
 		this.#eventContext?.dispatchEvent(event);
+	}
+
+	/**
+	 * Performs the single-transaction create/update-and-publish via the publishing repository, then asks
+	 * the document workspace context to apply the matching create/update lifecycle. The data state is
+	 * refreshed by the reload that #performSaveAndPublish runs afterwards.
+	 * @param {Array<UmbVariantId>} variantIds - The variants to publish
+	 * @param {UmbDocumentDetailModel} saveData - The data to save (constructed for the selected variants)
+	 */
+	async #createOrUpdateAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
+		const documentWorkspaceContext = this.#documentWorkspaceContext;
+		if (!documentWorkspaceContext) throw new Error('Document workspace context is missing');
+
+		if (documentWorkspaceContext.getIsNew()) {
+			const parent = documentWorkspaceContext._internal_getCreateUnderParent();
+			if (!parent) throw new Error('Parent is not set');
+
+			const { error } = await this.#publishingRepository.createAndPublish(saveData, variantIds, parent.unique);
+			if (error) throw new Error('Error creating and publishing document');
+
+			await documentWorkspaceContext.finalizeCreate(saveData);
+		} else {
+			const { error } = await this.#publishingRepository.updateAndPublish(saveData, variantIds);
+			if (error) throw new Error('Error updating and publishing document');
+
+			await documentWorkspaceContext.finalizeUpdate();
+		}
 	}
 
 	#publishableVariantsFilter = (option: UmbDocumentVariantOptionModel) => {

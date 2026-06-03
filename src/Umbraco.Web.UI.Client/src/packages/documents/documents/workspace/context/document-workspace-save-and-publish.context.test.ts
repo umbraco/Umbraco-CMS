@@ -5,6 +5,7 @@ import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
 import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-workspace-context.test-utils.js';
 import { UmbDocumentServerDataSource } from '../../repository/detail/document-detail.server.data-source.js';
+import { UmbDocumentPublishingServerDataSource } from '../../publishing/repository/document-publishing.server.data-source.js';
 
 const VARIANT_DOCUMENT_ID = 'variant-documents-variant-document-id';
 const EN_US = UmbVariantId.Create({ culture: 'en-US', segment: null });
@@ -14,13 +15,18 @@ const DA_ORIGINAL = 'Dette er den danske varianttekst.';
 
 /**
  * Reproduces the save-and-publish orchestration that the publishing workspace context performs
- * (#performSaveAndPublish): capture the draft, perform the combined create/update-and-publish call,
- * reload, then transfer only the published variants back to the current data state.
+ * (#performSaveAndPublish): capture the draft, perform the combined update-and-publish call via the
+ * publishing data source, reload, then transfer only the published variants back to the current data
+ * state. These scenarios use an existing (non-new) document, so the update-and-publish path is used.
  */
-async function saveAndPublish(context: UmbDocumentWorkspaceContext, variantIds: Array<UmbVariantId>) {
+async function saveAndPublish(
+	context: UmbDocumentWorkspaceContext,
+	publishingDataSource: UmbDocumentPublishingServerDataSource,
+	variantIds: Array<UmbVariantId>,
+) {
 	const dirtyData = context.getData();
 	const saveData = await context.constructSaveData(variantIds);
-	await context.performCreateOrUpdateAndPublish(variantIds, saveData);
+	await publishingDataSource.updateAndPublish(saveData, variantIds);
 	await context.reload();
 	await context.transferPublishedVariantsToCurrent(dirtyData, variantIds);
 }
@@ -28,6 +34,7 @@ async function saveAndPublish(context: UmbDocumentWorkspaceContext, variantIds: 
 describe('UmbDocumentWorkspaceContext (save & publish data state)', () => {
 	let hostElement: UmbTestDocumentWorkspaceHostElement;
 	let context: UmbDocumentWorkspaceContext;
+	let publishingDataSource: UmbDocumentPublishingServerDataSource;
 
 	before(() => {
 		umbExtensionsRegistry.registerMany(TEST_MANIFESTS);
@@ -43,6 +50,7 @@ describe('UmbDocumentWorkspaceContext (save & publish data state)', () => {
 		document.body.appendChild(hostElement);
 		await hostElement.init();
 		context = new UmbDocumentWorkspaceContext(hostElement);
+		publishingDataSource = new UmbDocumentPublishingServerDataSource(hostElement);
 		await context.load(VARIANT_DOCUMENT_ID);
 	});
 
@@ -54,7 +62,7 @@ describe('UmbDocumentWorkspaceContext (save & publish data state)', () => {
 		await context.setPropertyValue('variantText', 'Edited English', EN_US);
 		await context.setPropertyValue('variantText', 'Redigeret dansk', DA);
 
-		await saveAndPublish(context, [EN_US]);
+		await saveAndPublish(context, publishingDataSource, [EN_US]);
 
 		// Danish was edited but not published, so it must remain dirty in the current data state.
 		expect(context.getPropertyValue('variantText', DA)).to.equal('Redigeret dansk');
@@ -78,7 +86,7 @@ describe('UmbDocumentWorkspaceContext (save & publish data state)', () => {
 
 		const dirtyData = context.getData();
 		const saveData = await context.constructSaveData([EN_US]);
-		await context.performCreateOrUpdateAndPublish([EN_US], saveData);
+		await publishingDataSource.updateAndPublish(saveData, [EN_US]);
 		await context.reload();
 
 		// After reload, current state is the full server document, so the unsaved Danish edit is gone.
@@ -95,7 +103,7 @@ describe('UmbDocumentWorkspaceContext (save & publish data state)', () => {
 		await context.setPropertyValue('variantText', 'Edited English', EN_US);
 		await context.setPropertyValue('variantText', 'Redigeret dansk', DA);
 
-		await saveAndPublish(context, [EN_US]);
+		await saveAndPublish(context, publishingDataSource, [EN_US]);
 
 		const freshContext = new UmbDocumentWorkspaceContext(hostElement);
 		await freshContext.load(VARIANT_DOCUMENT_ID);
@@ -103,12 +111,12 @@ describe('UmbDocumentWorkspaceContext (save & publish data state)', () => {
 		expect(freshContext.getPropertyValue('variantText', DA), 'da not saved on server').to.equal(DA_ORIGINAL);
 	});
 
-	it('uses a single update-and-publish call (no separate publish request)', async () => {
+	it('uses the combined update-and-publish call, not the save-only update endpoint', async () => {
 		let updateAndPublishCalls = 0;
 		let updateCalls = 0;
-		const originalUpdateAndPublish = UmbDocumentServerDataSource.prototype.updateAndPublish;
+		const originalUpdateAndPublish = UmbDocumentPublishingServerDataSource.prototype.updateAndPublish;
 		const originalUpdate = UmbDocumentServerDataSource.prototype.update;
-		UmbDocumentServerDataSource.prototype.updateAndPublish = function (...args) {
+		UmbDocumentPublishingServerDataSource.prototype.updateAndPublish = function (...args) {
 			updateAndPublishCalls++;
 			return originalUpdateAndPublish.apply(this, args as never);
 		};
@@ -120,9 +128,9 @@ describe('UmbDocumentWorkspaceContext (save & publish data state)', () => {
 		try {
 			await context.setPropertyValue('variantText', 'Edited English', EN_US);
 			const saveData = await context.constructSaveData([EN_US]);
-			await context.performCreateOrUpdateAndPublish([EN_US], saveData);
+			await publishingDataSource.updateAndPublish(saveData, [EN_US]);
 		} finally {
-			UmbDocumentServerDataSource.prototype.updateAndPublish = originalUpdateAndPublish;
+			UmbDocumentPublishingServerDataSource.prototype.updateAndPublish = originalUpdateAndPublish;
 			UmbDocumentServerDataSource.prototype.update = originalUpdate;
 		}
 

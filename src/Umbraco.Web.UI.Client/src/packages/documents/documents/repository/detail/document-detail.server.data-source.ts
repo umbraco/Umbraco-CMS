@@ -3,9 +3,7 @@ import { UMB_DOCUMENT_ENTITY_TYPE } from '../../entity.js';
 import { UmbId } from '@umbraco-cms/backoffice/id';
 import type { UmbDetailDataSource } from '@umbraco-cms/backoffice/repository';
 import type {
-	CreateAndPublishDocumentRequestModel,
 	CreateDocumentRequestModel,
-	UpdateAndPublishDocumentRequestModel,
 	UpdateDocumentRequestModel,
 } from '@umbraco-cms/backoffice/external/backend-api';
 import { DocumentService } from '@umbraco-cms/backoffice/external/backend-api';
@@ -13,7 +11,7 @@ import { tryExecute } from '@umbraco-cms/backoffice/resources';
 import { umbDeepMerge, type UmbDeepPartialObject } from '@umbraco-cms/backoffice/utils';
 import { UmbDocumentTypeDetailServerDataSource } from '@umbraco-cms/backoffice/document-type';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
-import type { UmbVariantId } from '@umbraco-cms/backoffice/variant';
+import { umbMapDocumentCreateRequestBody, umbMapDocumentUpdateRequestBody } from './document-detail-request.mappers.js';
 
 /**
  * A data source for the Document that fetches data from the server
@@ -128,7 +126,7 @@ export class UmbDocumentServerDataSource
 		if (!model) throw new Error('Document is missing');
 		if (!model.unique) throw new Error('Document unique is missing');
 
-		const body: CreateDocumentRequestModel = this.#mapCreateRequestBody(model, parentUnique);
+		const body: CreateDocumentRequestModel = umbMapDocumentCreateRequestBody(model, parentUnique);
 
 		const { data, error } = await tryExecute(
 			this,
@@ -153,7 +151,7 @@ export class UmbDocumentServerDataSource
 	async update(model: UmbDocumentDetailModel) {
 		if (!model.unique) throw new Error('Unique is missing');
 
-		const body: UpdateDocumentRequestModel = this.#mapUpdateRequestBody(model);
+		const body: UpdateDocumentRequestModel = umbMapDocumentUpdateRequestBody(model);
 
 		const { error } = await tryExecute(
 			this,
@@ -168,101 +166,6 @@ export class UmbDocumentServerDataSource
 		}
 
 		return { error };
-	}
-
-	/**
-	 * Creates and publishes a new Document on the server in a single operation
-	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after creating
-	 * @param parentUnique
-	 * @returns {*}
-	 * @memberof UmbDocumentServerDataSource
-	 */
-	async createAndPublish(
-		model: UmbDocumentDetailModel,
-		variantIds: Array<UmbVariantId>,
-		parentUnique: string | null = null,
-	) {
-		if (!model) throw new Error('Document is missing');
-		if (!model.unique) throw new Error('Document unique is missing');
-
-		const body: CreateAndPublishDocumentRequestModel = {
-			...this.#mapCreateRequestBody(model, parentUnique),
-			culturesToPublish: this.#mapCulturesToPublish(variantIds),
-		};
-
-		const { data, error } = await tryExecute(
-			this,
-			DocumentService.postDocumentCreateAndPublish({
-				body: body,
-			}),
-		);
-
-		// 201 Created returns only the key (no document body). The workspace reloads after this to refresh
-		// its state, so we deliberately do NOT re-read the full document here — that would be a redundant
-		// round-trip on top of the reload.
-		return { data, error };
-	}
-
-	/**
-	 * Updates and publishes a Document on the server in a single operation
-	 * @param {UmbDocumentDetailModel} model - Document Model
-	 * @param {Array<UmbVariantId>} variantIds - The variants to publish after updating
-	 * @returns {*}
-	 * @memberof UmbDocumentServerDataSource
-	 */
-	async updateAndPublish(model: UmbDocumentDetailModel, variantIds: Array<UmbVariantId>) {
-		if (!model.unique) throw new Error('Unique is missing');
-
-		const body: UpdateAndPublishDocumentRequestModel = {
-			...this.#mapUpdateRequestBody(model),
-			culturesToPublish: this.#mapCulturesToPublish(variantIds),
-		};
-
-		const { error } = await tryExecute(
-			this,
-			DocumentService.putDocumentByIdUpdateAndPublish({
-				path: { id: model.unique },
-				body: body,
-			}),
-		);
-
-		// 200 returns only a notification header (no document body). The workspace reloads after this to
-		// refresh its state, so we deliberately do NOT re-read the full document here — that would be a
-		// redundant round-trip on top of the reload.
-		return { error };
-	}
-
-	/**
-	 * Maps the selected variants to the culture codes accepted by the create/update-and-publish endpoints.
-	 * Invariant content types require an empty array (cultures cannot be specified), and the server rejects
-	 * `null`/`"*"` entries, so invariant variants are filtered out and only distinct culture codes remain.
-	 * @param {Array<UmbVariantId>} variantIds - The selected variants to publish
-	 * @returns {Array<string>} The distinct culture codes to publish
-	 */
-	#mapCulturesToPublish(variantIds: Array<UmbVariantId>): Array<string> {
-		return [...new Set(variantIds.filter((x) => !x.isCultureInvariant()).map((x) => x.toCultureString()))];
-	}
-
-	// TODO: make data mapper to prevent errors
-	#mapCreateRequestBody(model: UmbDocumentDetailModel, parentUnique: string | null): CreateDocumentRequestModel {
-		return {
-			id: model.unique,
-			parent: parentUnique ? { id: parentUnique } : null,
-			documentType: { id: model.documentType.unique },
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
-		};
-	}
-
-	// TODO: make data mapper to prevent errors
-	#mapUpdateRequestBody(model: UmbDocumentDetailModel): UpdateDocumentRequestModel {
-		return {
-			template: model.template ? { id: model.template.unique } : null,
-			values: model.values,
-			variants: model.variants,
-		};
 	}
 
 	/**

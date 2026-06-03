@@ -4,6 +4,7 @@ import { UmbVariantId } from '@umbraco-cms/backoffice/variant';
 import { useMockSet } from '@umbraco-cms/internal/mock-manager';
 import { UmbDocumentWorkspaceContext } from './document-workspace.context.js';
 import { TEST_MANIFESTS, UmbTestDocumentWorkspaceHostElement } from './document-workspace-context.test-utils.js';
+import { UmbDocumentPublishingServerDataSource } from '../../publishing/repository/document-publishing.server.data-source.js';
 
 const INVARIANT_DOCUMENT_TYPE_ID = 'variant-documents-invariant-document-type-id';
 const VARIANT_DOCUMENT_TYPE_ID = 'variant-documents-variant-document-type-id';
@@ -11,9 +12,28 @@ const PARENT_ENTITY = { entityType: 'document', unique: null } as const;
 const EN_US = UmbVariantId.Create({ culture: 'en-US', segment: null });
 const DA = UmbVariantId.Create({ culture: 'da', segment: null });
 
+/**
+ * Reproduces the create-and-publish orchestration the publishing workspace context performs: build the
+ * save data, call the combined create-and-publish endpoint via the publishing data source, then ask the
+ * document workspace context to apply the create lifecycle (finalizeCreate). The reload+transfer that
+ * #performSaveAndPublish runs afterwards is intentionally omitted here — these tests assert the state in
+ * the window before that reload, which is exactly the window the new->edit redirect navigates in.
+ */
+async function createAndPublish(
+	context: UmbDocumentWorkspaceContext,
+	publishingDataSource: UmbDocumentPublishingServerDataSource,
+	variantIds: Array<UmbVariantId>,
+) {
+	const saveData = await context.constructSaveData(variantIds);
+	const parent = context._internal_getCreateUnderParent();
+	await publishingDataSource.createAndPublish(saveData, variantIds, parent?.unique ?? null);
+	await context.finalizeCreate(saveData);
+}
+
 describe('UmbDocumentWorkspaceContext (create-and-publish redirect dirty state)', () => {
 	let hostElement: UmbTestDocumentWorkspaceHostElement;
 	let context: UmbDocumentWorkspaceContext;
+	let publishingDataSource: UmbDocumentPublishingServerDataSource;
 
 	before(() => {
 		umbExtensionsRegistry.registerMany(TEST_MANIFESTS);
@@ -29,7 +49,7 @@ describe('UmbDocumentWorkspaceContext (create-and-publish redirect dirty state)'
 		document.body.appendChild(hostElement);
 		await hostElement.init();
 		context = new UmbDocumentWorkspaceContext(hostElement);
-		await context.create(PARENT_ENTITY, INVARIANT_DOCUMENT_TYPE_ID);
+		publishingDataSource = new UmbDocumentPublishingServerDataSource(hostElement);
 	});
 
 	afterEach(() => {
@@ -42,12 +62,11 @@ describe('UmbDocumentWorkspaceContext (create-and-publish redirect dirty state)'
 	// already report itself as clean — otherwise the redirect navigation pops a spurious
 	// "Discard unsaved changes" dialog (most visible with an empty RTE, which keeps current != persisted).
 	it('is not dirty immediately after create-and-publish, before the reload reconciles state', async () => {
+		await context.create(PARENT_ENTITY, INVARIANT_DOCUMENT_TYPE_ID);
 		context.setName('New Test Document');
 		await context.setPropertyValue('text', 'A value');
 
-		const variantIds = [UmbVariantId.CreateInvariant()];
-		const saveData = await context.constructSaveData(variantIds);
-		await context.performCreateOrUpdateAndPublish(variantIds, saveData);
+		await createAndPublish(context, publishingDataSource, [UmbVariantId.CreateInvariant()]);
 
 		expect(context.getIsNew(), 'workspace is no longer new').to.be.false;
 		expect(
@@ -57,8 +76,8 @@ describe('UmbDocumentWorkspaceContext (create-and-publish redirect dirty state)'
 	});
 
 	// Guards the #68071 promise on the create path: clearing the dirty state for the redirect must NOT
-	// also clear edited-but-unpublished variants. Reconciling persisted to `saveData` (not the full
-	// current data) keeps those variants dirty so their edits survive and stay navigation-guarded.
+	// also clear edited-but-unpublished variants. finalizeCreate reconciles persisted to `saveData` (not
+	// the full current data), so those variants stay dirty and their edits survive + remain guarded.
 	it('keeps an edited-but-unpublished variant dirty after create-and-publish (no data loss)', async () => {
 		await context.create(PARENT_ENTITY, VARIANT_DOCUMENT_TYPE_ID);
 		context.setName('English name', EN_US);
@@ -66,12 +85,17 @@ describe('UmbDocumentWorkspaceContext (create-and-publish redirect dirty state)'
 		await context.setPropertyValue('variantText', 'English value', EN_US);
 		await context.setPropertyValue('variantText', 'Dansk vaerdi', DA);
 
-		const saveData = await context.constructSaveData([EN_US]);
-		await context.performCreateOrUpdateAndPublish([EN_US], saveData);
+		await createAndPublish(context, publishingDataSource, [EN_US]);
 
 		const changed = context.getChangedVariants();
-		expect(changed.some((v) => v.culture === 'en-US'), 'en-US is clean (it was published)').to.be.false;
-		expect(changed.some((v) => v.culture === 'da'), 'da stays dirty (edited but not published)').to.be.true;
+		expect(
+			changed.some((v) => v.culture === 'en-US'),
+			'en-US is clean (it was published)',
+		).to.be.false;
+		expect(
+			changed.some((v) => v.culture === 'da'),
+			'da stays dirty (edited but not published)',
+		).to.be.true;
 		expect(context.getPropertyValue('variantText', DA), 'the Danish edit is preserved').to.equal('Dansk vaerdi');
 	});
 });

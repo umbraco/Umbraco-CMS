@@ -396,49 +396,26 @@ export class UmbDocumentWorkspaceContext
 	}
 
 	/**
-	 * Creates or updates the document and publishes the selected variants in a single server operation.
-	 * Mirrors the create/update event side-effects of the base save flow, but does NOT set the
-	 * persisted/current data state.
+	 * Finalizes the workspace lifecycle after a NEW document has been created (and published) via a
+	 * single-transaction endpoint orchestrated by another context (the publishing workspace context). The
+	 * HTTP call and the subsequent reload are the caller's responsibility; this only applies the create
+	 * side-effects the base save flow would: reconcile persisted to the saved data, mark the workspace as
+	 * no longer new, and notify the tree.
 	 *
-	 * IMPORTANT: this leaves the workspace in an intermediate state. The caller MUST follow up with
-	 * `reload()` and {@link transferPublishedVariantsToCurrent} to bring the workspace back to a valid
-	 * state (persisted = full server document, current = published variants + retained unpublished edits).
-	 * It is split from the reload only to avoid a transient false-positive pending-changes flash — do not
-	 * call it standalone. See `UmbDocumentPublishingWorkspaceContext` `#performSaveAndPublish`.
-	 * @param {Array<UmbVariantId>} variantIds - The variants to publish
-	 * @param {UmbDocumentDetailModel} saveData - The data to save (constructed for the selected variants)
-	 * @returns {Promise<void>} Resolves when the server operation has completed (the workspace state is
-	 * refreshed by the subsequent reload, not by this method).
+	 * Persisted is reconciled to `savedData` (not the full current data) BEFORE flipping isNew: that flip
+	 * triggers the new->edit redirect, whose navigation guard would otherwise see a transient dirty state
+	 * (the caller's reload reconciles only afterwards) and pop a spurious "Discard unsaved changes" dialog
+	 * (reported by Andy Butland). Using `savedData` keeps published variants clean while edited-but-
+	 * unpublished variants correctly stay dirty, so their edits remain guarded during the pre-reload window.
+	 * @param {UmbDocumentDetailModel} savedData - The data that was sent to the server (constructSaveData)
+	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentWorkspaceContext
 	 */
-	public async performCreateOrUpdateAndPublish(
-		variantIds: Array<UmbVariantId>,
-		saveData: UmbDocumentDetailModel,
-	): Promise<void> {
-		return this.getIsNew()
-			? this.#createAndPublish(variantIds, saveData)
-			: this.#updateAndPublish(variantIds, saveData);
-	}
-
-	async #createAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
-		if (!this._detailRepository) throw new Error('Detail repository is not set');
-
+	public async finalizeCreate(savedData: UmbDocumentDetailModel): Promise<void> {
 		const parent = this._internal_getCreateUnderParent();
 		if (!parent) throw new Error('Parent is not set');
 
-		const { error } = await this._detailRepository.createAndPublish(saveData, variantIds, parent.unique);
-		if (error) {
-			throw new Error('Error creating and publishing document');
-		}
-
-		// Reconcile persisted to what was just saved BEFORE flipping isNew: that flip triggers the
-		// new->edit redirect, whose navigation guard would otherwise see a transient dirty state (the
-		// reload only reconciles afterwards) and pop a spurious "Discard unsaved changes" dialog
-		// (reported by Andy Butland). Using `saveData` rather than the full current data means the
-		// published variants become clean while any edited-but-unpublished variants correctly stay dirty,
-		// so their edits are still guarded against navigation during the brief pre-reload window.
-		this._data.setPersisted(saveData);
-
+		this._data.setPersisted(savedData);
 		this.setIsNew(false);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
@@ -452,14 +429,15 @@ export class UmbDocumentWorkspaceContext
 		);
 	}
 
-	async #updateAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
-		if (!this._detailRepository) throw new Error('Detail repository is not set');
-
-		const { error } = await this._detailRepository.updateAndPublish(saveData, variantIds);
-		if (error) {
-			throw new Error('Error updating and publishing document');
-		}
-
+	/**
+	 * Finalizes the workspace lifecycle after an EXISTING document has been updated (and published) via a
+	 * single-transaction endpoint orchestrated by another context. The HTTP call and the subsequent reload
+	 * are the caller's responsibility; this only notifies the tree/structure and emits the workspace's own
+	 * UmbEntityUpdatedEvent (stamped so the workspace ignores its own update).
+	 * @returns {Promise<void>}
+	 * @memberof UmbDocumentWorkspaceContext
+	 */
+	public async finalizeUpdate(): Promise<void> {
 		const unique = this.getUnique()!;
 		const entityType = this.getEntityType();
 
