@@ -1,5 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
@@ -16,6 +19,7 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
     private readonly IDataValueEditorFactory _dataValueEditorFactory;
     private readonly IConfigurationEditorJsonSerializer _configurationEditorJsonSerializer;
     private readonly TimeProvider _timeProvider;
+    private readonly ILogger<DataTypePresentationFactory> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DataTypePresentationFactory"/> class, which is responsible for creating data type presentation models.
@@ -25,18 +29,46 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
     /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
     /// <param name="configurationEditorJsonSerializer">Serializer for configuration editor JSON data.</param>
     /// <param name="timeProvider">Provides the current time for time-dependent operations.</param>
+    /// <param name="logger">The logger.</param>
     public DataTypePresentationFactory(
         IDataTypeContainerService dataTypeContainerService,
         PropertyEditorCollection propertyEditorCollection,
         IDataValueEditorFactory dataValueEditorFactory,
         IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
-        TimeProvider timeProvider)
+        TimeProvider timeProvider,
+        ILogger<DataTypePresentationFactory> logger)
     {
         _dataTypeContainerService = dataTypeContainerService;
         _propertyEditorCollection = propertyEditorCollection;
         _dataValueEditorFactory = dataValueEditorFactory;
         _configurationEditorJsonSerializer = configurationEditorJsonSerializer;
         _timeProvider = timeProvider;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataTypePresentationFactory"/> class, which is responsible for creating data type presentation models.
+    /// </summary>
+    /// <param name="dataTypeContainerService">Service used to manage data type containers.</param>
+    /// <param name="propertyEditorCollection">A collection containing all available property editors.</param>
+    /// <param name="dataValueEditorFactory">Factory for creating data value editors.</param>
+    /// <param name="configurationEditorJsonSerializer">Serializer for configuration editor JSON data.</param>
+    /// <param name="timeProvider">Provides the current time for time-dependent operations.</param>
+    [Obsolete("Please use the constructor that takes all parameters. Scheduled for removal in Umbraco 19.")]
+    public DataTypePresentationFactory(
+        IDataTypeContainerService dataTypeContainerService,
+        PropertyEditorCollection propertyEditorCollection,
+        IDataValueEditorFactory dataValueEditorFactory,
+        IConfigurationEditorJsonSerializer configurationEditorJsonSerializer,
+        TimeProvider timeProvider)
+        : this(
+            dataTypeContainerService,
+            propertyEditorCollection,
+            dataValueEditorFactory,
+            configurationEditorJsonSerializer,
+            timeProvider,
+            StaticServiceProvider.Instance.GetRequiredService<ILogger<DataTypePresentationFactory>>())
+    {
     }
 
     /// <inheritdoc />
@@ -130,9 +162,15 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
                 return ValueTypes.ToStorageType(configureValueType.ValueType);
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // Swallow and fall back to the value editor's value type below.
+            // Configuration editors are third-party and can throw anything when the stored configuration
+            // doesn't deserialize into their configuration type. Fall back to the value editor's value type
+            // rather than failing the save, but log so the misconfiguration remains observable.
+            _logger.LogWarning(
+                ex,
+                "Could not build the configuration object for editor {EditorAlias} to determine its value storage type; falling back to the value editor's value type.",
+                editor.Alias);
         }
 
         var valueType = editor.GetValueEditor().ValueType;

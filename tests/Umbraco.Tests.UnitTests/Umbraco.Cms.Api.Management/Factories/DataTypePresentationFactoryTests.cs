@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
@@ -186,7 +187,8 @@ public class DataTypePresentationFactoryTests
             propertyEditorCollection,
             _dataValueEditorFactory.Object,
             configurationEditorJsonSerializer,
-            TimeProvider.System);
+            TimeProvider.System,
+            NullLogger<DataTypePresentationFactory>.Instance);
     }
 
     private IDataEditor CreateMockEditorWithConfigurationEditor(string alias, IConfigurationEditor configurationEditor, string defaultValueType = ValueTypes.String)
