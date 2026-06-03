@@ -406,7 +406,7 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 		// Save and publish in a single server transaction (replaces the separate save + publish calls).
 		// The HTTP lives in the publishing domain; the document workspace context applies the create/update
 		// lifecycle (isNew, tree events, persisted reconcile) via its finalize* methods.
-		await this.#createOrUpdateAndPublish(variantIds, saveData);
+		await this.#createOrUpdateAndPublish(this.#documentWorkspaceContext, variantIds, saveData);
 
 		this.#notificationContext?.peek('positive', {
 			data: {
@@ -437,13 +437,15 @@ export class UmbDocumentPublishingWorkspaceContext extends UmbContextBase implem
 	 * Performs the single-transaction create/update-and-publish via the publishing repository, then asks
 	 * the document workspace context to apply the matching create/update lifecycle. The data state is
 	 * refreshed by the reload that #performSaveAndPublish runs afterwards.
+	 * @param {typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE} documentWorkspaceContext - The document workspace context
 	 * @param {Array<UmbVariantId>} variantIds - The variants to publish
 	 * @param {UmbDocumentDetailModel} saveData - The data to save (constructed for the selected variants)
 	 */
-	async #createOrUpdateAndPublish(variantIds: Array<UmbVariantId>, saveData: UmbDocumentDetailModel): Promise<void> {
-		const documentWorkspaceContext = this.#documentWorkspaceContext;
-		if (!documentWorkspaceContext) throw new Error('Document workspace context is missing');
-
+	async #createOrUpdateAndPublish(
+		documentWorkspaceContext: typeof UMB_DOCUMENT_WORKSPACE_CONTEXT.TYPE,
+		variantIds: Array<UmbVariantId>,
+		saveData: UmbDocumentDetailModel,
+	): Promise<void> {
 		if (documentWorkspaceContext.getIsNew()) {
 			const parent = documentWorkspaceContext._internal_getCreateUnderParent();
 			if (!parent) throw new Error('Parent is not set');
