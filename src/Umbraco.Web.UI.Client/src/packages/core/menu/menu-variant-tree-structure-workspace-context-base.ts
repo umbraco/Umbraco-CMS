@@ -143,10 +143,16 @@ export abstract class UmbMenuVariantTreeStructureWorkspaceContextBase extends Um
 		let structureItems: Array<UmbVariantStructureItemModel> = [];
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
-		if (unique === undefined) return;
+		if (unique === undefined) {
+			if (this._host) console.warn('[UmbMenuVariantTreeStructureWorkspaceContextBase] unique not available');
+			return;
+		}
 
 		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
-		if (!entityType) return;
+		if (!entityType) {
+			if (this._host) console.warn('[UmbMenuVariantTreeStructureWorkspaceContextBase] entityType not available');
+			return;
+		}
 
 		// TODO: introduce variant tree item model
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<any, UmbTreeRootModel>>(
