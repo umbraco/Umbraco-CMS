@@ -31,6 +31,7 @@ export class UmbMediaSearchServerDataSource
 
 		const requestController = new UmbItemDataApiGetRequestController(this.#host, {
 			uniques: ids,
+			// eslint-disable-next-line local-rules/no-direct-api-import
 			api: ({ uniques }) => MediaService.getItemMediaAncestors({ query: { id: uniques } }),
 		});
 		const { data, error } = await requestController.request();

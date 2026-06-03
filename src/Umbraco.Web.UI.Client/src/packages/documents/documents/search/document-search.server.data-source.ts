@@ -31,6 +31,7 @@ export class UmbDocumentSearchServerDataSource
 
 		const requestController = new UmbItemDataApiGetRequestController(this.#host, {
 			uniques: ids,
+			// eslint-disable-next-line local-rules/no-direct-api-import
 			api: ({ uniques }) => DocumentService.getItemDocumentAncestors({ query: { id: uniques } }),
 		});
 		const { data, error } = await requestController.request();

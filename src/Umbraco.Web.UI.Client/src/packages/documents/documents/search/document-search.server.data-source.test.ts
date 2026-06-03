@@ -76,9 +76,10 @@ describe('UmbDocumentSearchServerDataSource', () => {
 		expect(ancestorRequestBatches.length).to.equal(3);
 		ancestorRequestBatches.forEach((batch) => expect(batch.length).to.be.at.most(40));
 
-		// Every id is requested exactly once across the batches.
+		// Every id is requested exactly once across the batches (no duplicates, no gaps).
 		const requestedIds = ancestorRequestBatches.flat();
 		expect(requestedIds.length).to.equal(95);
+		expect(new Set(requestedIds).size).to.equal(95);
 
 		// Results are returned with their ancestors mapped from the amalgamated batches.
 		expect(data?.items.length).to.equal(95);
