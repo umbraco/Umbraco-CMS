@@ -428,7 +428,7 @@ export default {
 		enterFolderName: 'Introduza um nome de pasta',
 		updateData: 'Escolha um tipo e um título',
 		noDocumentTypes:
-			'Não existem Tipos de Documento permitidos disponíveis para criar conteúdo aqui. Deve ativá-los em <strong>Tipos de Documento</strong> na secção <strong>Definições</strong>, editando os <strong>Tipos de nó filho permitidos</strong> em <strong>Permissões</strong>.',
+			'Não existem Tipos de Documento permitidos disponíveis para criar conteúdo aqui. Deve ativá-los em <strong>Tipos de Documento</strong> na secção <strong>Definições</strong>, editando os <strong>Tipos de nó filho permitidos</strong> em <strong>Estrutura</strong>.',
 		noDocumentTypesAtRoot:
 			'Não existem Tipos de Documento disponíveis para criar conteúdo aqui. Deve criá-los em <strong>Tipos de Documento</strong> na secção <strong>Definições</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -436,9 +436,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Editar permissões para este Tipo de Documento',
 		noDocumentTypesCreateNew: 'Criar um novo Tipo de Documento',
 		noDocumentTypesAllowedAtRoot:
-			'Não existem Tipos de Documento permitidos disponíveis para criar conteúdo aqui. Deve ativá-los em <strong>Tipos de Documento</strong> na secção <strong>Definições</strong>, alterando a opção <strong>Permitir como raiz</strong> em <strong>Permissões</strong>.',
+			'Não existem Tipos de Documento permitidos disponíveis para criar conteúdo aqui. Deve ativá-los em <strong>Tipos de Documento</strong> na secção <strong>Definições</strong>, alterando a opção <strong>Permitir como raiz</strong> em <strong>Estrutura</strong>.',
 		noMediaTypes:
-			'Não existem Tipos de Multimédia permitidos disponíveis para criar multimédia aqui. Deve ativá-los em <strong>Tipos de Multimédia</strong> na secção <strong>Definições</strong>, editando os <strong>Tipos de nó filho permitidos</strong> em <strong>Permissões</strong>.',
+			'Não existem Tipos de Multimédia permitidos disponíveis para criar multimédia aqui. Deve ativá-los em <strong>Tipos de Multimédia</strong> na secção <strong>Definições</strong>, editando os <strong>Tipos de nó filho permitidos</strong> em <strong>Estrutura</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			'A multimédia selecionada na árvore não permite a criação de nenhuma outra multimédia abaixo dela.',
 		noMediaTypesEditPermissions: 'Editar permissões para este Tipo de Multimédia',
@@ -1404,6 +1404,7 @@ export default {
 	},
 	sections: {
 		content: 'Conteúdo',
+		library: 'Biblioteca',
 		media: 'Multimédia',
 		member: 'Membros',
 		packages: 'Pacotes',

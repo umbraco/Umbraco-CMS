@@ -368,7 +368,7 @@ export default {
 		enterFolderName: 'Unesite naziv mape',
 		updateData: 'Odaberite vrstu i naslov',
 		noDocumentTypes:
-			'Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Vrste Dokumenta</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljene vrste podređenih čvorova</strong> unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Vrste Dokumenta</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljene vrste podređenih čvorova</strong> unutar <strong>Struktura</strong>.',
 		noDocumentTypesAtRoot:
 			'Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih kreirati u <strong>Vrste Dokumenata</strong> unutar sekcije <strong>Postavke</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -376,9 +376,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Uredi dozvole za ovu vrstu dokumenta',
 		noDocumentTypesCreateNew: 'Kreiraj novu vrstu dokumenta',
 		noDocumentTypesAllowedAtRoot:
-			'Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Vrste Dokumenta</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih vrsta dokumenata dostupnih za kreiranje sadržaja ovdje. Morate ih omogućiti u <strong>Vrste Dokumenta</strong> unutar sekcije <strong>Postavke</strong>, izmjenom <strong>Dozvoli kao root</strong> opcije unutar <strong>Struktura</strong>.',
 		noMediaTypes:
-			'Nema dozvoljenih vrsta medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Vrste Medija</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljene vrste podređenih čvorova</strong> unutar <strong>Dozvole</strong>.',
+			'Nema dozvoljenih vrsta medija dostupnih za kreiranje medija ovdje. Morate ih omogućiti u <strong>Vrste Medija</strong> unutar sekcije <strong>Postavke</strong>, uređivanjem <strong>Dozvoljene vrste podređenih čvorova</strong> unutar <strong>Struktura</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			'Odabrani medij u stablu ne dopušta bilo koji drugi medij\n       kreiran ispod njega.\n    ',
 		noMediaTypesEditPermissions: 'Uredi dozvole za ovu vrstu medija',
@@ -1229,20 +1229,13 @@ export default {
 		editscript: 'Uredite datoteku skripte',
 	},
 	sections: {
-		concierge: 'Portirnica',
 		content: 'Sadržaj',
-		courier: 'Kurir',
-		developer: 'Developer',
-		forms: 'Forme',
-		help: 'Pomoć',
-		installer: 'Umbraco Konfiguracijski Čarobnjak',
+		library: 'Knjižnica',
 		media: 'Mediji',
 		member: 'Članovi',
-		newsletters: 'Newsletteri',
 		packages: 'Paketi',
 		marketplace: 'Marketplace',
 		settings: 'Postavke',
-		statistics: 'Statistika',
 		translation: 'Prijevodi',
 		users: 'Korisnici',
 	},

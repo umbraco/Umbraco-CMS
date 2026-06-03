@@ -1,4 +1,5 @@
 import {ConstantHelper, test} from '@umbraco/acceptance-test-helpers';
+import {expect} from '@playwright/test';
 
 test.beforeEach(async ({umbracoUi}) => {
   await umbracoUi.goToBackOffice();

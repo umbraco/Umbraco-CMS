@@ -249,14 +249,24 @@ internal sealed class RedirectUrlRepository : EntityRepositoryBase<Guid, IRedire
 
     protected override IEnumerable<IRedirectUrl> PerformGetAll(params Guid[]? ids)
     {
-        if (ids?.Length > Constants.Sql.MaxParameterCount)
+        if (ids is null || ids.Length == 0)
         {
-            throw new NotSupportedException(
-                $"This repository does not support more than {Constants.Sql.MaxParameterCount} ids.");
+            return Database.Fetch<RedirectUrlDto>(GetBaseQuery(false))
+                .WhereNotNull()
+                .Select(Map)
+                .WhereNotNull();
         }
 
-        Sql<ISqlContext> sql = GetBaseQuery(false).WhereIn<RedirectUrlDto>(x => x.Id, ids);
-        List<RedirectUrlDto> dtos = Database.Fetch<RedirectUrlDto>(sql);
+        // Batch the WhereIn fetch so we never exceed SQL Server's 2100 parameter limit.
+        // EntityRepositoryBase.GetMany already groups IDs, but we keep the batching here as
+        // a defensive measure for safety and consistency at the repository boundary.
+        var dtos = new List<RedirectUrlDto>(ids.Length);
+        foreach (IEnumerable<Guid> group in ids.InGroupsOf(Constants.Sql.MaxParameterCount))
+        {
+            Sql<ISqlContext> sql = GetBaseQuery(false).WhereIn<RedirectUrlDto>(x => x.Id, group);
+            dtos.AddRange(Database.Fetch<RedirectUrlDto>(sql));
+        }
+
         return dtos.WhereNotNull().Select(Map).WhereNotNull();
     }
 

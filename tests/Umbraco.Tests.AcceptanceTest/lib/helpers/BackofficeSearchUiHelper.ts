@@ -59,14 +59,18 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
     await this.searchForQuery(query, ConstantHelper.apiEndpoints.memberSearch);
   }
 
+  async searchForElement(query: string) {
+    await this.searchForQuery(query, ConstantHelper.apiEndpoints.elementSearch);
+  }
+
   async clickSearchProvider(providerName: string) {
-    await this.click(this.searchModal.getByRole('button', {name: providerName, exact: true}));
+    await this.click(this.providerByName(providerName));
   }
 
   async clickSearchProviderAndWaitForRerun(providerName: string, searchUrl: string) {
     await this.waitForResponseAfterExecutingPromise(
       searchUrl,
-      this.click(this.searchModal.getByRole('button', {name: providerName, exact: true})),
+      this.click(this.providerByName(providerName)),
       ConstantHelper.statusCodes.ok,
     );
   }
@@ -78,17 +82,25 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
   async isSearchProviderActive(providerName: string) {
     await this.hasText(this.activeProvider, providerName);
   }
-
-  async isSearchResultWithNameVisible(name: string, isVisible: boolean = true) {
-    await this.isVisible(this.results.filter({hasText: name}), isVisible);
-  }
-
+  
   async doesSearchResultHaveCount(count: number) {
     expect(await this.results.count()).toBe(count);
   }
 
+  async isSearchProviderVisible(providerName: string, isVisible: boolean = true) {
+    await this.isVisible(this.providerByName(providerName), isVisible);
+  }
+
+  async isSearchResultWithNameVisible(name: string, isVisible: boolean = true) {
+    await this.isVisible(this.resultByName(name), isVisible);
+  }
+
+  async getSearchResultsCount() {
+    return await this.results.count();
+  }
+
   async clickSearchResult(name: string) {
-    await this.click(this.results.filter({hasText: name}));
+    await this.click(this.resultByName(name));
   }
 
   async isNoResultsMessageVisible(isVisible: boolean = true) {
@@ -111,5 +123,13 @@ export class BackofficeSearchUiHelper extends UiBaseLocators {
     await this.hasCount(this.activeResult, 1, ConstantHelper.timeout.short);
     const index = await this.activeResult.getAttribute('data-item-index');
     return index ? parseInt(index, 10) : -1;
+  }
+
+  private resultByName(name: string) {
+    return this.results.filter({hasText: name});
+  }
+
+  private providerByName(providerName: string) {
+    return this.searchModal.getByRole('button', {name: providerName, exact: true});
   }
 }
