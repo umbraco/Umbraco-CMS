@@ -3,10 +3,12 @@ using NUnit.Framework;
 using Umbraco.Cms.Api.Management.Factories;
 using Umbraco.Cms.Api.Management.ViewModels.DataType;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Cms.Api.Management.Factories;
 
@@ -103,6 +105,42 @@ public class DataTypePresentationFactoryTests
     }
 
     [Test]
+    public async Task CreateAsync_ConfigurationWithCollectionStoredAsJsonString_DoesNotThrowAndFallsBackToValueEditorType()
+    {
+        // Arrange - a real configuration editor whose typed configuration has a collection property,
+        // fed a value stored as a JSON string (as a custom multi-value config editor does). This is the
+        // shape from https://github.com/umbraco/Umbraco-CMS/issues/23057: round-tripping the configuration
+        // dictionary into the typed configuration throws because the string can't bind to List<T>.
+        IConfigurationEditorJsonSerializer serializer =
+            new SystemTextConfigurationEditorJsonSerializer(new DefaultJsonSerializerEncoderFactory());
+        var configurationEditor = new TestCollectionConfigurationEditor(Mock.Of<IIOHelper>());
+
+        IDataEditor editor = CreateMockEditorWithConfigurationEditor(
+            "Test.CollectionEditor",
+            configurationEditor,
+            defaultValueType: ValueTypes.Json);
+        DataTypePresentationFactory factory = CreateFactory(editor, serializer);
+
+        var requestModel = new CreateDataTypeRequestModel
+        {
+            Name = "Collection editor",
+            EditorAlias = "Test.CollectionEditor",
+            EditorUiAlias = "Test.CollectionEditorUi",
+            Values =
+            [
+                new DataTypePropertyPresentationModel { Alias = "buttons", Value = "[{\"value\":\"a\"}]" },
+            ],
+        };
+
+        // Act
+        var result = await factory.CreateAsync(requestModel);
+
+        // Assert - the save succeeds and falls back to the value editor's value type.
+        Assert.IsTrue(result.Success);
+        Assert.AreEqual(ValueStorageType.Ntext, result.Result.DatabaseType);
+    }
+
+    [Test]
     public async Task CreateAsync_Update_LabelEditorWithTextValueType_SetsDatabaseTypeToNtext()
     {
         // Arrange
@@ -136,6 +174,9 @@ public class DataTypePresentationFactoryTests
     }
 
     private DataTypePresentationFactory CreateFactory(IDataEditor editor)
+        => CreateFactory(editor, _configurationEditorJsonSerializer.Object);
+
+    private DataTypePresentationFactory CreateFactory(IDataEditor editor, IConfigurationEditorJsonSerializer configurationEditorJsonSerializer)
     {
         var propertyEditorCollection = new PropertyEditorCollection(
             new DataEditorCollection(() => [editor]));
@@ -144,8 +185,21 @@ public class DataTypePresentationFactoryTests
             _dataTypeContainerService.Object,
             propertyEditorCollection,
             _dataValueEditorFactory.Object,
-            _configurationEditorJsonSerializer.Object,
+            configurationEditorJsonSerializer,
             TimeProvider.System);
+    }
+
+    private IDataEditor CreateMockEditorWithConfigurationEditor(string alias, IConfigurationEditor configurationEditor, string defaultValueType = ValueTypes.String)
+    {
+        var mockValueEditor = new Mock<IDataValueEditor>();
+        mockValueEditor.Setup(v => v.ValueType).Returns(defaultValueType);
+
+        var mockEditor = new Mock<IDataEditor>();
+        mockEditor.Setup(e => e.Alias).Returns(alias);
+        mockEditor.Setup(e => e.GetConfigurationEditor()).Returns(configurationEditor);
+        mockEditor.Setup(e => e.GetValueEditor()).Returns(mockValueEditor.Object);
+
+        return mockEditor.Object;
     }
 
     private IDataEditor CreateMockEditor(string alias, object configurationObject, string defaultValueType = ValueTypes.String)
@@ -169,5 +223,24 @@ public class DataTypePresentationFactoryTests
         mockEditor.Setup(e => e.GetValueEditor()).Returns(mockValueEditor.Object);
 
         return mockEditor.Object;
+    }
+
+    private sealed class TestCollectionConfigurationEditor : ConfigurationEditor<TestCollectionConfiguration>
+    {
+        public TestCollectionConfigurationEditor(IIOHelper ioHelper)
+            : base(ioHelper)
+        {
+        }
+    }
+
+    private sealed class TestCollectionConfiguration
+    {
+        [ConfigurationField("buttons")]
+        public List<TestCollectionItem> Buttons { get; set; } = [];
+    }
+
+    private sealed class TestCollectionItem
+    {
+        public string Value { get; set; } = string.Empty;
     }
 }

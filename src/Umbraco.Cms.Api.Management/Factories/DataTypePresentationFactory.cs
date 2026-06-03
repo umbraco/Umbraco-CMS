@@ -72,7 +72,6 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
             dataType.Key = requestModel.Id.Value;
         }
 
-
         return Attempt.SucceedWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.Success, dataType);
     }
 
@@ -82,7 +81,7 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
         {
             try
             {
-                var parent = await _dataTypeContainerService.GetAsync(requestModel.Parent.Id);
+                EntityContainer? parent = await _dataTypeContainerService.GetAsync(requestModel.Parent.Id);
 
                 return parent is null
                     ? Attempt.FailWithStatus(DataTypeOperationStatus.ParentNotFound, 0)
@@ -104,7 +103,7 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
             return Task.FromResult(Attempt.FailWithStatus<IDataType, DataTypeOperationStatus>(DataTypeOperationStatus.PropertyEditorNotFound, new DataType(new VoidEditor(_dataValueEditorFactory), _configurationEditorJsonSerializer) ));
         }
 
-        IDataType dataType = (IDataType)current.DeepClone();
+        var dataType = (IDataType)current.DeepClone();
 
         IDictionary<string, object> configurationData = MapConfigurationData(requestModel, editor);
         dataType.Name = requestModel.Name;
@@ -119,12 +118,21 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
 
     private ValueStorageType GetEditorValueStorageType(IDataEditor editor, IDictionary<string, object> configurationData)
     {
-        var configurationObject = editor.GetConfigurationEditor()
-            .ToConfigurationObject(configurationData, _configurationEditorJsonSerializer);
-
-        if (configurationObject is IConfigureValueType configureValueType)
+        // Only editors whose configuration object implements IConfigureValueType derive their storage
+        // type from the configuration. Building the typed configuration object can throw for editors
+        // whose stored configuration doesn't cleanly deserialize into their configuration type; that
+        // must not fail the save, so fall back to the value editor's value type in that case.
+        try
         {
-            return ValueTypes.ToStorageType(configureValueType.ValueType);
+            if (editor.GetConfigurationEditor().ToConfigurationObject(configurationData, _configurationEditorJsonSerializer)
+                is IConfigureValueType configureValueType)
+            {
+                return ValueTypes.ToStorageType(configureValueType.ValueType);
+            }
+        }
+        catch (Exception)
+        {
+            // Swallow and fall back to the value editor's value type below.
         }
 
         var valueType = editor.GetValueEditor().ValueType;
