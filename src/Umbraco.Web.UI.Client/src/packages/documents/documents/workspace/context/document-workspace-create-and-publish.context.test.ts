@@ -75,17 +75,26 @@ describe('UmbDocumentWorkspaceContext (create-and-publish redirect dirty state)'
 		).to.be.false;
 	});
 
-	// Guards the #68071 promise on the create path: clearing the dirty state for the redirect must NOT
-	// also clear edited-but-unpublished variants. finalizeCreate reconciles persisted to `saveData` (not
-	// the full current data), so those variants stay dirty and their edits survive + remain guarded.
-	it('keeps an edited-but-unpublished variant dirty after create-and-publish (no data loss)', async () => {
+	// Guards the #68071 promise on the create path: finalizeCreate clears the dirty state for the redirect
+	// by resetting current to the saved (published) data, so the edited-but-unpublished variant is briefly
+	// absent. The full flow must restore it — the reload + transferPublishedVariantsToCurrent that
+	// #performSaveAndPublish runs re-applies the unpublished variant's edit so it survives and is dirty
+	// again. This asserts that end state (no data loss), not the intermediate redirect window.
+	it('restores an edited-but-unpublished variant after the full create-and-publish flow (no data loss)', async () => {
 		await context.create(PARENT_ENTITY, VARIANT_DOCUMENT_TYPE_ID);
 		context.setName('English name', EN_US);
 		context.setName('Dansk navn', DA);
 		await context.setPropertyValue('variantText', 'English value', EN_US);
 		await context.setPropertyValue('variantText', 'Dansk vaerdi', DA);
 
-		await createAndPublish(context, publishingDataSource, [EN_US]);
+		// Mirror UmbDocumentPublishingWorkspaceContext #performSaveAndPublish for the create path:
+		const dirtyData = context.getData(); // full draft, incl. the unpublished Danish edit
+		const saveData = await context.constructSaveData([EN_US]);
+		const parent = context._internal_getCreateUnderParent();
+		await publishingDataSource.createAndPublish(saveData, [EN_US], parent?.unique ?? null);
+		await context.finalizeCreate(saveData);
+		await context.reload();
+		await context.transferPublishedVariantsToCurrent(dirtyData, [EN_US]);
 
 		const changed = context.getChangedVariants();
 		expect(

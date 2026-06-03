@@ -399,14 +399,13 @@ export class UmbDocumentWorkspaceContext
 	 * Finalizes the workspace lifecycle after a NEW document has been created (and published) via a
 	 * single-transaction endpoint orchestrated by another context (the publishing workspace context). The
 	 * HTTP call and the subsequent reload are the caller's responsibility; this only applies the create
-	 * side-effects the base save flow would: reconcile persisted to the saved data, mark the workspace as
-	 * no longer new, and notify the tree.
+	 * side-effects the base save flow would: reconcile the data state to what was saved, mark the
+	 * workspace as no longer new, and notify the tree.
 	 *
-	 * Persisted is reconciled to `savedData` (not the full current data) BEFORE flipping isNew: that flip
-	 * triggers the new->edit redirect, whose navigation guard would otherwise see a transient dirty state
-	 * (the caller's reload reconciles only afterwards) and pop a spurious "Discard unsaved changes" dialog
-	 * (reported by Andy Butland). Using `savedData` keeps published variants clean while edited-but-
-	 * unpublished variants correctly stay dirty, so their edits remain guarded during the pre-reload window.
+	 * Both persisted AND current are reconciled to `savedData` BEFORE flipping isNew, so the new->edit
+	 * redirect that flip triggers can never observe a dirty state and pop a spurious "Discard unsaved
+	 * changes" dialog (reported by Andy Butland). Edited-but-unpublished variants are temporarily absent
+	 * from current until the caller's reload + transferPublishedVariantsToCurrent restores them (dirty again).
 	 * @param {UmbDocumentDetailModel} savedData - The data that was sent to the server (constructSaveData)
 	 * @returns {Promise<void>}
 	 * @memberof UmbDocumentWorkspaceContext
@@ -415,7 +414,14 @@ export class UmbDocumentWorkspaceContext
 		const parent = this._internal_getCreateUnderParent();
 		if (!parent) throw new Error('Parent is not set');
 
+		// Set persisted AND current to the same data before flipping isNew. The flip triggers the new->edit
+		// redirect, whose navigation guard compares the two states with an order-sensitive jsonStringComparison.
+		// `savedData` is a merge-processed projection of the draft (its values array can be ordered
+		// differently, and resolver-backed editors may rewrite values), so reconciling only persisted can
+		// still leave a spurious mismatch -> dialog. The edited-but-unpublished variants are restored (and
+		// become dirty again) by the caller's reload + transferPublishedVariantsToCurrent.
 		this._data.setPersisted(savedData);
+		this._data.setCurrent(savedData);
 		this.setIsNew(false);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
