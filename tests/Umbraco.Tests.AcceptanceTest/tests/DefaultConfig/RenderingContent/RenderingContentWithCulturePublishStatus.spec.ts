@@ -76,6 +76,7 @@ test('a descendant is not rendered when its ancestor is unpublished in the reque
   await umbracoUi.contentRender.navigateToRenderedContentPage(rootEnglishUrl);
 
   // Assert
-  // In English only the published child is a descendant the grandchild is excluded because its ancestor is unpublished in English
-  await umbracoUi.contentRender.doesContentRenderValueContainText(publishedChildName, true);
+  // In English the published child is a descendant, but the grandchild is excluded because its ancestor is unpublished in English
+  await umbracoUi.contentRender.doesContentRenderValueContainText(publishedChildName);
+  await umbracoUi.contentRender.doesContentRenderValueContainText(grandchildContentName, false, false);
 });
