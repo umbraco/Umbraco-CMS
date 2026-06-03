@@ -431,6 +431,14 @@ export class UmbDocumentWorkspaceContext
 			throw new Error('Error creating and publishing document');
 		}
 
+		// Reconcile persisted to what was just saved BEFORE flipping isNew: that flip triggers the
+		// new->edit redirect, whose navigation guard would otherwise see a transient dirty state (the
+		// reload only reconciles afterwards) and pop a spurious "Discard unsaved changes" dialog
+		// (reported by Andy Butland). Using `saveData` rather than the full current data means the
+		// published variants become clean while any edited-but-unpublished variants correctly stay dirty,
+		// so their edits are still guarded against navigation during the brief pre-reload window.
+		this._data.setPersisted(saveData);
+
 		this.setIsNew(false);
 
 		const eventContext = await this.getContext(UMB_ACTION_EVENT_CONTEXT);
