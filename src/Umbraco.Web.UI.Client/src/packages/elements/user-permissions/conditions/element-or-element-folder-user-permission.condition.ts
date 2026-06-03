@@ -7,6 +7,7 @@ import { UmbConditionBase } from '@umbraco-cms/backoffice/extension-registry';
 import type { UmbConditionControllerArguments, UmbExtensionCondition } from '@umbraco-cms/backoffice/extension-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
 
+/** Permits when the user has the configured element OR element folder (container) permissions. */
 export class UmbElementOrElementFolderUserPermissionCondition
 	extends UmbConditionBase<UmbElementOrElementFolderUserPermissionConditionConfig>
 	implements UmbExtensionCondition

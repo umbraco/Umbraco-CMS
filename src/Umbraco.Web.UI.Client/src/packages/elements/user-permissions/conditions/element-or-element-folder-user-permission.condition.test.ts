@@ -66,18 +66,13 @@ describe('UmbElementOrElementFolderUserPermissionCondition', () => {
 			hostElement.setEntity({ unique: 'permissions-element-read-only-id', entityType: UMB_ELEMENT_ENTITY_TYPE });
 			hostElement.setEntityAncestors([]);
 
-			let callbackCount = 0;
-
 			condition = new UmbElementOrElementFolderUserPermissionCondition(hostElement, {
 				host: hostElement,
 				config: CONDITION_CONFIG,
 				onChange: () => {
-					callbackCount++;
-					if (callbackCount === 1) {
-						expect(condition.permitted).to.be.true;
-						condition.hostDisconnected();
-						done();
-					}
+					expect(condition.permitted).to.be.true;
+					condition.hostDisconnected();
+					done();
 				},
 			});
 		});
@@ -88,18 +83,13 @@ describe('UmbElementOrElementFolderUserPermissionCondition', () => {
 			hostElement.setEntity({ unique: 'permissions-folder-read-only-id', entityType: UMB_ELEMENT_ENTITY_TYPE });
 			hostElement.setEntityAncestors([]);
 
-			let callbackCount = 0;
-
 			condition = new UmbElementOrElementFolderUserPermissionCondition(hostElement, {
 				host: hostElement,
 				config: CONDITION_CONFIG,
 				onChange: () => {
-					callbackCount++;
-					if (callbackCount === 1) {
-						expect(condition.permitted).to.be.true;
-						condition.hostDisconnected();
-						done();
-					}
+					expect(condition.permitted).to.be.true;
+					condition.hostDisconnected();
+					done();
 				},
 			});
 		});
@@ -110,18 +100,13 @@ describe('UmbElementOrElementFolderUserPermissionCondition', () => {
 			hostElement.setEntity({ unique: 'permissions-both-read-id', entityType: UMB_ELEMENT_ENTITY_TYPE });
 			hostElement.setEntityAncestors([]);
 
-			let callbackCount = 0;
-
 			condition = new UmbElementOrElementFolderUserPermissionCondition(hostElement, {
 				host: hostElement,
 				config: CONDITION_CONFIG,
 				onChange: () => {
-					callbackCount++;
-					if (callbackCount === 1) {
-						expect(condition.permitted).to.be.true;
-						condition.hostDisconnected();
-						done();
-					}
+					expect(condition.permitted).to.be.true;
+					condition.hostDisconnected();
+					done();
 				},
 			});
 		});

@@ -58,7 +58,6 @@ export const data: Array<UmbMockUserGroupModel> = [
 				},
 				verbs: ['Umb.Document.Delete', 'Umb.Document.Read'],
 			},
-			// Element and element folder permissions for testing the combined condition
 			{
 				$type: 'ElementPermissionPresentationModel',
 				element: { id: 'permissions-element-read-only-id' },
