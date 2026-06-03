@@ -25,8 +25,7 @@ public class ContentTypeDtoConfiguration : IEntityTypeConfiguration<ContentTypeD
             .HasColumnName(ContentTypeDto.IconColumnName);
 
         builder.Property(x => x.Thumbnail)
-            .HasColumnName(ContentTypeDto.ThumbnailColumnName)
-            .HasDefaultValue("folder.png");
+            .HasColumnName(ContentTypeDto.ThumbnailColumnName);
 
         builder.Property(x => x.Description)
             .HasColumnName(ContentTypeDto.DescriptionColumnName)
@@ -48,8 +47,7 @@ public class ContentTypeDtoConfiguration : IEntityTypeConfiguration<ContentTypeD
             .HasDefaultValue(false);
 
         builder.Property(x => x.Variations)
-            .HasColumnName(ContentTypeDto.VariationsColumnName)
-            .HasDefaultValue((byte)1);
+            .HasColumnName(ContentTypeDto.VariationsColumnName);
 
         // IX_cmsContentType (unique on nodeId)
         builder.HasIndex(x => x.NodeId)

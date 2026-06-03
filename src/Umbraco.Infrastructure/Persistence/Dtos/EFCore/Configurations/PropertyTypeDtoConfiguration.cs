@@ -58,8 +58,7 @@ public class PropertyTypeDtoConfiguration : IEntityTypeConfiguration<PropertyTyp
             .HasDefaultValue(false);
 
         builder.Property(x => x.Variations)
-            .HasColumnName(PropertyTypeDto.VariationsColumnName)
-            .HasDefaultValue((byte)1);
+            .HasColumnName(PropertyTypeDto.VariationsColumnName);
 
         builder.Property(x => x.UniqueId)
             .HasColumnName(PropertyTypeDto.UniqueIdColumnName);
