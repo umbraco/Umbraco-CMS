@@ -78,6 +78,20 @@ public class UmbracoDbContext : DbContext
 
     public required DbSet<AccessRuleDto> AccessRules { get; set; }
 
+    public required DbSet<ContentTypeDto> ContentTypes { get; set; }
+
+    public required DbSet<ContentType2ContentTypeDto> ContentTypeComposition { get; set; }
+
+    public required DbSet<ContentTypeAllowedContentTypeDto> ContentTypeAllowedContentTypes { get; set; }
+
+    public required DbSet<ContentTypeTemplateDto> ContentTypeTemplates { get; set; }
+
+    public required DbSet<PropertyTypeGroupDto> PropertyTypeGroups { get; set; }
+
+    public required DbSet<PropertyTypeDto> PropertyTypes { get; set; }
+
+    public required DbSet<DataTypeDto> DataTypes { get; set; }
+
     private static DbContextOptions<UmbracoDbContext> ConfigureOptions(DbContextOptions<UmbracoDbContext> options)
     {
         var coreExtensions = options.FindExtension<Microsoft.EntityFrameworkCore.Infrastructure.CoreOptionsExtension>();

@@ -406,6 +406,138 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.ToTable("umbracoCacheInstruction", (string)null);
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentType2ContentTypeDto", b =>
+                {
+                    b.Property<int>("ParentId")
+                        .HasColumnType("int")
+                        .HasColumnName("parentContentTypeId");
+
+                    b.Property<int>("ChildId")
+                        .HasColumnType("int")
+                        .HasColumnName("childContentTypeId");
+
+                    b.HasKey("ParentId", "ChildId")
+                        .HasName("PK_cmsContentType2ContentType");
+
+                    b.ToTable("cmsContentType2ContentType", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeAllowedContentTypeDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    b.Property<int>("AllowedId")
+                        .HasColumnType("int")
+                        .HasColumnName("AllowedId");
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasColumnName("SortOrder");
+
+                    b.HasKey("Id", "AllowedId")
+                        .HasName("PK_cmsContentTypeAllowedContentType");
+
+                    b.ToTable("cmsContentTypeAllowedContentType", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeDto", b =>
+                {
+                    b.Property<int>("PrimaryKey")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("pk");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrimaryKey"));
+
+                    b.Property<string>("Alias")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("alias");
+
+                    b.Property<bool>("AllowAtRoot")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("allowAtRoot");
+
+                    b.Property<bool>("AllowedInLibrary")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("allowedInLibrary");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1500)
+                        .HasColumnType("nvarchar(1500)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("icon");
+
+                    b.Property<bool>("IsElement")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("isElement");
+
+                    b.Property<Guid?>("ListView")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("listView");
+
+                    b.Property<int>("NodeId")
+                        .HasColumnType("int")
+                        .HasColumnName("nodeId");
+
+                    b.Property<string>("Thumbnail")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("folder.png")
+                        .HasColumnName("thumbnail");
+
+                    b.Property<byte>("Variations")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint")
+                        .HasDefaultValue((byte)1)
+                        .HasColumnName("variations");
+
+                    b.HasKey("PrimaryKey");
+
+                    b.HasIndex("Icon")
+                        .HasDatabaseName("IX_cmsContentType_icon");
+
+                    b.HasIndex("NodeId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_cmsContentType");
+
+                    b.ToTable("cmsContentType", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeTemplateDto", b =>
+                {
+                    b.Property<int>("ContentTypeNodeId")
+                        .HasColumnType("int")
+                        .HasColumnName("contentTypeNodeId");
+
+                    b.Property<int>("TemplateNodeId")
+                        .HasColumnType("int")
+                        .HasColumnName("templateNodeId");
+
+                    b.Property<bool>("IsDefault")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDefault");
+
+                    b.HasKey("ContentTypeNodeId", "TemplateNodeId")
+                        .HasName("PK_cmsDocumentType");
+
+                    b.ToTable("cmsDocumentType", (string)null);
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentVersionCleanupPolicyDto", b =>
                 {
                     b.Property<int>("ContentTypeId")
@@ -432,6 +564,36 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasName("PK_umbracoContentVersionCleanupPolicy");
 
                     b.ToTable("umbracoContentVersionCleanupPolicy", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DataTypeDto", b =>
+                {
+                    b.Property<int>("NodeId")
+                        .HasColumnType("int")
+                        .HasColumnName("nodeId");
+
+                    b.Property<string>("Configuration")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("config");
+
+                    b.Property<string>("DbType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("dbType");
+
+                    b.Property<string>("EditorAlias")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("propertyEditorAlias");
+
+                    b.Property<string>("EditorUiAlias")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("propertyEditorUiAlias");
+
+                    b.HasKey("NodeId");
+
+                    b.ToTable("umbracoDataType", (string)null);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DomainDto", b =>
@@ -743,6 +905,143 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasDatabaseName("IX_umbracoNode_Level");
 
                     b.ToTable("umbracoNode", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Alias")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("Alias");
+
+                    b.Property<int>("ContentTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("contentTypeId");
+
+                    b.Property<int>("DataTypeId")
+                        .HasColumnType("int")
+                        .HasColumnName("dataTypeId");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("Description");
+
+                    b.Property<bool>("LabelOnTop")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("labelOnTop");
+
+                    b.Property<bool>("Mandatory")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("mandatory");
+
+                    b.Property<string>("MandatoryMessage")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("mandatoryMessage");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Name");
+
+                    b.Property<int?>("PropertyTypeGroupId")
+                        .HasColumnType("int")
+                        .HasColumnName("propertyTypeGroupId");
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasColumnName("sortOrder");
+
+                    b.Property<Guid>("UniqueId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("UniqueId");
+
+                    b.Property<string>("ValidationRegExp")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("validationRegExp");
+
+                    b.Property<string>("ValidationRegExpMessage")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("validationRegExpMessage");
+
+                    b.Property<byte>("Variations")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint")
+                        .HasDefaultValue((byte)1)
+                        .HasColumnName("variations");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Alias")
+                        .HasDatabaseName("IX_cmsPropertyTypeAlias");
+
+                    b.HasIndex("DataTypeId");
+
+                    b.HasIndex("PropertyTypeGroupId");
+
+                    b.HasIndex("UniqueId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_cmsPropertyTypeUniqueID");
+
+                    b.ToTable("cmsPropertyType", (string)null);
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeGroupDto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Alias")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("alias");
+
+                    b.Property<int>("ContentTypeNodeId")
+                        .HasColumnType("int")
+                        .HasColumnName("contenttypeNodeId");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int")
+                        .HasColumnName("sortorder");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("text");
+
+                    b.Property<short>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("smallint")
+                        .HasDefaultValue((short)0)
+                        .HasColumnName("type");
+
+                    b.Property<Guid>("UniqueId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("uniqueID");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UniqueId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_cmsPropertyTypeGroupUniqueID");
+
+                    b.ToTable("cmsPropertyTypeGroup", (string)null);
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.RelationDto", b =>
@@ -1109,6 +1408,30 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                     b.Navigation("Access");
                 });
 
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.ContentTypeDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", "NodeDto")
+                        .WithMany()
+                        .HasForeignKey("NodeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_cmsContentType_umbracoNode");
+
+                    b.Navigation("NodeDto");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DataTypeDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.NodeDto", "NodeDto")
+                        .WithMany()
+                        .HasForeignKey("NodeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_umbracoDataType_umbracoNode");
+
+                    b.Navigation("NodeDto");
+                });
+
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", b =>
                 {
                     b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.LanguageDto", "FallbackLanguage")
@@ -1136,6 +1459,26 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeDto", b =>
+                {
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.DataTypeDto", "DataTypeDto")
+                        .WithMany()
+                        .HasForeignKey("DataTypeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_cmsPropertyType_umbracoDataType");
+
+                    b.HasOne("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeGroupDto", "PropertyTypeGroupDto")
+                        .WithMany("PropertyTypeDtos")
+                        .HasForeignKey("PropertyTypeGroupId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("FK_cmsPropertyType_cmsPropertyTypeGroup");
+
+                    b.Navigation("DataTypeDto");
+
+                    b.Navigation("PropertyTypeGroupDto");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.RelationDto", b =>
@@ -1215,6 +1558,11 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.AccessDto", b =>
                 {
                     b.Navigation("Rules");
+                });
+
+            modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.PropertyTypeGroupDto", b =>
+                {
+                    b.Navigation("PropertyTypeDtos");
                 });
 
             modelBuilder.Entity("Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore.WebhookDto", b =>
