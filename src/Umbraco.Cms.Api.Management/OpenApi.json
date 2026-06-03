@@ -43141,13 +43141,6 @@
             ],
             "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
-          },
           "name": {
             "type": "string",
             "description": "Gets or sets the name of the content for this variant."
@@ -43213,13 +43206,6 @@
               "string"
             ],
             "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
-          },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
           },
           "name": {
             "type": "string",
@@ -43813,13 +43799,6 @@
             ],
             "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
-          },
           "name": {
             "type": "string",
             "description": "Gets or sets the name of the content for this variant."
@@ -43885,13 +43864,6 @@
               "string"
             ],
             "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
-          },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
           },
           "name": {
             "type": "string",
@@ -46253,13 +46225,6 @@
             ],
             "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
-          },
           "name": {
             "type": "string",
             "description": "Gets or sets the name of the content for this variant."
@@ -46288,13 +46253,6 @@
               "string"
             ],
             "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
-          },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
           },
           "name": {
             "type": "string",
@@ -46946,13 +46904,6 @@
             ],
             "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
           },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
-          },
           "name": {
             "type": "string",
             "description": "Gets or sets the name of the content for this variant."
@@ -46981,13 +46932,6 @@
               "string"
             ],
             "description": "Gets or sets the culture code for this variant, or `null` for invariant content."
-          },
-          "segment": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "description": "Gets or sets the segment identifier for this variant, or `null` for non-segmented content."
           },
           "name": {
             "type": "string",

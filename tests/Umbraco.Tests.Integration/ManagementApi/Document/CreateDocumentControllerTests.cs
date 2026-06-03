@@ -79,7 +79,7 @@ public class CreateDocumentControllerTests : ManagementApiUserGroupTestBase<Crea
             Values = new DocumentValueModel[] { },
             Variants = new DocumentVariantRequestModel[]
             {
-                new() { Culture = null, Segment = null, Name = "The en-US name", },
+                new() { Culture = null, Name = "The en-US name", },
             },
         };
 

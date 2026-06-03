@@ -42,7 +42,7 @@ public class ElementMapDefinition : ContentMapDefinition<IElement, ElementValueR
         target.Values = MapValueViewModels(source.Properties);
         target.Variants = MapVariantViewModels(
             source,
-            (culture, _, documentVariantViewModel) =>
+            (culture, documentVariantViewModel) =>
             {
                 documentVariantViewModel.State = PublishableVariantStateHelper.GetState(source, culture);
                 documentVariantViewModel.PublishDate = culture == null
