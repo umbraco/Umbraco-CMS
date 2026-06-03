@@ -87,7 +87,7 @@ stages:
         steps:
           - checkout: self
             submodules: false
-            lfs: false,
+            lfs: false
             fetchDepth: 500
           - template: templates/backoffice-install.yml
           - script: npm run build:for:cms
@@ -141,7 +141,7 @@ stages:
         steps:
           - checkout: self
             submodules: false
-            lfs: false,
+            lfs: false
             fetchDepth: 500
           - template: templates/backoffice-install.yml
           - script: npm run build:for:npm
@@ -261,7 +261,7 @@ stages:
         steps:
           - checkout: self
             submodules: false
-            lfs: false,
+            lfs: false
             fetchDepth: 1
             fetchFilter: tree:0
           - template: templates/backoffice-install.yml
@@ -322,7 +322,7 @@ stages:
         steps:
           - checkout: self
             submodules: false
-            lfs: false,
+            lfs: false
             fetchDepth: 1
             fetchFilter: tree:0
           - task: DownloadPipelineArtifact@2
@@ -389,7 +389,7 @@ stages:
         steps:
           - checkout: self
             submodules: false
-            lfs: false,
+            lfs: false
             fetchDepth: 1
             fetchFilter: tree:0
           # Setup test environment

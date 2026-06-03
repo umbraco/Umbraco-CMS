@@ -41,6 +41,7 @@ variables:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   NODE_OPTIONS: --max_old_space_size=16384
+  NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
 
 stages:
   ###############################################
@@ -51,29 +52,38 @@ stages:
       - job: A
         displayName: Build Umbraco CMS
         pool:
-          vmImage: "windows-latest"
+          vmImage: "ubuntu-latest"
         steps:
           - checkout: self
             submodules: false
-            lfs: false,
+            lfs: false
             fetchDepth: 500
           - template: templates/backoffice-install.yml
+          - script: npm run build:for:cms
+            displayName: "Backoffice: Build"
+            workingDirectory: src/Umbraco.Web.UI.Client
+          - template: templates/login-install.yml
           - task: UseDotNet@2
             displayName: Use .NET SDK from global.json
             inputs:
               useGlobalJson: true
+          - task: Cache@2
+            displayName: Cache NuGet packages
+            inputs:
+              key: 'nuget | "$(Agent.OS)" | **/packages.lock.json,!**/bin/**,!**/obj/**'
+              restoreKeys: |
+                nuget | "$(Agent.OS)"
+                nuget
+              path: $(NUGET_PACKAGES)
           - task: DotNetCoreCLI@2
             displayName: Run dotnet restore
             inputs:
               command: restore
               projects: $(solution)
-          - task: DotNetCoreCLI@2
+              arguments: "--locked-mode"
+          - script: dotnet build $(solution) --configuration $(buildConfiguration) --no-restore -clp:ErrorsOnly --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg
             name: build
             displayName: Run dotnet build and generate NuGet packages
-            inputs:
-              command: build
-              projects: $(solution)
-              arguments: "--configuration $(buildConfiguration) --no-restore --property:ContinuousIntegrationBuild=true --property:GeneratePackageOnBuild=true --property:PackageOutputPath=$(Build.ArtifactStagingDirectory)/nupkg"
           - task: PublishPipelineArtifact@1
             displayName: Publish nupkg
             inputs:
@@ -92,7 +102,7 @@ stages:
         steps:
           - checkout: self
             submodules: false
-            lfs: false,
+            lfs: false
             fetchDepth: 500
           - template: templates/backoffice-install.yml
           - script: npm run build:for:npm
@@ -165,7 +175,7 @@ stages:
         steps:
           - checkout: self
             submodules: false
-            lfs: false,
+            lfs: false
             fetchDepth: 1
             fetchFilter: tree:0
           # Setup test environment
@@ -392,7 +402,6 @@ stages:
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
 
-
           - pwsh: |
               dotnet restore UmbracoProject
               cp $(Build.SourcesDirectory)/tests/Umbraco.Tests.AcceptanceTest.UmbracoProject/*.cs UmbracoProject
@@ -469,7 +478,6 @@ stages:
               PlaywrightUserEmail: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSEREMAIL }}
               PlaywrightPassword: ${{ variables.UMBRACO__CMS__UNATTENDED__UNATTENDEDUSERPASSWORD }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
-
 
           - pwsh: |
               dotnet restore UmbracoProject
@@ -621,7 +629,6 @@ stages:
               PlaywrightUserEmail: ${{ variables.PlaywrightUserEmail }}
               PlaywrightPassword: ${{ variables.PlaywrightPassword }}
               ASPNETCORE_URLS: ${{ variables.ASPNETCORE_URLS }}
-
 
           # Install NuGet package if specified in the matrix
           - pwsh: |
