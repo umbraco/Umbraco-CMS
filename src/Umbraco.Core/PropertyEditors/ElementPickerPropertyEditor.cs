@@ -53,7 +53,6 @@ public class ElementPickerPropertyEditor : DataEditor
         {
             _jsonSerializer = jsonSerializer;
             Validators.Add(new ElementPickerValidatorRunner(
-                jsonSerializer,
                 new AllowedTypeValidator(localizedTextService, elementService, coreScopeProvider)));
         }
 
@@ -82,7 +81,7 @@ public class ElementPickerPropertyEditor : DataEditor
     {
         private readonly AllowedTypeValidator _validator;
 
-        public ElementPickerValidatorRunner(IJsonSerializer jsonSerializer, AllowedTypeValidator validator)
+        public ElementPickerValidatorRunner(AllowedTypeValidator validator)
             => _validator = validator;
 
         public IEnumerable<ValidationResult> Validate(
