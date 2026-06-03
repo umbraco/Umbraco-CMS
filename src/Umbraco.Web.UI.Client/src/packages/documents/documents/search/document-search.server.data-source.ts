@@ -46,29 +46,7 @@ export class UmbDocumentSearchServerDataSource
 		const ancestorsByItemId = new Map<string, Array<UmbDocumentItemModel>>();
 		if (data) {
 			for (const entry of data) {
-				ancestorsByItemId.set(
-					entry.id,
-					entry.ancestors.map((ancestor: DocumentItemResponseModel) => ({
-						documentType: {
-							unique: ancestor.documentType.id,
-							icon: ancestor.documentType.icon,
-							collection: ancestor.documentType.collection ? { unique: ancestor.documentType.collection.id } : null,
-						},
-						entityType: UMB_DOCUMENT_ENTITY_TYPE,
-						hasChildren: ancestor.hasChildren,
-						isProtected: ancestor.isProtected,
-						isTrashed: ancestor.isTrashed,
-						parent: ancestor.parent ? { unique: ancestor.parent.id } : null,
-						unique: ancestor.id,
-						variants: ancestor.variants.map((variant) => ({
-							name: variant.name,
-							culture: variant.culture || null,
-							state: variant.state,
-							flags: variant.flags,
-						})),
-						flags: ancestor.flags,
-					})),
-				);
+				ancestorsByItemId.set(entry.id, entry.ancestors.map(mapAncestorToItemModel));
 			}
 		}
 		return { data: ancestorsByItemId };
@@ -135,4 +113,27 @@ export class UmbDocumentSearchServerDataSource
 
 		return { error };
 	}
+}
+
+function mapAncestorToItemModel(ancestor: DocumentItemResponseModel): UmbDocumentItemModel {
+	return {
+		documentType: {
+			unique: ancestor.documentType.id,
+			icon: ancestor.documentType.icon,
+			collection: ancestor.documentType.collection ? { unique: ancestor.documentType.collection.id } : null,
+		},
+		entityType: UMB_DOCUMENT_ENTITY_TYPE,
+		hasChildren: ancestor.hasChildren,
+		isProtected: ancestor.isProtected,
+		isTrashed: ancestor.isTrashed,
+		parent: ancestor.parent ? { unique: ancestor.parent.id } : null,
+		unique: ancestor.id,
+		variants: ancestor.variants.map((variant) => ({
+			name: variant.name,
+			culture: variant.culture || null,
+			state: variant.state,
+			flags: variant.flags,
+		})),
+		flags: ancestor.flags,
+	};
 }
