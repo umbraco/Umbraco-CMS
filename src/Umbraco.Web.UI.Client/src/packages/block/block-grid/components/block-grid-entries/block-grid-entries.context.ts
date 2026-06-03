@@ -712,7 +712,7 @@ export class UmbBlockGridEntriesContext
 		const allowedKeys = allowedBlocks.map((x) => x.contentElementTypeKey);
 		// get content for each layout entry:
 		const invalidEntries = layoutEntries.filter((entry) => {
-			const contentTypeKey = this._manager?.getContentTypeKeyOfContentKey(entry.contentKey);
+			const contentTypeKey = this._manager.getContentTypeKeyOfContentKey(entry.contentKey);
 			if (!contentTypeKey) {
 				// We could not find the content type key, so we cant determin if this is valid or not when the content is missing.
 				// This should be captured elsewhere as the Block then becomes invalid. So the unsupported Block should capture this.
@@ -722,7 +722,7 @@ export class UmbBlockGridEntriesContext
 			if (contentTypeKey && isBad) {
 				// if bad, then add the ContentTypeName to the list of invalids (if we could not find the name add the key)
 				this.#invalidBlockTypeConfigurations?.push(
-					this._manager?.getContentTypeNameOf(contentTypeKey) ?? contentTypeKey,
+					this._manager.getContentTypeNameOf(contentTypeKey) ?? contentTypeKey,
 				);
 			}
 			return isBad;
