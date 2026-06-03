@@ -1288,14 +1288,14 @@ export default {
 	},
 	sections: {
 		content: 'Cynnwys',
-		forms: 'Ffurflenni',
+		library: 'Llyfrgell',
 		media: 'Cyfrwng',
 		member: 'Aelodau',
 		packages: 'Pecynnau',
+		marketplace: 'Marchnad',
 		settings: 'Gosodiadau',
 		translation: 'Cyfieithiad',
 		users: 'Defnyddwyr',
-		marketplace: 'Marchnad',
 	},
 	settings: {
 		defaulttemplate: 'Templed diofyn',

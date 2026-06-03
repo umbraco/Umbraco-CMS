@@ -1117,7 +1117,7 @@ export default {
 	},
 	sections: {
 		content: 'Contenu',
-		forms: 'Formulaires',
+		library: 'Bibliothèque',
 		media: 'Medias',
 		member: 'Membres',
 		packages: 'Packages',
