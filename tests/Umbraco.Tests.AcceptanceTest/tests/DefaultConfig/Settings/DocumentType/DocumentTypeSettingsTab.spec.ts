@@ -78,7 +78,7 @@ test('can disable history cleanup for a document type', async ({umbracoApi, umbr
   expect(documentTypeData.cleanup.preventCleanup).toBeTruthy();
 });
 
-test('cannot see History Cleanup section in Settings tab for an Element Type', async ({umbracoApi, umbracoUi}) => {
+test('cannot see History Cleanup section in Settings tab for an Element Type without Allow in Library', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoApi.documentType.createEmptyElementType(documentTypeName);
   await umbracoUi.documentType.goToSection(ConstantHelper.sections.settings);
