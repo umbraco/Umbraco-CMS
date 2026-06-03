@@ -96,7 +96,7 @@ public abstract class BlockEditorDataConverter<TValue, TLayout>
     // this method is only meant to have any effect when migrating block editor values
     // from the original format to the new, variant enabled format
     private static void AmendExpose(TValue value)
-        => value.Expose = value.ContentData.ConvertAll(cd => new BlockItemVariation(cd.Key, null, null));
+        => value.Expose = value.ContentData.ConvertAll(cd => new BlockItemVariation(cd.Key, null));
 
     // this method is only meant to have any effect when migrating block editor values
     // from the original format to the new, variant enabled format
