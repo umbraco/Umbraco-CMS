@@ -466,9 +466,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
                     }
                 ],
                 Variants = [
-                    new() { Name = "Test Document" },
-                    new() { Name = "Test Document", Segment = "seg-1" },
-                    new() { Name = "Test Document", Segment = "seg-2" }
+                    new() { Name = "Test Document" }
                 ]
             },
             contentType);
@@ -513,9 +511,7 @@ internal sealed class ContentValidationServiceTests : UmbracoIntegrationTestWith
                     }
                 ],
                 Variants = [
-                    new() { Name = "Test Document" },
-                    new() { Name = "Test Document", Segment = "seg-1" },
-                    new() { Name = "Test Document", Segment = "seg-2" }
+                    new() { Name = "Test Document" }
                 ]
             },
             contentType);

@@ -638,9 +638,7 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new () { Name = "The Name" },
-                new () { Segment = "seg-1", Name = "The Name" },
-                new () { Segment = "seg-2", Name = "The Name" }
+                new () { Name = "The Name" }
             ]
         };
 
@@ -689,11 +687,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new () { Name = "The English Name", Culture = "en-US" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
-                new () { Name = "The Danish Name", Culture = "da-DK" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new () { Name = "The Danish Name", Culture = "da-DK" }
             ]
         };
 
@@ -752,11 +746,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new () { Name = "The English Name", Culture = "en-US" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
-                new () { Name = "The Danish Name", Culture = "da-DK" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new () { Name = "The Danish Name", Culture = "da-DK" }
             ]
         };
 
@@ -816,11 +806,7 @@ public partial class ContentEditingServiceTests
             Variants =
             [
                 new () { Name = "The English Name", Culture = "en-US" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
-                new () { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
-                new () { Name = "The Danish Name", Culture = "da-DK" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new () { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new () { Name = "The Danish Name", Culture = "da-DK" }
             ]
         };
 
@@ -932,7 +918,7 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new () { Name = "The name", Culture = "en-US", Segment = "segment" }
+                new () { Name = "The name", Culture = "en-US" }
             ]
         };
 
@@ -1030,8 +1016,7 @@ public partial class ContentEditingServiceTests
             ],
             Variants =
             [
-                new () { Segment = "seg-1", Name = "The Name" },
-                new () { Segment = "seg-2", Name = "The Name" }
+                new () { Name = "The Name" }
             ]
         };
 

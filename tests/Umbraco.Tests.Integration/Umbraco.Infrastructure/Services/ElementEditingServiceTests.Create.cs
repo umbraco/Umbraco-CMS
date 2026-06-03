@@ -246,9 +246,7 @@ public partial class ElementEditingServiceTests
             ],
             Variants =
             [
-                new VariantModel { Name = "The Name" },
-                new VariantModel { Segment = "seg-1", Name = "The Name" },
-                new VariantModel { Segment = "seg-2", Name = "The Name" }
+                new VariantModel { Name = "The Name" }
             ],
         };
 
@@ -297,11 +295,7 @@ public partial class ElementEditingServiceTests
             Variants =
             [
                 new VariantModel { Name = "The English Name", Culture = "en-US" },
-                new VariantModel { Name = "The English Name", Culture = "en-US", Segment = "seg-1" },
-                new VariantModel { Name = "The English Name", Culture = "en-US", Segment = "seg-2" },
-                new VariantModel { Name = "The Danish Name", Culture = "da-DK" },
-                new VariantModel { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-1" },
-                new VariantModel { Name = "The Danish Name", Culture = "da-DK", Segment = "seg-2" }
+                new VariantModel { Name = "The Danish Name", Culture = "da-DK" }
             ],
         };
 

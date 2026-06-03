@@ -17,7 +17,7 @@ public static class DocumentUpdateHelper
             {
                 Segment = null,
                 Culture = null,
-                Name = createModel.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
+                Name = createModel.Variants.FirstOrDefault(v => v.Culture is null)?.Name
                         ?? throw new ArgumentException("Could not find an invariant variant for the model name", nameof(createModel)),
             }
         ];
@@ -45,7 +45,7 @@ public static class DocumentUpdateHelper
             {
                 Segment = null,
                 Culture = null,
-                Name = createModel.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
+                Name = createModel.Variants.FirstOrDefault(v => v.Culture is null)?.Name
                        ?? throw new ArgumentException("Could not find an invariant variant for the model name", nameof(createModel)),
             }
         ];
