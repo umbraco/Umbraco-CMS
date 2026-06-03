@@ -209,7 +209,7 @@ test('can remove an element from the element picker in the element', async ({umb
   // Assert
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.values[0].value).toEqual('');
+  expect(elementData.values).toEqual([]);
 });
 
 test('can remove a not-found element from the element picker in the element', async ({umbracoApi, umbracoUi}) => {
@@ -232,5 +232,5 @@ test('can remove a not-found element from the element picker in the element', as
   // Assert
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
-  expect(elementData.values[0].value).toEqual('');
+  expect(elementData.values).toEqual([]);
 });
