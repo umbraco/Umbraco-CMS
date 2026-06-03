@@ -74,12 +74,8 @@ internal sealed class KeyValueRepository : AsyncEntityRepositoryBase<string, IKe
         });
 
     /// <inheritdoc/>
-    protected override async Task<IEnumerable<IKeyValue>?> PerformGetManyAsync(string[]? ids)
+    protected override async Task<IEnumerable<IKeyValue>?> PerformGetManyAsync(string[] ids)
     {
-        if (ids is null)
-        {
-            return null;
-        }
 
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {

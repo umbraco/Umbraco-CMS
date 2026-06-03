@@ -53,6 +53,7 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
     /// <param name="eventAggregator">The event aggregator for unit-of-work notifications.</param>
     /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
     /// <param name="cacheSyncService">The cache synchronization service.</param>
+    /// <param name="contentTypeRepository">The content type repository used to resolve content types by ID.</param>
     protected AsyncPublishableContentRepositoryBase(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
@@ -65,7 +66,8 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
         IDataTypeService dataTypeService,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IContentTypeRepository contentTypeRepository)
         : base(
             scopeAccessor,
             appCaches,
@@ -80,7 +82,11 @@ internal abstract class AsyncPublishableContentRepositoryBase<TEntity, TReposito
             repositoryCacheVersionService,
             cacheSyncService)
     {
+        ContentTypeRepository = contentTypeRepository;
     }
+
+    /// <summary>Gets the content type repository used to resolve content types by their integer ID.</summary>
+    protected IContentTypeRepository ContentTypeRepository { get; }
 
     // --- Entity ↔ DTO mapping (abstract: concrete repos provide the mapping logic) ---
 

@@ -90,10 +90,10 @@ internal sealed class RelationTypeRepository : AsyncEntityRepositoryBase<int, IR
         });
 
     /// <inheritdoc />
-    protected override async Task<IEnumerable<IRelationType>?> PerformGetManyAsync(int[]? keys)
+    protected override async Task<IEnumerable<IRelationType>?> PerformGetManyAsync(int[] keys)
         => await AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelationType>?>(async db =>
         {
-            if (keys is null || keys.Length == 0)
+            if (keys.Length == 0)
             {
                 List<EFCoreRelationTypeDto> all = await db.RelationTypes.AsNoTracking().ToListAsync();
                 return all.Select(RelationTypeFactory.BuildEntity).ToList();

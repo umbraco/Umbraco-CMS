@@ -350,10 +350,10 @@ internal sealed class RelationRepository : AsyncEntityRepositoryBase<int, IRelat
         });
 
     /// <inheritdoc />
-    protected override async Task<IEnumerable<IRelation>?> PerformGetManyAsync(int[]? keys)
+    protected override async Task<IEnumerable<IRelation>?> PerformGetManyAsync(int[] keys)
         => await AmbientScope.ExecuteWithContextAsync<IEnumerable<IRelation>?>(async db =>
         {
-            if (keys is null || keys.Length == 0)
+            if (keys.Length == 0)
             {
                 return Array.Empty<IRelation>();
             }

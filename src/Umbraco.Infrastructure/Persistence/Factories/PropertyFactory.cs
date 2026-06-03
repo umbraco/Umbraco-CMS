@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
+using EFCoreDtos = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
@@ -39,6 +40,54 @@ internal static class PropertyFactory
             if (xdtos.TryGetValue(propertyType.Id, out IEnumerable<PropertyDataDto>? propDtos))
             {
                 foreach (PropertyDataDto propDto in propDtos)
+                {
+                    propertyId = propDto.Id;
+                    values.Add(new Property.InitialPropertyValue(
+                        await languageRepository.GetIsoCodeByIdAsync(propDto.LanguageId),
+                        propDto.Segment,
+                        propDto.VersionId == publishedVersionId,
+                        propDto.Value));
+                }
+            }
+
+            var property = Property.CreateWithValues(propertyId, propertyType, values.ToArray());
+            properties.Add(property);
+        }
+
+        return properties;
+    }
+
+    /// <summary>
+    /// Builds a collection of <see cref="IProperty"/> entities from EF Core property data DTOs.
+    /// </summary>
+    /// <param name="propertyTypes">An array of property types to build properties for. If null, an empty collection is returned.</param>
+    /// <param name="dtos">A read-only collection of EF Core property data DTOs containing property data for all property types.</param>
+    /// <param name="publishedVersionId">The identifier of the published version, used to determine which property values are considered published.</param>
+    /// <param name="languageRepository">The language repository used to resolve language ISO codes from language IDs in the property data.</param>
+    /// <returns>An enumerable collection of <see cref="IProperty"/> entities.</returns>
+    public static async Task<IEnumerable<IProperty>> BuildEntities(
+        IPropertyType[]? propertyTypes,
+        IReadOnlyCollection<EFCoreDtos.PropertyDataDto> dtos,
+        int publishedVersionId,
+        ILanguageRepository languageRepository)
+    {
+        var properties = new List<IProperty>();
+        var xdtos = dtos.GroupBy(x => x.PropertyTypeId)
+            .ToDictionary(x => x.Key, x => (IEnumerable<EFCoreDtos.PropertyDataDto>)x);
+
+        if (propertyTypes is null)
+        {
+            return properties;
+        }
+
+        foreach (IPropertyType propertyType in propertyTypes)
+        {
+            var values = new List<Property.InitialPropertyValue>();
+            int propertyId = default;
+
+            if (xdtos.TryGetValue(propertyType.Id, out IEnumerable<EFCoreDtos.PropertyDataDto>? propDtos))
+            {
+                foreach (EFCoreDtos.PropertyDataDto propDto in propDtos)
                 {
                     propertyId = propDto.Id;
                     values.Add(new Property.InitialPropertyValue(

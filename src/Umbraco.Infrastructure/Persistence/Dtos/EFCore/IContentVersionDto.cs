@@ -5,12 +5,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 ///     (e.g. <c>umbracoDocumentVersion</c>, <c>umbracoMediaVersion</c>)
 ///     whose primary key is shared with <see cref="ContentVersionDto" />.
 /// </summary>
-/// <remarks>
-///     TODO: Extend this interface with additional shared properties as the EF Core
-///     repository layer is built out.
-/// </remarks>
 internal interface IContentVersionDto
 {
     /// <summary>Gets the primary key, shared with <see cref="ContentVersionDto.Id" />.</summary>
     int Id { get; }
+
+    /// <summary>
+    /// Gets the shared content version row containing version metadata (name, date, writer).
+    /// Not a database column — populated by the repository after query.
+    /// </summary>
+    ContentVersionDto ContentVersionDto { get; }
 }

@@ -36,5 +36,7 @@ public class DocumentVersionDtoConfiguration : IEntityTypeConfiguration<Document
         // Note: SQL Server included columns (Id, TemplateId) are added by SqlServerDocumentVersionDtoModelCustomizer.
         builder.HasIndex(x => x.Published)
             .HasDatabaseName($"IX_{DocumentVersionDto.TableName}_published");
+
+        builder.Ignore(x => x.ContentVersionDto);
     }
 }

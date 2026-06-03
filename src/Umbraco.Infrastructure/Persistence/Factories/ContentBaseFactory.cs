@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using EFCoreDtos = Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories;
 
@@ -21,6 +22,39 @@ internal sealed class ContentBaseFactory
         return BuildPublishableEntity(
             new Content(nodeDto.Text ?? throw new ArgumentException("The content did not have a name", nameof(dto)), nodeDto.ParentId, contentType),
             dto);
+    }
+
+    /// <summary>
+    ///     Creates a <see cref="Content"/> entity from an EF Core <see cref="EFCoreDtos.DocumentDto"/> with its
+    ///     nav properties populated by the repository (mirrors the NPoco <see cref="BuildEntity(DocumentDto, IContentType?)"/> overload).
+    /// </summary>
+    /// <param name="dto">
+    ///     The EF Core <see cref="EFCoreDtos.DocumentDto"/> with <c>ContentDto</c>, <c>CurrentVersion</c>,
+    ///     and (optionally) <c>PublishedVersion</c> populated.
+    /// </param>
+    /// <param name="contentType">The content type, or <c>null</c> if it could not be resolved.</param>
+    /// <returns>A <see cref="Content"/> instance populated from the DTO.</returns>
+    public static Content BuildEntity(EFCoreDtos.DocumentDto dto, IContentType? contentType)
+    {
+        EFCoreDtos.ContentVersionDto currentVersion = dto.CurrentVersion.ContentVersionDto;
+        var entity = new Content(currentVersion.Text ?? string.Empty, dto.ContentDto.NodeDto.ParentId, contentType);
+
+        try
+        {
+            entity.DisableChangeTracking();
+            PopulatePublishableEntity(entity, dto);
+
+            // Document-specific: templates set here rather than in a separate repository pass
+            entity.TemplateId = dto.CurrentVersion.TemplateId;
+            entity.PublishTemplateId = dto.PublishedVersion?.TemplateId;
+
+            entity.ResetDirtyProperties(false);
+            return entity;
+        }
+        finally
+        {
+            entity.EnableChangeTracking();
+        }
     }
 
     /// <summary>
@@ -418,6 +452,49 @@ internal sealed class ContentBaseFactory
         finally
         {
             content.EnableChangeTracking();
+        }
+    }
+
+    /// <summary>
+    ///     Populates <paramref name="content"/> from an EF Core <see cref="EFCoreDtos.IPublishableContentDto{TVersionDto}"/>.
+    ///     Does not manage change tracking — the calling <c>BuildEntity</c> method owns that lifecycle.
+    ///     This is the EF Core counterpart of <see cref="BuildPublishableEntity{TEntity,TVersionDto}"/>.
+    /// </summary>
+    private static void PopulatePublishableEntity<TEntity, TVersionDto>(
+        TEntity content,
+        EFCoreDtos.IPublishableContentDto<TVersionDto> dto)
+        where TEntity : PublishableContentBase
+        where TVersionDto : class, EFCoreDtos.IContentVersionDto
+    {
+        EFCoreDtos.NodeDto nodeDto = dto.ContentDto.NodeDto;
+        EFCoreDtos.ContentVersionDto contentVersion = dto.CurrentVersion.ContentVersionDto;
+        TVersionDto? publishedVersion = dto.PublishedVersion;
+
+        content.Id = dto.NodeId;
+        content.Key = nodeDto.UniqueId;
+        content.VersionId = contentVersion.Id;
+        content.Name = contentVersion.Text;
+        content.Path = nodeDto.Path;
+        content.Level = nodeDto.Level;
+        content.ParentId = nodeDto.ParentId;
+        content.SortOrder = nodeDto.SortOrder;
+        content.Trashed = nodeDto.Trashed;
+        content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
+        content.WriterId = contentVersion.UserId ?? Constants.Security.UnknownUserId;
+        content.CreateDate = nodeDto.CreateDate.EnsureUtc();
+        content.UpdateDate = contentVersion.VersionDate.EnsureUtc();
+        content.Published = dto.Published;
+        content.Edited = dto.Edited;
+
+        if (publishedVersion is not null)
+        {
+            content.PublishedVersionId = publishedVersion.Id;
+            if (dto.Published)
+            {
+                content.PublishDate = publishedVersion.ContentVersionDto.VersionDate.EnsureUtc();
+                content.PublishName = publishedVersion.ContentVersionDto.Text;
+                content.PublisherId = publishedVersion.ContentVersionDto.UserId;
+            }
         }
     }
 }

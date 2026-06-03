@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -10,6 +11,9 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
+using Umbraco.Cms.Core.Extensions;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.EFCore;
 
@@ -40,6 +44,7 @@ internal sealed class AsyncDocumentRepository
     /// <param name="eventAggregator">The event aggregator for unit-of-work notifications.</param>
     /// <param name="repositoryCacheVersionService">The repository cache version service.</param>
     /// <param name="cacheSyncService">The cache synchronization service.</param>
+    /// <param name="contentTypeRepository">The content type repository.</param>
     internal AsyncDocumentRepository(
         IEFCoreScopeAccessor<UmbracoDbContext> scopeAccessor,
         AppCaches appCaches,
@@ -52,7 +57,8 @@ internal sealed class AsyncDocumentRepository
         IDataTypeService dataTypeService,
         IEventAggregator eventAggregator,
         IRepositoryCacheVersionService repositoryCacheVersionService,
-        ICacheSyncService cacheSyncService)
+        ICacheSyncService cacheSyncService,
+        IContentTypeRepository contentTypeRepository)
         : base(
             scopeAccessor,
             appCaches,
@@ -65,7 +71,8 @@ internal sealed class AsyncDocumentRepository
             dataTypeService,
             eventAggregator,
             repositoryCacheVersionService,
-            cacheSyncService)
+            cacheSyncService,
+            contentTypeRepository)
     {
     }
 
@@ -81,16 +88,23 @@ internal sealed class AsyncDocumentRepository
     // --- AsyncEntityRepositoryBase abstract overrides ---
 
     /// <inheritdoc />
-    protected override Task<IContent?> PerformGetAsync(Guid key) =>
-        throw new NotImplementedException();
+    protected override async Task<IContent?> PerformGetAsync(Guid key)
+    {
+        List<IContent> results = await PerformGetRangeAsync([key]);
+        return results.FirstOrDefault();
+    }
 
     /// <inheritdoc />
-    protected override Task<IEnumerable<IContent>?> PerformGetAllAsync() =>
-        throw new NotImplementedException();
+    protected override async Task<IEnumerable<IContent>?> PerformGetAllAsync()
+    {
+        return await PerformGetRangeAsync(null);
+    }
 
     /// <inheritdoc />
-    protected override Task<IEnumerable<IContent>?> PerformGetManyAsync(Guid[]? keys) =>
-        throw new NotImplementedException();
+    protected override async Task<IEnumerable<IContent>?> PerformGetManyAsync(Guid[] keys)
+    {
+        return await PerformGetRangeAsync(keys);
+    }
 
     /// <inheritdoc />
     protected override Task PersistNewItemAsync(IContent item) =>
@@ -137,7 +151,8 @@ internal sealed class AsyncDocumentRepository
 
     /// <inheritdoc />
     protected override IContent BuildEntity(DocumentDto entityDto, IContentType? contentType) =>
-        throw new NotImplementedException();
+        throw new NotSupportedException(
+            $"{nameof(AsyncDocumentRepository)} requires a full data projection to build entities. Use {nameof(PerformGetAsync)} instead.");
 
     /// <inheritdoc />
     protected override DocumentDto BuildEntityDto(IContent entity) =>
@@ -176,4 +191,175 @@ internal sealed class AsyncDocumentRepository
     /// <inheritdoc />
     public Task<bool> RecycleBinSmellsAsync(CancellationToken cancellationToken) =>
         throw new NotImplementedException();
+
+    // --- Private helpers ---
+
+    private Task<List<IContent>> PerformGetRangeAsync(Guid[]? keys) =>
+        AmbientScope.ExecuteWithContextAsync(async db =>
+        {
+            IQueryable<NodeDto> nodeQuery = db.Nodes.Where(node => node.NodeObjectType == NodeObjectTypeKey);
+            if (keys is not null)
+            {
+                nodeQuery = nodeQuery.Where(node => keys.Contains(node.UniqueId));
+            }
+
+            var rows = await nodeQuery
+                .Join(db.Documents,
+                    node => node.NodeId,
+                    document => document.NodeId,
+                    (node, document) => new { node, document })
+                .Join(db.Content,
+                    joined => joined.node.NodeId,
+                    content => content.NodeId,
+                    (joined, content) => new { joined.node, joined.document, content })
+                .Join(db.ContentVersions.Where(contentVersion => contentVersion.Current),
+                    joined => joined.node.NodeId,
+                    contentVersion => contentVersion.NodeId,
+                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
+                .Join(db.DocumentVersions,
+                    joined => joined.contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
+                .ToListAsync();
+
+            if (rows.Count == 0)
+            {
+                return [];
+            }
+
+            int[] nodeIds = rows.Select(row => row.node.NodeId).ToArray();
+
+            // Published versions (one per node at most)
+            var publishedByNodeId = await db.ContentVersions
+                .Join(db.DocumentVersions.Where(documentVersion => documentVersion.Published),
+                    contentVersion => contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (contentVersion, documentVersion) => new { contentVersion, documentVersion })
+                .Where(joined => nodeIds.Contains(joined.contentVersion.NodeId))
+                .ToDictionaryAsync(joined => joined.contentVersion.NodeId);
+
+            // All relevant version IDs (current + published)
+            var allVersionIds = rows.Select(row => row.contentVersion.Id).ToList();
+            allVersionIds.AddRange(publishedByNodeId.Values.Select(joined => joined.contentVersion.Id));
+
+            // TODO: batch allVersionIds/nodeIds IN queries when > Constants.Sql.MaxParameterCount
+
+            // Property data grouped by version ID
+            var propertyDtosByVersionId = (await db.PropertyData
+                .Where(propertyData => allVersionIds.Contains(propertyData.VersionId))
+                .ToListAsync())
+                .GroupBy(propertyData => propertyData.VersionId)
+                .ToDictionary(group => group.Key, group => group.ToList());
+
+            // Content version culture variations (draft + published names per culture)
+            var cvVariationsByVersionId = (await db.ContentVersionCultureVariations
+                .Where(variation => allVersionIds.Contains(variation.VersionId))
+                .ToListAsync())
+                .GroupBy(variation => variation.VersionId)
+                .ToDictionary(group => group.Key, group => (IReadOnlyList<ContentVersionCultureVariationDto>)group.ToList());
+
+            // Document culture variations (edited flag per culture per node)
+            var dcVariationsByNodeId = (await db.DocumentCultureVariations
+                .Where(variation => nodeIds.Contains(variation.NodeId))
+                .ToListAsync())
+                .GroupBy(variation => variation.NodeId)
+                .ToDictionary(group => group.Key, group => (IReadOnlyList<DocumentCultureVariationDto>)group.ToList());
+
+            var contentTypeMap = new Dictionary<int, IContentType?>();
+            var entities = new List<IContent>(rows.Count);
+
+            foreach (var row in rows)
+            {
+                if (!contentTypeMap.TryGetValue(row.content.ContentTypeId, out IContentType? contentType))
+                {
+                    contentType = ContentTypeRepository.Get(row.content.ContentTypeId);
+                    contentTypeMap[row.content.ContentTypeId] = contentType;
+                }
+
+                publishedByNodeId.TryGetValue(row.node.NodeId, out var publishedJoined);
+
+                // Wire nav properties (mirrors what NPoco [Reference] does automatically)
+                row.content.NodeDto = row.node;
+                row.documentVersion.ContentVersionDto = row.contentVersion;
+                if (publishedJoined is not null)
+                {
+                    publishedJoined.documentVersion.ContentVersionDto = publishedJoined.contentVersion;
+                }
+
+                row.document.ContentDto = row.content;
+                row.document.CurrentVersion = row.documentVersion;
+                row.document.PublishedVersion = publishedJoined?.documentVersion;
+
+                IContent entity = ContentBaseFactory.BuildEntity(row.document, contentType);
+
+                var versionPropertyDtos = new List<PropertyDataDto>();
+                if (propertyDtosByVersionId.TryGetValue(row.contentVersion.Id, out var currentProps))
+                {
+                    versionPropertyDtos.AddRange(currentProps);
+                }
+
+                if (publishedJoined is not null &&
+                    propertyDtosByVersionId.TryGetValue(publishedJoined.contentVersion.Id, out var pubProps))
+                {
+                    versionPropertyDtos.AddRange(pubProps);
+                }
+
+                IPropertyType[] compositionProperties = contentType?.CompositionPropertyTypes.ToArray() ?? [];
+                entity.Properties = new PropertyCollection(
+                    await PropertyFactory.BuildEntities(
+                        compositionProperties,
+                        versionPropertyDtos,
+                        publishedJoined?.contentVersion.Id ?? 0,
+                        LanguageRepository));
+
+                await ApplyVariationsAsync(
+                    entity,
+                    row.contentVersion.Id,
+                    publishedJoined?.contentVersion.Id ?? 0,
+                    cvVariationsByVersionId,
+                    dcVariationsByNodeId.GetValueOrDefault(row.node.NodeId, []));
+
+                entities.Add(entity);
+            }
+
+            return entities;
+        });
+
+    private async Task ApplyVariationsAsync(
+        IContent entity,
+        int currentVersionId,
+        int publishedVersionId,
+        Dictionary<int, IReadOnlyList<ContentVersionCultureVariationDto>> cvVariationsByVersionId,
+        IReadOnlyList<DocumentCultureVariationDto> dcVariations)
+    {
+        // Draft culture names
+        if (cvVariationsByVersionId.TryGetValue(currentVersionId, out IReadOnlyList<ContentVersionCultureVariationDto>? draftVariations))
+        {
+            foreach (ContentVersionCultureVariationDto variation in draftVariations)
+            {
+                string? culture = await LanguageRepository.GetIsoCodeByIdAsync(variation.LanguageId);
+                entity.SetCultureInfo(culture, variation.Name, variation.UpdateDate.EnsureUtc());
+            }
+        }
+
+        // Published culture names
+        if (entity.Published && publishedVersionId > 0 &&
+            cvVariationsByVersionId.TryGetValue(publishedVersionId, out IReadOnlyList<ContentVersionCultureVariationDto>? publishedVariations))
+        {
+            foreach (ContentVersionCultureVariationDto variation in publishedVariations)
+            {
+                string? culture = await LanguageRepository.GetIsoCodeByIdAsync(variation.LanguageId);
+                entity.SetPublishInfo(culture, variation.Name, variation.UpdateDate.EnsureUtc());
+            }
+        }
+
+        // Edited cultures
+        var editedCultures = new List<string?>();
+        foreach (DocumentCultureVariationDto variation in dcVariations.Where(v => v.Edited))
+        {
+            editedCultures.Add(await LanguageRepository.GetIsoCodeByIdAsync(variation.LanguageId));
+        }
+
+        entity.SetCultureEdited(editedCultures);
+    }
 }

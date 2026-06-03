@@ -79,6 +79,43 @@ public class PropertyDataDto
     public string? SortableValue { get; set; }
 
     /// <summary>
+    /// Gets the value of the property by returning the first non-null or non-empty value from the following, in order:
+    /// <see cref="IntegerValue"/>, <see cref="DecimalValue"/>, <see cref="DateValue"/>, <see cref="VarcharValue"/>, and <see cref="TextValue"/>.
+    /// </summary>
+    public object? Value
+    {
+        get
+        {
+            if (IntegerValue.HasValue)
+            {
+                return IntegerValue.Value;
+            }
+
+            if (DecimalValue.HasValue)
+            {
+                return DecimalValue.Value;
+            }
+
+            if (DateValue.HasValue)
+            {
+                return DateValue.Value;
+            }
+
+            if (!string.IsNullOrEmpty(VarcharValue))
+            {
+                return VarcharValue;
+            }
+
+            if (!string.IsNullOrEmpty(TextValue))
+            {
+                return TextValue;
+            }
+
+            return null;
+        }
+    }
+
+    /// <summary>
     /// Creates a copy of the current <see cref="PropertyDataDto"/> with the specified version ID.
     /// </summary>
     /// <param name="versionId">The version ID to assign to the cloned instance.</param>

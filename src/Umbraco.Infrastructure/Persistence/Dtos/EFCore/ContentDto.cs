@@ -20,4 +20,9 @@ public class ContentDto
     /// Gets or sets the identifier of the content type.
     /// </summary>
     public int ContentTypeId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the node row. Not a database column — populated by the repository after query.
+    /// </summary>
+    public NodeDto NodeDto { get; set; } = null!;
 }

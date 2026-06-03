@@ -248,7 +248,7 @@ public abstract class AsyncEntityRepositoryBase<TKey, TEntity> : AsyncRepository
     /// </summary>
     /// <param name="keys">The keys of the entities to retrieve.</param>
     /// <returns>The matching entities, or <see langword="null"/>.</returns>
-    protected abstract Task<IEnumerable<TEntity>?> PerformGetManyAsync(TKey[]? keys);
+    protected abstract Task<IEnumerable<TEntity>?> PerformGetManyAsync(TKey[] keys);
 
     /// <summary>
     ///     Persists a new entity to the data store.

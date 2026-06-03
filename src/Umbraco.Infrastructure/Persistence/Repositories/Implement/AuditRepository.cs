@@ -122,9 +122,9 @@ internal sealed class AuditRepository : AsyncEntityRepositoryBase<int, IAuditIte
             "The audit log can be extremely huge. Use the GetPagedAsync method instead.");
 
     /// <inheritdoc />
-    protected override async Task<IEnumerable<IAuditItem>?> PerformGetManyAsync(int[]? keys)
+    protected override async Task<IEnumerable<IAuditItem>?> PerformGetManyAsync(int[] keys)
     {
-        if (keys is null || keys.Length == 0)
+        if (keys.Length == 0)
         {
             return [];
         }

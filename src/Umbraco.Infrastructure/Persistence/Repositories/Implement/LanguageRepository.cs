@@ -268,13 +268,8 @@ internal sealed class LanguageRepository : AsyncEntityRepositoryBase<Guid, ILang
                 .AsEnumerable();
         });
 
-    protected override async Task<IEnumerable<ILanguage>?> PerformGetManyAsync(Guid[]? keys)
+    protected override async Task<IEnumerable<ILanguage>?> PerformGetManyAsync(Guid[] keys)
     {
-        if (keys is null)
-        {
-            return null;
-        }
-
         return await AmbientScope.ExecuteWithContextAsync(async db =>
         {
             List<LanguageDto> dtos = await db.Language

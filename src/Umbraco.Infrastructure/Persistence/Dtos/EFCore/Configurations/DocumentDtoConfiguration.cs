@@ -30,5 +30,9 @@ public class DocumentDtoConfiguration : IEntityTypeConfiguration<DocumentDto>
         // IX_umbracoDocument_Published
         builder.HasIndex(x => x.Published)
             .HasDatabaseName($"IX_{DocumentDto.TableName}_Published");
+
+        builder.Ignore(x => x.ContentDto);
+        builder.Ignore(x => x.CurrentVersion);
+        builder.Ignore(x => x.PublishedVersion);
     }
 }
