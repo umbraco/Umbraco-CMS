@@ -106,6 +106,7 @@ export class UiBaseLocators extends BasePage {
   public readonly allowAtRootBtn: Locator;
   public readonly allowedChildNodesModal: Locator;
   public readonly addCollectionBtn: Locator;
+  public readonly allowInLibraryBtn: Locator;
 
   // Reorder
   public readonly iAmDoneReorderingBtn: Locator;
@@ -399,6 +400,7 @@ export class UiBaseLocators extends BasePage {
     this.addCollectionBtn = page.locator(
       "umb-input-content-type-collection-configuration #create-button",
     );
+    this.allowInLibraryBtn = page.locator("label").filter({ hasText: "Allow in library" });
 
     // Reorder
     this.iAmDoneReorderingBtn = page.getByLabel("I am done reordering");
@@ -1372,6 +1374,10 @@ export class UiBaseLocators extends BasePage {
 
   async clickAllowAtRootButton() {
     await this.click(this.allowAtRootBtn);
+  }
+
+  async clickAllowInLibraryButton() {
+    await this.click(this.allowInLibraryBtn);
   }
 
   async clickAllowedChildNodesButton() {

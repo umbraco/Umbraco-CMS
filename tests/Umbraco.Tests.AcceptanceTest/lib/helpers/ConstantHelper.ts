@@ -397,4 +397,10 @@
     copy: 'Copy',
     unpublish: 'Unpublish'
   }
- }
+
+  public static readonly elementTypeChangeMessages = {
+    elementHasContent: 'Cannot change to document type because content has already been created with this element type.',
+    documentHasContent: 'Cannot change to element type because content has already been created with this document type.',
+    elementUsedInBlockEditor: 'Cannot change to document type because this element type is used in the configuration of a data type.',
+  }
+}

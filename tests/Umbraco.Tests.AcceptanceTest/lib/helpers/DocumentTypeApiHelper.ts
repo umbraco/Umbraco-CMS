@@ -609,14 +609,14 @@ export class DocumentTypeApiHelper {
     return await this.create(documentType);
   }
 
-  async createEmptyElementType(elementTypeName: string) {
+  async createEmptyElementType(elementTypeName: string, isAllowedInLibrary: boolean = false) {
     await this.ensureNameNotExists(elementTypeName);
 
     const documentType = new DocumentTypeBuilder()
       .withName(elementTypeName)
       .withAlias(AliasHelper.toAlias(elementTypeName))
       .withIsElement(true)
-      .withAllowedInLibrary(true)
+      .withAllowedInLibrary(isAllowedInLibrary)
       .withIcon("icon-plugin")
       .build();
 
