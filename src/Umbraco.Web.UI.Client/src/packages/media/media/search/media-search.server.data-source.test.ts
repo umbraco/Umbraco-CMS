@@ -93,4 +93,22 @@ describe('UmbMediaSearchServerDataSource', () => {
 		expect(ancestorRequestBatches[0].length).to.equal(10);
 		expect(data?.items.length).to.equal(10);
 	});
+
+	it('returns an error instead of throwing when one of the batches fails', async () => {
+		stubSearchReturning(95);
+
+		// Fail the second of the three batches; the controller resolves it without rejecting, which
+		// would otherwise leave an undefined hole in the amalgamated ancestors data.
+		let callCount = 0;
+		(MediaService as any).getItemMediaAncestors = (options: { query: { id: Array<string> } }) => {
+			callCount++;
+			if (callCount === 2) return Promise.reject(new Error('Simulated server error'));
+			return Promise.resolve({ data: options.query.id.map((id) => makeAncestorEntry(id)) });
+		};
+
+		const result = await dataSource.search({ query: 'pharmacy' });
+
+		expect(result.error).to.exist;
+		expect(result.data).to.be.undefined;
+	});
 });

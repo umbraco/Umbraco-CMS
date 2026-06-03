@@ -37,6 +37,11 @@ export class UmbDocumentSearchServerDataSource
 
 		if (error) return { error };
 
+		// A failed batch resolves without rejecting, leaving an `undefined` hole in `data` rather than
+		// surfacing an error, so guard against it before mapping below.
+		if (data?.some((entry) => entry == null))
+			return { error: new Error('Error fetching ancestors for one or more document items.') };
+
 		const ancestorsByItemId = new Map<string, Array<UmbDocumentItemModel>>();
 		if (data) {
 			for (const entry of data) {
