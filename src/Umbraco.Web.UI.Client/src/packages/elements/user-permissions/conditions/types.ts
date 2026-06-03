@@ -16,7 +16,7 @@ export type UmbElementUserPermissionConditionConfig = UmbConditionConfigBase<'Um
 	oneOf?: Array<string>;
 };
 
-type UmbPermissionVerbsConfig = {
+export type UmbPermissionVerbsConfig = {
 	allOf?: Array<string>;
 	oneOf?: Array<string>;
 };

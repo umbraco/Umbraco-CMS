@@ -42,7 +42,7 @@ export class UmbElementCreateOptionsModalElement extends UmbModalBaseElement<
 					allOf: [UMB_USER_PERMISSION_ELEMENT_CREATE],
 				},
 				onChange: (permitted: boolean) => {
-					if (permitted) {
+					if (permitted && this._allowedElementTypes.length === 0) {
 						this.#retrieveAllowedElementTypes();
 					}
 				},

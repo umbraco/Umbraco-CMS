@@ -129,7 +129,9 @@ describe('UmbElementOrElementFolderUserPermissionCondition', () => {
 				},
 			});
 
-			// After contexts have settled, verify permitted is still false
+			// Safe to assert after 200ms: mock contexts resolve synchronously, so both
+			// sub-conditions have evaluated well within this window. The initial default
+			// is also false, so a pass here confirms the condition never became true.
 			setTimeout(() => {
 				expect(condition.permitted).to.be.false;
 				condition.hostDisconnected();

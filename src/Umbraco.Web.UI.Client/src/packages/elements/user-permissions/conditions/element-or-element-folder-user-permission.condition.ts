@@ -12,8 +12,8 @@ export class UmbElementOrElementFolderUserPermissionCondition
 	extends UmbConditionBase<UmbElementOrElementFolderUserPermissionConditionConfig>
 	implements UmbExtensionCondition
 {
-	#elementCondition: UmbElementUserPermissionCondition;
-	#folderCondition: UmbElementFolderUserPermissionCondition;
+	#elementCondition: UmbElementUserPermissionCondition | undefined;
+	#folderCondition: UmbElementFolderUserPermissionCondition | undefined;
 
 	constructor(
 		host: UmbControllerHost,
@@ -21,21 +21,25 @@ export class UmbElementOrElementFolderUserPermissionCondition
 	) {
 		super(host, args);
 
-		this.#elementCondition = new UmbElementUserPermissionCondition(this, {
-			host: this,
-			config: { alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS, ...this.config.element },
-			onChange: () => this.#evaluate(),
-		});
+		if (this.config.element) {
+			this.#elementCondition = new UmbElementUserPermissionCondition(this, {
+				host: this,
+				config: { alias: UMB_ELEMENT_USER_PERMISSION_CONDITION_ALIAS, ...this.config.element },
+				onChange: () => this.#evaluate(),
+			});
+		}
 
-		this.#folderCondition = new UmbElementFolderUserPermissionCondition(this, {
-			host: this,
-			config: { alias: UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS, ...this.config.folder },
-			onChange: () => this.#evaluate(),
-		});
+		if (this.config.folder) {
+			this.#folderCondition = new UmbElementFolderUserPermissionCondition(this, {
+				host: this,
+				config: { alias: UMB_ELEMENT_FOLDER_USER_PERMISSION_CONDITION_ALIAS, ...this.config.folder },
+				onChange: () => this.#evaluate(),
+			});
+		}
 	}
 
 	#evaluate() {
-		this.permitted = this.#elementCondition.permitted || this.#folderCondition.permitted;
+		this.permitted = (this.#elementCondition?.permitted ?? false) || (this.#folderCondition?.permitted ?? false);
 	}
 }
 
