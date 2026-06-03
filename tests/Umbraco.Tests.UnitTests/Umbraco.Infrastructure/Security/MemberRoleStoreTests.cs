@@ -41,14 +41,14 @@ public class MemberRoleStoreTests
 
     private void SetupIdToKey(int id, Guid key)
     {
-        _mockIdKeyMap.Setup(x => x.GetKeyForId(id, UmbracoObjectTypes.MemberGroup))
-            .Returns(Attempt.Succeed(key));
+        _mockIdKeyMap.Setup(x => x.GetKeyForIdAsync(id, UmbracoObjectTypes.MemberGroup))
+            .ReturnsAsync(Attempt.Succeed(key));
     }
 
     private void SetupIdToKeyFailure(int id)
     {
-        _mockIdKeyMap.Setup(x => x.GetKeyForId(id, UmbracoObjectTypes.MemberGroup))
-            .Returns(Attempt.Fail<Guid>());
+        _mockIdKeyMap.Setup(x => x.GetKeyForIdAsync(id, UmbracoObjectTypes.MemberGroup))
+            .ReturnsAsync(Attempt.Fail<Guid>());
     }
 
     [Test]

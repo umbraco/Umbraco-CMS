@@ -562,7 +562,7 @@ internal sealed class EntityXmlSerializer : IEntityXmlSerializer
         foreach (IPropertyType propertyType in propertyTypes)
         {
             IDataType? definition = null;
-            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(propertyType.DataTypeId, UmbracoObjectTypes.DataType);
+            Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(propertyType.DataTypeId, UmbracoObjectTypes.DataType).GetAwaiter().GetResult();
             if (keyAttempt.Success)
             {
                 definition = _dataTypeService.GetAsync(keyAttempt.Result).GetAwaiter().GetResult();

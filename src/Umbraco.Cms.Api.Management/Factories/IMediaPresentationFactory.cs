@@ -24,7 +24,7 @@ public interface IMediaPresentationFactory
     /// </summary>
     /// <param name="entity">The media entity to create the response model from.</param>
     /// <returns>A <see cref="MediaItemResponseModel"/> representing the media entity.</returns>
-    MediaItemResponseModel CreateItemResponseModel(IMediaEntitySlim entity);
+    Task<MediaItemResponseModel> CreateItemResponseModelAsync(IMediaEntitySlim entity);
 
     /// <summary>
     /// Creates variant item response models for the specified media entity.

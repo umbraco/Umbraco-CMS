@@ -421,8 +421,8 @@ internal sealed class ServerEventSenderTests
 
         var idKeyMapMock = new Mock<IIdKeyMap>();
         idKeyMapMock
-            .Setup(x => x.GetKeyForId(protectedNodeId, UmbracoObjectTypes.Document))
-            .Returns(Attempt<Guid>.Succeed(protectedDocumentKey));
+            .Setup(x => x.GetKeyForIdAsync(protectedNodeId, UmbracoObjectTypes.Document))
+            .ReturnsAsync(Attempt<Guid>.Succeed(protectedDocumentKey));
 
         var notification = new PublicAccessEntrySavedNotification(entry, new EventMessages());
         var recordingRouter = new RecordingServerEventRouter();
@@ -467,8 +467,8 @@ internal sealed class ServerEventSenderTests
 
         var idKeyMapMock = new Mock<IIdKeyMap>();
         idKeyMapMock
-            .Setup(x => x.GetKeyForId(protectedNodeId, UmbracoObjectTypes.Document))
-            .Returns(Attempt<Guid>.Succeed(protectedDocumentKey));
+            .Setup(x => x.GetKeyForIdAsync(protectedNodeId, UmbracoObjectTypes.Document))
+            .ReturnsAsync(Attempt<Guid>.Succeed(protectedDocumentKey));
 
         var notification = new PublicAccessEntrySavedNotification(entry, new EventMessages());
         var recordingRouter = new RecordingServerEventRouter();
@@ -507,8 +507,8 @@ internal sealed class ServerEventSenderTests
 
         var idKeyMapMock = new Mock<IIdKeyMap>();
         idKeyMapMock
-            .Setup(x => x.GetKeyForId(protectedNodeId, UmbracoObjectTypes.Document))
-            .Returns(Attempt<Guid>.Succeed(protectedDocumentKey));
+            .Setup(x => x.GetKeyForIdAsync(protectedNodeId, UmbracoObjectTypes.Document))
+            .ReturnsAsync(Attempt<Guid>.Succeed(protectedDocumentKey));
 
         var notification = new PublicAccessEntryDeletedNotification(entry, new EventMessages());
         var recordingRouter = new RecordingServerEventRouter();
@@ -1675,8 +1675,8 @@ internal sealed class ServerEventSenderTests
 
         var idKeyMapMock = new Mock<IIdKeyMap>();
         idKeyMapMock
-            .Setup(x => x.GetKeyForId(protectedNodeId, UmbracoObjectTypes.Document))
-            .Returns(Attempt<Guid>.Succeed(protectedDocumentKey));
+            .Setup(x => x.GetKeyForIdAsync(protectedNodeId, UmbracoObjectTypes.Document))
+            .ReturnsAsync(Attempt<Guid>.Succeed(protectedDocumentKey));
 
         var notifications = new[]
         {

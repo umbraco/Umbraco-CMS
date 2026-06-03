@@ -82,7 +82,7 @@ public class DefaultUrlProvider : IUrlProvider
     /// </remarks>
     public virtual IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
     {
-        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForId(id, UmbracoObjectTypes.Document);
+        Attempt<Guid> keyAttempt = _idKeyMap.GetKeyForIdAsync(id, UmbracoObjectTypes.Document).GetAwaiter().GetResult();
 
         if (keyAttempt.Success is false)
         {

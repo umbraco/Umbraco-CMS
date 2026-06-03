@@ -36,8 +36,8 @@ public class PropertyValidationServiceTests
         dt = dataType;
 
         var idKeyMap = new Mock<IIdKeyMap>();
-        idKeyMap.Setup(x => x.GetKeyForId(It.IsAny<int>(), UmbracoObjectTypes.DataType))
-            .Returns(Attempt.Succeed(dataTypeKey));
+        idKeyMap.Setup(x => x.GetKeyForIdAsync(It.IsAny<int>(), UmbracoObjectTypes.DataType))
+            .ReturnsAsync(Attempt.Succeed(dataTypeKey));
 
 
         // new data editor that returns a TextOnlyValueEditor which will do the validation for the properties

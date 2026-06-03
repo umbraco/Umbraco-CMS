@@ -6,7 +6,6 @@ using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.ViewModels.Item;
 using Umbraco.Cms.Api.Management.ViewModels.Media.Item;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 
@@ -14,15 +13,12 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 public class AncestorsMediaItemController : MediaItemControllerBase
 {
     private readonly IItemAncestorService _itemAncestorService;
-    private readonly IMediaPresentationFactory _mediaPresentationFactory;
 
     public AncestorsMediaItemController(
         IItemAncestorService itemAncestorService,
         IMediaPresentationFactory mediaPresentationFactory)
-    {
-        _itemAncestorService = itemAncestorService;
-        _mediaPresentationFactory = mediaPresentationFactory;
-    }
+        : base(mediaPresentationFactory)
+        => _itemAncestorService = itemAncestorService;
 
     [HttpGet("ancestors")]
     [MapToApiVersion("1.0")]
@@ -42,10 +38,7 @@ public class AncestorsMediaItemController : MediaItemControllerBase
             UmbracoObjectTypes.Media,
             null,
             ids,
-            ancestors => Task.FromResult(
-                ancestors
-                    .OfType<IMediaEntitySlim>()
-                    .Select(_mediaPresentationFactory.CreateItemResponseModel)));
+            MapMediaItemsAsync);
 
         return Ok(result);
     }

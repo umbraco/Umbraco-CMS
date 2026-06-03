@@ -38,11 +38,16 @@ public class AssignedUserGroupPermissionsWebhookEvent : WebhookEventBase<Assigne
     public override string Alias => Constants.WebhookEvents.Aliases.AssignedUserGroupPermissions;
 
     /// <inheritdoc />
-    public override object ConvertNotificationToRequestPayload(AssignedUserGroupPermissionsNotification notification)
-        => notification.EntityPermissions.Select(permission =>
-        new
+    public override object ConvertNotificationToRequestPayload(AssignedUserGroupPermissionsNotification notification) =>
+        notification.EntityPermissions.Select(permission =>
         {
-            UserId = _idKeyMap.GetKeyForId(permission.EntityId, UmbracoObjectTypes.Unknown).Result,
-            UserGroupId = _idKeyMap.GetKeyForId(permission.UserGroupId, UmbracoObjectTypes.Unknown).Result,
+            Attempt<Guid> userIdAttempt = _idKeyMap.GetKeyForIdAsync(permission.EntityId, UmbracoObjectTypes.Unknown).GetAwaiter().GetResult();
+            Attempt<Guid> userGroupIdAttempt = _idKeyMap.GetKeyForIdAsync(permission.UserGroupId, UmbracoObjectTypes.Unknown).GetAwaiter().GetResult();
+
+            return new
+            {
+                UserId = userIdAttempt.Result,
+                UserGroupId = userGroupIdAttempt.Result,
+            };
         });
 }
