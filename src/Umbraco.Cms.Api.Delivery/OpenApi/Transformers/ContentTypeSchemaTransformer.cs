@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Schema;
 using System.Text.Json.Serialization.Metadata;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.OpenApi;
@@ -340,6 +342,15 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
         }
 
         var schemaId = GetSchemaId(jsonTypeInfo);
+
+        // STJ represents unconstrained types (JsonNode, object, custom-converter types) as boolean 'true'
+        // in JSON Schema. Return an inline {} schema rather than registering a named component, since a
+        // named component adds no value and would incorrectly imply a concrete model shape.
+        JsonNode rawSchema = JsonSchemaExporter.GetJsonSchemaAsNode(jsonTypeInfo);
+        if (rawSchema.GetValueKind() == JsonValueKind.True)
+        {
+            return new OpenApiSchema();
+        }
 
         // If this is one of the types we handle, and we already started generating it, return a placeholder
         // to avoid circular reference issues.
