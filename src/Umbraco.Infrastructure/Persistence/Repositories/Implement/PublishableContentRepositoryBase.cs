@@ -1272,6 +1272,7 @@ internal abstract class PublishableContentRepositoryBase<TEntity, TRepository, T
                 entity.PublishedVersionId = entity.VersionId;
 
                 contentVersionDto.Id = 0; // want a new id
+                contentVersionDto.Key = Guid.NewGuid(); // each version needs its own unique key
                 contentVersionDto.Current = true; // current version
                 contentVersionDto.Text = entity.Name;
                 contentVersionDto.PreventCleanup = false; // new draft version disregards prevent cleanup flag
