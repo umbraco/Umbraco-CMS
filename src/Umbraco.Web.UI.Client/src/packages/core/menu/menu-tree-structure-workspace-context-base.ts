@@ -57,9 +57,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 				this.#workspaceContext?.unique,
 				(value) => {
 					if (!value) return;
-					this.#requestStructure().catch(() => {
-						// Context may have been destroyed while the async request was in flight.
-					});
+					this.#requestStructure();
 				},
 				'observeUnique',
 			);
@@ -70,9 +68,7 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 					// Workspace has changed from new to existing
 					if (value === false && this.#isNew === true) {
 						// TODO: We do not need to request here as we already know the structure and unique
-						this.#requestStructure().catch(() => {
-							// Context may have been destroyed while the async request was in flight.
-						});
+						this.#requestStructure();
 					}
 					this.#isNew = value;
 				},
@@ -93,10 +89,10 @@ export abstract class UmbMenuTreeStructureWorkspaceContextBase extends UmbContex
 		let structureItems: Array<UmbStructureItemModel> = [];
 
 		const unique = (await this.observe(uniqueObservable, () => {})?.asPromise()) as string;
-		if (unique === undefined) throw new Error('Unique is not available');
+		if (unique === undefined) return;
 
 		const entityType = (await this.observe(entityTypeObservable, () => {})?.asPromise()) as string;
-		if (!entityType) throw new Error('Entity type is not available');
+		if (!entityType) return;
 
 		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository<UmbTreeItemModel, UmbTreeRootModel>>(
 			this,
