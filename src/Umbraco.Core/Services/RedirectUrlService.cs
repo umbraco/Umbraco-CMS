@@ -45,6 +45,10 @@ internal sealed class RedirectUrlService : RepositoryService, IRedirectUrlServic
             redir = new RedirectUrl { Key = Guid.NewGuid(), Url = oldUrl, ContentKey = contentKey, Culture = culture };
         }
 
+        // Use a detached EventMessages instance so a handler cancelling the save does not surface a
+        // notification in the backoffice. Redirect creation is a silent side-effect of publishing, so a
+        // cancellation is not something the editor triggered or can act on - unlike deletion (an explicit
+        // editor action), where the sibling methods deliberately use EventMessagesFactory.Get() instead.
         var eventMessages = new EventMessages();
         var savingNotification = new RedirectUrlSavingNotification(redir, eventMessages);
 
