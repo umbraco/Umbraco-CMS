@@ -6,6 +6,6 @@
 		"build": "vite build"
 	},
 	"dependencies": {
-		"@umbraco-ui/uui": "^2.0.0-rc.1"
+		"@umbraco-ui/uui": "^2.0.0-rc.2"
 	}
 }
