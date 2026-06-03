@@ -103,7 +103,9 @@ public class ElementPickerPropertyEditor : DataEditor
             return _validator.Validate(guids, configuration, valueType, validationContext);
         }
     }
-
+    /// <summary>
+    /// Validator for the allowed types of the element picker, validating that the selected elements are of an allowed content type.
+    /// </summary>
     internal sealed class AllowedTypeValidator : ITypedJsonValidator<Guid[], ElementPickerConfiguration>
     {
         private readonly ILocalizedTextService _localizedTextService;
@@ -142,6 +144,15 @@ public class ElementPickerPropertyEditor : DataEditor
             using ICoreScope scope = _coreScopeProvider.CreateCoreScope();
             IElement[] elements = _elementService.GetByIds(value).ToArray();
             scope.Complete();
+
+            if (elements.Length != value.Length)
+            {
+                return [
+                    new ValidationResult(
+                        _localizedTextService.Localize("validation", "invalidObjectType"),
+                        ["value"])
+                ];
+            }
 
             foreach (IElement element in elements)
             {

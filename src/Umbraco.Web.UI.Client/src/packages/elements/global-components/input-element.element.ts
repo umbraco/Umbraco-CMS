@@ -1,11 +1,9 @@
 import { UmbElementTreePickerDataSource } from '../picker-data-source/element-tree.picker-data-source.js';
-//import { UMB_ELEMENT_ENTITY_TYPE } from '../entity.js';
 import { html, customElement, property, ifDefined } from '@umbraco-cms/backoffice/external/lit';
 import { splitStringToArray } from '@umbraco-cms/backoffice/utils';
 import { UmbChangeEvent } from '@umbraco-cms/backoffice/event';
 import { UmbFormControlMixin } from '@umbraco-cms/backoffice/validation';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
-//import type { UmbReferenceByUniqueAndType } from '@umbraco-cms/backoffice/models';
 import type { UmbTreeStartNode } from '@umbraco-cms/backoffice/tree';
 
 @customElement('umb-input-element')
