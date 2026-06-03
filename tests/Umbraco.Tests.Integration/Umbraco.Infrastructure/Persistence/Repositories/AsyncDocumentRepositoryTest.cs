@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore;
 using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -25,6 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
 internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
 {
+    private ITemplate _template = null!;
     private ContentType _contentType = null!;
     private Content _textpage = null!;
     private Content _subpage = null!;
@@ -52,6 +54,7 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
     {
         var template = TemplateBuilder.CreateTextPageTemplate("defaultTemplate");
         await TemplateService.CreateAsync(template, Constants.Security.SuperUserKey);
+        _template = template;
 
         _contentType = ContentTypeBuilder.CreateSimpleContentType("umbTextpage", "Textpage", defaultTemplateId: template.Id);
         _contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
@@ -353,5 +356,228 @@ internal sealed class AsyncDocumentRepositoryTest : UmbracoIntegrationTest
                 Is.EqualTo(fromService.GetValue(property.Alias)),
                 $"Property '{property.Alias}' differs between EF Core and NPoco paths");
         }
+    }
+
+    // --- Published/draft property split ---
+
+    [Test]
+    public async Task GetAsync_EditedAfterPublish_HasBothDraftAndPublishedPropertyValues()
+    {
+        // _publishedPage was saved with title="Welcome to our Home page" and then published in SetUp.
+        // Edit the title in the draft without re-publishing so the two versions diverge.
+        _publishedPage.SetValue("title", "draft edit");
+        ContentService.Save(_publishedPage, -1);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        IContent? result = await repository.GetAsync(_publishedPage.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.GetValue("title"), Is.EqualTo("draft edit"),
+            "draft value should reflect the unsaved edit");
+        Assert.That(result.GetValue("title", published: true), Is.EqualTo("Welcome to our Home page"),
+            "published value should remain unchanged");
+    }
+
+    // --- Culture variations (ApplyVariationsAsync) ---
+
+    // Helper: creates a French language and a culture-variant content type with a variant text property.
+    // en-US is already installed as the default language by the migration runner.
+    private async Task<IContentType> CreateVariantContentTypeAsync()
+    {
+        await GetRequiredService<ILanguageService>().CreateAsync(
+            new Language("fr", "French"),
+            Constants.Security.SuperUserKey);
+
+        var propertyCollection = new PropertyTypeCollection(true)
+        {
+            new PropertyType(ShortStringHelper, "variantTitle", ValueStorageType.Ntext)
+            {
+                Alias = "variantTitle",
+                DataTypeId = -88,
+                Variations = ContentVariation.Culture,
+            },
+        };
+
+        var contentType = ContentTypeBuilder.CreateBasicContentType("umbVariant", "Variant");
+        contentType.Variations = ContentVariation.Culture;
+        contentType.PropertyGroups.Add(new PropertyGroup(propertyCollection) { Alias = "content", Name = "Content" });
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
+        return contentType;
+    }
+
+    [Test]
+    public async Task GetAsync_VariantDocument_HasDraftCultureNames()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+
+        IContent doc = ContentBuilder.CreateBasicContent(contentType);
+        doc.SetCultureName("English Name", "en-US");
+        doc.SetCultureName("Nom Français", "fr");
+        ContentService.Save(doc);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        IContent? result = await repository.GetAsync(doc.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.GetCultureName("en-US"), Is.EqualTo("English Name"));
+        Assert.That(result.GetCultureName("fr"), Is.EqualTo("Nom Français"));
+    }
+
+    [Test]
+    public async Task GetAsync_PublishedVariantDocument_HasPublishedCultureNames()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+
+        IContent doc = ContentBuilder.CreateBasicContent(contentType);
+        doc.SetCultureName("English Name", "en-US");
+        doc.SetCultureName("Nom Français", "fr");
+        ContentService.Save(doc);
+        ContentService.Publish(doc, doc.AvailableCultures.ToArray());
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        IContent? result = await repository.GetAsync(doc.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.GetPublishName("en-US"), Is.EqualTo("English Name"));
+        Assert.That(result.GetPublishName("fr"), Is.EqualTo("Nom Français"));
+    }
+
+    [Test]
+    public async Task GetAsync_VariantDocument_EditedCultureIsMarked()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+
+        IContent doc = ContentBuilder.CreateBasicContent(contentType);
+        doc.SetCultureName("English Name", "en-US");
+        doc.SetCultureName("Nom Français", "fr");
+        ContentService.Save(doc);
+        ContentService.Publish(doc, doc.AvailableCultures.ToArray());
+
+        // Re-fetch so the entity has the published state, then edit fr only.
+        doc = ContentService.GetById(doc.Key)!;
+        doc.SetCultureName("Nom Modifié", "fr");
+        ContentService.Save(doc);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        IContent? result = await repository.GetAsync(doc.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.IsCultureEdited("fr"), Is.True,
+            "fr was edited after publishing so it should be marked edited");
+        Assert.That(result.IsCultureEdited("en-US"), Is.False,
+            "en-US was not touched after publishing so it should not be marked edited");
+    }
+
+    [Test]
+    public async Task GetAsync_VariantDocument_HasCultureSpecificPropertyValues()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+
+        IContent doc = ContentBuilder.CreateBasicContent(contentType);
+        doc.SetCultureName("English Name", "en-US");
+        doc.SetCultureName("Nom Français", "fr");
+        doc.SetValue("variantTitle", "English Title", "en-US");
+        doc.SetValue("variantTitle", "Titre Français", "fr");
+        ContentService.Save(doc);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        IContent? result = await repository.GetAsync(doc.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.GetValue("variantTitle", "en-US"), Is.EqualTo("English Title"));
+        Assert.That(result.GetValue("variantTitle", "fr"), Is.EqualTo("Titre Français"));
+    }
+
+    // --- Template IDs ---
+
+    [Test]
+    public async Task GetAsync_PublishedDocumentWithTemplate_PopulatesTemplateIds()
+    {
+        var content = ContentBuilder.CreateSimpleContent(_contentType, "Templated Page");
+        content.TemplateId = _template.Id;
+        ContentService.Save(content, -1);
+        ContentService.Publish(content, ["*"]);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        IContent? result = await repository.GetAsync(content.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.TemplateId, Is.EqualTo(_template.Id),
+            "TemplateId should reflect the current draft's template");
+        // PublishTemplateId comes from the published DocumentVersion join. The NPoco
+        // single-entity path (AddAdditionalContentMapping) skips this field; the NPoco
+        // bulk path and the EF Core path both set it from the published version's TemplateId.
+        Assert.That(result.PublishTemplateId, Is.EqualTo(_template.Id),
+            "PublishTemplateId should reflect the template that was active when the document was published");
+    }
+
+    // --- Partial culture publication ---
+
+    [Test]
+    public async Task GetAsync_PartiallyPublishedVariantDocument_OnlyPublishedCultureHasPublishInfo()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+
+        IContent doc = ContentBuilder.CreateBasicContent(contentType);
+        doc.SetCultureName("English Name", "en-US");
+        doc.SetCultureName("Nom Français", "fr");
+        ContentService.Save(doc);
+        ContentService.Publish(doc, ["en-US"]); // publish only en-US, leave fr as draft
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        IContent? result = await repository.GetAsync(doc.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.IsCulturePublished("en-US"), Is.True,
+            "en-US was published so it should have publish info");
+        Assert.That(result.IsCulturePublished("fr"), Is.False,
+            "fr was never published so it should not have publish info");
+        Assert.That(result.GetPublishName("en-US"), Is.EqualTo("English Name"));
+        Assert.That(result.GetPublishName("fr"), Is.Null);
+    }
+
+    // --- Variant published/draft property split ---
+
+    [Test]
+    public async Task GetAsync_VariantDocument_EditedAfterPublish_HasBothDraftAndPublishedPropertyValues()
+    {
+        IContentType contentType = await CreateVariantContentTypeAsync();
+
+        IContent doc = ContentBuilder.CreateBasicContent(contentType);
+        doc.SetCultureName("English Name", "en-US");
+        doc.SetCultureName("Nom Français", "fr");
+        doc.SetValue("variantTitle", "published value", "en-US");
+        ContentService.Save(doc);
+        ContentService.Publish(doc, ["en-US", "fr"]);
+
+        // Edit the draft value without re-publishing.
+        doc = ContentService.GetById(doc.Key)!;
+        doc.SetValue("variantTitle", "draft value", "en-US");
+        ContentService.Save(doc);
+
+        using var scope = NewScopeProvider.CreateScope();
+        var repository = CreateRepository();
+        IContent? result = await repository.GetAsync(doc.Key, CancellationToken.None);
+        scope.Complete();
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result!.GetValue("variantTitle", "en-US"), Is.EqualTo("draft value"),
+            "draft property value should reflect the unsaved edit");
+        Assert.That(result.GetValue("variantTitle", "en-US", published: true), Is.EqualTo("published value"),
+            "published property value should remain unchanged");
     }
 }
