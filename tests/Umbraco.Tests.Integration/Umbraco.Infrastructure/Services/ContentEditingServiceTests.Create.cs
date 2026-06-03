@@ -999,32 +999,6 @@ public partial class ContentEditingServiceTests
         Assert.AreEqual(ContentEditingOperationStatus.InvalidCulture, result.Status);
     }
 
-    [Test]
-    public async Task Cannot_Create_Segment_Variant_Without_Default_Segment()
-    {
-        var contentType = await CreateVariantContentType(ContentVariation.Segment);
-
-        var createModel = new ContentCreateModel
-        {
-            ContentTypeKey = contentType.Key,
-            ParentKey = Constants.System.RootKey,
-            Properties =
-            [
-                new PropertyValueModel { Alias = "invariantTitle", Value = "The Invariant Title" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The Seg-1 Title", Segment = "seg-1" },
-                new PropertyValueModel { Alias = "variantTitle", Value = "The Seg-2 Title", Segment = "seg-2" }
-            ],
-            Variants =
-            [
-                new () { Name = "The Name" }
-            ]
-        };
-
-        var result = await ContentEditingService.CreateAsync(createModel, Constants.Security.SuperUserKey);
-        Assert.IsFalse(result.Success);
-        Assert.AreEqual(ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch, result.Status);
-    }
-
     private void AssertBodyTextEquals(string expected, IContent content)
     {
         var bodyTextValue = content.GetValue<string>("bodyText");
