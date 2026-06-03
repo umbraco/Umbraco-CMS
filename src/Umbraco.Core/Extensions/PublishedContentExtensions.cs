@@ -2230,9 +2230,9 @@ public static class PublishedContentExtensions
         // with a non-existing published node, will get cache misses and call the DB
         // making it a very slow operation.
 
-        return publishedStatusFilteringService
-            .FilterAvailable(childrenKeys, culture)
-            .OrderBy(x => x.SortOrder);
+        // INavigationQueryService.TryGetChildrenKeys returns keys already ordered by SortOrder
+        // and FilterAvailable preserves enumeration order, so no further OrderBy is needed.
+        return publishedStatusFilteringService.FilterAvailable(childrenKeys, culture);
     }
 
     private static IEnumerable<IPublishedContent> EnumerateDescendantsOrSelfInternal(
