@@ -163,13 +163,12 @@ public class DataTypePresentationFactory : IDataTypePresentationFactory
                 return ValueTypes.ToStorageType(configureValueType.ValueType);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Configuration editors are third-party and can throw anything when the stored configuration
             // doesn't deserialize into their configuration type. Fall back to the value editor's value type
             // rather than failing the save, but log so the misconfiguration remains observable.
             _logger.LogWarning(
-                ex,
                 "Could not build the configuration object for editor {EditorAlias} to determine its value storage type; falling back to the value editor's value type.",
                 editor.Alias);
         }
