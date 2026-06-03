@@ -9,12 +9,12 @@ const propertyName = 'Test Approved Color';
 const colorValue = '9c2121';
 const oldLabel = 'first';
 const newLabel = 'third';
-let contentId = null;
+let contentKey = null;
 
 test.beforeEach(async ({umbracoApi, umbracoUi}) => {
   const dataTypeId = await umbracoApi.dataType.createApprovedColorDataTypeWithOneItem(customDataTypeName, oldLabel, colorValue);
   const templateId = await umbracoApi.template.createTemplateWithDisplayingApprovedColorValue(templateName, AliasHelper.toAlias(propertyName));
-  contentId = await umbracoApi.document.createPublishedDocumentWithValue(contentName, {label: oldLabel, value: '#' + colorValue}, dataTypeId, templateId, propertyName, documentTypeName);
+  contentKey = await umbracoApi.document.createPublishedDocumentWithValue(contentName, {label: oldLabel, value: '#' + colorValue}, dataTypeId, templateId, propertyName, documentTypeName);
   await umbracoUi.goToBackOffice();
   await umbracoUi.content.goToSection(ConstantHelper.sections.content);
 });
@@ -49,7 +49,7 @@ test('can render the updated color label after republishing', async ({umbracoApi
   // Act
   await umbracoUi.content.goToContentWithName(contentName);
   await umbracoUi.content.clickSaveAndPublishButtonAndWaitForContentToBeUpdated();
-  const contentURL = await umbracoApi.document.getDocumentUrl(contentId);
+  const contentURL = await umbracoApi.document.getDocumentUrl(contentKey);
   await umbracoUi.contentRender.navigateToRenderedContentPage(contentURL);
 
   // Assert

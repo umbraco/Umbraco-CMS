@@ -1478,7 +1478,7 @@ export class DataTypeApiHelper {
   async updateApprovedColorItemLabel(dataTypeName: string, color: string, label: string) {
     const dataTypeData = await this.getByName(dataTypeName);
     const itemsValue = dataTypeData.values.find(item => item.alias === 'items');
-    const colorItem = itemsValue?.value.find(item => item.value === color);
+    const colorItem = itemsValue?.value?.find(item => item.value === color);
     if (colorItem) {
       colorItem.label = label;
     }
