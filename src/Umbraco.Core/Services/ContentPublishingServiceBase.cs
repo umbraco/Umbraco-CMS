@@ -255,8 +255,7 @@ internal abstract class ContentPublishingServiceBase<TContent, TContentService>
             Variants = cultures.Select(culture => new VariantModel()
             {
                 Name = content.GetPublishName(culture) ?? string.Empty,
-                Culture = culture,
-                Segment = null
+                Culture = culture
             }).ToArray()
         };
 

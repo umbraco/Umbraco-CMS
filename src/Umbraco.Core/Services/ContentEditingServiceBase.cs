@@ -523,7 +523,7 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             return null;
         }
 
-        if (contentType.VariesByNothing() && contentEditingModelBase.Variants.Any(v => v.Culture is null && v.Segment is null) is false)
+        if (contentType.VariesByNothing() && contentEditingModelBase.Variants.Any(v => v.Culture is null) is false)
         {
             // does not vary by anything and is missing the invariant name = invalid
             operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
@@ -534,13 +534,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
         {
             // varies by culture with one or more variants not bound to a culture = invalid
             operationStatus = ContentEditingOperationStatus.ContentTypeCultureVarianceMismatch;
-            return null;
-        }
-
-        if (contentType.VariesBySegment() && contentEditingModelBase.Variants.Any(v => v.Segment is null) is false)
-        {
-            // varies by segment with no default segment variants = invalid
-            operationStatus = ContentEditingOperationStatus.ContentTypeSegmentVarianceMismatch;
             return null;
         }
 
@@ -669,7 +662,6 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
             // as each culture can have several segments. we'll prioritize the segment-less names
             var variantNamesByCulture = contentEditingModelBase.Variants
                 .Where(v => v.Culture.IsNullOrWhiteSpace() == false)
-                .OrderBy(v => v.Segment.IsNullOrWhiteSpace() ? 0 : 1)
                 .GroupBy(v => v.Culture!)
                 .ToDictionary(g => g.Key, g => g.First().Name);
 
@@ -679,16 +671,10 @@ internal abstract class ContentEditingServiceBase<TContent, TContentType, TConte
                 content.SetCultureName(name, culture);
             }
         }
-        else if (contentType.VariesBySegment())
-        {
-            // this should be validated already so it's OK to throw an exception here
-            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Segment is null)?.Name
-                           ?? throw new ArgumentException("Could not find the default segment variant", nameof(contentEditingModelBase));
-        }
         else
         {
             // this should be validated already so it's OK to throw an exception here
-            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Culture is null && v.Segment is null)?.Name
+            content.Name = contentEditingModelBase.Variants.FirstOrDefault(v => v.Culture is null)?.Name
                            ?? throw new ArgumentException("Could not find a culture invariant variant", nameof(contentEditingModelBase));
         }
     }
