@@ -2,8 +2,7 @@ import { UMB_DOCUMENT_ENTITY_TYPE, UMB_DOCUMENT_ROOT_ENTITY_TYPE } from '../../e
 import { UmbDocumentItemRepository } from '../../item/index.js';
 import { UMB_DUPLICATE_DOCUMENT_MODAL } from './modal/index.js';
 import { UmbDuplicateDocumentRepository } from './repository/index.js';
-import { UMB_DOCUMENT_TREE_REPOSITORY_ALIAS } from '../../tree/manifests.js';
-import type { UmbTreeRepository } from '@umbraco-cms/backoffice/tree';
+import { UmbDocumentTreeRepository } from '../../tree/index.js';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
 import { UmbEntityActionBase, UmbRequestReloadChildrenOfEntityEvent } from '@umbraco-cms/backoffice/entity-action';
@@ -11,7 +10,6 @@ import {
 	UmbDocumentTypeDetailRepository,
 	UmbDocumentTypeStructureRepository,
 } from '@umbraco-cms/backoffice/document-type';
-import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 
 export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never> {
@@ -52,11 +50,10 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 	}
 
 	async #requestAncestors() {
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, UMB_DOCUMENT_TREE_REPOSITORY_ALIAS);
-		const { data } =
-			(await treeRepository?.requestTreeItemAncestors({
-				treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
-			})) ?? {};
+		const treeRepository = new UmbDocumentTreeRepository(this);
+		const { data } = await treeRepository.requestTreeItemAncestors({
+			treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
+		});
 		return data;
 	}
 
