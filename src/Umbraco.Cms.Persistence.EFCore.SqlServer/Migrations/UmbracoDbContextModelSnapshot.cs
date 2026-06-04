@@ -493,15 +493,11 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnName("nodeId");
 
                     b.Property<string>("Thumbnail")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(max)")
-                        .HasDefaultValue("folder.png")
                         .HasColumnName("thumbnail");
 
                     b.Property<byte>("Variations")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint")
-                        .HasDefaultValue((byte)1)
                         .HasColumnName("variations");
 
                     b.HasKey("PrimaryKey");
@@ -978,9 +974,7 @@ namespace Umbraco.Cms.Persistence.EFCore.SqlServer.Migrations
                         .HasColumnName("validationRegExpMessage");
 
                     b.Property<byte>("Variations")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint")
-                        .HasDefaultValue((byte)1)
                         .HasColumnName("variations");
 
                     b.HasKey("Id");

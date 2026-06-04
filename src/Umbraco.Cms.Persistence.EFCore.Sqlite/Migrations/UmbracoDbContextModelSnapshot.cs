@@ -533,16 +533,12 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .HasColumnName("nodeId");
 
                     b.Property<string>("Thumbnail")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue("folder.png")
                         .HasColumnName("thumbnail")
                         .UseCollation("NOCASE");
 
                     b.Property<byte>("Variations")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
-                        .HasDefaultValue((byte)1)
                         .HasColumnName("variations");
 
                     b.HasKey("PrimaryKey");
@@ -1033,9 +1029,7 @@ namespace Umbraco.Cms.Persistence.EFCore.Sqlite.Migrations
                         .UseCollation("NOCASE");
 
                     b.Property<byte>("Variations")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
-                        .HasDefaultValue((byte)1)
                         .HasColumnName("variations");
 
                     b.HasKey("Id");
