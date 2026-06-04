@@ -25,7 +25,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
 				expandTreeRoot: true,
-				treeExpansion: ancestors ? linkEntityExpansionEntries(ancestors) : [],
+				treeExpansion: linkEntityExpansionEntries(ancestors),
 				pickableFilter: await this._getPickableFilter(this.args.unique),
 			},
 		});
@@ -49,13 +49,18 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 	}
 
 	async #requestAncestors() {
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.args.meta.treeRepositoryAlias);
-		const { data } =
-			(await treeRepository?.requestTreeItemAncestors({
-				treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
-			})) ?? {};
-		// Exclude self — the API returns the descendant as part of the ancestors list, but we only want to expand its parents.
-		return data?.filter((item) => item.unique !== this.args.unique);
+		try {
+			const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.args.meta.treeRepositoryAlias);
+			const { data } =
+				(await treeRepository?.requestTreeItemAncestors({
+					treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
+				})) ?? {};
+			// Exclude self — the API returns the descendant as part of the ancestors list, but we only want to expand its parents.
+			return data?.filter((item) => item.unique !== this.args.unique) ?? [];
+		} catch {
+			// Tree pre-expansion is a UX convenience — if it fails the modal still opens normally.
+			return [];
+		}
 	}
 
 	async #reloadMenu() {

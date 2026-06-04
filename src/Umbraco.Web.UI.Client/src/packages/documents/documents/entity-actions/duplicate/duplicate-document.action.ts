@@ -28,7 +28,7 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 				unique: this.args.unique,
 				entityType: this.args.entityType,
 				selectableFilter,
-				treeExpansion: ancestors ? linkEntityExpansionEntries(ancestors) : [],
+				treeExpansion: linkEntityExpansionEntries(ancestors),
 			},
 		});
 
@@ -50,12 +50,17 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 	}
 
 	async #requestAncestors() {
-		const treeRepository = new UmbDocumentTreeRepository(this);
-		const { data } = await treeRepository.requestTreeItemAncestors({
-			treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
-		});
-		// Exclude self — the API returns the descendant as part of the ancestors list, but we only want to expand its parents.
-		return data?.filter((item) => item.unique !== this.args.unique);
+		try {
+			const treeRepository = new UmbDocumentTreeRepository(this);
+			const { data } = await treeRepository.requestTreeItemAncestors({
+				treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
+			});
+			// Exclude self — the API returns the descendant as part of the ancestors list, but we only want to expand its parents.
+			return data?.filter((item) => item.unique !== this.args.unique) ?? [];
+		} catch {
+			// Tree pre-expansion is a UX convenience — if it fails the modal still opens normally.
+			return [];
+		}
 	}
 
 	async #getSelectableFilterByDocumentUnique(documentUnique: string) {
