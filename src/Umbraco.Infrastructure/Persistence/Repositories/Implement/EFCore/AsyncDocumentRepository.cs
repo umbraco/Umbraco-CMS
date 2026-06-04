@@ -246,12 +246,18 @@ internal sealed class AsyncDocumentRepository
                 .Distinct()
                 .ToList();
 
-            // TODO: batch allVersionIds/nodeIds IN queries when > Constants.Sql.MaxParameterCount
+            // Property data grouped by version ID — batched to stay within SQL Server's 2100-parameter limit.
+            // allVersionIds can reach 2× the document count (current + published version per document).
+            var allPropertyData = new List<PropertyDataDto>();
+            foreach (IEnumerable<int> batch in allVersionIds.InGroupsOf(Constants.Sql.MaxParameterCount))
+            {
+                int[] batchArray = batch.ToArray();
+                allPropertyData.AddRange(await db.PropertyData
+                    .Where(propertyData => batchArray.Contains(propertyData.VersionId))
+                    .ToListAsync());
+            }
 
-            // Property data grouped by version ID
-            var propertyDtosByVersionId = (await db.PropertyData
-                .Where(propertyData => allVersionIds.Contains(propertyData.VersionId))
-                .ToListAsync())
+            var propertyDtosByVersionId = allPropertyData
                 .GroupBy(propertyData => propertyData.VersionId)
                 .ToDictionary(group => group.Key, group => group.ToList());
 
@@ -270,17 +276,31 @@ internal sealed class AsyncDocumentRepository
 
             if (contentTypeMap.Values.Any(ct => ct?.VariesByCulture() ?? false))
             {
-                // Content version culture variations (draft + published names per culture)
-                cvVariationsByVersionId = (await db.ContentVersionCultureVariations
-                    .Where(variation => allVersionIds.Contains(variation.VersionId))
-                    .ToListAsync())
+                // Content version culture variations — batched for the same 2100-parameter reason as property data.
+                var allCvVariations = new List<ContentVersionCultureVariationDto>();
+                foreach (IEnumerable<int> batch in allVersionIds.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
+                {
+                    int[] batchArray = batch.ToArray();
+                    allCvVariations.AddRange(await db.ContentVersionCultureVariations
+                        .Where(variation => batchArray.Contains(variation.VersionId))
+                        .ToListAsync());
+                }
+
+                cvVariationsByVersionId = allCvVariations
                     .GroupBy(variation => variation.VersionId)
                     .ToDictionary(group => group.Key, group => (IReadOnlyList<ContentVersionCultureVariationDto>)group.ToList());
 
-                // Document culture variations (edited flag per culture per node)
-                dcVariationsByNodeId = (await db.DocumentCultureVariations
-                    .Where(variation => nodeIds.Contains(variation.NodeId))
-                    .ToListAsync())
+                // Document culture variations — nodeIds is unbounded for GetAll; batch accordingly.
+                var allDcVariations = new List<DocumentCultureVariationDto>();
+                foreach (IEnumerable<int> batch in nodeIds.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
+                {
+                    int[] batchArray = batch.ToArray();
+                    allDcVariations.AddRange(await db.DocumentCultureVariations
+                        .Where(variation => batchArray.Contains(variation.NodeId))
+                        .ToListAsync());
+                }
+
+                dcVariationsByNodeId = allDcVariations
                     .GroupBy(variation => variation.NodeId)
                     .ToDictionary(group => group.Key, group => (IReadOnlyList<DocumentCultureVariationDto>)group.ToList());
             }
