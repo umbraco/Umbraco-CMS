@@ -18,11 +18,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.args.meta.treeRepositoryAlias);
-		const { data: ancestors } =
-			(await treeRepository?.requestTreeItemAncestors({
-				treeItem: { unique: this.args.unique, entityType: this.args.entityType },
-			})) ?? {};
+		const ancestors = await this.#requestAncestors();
 
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
@@ -50,6 +46,15 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		}
 
 		this.#reloadMenu();
+	}
+
+	async #requestAncestors() {
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.args.meta.treeRepositoryAlias);
+		const { data } =
+			(await treeRepository?.requestTreeItemAncestors({
+				treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
+			})) ?? {};
+		return data;
 	}
 
 	async #reloadMenu() {

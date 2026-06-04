@@ -12,11 +12,7 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.args.meta.treeRepositoryAlias);
-		const { data: ancestors } =
-			(await treeRepository?.requestTreeItemAncestors({
-				treeItem: { unique: this.args.unique, entityType: this.args.entityType },
-			})) ?? {};
+		const ancestors = await this.#requestAncestors();
 
 		const value = await umbOpenModal(this, UMB_DUPLICATE_TO_MODAL, {
 			data: {
@@ -47,6 +43,15 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 		}
 
 		this.#reloadMenu();
+	}
+
+	async #requestAncestors() {
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.args.meta.treeRepositoryAlias);
+		const { data } =
+			(await treeRepository?.requestTreeItemAncestors({
+				treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
+			})) ?? {};
+		return data;
 	}
 
 	async #reloadMenu() {

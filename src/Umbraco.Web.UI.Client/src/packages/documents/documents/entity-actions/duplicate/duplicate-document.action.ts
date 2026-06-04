@@ -20,13 +20,10 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
 		const duplicateRepository = new UmbDuplicateDocumentRepository(this);
-		const selectableFilter = await this.#getSelectableFilterByDocumentUnique(this.args.unique);
-
-		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, UMB_DOCUMENT_TREE_REPOSITORY_ALIAS);
-		const { data: ancestors } =
-			(await treeRepository?.requestTreeItemAncestors({
-				treeItem: { unique: this.args.unique, entityType: this.args.entityType },
-			})) ?? {};
+		const [selectableFilter, ancestors] = await Promise.all([
+			this.#getSelectableFilterByDocumentUnique(this.args.unique),
+			this.#requestAncestors(),
+		]);
 
 		const value = await umbOpenModal(this, UMB_DUPLICATE_DOCUMENT_MODAL, {
 			data: {
@@ -52,6 +49,15 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		}
 
 		this.#reloadMenu(destinationUnique);
+	}
+
+	async #requestAncestors() {
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, UMB_DOCUMENT_TREE_REPOSITORY_ALIAS);
+		const { data } =
+			(await treeRepository?.requestTreeItemAncestors({
+				treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
+			})) ?? {};
+		return data;
 	}
 
 	async #getSelectableFilterByDocumentUnique(documentUnique: string) {
