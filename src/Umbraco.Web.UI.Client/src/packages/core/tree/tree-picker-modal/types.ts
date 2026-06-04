@@ -18,7 +18,7 @@ export interface UmbTreePickerModalData<
 > extends UmbPickerModalData<TreeItemType> {
 	hideTreeRoot?: boolean;
 	expandTreeRoot?: boolean;
-	expansion?: UmbEntityExpansionModel;
+	treeExpansion?: UmbEntityExpansionModel;
 	treeAlias?: string;
 	// TODO: create action should be replaces by entity actions in the pickers. Then we also open up for creating folders, choosing where to place items etc. [MR]
 	createAction?: UmbTreePickerModalCreateActionData<PathPatternParamsType>;

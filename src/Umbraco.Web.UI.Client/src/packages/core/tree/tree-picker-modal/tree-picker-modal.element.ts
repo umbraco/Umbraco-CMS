@@ -76,8 +76,8 @@ export class UmbTreePickerModalElement<TreeItemType extends UmbTreeItemModelBase
 				multiple,
 			};
 
-			if (this.data?.expansion !== undefined) {
-				this._pickerContext.expansion.setExpansion(this.data.expansion);
+			if (this.data?.treeExpansion !== undefined) {
+				this._pickerContext.expansion.setExpansion(this.data.treeExpansion);
 			}
 		}
 

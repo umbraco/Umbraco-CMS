@@ -6,7 +6,7 @@ import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
 
 export interface UmbDuplicateDocumentModalData extends UmbEntityModel {
 	selectableFilter?: (item: UmbDocumentTreeItemModel) => boolean;
-	expansion?: UmbEntityExpansionModel;
+	treeExpansion?: UmbEntityExpansionModel;
 }
 
 export interface UmbDuplicateDocumentModalValue {

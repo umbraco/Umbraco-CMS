@@ -7,7 +7,7 @@ export const UMB_DUPLICATE_TO_MODAL_ALIAS = 'Umb.Modal.DuplicateTo';
 export interface UmbDuplicateToModalData extends UmbEntityModel {
 	treeAlias: string;
 	foldersOnly?: boolean;
-	expansion?: UmbEntityExpansionModel;
+	treeExpansion?: UmbEntityExpansionModel;
 }
 
 export interface UmbDuplicateToModalValue {

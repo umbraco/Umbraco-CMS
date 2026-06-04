@@ -29,7 +29,7 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	protected override updated(_changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>) {
 		super.updated(_changedProperties);
 		if (_changedProperties.has('data')) {
-			this._treeExpansion = this.data?.expansion ?? [];
+			this._treeExpansion = this.data?.treeExpansion ?? [];
 		}
 	}
 

@@ -20,7 +20,7 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 				entityType: this.args.entityType,
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
-				expansion: ancestors ? linkEntityExpansionEntries(ancestors) : [],
+				treeExpansion: ancestors ? linkEntityExpansionEntries(ancestors) : [],
 			},
 		});
 
