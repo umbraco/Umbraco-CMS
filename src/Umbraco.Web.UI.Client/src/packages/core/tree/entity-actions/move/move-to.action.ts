@@ -25,7 +25,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
 				expandTreeRoot: true,
-				treeExpansion: linkEntityExpansionEntries(ancestors),
+				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
 				pickableFilter: await this._getPickableFilter(this.args.unique),
 			},
 		});

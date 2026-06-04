@@ -28,7 +28,7 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 				unique: this.args.unique,
 				entityType: this.args.entityType,
 				selectableFilter,
-				treeExpansion: linkEntityExpansionEntries(ancestors),
+				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
 			},
 		});
 
