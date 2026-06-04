@@ -170,9 +170,7 @@ internal abstract class OpenApiContractTestBase : OpenApiTestBase
         // discriminator mapping refs that match the registered schema names.
         var polymorphicDataType = await CreatePolymorphicTestDataTypeAsync();
 
-        // Create a Plain JSON data type. JsonValueConverter handles all JSON-type property editors
-        // and returns typeof(JsonNode) as the Delivery API model type. This verifies that the schema
-        // generator produces an inline {} schema rather than a named JsonNode component (#23034).
+        // Create a Plain JSON data type to exercise the unconstrained-type schema path (#23034).
         var plainJsonDataType = await CreatePlainJsonDataTypeAsync();
 
         // Create a composition type that exposes shared SEO metadata properties

@@ -343,9 +343,7 @@ public sealed class ContentTypeSchemaTransformer : IOpenApiSchemaTransformer, IO
 
         var schemaId = GetSchemaId(jsonTypeInfo);
 
-        // STJ represents unconstrained types (JsonNode, object, custom-converter types) as boolean 'true'
-        // in JSON Schema. Return an inline {} schema rather than registering a named component, since a
-        // named component adds no value and would incorrectly imply a concrete model shape.
+        // Types that produce 'true' in JSON Schema (unconstrained: JsonNode, object, custom-converter types) should be inline {} rather than named components.
         JsonNode rawSchema = JsonSchemaExporter.GetJsonSchemaAsNode(jsonTypeInfo);
         if (rawSchema.GetValueKind() == JsonValueKind.True)
         {
