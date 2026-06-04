@@ -11,8 +11,6 @@ import type { UUIBooleanInputEvent } from '@umbraco-cms/backoffice/external/uui'
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
 import type { UmbTreeElement } from '@umbraco-cms/backoffice/tree';
 import type { UmbDocumentTreeItemModel } from '../../../types.js';
-import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
-import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 const elementName = 'umb-document-duplicate-to-modal';
 @customElement(elementName)
@@ -23,14 +21,8 @@ export class UmbDocumentDuplicateToModalElement extends UmbModalBaseElement<
 	@state()
 	private _destinationUnique?: string | null;
 
-	@state()
-	private _treeExpansion: UmbEntityExpansionModel = [];
-
-	protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>) {
-		super.updated(_changedProperties);
-		if (_changedProperties.has('data')) {
-			this._treeExpansion = this.data?.treeExpansion ?? [];
-		}
+	private get _treeExpansion() {
+		return this.data?.treeExpansion ?? [];
 	}
 
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
