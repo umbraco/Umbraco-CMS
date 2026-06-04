@@ -147,8 +147,7 @@ internal sealed class AsyncDocumentRepository
 
     /// <inheritdoc />
     protected override IContent BuildEntity(DocumentDto entityDto, IContentType? contentType) =>
-        throw new NotSupportedException(
-            $"{nameof(AsyncDocumentRepository)} requires a full data projection to build entities. Use {nameof(PerformGetAsync)} instead.");
+        ContentBaseFactory.BuildEntity(entityDto, contentType);
 
     /// <inheritdoc />
     protected override DocumentDto BuildEntityDto(IContent entity) =>
@@ -274,7 +273,7 @@ internal sealed class AsyncDocumentRepository
             var allPropertyData = new List<PropertyDataDto>();
             foreach (IEnumerable<int> batch in allVersionIds.InGroupsOf(Constants.Sql.MaxParameterCount))
             {
-                List<int> batchIds = batch.ToList();
+                var batchIds = batch.ToList();
                 allPropertyData.AddRange(await db.PropertyData
                     .Where(propertyData => batchIds.Contains(propertyData.VersionId))
                     .ToListAsync());
@@ -303,7 +302,7 @@ internal sealed class AsyncDocumentRepository
                 var allCvVariations = new List<ContentVersionCultureVariationDto>();
                 foreach (IEnumerable<int> batch in allVersionIds.InGroupsOf(Constants.Sql.MaxParameterCount))
                 {
-                    List<int> batchIds = batch.ToList();
+                    var batchIds = batch.ToList();
                     allCvVariations.AddRange(await db.ContentVersionCultureVariations
                         .Where(variation => batchIds.Contains(variation.VersionId))
                         .ToListAsync());
@@ -317,7 +316,7 @@ internal sealed class AsyncDocumentRepository
                 var allDcVariations = new List<DocumentCultureVariationDto>();
                 foreach (IEnumerable<int> batch in nodeIds.InGroupsOf(Core.Constants.Sql.MaxParameterCount))
                 {
-                    List<int> batchIds = batch.ToList();
+                    var batchIds = batch.ToList();
                     allDcVariations.AddRange(await db.DocumentCultureVariations
                         .Where(variation => batchIds.Contains(variation.NodeId))
                         .ToListAsync());
@@ -346,7 +345,7 @@ internal sealed class AsyncDocumentRepository
                 row.document.CurrentVersion = row.documentVersion;
                 row.document.PublishedVersion = row.publishedDocumentVersion;
 
-                IContent entity = ContentBaseFactory.BuildEntity(row.document, contentType);
+                IContent entity = BuildEntity(row.document, contentType);
 
                 var versionPropertyDtos = new List<PropertyDataDto>();
                 if (propertyDtosByVersionId.TryGetValue(row.contentVersion.Id, out List<PropertyDataDto>? currentProps))
