@@ -39,9 +39,9 @@ public class MediaRecycleBinControllerBase : RecycleBinControllerBase<MediaRecyc
 
     protected override Guid RecycleBinRootKey => Constants.System.RecycleBinMediaKey;
 
-    protected override MediaRecycleBinItemResponseModel MapRecycleBinViewModel(Guid? parentKey, IEntitySlim entity)
+    protected override async Task<MediaRecycleBinItemResponseModel> MapRecycleBinViewModelAsync(Guid? parentKey, IEntitySlim entity)
     {
-        MediaRecycleBinItemResponseModel responseModel = base.MapRecycleBinViewModel(parentKey, entity);
+        MediaRecycleBinItemResponseModel responseModel = await base.MapRecycleBinViewModelAsync(parentKey, entity);
 
         if (entity is IMediaEntitySlim mediaEntitySlim)
         {

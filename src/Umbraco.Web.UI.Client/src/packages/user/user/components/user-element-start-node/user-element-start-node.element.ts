@@ -55,12 +55,11 @@ export class UmbUserElementStartNodeElement extends UmbLitElement {
 			(item) => item.unique,
 			(item) => {
 				return html`
-					<!-- TODO: get correct variant name -->
 					<uui-ref-node
-						name=${item.variants[0]?.name}
+						name=${item.name}
 						?disabled=${this.readonly}
 						style="--uui-color-disabled-contrast: var(--uui-color-text)">
-						<uui-icon slot="icon" name="folder"></uui-icon>
+						<uui-icon slot="icon" name=${item.icon ?? 'icon-folder'}></uui-icon>
 					</uui-ref-node>
 				`;
 			},

@@ -1,10 +1,13 @@
 using System.Data.Common;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore;
+using Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Scoping;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -17,9 +20,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
     [Test]
     public async Task Get_ReturnsNull_WhenOperationDoesNotExist()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
+        var repository = CreateRepository();
         await CreateTestData(repository);
 
         var result = await repository.GetAsync(Guid.NewGuid());
@@ -29,9 +32,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
     [Test]
     public async Task Get_ReturnsExpectedOperation_WhenOperationExists()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
+        var repository = CreateRepository();
         await CreateTestData(repository);
 
         var testOperation = _operations[1];
@@ -57,9 +60,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
     [TestCase("Test", new LongRunningOperationStatus[] { }, 5, 1, 0, 5)]
     public async Task GetByType_ReturnsExpectedOperations(string type, LongRunningOperationStatus[] statuses, int skip, int take, int expectedCount, int expectedTotal)
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
+        var repository = CreateRepository();
         await CreateTestData(repository);
 
         var result = await repository.GetByTypeAsync(type, statuses, skip, take);
@@ -72,9 +75,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
     [Test]
     public async Task GetStatus_ReturnsNull_WhenOperationDoesNotExist()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
+        var repository = CreateRepository();
         await CreateTestData(repository);
 
         var result = await repository.GetStatusAsync(Guid.NewGuid());
@@ -84,9 +87,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
     [Test]
     public async Task GetStatus_ReturnsExpectedStatus_WhenOperationExists()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
+        var repository = CreateRepository();
         await CreateTestData(repository);
 
         var result = await repository.GetStatusAsync(_operations[0].Operation.Id);
@@ -96,9 +99,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
     [Test]
     public async Task Create_InsertsOperationIntoDatabase()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
+        var repository = CreateRepository();
         await CreateTestData(repository);
 
         var newOperation = new LongRunningOperation
@@ -119,9 +122,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
     [Test]
     public async Task Create_ThrowsException_WhenOperationWithTheSameIdExists()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
+        var repository = CreateRepository();
         await CreateTestData(repository);
 
         var newOperation = new LongRunningOperation
@@ -130,15 +133,15 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
             Type = "NewTest",
             Status = LongRunningOperationStatus.Enqueued,
         };
-        Assert.ThrowsAsync(Is.InstanceOf<DbException>(), () => repository.CreateAsync(newOperation, DateTimeOffset.UtcNow.AddMinutes(5)));
+        Assert.ThrowsAsync(Is.InstanceOf<DbUpdateException>(), () => repository.CreateAsync(newOperation, DateTimeOffset.UtcNow.AddMinutes(5)));
     }
 
     [Test]
     public async Task UpdateStatus_UpdatesOperationStatusInDatabase()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
+        var repository = CreateRepository();
         await CreateTestData(repository);
 
         var testOperation = _operations[1];
@@ -152,9 +155,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
     [Test]
     public async Task SetResult_UpdatesOperationResultInDatabase()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
+        var repository = CreateRepository();
         await CreateTestData(repository);
 
         var testOperation = _operations[1];
@@ -170,9 +173,9 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
     [Test]
     public async Task CleanOperations_RemovesOldOperationsFromTheDatabase()
     {
-        var provider = ScopeProvider;
+        var provider = NewScopeProvider;
         using var scope = provider.CreateScope();
-        var repository = CreateRepository(provider);
+        var repository = CreateRepository();
         await CreateTestData(repository);
 
         var oldOperation = _operations[0];
@@ -188,8 +191,12 @@ public class LongRunningOperationRepositoryTests : UmbracoIntegrationTest
         Assert.IsNull(result);
     }
 
-    private LongRunningOperationRepository CreateRepository(IScopeProvider provider)
-        => new(GetRequiredService<IJsonSerializer>(), (IScopeAccessor)provider, AppCaches.Disabled, TimeProvider.System);
+    private LongRunningOperationRepository CreateRepository() =>
+        new(
+            GetRequiredService<IJsonSerializer>(),
+            GetRequiredService<IEFCoreScopeAccessor<UmbracoDbContext>>(),
+            AppCaches.Disabled,
+            TimeProvider.System);
 
     private async Task CreateTestData(LongRunningOperationRepository repository)
     {

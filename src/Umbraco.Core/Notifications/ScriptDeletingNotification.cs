@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Notifications;
 /// <summary>
-///  A notification that is used to trigger the IFileService when the DeleteScript method is called in the API.
+///  A notification that is used to trigger the <see cref="Services.IScriptService"/> when a script is being deleted.
 /// </summary>
 public class ScriptDeletingNotification : DeletingNotification<IScript>
 {

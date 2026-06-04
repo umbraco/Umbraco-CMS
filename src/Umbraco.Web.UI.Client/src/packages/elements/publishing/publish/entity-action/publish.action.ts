@@ -99,19 +99,16 @@ export class UmbPublishElementEntityAction extends UmbEntityActionBase<never> {
 			if (isInvariant) {
 				notificationContext?.peek('positive', {
 					data: {
-						headline: localize.term('speechBubbles_editContentPublishedHeader'),
-						message: localize.term('speechBubbles_editContentPublishedText'),
+						message: localize.term('speechBubbles_editElementPublishedHeader'),
 					},
 				});
 			} else {
-				const elementVariants = elementData.variants.filter((variant) =>
-					result.selection.includes(variant.culture!),
-				);
+				const elementVariants = elementData.variants.filter((variant) => result.selection.includes(variant.culture!));
 				notificationContext?.peek('positive', {
 					data: {
 						headline: localize.term('speechBubbles_editContentPublishedHeader'),
 						message: localize.term(
-							'speechBubbles_editVariantPublishedText',
+							'speechBubbles_editVariantElementPublishedText',
 							localize.list(elementVariants.map((v) => UmbVariantId.Create(v).toString() ?? v.name)),
 						),
 					},

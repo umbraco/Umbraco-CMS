@@ -15,7 +15,7 @@ export class UmbScriptFolderStore extends UmbDetailStoreBase<UmbFolderModel> {
 	 * @memberof UmbScriptFolderStore
 	 */
 	constructor(host: UmbControllerHost) {
-		super(host, UMB_SCRIPT_FOLDER_STORE_CONTEXT.toString());
+		super(host, UMB_SCRIPT_FOLDER_STORE_CONTEXT);
 	}
 }
 

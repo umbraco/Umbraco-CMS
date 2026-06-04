@@ -1,5 +1,6 @@
 ﻿import {ApiHelpers} from "./ApiHelpers";
 import {AliasHelper} from "./AliasHelper";
+import {ConstantHelper} from "./ConstantHelper";
 import {MemberTypeBuilder} from "../builders";
 
 export class MemberTypeApiHelper {
@@ -15,17 +16,62 @@ export class MemberTypeApiHelper {
 
     for (const memberType of jsonMemberTypes.items) {
       if (memberType.name === name) {
+        if (memberType.isFolder) {
+          return await this.recurseDeleteChildren(memberType);
+        }
         return await this.delete(memberType.id);
+      } else if (memberType.hasChildren) {
+        await this.recurseChildren(name, memberType.id, true);
       }
     }
     return null;
+  }
+
+  private async recurseChildren(name: string, id: string, toDelete: boolean) {
+    const items = await this.getChildren(id);
+
+    for (const child of items) {
+      if (child.name === name) {
+        if (!toDelete) {
+          if (child.isFolder) {
+            return await this.getFolder(child.id);
+          }
+          return await this.get(child.id);
+        }
+        if (child.isFolder) {
+          return await this.recurseDeleteChildren(child);
+        }
+        return await this.delete(child.id);
+      } else if (child.hasChildren) {
+        return await this.recurseChildren(name, child.id, toDelete);
+      }
+    }
+    return false;
+  }
+
+  private async recurseDeleteChildren(memberTypeFolder) {
+    if (!memberTypeFolder.hasChildren) {
+      return await this.deleteFolder(memberTypeFolder.id);
+    }
+    const items = await this.getChildren(memberTypeFolder.id);
+
+    for (const child of items) {
+      if (child.hasChildren) {
+        await this.recurseDeleteChildren(child);
+      } else if (child.isFolder) {
+        await this.deleteFolder(child.id);
+      } else {
+        await this.delete(child.id);
+      }
+    }
+    return await this.deleteFolder(memberTypeFolder.id);
   }
 
   async create(memberType) {
     if (memberType == null) {
       return;
     }
-    const response = await this.api.post(this.api.baseUrl + '/umbraco/management/api/v1/member-type', memberType);
+    const response = await this.api.post(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType, memberType);
     return response.headers().location.split("v1/member-type/").pop();
   }
 
@@ -33,11 +79,11 @@ export class MemberTypeApiHelper {
     if (updatedMemberType == null) {
       return;
     }
-    return await this.api.put(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id, updatedMemberType);
+    return await this.api.put(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id, updatedMemberType);
   }
 
   async get(id: string) {
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id);
+    const response = await this.api.get(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id);
     return await response.json();
   }
 
@@ -45,12 +91,18 @@ export class MemberTypeApiHelper {
     if (id == null) {
       return;
     }
-    const response = await this.api.delete(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id);
+    const response = await this.api.delete(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id);
     return response.status();
   }
 
   async getAllAtRoot() {
-    return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/member-type/root?skip=0&take=10000');
+    return await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/tree/member-type/root?skip=0&take=10000&foldersOnly=false');
+  }
+
+  async getChildren(id: string) {
+    const response = await this.api.get(`${this.api.baseUrl}/umbraco/management/api/v1/tree/member-type/children?parentId=${id}&skip=0&take=10000&foldersOnly=false`);
+    const items = await response.json();
+    return items.items;
   }
 
   async getByName(name: string) {
@@ -59,14 +111,22 @@ export class MemberTypeApiHelper {
 
     for (const memberType of jsonMemberTypes.items) {
       if (memberType.name === name) {
+        if (memberType.isFolder) {
+          return this.getFolder(memberType.id);
+        }
         return this.get(memberType.id);
+      } else if (memberType.isContainer || memberType.hasChildren) {
+        const result = await this.recurseChildren(name, memberType.id, false);
+        if (result) {
+          return result;
+        }
       }
     }
     return false;
   }
 
   async doesExist(id: string) {
-    const response = await this.api.get(this.api.baseUrl + '/umbraco/management/api/v1/member-type/' + id);
+    const response = await this.api.get(this.api.baseUrl + ConstantHelper.apiEndpoints.memberType + '/' + id);
     return response.status() === 200;
   }
 
@@ -150,5 +210,31 @@ export class MemberTypeApiHelper {
         .done()
       .build();
     return await this.create(memberType);
+  }
+
+  // Folder
+  async getFolder(id: string) {
+    const response = await this.api.get(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder + '/' + id);
+    return await response.json();
+  }
+
+  async deleteFolder(id: string) {
+    return await this.api.delete(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder + '/' + id);
+  }
+
+  async createFolder(name: string, parentId?: string) {
+    const folder = {
+      "name": name,
+      "parent": parentId ? {"id": parentId} : null
+    }
+    const response = await this.api.post(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder, folder);
+    return response.headers().location.split("/").pop();
+  }
+
+  async renameFolder(folderId: string, folderName: string) {
+    const folder = {
+      "name": folderName
+    }
+    return await this.api.put(this.api.baseUrl + ConstantHelper.apiEndpoints.memberTypeFolder + '/' + folderId, folder);
   }
 }

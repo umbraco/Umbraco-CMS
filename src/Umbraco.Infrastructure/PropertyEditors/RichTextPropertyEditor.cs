@@ -213,6 +213,10 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
         /// <param name="blockEditorVarianceHandler">Handles variance logic for block editors.</param>
         /// <param name="languageService">Provides language and localization services.</param>
         /// <param name="ioHelper">Helper for IO operations.</param>
+        /// <param name="mediaService">Service for media operations.</param>
+        /// <param name="mediaTypeService">Service for media type operations.</param>
+        /// <param name="localizedTextService">Service for localized text lookups.</param>
+        /// <param name="appCaches">Application caches for request-level caching.</param>
         public RichTextPropertyValueEditor(
             DataEditorAttribute attribute,
             PropertyEditorCollection propertyEditors,
@@ -232,7 +236,11 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
             IRichTextRegexValidator richTextRegexValidator,
             BlockEditorVarianceHandler blockEditorVarianceHandler,
             ILanguageService languageService,
-            IIOHelper ioHelper)
+            IIOHelper ioHelper,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService,
+            ILocalizedTextService localizedTextService,
+            AppCaches appCaches)
             : base(propertyEditors, dataTypeReadCache, shortStringHelper, jsonSerializer, dataValueReferenceFactoryCollection, blockEditorVarianceHandler, languageService, ioHelper, attribute)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
@@ -248,6 +256,7 @@ public class RichTextPropertyEditor : DataEditor, IValueSchemaProvider
 
             BlockEditorValues = new(new RichTextEditorBlockDataConverter(_jsonSerializer), elementTypeCache, logger);
             Validators.Add(new RichTextEditorBlockValidator(propertyValidationService, BlockEditorValues, elementTypeCache, jsonSerializer, logger));
+            Validators.Add(new RichTextAllowedMediaTypeValidator(imageSourceParser, mediaService, localizedTextService, jsonSerializer, logger, new AllowedMediaTypeHelper(mediaTypeService, appCaches)));
         }
 
         /// <summary>

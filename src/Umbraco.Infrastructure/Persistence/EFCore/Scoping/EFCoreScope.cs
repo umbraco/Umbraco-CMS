@@ -16,15 +16,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 /// Represents an EF Core scope that provides database context access and transaction management.
 /// </summary>
 /// <typeparam name="TDbContext">The type of DbContext.</typeparam>
-internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
+internal class EFCoreScope<TDbContext> : CoreScope, IEFCoreScope<TDbContext>
     where TDbContext : DbContext
 {
     private readonly IEFCoreScopeAccessor<TDbContext> _efCoreScopeAccessor;
     private readonly EFCoreScopeProvider<TDbContext> _efCoreScopeProvider;
     private readonly IScope? _innerScope;
+    private readonly bool _shareUmbracoConnection;
     private bool _disposed;
     private TDbContext? _dbContext;
-    private IDbContextFactory<TDbContext> _dbContextFactory;
+    private readonly IDbContextFactory<TDbContext> _dbContextFactory;
     private string? _originalConnectionString;
     private bool _connectionOverridden;
 
@@ -44,6 +45,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     /// <param name="scopeContext">The scope context.</param>
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="dbContextFactory">The DbContext factory.</param>
+    /// <param name="shareUmbracoConnection">Whether to share the NPoco connection and transaction.</param>
     /// <param name="repositoryCacheMode">The repository cache mode.</param>
     /// <param name="scopeFileSystems">Whether to scope file systems.</param>
     protected EFCoreScope(
@@ -55,6 +57,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         IScopeContext? scopeContext,
         IEventAggregator eventAggregator,
         IDbContextFactory<TDbContext> dbContextFactory,
+        bool shareUmbracoConnection = true,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null)
         : base(distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
@@ -63,6 +66,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         _efCoreScopeProvider = (EFCoreScopeProvider<TDbContext>)iefCoreScopeProvider;
         ScopeContext = scopeContext;
         _dbContextFactory = dbContextFactory;
+        _shareUmbracoConnection = shareUmbracoConnection;
     }
 
     /// <summary>
@@ -77,6 +81,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     /// <param name="scopeContext">The scope context.</param>
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="dbContextFactory">The DbContext factory.</param>
+    /// <param name="shareUmbracoConnection">Whether to share the NPoco connection and transaction.</param>
     /// <param name="repositoryCacheMode">The repository cache mode.</param>
     /// <param name="scopeFileSystems">Whether to scope file systems.</param>
     public EFCoreScope(
@@ -89,6 +94,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         IScopeContext? scopeContext,
         IEventAggregator eventAggregator,
         IDbContextFactory<TDbContext> dbContextFactory,
+        bool shareUmbracoConnection = true,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null)
         : base(parentScope, distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
@@ -98,6 +104,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         ScopeContext = scopeContext;
         _innerScope = parentScope;
         _dbContextFactory = dbContextFactory;
+        _shareUmbracoConnection = shareUmbracoConnection;
     }
 
     /// <summary>
@@ -112,6 +119,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
     /// <param name="scopeContext">The scope context.</param>
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="dbContextFactory">The DbContext factory.</param>
+    /// <param name="shareUmbracoConnection">Whether to share the NPoco connection and transaction.</param>
     /// <param name="repositoryCacheMode">The repository cache mode.</param>
     /// <param name="scopeFileSystems">Whether to scope file systems.</param>
     public EFCoreScope(
@@ -124,6 +132,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         IScopeContext? scopeContext,
         IEventAggregator eventAggregator,
         IDbContextFactory<TDbContext> dbContextFactory,
+        bool shareUmbracoConnection = true,
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null)
         : base(parentScope, distributedLockingMechanismFactory, loggerFactory, scopedFileSystem, eventAggregator, repositoryCacheMode, scopeFileSystems)
@@ -133,6 +142,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         ScopeContext = scopeContext;
         ParentScope = parentScope;
         _dbContextFactory = dbContextFactory;
+        _shareUmbracoConnection = shareUmbracoConnection;
     }
 
 
@@ -192,7 +202,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
                 // Stack was empty the push was reverted by async execution context restoration.
             }
 
-            DisposeEfCoreDatabase();
+            DisposeEFCoreDatabase();
             _disposed = true;
             return;
         }
@@ -206,7 +216,7 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
 
         if (ParentScope is null)
         {
-            DisposeEfCoreDatabase();
+            DisposeEFCoreDatabase();
         }
 
         Locks.ClearLocks(InstanceId);
@@ -240,32 +250,37 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
 
     private void InitializeDatabase()
     {
-        if (_dbContext is null)
-        {
-            _dbContext = FindDbContext();
-        }
+        _dbContext ??= FindDbContext();
 
         _originalConnectionString ??= _dbContext.Database.GetConnectionString();
 
-        // Check if we are already in a transaction before starting one
+        // Check if we are already in a transaction before starting one.
         if (_dbContext.Database.CurrentTransaction is null)
         {
-            // Walk up to the root scope to find the NPoco inner scope's transaction.
-            // Child scopes have _innerScope = null (only the root has it), but we need
-            // to share the NPoco connection so both ORMs participate in the same transaction.
-            DbTransaction? transaction = FindInnerScopeTransaction();
-
-            if (transaction is not null)
+            if (_shareUmbracoConnection)
             {
-                // Share the parent NPoco scope's connection so both ORMs participate
-                // in the same transaction. Note: SetDbConnection always nulls EF Core's
-                // internal _connectionString field, which we must restore before pool return
-                // (see DisposeEfCoreDatabase).
-                _dbContext.Database.SetDbConnection(transaction.Connection);
-                _dbContext.Database.UseTransaction(transaction);
+                // Walk up to the root scope to find the NPoco inner scope's transaction.
+                // Child scopes have _innerScope = null (only the root has it), but we need
+                // to share the NPoco connection so both ORMs participate in the same transaction.
+                DbTransaction? transaction = FindInnerScopeTransaction();
+
+                if (transaction is not null)
+                {
+                    // Share the parent NPoco scope's connection so both ORMs participate
+                    // in the same transaction. Note: SetDbConnection always nulls EF Core's
+                    // internal _connectionString field, which we must restore before pool return
+                    // (see DisposeEFCoreDatabase).
+                    _dbContext.Database.SetDbConnection(transaction.Connection);
+                    _dbContext.Database.UseTransaction(transaction);
+                }
+                else
+                {
+                    _dbContext.Database.BeginTransaction();
+                }
             }
             else
             {
+                // Separate database — use the DbContext's own configured connection.
                 _dbContext.Database.BeginTransaction();
             }
 
@@ -321,13 +336,20 @@ internal class EFCoreScope<TDbContext> : CoreScope, IEfCoreScope<TDbContext>
         }
     }
 
-    private void DisposeEfCoreDatabase()
+    private void DisposeEFCoreDatabase()
     {
         var completed = Completed.HasValue && Completed.Value;
         {
             try
             {
-                if (_dbContext is null || _innerScope is not null)
+                if (_dbContext is null)
+                {
+                    return;
+                }
+
+                // When sharing the Umbraco connection, the NPoco inner scope owns the transaction —
+                // skip commit/rollback here (the inner scope handles it).
+                if (_innerScope is not null && _shareUmbracoConnection)
                 {
                     return;
                 }

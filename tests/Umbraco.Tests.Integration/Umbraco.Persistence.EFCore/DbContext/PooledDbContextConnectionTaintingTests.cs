@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Persistence.EFCore.DbContext;
 [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
 public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
 {
-    private IEFCoreScopeProvider<PooledTestDbContext> EfCoreScopeProvider =>
+    private IEFCoreScopeProvider<PooledTestDbContext> EFCoreScopeProvider =>
         GetRequiredService<IEFCoreScopeProvider<PooledTestDbContext>>();
 
     private IDbContextFactory<PooledTestDbContext> DbContextFactory =>
@@ -23,7 +23,8 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
 
     protected override void CustomTestSetup(IUmbracoBuilder builder) =>
         builder.Services.AddUmbracoDbContext<PooledTestDbContext>(
-            (serviceProvider, options, connectionString, providerName) => options.UseUmbracoDatabaseProvider(serviceProvider));
+            (serviceProvider, options, connectionString, providerName) => options.UseUmbracoDatabaseProvider(serviceProvider),
+            shareUmbracoConnection: true);
 
     /// <summary>
     /// Verifies that a pooled DbContext obtained from IDbContextFactory has a valid connection string
@@ -41,7 +42,7 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         // Step 1: Use an EFCore scope to trigger InitializeDatabase() which calls
         // SetDbConnection(transaction?.Connection) on the pooled DbContext.
         // This sets a ProfiledDbConnection (from the NPoco scope) on the EF context.
-        using (IEfCoreScope<PooledTestDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<PooledTestDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async db =>
             {
@@ -64,10 +65,7 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         // Step 4: The context should be usable. Before the fix, this would throw
         // NullReferenceException at ProfiledDbConnection.get_ConnectionString() because
         // the pooled context retained a stale ProfiledDbConnection whose inner connection was null.
-        Assert.DoesNotThrowAsync(async () =>
-        {
-            await context.Database.CanConnectAsync();
-        });
+        await context.Database.CanConnectAsync();
     }
 
     /// <summary>
@@ -79,7 +77,7 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
     public async Task Can_Use_Factory_DbContext_For_Migrations_After_Scope_Usage()
     {
         // Step 1: Normal data access via scope (triggers SetDbConnection)
-        using (IEfCoreScope<PooledTestDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<PooledTestDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async db =>
             {
@@ -95,17 +93,13 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         // This is what fails in the reported issue:
         // context.Database.GetPendingMigrationsAsync() eventually calls
         // ProfiledDbConnection.ConnectionString which NREs.
-        Assert.DoesNotThrowAsync(async () =>
-        {
-            // GetPendingMigrationsAsync accesses ConnectionString internally
-            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-        });
+        await context.Database.GetPendingMigrationsAsync();
     }
 
     /// <summary>
     /// Verifies that the connection string is preserved on a pooled DbContext after an EFCore scope
     /// disposes. SetDbConnection(null) during scope disposal clears EF Core's internal connection
-    /// string field; without the restore in DisposeEfCoreDatabase, the pooled context is returned
+    /// string field; without the restore in DisposeEFCoreDatabase, the pooled context is returned
     /// with a null connection string, causing InvalidOperationException on SQL Server reuse.
     /// </summary>
     [Test]
@@ -126,7 +120,7 @@ public class PooledDbContextConnectionTaintingTests : UmbracoIntegrationTest
         Assert.IsNotNull(originalConnectionString, "Precondition: factory context should have a connection string.");
 
         // Step 2: Use and dispose an EFCore scope, which calls SetDbConnection(null) on cleanup.
-        using (IEfCoreScope<PooledTestDbContext> scope = EfCoreScopeProvider.CreateScope())
+        using (IEFCoreScope<PooledTestDbContext> scope = EFCoreScopeProvider.CreateScope())
         {
             await scope.ExecuteWithContextAsync<Task>(async db =>
             {

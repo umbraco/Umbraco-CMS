@@ -247,7 +247,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
             var validators = new TypedJsonValidatorRunner<List<MediaWithCropsDto>, MediaPicker3Configuration>(
                 jsonSerializer,
                 new MinMaxValidator(localizedTextService),
-                new AllowedTypeValidator(localizedTextService, mediaTypeService, _mediaService, appCaches),
+                new AllowedTypeValidator(localizedTextService, _mediaService, new AllowedMediaTypeHelper(mediaTypeService, appCaches)),
                 new StartNodeValidator(localizedTextService, mediaNavigationQueryService));
 
             Validators.Add(validators);
@@ -575,22 +575,18 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
         /// </summary>
         internal sealed class AllowedTypeValidator : ITypedJsonValidator<List<MediaWithCropsDto>, MediaPicker3Configuration>
         {
-            private const string MediaTypeCacheKeyFormat = nameof(AllowedTypeValidator) + "_MediaTypeKey_{0}";
-
             private readonly ILocalizedTextService _localizedTextService;
-            private readonly IMediaTypeService _mediaTypeService;
             private readonly IMediaService _mediaService;
-            private readonly AppCaches _appCaches;
+            private readonly AllowedMediaTypeHelper _allowedMediaTypeHelper;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="AllowedTypeValidator"/> class.
             /// </summary>
-            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaTypeService mediaTypeService, IMediaService mediaService, AppCaches appCaches)
+            public AllowedTypeValidator(ILocalizedTextService localizedTextService, IMediaService mediaService, AllowedMediaTypeHelper allowedMediaTypeHelper)
             {
                 _localizedTextService = localizedTextService;
-                _mediaTypeService = mediaTypeService;
                 _mediaService = mediaService;
-                _appCaches = appCaches;
+                _allowedMediaTypeHelper = allowedMediaTypeHelper;
             }
 
             /// <inheritdoc/>
@@ -605,10 +601,10 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
                     return [];
                 }
 
-                var allowedTypes = configuration.Filter?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
+                HashSet<string> allowedTypeKeys = AllowedMediaTypeHelper.ParseAllowedTypeKeys(configuration.Filter);
 
                 // No allowed types = all types are allowed
-                if (allowedTypes is null || allowedTypes.Length == 0)
+                if (allowedTypeKeys.Count == 0)
                 {
                     return [];
                 }
@@ -630,9 +626,7 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
 
                 foreach (var typeAlias in distinctTypeAliases)
                 {
-                    string? typeKey = GetMediaTypeKey(typeAlias);
-
-                    if (typeKey is null || allowedTypes.Contains(typeKey) is false)
+                    if (_allowedMediaTypeHelper.IsAllowed(typeAlias, allowedTypeKeys) is false)
                     {
                         return
                         [
@@ -644,31 +638,6 @@ public class MediaPicker3PropertyEditor : DataEditor, IValueSchemaProvider
                 }
 
                 return [];
-            }
-
-            private string? GetMediaTypeKey(string typeAlias)
-            {
-                // Cache media type lookups since the same media type is likely to be used multiple times in validation,
-                // particularly if we have multiple languages and blocks.
-                string? GetMediaTypeKeyFromService(string typeAlias) => _mediaTypeService.Get(typeAlias)?.Key.ToString();
-
-                if (_appCaches.RequestCache.IsAvailable is false)
-                {
-                    return GetMediaTypeKeyFromService(typeAlias);
-                }
-
-                var cacheKey = string.Format(MediaTypeCacheKeyFormat, typeAlias);
-                string? typeKey = _appCaches.RequestCache.GetCacheItem<string?>(cacheKey);
-                if (typeKey is null)
-                {
-                    typeKey = GetMediaTypeKeyFromService(typeAlias);
-                    if (typeKey is not null)
-                    {
-                        _appCaches.RequestCache.Set(cacheKey, typeKey);
-                    }
-                }
-
-                return typeKey;
             }
         }
 

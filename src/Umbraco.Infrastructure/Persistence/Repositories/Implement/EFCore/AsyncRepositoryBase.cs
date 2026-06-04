@@ -27,11 +27,11 @@ public class AsyncRepositoryBase : IRepository
     /// <summary>
     ///     Gets the AmbientScope
     /// </summary>
-    protected IEfCoreScope<UmbracoDbContext> AmbientScope
+    protected IEFCoreScope<UmbracoDbContext> AmbientScope
     {
         get
         {
-            IEfCoreScope<UmbracoDbContext>? scope = ScopeAccessor.AmbientScope;
+            IEFCoreScope<UmbracoDbContext>? scope = ScopeAccessor.AmbientScope;
             if (scope == null)
             {
                 throw new InvalidOperationException("Cannot run a repository without an ambient scope.");

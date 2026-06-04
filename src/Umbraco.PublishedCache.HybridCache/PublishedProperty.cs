@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Models;
@@ -13,6 +14,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     private readonly IPublishedElement _element;
     private readonly bool _isPreviewing;
     private readonly IVariationContextAccessor _variationContextAccessor;
+    private readonly IPropertyRenderingContextAccessor _propertyRenderingContextAccessor;
     private readonly IElementsCache _elementsCache;
     private readonly bool _isMember;
     private string? _valuesCacheKey;
@@ -38,6 +40,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
         IPublishedPropertyType propertyType,
         IPublishedElement element,
         IVariationContextAccessor variationContextAccessor,
+        IPropertyRenderingContextAccessor propertyRenderingContextAccessor,
         bool preview,
         PropertyData[]? sourceValues,
         IElementsCache elementsElementsCache,
@@ -69,6 +72,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
         _element = element;
         _variationContextAccessor = variationContextAccessor;
+        _propertyRenderingContextAccessor = propertyRenderingContextAccessor;
         _isPreviewing = preview;
         _isMember = element.ContentType.ItemType == PublishedItemType.Member;
         _elementsCache = elementsElementsCache;
@@ -97,7 +101,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     // determines whether a property has value
     public override bool HasValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
 
         var value = GetSourceValue(culture, segment);
         var isValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
@@ -121,7 +125,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetSourceValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_sourceVariations, _element.Id, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_sourceVariations, _element.Id, PropertyType.Alias, ref culture, ref segment);
 
         // source values are tightly bound to the property/schema culture and segment configurations, so we need to
         // sanitize the contextualized culture/segment states before using them to access the source values.
@@ -164,10 +168,13 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetValue(string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
 
-        object? value;
-        CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
+        // Include the fallback policy in the cache key so that different fallback strategies
+        // produce separate cached values (e.g., block editors filter differently with Fallback.ToLanguage).
+        Fallback fallback = _propertyRenderingContextAccessor.PropertyRenderingContext?.Fallback ?? default;
+
+        CacheValue cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment, fallback);
 
         // initial reference cache level always is .Content
         const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
@@ -179,9 +186,8 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
         cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_element, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
         cacheValues.ObjectInitialized = true;
-        value = cacheValues.ObjectValue;
 
-        return value;
+        return cacheValues.ObjectValue;
     }
 
     private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
@@ -227,7 +233,7 @@ internal sealed class PublishedProperty : PublishedPropertyBase
 
     public override object? GetDeliveryApiValue(bool expanding, string? culture = null, string? segment = null)
     {
-        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, ref culture, ref segment);
+        _variationContextAccessor.ContextualizeVariation(_variations, _element.Id, PropertyType.Alias, ref culture, ref segment);
 
         object? value;
         CacheValue cacheValues = GetCacheValues(expanding ? PropertyType.DeliveryApiCacheLevelForExpansion : PropertyType.DeliveryApiCacheLevel).For(culture, segment);
@@ -289,17 +295,17 @@ internal sealed class PublishedProperty : PublishedPropertyBase
     private sealed class CacheValues : CacheValue
     {
         private readonly Lock _locko = new();
-        private ConcurrentDictionary<CompositeStringStringKey, CacheValue>? _values;
+        private ConcurrentDictionary<CompositeStringArrayKey, CacheValue>? _values;
 
-        public CacheValue For(string? culture, string? segment)
+        public CacheValue For(string? culture, string? segment, Fallback fallback = default)
         {
             // As noted on IPropertyValue, null value means invariant
-            // But as we need an actual string value to build a CompositeStringStringKey
+            // But as we need an actual string value to build a cache key
             // We need to convert null to empty
             culture ??= string.Empty;
             segment ??= string.Empty;
 
-            if (culture == string.Empty && segment == string.Empty)
+            if (culture == string.Empty && segment == string.Empty && fallback.HasPolicies is false)
             {
                 return this;
             }
@@ -308,15 +314,44 @@ internal sealed class PublishedProperty : PublishedPropertyBase
             {
                 lock (_locko)
                 {
-                    _values ??= InitializeConcurrentDictionary<CompositeStringStringKey, CacheValue>();
+                    _values ??= InitializeConcurrentDictionary<CompositeStringArrayKey, CacheValue>();
                 }
             }
 
-            var k = new CompositeStringStringKey(culture, segment);
+            var k = new CompositeStringArrayKey(culture, segment, ToFallbackKey(fallback));
 
             CacheValue value = _values.GetOrAdd(k, _ => new CacheValue());
 
             return value;
+        }
+
+        private static string ToFallbackKey(Fallback fallback)
+        {
+            // Only language-related policies affect converter output.
+            // Build a compact, deterministic string for cache differentiation.
+            var hasLanguage = false;
+            var hasDefaultLanguage = false;
+
+            foreach (var policy in fallback)
+            {
+                switch (policy)
+                {
+                    case Fallback.Language:
+                        hasLanguage = true;
+                        break;
+                    case Fallback.DefaultLanguage:
+                        hasDefaultLanguage = true;
+                        break;
+                }
+            }
+
+            return (hasLanguage, hasDefaultLanguage) switch
+            {
+                (true, true) => "l+dl",
+                (true, false) => "l",
+                (false, true) => "dl",
+                _ => string.Empty,
+            };
         }
     }
 

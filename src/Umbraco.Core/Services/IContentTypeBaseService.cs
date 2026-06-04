@@ -121,44 +121,12 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     bool HasChildren(Guid id);
 
     /// <summary>
-    ///     Saves a content type.
-    /// </summary>
-    /// <param name="item">The content type to save.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    [Obsolete("Please use the respective Create or Update instead")]
-    void Save(TItem? item, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Saves a content type asynchronously.
-    /// </summary>
-    /// <param name="item">The content type to save.</param>
-    /// <param name="performingUserKey">The unique identifier of the user performing the action.</param>
-    [Obsolete("Please use the respective Create or Update instead")]
-    Task SaveAsync(TItem item, Guid performingUserKey)
-    {
-        Save(item);
-        return Task.CompletedTask;
-    }
-
-    /// <summary>
-    ///     Saves a collection of content types.
-    /// </summary>
-    /// <param name="items">The content types to save.</param>
-    /// <param name="userId">The identifier of the user performing the action.</param>
-    [Obsolete("Please use the respective Create or Update instead")]
-    void Save(IEnumerable<TItem> items, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
     ///     Creates a new content type.
     /// </summary>
     /// <param name="item">The content type to create.</param>
     /// <param name="performingUserKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the operation status.</returns>
-    Task<Attempt<ContentTypeOperationStatus>> CreateAsync(TItem item, Guid performingUserKey)
-    {
-        Save(item);
-        return Task.FromResult(Attempt.Succeed(ContentTypeOperationStatus.Success));
-    }
+    Task<Attempt<ContentTypeOperationStatus>> CreateAsync(TItem item, Guid performingUserKey);
 
     /// <summary>
     ///     Updates an existing content type.
@@ -166,11 +134,7 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// <param name="item">The content type to update.</param>
     /// <param name="performingUserKey">The unique identifier of the user performing the action.</param>
     /// <returns>An attempt containing the operation status.</returns>
-    Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(TItem item, Guid performingUserKey)
-    {
-        Save(item);
-        return Task.FromResult(Attempt.Succeed(ContentTypeOperationStatus.Success));
-    }
+    Task<Attempt<ContentTypeOperationStatus>> UpdateAsync(TItem item, Guid performingUserKey);
 
     /// <summary>
     ///     Deletes a content type.
@@ -286,46 +250,6 @@ public interface IContentTypeBaseService<TItem> : IContentTypeBaseService, IServ
     /// <param name="userId">The identifier of the user performing the action.</param>
     /// <returns>An attempt containing the operation result with the renamed container.</returns>
     Attempt<OperationResult<OperationResultType, EntityContainer>?> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId);
-
-    /// <summary>
-    ///     Moves a content type to a container.
-    /// </summary>
-    /// <param name="moving">The content type to move.</param>
-    /// <param name="containerId">The identifier of the target container.</param>
-    /// <returns>An attempt containing the operation result.</returns>
-    [Obsolete("Please use MoveAsync. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult<MoveOperationStatusType>?> Move(TItem moving, int containerId);
-
-    /// <summary>
-    ///     Copies a content type to a container.
-    /// </summary>
-    /// <param name="copying">The content type to copy.</param>
-    /// <param name="containerId">The identifier of the target container.</param>
-    /// <returns>An attempt containing the operation result with the copied content type.</returns>
-    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
-    Attempt<OperationResult<MoveOperationStatusType, TItem>?> Copy(TItem copying, int containerId);
-
-    /// <summary>
-    ///     Copies a content type with a new alias and name.
-    /// </summary>
-    /// <param name="original">The content type to copy.</param>
-    /// <param name="alias">The alias for the copy.</param>
-    /// <param name="name">The name for the copy.</param>
-    /// <param name="parentId">The identifier of the parent container.</param>
-    /// <returns>The copied content type.</returns>
-    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
-    TItem Copy(TItem original, string alias, string name, int parentId = -1);
-
-    /// <summary>
-    ///     Copies a content type with a new alias and name under a parent.
-    /// </summary>
-    /// <param name="original">The content type to copy.</param>
-    /// <param name="alias">The alias for the copy.</param>
-    /// <param name="name">The name for the copy.</param>
-    /// <param name="parent">The parent content type.</param>
-    /// <returns>The copied content type.</returns>
-    [Obsolete("Please use CopyAsync. Scheduled for removal in Umbraco 18.")]
-    TItem Copy(TItem original, string alias, string name, TItem parent);
 
     /// <summary>
     ///     Copies a content type to a container asynchronously.

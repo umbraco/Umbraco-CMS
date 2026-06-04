@@ -7,8 +7,6 @@ using Umbraco.Cms.Api.Management.Services.Entities;
 using Umbraco.Cms.Api.Management.Services.Flags;
 using Umbraco.Cms.Api.Management.Services.PermissionFilter;
 using Umbraco.Cms.Api.Management.ViewModels.Tree;
-using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Api.Management.Controllers.Element.Tree;
@@ -23,13 +21,10 @@ public class SiblingsElementTreeController : ElementTreeControllerBase
     public SiblingsElementTreeController(
         IEntityService entityService,
         FlagProviderCollection flagProviders,
-        IUserStartNodeEntitiesService userStartNodeEntitiesService,
-        IDataTypeService dataTypeService,
-        AppCaches appCaches,
-        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IElementStartNodeTreeFilterService treeFilterService,
         IElementPresentationFactory elementPresentationFactory,
         IElementPermissionFilterService elementPermissionFilterService)
-        : base(entityService, flagProviders, userStartNodeEntitiesService, dataTypeService, appCaches, backOfficeSecurityAccessor, elementPresentationFactory, elementPermissionFilterService)
+        : base(entityService, flagProviders, treeFilterService, elementPresentationFactory, elementPermissionFilterService)
     {
     }
 
@@ -41,6 +36,7 @@ public class SiblingsElementTreeController : ElementTreeControllerBase
     /// <param name="before">The number of sibling items to retrieve before the target.</param>
     /// <param name="after">The number of sibling items to retrieve after the target.</param>
     /// <param name="foldersOnly">Whether to return only folder items.</param>
+    /// <param name="dataTypeId">An optional data type identifier to filter the sibling items.</param>
     /// <returns>A subset collection of sibling element tree items.</returns>
     [HttpGet("siblings")]
     [MapToApiVersion("1.0")]
@@ -52,9 +48,11 @@ public class SiblingsElementTreeController : ElementTreeControllerBase
         Guid target,
         int before,
         int after,
-        bool foldersOnly = false)
+        bool foldersOnly = false,
+        Guid? dataTypeId = null)
     {
         RenderFoldersOnly(foldersOnly);
+        IgnoreUserStartNodesForDataType(dataTypeId);
         return await GetSiblings(target, before, after);
     }
 }

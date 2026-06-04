@@ -32,7 +32,9 @@ public interface IContentServiceBase<TItem> : IContentServiceBase
 public interface IContentServiceBase : IService
 {
     /// <summary>
-    ///     Checks/fixes the data integrity of node paths/levels stored in the database
+    /// Checks the data integrity of the content tree and optionally fixes issues.
     /// </summary>
+    /// <param name="options">The options for the data integrity check.</param>
+    /// <returns>A <see cref="ContentDataIntegrityReport"/> containing the results of the integrity check.</returns>
     ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
 }

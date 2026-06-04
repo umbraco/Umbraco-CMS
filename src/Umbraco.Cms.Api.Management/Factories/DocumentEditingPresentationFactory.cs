@@ -1,15 +1,41 @@
+using Umbraco.Cms.Api.Management.Patching;
+using Umbraco.Cms.Api.Management.ViewModels;
 using Umbraco.Cms.Api.Management.ViewModels.Document;
+using Umbraco.Cms.Api.Management.ViewModels.Patching;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Api.Management.Factories;
 
+/// <summary>
+/// Factory for creating and mapping presentation models used in document editing operations.
+/// </summary>
 internal sealed class DocumentEditingPresentationFactory : ContentEditingPresentationFactory<DocumentValueModel, DocumentVariantRequestModel>, IDocumentEditingPresentationFactory
 {
+    private readonly PropertyEditorCollection _propertyEditorCollection;
+    private readonly IDataValueEditorFactory _dataValueEditorFactory;
+    private readonly ITemplateService _templateService;
+
     /// <summary>
-    /// Maps a <see cref="CreateDocumentRequestModel"/> to a <see cref="ContentCreateModel"/>.
+    /// Initializes a new instance of the <see cref="DocumentEditingPresentationFactory"/> class.
     /// </summary>
-    /// <param name="requestModel">The request model containing data to create the content.</param>
-    /// <returns>A <see cref="ContentCreateModel"/> representing the content to be created.</returns>
+    /// <param name="propertyEditorCollection">The collection of available property editors.</param>
+    /// <param name="dataValueEditorFactory">The factory for creating data value editors.</param>
+    /// <param name="templateService">The service for retrieving templates.</param>
+    public DocumentEditingPresentationFactory(
+        PropertyEditorCollection propertyEditorCollection,
+        IDataValueEditorFactory dataValueEditorFactory,
+        ITemplateService templateService)
+    {
+        _propertyEditorCollection = propertyEditorCollection;
+        _dataValueEditorFactory = dataValueEditorFactory;
+        _templateService = templateService;
+    }
+
+    /// <inheritdoc/>
     public ContentCreateModel MapCreateModel(CreateDocumentRequestModel requestModel)
     {
         ContentCreateModel model = MapContentEditingModel<ContentCreateModel>(requestModel);
@@ -21,19 +47,46 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
         return model;
     }
 
-    /// <summary>
-    /// Maps the given <see cref="UpdateDocumentRequestModel"/> to a <see cref="ContentUpdateModel"/>.
-    /// </summary>
-    /// <param name="requestModel">The update document request model to map from.</param>
-    /// <returns>The mapped <see cref="ContentUpdateModel"/> instance.</returns>
+    /// <inheritdoc/>
     public ContentUpdateModel MapUpdateModel(UpdateDocumentRequestModel requestModel)
         => MapUpdateContentModel<ContentUpdateModel>(requestModel);
 
-    /// <summary>
-    /// Maps a <see cref="ValidateUpdateDocumentRequestModel"/> to a <see cref="ValidateContentUpdateModel"/>, copying relevant validation data.
-    /// </summary>
-    /// <param name="requestModel">The request model containing the document update validation data.</param>
-    /// <returns>A <see cref="ValidateContentUpdateModel"/> populated with validation data from the request model.</returns>
+    /// <inheritdoc/>
+    public async Task<UpdateDocumentRequestModel> CreateUpdateRequestModelAsync(IContent content)
+    {
+        DocumentValueModel[] values = MapValuesToRequestModel(content.Properties);
+
+        DocumentVariantRequestModel[] variants = MapVariantsToRequestModel(content);
+
+        Guid? templateKey = content.TemplateId.HasValue
+            ? (await _templateService.GetAsync(content.TemplateId.Value))?.Key
+            : null;
+
+        return new UpdateDocumentRequestModel
+        {
+            Values = values,
+            Variants = variants,
+            Template = templateKey.HasValue ? new ReferenceByIdModel { Id = templateKey.Value } : null,
+        };
+    }
+
+    /// <inheritdoc/>
+    public ContentPatchModel MapPatchModel(PatchDocumentRequestModel requestModel)
+    {
+        PatchOperationModel[] operations = requestModel.Operations.Select(op => new PatchOperationModel
+        {
+            Op = MapOperationType(op.Op),
+            Path = op.Path,
+            Value = op.Value,
+        }).ToArray();
+
+        return new ContentPatchModel
+        {
+            Operations = operations,
+        };
+    }
+
+    /// <inheritdoc/>
     public ValidateContentUpdateModel MapValidateUpdateModel(ValidateUpdateDocumentRequestModel requestModel)
     {
         ValidateContentUpdateModel model = MapUpdateContentModel<ValidateContentUpdateModel>(requestModel);
@@ -41,6 +94,61 @@ internal sealed class DocumentEditingPresentationFactory : ContentEditingPresent
 
         return model;
     }
+
+    private DocumentValueModel[] MapValuesToRequestModel(IPropertyCollection properties)
+    {
+        Dictionary<string, IDataEditor> missingPropertyEditors = [];
+        return properties
+            .SelectMany(property => property
+                .Values
+                .Select(propertyValue =>
+                {
+                    IDataEditor? propertyEditor = _propertyEditorCollection[property.PropertyType.PropertyEditorAlias];
+                    if (propertyEditor is null && !missingPropertyEditors.TryGetValue(property.PropertyType.PropertyEditorAlias, out propertyEditor))
+                    {
+                        // Cache missing property editors to avoid creating multiple instances
+                        propertyEditor = new MissingPropertyEditor(property.PropertyType.PropertyEditorAlias, _dataValueEditorFactory);
+                        missingPropertyEditors[property.PropertyType.PropertyEditorAlias] = propertyEditor;
+                    }
+
+                    return new DocumentValueModel
+                    {
+                        Culture = propertyValue.Culture,
+                        Segment = propertyValue.Segment,
+                        Alias = property.Alias,
+                        Value = propertyEditor.GetValueEditor().ToEditor(property, propertyValue.Culture, propertyValue.Segment),
+                    };
+                }))
+            .WhereNotNull()
+            .ToArray();
+    }
+
+    private DocumentVariantRequestModel[] MapVariantsToRequestModel(IContent content)
+    {
+        IPropertyValue[] propertyValues = content.Properties.SelectMany(propertyCollection => propertyCollection.Values).ToArray();
+        var cultures = content.AvailableCultures.DefaultIfEmpty(null).ToArray();
+
+        // The default segment (null) must always be included
+        var segments = propertyValues.Select(property => property.Segment).Union([null]).Distinct().ToArray();
+
+        return cultures
+            .SelectMany(culture => segments.Select(segment => new DocumentVariantRequestModel
+            {
+                Culture = culture,
+                Segment = segment,
+                Name = content.GetCultureName(culture) ?? string.Empty,
+            }))
+            .ToArray();
+    }
+
+    private static PatchOperationType MapOperationType(string op) =>
+        op.ToLowerInvariant() switch
+        {
+            "replace" => PatchOperationType.Replace,
+            "add" => PatchOperationType.Add,
+            "remove" => PatchOperationType.Remove,
+            _ => throw new ArgumentException($"Unsupported operation type: {op}", nameof(op)),
+        };
 
     private TUpdateModel MapUpdateContentModel<TUpdateModel>(UpdateDocumentRequestModel requestModel)
         where TUpdateModel : ContentUpdateModel, new()

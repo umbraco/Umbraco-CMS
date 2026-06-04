@@ -106,6 +106,7 @@ public static class UdiGetterExtensions
         return entity switch
         {
             IContent content => content.GetUdi(),
+            IElement element => element.GetUdi(),
             IMedia media => media.GetUdi(),
             IMember member => member.GetUdi(),
             _ => throw new NotSupportedException($"Content base type {entity.GetType().FullName} is not supported."),
@@ -126,6 +127,20 @@ public static class UdiGetterExtensions
         string entityType = entity.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document;
 
         return new GuidUdi(entityType, entity.Key).EnsureClosed();
+    }
+
+    /// <summary>
+    /// Gets the entity identifier of the entity.
+    /// </summary>
+    /// <param name="entity">The entity.</param>
+    /// <returns>
+    /// The entity identifier of the entity.
+    /// </returns>
+    public static GuidUdi GetUdi(this IElement entity)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
+
+        return new GuidUdi(Constants.UdiEntityType.Element, entity.Key).EnsureClosed();
     }
 
     /// <summary>

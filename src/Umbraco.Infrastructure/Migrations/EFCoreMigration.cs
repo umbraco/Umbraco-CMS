@@ -15,5 +15,12 @@ public enum EFCoreMigration
     SqliteCollation = 7,
     AddLanguageDto = 8,
     AddDomainDto = 9,
-    AddDictionaryDto = 10,
+    AddAuditDtos = 10,
+    AddLongRunningOperationDto = 11,
+    AddRelationDtos = 12,
+    AddContentVersionCleanupPolicyDto = 13,
+    AddPublicAccessDto = 14,
+    AddDistributedJobDto = 15,
+    AddConsentDto = 16,
+    AddDictionaryDto = 17,
 }

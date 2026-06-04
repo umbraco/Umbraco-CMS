@@ -28,9 +28,7 @@ test('can create empty element', async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(elementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(elementTypeName);
   await umbracoUi.library.enterElementName(elementName);
   await umbracoUi.library.clickSaveButtonAndWaitForElementToBeCreated();
 
@@ -39,9 +37,17 @@ test('can create empty element', async ({umbracoApi, umbracoUi}) => {
   const elementData = await umbracoApi.element.getByName(elementName);
   expect(elementData.variants[0].state).toBe(expectedState);
   await umbracoUi.library.isElementInTreeVisible(elementName);
+  // Verify audit trail
+  await umbracoUi.library.goToElementWithName(elementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryHaveCount(1);
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementSaved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });
 
-test('can save and publish empty element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can save and publish empty element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const expectedState = 'Published';
   await umbracoUi.goToBackOffice();
@@ -50,9 +56,7 @@ test('can save and publish empty element', {tag: '@smoke'}, async ({umbracoApi, 
   // Act
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(elementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(elementTypeName);
   await umbracoUi.library.enterElementName(elementName);
   await umbracoUi.library.clickSaveAndPublishButtonAndWaitForElementToBeCreated();
 
@@ -60,9 +64,16 @@ test('can save and publish empty element', {tag: '@smoke'}, async ({umbracoApi, 
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
   expect(elementData.variants[0].state).toBe(expectedState);
+  // Verify audit trail
+  await umbracoUi.library.goToElementWithName(elementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.publish);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementSavedAndPublished);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });
 
-test('can create element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can create element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   await umbracoUi.goToBackOffice();
   await umbracoUi.library.goToSection(ConstantHelper.sections.library);
@@ -70,9 +81,7 @@ test('can create element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Act
   await umbracoUi.library.clickActionsMenuAtRoot();
   await umbracoUi.library.clickCreateActionMenuOption();
-  await umbracoUi.library.clickElementButton();
-  await umbracoUi.library.clickModalMenuItemWithName(elementTypeName);
-  await umbracoUi.library.clickChooseModalButton();
+  await umbracoUi.library.chooseElementType(elementTypeName);
   await umbracoUi.library.enterElementName(elementName);
   await umbracoUi.library.enterTextstring(elementText);
   await umbracoUi.library.clickSaveButtonAndWaitForElementToBeCreated();
@@ -81,6 +90,14 @@ test('can create element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   expect(await umbracoApi.element.doesNameExist(elementName)).toBeTruthy();
   const elementData = await umbracoApi.element.getByName(elementName);
   expect(elementData.values[0].value).toBe(elementText);
+  // Verify audit trail
+  await umbracoUi.library.goToElementWithName(elementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryHaveCount(1);
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementSaved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can rename element', async ({umbracoApi, umbracoUi}) => {
@@ -99,9 +116,16 @@ test('can rename element', async ({umbracoApi, umbracoUi}) => {
   // Assert
   const updatedElementData = await umbracoApi.element.get(elementId);
   expect(updatedElementData.variants[0].name).toEqual(elementName);
+  // Verify audit trail
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryHaveCount(2);
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementSaved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });
 
-test('can update element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can update element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   const wrongElementText = 'This is wrong test element text';
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, wrongElementText, dataTypeName);
@@ -116,9 +140,16 @@ test('can update element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
   // Assert
   const updatedElementData = await umbracoApi.element.getByName(elementName);
   expect(updatedElementData.values[0].value).toBe(elementText);
+  // Verify audit trail
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryHaveCount(2);
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.save);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementSaved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });
 
-test('can unpublish element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) => {
+test('can unpublish element', async ({umbracoApi, umbracoUi}) => {
   // Arrange
   elementId = await umbracoApi.element.createElementWithTextContent(elementName, elementTypeId, elementText, dataTypeName);
   await umbracoApi.element.publish(elementId);
@@ -131,9 +162,16 @@ test('can unpublish element', {tag: '@smoke'}, async ({umbracoApi, umbracoUi}) =
   await umbracoUi.library.clickConfirmToUnpublishButton();
 
   // Assert
-  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.unpublished);
+  await umbracoUi.library.doesSuccessNotificationHaveText(NotificationConstantHelper.success.elementUnpublished);
   const elementData = await umbracoApi.element.getByName(elementName);
   expect(elementData.variants[0].state).toBe('Draft');
+  // Verify audit trail
+  await umbracoUi.library.goToElementWithName(elementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.unpublish);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementUnpublished);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });
 
 test('can duplicate a element node to root', async ({umbracoApi, umbracoUi}) => {
@@ -159,6 +197,13 @@ test('can duplicate a element node to root', async ({umbracoApi, umbracoUi}) => 
   const elementData = await umbracoApi.element.getByName(elementName);
   const duplicatedElementData = await umbracoApi.element.getByName(duplicatedElementName);
   expect(elementData.values[0].value).toEqual(duplicatedElementData.values[0].value);
+  // Verify audit trail on the source element
+  await umbracoUi.library.goToElementWithName(elementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.copy);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementCopied);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 
   // Clean
   await umbracoApi.element.ensureNameNotExists(duplicatedElementName);
@@ -216,4 +261,11 @@ test('can move a element node to other parent', async ({umbracoApi, umbracoUi}) 
   await umbracoUi.library.isChildElementInTreeVisible(elementFolderName, elementName, true);
   await umbracoUi.library.isCaretButtonVisibleForElementName(elementName, false);
   expect(await umbracoApi.element.getChildrenAmount(elementFolderId)).toEqual(1);
+  // Verify audit trail
+  await umbracoUi.library.goToElementWithName(elementName);
+  await umbracoUi.library.clickInfoTab();
+  await umbracoUi.library.doesHistoryItemHaveTag(ConstantHelper.auditTrailTypes.move);
+  await umbracoUi.library.doesHistoryItemHaveDescription(ConstantHelper.auditTrailMessages.elementMoved);
+  const currentUser = await umbracoApi.user.getCurrentUser();
+  await umbracoUi.library.doesHistoryItemHaveUsername(currentUser.name);
 });

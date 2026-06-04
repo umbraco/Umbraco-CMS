@@ -36,7 +36,7 @@ public class ContentFinderByUrlAliasTests
 
         public Mock<IIdKeyMap> IdKeyMap { get; } = new();
 
-        public Mock<IFileService> FileService { get; } = new();
+        public Mock<ITemplateService> TemplateService { get; } = new();
 
         public TestContext()
         {
@@ -58,7 +58,7 @@ public class ContentFinderByUrlAliasTests
 
         public PublishedRequestBuilder CreateRequestBuilder(string url, DomainAndUri? domain = null)
         {
-            var builder = new PublishedRequestBuilder(new Uri(url, UriKind.Absolute), FileService.Object);
+            var builder = new PublishedRequestBuilder(new Uri(url, UriKind.Absolute), TemplateService.Object);
             if (domain is not null)
             {
                 builder.SetDomain(domain);
@@ -79,8 +79,8 @@ public class ContentFinderByUrlAliasTests
 
         public void SetupDomainRoot(int domainRootId, Guid domainRootKey) =>
             IdKeyMap
-                .Setup(x => x.GetKeyForId(domainRootId, UmbracoObjectTypes.Document))
-                .Returns(Attempt<Guid>.Succeed(domainRootKey));
+                .Setup(x => x.GetKeyForIdAsync(domainRootId, UmbracoObjectTypes.Document))
+                .ReturnsAsync(Attempt<Guid>.Succeed(domainRootKey));
 
         public void SetupDocumentAncestors(Guid documentKey, params Guid[] ancestorKeys)
         {

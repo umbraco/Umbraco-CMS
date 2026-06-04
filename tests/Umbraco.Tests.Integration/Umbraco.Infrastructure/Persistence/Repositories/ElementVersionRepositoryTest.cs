@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -20,10 +21,10 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
     public IElementService ElementService => GetRequiredService<IElementService>();
 
     [Test]
-    public void GetElementVersionsEligibleForCleanup_Always_ExcludesActiveVersions()
+    public async Task GetElementVersionsEligibleForCleanup_Always_ExcludesActiveVersions()
     {
         var contentType = ContentTypeBuilder.CreateSimpleElementType();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
         ElementService.Save(content);
@@ -37,7 +38,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         using (ScopeProvider.CreateScope())
         {
             var sut = new ElementVersionRepository(ScopeAccessor);
-            var results = sut.GetContentVersionsEligibleForCleanup();
+            var results = sut.GetContentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(1), null);
 
             Assert.Multiple(() =>
             {
@@ -48,10 +49,10 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetElementVersionsEligibleForCleanup_Always_ExcludesPinnedVersions()
+    public async Task GetElementVersionsEligibleForCleanup_Always_ExcludesPinnedVersions()
     {
         var contentType = ContentTypeBuilder.CreateSimpleElementType();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
         ElementService.Save(content);
@@ -71,7 +72,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
             ScopeAccessor.AmbientScope.Database.Update<ContentVersionDto>("set preventCleanup = 1 where id in (1,3)");
 
             var sut = new ElementVersionRepository(ScopeAccessor);
-            var results = sut.GetContentVersionsEligibleForCleanup();
+            var results = sut.GetContentVersionsEligibleForCleanup(DateTime.UtcNow.AddDays(1), null);
 
             Assert.Multiple(() =>
             {
@@ -87,10 +88,10 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void DeleteVersions_Always_DeletesSpecifiedVersions()
+    public async Task DeleteVersions_Always_DeletesSpecifiedVersions()
     {
         var contentType = ContentTypeBuilder.CreateSimpleElementType();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
         ElementService.Save(content);
@@ -121,10 +122,10 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
 
 
     [Test]
-    public void GetPagedItemsByContentId_WithInvariantCultureContent_ReturnsPaginatedResults()
+    public async Task GetPagedItemsByContentId_WithInvariantCultureContent_ReturnsPaginatedResults()
     {
         var contentType = ContentTypeBuilder.CreateSimpleElementType();
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType);
         ElementService.Save(content);
@@ -150,7 +151,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
     }
 
     [Test]
-    public void GetPagedItemsByContentId_WithVariantCultureContent_ReturnsPaginatedResults()
+    public async Task GetPagedItemsByContentId_WithVariantCultureContent_ReturnsPaginatedResults()
     {
         var contentType = ContentTypeBuilder.CreateSimpleElementType();
         contentType.Variations = ContentVariation.Culture;
@@ -158,7 +159,7 @@ internal sealed class ElementVersionRepositoryTest : UmbracoIntegrationTest
         {
             propertyType.Variations = ContentVariation.Culture;
         }
-        ContentTypeService.Save(contentType);
+        await ContentTypeService.CreateAsync(contentType, Constants.Security.SuperUserKey);
 
         var content = ElementBuilder.CreateSimpleElement(contentType, "foo", culture: "en-US");
         content.SetCultureName("foo", "en-US");

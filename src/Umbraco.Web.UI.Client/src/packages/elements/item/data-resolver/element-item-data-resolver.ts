@@ -1,4 +1,5 @@
-import { UmbElementVariantState } from '../../types.js';
+import type { UmbElementEntityType, UmbElementFolderEntityType } from '../../entity.js';
+import { UmbElementVariantState } from '../../variant-state.js';
 import type { UmbElementItemModel } from '../types.js';
 import { UmbControllerBase } from '@umbraco-cms/backoffice/class-api';
 import type { UmbControllerHost } from '@umbraco-cms/backoffice/controller-api';
@@ -14,7 +15,9 @@ import {
 import { type UmbVariantContext, UMB_VARIANT_CONTEXT } from '@umbraco-cms/backoffice/variant';
 import type { UmbItemDataResolver } from '@umbraco-cms/backoffice/entity-item';
 
-type UmbElementItemDataResolverModel = Omit<UmbElementItemModel, 'parent' | 'hasChildren'>;
+type UmbElementItemDataResolverModel = Omit<UmbElementItemModel, 'parent' | 'hasChildren' | 'entityType'> & {
+	entityType: UmbElementEntityType | UmbElementFolderEntityType;
+};
 
 /**
  * @param variants

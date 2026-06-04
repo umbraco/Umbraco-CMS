@@ -31,6 +31,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
     /// <param name="scopeAccessor">Provides access to the database scope for context management.</param>
     /// <param name="cache">The application-level cache manager.</param>
     /// <param name="logger">The logger used for logging repository operations.</param>
+    /// <param name="loggerFactory">Factory for creating logger instances.</param>
     /// <param name="languageRepository">Repository for managing language entities.</param>
     /// <param name="repositoryCacheVersionService">Service for managing repository cache versions.</param>
     /// <param name="cacheSyncService">Service for synchronizing cache across distributed environments.</param>
@@ -188,7 +189,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 
                 return dtos
                     .Select(dto => ConvertFromDto(dto, languagesById))
-                    .OrderBy(x => x.ItemKey)
+                    .OrderBy(x => x.PrimaryKey)
                     .ToList();
             });
         }
@@ -288,7 +289,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
             List<DictionaryDto> dtos = await db.DictionaryEntries
                 .Include(x => x.LanguageText)
                 .Where(x => keys.Contains(x.UniqueId))
-                .OrderBy(x => x.UniqueId)
+                .OrderBy(x => x.PrimaryKey)
                 .ToListAsync();
 
             return dtos

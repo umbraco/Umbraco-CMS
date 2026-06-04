@@ -53,11 +53,14 @@ public class SearchDataTypeItemController : DatatypeItemControllerBase
             return Ok(new PagedModel<DataTypeItemResponseModel> { Total = searchResult.Total });
         }
 
-        IEnumerable<IDataType> dataTypes = await _dataTypeService.GetAllAsync(searchResult.Items.Select(item => item.Key).ToArray());
+        Guid[] keys = searchResult.Items.Select(x => x.Key).ToArray();
+        IEnumerable<IDataType> dataTypes = await _dataTypeService.GetAllAsync(keys);
+        IEnumerable<IDataType> orderedDataTypes = OrderByRequestedIds(dataTypes, keys);
+
         var result = new PagedModel<DataTypeItemResponseModel>
         {
-            Items = _mapper.MapEnumerable<IDataType, DataTypeItemResponseModel>(dataTypes),
-            Total = searchResult.Total
+            Items = _mapper.MapEnumerable<IDataType, DataTypeItemResponseModel>(orderedDataTypes),
+            Total = searchResult.Total,
         };
 
         return Ok(result);

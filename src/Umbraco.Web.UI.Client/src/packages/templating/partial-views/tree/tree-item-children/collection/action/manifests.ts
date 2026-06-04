@@ -1,5 +1,6 @@
 import { UMB_PARTIAL_VIEW_TREE_ITEM_CHILDREN_COLLECTION_ALIAS } from '../constants.js';
 import { UMB_COLLECTION_ALIAS_CONDITION } from '@umbraco-cms/backoffice/collection';
+import { UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS } from '@umbraco-cms/backoffice/server';
 
 export const manifests: Array<UmbExtensionManifest> = [
 	{
@@ -7,6 +8,15 @@ export const manifests: Array<UmbExtensionManifest> = [
 		kind: 'create',
 		name: 'Partial View Tree Item Children Collection Create Action',
 		alias: 'Umb.CollectionAction.PartialViewTreeItemChildren.Create',
-		conditions: [{ alias: UMB_COLLECTION_ALIAS_CONDITION, match: UMB_PARTIAL_VIEW_TREE_ITEM_CHILDREN_COLLECTION_ALIAS }],
+		conditions: [
+			{
+				alias: UMB_COLLECTION_ALIAS_CONDITION,
+				match: UMB_PARTIAL_VIEW_TREE_ITEM_CHILDREN_COLLECTION_ALIAS,
+			},
+			{
+				alias: UMB_IS_SERVER_PRODUCTION_MODE_CONDITION_ALIAS,
+				match: false,
+			},
+		],
 	},
 ];

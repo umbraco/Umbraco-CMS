@@ -22,14 +22,12 @@ export class UmbElementFolderRecycleBinServerDataSource implements UmbRecycleBin
 	restore(args: UmbRecycleBinRestoreRequestArgs) {
 		return tryExecute(
 			this.#host,
-			Promise.reject(`Recycle bin folder restore has not been implemented yet. (${args.unique})`),
-			// TODO: Uncomment this when backend endpoint is available. [LK:2026-01-06]
-			// ElementService.putRecycleBinElementFolderByIdRestore({
-			// 	path: { id: args.unique },
-			// 	body: {
-			// 		target: args.destination.unique ? { id: args.destination.unique } : null,
-			// 	},
-			// }),
+			ElementService.putRecycleBinElementFolderByIdRestore({
+				path: { id: args.unique },
+				body: {
+					target: args.destination.unique ? { id: args.destination.unique } : null,
+				},
+			}),
 		);
 	}
 
@@ -40,16 +38,13 @@ export class UmbElementFolderRecycleBinServerDataSource implements UmbRecycleBin
 	async getOriginalParent(args: UmbRecycleBinOriginalParentRequestArgs) {
 		const { data, error } = await tryExecute(
 			this.#host,
-			Promise.reject(`Recycle bin folder restore has not been implemented yet. (${args.unique})`),
-			// TODO: Uncomment this when backend endpoint is available. [LK:2026-01-06]
-			//ElementService.getRecycleBinElementFolderByIdOriginalParent({ path: { id: args.unique } }),
+			ElementService.getRecycleBinElementFolderByIdOriginalParent({ path: { id: args.unique } }),
 		);
 
 		// only check for undefined because data can be null if the parent is the root
 		if (data !== undefined) {
-			// TODO: Uncomment this when backend endpoint is available. [LK:2026-01-06]
-			// const mappedData = data ? { unique: data.id } : null;
-			// return { data: mappedData };
+			const mappedData = data ? { unique: data.id } : null;
+			return { data: mappedData };
 		}
 
 		return { error };

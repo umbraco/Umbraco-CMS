@@ -18,7 +18,7 @@ public abstract class PublishedElementModel : PublishedElementWrapped
     /// <param name="content">The original content.</param>
     /// <param name="publishedValueFallback">The published value fallback.</param>
     protected PublishedElementModel(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
-        : base(content, publishedValueFallback)
+        : base(content)
     {
     }
 }

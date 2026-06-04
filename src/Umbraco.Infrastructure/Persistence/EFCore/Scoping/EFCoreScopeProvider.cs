@@ -20,20 +20,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.EFCore.Scoping;
 /// <typeparam name="TDbContext">The type of DbContext.</typeparam>
 internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDbContext> where TDbContext : DbContext
 {
-    private readonly IAmbientEFCoreScopeStack<TDbContext> _ambientEfCoreScopeStack;
+    private readonly IAmbientEFCoreScopeStack<TDbContext> _ambientEFCoreScopeStack;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IEFCoreScopeAccessor<TDbContext> _efCoreScopeAccessor;
-    private readonly IAmbientScopeContextStack _ambientEfCoreScopeContextStack;
+    private readonly IAmbientScopeContextStack _ambientEFCoreScopeContextStack;
     private readonly IDistributedLockingMechanismFactory _distributedLockingMechanismFactory;
     private readonly IEventAggregator _eventAggregator;
     private readonly FileSystems _fileSystems;
     private readonly IScopeProvider _scopeProvider;
     private readonly IDbContextFactory<TDbContext> _dbContextFactory;
+    private readonly bool _shareUmbracoConnection;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EFCoreScopeProvider{TDbContext}"/> class.
     /// </summary>
-    /// <remarks>Needed for DI as IAmbientEfCoreScopeStack is internal.</remarks>
+    /// <remarks>Needed for DI as IAmbientEFCoreScopeStack is internal.</remarks>
     public EFCoreScopeProvider()
         : this(
             StaticServiceProvider.Instance.GetRequiredService<IAmbientEFCoreScopeStack<TDbContext>>(),
@@ -44,47 +45,51 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             StaticServiceProvider.Instance.GetRequiredService<IEventAggregator>(),
             StaticServiceProvider.Instance.GetRequiredService<FileSystems>(),
             StaticServiceProvider.Instance.GetRequiredService<IScopeProvider>(),
-            StaticServiceProvider.Instance.GetRequiredService<IDbContextFactory<TDbContext>>())
+            StaticServiceProvider.Instance.GetRequiredService<IDbContextFactory<TDbContext>>(),
+            StaticServiceProvider.Instance.GetRequiredService<EFCoreScopeConfiguration<TDbContext>>())
     {
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EFCoreScopeProvider{TDbContext}"/> class with explicit dependencies.
     /// </summary>
-    /// <param name="ambientEfCoreScopeStack">The ambient scope stack.</param>
+    /// <param name="ambientEFCoreScopeStack">The ambient scope stack.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="efCoreScopeAccessor">The scope accessor.</param>
-    /// <param name="ambientEfCoreScopeContextStack">The ambient scope context stack.</param>
+    /// <param name="ambientEFCoreScopeContextStack">The ambient scope context stack.</param>
     /// <param name="distributedLockingMechanismFactory">The distributed locking mechanism factory.</param>
     /// <param name="eventAggregator">The event aggregator.</param>
     /// <param name="fileSystems">The file systems.</param>
     /// <param name="scopeProvider">The scope provider.</param>
     /// <param name="dbContextFactory">The DbContext factory.</param>
+    /// <param name="scopeConfiguration">The per-DbContext scope configuration.</param>
     internal EFCoreScopeProvider(
-        IAmbientEFCoreScopeStack<TDbContext> ambientEfCoreScopeStack,
+        IAmbientEFCoreScopeStack<TDbContext> ambientEFCoreScopeStack,
         ILoggerFactory loggerFactory,
         IEFCoreScopeAccessor<TDbContext> efCoreScopeAccessor,
-        IAmbientScopeContextStack ambientEfCoreScopeContextStack,
+        IAmbientScopeContextStack ambientEFCoreScopeContextStack,
         IDistributedLockingMechanismFactory distributedLockingMechanismFactory,
         IEventAggregator eventAggregator,
         FileSystems fileSystems,
         IScopeProvider scopeProvider,
-        IDbContextFactory<TDbContext> dbContextFactory)
+        IDbContextFactory<TDbContext> dbContextFactory,
+        EFCoreScopeConfiguration<TDbContext> scopeConfiguration)
     {
-        _ambientEfCoreScopeStack = ambientEfCoreScopeStack;
+        _ambientEFCoreScopeStack = ambientEFCoreScopeStack;
         _loggerFactory = loggerFactory;
         _efCoreScopeAccessor = efCoreScopeAccessor;
-        _ambientEfCoreScopeContextStack = ambientEfCoreScopeContextStack;
+        _ambientEFCoreScopeContextStack = ambientEFCoreScopeContextStack;
         _distributedLockingMechanismFactory = distributedLockingMechanismFactory;
         _eventAggregator = eventAggregator;
         _fileSystems = fileSystems;
         _scopeProvider = scopeProvider;
         _dbContextFactory = dbContextFactory;
+        _shareUmbracoConnection = scopeConfiguration.ShareUmbracoConnection;
         _fileSystems.IsScoped = () => efCoreScopeAccessor.AmbientScope != null && ((EFCoreScope<TDbContext>)efCoreScopeAccessor.AmbientScope).ScopedFileSystems;
     }
 
     /// <inheritdoc />
-    public IEfCoreScope<TDbContext> CreateDetachedScope(
+    public IEFCoreScope<TDbContext> CreateDetachedScope(
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
         bool? scopeFileSystems = null) =>
         new EFCoreDetachableScope<TDbContext>(
@@ -96,11 +101,12 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             null,
             _eventAggregator,
             _dbContextFactory,
+            _shareUmbracoConnection,
             repositoryCacheMode,
             scopeFileSystems);
 
     /// <inheritdoc />
-    public void AttachScope(IEfCoreScope<TDbContext> other)
+    public void AttachScope(IEFCoreScope<TDbContext> other)
     {
         // IScopeProvider.AttachScope works with an IEFCoreScope
         // but here we can only deal with our own Scope class
@@ -120,17 +126,17 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         }
 
         otherScope.Attached = true;
-        otherScope.OriginalScope = (EFCoreScope<TDbContext>)_ambientEfCoreScopeStack.AmbientScope!;
+        otherScope.OriginalScope = (EFCoreScope<TDbContext>)_ambientEFCoreScopeStack.AmbientScope!;
         otherScope.OriginalContext = AmbientScopeContext;
 
         PushAmbientScopeContext(otherScope.ScopeContext);
-        _ambientEfCoreScopeStack.Push(otherScope);
+        _ambientEFCoreScopeStack.Push(otherScope);
     }
 
     /// <inheritdoc />
-    public IEfCoreScope<TDbContext> DetachScope()
+    public IEFCoreScope<TDbContext> DetachScope()
     {
-        if (_ambientEfCoreScopeStack.AmbientScope is not EFCoreDetachableScope<TDbContext> ambientScope)
+        if (_ambientEFCoreScopeStack.AmbientScope is not EFCoreDetachableScope<TDbContext> ambientScope)
         {
             throw new InvalidOperationException("Ambient scope is not detachable");
         }
@@ -148,16 +154,16 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         PopAmbientScope();
         PopAmbientScopeContext();
 
-        var originalScope = (EFCoreScope<TDbContext>)_ambientEfCoreScopeStack.AmbientScope!;
+        var originalScope = (EFCoreScope<TDbContext>)_ambientEFCoreScopeStack.AmbientScope!;
         if (originalScope != ambientScope.OriginalScope)
         {
-            throw new InvalidOperationException($"The detatched scope ({ambientScope.InstanceId}) does not match the original ({originalScope.InstanceId})");
+            throw new InvalidOperationException($"The detached scope ({ambientScope.InstanceId}) does not match the original ({originalScope.InstanceId})");
         }
 
         IScopeContext? originalScopeContext = AmbientScopeContext;
         if (originalScopeContext != ambientScope.OriginalContext)
         {
-            throw new InvalidOperationException($"The detatched scope context does not match the original");
+            throw new InvalidOperationException($"The detached scope context does not match the original");
         }
 
         ambientScope.OriginalScope = null;
@@ -183,15 +189,15 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     internal int ScopeContextDepth => _scopeContextDepth.Value;
 
     /// <inheritdoc />
-    public IScopeContext? AmbientScopeContext => _ambientEfCoreScopeContextStack.AmbientContext;
+    public IScopeContext? AmbientScopeContext => _ambientEFCoreScopeContextStack.AmbientContext;
 
     /// <inheritdoc />
-    public IEfCoreScope<TDbContext> CreateScope(
+    public IEFCoreScope<TDbContext> CreateScope(
         RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified, bool? scopeFileSystems = null)
     {
-        if (_ambientEfCoreScopeStack.AmbientScope is null)
+        if (_ambientEFCoreScopeStack.AmbientScope is null)
         {
-            ScopeContext? newContext = _ambientEfCoreScopeContextStack.AmbientContext == null ? new ScopeContext() : null;
+            ScopeContext? newContext = _ambientEFCoreScopeContextStack.AmbientContext == null ? new ScopeContext() : null;
             IScope parentScope = _scopeProvider.CreateScope(IsolationLevel.Unspecified, repositoryCacheMode, null, null, scopeFileSystems);
             var ambientScope = new EFCoreScope<TDbContext>(
                 parentScope,
@@ -203,6 +209,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
                 newContext,
                 _eventAggregator,
                 _dbContextFactory,
+                _shareUmbracoConnection,
                 repositoryCacheMode,
                 scopeFileSystems);
 
@@ -211,12 +218,12 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
                 PushAmbientScopeContext(newContext);
             }
 
-            _ambientEfCoreScopeStack.Push(ambientScope);
+            _ambientEFCoreScopeStack.Push(ambientScope);
             return ambientScope;
         }
 
         var efCoreScope = new EFCoreScope<TDbContext>(
-            (EFCoreScope<TDbContext>)_ambientEfCoreScopeStack.AmbientScope,
+            (EFCoreScope<TDbContext>)_ambientEFCoreScopeStack.AmbientScope,
             _distributedLockingMechanismFactory,
             _loggerFactory,
             _efCoreScopeAccessor,
@@ -225,10 +232,11 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             null,
             _eventAggregator,
             _dbContextFactory,
+            _shareUmbracoConnection,
             repositoryCacheMode,
             scopeFileSystems);
 
-        _ambientEfCoreScopeStack.Push(efCoreScope);
+        _ambientEFCoreScopeStack.Push(efCoreScope);
         return efCoreScope;
     }
 
@@ -247,10 +255,10 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// </summary>
     /// <param name="existingNPocoScope">The existing ambient NPoco scope.</param>
     /// <returns>The created bridge scope which is pushed onto the stack.</returns>
-    internal IEfCoreScope<TDbContext> CreateBridgeScope(IScope existingNPocoScope)
+    internal IEFCoreScope<TDbContext> CreateBridgeScope(IScope existingNPocoScope)
     {
         // Check if a bridge scope was already created for this scope context.
-        IEfCoreScope<TDbContext>? existing = _scopeProvider.Context!.GetEnlisted<IEfCoreScope<TDbContext>>(BridgeScopeContextKey);
+        IEFCoreScope<TDbContext>? existing = _scopeProvider.Context!.GetEnlisted<IEFCoreScope<TDbContext>>(BridgeScopeContextKey);
         if (existing is not null)
         {
             return existing;
@@ -270,10 +278,10 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
             IsBridgeScope = true,
         };
 
-        _ambientEfCoreScopeStack.Push(bridgeScope);
+        _ambientEFCoreScopeStack.Push(bridgeScope);
         bridgeScope.Complete();
 
-        _scopeProvider.Context!.Enlist<IEfCoreScope<TDbContext>>(
+        _scopeProvider.Context!.Enlist<IEFCoreScope<TDbContext>>(
             BridgeScopeContextKey,
             () => bridgeScope,
             (_, scope) => scope?.Dispose());
@@ -284,7 +292,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// <summary>
     /// Removes the current ambient scope from the stack.
     /// </summary>
-    public void PopAmbientScope() => _ambientEfCoreScopeStack.Pop();
+    public void PopAmbientScope() => _ambientEFCoreScopeStack.Pop();
 
     /// <summary>
     /// Pushes a scope context onto the ambient scope context stack.
@@ -299,7 +307,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
         }
 
         _scopeContextDepth.Value++;
-        _ambientEfCoreScopeContextStack.Push(scopeContext);
+        _ambientEFCoreScopeContextStack.Push(scopeContext);
     }
 
     /// <summary>
@@ -308,7 +316,7 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     public void PopAmbientScopeContext()
     {
         _scopeContextDepth.Value--;
-        _ambientEfCoreScopeContextStack.Pop();
+        _ambientEFCoreScopeContextStack.Pop();
     }
 
     /// <inheritdoc />
@@ -322,9 +330,9 @@ internal sealed class EFCoreScopeProvider<TDbContext> : IEFCoreScopeProvider<TDb
     /// <inheritdoc />
     void CoreEFCoreScopeProvider.AttachScope(ICoreScope other)
     {
-        if (other is not IEfCoreScope<TDbContext> efCoreScope)
+        if (other is not IEFCoreScope<TDbContext> efCoreScope)
         {
-            throw new ArgumentException($"Scope must be an IEfCoreScope<{typeof(TDbContext).Name}>.", nameof(other));
+            throw new ArgumentException($"Scope must be an IEFCoreScope<{typeof(TDbContext).Name}>.", nameof(other));
         }
 
         AttachScope(efCoreScope);

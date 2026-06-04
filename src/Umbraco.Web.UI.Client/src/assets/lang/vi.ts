@@ -438,7 +438,7 @@ export default {
 		enterFolderName: 'Nhập tên thư mục',
 		updateData: 'Chọn loại và tiêu đề',
 		noDocumentTypes:
-			'Không có loại tài liệu nào được phép để tạo nội dung ở đây. Bạn phải kích hoạt chúng trong <strong>Document Types</strong> trong phần <strong>Settings</strong>, bằng cách chỉnh sửa <strong>Allowed child node types</strong> dưới <strong>Permissions</strong>.',
+			'Không có loại tài liệu nào được phép để tạo nội dung ở đây. Bạn phải kích hoạt chúng trong <strong>Document Types</strong> trong phần <strong>Settings</strong>, bằng cách chỉnh sửa <strong>Allowed child node types</strong> dưới <strong>Structure</strong>.',
 		noDocumentTypesAtRoot:
 			'Không có loại tài liệu nào có sẵn để tạo nội dung ở đây. Bạn phải tạo chúng trong <strong>Document Types</strong> trong phần <strong>Settings</strong>.',
 		noDocumentTypesWithNoSettingsAccess:
@@ -446,9 +446,9 @@ export default {
 		noDocumentTypesEditPermissions: 'Chỉnh sửa quyền cho loại tài liệu này',
 		noDocumentTypesCreateNew: 'Tạo một loại tài liệu mới',
 		noDocumentTypesAllowedAtRoot:
-			'Không có loại tài liệu nào được phép có sẵn để tạo nội dung ở đây. Bạn phải kích hoạt chúng trong <strong>Document Types</strong> trong phần <strong>Settings</strong>, bằng cách thay đổi tùy chọn <strong>Allow as root</strong> dưới <strong>Permissions</strong>.',
+			'Không có loại tài liệu nào được phép có sẵn để tạo nội dung ở đây. Bạn phải kích hoạt chúng trong <strong>Document Types</strong> trong phần <strong>Settings</strong>, bằng cách thay đổi tùy chọn <strong>Allow as root</strong> dưới <strong>Structure</strong>.',
 		noMediaTypes:
-			'Không có loại phương tiện nào được phép có sẵn để tạo phương tiện ở đây. Bạn phải kích hoạt chúng trong <strong>Media Types</strong> trong phần <strong>Settings</strong>, bằng cách chỉnh sửa <strong>Allowed child node types</strong> dưới <strong>Permissions</strong>.',
+			'Không có loại phương tiện nào được phép có sẵn để tạo phương tiện ở đây. Bạn phải kích hoạt chúng trong <strong>Media Types</strong> trong phần <strong>Settings</strong>, bằng cách chỉnh sửa <strong>Allowed child node types</strong> dưới <strong>Structure</strong>.',
 		noMediaTypesWithNoSettingsAccess:
 			'Phương tiện được chọn trong cây không cho phép tạo bất kỳ phương tiện nào bên dưới nó.',
 		noMediaTypesEditPermissions: 'Chỉnh sửa quyền cho loại phương tiện này',
@@ -837,6 +837,7 @@ export default {
 		content: 'Nội dung',
 		continue: 'Tiếp tục',
 		copy: 'Sao chép',
+		copied: 'Đã sao chép!',
 		create: 'Tạo mới',
 		database: 'Cơ sở dữ liệu',
 		date: 'Ngày',
@@ -2010,7 +2011,7 @@ export default {
 		},
 		changePassword: 'Đổi mật khẩu',
 		changePhoto: 'Đổi ảnh',
-		configureMfa: 'Cấu hình MFA',
+		configureMfa: 'Cấu hình 2FA',
 		emailRequired: 'Bắt buộc - nhập địa chỉ email cho người dùng này',
 		emailDescription: (usernameIsEmail: boolean) => {
 			return usernameIsEmail
@@ -2290,6 +2291,8 @@ export default {
 	redirectUrls: {
 		disableUrlTracker: 'Tắt theo dõi URL',
 		enableUrlTracker: 'Bật theo dõi URL',
+		urlTrackerEnabled: 'Đã bật',
+		urlTrackerDisabled: 'Đã tắt',
 		originalUrl: 'URL gốc',
 		redirectedTo: 'Chuyển hướng đến',
 		redirectUrlManagement: 'Quản lý URL chuyển hướng',
@@ -2368,7 +2371,8 @@ export default {
 		openBackofficeSearch: 'Mở tìm kiếm backoffice',
 		openCloseBackofficeHelp: 'Mở/Đóng trợ giúp backoffice',
 		openCloseBackofficeProfileOptions: 'Mở/Đóng tùy chọn hồ sơ của bạn',
-		profileOptions: 'Tùy chọn hồ sơ',
+		profileOptions: 'Hồ sơ người dùng cho %0% (%1%)',
+		profileOptionsDefault: 'Hồ sơ người dùng',
 		assignDomainDescription: 'Thiết lập Ngôn ngữ và Tên miền cho %0%',
 		createDescription: 'Tạo nút mới dưới %0%',
 		protectDescription: 'Thiết lập hạn chế truy cập trên %0%',

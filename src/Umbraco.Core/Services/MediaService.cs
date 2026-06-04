@@ -185,8 +185,10 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="mediaTypeAlias">The alias of the media type.</param>
         /// <param name="userId">The optional id of the user creating the media.</param>
         /// <returns>The media object.</returns>
-        public IMedia CreateMedia(string? name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
+        public IMedia CreateMedia(string name, int parentId, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
+            ArgumentNullException.ThrowIfNull(name);
+
             IMediaType? mediaType = GetMediaType(mediaTypeAlias);
             if (mediaType == null)
             {
@@ -199,7 +201,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media with that id.", nameof(parentId));
             }
 
-            if (name != null && name.Length > 255)
+            if (name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
@@ -225,6 +227,8 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>The media object.</returns>
         public IMedia CreateMedia(string name, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
+            ArgumentNullException.ThrowIfNull(name);
+
             // not locking since not saving anything
 
             IMediaType? mediaType = GetMediaType(mediaTypeAlias);
@@ -233,7 +237,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias));
             }
 
-            if (name != null && name.Length > 255)
+            if (name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
@@ -260,6 +264,8 @@ namespace Umbraco.Cms.Core.Services
         /// <returns>The media object.</returns>
         public IMedia CreateMedia(string name, IMedia? parent, string mediaTypeAlias, int userId = Constants.Security.SuperUserId)
         {
+            ArgumentNullException.ThrowIfNull(name);
+
             if (parent == null)
             {
                 throw new ArgumentNullException(nameof(parent));
@@ -274,7 +280,7 @@ namespace Umbraco.Cms.Core.Services
                 throw new ArgumentException("No media type with that alias.", nameof(mediaTypeAlias)); // causes rollback
             }
 
-            if (name != null && name.Length > 255)
+            if (name.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
             }
@@ -1169,7 +1175,7 @@ namespace Umbraco.Cms.Core.Services
             //media.Path = (parent == null ? "-1" : parent.Path) + "," + media.Id;
             //media.SortOrder = ((MediaRepository) repository).NextChildSortOrder(parentId);
             //media.Level += levelDelta;
-            PerformMoveMediaLocked(media, trash);
+            PerformMoveMediaLocked(media, userId, trash);
 
             // if uow is not immediate, content.Path will be updated only when the UOW commits,
             // and because we want it now, we have to calculate it by ourselves
@@ -1191,7 +1197,7 @@ namespace Umbraco.Cms.Core.Services
                     // update path and level since we do not update parentId
                     descendant.Path = paths[descendant.Id] = paths[descendant.ParentId] + "," + descendant.Id;
                     descendant.Level += levelDelta;
-                    PerformMoveMediaLocked(descendant, trash);
+                    PerformMoveMediaLocked(descendant, userId, trash);
                 }
 
             }
@@ -1202,16 +1208,21 @@ namespace Umbraco.Cms.Core.Services
         ///     Performs the actual save of a media item during a move operation while holding a write lock.
         /// </summary>
         /// <param name="media">The media item to save.</param>
+        /// <param name="userId">The identifier of the user performing the move.</param>
         /// <param name="trash">
         ///     If <c>true</c>, marks the item as trashed; if <c>false</c>, marks the item as not trashed;
         ///     if <c>null</c>, leaves the trashed status unchanged.
         /// </param>
-        private void PerformMoveMediaLocked(IMedia media, bool? trash)
+        private void PerformMoveMediaLocked(IMedia media, int userId, bool? trash)
         {
             if (trash.HasValue)
             {
                 ((ContentBase)media).Trashed = trash.Value;
             }
+
+            // Track who moved/trashed the item so the audit trail (and any consumer of WriterId)
+            // reflects the acting user, not the original creator. Mirrors PerformMoveContentLocked.
+            media.WriterId = userId;
 
             _mediaRepository.Save(media);
         }

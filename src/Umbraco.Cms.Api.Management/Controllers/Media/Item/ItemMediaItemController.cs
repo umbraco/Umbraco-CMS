@@ -17,7 +17,6 @@ namespace Umbraco.Cms.Api.Management.Controllers.Media.Item;
 public class ItemMediaItemController : MediaItemControllerBase
 {
     private readonly IEntityService _entityService;
-    private readonly IMediaPresentationFactory _mediaPresentationFactory;
     private readonly FlagProviderCollection _flagProviders;
 
     /// <summary>
@@ -30,9 +29,9 @@ public class ItemMediaItemController : MediaItemControllerBase
         IEntityService entityService,
         IMediaPresentationFactory mediaPresentationFactory,
         FlagProviderCollection flagProviders)
+        : base(mediaPresentationFactory)
     {
         _entityService = entityService;
-        _mediaPresentationFactory = mediaPresentationFactory;
         _flagProviders = flagProviders;
     }
 
@@ -50,11 +49,9 @@ public class ItemMediaItemController : MediaItemControllerBase
             return Ok(Enumerable.Empty<MediaItemResponseModel>());
         }
 
-        IEnumerable<IMediaEntitySlim> media = _entityService
-            .GetAll(UmbracoObjectTypes.Media, ids.ToArray())
-            .OfType<IMediaEntitySlim>();
+        IEnumerable<IEntitySlim> media = _entityService.GetAll(UmbracoObjectTypes.Media, ids.ToArray());
 
-        IEnumerable<MediaItemResponseModel> responseModels = media.Select(_mediaPresentationFactory.CreateItemResponseModel);
+        IEnumerable<MediaItemResponseModel> responseModels = await MapMediaItemsAsync(media);
         await PopulateFlags(responseModels);
 
         return Ok(responseModels);

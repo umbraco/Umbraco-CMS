@@ -1,4 +1,5 @@
 import { UMB_ELEMENT_ENTITY_TYPE, UMB_ELEMENT_FOLDER_ENTITY_TYPE } from '../../entity.js';
+import { UmbElementVariantState } from '../../variant-state.js';
 import { UMB_ELEMENT_RECYCLE_BIN_ROOT_ENTITY_TYPE } from '../constants.js';
 import type { UmbElementRecycleBinTreeItemModel } from '../types.js';
 import type { UmbElementTreeItemVariantModel } from '../../tree/types.js';
@@ -11,6 +12,7 @@ import type {
 	UmbTreeChildrenOfRequestArgs,
 	UmbTreeRootItemsRequestArgs,
 } from '@umbraco-cms/backoffice/tree';
+import type { UmbOffsetPaginationRequestModel } from '@umbraco-cms/backoffice/utils';
 
 /**
  * A data source for the Element Recycle Bin tree that fetches data from the server
@@ -36,18 +38,25 @@ export class UmbElementRecycleBinTreeServerDataSource extends UmbTreeServerDataS
 	}
 }
 
-const getRootItems = (args: UmbTreeRootItemsRequestArgs) =>
+const getRootItems = async (args: UmbTreeRootItemsRequestArgs) => {
+	const { skip = 0, take = 100 } = (args.paging ?? {}) as UmbOffsetPaginationRequestModel;
 	// eslint-disable-next-line local-rules/no-direct-api-import
-	ElementService.getRecycleBinElementRoot({ query: { skip: args.skip, take: args.take } });
+	const { data, ...rest } = await ElementService.getRecycleBinElementRoot({
+		query: { skip, take },
+	});
+	return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
+};
 
-const getChildrenOf = (args: UmbTreeChildrenOfRequestArgs) => {
+const getChildrenOf = async (args: UmbTreeChildrenOfRequestArgs) => {
 	if (args.parent.unique === null) {
 		return getRootItems(args);
 	} else {
+		const { skip = 0, take = 100 } = (args.paging ?? {}) as UmbOffsetPaginationRequestModel;
 		// eslint-disable-next-line local-rules/no-direct-api-import
-		return ElementService.getRecycleBinElementChildren({
-			query: { parentId: args.parent.unique, skip: args.skip, take: args.take },
+		const { data, ...rest } = await ElementService.getRecycleBinElementChildren({
+			query: { parentId: args.parent.unique, skip, take },
 		});
+		return { data: { ...data, totalBefore: skip, totalAfter: Math.max(data.total - skip - data.items.length, 0) }, ...rest };
 	}
 };
 
@@ -57,7 +66,6 @@ const getAncestorsOf = (args: UmbTreeAncestorsOfRequestArgs) =>
 		query: { descendantId: args.treeItem.unique },
 	});
 
-// TODO: Review the commented out properties. [LK:2026-01-06]
 const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinTreeItemModel => {
 	return {
 		unique: item.id,
@@ -72,22 +80,24 @@ const mapper = (item: ElementRecycleBinItemResponseModel): UmbElementRecycleBinT
 		entityType: item.isFolder ? UMB_ELEMENT_FOLDER_ENTITY_TYPE : UMB_ELEMENT_ENTITY_TYPE,
 		icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
 		isTrashed: true,
+		noAccess: false,
 		hasChildren: item.hasChildren,
-		//isProtected: false,
 		documentType: {
 			unique: item.documentType?.id ?? '',
 			icon: item.isFolder ? 'icon-folder' : (item.documentType?.icon ?? 'icon-document'),
 			collection: null,
 		},
-		variants: item.variants.map((variant): UmbElementTreeItemVariantModel => {
-			return {
-				name: variant.name,
-				culture: variant.culture || null,
-				segment: null, // TODO: add segment to the backend API?
-				state: variant.state,
-				//flags: variant.flags ?? [],
-			};
-		}),
+		variants: item.isFolder
+			? [{ name: item.name, culture: null, segment: null, state: UmbElementVariantState.PUBLISHED, flags: [] }]
+			: item.variants.map((variant): UmbElementTreeItemVariantModel => {
+					return {
+						name: variant.name,
+						culture: variant.culture || null,
+						segment: null, // TODO: add segment to the backend API?
+						state: variant.state,
+						flags: variant.flags,
+					};
+				}),
 		// TODO: this is not correct. We need to get it from the variants. This is a temp solution. [LK]
 		name: item.isFolder ? item.name : item.variants[0]?.name,
 		isFolder: item.isFolder,
