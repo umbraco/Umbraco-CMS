@@ -270,6 +270,54 @@ Sql<ISqlContext> sql = Sql()
     .Where<ContentDto>(x => x.NodeId == id);
 ```
 
+**EF Core LINQ — always use fluent (method) syntax, never query syntax:**
+```csharp
+// CORRECT — fluent syntax
+var results = await db.Nodes
+    .Join(db.Content, node => node.NodeId, content => content.NodeId, (node, content) => new { node, content })
+    .Where(joined => joined.node.NodeObjectType == objectTypeKey)
+    .ToListAsync();
+
+// WRONG — query syntax is banned in this codebase
+var results = await (
+    from node in db.Nodes
+    join content in db.Content on node.NodeId equals content.NodeId
+    where node.NodeObjectType == objectTypeKey
+    select new { node, content }).ToListAsync();
+```
+
+LEFT JOINs use `GroupJoin` + `SelectMany` with `DefaultIfEmpty()`:
+```csharp
+.GroupJoin(inner, outer => outer.Id, inner => inner.OuterId, (outer, innerGroup) => new { outer, innerGroup })
+.SelectMany(joined => joined.innerGroup.DefaultIfEmpty(), (joined, inner) => new { joined.outer, inner })
+```
+
+**EF Core LINQ — avoid `Contains` on arrays; use `List<T>` to prevent C# 14 span overload resolution issues:**
+```csharp
+// CORRECT — List<T> has no implicit span conversion; EF Core translates to SQL IN
+List<int> ids = batch.ToList();
+await db.FooEntities.Where(entity => ids.Contains(entity.Id)).ToListAsync();
+
+// CORRECT — string path matching uses EF.Functions.Like, not string.Contains
+await db.Nodes.Where(node => EF.Functions.Like(node.Path, $"%{segment}%")).ToListAsync();
+
+// WRONG — int[]/Guid[] are implicitly ReadOnlySpan<T>; C# 14 may pick the span overload,
+// which EF Core cannot translate to SQL and will throw at runtime
+int[] ids = batch.ToArray();
+await db.FooEntities.Where(entity => ids.Contains(entity.Id)).ToListAsync();
+```
+
+**EF Core LINQ — use descriptive lambda parameter names, not single letters:**
+```csharp
+// CORRECT
+db.Nodes.Where(node => node.NodeObjectType == key)
+db.Content.Join(db.ContentTypes, content => content.ContentTypeId, contentType => contentType.NodeId, ...)
+
+// WRONG
+db.Nodes.Where(n => n.NodeObjectType == key)
+db.Content.Join(db.ContentTypes, c => c.ContentTypeId, ct => ct.NodeId, ...)
+```
+
 ---
 
 ## 4. Test Bench
