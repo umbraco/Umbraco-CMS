@@ -1,14 +1,22 @@
 import { UMB_DUPLICATE_TO_MODAL } from './modal/duplicate-to-modal.token.js';
 import type { MetaEntityActionDuplicateToKind, UmbDuplicateToRepository } from './types.js';
+import type { UmbTreeRepository } from '../../data/tree-repository.interface.js';
 import { UmbEntityActionBase, UmbRequestReloadStructureForEntityEvent } from '@umbraco-cms/backoffice/entity-action';
 import { umbOpenModal } from '@umbraco-cms/backoffice/modal';
 import { createExtensionApiByAlias } from '@umbraco-cms/backoffice/extension-registry';
 import { UMB_ACTION_EVENT_CONTEXT } from '@umbraco-cms/backoffice/action';
+import { linkEntityExpansionEntries } from '@umbraco-cms/backoffice/utils';
 
 export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityActionDuplicateToKind> {
 	override async execute() {
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
+
+		const treeRepository = await createExtensionApiByAlias<UmbTreeRepository>(this, this.args.meta.treeRepositoryAlias);
+		const { data: ancestors } =
+			(await treeRepository?.requestTreeItemAncestors({
+				treeItem: { unique: this.args.unique, entityType: this.args.entityType },
+			})) ?? {};
 
 		const value = await umbOpenModal(this, UMB_DUPLICATE_TO_MODAL, {
 			data: {
@@ -16,6 +24,7 @@ export class UmbDuplicateToEntityAction extends UmbEntityActionBase<MetaEntityAc
 				entityType: this.args.entityType,
 				treeAlias: this.args.meta.treeAlias,
 				foldersOnly: this.args.meta.foldersOnly,
+				expansion: ancestors ? linkEntityExpansionEntries(ancestors) : [],
 			},
 		});
 

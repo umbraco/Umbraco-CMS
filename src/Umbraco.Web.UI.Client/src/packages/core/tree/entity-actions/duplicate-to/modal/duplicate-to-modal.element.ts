@@ -4,12 +4,24 @@ import { html, customElement, nothing, state } from '@umbraco-cms/backoffice/ext
 import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UmbModalBaseElement } from '@umbraco-cms/backoffice/modal';
 import type { UmbSelectionChangeEvent } from '@umbraco-cms/backoffice/event';
+import type { UmbEntityExpansionModel } from '@umbraco-cms/backoffice/utils';
+import type { PropertyValueMap } from '@umbraco-cms/backoffice/external/lit';
 
 const elementName = 'umb-duplicate-to-modal';
 @customElement(elementName)
 export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicateToModalData, UmbDuplicateToModalValue> {
 	@state()
 	private _destinationUnique?: string | null;
+
+	@state()
+	private _treeExpansion: UmbEntityExpansionModel = [];
+
+	protected override updated(_changedProperties: PropertyValueMap<unknown> | Map<PropertyKey, unknown>) {
+		super.updated(_changedProperties);
+		if (_changedProperties.has('data')) {
+			this._treeExpansion = this.data?.expansion ?? [];
+		}
+	}
 
 	#onTreeSelectionChange(event: UmbSelectionChangeEvent) {
 		const target = event.target as UmbTreeElement;
@@ -32,6 +44,7 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 						.props=${{
 							foldersOnly: this.data?.foldersOnly,
 							expandTreeRoot: true,
+							expansion: this._treeExpansion,
 						}}
 						@selection-change=${this.#onTreeSelectionChange}></umb-tree>
 				</uui-box>
@@ -43,7 +56,10 @@ export class UmbDuplicateToModalElement extends UmbModalBaseElement<UmbDuplicate
 
 	#renderActions() {
 		return html`
-			<uui-button slot="actions" label=${this.localize.term('general_cancel')} @click="${this._rejectModal}"></uui-button>
+			<uui-button
+				slot="actions"
+				label=${this.localize.term('general_cancel')}
+				@click="${this._rejectModal}"></uui-button>
 			<uui-button
 				slot="actions"
 				color="positive"
