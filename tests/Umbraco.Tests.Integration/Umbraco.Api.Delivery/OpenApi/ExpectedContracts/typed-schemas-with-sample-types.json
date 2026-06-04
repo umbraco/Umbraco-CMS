@@ -273,7 +273,7 @@
         },
         "security": [
           {
-            "ApiKeyAuth": []
+            "ApiKeyAuth": [ ]
           }
         ]
       }
@@ -413,7 +413,7 @@
         },
         "security": [
           {
-            "ApiKeyAuth": []
+            "ApiKeyAuth": [ ]
           }
         ]
       }
@@ -553,7 +553,7 @@
         },
         "security": [
           {
-            "ApiKeyAuth": []
+            "ApiKeyAuth": [ ]
           }
         ]
       }
@@ -695,7 +695,7 @@
         },
         "security": [
           {
-            "ApiKeyAuth": []
+            "ApiKeyAuth": [ ]
           }
         ]
       }
@@ -888,7 +888,7 @@
         },
         "security": [
           {
-            "ApiKeyAuth": []
+            "ApiKeyAuth": [ ]
           }
         ]
       }
@@ -974,7 +974,7 @@
         },
         "security": [
           {
-            "ApiKeyAuth": []
+            "ApiKeyAuth": [ ]
           }
         ]
       }
@@ -1059,7 +1059,7 @@
         },
         "security": [
           {
-            "ApiKeyAuth": []
+            "ApiKeyAuth": [ ]
           }
         ]
       }
@@ -1147,7 +1147,7 @@
         },
         "security": [
           {
-            "ApiKeyAuth": []
+            "ApiKeyAuth": [ ]
           }
         ]
       }
@@ -1279,7 +1279,7 @@
               }
             ]
           },
-          "plainJson": {}
+          "plainJson": { }
         }
       },
       "ArticlePageContentResponseModel": {
@@ -2734,7 +2734,7 @@
   },
   "security": [
     {
-      "ApiKeyAuth": []
+      "ApiKeyAuth": [ ]
     }
   ],
   "tags": [
