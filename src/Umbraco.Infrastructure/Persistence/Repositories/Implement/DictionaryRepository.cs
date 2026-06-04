@@ -189,7 +189,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
 
                 return dtos
                     .Select(dto => ConvertFromDto(dto, languagesById))
-                    .OrderBy(x => x.PrimaryKey)
+                    .OrderBy(x => x.ItemKey)
                     .ToList();
             });
         }
@@ -289,7 +289,7 @@ internal sealed class DictionaryRepository : AsyncEntityRepositoryBase<Guid, IDi
             List<DictionaryDto> dtos = await db.DictionaryEntries
                 .Include(x => x.LanguageText)
                 .Where(x => keys.Contains(x.UniqueId))
-                .OrderBy(x => x.PrimaryKey)
+                .OrderBy(x => x.UniqueId)
                 .ToListAsync();
 
             return dtos

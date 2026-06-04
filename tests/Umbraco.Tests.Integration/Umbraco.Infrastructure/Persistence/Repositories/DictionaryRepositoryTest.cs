@@ -629,7 +629,7 @@ internal sealed class DictionaryRepositoryTest : UmbracoIntegrationTest
         {
             var repository = CreateRepository();
 
-            var results = repository.GetDictionaryItemDescendants(null).ToArray();
+            var results = (await repository.GetDictionaryItemDescendantsAsync(null)).ToArray();
 
             // 2 items from CreateTestData ("Read More", "Article") + the 5 items added above.
             var expectedKeys = new[] { "Read More", "Article" }.Concat(additionalKeys).OrderBy(x => x).ToArray();
