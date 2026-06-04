@@ -54,7 +54,8 @@ export class UmbDuplicateDocumentEntityAction extends UmbEntityActionBase<never>
 		const { data } = await treeRepository.requestTreeItemAncestors({
 			treeItem: { unique: this.args.unique!, entityType: this.args.entityType! },
 		});
-		return data;
+		// Exclude self — the API returns the descendant as part of the ancestors list, but we only want to expand its parents.
+		return data?.filter((item) => item.unique !== this.args.unique);
 	}
 
 	async #getSelectableFilterByDocumentUnique(documentUnique: string) {
