@@ -170,6 +170,11 @@ internal abstract class OpenApiContractTestBase : OpenApiTestBase
         // discriminator mapping refs that match the registered schema names.
         var polymorphicDataType = await CreatePolymorphicTestDataTypeAsync();
 
+        // Create a Plain JSON data type. JsonValueConverter handles all JSON-type property editors
+        // and returns typeof(JsonNode) as the Delivery API model type. This verifies that the schema
+        // generator produces an inline {} schema rather than a named JsonNode component (#23034).
+        var plainJsonDataType = await CreatePlainJsonDataTypeAsync();
+
         // Create a composition type that exposes shared SEO metadata properties
         var seoMetadataComposition = new ContentTypeBuilder()
             .WithAlias("seoMetadata")
@@ -222,6 +227,11 @@ internal abstract class OpenApiContractTestBase : OpenApiTestBase
                     .WithAlias("polymorphicTest")
                     .WithName("Polymorphic Test")
                     .WithDataTypeId(polymorphicDataType.Id)
+                    .Done()
+                .AddPropertyType()
+                    .WithAlias("plainJson")
+                    .WithName("Plain JSON")
+                    .WithDataTypeId(plainJsonDataType.Id)
                     .Done()
                 .Done()
             .Build();
@@ -335,6 +345,24 @@ internal abstract class OpenApiContractTestBase : OpenApiTestBase
         var dataType = new DataType(editor, ConfigurationEditorJsonSerializer)
         {
             Name = "Polymorphic Test",
+            DatabaseType = ValueStorageType.Ntext,
+            ParentId = Constants.System.Root,
+            CreateDate = DateTime.UtcNow,
+        };
+
+        await DataTypeService.CreateAsync(dataType, Constants.Security.SuperUserKey);
+        return dataType;
+    }
+
+    private async Task<IDataType> CreatePlainJsonDataTypeAsync()
+    {
+        var editor = PropertyEditorCollection[Constants.PropertyEditors.Aliases.PlainJson]
+                     ?? throw new InvalidOperationException(
+                         $"Property editor '{Constants.PropertyEditors.Aliases.PlainJson}' was not registered.");
+
+        var dataType = new DataType(editor, ConfigurationEditorJsonSerializer)
+        {
+            Name = "Plain JSON",
             DatabaseType = ValueStorageType.Ntext,
             ParentId = Constants.System.Root,
             CreateDate = DateTime.UtcNow,
