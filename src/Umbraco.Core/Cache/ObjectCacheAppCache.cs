@@ -368,8 +368,17 @@ public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
         }
 
         // Ensure key is removed from set when evicted from cache
-        return options.RegisterPostEvictionCallback((key, _, _, _) =>
+        return options.RegisterPostEvictionCallback((key, _, reason, _) =>
         {
+            // Removed and Replaced evictions are already handled synchronously under the write lock by
+            // Clear/ClearByPredicate/Insert (and a replaced key still has a live entry). Acting on them
+            // here runs on a background thread and races with a re-add, which can drop a key that is still
+            // cached from the tracking set. (#23064)
+            if (reason is EvictionReason.Removed or EvictionReason.Replaced)
+            {
+                return;
+            }
+
             try
             {
                 if (_locker.TryEnterWriteLock(_writeLockTimeout) is false)
