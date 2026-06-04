@@ -18,7 +18,10 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 		if (!this.args.unique) throw new Error('Unique is not available');
 		if (!this.args.entityType) throw new Error('Entity Type is not available');
 
-		const ancestors = await this.#requestAncestors();
+		const [ancestors, pickableFilter] = await Promise.all([
+			this.#requestAncestors(),
+			this._getPickableFilter(this.args.unique),
+		]);
 
 		const value = await umbOpenModal(this, UMB_TREE_PICKER_MODAL, {
 			data: {
@@ -26,7 +29,7 @@ export class UmbMoveToEntityAction extends UmbEntityActionBase<MetaEntityActionM
 				foldersOnly: this.args.meta.foldersOnly,
 				expandTreeRoot: true,
 				treeExpansion: ancestors.length ? linkEntityExpansionEntries(ancestors) : undefined,
-				pickableFilter: await this._getPickableFilter(this.args.unique),
+				pickableFilter,
 			},
 		});
 
