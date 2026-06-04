@@ -137,7 +137,19 @@ internal sealed class ContentTypeRepository : AsyncEntityRepositoryBase<Guid, IC
     // ----------------------------------------------------------------------------------------------------
 
     private IEnumerable<IContentType> GetAllCached()
-        => GetAllAsync(CancellationToken.None).GetAwaiter().GetResult();
+    {
+        EnsureAmbientScopeOnCallerContext();
+        return GetAllAsync(CancellationToken.None).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Touches the ambient EF Core scope on the synchronous caller's execution context before entering an
+    /// async member. AsyncLocal changes made inside an async method are invisible to its synchronous caller,
+    /// so if the NPoco bridge scope were first created inside the async flow, the ambient scope stack
+    /// bookkeeping would diverge from the bridge's scope-context cleanup, leaving a stale (disposed) scope
+    /// ambient for subsequent operations.
+    /// </summary>
+    private void EnsureAmbientScopeOnCallerContext() => _ = AmbientScope;
 
     /// <inheritdoc />
     public IContentType? Get(int id)
@@ -175,11 +187,17 @@ internal sealed class ContentTypeRepository : AsyncEntityRepositoryBase<Guid, IC
 
     /// <inheritdoc />
     public void Save(IContentType entity)
-        => SaveAsync(entity, CancellationToken.None).GetAwaiter().GetResult();
+    {
+        EnsureAmbientScopeOnCallerContext();
+        SaveAsync(entity, CancellationToken.None).GetAwaiter().GetResult();
+    }
 
     /// <inheritdoc />
     public void Delete(IContentType entity)
-        => DeleteAsync(entity, CancellationToken.None).GetAwaiter().GetResult();
+    {
+        EnsureAmbientScopeOnCallerContext();
+        DeleteAsync(entity, CancellationToken.None).GetAwaiter().GetResult();
+    }
 
     /// <inheritdoc />
     public IEnumerable<IContentType> Get(IQuery<IContentType> query)
