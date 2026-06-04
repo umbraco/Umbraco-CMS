@@ -465,6 +465,22 @@ public static class DistributedCacheExtensions
             UnpublishedCultures = x.UnpublishedCultures?.ToArray(),
         }));
 
+    /// <summary>
+    ///     Invalidates the element cache for the specified deleted element containers (folders).
+    /// </summary>
+    /// <param name="dc">The distributed cache.</param>
+    /// <param name="deletedContainers">The element containers that were deleted.</param>
+    /// <remarks>
+    ///     A deleted container's node id is never reused, so its key→id mapping in
+    ///     <see cref="Umbraco.Cms.Core.Services.IIdKeyMap"/> must be evicted on every server. Otherwise a
+    ///     container recreated under the same key resolves to
+    ///     the stale id and the element tree's children query returns nothing until the next app restart.
+    /// </remarks>
+    public static void RefreshElementCache(this DistributedCache dc, IEnumerable<EntityContainer> deletedContainers)
+        => dc.RefreshByPayload(
+            ElementCacheRefresher.UniqueId,
+            deletedContainers.Select(container => new ElementCacheRefresher.JsonPayload(container.Id, container.Key, TreeChangeTypes.Remove)));
+
     #endregion
 
     #region Published Snapshot
