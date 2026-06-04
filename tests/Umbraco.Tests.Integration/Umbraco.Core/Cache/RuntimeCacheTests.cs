@@ -154,36 +154,31 @@ internal sealed class RuntimeCacheTests : UmbracoIntegrationTest
     public void ClearByKey_Clears_Entry_After_Value_Is_Replaced()
     {
         RuntimeCache.Insert("key", () => "first", _timeout);
+        RuntimeCache.Insert("key", () => "second", _timeout); // replace
 
-        // Replacing a cached value evicts the previous entry on a background thread. Once that eviction
-        // has been processed, ClearByKey must still find and clear the current entry. Regression test for
-        // #23064, where the background eviction removed the re-added key from the cache's key-tracking set.
-        RuntimeCache.Insert("key", () => "second", _timeout);
+        // Replacing evicts the previous entry on a background thread; wait for that callback to run.
+        WaitForReplacedEntryEviction("key");
 
-        WaitForKeyTrackingDesync("key");
+        // #23064: the eviction must not drop the re-added key from the tracking set, so key-based search
+        // still finds the current entry...
+        Assert.That(RuntimeCache.SearchByKey("key"), Is.EquivalentTo(new[] { "second" }));
 
+        // ...and ClearByKey can therefore still clear it.
         RuntimeCache.ClearByKey("key");
-
         Assert.That(RuntimeCache.Get("key"), Is.Null);
     }
 
     /// <summary>
-    /// Waits until the background post-eviction callback has had the chance to run. Before the fix this
-    /// leaves the cache in a desynced state (the value is still cached but key-based search no longer
-    /// finds it); after the fix the condition never becomes true and the wait simply elapses, with the
-    /// calling test's assertions validating the corrected behaviour.
+    /// Waits until the background post-eviction callback for the replaced entry has had the chance to run.
+    /// Before the fix that callback removes the re-added key from the tracking set, observable as a desync
+    /// (the value is still cached but key-based search no longer finds it) which returns early. After the
+    /// fix no desync occurs and the bounded wait simply elapses.
     /// </summary>
-    private void WaitForKeyTrackingDesync(string key)
+    private void WaitForReplacedEntryEviction(string key)
     {
         var stopwatch = Stopwatch.StartNew();
-        while (stopwatch.Elapsed < TimeSpan.FromMilliseconds(500))
+        while (stopwatch.Elapsed < TimeSpan.FromSeconds(2) && RuntimeCache.SearchByKey(key).Any())
         {
-            var desynced = RuntimeCache.Get(key) is not null && RuntimeCache.SearchByKey(key).Any() is false;
-            if (desynced)
-            {
-                return;
-            }
-
             Thread.Sleep(25);
         }
     }

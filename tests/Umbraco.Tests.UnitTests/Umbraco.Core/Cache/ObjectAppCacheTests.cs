@@ -34,11 +34,11 @@ public class ObjectAppCacheTests : RuntimeAppCacheTests
         _provider.Insert("key", () => "first", timeout);
         _provider.Insert("key", () => "second", timeout);
 
-        // Give the background eviction callback for the replaced entry time to run.
+        // The replaced entry is evicted on a background thread. On a build with the bug that eviction
+        // removes the key from the tracking set - a sticky desync we can detect. On a fixed build nothing
+        // changes and the bounded wait simply elapses.
         var stopwatch = Stopwatch.StartNew();
-        while (stopwatch.Elapsed < TimeSpan.FromMilliseconds(500)
-               && _provider.Get("key") is not null
-               && _provider.SearchByKey("key").Any())
+        while (stopwatch.Elapsed < TimeSpan.FromSeconds(2) && _provider.SearchByKey("key").Any())
         {
             Thread.Sleep(25);
         }
