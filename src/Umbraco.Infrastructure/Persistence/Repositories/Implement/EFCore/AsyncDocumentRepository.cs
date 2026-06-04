@@ -203,32 +203,54 @@ internal sealed class AsyncDocumentRepository
             // Published version pairs: ContentVersion + DocumentVersion where Published = true.
             // Used as the inner side of the LEFT JOIN below so the published version is fetched
             // in the same round-trip as the current version (mirrors NPoco's nested LEFT JOIN in GetBaseQuery).
-            var publishedSubquery =
-                from pcv in db.ContentVersions
-                join pdv in db.DocumentVersions.Where(x => x.Published) on pcv.Id equals pdv.Id
-                select new { pcv, pdv };
+            var publishedSubquery = db.ContentVersions
+                .Join(
+                    db.DocumentVersions.Where(documentVersion => documentVersion.Published),
+                    contentVersion => contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (contentVersion, documentVersion) => new { contentVersion, documentVersion });
 
             // Single round-trip: current version rows with the published version LEFT JOINed inline.
             // publishedContentVersion / publishedDocumentVersion are null for unpublished documents.
-            var rows = await (
-                from node in nodeQuery
-                join document in db.Documents on node.NodeId equals document.NodeId
-                join content in db.Content on node.NodeId equals content.NodeId
-                join contentVersion in db.ContentVersions.Where(x => x.Current) on node.NodeId equals contentVersion.NodeId
-                join documentVersion in db.DocumentVersions on contentVersion.Id equals documentVersion.Id
-                join pub in publishedSubquery on node.NodeId equals pub.pcv.NodeId into pubGroup
-                from pub in pubGroup.DefaultIfEmpty()
-                select new
-                {
-                    node,
-                    document,
-                    content,
-                    contentVersion,
-                    documentVersion,
-                    publishedContentVersion = pub.pcv,
-                    publishedDocumentVersion = pub.pdv,
-                })
-            .ToListAsync();
+            var rows = await nodeQuery
+                .Join(
+                    db.Documents,
+                    node => node.NodeId,
+                    document => document.NodeId,
+                    (node, document) => new { node, document })
+                .Join(
+                    db.Content,
+                    joined => joined.node.NodeId,
+                    content => content.NodeId,
+                    (joined, content) => new { joined.node, joined.document, content })
+                .Join(
+                    db.ContentVersions.Where(contentVersion => contentVersion.Current),
+                    joined => joined.node.NodeId,
+                    contentVersion => contentVersion.NodeId,
+                    (joined, contentVersion) => new { joined.node, joined.document, joined.content, contentVersion })
+                .Join(
+                    db.DocumentVersions,
+                    joined => joined.contentVersion.Id,
+                    documentVersion => documentVersion.Id,
+                    (joined, documentVersion) => new { joined.node, joined.document, joined.content, joined.contentVersion, documentVersion })
+                .GroupJoin(
+                    publishedSubquery,
+                    joined => joined.node.NodeId,
+                    pub => pub.contentVersion.NodeId,
+                    (joined, pubGroup) => new { joined.node, joined.document, joined.content, joined.contentVersion, joined.documentVersion, pubGroup })
+                .SelectMany(
+                    joined => joined.pubGroup.DefaultIfEmpty(),
+                    (joined, pub) => new
+                    {
+                        joined.node,
+                        joined.document,
+                        joined.content,
+                        joined.contentVersion,
+                        joined.documentVersion,
+                        publishedContentVersion = pub!.contentVersion,
+                        publishedDocumentVersion = pub!.documentVersion,
+                    })
+                .ToListAsync();
 
             if (rows.Count == 0)
             {
