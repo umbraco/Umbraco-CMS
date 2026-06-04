@@ -220,7 +220,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
             string pathMatch = parentNodeId == -1 ? "-1," : $",{parentNodeId},";
 
             return await db.Nodes
-                .Where(node => node.NodeObjectType == NodeObjectTypeKey && node.Path.Contains(pathMatch))
+                .Where(node => node.NodeObjectType == NodeObjectTypeKey && EF.Functions.Like(node.Path, $"%{pathMatch}%"))
                 .CountAsync(cancellationToken);
         });
 
@@ -233,7 +233,7 @@ internal abstract class AsyncContentRepositoryBase<TEntity, TRepository>
             string pathMatch = parentNodeId == -1 ? "-1," : $",{parentNodeId},";
 
             return await NodesFilteredByContentTypeAlias(db, contentTypeAlias)
-                .Where(node => node.Path.Contains(pathMatch))
+                .Where(node => EF.Functions.Like(node.Path, $"%{pathMatch}%"))
                 .CountAsync(cancellationToken);
         });
 
