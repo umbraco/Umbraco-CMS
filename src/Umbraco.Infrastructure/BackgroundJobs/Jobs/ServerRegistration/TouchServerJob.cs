@@ -84,8 +84,19 @@ public class TouchServerJob : RecurringBackgroundJobBase
         var serverAddress = _hostingEnvironment.ApplicationMainUrl?.ToString();
         if (string.IsNullOrWhiteSpace(serverAddress))
         {
-            _logger.LogWarning("No umbracoApplicationUrl for service (yet), skip.");
-            return Task.CompletedTask;
+            // No application URL is known yet: either detection is off (WebRouting:ApplicationUrlDetection is
+            // None with no UmbracoApplicationUrl set), or detection is on but no request has been served yet.
+            // Register with the machine name as a placeholder so server-role election can still proceed (uniqueness
+            // comes from the server identity, not this address). If a URL is later detected from a request, the next
+            // touch overwrites the placeholder.
+            serverAddress = Environment.MachineName;
+            _logger.LogDebug(
+                "No application URL available; registering server with placeholder address {ServerAddress}.",
+                serverAddress);
+        }
+        else
+        {
+            _logger.LogDebug("Registering server with application URL {ServerAddress}.", serverAddress);
         }
 
         try
